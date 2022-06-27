@@ -1908,7 +1908,7 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 	dsname->uuid = vmware_shared_strdup(src->uuid);
 
 	VMWARE_VECTOR_CREATE(&dsname->hvdisks, vmware_hvdisk);
-	zbx_vector_vmware_hvdisk_reserve(&dsname->hvdisks, src->hvdisks.values_num);
+	zbx_vector_vmware_hvdisk_reserve(&dsname->hvdisks, (size_t)src->hvdisks.values_num);
 
 	for (i = 0; i < src->hvdisks.values_num; i++)
 	{
@@ -2887,7 +2887,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_COUNTERINFO(), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_COUNTERINFO(), xpathCtx)))
 	{
 		*error = zbx_strdup(*error, "Cannot make performance counter list parsing query.");
 		goto clean;
@@ -3044,7 +3044,7 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 
 	xpathCtx = xmlXPathNewContext(details);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_HARDWARE("device")
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_VM_HARDWARE("device")
 			"[*[local-name()='macAddress']]", xpathCtx)))
 	{
 		goto clean;
@@ -3101,7 +3101,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 	xpathCtx = xmlXPathNewContext(details);
 
 	/* select all hardware devices of VirtualDisk type */
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_HARDWARE("device")
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_VM_HARDWARE("device")
 			"[string(@*[local-name()='type'])='VirtualDisk']", xpathCtx)))
 	{
 		goto clean;
@@ -3139,7 +3139,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 			xpath = zbx_dsprintf(xpath, ZBX_XPATH_VM_HARDWARE("device")
 					"[*[local-name()='key']/text()='%s']", controllerKey);
 
-			if (NULL == (xpathObjController = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
+			if (NULL == (xpathObjController = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
 				break;
 
 			if (0 != xmlXPathNodeSetIsEmpty(xpathObjController->nodesetval))
@@ -3229,7 +3229,7 @@ static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, xmlDoc *details)
 
 	xpathCtx = xmlXPathNewContext(details);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_GUESTDISKS(), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_VM_GUESTDISKS(), xpathCtx)))
 		goto clean;
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
@@ -3292,7 +3292,7 @@ static void	vmware_vm_get_custom_attrs(zbx_vmware_vm_t *vm, xmlDoc *details)
 
 	xpathCtx = xmlXPathNewContext(details);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_CUSTOM_FIELD_VALUES(), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_VM_CUSTOM_FIELD_VALUES(), xpathCtx)))
 		goto clean;
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
@@ -3950,7 +3950,7 @@ static int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmw
 
 	xpathCtx->node = node;
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XNN("AlarmState"), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XNN("AlarmState"), xpathCtx)))
 		goto clean;
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
@@ -4196,7 +4196,7 @@ static int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_di
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *) ZBX_XPATH_DS_INFO_EXTENT(), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *) ZBX_XPATH_DS_INFO_EXTENT(), xpathCtx)))
 		goto out;
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
@@ -5094,7 +5094,7 @@ static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_
 
 	xpathCtx = xmlXPathNewContext(details);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_HV_PNICS(), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_HV_PNICS(), xpathCtx)))
 		goto clean;
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
@@ -5224,7 +5224,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		goto out;
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
-	zbx_vector_vmware_dsname_reserve(&hv->dsnames, datastores.values_num);
+	zbx_vector_vmware_dsname_reserve(&hv->dsnames, (size_t)datastores.values_num);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): %d datastores are connected to hypervisor \"%s\"", __func__,
 			datastores.values_num, hv->id);
 
@@ -5300,7 +5300,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	zbx_vector_vmware_dsname_sort(&hv->dsnames, vmware_dsname_compare);
 	zbx_xml_read_values(details, ZBX_XPATH_HV_VMS(), &vms);
-	zbx_vector_ptr_reserve(&hv->vms, vms.values_num + hv->vms.values_alloc);
+	zbx_vector_ptr_reserve(&hv->vms, (size_t)vms.values_num + hv->vms.values_alloc);
 
 	for (i = 0; i < vms.values_num; i++)
 	{
@@ -5363,8 +5363,11 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *) ZBX_XPATH_OBJECTS_BY_TYPE(ZBX_VMWARE_SOAP_DC), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_OBJECTS_BY_TYPE(ZBX_VMWARE_SOAP_DC),
+			xpathCtx)))
+	{
 		goto out;
+	}
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
@@ -5443,7 +5446,7 @@ static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswi
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_OBJECTS_BY_TYPE(ZBX_VMWARE_SOAP_DVS),
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_OBJECTS_BY_TYPE(ZBX_VMWARE_SOAP_DVS),
 			xpathCtx)))
 	{
 		goto out;
@@ -6137,8 +6140,9 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 
 	xpathCtx = xmlXPathNewContext(xdoc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)(0 == is_prop ? "/*/*/*"ZBX_XPATH_LN("returnval") :
-			"/*/*/*"ZBX_XPATH_LN("returnval")"/*/*/*"ZBX_XPATH_LN("Event")), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)(0 == is_prop ? "/*/*/*"
+			ZBX_XPATH_LN("returnval") : "/*/*/*" ZBX_XPATH_LN("returnval") "/*/*/*"ZBX_XPATH_LN("Event")),
+			xpathCtx)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot make evenlog list parsing query.");
 		goto clean;
@@ -6196,7 +6200,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 	if (0 != ids.values_num)
 	{
 		zbx_vector_id_xmlnode_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_ptr_reserve(events, ids.values_num + events->values_alloc);
+		zbx_vector_ptr_reserve(events, (size_t)ids.values_num + events->values_alloc);
 
 		/* validate that last event from "latestPage" is connected with first event from ReadPreviousEvents */
 		if (0 != events->values_num && LAST_KEY(events) != ids.values[ids.values_num -1].id + 1)
@@ -6409,7 +6413,7 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_PROP_NAME("latestEvent"), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_PROP_NAME("latestEvent"), xpathCtx)))
 	{
 		*error = zbx_strdup(*error, "Cannot make lastevenlog list parsing query.");
 		goto clean;
@@ -6729,7 +6733,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 
 	zbx_xml_read_values(cluster_data, "/*/*/*/*/*[local-name()='objects']/*[local-name()='obj']"
 			"[@type='" ZBX_VMWARE_SOAP_CLUSTER "']", &ids);
-	zbx_vector_ptr_reserve(clusters, ids.values_num + clusters->values_alloc);
+	zbx_vector_ptr_reserve(clusters, (size_t)ids.values_num + clusters->values_alloc);
 
 	for (i = 0; i < ids.values_num; i++)
 	{
@@ -7433,7 +7437,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
-	zbx_vector_vmware_datastore_reserve(&data->datastores, dss.values_num + data->datastores.values_alloc);
+	zbx_vector_vmware_datastore_reserve(&data->datastores, (size_t)dss.values_num + data->datastores.values_alloc);
 
 	for (i = 0; i < dss.values_num; i++)
 	{
@@ -7690,7 +7694,7 @@ static int	vmware_service_process_perf_entity_data(zbx_vmware_perf_data_t *perfd
 	xpathCtx = xmlXPathNewContext(xdoc);
 	xpathCtx->node = node;
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"*[local-name()='value']", xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)"*[local-name()='value']", xpathCtx)))
 		goto out;
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
@@ -7768,7 +7772,7 @@ static void	vmware_service_parse_perf_data(zbx_vector_ptr_t *perfdata, xmlDoc *x
 
 	xpathCtx = xmlXPathNewContext(xdoc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"/*/*/*/*", xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)"/*/*/*/*", xpathCtx)))
 		goto clean;
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
