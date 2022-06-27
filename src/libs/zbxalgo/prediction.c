@@ -1001,7 +1001,7 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 	}
 	else if (FIT_POLYNOMIAL == fit)
 	{
-		if (n <= k)
+		if ((unsigned)n <= k)
 			return ZBX_MATH_ERROR;
 	}
 
