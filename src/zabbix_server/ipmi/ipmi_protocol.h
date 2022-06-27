@@ -24,6 +24,8 @@
 
 #ifdef HAVE_OPENIPMI
 
+#include "zbxtime.h"
+
 #define ZBX_IPC_SERVICE_IPMI	"ipmi"
 
 #define ZBX_IPC_IPMI_REGISTER		1
