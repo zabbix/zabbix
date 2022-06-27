@@ -22,6 +22,7 @@ OBJS = \
 	$(OUTPUTDIR)\param.o \
 	$(OUTPUTDIR)\misc.o \
 	$(OUTPUTDIR)\time.o \
+	$(OUTPUTDIR)\expr.o \
 	$(OUTPUTDIR)\token.o \
 	$(OUTPUTDIR)\fatal.o \
 	$(OUTPUTDIR)\disk.o \
@@ -112,9 +113,6 @@ $(OUTPUTDIR)\misc.o: $(TOPDIR)\src\libs\zbxcommon\misc.c
 $(OUTPUTDIR)\iprange.o: $(TOPDIR)\src\libs\zbxip\iprange.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\interval.o: $(TOPDIR)\src\libs\zbxexpr\interval.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
 $(OUTPUTDIR)\num.o: $(TOPDIR)\src\libs\zbxnum\num.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
@@ -128,6 +126,12 @@ $(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxcommon\file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\time.o: $(TOPDIR)\src\libs\zbxtime\time.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\expr.o: $(TOPDIR)\src\libs\zbxexpr\expr.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\interval.o: $(TOPDIR)\src\libs\zbxexpr\interval.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\token.o: $(TOPDIR)\src\libs\zbxexpr\token.c
