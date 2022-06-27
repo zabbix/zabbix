@@ -28,27 +28,25 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
-        $(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-        $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-        $(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-        $(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-        $(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
-        $(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-        $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-        $(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
-        $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-        $(top_srcdir)/src/libs/zbxip/libzbxip.a \
-        $(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-        $(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-        $(top_srcdir)/tests/libzbxmocktest.a \
-        $(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/tests/libzbxmockdata.a
 
 zbx_item_preproc_SOURCES = \
-	zbx_item_preproc.c 
+	zbx_item_preproc.c
 
 zbx_item_preproc_LDADD = $(JSON_LIBS)
 

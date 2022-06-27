@@ -1,5 +1,5 @@
 if SERVER
-SERVER_tests = zbx_trapper_preproc_test_run 
+SERVER_tests = zbx_trapper_preproc_test_run
 
 noinst_PROGRAMS = $(SERVER_tests)
 
@@ -25,26 +25,25 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
-        $(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
-        $(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-        $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-        $(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-        $(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-        $(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
-        $(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-        $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-        $(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
-        $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-        $(top_srcdir)/src/libs/zbxip/libzbxip.a \
-        $(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-        $(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-        $(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/tests/libzbxmockdata.a
 
 zbx_trapper_preproc_test_run_SOURCES = \
 	zbx_trapper_preproc_test_run.c \

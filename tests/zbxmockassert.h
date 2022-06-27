@@ -20,7 +20,6 @@
 #ifndef ZABBIX_MOCK_ASSERT_H
 #define ZABBIX_MOCK_ASSERT_H
 
-#include "common.h"
 #include "zbxtime.h"
 
 void	__zbx_mock_assert_str_eq(const char *file, int line, const char *prefix_msg, const char *expected_value,

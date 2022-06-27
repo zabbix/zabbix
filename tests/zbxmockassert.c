@@ -22,7 +22,6 @@
 #include "zbxmockassert.h"
 
 #include "zbxnum.h"
-#include "common.h"
 
 void cm_print_error(const char * const format, ...);
 

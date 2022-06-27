@@ -20,8 +20,6 @@
 #ifndef ZABBIX_MOCK_DATA_H
 #define ZABBIX_MOCK_DATA_H
 
-#include "common.h"
-
 #include "zbxtime.h"
 
 int	zbx_mock_data_init(void **state);
