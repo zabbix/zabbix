@@ -200,7 +200,7 @@ class testFormServicesSla extends CWebTest {
 		$dropdowns = [
 			'Time zone' => [
 				'count' => 426,
-				'default' => 'System default: (UTC+00:00) UTC'
+				'default' => 'System default: (UTC+03:00) Europe/Riga'
 			],
 			'name:service_tags[0][operator]' => [
 				'values' => ['Equals', 'Contains'],
@@ -983,12 +983,12 @@ class testFormServicesSla extends CWebTest {
 		// Add excluded downtimes if such specified.
 		if (array_key_exists('excluded_downtimes', $data)) {
 			$form->selectTab('Excluded downtimes');
-			$add_button = $form->query('id:excluded-downtimes')->waitUntilVisible()->one()->query('button:Add')->one();
 
 			foreach ($data['excluded_downtimes'] as $downtime) {
-				$add_button->waitUntilClickable()->click();
+				$form->query('id:excluded-downtimes')->waitUntilVisible()->one()->query('button:Add')->one()->click();
 				$downtimes_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
 				$downtimes_form->fill($downtime);
+
 				$downtimes_form->submit();
 			}
 
