@@ -698,42 +698,6 @@ static int	is_uhex(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the string is a hexadecimal representation of data in    *
- *          the form "F4 CE 46 01 0C 44 8B F4\nA0 2C 29 74 5D 3F 13 49\n"     *
- *                                                                            *
- * Parameters: str - string to check                                          *
- *                                                                            *
- * Return value:  SUCCEED - the string is formatted like the example above    *
- *                FAIL - otherwise                                            *
- *                                                                            *
- ******************************************************************************/
-static int	is_hex_string(const char *str)
-{
-	if ('\0' == *str)
-		return FAIL;
-
-	while ('\0' != *str)
-	{
-		if (0 == isxdigit(*str))
-			return FAIL;
-
-		if (0 == isxdigit(*(str + 1)))
-			return FAIL;
-
-		if ('\0' == *(str + 2))
-			break;
-
-		if (' ' != *(str + 2) && '\n' != *(str + 2))
-			return FAIL;
-
-		str += 3;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: execute decimal value conversion operation                        *
  *                                                                            *
  * Parameters: value   - [IN/OUT] the value to convert                        *

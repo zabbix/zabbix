@@ -43,6 +43,9 @@ int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charli
 
 int	str_in_list(const char *list, const char *value, char delimiter);
 int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter);
+
+int	is_hex_string(const char *str);
+
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
