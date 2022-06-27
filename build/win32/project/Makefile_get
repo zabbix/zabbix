@@ -30,12 +30,15 @@ OBJS = \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
 	..\..\..\src\libs\zbxcommon\comms.o \
+	..\..\..\src\libs\zbxip\ip.o \
 	..\..\..\src\libs\zbxip\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
 	..\..\..\src\libs\zbxstr\str.o \
+	..\..\..\src\libs\zbxnum\num.o \
 	..\..\..\src\libs\zbxcommon\temp_str.o \
 	..\..\..\src\libs\zbxparam\param.o \
 	..\..\..\src\libs\zbxtime\time.o \
+	..\..\..\src\libs\zbxexpr\expr.o \
 	..\..\..\src\libs\zbxexpr\token.o \
 	..\..\..\src\libs\zbxcommon\components_strings_representations.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \

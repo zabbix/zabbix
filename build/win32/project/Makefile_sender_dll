@@ -34,7 +34,9 @@ ADD_RFLAGS = /d "ZABBIX_SENDER"
 
 # the main object file must be already added in master Makefile
 OBJS = \
+	..\..\..\src\libs\zbxnum\num.o \
 	..\..\..\src\libs\zbxcommon\comms.o \
+	..\..\..\src\libs\zbxip\ip.o \
 	..\..\..\src\libs\zbxip\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
 	..\..\..\src\libs\zbxstr\str.o \
@@ -43,6 +45,7 @@ OBJS = \
 	..\..\..\src\libs\zbxexpr\token.o \
 	..\..\..\src\libs\zbxcommon\components_strings_representations.o \
 	..\..\..\src\libs\zbxtime\time.o \
+	..\..\..\src\libs\zbxexpr\expr.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
