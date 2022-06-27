@@ -3957,7 +3957,7 @@ static int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmw
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
-	zbx_vector_vmware_alarm_reserve(alarms_data->alarms, alarms_data->alarms->values_num + nodeset->nodeNr);
+	zbx_vector_vmware_alarm_reserve(alarms_data->alarms, (size_t)alarms_data->alarms->values_num + nodeset->nodeNr);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
