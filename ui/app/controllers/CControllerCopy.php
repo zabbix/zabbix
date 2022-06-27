@@ -57,7 +57,8 @@ class CControllerCopy extends CController {
 
 	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS) ||
-			!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
+				!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)||
+				!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS)) {
 			return false;
 		}
 
