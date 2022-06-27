@@ -27,7 +27,6 @@
 #include "zbxserver.h"
 #include "../../src/libs/zbxserver/evalfunc.h"
 
-#include "common.h"
 #include "zbxnum.h"
 
 #include "mocks/valuecache/valuecache_mock.h"

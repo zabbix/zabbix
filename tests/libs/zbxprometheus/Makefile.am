@@ -15,31 +15,29 @@ PROMETHEUS_LIBS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-        $(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-        $(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-        $(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
-        $(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-        $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-        $(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
-        $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-        $(top_srcdir)/src/libs/zbxip/libzbxip.a \
-        $(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-        $(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-        $(top_srcdir)/tests/libzbxmocktest.a \
-        $(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/tests/libzbxmockdata.a
+
 prometheus_filter_init_SOURCES = \
 	prometheus_filter_init.c
 
 prometheus_filter_init_CFLAGS = \
 	-I@top_srcdir@/tests
 
-prometheus_filter_init_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@	
+prometheus_filter_init_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@
 prometheus_filter_init_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_prometheus_pattern_SOURCES = \
@@ -48,7 +46,7 @@ zbx_prometheus_pattern_SOURCES = \
 zbx_prometheus_pattern_CFLAGS = \
 	-I@top_srcdir@/tests
 
-zbx_prometheus_pattern_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@	
+zbx_prometheus_pattern_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@
 zbx_prometheus_pattern_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_prometheus_to_json_SOURCES = \

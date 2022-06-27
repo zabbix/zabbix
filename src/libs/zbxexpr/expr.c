@@ -209,8 +209,6 @@ int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *
 	return FAIL;
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: validate parameters that end with '\0'                            *
@@ -230,7 +228,6 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length)
 
 	return function_validate_parameters(expr, '\0', length, &offset, &len);
 }
-
 
 #define ZBX_MACRO_REGEX_PREFIX		"regex:"
 
@@ -635,10 +632,6 @@ int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t 
 	return FAIL;
 }
 
-
-
-
-//
 /******************************************************************************
  *                                                                            *
  * Purpose: parses function parameter                                         *

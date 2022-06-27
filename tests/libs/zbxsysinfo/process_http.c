@@ -21,8 +21,8 @@
 #include "zbxmockdata.h"
 
 #include "zbxnum.h"
-#include "zbxdbhigh.h"
 #include "zbxstr.h"
+#include "zbxdbhigh.h"
 #include "sysinfo.h"
 
 static char	*called_key = NULL;

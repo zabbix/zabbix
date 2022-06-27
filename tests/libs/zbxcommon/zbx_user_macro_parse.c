@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
-#include "common.h"
+
 #include "zbxexpr.h"
 
 void	zbx_mock_test_entry(void **state)

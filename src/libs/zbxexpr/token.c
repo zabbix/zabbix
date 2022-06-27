@@ -920,7 +920,3 @@ int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_tok
 {
 	return token_parse_lld_macro(expression, macro, token);
 }
-
-
-
-

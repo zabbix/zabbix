@@ -20,7 +20,6 @@
 #ifndef ZABBIX_EMBED_H
 #define ZABBIX_EMBED_H
 
-#include "common.h"
 #include "duktape.h"
 #include "zbxtime.h"
 

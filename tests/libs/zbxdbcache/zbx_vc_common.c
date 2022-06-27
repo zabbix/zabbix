@@ -23,7 +23,6 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
 #include "zbxnum.h"
 #include "zbxmutexs.h"
 #include "valuecache.h"

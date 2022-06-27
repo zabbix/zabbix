@@ -75,10 +75,6 @@ struct zbx_custom_interval
 	zbx_scheduler_interval_t	*scheduling;
 };
 
-
-
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: check if current time is within given period                      *
@@ -99,7 +95,6 @@ static int	check_time_period(const zbx_time_period_t period, struct tm *tm)
 	return period.start_day <= day && day <= period.end_day && period.start_time <= time && time < period.end_time ?
 			SUCCEED : FAIL;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -129,7 +124,6 @@ static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *f
 	}
 	return -1 == current_delay ? default_delay : current_delay;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -186,7 +180,6 @@ static int	get_next_delay_interval(const zbx_flexible_interval_t *flex_intervals
 	*next_interval = now - time + next;
 	return SUCCEED;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -350,7 +343,6 @@ int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *
 
 	return FAIL;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -617,7 +609,6 @@ static int	scheduler_parse_filter(zbx_scheduler_filter_t **filter, const char *t
 	return scheduler_parse_filter_r(filter, text, len, min, max, var_len);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: parses scheduler interval                                         *
@@ -705,7 +696,6 @@ static int	scheduler_interval_parse(zbx_scheduler_interval_t *interval, const ch
 
 	return ret;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -843,7 +833,6 @@ static int	scheduler_validate_wday_filter(const zbx_scheduler_interval_t *interv
 	return FAIL;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: calculates the next day that satisfies month and week day filters *
@@ -889,7 +878,6 @@ static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval,
 
 	return FAIL;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -988,7 +976,6 @@ static void	scheduler_apply_day_filter(zbx_scheduler_interval_t *interval, struc
 		tm->tm_sec = 0;
 	}
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -1614,6 +1601,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 
 	return nextcheck;
 }
+
 /******************************************************************************
  *                                                                            *
  * Purpose: calculate nextcheck timestamp for item on unreachable host        *
@@ -1664,7 +1652,6 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
 
 	return nextcheck;
 }
-
 
 /******************************************************************************
  *                                                                            *
