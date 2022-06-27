@@ -4000,15 +4000,20 @@ static int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmw
 		alarm->name = zbx_strdup(NULL, alarms_data->details.values[j]->name);
 		alarm->system_name = zbx_strdup(NULL, alarms_data->details.values[j]->system_name);
 		alarm->description = zbx_strdup(NULL, alarms_data->details.values[j]->description);
-		alarm->overall_status = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XNN("overallStatus"));
-		alarm->time = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XNN("time"));
-		alarm->enabled = alarms_data->details.values[j]->enabled;
 
-		if (NULL != (value = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XNN("acknowledged"))))
+		if (NULL == (alarm->overall_status = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i],
+				ZBX_XNN("overallStatus"))))
 		{
-			alarm->acknowledged = (0 == strcmp(value, "true") ? 1 : 0);
-			zbx_free(value);
+			alarm->overall_status = zbx_strdup(NULL, "");
 		}
+
+		if (NULL == (alarm->time = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XNN("time"))))
+			alarm->time = zbx_strdup(NULL, "");
+
+		alarm->enabled = alarms_data->details.values[j]->enabled;
+		value = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XNN("acknowledged"));
+		alarm->acknowledged = (NULL != value && 0 == strcmp(value, "true") ? 1 : 0);
+		zbx_free(value);
 
 		zbx_vector_vmware_alarm_append(alarms_data->alarms, alarm);
 		zbx_vector_str_append(ids, zbx_strdup(NULL, alarm->key));
