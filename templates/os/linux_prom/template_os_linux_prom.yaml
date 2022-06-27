@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-13T22:41:29Z'
-  groups:
+  date: '2022-06-07T19:33:42Z'
+  template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -2408,8 +2408,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Linux by Prom'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: 558606056f464970a7c544ba75d544f2
           name: 'System performance'
@@ -2429,8 +2429,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Linux by Prom'
                         name: 'System load'
-                        host: 'Linux by Prom'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2445,8 +2445,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Linux by Prom'
                         name: 'CPU usage'
-                        host: 'Linux by Prom'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2461,8 +2461,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'Linux by Prom'
+                        name: 'Memory usage'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2478,8 +2478,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: 'Linux by Prom'
+                        name: 'Swap usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2502,8 +2502,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSNAME}: Disk space usage'
                         host: 'Linux by Prom'
+                        name: '{#FSNAME}: Disk space usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '15'
@@ -2526,8 +2526,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk read/write rates'
                         host: 'Linux by Prom'
+                        name: '{#DEVNAME}: Disk read/write rates'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '20'
@@ -2550,8 +2550,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk average waiting time'
                         host: 'Linux by Prom'
+                        name: '{#DEVNAME}: Disk average waiting time'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '25'
@@ -2574,8 +2574,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk utilization and queue'
                         host: 'Linux by Prom'
+                        name: '{#DEVNAME}: Disk utilization and queue'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '30'
@@ -2598,8 +2598,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Linux by Prom'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: 4827063819f14d539f509552c84f5f94

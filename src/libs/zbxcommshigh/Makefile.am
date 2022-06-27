@@ -4,3 +4,6 @@ noinst_LIBRARIES = libzbxcommshigh.a
 
 libzbxcommshigh_a_SOURCES = \
 	commshigh.c
+
+libzbxcommshigh_a_CFLAGS = \
+		$(TLS_CFLAGS)

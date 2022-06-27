@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20211222';
-$browser-sprite-path: '../img/browser-sprite.png?20211222';
+$sprite-path: '../img/icon-sprite.svg?20220519';
+$browser-sprite-path: '../img/browser-sprite.png?20220519';
 
 @import "utils/mixins";
 
@@ -21,10 +21,11 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "utils/scrollable";
 @import "utils/sortable";
 
-@import "layout/grid";
+@import "layout/layout";
 @import "layout/header";
 @import "layout/footer";
 @import "layout/sidebar";
+@import "layout/grid-columns";
 @import "layout/form-grid";
 
 @import "components/buttons";
@@ -43,8 +44,10 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "components/menu-user";
 @import "components/message-box";
 @import "components/radio-list-control";
+@import "components/range-control";
 @import "components/service/info";
 @import "components/subfilter";
+@import "components/svg-graph";
 @import "components/tabfilter";
 @import "components/toc";
 @import "components/z-bar-gauge";
@@ -754,6 +757,12 @@ form {
 			}
 		}
 	}
+
+	td {
+		.checkbox-radio + label span {
+			top: -2px;
+		}
+	}
 }
 
 .table-paging {
@@ -1402,10 +1411,6 @@ form {
 		width: 85%;
 		position: relative;
 
-		&.has-before {
-			padding-top: 0;
-		}
-
 		td {
 			padding: 5px 5px 5px 0;
 			position: relative;
@@ -1442,6 +1447,16 @@ form {
 		.table-forms-separator {
 			.radio-segmented + .multiselect-wrapper {
 				margin-top: 5px;
+			}
+		}
+
+		.checkbox-radio + label span {
+			top: -1px;
+		}
+
+		.checkbox-list {
+			.checkbox-radio + label span {
+				top: -3px;
 			}
 		}
 	}
@@ -1619,13 +1634,16 @@ input {
 }
 
 textarea {
+	margin: 0;
+	padding: 4px 5px;
+	overflow: auto;
 	font: {
 		family: $font-stack;
 		size: $font-form-size;
 	}
-	padding: 4px 5px;
-	margin: 0;
-	overflow: auto;
+	line-height: normal;
+	vertical-align: top;
+
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
 
@@ -1667,6 +1685,7 @@ select {
 		padding: 4px 5px;
 		width: 300px;
 		height: 150px;
+		vertical-align: top;
 
 		option {
 			padding: 0;
@@ -1776,18 +1795,21 @@ select {
 	opacity: 0;
 	z-index: 1;
 
-	+ label span {
-		position: relative;
-		display: inline-block;
-		width: 14px;
-		height: 14px;
-		margin: -4px 4px 0 0;
-		bottom: -3px;
-		border: 1px solid $form-border-color;
-		background-color: $form-bg-color;
+	+ label {
+		span {
+			position: relative;
+			display: inline-block;
+			width: 14px;
+			height: 14px;
+			margin-right: 4px;
+			top: -2px;
+			vertical-align: middle;
+			border: 1px solid $form-border-color;
+			background-color: $form-bg-color;
 
-		&:active {
-			border-color: $form-border-color;
+			&:active {
+				border-color: $form-border-color;
+			}
 		}
 	}
 
@@ -2434,6 +2456,13 @@ $icon-widget-btn: (
 			background-color: $ui-bg-selected-color;
 			border-bottom: 0;
 		}
+	}
+}
+
+.calendar-control {
+	.icon-cal {
+		position: relative;
+		top: -1px;
 	}
 }
 
@@ -3393,6 +3422,15 @@ $form-icon-btn: (
 			vertical-align: top;
 		}
 
+		&.macro-textarea-parent {
+			textarea {
+				float: left;
+			}
+			span {
+				margin-left: 10px;
+			}
+		}
+
 		button {
 			line-height: normal;
 		}
@@ -3607,12 +3645,6 @@ $form-icon-btn: (
 	}
 }
 
-.calendar-control {
-	input {
-		vertical-align: middle;
-	}
-}
-
 // Problem notification overlay.
 .notif {
 	width: 250px;
@@ -3729,14 +3761,10 @@ $form-icon-btn: (
 	stroke: $red;
 	stroke-width: 2px;
 }
-.svg-point-highlight {
-	fill: $font-color !important;
-	fill-opacity: .5 !important;
-}
 
 .svg-graph-preview {
 	margin-top: 10px;
-	min-width: 960px;
+	min-width: 1120px;
 	height: 300px;
 	position: relative;
 
@@ -3749,55 +3777,6 @@ $form-icon-btn: (
 		top: 0;
 		z-index: 3; // More than z-index of form controls, less than z-index of .msg-*.
 	}
-}
-
-.svg-graph {
-	display: block;
-}
-
-.svg-single-item-graph-legend,
-.svg-single-two-items-graph-legend,
-.svg-graph-legend {
-	// Legend single line height is 18. Value should be synchronized with $legend_height in 'CSvgGraphHelper.php'.
-	$svg-legend-line-height: 18px;
-	$svg-legend-handle-height: 4px;
-
-	overflow-y: hidden;
-	white-space: normal;
-	margin: 0 10px;
-	line-height: $svg-legend-line-height;
-
-	div {
-		display: inline-block;
-		margin: 0 4px;
-		font-size: 12px;
-		line-height: 1.1;
-		vertical-align: bottom;
-		min-width: 120px;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		border: 0 none transparent;
-	}
-
-	div::before {
-		content: ' ';
-		display: inline-block;
-		margin-right: 4px;
-		width: 10px;
-		height: 0;
-		vertical-align: middle;
-		margin-top: -$svg-legend-handle-height;
-		border-top-width: $svg-legend-handle-height;
-		border-top-style: solid;
-		border-top-color: inherit;
-	}
-}
-.svg-graph-legend div {
-	max-width: 30%;
-}
-.svg-single-two-items-graph-legend div {
-	max-width: 50%;
 }
 
 .svg-graph-hintbox {
@@ -3825,12 +3804,17 @@ $form-icon-btn: (
 	li {
 		padding-left: 23px;
 
-		.svg-graph-hintbox-item-color {
+		.svg-graph-hintbox-item-color,
+		.svg-graph-hintbox-trigger-color {
 			margin: 3px 10px 3px -20px;
 			width: 10px;
 			height: 10px;
 			float: left;
 			display: block;
+		}
+
+		.svg-graph-hintbox-trigger-color {
+			border-radius: 50%;
 		}
 	}
 
@@ -4850,13 +4834,10 @@ svg {
 }
 
 .list-vertical-accordion {
-	display: table;
 	padding-left: 15px;
 	width: calc(100% - 15px);
 
 	.list-accordion-item {
-		display: table-row;
-
 		.btn-remove {
 			position: relative;
 			right: -10px;
@@ -4869,19 +4850,30 @@ svg {
 		padding-bottom: 2px;
 	}
 
+	.list-accordion-item-opened {
+		.list-accordion-item-body {
+			display: block;
+		}
+
+		.list-accordion-item-toggle {
+			@extend .btn-widget-collapse;
+			margin: 0;
+		}
+	}
+
 	.list-accordion-item-closed {
-		.multiselect {
-			height: 24px;
-			overflow: hidden;
-		}
-
-		.list-accordion-item-head {
-			margin-bottom: 5px;
-		}
-
 		.list-accordion-item-body {
 			display: none;
 		}
+
+		.list-accordion-item-toggle {
+			@extend .btn-widget-expand;
+			margin: 0;
+		}
+	}
+
+	.list-accordion-item-toggle {
+		text-indent: -9999px;
 	}
 }
 
@@ -5306,6 +5298,28 @@ svg {
 	}
 }
 
+.icon-count {
+	font-size: 12px;
+	padding: 3px 5px 2px;
+	color: $font-selected-color;
+	background-color: $ui-bg-selected-color;
+	border-radius: 3px;
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px rgba($blue, .35);
+	}
+}
+
+a.icon-count {
+	color: $font-selected-color;
+}
+
 .problem-icon-link,
 .problem-icon-list {
 	display: inline-flex;
@@ -5366,6 +5380,8 @@ svg {
 .icon-action-message,
 .icon-action-ack,
 .icon-action-unack,
+.icon-action-suppress,
+.icon-action-unsuppress,
 .icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
@@ -5397,6 +5413,8 @@ svg {
 	}
 }
 
+.icon-action-suppress,
+.icon-action-unsuppress,
 .icon-invisible {
 	&:link,
 	&:hover,
@@ -5420,6 +5438,8 @@ button {
 	&.icon-action-severity-changed,
 	&.icon-action-message,
 	&.icon-action-ack,
+	&.icon-action-suppress,
+	&.icon-action-unsuppress,
 	&.icon-problem-generated,
 	&.icon-problem-recovery,
 	&.icon-actions-number-gray,
@@ -5484,6 +5504,14 @@ button {
 
 .icon-action-unack::before {
 	background-position: -173px -245px;
+}
+
+.icon-action-suppress::before {
+	background-position: -89px -803px;
+}
+
+.icon-action-unsuppress::before {
+	background-position: -89px -836px;
 }
 
 .icon-invisible::before {
@@ -5659,157 +5687,11 @@ button {
 	display: table;
 }
 
-// Range control.
-$range-track-color: #c0c0c0;
-$range-progress-color: $link-color;
-$range-thumb-color: $link-color;
-$range-thumb-color-focus: $link-active-color;
-$range-progress-color-focus: $link-active-color;
-$range-thumb-size: 10px;
-$range-track-height: 2px;
-$range-input-width: 31px;
-
-.range-control {
-	position: relative;
-	display: inline-block;
-	vertical-align: middle;
-
-	input[type=range] {
-		cursor: pointer;
-		-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
-		-moz-appearance: none; /* Hides the slider so that custom slider can be made */
-		width: calc(100% + 10px);
-		opacity: 0;
-		vertical-align: middle;
-		margin: 0 -5px;
-		padding: 0;
-		height: 20px;
-
-		&:focus {
-			outline: none;
-		}
-
-		/* Special styling for WebKit/Blink */
-		&::-webkit-slider-thumb,
-		&::-moz-range-thumb {
-			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-			height: $range-thumb-size;
-			width: $range-thumb-size;
-			opacity: 0;
-		}
-
-		&::-webkit-slider-runnable-track {
-			height: $range-thumb-size;
-			opacity: 0;
-		}
-	}
-
-	input[type=text] {
-		width: $range-input-width;
-		float: right;
-	}
-
-	> div {
-		position: relative;
-		width: calc(100% - 10px - #{$range-input-width});
-		margin: 2px $range-thumb-size 0 0;
-		float: left;
-	}
-
-	.range-control-track,
-	.range-control-progress {
-		position: absolute;
-		top: 50%;
-		margin-top: -$range-track-height / 2;
-		left: 0;
-		height: $range-track-height;
-		cursor: pointer;
-	}
-
-	.range-control-track {
-		width: 100%;
-		background: $range-track-color;
-	}
-
-	.range-control-progress {
-		background: $range-progress-color;
-	}
-
-	.range-control-thumb {
-		position: absolute;
-		top: 50%;
-		margin-top: -$range-thumb-size / 2;
-		margin-left: -$range-thumb-size / 2;
-		width: $range-thumb-size;
-		height: $range-thumb-size;
-		border-radius: 50%;
-		background: $range-thumb-color;
-	}
-
-	&.range-control-focus {
-		.range-control-thumb {
-			margin-top: -$range-thumb-size / 1.5;
-			margin-left: -$range-thumb-size / 1.5;
-			background: $range-thumb-color-focus;
-			border: 2px solid lighten($btn-bg-color, 10%);
-		}
-
-		.range-control-progress {
-			background: $range-progress-color-focus;
-		}
-	}
-
-	&.disabled {
-		opacity: 1;
-
-		input[type=range] {
-			cursor: default;
-		}
-		.range-control-progress,
-		.range-control-thumb {
-			background: #c0c0c0;
-		}
-	}
-
-	datalist {
-		position: absolute;
-		display: flex;
-		width: 100%;
-		top: 50%;
-		margin-top: -$range-track-height / 2;
-
-		option {
-			padding: 0;
-			font-size: 0;
-			flex: 1 0 0;
-			height: $range-track-height;
-			border-left: 1px solid $body-bg-color;
-		}
-	}
-}
-
 .graph-legend {
 	text-align: left;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
-}
-
-.graph-widget-config-tabs {
-	padding: 10px 0;
-
-	> .tabs-nav {
-		padding-left: calc(15% + 10px);
-		margin-right: 0;
-		margin-left: 0;
-	}
-
-	.ui-tabs-nav {
-		position: sticky;
-		top: 0;
-		background: $header-bg-color;
-		z-index: 3;
-	}
 }
 
 // Screen reader.
@@ -6109,6 +5991,7 @@ $range-input-width: 31px;
 
 .btn-toggle-chevron {
 	position: relative;
+	text-indent: -9999px;
 
 	&[aria-expanded="true"] {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
@@ -6307,10 +6190,6 @@ $range-input-width: 31px;
 	&.list-accordion-item-closed {
 		.interface-btn-toggle {
 			@extend .btn-widget-expand;
-		}
-
-		.list-accordion-item-body {
-			display: none;
 		}
 	}
 

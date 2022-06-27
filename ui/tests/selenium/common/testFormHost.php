@@ -300,7 +300,7 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'error' => 'Incorrect value for field "host": cannot be empty.'
 				]
@@ -320,7 +320,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Available host',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'error_title' => 'Cannot add host',
 					'error' => 'Host with the same name "Available host" already exists.'
@@ -331,7 +331,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Empty template',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'error_title' => 'Cannot add host',
 					'error' => 'Template with the same name "Empty template" already exists.'
@@ -342,7 +342,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Existen visible name',
-						'Groups' => 'Zabbix servers',
+						'Host groups' => 'Zabbix servers',
 						'Visible name' => 'ЗАББИКС Сервер'
 					],
 					'error_title' => 'Cannot add host',
@@ -355,7 +355,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => '@#$%^&*()_+',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'error_title' => 'Cannot add host',
 					'error' => 'Incorrect characters used for host name "@#$%^&*()_+".'
@@ -366,7 +366,7 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Groups' => 'Zabbix servers',
+						'Host groups' => 'Zabbix servers',
 						'Host name' => '😀'
 					],
 					'error_title' => 'Cannot add host',
@@ -379,7 +379,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Empty ip address',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -397,7 +397,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Empty dns',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -416,7 +416,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Empty IP and filled in DNS',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -435,7 +435,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Empty dns and filled in IP',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -454,7 +454,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Empty port',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -473,7 +473,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Invalid ip',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -491,7 +491,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Invalid ip',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -510,7 +510,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Invalid port',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -528,7 +528,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Invalid port',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -546,7 +546,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Invalid port',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -565,7 +565,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Invalid snmp community',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -584,7 +584,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_GOOD,
 					'host_fields' => [
 						'Host name' => 'Host without interfaces',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					]
 				]
 			],
@@ -594,7 +594,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_GOOD,
 					'host_fields' => [
 						'Host name' => 'Host with utf8mb4 visible name',
-						'Groups' => 'Zabbix servers',
+						'Host groups' => 'Zabbix servers',
 						'Visible name' => '😀',
 						'Description' => '😀🙃😀'
 					]
@@ -606,7 +606,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_GOOD,
 					'host_fields' => [
 						'Host name' => 'Host with default values of all interfaces',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -635,7 +635,7 @@ class testFormHost extends CWebTest {
 					'default_values' => true,
 					'host_fields' => [
 						'Host name' => 'Host with default second agent interface',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -660,7 +660,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_GOOD,
 					'host_fields' => [
 						'Host name' => 'Host with different versions of SNMP interface',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -716,7 +716,7 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Host name' => 'Host with all interfaces',
 						'Visible name' => 'Host with all interfaces visible name',
-						'Groups' => 'Zabbix servers',
+						'Host groups' => 'Zabbix servers',
 						'Description' => 'Added description for host with all interfaces',
 						'Monitored by proxy' => 'Active proxy 1',
 						'Enabled' => false
@@ -871,7 +871,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => '',
-						'Groups' => ''
+						'Host groups' => ''
 					],
 					'interfaces' => [
 						[
@@ -900,7 +900,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => '',
-						'Groups' => ''
+						'Host groups' => ''
 					],
 					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "host": cannot be empty.']
 				]
@@ -919,7 +919,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Empty host group',
-						'Groups' => ''
+						'Host groups' => ''
 					],
 					'error' => 'Field "groups" is mandatory.'
 				]
@@ -1268,7 +1268,7 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Host name' => 'Update host with all interfaces',
 						'Visible name' => 'Update host with all interfaces visible name',
-						'Groups' => 'Linux servers',
+						'Host groups' => 'Linux servers',
 						'Description' => 'Update description',
 						'Monitored by proxy' => 'Active proxy 3',
 						'Enabled' => false
@@ -1319,7 +1319,7 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_GOOD,
 					'host_fields' => [
 						'Host name' => 'Update host with utf8 visible name',
-						'Groups' => 'Linux servers',
+						'Host groups' => 'Linux servers',
 						'Visible name' => '😀😀',
 						'Description' => '😀😀😀😀😀😀😀'
 					],
@@ -1374,7 +1374,7 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Host name' => 'Mixed interface actions',
 						'Visible name' => '',
-						'Groups' => 'Discovered hosts',
+						'Host groups' => 'Discovered hosts',
 						'Description' => '',
 						'Monitored by proxy' => '(no proxy)'
 					],
@@ -1422,7 +1422,7 @@ class testFormHost extends CWebTest {
 			'host_fields' => [
 				'Host name' => 'testFormHost_Update',
 				'Visible name' => 'testFormHost_Update Visible name',
-				'Groups' => 'Zabbix servers',
+				'Host groups' => 'Zabbix servers',
 				'Description' => 'Created host via API to test update functionality in host form and interfaces',
 				'Monitored by proxy' => 'Active proxy 2',
 				'Enabled' => true
@@ -1913,14 +1913,14 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$this->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
-		$host_link = $this->query("xpath://table[@class='list-table']")->asTable()->one()->waitUntilVisible()
-				->findRow('Name', $host, true)->getColumn('Name')->query($this->monitoring ? 'tag:a' : "xpath:.//a[@onclick]")
-				->waitUntilClickable();
+		$host_link = $table->findRow('Name', $host)->getColumn('Name')->query($this->monitoring ? 'tag:a' : "xpath:.//a[@onclick]")->waitUntilClickable();
 
 		if ($this->monitoring) {
 			$host_link->asPopupButton()->one()->select('Configuration');

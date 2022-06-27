@@ -212,7 +212,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			'host' => 'host_{#KEY}',
 			'groupLinks' => [
 				[
-					'groupid' => 1
+					'groupid' => 4
 				]
 			],
 			'ruleid' => self::$ruleid,

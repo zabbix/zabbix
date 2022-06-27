@@ -1194,6 +1194,10 @@ class CUser extends CApiService {
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
 		]);
+		DB::update('event_suppress', [
+			'values' => ['userid' => null],
+			'where' => ['userid' => $userids]
+		]);
 
 		$tokenids = DB::select('token', [
 			'output' => [],

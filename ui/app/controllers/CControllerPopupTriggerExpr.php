@@ -1182,6 +1182,7 @@ class CControllerPopupTriggerExpr extends CController {
 		$fields = [
 			'dstfrm' =>				'string|fatal',
 			'dstfld1' =>			'string|not_empty',
+			'context' =>			'required|string|in host,template',
 			'expression' =>			'string',
 			'itemid' =>				'db items.itemid',
 			'parent_discoveryid' =>	'db items.itemid',
@@ -1421,6 +1422,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'parent_discoveryid' => $this->getInput('parent_discoveryid', ''),
 			'dstfrm' => $this->getInput('dstfrm'),
 			'dstfld1' => $dstfld1,
+			'context' => $this->getInput('context'),
 			'itemid' => $itemid,
 			'value' => $value,
 			'params' => $params,

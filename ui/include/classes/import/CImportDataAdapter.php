@@ -50,12 +50,21 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Get groups from the imported data.
+	 * Get template groups from the imported data.
 	 *
 	 * @return array
 	 */
-	public function getGroups(): array {
-		return array_key_exists('groups', $this->data) ? $this->data['groups'] : [];
+	public function getTemplateGroups(): array {
+		return array_key_exists('template_groups', $this->data) ? $this->data['template_groups'] : [];
+	}
+
+	/**
+	 * Get host groups from the imported data.
+	 *
+	 * @return array
+	 */
+	public function getHostGroups(): array {
+		return array_key_exists('host_groups', $this->data) ? $this->data['host_groups'] : [];
 	}
 
 	/**

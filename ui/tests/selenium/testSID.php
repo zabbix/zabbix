@@ -830,6 +830,47 @@ class testSID extends CWebTest {
 						'&name=Report+for+testFormScheduledReport&subject=Report+subject+for+testFormScheduledReport&'.
 						'message=Report+message+text',
 				'json_output' => true
+			]],
+
+			// Host group creation.
+			[[
+				'link' => 'zabbix.php?action=hostgroup.create&name=aaaaaaa',
+				'json_output' => true
+			]],
+			// Host group update.
+			[[
+				'link' => 'zabbix.php?action=hostgroup.update&name=aaabbb&groupid=6',
+				'json_output' => true
+			]],
+			// Host group delete.
+			[[
+				'link' => 'zabbix.php?action=hostgroup.delete&groupids%5B0%5D=7',
+				'json_output' => true
+			]],
+			// Host group disable.
+			[[
+				'link' => 'zabbix.php?action=hostgroup.enable&groupids%5B0%5D=7',
+				'json_output' => true
+			]],
+			// Host group enable.
+			[[
+				'link' => 'zabbix.php?action=hostgroup.disable&groupids%5B0%5D=7',
+				'json_output' => true
+			]],
+			// Template group creation.
+			[[
+				'link' => 'zabbix.php?action=templategroup.create&name=aaa',
+				'json_output' => true
+			]],
+			// Template group update.
+			[[
+				'link' => 'zabbix.php?action=templategroup.update&name=aaabbb&groupid=14',
+				'json_output' => true
+			]],
+			// Template group delete.
+			[[
+				'link' => 'zabbix.php?action=templategroup.delete&groupids%5B0%5D=14',
+				'json_output' => true
 			]]
 		];
 	}
@@ -885,16 +926,34 @@ class testSID extends CWebTest {
 			// Host groups creation.
 			[
 				[
-					'db' => 'SELECT * FROM hosts_groups',
-					'link' => 'hostgroups.php?form=create'
+					'db' => 'SELECT * FROM hstgrp',
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=hostgroup.edit'
 				]
 			],
-
 			// Host groups update.
 			[
 				[
-					'db' => 'SELECT * FROM hosts_groups',
-					'link' => 'hostgroups.php?form=update&groupid=50012'
+					'db' => 'SELECT * FROM hstgrp',
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=hostgroup.edit&groupid=50012'
+				]
+			],
+
+			// Template groups creation.
+			[
+				[
+					'db' => 'SELECT * FROM hstgrp',
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=templategroup.edit'
+				]
+			],
+			// Template groups update.
+			[
+				[
+					'db' => 'SELECT * FROM hstgrp',
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=templategroup.edit&groupid=14'
 				]
 			],
 

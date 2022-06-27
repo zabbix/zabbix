@@ -75,12 +75,10 @@ function imageThumb($source, $thumbWidth = 0, $thumbHeight = 0) {
 			}
 		}
 
-		if (function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)) {
-			$thumb = imagecreatetruecolor($thumbWidth, $thumbHeight);
-		}
-		else {
-			$thumb = imagecreate($thumbWidth, $thumbHeight);
-		}
+		$thumbWidth = (int) round($thumbWidth);
+		$thumbHeight = (int) round($thumbHeight);
+
+		$thumb = imagecreatetruecolor($thumbWidth, $thumbHeight);
 
 		// preserve png transparency
 		imagealphablending($thumb, false);
@@ -91,11 +89,13 @@ function imageThumb($source, $thumbWidth = 0, $thumbHeight = 0) {
 			0, 0,
 			0, 0,
 			$thumbWidth, $thumbHeight,
-			$srcWidth, $srcHeight);
+			$srcWidth, $srcHeight
+		);
 
 		imagedestroy($source);
 		$source = $thumb;
 	}
+
 	return $source;
 }
 

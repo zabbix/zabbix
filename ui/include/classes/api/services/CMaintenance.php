@@ -81,6 +81,7 @@ class CMaintenance extends CApiService {
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectGroups'				=> null,
+			'selectHostGroups'			=> null,
 			'selectHosts'				=> null,
 			'selectTags'				=> null,
 			'selectTimeperiods'			=> null,
@@ -92,6 +93,8 @@ class CMaintenance extends CApiService {
 			'limit'						=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+
+		$this->checkDeprecatedParam($options, 'selectGroups');
 
 		// editable + PERMISSION CHECK
 		$maintenanceids = [];
@@ -1236,22 +1239,8 @@ class CMaintenance extends CApiService {
 	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
-		// selectGroups
-		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-			$groups = [];
-			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'groupid', 'maintenances_groups');
-			$related_ids = $relationMap->getRelatedIds();
-
-			if ($related_ids) {
-				$groups = API::HostGroup()->get([
-					'output' => $options['selectGroups'],
-					'hostgroupids' => $related_ids,
-					'preservekeys' => true
-				]);
-			}
-
-			$result = $relationMap->mapMany($result, $groups, 'groups');
-		}
+		$this->addRelatedGroups($options, $result, 'selectGroups');
+		$this->addRelatedGroups($options, $result, 'selectHostGroups');
 
 		// selectHosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
@@ -1295,5 +1284,35 @@ class CMaintenance extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Adds related host groups requested by "select*" options to the resulting object set.
+	 *
+	 * @param array  $options [IN] Original input options.
+	 * @param array  $result  [IN/OUT] Result output.
+	 * @param string $option  [IN] Possible values:
+	 *                               - "selectGroups" (deprecated);
+	 *                               - "selectHostGroups" (or any other value).
+	 */
+	private function addRelatedGroups(array $options, array &$result, string $option): void {
+		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
+			return;
+		}
+
+		$groups = [];
+		$relationMap = $this->createRelationMap($result, 'maintenanceid', 'groupid', 'maintenances_groups');
+		$related_ids = $relationMap->getRelatedIds();
+
+		if ($related_ids) {
+			$groups = API::HostGroup()->get([
+				'output' => $options[$option],
+				'groupids' => $related_ids,
+				'preservekeys' => true
+			]);
+		}
+
+		$output_tag = $option === 'selectGroups' ? 'groups' : 'hostgroups';
+		$result = $relationMap->mapMany($result, $groups, $output_tag);
 	}
 }

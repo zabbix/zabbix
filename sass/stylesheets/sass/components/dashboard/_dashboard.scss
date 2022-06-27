@@ -826,6 +826,11 @@
 				border-color: darken($ui-border-color, 6%);
 			}
 		}
+
+		&:not(.dashboard-grid-widget-focus) {
+			transition-property: width, height, left, top;
+			transition-duration: 0.15s;
+		}
 	}
 
 	.dashboard-grid-iterator {
@@ -1046,6 +1051,13 @@
 			background-color: $dashboard-shared-bg-color;
 			border-color: $dashboard-shared-bg-color;
 		}
+	}
+}
+
+.overlay-dialogue {
+	&.modal-popup.modal-widget-configuration {
+		max-width: 1120px;
+		min-width: 650px;
 	}
 }
 

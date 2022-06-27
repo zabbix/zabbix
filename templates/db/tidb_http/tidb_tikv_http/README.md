@@ -101,7 +101,7 @@ There are no template links in this template.
 |TiKV: Too many coprocessor request error |<p>-</p> |`min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}` |WARNING | |
 |TiKV: Too many pending commands |<p>-</p> |`min(/TiDB TiKV by HTTP/tikv.scheduler_contex,5m)>{$TIKV.PENDING_COMMANDS.MAX.WARN}` |AVERAGE | |
 |TiKV: Too many pending tasks |<p>-</p> |`min(/TiDB TiKV by HTTP/tikv.worker_pending_task,5m)>{$TIKV.PENDING_TASKS.MAX.WARN}` |AVERAGE | |
-|TiKV: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/TiDB TiKV by HTTP/tikv.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|TiKV: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/TiDB TiKV by HTTP/tikv.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |TiKV: Store_id {#STORE_ID}: Too many failure messages "{#TYPE}" |<p>Indicates that the remote TiKV cannot be connected.</p> |`min(/TiDB TiKV by HTTP/tikv.messages.failure.rate[{#STORE_ID},{#TYPE}],5m)>{$TIKV.STORE.ERRORS.MAX.WARN}` |WARNING | |
 
 ## Feedback

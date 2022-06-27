@@ -65,7 +65,7 @@ class CScript extends CApiService {
 			'confirmation', 'type', 'execute_on', 'timeout', 'parameters', 'scope', 'port', 'authtype', 'username',
 			'password', 'publickey', 'privatekey', 'menu_path'
 		];
-		$group_fields = ['groupid', 'name', 'flags', 'internal'];
+		$group_fields = ['groupid', 'name', 'flags', 'uuid'];
 		$host_fields = ['hostid', 'host', 'name', 'description', 'status', 'proxy_hostid', 'inventory_mode', 'flags',
 			'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status',
 			'maintenance_type', 'maintenance_from', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'
@@ -104,7 +104,8 @@ class CScript extends CApiService {
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $script_fields), 'default' => API_OUTPUT_EXTEND],
-			'selectGroups' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_fields), 'default' => null],
+			'selectGroups' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'in' => implode(',', $group_fields), 'default' => null],
+			'selectHostGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_fields), 'default' => null],
 			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_fields), 'default' => null],
 			'selectActions' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $this->action_fields), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
@@ -803,7 +804,7 @@ class CScript extends CApiService {
 
 		$groupids = array_keys($groupids);
 
-		$db_groups = DB::select('hstgrp', [
+		$db_groups = API::HostGroup()->get([
 			'output' => [],
 			'groupids' => $groupids,
 			'preservekeys' => true
@@ -1003,6 +1004,7 @@ class CScript extends CApiService {
 
 		$scripts = $this->addRelatedGroupsAndHosts([
 			'selectGroups' => null,
+			'selectHostGroups' => null,
 			'selectHosts' => ['hostid']
 		], $scripts, $hostids);
 
@@ -1051,7 +1053,8 @@ class CScript extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['selectGroups'] !== null || $options['selectHosts'] !== null) {
+		if ($options['selectGroups'] !== null || $options['selectHostGroups'] !== null
+				|| $options['selectHosts'] !== null) {
 			$sqlParts = $this->addQuerySelect($this->fieldId('groupid'), $sqlParts);
 			$sqlParts = $this->addQuerySelect($this->fieldId('host_access'), $sqlParts);
 		}
@@ -1168,7 +1171,7 @@ class CScript extends CApiService {
 	 * Applies relational subselect onto already fetched result.
 	 *
 	 * @param  array $options
-	 * @param  mixed $options['selectGroups']
+	 * @param  mixed $options['selectHostGroups']
 	 * @param  mixed $options['selectHosts']
 	 * @param  array $result
 	 * @param  array $hostids                  An additional filter by hostids, which will be added to "hosts" key.
@@ -1176,10 +1179,11 @@ class CScript extends CApiService {
 	 * @return array $result
 	 */
 	private function addRelatedGroupsAndHosts(array $options, array $result, array $hostids = null) {
-		$is_groups_select = $options['selectGroups'] !== null && $options['selectGroups'];
-		$is_hosts_select = $options['selectHosts'] !== null && $options['selectHosts'];
+		$is_groups_select = $options['selectGroups'] !== null;
+		$is_hostgroups_select = $options['selectHostGroups'] !== null;
+		$is_hosts_select = $options['selectHosts'] !== null;
 
-		if (!$is_groups_select && !$is_hosts_select) {
+		if (!$is_groups_select && !$is_hostgroups_select && !$is_hosts_select) {
 			return $result;
 		}
 
@@ -1209,8 +1213,17 @@ class CScript extends CApiService {
 			}
 		}
 
-		$select_groups = ['name', 'groupid'];
-		$select_groups = $this->outputExtend($options['selectGroups'], $select_groups);
+		if ($options['selectGroups'] === API_OUTPUT_EXTEND || $options['selectHostGroups'] === API_OUTPUT_EXTEND) {
+			$select_groups = API_OUTPUT_EXTEND;
+		}
+		else {
+			$select_groups = array_unique(array_merge(
+				is_array($options['selectGroups']) ? $options['selectGroups'] : [],
+				is_array($options['selectHostGroups']) ? $options['selectHostGroups'] : []
+			));
+		}
+
+		$select_groups = $this->outputExtend($select_groups, ['groupid', 'name']);
 
 		$host_groups = API::HostGroup()->get([
 			'output' => $select_groups,
@@ -1223,7 +1236,7 @@ class CScript extends CApiService {
 		if ($has_write_access_level && $host_groups) {
 			$host_groups_with_write_access = API::HostGroup()->get([
 				'output' => $select_groups,
-				'groupid' => array_keys($host_groups),
+				'groupids' => array_keys($host_groups),
 				'preservekeys' => true,
 				'editable' => true
 			]);
@@ -1277,11 +1290,6 @@ class CScript extends CApiService {
 			]);
 		}
 
-		$host_groups = $this->unsetExtraFields($host_groups, ['name', 'groupid'], $options['selectGroups']);
-		$host_groups_with_write_access = $this->unsetExtraFields(
-			$host_groups_with_write_access, ['name', 'groupid'], $options['selectGroups']
-		);
-
 		foreach ($result as &$script) {
 			if ($script['groupid'] == 0) {
 				$script_groups = ($script['host_access'] == PERM_READ_WRITE)
@@ -1295,7 +1303,15 @@ class CScript extends CApiService {
 			}
 
 			if ($is_groups_select) {
-				$script['groups'] = array_values($script_groups);
+				$script['groups'] = array_values($this->unsetExtraFields($script_groups,
+					['groupid', 'name', 'flags', 'uuid'], $options['selectGroups']
+				));
+			}
+
+			if ($is_hostgroups_select) {
+				$script['hostgroups'] = array_values($this->unsetExtraFields($script_groups,
+					['groupid', 'name', 'flags', 'uuid'], $options['selectHostGroups']
+				));
 			}
 
 			if ($is_hosts_select) {

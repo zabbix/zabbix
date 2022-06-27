@@ -739,11 +739,14 @@ else {
 
 	$filter = [
 		'status' => CProfile::get($prefix.'httpconf.filter_status', -1),
-		'groups' => CProfile::getArray($prefix.'httpconf.filter_groupids', null),
-		'hosts' => CProfile::getArray($prefix.'httpconf.filter_hostids', null),
+		'groups' => [],
+		'hosts' => [],
 		'evaltype' => CProfile::get($prefix.'httpconf.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 		'tags' => []
 	];
+
+	$filter_groupids = CProfile::getArray($prefix.'httpconf.filter_groupids', []);
+	$filter_hostids = CProfile::getArray($prefix.'httpconf.filter_hostids', []);
 
 	foreach (CProfile::getArray($prefix.'httpconf.filter.tags.tag', []) as $i => $tag) {
 		$filter['tags'][] = [
@@ -754,35 +757,23 @@ else {
 	}
 
 	// Get host groups.
-	$filter['groups'] = $filter['groups']
-		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $filter['groups'],
-			'editable' => true,
-			'preservekeys' => true
-		]), ['groupid' => 'id'])
-		: [];
-
-	$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
-	if ($filter_groupids) {
-		$filter_groupids = getSubGroups($filter_groupids);
-	}
+	$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], $data['context']);
 
 	if ($data['context'] === 'host') {
-		$filter['hosts'] = $filter['hosts']
+		$filter['hosts'] = $filter_hostids
 			? CArrayHelper::renameObjectsKeys(API::Host()->get([
 				'output' => ['hostid', 'name'],
-				'hostids' => $filter['hosts'],
+				'hostids' => $filter_hostids,
 				'editable' => true,
 				'preservekeys' => true
 			]), ['hostid' => 'id'])
 			: [];
 	}
 	else {
-		$filter['hosts'] = $filter['hosts']
+		$filter['hosts'] = $filter_hostids
 			? CArrayHelper::renameObjectsKeys(API::Template()->get([
 				'output' => ['templateid', 'name'],
-				'templateids' => $filter['hosts'],
+				'templateids' => $filter_hostids,
 				'editable' => true,
 				'preservekeys' => true
 			]), ['templateid' => 'id'])
@@ -807,7 +798,7 @@ else {
 		'output' => ['httptestid', $sortField],
 		'selectTags' => ['tag', 'value'],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
-		'groupids' => $filter_groupids,
+		'groupids' => $filter_groupids ? $filter_groupids : null,
 		'tags' => $data['filter']['tags'],
 		'evaltype' => $data['filter']['evaltype'],
 		'templated' => ($data['context'] === 'template'),

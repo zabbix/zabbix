@@ -72,9 +72,9 @@ $filter = (new CFilter())
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_groups_',
-								'real_hosts' => 1,
-								'editable' => 1,
-								'enrich_parent_groups' => 1
+								'with_hosts' => true,
+								'editable' => true,
+								'enrich_parent_groups' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
