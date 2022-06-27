@@ -1581,7 +1581,7 @@ static zbx_vmware_cluster_t	*vmware_cluster_shared_dup(const zbx_vmware_cluster_
 	cluster->name = vmware_shared_strdup(src->name);
 	cluster->status = vmware_shared_strdup(src->status);
 	VMWARE_VECTOR_CREATE(&cluster->alarm_ids, str);
-	zbx_vector_str_reserve(&cluster->alarm_ids, src->alarm_ids.values_num);
+	zbx_vector_str_reserve(&cluster->alarm_ids, (size_t)src->alarm_ids.values_num);
 
 	for (i = 0; i < src->alarm_ids.values_num; i++)
 		zbx_vector_str_append(&cluster->alarm_ids, vmware_shared_strdup(src->alarm_ids.values[i]));
@@ -1649,11 +1649,11 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 	datastore->name = vmware_shared_strdup(src->name);
 	datastore->id = vmware_shared_strdup(src->id);
 	VMWARE_VECTOR_CREATE(&datastore->hv_uuids_access, str_uint64_pair);
-	zbx_vector_str_uint64_pair_reserve(&datastore->hv_uuids_access, src->hv_uuids_access.values_num);
+	zbx_vector_str_uint64_pair_reserve(&datastore->hv_uuids_access, (size_t)src->hv_uuids_access.values_num);
 	VMWARE_VECTOR_CREATE(&datastore->diskextents, vmware_diskextent);
-	zbx_vector_vmware_diskextent_reserve(&datastore->diskextents, src->diskextents.values_num);
+	zbx_vector_vmware_diskextent_reserve(&datastore->diskextents, (size_t)src->diskextents.values_num);
 	VMWARE_VECTOR_CREATE(&datastore->alarm_ids, str);
-	zbx_vector_str_reserve(&datastore->alarm_ids, src->alarm_ids.values_num);
+	zbx_vector_str_reserve(&datastore->alarm_ids, (size_t)src->alarm_ids.values_num);
 
 	datastore->capacity = src->capacity;
 	datastore->free_space = src->free_space;
@@ -1698,7 +1698,7 @@ static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_da
 	datacenter->name = vmware_shared_strdup(src->name);
 	datacenter->id = vmware_shared_strdup(src->id);
 	VMWARE_VECTOR_CREATE(&datacenter->alarm_ids, str);
-	zbx_vector_str_reserve(&datacenter->alarm_ids, src->alarm_ids.values_num);
+	zbx_vector_str_reserve(&datacenter->alarm_ids, (size_t)src->alarm_ids.values_num);
 
 	for (i = 0; i < src->alarm_ids.values_num; i++)
 		zbx_vector_str_append(&datacenter->alarm_ids, vmware_shared_strdup(src->alarm_ids.values[i]));
@@ -1860,10 +1860,10 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 	VMWARE_VECTOR_CREATE(&vm->file_systems, ptr);
 	VMWARE_VECTOR_CREATE(&vm->custom_attrs, vmware_custom_attr);
 	VMWARE_VECTOR_CREATE(&vm->alarm_ids, str);
-	zbx_vector_ptr_reserve(&vm->devs, src->devs.values_num);
-	zbx_vector_ptr_reserve(&vm->file_systems, src->file_systems.values_num);
-	zbx_vector_vmware_custom_attr_reserve(&vm->custom_attrs, src->custom_attrs.values_num);
-	zbx_vector_str_reserve(&vm->alarm_ids, src->alarm_ids.values_num);
+	zbx_vector_ptr_reserve(&vm->devs, (size_t)src->devs.values_num);
+	zbx_vector_ptr_reserve(&vm->file_systems, (size_t)src->file_systems.values_num);
+	zbx_vector_vmware_custom_attr_reserve(&vm->custom_attrs, (size_t)src->custom_attrs.values_num);
+	zbx_vector_str_reserve(&vm->alarm_ids, (size_t)src->alarm_ids.values_num);
 
 	vm->uuid = vmware_shared_strdup(src->uuid);
 	vm->id = vmware_shared_strdup(src->id);
@@ -1983,10 +1983,10 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 	VMWARE_VECTOR_CREATE(&dst->vms, ptr);
 	VMWARE_VECTOR_CREATE(&dst->pnics, vmware_pnic);
 	VMWARE_VECTOR_CREATE(&dst->alarm_ids, str);
-	zbx_vector_vmware_dsname_reserve(&dst->dsnames, src->dsnames.values_num);
-	zbx_vector_ptr_reserve(&dst->vms, src->vms.values_num);
-	zbx_vector_vmware_pnic_reserve(&dst->pnics, src->pnics.values_num);
-	zbx_vector_str_reserve(&dst->alarm_ids, src->alarm_ids.values_num);
+	zbx_vector_vmware_dsname_reserve(&dst->dsnames, (size_t)src->dsnames.values_num);
+	zbx_vector_ptr_reserve(&dst->vms, (size_t)src->vms.values_num);
+	zbx_vector_vmware_pnic_reserve(&dst->pnics, (size_t)src->pnics.values_num);
+	zbx_vector_str_reserve(&dst->alarm_ids, (size_t)src->alarm_ids.values_num);
 
 	dst->uuid = vmware_shared_strdup(src->uuid);
 	dst->id = vmware_shared_strdup(src->id);
@@ -2038,14 +2038,14 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	VMWARE_VECTOR_CREATE(&data->dvswitches, vmware_dvswitch);
 	VMWARE_VECTOR_CREATE(&data->alarms, vmware_alarm);
 	VMWARE_VECTOR_CREATE(&data->alarm_ids, str);
-	zbx_vector_ptr_reserve(&data->clusters, src->clusters.values_num);
-	zbx_vector_ptr_reserve(&data->events, src->events.values_alloc);
-	zbx_vector_vmware_datastore_reserve(&data->datastores, src->datastores.values_num);
-	zbx_vector_vmware_datacenter_reserve(&data->datacenters, src->datacenters.values_num);
+	zbx_vector_ptr_reserve(&data->clusters, (size_t)src->clusters.values_num);
+	zbx_vector_ptr_reserve(&data->events, (size_t)src->events.values_alloc);
+	zbx_vector_vmware_datastore_reserve(&data->datastores, (size_t)src->datastores.values_num);
+	zbx_vector_vmware_datacenter_reserve(&data->datacenters, (size_t)src->datacenters.values_num);
 	zbx_vector_vmware_resourcepool_reserve(&data->resourcepools, (size_t)src->resourcepools.values_num);
 	zbx_vector_vmware_dvswitch_reserve(&data->dvswitches, (size_t)src->dvswitches.values_num);
-	zbx_vector_vmware_alarm_reserve(&data->alarms, src->alarms.values_num);
-	zbx_vector_str_reserve(&data->alarm_ids, src->alarm_ids.values_num);
+	zbx_vector_vmware_alarm_reserve(&data->alarms, (size_t)src->alarms.values_num);
+	zbx_vector_str_reserve(&data->alarm_ids, (size_t)src->alarm_ids.values_num);
 
 	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_shmem_malloc_func,
 			__vm_shmem_realloc_func, __vm_shmem_free_func);
