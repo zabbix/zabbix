@@ -541,7 +541,12 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE && $this->ymin_itemid != 0) {
-			$item = get_item_by_itemid($this->ymin_itemid);
+			$items = API::Item()->get([
+				'output' => ['itemid', 'value_type'],
+				'itemids' => [$this->ymin_itemid]
+			]);
+			$item = $items[0];
+
 			if ($item) {
 				$history = Manager::History()->getLastValues([$item]);
 				if (isset($history[$item['itemid']])) {
@@ -611,7 +616,12 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE && $this->ymax_itemid != 0) {
-			$item = get_item_by_itemid($this->ymax_itemid);
+			$items = API::Item()->get([
+				'output' => ['itemid', 'value_type'],
+				'itemids' => [$this->ymax_itemid]
+			]);
+			$item = $items[0];
+
 			if ($item) {
 				$history = Manager::History()->getLastValues([$item]);
 				if (isset($history[$item['itemid']])) {

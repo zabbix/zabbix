@@ -398,8 +398,27 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
 			$gitem['key_'] = $dbItem['key_'];
 		}
 		elseif ($error) {
-			$item = get_item_by_itemid($gitem['itemid']);
-			$host = get_host_by_hostid($destinationHostId);
+			$items = API::Item()->get([
+				'output' => ['itemid', 'key_'],
+				'itemids' => [$gitem['itemid']]
+			]);
+
+			if (!$items) {
+				return false;
+			}
+
+			$item = $items[0];
+
+			$hosts = API::Host()->get([
+				'output' => ['hostid', 'host'],
+				'hostids' => [$destinationHostId]
+			]);
+
+			if (!$hosts) {
+				return false;
+			}
+
+			$host = $hosts[0];
 
 			error(_s('Missing key "%1$s" for host "%2$s".', $item['key_'], $host['host']));
 

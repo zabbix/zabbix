@@ -40,7 +40,12 @@ class CPieGraphDraw extends CGraphDraw {
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
-		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($itemid)]);
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_'],
+			'itemids' => [$itemid]
+		]);
+
+		$items = CMacrosResolverHelper::resolveItemNames([$items[0]]);
 
 		$this->items[$this->num] = reset($items);
 
@@ -133,10 +138,18 @@ class CPieGraphDraw extends CGraphDraw {
 		}
 
 		$config = select_config();
+
 		$items = [];
 
+		$db_items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'value_type', 'units', 'history', 'trends'],
+			'itemids' => array_column($this->items, 'itemid'),
+			'preservekeys' => true
+		]);
+
 		for ($i = 0; $i < $this->num; $i++) {
-			$item = get_item_by_itemid($this->items[$i]['itemid']);
+			$item = $db_items[$this->items[$i]['itemid']];
+
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 

@@ -180,18 +180,21 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 	elseif ($data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismin', $data['yaxismin']);
 
+		$ymin_axis_ms_data = [];
+
+		if (array_key_exists($data['ymin_itemid'], $data['yaxis_items'])) {
+			$ymin_axis_ms_data = [[
+				'id' => $data['yaxis_items'][$data['ymin_itemid']]['itemid'],
+				'name' => $data['yaxis_items'][$data['ymin_itemid']]['name_expanded'],
+				'prefix' => $data['yaxis_items'][$data['ymin_itemid']]['hosts'][0]['name'].NAME_DELIMITER
+			]];
+		}
+
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMinData[] = (new CMultiSelect([
 			'name' => 'ymin_itemid',
 			'object_name' => 'ymin_itemid',
-			'data' => [
-				[
-					'id' => $data['yaxis_items'][$data['ymin_itemid']]['itemid'],
-					'name' => $data['yaxis_items'][$data['ymin_itemid']]['name_expanded'],
-					'prefix' => $data['yaxis_items'][$data['ymin_itemid']]['hosts'][0]['name'].NAME_DELIMITER
-				]
-				// TODO add check if key exists, if no then return []
-			],
+			'data' => $ymin_axis_ms_data,
 			'multiple' => false,
 			'styles' => [
 				'display' => 'inline-flex'
@@ -259,18 +262,21 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 	elseif ($data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismax', $data['yaxismax']);
 
+		$ymax_axis_ms_data = [];
+
+		if (array_key_exists($data['ymax_itemid'], $data['yaxis_items'])) {
+			$ymax_axis_ms_data = [[
+				'id' => $data['yaxis_items'][$data['ymax_itemid']]['itemid'],
+				'name' => $data['yaxis_items'][$data['ymax_itemid']]['name_expanded'],
+				'prefix' => $data['yaxis_items'][$data['ymax_itemid']]['hosts'][0]['name'].NAME_DELIMITER
+			]];
+		}
+
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMaxData[] = (new CMultiSelect([
 			'name' => 'ymax_itemid',
 			'object_name' => 'ymax_itemid',
-			'data' => [
-				[
-					'id' => $data['yaxis_items'][$data['ymax_itemid']]['itemid'],
-					'name' => $data['yaxis_items'][$data['ymax_itemid']]['name_expanded'],
-					'prefix' => $data['yaxis_items'][$data['ymax_itemid']]['hosts'][0]['name'].NAME_DELIMITER
-				]
-				// TODO add check if key exists, if no then return []
-			],
+			'data' => $ymax_axis_ms_data,
 			'multiple' => false,
 			'styles' => [
 				'display' => 'inline-flex'
