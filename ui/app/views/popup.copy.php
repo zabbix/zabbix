@@ -39,16 +39,19 @@ $form = (new CForm('post', (new CUrl())->getUrl()))
 if (array_key_exists('itemids', $data)) {
 	$form->addVar('itemids', $data['itemids']);
 	$action = 'copy.items';
+	$header = _n('Copy %1$s item', 'Copy %1$s items', count($data['itemids']));
 }
 
 elseif (array_key_exists('triggerids', $data)) {
 	$form->addVar('triggerids', $data['triggerids']);
 	$action = 'copy.triggers';
+	$header = _n('Copy %1$s trigger', 'Copy %1$s triggers', count($data['triggerids']));
 }
 
 elseif (array_key_exists('graphids', $data)) {
 	$form->addVar('graphids', $data['graphids']);
 	$action = 'copy.graphs';
+	$header = _n('Copy %1$s graph', 'Copy %1$s graphs', count($data['graphids']));
 }
 
 $form_grid = (new CFormGrid())
@@ -91,7 +94,7 @@ $buttons = [
 ];
 
 $output = [
-	'header' => 'Copy',
+	'header' => $header,
 	'copy_targetids' => $data['copy_targetids'],
 	'body' => $form->toString(),
 	'buttons' => $buttons,
