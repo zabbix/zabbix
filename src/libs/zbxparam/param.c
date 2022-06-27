@@ -18,9 +18,9 @@
 **/
 
 #include "zbxexpr.h"
+#include "zbxnum.h"
 
 #include "zbxparam.h"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: return parameter by index (num) from parameter list (param)       *

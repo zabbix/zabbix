@@ -283,68 +283,6 @@ retry:
 	*offset += written_len;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: check if the string is unsigned hexadecimal integer within the    *
- *          specified range and optionally store it into value parameter      *
- *                                                                            *
- * Parameters: str   - [IN] string to check                                   *
- *             n     - [IN] string length                                     *
- *             value - [OUT] a pointer to output buffer where the converted   *
- *                     value is to be written (optional, can be NULL)         *
- *             size  - [IN] size of the output buffer (optional)              *
- *             min   - [IN] the minimum acceptable value                      *
- *             max   - [IN] the maximum acceptable value                      *
- *                                                                            *
- * Return value:  SUCCEED - the string is unsigned integer                    *
- *                FAIL - the string is not a hexadecimal number or its value  *
- *                       is outside the specified range                       *
- *                                                                            *
- ******************************************************************************/
-int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
-{
-	zbx_uint64_t		value_uint64 = 0, c;
-	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
-	int			len = 0;
-
-	if ('\0' == *str || 0 == n || sizeof(zbx_uint64_t) < size || (0 == size && NULL != value))
-		return FAIL;
-
-	while ('\0' != *str && 0 < n--)
-	{
-		if ('0' <= *str && *str <= '9')
-			c = *str - '0';
-		else if ('a' <= *str && *str <= 'f')
-			c = 10 + (*str - 'a');
-		else if ('A' <= *str && *str <= 'F')
-			c = 10 + (*str - 'A');
-		else
-			return FAIL;	/* not a hexadecimal digit */
-
-		if (16 < ++len && (max_uint64 >> 4) < value_uint64)
-			return FAIL;	/* maximum value exceeded */
-
-		value_uint64 = (value_uint64 << 4) + c;
-
-		str++;
-	}
-	if (min > value_uint64 || value_uint64 > max)
-		return FAIL;
-
-	if (NULL != value)
-	{
-		/* On little endian architecture the output value will be stored starting from the first bytes */
-		/* of 'value' buffer while on big endian architecture it will be stored starting from the last */
-		/* bytes. We handle it by storing the offset in the most significant byte of short value and   */
-		/* then use the first byte as source offset.                                                   */
-		unsigned short	value_offset = (unsigned short)((sizeof(zbx_uint64_t) - size) << 8);
-
-		memcpy(value, (unsigned char *)&value_uint64 + *((unsigned char *)&value_offset), size);
-	}
-
-	return SUCCEED;
-}
-
 #if defined(_WINDOWS) || defined(__MINGW32__)
 
 /* convert from selected code page to unicode */

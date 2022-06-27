@@ -14,6 +14,7 @@ WINDRES = windres.exe
 
 OBJS = \
 	$(OUTPUTDIR)\threads.o \
+	$(OUTPUTDIR)\expr.o \
 	$(OUTPUTDIR)\interval.o \
 	$(OUTPUTDIR)\num.o \
 	$(OUTPUTDIR)\str.o \

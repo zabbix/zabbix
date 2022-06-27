@@ -18,6 +18,7 @@
 **/
 
 #include "zbxstr.h"
+#include "zbxnum.h"
 #include "zbxcomms.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
