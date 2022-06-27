@@ -104,10 +104,10 @@ static void	validate_and_add_tag(ZBX_DB_EVENT* event, zbx_tag_t *tag)
 	zbx_ltrim(tag->tag, ZBX_WHITESPACE);
 	zbx_ltrim(tag->value, ZBX_WHITESPACE);
 
-	if (TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
-		tag->tag[zbx_strlen_utf8_nchars(tag->tag, TAG_NAME_LEN)] = '\0';
-	if (TAG_VALUE_LEN < zbx_strlen_utf8(tag->value))
-		tag->value[zbx_strlen_utf8_nchars(tag->value, TAG_VALUE_LEN)] = '\0';
+	if (ZBX_DB_TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
+		tag->tag[zbx_strlen_utf8_nchars(tag->tag, ZBX_DB_TAG_NAME_LEN)] = '\0';
+	if (ZBX_DB_TAG_VALUE_LEN < zbx_strlen_utf8(tag->value))
+		tag->value[zbx_strlen_utf8_nchars(tag->value, ZBX_DB_TAG_VALUE_LEN)] = '\0';
 
 	zbx_rtrim(tag->tag, ZBX_WHITESPACE);
 	zbx_rtrim(tag->value, ZBX_WHITESPACE);
