@@ -144,9 +144,6 @@ $(OUTPUTDIR)\components_strings_representations.o: $(TOPDIR)\src\libs\zbxcommon\
 $(OUTPUTDIR)\param.o: $(TOPDIR)\src\libs\zbxparam\param.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\tls_version.o: $(TOPDIR)\src\libs\zbxcrypto\tls_version.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
 $(OUTPUTDIR)\tls_version.o: $(TOPDIR)\src\libs\zbxcomms\tls_version.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
