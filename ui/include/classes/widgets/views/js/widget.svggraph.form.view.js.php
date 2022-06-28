@@ -378,7 +378,7 @@ window.widget_svggraph_form = new class {
 			);
 		}
 
-		for (const input of dataset.querySelectorAll('input[name^=ds]')) {
+		for (const input of dataset.querySelectorAll('[name^=ds]')) {
 			const cloned_name = input.name.replace(/([a-z]+\[)\d+(]\[[a-z_]+])/,
 				`$1${cloned_dataset.getAttribute('data-set')}$2`
 			);
@@ -394,10 +394,9 @@ window.widget_svggraph_form = new class {
 					cloned_dataset.querySelector(`[name="${cloned_name}"]`).dispatchEvent(new Event('change'));
 				}
 			}
-			else if ((input.type === 'checkbox' || input.type === 'radio') && input.checked) {
+			else if (input.type === 'checkbox' || input.type === 'radio') {
 				// Click to fire events.
-				cloned_dataset.querySelector(`[name="${cloned_name}"][value="${input.value}"]`)
-					.dispatchEvent(new Event('click'));
+				cloned_dataset.querySelector(`[name="${cloned_name}"][value="${input.value}"]`).checked = input.checked;
 			}
 		}
 
