@@ -352,7 +352,6 @@ $triggers_form->addItem([
 			'trigger.masscopyto' => [
 				'content' => (new CSimpleButton(_('Copy')))
 					->addClass('js-copy')
-					->addClass('no-chkbxrange')
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeid()
 			],

@@ -316,7 +316,6 @@ if ($data['context'] === 'host') {
 			'content' => (new CSimpleButton(_('Execute now')))
 				->addClass('js-massCheckNow')
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		],
 		'item.massclearhistory' => $massclearhistory,
@@ -327,7 +326,6 @@ $button_list += [
 	'item.masscopyto' => [
 		'content' => (new CSimpleButton(_('Copy')))
 			->addClass('js-copy')
-			->addClass('no-chkbxrange')
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->removeid()
 	],
