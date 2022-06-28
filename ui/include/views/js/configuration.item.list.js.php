@@ -55,6 +55,15 @@
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
 				new CTagFilterItem(row);
 			});
+			this._initActions();
+		},
+
+		_initActions() {
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-copy')) {
+					this.openCopyPopup();
+				}
+			});
 		},
 
 		editHost(e, hostid) {
@@ -80,15 +89,15 @@
 			}, {once: true});
 		},
 
-		openCopyPopup(button) {
-			const form = button.closest('form');
+		openCopyPopup() {
+			const form = document.activeElement.closest('form');
 			const parameters = {};
-			parameters.context = form.querySelector('#form_context').value;
 			parameters.itemids = Object.keys(chkbxRange.getSelectedIds());
+			parameters.context = form.querySelector('#form_context').value
 
 			return PopUp('popup.copy.items', parameters, {
 				dialogueid: 'copy',
-				dialogue_class: 'modal-popup-static'
+				dialogue_class: 'modal-popup-static',
 			});
 		},
 

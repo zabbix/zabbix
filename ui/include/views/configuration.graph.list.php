@@ -253,10 +253,11 @@ foreach ($data['graphs'] as $graph) {
 $buttonsArray = [];
 if (!$this->data['parent_discoveryid']) {
 	$buttonsArray['graph.masscopyto'] = [
-		'content' => (new CButton('', _('Copy')))
-			->onClick("view.openCopyPopup(this);")
+		'content' => (new CSimpleButton(_('Copy')))
+			->addClass('js-copy')
+			->addClass('no-chkbxrange')
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->removeAttribute('id')
+			->removeid()
 	];
 }
 $buttonsArray['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
@@ -277,5 +278,8 @@ $graphForm->addItem([
 
 // append form to widget
 $widget->addItem($graphForm);
-
 $widget->show();
+
+(new CScriptTag('view._initActions();'))
+	->setOnDocumentReady()
+	->show();

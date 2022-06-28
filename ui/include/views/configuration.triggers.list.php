@@ -350,10 +350,11 @@ $triggers_form->addItem([
 			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?')],
 			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?')],
 			'trigger.masscopyto' => [
-				'content' => (new CButton('', _('Copy')))
-					->onClick('view.openCopyPopup(this);')
+				'content' => (new CSimpleButton(_('Copy')))
+					->addClass('js-copy')
+					->addClass('no-chkbxrange')
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeAttribute('id')
+					->removeid()
 			],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))

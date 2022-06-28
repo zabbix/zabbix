@@ -48,6 +48,16 @@
 					$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
 				})
 				.trigger('change');
+
+			this._initActions();
+		},
+
+		_initActions() {
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-copy')) {
+					this.openCopyPopup();
+				}
+			});
 		},
 
 		editHost(e, hostid) {
@@ -73,15 +83,15 @@
 			}, {once: true});
 		},
 
-		openCopyPopup(button) {
-			const form = button.closest('form');
+		openCopyPopup() {
+			const form = document.activeElement.closest('form');
 			const parameters = {};
-			parameters.context = form.querySelector('#form_context').value;
 			parameters.triggerids = Object.keys(chkbxRange.getSelectedIds());
+			parameters.context = form.querySelector('#form_context').value
 
 			return PopUp('popup.copy.triggers', parameters, {
 				dialogueid: 'copy',
-				dialogue_class: 'modal-popup-static'
+				dialogue_class: 'modal-popup-static',
 			});
 		},
 

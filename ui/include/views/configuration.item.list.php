@@ -319,16 +319,17 @@ if ($data['context'] === 'host') {
 				->addClass('no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		],
-		'item.massclearhistory' => $massclearhistory
+		'item.massclearhistory' => $massclearhistory,
 	];
 }
 
 $button_list += [
 	'item.masscopyto' => [
-		'content' => (new CButton('', _('Copy')))
-			->onClick('view.openCopyPopup(this);')
+		'content' => (new CSimpleButton(_('Copy')))
+			->addClass('js-copy')
+			->addClass('no-chkbxrange')
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->removeAttribute('id')
+			->removeid()
 	],
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))
