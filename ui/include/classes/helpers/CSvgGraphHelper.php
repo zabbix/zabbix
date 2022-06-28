@@ -63,12 +63,18 @@ class CSvgGraphHelper {
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
+		$svg_height = $height - ($legend !== null ? $legend->getLinesCount() * CSvgGraphLegend::LINE_HEIGHT : 0);
+
+		if (0 > $svg_height) {
+			$svg_height = 0;
+		}
+
 		$graph = (new CSvgGraph([
 			'displaying' => $options['displaying'],
 			'time_period' => $options['time_period'],
 			'axes' => $options['axes']
 		]))
-			->setSize($width, $height - ($legend !== null ? $legend->getLinesCount() * CSvgGraphLegend::LINE_HEIGHT : 0))
+			->setSize($width, $svg_height)
 			->addMetrics($metrics)
 			->addSimpleTriggers(self::getSimpleTriggers($metrics, $options['displaying']))
 			->addProblems(self::getProblems($metrics, $options['problems'], $options['time_period']))
