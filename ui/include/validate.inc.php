@@ -425,7 +425,6 @@ function check_fields_raw(&$fields) {
  * @return bool true on success, false on error.
  */
 function check_fields(&$fields, $show_messages = true) {
-
 	$err = check_fields_raw($fields);
 
 	if ($err & ZBX_VALID_ERROR) {

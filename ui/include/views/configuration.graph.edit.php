@@ -132,7 +132,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			->onClick('javascript: showHideVisible("percent_left");')
 			->setEnabled(!$readonly);
 
-		if(isset($data['visible']) && isset($data['visible']['percent_left'])) {
+		if(array_key_exists('visible', $data) && array_key_exists('percent_left', $data['visible'])) {
 			$percentLeftCheckbox->setChecked(true);
 		}
 		elseif ($data['percent_left'] == 0) {
@@ -205,6 +205,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			'object_name' => 'ymin_itemid',
 			'data' => $ymin_axis_ms_data,
 			'multiple' => false,
+			'disabled' => $readonly,
 			'styles' => [
 				'display' => 'inline-flex'
 			],
@@ -215,7 +216,8 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 					'srcfld2' => 'name',
 					'dstfrm' => $graphForm->getName(),
 					'dstfld1' => 'ymin_itemid',
-					'hostid' => $data['is_template'] ? $data['hostid'] : 0
+					'hostid' => $data['is_template'] ? $data['hostid'] : 0,
+					'real_hosts' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
@@ -296,6 +298,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			'object_name' => 'ymax_itemid',
 			'data' => $ymax_axis_ms_data,
 			'multiple' => false,
+			'disabled' => $readonly,
 			'styles' => [
 				'display' => 'inline-flex'
 			],
@@ -306,7 +309,8 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 					'srcfld2' => 'name',
 					'dstfrm' => $graphForm->getName(),
 					'dstfld1' => 'ymax_itemid',
-					'hostid' => $data['is_template'] ? $data['hostid'] : 0
+					'hostid' => $data['is_template'] ? $data['hostid'] : 0,
+					'real_hosts' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);

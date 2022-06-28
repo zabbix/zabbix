@@ -49,7 +49,7 @@ class CScreenPlainText extends CScreenBase {
 			'itemids' => [$this->screenitem['resourceid']]
 		]);
 
-		$items = CMacrosResolverHelper::resolveItemNames([$items[0]]);
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 		$item = reset($items);
 
 		$host = get_host_by_itemid($this->screenitem['resourceid']);

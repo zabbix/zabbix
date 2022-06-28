@@ -227,7 +227,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				// get graph, used below
-
 				$graph = API::Graph()->get([
 					'output' => API_OUTPUT_EXTEND,
 					'selectHosts' => ['name'],

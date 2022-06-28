@@ -45,7 +45,7 @@ class CPieGraphDraw extends CGraphDraw {
 			'itemids' => [$itemid]
 		]);
 
-		$items = CMacrosResolverHelper::resolveItemNames([$items[0]]);
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		$this->items[$this->num] = reset($items);
 
@@ -138,7 +138,6 @@ class CPieGraphDraw extends CGraphDraw {
 		}
 
 		$config = select_config();
-
 		$items = [];
 
 		$db_items = API::Item()->get([
