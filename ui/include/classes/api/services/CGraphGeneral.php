@@ -259,6 +259,7 @@ abstract class CGraphGeneral extends CApiService {
 	 *
 	 * @param array $graph
 	 * @param bool  $tpl
+	 * @param array $db_graph
 	 */
 	protected function checkAxisItems(array $graph, $tpl = false, array $db_graph = null) {
 		$axisItems = [];
