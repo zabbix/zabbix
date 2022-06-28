@@ -1443,7 +1443,7 @@ class CApiInputValidator {
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS,
 	 *                                           API_ALLOW_UNEXPECTED
-	 * @param array  $rule['fields']  Rules of the objects fields. Optional in case if length is zero.
+	 * @param array  $rule['fields']  Rules of the objects fields. Optional if length is zero.
 	 * @param int    $rule['length']  (optional) Allowed count of objects.
 	 * @param mixed  $data
 	 * @param string $path

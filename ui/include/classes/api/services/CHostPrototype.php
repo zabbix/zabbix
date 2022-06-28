@@ -1359,7 +1359,7 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Check if value of the given object field remain unchanged.
+	 * Check if value of the given object field remains unchanged.
 	 *
 	 * @param array  $object
 	 * @param array  $db_object
