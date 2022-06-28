@@ -670,7 +670,7 @@ class CGraphPrototype extends CGraphGeneral {
 		}
 		unset($graph);
 
-		$itemIds = $this->validateItemsUpdate($graphs);
+		$itemIds = $this->validateItemsUpdate($graphs, $dbGraphs);
 
 		$allowedItems = API::Item()->get([
 			'itemids' => $itemIds,

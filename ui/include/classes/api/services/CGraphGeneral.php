@@ -260,23 +260,28 @@ abstract class CGraphGeneral extends CApiService {
 	 * @param array $graph
 	 * @param bool  $tpl
 	 */
-	protected function checkAxisItems(array $graph, $tpl = false) {
+	protected function checkAxisItems(array $graph, $tpl = false, array $db_graph = null) {
 		$axisItems = [];
-		if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-			$axisItems[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+		if (array_key_exists('ymin_type', $graph) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			if ($db_graph === null || $graph['ymin_itemid'] != $db_graph['ymin_itemid']) {
+				$axisItems[$graph['ymin_itemid']] = 1;
+			}
 		}
-		if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-			$axisItems[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+		if (array_key_exists('ymax_type', $graph) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			if ($db_graph === null || $graph['ymax_itemid'] != $db_graph['ymax_itemid']) {
+				$axisItems[$graph['ymax_itemid']] = 1;
+			}
 		}
 
-		if (!empty($axisItems)) {
+		if (count($axisItems)) {
 			$options = [
-				'itemids' => $axisItems,
 				'output' => ['itemid'],
-				'countOutput' => true,
+				'filter' => ['flags' => null, 'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
+				'itemids' => array_keys($axisItems),
 				'webitems' => true,
-				'filter' => ['flags' => null, 'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]]
+				'countOutput' => true
 			];
+
 			if ($tpl) {
 				$options['hostids'] = $tpl;
 			}
@@ -572,10 +577,11 @@ abstract class CGraphGeneral extends CApiService {
 	 * and return valid item ID's on success or trow an error on failure.
 	 *
 	 * @param array $graphs
+	 * @param array $db_graphs
 	 *
 	 * @return array
 	 */
-	protected function validateItemsUpdate(array $graphs) {
+	protected function validateItemsUpdate(array $graphs, array $db_graphs) {
 		$dbFields = ['itemid' => null];
 		$itemid_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
 
@@ -606,7 +612,10 @@ abstract class CGraphGeneral extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 				else {
-					$itemIds[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+					// Skip itemid if ymin_itemid stay the same.
+					if ($graph['ymin_itemid'] != $db_graphs[$graph['graphid']]['ymin_itemid']) {
+						$itemIds[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+					}
 				}
 			}
 
@@ -616,7 +625,10 @@ abstract class CGraphGeneral extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 				else {
-					$itemIds[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+					// Skip itemid if ymax_itemid stay the same.
+					if ($graph['ymax_itemid'] != $db_graphs[$graph['graphid']]['ymax_itemid']) {
+						$itemIds[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+					}
 				}
 			}
 		}
@@ -719,7 +731,7 @@ abstract class CGraphGeneral extends CApiService {
 			}
 
 			// check ymin, ymax items
-			$this->checkAxisItems($graph, $templatedGraph);
+			$this->checkAxisItems($graph, $templatedGraph, $dbGraphs[$graph['graphid']]);
 		}
 
 		$this->validateHostsAndTemplates($graphs);
