@@ -4037,8 +4037,8 @@ clean:
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             id           - [IN] the virtual machine id                     *
- *             alarms_data  - [IN/OUT] the all alarms with cache              *
  *             rpools       - [IN/OUT] the vector with all Resource Pools     *
+ *             alarms_data  - [IN/OUT] the all alarms with cache              *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: The created virtual machine object or NULL if an error was   *
