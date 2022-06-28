@@ -182,12 +182,21 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 
 		$ymin_axis_ms_data = [];
 
-		if (array_key_exists($data['ymin_itemid'], $data['yaxis_items'])) {
-			$ymin_axis_ms_data = [[
-				'id' => $data['yaxis_items'][$data['ymin_itemid']]['itemid'],
-				'name' => $data['yaxis_items'][$data['ymin_itemid']]['name_expanded'],
-				'prefix' => $data['yaxis_items'][$data['ymin_itemid']]['hosts'][0]['name'].NAME_DELIMITER
-			]];
+		if ($data['ymin_itemid'] != 0) {
+			if (array_key_exists($data['ymin_itemid'], $data['yaxis_items'])) {
+				$ymin_axis_ms_data = [[
+					'id' => $data['ymin_itemid'],
+					'name' => $data['yaxis_items'][$data['ymin_itemid']]['name_expanded'],
+					'prefix' => $data['yaxis_items'][$data['ymin_itemid']]['hosts'][0]['name'].NAME_DELIMITER
+				]];
+			}
+			else {
+				$ymin_axis_ms_data = [[
+					'id' => $data['ymin_itemid'],
+					'name' => _('Inaccessible item'),
+					'prefix' => ''
+				]];
+			}
 		}
 
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -205,7 +214,8 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
 					'dstfrm' => $graphForm->getName(),
-					'dstfld1' => 'ymin_itemid'
+					'dstfld1' => 'ymin_itemid',
+					'hostid' => $data['is_template'] ? $data['hostid'] : 0
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
@@ -263,13 +273,21 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 		$graphForm->addVar('yaxismax', $data['yaxismax']);
 
 		$ymax_axis_ms_data = [];
-
-		if (array_key_exists($data['ymax_itemid'], $data['yaxis_items'])) {
-			$ymax_axis_ms_data = [[
-				'id' => $data['yaxis_items'][$data['ymax_itemid']]['itemid'],
-				'name' => $data['yaxis_items'][$data['ymax_itemid']]['name_expanded'],
-				'prefix' => $data['yaxis_items'][$data['ymax_itemid']]['hosts'][0]['name'].NAME_DELIMITER
-			]];
+		if ($data['ymax_itemid'] != 0) {
+			if (array_key_exists($data['ymax_itemid'], $data['yaxis_items'])) {
+				$ymax_axis_ms_data = [[
+					'id' => $data['ymax_itemid'],
+					'name' => $data['yaxis_items'][$data['ymax_itemid']]['name_expanded'],
+					'prefix' => $data['yaxis_items'][$data['ymax_itemid']]['hosts'][0]['name'].NAME_DELIMITER
+				]];
+			}
+			else {
+				$ymax_axis_ms_data = [[
+					'id' => $data['ymax_itemid'],
+					'name' => _('Inaccessible item'),
+					'prefix' => ''
+				]];
+			}
 		}
 
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -287,7 +305,8 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
 					'dstfrm' => $graphForm->getName(),
-					'dstfld1' => 'ymax_itemid'
+					'dstfld1' => 'ymax_itemid',
+					'hostid' => $data['is_template'] ? $data['hostid'] : 0
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
