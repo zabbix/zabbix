@@ -314,7 +314,7 @@ if ($data['context'] === 'host') {
 	$button_list += [
 		'item.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))
-				->onClick('view.massCheckNow(this);')
+				->addClass('js-massCheckNow')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
 				->setAttribute('data-required', 'execute')

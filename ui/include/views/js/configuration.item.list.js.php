@@ -63,6 +63,9 @@
 				if (e.target.classList.contains('js-copy')) {
 					this.openCopyPopup();
 				}
+				else if (e.target.classList.contains('js-massCheckNow')) {
+					this.massCheckNow();
+				}
 			});
 		},
 
@@ -101,8 +104,8 @@
 			});
 		},
 
-		massCheckNow(button) {
-			button.classList.add('is-loading');
+		massCheckNow() {
+			document.activeElement.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.masscheck_now');
@@ -136,11 +139,10 @@
 					addMessage(message_box);
 				})
 				.finally(() => {
-					button.classList.remove('is-loading');
-
 					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
-					button.blur();
+					document.activeElement.blur();
 				});
+			document.activeElement.classList.remove('is-loading');
 		},
 
 		events: {
