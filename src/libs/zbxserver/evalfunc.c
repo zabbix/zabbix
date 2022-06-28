@@ -3857,7 +3857,7 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	{
 		ret = evaluate_BASELINE(value, item, function + 8, parameter, ts, error);
 	}
-	else if (NULL != (ptr = strstr(function, "_foreach")) && 8 == strlen(ptr))
+	else if (NULL != (ptr = strstr(function, "_foreach")) && ZBX_CONST_STRLEN("_foreach") == strlen(ptr))
 	{
 		*error = zbx_dsprintf(*error, "single item query is not supported by \"%s\" function", function);
 		ret = FAIL;
