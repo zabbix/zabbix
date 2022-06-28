@@ -3904,7 +3904,6 @@ static int	vmware_service_alarm_details_update(const zbx_vmware_service_t *servi
 	}
 
 	zbx_vector_vmware_alarm_details_append(details, detail);
-	detail = NULL;
 	zbx_vector_vmware_alarm_details_sort(details, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
 	if (FAIL == (ret = zbx_vector_vmware_alarm_details_bsearch(details, &cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
@@ -5307,7 +5306,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	{
 		zbx_vmware_vm_t	*vm;
 
-		if (NULL != (vm = vmware_service_create_vm(service, easyhandle, vms.values[i], rpools, alarms_data, error)))
+		if (NULL != (vm = vmware_service_create_vm(service, easyhandle, vms.values[i], rpools, alarms_data,
+				error)))
 		{
 			zbx_vector_ptr_append(&hv->vms, vm);
 		}

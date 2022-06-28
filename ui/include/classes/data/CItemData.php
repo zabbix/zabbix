@@ -1244,7 +1244,7 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.cluster.alarms.get[<url>,<id>]' => [
-				'description' => _('VMware cluster alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware cluster name'),
+				'description' => _('VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.cluster.discovery[<url>]' => [

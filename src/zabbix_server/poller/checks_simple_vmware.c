@@ -4990,7 +4990,8 @@ out:
 }
 
 
-static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_t *alarms, zbx_vector_str_t *ids, AGENT_RESULT *result)
+static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_t *alarms, zbx_vector_str_t *ids,
+		AGENT_RESULT *result)
 {
 	int		i, ret = SYSINFO_RET_OK;
 	struct zbx_json	json_data;
