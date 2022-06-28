@@ -59,12 +59,9 @@ class CSvgGraphLine extends CSvgPath {
 		if (count($this->path) > 1) {
 			$last_point = [0, 0];
 
-			$first = true;
-
-			foreach ($this->path as $point) {
-				if ($first) {
+			foreach ($this->path as $index => $point) {
+				if ($index == 0) {
 					$this->moveTo($point[0], $point[1]);
-					$first = false;
 				}
 				else {
 					if ($this->options['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
