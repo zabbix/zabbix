@@ -1653,5 +1653,5 @@ INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node4','192.16
 INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node5','192.168.1.9','10053','1','ckuo7i1nv000d0sajd95y1b6x');
 INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node6','192.168.1.10','10053','2','ckuo7i1nw000e0sajwfttc1mp');
 INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node7','192.168.1.11','10053','2','ckuo7i1nw000f0sajtzv1c6v3');
-INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('ZZZnode8','192.168.1.12','10051','1','ckuo7i1nw000g0sajjsjre7e3');
+INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('z-node','192.168.1.12','10051','1','ckuo7i1nw000g0sajjsjre7e3');
 INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node-active','192.168.1.13','10051','3','ckuo7i1nw000h0sajj3l3hh8u');
