@@ -1609,9 +1609,9 @@ int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 				break;
 		}
 
-		if (0 < (ret = waitpid(ha_pid, &status, WNOHANG)))
+		if (0 < waitpid(ha_pid, &status, WNOHANG))
 		{
-			ha_pid = -1;
+			ha_pid = ZBX_THREAD_ERROR;
 			*error = zbx_strdup(NULL, "HA manager has stopped during startup registration");
 			goto out;
 		}
@@ -1627,7 +1627,7 @@ int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 
 	ret = SUCCEED;
 out:
-	if (SUCCEED != ret && ZBX_THREAD_ERROR != ha_pid)
+	if (SUCCEED != ret)
 	{
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 		zbx_locks_disable();
