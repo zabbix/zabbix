@@ -59,16 +59,6 @@ window.widget_svggraph_form = new class {
 			.on('tabsactivate', () => jQuery.colorpicker('hide'))
 			.on('change', 'input, z-select, .multiselect', (e) => this.onGraphConfigChange(e));
 
-		jQuery('.overlay-dialogue').on('overlay-dialogue-resize', (event, size_new, size_old) => {
-			if (jQuery('#svg-graph-preview').length) {
-				if (size_new.width != size_old.width) {
-					this._updatePreview();
-				}
-			} else {
-				jQuery('.overlay-dialogue').off('overlay-dialogue-resize');
-			}
-		});
-
 		this._datasetTabInit();
 		this._timePeriodTabInit();
 		this._legendTabInit();
