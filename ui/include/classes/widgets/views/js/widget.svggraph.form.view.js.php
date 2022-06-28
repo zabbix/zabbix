@@ -578,7 +578,7 @@ window.widget_svggraph_form = new class {
 	}
 
 	_updateSingleItemsOrder(dataset) {
-		jQuery.colorpicker('destroy', jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input', dataset));
+		jQuery.colorpicker('destroy', jQuery('.single-item-table .<?= ZBX_STYLE_COLOR_PICKER ?> input', dataset));
 
 		const dataset_index = dataset.getAttribute('data-set');
 
@@ -589,7 +589,7 @@ window.widget_svggraph_form = new class {
 			row.querySelector('.table-col-name a').id = `${prefix}_name`;
 			row.querySelector('.table-col-action input').id = `${prefix}_input`;
 
-			const colorpicker = row.querySelector('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
+			const colorpicker = row.querySelector('.single-item-table .<?= ZBX_STYLE_COLOR_PICKER ?> input');
 
 			colorpicker.id = `${prefix}_color`;
 			jQuery(colorpicker).colorpicker({appendTo: '.overlay-dialogue-body'});
