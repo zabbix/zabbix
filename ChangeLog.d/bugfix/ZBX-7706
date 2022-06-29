@@ -1,1 +1,1 @@
-A.F....... [ZBXNEXT-7706] removed permission checks for ymin_itemid, ymax_itemid (acikuns, rlataria)
+A.F....... [ZBX-7706] removed permission checks for ymin_itemid and ymax_itemid (acikuns, rlataria)
