@@ -400,6 +400,180 @@ int	str_in_list(const char *list, const char *value, char delimiter)
 	return str_n_in_list(list, value, strlen(value), delimiter);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if string is contained in a list of delimited strings       *
+ *                                                                            *
+ * Parameters: list      - [IN] strings a,b,ccc,ddd                           *
+ *             value     - [IN] value                                         *
+ *             len       - [IN] value length                                  *
+ *             delimiter - [IN] delimiter                                     *
+ *                                                                            *
+ * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
+ *                                                                            *
+ ******************************************************************************/
+int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter)
+{
+	const char	*end;
+	size_t		token_len, next = 1;
+
+	while ('\0' != *list)
+	{
+		if (NULL != (end = strchr(list, delimiter)))
+		{
+			token_len = end - list;
+			next = 1;
+		}
+		else
+		{
+			token_len = strlen(list);
+			next = 0;
+		}
+
+		if (len == token_len && 0 == memcmp(list, value, len))
+			return SUCCEED;
+
+		list += token_len + next;
+	}
+
+	if (1 == next && 0 == len)
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: wrap long string at specified position with linefeeds             *
+ *                                                                            *
+ * Parameters: src     - input string                                         *
+ *             maxline - maximum length of a line                             *
+ *             delim   - delimiter to use as linefeed (default "\n" if NULL)  *
+ *                                                                            *
+ * Return value: newly allocated copy of input string with linefeeds          *
+ *                                                                            *
+ * Comments: allocates memory                                                 *
+ *                                                                            *
+ ******************************************************************************/
+char	*str_linefeed(const char *src, size_t maxline, const char *delim)
+{
+	size_t		src_size, dst_size, delim_size, left;
+	int		feeds;		/* number of feeds */
+	char		*dst = NULL;	/* output with linefeeds */
+	const char	*p_src;
+	char		*p_dst;
+
+	assert(NULL != src);
+	assert(0 < maxline);
+
+	/* default delimiter */
+	if (NULL == delim)
+		delim = "\n";
+
+	src_size = strlen(src);
+	delim_size = strlen(delim);
+
+	/* make sure we don't feed the last line */
+	feeds = (int)(src_size / maxline - (0 != src_size % maxline || 0 == src_size ? 0 : 1));
+
+	left = src_size - feeds * maxline;
+	dst_size = src_size + feeds * delim_size + 1;
+
+	/* allocate memory for output */
+	dst = (char *)zbx_malloc(dst, dst_size);
+
+	p_src = src;
+	p_dst = dst;
+
+	/* copy chunks appending linefeeds */
+	while (0 < feeds--)
+	{
+		memcpy(p_dst, p_src, maxline);
+		p_src += maxline;
+		p_dst += maxline;
+
+		memcpy(p_dst, delim, delim_size);
+		p_dst += delim_size;
+	}
+
+	if (0 < left)
+	{
+		/* copy what's left */
+		memcpy(p_dst, p_src, left);
+		p_dst += left;
+	}
+
+	*p_dst = '\0';
+
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize dynamic string array                                   *
+ *                                                                            *
+ * Parameters: arr - a pointer to array of strings                            *
+ *                                                                            *
+ * Comments: allocates memory, calls assert() if that fails                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strarr_init(char ***arr)
+{
+	*arr = (char **)zbx_malloc(*arr, sizeof(char *));
+	**arr = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add a string to dynamic string array                              *
+ *                                                                            *
+ * Parameters: arr - a pointer to array of strings                            *
+ *             entry - string to add                                          *
+ *                                                                            *
+ * Comments: allocates memory, calls assert() if that fails                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strarr_add(char ***arr, const char *entry)
+{
+	int	i;
+
+	assert(entry);
+
+	for (i = 0; NULL != (*arr)[i]; i++)
+		;
+
+	*arr = (char **)zbx_realloc(*arr, sizeof(char *) * (i + 2));
+
+	(*arr)[i] = zbx_strdup((*arr)[i], entry);
+	(*arr)[++i] = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free dynamic string array memory                                  *
+ *                                                                            *
+ * Parameters: arr - array of strings                                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strarr_free(char ***arr)
+{
+	char	**p;
+
+	for (p = *arr; NULL != *p; p++)
+		zbx_free(*p);
+	zbx_free(*arr);
+}
+
+void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src)
+{
+	zbx_strncpy_alloc(str, alloc_len, offset, src, strlen(src));
+}
+
+void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c)
+{
+	zbx_strncpy_alloc(str, alloc_len, offset, &c, 1);
+}
+
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
 {
 	if (NULL == *str)
@@ -418,16 +592,6 @@ void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const c
 	memcpy(*str + *offset, src, n);
 	*offset += n;
 	(*str)[*offset] = '\0';
-}
-
-void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src)
-{
-	zbx_strncpy_alloc(str, alloc_len, offset, src, strlen(src));
-}
-
-void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c)
-{
-	zbx_strncpy_alloc(str, alloc_len, offset, &c, 1);
 }
 
 void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str)
@@ -480,6 +644,52 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 	*dst++ = '"';
 	*dst = '\0';
 	*str_offset += size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: src       - [IN] source string                                 *
+ *             delimiter - [IN] delimiter                                     *
+ *             last      - [IN] split after last delimiter                    *
+ *             left      - [IN/OUT] first part of the string                  *
+ *             right     - [IN/OUT] second part of the string or NULL, if     *
+ *                                  delimiter was not found                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_string_split(const char *src, char delimiter, unsigned char last, char **left, char **right)
+{
+	char	*delimiter_ptr;
+
+	if (NULL == (delimiter_ptr = (0 == last ? strchr(src, delimiter) : strrchr(src, delimiter))))
+	{
+		*left = zbx_strdup(NULL, src);
+		*right = NULL;
+	}
+	else
+	{
+		size_t	left_size;
+		size_t	right_size;
+
+		left_size = (size_t)(delimiter_ptr - src) + 1;
+		right_size = strlen(src) - (size_t)(delimiter_ptr - src);
+
+		*left = zbx_malloc(NULL, left_size);
+		*right = zbx_malloc(NULL, right_size);
+
+		memcpy(*left, src, left_size - 1);
+		(*left)[left_size - 1] = '\0';
+		memcpy(*right, delimiter_ptr + 1, right_size);
+	}
+}
+
+void	zbx_strsplit_first(const char *src, char delimiter, char **left, char **right)
+{
+	zbx_string_split(src, delimiter, 0, left, right);
+}
+
+void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **right)
+{
+	zbx_string_split(src, delimiter, 1, left, right);
 }
 
 /******************************************************************************
@@ -603,69 +813,131 @@ char	*zbx_strdcatf(char *dest, const char *f, ...)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check a byte stream for a valid hostname                          *
+ * Purpose: check the item key characters length and, if the length exceeds   *
+ *          max allowable characters length, truncate the item key, while     *
+ *          maintaining the right square bracket                              *
  *                                                                            *
- * Parameters: hostname - pointer to the first char of hostname               *
- *             error - pointer to the error message (can be NULL)             *
+ * Parameters: key      - [IN] item key for processing                        *
+ *             char_max - [IN] item key max characters length                 *
+ *             buf      - [IN/OUT] buffer for short version of item key       *
+ *             buf_len  - [IN] buffer size for short version of item key      *
  *                                                                            *
- * Return value: return SUCCEED if hostname is valid                          *
- *               or FAIL if hostname contains invalid chars, is empty         *
- *               or is longer than ZBX_MAX_HOSTNAME_LEN                       *
+ * Return value: The item key that does not exceed passed length              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_hostname(const char *hostname, char **error)
+const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *buf, const size_t buf_len)
 {
-	int	len = 0;
+#	define ZBX_SUFFIX	"..."
+#	define ZBX_BSUFFIX	"[...]"
 
-	while ('\0' != hostname[len])
+	size_t	key_byte_count, key_char_total;
+	int	is_bracket = 0;
+	char	*bracket_l;
+
+	if (char_max >= (key_char_total = zbx_strlen_utf8(key)))
+		return key;
+
+	if (NULL != (bracket_l = strchr(key, '[')))
+		is_bracket = 1;
+
+	if (char_max < ZBX_CONST_STRLEN(ZBX_SUFFIX) + 2 * is_bracket)	/* [...] or ... */
+		return key;
+
+	if (0 != is_bracket)
 	{
-		if (FAIL == is_hostname_char(hostname[len]))
+		size_t	key_char_count, param_char_count, param_byte_count;
+
+		key_char_count = zbx_charcount_utf8_nbytes(key, bracket_l - key);
+		param_char_count = key_char_total - key_char_count;
+
+		if (param_char_count <= ZBX_CONST_STRLEN(ZBX_BSUFFIX))
 		{
-			if (NULL != error)
-				*error = zbx_dsprintf(NULL, "name contains invalid character '%c'", hostname[len]);
-			return FAIL;
+			if (char_max < param_char_count + ZBX_CONST_STRLEN(ZBX_SUFFIX))
+				return key;
+
+			key_byte_count = 1 + zbx_strlen_utf8_nchars(key, char_max - param_char_count -
+					ZBX_CONST_STRLEN(ZBX_SUFFIX));
+			param_byte_count = 1 + zbx_strlen_utf8_nchars(bracket_l, key_char_count);
+
+			if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX) + param_byte_count - 1)
+				return key;
+
+			key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
+			key_byte_count += zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
+			zbx_strlcpy_utf8(&buf[key_byte_count], bracket_l, param_byte_count);
+
+			return buf;
 		}
 
-		len++;
+		if (key_char_count + ZBX_CONST_STRLEN(ZBX_BSUFFIX) > char_max)
+		{
+			if (char_max <= ZBX_CONST_STRLEN(ZBX_SUFFIX) + ZBX_CONST_STRLEN(ZBX_BSUFFIX))
+				return key;
+
+			key_byte_count = 1 + zbx_strlen_utf8_nchars(key, char_max - ZBX_CONST_STRLEN(ZBX_SUFFIX) -
+					ZBX_CONST_STRLEN(ZBX_BSUFFIX));
+
+			if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX) + ZBX_CONST_STRLEN(ZBX_BSUFFIX))
+				return key;
+
+			key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
+			key_byte_count += zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
+			zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_BSUFFIX, sizeof(ZBX_BSUFFIX));
+
+			return buf;
+		}
 	}
 
-	if (0 == len)
-	{
-		if (NULL != error)
-			*error = zbx_strdup(NULL, "name is empty");
-		return FAIL;
-	}
+	key_byte_count = 1 + zbx_strlen_utf8_nchars(key, char_max - (ZBX_CONST_STRLEN(ZBX_SUFFIX) + is_bracket));
 
-	if (ZBX_MAX_HOSTNAME_LEN < len)
-	{
-		if (NULL != error)
-			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", ZBX_MAX_HOSTNAME_LEN);
-		return FAIL;
-	}
+	if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX) + is_bracket)
+		return key;
 
-	return SUCCEED;
+	key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
+	zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
+
+	if (0 != is_bracket)
+		zbx_strlcpy_utf8(&buf[key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX)], "]", sizeof("]"));
+
+	return buf;
+
+#	undef ZBX_SUFFIX
+#	undef ZBX_BSUFFIX
 }
 
-int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check the value characters length and, if the length exceeds      *
+ *          max allowable characters length, truncate the value               *
+ *                                                                            *
+ * Parameters: val      - [IN] value for processing                           *
+ *             char_max - [IN] value max characters length                    *
+ *             buf      - [IN/OUT] buffer for short version of value          *
+ *             buf_len  - [IN] buffer size for short version of value         *
+ *                                                                            *
+ * Return value: The value that does not exceed passed length                 *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf, const size_t buf_len)
 {
-	if (NULL == s1 && NULL == s2)
-		return 0;
+#	define ZBX_SUFFIX	"..."
 
-	if (NULL == s1)
-		return 1;
+	size_t	key_byte_count;
 
-	if (NULL == s2)
-		return -1;
+	if (char_max >= zbx_strlen_utf8(val))
+		return val;
 
-	while (0 != n && '\0' != *s1 && '\0' != *s2 &&
-			tolower((unsigned char)*s1) == tolower((unsigned char)*s2))
-	{
-		s1++;
-		s2++;
-		n--;
-	}
+	key_byte_count = 1 + zbx_strlen_utf8_nchars(val, char_max - ZBX_CONST_STRLEN(ZBX_SUFFIX));
 
-	return 0 == n ? 0 : tolower((unsigned char)*s1) - tolower((unsigned char)*s2);
+	if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX))
+		return val;
+
+	key_byte_count = zbx_strlcpy_utf8(buf, val, key_byte_count);
+	zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
+
+	return buf;
+
+#	undef ZBX_SUFFIX
 }
 
 char	*zbx_strcasestr(const char *haystack, const char *needle)
@@ -691,6 +963,28 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	}
 
 	return NULL;
+}
+
+int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
+{
+	if (NULL == s1 && NULL == s2)
+		return 0;
+
+	if (NULL == s1)
+		return 1;
+
+	if (NULL == s2)
+		return -1;
+
+	while (0 != n && '\0' != *s1 && '\0' != *s2 &&
+			tolower((unsigned char)*s1) == tolower((unsigned char)*s2))
+	{
+		s1++;
+		s2++;
+		n--;
+	}
+
+	return 0 == n ? 0 : tolower((unsigned char)*s1) - tolower((unsigned char)*s2);
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -1008,30 +1302,6 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 }
 #endif	/* HAVE_ICONV */
 
-size_t	zbx_strlen_utf8(const char *text)
-{
-	size_t	n = 0;
-
-	while ('\0' != *text)
-	{
-		if (0x80 != (0xc0 & *text++))
-			n++;
-	}
-
-	return n;
-}
-
-char	*zbx_strshift_utf8(char *text, size_t num)
-{
-	while ('\0' != *text && 0 < num)
-	{
-		if (0x80 != (0xc0 & *(++text)))
-			num--;
-	}
-
-	return text;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Returns the size (in bytes) of a UTF-8 encoded character or 0     *
@@ -1054,6 +1324,30 @@ size_t	zbx_utf8_char_len(const char *text)
 #	error "zbx_utf8_char_len() is not synchronized with ZBX_MAX_BYTES_IN_UTF8_CHAR"
 #endif
 	return 0;				/* not a valid UTF-8 character */
+}
+
+size_t	zbx_strlen_utf8(const char *text)
+{
+	size_t	n = 0;
+
+	while ('\0' != *text)
+	{
+		if (0x80 != (0xc0 & *text++))
+			n++;
+	}
+
+	return n;
+}
+
+char	*zbx_strshift_utf8(char *text, size_t num)
+{
+	while ('\0' != *text && 0 < num)
+	{
+		if (0x80 != (0xc0 & *(++text)))
+			num--;
+	}
+
+	return text;
 }
 
 /******************************************************************************
@@ -1428,6 +1722,94 @@ void	dos2unix(char *str)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check a byte stream for a valid hostname                          *
+ *                                                                            *
+ * Parameters: hostname - pointer to the first char of hostname               *
+ *             error - pointer to the error message (can be NULL)             *
+ *                                                                            *
+ * Return value: return SUCCEED if hostname is valid                          *
+ *               or FAIL if hostname contains invalid chars, is empty         *
+ *               or is longer than ZBX_MAX_HOSTNAME_LEN                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_hostname(const char *hostname, char **error)
+{
+	int	len = 0;
+
+	while ('\0' != hostname[len])
+	{
+		if (FAIL == is_hostname_char(hostname[len]))
+		{
+			if (NULL != error)
+				*error = zbx_dsprintf(NULL, "name contains invalid character '%c'", hostname[len]);
+			return FAIL;
+		}
+
+		len++;
+	}
+
+	if (0 == len)
+	{
+		if (NULL != error)
+			*error = zbx_strdup(NULL, "name is empty");
+		return FAIL;
+	}
+
+	if (ZBX_MAX_HOSTNAME_LEN < len)
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", ZBX_MAX_HOSTNAME_LEN);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: to replace memory block and allocate more memory if needed        *
+ *                                                                            *
+ * Parameters: data       - [IN/OUT] allocated memory                         *
+ *             data_alloc - [IN/OUT] allocated memory size                    *
+ *             data_len   - [IN/OUT] used memory size                         *
+ *             offset     - [IN] offset of memory block to be replaced        *
+ *             sz_to      - [IN] size of block that need to be replaced       *
+ *             from       - [IN] what to replace with                         *
+ *             sz_from    - [IN] size of new block                            *
+ *                                                                            *
+ * Return value: once data is replaced offset can become less, bigger or      *
+ *               remain unchanged                                             *
+ ******************************************************************************/
+int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_t offset, size_t sz_to,
+		const char *from, size_t sz_from)
+{
+	size_t	sz_changed = sz_from - sz_to;
+
+	if (0 != sz_changed)
+	{
+		char	*to;
+
+		*data_len += sz_changed;
+
+		if (*data_len > *data_alloc)
+		{
+			while (*data_len > *data_alloc)
+				*data_alloc *= 2;
+
+			*data = (char *)zbx_realloc(*data, *data_alloc);
+		}
+
+		to = *data + offset;
+		memmove(to + sz_from, to + sz_to, *data_len - (to - *data) - sz_from);
+	}
+
+	memcpy(*data + offset, from, sz_from);
+
+	return (int)sz_changed;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: remove whitespace surrounding a string list item delimiters       *
  *                                                                            *
  * Parameters: list      - the list (a string containing items separated by   *
@@ -1577,261 +1959,6 @@ int	zbx_strcmp_natural(const char *s1, const char *s2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if string is contained in a list of delimited strings       *
- *                                                                            *
- * Parameters: list      - [IN] strings a,b,ccc,ddd                           *
- *             value     - [IN] value                                         *
- *             len       - [IN] value length                                  *
- *             delimiter - [IN] delimiter                                     *
- *                                                                            *
- * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
- *                                                                            *
- ******************************************************************************/
-int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter)
-{
-	const char	*end;
-	size_t		token_len, next = 1;
-
-	while ('\0' != *list)
-	{
-		if (NULL != (end = strchr(list, delimiter)))
-		{
-			token_len = end - list;
-			next = 1;
-		}
-		else
-		{
-			token_len = strlen(list);
-			next = 0;
-		}
-
-		if (len == token_len && 0 == memcmp(list, value, len))
-			return SUCCEED;
-
-		list += token_len + next;
-	}
-
-	if (1 == next && 0 == len)
-		return SUCCEED;
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: wrap long string at specified position with linefeeds             *
- *                                                                            *
- * Parameters: src     - input string                                         *
- *             maxline - maximum length of a line                             *
- *             delim   - delimiter to use as linefeed (default "\n" if NULL)  *
- *                                                                            *
- * Return value: newly allocated copy of input string with linefeeds          *
- *                                                                            *
- * Comments: allocates memory                                                 *
- *                                                                            *
- ******************************************************************************/
-char	*str_linefeed(const char *src, size_t maxline, const char *delim)
-{
-	size_t		src_size, dst_size, delim_size, left;
-	int		feeds;		/* number of feeds */
-	char		*dst = NULL;	/* output with linefeeds */
-	const char	*p_src;
-	char		*p_dst;
-
-	assert(NULL != src);
-	assert(0 < maxline);
-
-	/* default delimiter */
-	if (NULL == delim)
-		delim = "\n";
-
-	src_size = strlen(src);
-	delim_size = strlen(delim);
-
-	/* make sure we don't feed the last line */
-	feeds = (int)(src_size / maxline - (0 != src_size % maxline || 0 == src_size ? 0 : 1));
-
-	left = src_size - feeds * maxline;
-	dst_size = src_size + feeds * delim_size + 1;
-
-	/* allocate memory for output */
-	dst = (char *)zbx_malloc(dst, dst_size);
-
-	p_src = src;
-	p_dst = dst;
-
-	/* copy chunks appending linefeeds */
-	while (0 < feeds--)
-	{
-		memcpy(p_dst, p_src, maxline);
-		p_src += maxline;
-		p_dst += maxline;
-
-		memcpy(p_dst, delim, delim_size);
-		p_dst += delim_size;
-	}
-
-	if (0 < left)
-	{
-		/* copy what's left */
-		memcpy(p_dst, p_src, left);
-		p_dst += left;
-	}
-
-	*p_dst = '\0';
-
-	return dst;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: initialize dynamic string array                                   *
- *                                                                            *
- * Parameters: arr - a pointer to array of strings                            *
- *                                                                            *
- * Comments: allocates memory, calls assert() if that fails                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_strarr_init(char ***arr)
-{
-	*arr = (char **)zbx_malloc(*arr, sizeof(char *));
-	**arr = NULL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: add a string to dynamic string array                              *
- *                                                                            *
- * Parameters: arr - a pointer to array of strings                            *
- *             entry - string to add                                          *
- *                                                                            *
- * Comments: allocates memory, calls assert() if that fails                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_strarr_add(char ***arr, const char *entry)
-{
-	int	i;
-
-	assert(entry);
-
-	for (i = 0; NULL != (*arr)[i]; i++)
-		;
-
-	*arr = (char **)zbx_realloc(*arr, sizeof(char *) * (i + 2));
-
-	(*arr)[i] = zbx_strdup((*arr)[i], entry);
-	(*arr)[++i] = NULL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: free dynamic string array memory                                  *
- *                                                                            *
- * Parameters: arr - array of strings                                         *
- *                                                                            *
- ******************************************************************************/
-void	zbx_strarr_free(char ***arr)
-{
-	char	**p;
-
-	for (p = *arr; NULL != *p; p++)
-		zbx_free(*p);
-	zbx_free(*arr);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: to replace memory block and allocate more memory if needed        *
- *                                                                            *
- * Parameters: data       - [IN/OUT] allocated memory                         *
- *             data_alloc - [IN/OUT] allocated memory size                    *
- *             data_len   - [IN/OUT] used memory size                         *
- *             offset     - [IN] offset of memory block to be replaced        *
- *             sz_to      - [IN] size of block that need to be replaced       *
- *             from       - [IN] what to replace with                         *
- *             sz_from    - [IN] size of new block                            *
- *                                                                            *
- * Return value: once data is replaced offset can become less, bigger or      *
- *               remain unchanged                                             *
- ******************************************************************************/
-int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_t offset, size_t sz_to,
-		const char *from, size_t sz_from)
-{
-	size_t	sz_changed = sz_from - sz_to;
-
-	if (0 != sz_changed)
-	{
-		char	*to;
-
-		*data_len += sz_changed;
-
-		if (*data_len > *data_alloc)
-		{
-			while (*data_len > *data_alloc)
-				*data_alloc *= 2;
-
-			*data = (char *)zbx_realloc(*data, *data_alloc);
-		}
-
-		to = *data + offset;
-		memmove(to + sz_from, to + sz_to, *data_len - (to - *data) - sz_from);
-	}
-
-	memcpy(*data + offset, from, sz_from);
-
-	return (int)sz_changed;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: splits string                                                     *
- *                                                                            *
- * Parameters: src       - [IN] source string                                 *
- *             delimiter - [IN] delimiter                                     *
- *             last      - [IN] split after last delimiter                    *
- *             left      - [IN/OUT] first part of the string                  *
- *             right     - [IN/OUT] second part of the string or NULL, if     *
- *                                  delimiter was not found                   *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_string_split(const char *src, char delimiter, unsigned char last, char **left, char **right)
-{
-	char	*delimiter_ptr;
-
-	if (NULL == (delimiter_ptr = (0 == last ? strchr(src, delimiter) : strrchr(src, delimiter))))
-	{
-		*left = zbx_strdup(NULL, src);
-		*right = NULL;
-	}
-	else
-	{
-		size_t	left_size;
-		size_t	right_size;
-
-		left_size = (size_t)(delimiter_ptr - src) + 1;
-		right_size = strlen(src) - (size_t)(delimiter_ptr - src);
-
-		*left = zbx_malloc(NULL, left_size);
-		*right = zbx_malloc(NULL, right_size);
-
-		memcpy(*left, src, left_size - 1);
-		(*left)[left_size - 1] = '\0';
-		memcpy(*right, delimiter_ptr + 1, right_size);
-	}
-}
-
-void	zbx_strsplit_first(const char *src, char delimiter, char **left, char **right)
-{
-	zbx_string_split(src, delimiter, 0, left, right);
-}
-
-void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **right)
-{
-	zbx_string_split(src, delimiter, 1, left, right);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: extracts value from a string, unquoting if necessary              *
  *                                                                            *
  * Parameters:                                                                *
@@ -1900,131 +2027,24 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check the item key characters length and, if the length exceeds   *
- *          max allowable characters length, truncate the item key, while     *
- *          maintaining the right square bracket                              *
+ * Purpose: extracts substring at the specified location                      *
  *                                                                            *
- * Parameters: key      - [IN] item key for processing                        *
- *             char_max - [IN] item key max characters length                 *
- *             buf      - [IN/OUT] buffer for short version of item key       *
- *             buf_len  - [IN] buffer size for short version of item key      *
+ * Parameters: src   - [IN] the source string                                 *
+ *             left  - [IN] the left substring position 9start)               *
+ *             right - [IN] the right substirng position (end)                *
  *                                                                            *
- * Return value: The item key that does not exceed passed length              *
+ * Return value: The unquoted and copied substring.                           *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *buf, const size_t buf_len)
+char	*zbx_substr(const char *src, size_t left, size_t right)
 {
-#	define ZBX_SUFFIX	"..."
-#	define ZBX_BSUFFIX	"[...]"
+	char	*str;
 
-	size_t	key_byte_count, key_char_total;
-	int	is_bracket = 0;
-	char	*bracket_l;
+	str = zbx_malloc(NULL, right - left + 2);
+	memcpy(str, src + left, right - left + 1);
+	str[right - left + 1] = '\0';
 
-	if (char_max >= (key_char_total = zbx_strlen_utf8(key)))
-		return key;
-
-	if (NULL != (bracket_l = strchr(key, '[')))
-		is_bracket = 1;
-
-	if (char_max < ZBX_CONST_STRLEN(ZBX_SUFFIX) + 2 * is_bracket)	/* [...] or ... */
-		return key;
-
-	if (0 != is_bracket)
-	{
-		size_t	key_char_count, param_char_count, param_byte_count;
-
-		key_char_count = zbx_charcount_utf8_nbytes(key, bracket_l - key);
-		param_char_count = key_char_total - key_char_count;
-
-		if (param_char_count <= ZBX_CONST_STRLEN(ZBX_BSUFFIX))
-		{
-			if (char_max < param_char_count + ZBX_CONST_STRLEN(ZBX_SUFFIX))
-				return key;
-
-			key_byte_count = 1 + zbx_strlen_utf8_nchars(key, char_max - param_char_count -
-					ZBX_CONST_STRLEN(ZBX_SUFFIX));
-			param_byte_count = 1 + zbx_strlen_utf8_nchars(bracket_l, key_char_count);
-
-			if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX) + param_byte_count - 1)
-				return key;
-
-			key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
-			key_byte_count += zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
-			zbx_strlcpy_utf8(&buf[key_byte_count], bracket_l, param_byte_count);
-
-			return buf;
-		}
-
-		if (key_char_count + ZBX_CONST_STRLEN(ZBX_BSUFFIX) > char_max)
-		{
-			if (char_max <= ZBX_CONST_STRLEN(ZBX_SUFFIX) + ZBX_CONST_STRLEN(ZBX_BSUFFIX))
-				return key;
-
-			key_byte_count = 1 + zbx_strlen_utf8_nchars(key, char_max - ZBX_CONST_STRLEN(ZBX_SUFFIX) -
-					ZBX_CONST_STRLEN(ZBX_BSUFFIX));
-
-			if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX) + ZBX_CONST_STRLEN(ZBX_BSUFFIX))
-				return key;
-
-			key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
-			key_byte_count += zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
-			zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_BSUFFIX, sizeof(ZBX_BSUFFIX));
-
-			return buf;
-		}
-	}
-
-	key_byte_count = 1 + zbx_strlen_utf8_nchars(key, char_max - (ZBX_CONST_STRLEN(ZBX_SUFFIX) + is_bracket));
-
-	if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX) + is_bracket)
-		return key;
-
-	key_byte_count = zbx_strlcpy_utf8(buf, key, key_byte_count);
-	zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
-
-	if (0 != is_bracket)
-		zbx_strlcpy_utf8(&buf[key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX)], "]", sizeof("]"));
-
-	return buf;
-
-#	undef ZBX_SUFFIX
-#	undef ZBX_BSUFFIX
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check the value characters length and, if the length exceeds      *
- *          max allowable characters length, truncate the value               *
- *                                                                            *
- * Parameters: val      - [IN] value for processing                           *
- *             char_max - [IN] value max characters length                    *
- *             buf      - [IN/OUT] buffer for short version of value          *
- *             buf_len  - [IN] buffer size for short version of value         *
- *                                                                            *
- * Return value: The value that does not exceed passed length                 *
- *                                                                            *
- ******************************************************************************/
-const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf, const size_t buf_len)
-{
-#	define ZBX_SUFFIX	"..."
-
-	size_t	key_byte_count;
-
-	if (char_max >= zbx_strlen_utf8(val))
-		return val;
-
-	key_byte_count = 1 + zbx_strlen_utf8_nchars(val, char_max - ZBX_CONST_STRLEN(ZBX_SUFFIX));
-
-	if (buf_len < key_byte_count + ZBX_CONST_STRLEN(ZBX_SUFFIX))
-		return val;
-
-	key_byte_count = zbx_strlcpy_utf8(buf, val, key_byte_count);
-	zbx_strlcpy_utf8(&buf[key_byte_count], ZBX_SUFFIX, sizeof(ZBX_SUFFIX));
-
-	return buf;
-
-#	undef ZBX_SUFFIX
+	return str;
 }
 
 /******************************************************************************
@@ -2084,28 +2104,6 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: extracts substring at the specified location                      *
- *                                                                            *
- * Parameters: src   - [IN] the source string                                 *
- *             left  - [IN] the left substring position 9start)               *
- *             right - [IN] the right substirng position (end)                *
- *                                                                            *
- * Return value: The unquoted and copied substring.                           *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_substr(const char *src, size_t left, size_t right)
-{
-	char	*str;
-
-	str = zbx_malloc(NULL, right - left + 2);
-	memcpy(str, src + left, right - left + 1);
-	str[right - left + 1] = '\0';
-
-	return str;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: return pointer to the next utf-8 character                        *
  *                                                                            *
  * Parameters: str  - [IN] the input string                                   *
@@ -2119,28 +2117,6 @@ static const char	*utf8_chr_next(const char *str)
 
 	while (0x80 == (0xc0 & (unsigned char)*str))
 		str++;
-
-	return str;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: return pointer to the previous utf-8 character                    *
- *                                                                            *
- * Parameters: str   - [IN] the input string                                  *
- *             start - [IN] the start of the initial string                   *
- *                                                                            *
- * Return value: A pointer to the previous utf-8 character.                   *
- *                                                                            *
- ******************************************************************************/
-static char	*utf8_chr_prev(char *str, const char *start)
-{
-	do
-	{
-		if (--str < start)
-			return NULL;
-	}
-	while (0x80 == (0xc0 & (unsigned char)*str));
 
 	return str;
 }
@@ -2211,6 +2187,28 @@ void	zbx_ltrim_utf8(char *str, const char *charlist)
 
 		str[len] = '\0';
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return pointer to the previous utf-8 character                    *
+ *                                                                            *
+ * Parameters: str   - [IN] the input string                                  *
+ *             start - [IN] the start of the initial string                   *
+ *                                                                            *
+ * Return value: A pointer to the previous utf-8 character.                   *
+ *                                                                            *
+ ******************************************************************************/
+static char	*utf8_chr_prev(char *str, const char *start)
+{
+	do
+	{
+		if (--str < start)
+			return NULL;
+	}
+	while (0x80 == (0xc0 & (unsigned char)*str));
+
+	return str;
 }
 
 /******************************************************************************
