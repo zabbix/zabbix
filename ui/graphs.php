@@ -586,7 +586,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['show_triggers'] = getRequest('show_triggers', 0);
 		$data['show_legend'] = getRequest('show_legend', 0);
 		$data['show_3d'] = getRequest('show_3d', 0);
-		$data['visible'] = getRequest('visible');
+		$data['visible'] = getRequest('visible', []);
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
 		$data['items'] = $gitems;

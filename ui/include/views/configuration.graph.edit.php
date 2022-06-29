@@ -132,8 +132,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			->onClick('javascript: showHideVisible("percent_left");')
 			->setEnabled(!$readonly);
 
-		if(array_key_exists('visible', $data) && is_array($data['visible'])
-				&& array_key_exists('percent_left', $data['visible'])) {
+		if (array_key_exists('percent_left', $data['visible'])) {
 			$percentLeftCheckbox->setChecked(true);
 		}
 		elseif ($data['percent_left'] == 0) {
@@ -151,7 +150,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			->onClick('javascript: showHideVisible("percent_right");')
 			->setEnabled(!$readonly);
 
-		if(isset($data['visible']) && isset($data['visible']['percent_right'])) {
+		if (array_key_exists('percent_right', $data['visible'])) {
 			$percentRightCheckbox->setChecked(true);
 		}
 		elseif ($data['percent_right'] == 0) {
