@@ -20,6 +20,8 @@
 #ifndef ZABBIX_DIAG_PROXY_H
 #define ZABBIX_DIAG_PROXY_H
 
+#include "zbxjson.h"
+
 int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *json,
 		char **error);
 

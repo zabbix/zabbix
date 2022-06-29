@@ -18,14 +18,13 @@
 **/
 
 #include "proxypoller.h"
+#include "zbxserver.h"
+#include "proxy.h"
 
-#include "common.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "zbxserver.h"
 #include "zbxdbhigh.h"
 #include "log.h"
-#include "proxy.h"
 #include "zbxcrypto.h"
 #include "../trapper/proxydata.h"
 #include "zbxcompress.h"

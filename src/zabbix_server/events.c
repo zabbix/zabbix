@@ -18,11 +18,11 @@
 **/
 
 #include "events.h"
+#include "zbxserver.h"
 
 #include "db_lengths.h"
 #include "log.h"
 #include "actions.h"
-#include "zbxserver.h"
 #include "zbxexport.h"
 #include "zbxservice.h"
 #include "zbxnum.h"

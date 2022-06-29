@@ -28,7 +28,6 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "dir.h"
-#include "zbxhash.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"

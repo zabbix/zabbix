@@ -18,10 +18,10 @@
 **/
 
 #include "proxydata.h"
-#include "zbxdbhigh.h"
-#include "log.h"
 #include "proxy.h"
 
+#include "zbxdbhigh.h"
+#include "log.h"
 #include "zbxtasks.h"
 #include "zbxmutexs.h"
 #include "zbxnix.h"

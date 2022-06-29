@@ -23,11 +23,12 @@
 
 #ifdef HAVE_OPENIPMI
 
+#include "zbxserver.h"
+
 #include "log.h"
 #include "zbxipcservice.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
-#include "zbxserver.h"
 #include "zbxnum.h"
 
 /******************************************************************************

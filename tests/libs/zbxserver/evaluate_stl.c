@@ -22,11 +22,9 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "valuecache.h"
 #include "zbxserver.h"
-
+#include "valuecache.h"
 #include "mocks/valuecache/valuecache_mock.h"
-
 #include "../../../src/libs/zbxserver/anomalystl.h"
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,

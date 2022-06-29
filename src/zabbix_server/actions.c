@@ -18,9 +18,9 @@
 **/
 
 #include "actions.h"
+#include "zbxserver.h"
 
 #include "log.h"
-#include "zbxserver.h"
 #include "operations.h"
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"

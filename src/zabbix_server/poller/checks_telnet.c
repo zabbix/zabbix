@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "checks_telnet.h"
+
 #include "zbxcomms.h"
 #include "log.h"
 #include "zbxnum.h"
-
-#include "checks_telnet.h"
 
 #define TELNET_RUN_KEY	"telnet.run"
 

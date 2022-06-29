@@ -18,11 +18,11 @@
 **/
 
 #include "postinit.h"
+#include "zbxserver.h"
 
 #include "db_lengths.h"
 #include "zbxtasks.h"
 #include "log.h"
-#include "zbxserver.h"
 #include "zbxnum.h"
 
 #define ZBX_HIST_MACRO_NONE		(-1)

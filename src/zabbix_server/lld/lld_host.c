@@ -18,10 +18,10 @@
 **/
 
 #include "lld.h"
+#include "zbxserver.h"
 
 #include "../db_lengths.h"
 #include "log.h"
-#include "zbxserver.h"
 #include "zbxavailability.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"

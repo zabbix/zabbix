@@ -18,12 +18,7 @@
 **/
 
 #include "poller.h"
-
-#include "zbxnix.h"
 #include "zbxserver.h"
-#include "zbxself.h"
-#include "preproc.h"
-#include "zbxrtc.h"
 
 #include "checks_agent.h"
 #include "checks_external.h"
@@ -37,6 +32,11 @@
 #include "checks_java.h"
 #include "checks_calculated.h"
 #include "checks_http.h"
+
+#include "zbxnix.h"
+#include "zbxself.h"
+#include "preproc.h"
+#include "zbxrtc.h"
 #include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"

@@ -25,7 +25,6 @@
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
-
 #include "zbxnix.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"

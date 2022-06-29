@@ -19,9 +19,9 @@
 
 #include "evalfunc.h"
 #include "evalfunc_common.h"
+#include "zbxserver.h"
 
 #include "log.h"
-#include "zbxserver.h"
 #include "zbxregexp.h"
 #include "valuecache.h"
 #include "zbxtrends.h"

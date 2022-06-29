@@ -18,9 +18,9 @@
 **/
 
 #include "trapper_item_test.h"
+#include "zbxserver.h"
 
 #include "log.h"
-#include "zbxserver.h"
 #include "../poller/poller.h"
 #include "zbxtasks.h"
 #include "zbxcommshigh.h"

@@ -20,8 +20,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "zbxnum.h"
 #include "sysinfo.h"
+#include "zbxnum.h"
 #include "../../../../src/libs/zbxsysinfo/common/system.h"
 
 #define LONG_DATETIME_LENGTH	30	/* Length of datetime like "2017-12-18,14:06:09.123,+02:30" */

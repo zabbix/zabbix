@@ -18,8 +18,8 @@
 **/
 
 #include "dbupgrade_macros.h"
-
 #include "dbupgrade.h"
+
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
 

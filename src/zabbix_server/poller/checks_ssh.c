@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxnum.h"
-
 #include "checks_ssh.h"
 
 /* the size of temporary buffer used to read from data channel */
@@ -33,6 +31,7 @@
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "zbxcomms.h"
 #include "log.h"
+#include "zbxnum.h"
 
 #define SSH_RUN_KEY	"ssh.run"
 #endif

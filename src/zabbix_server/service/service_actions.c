@@ -18,10 +18,10 @@
 **/
 
 #include "service_actions.h"
+#include "zbxserver.h"
 
 #include "zbxnum.h"
 #include "log.h"
-#include "zbxserver.h"
 
 /******************************************************************************
  *                                                                            *

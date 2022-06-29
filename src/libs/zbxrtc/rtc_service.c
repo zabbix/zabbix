@@ -25,7 +25,6 @@
 #include "zbxnix.h"
 #include "log.h"
 #include "zbxdiag.h"
-#include "zbxrtc.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 

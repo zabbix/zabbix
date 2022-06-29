@@ -17,6 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "ha.h"
+#include "zbxha.h"
+
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
@@ -28,9 +31,6 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
-
-#include "ha.h"
-#include "zbxha.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 

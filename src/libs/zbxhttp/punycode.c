@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "punycode.h"
 #include "zbxhttp.h"
 
 #include "zbxstr.h"
+#include "punycode.h"
 
 /******************************************************************************
  *                                                                            *

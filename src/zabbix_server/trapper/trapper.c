@@ -18,9 +18,10 @@
 **/
 
 #include "trapper.h"
+#include "zbxserver.h"
+#include "proxy.h"
 
 #include "log.h"
-#include "proxy.h"
 #include "zbxself.h"
 #include "active.h"
 #include "nodecommand.h"
@@ -28,7 +29,6 @@
 #include "proxydata.h"
 #include "zbxnix.h"
 #include "zbxcommshigh.h"
-#include "zbxserver.h"
 #include "../poller/checks_snmp.h"
 #include "trapper_auth.h"
 #include "trapper_preproc.h"

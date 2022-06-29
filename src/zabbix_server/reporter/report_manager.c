@@ -18,6 +18,7 @@
 **/
 
 #include "report_manager.h"
+#include "zbxserver.h"
 
 #include "../db_lengths.h"
 #include "zbxself.h"
@@ -27,7 +28,6 @@
 #include "zbxhash.h"
 #include "zbxcrypto.h"
 #include "zbxalert.h"
-#include "zbxserver.h"
 #include "report_protocol.h"
 #include "zbxnum.h"
 #include "zbxtime.h"

@@ -18,9 +18,9 @@
 **/
 
 #include "active.h"
+#include "zbxserver.h"
 
 #include "log.h"
-#include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
 #include "zbxnum.h"

@@ -20,9 +20,9 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
+#include "zbxserver.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
-#include "zbxserver.h"
 
 void	zbx_mock_test_entry(void **state)
 {

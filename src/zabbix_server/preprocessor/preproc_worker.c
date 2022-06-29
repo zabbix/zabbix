@@ -20,7 +20,6 @@
 #include "preproc_worker.h"
 
 #include "../db_lengths.h"
-#include "common.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"

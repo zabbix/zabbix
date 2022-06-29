@@ -19,7 +19,6 @@
 
 #include "httppoller.h"
 
-#include "common.h"
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxnix.h"
