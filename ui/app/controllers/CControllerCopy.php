@@ -37,7 +37,7 @@ class CControllerCopy extends CController {
 			'graphids' => 'array_id',
 			'copy_type' => 'in '.implode(',', [
 				COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE
-				]),
+				])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -62,25 +62,23 @@ class CControllerCopy extends CController {
 			$entity = API::Item()->get([
 				'output' => [],
 				'itemids' => $this->getInput('itemids'),
-				'editable' => true,
+				'editable' => true
 			]);
 			$element_count = count($this->getInput('itemids'));
 		}
-
 		elseif ($action == 'copy.triggers') {
 			$entity = API::Trigger()->get([
 				'output' => [],
 				'triggerids' => $this->getInput('triggerids'),
-				'editable' => true,
+				'editable' => true
 			]);
 			$element_count = count($this->getInput('triggerids'));
 		}
-
 		elseif ($action == 'copy.graphs') {
 			$entity = API::Graph()->get([
 				'output' => [],
 				'graphids' => $this->getInput('graphids'),
-				'editable' => true,
+				'editable' => true
 			]);
 			$element_count = count($this->getInput('graphids'));
 		}

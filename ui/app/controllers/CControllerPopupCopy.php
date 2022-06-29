@@ -59,7 +59,7 @@ class CControllerPopupCopy extends CController {
 			$entity = API::Item()->get([
 				'output' => [],
 				'itemids' => $this->getInput('itemids'),
-				'editable' => true,
+				'editable' => true
 			]);
 			$element_count = count($this->getInput('itemids'));
 		}
@@ -68,7 +68,7 @@ class CControllerPopupCopy extends CController {
 			$entity = API::Trigger()->get([
 				'output' => [],
 				'triggerids' => $this->getInput('triggerids'),
-				'editable' => true,
+				'editable' => true
 			]);
 			$element_count = count($this->getInput('triggerids'));
 		}
@@ -77,7 +77,7 @@ class CControllerPopupCopy extends CController {
 			$entity = API::Graph()->get([
 				'output' => [],
 				'graphids' => $this->getInput('graphids'),
-				'editable' => true,
+				'editable' => true
 			]);
 			$element_count = count($this->getInput('graphids'));
 		}
