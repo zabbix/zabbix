@@ -139,6 +139,20 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 				}
 			}
 
+			// Drop all inaccessible triggers.
+			if ($problems_per_trigger) {
+				$triggers = API::Trigger()->get([
+					'output' => [],
+					'triggerids' => array_keys($problems_per_trigger),
+					'monitored' => true,
+					'preservekeys' => true
+				]);
+
+				$problems_per_trigger = array_intersect_key($problems_per_trigger, $triggers);
+
+				unset($triggers);
+			}
+
 			// Select lowest severity to reduce amount of data returned by API.
 			$severity_min = min(zbx_objectValues($sysmaps, 'severity_min'));
 
@@ -147,7 +161,6 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 				$triggers = API::Trigger()->get([
 					'output' => ['triggerid'],
 					'groupids' => array_keys($host_groups),
-					'skipDependent' => true,
 					'selectGroups' => ['groupid'],
 					'preservekeys' => true
 				]);
@@ -164,18 +177,17 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 
 			// Get triggers related to hosts.
 			if ($hosts) {
-				$triggers = API::Trigger()->get([
-					'output' => ['triggerid'],
-					'selectHosts' => ['hostid'],
+				$hosts = API::Host()->get([
+					'output' => [],
+					'selectTriggers' => ['triggerid'],
 					'hostids' => array_keys($hosts),
-					'skipDependent' => true,
-					'preservekeys' => true,
-					'monitored' => true
+					'monitored' => true,
+					'preservekeys' => true
 				]);
 
-				foreach ($triggers as $trigger) {
-					if (($host = reset($trigger['hosts'])) !== false) {
-						$triggers_per_hosts[$host['hostid']][$trigger['triggerid']] = true;
+				foreach ($hosts as $hostid => $host) {
+					foreach ($host['triggers'] as $trigger) {
+						$triggers_per_hosts[$hostid][$trigger['triggerid']] = true;
 						$problems_per_trigger[$trigger['triggerid']] = $this->problems_per_severity_tpl;
 					}
 				}
@@ -185,20 +197,11 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 
 			// Count problems per trigger.
 			if ($problems_per_trigger) {
-				$triggers = API::Trigger()->get([
-					'output' => [],
-					'selectGroups' => ['groupid'],
-					'triggerids' => array_keys($problems_per_trigger),
-					'skipDependent' => true,
-					'preservekeys' => true,
-					'monitored' => true
-				]);
-
 				$problems = API::Problem()->get([
 					'output' => ['objectid', 'severity'],
 					'source' => EVENT_SOURCE_TRIGGERS,
 					'object' => EVENT_OBJECT_TRIGGER,
-					'objectids' => array_keys($triggers),
+					'objectids' => array_keys($problems_per_trigger),
 					'severities' => range($severity_min, TRIGGER_SEVERITY_COUNT - 1),
 					'preservekeys' => true
 				]);

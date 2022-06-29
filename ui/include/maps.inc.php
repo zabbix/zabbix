@@ -701,26 +701,34 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		}
 	}
 
+	$triggerids = array_keys($triggerids);
 	$problems = API::Problem()->get([
 		'output' => ['eventid', 'objectid', 'name', 'acknowledged', 'clock', 'r_clock', 'severity'],
-		'objectids' => array_keys($triggerids),
+		'objectids' => $triggerids,
 		'acknowledged' => ($sysmap['show_unack'] == EXTACK_OPTION_UNACK) ? false : null,
 		'severities' => range($options['severity_min'], TRIGGER_SEVERITY_COUNT - 1),
 		'suppressed' => ($sysmap['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 		'recent' => true
 	]);
 
-	foreach ($selements as $snum => $selement) {
-		foreach ($problems as $problem) {
-			if (array_key_exists($problem['objectid'], $selement['triggers'])) {
-				$selements[$snum]['triggers'][$problem['objectid']]['problems'][] = $problem;
-			}
-		}
+	$problems_by_trigger = array_fill_keys($triggerids, []);
+	foreach ($problems as $problem) {
+		$problems_by_trigger[$problem['objectid']][] = $problem;
 	}
+
+	foreach ($selements as $snum => &$selement) {
+		$selement['triggers'] = array_map(function ($trigger) use ($problems_by_trigger) {
+			return $trigger + [
+				'problems' => $problems_by_trigger[$trigger['triggerid']]
+			];
+		}, $selement['triggers']);
+	}
+	unset($selement);
 
 	$config = select_config();
 
 	$info = [];
+
 	foreach ($selements as $selementId => $selement) {
 		$i = [
 			'elementtype' => $selement['elementtype'],
