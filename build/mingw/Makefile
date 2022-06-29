@@ -17,7 +17,7 @@ OBJS = \
 	$(OUTPUTDIR)\interval.o \
 	$(OUTPUTDIR)\num.o \
 	$(OUTPUTDIR)\str.o \
-	$(OUTPUTDIR)\temp_str.o \
+	$(OUTPUTDIR)\common_str.o \
 	$(OUTPUTDIR)\components_strings_representations.o \
 	$(OUTPUTDIR)\param.o \
 	$(OUTPUTDIR)\misc.o \
@@ -119,7 +119,7 @@ $(OUTPUTDIR)\num.o: $(TOPDIR)\src\libs\zbxnum\num.c
 $(OUTPUTDIR)\str.o: $(TOPDIR)\src\libs\zbxstr\str.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\temp_str.o: $(TOPDIR)\src\libs\zbxcommon\temp_str.c
+$(OUTPUTDIR)\common_str.o: $(TOPDIR)\src\libs\zbxcommon\common_str.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxcommon\file.c

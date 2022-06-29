@@ -1069,7 +1069,6 @@ zbx_proxy_suppress_t;
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
 
-
 /* move remaining temp string functions into libzbxstr.a */
 
 /* used by log which will be part of common*/

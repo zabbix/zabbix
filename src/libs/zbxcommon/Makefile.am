@@ -7,7 +7,7 @@ libzbxcommon_a_SOURCES = \
 	file.c \
 	misc.c \
 	setproctitle.c \
-	temp_str.c \
+	common_str.c \
 	cuid.c \
 	components_strings_representations.c
 
