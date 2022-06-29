@@ -234,7 +234,6 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 						'srcfld2' => 'name',
 						'dstfrm' => $graphForm->getName(),
 						'dstfld1' => 'ymin_itemid',
-						'dstfld2' => 'ymin_name',
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
 					]).', null, this);'
@@ -327,7 +326,6 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 						'srcfld2' => 'name',
 						'dstfrm' => $graphForm->getName(),
 						'dstfld1' => 'ymax_itemid',
-						'dstfld2' => 'ymax_name',
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
 					]).', null, this);'

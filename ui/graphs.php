@@ -496,9 +496,9 @@ elseif (isset($_REQUEST['form'])) {
 
 	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
 		$options = [
-			'graphids' => $data['graphid'],
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid']
+			'selectHosts' => ['hostid'],
+			'graphids' => $data['graphid']
 		];
 
 		if ($data['parent_discoveryid'] === null) {
@@ -608,7 +608,7 @@ elseif (isset($_REQUEST['form'])) {
 	}
 
 	if (array_key_exists('ymax_itemid', $data) || array_key_exists('ymin_itemid', $data)) {
-		$items = API::Item()->get([
+		$options = [
 			'output' => ['itemid', 'hostid', 'name', 'key_'],
 			'selectHosts' => ['name'],
 			'itemids' => [
@@ -617,7 +617,14 @@ elseif (isset($_REQUEST['form'])) {
 			],
 			'webitems' => true,
 			'preservekeys' => true
-		]);
+		];
+
+		$items = API::Item()->get($options);
+
+		if ($data['parent_discoveryid'] !== null) {
+			$items = $items + API::ItemPrototype()->get($options);
+		}
+
 		$data['yaxis_items'] = CMacrosResolverHelper::resolveItemNames($items);
 
 		unset($items);
@@ -628,7 +635,7 @@ elseif (isset($_REQUEST['form'])) {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'flags'],
 			'selectHosts' => ['hostid', 'name'],
-			'itemids' => zbx_objectValues($data['items'], 'itemid'),
+			'itemids' => array_column($data['items'], 'itemid'),
 			'filter' => [
 				'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
 			],
