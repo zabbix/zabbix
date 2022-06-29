@@ -1304,10 +1304,12 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				",null,null,null,null");
 #endif
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o,opcommand_hst oh,scripts s"
-			" where o.operationid=oh.operationid"
-				" and o.scriptid=s.scriptid"
-				" and o.operationid=" ZBX_FS_UI64
+			" from opcommand o"
+			" join scripts s"
+				" on o.scriptid=s.scriptid"
+			" left join opcommand_hst oh"
+				" on o.operationid=oh.operationid"
+			" where  o.operationid=" ZBX_FS_UI64
 				" and oh.hostid is null",
 			operationid);
 
@@ -1383,54 +1385,58 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			goto fail;
 		}
 
-		/* get host details */
-
-		if (0 == host.hostid)
-		{
-			/* target is "Current host" */
-			if (SUCCEED != (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
-					sizeof(error))))
-			{
-				goto fail;
-			}
-		}
-
-		if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			goto skip;
-
-		zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-
-		if (0 < groupid && SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
-		{
-			zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
-					sizeof(error));
-			rc = FAIL;
-			goto fail;
-		}
-
 		if (EVENT_SOURCE_SERVICE == event->source)
 		{
 			/* service event cannot have target, force execution on Zabbix server */
 			script.execute_on = ZBX_SCRIPT_EXECUTE_ON_SERVER;
 		}
-		else if ('\0' == *host.host)
+		else
 		{
-			/* target is from "Host" list or "Host group" list */
+			/* get host details */
 
-			strscpy(host.host, row[2]);
-			host.tls_connect = (unsigned char)atoi(row[17]);
+			if (0 == host.hostid)
+			{
+				/* target is "Current host" */
+				if (SUCCEED != (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
+						sizeof(error))))
+				{
+					goto fail;
+				}
+			}
+
+			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				goto skip;
+
+			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+
+			if (0 < groupid && SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
+			{
+				zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
+						sizeof(error));
+				rc = FAIL;
+				goto fail;
+			}
+
+
+			if ('\0' == *host.host)
+			{
+				/* target is from "Host" list or "Host group" list */
+
+				strscpy(host.host, row[2]);
+				host.tls_connect = (unsigned char)atoi(row[17]);
 #ifdef HAVE_OPENIPMI
-			host.ipmi_authtype = (signed char)atoi(row[18]);
-			host.ipmi_privilege = (unsigned char)atoi(row[19]);
-			strscpy(host.ipmi_username, row[20]);
-			strscpy(host.ipmi_password, row[21]);
+				host.ipmi_authtype = (signed char)atoi(row[18]);
+				host.ipmi_privilege = (unsigned char)atoi(row[19]);
+				strscpy(host.ipmi_username, row[20]);
+				strscpy(host.ipmi_password, row[21]);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
-			strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
-			strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
-			strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
+			}
 		}
 
 		/* substitute macros in script body and webhook parameters */
