@@ -3706,6 +3706,10 @@ msgstr "Закольцованное соединение шаблонов не 
 msgid "Class %1$s not found for action %2$s."
 msgstr "Класс %1$s не найден для действия %2$s."
 
+#: include/classes/core/ZBase.php:494
+msgid "Class not found."
+msgstr ""
+
 #: include/views/configuration.httpconf.list.php:217
 #: include/views/configuration.item.list.php:297
 msgid "Clear history"
@@ -6604,6 +6608,13 @@ msgstr "Сообщение об ошибке"
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr "Ошибка! Zabbix сервер не может стартовать из-за слишком старой версии сервера базы данных (%1$s). Минимальная разрешённая версия %2$s"
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
+msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -14222,6 +14233,10 @@ msgstr "Португальский (pt_PT)"
 msgid "Position"
 msgstr "Расположение"
 
+#: include/classes/widgets/views/widget.item.form.view.php:142
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "Post поля"
@@ -17498,6 +17513,10 @@ msgstr "Шаблоны"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Шаблоны \"%1$s\" отсоединены от узлов сети \"%2$s\"."
 
+#: app/partials/configuration.host.edit.html.php:215
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr "Шаблоны обновлены"
@@ -18789,6 +18808,16 @@ msgstr "Отсоединить от шаблонов"
 msgid "Unmute"
 msgstr "Включить звук"
 
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
 #, c-format
@@ -18977,6 +19006,10 @@ msgstr "Использовать пользовательские цвета с�
 #: jsLoader.php:402
 msgid "Use default"
 msgstr "Использовать умолчание"
+
+#: app/partials/configuration.host.edit.html.php:216
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
+msgstr ""
 
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
 msgid "Use if severity"
@@ -19882,10 +19915,24 @@ msgstr "Предупреждение"
 msgid "Warning message"
 msgstr "Предупреждающее сообщение"
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr "Внимание! Ваш сервер базы данных версии %1$s слишком старый. Необходима как минимум версия %2$s"
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
+msgstr ""
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
