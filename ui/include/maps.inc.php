@@ -699,36 +699,43 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		}
 	}
 
+	$triggerids = array_keys($triggerids);
 	$problems = API::Problem()->get([
 		'output' => ['eventid', 'objectid', 'name', 'acknowledged', 'clock', 'r_clock', 'severity'],
 		'selectTags' => ['tag', 'value'],
-		'objectids' => array_keys($triggerids),
+		'objectids' => $triggerids,
 		'acknowledged' => ($sysmap['show_unack'] == EXTACK_OPTION_UNACK) ? false : null,
 		'severities' => range($options['severity_min'], TRIGGER_SEVERITY_COUNT - 1),
 		'suppressed' => ($sysmap['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 		'recent' => true
 	]);
 
+	$problems_by_trigger = array_fill_keys($triggerids, []);
+	foreach ($problems as $problem) {
+		$problems_by_trigger[$problem['objectid']][] = $problem;
+	}
+
 	foreach ($selements as &$selement) {
-		// Find problems originated from $selement triggers.
-		$filtered_problems = array_filter($problems, function ($problem) use ($selement) {
-			return array_key_exists($problem['objectid'], $selement['triggers']);
-		});
+		$selement['triggers'] = array_map(function ($trigger) use ($problems_by_trigger, $selement) {
+			$filtered_problems = $problems_by_trigger[$trigger['triggerid']];
 
-		// Check if $filtered_problems tags matches $selement filter tags.
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
-				|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-			$filtered_problems = getProblemsMatchingTags($filtered_problems, $selement['tags'], $selement['evaltype']);
-		}
+			// Check if $filtered_problems tags matches $selement filter tags.
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
+					|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
+				$filtered_problems = getProblemsMatchingTags($filtered_problems, $selement['tags'],
+					$selement['evaltype']
+				);
+			}
 
-		// Apply filtered problems to elements they belong to.
-		foreach ($filtered_problems as $problem) {
-			$selement['triggers'][$problem['objectid']]['problems'][] = $problem;
-		}
+			$trigger['problems'] = $filtered_problems;
+
+			return $trigger;
+		}, $selement['triggers']);
 	}
 	unset($selement);
 
 	$info = [];
+
 	foreach ($selements as $selementId => $selement) {
 		$i = [
 			'elementtype' => $selement['elementtype'],
