@@ -21,10 +21,8 @@
 #ifndef ZABBIX_ZBXTRENDS_H
 #define ZABBIX_ZBXTRENDS_H
 
-
 #include "dbcache.h"
 #include "zbxtime.h"
-#include "common.h"
 
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error);
 int	zbx_trends_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char **error);

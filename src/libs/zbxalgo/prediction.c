@@ -19,7 +19,6 @@
 
 #include "zbxalgo.h"
 
-#include "common.h"
 #include "log.h"
 #include "zbxnum.h"
 

@@ -18,11 +18,11 @@
 **/
 
 #include "audit/zbxaudit_graph.h"
-
 #include "audit/zbxaudit.h"
+#include "audit.h"
+
 #include "log.h"
 #include "zbxdbhigh.h"
-#include "audit.h"
 #include "zbxnum.h"
 
 static int	graph_flag_to_resource_type(int flag)

@@ -18,12 +18,12 @@
 **/
 
 #include "audit/zbxaudit_trigger.h"
-
 #include "audit/zbxaudit.h"
+#include "audit.h"
+
 #include "log.h"
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
-#include "audit.h"
 #include "zbxnum.h"
 
 static int	trigger_flag_to_resource_type(int flag)

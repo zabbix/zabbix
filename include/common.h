@@ -93,7 +93,6 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 const char	*zbx_sysinfo_ret_string(int ret);
 const char	*zbx_result_string(int result);
 
-
 #define MAX_ID_LEN			21
 #define MAX_STRING_LEN			2048
 #define MAX_BUFFER_LEN			65536
@@ -503,8 +502,6 @@ zbx_group_status_type_t;
 #define ZBX_PROGRAM_TYPE_AGENTD		0x08
 #define ZBX_PROGRAM_TYPE_SENDER		0x10
 #define ZBX_PROGRAM_TYPE_GET		0x20
-const char	*get_process_type_string(unsigned char proc_type);
-int		get_process_type_by_name(const char *proc_type_str);
 const char	*get_program_type_string(unsigned char program_type);
 
 /* process type */
@@ -555,6 +552,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_EXT_LAST		127
 
 #define ZBX_PROCESS_TYPE_UNKNOWN		255
+
+const char	*get_process_type_string(unsigned char proc_type);
+int		get_process_type_by_name(const char *proc_type_str);
 
 /* maintenance */
 typedef enum
@@ -1071,23 +1071,31 @@ zbx_proxy_suppress_t;
 
 
 /* move remaining temp string functions into libzbxstr.a */
+
+/* used by log which will be part of common*/
 #if defined(__GNUC__) || defined(__clang__)
 #	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
 #else
 #	define __zbx_attr_format_printf(idx1, idx2)
 #endif
 
+/* used by cuid and also by log */
 size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_format_printf(3, 4);
 
+/* could be moved into libzbxstr.a but it seems to be logically grouped with surrounding functions */
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
 
+/* used by log */
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
-char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
-void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
-void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 
+/* used by log */
+char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
+
+/* used by zbxcommon, setproctitle */
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
+
+/* used by dsprintf, which is used by log */
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff

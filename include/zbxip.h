@@ -20,6 +20,8 @@
 #ifndef ZABBIX_IP_H
 #define ZABBIX_IP_H
 
+#include "zbxtypes.h"
+
 int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
 int	is_supported_ip(const char *ip);

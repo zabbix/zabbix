@@ -129,4 +129,6 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 void	zbx_ltrim_utf8(char *str, const char *charlist);
 void	zbx_rtrim_utf8(char *str, const char *charlist);
 
+void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
+void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 #endif /* ZABBIX_STR_H */

@@ -17,10 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxparam.h"
+
 #include "zbxexpr.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 
-#include "zbxparam.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: return parameter by index (num) from parameter list (param)       *

@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxembed.h"
 #include "zbxmutexs.h"
+#include "zbxstr.h"
 
 const char	*progname;
 const char	title_message[] = "zabbix_js";
