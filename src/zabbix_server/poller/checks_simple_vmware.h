@@ -182,6 +182,8 @@ int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *user
 		AGENT_RESULT *result);
 int	check_vcenter_vm_net_if_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_vm_property(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_snapshot_get(AGENT_REQUEST *request, const char *username, const char *password,

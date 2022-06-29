@@ -124,6 +124,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.net.if.out", VMCHECK_FUNC(check_vcenter_vm_net_if_out)},
 	{"vm.net.if.usage", VMCHECK_FUNC(check_vcenter_vm_net_if_usage)},
 	{"vm.perfcounter", VMCHECK_FUNC(check_vcenter_vm_perfcounter)},
+	{"vm.property", VMCHECK_FUNC(check_vcenter_vm_property)},
 	{"vm.powerstate", VMCHECK_FUNC(check_vcenter_vm_powerstate)},
 	{"vm.snapshot.get", VMCHECK_FUNC(check_vcenter_vm_snapshot_get)},
 	{"vm.state", VMCHECK_FUNC(check_vcenter_vm_state)},
