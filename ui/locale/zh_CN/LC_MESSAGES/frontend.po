@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-17 09:53+0000\n"
+"PO-Revision-Date: 2022-06-27 10:39+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -3692,7 +3692,7 @@ msgstr "在动作%2$s未在分组%1$s中找到。"
 
 #: include/classes/core/ZBase.php:563
 msgid "Class not found."
-msgstr ""
+msgstr "未找到分类。"
 
 #: include/views/configuration.httpconf.list.php:221
 #: include/views/configuration.item.list.php:301
@@ -7245,11 +7245,11 @@ msgstr "首"
 #: app/controllers/CControllerPopupTriggerExpr.php:268
 #: app/controllers/CControllerPopupTriggerExpr.php:297
 msgid "Fit"
-msgstr "适合"
+msgstr "曲线拟合"
 
 #: include/views/js/monitoring.sysmaps.js.php:117
 msgid "Fit to map"
-msgstr "调整至符合拓扑图"
+msgstr "调整至拓扑图"
 
 #: include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:255
@@ -21114,7 +21114,7 @@ msgstr "avg() - 周期 T 内的平均值"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1053
 msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
-msgstr "baselinedev() - 返回季节数据周期与最后一个数据周期之间的偏差数"
+msgstr "baselinedev() - 返回前几个时间段相同数据周期与最后一个数据周期之间的偏差（stddevpop算法）"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1060
 msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
