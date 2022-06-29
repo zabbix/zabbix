@@ -47,7 +47,7 @@ class testFormGraphs extends CWebTest {
 		return [
 			[
 				[
-					'check_defaults' => true, // Check tabs, empty item table and preview only for one time.
+					'check_defaults' => true,
 					'change_fields' => [
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
 					],
@@ -208,6 +208,7 @@ class testFormGraphs extends CWebTest {
 				->one()->click();
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 
+		// Check default fields only for first case.
 		if (CTestArrayHelper::get($data, 'check_defaults', false)) {
 			$this->assertEquals([($this->prototype ? 'Graph prototype' : 'Graph'),'Preview'], $form->getTabs());
 			$this->assertFalse($form->query('xpath:.//table[@id="itemsTable"]//div[@class="drag-icon"]')->exists());
@@ -217,9 +218,13 @@ class testFormGraphs extends CWebTest {
 
 			if ($this->prototype) {
 				$this->assertTrue($items_container->query('button:Add prototype')->one()->isVisible());
+				$discover_field = $form->getField('Discover');
+				$this->assertTrue($discover_field->isVisible());
+				$this->assertEquals(true, $discover_field->getValue());
 			}
 			else {
 				$this->assertFalse($items_container->query('button:Add prototype')->exists());
+				$this->assertFalse($form->query('id:discover')->exists());
 			}
 
 			$form->selectTab('Preview');
