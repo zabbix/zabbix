@@ -176,17 +176,17 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 
 			// Get triggers related to hosts.
 			if ($hosts) {
-				$hosts = API::Host()->get([
-					'output' => [],
-					'selectTriggers' => ['triggerid'],
+				$triggers = API::Trigger()->get([
+					'output' => ['triggerid'],
+					'selectHosts' => ['hostid'],
 					'hostids' => array_keys($hosts),
-					'monitored' => true,
-					'preservekeys' => true
+					'preservekeys' => true,
+					'monitored' => true
 				]);
 
-				foreach ($hosts as $hostid => $host) {
-					foreach ($host['triggers'] as $trigger) {
-						$triggers_per_hosts[$hostid][$trigger['triggerid']] = true;
+				foreach ($triggers as $trigger) {
+					if (($host = reset($trigger['hosts'])) !== false) {
+						$triggers_per_hosts[$host['hostid']][$trigger['triggerid']] = true;
 						$problems_per_trigger[$trigger['triggerid']] = $this->problems_per_severity_tpl;
 					}
 				}
