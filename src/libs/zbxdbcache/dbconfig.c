@@ -219,7 +219,6 @@ static int	cmp_key_id(const char *key_1, const char *key_2)
 	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
 }
 
-
 static unsigned char	poller_by_item(unsigned char type, const char *key)
 {
 	switch (type)
@@ -2754,7 +2753,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &item->interfaceid);
 			dc_interface_update_agent_stats(interface, item->type, -1);
 		}
-
 
 		itemid = item->itemid;
 
@@ -5460,7 +5458,6 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
 	zbx_ipc_message_t	message;
 	unsigned char		*data = NULL;
 	zbx_uint32_t		data_len = 0;
-
 
 	if (0 == diff->values_num)
 		return;
@@ -10491,7 +10488,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
-
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 			continue;

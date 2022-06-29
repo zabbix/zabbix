@@ -399,7 +399,6 @@ zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
 	return (now.sec - ts->sec) * 1e3 + (now.ns - ts->ns) / 1e6;
 }
 
-
 static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
 static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
 
@@ -870,7 +869,6 @@ int	zbx_get_week_number(const struct tm *tm)
 	return days / 7 + 1;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: check if the string is a non-negative integer with or without     *
@@ -1024,4 +1022,3 @@ char	*zbx_time2str(time_t time, const char *tz)
 			tm->tm_sec);
 	return buffer;
 }
-

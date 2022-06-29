@@ -247,7 +247,6 @@ static duk_ret_t	es_hmac(duk_context *ctx)
 	return 1;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: initializes additional global functions                           *

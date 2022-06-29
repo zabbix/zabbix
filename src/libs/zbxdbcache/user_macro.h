@@ -73,7 +73,6 @@ void	um_cache_resolve_const(const zbx_um_cache_t *cache, const zbx_uint64_t *hos
 void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
 		int env, char **value);
 
-
 void	um_cache_dump(zbx_um_cache_t *cache);
 
 #endif

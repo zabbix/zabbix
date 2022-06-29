@@ -1944,7 +1944,6 @@ static size_t	zbx_db_bytea_unescape(u_char *io)
 }
 #endif
 
-
 #if defined(HAVE_ORACLE)
 static void	db_set_fetch_error(int dberr)
 {

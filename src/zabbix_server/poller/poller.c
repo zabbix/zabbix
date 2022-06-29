@@ -140,7 +140,6 @@ static int	interface_availability_by_item_type(unsigned char item_type, unsigned
 	return FAIL;
 }
 
-
 static const char	*item_type_agent_string(zbx_item_type_t item_type)
 {
 	switch (item_type)

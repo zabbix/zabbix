@@ -340,7 +340,6 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	zbx_uint64_t			triggerid, tagid;
 	zbx_db_tag_t			*db_tag;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == new_triggerids->values_num && 0 == cur_triggerids->values_num)

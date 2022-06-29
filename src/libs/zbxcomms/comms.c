@@ -696,7 +696,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		server_name = ip;
 	}
 
-
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
 			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))
 	{

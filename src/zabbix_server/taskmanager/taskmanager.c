@@ -739,7 +739,6 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: process task for reload of configuration cache on passive proxy   *

@@ -102,7 +102,6 @@ int	zbx_double_compare(double a, double b)
 	return fabs(a - b) <= ZBX_DOUBLE_EPSILON ? SUCCEED : FAIL;
 }
 
-
 static int	is_double_valid_syntax(const char *str)
 {
 	int	len;
@@ -200,7 +199,6 @@ int	_wis_uint(const wchar_t *wide_string)
 	return SUCCEED;
 }
 #endif
-
 
 /******************************************************************************
  *                                                                            *

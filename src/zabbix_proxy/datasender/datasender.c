@@ -52,7 +52,6 @@ extern unsigned int	configured_tls_connect_mode;
 					ZBX_DATASENDER_AUTOREGISTRATION | ZBX_DATASENDER_TASKS |	\
 					ZBX_DATASENDER_TASKS_RECV)
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Get current history upload state (disabled/enabled)               *

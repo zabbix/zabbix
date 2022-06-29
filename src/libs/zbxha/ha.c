@@ -180,4 +180,3 @@ const char	*zbx_ha_status_str(int ha_status)
 			return "unknown";
 	}
 }
-

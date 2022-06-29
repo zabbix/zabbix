@@ -1758,6 +1758,3 @@ void	zbx_free_tag(zbx_tag_t *tag)
 	zbx_free(tag->value);
 	zbx_free(tag);
 }
-
-
-

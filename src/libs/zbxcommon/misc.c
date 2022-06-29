@@ -354,7 +354,6 @@ void	zbx_setproctitle(const char *fmt, ...)
 #endif
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: check if string is a valid internet hostname                      *
@@ -763,7 +762,6 @@ int	parse_host_key(char *exp, char **host, char **key)
 	return SUCCEED;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: replace all not-allowed hostname characters in the string         *
@@ -818,8 +816,6 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 			return INTERFACE_TYPE_UNKNOWN;
 	}
 }
-
-
 
 void	zbx_alarm_flag_set(void)
 {
@@ -906,7 +902,6 @@ void	zbx_update_env(double time_now)
 #endif
 	}
 }
-
 
 /******************************************************************************
  *                                                                            *

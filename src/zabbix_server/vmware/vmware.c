@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 #include "vmware.h"
 
 #include "zbxxml.h"
@@ -2278,7 +2277,6 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 	zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_datacenter_free);
 	zbx_vector_vmware_datacenter_destroy(&data->datacenters);
 
-
 	zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_resourcepool_free);
 	zbx_vector_vmware_resourcepool_destroy(&data->resourcepools);
 
@@ -3609,7 +3607,6 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_RESOURCEPOOL_PARENTID("%s"), id_esc);
 		id = zbx_xml_doc_read_value(xdoc , tmp);
 
-
 		if (NULL != id)	/* we do not include the last default 'ResourcePool' */
 		{
 			if (NULL == *path)
@@ -3628,7 +3625,6 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
 		zbx_free(name);
 	}
 	while (NULL != id);
-
 
 	if (SUCCEED == ret)
 	{

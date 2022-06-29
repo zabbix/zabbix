@@ -482,8 +482,6 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 	*str_offset += size;
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Appends src to string dst of size siz (unlike strncat, size is    *
@@ -1428,9 +1426,6 @@ void	dos2unix(char *str)
 	*o = '\0';
 }
 
-
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: remove whitespace surrounding a string list item delimiters       *
@@ -1535,7 +1530,6 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg)
 
 	return arg_esc;
 }
-
 
 /******************************************************************************
  *                                                                            *
