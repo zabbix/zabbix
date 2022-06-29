@@ -718,9 +718,9 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 
 	foreach ($selements as $snum => &$selement) {
 		$selement['triggers'] = array_map(function ($trigger) use ($problems_by_trigger) {
-			return $trigger + [
-				'problems' => $problems_by_trigger[$trigger['triggerid']]
-			];
+			$trigger['problems'] = $problems_by_trigger[$trigger['triggerid']];
+
+			return $trigger;
 		}, $selement['triggers']);
 	}
 	unset($selement);
