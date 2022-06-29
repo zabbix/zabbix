@@ -1414,7 +1414,7 @@ define('API_UINTS64',				14);
 define('API_CUIDS',					44);
 define('API_USER_MACROS',			52);
 // any type
-define('API_ANY',					56);
+define('API_ANY',					58);
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
@@ -1456,13 +1456,13 @@ define('API_LAT_LNG_ZOOM',			54);
 define('API_TIMESTAMP',				55);
 define('API_TG_NAME',				56);
 define('API_COLORS',				57);
-define('API_ITEM_KEY',				58);
-define('API_ITEM_DELAY',			59);
-define('API_JSON',					60);
-define('API_XML',					61);
-define('API_PREPROC_PARAMS',		62);
-define('API_PROMETHEUS_PATTERN',	63);
-define('API_PROMETHEUS_LABEL',		64);
+define('API_ITEM_KEY',				59);
+define('API_ITEM_DELAY',			60);
+define('API_JSON',					61);
+define('API_XML',					62);
+define('API_PREPROC_PARAMS',		63);
+define('API_PROMETHEUS_PATTERN',	64);
+define('API_PROMETHEUS_LABEL',		65);
 
 // flags
 define('API_REQUIRED',					0x00001);
