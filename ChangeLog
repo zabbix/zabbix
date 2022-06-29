@@ -5,7 +5,7 @@ New features:
 .........T [ZBXNEXT-5956] added template AWS EC2 by HTTP (ychukina)
 
 Bug fixes:
-........S.[ZBX-21263] fixed item tags not being created by LLD (vso)
+........S. [ZBX-21263] fixed item tags not being created by LLD (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0rc2
