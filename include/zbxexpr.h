@@ -222,4 +222,6 @@ void	zbx_free_tag(zbx_tag_t *tag);
 
 int	zbx_is_double_suffix(const char *str, unsigned char flags);
 double	str2double(const char *str);
+int	zbx_suffixed_number_parse(const char *number, int *len);
+int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 #endif /* ZABBIX_EXPR_H */

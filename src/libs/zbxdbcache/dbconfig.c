@@ -209,6 +209,17 @@ clean:
 	return ret;
 }
 
+static int	cmp_key_id(const char *key_1, const char *key_2)
+{
+	const char	*p, *q;
+
+	for (p = key_1, q = key_2; *p == *q && '\0' != *q && '[' != *q; p++, q++)
+		;
+
+	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
+}
+
+
 static unsigned char	poller_by_item(unsigned char type, const char *key)
 {
 	switch (type)

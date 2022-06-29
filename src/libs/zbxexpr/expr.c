@@ -877,3 +877,67 @@ double	str2double(const char *str)
 
 	return atof(str) * suffix2factor(str[sz]);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse a suffixed number like "12.345K"                            *
+ *                                                                            *
+ * Parameters: number - [IN] start of number                                  *
+ *             len    - [OUT] length of parsed number                         *
+ *                                                                            *
+ * Return value: SUCCEED - the number was parsed successfully                 *
+ *               FAIL    - invalid number                                     *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *           The token field locations are specified as offsets from the      *
+ *           beginning of the expression.                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_suffixed_number_parse(const char *number, int *len)
+{
+	if (FAIL == zbx_number_parse(number, len))
+		return FAIL;
+
+	if (0 != isalpha(number[*len]) && NULL != strchr(ZBX_UNIT_SYMBOLS, number[*len]))
+		(*len)++;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if pattern matches the specified value                      *
+ *                                                                            *
+ * Parameters: value    - [IN] the value to match                             *
+ *             pattern  - [IN] the pattern to match                           *
+ *             op       - [IN] the matching operator                          *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op)
+{
+	int	ret = FAIL;
+
+	switch (op)
+	{
+		case CONDITION_OPERATOR_EQUAL:
+			if (0 == strcmp(value, pattern))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (0 != strcmp(value, pattern))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_LIKE:
+			if (NULL != strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_LIKE:
+			if (NULL == strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+	}
+
+	return ret;
+}

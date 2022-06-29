@@ -148,113 +148,6 @@ void	zbx_lrtrim(char *str, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
- *          double quotation mark is present on both ends of the string. If   *
- *          strip_plus_sign is non-zero, then removes single "+" sign from    *
- *          the beginning of the trimmed and unquoted string.                 *
- *                                                                            *
- *          This function does not guarantee that the resulting string        *
- *          contains numeric value. It is meant to be used for removing       *
- *          "valid" characters from the value that is expected to be numeric  *
- *          before checking if value is numeric.                              *
- *                                                                            *
- * Parameters: str             - [IN/OUT] string for processing               *
- *             strip_plus_sign - [IN] non-zero if "+" should be stripped      *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_trim_number(char *str, int strip_plus_sign)
-{
-	char	*left = str;			/* pointer to the first character */
-	char	*right = strchr(str, '\0') - 1; /* pointer to the last character, not including terminating null-char */
-
-	if (left > right)
-	{
-		/* string is empty before any trimming */
-		return;
-	}
-
-	while (' ' == *left)
-	{
-		left++;
-	}
-
-	while (' ' == *right && left < right)
-	{
-		right--;
-	}
-
-	if ('"' == *left && '"' == *right && left < right)
-	{
-		left++;
-		right--;
-	}
-
-	if (0 != strip_plus_sign && '+' == *left)
-	{
-		left++;
-	}
-
-	if (left > right)
-	{
-		/* string is empty after trimming */
-		*str = '\0';
-		return;
-	}
-
-	if (str < left)
-	{
-		while (left <= right)
-		{
-			*str++ = *left++;
-		}
-		*str = '\0';
-	}
-	else
-	{
-		*(right + 1) = '\0';
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
- *          double quotation mark is present on both ends of the string, then *
- *          removes single "+" sign from the beginning of the trimmed and     *
- *          unquoted string.                                                  *
- *                                                                            *
- *          This function does not guarantee that the resulting string        *
- *          contains integer value. It is meant to be used for removing       *
- *          "valid" characters from the value that is expected to be numeric  *
- *          before checking if value is numeric.                              *
- *                                                                            *
- * Parameters: str - [IN/OUT] string for processing                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_trim_integer(char *str)
-{
-	zbx_trim_number(str, 1);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
- *          double quotation mark is present on both ends of the string.      *
- *                                                                            *
- *          This function does not guarantee that the resulting string        *
- *          contains floating-point number. It is meant to be used for        *
- *          removing "valid" characters from the value that is expected to be *
- *          numeric before checking if value is numeric.                      *
- *                                                                            *
- * Parameters: str - [IN/OUT] string for processing                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_trim_float(char *str)
-{
-	zbx_trim_number(str, 0);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: Remove characters 'charlist' from the whole string                *
  *                                                                            *
  * Parameters: str - string for processing                                    *
@@ -505,42 +398,6 @@ int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charli
 int	str_in_list(const char *list, const char *value, char delimiter)
 {
 	return str_n_in_list(list, value, strlen(value), delimiter);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if the string is a hexadecimal representation of data in    *
- *          the form "F4 CE 46 01 0C 44 8B F4\nA0 2C 29 74 5D 3F 13 49\n"     *
- *                                                                            *
- * Parameters: str - string to check                                          *
- *                                                                            *
- * Return value:  SUCCEED - the string is formatted like the example above    *
- *                FAIL - otherwise                                            *
- *                                                                            *
- ******************************************************************************/
-int	is_hex_string(const char *str)
-{
-	if ('\0' == *str)
-		return FAIL;
-
-	while ('\0' != *str)
-	{
-		if (0 == isxdigit(*str))
-			return FAIL;
-
-		if (0 == isxdigit(*(str + 1)))
-			return FAIL;
-
-		if ('\0' == *(str + 2))
-			break;
-
-		if (' ' != *(str + 2) && '\n' != *(str + 2))
-			return FAIL;
-
-		str += 3;
-	}
-
-	return SUCCEED;
 }
 
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
@@ -836,16 +693,6 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	}
 
 	return NULL;
-}
-
-int	cmp_key_id(const char *key_1, const char *key_2)
-{
-	const char	*p, *q;
-
-	for (p = key_1, q = key_2; *p == *q && '\0' != *q && '[' != *q; p++, q++)
-		;
-
-	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -1732,44 +1579,6 @@ int	zbx_strcmp_natural(const char *s1, const char *s2)
 	}
 
 	return *s1 - *s2;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if pattern matches the specified value                      *
- *                                                                            *
- * Parameters: value    - [IN] the value to match                             *
- *             pattern  - [IN] the pattern to match                           *
- *             op       - [IN] the matching operator                          *
- *                                                                            *
- * Return value: SUCCEED - matches, FAIL - otherwise                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op)
-{
-	int	ret = FAIL;
-
-	switch (op)
-	{
-		case CONDITION_OPERATOR_EQUAL:
-			if (0 == strcmp(value, pattern))
-				ret = SUCCEED;
-			break;
-		case CONDITION_OPERATOR_NOT_EQUAL:
-			if (0 != strcmp(value, pattern))
-				ret = SUCCEED;
-			break;
-		case CONDITION_OPERATOR_LIKE:
-			if (NULL != strstr(value, pattern))
-				ret = SUCCEED;
-			break;
-		case CONDITION_OPERATOR_NOT_LIKE:
-			if (NULL == strstr(value, pattern))
-				ret = SUCCEED;
-			break;
-	}
-
-	return ret;
 }
 
 /******************************************************************************

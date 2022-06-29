@@ -264,32 +264,6 @@ int	zbx_number_parse(const char *number, int *len)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse a suffixed number like "12.345K"                            *
- *                                                                            *
- * Parameters: number - [IN] start of number                                  *
- *             len    - [OUT] length of parsed number                         *
- *                                                                            *
- * Return value: SUCCEED - the number was parsed successfully                 *
- *               FAIL    - invalid number                                     *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *           The token field locations are specified as offsets from the      *
- *           beginning of the expression.                                     *
- *                                                                            *
- ******************************************************************************/
-int	zbx_suffixed_number_parse(const char *number, int *len)
-{
-	if (FAIL == zbx_number_parse(number, len))
-		return FAIL;
-
-	if (0 != isalpha(number[*len]) && NULL != strchr(ZBX_UNIT_SYMBOLS, number[*len]))
-		(*len)++;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: check if the string is unsigned integer within the specified      *
  *          range and optionally store it into value parameter                *
  *                                                                            *
@@ -442,4 +416,147 @@ int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
 		*value *= factor;
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
+ *          double quotation mark is present on both ends of the string. If   *
+ *          strip_plus_sign is non-zero, then removes single "+" sign from    *
+ *          the beginning of the trimmed and unquoted string.                 *
+ *                                                                            *
+ *          This function does not guarantee that the resulting string        *
+ *          contains numeric value. It is meant to be used for removing       *
+ *          "valid" characters from the value that is expected to be numeric  *
+ *          before checking if value is numeric.                              *
+ *                                                                            *
+ * Parameters: str             - [IN/OUT] string for processing               *
+ *             strip_plus_sign - [IN] non-zero if "+" should be stripped      *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_trim_number(char *str, int strip_plus_sign)
+{
+	char	*left = str;			/* pointer to the first character */
+	char	*right = strchr(str, '\0') - 1; /* pointer to the last character, not including terminating null-char */
+
+	if (left > right)
+	{
+		/* string is empty before any trimming */
+		return;
+	}
+
+	while (' ' == *left)
+	{
+		left++;
+	}
+
+	while (' ' == *right && left < right)
+	{
+		right--;
+	}
+
+	if ('"' == *left && '"' == *right && left < right)
+	{
+		left++;
+		right--;
+	}
+
+	if (0 != strip_plus_sign && '+' == *left)
+	{
+		left++;
+	}
+
+	if (left > right)
+	{
+		/* string is empty after trimming */
+		*str = '\0';
+		return;
+	}
+
+	if (str < left)
+	{
+		while (left <= right)
+		{
+			*str++ = *left++;
+		}
+		*str = '\0';
+	}
+	else
+	{
+		*(right + 1) = '\0';
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
+ *          double quotation mark is present on both ends of the string, then *
+ *          removes single "+" sign from the beginning of the trimmed and     *
+ *          unquoted string.                                                  *
+ *                                                                            *
+ *          This function does not guarantee that the resulting string        *
+ *          contains integer value. It is meant to be used for removing       *
+ *          "valid" characters from the value that is expected to be numeric  *
+ *          before checking if value is numeric.                              *
+ *                                                                            *
+ * Parameters: str - [IN/OUT] string for processing                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trim_integer(char *str)
+{
+	zbx_trim_number(str, 1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
+ *          double quotation mark is present on both ends of the string.      *
+ *                                                                            *
+ *          This function does not guarantee that the resulting string        *
+ *          contains floating-point number. It is meant to be used for        *
+ *          removing "valid" characters from the value that is expected to be *
+ *          numeric before checking if value is numeric.                      *
+ *                                                                            *
+ * Parameters: str - [IN/OUT] string for processing                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trim_float(char *str)
+{
+	zbx_trim_number(str, 0);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is a hexadecimal representation of data in    *
+ *          the form "F4 CE 46 01 0C 44 8B F4\nA0 2C 29 74 5D 3F 13 49\n"     *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is formatted like the example above    *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	is_hex_string(const char *str)
+{
+	if ('\0' == *str)
+		return FAIL;
+
+	while ('\0' != *str)
+	{
+		if (0 == isxdigit(*str))
+			return FAIL;
+
+		if (0 == isxdigit(*(str + 1)))
+			return FAIL;
+
+		if ('\0' == *(str + 2))
+			break;
+
+		if (' ' != *(str + 2) && '\n' != *(str + 2))
+			return FAIL;
+
+		str += 3;
+	}
+
+	return SUCCEED;
 }

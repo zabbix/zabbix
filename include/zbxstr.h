@@ -29,8 +29,6 @@ int	is_ascii_string(const char *str);
 int	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(char *str, const char *charlist);
 void	zbx_lrtrim(char *str, const char *charlist);
-void	zbx_trim_integer(char *str);
-void	zbx_trim_float(char *str);
 void	zbx_remove_chars(char *str, const char *charlist);
 char	*zbx_str_printable_dyn(const char *text);
 #define ZBX_WHITESPACE			" \t\r\n"
@@ -43,8 +41,6 @@ int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charli
 
 int	str_in_list(const char *list, const char *value, char delimiter);
 int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter);
-
-int	is_hex_string(const char *str);
 
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 void	zbx_strarr_init(char ***arr);
@@ -75,7 +71,6 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
 #define ZBX_NULL2EMPTY_STR(str)	(NULL != (str) ? (str) : "")
 
 char	*zbx_strcasestr(const char *haystack, const char *needle);
-int	cmp_key_id(const char *key_1, const char *key_2);
 int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -105,7 +100,6 @@ int	zbx_cesu8_to_utf8(const char *cesu8, char **utf8);
 void	dos2unix(char *str);
 
 int	zbx_check_hostname(const char *hostname, char **error);
-int	zbx_suffixed_number_parse(const char *number, int *len);
 
 int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_t offset, size_t sz_to,
 		const char *from, size_t sz_from);
@@ -117,7 +111,6 @@ int	zbx_strcmp_null(const char *s1, const char *s2);
 char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 
 int	zbx_strcmp_natural(const char *s1, const char *s2);
-int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 int	zbx_str_extract(const char *text, size_t len, char **value);
 char	*zbx_substr(const char *src, size_t left, size_t right);
 char	*zbx_substr_unquote(const char *src, size_t left, size_t right);

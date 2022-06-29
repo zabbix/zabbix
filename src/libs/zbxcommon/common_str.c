@@ -205,7 +205,6 @@ retry:
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-
 /* convert from selected code page to unicode */
 static wchar_t	*zbx_to_unicode(unsigned int codepage, const char *cp_string)
 {

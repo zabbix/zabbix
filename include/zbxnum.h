@@ -63,8 +63,6 @@ int	zbx_wis_uint(const wchar_t *wide_string);
 
 const char	*zbx_print_double(char *buffer, size_t size, double val);
 int		zbx_number_parse(const char *number, int *len);
-int		zbx_suffixed_number_parse(const char *number, int *len);
-
 
 #define ZBX_STR2UINT64(uint, string) is_uint64(string, &uint)
 
@@ -73,5 +71,7 @@ void	zbx_update_epsilon_to_not_use_double_precision(void);
 void	zbx_update_epsilon_to_python_compatible_precision(void);
 
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
-
+void	zbx_trim_integer(char *str);
+void	zbx_trim_float(char *str);
+int	is_hex_string(const char *str);
 #endif /* ZABBIX_NUM_H */
