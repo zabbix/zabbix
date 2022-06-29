@@ -128,7 +128,6 @@ int	zbx_ipc_async_socket_connected(zbx_ipc_async_socket_t *asocket);
 int	zbx_ipc_async_exchange(const char *service_name, zbx_uint32_t code, int timeout, const unsigned char *data,
 		zbx_uint32_t size, unsigned char **out, char **error);
 
-
 void	zbx_ipc_message_free(zbx_ipc_message_t *message);
 void	zbx_ipc_message_clean(zbx_ipc_message_t *message);
 void	zbx_ipc_message_init(zbx_ipc_message_t *message);
@@ -136,4 +135,3 @@ void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data);
 void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src);
 
 #endif
-

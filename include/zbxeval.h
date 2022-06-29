@@ -254,7 +254,6 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
 
 void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs);
 
-
 typedef struct
 {
 	char	*host;

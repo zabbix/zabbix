@@ -118,7 +118,6 @@
 	)
 #endif
 
-
 /* complex serialization/deserialization functions */
 
 zbx_uint32_t	zbx_serialize_uint31_compact(unsigned char *ptr, zbx_uint32_t value);

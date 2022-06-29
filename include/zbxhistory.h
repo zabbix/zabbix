@@ -53,7 +53,6 @@ void	zbx_history_value2variant(const history_value_t *value, unsigned char value
 /* mirrors the vector creation function to vector destroying function.                    */
 #define zbx_history_record_vector_create(vector)	zbx_vector_history_record_create(vector)
 
-
 int	zbx_history_init(char **error);
 void	zbx_history_destroy(void);
 

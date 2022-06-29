@@ -122,7 +122,6 @@ const char	*zbx_result_string(int result);
  ******************************************************************************/
 #define ZBX_UNUSED(var) (void)(var)
 
-
 /* item types */
 typedef enum
 {
@@ -1031,7 +1030,6 @@ zbx_proxy_suppress_t;
 #define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
 	(data << ZBX_RTC_DATA_SHIFT))
 
-
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
 #define ZBX_GIBIBYTE		1073741824
@@ -1158,13 +1156,11 @@ void	make_hostname(char *host);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
-
 #define ZBX_SESSION_ACTIVE		0
 #define ZBX_SESSION_PASSIVE		1
 #define ZBX_AUTH_TOKEN_ENABLED		0
 #define ZBX_AUTH_TOKEN_DISABLED		1
 #define ZBX_AUTH_TOKEN_NEVER_EXPIRES	0
-
 
 #define ZBX_DO_NOT_SEND_RESPONSE	0
 #define ZBX_SEND_RESPONSE		1
@@ -1183,7 +1179,6 @@ unsigned char	get_interface_type_by_item_type(unsigned char type);
 #define ZBX_PSK_FOR_HOST		0x01				/* PSK can be used for a known host */
 #define ZBX_PSK_FOR_AUTOREG		0x02				/* PSK can be used for host autoregistration */
 #define ZBX_PSK_FOR_PROXY		0x04				/* PSK is configured on proxy */
-
 
 void	zbx_alarm_flag_set(void);
 void	zbx_alarm_flag_clear(void);

@@ -67,7 +67,6 @@ int		zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *
 int		zbx_day_in_month(int year, int mon);
 zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts);
 
-
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text);
 int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_time_unit_t *base, char **error);
 void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);

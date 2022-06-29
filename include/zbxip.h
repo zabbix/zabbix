@@ -31,7 +31,6 @@ int	ip_in_list(const char *list, const char *ip);
 
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
 
-
 #define ZBX_IPRANGE_V4	0
 #define ZBX_IPRANGE_V6	1
 

@@ -197,11 +197,9 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int 
 #define ZBX_REPORT_CYCLE_MONTHLY	2
 #define ZBX_REPORT_CYCLE_YEARLY		3
 
-
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
 		int *nextcheck, int *scheduling, char **error);
 /* token END */
-
 
 /* interval START */
 typedef struct zbx_custom_interval	zbx_custom_interval_t;
