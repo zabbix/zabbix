@@ -1194,6 +1194,30 @@ static char	*format_user_fullname(const char *name, const char *surname, const c
 	return buf;
 }
 
+static const char	*alert_type_string(unsigned char type)
+{
+	switch (type)
+	{
+		case ALERT_TYPE_MESSAGE:
+			return "message";
+		default:
+			return "script";
+	}
+}
+
+static const char	*alert_status_string(unsigned char type, unsigned char status)
+{
+	switch (status)
+	{
+		case ALERT_STATUS_SENT:
+			return (ALERT_TYPE_MESSAGE == type ? "sent" : "executed");
+		case ALERT_STATUS_NOT_SENT:
+			return "in progress";
+		default:
+			return "failed";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve escalation history                                       *
@@ -1242,8 +1266,8 @@ static void	get_escalation_history(zbx_uint64_t actionid, const ZBX_DB_EVENT *ev
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s %s %-7s %-11s",
 				zbx_date2str(now, tz), zbx_time2str(now, tz),	/* date, time */
-				zbx_alert_type_string(type),		/* alert type */
-				zbx_alert_status_string(type, status));	/* alert status */
+				alert_type_string(type),		/* alert type */
+				alert_status_string(type, status));	/* alert status */
 
 		if (ALERT_TYPE_COMMAND == type)
 		{
@@ -2045,6 +2069,62 @@ static void	get_event_tag_by_name(const char *text, const ZBX_DB_EVENT *event, c
 	}
 }
 
+static const char      *trigger_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case TRIGGER_STATE_NORMAL:
+			return "Normal";
+		case TRIGGER_STATE_UNKNOWN:
+			return "Unknown";
+		default:
+			return "unknown";
+	}
+}
+
+static const char	*item_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case ITEM_STATE_NORMAL:
+			return "Normal";
+		case ITEM_STATE_NOTSUPPORTED:
+			return "Not supported";
+		default:
+			return "unknown";
+	}
+}
+
+static const char	*event_value_string(unsigned char source, unsigned char object, unsigned char value)
+{
+	if (EVENT_SOURCE_TRIGGERS == source || EVENT_SOURCE_SERVICE == source)
+	{
+		switch (value)
+		{
+			case EVENT_STATUS_PROBLEM:
+				return "PROBLEM";
+			case EVENT_STATUS_RESOLVED:
+				return "RESOLVED";
+			default:
+				return "unknown";
+		}
+	}
+
+	if (EVENT_SOURCE_INTERNAL == source)
+	{
+		switch (object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				return trigger_state_string(value);
+			case EVENT_OBJECT_ITEM:
+			case EVENT_OBJECT_LLDRULE:
+				return item_state_string(value);
+		}
+	}
+
+	return "unknown";
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: request recovery event value by macro                             *
@@ -2064,7 +2144,7 @@ static void	get_recovery_event_value(const char *macro, const ZBX_DB_EVENT *r_ev
 	else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_STATUS))
 	{
 		*replace_to = zbx_strdup(*replace_to,
-				zbx_event_value_string(r_event->source, r_event->object, r_event->value));
+				event_value_string(r_event->source, r_event->object, r_event->value));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_TIME))
 	{
@@ -2097,7 +2177,7 @@ static void	get_current_event_value(const char *macro, const ZBX_DB_EVENT *event
 	if (0 == strcmp(macro, MVAR_EVENT_STATUS))
 	{
 		*replace_to = zbx_strdup(*replace_to,
-				zbx_event_value_string(event->source, event->object, event->value));
+				event_value_string(event->source, event->object, event->value));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_VALUE))
 	{
@@ -2727,6 +2807,19 @@ static const char	*dservice_type_string(zbx_dservice_type_t service)
 	}
 }
 
+static const char	*trigger_value_string(unsigned char value)
+{
+	switch (value)
+	{
+		case TRIGGER_VALUE_PROBLEM:
+			return "PROBLEM";
+		case TRIGGER_VALUE_OK:
+			return "OK";
+		default:
+			return "unknown";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
@@ -3158,7 +3251,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				else if (0 == strcmp(m, MVAR_TRIGGER_STATUS) || 0 == strcmp(m, MVAR_STATUS))
 				{
 					replace_to = zbx_strdup(replace_to,
-							zbx_trigger_value_string(c_event->trigger.value));
+							trigger_value_string(c_event->trigger.value));
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
 				{
@@ -3436,7 +3529,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_STATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_trigger_state_string(c_event->value));
+					replace_to = zbx_strdup(replace_to, trigger_state_string(c_event->value));
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_STATE_ERROR))
 				{
@@ -3832,7 +3925,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_STATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_item_state_string(c_event->value));
+					replace_to = zbx_strdup(replace_to, item_state_string(c_event->value));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_VALUETYPE))
 				{
@@ -3981,7 +4074,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				}
 				else if (0 == strcmp(m, MVAR_LLDRULE_STATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_item_state_string(c_event->value));
+					replace_to = zbx_strdup(replace_to, item_state_string(c_event->value));
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{

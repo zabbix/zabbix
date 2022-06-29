@@ -201,8 +201,6 @@ zbx_item_authtype_t;
 #define EVENT_SOURCE_SERVICE		4
 #define EVENT_SOURCE_COUNT		5
 
-const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
-
 /* event objects */
 #define EVENT_OBJECT_TRIGGER		0
 #define EVENT_OBJECT_DHOST		1
@@ -453,7 +451,6 @@ typedef enum
 	ALERT_STATUS_NEW
 }
 zbx_alert_status_t;
-const char	*zbx_alert_status_string(unsigned char type, unsigned char status);
 
 /* escalation statuses */
 typedef enum
@@ -464,7 +461,6 @@ typedef enum
 	ESCALATION_STATUS_COMPLETED	/* only in server code, never in DB */
 }
 zbx_escalation_status_t;
-const char	*zbx_escalation_status_string(unsigned char status);
 
 /* alert types */
 typedef enum
@@ -473,7 +469,6 @@ typedef enum
 	ALERT_TYPE_COMMAND
 }
 zbx_alert_type_t;
-const char	*zbx_alert_type_string(unsigned char type);
 
 /* item statuses */
 #define ITEM_STATUS_ACTIVE		0
@@ -482,7 +477,6 @@ const char	*zbx_alert_type_string(unsigned char type);
 /* item states */
 #define ITEM_STATE_NORMAL		0
 #define ITEM_STATE_NOTSUPPORTED		1
-const char	*zbx_item_state_string(unsigned char state);
 
 /* group statuses */
 typedef enum
@@ -650,12 +644,10 @@ zbx_prototype_discover_t;
 #define TRIGGER_VALUE_PROBLEM		1
 #define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
 #define TRIGGER_VALUE_NONE		3	/* only in server code, never in DB */
-const char	*zbx_trigger_value_string(unsigned char value);
 
 /* trigger states */
 #define TRIGGER_STATE_NORMAL		0
 #define TRIGGER_STATE_UNKNOWN		1
-const char	*zbx_trigger_state_string(unsigned char state);
 
 /* trigger severity */
 #define TRIGGER_SEVERITY_NOT_CLASSIFIED	0

@@ -2288,6 +2288,21 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 	return ret;
 }
 
+static const char	*escalation_status_string(unsigned char status)
+{
+	switch (status)
+	{
+		case ESCALATION_STATUS_ACTIVE:
+			return "active";
+		case ESCALATION_STATUS_SLEEP:
+			return "sleep";
+		case ESCALATION_STATUS_COMPLETED:
+			return "completed";
+		default:
+			return "unknown";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: check whether escalation must be cancelled, deleted, skipped or   *
@@ -2317,7 +2332,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	unsigned char	maintenance = HOST_MAINTENANCE_STATUS_OFF, skip = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	if (EVENT_OBJECT_TRIGGER == event->object)
 	{
@@ -2434,7 +2449,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	ZBX_USER_MSG	*user_msg = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	/* the cancellation notification can be sent if no objects are deleted and notification is not disabled */
 	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step &&
@@ -2464,7 +2479,7 @@ static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *actio
 		const ZBX_DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	escalation_execute_operations(escalation, event, action, service, default_timezone, roles);
 
@@ -2486,7 +2501,7 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
 		zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	escalation_execute_recovery_operations(event, r_event, action, service, default_timezone, roles);
 
@@ -2513,7 +2528,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " acknowledgeid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation->acknowledgeid,
-			zbx_escalation_status_string(escalation->status));
+			escalation_status_string(escalation->status));
 
 	result = DBselect(
 			"select message,userid,clock,action,old_severity,new_severity,suppress_until from acknowledges"
@@ -2561,7 +2576,7 @@ static void	escalation_update(DB_ESCALATION *escalation, const DB_ACTION *action
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " servicealarmid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation->servicealarmid,
-			zbx_escalation_status_string(escalation->status));
+			escalation_status_string(escalation->status));
 
 	escalation_execute_update_operations(event, NULL, action, NULL, service_alarm, service, default_timezone, roles);
 
