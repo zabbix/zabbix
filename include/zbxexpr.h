@@ -37,10 +37,21 @@ char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
 int	zbx_function_param_quote(char **param, int forced);
 char	*zbx_function_get_param_dyn(const char *params, int Nparam);
 
+typedef enum
+{
+	ZBX_FUNCTION_TYPE_UNKNOWN,
+	ZBX_FUNCTION_TYPE_HISTORY,
+	ZBX_FUNCTION_TYPE_TIMER,
+	ZBX_FUNCTION_TYPE_TRENDS
+}
+zbx_function_type_t;
 
-int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
-		const char *tz);
+zbx_function_type_t	zbx_get_function_type(const char *func);
 
+int	zbx_is_double_suffix(const char *str, unsigned char flags);
+double	str2double(const char *str);
+int	zbx_suffixed_number_parse(const char *number, int *len);
+int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
 /* token START */
 /* tokens used in expressions */
@@ -187,23 +198,12 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int 
 #define ZBX_REPORT_CYCLE_YEARLY		3
 
 
-typedef enum
-{
-	ZBX_FUNCTION_TYPE_UNKNOWN,
-	ZBX_FUNCTION_TYPE_HISTORY,
-	ZBX_FUNCTION_TYPE_TIMER,
-	ZBX_FUNCTION_TYPE_TRENDS
-}
-zbx_function_type_t;
-
-zbx_function_type_t	zbx_get_function_type(const char *func);
-
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
 		int *nextcheck, int *scheduling, char **error);
 /* token END */
 
 
-/* scheduler START */
+/* interval START */
 typedef struct zbx_custom_interval	zbx_custom_interval_t;
 int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
 		char **error);
@@ -216,12 +216,7 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
 		time_t disable_until);
 
 int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res);
-/* scheduler END */
-
-void	zbx_free_tag(zbx_tag_t *tag);
-
-int	zbx_is_double_suffix(const char *str, unsigned char flags);
-double	str2double(const char *str);
-int	zbx_suffixed_number_parse(const char *number, int *len);
-int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
+int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
+		const char *tz);
+/* interval END */
 #endif /* ZABBIX_EXPR_H */

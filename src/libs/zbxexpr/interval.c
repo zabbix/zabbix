@@ -300,165 +300,6 @@ static int	time_period_parse(zbx_time_period_t *period, const char *text, int le
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate time period and check if specified time is within it     *
- *                                                                            *
- * Parameters: period - [IN] semicolon-separated list of time periods in one  *
- *                           of the following formats:                        *
- *                             d1-d2,h1:m1-h2:m2                              *
- *                             or d1,h1:m1-h2:m2                              *
- *             time   - [IN] time to check                                    *
- *             res    - [OUT] check result:                                   *
- *                              SUCCEED - if time is within period            *
- *                              FAIL    - otherwise                           *
- *                                                                            *
- * Return value: validation result (SUCCEED - valid, FAIL - invalid)          *
- *                                                                            *
- * Comments:   !!! Don't forget to sync code with PHP !!!                     *
- *                                                                            *
- ******************************************************************************/
-int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res)
-{
-	int			res_total = FAIL;
-	const char		*next;
-	struct tm		*tm;
-	zbx_time_period_t	tp;
-
-	tm = zbx_localtime(&time, tz);
-
-	next = strchr(period, ';');
-	while  (SUCCEED == time_period_parse(&tp, period, (NULL == next ? (int)strlen(period) : (int)(next - period))))
-	{
-		if (SUCCEED == check_time_period(tp, tm))
-			res_total = SUCCEED;	/* no short-circuits, validate all periods before return */
-
-		if (NULL == next)
-		{
-			*res = res_total;
-			return SUCCEED;
-		}
-
-		period = next + 1;
-		next = strchr(period, ';');
-	}
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees flexible interval                                           *
- *                                                                            *
- * Parameters: interval - [IN] flexible interval                              *
- *                                                                            *
- ******************************************************************************/
-static void	flexible_interval_free(zbx_flexible_interval_t *interval)
-{
-	zbx_flexible_interval_t	*interval_next;
-
-	for (; NULL != interval; interval = interval_next)
-	{
-		interval_next = interval->next;
-		zbx_free(interval);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parses flexible interval                                          *
- *                                                                            *
- * Parameters: interval - [IN/OUT] the first interval                         *
- *             text     - [IN] the text to parse                              *
- *             len      - [IN] the text length                                *
- *                                                                            *
- * Return value: SUCCEED - the interval was successfully parsed               *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: !!! Don't forget to sync code with PHP !!!                       *
- *           Supported format is delay/period                                 *
- *                                                                            *
- ******************************************************************************/
-static int	flexible_interval_parse(zbx_flexible_interval_t *interval, const char *text, int len)
-{
-	const char	*ptr;
-
-	for (ptr = text; 0 < len && '\0' != *ptr && '/' != *ptr; len--, ptr++)
-		;
-
-	if (SUCCEED != is_time_suffix(text, &interval->delay, (int)(ptr - text)))
-		return FAIL;
-
-	if (0 >= len-- || '/' != *ptr++)
-		return FAIL;
-
-	return time_period_parse(&interval->period, ptr, len);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: calculates day of week                                            *
- *                                                                            *
- * Parameters: year - [IN] the year (>1752)                                   *
- *             mon  - [IN] the month (1-12)                                   *
- *             mday - [IN] the month day (1-31)                               *
- *                                                                            *
- * Return value: The day of week: 1 - Monday, 2 - Tuesday, ...                *
- *                                                                            *
- ******************************************************************************/
-static int	calculate_dayofweek(int year, int mon, int mday)
-{
-	static int	mon_table[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
-
-	if (mon < 3)
-		year--;
-
-	return (year + year / 4 - year / 100 + year / 400 + mon_table[mon - 1] + mday - 1) % 7 + 1;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees scheduler interval filter                                   *
- *                                                                            *
- * Parameters: filter - [IN] scheduler interval filter                        *
- *                                                                            *
- ******************************************************************************/
-static void	scheduler_filter_free(zbx_scheduler_filter_t *filter)
-{
-	zbx_scheduler_filter_t	*filter_next;
-
-	for (; NULL != filter; filter = filter_next)
-	{
-		filter_next = filter->next;
-		zbx_free(filter);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees scheduler interval                                          *
- *                                                                            *
- * Parameters: interval - [IN] scheduler interval                             *
- *                                                                            *
- ******************************************************************************/
-static void	scheduler_interval_free(zbx_scheduler_interval_t *interval)
-{
-	zbx_scheduler_interval_t	*interval_next;
-
-	for (; NULL != interval; interval = interval_next)
-	{
-		interval_next = interval->next;
-
-		scheduler_filter_free(interval->mdays);
-		scheduler_filter_free(interval->wdays);
-		scheduler_filter_free(interval->hours);
-		scheduler_filter_free(interval->minutes);
-		scheduler_filter_free(interval->seconds);
-
-		zbx_free(interval);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: parses text string into scheduler filter                          *
  *                                                                            *
  * Parameters: filter  - [IN/OUT] the first filter                            *
@@ -699,6 +540,550 @@ static int	scheduler_interval_parse(zbx_scheduler_interval_t *interval, const ch
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees scheduler interval filter                                   *
+ *                                                                            *
+ * Parameters: filter - [IN] scheduler interval filter                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	scheduler_filter_free(zbx_scheduler_filter_t *filter)
+{
+	zbx_scheduler_filter_t	*filter_next;
+
+	for (; NULL != filter; filter = filter_next)
+	{
+		filter_next = filter->next;
+		zbx_free(filter);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees scheduler interval                                          *
+ *                                                                            *
+ * Parameters: interval - [IN] scheduler interval                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	scheduler_interval_free(zbx_scheduler_interval_t *interval)
+{
+	zbx_scheduler_interval_t	*interval_next;
+
+	for (; NULL != interval; interval = interval_next)
+	{
+		interval_next = interval->next;
+
+		scheduler_filter_free(interval->mdays);
+		scheduler_filter_free(interval->wdays);
+		scheduler_filter_free(interval->hours);
+		scheduler_filter_free(interval->minutes);
+		scheduler_filter_free(interval->seconds);
+
+		zbx_free(interval);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parses flexible interval                                          *
+ *                                                                            *
+ * Parameters: interval - [IN/OUT] the first interval                         *
+ *             text     - [IN] the text to parse                              *
+ *             len      - [IN] the text length                                *
+ *                                                                            *
+ * Return value: SUCCEED - the interval was successfully parsed               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync code with PHP !!!                       *
+ *           Supported format is delay/period                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	flexible_interval_parse(zbx_flexible_interval_t *interval, const char *text, int len)
+{
+	const char	*ptr;
+
+	for (ptr = text; 0 < len && '\0' != *ptr && '/' != *ptr; len--, ptr++)
+		;
+
+	if (SUCCEED != is_time_suffix(text, &interval->delay, (int)(ptr - text)))
+		return FAIL;
+
+	if (0 >= len-- || '/' != *ptr++)
+		return FAIL;
+
+	return time_period_parse(&interval->period, ptr, len);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees flexible interval                                           *
+ *                                                                            *
+ * Parameters: interval - [IN] flexible interval                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	flexible_interval_free(zbx_flexible_interval_t *interval)
+{
+	zbx_flexible_interval_t	*interval_next;
+
+	for (; NULL != interval; interval = interval_next)
+	{
+		interval_next = interval->next;
+		zbx_free(interval);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parses item and low-level discovery rule update intervals         *
+ *                                                                            *
+ * Parameters: interval_str     - [IN] update interval string to parse        *
+ *             simple_interval  - [OUT] simple update interval                *
+ *             custom_intervals - [OUT] flexible and scheduling intervals     *
+ *             error            - [OUT] error message                         *
+ *                                                                            *
+ * Return value: SUCCEED - intervals are valid                                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync code with PHP !!!                       *
+ *           Supported format:                                                *
+ *             SimpleInterval, {";", FlexibleInterval | SchedulingInterval};  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
+		char **error)
+{
+	zbx_flexible_interval_t		*flexible = NULL;
+	zbx_scheduler_interval_t	*scheduling = NULL;
+	const char			*delim, *interval_type;
+
+	if (SUCCEED != is_time_suffix(interval_str, simple_interval,
+			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str)))
+	{
+		interval_type = "update";
+		goto fail;
+	}
+
+	if (NULL == custom_intervals)	/* caller wasn't interested in custom intervals, don't parse them */
+		return SUCCEED;
+
+	while (NULL != delim)
+	{
+		interval_str = delim + 1;
+		delim = strchr(interval_str, ';');
+
+		if (0 != isdigit(*interval_str))
+		{
+			zbx_flexible_interval_t	*new_interval;
+
+			new_interval = (zbx_flexible_interval_t *)zbx_malloc(NULL, sizeof(zbx_flexible_interval_t));
+
+			if (SUCCEED != flexible_interval_parse(new_interval, interval_str,
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))) ||
+					(0 == *simple_interval && 0 == new_interval->delay))
+			{
+				zbx_free(new_interval);
+				interval_type = "flexible";
+				goto fail;
+			}
+
+			new_interval->next = flexible;
+			flexible = new_interval;
+		}
+		else
+		{
+			zbx_scheduler_interval_t	*new_interval;
+
+			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
+			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
+
+			if (SUCCEED != scheduler_interval_parse(new_interval, interval_str,
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))))
+			{
+				scheduler_interval_free(new_interval);
+				interval_type = "scheduling";
+				goto fail;
+			}
+
+			new_interval->next = scheduling;
+			scheduling = new_interval;
+		}
+	}
+
+	if ((NULL == flexible && NULL == scheduling && 0 == *simple_interval) || SEC_PER_DAY < *simple_interval)
+	{
+		interval_type = "update";
+		goto fail;
+	}
+
+	*custom_intervals = (zbx_custom_interval_t *)zbx_malloc(NULL, sizeof(zbx_custom_interval_t));
+	(*custom_intervals)->flexible = flexible;
+	(*custom_intervals)->scheduling = scheduling;
+
+	return SUCCEED;
+fail:
+	if (NULL != error)
+	{
+		*error = zbx_dsprintf(*error, "Invalid %s interval \"%.*s\".", interval_type,
+				(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)),
+				interval_str);
+	}
+
+	flexible_interval_free(flexible);
+	scheduler_interval_free(scheduling);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parses user macro and finds it's length                           *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             len   - [OUT] length simple interval string until separator    *
+ *             sep   - [IN] separator to calculate length                     *
+ *             value - [OUT] interval value                                   *
+ *                                                                            *
+ * Return Value:                                                              *
+ *     SUCCEED - the macro was parsed successfully.                           *
+ *     FAIL    - the macro parsing failed, the content of output variables    *
+ *               is not defined.                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_simple_interval(const char *str, int *len, char sep, int *value)
+{
+	const char	*delim;
+
+	if (SUCCEED != is_time_suffix(str, value,
+			(int)(NULL == (delim = strchr(str, sep)) ? ZBX_LENGTH_UNLIMITED : delim - str)))
+	{
+		return FAIL;
+	}
+
+	*len = NULL == delim ? (int)strlen(str) : delim - str;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parses user macro and finds it's length                           *
+ *                                                                            *
+ * Parameters: str  - [IN] string to check                                    *
+ *             len  - [OUT] length of macro                                   *
+ *                                                                            *
+ * Return Value:                                                              *
+ *     SUCCEED - the macro was parsed successfully.                           *
+ *     FAIL    - the macro parsing failed, the content of output variables    *
+ *               is not defined.                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_user_macro(const char *str, int *len)
+{
+	int	macro_r, context_l, context_r;
+
+	if ('{' != *str || '$' != *(str + 1) || SUCCEED != zbx_user_macro_parse(str, &macro_r, &context_l, &context_r,
+			NULL))
+	{
+		return FAIL;
+	}
+
+	*len = macro_r + 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate update interval, flexible and scheduling intervals       *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             error - [OUT] validation error                                 *
+ *                                                                            *
+ * Return Value:                                                              *
+ *     SUCCEED - parsed successfully.                                         *
+ *     FAIL    - parsing failed.                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_validate_interval(const char *str, char **error)
+{
+	int		simple_interval, interval, len, custom = 0, macro;
+	const char	*delim;
+
+	if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
+	{
+		if ('\0' == *delim)
+			delim = NULL;
+
+		simple_interval = 1;
+	}
+	else if (SUCCEED == parse_simple_interval(str, &len, ';', &simple_interval))
+	{
+		if ('\0' == *(delim = str + len))
+			delim = NULL;
+	}
+	else
+	{
+		*error = zbx_dsprintf(*error, "Invalid update interval \"%.*s\".",
+				NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str), str);
+		return FAIL;
+	}
+
+	while (NULL != delim)
+	{
+		str = delim + 1;
+
+		if ((SUCCEED == (macro = parse_user_macro(str, &len)) ||
+				SUCCEED == parse_simple_interval(str, &len, '/', &interval)) &&
+				'/' == *(delim = str + len))
+		{
+			zbx_time_period_t period;
+
+			custom = 1;
+
+			if (SUCCEED == macro)
+				interval = 1;
+
+			if (0 == interval && 0 == simple_interval)
+			{
+				*error = zbx_dsprintf(*error, "Invalid flexible interval \"%.*s\".", (int)(delim - str),
+						str);
+				return FAIL;
+			}
+
+			str = delim + 1;
+
+			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
+			{
+				if ('\0' == *delim)
+					delim = NULL;
+
+				continue;
+			}
+
+			if (SUCCEED == time_period_parse(&period, str,
+					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str)))
+			{
+				continue;
+			}
+
+			*error = zbx_dsprintf(*error, "Invalid flexible period \"%.*s\".",
+					NULL == delim ? (int)strlen(str) : (int)(delim - str), str);
+			return FAIL;
+		}
+		else
+		{
+			zbx_scheduler_interval_t	*new_interval;
+
+			custom = 1;
+
+			if (SUCCEED == macro && ('\0' == *(delim = str + len) || ';' == *delim))
+			{
+				if ('\0' == *delim)
+					delim = NULL;
+
+				continue;
+			}
+
+			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
+			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
+
+			if (SUCCEED == scheduler_interval_parse(new_interval, str,
+					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str)))
+			{
+				scheduler_interval_free(new_interval);
+				continue;
+			}
+			scheduler_interval_free(new_interval);
+
+			*error = zbx_dsprintf(*error, "Invalid custom interval \"%.*s\".",
+					NULL == delim ? (int)strlen(str) : (int)(delim - str), str);
+
+			return FAIL;
+		}
+	}
+
+	if ((0 == custom && 0 == simple_interval) || SEC_PER_DAY < simple_interval)
+	{
+		*error = zbx_dsprintf(*error, "Invalid update interval \"%d\"", simple_interval);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if custom interval contains scheduling interval             *
+ *                                                                            *
+ * Parameters: custom_intervals - [IN] custom intervals                       *
+ *                                                                            *
+ * Return value: SUCCEED if custom interval contains scheduling interval      *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_custom_interval_is_scheduling(const zbx_custom_interval_t *custom_intervals)
+{
+	return NULL == custom_intervals->scheduling ? FAIL : SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees custom update intervals                                     *
+ *                                                                            *
+ * Parameters: custom_intervals - [IN] custom intervals                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals)
+{
+	flexible_interval_free(custom_intervals->flexible);
+	scheduler_interval_free(custom_intervals->scheduling);
+	zbx_free(custom_intervals);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: increment struct tm value by one second                           *
+ *                                                                            *
+ * Parameters: tm - [IN/OUT] the tm structure to increment                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	scheduler_tm_inc(struct tm *tm)
+{
+	if (60 > ++tm->tm_sec)
+		return;
+
+	tm->tm_sec = 0;
+	if (60 > ++tm->tm_min)
+		return;
+
+	tm->tm_min = 0;
+	if (24 > ++tm->tm_hour)
+		return;
+
+	tm->tm_hour = 0;
+	if (zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1) >= ++tm->tm_mday)
+		return;
+
+	tm->tm_mday = 1;
+	if (12 > ++tm->tm_mon)
+		return;
+
+	tm->tm_mon = 0;
+	tm->tm_year++;
+	return;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: finds daylight saving change time inside specified time period    *
+ *                                                                            *
+ * Parameters: time_start - [IN] the time period start                        *
+ *             time_end   - [IN] the time period end                          *
+ *                                                                            *
+ * Return Value: Time when the daylight saving changes should occur.          *
+ *                                                                            *
+ * Comments: The calculated time is cached and reused if it first the         *
+ *           specified period.                                                *
+ *                                                                            *
+ ******************************************************************************/
+static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
+{
+	static time_t	time_dst = 0;
+	struct tm	*tm;
+	time_t		time_mid;
+	int		start, end, mid, dst_start;
+
+	if (time_dst < time_start || time_dst > time_end)
+	{
+		/* assume that daylight saving will change only on 0 seconds */
+		start = time_start / 60;
+		end = time_end / 60;
+
+		tm = localtime(&time_start);
+		dst_start = tm->tm_isdst;
+
+		while (end > start + 1)
+		{
+			mid = (start + end) / 2;
+			time_mid = mid * 60;
+
+			tm = localtime(&time_mid);
+
+			if (tm->tm_isdst == dst_start)
+				start = mid;
+			else
+				end = mid;
+		}
+
+		time_dst = end * 60;
+	}
+
+	return time_dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: calculates day of week                                            *
+ *                                                                            *
+ * Parameters: year - [IN] the year (>1752)                                   *
+ *             mon  - [IN] the month (1-12)                                   *
+ *             mday - [IN] the month day (1-31)                               *
+ *                                                                            *
+ * Return value: The day of week: 1 - Monday, 2 - Tuesday, ...                *
+ *                                                                            *
+ ******************************************************************************/
+static int	calculate_dayofweek(int year, int mon, int mday)
+{
+	static int	mon_table[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+
+	if (mon < 3)
+		year--;
+
+	return (year + year / 4 - year / 100 + year / 400 + mon_table[mon - 1] + mday - 1) % 7 + 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if the specified date satisfies week day filter            *
+ *                                                                            *
+ * Parameters: interval - [IN] the scheduler interval                         *
+ *             tm       - [IN] the date & time to validate                    *
+ *                                                                            *
+ * Return value: SUCCEED - the input date satisfies week day filter           *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	scheduler_validate_wday_filter(const zbx_scheduler_interval_t *interval, struct tm *tm)
+{
+	const zbx_scheduler_filter_t	*filter;
+	int				value;
+
+	if (NULL == interval->wdays)
+		return SUCCEED;
+
+	value = calculate_dayofweek(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
+
+	/* check if the value match week day filter */
+	for (filter = interval->wdays; NULL != filter; filter = filter->next)
+	{
+		if (filter->start <= value && value <= filter->end)
+		{
+			int	next = value, offset;
+
+			/* apply step */
+			offset = (next - filter->start) % filter->step;
+			if (0 != offset)
+				next += filter->step - offset;
+
+			/* succeed if the calculated value is still in filter range */
+			if (next <= filter->end)
+				return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: gets the next nearest value that satisfies the filter chain       *
  *                                                                            *
  * Parameters: filter - [IN] the filter chain                                 *
@@ -768,7 +1153,6 @@ static int	scheduler_get_wday_nextcheck(const zbx_scheduler_interval_t *interval
 		return SUCCEED;
 
 	value_now = value_next = calculate_dayofweek(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
-
 	/* get the nearest week day from the current week day*/
 	if (SUCCEED != scheduler_get_nearest_filter_value(interval->wdays, &value_next))
 	{
@@ -789,48 +1173,6 @@ static int	scheduler_get_wday_nextcheck(const zbx_scheduler_interval_t *interval
 
 	/* check if the resulting month day is valid */
 	return (tm->tm_mday <= zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1) ? SUCCEED : FAIL);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: checks if the specified date satisfies week day filter            *
- *                                                                            *
- * Parameters: interval - [IN] the scheduler interval                         *
- *             tm       - [IN] the date & time to validate                    *
- *                                                                            *
- * Return value: SUCCEED - the input date satisfies week day filter           *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	scheduler_validate_wday_filter(const zbx_scheduler_interval_t *interval, struct tm *tm)
-{
-	const zbx_scheduler_filter_t	*filter;
-	int				value;
-
-	if (NULL == interval->wdays)
-		return SUCCEED;
-
-	value = calculate_dayofweek(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
-
-	/* check if the value match week day filter */
-	for (filter = interval->wdays; NULL != filter; filter = filter->next)
-	{
-		if (filter->start <= value && value <= filter->end)
-		{
-			int	next = value, offset;
-
-			/* apply step */
-			offset = (next - filter->start) % filter->step;
-			if (0 != offset)
-				next += filter->step - offset;
-
-			/* succeed if the calculated value is still in filter range */
-			if (next <= filter->end)
-				return SUCCEED;
-		}
-	}
-
-	return FAIL;
 }
 
 /******************************************************************************
@@ -1057,87 +1399,6 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds daylight saving change time inside specified time period    *
- *                                                                            *
- * Parameters: time_start - [IN] the time period start                        *
- *             time_end   - [IN] the time period end                          *
- *                                                                            *
- * Return Value: Time when the daylight saving changes should occur.          *
- *                                                                            *
- * Comments: The calculated time is cached and reused if it first the         *
- *           specified period.                                                *
- *                                                                            *
- ******************************************************************************/
-static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
-{
-	static time_t	time_dst = 0;
-	struct tm	*tm;
-	time_t		time_mid;
-	int		start, end, mid, dst_start;
-
-	if (time_dst < time_start || time_dst > time_end)
-	{
-		/* assume that daylight saving will change only on 0 seconds */
-		start = time_start / 60;
-		end = time_end / 60;
-
-		tm = localtime(&time_start);
-		dst_start = tm->tm_isdst;
-
-		while (end > start + 1)
-		{
-			mid = (start + end) / 2;
-			time_mid = mid * 60;
-
-			tm = localtime(&time_mid);
-
-			if (tm->tm_isdst == dst_start)
-				start = mid;
-			else
-				end = mid;
-		}
-
-		time_dst = end * 60;
-	}
-
-	return time_dst;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: increment struct tm value by one second                           *
- *                                                                            *
- * Parameters: tm - [IN/OUT] the tm structure to increment                    *
- *                                                                            *
- ******************************************************************************/
-static void	scheduler_tm_inc(struct tm *tm)
-{
-	if (60 > ++tm->tm_sec)
-		return;
-
-	tm->tm_sec = 0;
-	if (60 > ++tm->tm_min)
-		return;
-
-	tm->tm_min = 0;
-	if (24 > ++tm->tm_hour)
-		return;
-
-	tm->tm_hour = 0;
-	if (zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1) >= ++tm->tm_mday)
-		return;
-
-	tm->tm_mday = 1;
-	if (12 > ++tm->tm_mon)
-		return;
-
-	tm->tm_mon = 0;
-	tm->tm_year++;
-	return;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: finds the next timestamp satisfying one of intervals.             *
  *                                                                            *
  * Parameters: interval - [IN] the scheduler interval                         *
@@ -1192,314 +1453,6 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 	}
 
 	return nextcheck;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parses user macro and finds it's length                           *
- *                                                                            *
- * Parameters: str  - [IN] string to check                                    *
- *             len  - [OUT] length of macro                                   *
- *                                                                            *
- * Return Value:                                                              *
- *     SUCCEED - the macro was parsed successfully.                           *
- *     FAIL    - the macro parsing failed, the content of output variables    *
- *               is not defined.                                              *
- *                                                                            *
- ******************************************************************************/
-static int	parse_user_macro(const char *str, int *len)
-{
-	int	macro_r, context_l, context_r;
-
-	if ('{' != *str || '$' != *(str + 1) || SUCCEED != zbx_user_macro_parse(str, &macro_r, &context_l, &context_r,
-			NULL))
-	{
-		return FAIL;
-	}
-
-	*len = macro_r + 1;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parses user macro and finds it's length                           *
- *                                                                            *
- * Parameters: str   - [IN] string to check                                   *
- *             len   - [OUT] length simple interval string until separator    *
- *             sep   - [IN] separator to calculate length                     *
- *             value - [OUT] interval value                                   *
- *                                                                            *
- * Return Value:                                                              *
- *     SUCCEED - the macro was parsed successfully.                           *
- *     FAIL    - the macro parsing failed, the content of output variables    *
- *               is not defined.                                              *
- *                                                                            *
- ******************************************************************************/
-static int	parse_simple_interval(const char *str, int *len, char sep, int *value)
-{
-	const char	*delim;
-
-	if (SUCCEED != is_time_suffix(str, value,
-			(int)(NULL == (delim = strchr(str, sep)) ? ZBX_LENGTH_UNLIMITED : delim - str)))
-	{
-		return FAIL;
-	}
-
-	*len = NULL == delim ? (int)strlen(str) : delim - str;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: validate update interval, flexible and scheduling intervals       *
- *                                                                            *
- * Parameters: str   - [IN] string to check                                   *
- *             error - [OUT] validation error                                 *
- *                                                                            *
- * Return Value:                                                              *
- *     SUCCEED - parsed successfully.                                         *
- *     FAIL    - parsing failed.                                              *
- *                                                                            *
- ******************************************************************************/
-int	zbx_validate_interval(const char *str, char **error)
-{
-	int		simple_interval, interval, len, custom = 0, macro;
-	const char	*delim;
-
-	if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
-	{
-		if ('\0' == *delim)
-			delim = NULL;
-
-		simple_interval = 1;
-	}
-	else if (SUCCEED == parse_simple_interval(str, &len, ';', &simple_interval))
-	{
-		if ('\0' == *(delim = str + len))
-			delim = NULL;
-	}
-	else
-	{
-		*error = zbx_dsprintf(*error, "Invalid update interval \"%.*s\".",
-				NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str), str);
-		return FAIL;
-	}
-
-	while (NULL != delim)
-	{
-		str = delim + 1;
-
-		if ((SUCCEED == (macro = parse_user_macro(str, &len)) ||
-				SUCCEED == parse_simple_interval(str, &len, '/', &interval)) &&
-				'/' == *(delim = str + len))
-		{
-			zbx_time_period_t period;
-
-			custom = 1;
-
-			if (SUCCEED == macro)
-				interval = 1;
-
-			if (0 == interval && 0 == simple_interval)
-			{
-				*error = zbx_dsprintf(*error, "Invalid flexible interval \"%.*s\".", (int)(delim - str),
-						str);
-				return FAIL;
-			}
-
-			str = delim + 1;
-
-			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
-			{
-				if ('\0' == *delim)
-					delim = NULL;
-
-				continue;
-			}
-
-			if (SUCCEED == time_period_parse(&period, str,
-					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str)))
-			{
-				continue;
-			}
-
-			*error = zbx_dsprintf(*error, "Invalid flexible period \"%.*s\".",
-					NULL == delim ? (int)strlen(str) : (int)(delim - str), str);
-			return FAIL;
-		}
-		else
-		{
-			zbx_scheduler_interval_t	*new_interval;
-
-			custom = 1;
-
-			if (SUCCEED == macro && ('\0' == *(delim = str + len) || ';' == *delim))
-			{
-				if ('\0' == *delim)
-					delim = NULL;
-
-				continue;
-			}
-
-			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
-			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
-
-			if (SUCCEED == scheduler_interval_parse(new_interval, str,
-					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str)))
-			{
-				scheduler_interval_free(new_interval);
-				continue;
-			}
-			scheduler_interval_free(new_interval);
-
-			*error = zbx_dsprintf(*error, "Invalid custom interval \"%.*s\".",
-					NULL == delim ? (int)strlen(str) : (int)(delim - str), str);
-
-			return FAIL;
-		}
-	}
-
-	if ((0 == custom && 0 == simple_interval) || SEC_PER_DAY < simple_interval)
-	{
-		*error = zbx_dsprintf(*error, "Invalid update interval \"%d\"", simple_interval);
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parses item and low-level discovery rule update intervals         *
- *                                                                            *
- * Parameters: interval_str     - [IN] update interval string to parse        *
- *             simple_interval  - [OUT] simple update interval                *
- *             custom_intervals - [OUT] flexible and scheduling intervals     *
- *             error            - [OUT] error message                         *
- *                                                                            *
- * Return value: SUCCEED - intervals are valid                                *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: !!! Don't forget to sync code with PHP !!!                       *
- *           Supported format:                                                *
- *             SimpleInterval, {";", FlexibleInterval | SchedulingInterval};  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
-		char **error)
-{
-	zbx_flexible_interval_t		*flexible = NULL;
-	zbx_scheduler_interval_t	*scheduling = NULL;
-	const char			*delim, *interval_type;
-
-	if (SUCCEED != is_time_suffix(interval_str, simple_interval,
-			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str)))
-	{
-		interval_type = "update";
-		goto fail;
-	}
-
-	if (NULL == custom_intervals)	/* caller wasn't interested in custom intervals, don't parse them */
-		return SUCCEED;
-
-	while (NULL != delim)
-	{
-		interval_str = delim + 1;
-		delim = strchr(interval_str, ';');
-
-		if (0 != isdigit(*interval_str))
-		{
-			zbx_flexible_interval_t	*new_interval;
-
-			new_interval = (zbx_flexible_interval_t *)zbx_malloc(NULL, sizeof(zbx_flexible_interval_t));
-
-			if (SUCCEED != flexible_interval_parse(new_interval, interval_str,
-					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))) ||
-					(0 == *simple_interval && 0 == new_interval->delay))
-			{
-				zbx_free(new_interval);
-				interval_type = "flexible";
-				goto fail;
-			}
-
-			new_interval->next = flexible;
-			flexible = new_interval;
-		}
-		else
-		{
-			zbx_scheduler_interval_t	*new_interval;
-
-			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
-			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
-
-			if (SUCCEED != scheduler_interval_parse(new_interval, interval_str,
-					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))))
-			{
-				scheduler_interval_free(new_interval);
-				interval_type = "scheduling";
-				goto fail;
-			}
-
-			new_interval->next = scheduling;
-			scheduling = new_interval;
-		}
-	}
-
-	if ((NULL == flexible && NULL == scheduling && 0 == *simple_interval) || SEC_PER_DAY < *simple_interval)
-	{
-		interval_type = "update";
-		goto fail;
-	}
-
-	*custom_intervals = (zbx_custom_interval_t *)zbx_malloc(NULL, sizeof(zbx_custom_interval_t));
-	(*custom_intervals)->flexible = flexible;
-	(*custom_intervals)->scheduling = scheduling;
-
-	return SUCCEED;
-fail:
-	if (NULL != error)
-	{
-		*error = zbx_dsprintf(*error, "Invalid %s interval \"%.*s\".", interval_type,
-				(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)),
-				interval_str);
-	}
-
-	flexible_interval_free(flexible);
-	scheduler_interval_free(scheduling);
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if custom interval contains scheduling interval             *
- *                                                                            *
- * Parameters: custom_intervals - [IN] custom intervals                       *
- *                                                                            *
- * Return value: SUCCEED if custom interval contains scheduling interval      *
- *               FAIL otherwise                                               *
- *                                                                            *
- ******************************************************************************/
-int	zbx_custom_interval_is_scheduling(const zbx_custom_interval_t *custom_intervals)
-{
-	return NULL == custom_intervals->scheduling ? FAIL : SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees custom update intervals                                     *
- *                                                                            *
- * Parameters: custom_intervals - [IN] custom intervals                       *
- *                                                                            *
- ******************************************************************************/
-void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals)
-{
-	flexible_interval_free(custom_intervals->flexible);
-	scheduler_interval_free(custom_intervals->scheduling);
-	zbx_free(custom_intervals);
 }
 
 /******************************************************************************
@@ -1655,6 +1608,52 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: validate time period and check if specified time is within it     *
+ *                                                                            *
+ * Parameters: period - [IN] semicolon-separated list of time periods in one  *
+ *                           of the following formats:                        *
+ *                             d1-d2,h1:m1-h2:m2                              *
+ *                             or d1,h1:m1-h2:m2                              *
+ *             time   - [IN] time to check                                    *
+ *             res    - [OUT] check result:                                   *
+ *                              SUCCEED - if time is within period            *
+ *                              FAIL    - otherwise                           *
+ *                                                                            *
+ * Return value: validation result (SUCCEED - valid, FAIL - invalid)          *
+ *                                                                            *
+ * Comments:   !!! Don't forget to sync code with PHP !!!                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res)
+{
+	int			res_total = FAIL;
+	const char		*next;
+	struct tm		*tm;
+	zbx_time_period_t	tp;
+
+	tm = zbx_localtime(&time, tz);
+
+	next = strchr(period, ';');
+	while  (SUCCEED == time_period_parse(&tp, period, (NULL == next ? (int)strlen(period) : (int)(next - period))))
+	{
+		if (SUCCEED == check_time_period(tp, tm))
+			res_total = SUCCEED;	/* no short-circuits, validate all periods before return */
+
+		if (NULL == next)
+		{
+			*res = res_total;
+			return SUCCEED;
+		}
+
+		period = next + 1;
+		next = strchr(period, ';');
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: calculate item nextcheck for Zabbix agent type items              *
  *                                                                            *
  ******************************************************************************/
@@ -1750,11 +1749,4 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 	while (-1 != nextcheck && nextcheck <= now);
 
 	return nextcheck;
-}
-
-void	zbx_free_tag(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
 }

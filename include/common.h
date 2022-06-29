@@ -1267,6 +1267,8 @@ zbx_tag_t;
 #define ZBX_OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
 #define ZBX_HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
 
+void	zbx_free_tag(zbx_tag_t *tag);
+
 #define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
 
 #define ZBX_CONST_STRING(str) "" str
