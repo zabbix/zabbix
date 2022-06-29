@@ -212,6 +212,16 @@ class testFormGraphs extends CWebTest {
 			$this->assertEquals([($this->prototype ? 'Graph prototype' : 'Graph'),'Preview'], $form->getTabs());
 			$this->assertFalse($form->query('xpath:.//table[@id="itemsTable"]//div[@class="drag-icon"]')->exists());
 
+			$items_container = $form->getFieldContainer('Items');
+			$this->assertTrue($items_container->query('button:Add')->one()->isVisible());
+
+			if ($this->prototype) {
+				$this->assertTrue($items_container->query('button:Add prototype')->one()->isVisible());
+			}
+			else {
+				$this->assertFalse($items_container->query('button:Add prototype')->exists());
+			}
+
 			$form->selectTab('Preview');
 			$this->page->waitUntilReady();
 			$this->assertTrue($this->query('xpath://div[@id="previewChart"]/img')->waitUntilPresent()->one()->isVisible());
