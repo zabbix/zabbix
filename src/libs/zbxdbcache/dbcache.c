@@ -19,7 +19,6 @@
 
 #include "dbcache.h"
 
-#include "common.h"
 #include "log.h"
 #include "zbxmutexs.h"
 #include "zbxserver.h"

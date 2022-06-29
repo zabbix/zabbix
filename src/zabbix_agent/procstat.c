@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "procstat.h"
+
 #include "log.h"
 #include "stats.h"
 #include "zbxnix.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-
-#include "procstat.h"
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 

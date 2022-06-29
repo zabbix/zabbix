@@ -18,12 +18,12 @@
 **/
 
 #include "simple.h"
+#include "sysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
-#include "sysinfo.h"
 #include "zbxcomms.h"
 #include "log.h"
 #include "cfg.h"

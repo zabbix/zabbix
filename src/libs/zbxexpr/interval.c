@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxexpr.h"
+
 #include "zbxnum.h"
 #include "zbxtime.h"
-
-#include "zbxexpr.h"
 
 #define ZBX_SCHEDULER_FILTER_DAY	1
 #define ZBX_SCHEDULER_FILTER_HOUR	2

@@ -19,6 +19,7 @@
 
 #include <sys/procfs.h>
 #include "sysinfo.h"
+
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxstr.h"

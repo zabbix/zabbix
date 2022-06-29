@@ -18,13 +18,12 @@
 **/
 
 #include "zabbix_stats.h"
+#include "sysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxcomms.h"
 #include "zbxjson.h"
-#include "sysinfo.h"
-#include "common.h"
 
 /******************************************************************************
  *                                                                            *

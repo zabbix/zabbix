@@ -18,9 +18,9 @@
 **/
 
 #include "proc.h"
+#include "sysinfo.h"
 
 #include "zbxstr.h"
-#include "sysinfo.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"

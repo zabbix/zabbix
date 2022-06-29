@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "anomalystl.h"
+
 #include "zbxnum.h"
 #include "log.h"
 #include "zbxeval.h"
-
-#include "anomalystl.h"
 
 ZBX_PTR_VECTOR_DECL(VV, zbx_vector_history_record_t *)
 ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)

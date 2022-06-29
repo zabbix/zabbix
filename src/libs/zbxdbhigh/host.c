@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxdbhigh.h"
+
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
@@ -30,7 +31,6 @@
 #include "trigger_linking.h"
 #include "graph_linking.h"
 #include "zbxnum.h"
-#include "zbxdbhigh.h"
 
 typedef struct
 {

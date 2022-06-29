@@ -19,7 +19,6 @@
 
 #include "net.h"
 
-#include "common.h"
 #include "zbxcomms.h"
 #include "log.h"
 #include "cfg.h"

@@ -22,8 +22,8 @@
 
 #include "zbxtypes.h"
 
-int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
+int	is_ip6(const char *ip);
 int	is_supported_ip(const char *ip);
 int	is_ip(const char *ip);
 

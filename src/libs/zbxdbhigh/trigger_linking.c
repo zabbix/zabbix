@@ -18,15 +18,15 @@
 **/
 
 #include "trigger_linking.h"
-
 #include "zbxdbhigh.h"
+#include "trigger_dep_linking.h"
+
 #include "zbxeval.h"
 #include "log.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
 
-#include "trigger_dep_linking.h"
 
 typedef struct
 {

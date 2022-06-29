@@ -18,6 +18,7 @@
  **/
 
 #include "zbxserver.h"
+
 #include "log.h"
 #include "valuecache.h"
 #include "evalfunc.h"

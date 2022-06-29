@@ -18,11 +18,11 @@
 **/
 
 #include "httprequest.h"
+#include "embed.h"
 
 #include "zbxstr.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
-#include "embed.h"
 #include "duktape.h"
 #include "zbxalgo.h"
 

@@ -19,7 +19,6 @@
 
 #include "evalfunc_common.h"
 
-#include "common.h"
 #include "log.h"
 #include "zbxtrends.h"
 #include "zbxnum.h"

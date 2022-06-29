@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <procfs.h>
 #include "sysinfo.h"
+
+#include <procfs.h>
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"

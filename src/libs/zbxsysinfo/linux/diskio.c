@@ -18,6 +18,7 @@
 **/
 
 #include "sysinfo.h"
+
 #include "stats.h"
 #include "diskdevices.h"
 #include "zbxjson.h"

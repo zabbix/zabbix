@@ -18,6 +18,7 @@
 **/
 
 #include "sysinfo.h"
+
 #include "zbxregexp.h"
 #include "zbxstr.h"
 

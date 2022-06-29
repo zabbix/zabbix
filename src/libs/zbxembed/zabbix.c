@@ -18,11 +18,11 @@
 **/
 
 #include "zabbix.h"
+#include "embed.h"
 
 #include "zbxstr.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "embed.h"
 #include "duktape.h"
 
 /******************************************************************************

@@ -25,7 +25,6 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"
-#include "zbxnum.h"
 
 /******************************************************************************
  *                                                                            *

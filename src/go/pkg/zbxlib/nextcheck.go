@@ -22,10 +22,10 @@ package zbxlib
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 
-//#include "common.h"
 #include "zbxexpr.h"
-   //int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
-   //		int *nextcheck, int *scheduling, char **error);
+
+int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
+		int *nextcheck, int *scheduling, char **error);
 */
 import "C"
 

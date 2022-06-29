@@ -18,8 +18,8 @@
 **/
 
 #include "zbxsysinfo_common.h"
-
 #include "sysinfo.h"
+
 #include "log.h"
 #include "file.h"
 #include "dir.h"

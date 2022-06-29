@@ -17,14 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxhistory.h"
+#include "history.h"
+
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "dbcache.h"
 #include "zbxnum.h"
-#include "zbxhistory.h"
-
-#include "history.h"
 
 typedef struct
 {

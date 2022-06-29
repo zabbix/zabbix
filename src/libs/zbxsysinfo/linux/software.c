@@ -18,8 +18,8 @@
 **/
 
 #include "software.h"
-
 #include "sysinfo.h"
+
 #include "zbxalgo.h"
 #include "zbxexec.h"
 #include "cfg.h"

@@ -17,15 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "log.h"
 #include "zbxembed.h"
+#include "embed_xml.h"
+#include "embed.h"
 
+#include "log.h"
 #include "httprequest.h"
 #include "zabbix.h"
 #include "global.h"
 #include "console.h"
-#include "embed_xml.h"
-#include "embed.h"
 #include "zbxstr.h"
 
 #define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 64)

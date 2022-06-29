@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxnix.h"
 #include "control.h"
-#include "zbxnum.h"
+#include "zbxnix.h"
 
-#include "common.h"
+#include "zbxnum.h"
 
 static int	parse_log_level_options(const char *opt, size_t len, unsigned int *scope, unsigned int *data)
 {
