@@ -46,6 +46,7 @@
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
+int	is_hex_string(const char *str);
 
 int	zbx_double_compare(double a, double b);
 
@@ -71,7 +72,7 @@ void	zbx_update_epsilon_to_not_use_double_precision(void);
 void	zbx_update_epsilon_to_python_compatible_precision(void);
 
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
+
 void	zbx_trim_integer(char *str);
 void	zbx_trim_float(char *str);
-int	is_hex_string(const char *str);
 #endif /* ZABBIX_NUM_H */
