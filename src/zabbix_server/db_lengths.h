@@ -30,8 +30,8 @@
 #endif
 #define TRIGGER_EVENT_NAME_LEN		2048
 
-#define TAG_NAME_LEN			255
-#define TAG_VALUE_LEN			255
+#define ZBX_DB_TAG_NAME_LEN			255
+#define ZBX_DB_TAG_VALUE_LEN			255
 
 #define GROUP_NAME_LEN			255
 

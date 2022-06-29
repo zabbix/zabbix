@@ -2450,7 +2450,7 @@ INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, perio
 -- Dashboard_1 for widgets copying
 INSERT INTO dashboard (dashboardid, name, userid, private, auto_start) VALUES (1300, 'Dashboard_1 for Copying widgets', 1, 1, 0);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (9001, 1300);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid, name, sortorder) VALUES (1430, 1300, 'Test_page', 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid, name, sortorder) VALUES (2001, 1300, 'Test_page', 1);
 
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10050, 9001, 'actionlog', 'Test copy Action log', 0, 0, 7, 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90250, 10050, 0, 'rf_rate', 10);
@@ -2572,7 +2572,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 -- Dashboard_2 for widgets copying.
 INSERT INTO dashboard (dashboardid, name, userid, private, auto_start) VALUES (1350, 'Dashboard_2 for Copying widgets', 1, 1, 0);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (9002, 1350);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid, name, sortorder) VALUES (1450, 1350, 'Test_page', 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid, name, sortorder) VALUES (2002, 1350, 'Test_page', 1);
 
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10068, 9002, 'systeminfo', 'Test copy System information', 16, 0, 8, 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905008, 10068, 0, 'rf_rate', 30);
