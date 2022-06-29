@@ -4522,7 +4522,7 @@ int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp)
 	int	version;
 
 	if (NULL != jp && SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value), NULL) &&
-			-1 != (version = zbx_get_component_version(value)))
+			FAIL != (version = zbx_get_component_version(value)))
 	{
 		return version;
 	}

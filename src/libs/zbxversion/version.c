@@ -24,11 +24,13 @@
  *                                                                            *
  * Purpose: extracts protocol version from value                              *
  *                                                                            *
+ * Note: Function modifies argument 'value'!                                  *
+ *                                                                            *
  * Parameters:                                                                *
  *     value      - [IN] textual representation of version                    *
  *                                                                            *
  * Return value: The protocol version if it was successfully extracted,       *
- *               otherwise -1                                                 *
+ *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_component_version(char *value)

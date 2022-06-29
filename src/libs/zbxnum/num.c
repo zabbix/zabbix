@@ -159,37 +159,6 @@ int	zbx_is_double(const char *str, double *value)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the string is double                                     *
- *                                                                            *
- * Parameters: str   - string to check                                        *
- *             flags - extra options including:                               *
- *                       ZBX_FLAG_DOUBLE_SUFFIX - allow suffixes              *
- *                                                                            *
- * Return value:  SUCCEED - the string is double                              *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Comments: the function automatically processes suffixes K, M, G, T and     *
- *           s, m, h, d, w                                                    *
- *                                                                            *
- ******************************************************************************/
-int	zbx_is_double_suffix(const char *str, unsigned char flags)
-{
-	int	len;
-
-	if ('-' == *str)	/* check leading sign */
-		str++;
-
-	if (FAIL == zbx_number_parse(str, &len))
-		return FAIL;
-
-	if ('\0' != *(str += len) && 0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, *str))
-		str++;		/* allow valid suffix if flag is enabled */
-
-	return '\0' == *str ? SUCCEED : FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: converts double value to string and truncates insignificant       *
  *          precision                                                         *
  *                                                                            *
@@ -473,26 +442,4 @@ int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
 		*value *= factor;
 
 	return ret;
-}
-
-
-/******************************************************************************
- *                                                                            *
- * Purpose: convert string to double                                          *
- *                                                                            *
- * Parameters: str - string to convert                                        *
- *                                                                            *
- * Return value: converted double value                                       *
- *                                                                            *
- * Comments: the function automatically processes suffixes K, M, G, T and     *
- *           s, m, h, d, w                                                    *
- *                                                                            *
- ******************************************************************************/
-double	str2double(const char *str)
-{
-	size_t	sz;
-
-	sz = strlen(str) - 1;
-
-	return atof(str) * suffix2factor(str[sz]);
 }

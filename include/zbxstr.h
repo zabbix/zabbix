@@ -68,7 +68,6 @@ size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size);
 char	*zbx_strdcat(char *dest, const char *src);
 char	*zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
-#define VALUE_ERRMSG_MAX	128
 const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *buf, const size_t buf_len);
 const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf, const size_t buf_len);
 

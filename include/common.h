@@ -1085,6 +1085,7 @@ size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 /* used by dsprintf, which is used by log */
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
+#define VALUE_ERRMSG_MAX	128
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
 
 #if defined(_WINDOWS) || defined(__MINGW32__)

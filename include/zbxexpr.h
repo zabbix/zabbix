@@ -220,4 +220,6 @@ int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *
 
 void	zbx_free_tag(zbx_tag_t *tag);
 
+int	zbx_is_double_suffix(const char *str, unsigned char flags);
+double	str2double(const char *str);
 #endif /* ZABBIX_EXPR_H */

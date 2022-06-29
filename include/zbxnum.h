@@ -56,7 +56,6 @@ int	int_in_list(char *list, int value);
 #define ZBX_FLAG_DOUBLE_PLAIN	0x00
 #define ZBX_FLAG_DOUBLE_SUFFIX	0x01
 int	zbx_is_double(const char *str, double *value);
-int	zbx_is_double_suffix(const char *str, unsigned char flags);
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 int	zbx_wis_uint(const wchar_t *wide_string);
@@ -74,6 +73,5 @@ void	zbx_update_epsilon_to_not_use_double_precision(void);
 void	zbx_update_epsilon_to_python_compatible_precision(void);
 
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
-double	str2double(const char *str);
 
 #endif /* ZABBIX_NUM_H */
