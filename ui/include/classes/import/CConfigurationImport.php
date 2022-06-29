@@ -2345,6 +2345,7 @@ class CConfigurationImport {
 		if (!$this->options['templateDashboards']['deleteMissing']) {
 			return;
 		}
+
 		$dashboard_importer = new CTemplateDashboardImporter($this->options, $this->referencer,
 			$this->importedObjectContainer
 		);
