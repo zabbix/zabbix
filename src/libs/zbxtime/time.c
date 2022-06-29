@@ -159,7 +159,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	}
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Gets the current time including UTC offset                        *
@@ -182,7 +181,6 @@ int	zbx_is_leap_year(int year)
 {
 	return 0 == year % 4 && (0 != year % 100 || 0 == year % 400) ? SUCCEED : FAIL;
 }
-
 
 /******************************************************************************
  *                                                                            *

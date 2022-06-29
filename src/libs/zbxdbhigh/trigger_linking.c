@@ -27,7 +27,6 @@
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
 
-
 typedef struct
 {
 	zbx_uint64_t	hostid;

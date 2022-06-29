@@ -477,7 +477,6 @@ static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int
 	return ret;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: replaces an item key, SNMP OID or their parameters by using       *
