@@ -1,3 +1,13 @@
+Changes for 6.2.0rc3
+
+New features:
+..F....... [ZBXNEXT-6940] fixed clone, sorting, validation in graph widget configuration form (ashubin)
+.........T [ZBXNEXT-5956] added template AWS EC2 by HTTP (ychukina)
+
+Bug fixes:
+........S.[ZBX-21263] fixed item tags not being created by LLD (vso)
+
+--------------------------------------------------------------------------------
 Changes for 6.2.0rc2
 
 New features:
