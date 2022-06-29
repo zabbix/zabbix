@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup graphs
  */
-class testFormGraphPrototype extends CLegacyWebTest {
+class testFormGraphPrototypeOld extends CLegacyWebTest {
 
 	/**
 	 * The name of the test template created in the test data set.
@@ -309,7 +309,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	/**
 	 * @dataProvider layout
 	 */
-	public function testFormGraphPrototype_CheckLayout($data) {
+	public function testFormGraphPrototypeOld_CheckLayout($data) {
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->query('button:Reset')->one()->click();
@@ -745,7 +745,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormGraphPrototype_SimpleUpdate($data) {
+	public function testFormGraphPrototypeOld_SimpleUpdate($data) {
 		$sqlGraphs = "select * from graphs ORDER BY graphid";
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
@@ -1056,7 +1056,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testFormGraphPrototype_SimpleCreate($data) {
+	public function testFormGraphPrototypeOld_SimpleCreate($data) {
 		$this->zbxTestLogin('graphs.php?parent_discoveryid=133800&context=host&form=Create+graph+prototype');
 
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');

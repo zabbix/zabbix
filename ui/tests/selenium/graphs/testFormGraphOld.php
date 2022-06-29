@@ -26,7 +26,7 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * @backup graphs
  */
-class testFormGraph extends CLegacyWebTest {
+class testFormGraphOld extends CLegacyWebTest {
 
 	/**
 	 * The name of the host for the testing of the create function created in the test data set.
@@ -192,7 +192,7 @@ class testFormGraph extends CLegacyWebTest {
 	/**
 	 * @dataProvider layout
 	 */
-	public function testFormGraph_CheckLayout($data) {
+	public function testFormGraphOld_CheckLayout($data) {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
@@ -591,7 +591,7 @@ class testFormGraph extends CLegacyWebTest {
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormGraph_SimpleUpdate($data) {
+	public function testFormGraphOld_SimpleUpdate($data) {
 		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
@@ -840,7 +840,7 @@ class testFormGraph extends CLegacyWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testFormGraph_SimpleCreate($data) {
+	public function testFormGraphOld_SimpleCreate($data) {
 		$this->zbxTestLogin('graphs.php?hostid=40001&context=host&form=Create+graph');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
