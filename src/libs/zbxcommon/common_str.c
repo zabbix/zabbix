@@ -227,12 +227,6 @@ wchar_t	*zbx_utf8_to_unicode(const char *utf8_string)
 	return zbx_to_unicode(CP_UTF8, utf8_string);
 }
 
-/* convert from Windows ANSI code page to unicode */
-wchar_t	*zbx_acp_to_unicode(const char *acp_string)
-{
-	return zbx_to_unicode(CP_ACP, acp_string);
-}
-
 /* convert from Windows OEM code page to unicode */
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string)
 {

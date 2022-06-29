@@ -1056,7 +1056,8 @@ zbx_proxy_suppress_t;
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
 
-/* move remaining temp string functions into libzbxstr.a */
+/* string functions that could not be moved into libzbxstr.a because they */
+/* are used by libzbxcommon.a */
 
 /* used by log which will be part of common*/
 #if defined(__GNUC__) || defined(__clang__)
@@ -1085,7 +1086,13 @@ size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
-/* move remaining temp string functions into libzbxstr.a END */
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+wchar_t	*zbx_utf8_to_unicode(const char *utf8_string);
+wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
+#endif
+/* string functions that could not be moved into libzbxstr.a because they */
+/* are used by libzbxcommon.a END */
 
 /* future proctitle library */
 void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
@@ -1105,9 +1112,6 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 #if defined(_WINDOWS) || defined(__MINGW32__)
 const OSVERSIONINFOEX	*zbx_win_getversion(void);
 void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, double timeout, char **utf8_value);
-wchar_t	*zbx_utf8_to_unicode(const char *utf8_string);
-wchar_t	*zbx_acp_to_unicode(const char *acp_string);
-wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 #endif
 
 #if defined(_WINDOWS)
