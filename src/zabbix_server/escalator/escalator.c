@@ -1389,6 +1389,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		{
 			/* service event cannot have target, force execution on Zabbix server */
 			script.execute_on = ZBX_SCRIPT_EXECUTE_ON_SERVER;
+			strlcpy(host.host, "Zabbix server");
 		}
 		else
 		{
