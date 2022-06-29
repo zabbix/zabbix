@@ -1089,6 +1089,7 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+wchar_t	*zbx_acp_to_unicode(const char *acp_string)
 wchar_t	*zbx_utf8_to_unicode(const char *utf8_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 #endif

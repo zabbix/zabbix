@@ -946,12 +946,6 @@ static int	get_codepage(const char *encoding, unsigned int *codepage)
 	return FAIL;
 }
 
-/* convert from Windows ANSI code page to unicode */
-wchar_t	*zbx_acp_to_unicode(const char *acp_string)
-{
-	return zbx_to_unicode(CP_ACP, acp_string);
-}
-
 /* convert from unicode to utf8 */
 char	*zbx_unicode_to_utf8(const wchar_t *wide_string)
 {

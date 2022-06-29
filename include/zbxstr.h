@@ -79,7 +79,6 @@ int	cmp_key_id(const char *key_1, const char *key_2);
 int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-wchar_t	*zbx_acp_to_unicode(const char *acp_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 char	*zbx_unicode_to_utf8(const wchar_t *wide_string);
 char	*zbx_unicode_to_utf8_static(const wchar_t *wide_string, char *utf8_string, int utf8_size);

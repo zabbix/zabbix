@@ -221,6 +221,12 @@ static wchar_t	*zbx_to_unicode(unsigned int codepage, const char *cp_string)
 	return wide_string;
 }
 
+/* convert from Windows ANSI code page to unicode */
+wchar_t	*zbx_acp_to_unicode(const char *acp_string)
+{
+	return zbx_to_unicode(CP_ACP, acp_string);
+}
+
 /* convert from UTF-8 to unicode */
 wchar_t	*zbx_utf8_to_unicode(const char *utf8_string)
 {
