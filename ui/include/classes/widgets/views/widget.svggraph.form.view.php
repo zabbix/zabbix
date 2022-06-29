@@ -70,7 +70,8 @@ $form
 		(new CScriptTag('
 			widget_svggraph_form.init('.json_encode([
 				'form_id' => $form->getId(),
-				'form_tabs_id' => $form_tabs->getId()
+				'form_tabs_id' => $form_tabs->getId(),
+				'color_palette' => CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE
 			]).');
 		'))->setOnDocumentReady()
 	);
@@ -109,7 +110,6 @@ function getGraphDataSetItemRow(): string {
 	]))
 		->addClass('sortable')
 		->addClass('single-item-table-row')
-		->setAttribute('data-number', '#{rowNum}')
 		->toString();
 }
 
