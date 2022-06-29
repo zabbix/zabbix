@@ -104,7 +104,7 @@ window.copy_popup = new class {
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
-		}
+	}
 
 	_post(url, data, success_callback) {
 		fetch(this.curl.getUrl(), {

@@ -63,7 +63,7 @@
 				if (e.target.classList.contains('js-copy')) {
 					this.openCopyPopup();
 				}
-				else if (e.target.classList.contains('js-massCheckNow')) {
+				else if (e.target.classList.contains('js-execute-now')) {
 					this.massCheckNow();
 				}
 			});
@@ -100,7 +100,7 @@
 
 			return PopUp('popup.copy.items', parameters, {
 				dialogueid: 'copy',
-				dialogue_class: 'modal-popup-static',
+				dialogue_class: 'modal-popup-static'
 			});
 		},
 

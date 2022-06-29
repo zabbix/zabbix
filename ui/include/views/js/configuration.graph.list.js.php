@@ -65,7 +65,7 @@
 
 			return PopUp('popup.copy.graphs', parameters, {
 				dialogueid: 'copy',
-				dialogue_class: 'modal-popup-static',
+				dialogue_class: 'modal-popup-static'
 			});
 		},
 

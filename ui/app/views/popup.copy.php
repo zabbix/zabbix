@@ -41,13 +41,11 @@ if (array_key_exists('itemids', $data)) {
 	$header = _n('Copy %1$s item', 'Copy %1$s items', count($data['itemids']));
 	$action = 'copy.items';
 }
-
 elseif (array_key_exists('triggerids', $data)) {
 	$form->addVar('triggerids', $data['triggerids']);
 	$header = _n('Copy %1$s trigger', 'Copy %1$s triggers', count($data['triggerids']));
 	$action = 'copy.triggers';
 }
-
 elseif (array_key_exists('graphids', $data)) {
 	$form->addVar('graphids', $data['graphids']);
 	$header = _n('Copy %1$s graph', 'Copy %1$s graphs', count($data['graphids']));

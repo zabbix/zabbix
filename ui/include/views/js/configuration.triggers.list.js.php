@@ -91,7 +91,7 @@
 
 			return PopUp('popup.copy.triggers', parameters, {
 				dialogueid: 'copy',
-				dialogue_class: 'modal-popup-static',
+				dialogue_class: 'modal-popup-static'
 			});
 		},
 

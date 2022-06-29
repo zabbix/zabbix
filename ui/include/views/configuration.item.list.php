@@ -80,7 +80,8 @@ if (!empty($data['hostid'])) {
 $itemTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
+			(new CCheckBox('all_items'))
+				->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		'',
 		($data['hostid'] == 0)
@@ -314,11 +315,11 @@ if ($data['context'] === 'host') {
 	$button_list += [
 		'item.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))
-				->addClass('js-massCheckNow')
+				->addClass('js-execute-now')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setAttribute('data-required', 'execute')
 		],
-		'item.massclearhistory' => $massclearhistory,
+		'item.massclearhistory' => $massclearhistory
 	];
 }
 
