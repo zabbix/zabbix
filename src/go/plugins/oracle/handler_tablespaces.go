@@ -21,135 +21,29 @@ package oracle
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"strings"
 
 	"zabbix.com/pkg/zbxerr"
+)
+
+const (
+	temp = "TEMPORARY"
+	perm = "PERMANENT"
+	undo = "UNDO"
 )
 
 func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]string,
 	_ ...string) (interface{}, error) {
 	var tablespaces string
 
-	row, err := conn.QueryRow(ctx, `
-		SELECT
-			JSON_ARRAYAGG(
-				JSON_OBJECT(TABLESPACE_NAME VALUE
-					JSON_OBJECT(
-						'contents'	    VALUE CONTENTS,
-						'file_bytes'    VALUE FILE_BYTES,
-						'max_bytes'     VALUE MAX_BYTES,
-						'free_bytes'    VALUE FREE_BYTES,
-						'used_bytes'    VALUE USED_BYTES,
-						'used_pct_max'  VALUE USED_PCT_MAX,
-						'used_file_pct' VALUE USED_FILE_PCT,
-						'status'        VALUE STATUS
-					)
-				) RETURNING CLOB
-			)
-		FROM
-			(
-			SELECT
-				df.TABLESPACE_NAME AS TABLESPACE_NAME,
-				df.CONTENTS AS CONTENTS,
-				NVL(SUM(df.BYTES), 0) AS FILE_BYTES,
-				NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES,
-				NVL(SUM(f.FREE), 0) AS FREE_BYTES,
-				SUM(df.BYTES)-SUM(f.FREE) AS USED_BYTES,
-				ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
-				ROUND(DECODE(SUM(df.BYTES), 0, 0, (SUM(df.BYTES)-SUM(f.FREE)) / SUM(df.BYTES)* 100), 2) AS USED_FILE_PCT,
-				DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
-			FROM
-				(
-				SELECT
-					ddf.FILE_ID,
-					dt.CONTENTS,
-					dt.STATUS,
-					ddf.FILE_NAME,
-					ddf.TABLESPACE_NAME,
-					TRUNC(ddf.BYTES) AS BYTES,
-					TRUNC(GREATEST(ddf.BYTES, ddf.MAXBYTES)) AS MAX_BYTES
-				FROM
-					DBA_DATA_FILES ddf,
-					DBA_TABLESPACES dt
-				WHERE
-					ddf.TABLESPACE_NAME = dt.TABLESPACE_NAME
-				) df,
-				(
-				SELECT
-					TRUNC(SUM(BYTES)) AS FREE,
-					FILE_ID
-				FROM
-					DBA_FREE_SPACE
-				GROUP BY
-					FILE_ID
-				) f
-			WHERE
-				df.FILE_ID = f.FILE_ID (+)
-			GROUP BY
-				df.TABLESPACE_NAME, df.CONTENTS, df.STATUS
-		UNION ALL
-			SELECT
-				Y.NAME AS TABLESPACE_NAME,
-				Y.CONTENTS AS CONTENTS,
-				NVL(SUM(Y.BYTES), 0) AS FILE_BYTES,
-				NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES,
-				NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE,
-				SUM(Y.BYTES)-SUM(Y.FREE_BYTES) AS USED_BYTES,
-				ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
-				ROUND(DECODE(SUM(Y.BYTES), 0, 0, (SUM(Y.BYTES)-SUM(Y.FREE_BYTES)) / SUM(Y.BYTES)* 100), 2) AS USED_FILE_PCT,
-				DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
-			FROM
-				(
-				SELECT
-					dtf.TABLESPACE_NAME AS NAME,
-					dt.CONTENTS,
-					dt.STATUS AS TBS_STATUS,
-					dtf.STATUS AS STATUS,
-					dtf.BYTES AS BYTES,
-					(
-					SELECT
-						((f.TOTAL_BLOCKS - s.TOT_USED_BLOCKS) * vp.VALUE)
-					FROM
-						(
-						SELECT
-							TABLESPACE_NAME, SUM(USED_BLOCKS) TOT_USED_BLOCKS
-						FROM
-							GV$SORT_SEGMENT
-						WHERE
-							TABLESPACE_NAME != 'DUMMY'
-						GROUP BY
-							TABLESPACE_NAME) s, (
-						SELECT
-							TABLESPACE_NAME, SUM(BLOCKS) TOTAL_BLOCKS
-						FROM
-							DBA_TEMP_FILES
-						WHERE
-							TABLESPACE_NAME != 'DUMMY'
-						GROUP BY
-							TABLESPACE_NAME) f, (
-						SELECT
-							VALUE
-						FROM
-							V$PARAMETER
-						WHERE
-							NAME = 'db_block_size') vp
-					WHERE
-						f.TABLESPACE_NAME = s.TABLESPACE_NAME
-						AND f.TABLESPACE_NAME = dtf.TABLESPACE_NAME
-					) AS FREE_BYTES,
-					CASE
-						WHEN dtf.MAXBYTES = 0 THEN dtf.BYTES
-						ELSE dtf.MAXBYTES
-					END AS MAX_BYTES
-				FROM
-					sys.DBA_TEMP_FILES dtf,
-					sys.DBA_TABLESPACES dt
-				WHERE
-					dtf.TABLESPACE_NAME = dt.TABLESPACE_NAME ) Y
-			GROUP BY
-				Y.NAME, Y.CONTENTS, Y.TBS_STATUS
-			)
-	`)
+	query, err := getQuery(params)
+	if err != nil {
+		return nil, err
+	}
+
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
@@ -165,4 +59,364 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 	tablespaces = strings.ReplaceAll(tablespaces, "\":.", "\":0.")
 
 	return tablespaces, nil
+}
+
+func getQuery(params map[string]string) (string, error) {
+	ts := params["Tablespace"]
+	t := params["Type"]
+
+	if ts == "" {
+		if t != "" {
+			return "", zbxerr.ErrorInvalidParams.Wrap(errors.New("table-space name must also be provided"))
+		}
+
+		return getFullQuery(), nil
+	}
+
+	if t == "" {
+		return "", zbxerr.ErrorInvalidParams.Wrap(errors.New("table-space type must also be provided"))
+	}
+
+	var query string
+
+	switch t {
+	case perm, undo:
+		query = getPermQueryPart(ts)
+	case temp:
+		query = getTempQueryPart(ts)
+	default:
+		return "", zbxerr.ErrorInvalidParams.Wrap(fmt.Errorf("incorrect table-space type %s", t))
+	}
+
+	return query, nil
+}
+
+func getFullQuery() string {
+	return `SELECT
+	JSON_ARRAYAGG(
+		JSON_OBJECT(TABLESPACE_NAME VALUE
+			JSON_OBJECT(
+				'contents'	    VALUE CONTENTS,
+				'file_bytes'    VALUE FILE_BYTES,
+				'max_bytes'     VALUE MAX_BYTES,
+				'free_bytes'    VALUE FREE_BYTES,
+				'used_bytes'    VALUE USED_BYTES,
+				'used_pct_max'  VALUE USED_PCT_MAX,
+				'used_file_pct' VALUE USED_FILE_PCT,
+				'status'        VALUE STATUS
+			)
+		) RETURNING CLOB
+	)
+FROM
+	(
+	SELECT
+		df.TABLESPACE_NAME AS TABLESPACE_NAME,
+		df.CONTENTS AS CONTENTS,
+		NVL(SUM(df.BYTES), 0) AS FILE_BYTES,
+		NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES,
+		NVL(SUM(f.FREE), 0) AS FREE_BYTES,
+		SUM(df.BYTES)-SUM(f.FREE) AS USED_BYTES,
+		ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
+		ROUND(DECODE(SUM(df.BYTES), 0, 0, (SUM(df.BYTES)-SUM(f.FREE)) / SUM(df.BYTES)* 100), 2) AS USED_FILE_PCT,
+		DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
+	FROM
+		(
+		SELECT
+			ddf.FILE_ID,
+			dt.CONTENTS,
+			dt.STATUS,
+			ddf.FILE_NAME,
+			ddf.TABLESPACE_NAME,
+			TRUNC(ddf.BYTES) AS BYTES,
+			TRUNC(GREATEST(ddf.BYTES, ddf.MAXBYTES)) AS MAX_BYTES
+		FROM
+			DBA_DATA_FILES ddf,
+			DBA_TABLESPACES dt
+		WHERE
+			ddf.TABLESPACE_NAME = dt.TABLESPACE_NAME
+		) df,
+		(
+		SELECT
+			TRUNC(SUM(BYTES)) AS FREE,
+			FILE_ID
+		FROM
+			DBA_FREE_SPACE
+		GROUP BY
+			FILE_ID
+		) f
+	WHERE
+		df.FILE_ID = f.FILE_ID (+)
+	GROUP BY
+		df.TABLESPACE_NAME, df.CONTENTS, df.STATUS
+UNION ALL
+	SELECT
+		Y.NAME AS TABLESPACE_NAME,
+		Y.CONTENTS AS CONTENTS,
+		NVL(SUM(Y.BYTES), 0) AS FILE_BYTES,
+		NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES,
+		NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE,
+		SUM(Y.BYTES)-SUM(Y.FREE_BYTES) AS USED_BYTES,
+		ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
+		ROUND(DECODE(SUM(Y.BYTES), 0, 0, (SUM(Y.BYTES)-SUM(Y.FREE_BYTES)) / SUM(Y.BYTES)* 100), 2) AS USED_FILE_PCT,
+		DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
+	FROM
+		(
+		SELECT
+			dtf.TABLESPACE_NAME AS NAME,
+			dt.CONTENTS,
+			dt.STATUS AS TBS_STATUS,
+			dtf.STATUS AS STATUS,
+			dtf.BYTES AS BYTES,
+			(
+			SELECT
+				((f.TOTAL_BLOCKS - s.TOT_USED_BLOCKS) * vp.VALUE)
+			FROM
+				(
+				SELECT
+					TABLESPACE_NAME, SUM(USED_BLOCKS) TOT_USED_BLOCKS
+				FROM
+					GV$SORT_SEGMENT
+				WHERE
+					TABLESPACE_NAME != 'DUMMY'
+				GROUP BY
+					TABLESPACE_NAME) s, (
+				SELECT
+					TABLESPACE_NAME, SUM(BLOCKS) TOTAL_BLOCKS
+				FROM
+					DBA_TEMP_FILES
+				WHERE
+					TABLESPACE_NAME != 'DUMMY'
+				GROUP BY
+					TABLESPACE_NAME) f, (
+				SELECT
+					VALUE
+				FROM
+					V$PARAMETER
+				WHERE
+					NAME = 'db_block_size') vp
+			WHERE
+				f.TABLESPACE_NAME = s.TABLESPACE_NAME
+				AND f.TABLESPACE_NAME = dtf.TABLESPACE_NAME
+			) AS FREE_BYTES,
+			CASE
+				WHEN dtf.MAXBYTES = 0 THEN dtf.BYTES
+				ELSE dtf.MAXBYTES
+			END AS MAX_BYTES
+		FROM
+			sys.DBA_TEMP_FILES dtf,
+			sys.DBA_TABLESPACES dt
+		WHERE
+			dtf.TABLESPACE_NAME = dt.TABLESPACE_NAME ) Y
+	GROUP BY
+		Y.NAME, Y.CONTENTS, Y.TBS_STATUS
+	)
+`
+}
+
+func getPermQueryPart(name string) string {
+	return fmt.Sprintf(`
+SELECT
+    JSON_ARRAYAGG(
+        JSON_OBJECT(
+            TABLESPACE_NAME VALUE JSON_OBJECT(
+                'contents' VALUE CONTENTS,
+                'file_bytes' VALUE FILE_BYTES,
+                'max_bytes' VALUE MAX_BYTES,
+                'free_bytes' VALUE FREE_BYTES,
+                'used_bytes' VALUE USED_BYTES,
+                'used_pct_max' VALUE USED_PCT_MAX,
+                'used_file_pct' VALUE USED_FILE_PCT,
+                'status' VALUE STATUS
+            )
+        ) RETURNING CLOB
+    )
+FROM
+    (
+        SELECT
+            df.TABLESPACE_NAME AS TABLESPACE_NAME,
+            df.CONTENTS AS CONTENTS,
+            NVL(SUM(df.BYTES), 0) AS FILE_BYTES,
+            NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES,
+            NVL(SUM(f.FREE), 0) AS FREE_BYTES,
+            SUM(df.BYTES) - SUM(f.FREE) AS USED_BYTES,
+            ROUND(
+                DECODE(
+                    SUM(df.MAX_BYTES),
+                    0,
+                    0,
+                    (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)
+                ),
+                2
+            ) AS USED_PCT_MAX,
+            ROUND(
+                DECODE(
+                    SUM(df.BYTES),
+                    0,
+                    0,
+                    (SUM(df.BYTES) - SUM(f.FREE)) / SUM(df.BYTES) * 100
+                ),
+                2
+            ) AS USED_FILE_PCT,
+            DECODE(
+                df.STATUS,
+                'ONLINE',
+                1,
+                'OFFLINE',
+                2,
+                'READ ONLY',
+                3,
+                0
+            ) AS STATUS
+        FROM
+            (
+                SELECT
+                    ddf.FILE_ID,
+                    dt.CONTENTS,
+                    dt.STATUS,
+                    ddf.FILE_NAME,
+                    ddf.TABLESPACE_NAME,
+                    TRUNC(ddf.BYTES) AS BYTES,
+                    TRUNC(GREATEST(ddf.BYTES, ddf.MAXBYTES)) AS MAX_BYTES
+                FROM
+                    DBA_DATA_FILES ddf,
+                    DBA_TABLESPACES dt
+                WHERE
+                    ddf.TABLESPACE_NAME = dt.TABLESPACE_NAME
+            ) df,
+            (
+                SELECT
+                    TRUNC(SUM(BYTES)) AS FREE,
+                    FILE_ID
+                FROM
+                    DBA_FREE_SPACE
+                GROUP BY
+                    FILE_ID
+            ) f
+        WHERE
+            df.FILE_ID = f.FILE_ID (+)
+		AND df.TABLESPACE_NAME = '%s'
+        GROUP BY
+            df.TABLESPACE_NAME,
+            df.CONTENTS,
+            df.STATUS
+	)
+`, name)
+}
+
+func getTempQueryPart(name string) string {
+	return fmt.Sprintf(`
+	SELECT
+    JSON_ARRAYAGG(
+        JSON_OBJECT(
+            TABLESPACE_NAME VALUE JSON_OBJECT(
+                'contents' VALUE CONTENTS,
+                'file_bytes' VALUE FILE_BYTES,
+                'max_bytes' VALUE MAX_BYTES,
+                'free_bytes' VALUE FREE_BYTES,
+                'used_bytes' VALUE USED_BYTES,
+                'used_pct_max' VALUE USED_PCT_MAX,
+                'used_file_pct' VALUE USED_FILE_PCT,
+                'status' VALUE STATUS
+            )
+        ) RETURNING CLOB
+    )
+FROM
+    (
+        SELECT
+            Y.NAME AS TABLESPACE_NAME,
+            Y.CONTENTS AS CONTENTS,
+            NVL(SUM(Y.BYTES), 0) AS FILE_BYTES,
+            NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES,
+            NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE_BYTES,
+            SUM(Y.BYTES) - SUM(Y.FREE_BYTES) AS USED_BYTES,
+            ROUND(
+                DECODE(
+                    SUM(Y.MAX_BYTES),
+                    0,
+                    0,
+                    (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)
+                ),
+                2
+            ) AS USED_PCT_MAX,
+            ROUND(
+                DECODE(
+                    SUM(Y.BYTES),
+                    0,
+                    0,
+                    (SUM(Y.BYTES) - SUM(Y.FREE_BYTES)) / SUM(Y.BYTES) * 100
+                ),
+                2
+            ) AS USED_FILE_PCT,
+            DECODE(
+                Y.TBS_STATUS,
+                'ONLINE',
+                1,
+                'OFFLINE',
+                2,
+                'READ ONLY',
+                3,
+                0
+            ) AS STATUS
+        FROM
+            (
+                SELECT
+                    dtf.TABLESPACE_NAME AS NAME,
+                    dt.CONTENTS,
+                    dt.STATUS AS TBS_STATUS,
+                    dtf.STATUS AS STATUS,
+                    dtf.BYTES AS BYTES,
+                    (
+                        SELECT
+                            ((f.TOTAL_BLOCKS - s.TOT_USED_BLOCKS) * vp.VALUE)
+                        FROM
+                            (
+                                SELECT
+                                    TABLESPACE_NAME,
+                                    SUM(USED_BLOCKS) TOT_USED_BLOCKS
+                                FROM
+                                    GV$SORT_SEGMENT
+                                WHERE
+                                    TABLESPACE_NAME != 'DUMMY'
+                                GROUP BY
+                                    TABLESPACE_NAME
+                            ) s,
+                            (
+                                SELECT
+                                    TABLESPACE_NAME,
+                                    SUM(BLOCKS) TOTAL_BLOCKS
+                                FROM
+                                    DBA_TEMP_FILES
+                                WHERE
+                                    TABLESPACE_NAME != 'DUMMY'
+                                GROUP BY
+                                    TABLESPACE_NAME
+                            ) f,
+                            (
+                                SELECT
+                                    VALUE
+                                FROM
+                                    V$PARAMETER
+                                WHERE
+                                    NAME = 'db_block_size'
+                            ) vp
+                        WHERE
+                            f.TABLESPACE_NAME = s.TABLESPACE_NAME
+                            AND f.TABLESPACE_NAME = dtf.TABLESPACE_NAME
+                    ) AS FREE_BYTES,
+                    CASE
+                        WHEN dtf.MAXBYTES = 0 THEN dtf.BYTES
+                        ELSE dtf.MAXBYTES
+                    END AS MAX_BYTES
+                FROM
+                    sys.DBA_TEMP_FILES dtf,
+                    sys.DBA_TABLESPACES dt
+                WHERE
+                    dtf.TABLESPACE_NAME = dt.TABLESPACE_NAME
+                    AND dtf.TABLESPACE_NAME = '%s'
+            ) Y
+        GROUP BY
+            Y.NAME,
+            Y.CONTENTS,
+            Y.TBS_STATUS
+    )`, name)
 }

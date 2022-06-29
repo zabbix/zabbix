@@ -21,6 +21,7 @@ package oracle
 
 import (
 	"context"
+	"fmt"
 
 	"zabbix.com/pkg/zbxerr"
 )
@@ -28,24 +29,7 @@ import (
 func archiveHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var archiveLogs string
 
-	row, err := conn.QueryRow(ctx, `
-		SELECT
-			JSON_ARRAYAGG(
-				JSON_OBJECT(d.DEST_NAME VALUE
-					JSON_OBJECT(
-						'status'       VALUE DECODE(d.STATUS, 'VALID', 3, 'DEFERRED', 2, 'ERROR', 1, 0),
-						'log_sequence' VALUE d.LOG_SEQUENCE,
-						'error'        VALUE NVL(TO_CHAR(d.ERROR), ' ')
-					)
-				) RETURNING CLOB 
-			)		
-		FROM
-			V$ARCHIVE_DEST d,
-			V$DATABASE db
-		WHERE 
-			d.STATUS != 'INACTIVE' 
-			AND db.LOG_MODE = 'ARCHIVELOG'
-	`)
+	row, err := conn.QueryRow(ctx, getArchiveQuery(params["Destination"]))
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
@@ -60,4 +44,31 @@ func archiveHandler(ctx context.Context, conn OraClient, params map[string]strin
 	}
 
 	return archiveLogs, nil
+}
+
+func getArchiveQuery(name string) string {
+	var whereStr string
+	if name != "" {
+		whereStr = fmt.Sprintf(`AND DEST_NAME = '%s'`, name)
+	}
+
+	return fmt.Sprintf(`
+	SELECT
+		JSON_ARRAYAGG(
+			JSON_OBJECT(d.DEST_NAME VALUE
+				JSON_OBJECT(
+					'status'       VALUE DECODE(d.STATUS, 'VALID', 3, 'DEFERRED', 2, 'ERROR', 1, 0),
+					'log_sequence' VALUE d.LOG_SEQUENCE,
+					'error'        VALUE NVL(TO_CHAR(d.ERROR), ' ')
+				)
+			) RETURNING CLOB 
+		)		
+	FROM
+		V$ARCHIVE_DEST d,
+		V$DATABASE db
+	WHERE 
+		d.STATUS != 'INACTIVE' 
+		AND db.LOG_MODE = 'ARCHIVELOG'
+		%s
+`, whereStr)
 }
