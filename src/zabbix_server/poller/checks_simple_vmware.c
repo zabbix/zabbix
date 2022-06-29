@@ -1605,12 +1605,6 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 		goto unlock;
 	}
 
-	if (NULL == datastore->uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
-		goto unlock;
-	}
-
 	uuid_cmp.name = hv->uuid;
 
 	if (FAIL == (i = zbx_vector_str_uint64_pair_bsearch(&datastore->hv_uuids_access, uuid_cmp,
@@ -2220,12 +2214,6 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		}
 
 		datastore = service->data->datastores.values[i];
-	}
-
-	if (NULL == datastore->uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
-		goto unlock;
 	}
 
 	if (FAIL == zbx_vmware_service_get_counterid(service, perfcounter, &counterid))
