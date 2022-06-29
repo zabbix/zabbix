@@ -155,10 +155,6 @@ window.widget_svggraph_form = new class {
 			})
 			.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>'});
 
-		for (const element of this._dataset_wrapper.querySelectorAll('.js-type, .js-stacked')) {
-			element.addEventListener('change', () => this._updatedForm());
-		}
-
 		// Initialize rangeControl UI elements.
 		jQuery('.<?= CRangeControl::ZBX_STYLE_CLASS ?>', jQuery(this._dataset_wrapper)).rangeControl();
 
@@ -222,11 +218,7 @@ window.widget_svggraph_form = new class {
 		this._updateSingleItemsLinks();
 		this._initDataSetSortable();
 
-		const dataset = widget_svggraph_form._getOpenedDataset();
-
-		if (dataset !== null) {
-			this._initSingleItemSortable(dataset);
-		}
+		this._initSingleItemSortable(widget_svggraph_form._getOpenedDataset());
 	}
 
 	_timePeriodTabInit() {
