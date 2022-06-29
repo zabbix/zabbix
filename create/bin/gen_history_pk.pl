@@ -185,7 +185,10 @@ CREATE TEMP TABLE temp_%HISTTBL (
 
 \copy temp_%HISTTBL FROM '/tmp/%HISTTBL.csv' DELIMITER ',' CSV
 
-SELECT create_hypertable('%HISTTBL', 'clock', chunk_time_interval => 86400, migrate_data => true);
+SELECT create_hypertable('%HISTTBL', 'clock', chunk_time_interval => (
+	SELECT integer_interval FROM timescaledb_information.dimensions WHERE hypertable_name='%HISTTBL_old'
+), migrate_data => true);
+
 INSERT INTO %HISTTBL SELECT * FROM temp_%HISTTBL ON CONFLICT (itemid,clock,ns) DO NOTHING;
 %COMPRESS
 HEREDOC
