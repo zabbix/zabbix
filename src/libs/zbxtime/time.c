@@ -17,10 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
 #include "zbxnum.h"
+
 #include "zbxtime.h"
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Gets the current time.                                            *
+ *                                                                            *
+ * Return value: Time in seconds                                              *
+ *                                                                            *
+ * Comments: Time in seconds since midnight (00:00:00),                       *
+ *           January 1, 1970, coordinated universal time (UTC).               *
+ *                                                                            *
+ ******************************************************************************/
+double	zbx_time(void)
+{
+	zbx_timespec_t	ts;
+
+	zbx_timespec(&ts);
+
+	return (double)ts.sec + 1.0e-9 * (double)ts.ns;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -141,24 +159,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: Gets the current time.                                            *
- *                                                                            *
- * Return value: Time in seconds                                              *
- *                                                                            *
- * Comments: Time in seconds since midnight (00:00:00),                       *
- *           January 1, 1970, coordinated universal time (UTC).               *
- *                                                                            *
- ******************************************************************************/
-double	zbx_time(void)
-{
-	zbx_timespec_t	ts;
-
-	zbx_timespec(&ts);
-
-	return (double)ts.sec + 1.0e-9 * (double)ts.ns;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -182,6 +182,7 @@ int	zbx_is_leap_year(int year)
 {
 	return 0 == year % 4 && (0 != year % 100 || 0 == year % 400) ? SUCCEED : FAIL;
 }
+
 
 /******************************************************************************
  *                                                                            *

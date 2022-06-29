@@ -477,120 +477,6 @@ static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: remove parameter by index (num) from parameter list (param)       *
- *                                                                            *
- * Parameters:                                                                *
- *      param  - parameter list                                               *
- *      num    - requested parameter index                                    *
- *                                                                            *
- * Comments: delimiter for parameters is ','                                  *
- *                                                                            *
- ******************************************************************************/
-void	remove_param(char *param, int num)
-{
-	int	state = 0;	/* 0 - unquoted parameter, 1 - quoted parameter */
-	int	idx = 1, skip_char = 0;
-	char	*p;
-
-	for (p = param; '\0' != *p; p++)
-	{
-		switch (state)
-		{
-			case 0:			/* in unquoted parameter */
-				if (',' == *p)
-				{
-					if (1 == idx && 1 == num)
-						skip_char = 1;
-					idx++;
-				}
-				else if ('"' == *p)
-					state = 1;
-				break;
-			case 1:			/* in quoted parameter */
-				if ('"' == *p && '\\' != *(p - 1))
-					state = 0;
-				break;
-		}
-		if (idx != num && 0 == skip_char)
-			*param++ = *p;
-
-		skip_char = 0;
-	}
-
-	*param = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: return parameter by index (num) from parameter list (param)       *
- *          to be used for keys: key[param1,param2]                           *
- *                                                                            *
- * Parameters:                                                                *
- *      param   - parameter list                                              *
- *      num     - requested parameter index                                   *
- *      buf     - pointer of output buffer                                    *
- *      max_len - size of output buffer                                       *
- *                                                                            *
- * Return value:                                                              *
- *      1 - requested parameter missing                                       *
- *      0 - requested parameter found (value - 'buf' can be empty string)     *
- *                                                                            *
- * Comments:  delimiter for parameters is ','                                 *
- *                                                                            *
- ******************************************************************************/
-int	get_key_param(char *param, int num, char *buf, size_t max_len)
-{
-	int	ret;
-	char	*pl, *pr;
-
-	pl = strchr(param, '[');
-	pr = strrchr(param, ']');
-
-	if (NULL == pl || NULL == pr || pl > pr)
-		return 1;
-
-	*pr = '\0';
-	ret = get_param(pl + 1, num, buf, max_len, NULL);
-	*pr = ']';
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: calculate count of parameters from parameter list (param)         *
- *          to be used for keys: key[param1,param2]                           *
- *                                                                            *
- * Parameters:                                                                *
- *      param  - parameter list                                               *
- *                                                                            *
- * Return value: count of parameters                                          *
- *                                                                            *
- * Comments:  delimiter for parameters is ','                                 *
- *                                                                            *
- ******************************************************************************/
-int	num_key_param(char *param)
-{
-	int	ret;
-	char	*pl, *pr;
-
-	if (NULL == param)
-		return 0;
-
-	pl = strchr(param, '[');
-	pr = strrchr(param, ']');
-
-	if (NULL == pl || NULL == pr || pl > pr)
-		return 0;
-
-	*pr = '\0';
-	ret = num_param(pl + 1);
-	*pr = ']';
-
-	return ret;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -751,6 +637,121 @@ clean:
 		}
 		ret = FAIL;
 	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove parameter by index (num) from parameter list (param)       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      param  - parameter list                                               *
+ *      num    - requested parameter index                                    *
+ *                                                                            *
+ * Comments: delimiter for parameters is ','                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	remove_param(char *param, int num)
+{
+	int	state = 0;	/* 0 - unquoted parameter, 1 - quoted parameter */
+	int	idx = 1, skip_char = 0;
+	char	*p;
+
+	for (p = param; '\0' != *p; p++)
+	{
+		switch (state)
+		{
+			case 0:			/* in unquoted parameter */
+				if (',' == *p)
+				{
+					if (1 == idx && 1 == num)
+						skip_char = 1;
+					idx++;
+				}
+				else if ('"' == *p)
+					state = 1;
+				break;
+			case 1:			/* in quoted parameter */
+				if ('"' == *p && '\\' != *(p - 1))
+					state = 0;
+				break;
+		}
+		if (idx != num && 0 == skip_char)
+			*param++ = *p;
+
+		skip_char = 0;
+	}
+
+	*param = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return parameter by index (num) from parameter list (param)       *
+ *          to be used for keys: key[param1,param2]                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      param   - parameter list                                              *
+ *      num     - requested parameter index                                   *
+ *      buf     - pointer of output buffer                                    *
+ *      max_len - size of output buffer                                       *
+ *                                                                            *
+ * Return value:                                                              *
+ *      1 - requested parameter missing                                       *
+ *      0 - requested parameter found (value - 'buf' can be empty string)     *
+ *                                                                            *
+ * Comments:  delimiter for parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	get_key_param(char *param, int num, char *buf, size_t max_len)
+{
+	int	ret;
+	char	*pl, *pr;
+
+	pl = strchr(param, '[');
+	pr = strrchr(param, ']');
+
+	if (NULL == pl || NULL == pr || pl > pr)
+		return 1;
+
+	*pr = '\0';
+	ret = get_param(pl + 1, num, buf, max_len, NULL);
+	*pr = ']';
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: calculate count of parameters from parameter list (param)         *
+ *          to be used for keys: key[param1,param2]                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      param  - parameter list                                               *
+ *                                                                            *
+ * Return value: count of parameters                                          *
+ *                                                                            *
+ * Comments:  delimiter for parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	num_key_param(char *param)
+{
+	int	ret;
+	char	*pl, *pr;
+
+	if (NULL == param)
+		return 0;
+
+	pl = strchr(param, '[');
+	pr = strrchr(param, ']');
+
+	if (NULL == pl || NULL == pr || pl > pr)
+		return 0;
+
+	*pr = '\0';
+	ret = num_param(pl + 1);
+	*pr = ']';
 
 	return ret;
 }
