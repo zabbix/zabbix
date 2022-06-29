@@ -147,6 +147,21 @@ static int	get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_
 	return user_type;
 }
 
+static const char	*permission_string(int perm)
+{
+	switch (perm)
+	{
+		case PERM_DENY:
+			return "dn";
+		case PERM_READ:
+			return "r";
+		case PERM_READ_WRITE:
+			return "rw";
+		default:
+			return "unknown";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Return user permissions for access to the host                    *
@@ -185,7 +200,7 @@ static int	get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *h
 	DBfree_result(result);
 	zbx_free(sql);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
 
 	return perm;
 }
@@ -332,7 +347,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, const ZBX_DB_EVENT *event
 
 	zbx_vector_uint64_destroy(&hostgroupids);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
 
 	return perm;
 }
@@ -381,7 +396,7 @@ static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **
 out:
 	zbx_vector_uint64_destroy(&hostgroupids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
 
 	return perm;
 }

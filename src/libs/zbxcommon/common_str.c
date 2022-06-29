@@ -17,6 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/* this file is for the minimal possible set of string related functions that are used by libzbxcommon.a */
+/* or libraries/files it depends on */
+
 #include "common.h"
 
 /******************************************************************************

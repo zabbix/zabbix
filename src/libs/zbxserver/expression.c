@@ -955,6 +955,29 @@ static int	DBget_drule_value_by_event(const ZBX_DB_EVENT *event, char **replace_
 	return ret;
 }
 
+static const char	*item_logtype_string(unsigned char logtype)
+{
+	switch (logtype)
+	{
+		case ITEM_LOGTYPE_INFORMATION:
+			return "Information";
+		case ITEM_LOGTYPE_WARNING:
+			return "Warning";
+		case ITEM_LOGTYPE_ERROR:
+			return "Error";
+		case ITEM_LOGTYPE_FAILURE_AUDIT:
+			return "Failure Audit";
+		case ITEM_LOGTYPE_SUCCESS_AUDIT:
+			return "Success Audit";
+		case ITEM_LOGTYPE_CRITICAL:
+			return "Critical";
+		case ITEM_LOGTYPE_VERBOSE:
+			return "Verbose";
+		default:
+			return "unknown";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve a particular attribute of a log value                    *
@@ -1008,7 +1031,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 			break;
 		case ZBX_REQUEST_ITEM_LOG_SEVERITY:
 			*replace_to = zbx_strdup(*replace_to,
-					zbx_item_logtype_string((unsigned char)value.value.log->severity));
+					item_logtype_string((unsigned char)value.value.log->severity));
 			break;
 		case ZBX_REQUEST_ITEM_LOG_NSEVERITY:
 			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->severity);
@@ -2663,6 +2686,47 @@ static int	resolve_host_target_macros(const char *m, const DC_HOST *dc_host, DC_
 	return ret;
 }
 
+static const char	*dservice_type_string(zbx_dservice_type_t service)
+{
+	switch (service)
+	{
+		case SVC_SSH:
+			return "SSH";
+		case SVC_LDAP:
+			return "LDAP";
+		case SVC_SMTP:
+			return "SMTP";
+		case SVC_FTP:
+			return "FTP";
+		case SVC_HTTP:
+			return "HTTP";
+		case SVC_POP:
+			return "POP";
+		case SVC_NNTP:
+			return "NNTP";
+		case SVC_IMAP:
+			return "IMAP";
+		case SVC_TCP:
+			return "TCP";
+		case SVC_AGENT:
+			return "Zabbix agent";
+		case SVC_SNMPv1:
+			return "SNMPv1 agent";
+		case SVC_SNMPv2c:
+			return "SNMPv2c agent";
+		case SVC_SNMPv3:
+			return "SNMPv3 agent";
+		case SVC_ICMPPING:
+			return "ICMP ping";
+		case SVC_HTTPS:
+			return "HTTPS";
+		case SVC_TELNET:
+			return "Telnet";
+		default:
+			return "unknown";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
@@ -3468,7 +3532,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 							"c.type")))
 					{
 						replace_to = zbx_strdup(replace_to,
-								zbx_dservice_type_string(atoi(replace_to)));
+								dservice_type_string(atoi(replace_to)));
 					}
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_SERVICE_PORT))

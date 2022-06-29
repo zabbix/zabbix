@@ -150,7 +150,6 @@ typedef enum
 	ITEM_TYPE_SCRIPT	/* 21 */
 }
 zbx_item_type_t;
-const char	*zbx_agent_type_string(zbx_item_type_t item_type);
 
 typedef enum
 {
@@ -292,7 +291,6 @@ typedef enum
 	SVC_TELNET
 }
 zbx_dservice_type_t;
-const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
 /* item snmpv3 security levels */
 #define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
@@ -684,7 +682,6 @@ const char	*zbx_trigger_state_string(unsigned char state);
 #define ITEM_LOGTYPE_SUCCESS_AUDIT	8
 #define ITEM_LOGTYPE_CRITICAL		9
 #define ITEM_LOGTYPE_VERBOSE		10
-const char	*zbx_item_logtype_string(unsigned char logtype);
 
 /* media statuses */
 #define MEDIA_STATUS_ACTIVE	0
@@ -830,8 +827,6 @@ typedef enum
 	PERM_READ_WRITE
 }
 zbx_user_permission_t;
-
-const char	*zbx_permission_string(int perm);
 
 typedef struct
 {

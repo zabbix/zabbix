@@ -21,7 +21,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Returns process name                                              *
+ * Purpose: Returns Zabbix process name                                       *
  *                                                                            *
  * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*              *
  *                                                                            *
@@ -158,38 +158,6 @@ const char	*get_program_type_string(unsigned char program_type)
 	}
 }
 
-const char	*zbx_permission_string(int perm)
-{
-	switch (perm)
-	{
-		case PERM_DENY:
-			return "dn";
-		case PERM_READ:
-			return "r";
-		case PERM_READ_WRITE:
-			return "rw";
-		default:
-			return "unknown";
-	}
-}
-
-const char	*zbx_agent_type_string(zbx_item_type_t item_type)
-{
-	switch (item_type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			return "Zabbix agent";
-		case ITEM_TYPE_SNMP:
-			return "SNMP agent";
-		case ITEM_TYPE_IPMI:
-			return "IPMI agent";
-		case ITEM_TYPE_JMX:
-			return "JMX agent";
-		default:
-			return "generic";
-	}
-}
-
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 {
 	switch (value_type)
@@ -268,70 +236,6 @@ const char	*zbx_result_string(int result)
 			return "SIG_ERROR";
 		case SYSINFO_RET_FAIL:
 			return "SYSINFO_RET_FAIL";
-		default:
-			return "unknown";
-	}
-}
-
-const char	*zbx_item_logtype_string(unsigned char logtype)
-{
-	switch (logtype)
-	{
-		case ITEM_LOGTYPE_INFORMATION:
-			return "Information";
-		case ITEM_LOGTYPE_WARNING:
-			return "Warning";
-		case ITEM_LOGTYPE_ERROR:
-			return "Error";
-		case ITEM_LOGTYPE_FAILURE_AUDIT:
-			return "Failure Audit";
-		case ITEM_LOGTYPE_SUCCESS_AUDIT:
-			return "Success Audit";
-		case ITEM_LOGTYPE_CRITICAL:
-			return "Critical";
-		case ITEM_LOGTYPE_VERBOSE:
-			return "Verbose";
-		default:
-			return "unknown";
-	}
-}
-
-const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
-{
-	switch (service)
-	{
-		case SVC_SSH:
-			return "SSH";
-		case SVC_LDAP:
-			return "LDAP";
-		case SVC_SMTP:
-			return "SMTP";
-		case SVC_FTP:
-			return "FTP";
-		case SVC_HTTP:
-			return "HTTP";
-		case SVC_POP:
-			return "POP";
-		case SVC_NNTP:
-			return "NNTP";
-		case SVC_IMAP:
-			return "IMAP";
-		case SVC_TCP:
-			return "TCP";
-		case SVC_AGENT:
-			return "Zabbix agent";
-		case SVC_SNMPv1:
-			return "SNMPv1 agent";
-		case SVC_SNMPv2c:
-			return "SNMPv2c agent";
-		case SVC_SNMPv3:
-			return "SNMPv3 agent";
-		case SVC_ICMPPING:
-			return "ICMP ping";
-		case SVC_HTTPS:
-			return "HTTPS";
-		case SVC_TELNET:
-			return "Telnet";
 		default:
 			return "unknown";
 	}
