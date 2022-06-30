@@ -419,7 +419,7 @@ class CItemPrototype extends CItemGeneral {
 			]],
 			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
-									['else' => true, 'type' => API_ID, 'in' =>ZEROID]
+									['else' => true, 'type' => API_EMPTY_ID]
 			]],
 			'logtimefmt' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => ITEM_VALUE_TYPE_LOG], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'logtimefmt')],
@@ -578,7 +578,7 @@ class CItemPrototype extends CItemGeneral {
 			]],
 			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
-									['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
+									['else' => true, 'type' => API_EMPTY_ID]
 			]],
 			'logtimefmt' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => ITEM_VALUE_TYPE_LOG], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'logtimefmt')],

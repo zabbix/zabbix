@@ -1722,6 +1722,66 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/id": a number is expected.'
 			],
 			[
+				['type' => API_EMPTY_ID],
+				0,
+				'/1/id',
+				'0'
+			],
+			[
+				['type' => API_EMPTY_ID],
+				'0',
+				'/1/id',
+				'0'
+			],
+			[
+				['type' => API_EMPTY_ID],
+				'000000',
+				'/1/id',
+				'0'
+			],
+			[
+				['type' => API_EMPTY_ID],
+				true,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_EMPTY_ID],
+				null,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_EMPTY_ID],
+				[],
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_EMPTY_ID],
+				0.0,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_EMPTY_ID],
+				1.23E+11,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_EMPTY_ID],
+				108,
+				'/1/id',
+				'Invalid parameter "/1/id": should be empty.'
+			],
+			[
+				['type' => API_EMPTY_ID],
+				'108',
+				'/1/id',
+				'Invalid parameter "/1/id": should be empty.'
+			],
+			[
 				['type' => API_BOOLEAN],
 				true,
 				'/1/createMissing',

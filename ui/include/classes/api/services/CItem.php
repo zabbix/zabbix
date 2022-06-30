@@ -544,7 +544,7 @@ class CItem extends CItemGeneral {
 			]],
 			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
-									['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
+									['else' => true, 'type' => API_EMPTY_ID]
 			]],
 			'inventory_link' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])], 'type' => API_INT32, 'in' => '0,'.implode(',', array_keys(getHostInventories()))],
@@ -701,7 +701,7 @@ class CItem extends CItemGeneral {
 			]],
 			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
-									['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
+									['else' => true, 'type' => API_EMPTY_ID]
 			]],
 			'inventory_link' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])], 'type' => API_INT32, 'in' => '0,'.implode(',', array_keys(getHostInventories()))],

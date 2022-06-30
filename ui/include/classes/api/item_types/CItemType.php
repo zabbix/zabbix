@@ -65,7 +65,7 @@ abstract class CItemType {
 		$field_rules = [
 			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID, 'flags' => API_REQUIRED],
-									['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
+									['else' => true, 'type' => API_EMPTY_ID]
 			]],
 			'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')]
 		];
@@ -93,7 +93,7 @@ abstract class CItemType {
 									['if' => static function () use ($db_item): bool {
 										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 									}, 'type' => API_ID],
-									['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
+									['else' => true, 'type' => API_EMPTY_ID]
 			]],
 			'username' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function () use ($db_item): bool {
@@ -141,7 +141,7 @@ abstract class CItemType {
 									['if' => static function () use ($db_item): bool {
 										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 									}, 'type' => API_ID],
-									['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
+									['else' => true, 'type' => API_EMPTY_ID]
 			]],
 			'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')]
 		];

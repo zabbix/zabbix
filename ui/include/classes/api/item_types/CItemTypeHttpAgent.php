@@ -71,7 +71,7 @@ class CItemTypeHttpAgent extends CItemType {
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
 			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
-										['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
+										['else' => true, 'type' => API_EMPTY_ID]
 			]],
 			'delay' =>				self::getCreateFieldRule('delay', $item),
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), 'default' => DB::getDefault('items', 'allow_traps')],
@@ -137,7 +137,7 @@ class CItemTypeHttpAgent extends CItemType {
 										['if' => static function () use ($db_item): bool {
 											return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 										}, 'type' => API_ID],
-										['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
+										['else' => true, 'type' => API_EMPTY_ID]
 			]],
 			'delay' =>				self::getUpdateFieldRule('delay', $db_item),
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],

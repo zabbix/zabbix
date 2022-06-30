@@ -114,6 +114,9 @@ class CApiInputValidator {
 			case API_ID:
 				return self::validateId($rule, $data, $path, $error);
 
+			case API_EMPTY_ID:
+				return self::validateEmptyId($rule, $data, $path, $error);
+
 			case API_BOOLEAN:
 				return self::validateBoolean($rule, $data, $path, $error);
 
@@ -287,6 +290,7 @@ class CApiInputValidator {
 			case API_FLOAT:
 			case API_FLOATS:
 			case API_ID:
+			case API_EMPTY_ID:
 			case API_BOOLEAN:
 			case API_FLAG:
 			case API_OUTPUT:
@@ -1183,7 +1187,7 @@ class CApiInputValidator {
 	private static function validateId($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (($flags & API_ALLOW_NULL) && ($data === null || $data == ZEROID)) {
+		if (($flags & API_ALLOW_NULL) && $data === null) {
 			return true;
 		}
 
@@ -1204,9 +1208,41 @@ class CApiInputValidator {
 
 		$data = (string) $data;
 
-		if (rtrim($data, '0') === '') {
-			$data = '0';
+		if ($data[0] === '0') {
+			$data = ltrim($data, '0');
+
+			if ($data === '') {
+				$data = '0';
+			}
 		}
+
+		return true;
+	}
+
+	/**
+	 * Empty identifier validator.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateEmptyId(array $rule, &$data, string $path, string &$error): bool {
+		if (!is_scalar($data) || is_bool($data) || is_double($data) || !ctype_digit(strval($data))) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+
+			return false;
+		}
+
+		if ($data != 0) {
+			$error =  _s('Invalid parameter "%1$s": %2$s.', $path, _('should be empty'));
+
+			return false;
+		}
+
+		$data = '0';
 
 		return true;
 	}
