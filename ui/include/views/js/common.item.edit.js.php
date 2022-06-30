@@ -247,6 +247,9 @@
 			this.key_field = this.form.querySelector('[name=key]');
 			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
 			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
+			this.item_types_with_keys = <?=  json_encode([ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
+				ITEM_TYPE_IPMI, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX
+			]); ?>;
 
 			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
 				this.item_tab_type_field.value = this.preprocessing_tab_type_field.value;
@@ -272,11 +275,13 @@
 
 			['change', 'input', 'help_items.paste'].forEach((event_type) => {
 				this.key_field.addEventListener(event_type, (e) => {
-					if (this.preprocessing_active) {
-						return this.lookup(this.key_field.value, false);
-					}
+					if (this.item_types_with_keys.includes(parseInt(this.form.querySelector('[name=type]').value))) {
+						if (this.preprocessing_active) {
+							return this.lookup(this.key_field.value, false);
+						}
 
-					this.lookup(this.key_field.value);
+						this.lookup(this.key_field.value);
+					}
 				});
 			});
 
