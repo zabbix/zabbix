@@ -568,14 +568,16 @@
 					src.setArgument('yaxismax', $('#yaxismax').val());
 
 					if ($('#ymin_type').val() == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
-						const ymin_item_data = $('#ymin_itemid').multiSelect('getData');
+						var ymin_item_data = $('#ymin_itemid').multiSelect('getData');
+
 						if (ymin_item_data.length) {
 							src.setArgument('ymin_itemid', ymin_item_data[0]['id']);
 						}
 					}
 
 					if ($('#ymax_type').val() == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
-						const ymax_item_data = $('#ymax_itemid').multiSelect('getData');
+						var ymax_item_data = $('#ymax_itemid').multiSelect('getData');
+
 						if (ymax_item_data.length) {
 							src.setArgument('ymax_itemid', ymax_item_data[0]['id']);
 						}
