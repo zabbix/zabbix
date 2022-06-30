@@ -50,6 +50,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"fullname", VMCHECK_FUNC(check_vcenter_fullname)},
 	{"datastore.discovery", VMCHECK_FUNC(check_vcenter_datastore_discovery)},
 	{"datastore.read", VMCHECK_FUNC(check_vcenter_datastore_read)},
+	{"datastore.property", VMCHECK_FUNC(check_vcenter_datastore_property)},
 	{"datastore.size", VMCHECK_FUNC(check_vcenter_datastore_size)},
 	{"datastore.write", VMCHECK_FUNC(check_vcenter_datastore_write)},
 	{"datastore.hv.list", VMCHECK_FUNC(check_vcenter_datastore_hv_list)},

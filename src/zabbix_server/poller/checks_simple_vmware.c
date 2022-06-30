@@ -3048,6 +3048,91 @@ out:
 	return ret;
 }
 
+int	check_vcenter_datastore_property(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	const char			*url, *uuid, *key, *type = ZBX_VMWARE_SOAP_DS, *mode = "";
+	int				ret = SYSINFO_RET_FAIL;
+	char				*key_esc = NULL;
+	zbx_vmware_service_t		*service;
+	zbx_vmware_datastore_t		*ds;
+	zbx_vmware_cust_query_t		*custom_query;
+	zbx_vmware_custom_query_type_t	query_type = VMWARE_OBJECT_PROPERTY;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	key = get_rparam(request, 2);
+
+	if (NULL == key || '\0' == *key)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto out;
+	}
+
+	key_esc = zbx_xml_escape_dyn(key);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+		goto unlock;
+	}
+
+	/* FAIL is returned if custom query exists */
+	if (NULL == (custom_query = zbx_vmware_service_get_cust_query(service, type, ds->id, key_esc, query_type, mode))
+			&& NULL != (custom_query = zbx_vmware_service_add_cust_query(service, type, ds->id, key_esc,
+			query_type, mode, NULL)))
+	{
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+	else if (NULL == custom_query)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown vmware property query."));
+		goto unlock;
+	}
+
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_ERROR))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, custom_query->error));
+		goto unlock;
+	}
+
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_READY))
+		SET_STR_RESULT(result, zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(custom_query->value)));
+
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_PAUSED))
+		custom_query->state &= ~(unsigned char)ZBX_VMWARE_CQ_PAUSED;
+
+	if (NULL != custom_query->value && '\0' != *custom_query->value &&
+			0 != (custom_query->state & ZBX_VMWARE_CQ_SEPARATE))
+	{
+		custom_query->state &= ~(unsigned char)ZBX_VMWARE_CQ_SEPARATE;
+	}
+
+	custom_query->last_pooled = time(NULL);
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zbx_str_free(key_esc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
