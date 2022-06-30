@@ -501,7 +501,7 @@ class IpmiTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const ipmi_authtype = document.querySelector('[name="ipmi_authtype"]');
+		const ipmi_authtype = document.getElementById('ipmi_authtype');
 
 		if (ipmi_authtype !== null) {
 			const options = ipmi_authtype.selectedOptions;
@@ -511,7 +511,7 @@ class IpmiTabIndicatorItem extends TabIndicatorItem {
 			}
 		}
 
-		const ipmi_privilege = document.querySelector('[name="ipmi_privilege"]');
+		const ipmi_privilege = document.getElementById('ipmi_privilege');
 
 		if (ipmi_privilege !== null) {
 			const options = ipmi_privilege.selectedOptions;
@@ -521,7 +521,7 @@ class IpmiTabIndicatorItem extends TabIndicatorItem {
 			}
 		}
 
-		for (const input of document.querySelectorAll('[name="ipmi_username"], [name="ipmi_password"]')) {
+		for (const input of document.querySelectorAll('#ipmi_username, #ipmi_password')) {
 			if (input.value !== '') {
 				return true;
 			}
@@ -532,7 +532,7 @@ class IpmiTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		for (const input of document.querySelectorAll(
-				'[name="ipmi_authtype"], [name="ipmi_privilege"], [name="ipmi_username"], [name="ipmi_password"]')) {
+				'#ipmi_authtype, #ipmi_privilege, #ipmi_username, #ipmi_password')) {
 			input.addEventListener('change', () => {
 				this.addAttributes(element);
 			});
@@ -1008,13 +1008,13 @@ class MediatypeOptionsTabIndicatorItem extends TabIndicatorItem {
 			return true;
 		}
 
-		const maxattempts = document.querySelector('[name="maxattempts"]');
+		const maxattempts = document.getElementById('maxattempts');
 
 		if (maxattempts !== null && maxattempts.value != 3) {
 			return true;
 		}
 
-		const attempt_interval = document.querySelector('[name="attempt_interval"]');
+		const attempt_interval = document.getElementById('attempt_interval');
 
 		if (attempt_interval !== null && attempt_interval.value !== '10s') {
 			return true;
@@ -1024,8 +1024,7 @@ class MediatypeOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		for (const input of document.querySelectorAll(
-				'[name="maxsessions_type"], [name="maxattempts"], [name="attempt_interval"]')) {
+		for (const input of document.querySelectorAll('#maxsessions_type, #maxattempts, #attempt_interval')) {
 			input.addEventListener('change', () => {
 				this.addAttributes(element);
 			});
@@ -1277,6 +1276,8 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 
 class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 
+	static SVG_GRAPH_LEGEND_LINES_MIN = 1;
+
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
@@ -1290,7 +1291,7 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 
 		const legend_lines = document.getElementById('legend_lines');
 
-		if (legend_lines !== null && legend_lines.value != 1) {
+		if (legend_lines !== null && legend_lines.value != GraphLegendTabIndicatorItem.SVG_GRAPH_LEGEND_LINES_MIN) {
 			return true;
 		}
 
