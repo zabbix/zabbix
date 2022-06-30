@@ -359,6 +359,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			$copied_widget_form->submit();
 		}
 
+		$copied_widget->waitUntilReady();
 		$this->assertEquals($name, $copied_widget->getHeaderText());
 		$copied_fields = $copied_widget->edit()->getFields();
 
