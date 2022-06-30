@@ -586,7 +586,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
  *               FAIL on other cases                                          *
  *                                                                            *
  ******************************************************************************/
-static int	refresh_active_checks(zbx_vector_ptr_t *addrs, zbx_config_tls_t *zbx_config_tls)
+static int	refresh_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *zbx_config_tls)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -744,7 +744,7 @@ static int	check_response(char *response)
  *                                                                            *
  ******************************************************************************/
 static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec,
-		zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
 	int				ret = SUCCEED, i, now, level;
@@ -950,7 +950,7 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
 		const int *mtime, const unsigned long *timestamp, const char *source,
 		const unsigned short *severity, const unsigned long *logeventid, unsigned char flags,
-		zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
 	int				i, ret = FAIL;
@@ -1112,7 +1112,7 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_ptr_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, char **error,
-		zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	ZBX_UNUSED(addrs);
 	ZBX_UNUSED(agent2_result);
@@ -1126,13 +1126,13 @@ static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *age
 	return FAIL;
 }
 #else
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
+static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		char **error, zbx_config_tls_t *zbx_config_tls);
+		char **error, const zbx_config_tls_t *zbx_config_tls);
 #endif
 
 static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric, char **error,
-		zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	int		ret;
 	AGENT_RESULT	result;
@@ -1202,7 +1202,7 @@ static void	zbx_fill_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, con
 }
 #endif	/* not WINDOWS, not __MINGW32__ */
 
-static void	process_active_checks(zbx_vector_ptr_t *addrs, zbx_config_tls_t *zbx_config_tls)
+static void	process_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *zbx_config_tls)
 {
 	char	*error = NULL;
 	int	i, now;
@@ -1362,7 +1362,7 @@ static void	zbx_active_checks_sigusr_handler(int flags)
 }
 #endif
 
-static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs, zbx_config_tls_t *zbx_config_tls)
+static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *zbx_config_tls)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;

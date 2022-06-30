@@ -39,7 +39,7 @@ extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
-		zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};

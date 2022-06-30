@@ -317,7 +317,7 @@ static void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_o
  ******************************************************************************/
 #define ZBX_TLS_PARAMETER_CONFIG_FILE	0
 #define ZBX_TLS_PARAMETER_COMMAND_LINE	1
-static const char	*zbx_tls_parameter_name(int type, char **param, zbx_config_tls_t *zbx_config_tls)
+static const char	*zbx_tls_parameter_name(int type, char * const *param, const zbx_config_tls_t *zbx_config_tls)
 {
 	if (&(zbx_config_tls->connect) == param)
 		return ZBX_TLS_PARAMETER_CONFIG_FILE == type ? "TLSConnect" : "--tls-connect";
@@ -406,7 +406,7 @@ static const char	*zbx_tls_parameter_name(int type, char **param, zbx_config_tls
  *     zbx_config_tls - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_tls_parameter_not_empty(char **param, zbx_config_tls_t *zbx_config_tls)
+static void	zbx_tls_parameter_not_empty(char * const *param, const zbx_config_tls_t *zbx_config_tls)
 {
 	const char	*value = *param;
 
@@ -469,7 +469,7 @@ static void	zbx_tls_parameter_not_empty(char **param, zbx_config_tls_t *zbx_conf
 #define ZBX_TLS_VALIDATION_REQUIREMENT	2
 #define ZBX_TLS_VALIDATION_UTF8		3
 #define ZBX_TLS_VALIDATION_NO_PSK	4
-static void	zbx_tls_validation_error(int type, char **param1, char **param2, zbx_config_tls_t *zbx_config_tls)
+static void	zbx_tls_validation_error(int type, char **param1, char **param2, const zbx_config_tls_t *zbx_config_tls)
 {
 	if (ZBX_TLS_VALIDATION_INVALID == type)
 	{
@@ -600,7 +600,7 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2, zbx
  *                                                                            *
  ******************************************************************************/
 static void	zbx_tls_validation_error2(int type, char **param1, char **param2, char **param3,
-		zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	if (ZBX_TLS_VALIDATION_DEPENDENCY == type)
 	{
@@ -661,8 +661,8 @@ static void	zbx_tls_validation_error2(int type, char **param1, char **param2, ch
  *           parameters must match the value of config_tls_accept parameter.  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active_forks, int config_passive_forks,
-		zbx_get_program_type_f zbx_get_program_type_cb_arg)
+void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active_forks,
+		int config_passive_forks, zbx_get_program_type_f zbx_get_program_type_cb_arg)
 {
 	zbx_get_program_type_cb = zbx_get_program_type_cb_arg;
 
@@ -2239,7 +2239,7 @@ static void	zbx_gnutls_priority_init_or_exit(gnutls_priority_t *ciphersuites, co
 	}
 }
 
-void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls)
+void	zbx_tls_init_child(const zbx_config_tls_t *zbx_config_tls)
 {
 	int			res;
 #ifndef _WINDOWS
@@ -2551,7 +2551,7 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 	return ret;
 }
 
-void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls)
+void	zbx_tls_init_child(const zbx_config_tls_t *zbx_config_tls)
 {
 #define ZBX_CIPHERS_CERT_ECDHE		"EECDH+aRSA+AES128:"
 #define ZBX_CIPHERS_CERT		"RSA+aRSA+AES128"

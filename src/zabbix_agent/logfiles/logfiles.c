@@ -2022,7 +2022,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
 		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, const char *persistent_file_name,
-		zbx_vector_pre_persistent_t *prep_vec, char **err_msg, zbx_config_tls_t *zbx_config_tls)
+		zbx_vector_pre_persistent_t *prep_vec, char **err_msg, const zbx_config_tls_t *zbx_config_tls)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
@@ -2416,7 +2416,7 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
 		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, zbx_uint64_t *processed_bytes,
 		zbx_uint64_t seek_offset, const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
-		char **err_msg, zbx_config_tls_t *zbx_config_tls)
+		char **err_msg, const zbx_config_tls_t *zbx_config_tls)
 {
 	int	f, ret = FAIL;
 
@@ -3284,7 +3284,7 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 		const char *hostname, const char *key, int *jumped, float max_delay, double *start_time,
 		zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
 		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
-		zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
 				from_first_file = 1, last_processed, limit_reached = 0, res;
@@ -3829,7 +3829,8 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
  ******************************************************************************/
 int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec, zbx_config_tls_t *zbx_config_tls)
+		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;

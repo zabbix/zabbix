@@ -984,7 +984,7 @@ static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
-		zbx_config_tls_t	*zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	int	ret = SUCCEED;
 
@@ -1201,7 +1201,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	return ret;
 }
 
-static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts, zbx_config_tls_t	*zbx_config_tls)
+static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_tls_t *zbx_config_tls)
 {
 	ssize_t	bytes_received;
 

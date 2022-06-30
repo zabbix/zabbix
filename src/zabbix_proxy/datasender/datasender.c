@@ -84,7 +84,7 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  *                                                                            *
  ******************************************************************************/
 static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t *last_conn_time,
-		zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
 

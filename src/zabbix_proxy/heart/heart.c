@@ -36,7 +36,7 @@ extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 extern int		CONFIG_TIMEOUT;
 
-static int	send_heartbeat(zbx_config_tls_t *zbx_config_tls)
+static int	send_heartbeat(const zbx_config_tls_t *zbx_config_tls)
 {
 	zbx_socket_t		sock;
 	struct zbx_json		j;
