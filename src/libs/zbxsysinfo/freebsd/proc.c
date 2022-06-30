@@ -24,7 +24,6 @@
 #include "zbxjson.h"
 
 #if HAVE_LIBJAIL
-#include "sys/jail.h"
 #include "jail.h"
 #endif
 
@@ -59,11 +58,7 @@
 #	define ZBX_PROC_PPID		ki_ppid
 #	define ZBX_PROC_JID		ki_jid
 #	define ZBX_PROC_TID		ki_tid
-#if (__FreeBSD_version) < 900040
 #	define ZBX_PROC_TNAME		ki_ocomm
-#else
-#	define ZBX_PROC_TNAME		ki_tdname
-#endif
 #	define ZBX_PROC_COMM		ki_comm
 #	define ZBX_PROC_STAT		ki_stat
 #	define ZBX_PROC_TSIZE		ki_tsize
