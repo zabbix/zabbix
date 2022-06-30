@@ -21,6 +21,10 @@
 require_once dirname(__FILE__).'/testDocumentationLinks.php';
 require_once dirname(__FILE__).'/testGeneric.php';
 
+// Actions.
+require_once dirname(__FILE__).'/actions/testFormAction.php';
+require_once dirname(__FILE__).'/actions/testPageActions.php';
+
 // Api tokens.
 require_once dirname(__FILE__).'/apiTokens/testPageApiTokensAdministrationGeneral.php';
 require_once dirname(__FILE__).'/apiTokens/testPageApiTokensUserSettings.php';
@@ -60,7 +64,6 @@ require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
 require_once dirname(__FILE__).'/testPageProblems.php';
-require_once dirname(__FILE__).'/testPageActions.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
@@ -102,7 +105,6 @@ require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
-require_once dirname(__FILE__).'/testFormAction.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationLdap.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationSaml.php';
@@ -228,6 +230,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testDocumentationLinks');
 		$suite->addTestSuite('testGeneric');
 
+		// Actions.
+		$suite->addTestSuite('testFormAction');
+		$suite->addTestSuite('testPageActions');
+
 		// Api tokens.
 		$suite->addTestSuite('testFormApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testFormApiTokensUserSettings');
@@ -264,7 +270,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
 
-		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
 		$suite->addTestSuite('testPageAdministrationGeneralIconMapping');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
@@ -316,7 +321,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageWeb');
 		$suite->addTestSuite('testPasswordComplexity');
 		$suite->addTestSuite('testExpandExpressionMacros');
-		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
 		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
 		$suite->addTestSuite('testFormAdministrationAuthenticationLdap');
