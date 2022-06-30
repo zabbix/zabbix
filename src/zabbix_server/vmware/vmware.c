@@ -6943,8 +6943,8 @@ static void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zb
 	cqv->response = zbx_xml_doc_read_value(xdoc, xpath);
 	cqv->status = ZBX_VMWARE_CQV_VALUE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() SUCCEED id:%s response:%d", fn_parent, cqv->instance->id,
-			(int)strlen(cqv->response));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() SUCCEED id:%s key:%s response length:%d", fn_parent, cqv->instance->id,
+			cqv->instance->key, NULL == cqv->response ? -1 : (int)strlen(cqv->response));
 }
 
 /******************************************************************************
@@ -7043,7 +7043,7 @@ static char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values,
 	if (0 != (cq->instance->state & ZBX_VMWARE_CQ_SEPARATE))
 		return buff;
 
-	zbx_snprintf(buff, sizeof(bsz), "<ns0:pathSet>%s</ns0:pathSet>", cq->instance->key);
+	zbx_snprintf(buff, bsz, "<ns0:pathSet>%s</ns0:pathSet>", cq->instance->key);
 	*cq_prop = cq;
 
 	return buff;

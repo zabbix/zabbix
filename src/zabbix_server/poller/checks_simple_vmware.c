@@ -3086,8 +3086,17 @@ int	check_vcenter_datastore_property(AGENT_REQUEST *request, const char *usernam
 
 	if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
-		goto unlock;
+		int			i;
+		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)uuid};
+
+		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+				vmware_ds_name_compare)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+			goto unlock;
+		}
+
+		ds = service->data->datastores.values[i];
 	}
 
 	/* FAIL is returned if custom query exists */
