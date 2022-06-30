@@ -240,6 +240,7 @@
 		preprocessing_tab_type_field: null,
 		last_lookup: '',
 		inferred_type: null,
+		item_type: null,
 
 		init(key_type_suggestions) {
 			this.key_type_suggestions = key_type_suggestions;
@@ -248,7 +249,7 @@
 			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
 			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
 			this.item_type = this.form.querySelector('[name=type]');
-			this.item_types_with_defined_keys = <?=  json_encode([ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
+			const item_types_with_defined_keys = <?=  json_encode([ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR,
 				ITEM_TYPE_JMX
 			]); ?>;
@@ -277,7 +278,7 @@
 
 			['change', 'input', 'help_items.paste'].forEach((event_type) => {
 				this.key_field.addEventListener(event_type, (e) => {
-					if (this.item_types_with_defined_keys.includes(parseInt(this.item_type.value))) {
+					if (item_types_with_defined_keys.includes(parseInt(this.item_type.value))) {
 						if (this.preprocessing_active) {
 							return this.lookup(this.key_field.value, false);
 						}
