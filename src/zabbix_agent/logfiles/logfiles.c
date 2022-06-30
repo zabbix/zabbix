@@ -2022,7 +2022,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
 		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, const char *persistent_file_name,
-		zbx_vector_pre_persistent_t *prep_vec, char **err_msg, const zbx_config_tls_t *zbx_config_tls)
+		zbx_vector_pre_persistent_t *prep_vec, const zbx_config_tls_t *zbx_config_tls, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
@@ -2397,9 +2397,9 @@ out:
  *     persistent_file_name - [IN] name of file for saving persistent data    *
  *     prep_vec        - [IN/OUT] vector with data for writing into           *
  *                                persistent files                            *
+ *     zbx_config_tls  - [IN]                                                 *
  *     err_msg         - [IN/OUT] error message why an item became            *
  *                       NOTSUPPORTED                                         *
- *     zbx_config_tls  - [IN]                                                 *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -2416,7 +2416,7 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
 		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, zbx_uint64_t *processed_bytes,
 		zbx_uint64_t seek_offset, const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
-		char **err_msg, const zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls, char **err_msg)
 {
 	int	f, ret = FAIL;
 
@@ -2434,8 +2434,8 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 
 		if (SUCCEED == (ret = zbx_read2(f, flags, logfile, lastlogsize, mtime, big_rec, encoding, regexps,
 				pattern, output_template, p_count, s_count, process_value, addrs, agent2_result,
-				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec, err_msg,
-				zbx_config_tls)))
+				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec,
+				zbx_config_tls, err_msg)))
 		{
 			*processed_bytes = *lastlogsize - seek_offset;
 		}
@@ -3490,7 +3490,7 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 						mtime_sent, skip_old_data, big_rec, encoding, regexps, pattern,
 						output_template, p_count, s_count, process_value, addrs, agent2_result,
 						hostname, key, &processed_bytes_tmp, seek_offset, persistent_file_name,
-						prep_vec, err_msg, zbx_config_tls);
+						prep_vec, zbx_config_tls, err_msg);
 
 				/* process_log() advances 'lastlogsize' only on success therefore */
 				/* we do not check for errors here */

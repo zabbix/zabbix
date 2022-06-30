@@ -711,8 +711,8 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 		}
 		else
 		{
-			zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(zbx_config_tls->connect),
-					NULL, zbx_config_tls);
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(zbx_config_tls->connect), NULL,
+					zbx_config_tls);
 		}
 	}
 
@@ -748,15 +748,15 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 #if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 				accept_modes_tmp |= ZBX_TCP_SEC_TLS_PSK;
 #else
-				zbx_tls_validation_error(ZBX_TLS_VALIDATION_NO_PSK,
-						&(zbx_config_tls->accept), NULL, zbx_config_tls);
+				zbx_tls_validation_error(ZBX_TLS_VALIDATION_NO_PSK, &(zbx_config_tls->accept), NULL,
+						zbx_config_tls);
 #endif
 			}
 			else
 			{
 				zbx_free(s);
-				zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID,
-						&(zbx_config_tls->accept), NULL, zbx_config_tls);
+				zbx_tls_validation_error(ZBX_TLS_VALIDATION_INVALID, &(zbx_config_tls->accept), NULL,
+						zbx_config_tls);
 			}
 
 			if (NULL == delim)
@@ -807,8 +807,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 	/* Server certificate issuer is optional but must be defined only together with a certificate */
 	if (NULL == zbx_config_tls->cert_file && NULL != zbx_config_tls->server_cert_issuer)
 	{
-		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY,
-				&(zbx_config_tls->server_cert_issuer),
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->server_cert_issuer),
 				&(zbx_config_tls->cert_file), zbx_config_tls);
 	}
 
@@ -816,8 +815,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 
 	if (NULL == zbx_config_tls->cert_file && NULL != zbx_config_tls->server_cert_subject)
 	{
-		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY,
-				&(zbx_config_tls->server_cert_subject),
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->server_cert_subject),
 				&(zbx_config_tls->cert_file), zbx_config_tls);
 	}
 
@@ -936,15 +934,13 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 		if (NULL !=  zbx_config_tls->cipher_psk13 && NULL ==
 				zbx_config_tls->psk_identity)
 		{
-			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY,
-					&(zbx_config_tls->cipher_psk13),
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->cipher_psk13),
 					&(zbx_config_tls->psk_identity), zbx_config_tls);
 		}
 
 		if (NULL != zbx_config_tls->cipher_psk && NULL == zbx_config_tls->psk_identity)
 		{
-			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY,
-					&(zbx_config_tls->cipher_psk),
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->cipher_psk),
 					&(zbx_config_tls->psk_identity), zbx_config_tls);
 		}
 	}
@@ -959,18 +955,14 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 	{
 		if (NULL != zbx_config_tls->cipher_all13)
 		{
-			zbx_tls_validation_error2(ZBX_TLS_VALIDATION_DEPENDENCY,
-					&(zbx_config_tls->cipher_all13),
-					&(zbx_config_tls->cert_file),
-					&(zbx_config_tls->psk_identity), zbx_config_tls);
+			zbx_tls_validation_error2(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->cipher_all13),
+					&(zbx_config_tls->cert_file), &(zbx_config_tls->psk_identity), zbx_config_tls);
 		}
 
 		if (NULL != zbx_config_tls->cipher_all)
 		{
-			zbx_tls_validation_error2(ZBX_TLS_VALIDATION_DEPENDENCY,
-					&(zbx_config_tls->cipher_all),
-					&(zbx_config_tls->cert_file),
-					&(zbx_config_tls->psk_identity), zbx_config_tls);
+			zbx_tls_validation_error2(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->cipher_all),
+					&(zbx_config_tls->cert_file), &(zbx_config_tls->psk_identity), zbx_config_tls);
 		}
 	}
 
@@ -982,18 +974,14 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 	{
 		if (NULL != zbx_config_tls->cipher_cmd13)
 		{
-			zbx_tls_validation_error2(ZBX_TLS_VALIDATION_DEPENDENCY,
-					&(zbx_config_tls->cipher_cmd13),
-					&(zbx_config_tls->cert_file),
-					&(zbx_config_tls->psk_identity), zbx_config_tls);
+			zbx_tls_validation_error2(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->cipher_cmd13),
+					&(zbx_config_tls->cert_file), &(zbx_config_tls->psk_identity), zbx_config_tls);
 		}
 
 		if (NULL != zbx_config_tls->cipher_cmd)
 		{
-			zbx_tls_validation_error2(ZBX_TLS_VALIDATION_DEPENDENCY,
-					&(zbx_config_tls->cipher_cmd),
-					&(zbx_config_tls->cert_file),
-					&(zbx_config_tls->psk_identity), zbx_config_tls);
+			zbx_tls_validation_error2(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->cipher_cmd),
+					&(zbx_config_tls->cert_file), &(zbx_config_tls->psk_identity), zbx_config_tls);
 		}
 	}
 }
@@ -2329,12 +2317,11 @@ void	zbx_tls_init_child(const zbx_config_tls_t *zbx_config_tls)
 	if (NULL != zbx_config_tls->cert_file)
 	{
 		if (GNUTLS_E_SUCCESS != (res = gnutls_certificate_set_x509_key_file(my_cert_creds,
-				zbx_config_tls->cert_file, zbx_config_tls->key_file,
-				GNUTLS_X509_FMT_PEM)))
+				zbx_config_tls->cert_file, zbx_config_tls->key_file, GNUTLS_X509_FMT_PEM)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot load certificate or private key from file \"%s\" or \"%s\":"
-					" %d: %s", zbx_config_tls->cert_file,
-					zbx_config_tls->key_file, res, gnutls_strerror(res));
+					" %d: %s", zbx_config_tls->cert_file, zbx_config_tls->key_file, res,
+					gnutls_strerror(res));
 			zbx_tls_free();
 			exit(EXIT_FAILURE);
 		}
@@ -2685,13 +2672,11 @@ void	zbx_tls_init_child(const zbx_config_tls_t *zbx_config_tls)
 		if (NULL == (lookup_cert = X509_STORE_add_lookup(store_cert, X509_LOOKUP_file())))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_add_lookup() #%d failed"
-					" when loading CRL(s) from file \"%s\":", 1,
-					zbx_config_tls->crl_file);
+					" when loading CRL(s) from file \"%s\":", 1, zbx_config_tls->crl_file);
 			goto out;
 		}
 
-		if (0 >= (count_cert = X509_load_crl_file(lookup_cert, zbx_config_tls->crl_file,
-				X509_FILETYPE_PEM)))
+		if (0 >= (count_cert = X509_load_crl_file(lookup_cert, zbx_config_tls->crl_file, X509_FILETYPE_PEM)))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load CRL(s) from file \"%s\":",
 					zbx_config_tls->crl_file);
@@ -3113,8 +3098,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *zbx_config_tls)
 	/* cannot use TLSCipherPSK13, TLSCipherPSK, TLSCipherAll13 and TLSCipherAll13 parameters */
 	/* if PSK is not supported by crypto library */
 	if (NULL != zbx_config_tls->cipher_psk13 || NULL != zbx_config_tls->cipher_psk ||
-			NULL != zbx_config_tls->cipher_all13 ||
-			NULL != zbx_config_tls->cipher_all)
+			NULL != zbx_config_tls->cipher_all13 || NULL != zbx_config_tls->cipher_all)
 	{
 		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "at least one of parameters TLSCipherPSK13,"
 				" TLSCipherPSK, TLSCipherAll13 or TLSCipherAll is defined. These parameters must not"
