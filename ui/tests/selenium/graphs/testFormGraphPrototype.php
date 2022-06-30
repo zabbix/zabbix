@@ -27,13 +27,21 @@ class testFormGraphPrototype extends testFormGraphs {
 
 	CONST LLDID = 133800; // testFormDiscoveryRule on Simple form test host.
 
-	public $url = 'graphs.php?parent_discoveryid='.self::LLDID.'&context=host';
 	public $prototype = true;
+	public $url = 'graphs.php?parent_discoveryid='.self::LLDID.'&context=host';
+
 
 	/**
 	 * @dataProvider getLayoutData
 	 */
 	public function testFormGraphPrototype_Layout($data) {
 		$this->checkGraphLayout($data);
+	}
+
+	/**
+	 * @dataProvider getGraphData
+	 */
+	public function testFormGraphPrototype_Create($data) {
+		$this->checkGraphForm($data);
 	}
 }

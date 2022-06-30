@@ -35,4 +35,11 @@ class testFormGraph extends testFormGraphs {
 	public function testFormGraph_Layout($data) {
 		$this->checkGraphLayout($data);
 	}
+
+	/**
+	 * @dataProvider getGraphData
+	 */
+	public function testFormGraph_Create($data) {
+		$this->checkGraphForm($data);
+	}
 }

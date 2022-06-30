@@ -199,9 +199,6 @@ class testFormGraphs extends CWebTest {
 		];
 	}
 
-	/**
-	 * @dataProvider getLayoutData
-	 */
 	public function checkGraphLayout($data) {
 		$this->page->login()->open($this->url)->waitUntilReady();
 		$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
@@ -253,6 +250,233 @@ class testFormGraphs extends CWebTest {
 			if (array_key_exists('maxlength', $visible_field)) {
 				$this->assertEquals($visible_field['maxlength'], $form->getField($visible_field['field'])->getAttribute('maxlength'));
 			}
+		}
+	}
+
+	public function getGraphData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => '',
+						'Width' => '',
+						'Height' => ''
+					],
+					'error' => 'Page received incorrect data',
+					'details' => [
+						'Incorrect value for field "Name": cannot be empty.',
+						'Incorrect value "0" for "Width" field: must be between 20 and 65535.',
+						'Incorrect value "0" for "Height" field: must be between 20 and 65535.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Fractional width and height',
+						'Width' => 1.2,
+						'Height' => 15.5
+					],
+					'error' => 'Page received incorrect data',
+					'details' => [
+						'Field "Width" is not integer.',
+						'Field "Height" is not integer.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Negative and empty inputs',
+						'Width' => -100,
+						'Height' => -1,
+						'id:visible_percent_left' => true,
+						'id:visible_percent_right' => true,
+						'id:percent_left' => -2,
+						'id:percent_right' => -200,
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => '',
+						'id:yaxismax' => '',
+					],
+					'error' => 'Page received incorrect data',
+					'details' => [
+						'Incorrect value "-100" for "Width" field: must be between 20 and 65535.',
+						'Incorrect value "-1" for "Height" field: must be between 20 and 65535.',
+						'Field "yaxismin" is mandatory.',
+						'Field "yaxismax" is mandatory.',
+						'Incorrect value "-2" for "Percentile line (left)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.',
+						'Incorrect value "-200" for "Percentile line (right)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Commas in inputs',
+						'Width' => '20,5',
+						'Height' => '50,9',
+						'id:visible_percent_left' => true,
+						'id:visible_percent_right' => true,
+						'id:percent_left' => '1,3',
+						'id:percent_right' => '5,6',
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => '88,9',
+						'id:yaxismax' => '0,1',
+					],
+					'error' => 'Page received incorrect data',
+					'details' => [
+						'Field "yaxismin" is not correct: a number is expected',
+						'Field "yaxismax" is not correct: a number is expected',
+						'Field "Percentile line (left)" is not correct: a number is expected',
+						'Field "Percentile line (right)" is not correct: a number is expected'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Too large inputs',
+						'Width' => 65536,
+						'Height' => 65536,
+						'id:visible_percent_left' => true,
+						'id:visible_percent_right' => true,
+						'id:percent_left' => 101,
+						'id:percent_right' => 101,
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => 12345678999999998,
+						'id:yaxismax' => 12345678999999998,
+					],
+					'error' => 'Page received incorrect data',
+					'details' => [
+						'Incorrect value "65536" for "Width" field: must be between 20 and 65535.',
+						'Incorrect value "65536" for "Height" field: must be between 20 and 65535.',
+						'Field "yaxismin" is not correct: a number is too large',
+						'Field "yaxismax" is not correct: a number is too large',
+						'Incorrect value "101" for "Percentile line (left)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.',
+						'Incorrect value "101" for "Percentile line (right)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Text in inputs',
+						'Width' => 'test',
+						'Height' => 'value',
+						'id:visible_percent_left' => true,
+						'id:visible_percent_right' => true,
+						'id:percent_left' => 'letters',
+						'id:percent_right' => 'symbols',
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => 'text',
+						'id:yaxismax' => 'value',
+					],
+					'error' => 'Page received incorrect data',
+					'details' => [
+						'Incorrect value "0" for "Width" field: must be between 20 and 65535.',
+						'Incorrect value "0" for "Height" field: must be between 20 and 65535.',
+						'Field "yaxismin" is not correct: a number is expected',
+						'Field "yaxismax" is not correct: a number is expected',
+						'Field "Percentile line (left)" is not correct: a number is expected',
+						'Field "Percentile line (right)" is not correct: a number is expected'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Low width and height and too many fractional digits in percentile and axis',
+						'Width' => 1,
+						'Height' => 19,
+						'id:visible_percent_left' => true,
+						'id:visible_percent_right' => true,
+						'id:percent_left' => 1.99999,
+						'id:percent_right' => 2.12345,
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => 1.12345,
+						'id:yaxismax' => 1.999999999,
+					],
+					'error' => 'Page received incorrect data',
+					'details' => [
+						'Incorrect value "1" for "Width" field: must be between 20 and 65535.',
+						'Incorrect value "19" for "Height" field: must be between 20 and 65535.',
+						'Field "yaxismin" is not correct: a number has too many fractional digits',
+						'Field "yaxismax" is not correct: a number has too many fractional digits',
+						'Field "Percentile line (left)" is not correct: a number has too many fractional digits',
+						'Field "Percentile line (right)" is not correct: a number has too many fractional digits'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Too large negative numbers',
+						'id:visible_percent_left' => true,
+						'id:visible_percent_right' => true,
+						'id:percent_left' => -900000,
+						'id:percent_right' => -900000,
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => -90000000000000000,
+						'id:yaxismax' => -90000000000000000,
+					],
+					'error' => 'Page received incorrect data',
+					'details' => [
+						'Field "yaxismin" is not correct: a number is too large',
+						'Field "yaxismax" is not correct: a number is too large',
+						'Incorrect value "-900000" for "Percentile line (left)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.',
+						'Incorrect value "-900000" for "Percentile line (right)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty item'
+					],
+					'error' => ($this->prototype) ? 'Cannot add graph prototype' : 'Cannot add graph',
+					'details' => [
+						'Missing items for '.($this->prototype ? 'graph prototype' : 'graph').' "Empty item".'
+					]
+				]
+			],
+		];
+	}
+
+	public function checkGraphForm($data) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$sql = 'SELECT * FROM graphs ORDER BY graphid';
+			$old_hash = CDBHelper::getHash($sql);
+		}
+
+		$this->page->login()->open($this->url)->waitUntilReady();
+		$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
+				->one()->click();
+		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
+		$form->fill($data['fields']);
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, $data['error'], $data['details']);
+			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+		}
+		else {
+
 		}
 	}
 }
