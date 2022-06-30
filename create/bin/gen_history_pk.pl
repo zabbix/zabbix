@@ -190,6 +190,7 @@ SELECT create_hypertable('%HISTTBL', 'clock', chunk_time_interval => (
 
 INSERT INTO %HISTTBL SELECT * FROM temp_%HISTTBL ON CONFLICT (itemid,clock,ns) DO NOTHING;
 %COMPRESS
+%CONFIG_COMPR
 HEREDOC
 ;
 
@@ -226,10 +227,12 @@ sub output_tsdb {
 	if (not(defined $tsdb_compression))
 	{
 		$tsdb_out =~ s/%COMPRESS//g;
+		$tsdb_out =~ s/%CONFIG_COMPR/UPDATE config SET compression_status=0;/g;
 	}
 	elsif ($tsdb_compression eq 'with_compression')
 	{
 		$tsdb_out =~ s/%COMPRESS/$tsdb_compress_sql/g;
+		$tsdb_out =~ s/%CONFIG_COMPR/UPDATE config SET compression_status=1;/g;
 	}
 
 	my $temp_ddl = $postgresql{$tbl};
