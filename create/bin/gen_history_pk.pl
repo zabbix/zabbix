@@ -132,17 +132,10 @@ HEREDOC
 );
 
 my $tsdb_compress_sql = <<'HEREDOC'
-SELECT set_integer_now_func('%HISTTBL', 'zbx_ts_unix_now', true);
+	PERFORM set_integer_now_func('%HISTTBL', 'zbx_ts_unix_now', true);
 
-ALTER TABLE %HISTTBL
+	ALTER TABLE %HISTTBL
 	SET (timescaledb.compress,timescaledb.compress_segmentby='itemid',timescaledb.compress_orderby='clock,ns');
-
-DO $$
-DECLARE
-	jobid			INTEGER;
-	tsdb_version_major	INTEGER;
-BEGIN
-	SELECT substring(extversion, '^\d+') INTO tsdb_version_major FROM pg_extension WHERE extname='timescaledb';
 
 	IF (tsdb_version_major < 2)
 	THEN
@@ -169,7 +162,6 @@ BEGIN
 
 		PERFORM alter_job(jobid, scheduled => true, next_start => now());
 	END IF;
-END $$;
 HEREDOC
 ;
 
@@ -184,12 +176,33 @@ CREATE TEMP TABLE temp_%HISTTBL (
 
 \copy temp_%HISTTBL FROM '/tmp/%HISTTBL.csv' DELIMITER ',' CSV
 
-SELECT create_hypertable('%HISTTBL', 'clock', chunk_time_interval => (
-	SELECT integer_interval FROM timescaledb_information.dimensions WHERE hypertable_name='%HISTTBL_old'
-), migrate_data => true);
+DO $$
+DECLARE
+	tsdb_version_major	INTEGER;
+	chunk_tm_interval	INTEGER;
+BEGIN
+	SELECT substring(extversion, '^\d+') INTO tsdb_version_major FROM pg_extension WHERE extname='timescaledb';
 
-INSERT INTO %HISTTBL SELECT * FROM temp_%HISTTBL ON CONFLICT (itemid,clock,ns) DO NOTHING;
+	IF (tsdb_version_major < 2)
+	THEN
+		SELECT (upper(ranges[1]) - lower(ranges[1])) INTO chunk_tm_interval FROM chunk_relation_size('history_uint_old') LIMIT 1;
+
+		IF NOT FOUND THEN
+			chunk_tm_interval = 86400;
+		END IF;
+
+		PERFORM create_hypertable('%HISTTBL', 'clock', chunk_time_interval => chunk_tm_interval, migrate_data => true);
+	ELSE
+		PERFORM create_hypertable('%HISTTBL', 'clock', chunk_time_interval => (
+			SELECT integer_interval FROM timescaledb_information.dimensions WHERE hypertable_name='%HISTTBL_old'
+		), migrate_data => true);
+	END IF;
+
+	INSERT INTO %HISTTBL SELECT * FROM temp_%HISTTBL ON CONFLICT (itemid,clock,ns) DO NOTHING;
+
 %COMPRESS
+END $$;
+
 %CONFIG_COMPR
 HEREDOC
 ;
