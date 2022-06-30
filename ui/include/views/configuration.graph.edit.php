@@ -217,6 +217,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 					'dstfrm' => $graphForm->getName(),
 					'dstfld1' => 'ymin_itemid',
 					'hostid' => $data['is_template'] ? $data['hostid'] : 0,
+					'numeric' => '1',
 					'real_hosts' => true
 				]
 			]
@@ -309,6 +310,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 					'dstfrm' => $graphForm->getName(),
 					'dstfld1' => 'ymax_itemid',
 					'hostid' => $data['is_template'] ? $data['hostid'] : 0,
+					'numeric' => '1',
 					'real_hosts' => true
 				]
 			]
