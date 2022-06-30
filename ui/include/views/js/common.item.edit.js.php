@@ -247,8 +247,10 @@
 			this.key_field = this.form.querySelector('[name=key]');
 			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
 			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
-			this.item_types_with_keys = <?=  json_encode([ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
-				ITEM_TYPE_IPMI, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX
+			this.item_type = this.form.querySelector('[name=type]');
+			this.item_types_with_defined_keys = <?=  json_encode([ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
+				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR,
+				ITEM_TYPE_JMX
 			]); ?>;
 
 			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
@@ -261,7 +263,7 @@
 				this.updateHintDisplay();
 
 				// 'Do not keep trends' for Calculated with string-types of information is forced on Item save.
-				if (this.form.querySelector('[name=type]').value == <?=ITEM_TYPE_CALCULATED ?>) {
+				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?>) {
 					if (e.target.value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 							|| e.target.value == <?= ITEM_VALUE_TYPE_UINT64 ?>) {
 						this.form.querySelector('#trends_mode_1').disabled = false;
@@ -275,7 +277,7 @@
 
 			['change', 'input', 'help_items.paste'].forEach((event_type) => {
 				this.key_field.addEventListener(event_type, (e) => {
-					if (this.item_types_with_keys.includes(parseInt(this.form.querySelector('[name=type]').value))) {
+					if (this.item_types_with_defined_keys.includes(parseInt(this.item_type.value))) {
 						if (this.preprocessing_active) {
 							return this.lookup(this.key_field.value, false);
 						}
@@ -289,7 +291,7 @@
 				this.updatePreprocessingState();
 			});
 
-			this.form.querySelector('[name=type]').addEventListener('change', () => {
+			this.item_type.addEventListener('change', () => {
 				this.updateHintDisplay();
 			});
 
@@ -301,7 +303,7 @@
 		updateHintDisplay() {
 			this.form.querySelector('#js-item-type-hint')
 				.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>, (
-					this.form.querySelector('[name=type]').value == <?=ITEM_TYPE_CALCULATED ?>
+					this.item_type.value == <?=ITEM_TYPE_CALCULATED ?>
 						|| this.preprocessing_active || this.inferred_type === null
 						|| this.item_tab_type_field.value == this.inferred_type
 				));
