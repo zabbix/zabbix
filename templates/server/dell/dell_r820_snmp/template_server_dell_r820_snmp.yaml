@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:18Z'
-  groups:
+  date: '2022-06-07T19:33:15Z'
+  template_groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -370,7 +370,7 @@ zabbix_export:
               name: 'Dell R820: has been restarted'
               event_name: 'Dell R820: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -

@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:01:09Z'
-  groups:
+  date: '2022-06-07T19:37:36Z'
+  template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -398,7 +398,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -418,7 +418,7 @@ zabbix_export:
           units: B
           description: |
             MIB: FROGFOOT-RESOURCES-MIB
-            Memory used by kernel buffers (Buffers in /proc/meminfo)
+            Memory used by kernel buffers (Buffers in /proc/meminfo).
           preprocessing:
             -
               type: MULTIPLIER
@@ -438,7 +438,7 @@ zabbix_export:
           units: B
           description: |
             MIB: FROGFOOT-RESOURCES-MIB
-            Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)
+            Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo).
           preprocessing:
             -
               type: MULTIPLIER
@@ -476,7 +476,7 @@ zabbix_export:
           units: B
           description: |
             MIB: FROGFOOT-RESOURCES-MIB
-            Total memory in Bytes
+            Total memory in Bytes.
           preprocessing:
             -
               type: MULTIPLIER
@@ -495,7 +495,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '(last(//vm.memory.total[memTotal.0])-(last(//vm.memory.free[memFree.0])+last(//vm.memory.buffers[memBuffer.0])+last(//vm.memory.cached[memCache.0])))/last(//vm.memory.total[memTotal.0])*100'
-          description: 'Memory utilization in %'
+          description: 'Memory utilization in %.'
           tags:
             -
               tag: component
@@ -1118,8 +1118,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFDESCR}: Network traffic'
                         host: 'Ubiquiti AirOS SNMP'
+                        name: 'Interface {#IFDESCR}: Network traffic'
       valuemaps:
         -
           uuid: 2fc5bef495074d0e86641cc136e3dcde

@@ -548,7 +548,6 @@ else {
 
 	$prefix = ($data['context'] === 'host') ? 'web.hosts.' : 'web.templates.';
 
-	$filter_groupids_ms = [];
 	$filter_hostids_ms = [];
 
 	if (getRequest('filter_set')) {
@@ -606,18 +605,8 @@ else {
 		}
 	}
 
-	$filter_groupids_enriched =  [];
-	if ($filter_groupids) {
-		$filter_groupids = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $filter_groupids,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-		$filter_groupids_ms = CArrayHelper::renameObjectsKeys($filter_groupids, ['groupid' => 'id']);
-		$filter_groupids = array_keys($filter_groupids);
-		$filter_groupids_enriched = getSubGroups($filter_groupids);
-	}
+	$ms_groups = [];
+	$filter_groupids_enriched = getSubGroups($filter_groupids, $ms_groups, ['editable' => true], $data['context']);
 
 	if ($filter_hostids) {
 		if ($data['context'] === 'host') {
@@ -907,7 +896,7 @@ else {
 		'active_tab' => $active_tab,
 		'sort' => $sort,
 		'sortorder' => $sortorder,
-		'filter_groupids_ms' => $filter_groupids_ms,
+		'filter_groupids_ms' => $ms_groups,
 		'filter_hostids_ms' => $filter_hostids_ms,
 		'filter_name' => $filter_name,
 		'filter_priority' => $filter_priority,

@@ -465,7 +465,10 @@ else {
 	}
 }
 
-$filter_groupids = getSubGroups(getRequest('filter_groupids', []));
+$ms_groups = [];
+$filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, ['editable' => true],
+	getRequest('context')
+);
 $filter_hostids = getRequest('filter_hostids');
 if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
@@ -896,6 +899,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
+
 // clean history for selected items
 elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
@@ -1369,13 +1373,7 @@ else {
 	}
 
 	$data['filter_data'] = [
-		'groups' => hasRequest('filter_groupids')
-			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => getRequest('filter_groupids'),
-				'editable' => true
-			]), ['groupid' => 'id'])
-			: [],
+		'groups' => $ms_groups,
 		'hosts' => $host_template_filter,
 		'filter_name' => getRequest('filter_name'),
 		'filter_key' => getRequest('filter_key'),

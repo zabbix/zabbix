@@ -35,7 +35,7 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Memory |{#SNMPVALUE}: Used memory |<p>MIB: CISCO-MEMORY-POOL-MIB</p><p>Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.</p><p>Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</p> |SNMP |vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}] |
 |Memory |{#SNMPVALUE}: Free memory |<p>MIB: CISCO-MEMORY-POOL-MIB</p><p>Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed and ciscoMemoryPoolFree is the total amount of memory in the pool</p><p>Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</p> |SNMP |vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}] |
-|Memory |{#SNMPVALUE}: Memory utilization |<p>Memory utilization in %</p> |CALCULATED |vm.memory.util[vm.memory.util.{#SNMPINDEX}]<p>**Expression**:</p>`last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}])/(last(//vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}])+last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]))*100` |
+|Memory |{#SNMPVALUE}: Memory utilization |<p>Memory utilization in %.</p> |CALCULATED |vm.memory.util[vm.memory.util.{#SNMPINDEX}]<p>**Expression**:</p>`last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}])/(last(//vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}])+last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]))*100` |
 
 ## Triggers
 

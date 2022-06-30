@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:24Z'
-  groups:
+  date: '2022-06-07T19:36:37Z'
+  template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -2688,8 +2688,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
+                        host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: pg_stat_database metrics'
-                        host: 'PostgreSQL by Zabbix agent 2'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -2712,8 +2712,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
+                        host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: Locks'
-                        host: 'PostgreSQL by Zabbix agent 2'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -2736,8 +2736,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
+                        host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: Size'
-                        host: 'PostgreSQL by Zabbix agent 2'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -2761,8 +2761,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'DB {#DBNAME}: Number of bloating tables'
                         host: 'PostgreSQL by Zabbix agent 2'
+                        name: 'DB {#DBNAME}: Number of bloating tables'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2785,8 +2785,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'DB {#DBNAME}: Queries'
                         host: 'PostgreSQL by Zabbix agent 2'
+                        name: 'DB {#DBNAME}: Queries'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -2810,8 +2810,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'DB {#DBNAME}: Slow queries'
                         host: 'PostgreSQL by Zabbix agent 2'
+                        name: 'DB {#DBNAME}: Slow queries'
       valuemaps:
         -
           uuid: 9f38c01c325248d4b538c0582432b541

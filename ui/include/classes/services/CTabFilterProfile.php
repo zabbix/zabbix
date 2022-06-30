@@ -308,6 +308,18 @@ class CTabFilterProfile {
 	}
 
 	/**
+	 * Reset default filter profile.
+	 */
+	public function reset(): CTabFilterProfile {
+		if ($this->selected == 0) {
+			$this->setTabFilter($this->selected, ['filter_name' => '']);
+			$this->update();
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Get tab filters data only for fields having non default value.
 	 *
 	 * @return array

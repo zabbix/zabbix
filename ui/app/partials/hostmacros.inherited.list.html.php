@@ -57,10 +57,12 @@ else {
 	]);
 
 	foreach ($data['macros'] as $i => $macro) {
-		$readonly = ($data['readonly'] || !($macro['inherited_type'] & ZBX_PROPERTY_OWN));
 		$macro_cell = [
 			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
-				->setReadonly($data['readonly'] || $macro['inherited_type'] & ZBX_PROPERTY_INHERITED)
+				->setReadonly($data['readonly']
+					|| $macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
+					|| $macro['inherited_type'] & ZBX_PROPERTY_INHERITED
+				)
 				->addClass('macro')
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->setAttribute('placeholder', '{$MACRO}'),
@@ -68,6 +70,8 @@ else {
 		];
 
 		if (!$data['readonly']) {
+			$macro_cell[] = new CVar('macros['.$i.'][discovery_state]', $macro['discovery_state']);
+
 			if (array_key_exists('hostmacroid', $macro)) {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
 			}
@@ -78,52 +82,70 @@ else {
 				$macro_cell[] = new CVar('macros['.$i.'][inherited][description]', $inherited_macro['description']);
 				$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
 			}
+
+			if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
+				$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
+				$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
+				$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);
+			}
 		}
 
-		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))->setReadonly($readonly);
+		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))->setReadonly(
+			$data['readonly'] || !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
+				|| !($macro['inherited_type'] & ZBX_PROPERTY_OWN)
+		);
 
 		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
 			$macro_value->addRevertButton();
 			$macro_value->setRevertButtonVisibility(array_key_exists('value', $macro)
 				&& array_key_exists('hostmacroid', $macro)
 			);
-			$macro_value->setReadonly($readonly || ($macro['inherited_type'] & ZBX_PROPERTY_BOTH));
 		}
 
 		if (array_key_exists('value', $macro)) {
 			$macro_value->setAttribute('value', $macro['value']);
 		}
 
+		if (!$data['readonly']) {
+			// buttons
+			$action_buttons = [];
+			if ($macro['inherited_type'] & ZBX_PROPERTY_OWN) {
+				if ($macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING) {
+					$action_buttons[] = (new CButton('macros['.$i.'][change_state]', _('Revert')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-set-manual');
+				}
+				elseif ($macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC) {
+					$action_buttons[] = (new CButton('macros['.$i.'][change_state]', _x('Change', 'verb')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-set-manual');
+				}
+
+				if (($macro['inherited_type'] & ZBX_PROPERTY_BOTH) == ZBX_PROPERTY_BOTH) {
+					$action_buttons[] = (new CButton('macros['.$i.'][change_inheritance]', _x('Remove', 'verb')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-change');
+				}
+				else {
+					$action_buttons[] = (new CButton('macros['.$i.'][remove]', _x('Remove', 'verb')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove');
+				}
+			}
+			elseif ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
+				$action_buttons[] = (new CButton('macros['.$i.'][change_inheritance]', _x('Change', 'verb')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-change');
+			}
+		}
+
 		$row = [
 			(new CCol($macro_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol($macro_value))
 				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
-				->addClass(ZBX_STYLE_NOWRAP)
+				->addClass(ZBX_STYLE_NOWRAP),
+			!$data['readonly'] ? (new CCol(new CHorList($action_buttons)))->addClass(ZBX_STYLE_NOWRAP) : null
 		];
-
-		if (!$data['readonly']) {
-			if (($macro['inherited_type'] & ZBX_PROPERTY_BOTH) == ZBX_PROPERTY_BOTH) {
-				$row[] = (new CCol(
-					(new CButton('macros['.$i.'][change]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-change')
-				))->addClass(ZBX_STYLE_NOWRAP);
-			}
-			elseif ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
-				$row[] = (new CCol(
-					(new CButton('macros['.$i.'][change]', _x('Change', 'verb')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-change')
-				))->addClass(ZBX_STYLE_NOWRAP);
-			}
-			else {
-				$row[] = (new CCol(
-					(new CButton('macros['.$i.'][remove]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
-				))->addClass(ZBX_STYLE_NOWRAP);
-			}
-		}
 
 		// Parent host macro value.
 		if ($is_hostprototype) {
@@ -162,24 +184,29 @@ else {
 			->setAdaptiveWidth($inherited_width)
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
+		$description_readonly = ($data['readonly']
+			|| $macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC)
+			|| !($macro['inherited_type'] & ZBX_PROPERTY_OWN);
+
 		$table
 			->addRow($row, 'form_row')
 			->addRow((new CRow([
-				(new CCol(
+				(new CCol([
 					(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 						->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
 						->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))
-						->setReadonly($readonly || (
-							($macro['type'] == ZBX_MACRO_TYPE_SECRET) && ($macro['inherited_type'] & ZBX_PROPERTY_BOTH)
-						))
-				))
+						->setReadonly($description_readonly),
+					($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL)
+						? (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY)
+						: null
+				]))
 					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+					->addClass(CControllerHostMacrosList::MACRO_TEXTAREA_PARENT)
 					->setColSpan(count($row))
 			]))->addClass('form_row'));
 	}
 
-	// buttons
 	if (!$data['readonly']) {
 		$table->setFooter(new CCol(
 			(new CButton('macro_add', _('Add')))
