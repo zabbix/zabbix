@@ -1230,6 +1230,10 @@ int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlD
 		*value = zbx_strdup(*value, (const char *)val);
 		xmlFree(val);
 	}
+	else if (XML_ELEMENT_NODE == nodeset->nodeTab[0]->xmlChildrenNode->type)
+	{
+		*value = zbx_strdup(*value, (const char *)nodeset->nodeTab[0]->xmlChildrenNode->name);
+	}
 clean:
 	xmlXPathFreeObject(xpathObj);
 	xmlSetStructuredErrorFunc(NULL, NULL);

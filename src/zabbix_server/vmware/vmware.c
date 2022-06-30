@@ -229,7 +229,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 		"</SOAP-ENV:Envelope>"
 
 #define ZBX_XPATH_FAULTSTRING()										\
-	"/*/*/*[local-name()='Fault']/*[local-name()='faultstring']"
+	"/*/*/*[local-name()='Fault']/*[(local-name()='faultstring' or local-name()='detail')"		\
+	" and string-length(.) > 0][1]"
 
 #define ZBX_XPATH_REFRESHRATE()										\
 	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
@@ -6779,13 +6780,14 @@ static void	vmware_service_copy_cust_query_response(zbx_vector_cq_value_t *cq_va
 		{
 			vmware_shared_strfree(cq_values->values[i].instance->error);
 			cq_values->values[i].instance->error = vmware_shared_strdup(cq_values->values[i].response);
-			cq_values->values[i].instance->state = ZBX_VMWARE_CQ_ERROR;
+			cq_values->values[i].instance->state = ZBX_VMWARE_CQ_ERROR | ZBX_VMWARE_CQ_SEPARATE;
 		}
 		else if (ZBX_VMWARE_CQV_VALUE == cq_values->values[i].status)
 		{
 			vmware_shared_strfree(cq_values->values[i].instance->value);
 			cq_values->values[i].instance->value = vmware_shared_strdup(cq_values->values[i].response);
-			cq_values->values[i].instance->state = ZBX_VMWARE_CQ_READY;
+			cq_values->values[i].instance->state = ZBX_VMWARE_CQ_READY |
+					(cq_values->values[i].instance->state & ZBX_VMWARE_CQ_SEPARATE);
 		}
 	}
 }
@@ -6983,7 +6985,7 @@ static void	vmware_service_props_load(CURL *easyhandle, zbx_vector_cq_value_t *c
 
 	for (i = 0; i < cq_values->values_num; i++)
 	{
-		char			*error, tmp[MAX_STRING_LEN];
+		char			*error = NULL, tmp[MAX_STRING_LEN];
 		zbx_vmware_cq_value_t	*cqv = &cq_values->values[i];
 
 		if (0 == (cqv->instance->state & ZBX_VMWARE_CQ_SEPARATE))
