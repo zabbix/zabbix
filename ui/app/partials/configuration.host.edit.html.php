@@ -502,7 +502,7 @@ if (!$host_is_discovered) {
 $tabs = (new CTabView(['id' => 'host-tabs']))
 	->setSelected(0)
 	->addTab('host-tab', _('Host'), $host_tab)
-	->addTab('ipmi-tab', _('IPMI'), $ipmi_tab)
+	->addTab('ipmi-tab', _('IPMI'), $ipmi_tab, TAB_INDICATOR_IPMI)
 	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('macros-tab', _('Macros'), $macros_tab, TAB_INDICATOR_MACROS)
 	->addTab('inventory-tab', _('Inventory'), $inventory_tab, TAB_INDICATOR_INVENTORY)

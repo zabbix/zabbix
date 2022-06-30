@@ -184,6 +184,8 @@ class TabIndicatorFactory {
 				return new FiltersTabIndicatorItem;
 			case 'FrontendMessage':
 				return new FrontendMessageTabIndicatorItem;
+			case 'GraphAxes':
+				return new GraphAxesTabIndicatorItem;
 			case 'GraphDataset':
 				return new GraphDatasetTabIndicatorItem;
 			case 'GraphLegend':
@@ -200,12 +202,16 @@ class TabIndicatorFactory {
 				return new HttpAuthTabIndicatorItem;
 			case 'Media':
 				return new MediaTabIndicatorItem;
+			case 'MediatypeOptions':
+				return new MediatypeOptionsTabIndicatorItem;
 			case 'MessageTemplate':
 				return new MessageTemplateTabIndicatorItem;
 			case 'Http':
 				return new HttpTabIndicatorItem;
 			case 'Inventory':
 				return new InventoryTabIndicatorItem;
+			case 'Ipmi':
+				return new IpmiTabIndicatorItem;
 			case 'Ldap':
 				return new LdapTabIndicatorItem;
 			case 'LldMacros':
@@ -483,6 +489,55 @@ class InventoryTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		for (const input of document.querySelectorAll('[name=inventory_mode]')) {
 			input.addEventListener('click', () => {
+				this.addAttributes(element);
+			});
+		}
+	}
+}
+
+class IpmiTabIndicatorItem extends TabIndicatorItem {
+
+	static IPMI_AUTHTYPE_DEFAULT = -1;
+	static IPMI_PRIVILEGE_USER = 2;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const ipmi_authtype = document.querySelector('[name="ipmi_authtype"]');
+
+		if (ipmi_authtype !== null) {
+			const options = ipmi_authtype.selectedOptions;
+
+			if (options.length > 1 || options[0].value != IpmiTabIndicatorItem.IPMI_AUTHTYPE_DEFAULT) {
+				return true;
+			}
+		}
+
+		const ipmi_privilege = document.querySelector('[name="ipmi_privilege"]');
+
+		if (ipmi_privilege !== null) {
+			const options = ipmi_privilege.selectedOptions;
+
+			if (options.length > 1 || options[0].value != IpmiTabIndicatorItem.IPMI_PRIVILEGE_USER) {
+				return true;
+			}
+		}
+
+		for (const input of document.querySelectorAll('[name="ipmi_username"], [name="ipmi_password"]')) {
+			if (input.value !== '') {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	initObserver(element) {
+		for (const input of document.querySelectorAll(
+				'[name="ipmi_authtype"], [name="ipmi_privilege"], [name="ipmi_username"], [name="ipmi_password"]')) {
+			input.addEventListener('change', () => {
 				this.addAttributes(element);
 			});
 		}
@@ -971,6 +1026,44 @@ class MediaTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
+class MediatypeOptionsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const maxsessions_type = document.querySelector('[name="maxsessions_type"]:checked');
+
+		if (maxsessions_type !== null && maxsessions_type.value !== 'one') {
+			return true;
+		}
+
+		const maxattempts = document.querySelector('[name="maxattempts"]');
+
+		if (maxattempts !== null && maxattempts.value != 3) {
+			return true;
+		}
+
+		const attempt_interval = document.querySelector('[name="attempt_interval"]');
+
+		if (attempt_interval !== null && attempt_interval.value !== '10s') {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver(element) {
+		for (const input of document.querySelectorAll(
+				'[name="maxsessions_type"], [name="maxattempts"], [name="attempt_interval"]')) {
+			input.addEventListener('change', () => {
+				this.addAttributes(element);
+			});
+		}
+	}
+}
+
 class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
@@ -1078,6 +1171,61 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
+class GraphAxesTabIndicatorItem extends TabIndicatorItem {
+
+	static SVG_GRAPH_AXIS_UNITS_AUTO = 0;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		for (const checkbox of document.querySelectorAll('#lefty, #righty, #axisx')) {
+			if (!checkbox.checked) {
+				return true;
+			}
+		}
+
+		for (const input of document.querySelectorAll('#lefty_min, #lefty_max, #righty_min, #righty_max')) {
+			if (!input.disabled && input.value !== '') {
+				return true;
+			}
+		}
+
+		for (const input of document.querySelectorAll('#lefty_units, #righty_units')) {
+			if (!input.disabled && input.value != GraphAxesTabIndicatorItem.SVG_GRAPH_AXIS_UNITS_AUTO) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	initObserver(element) {
+		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes(element);
+		});
+
+		for (const checkbox of document.querySelectorAll('#lefty, #righty, #axisx')) {
+			checkbox.addEventListener('click', () => {
+				this.addAttributes(element);
+			});
+		}
+
+		for (const input of document.querySelectorAll('#lefty_min, #lefty_max, #lefty_units')) {
+			input.addEventListener('change', () => {
+				this.addAttributes(element);
+			});
+		}
+
+		for (const input of document.querySelectorAll('#righty_min, #righty_max, #righty_units')) {
+			input.addEventListener('change', () => {
+				this.addAttributes(element);
+			});
+		}
+	}
+}
+
 class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
@@ -1169,20 +1317,42 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const element = document.querySelector('#legend');
+		const legend = document.getElementById('legend');
 
-		if (element !== null) {
-			return element.checked;
+		if (legend !== null && !legend.checked) {
+			return true;
+		}
+
+		const legend_statistic = document.getElementById('legend_statistic');
+
+		if (legend_statistic !== null && legend_statistic.checked) {
+			return true;
+		}
+
+		const legend_lines = document.getElementById('legend_lines');
+
+		if (legend_lines !== null && legend_lines.value != 1) {
+			return true;
+		}
+
+		const legend_columns = document.getElementById('legend_columns');
+
+		if (legend_columns !== null && legend_columns.value != 4) {
+			return true;
 		}
 
 		return false;
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#legend');
+		for (const checkbox of document.querySelectorAll('#legend, #legend_statistic')) {
+			checkbox.addEventListener('click', () => {
+				this.addAttributes(element);
+			});
+		}
 
-		if (target_node !== null) {
-			target_node.addEventListener('click', () => {
+		for (const input of document.querySelectorAll('#legend_lines, #legend_columns')) {
+			input.parentNode.addEventListener('change', () => {
 				this.addAttributes(element);
 			});
 		}
