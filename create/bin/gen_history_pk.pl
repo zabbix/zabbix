@@ -168,7 +168,6 @@ BEGIN
 		END IF;
 
 		PERFORM alter_job(jobid, scheduled => true);
-		CALL run_job(jobid);
 	END IF;
 END $$;
 HEREDOC
