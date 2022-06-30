@@ -145,14 +145,14 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 			if ($host_groups) {
 				$triggers = API::Trigger()->get([
 					'output' => ['triggerid'],
+					'selectHostGroups' => ['groupid'],
 					'groupids' => array_keys($host_groups),
 					'skipDependent' => true,
-					'selectGroups' => ['groupid'],
 					'preservekeys' => true
 				]);
 
 				foreach ($triggers as $trigger) {
-					foreach ($trigger['groups'] as $host_group) {
+					foreach ($trigger['hostgroups'] as $host_group) {
 						$triggers_per_host_groups[$host_group['groupid']][$trigger['triggerid']] = true;
 					}
 					$problems_per_trigger[$trigger['triggerid']] = $this->problems_per_severity_tpl;
@@ -186,7 +186,6 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 			if ($problems_per_trigger) {
 				$triggers = API::Trigger()->get([
 					'output' => [],
-					'selectGroups' => ['groupid'],
 					'triggerids' => array_keys($problems_per_trigger),
 					'skipDependent' => true,
 					'preservekeys' => true,

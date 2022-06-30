@@ -211,6 +211,85 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/color": invalid byte sequence in UTF-8.'
 			],
 			[
+				['type' => API_COLOR],
+				'COLOR',
+				'/1/color',
+				'Invalid parameter "/1/color": a hexadecimal color code (6 symbols) is expected.'
+			],
+			[
+				['type' => API_COLORS],
+				['ffffff'],
+				'/1/colors',
+				['ffffff']
+			],
+			[
+				['type' => API_COLORS],
+				['037ACF'],
+				'/1/colors',
+				['037ACF']
+			],
+			[
+				['type' => API_COLORS],
+				['000000'],
+				'/1/colors',
+				['000000']
+			],
+			[
+				['type' => API_COLORS],
+				[],
+				'/1/colors',
+				[]
+			],
+			[
+				['type' => API_COLORS],
+				['ffffff', '037ACF', '000000'],
+				'/1/colors',
+				['ffffff', '037ACF', '000000']
+			],
+			[
+				['type' => API_COLORS, 'flags' => API_NOT_EMPTY],
+				[],
+				'/1/colors',
+				'Invalid parameter "/1/colors": cannot be empty.'
+			],
+			[
+				['type' => API_COLORS],
+				'',
+				'/1/colors',
+				'Invalid parameter "/1/colors": an array is expected.'
+			],
+			[
+				['type' => API_COLORS],
+				true,
+				'/1/colors',
+				'Invalid parameter "/1/colors": an array is expected.'
+			],
+			[
+				['type' => API_COLORS],
+				null,
+				'/1/colors',
+				'Invalid parameter "/1/colors": an array is expected.'
+			],
+			[
+				['type' => API_COLORS],
+				// broken UTF-8 byte sequence
+				["\xd1".'12345'],
+				'/1/colors',
+				'Invalid parameter "/1/colors/1": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_COLORS],
+				['COLOR'],
+				'/1/colors',
+				'Invalid parameter "/1/colors/1": a hexadecimal color code (6 symbols) is expected.'
+			],
+			[
+				['type' => API_COLORS],
+				['000000', 'WRONG'],
+				'/1/colors',
+				'Invalid parameter "/1/colors/2": a hexadecimal color code (6 symbols) is expected.'
+			],
+			[
 				['type' => API_COND_FORMULA],
 				'A and B',
 				'/1/formula',
@@ -1856,8 +1935,8 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_OBJECTS, 'fields' => [
 					'name' => ['type' => API_STRING_UTF8],
-					'col' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'default' => '0'],
-					'row' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'default' => '1'],
+					'col' => ['type' => API_INT32, 'default' => '0'],
+					'row' => ['type' => API_INT32, 'default' => '1'],
 					'width' => ['type' => API_INT32],
 					'height' => ['type' => API_INT32]
 				]],
@@ -5414,6 +5493,44 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				'Invalid parameter "/active_till": cannot be less than or equal to the value of parameter "/active_since".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'real_hosts' => ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
+					'with_hosts' => ['type' => API_BOOLEAN, 'default' => false]
+				]],
+				[],
+				'/',
+				['with_hosts' => false]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'real_hosts' => ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
+					'with_hosts' => ['type' => API_BOOLEAN, 'default' => false]
+				]],
+				['with_hosts' => true],
+				'/',
+				['with_hosts' => true]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'real_hosts' =>	['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
+					'with_hosts' =>	['type' => API_BOOLEAN, 'default' => false]
+				]],
+				['real_hosts' => true, 'with_hosts' => true],
+				'/',
+				'Deprecated parameter "/real_hosts" cannot be used with "/with_hosts".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'real_hosts' =>	['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
+					'with_hosts' =>	['type' => API_BOOLEAN, 'default' => false]
+				]],
+				['real_hosts' => true],
+				'/',
+				['with_hosts' => true],
+				true,
+				'Parameter "/real_hosts" is deprecated.'
 			]
 		];
 	}
@@ -5529,16 +5646,23 @@ class CApiInputValidatorTest extends TestCase {
 	/**
 	 * @dataProvider dataProviderInput
 	 *
-	 * @param array  $rule
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param mixed  $exprected
-	 * @param bool   $float_ieee754
+	 * @param array       $rule
+	 * @param mixed       $data
+	 * @param string      $path
+	 * @param mixed       $exprected
+	 * @param bool        $float_ieee754
+	 * @param string|null $deprecation_message
 	 */
-	public function testApiInputValidator(array $rule, $data, $path, $expected, $float_ieee754 = true) {
+	public function testApiInputValidator(array $rule, $data, $path, $expected, $float_ieee754 = true,
+			string $deprecation_message = null) {
 		global $DB;
 
 		$DB['DOUBLE_IEEE754'] = $float_ieee754;
+
+		if ($deprecation_message !== null) {
+//			$this->expectDeprecation();
+//			$this->expectDeprecationMessage($deprecation_message);
+		}
 
 		$rc = CApiInputValidator::validate($rule, $data, $path, $error);
 

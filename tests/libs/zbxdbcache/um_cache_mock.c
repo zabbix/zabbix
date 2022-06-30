@@ -281,8 +281,6 @@ void	um_mock_cache_init_from_config(zbx_um_mock_cache_t *cache, zbx_um_cache_t *
 	}
 }
 
-
-
 /*********************************************************************************
  *                                                                               *
  * Purpose: frees resources used by mock macro cache                             *

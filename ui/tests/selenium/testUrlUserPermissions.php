@@ -238,8 +238,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// Configuration
 			[[
-				'url' => 'hostgroups.php',
-				'title' =>	'Configuration of host groups',
+				'url' => 'zabbix.php?action=hostgroup.list',
+				'title' => 'Configuration of host groups',
 				'header' => 'Host groups',
 				'users' => [
 					'guest' => false,
@@ -248,9 +248,18 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'hostgroups.php?form=update&groupid=1',
-				'title' =>	'Configuration of host groups',
-				'no_permissions_to_object' => true,
+				'url' => 'zabbix.php?action=hostgroup.edit&groupid=4',
+				'title' => 'Configuration of host groups',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'admin-zabbix' => false
+				]
+			]],
+			[[
+				'url' => 'zabbix.php?action=hostgroup.edit',
+				'title' => 'Configuration of host group',
+				'header' => 'New host group',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -258,9 +267,28 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'hostgroups.php?form=Create+host+group',
-				'title' =>	'Configuration of host groups',
-				'header' => 'Host groups',
+				'url' => 'zabbix.php?action=templategroup.list',
+				'title' => 'Configuration of template groups',
+				'header' => 'Template groups',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'admin-zabbix' => true
+				]
+			]],
+			[[
+				'url' => 'zabbix.php?action=templategroup.edit&groupid=1',
+				'title' => 'Configuration of template groups',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'admin-zabbix' => false
+				]
+			]],
+			[[
+				'url' => 'zabbix.php?action=templategroup.edit',
+				'title' =>	'Configuration of template group',
+				'header' => 'New template group',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

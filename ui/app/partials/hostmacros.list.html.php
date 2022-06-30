@@ -39,27 +39,34 @@ else {
 		]);
 
 	foreach ($data['macros'] as $i => $macro) {
-		$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
-			->setReadonly($data['readonly'])
-			->addClass('macro')
-			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-			->setAttribute('placeholder', '{$MACRO}');
-		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))
-			->setReadonly($data['readonly']);
-		$macro_cell = [$macro_input];
+		$macro_cell = [
+			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
+				->setReadonly($data['readonly']
+					|| $macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
+				)
+				->addClass('macro')
+				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+				->setAttribute('placeholder', '{$MACRO}')
+		];
 
 		if (!$data['readonly']) {
+			$macro_cell[] = new CVar('macros['.$i.'][discovery_state]', $macro['discovery_state']);
+
 			if (array_key_exists('hostmacroid', $macro)) {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
 			}
 
-			$action_btn = (new CButton('macros['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove');
+			if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
+				$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
+				$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
+				$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);
+			}
 		}
-		else {
-			$action_btn = null;
-		}
+
+		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))
+			->setReadonly($data['readonly']
+				|| !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
+			);
 
 		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
 			$macro_value->addRevertButton();
@@ -72,6 +79,29 @@ else {
 			$macro_value->setAttribute('value', $macro['value']);
 		}
 
+		if (!$data['readonly']) {
+			$action_column = [];
+
+			if ($macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC) {
+				$action_column[] = (new CButton('macros['.$i.'][change_state]', _x('Change', 'verb')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-set-manual');
+			}
+			elseif ($macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING) {
+				$action_column[] = (new CButton('macros['.$i.'][change_state]', _('Revert')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-set-manual');
+			}
+
+			$action_column[] = (new CButton('macros['.$i.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove');
+
+			if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
+				$action_column[] = (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY);
+			}
+		}
+
 		$table->addRow([
 			(new CCol($macro_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol($macro_value))
@@ -81,14 +111,15 @@ else {
 				(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
-					->setReadonly($data['readonly'])
+					->setReadonly($data['readonly']
+						|| !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
+					)
 					->setAttribute('placeholder', _('description'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			$action_btn ? (new CCol($action_btn))->addClass(ZBX_STYLE_NOWRAP) : null
+			$data['readonly'] ? null : new CCol(new CHorList($action_column))
 		], 'form_row');
 	}
 
-	// buttons
 	if (!$data['readonly']) {
 		$table->setFooter(new CCol(
 			(new CButton('macro_add', _('Add')))

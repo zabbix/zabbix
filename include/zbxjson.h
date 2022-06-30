@@ -194,6 +194,7 @@
 #define ZBX_PROTO_TAG_PROXY_NAME		"proxy_name"
 #define ZBX_PROTO_TAG_PROXY_NAMES		"proxy_names"
 #define ZBX_PROTO_TAG_PROXY_HOSTIDS		"proxy_hostids"
+#define ZBX_PROTO_TAG_SUPPRESS_UNTIL		"suppress_until"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -231,6 +232,9 @@
 #define ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED	"disabled"
 
 #define ZBX_PROTO_VALUE_REPORT_TEST		"report.test"
+
+#define ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS	"suppress"
+#define ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS	"unsuppress"
 
 typedef enum
 {
