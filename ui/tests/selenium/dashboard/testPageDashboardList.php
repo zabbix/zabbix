@@ -77,7 +77,7 @@ class testPageDashboardList extends CWebTest {
 					'fields' => [
 						'Show' => 'All'
 					],
-					'result_count' => 22
+					'result_count' => 16
 				]
 			],
 			[

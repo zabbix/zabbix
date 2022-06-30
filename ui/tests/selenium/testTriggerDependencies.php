@@ -50,6 +50,8 @@ class testTriggerDependencies extends CLegacyWebTest {
 	 * Function links Zabbix agent template to FreeBSD by Zabbix agent template.
 	 */
 	public static function prepareTemplateData() {
+		CDataHelper::setSessionId(null);
+
 		$template_ids = CDBHelper::getAll('SELECT hostid FROM hosts WHERE host IN ('.zbx_dbstr(self::TEMPLATE_AGENT).','.
 				zbx_dbstr(self::TEMPLATE_FREEBSD).','.zbx_dbstr(self::TEMPLATE_APACHE).') ORDER BY host ASC'
 		);
