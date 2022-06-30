@@ -28,7 +28,9 @@ class CControllerPopupCopy extends CController {
 			'triggerids' => 'array_id',
 			'graphids' => 'array_id',
 			'allowed_ui_conf_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-			'allowed_ui_conf_templates' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			'allowed_ui_conf_host_groups' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS),
+			'allowed_ui_conf_templates' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+			'allowed_ui_conf_template_groups' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS)
 		];
 
 		$ret = $this->validateInput($fields);
@@ -48,8 +50,9 @@ class CControllerPopupCopy extends CController {
 
 	protected function checkPermissions() {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS) ||
+				!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS) ||
 				!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES) ||
-				!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS)) {
+				!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS)) {
 			return false;
 		}
 

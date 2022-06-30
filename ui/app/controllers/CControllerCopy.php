@@ -36,7 +36,7 @@ class CControllerCopy extends CController {
 			'triggerids' => 'array_id',
 			'graphids' => 'array_id',
 			'copy_type' => 'in '.implode(',', [
-				COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE
+				COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP
 				])
 		];
 
@@ -88,17 +88,15 @@ class CControllerCopy extends CController {
 
 	protected function doAction() {
 		$output = '';
-		// Item copy
+
 		if($this->getAction() === 'copy.items') {
 			$output = $this->copyItems();
 		}
 
-		// Trigger copy
 		elseif($this->getAction() === 'copy.triggers') {
 			$output = $this->copyTriggers();
 		}
 
-		// Graph copy
 		elseif ($this->getAction() === 'copy.graphs') {
 			$output = $this->copyGraphs();
 		}
@@ -112,22 +110,32 @@ class CControllerCopy extends CController {
 		$itemids = $this->getInput('itemids');
 
 		if ($copy_targetids) {
+			// hosts or templates
 			if ($copy_type == COPY_TYPE_TO_HOST || $copy_type == COPY_TYPE_TO_TEMPLATE) {
-				$hosts_ids = $copy_targetids;
+				$hostids = $copy_targetids;
 			}
 			// host groups
-			if ($copy_type == COPY_TYPE_TO_HOST_GROUP) {
-				$hosts_ids = [];
+			elseif ($copy_type == COPY_TYPE_TO_HOST_GROUP) {
+				$hostids = [];
 				$db_hosts = API::Host()->get([
 					'groupids' => $copy_targetids
 				]);
 
 				foreach ($db_hosts as $db_host) {
-					$hosts_ids[] = $db_host['hostid'];
+					$hostids[] = $db_host['hostid'];
 				}
 			}
+			// template groups
+			elseif ($copy_type == COPY_TYPE_TO_TEMPLATE_GROUP) {
+				$hostids = array_keys(API::Template()->get([
+					'output' => [],
+					'groupids' => $copy_targetids,
+					'editable' => true,
+					'preservekeys' => true
+				]));
+			}
 
-			$result = copyItemsToHosts($itemids, $hosts_ids);
+			$result = copyItemsToHosts($itemids, $hostids);
 			$output = [];
 			$items_count = count($itemids);
 
@@ -162,22 +170,32 @@ class CControllerCopy extends CController {
 		$triggerids = $this->getInput('triggerids');
 
 		if ($copy_targetids) {
+			// hosts or templates
 			if ($copy_type == COPY_TYPE_TO_HOST || $copy_type == COPY_TYPE_TO_TEMPLATE) {
-				$hosts_ids = $copy_targetids;
+				$hostids = $copy_targetids;
 			}
 			// host groups
-			if ($copy_type == COPY_TYPE_TO_HOST_GROUP) {
-				$hosts_ids = [];
+			elseif ($copy_type == COPY_TYPE_TO_HOST_GROUP) {
+				$hostids = [];
 				$db_hosts = API::Host()->get([
 					'groupids' => $copy_targetids
 				]);
 
 				foreach ($db_hosts as $db_host) {
-					$hosts_ids[] = $db_host['hostid'];
+					$hostids[] = $db_host['hostid'];
 				}
 			}
+			// template groups
+			elseif ($copy_type == COPY_TYPE_TO_TEMPLATE_GROUP) {
+				$hostids = array_keys(API::Template()->get([
+					'output' => [],
+					'groupids' => $copy_targetids,
+					'editable' => true,
+					'preservekeys' => true
+				]));
+			}
 
-			$result = copyTriggersToHosts($hosts_ids, getRequest('hostid'), $triggerids);
+			$result = copyTriggersToHosts($hostids, getRequest('hostid'), $triggerids);
 			$output = [];
 			$triggers_count = count($triggerids);
 
@@ -224,24 +242,9 @@ class CControllerCopy extends CController {
 			if ($copy_type == COPY_TYPE_TO_HOST || $copy_type == COPY_TYPE_TO_TEMPLATE) {
 				$options['hostids'] = $copy_targetids;
 			}
-			// host groups
+			// host groups or template groups
 			else {
-				$groupids = $copy_targetids;
-				zbx_value2array($groupids);
-
-				$dbGroups = API::HostGroup()->get([
-					'output' => ['groupid'],
-					'groupids' => $groupids,
-					'editable' => true
-				]);
-				$dbGroups = zbx_toHash($dbGroups, 'groupid');
-
-				foreach ($groupids as $groupid) {
-					if (!array_key_exists($groupid, $dbGroups)) {
-						access_deny();
-					}
-				}
-				$options['groupids'] = $groupids;
+				$options['groupids'] = $copy_targetids;
 			}
 			$dbHosts = API::Host()->get($options);
 

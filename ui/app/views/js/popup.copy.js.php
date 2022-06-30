@@ -83,6 +83,12 @@ window.copy_popup = new class {
 				helper_options.popup.parameters.srcfld1 = 'hostid';
 				helper_options.popup.parameters.srcfld2 = 'host';
 				break;
+
+			case '<?= COPY_TYPE_TO_TEMPLATE_GROUP ?>':
+				helper_options.object_name = 'templateGroup';
+				helper_options.popup.parameters.srctbl = 'template_groups';
+				helper_options.popup.parameters.srcfld1 = 'groupid';
+				break;
 		}
 
 		$('#copy_targets').html($multiselect);
