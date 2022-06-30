@@ -24,7 +24,7 @@
 #include "zbxjson.h"
 
 #if HAVE_LIBJAIL
-#include "jail.h"
+#	include <jail.h>
 #endif
 
 #if (__FreeBSD_version) < 500000
@@ -571,22 +571,30 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (SRUN == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
-			case ZBX_PROC_STAT_SLEEP:
-				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 != (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
+			case ZBX_PROC_STAT_TRACE:
+				if (SSTOP == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_ZOMB:
 				if (SZOMB == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
+#if (__FreeBSD_version) < 700000
+			case ZBX_PROC_STAT_SLEEP:
+			case ZBX_PROC_STAT_DISK:
+				if (SSLEEP == proc[i].ZBX_PROC_STAT)
+					stat_ok = 1;
+				break;
+#else
+			case ZBX_PROC_STAT_SLEEP:
+				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 != (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
+					stat_ok = 1;
+				break;
 			case ZBX_PROC_STAT_DISK:
 				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 == (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
 					stat_ok = 1;
 				break;
-			case ZBX_PROC_STAT_TRACE:
-				if (SSTOP == proc[i].ZBX_PROC_STAT)
-					stat_ok = 1;
-				break;
+#endif
 			}
 		}
 		else
@@ -615,18 +623,31 @@ static char	*get_state(struct kinfo_proc *proc)
 {
 	char	*state;
 
-	if (SRUN == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "running");
-	else if (SSLEEP == proc->ZBX_PROC_STAT && 0 != (proc->ZBX_PROC_TDFLAG & TDF_SINTR))
-		state = zbx_strdup(NULL, "sleeping");
-	else if (SZOMB == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "zombie");
-	else if (SSLEEP == proc->ZBX_PROC_STAT && 0 == (proc->ZBX_PROC_TDFLAG & TDF_SINTR))
-		state = zbx_strdup(NULL, "disk sleep");
-	else if (SSTOP == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "tracing stop");
-	else
-		state = zbx_strdup(NULL, "other");
+	switch (proc->ZBX_PROC_STAT)
+	{
+		case SRUN:
+			state = zbx_strdup(NULL, "running");
+			break;
+		case SZOMB:
+			state = zbx_strdup(NULL, "zombie");
+			break;
+		case SSTOP:
+			state = zbx_strdup(NULL, "tracing stop");
+			break;
+		case SSLEEP:
+#if (__FreeBSD_version) < 700000
+			state = zbx_strdup(NULL, "sleeping");
+#else
+			if (0 != (proc->ZBX_PROC_TDFLAG & TDF_SINTR))
+				state = zbx_strdup(NULL, "sleeping");
+			else
+				state = zbx_strdup(NULL, "disk sleep");
+#endif
+
+			break;
+		default:
+			state = zbx_strdup(NULL, "other");
+	}
 
 	return state;
 }
@@ -885,6 +906,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 			else
 			{
+				proc_data->jname = NULL;
 				proc_data->cmdline = NULL;
 				proc_data->state = NULL;
 				proc_data->user = NULL;
