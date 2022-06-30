@@ -58,6 +58,18 @@ require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/geomaps/testFormAdministrationGeneralGeomaps.php';
 require_once dirname(__FILE__).'/geomaps/testGeomapWidgetScreenshots.php';
 
+// Hosts.
+require_once dirname(__FILE__).'/hosts/testFormHostConfiguration.php';
+require_once dirname(__FILE__).'/hosts/testFormHostLinkTemplates.php';
+require_once dirname(__FILE__).'/hosts/testFormHostMonitoring.php';
+require_once dirname(__FILE__).'/hosts/testFormHostPrototype.php';
+require_once dirname(__FILE__).'/hosts/testFormHostStandalone.php';
+require_once dirname(__FILE__).'/hosts/testPageHostInterfaces.php';
+require_once dirname(__FILE__).'/hosts/testPageHostPrototypes.php';
+require_once dirname(__FILE__).'/hosts/testPageHosts.php';
+require_once dirname(__FILE__).'/hosts/testPageMonitoringHosts.php';
+
+
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 
@@ -76,9 +88,6 @@ require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageHostGraph.php';
-require_once dirname(__FILE__).'/testPageHostInterfaces.php';
-require_once dirname(__FILE__).'/testPageHostPrototypes.php';
-require_once dirname(__FILE__).'/testPageHosts.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/items/testPageItems.php';
 require_once dirname(__FILE__).'/items/testPageItemPrototypes.php';
@@ -89,7 +98,6 @@ require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
-require_once dirname(__FILE__).'/testPageMonitoringHosts.php';
 require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
 require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testPasswordComplexity.php';
@@ -128,12 +136,7 @@ require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
-require_once dirname(__FILE__).'/hosts/testFormHostConfiguration.php';
-require_once dirname(__FILE__).'/hosts/testFormHostMonitoring.php';
-require_once dirname(__FILE__).'/hosts/testFormHostStandalone.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
-require_once dirname(__FILE__).'/testFormHostLinkTemplates.php';
-require_once dirname(__FILE__).'/testFormHostPrototype.php';
 require_once dirname(__FILE__).'/items/testFormItem.php';
 require_once dirname(__FILE__).'/items/testFormItemHttpAgent.php';
 require_once dirname(__FILE__).'/items/testFormItemPrototype.php';
@@ -267,6 +270,17 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralGeomaps');
 		$suite->addTestSuite('testGeomapWidgetScreenshots');
 
+		// Hosts.
+		$suite->addTestSuite('testFormHostConfiguration');
+		$suite->addTestSuite('testFormHostLinkTemplates');
+		$suite->addTestSuite('testFormHostMonitoring');
+		$suite->addTestSuite('testFormHostPrototype');
+		$suite->addTestSuite('testFormHostStandalone');
+		$suite->addTestSuite('testPageHostInterfaces');
+		$suite->addTestSuite('testPageHostPrototypes');
+		$suite->addTestSuite('testPageHosts');
+		$suite->addTestSuite('testPageMonitoringHosts');
+
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
 
@@ -283,9 +297,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHostGraph');
-		$suite->addTestSuite('testPageHostInterfaces');
-		$suite->addTestSuite('testPageHostPrototypes');
-		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageItems');
 		$suite->addTestSuite('testPageItemPrototypes');
@@ -299,7 +310,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
-		$suite->addTestSuite('testPageMonitoringHosts');
 		$suite->addTestSuite('testPageServicesServices');
 		$suite->addTestSuite('testPageServicesServicesMassUpdate');
 		$suite->addTestSuite('testPageNetworkDiscovery');
@@ -341,12 +351,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormEventCorrelation');
 		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormGraphPrototype');
-		$suite->addTestSuite('testFormHostConfiguration');
-		$suite->addTestSuite('testFormHostMonitoring');
-		$suite->addTestSuite('testFormHostStandalone');
 		$suite->addTestSuite('testFormHostGroup');
-		$suite->addTestSuite('testFormHostLinkTemplates');
-		$suite->addTestSuite('testFormHostPrototype');
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormItemHttpAgent');
 		$suite->addTestSuite('testFormItemPrototype');
