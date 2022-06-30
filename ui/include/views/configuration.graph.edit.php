@@ -218,7 +218,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 					'dstfld1' => 'ymin_itemid',
 					'hostid' => $data['is_template'] ? $data['hostid'] : 0,
 					'numeric' => '1',
-					'real_hosts' => true
+					'real_hosts' => !$data['is_template']
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
@@ -311,7 +311,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 					'dstfld1' => 'ymax_itemid',
 					'hostid' => $data['is_template'] ? $data['hostid'] : 0,
 					'numeric' => '1',
-					'real_hosts' => true
+					'real_hosts' => !$data['is_template']
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
