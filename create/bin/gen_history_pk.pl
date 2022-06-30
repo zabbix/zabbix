@@ -167,7 +167,7 @@ BEGIN
 			RAISE EXCEPTION 'Failed to add compression policy';
 		END IF;
 
-		PERFORM alter_job(jobid, scheduled => true);
+		PERFORM alter_job(jobid, scheduled => true, next_start => now());
 	END IF;
 END $$;
 HEREDOC
