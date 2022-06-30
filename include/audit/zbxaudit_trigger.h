@@ -62,7 +62,7 @@ void	zbx_audit_trigger_update_json_remove_dependency(int flags, zbx_uint64_t tri
 void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid,
 		const char *tag, const char *value);
 void	zbx_audit_trigger_update_json_delete_tags(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid);
-void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(zbx_uint64_t trigger, int trigger_flags,
+void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(zbx_uint64_t triggerid, int trigger_flags,
 		zbx_uint64_t triggertagid);
 
 #define PREPARE_AUDIT_TRIGGER_UPDATE_TAG_H(resource, type1)							\
