@@ -1,3 +1,37 @@
+Changes for 5.0.26rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.25
+
+5.0.25rc1 was released as 5.0.25 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.25rc1
+
+Bug fixes:
+..F.....S. [ZBX-20994] fixed access limitation for Oracle DB to list tables accessible to the user (asestakovs)
+.......PS. [ZBX-21123] fixed crash when VMware VC was not available at the first moment when starting zabbix_server (MVekslers)
+.........T [ZBX-20029] fixed deprecated keys in IIS by Zabbix agent templates (drasihov)
+.D........ [ZBX-18035] updated README.md for Slack and Mattermost media types (drasihov)
+..F....... [ZBX-21163] fixed "Host inventory overview" page behavior when selected host group was removed (Sasha)
+.........T [ZBX-21143] changed API URL in Express.ms media type to a new version (drasihov)
+.........T [ZBX-20875] fixed filter condition for job discovery rule in MSSQL by ODBC template (drasihov)
+.......PS. [ZBX-21137] fixed VMware collector crash related to datastore state disconnected from all HVs (MVekslers)
+.........T [ZBX-20985] fixed notifications summary for MS Teams media type (drasihov)
+.........T [ZBX-20628] removed system metrics from PFSense template (vkhaliev)
+.........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.24
+
+5.0.24rc1 was released as 5.0.24 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.24rc1
 
 New features:
@@ -55,7 +89,7 @@ A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for PHP8 (acikuns
 .........T [ZBXNEXT-7493] added garbage collector and memory pool discovery to generic Java template (vkhaliev)
 
 Bug fixes:
-A......... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
+..F....... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
 .......PS. [ZBX-20518] fixed lastaccess update during proxy throttling (dgoloscapov)
 ...G...... [ZBX-20634] fixed handling of multiline FTP response (ssimonenko)
 ...G...... [ZBX-20528] fixed issue with pgsql.custom.query JSON response failing for Zabbix agent 2 (esneiders)
@@ -2491,6 +2525,33 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.43rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.42
+
+4.0.42rc1 was released as 4.0.42 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.42rc1
+
+New features:
+A......PS. [ZBXNEXT-7694] added "utf8mb3" character set support for MySQL database (Sasha)
+
+Bug fixes:
+.......PS. [ZBX-21123] fixed crash when VMware VC was not available at the first moment when starting zabbix_server (MVekslers)
+.......PS. [ZBX-21137] fixed VMware collector crash related to datastore state disconnected from all HVs (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.41
+
+4.0.41rc1 was released as 4.0.41 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.41rc1

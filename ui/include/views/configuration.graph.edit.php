@@ -444,6 +444,10 @@ $items_table->addRow(
 );
 
 foreach ($data['items'] as $n => $item) {
+	if (!$item['itemid']) {
+		continue;
+	}
+
 	$name = $item['host'].NAME_DELIMITER.$item['name_expanded'];
 
 	if (zbx_empty($item['drawtype'])) {

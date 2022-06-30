@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-05-22T11:57:30Z</date>
+    <date>2022-06-07T04:48:40Z</date>
     <media_types>
         <media_type>
             <name>MS Teams</name>
@@ -172,7 +172,7 @@ try {&#13;
         facts = [],&#13;
         body = {&#13;
             themeColor: SEVERITY_COLORS[params.event_nseverity].replace('#', ''),&#13;
-            summary: 'Zabbix',&#13;
+            summary: params.alert_subject,&#13;
             sections: [&#13;
                 {&#13;
                     markdown: 'false',&#13;

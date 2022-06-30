@@ -722,4 +722,29 @@ class CElement extends CBaseElement implements IWaitable {
 
 		return $this;
 	}
+
+	/**
+	 * Scroll the element to the top position.
+	 */
+	public function scrollToTop() {
+		CElementQuery::getDriver()->executeScript('arguments[0].scrollTo(0, 0)', [$this]);
+	}
+
+	/**
+	 * Check presence of the class(es).
+	 *
+	 * @param string|array $class	class or classes to be present.
+	 *
+	 * @return boolean
+	 */
+	function hasClass($class) {
+		$attribute = parent::getAttribute('class');
+		$classes = ($attribute !== null) ? explode(' ', $attribute) : [];
+
+		if (!is_array($class)) {
+			$class = [$class];
+		}
+
+		return (count(array_diff($class, $classes)) === 0);
+	}
 }
