@@ -44,6 +44,7 @@ zbx_vmcheck_t;
 static zbx_vmcheck_t	vmchecks[] =
 {
 	{"cluster.discovery", VMCHECK_FUNC(check_vcenter_cluster_discovery)},
+	{"cluster.property", VMCHECK_FUNC(check_vcenter_cluster_property)},
 	{"cluster.status", VMCHECK_FUNC(check_vcenter_cluster_status)},
 	{"version", VMCHECK_FUNC(check_vcenter_version)},
 	{"fullname", VMCHECK_FUNC(check_vcenter_fullname)},
@@ -79,6 +80,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.hw.vendor", VMCHECK_FUNC(check_vcenter_hv_hw_vendor)},
 	{"hv.memory.size.ballooned", VMCHECK_FUNC(check_vcenter_hv_memory_size_ballooned)},
 	{"hv.memory.used", VMCHECK_FUNC(check_vcenter_hv_memory_used)},
+	{"hv.property", VMCHECK_FUNC(check_vcenter_hv_property)},
 	{"hv.net.if.discovery", VMCHECK_FUNC(check_vcenter_hv_net_if_discovery)},
 	{"hv.network.in", VMCHECK_FUNC(check_vcenter_hv_network_in)},
 	{"hv.network.out", VMCHECK_FUNC(check_vcenter_hv_network_out)},

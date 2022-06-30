@@ -29,6 +29,8 @@
 
 int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_cluster_property(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
@@ -100,6 +102,8 @@ int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_property(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT * result);
