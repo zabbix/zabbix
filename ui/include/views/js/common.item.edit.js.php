@@ -352,6 +352,19 @@
 			if (this.last_lookup in this.key_type_suggestions) {
 				this.inferred_type = this.key_type_suggestions[this.last_lookup];
 			}
+			else {
+				const matches = Object.entries(this.key_type_suggestions).filter(([key_name, value_type]) => {
+					return key_name.startsWith(this.last_lookup);
+				});
+
+				if (matches.length > 0) {
+					const sample_type = matches[0][1];
+
+					if (matches.length == 1 || matches.every(([key_name, value_type]) => value_type === sample_type)) {
+						this.inferred_type = sample_type;
+					}
+				}
+			}
 
 			if (this.inferred_type === null) {
 				this.item_tab_type_field.dispatchEvent(new CustomEvent('change'));
