@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-06-01T12:48:50Z'
+  date: '2022-06-16T07:39:49Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -12,12 +12,12 @@ zabbix_export:
       name: 'HPE MSA 2040 Storage by HTTP'
       description: |
         The template to monitor HPE MSA 2040 by HTTP.
-        It works without any external scripts and uses the script items.
+        It works without any external scripts and uses the script item.
         
         Setup:
-        1. Create user zabbix on the storage with monitor role.
-        2. Link template to the host.
-        3. Configure {$HPE.MSA.API.PASSWORD} and an interface with address through which one API is accessible if not specified.
+        1. Create user "zabbix" with monitor role on the storage.
+        2. Link the template to a host.
+        3. Configure {$HPE.MSA.API.PASSWORD} and an interface with address through which API is accessible.
         4. Change {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -2070,7 +2070,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: 'last(//hpe.msa.disks.groups.space["{#NAME}",free])/last(//hpe.msa.disks.groups.space["{#NAME}",total])*100'
+              params: '100-last(//hpe.msa.disks.groups.space["{#NAME}",free])/last(//hpe.msa.disks.groups.space["{#NAME}",total])*100'
               description: 'The space utilization percentage in the disk group.'
               preprocessing:
                 -
@@ -3144,7 +3144,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: 'last(//hpe.msa.pools.space["{#NAME}",free])/last(//hpe.msa.pools.space["{#NAME}",total])*100'
+              params: '100-last(//hpe.msa.pools.space["{#NAME}",free])/last(//hpe.msa.pools.space["{#NAME}",total])*100'
               description: 'The space utilization percentage in the pool.'
               preprocessing:
                 -
@@ -4149,7 +4149,7 @@ zabbix_export:
         -
           macro: '{$HPE.MSA.API.SCHEME}'
           value: https
-          description: 'Connection scheme timeout for API.'
+          description: 'Connection scheme for API.'
         -
           macro: '{$HPE.MSA.API.USERNAME}'
           value: zabbix
@@ -4165,19 +4165,19 @@ zabbix_export:
         -
           macro: '{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT}'
           value: '90'
-          description: 'The critical threshold of the disk group space utilization in percent.'
+          description: 'The critical threshold of the disk group space utilization in %.'
         -
           macro: '{$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN}'
           value: '80'
-          description: 'The warning threshold of the disk group space utilization in percent.'
+          description: 'The warning threshold of the disk group space utilization in %.'
         -
           macro: '{$HPE.MSA.POOL.PUSED.MAX.CRIT}'
           value: '90'
-          description: 'The critical threshold of the pool space utilization in percent.'
+          description: 'The critical threshold of the pool space utilization in %.'
         -
           macro: '{$HPE.MSA.POOL.PUSED.MAX.WARN}'
           value: '80'
-          description: 'The warning threshold of the pool space utilization in percent.'
+          description: 'The warning threshold of the pool space utilization in %.'
       valuemaps:
         -
           uuid: 3bb065172c93464c9f5e2e569f523a05
