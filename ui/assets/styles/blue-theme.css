@@ -4826,10 +4826,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .overlay-dialogue-body {
   margin: 0 0 25px;
   white-space: nowrap; }
-  .overlay-dialogue-body > .msg-bad,
-  .overlay-dialogue-body > .msg-good,
-  .overlay-dialogue-body > .msg-warning {
-    z-index: 5; }
   .overlay-dialogue-body .debug-output {
     margin: 10px 0 0; }
 
