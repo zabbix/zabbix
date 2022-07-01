@@ -354,7 +354,7 @@ typedef int	(*nodeprocfunc_t)(void *, char **);
 static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr);
 static void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vmware_cq_value_t *cqv);
 static char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values, const char *soap_type,
-		const char *clusterid, const int bsz, char *buff, zbx_vmware_cq_value_t **cq_prop);
+		const char *clusterid, const size_t bsz, char *buff, zbx_vmware_cq_value_t **cq_prop);
 
 typedef struct
 {
@@ -6786,8 +6786,8 @@ static void	vmware_service_copy_cust_query_response(zbx_vector_cq_value_t *cq_va
 		{
 			vmware_shared_strfree(cq_values->values[i].instance->value);
 			cq_values->values[i].instance->value = vmware_shared_strdup(cq_values->values[i].response);
-			cq_values->values[i].instance->state = ZBX_VMWARE_CQ_READY |
-					(cq_values->values[i].instance->state & ZBX_VMWARE_CQ_SEPARATE);
+			cq_values->values[i].instance->state = (unsigned char)(ZBX_VMWARE_CQ_READY |
+					(cq_values->values[i].instance->state & ZBX_VMWARE_CQ_SEPARATE));
 		}
 	}
 }
@@ -7028,7 +7028,7 @@ static void	vmware_service_props_load(CURL *easyhandle, zbx_vector_cq_value_t *c
  *                                                                            *
  ******************************************************************************/
 static char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values, const char *soap_type,
-		const char *clusterid, const int bsz, char *buff, zbx_vmware_cq_value_t **cq_prop)
+		const char *clusterid, const size_t bsz, char *buff, zbx_vmware_cq_value_t **cq_prop)
 {
 	int			i;
 	zbx_vmware_cust_query_t	instance = {.soap_type = (char *)soap_type, .id = (char *)clusterid};

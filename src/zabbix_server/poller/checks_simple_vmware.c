@@ -624,12 +624,12 @@ static int	custquery_read_result(zbx_vmware_cust_query_t *custom_query, AGENT_RE
 		SET_STR_RESULT(result, zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(custom_query->value)));
 
 	if (0 != (custom_query->state & ZBX_VMWARE_CQ_PAUSED))
-		custom_query->state &= ~(unsigned char)ZBX_VMWARE_CQ_PAUSED;
+		custom_query->state &= (unsigned char)~ZBX_VMWARE_CQ_PAUSED;
 
 	if (NULL != custom_query->value && '\0' != *custom_query->value &&
 			0 != (custom_query->state & ZBX_VMWARE_CQ_SEPARATE))
 	{
-		custom_query->state &= ~(unsigned char)ZBX_VMWARE_CQ_SEPARATE;
+		custom_query->state &= (unsigned char)~ZBX_VMWARE_CQ_SEPARATE;
 	}
 
 	custom_query->last_pooled = time(NULL);
