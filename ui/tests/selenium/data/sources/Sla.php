@@ -29,7 +29,7 @@ class Sla {
 		CDataHelper::call('sla.create', [
 			[
 				'name' => 'Update SLA',
-				'period' => 2,
+				'period' => 0,
 				'slo' => '99.99',
 				'effective_date' => 1619827200,
 				'timezone' => 'Europe/Riga',
@@ -50,23 +50,28 @@ class Sla {
 					[
 						'tag' => 'old_tag_1',
 						'value' => 'old_value_1'
+					],
+					[
+						'tag' => 'test',
+						'operator' => 2,
+						'value' => 'test'
 					]
 				],
 				'excluded_downtimes' => [
 					[
 						'name' => 'excluded downtime',
 						'period_from' => 1651352400,
-						'period_to' => 1777582800
+						'period_to' => 1777593600
 					]
 				],
 				'schedule' => [
 					[
 						'period_from' => 0,
-						'period_to' => 20000
+						'period_to' => 120
 					],
 					[
-						'period_from' => 10000,
-						'period_to' => 38800
+						'period_from' => 60,
+						'period_to' => 240
 					]
 				]
 			],
@@ -175,10 +180,101 @@ class Sla {
 						'period_to' => 604800
 					]
 				]
+			],
+			[
+				'name' => 'SLA Daily',
+				'period' => 0,
+				'slo' => '11.111',
+				'effective_date' => 1619827200,
+				'timezone' => 'Europe/Riga',
+				'service_tags' => [
+					[
+						'tag' => 'old_tag_1',
+						'value' => 'old_value_1'
+					]
+				],
+				'excluded_downtimes' => [
+					[
+						'name' => 'EXCLUDED DOWNTIME',
+						'period_from' => time(),
+						'period_to' => time() + 86400
+					],
+					[
+						'name' => 'Second downtime',
+						'period_from' => time(),
+						'period_to' => time() + 31536000
+					],
+					[
+						'name' => 'Downtime in the past',
+						'period_from' => time() - 3600,
+						'period_to' => time() - 1
+					],
+					[
+						'name' => 'Downtime in the future',
+						'period_from' => time() + 86400,
+						'period_to' => time() + 31536000
+					]
+				]
+			],
+			[
+				'name' => 'SLA Monthly',
+				'period' => 2,
+				'slo' => '22.22',
+				'effective_date' => 1619827200,
+				'timezone' => 'Europe/Riga',
+				'service_tags' => [
+					[
+						'tag' => 'problem',
+						'operator' => 2,
+						'value' => 'e'
+					]
+				]
+			],
+			[
+				'name' => 'SLA Quarterly',
+				'period' => 3,
+				'slo' => '33.33',
+				'effective_date' => 1619827200,
+				'timezone' => 'Europe/Riga',
+				'service_tags' => [
+					[
+						'tag' => 'problem',
+						'operator' => 2,
+						'value' => 'e'
+					]
+				]
+			],
+			[
+				'name' => 'SLA Annual',
+				'period' => 4,
+				'slo' => '44.44',
+				'effective_date' => 1619827200,
+				'timezone' => 'Europe/Riga',
+				'service_tags' => [
+					[
+						'tag' => 'old_tag_1',
+						'value' => 'old_value_1'
+					]
+				]
+			],
+			[
+				'name' => 'SLA Weekly',
+				'period' => 1,
+				'slo' => '55.5555',
+				'effective_date' => 1619827200,
+				'timezone' => 'Europe/Riga',
+				'service_tags' => [
+					[
+						'tag' => 'problem',
+						'operator' => 2,
+						'value' => 'e'
+					]
+				]
 			]
-
 		]);
 
-		return ['sla_ids' => CDataHelper::getIds('name')];
+		$creation_time = time();
+
+		return ['sla_ids' => CDataHelper::getIds('name'), 'creation_time' => $creation_time];
 	}
 }

@@ -68,6 +68,56 @@ class testPageServicesSla extends CWebTest {
 				'Status' => 'Disabled'
 			],
 			[
+				'Name' => 'SLA Annual',
+				'SLO' => '44.44%',
+				'Effective date' => '2021-05-01',
+				'Reporting period' => 'Annually',
+				'Timezone' => 'Europe/Riga',
+				'Schedule' => '24x7',
+				'SLA report' => 'SLA report',
+				'Status' => 'Enabled'
+			],
+			[
+				'Name' => 'SLA Daily',
+				'SLO' => '11.111%',
+				'Effective date' => '2021-05-01',
+				'Reporting period' => 'Daily',
+				'Timezone' => 'Europe/Riga',
+				'Schedule' => '24x7',
+				'SLA report' => 'SLA report',
+				'Status' => 'Enabled'
+			],
+			[
+				'Name' => 'SLA Monthly',
+				'SLO' => '22.22%',
+				'Effective date' => '2021-05-01',
+				'Reporting period' => 'Monthly',
+				'Timezone' => 'Europe/Riga',
+				'Schedule' => '24x7',
+				'SLA report' => 'SLA report',
+				'Status' => 'Enabled'
+			],
+			[
+				'Name' => 'SLA Quarterly',
+				'SLO' => '33.33%',
+				'Effective date' => '2021-05-01',
+				'Reporting period' => 'Quarterly',
+				'Timezone' => 'Europe/Riga',
+				'Schedule' => '24x7',
+				'SLA report' => 'SLA report',
+				'Status' => 'Enabled'
+			],
+			[
+				'Name' => 'SLA Weekly',
+				'SLO' => '55.5555%',
+				'Effective date' => '2021-05-01',
+				'Reporting period' => 'Weekly',
+				'Timezone' => 'Europe/Riga',
+				'Schedule' => '24x7',
+				'SLA report' => 'SLA report',
+				'Status' => 'Enabled'
+			],
+			[
 				'Name' => 'SLA with schedule and downtime',
 				'SLO' => '12.3456%',
 				'Effective date' => '2022-04-30',
@@ -91,7 +141,7 @@ class testPageServicesSla extends CWebTest {
 				'Name' => 'Update SLA',
 				'SLO' => '99.99%',
 				'Effective date' => '2021-05-01',
-				'Reporting period' => 'Monthly',
+				'Reporting period' => 'Daily',
 				'Timezone' => 'Europe/Riga',
 				'Schedule' => '24x7',
 				'SLA report' => 'SLA report',
@@ -140,7 +190,7 @@ class testPageServicesSla extends CWebTest {
 			[
 				'name' => 'SLA with schedule and downtime',
 				'rows' => [
-					'Sunday 00:00-10:46',
+					'Sunday 00:00-00:04',
 					'Monday -',
 					'Tuesday -',
 					'Wednesday -',
@@ -418,6 +468,11 @@ class testPageServicesSla extends CWebTest {
 					'expected' => [
 						'Disabled SLA',
 						'Disabled SLA Annual',
+						'SLA Annual',
+						'SLA Daily',
+						'SLA Monthly',
+						'SLA Quarterly',
+						'SLA Weekly',
 						'SLA with schedule and downtime',
 						'SLA для удаления - 頑張って',
 						'Update SLA'
@@ -431,6 +486,11 @@ class testPageServicesSla extends CWebTest {
 						'Status' => 'Enabled'
 					],
 					'expected' => [
+						'SLA Annual',
+						'SLA Daily',
+						'SLA Monthly',
+						'SLA Quarterly',
+						'SLA Weekly',
 						'SLA with schedule and downtime',
 						'SLA для удаления - 頑張って',
 						'Update SLA'
@@ -465,6 +525,8 @@ class testPageServicesSla extends CWebTest {
 					],
 					'expected' => [
 						'Disabled SLA Annual',
+						'SLA Annual',
+						'SLA Daily',
 						'SLA with schedule and downtime'
 					]
 				]
@@ -486,6 +548,8 @@ class testPageServicesSla extends CWebTest {
 					'expected' => [
 						'Disabled SLA',
 						'Disabled SLA Annual',
+						'SLA Annual',
+						'SLA Daily',
 						'SLA with schedule and downtime'
 					]
 				]
@@ -522,6 +586,9 @@ class testPageServicesSla extends CWebTest {
 						]
 					],
 					'expected' => [
+						'SLA Monthly',
+						'SLA Quarterly',
+						'SLA Weekly',
 						'SLA для удаления - 頑張って',
 						'Update SLA'
 					]
@@ -543,6 +610,9 @@ class testPageServicesSla extends CWebTest {
 					],
 					'expected' => [
 						'Disabled SLA',
+						'SLA Monthly',
+						'SLA Quarterly',
+						'SLA Weekly',
 						'SLA для удаления - 頑張って',
 						'Update SLA'
 					]
@@ -564,6 +634,11 @@ class testPageServicesSla extends CWebTest {
 					],
 					'expected' => [
 						'Disabled SLA Annual',
+						'SLA Annual',
+						'SLA Daily',
+						'SLA Monthly',
+						'SLA Quarterly',
+						'SLA Weekly',
 						'SLA with schedule and downtime',
 						'SLA для удаления - 頑張って',
 						'Update SLA'
@@ -631,6 +706,11 @@ class testPageServicesSla extends CWebTest {
 					],
 					'expected' => [
 						'Disabled SLA Annual',
+						'SLA Annual',
+						'SLA Daily',
+						'SLA Monthly',
+						'SLA Quarterly',
+						'SLA Weekly',
 						'SLA with schedule and downtime',
 						'SLA для удаления - 頑張って',
 						'Update SLA'
@@ -682,6 +762,11 @@ class testPageServicesSla extends CWebTest {
 						'Update SLA',
 						'SLA для удаления - 頑張って',
 						'SLA with schedule and downtime',
+						'SLA Weekly',
+						'SLA Quarterly',
+						'SLA Monthly',
+						'SLA Daily',
+						'SLA Annual',
 						'Disabled SLA Annual',
 						'Disabled SLA'
 					]
@@ -692,8 +777,13 @@ class testPageServicesSla extends CWebTest {
 					'sort_field' => 'SLO',
 					'expected' => [
 						'9.99%',
+						'11.111%',
 						'12.3456%',
 						'13.01%',
+						'22.22%',
+						'33.33%',
+						'44.44%',
+						'55.5555%',
 						'66.6%',
 						'99.99%'
 					]
@@ -704,6 +794,11 @@ class testPageServicesSla extends CWebTest {
 					'sort_field' => 'Effective date',
 					'expected' => [
 						'2020-01-01',
+						'2021-05-01',
+						'2021-05-01',
+						'2021-05-01',
+						'2021-05-01',
+						'2021-05-01',
 						'2021-05-01',
 						'2022-04-30',
 						'2022-04-30',
@@ -717,6 +812,11 @@ class testPageServicesSla extends CWebTest {
 					'expected' => [
 						'Disabled',
 						'Disabled',
+						'Enabled',
+						'Enabled',
+						'Enabled',
+						'Enabled',
+						'Enabled',
 						'Enabled',
 						'Enabled',
 						'Enabled'

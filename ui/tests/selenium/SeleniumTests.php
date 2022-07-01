@@ -129,6 +129,7 @@ require_once dirname(__FILE__).'/services/testPageServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php';
 require_once dirname(__FILE__).'/sla/testFormServicesSla.php';
 require_once dirname(__FILE__).'/sla/testPageServicesSla.php';
+require_once dirname(__FILE__).'/sla/testPageServicesSlaReport.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
@@ -266,6 +267,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageReportsTriggerTop');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageServicesSla');
+		$suite->addTestSuite('testPageServicesSlaReport');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageTemplates');
 		$suite->addTestSuite('testPageUserGroups');
