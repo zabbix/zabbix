@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-02-08T13:48:49Z</date>
+   <date>2022-06-28T12:31:45Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -786,7 +786,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.blk_read_time</params>
+                     <params>$.blk_write_time</params>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
