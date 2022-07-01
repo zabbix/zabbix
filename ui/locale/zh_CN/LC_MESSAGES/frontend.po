@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-04-10 07:26+0000\n"
+"PO-Revision-Date: 2022-04-01 13:53+0000\n"
 "Last-Translator: Yanan <wangyanan@grandage.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -494,7 +494,7 @@ msgid "Action added"
 msgstr "动作已添加"
 
 #: include/classes/core/ZBase.php:433
-#, fuzzy, c-format
+#, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr "动作类 %1$s 必须扩展 %2$s 类。"
 
@@ -6544,7 +6544,6 @@ msgstr "前端信息中"
 
 #: app/views/monitoring.problem.view.php:289
 #: include/classes/widgets/forms/CWidgetFormProblems.php:138
-#, fuzzy
 msgid "Full"
 msgstr "填满"
 
@@ -7115,7 +7114,6 @@ msgstr ""
 #: app/views/monitoring.dashboard.view.php:125 include/html.inc.php:275
 #: include/html.inc.php:523 include/views/monitoring.screen.php:45
 #: include/views/monitoring.slides.php:43
-#, fuzzy
 msgctxt "screen reader"
 msgid "Hierarchy"
 msgstr "阶"
@@ -10363,7 +10361,6 @@ msgid "Left trim"
 msgstr "修整左边"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:292
-#, fuzzy
 msgid "Legend"
 msgstr "图例"
 
@@ -13427,7 +13424,6 @@ msgid "Pattern"
 msgstr ""
 
 #: actionconf.php:81 include/views/configuration.action.edit.php:160
-#, fuzzy
 msgid "Pause operations for suppressed problems"
 msgstr "暂停操作以制止问题"
 
@@ -14417,7 +14413,6 @@ msgstr "报表"
 #: include/views/configuration.item.massupdate.php:108
 #: include/views/configuration.item.prototype.edit.php:201
 #: include/views/configuration.item.prototype.massupdate.php:104
-#, fuzzy
 msgid "Request body"
 msgstr "请求正文"
 
@@ -14426,7 +14421,6 @@ msgstr "请求正文"
 #: include/views/configuration.item.massupdate.php:95
 #: include/views/configuration.item.prototype.edit.php:190
 #: include/views/configuration.item.prototype.massupdate.php:91
-#, fuzzy
 msgid "Request body type"
 msgstr "请求 body 类型"
 
@@ -14677,7 +14671,6 @@ msgstr "右"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:193
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:208
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
-#, fuzzy
 msgid "Right Y"
 msgstr "Right Y"
 
@@ -16912,7 +16905,6 @@ msgid "Time (descending)"
 msgstr "时间(降序)"
 
 #: include/classes/items/CHelpItems.php:1147
-#, fuzzy
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "乘以一个特定的 Zabbix 进程或一组进程（由 <type> 和 <mode> 标识）花费在 <state> 中的百分比。"
 
