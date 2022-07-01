@@ -2433,47 +2433,44 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
 
 .range-control {
   position: relative;
-  display: inline-block;
-  vertical-align: middle; }
+  display: inline-flex; }
   .range-control input[type=range] {
+    width: calc(100% + 10px);
+    height: 20px;
+    margin: 2px -5px;
+    padding: 0;
+    vertical-align: top;
+    opacity: 0;
     cursor: pointer;
     -webkit-appearance: none;
     /* Hides the slider so that custom slider can be made */
     -moz-appearance: none;
     /* Hides the slider so that custom slider can be made */
-    width: calc(100% + 10px);
-    opacity: 0;
-    vertical-align: middle;
-    margin: 0 -5px;
-    padding: 0;
-    height: 20px;
     /* Special styling for WebKit/Blink */ }
     .range-control input[type=range]:focus {
       outline: none; }
     .range-control input[type=range]::-webkit-slider-thumb, .range-control input[type=range]::-moz-range-thumb {
-      margin-top: 1px;
-      /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
       height: 10px;
       width: 10px;
+      margin-top: 1px;
+      /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
       opacity: 0; }
     .range-control input[type=range]::-webkit-slider-runnable-track {
       height: 10px;
       opacity: 0; }
   .range-control input[type=text] {
-    width: 31px;
-    float: right; }
+    width: 31px; }
   .range-control > div {
     position: relative;
     width: calc(100% - 10px - 31px);
-    margin: 2px 10px 0 0;
-    float: left; }
+    margin-right: 10px; }
   .range-control .range-control-track,
   .range-control .range-control-progress {
     position: absolute;
     top: 50%;
-    margin-top: -1px;
     left: 0;
     height: 2px;
+    margin-top: -1px;
     cursor: pointer; }
   .range-control .range-control-track {
     width: 100%;
@@ -2483,12 +2480,12 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .range-control .range-control-thumb {
     position: absolute;
     top: 50%;
-    margin-top: -5px;
-    margin-left: -5px;
     width: 10px;
     height: 10px;
-    border-radius: 50%;
-    background: #f8f8f8; }
+    margin-top: -5px;
+    margin-left: -5px;
+    background: #f8f8f8;
+    border-radius: 50%; }
   .range-control.range-control-focus .range-control-thumb {
     margin-top: -6.66667px;
     margin-left: -6.66667px;
@@ -2505,15 +2502,15 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       background: #c0c0c0; }
   .range-control datalist {
     position: absolute;
+    top: 50%;
     display: flex;
     width: 100%;
-    top: 50%;
     margin-top: -1px; }
     .range-control datalist option {
-      padding: 0;
-      font-size: 0;
       flex: 1 0 0;
       height: 2px;
+      padding: 0;
+      font-size: 0;
       border-left: 1px solid #111111; }
 
 .service-info {
@@ -3171,7 +3168,6 @@ form.is-loading {
     box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.1);
     color: #ffffff;
     height: 22px;
-    line-height: 1;
     vertical-align: middle;
     white-space: nowrap; }
     .list-table.compact-view td [class*='icon-'] {
@@ -3340,8 +3336,6 @@ form.is-loading {
     .list-table.sticky-footer tfoot tr:first-of-type td, .list-table.sticky-footer tfoot tr:first-of-type th {
       border-top: 2px solid #262626;
       border-bottom: 0; }
-  .list-table td .checkbox-radio + label span {
-    top: -2px; }
 
 .table-paging {
   text-align: center;
@@ -3799,10 +3793,6 @@ form.is-loading {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
-    .table-forms .table-forms-td-right .checkbox-radio + label span {
-      top: -1px; }
-    .table-forms .table-forms-td-right .checkbox-list .checkbox-radio + label span {
-      top: -3px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -3921,19 +3911,32 @@ select {
 .checkbox-radio {
   position: absolute !important;
   top: auto !important;
+  z-index: 1;
   width: 16px !important;
   height: 16px !important;
-  opacity: 0;
-  z-index: 1; }
+  opacity: 0; }
+  .checkbox-radio + label span {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+    vertical-align: text-bottom;
+    background-color: #383838;
+    border: 1px solid #666666; }
+    .checkbox-radio + label span:active {
+      border-color: #666666; }
+  .checkbox-radio + label.label-pos-left span {
+    margin-left: 4px;
+    margin-right: 0; }
   .checkbox-radio:checked[readonly] + label span {
     transition: none; }
     .checkbox-radio:checked[readonly] + label span::after {
       border-color: #666666 !important; }
-  .checkbox-radio[readonly],
-  .checkbox-radio[readonly] + label {
+  .checkbox-radio[readonly], .checkbox-radio[readonly] + label {
     pointer-events: none; }
-    .checkbox-radio[readonly] span,
-    .checkbox-radio[readonly] + label span {
+    .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span {
       transition: none; }
   .checkbox-radio[type="checkbox"] + label span {
     border-radius: 2px; }
@@ -3964,21 +3967,6 @@ select {
     border-radius: 50%; }
   .checkbox-radio[type="radio"]:checked[disabled] + label span::after {
     background-color: #666666 !important; }
-  .checkbox-radio + label span {
-    position: relative;
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    margin-right: 4px;
-    top: -2px;
-    vertical-align: middle;
-    border: 1px solid #666666;
-    background-color: #383838; }
-    .checkbox-radio + label span:active {
-      border-color: #666666; }
-  .checkbox-radio + label.label-pos-left span {
-    margin-left: 6px;
-    margin-right: 1px; }
   .checkbox-radio:focus + label span {
     border-color: #bbbbbb; }
   .checkbox-radio:checked:focus + label span {
@@ -3990,7 +3978,7 @@ select {
   .checkbox-radio[disabled] + label span {
     transition: none; }
 
-input[type="checkbox"], input[type="radio"] {
+input[type="radio"] {
   margin: 0;
   padding: 0;
   border: 0;
@@ -4498,8 +4486,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
-.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span,
-.checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
+.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
   color: #7d7d7d;
   background-color: #000000 !important;
   border-color: #5a5a5a; }
@@ -6101,10 +6088,7 @@ svg {
 .checkbox-list li {
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 20px; }
-  .checkbox-list li label {
-    line-height: 16px;
-    vertical-align: bottom; }
+  line-height: 24px; }
 
 .columns-wrapper {
   display: flex;
@@ -7170,9 +7154,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   background-position: -117px -506px !important; }
 
 .geomap-filter {
-  border: 2px solid rgba(68, 68, 68, 0.4);
+  border: 1px solid #666666;
   background-color: #000000;
-  padding: 10px 30px 5px 10px;
+  padding: 5px 20px 5px 10px;
   position: absolute;
   margin-right: -2px;
   margin-top: 5px;
@@ -7180,7 +7164,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   right: 0; }
 
 .geomap-filter.collapsed {
-  display: table; }
+  display: block; }
 
 .geomap-filter li {
   width: calc(100% + 20px); }
