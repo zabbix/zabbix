@@ -218,6 +218,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 					'dstfld1' => 'ymin_itemid',
 					'hostid' => $data['is_template'] ? $data['hostid'] : 0,
 					'numeric' => '1',
+					'with_webitems' => '1',
 					'real_hosts' => !$data['is_template']
 				]
 			]
@@ -311,6 +312,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 					'dstfld1' => 'ymax_itemid',
 					'hostid' => $data['is_template'] ? $data['hostid'] : 0,
 					'numeric' => '1',
+					'with_webitems' => '1',
 					'real_hosts' => !$data['is_template']
 				]
 			]
