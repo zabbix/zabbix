@@ -1094,45 +1094,18 @@ static void	zbx_check_db(void)
 	struct zbx_json			db_version_json;
 	int				result = SUCCEED;
 
-	DBextract_version_info(&db_version_info);
+	memset(&db_version_info, 0, sizeof(db_version_info));
+	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
 
-	if (db_version_info.current_version < db_version_info.min_version)
+	if (SUCCEED == result)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Error! Current %s database server version is too old (%s)",
-				db_version_info.database, db_version_info.friendly_current_version);
-		zabbix_log(LOG_LEVEL_ERR, "Must be a least %s", db_version_info.friendly_min_version);
-		result = FAIL;
-	}
-	else if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag)
-	{
-		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
-		{
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix server due to unsupported %s database server"
-					" version (%s)", db_version_info.database,
-					db_version_info.friendly_current_version);
-			zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s)",
-					db_version_info.friendly_min_supported_version);
-			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
-			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
-					" in Zabbix server configuration file at your own risk.");
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			result = FAIL;
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database server version (%s)",
-					db_version_info.database, db_version_info.friendly_current_version);
-			zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s)",
-					db_version_info.friendly_min_supported_version);
-			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			db_version_info.flag = DB_VERSION_NOT_SUPPORTED_WARNING;
-		}
+		zbx_db_extract_dbextension_info(&db_version_info);
 	}
 
-	if(SUCCEED == result && (SUCCEED != DBcheck_capabilities(db_version_info.current_version) ||
+	if (SUCCEED == result && (
+#ifdef HAVE_POSTGRESQL
+			SUCCEED != zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
+#endif
 			SUCCEED != DBcheck_version()))
 	{
 		result = FAIL;
@@ -1140,7 +1113,7 @@ static void	zbx_check_db(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if(SUCCEED == DBfield_exists("config", "dbversion_status"))
+	if (SUCCEED == DBfield_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -1157,14 +1130,17 @@ static void	zbx_check_db(void)
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)
-			zbx_history_check_version(&db_version_json);
+			zbx_history_check_version(&db_version_json, &result);
 
-		DBflush_version_requirements(db_version_json.buffer);
+		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
 	}
 
 	DBclose();
 	zbx_free(db_version_info.friendly_current_version);
+	zbx_free(db_version_info.extension);
+	zbx_free(db_version_info.ext_friendly_current_version);
+	zbx_free(db_version_info.ext_lic);
 
 	if(SUCCEED != result)
 	{
