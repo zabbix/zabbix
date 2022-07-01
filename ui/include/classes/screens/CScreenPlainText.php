@@ -45,7 +45,7 @@ class CScreenPlainText extends CScreenBase {
 		}
 
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_'],
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
 			'itemids' => [$this->screenitem['resourceid']],
 			'webitems' => true
 		]);
