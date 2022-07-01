@@ -180,12 +180,14 @@ DO $$
 DECLARE
 	tsdb_version_major	INTEGER;
 	chunk_tm_interval	INTEGER;
+	jobid			INTEGER;
 BEGIN
 	SELECT substring(extversion, '^\d+') INTO tsdb_version_major FROM pg_extension WHERE extname='timescaledb';
 
 	IF (tsdb_version_major < 2)
 	THEN
-		SELECT (upper(ranges[1]) - lower(ranges[1])) INTO chunk_tm_interval FROM chunk_relation_size('history_uint_old') LIMIT 1;
+		SELECT (upper(ranges[1]) - lower(ranges[1])) INTO chunk_tm_interval FROM chunk_relation_size('%HISTTBL')
+			ORDER BY ranges DESC LIMIT 1;
 
 		IF NOT FOUND THEN
 			chunk_tm_interval = 86400;
