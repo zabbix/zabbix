@@ -46,7 +46,8 @@ class CScreenPlainText extends CScreenBase {
 
 		$items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_'],
-			'itemids' => [$this->screenitem['resourceid']]
+			'itemids' => [$this->screenitem['resourceid']],
+			'webitems' => true
 		]);
 
 		$items = CMacrosResolverHelper::resolveItemNames($items);

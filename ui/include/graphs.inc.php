@@ -401,7 +401,8 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
 			$items = API::Item()->get([
 				'output' => ['itemid', 'key_'],
 				'selectHosts' => ['hostid', 'host'],
-				'itemids' => [$gitem['itemid']]
+				'itemids' => [$gitem['itemid']],
+				'webitems' => true
 			]);
 
 			if (!$items) {

@@ -42,7 +42,8 @@ class CPieGraphDraw extends CGraphDraw {
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_'],
-			'itemids' => [$itemid]
+			'itemids' => [$itemid],
+			'webitems' => true
 		]);
 
 		$items = CMacrosResolverHelper::resolveItemNames($items);
@@ -143,6 +144,7 @@ class CPieGraphDraw extends CGraphDraw {
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'value_type', 'units', 'history', 'trends'],
 			'itemids' => array_column($this->items, 'itemid'),
+			'webitems' => true,
 			'preservekeys' => true
 		]);
 

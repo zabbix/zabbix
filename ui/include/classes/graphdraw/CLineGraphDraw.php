@@ -543,7 +543,8 @@ class CLineGraphDraw extends CGraphDraw {
 		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE && $this->ymin_itemid != 0) {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'value_type'],
-				'itemids' => [$this->ymin_itemid]
+				'itemids' => [$this->ymin_itemid],
+				'webitems' => true
 			]);
 			$item = $items[0];
 
@@ -618,7 +619,8 @@ class CLineGraphDraw extends CGraphDraw {
 		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE && $this->ymax_itemid != 0) {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'value_type'],
-				'itemids' => [$this->ymax_itemid]
+				'itemids' => [$this->ymax_itemid],
+				'webitems' => true
 			]);
 			$item = $items[0];
 
