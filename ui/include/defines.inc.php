@@ -1463,6 +1463,7 @@ define('API_XML',					62);
 define('API_PREPROC_PARAMS',		63);
 define('API_PROMETHEUS_PATTERN',	64);
 define('API_PROMETHEUS_LABEL',		65);
+define('API_EMPTY_ID',				66);
 
 // flags
 define('API_REQUIRED',					0x00001);
