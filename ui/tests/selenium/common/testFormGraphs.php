@@ -70,7 +70,8 @@ class testFormGraphs extends CWebTest {
 						['field' => 'id:ymin_name', 'visible' => false], // Y axis MIN item input.
 						['field' => 'id:ymax_name', 'visible' => false], // Y axis MAX item input.
 						['field' => 'id:itemsTable', 'visible' => true]
-					]
+					],
+					'item_columns' => ['', '', 'Name', 'Function', 'Draw style', 'Y axis side', 'Color', 'Action']
 				]
 			],
 			[
@@ -98,7 +99,8 @@ class testFormGraphs extends CWebTest {
 						['field' => 'id:ymin_name', 'visible' => false], // Y axis MIN item input.
 						['field' => 'id:ymax_name', 'visible' => false], // Y axis MAX item input.
 						['field' => 'id:itemsTable', 'visible' => true]
-					]
+					],
+					'item_columns' => ['', '', 'Name', 'Function', 'Y axis side', 'Color', 'Action']
 				]
 			],
 			[
@@ -126,7 +128,8 @@ class testFormGraphs extends CWebTest {
 						['field' => 'id:ymax_name', 'exists' => false], // Y axis MAX item input.
 						['field' => 'id:show_3d', 'value' => false],
 						['field' => 'id:itemsTable', 'visible' => true]
-					]
+					],
+					'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Color', 'Action']
 				]
 			],
 			[
@@ -154,7 +157,8 @@ class testFormGraphs extends CWebTest {
 						['field' => 'id:ymax_name', 'exists' => false], // Y axis MAX item input.
 						['field' => 'id:show_3d', 'value' => false],
 						['field' => 'id:itemsTable', 'visible' => true]
-					]
+					],
+					'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Color', 'Action']
 				]
 			],
 			[
@@ -211,10 +215,10 @@ class testFormGraphs extends CWebTest {
 			$this->assertFalse($form->query('xpath:.//table[@id="itemsTable"]//div[@class="drag-icon"]')->exists());
 
 			$items_container = $form->getFieldContainer('Items');
-			$this->assertTrue($items_container->query('button:Add')->one()->isVisible());
+			$this->assertTrue($items_container->query('button:Add')->one()->isClickable());
 
 			if ($this->prototype) {
-				$this->assertTrue($items_container->query('button:Add prototype')->one()->isVisible());
+				$this->assertTrue($items_container->query('button:Add prototype')->one()->isClickable());
 				$discover_field = $form->getField('Discover');
 				$this->assertTrue($discover_field->isVisible());
 				$this->assertEquals(true, $discover_field->getValue());
@@ -250,10 +254,27 @@ class testFormGraphs extends CWebTest {
 			if (array_key_exists('maxlength', $visible_field)) {
 				$this->assertEquals($visible_field['maxlength'], $form->getField($visible_field['field'])->getAttribute('maxlength'));
 			}
+		};
+
+		// Check items functions fields depending on graph type.
+		if (array_key_exists('item_columns', $data)) {
+			$form->invalidate();
+			$items_container = $form->getFieldContainer('Items');
+
+			$item = ($this->prototype)
+				? ['button' => 'Add prototype', 'name' => 'testFormItemPrototype1']
+				: ['button' => 'Add', 'name' => 'testFormItem'];
+
+			$items_container->query('button', $item['button'])->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->one();
+			$dialog->query('link', $item['name'])->waitUntilClickable()->one()->click();
+			$dialog->waitUntilNotPresent();
+
+			$this->assertEquals($data['item_columns'], $form->query('id:itemsTable')->asTable()->one()->getHeadersText());
 		}
 	}
 
-	public function getGraphData() {
+	public function getCommonGraphData() {
 		return [
 			[
 				[
@@ -275,7 +296,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Fractional width and height',
+						'Name' => 'Fractional width and height'.($this->prototype ? ' {#KEY}' : NULL),
 						'Width' => 1.2,
 						'Height' => 15.5
 					],
@@ -290,7 +311,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Negative and empty inputs',
+						'Name' => 'Negative and empty inputs'.($this->prototype ? ' {#KEY}' : NULL),
 						'Width' => -100,
 						'Height' => -1,
 						'id:visible_percent_left' => true,
@@ -317,7 +338,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Commas in inputs',
+						'Name' => 'Commas in inputs'.($this->prototype ? ' {#KEY}' : NULL),
 						'Width' => '20,5',
 						'Height' => '50,9',
 						'id:visible_percent_left' => true,
@@ -342,7 +363,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Too large inputs',
+						'Name' => 'Too large inputs'.($this->prototype ? ' {#KEY}' : NULL),
 						'Width' => 65536,
 						'Height' => 65536,
 						'id:visible_percent_left' => true,
@@ -369,7 +390,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Text in inputs',
+						'Name' => 'Text in inputs'.($this->prototype ? ' {#KEY}' : NULL),
 						'Width' => 'test',
 						'Height' => 'value',
 						'id:visible_percent_left' => true,
@@ -396,7 +417,8 @@ class testFormGraphs extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Low width and height and too many fractional digits in percentile and axis',
+						'Name' => 'Low width and height and too many fractional digits in percentile and axis'.
+								($this->prototype ? ' {#KEY}' : NULL),
 						'Width' => 1,
 						'Height' => 19,
 						'id:visible_percent_left' => true,
@@ -423,7 +445,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Too large negative numbers',
+						'Name' => 'Too large negative numbers'.($this->prototype ? ' {#KEY}' : NULL),
 						'id:visible_percent_left' => true,
 						'id:visible_percent_right' => true,
 						'id:percent_left' => -900000,
@@ -446,14 +468,15 @@ class testFormGraphs extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty item'
+						'Name' => 'Empty item'.($this->prototype ? ' {#KEY}' : NULL)
 					],
 					'error' => ($this->prototype) ? 'Cannot add graph prototype' : 'Cannot add graph',
 					'details' => [
-						'Missing items for '.($this->prototype ? 'graph prototype' : 'graph').' "Empty item".'
+						'Missing items for '.($this->prototype ? 'graph prototype' : 'graph').' "Empty item'.
+								($this->prototype ? ' {#KEY}' : NULL).'".'
 					]
 				]
-			],
+			]
 		];
 	}
 
@@ -468,6 +491,47 @@ class testFormGraphs extends CWebTest {
 				->one()->click();
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 		$form->fill($data['fields']);
+
+		// Fill Y axis Item values separately because field is not real multiselect.
+		if (array_key_exists('yaxis_items', $data)) {
+			foreach ($data['yaxis_items'] as $y => $yaxis_item) {
+				$form->query(($this->prototype) ? 'id:yaxis_'.$y.'_prototype' : 'id:yaxis_'.$y)->waitUntilClickable()->one()->click();
+				$dialog = COverlayDialogElement::find()->one();
+				$dialog->query('link', $yaxis_item['value'])->waitUntilClickable()->one()->click();
+				$dialog->waitUntilNotPresent();
+			}
+		}
+
+		$items_container = $form->getFieldContainer('Items');
+
+		// Add items or item prototypes to graph.
+		if (array_key_exists('items', $data)) {
+			foreach ($data['items'] as $i => $item) {
+				$items_container->query('button', CTestArrayHelper::get($item, 'prototype', false) ? 'Add prototype' : 'Add')
+						->waitUntilClickable()->one()->click();
+				$dialog = COverlayDialogElement::find()->one();
+				$dialog->query('link', $item['item'])->waitUntilClickable()->one()->click();
+				$dialog->waitUntilNotPresent();
+
+				// Check that added item link appeared.
+				$item_row = $items_container->query('xpath:.//tr[@id="items_'.$i.'"]')->one()->waitUntilPresent();
+				$this->assertTrue($item_row->query('link', $item['host'].': '.$item['item'])->one()->isClickable());
+
+				// Add line styling functions.
+				if (array_key_exists('functions', $item)) {
+					foreach ($item['functions'] as $function => $value) {
+						$item_row->query('xpath:.//z-select[@name="items['.$i.']['.$function.']"]')->asDropdown()->one()->fill($value);
+					}
+				}
+
+				// Add line color.
+				if (array_key_exists('color', $item)) {
+					$item_row->query('xpath:.//button[@id="lbl_items_'.$i.'_color"]')->waitUntilClickable()->one()->click();
+					$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($item['color']);
+				}
+			}
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -476,7 +540,54 @@ class testFormGraphs extends CWebTest {
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
 		else {
+			$this->assertMessage(TEST_GOOD, ($this->prototype ? 'Graph prototype added' : 'Graph added'));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.
+					zbx_dbstr($data['fields']['Name']))
+			);
 
+			// Open just created graph and check that all fields present correctly in form.
+			$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilReady()
+					->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
+			$form->invalidate();
+//			$form->checkValue($data['fields']);
+
+			// Check Y axis Item values fake multiselects.
+			if (array_key_exists('yaxis_items', $data)) {
+				foreach ($data['yaxis_items'] as $y => $yaxis_item) {
+					$this->assertEquals($yaxis_item['host'].': '.$yaxis_item['value'],
+							$form->query('id:y'.$y.'_name')->one()->getAttribute('value')
+					);
+				}
+			}
+
+			// Check saved items count.
+			$items_container = $form->getFieldContainer('Items');
+			$this->assertEquals(count($data['items']),
+					$items_container->query('xpath:.//tr[@class="sortable"]')->all()->count()
+			);
+
+			// Check saved items names.
+			foreach ($data['items'] as $i => $item) {
+				$item_row = $items_container->query('xpath:.//tr[@id="items_'.$i.'"]')->one()->waitUntilPresent();
+				$this->assertTrue($item_row->query('link', $item['host'].': '.$item['item'])->one()->isClickable());
+
+				// Check lines styling functions.
+				if (array_key_exists('functions', $item)) {
+					foreach ($item['functions'] as $function => $value) {
+						$this->assertEquals($value, $item_row->query('xpath:.//z-select[@name="items['.$i.']['.$function.']"]')
+								->asDropdown()->one()->getValue()
+						);
+					}
+				}
+
+				// Check lines color.
+				if (array_key_exists('color', $item)) {
+					$item_row->query('xpath:.//button[@id="lbl_items_'.$i.'_color"]')->waitUntilClickable()->one()->click();
+					$this->assertEquals($item['color'],
+							$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->getValue()
+					);
+				}
+			}
 		}
 	}
 }
