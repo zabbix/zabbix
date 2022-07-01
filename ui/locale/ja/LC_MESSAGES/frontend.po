@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-17 12:52+0000\n"
+"PO-Revision-Date: 2022-06-30 13:38+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -255,7 +255,7 @@ msgstr "%1$s件選択済"
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$sパーセンタイル：%2$s"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -3689,7 +3689,7 @@ msgstr "アクション%2$sのためのクラス%1$sが見つかりません。"
 
 #: include/classes/core/ZBase.php:563
 msgid "Class not found."
-msgstr ""
+msgstr "クラスが見つかりません。"
 
 #: include/views/configuration.httpconf.list.php:221
 #: include/views/configuration.item.list.php:301
@@ -18325,42 +18325,42 @@ msgstr "子テンプレートかホストからのトリガーへの依存関係
 #: include/classes/api/services/CTriggerGeneral.php:2678
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "子テンプレートかホストからのトリガーの依存関係が許可されていないため、トリガー\"%1$s\"をテンプレート\"%3$s\"のトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2572
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "親テンプレートからのトリガーの依存関係は許可されていないため、トリガー\"%1$s\"をテンプレート\"%3$s\"のトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2305
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "ホスト\"%4$s\"に対して循環リンク(%3$s)が発生してしまうため、トリガー\"%1$s\"をトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2300
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%4$s\"に対して循環リンク(%3$s)が発生してしまうため、トリガー\"%1$s\"をトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2316
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "循環リンク(%3$s)が発生してしまうため、トリガー\"%1$s\"をトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2423
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "ホストトリガーのテンプレートトリガーへの依存関係は許可されていないため、トリガー\"%1$s\"をトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2808
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%3$s\"はホスト\"%4$s\"にリンクされていないため、トリガー\"%1$s\"をトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2807
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%3$s\"はテンプレート\"%4$s\"にリンクされていないため、トリガー\"%1$s\"をトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
