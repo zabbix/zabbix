@@ -187,12 +187,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
+|Dbstat: Checksum failures detected |<p>Data page checksum failures were detected on that DB instance.</p><p>https://www.postgresql.org/docs/current/checksums.html</p> |`{TEMPLATE_NAME:pgsql.dbstat.sum.checksum_failures.rate.last()}>0` |AVERAGE | |
 |Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m) |<p>-</p> |`{TEMPLATE_NAME:pgsql.connections.total_pct.min(5m)} > {$PG.CONN_TOTAL_PCT.MAX.WARN}` |AVERAGE | |
 |PostgreSQL: Oldest xid is too big |<p>-</p> |`{TEMPLATE_NAME:pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"].last()} > 18000000` |AVERAGE | |
 |PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE}) |<p>-</p> |`{TEMPLATE_NAME:pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"].last()} < 600` |AVERAGE | |
 |PostgreSQL: Service is down |<p>-</p> |`{TEMPLATE_NAME:pgsql.ping["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"].last()}=0` |HIGH | |
 |DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m) |<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.</p><p>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p> |`{TEMPLATE_NAME:pgsql.dbstat.conflicts.rate["{#DBNAME}"].min(5m)} > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}` |AVERAGE | |
 |DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m) |<p>-</p> |`{TEMPLATE_NAME:pgsql.dbstat.deadlocks.rate["{#DBNAME}"].min(5m)} > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}` |HIGH | |
+|DB {#DBNAME}: Checksum failures detected |<p>Data page checksum failures were detected on that database.</p><p>https://www.postgresql.org/docs/current/checksums.html</p> |`{TEMPLATE_NAME:pgsql.dbstat.checksum_failures.rate["{#DBNAME}"].last()}>0` |AVERAGE | |
 |DB {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m) |<p>-</p> |`{TEMPLATE_NAME:pgsql.queries.query.slow_count["{#DBNAME}"].min(5m)}>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}` |WARNING | |
 
 ## Feedback
