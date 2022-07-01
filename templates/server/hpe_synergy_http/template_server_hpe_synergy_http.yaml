@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-06-24T13:00:03Z'
+  date: '2022-07-01T10:50:32Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -25,6 +25,27 @@ zabbix_export:
         -
           name: 'Templates/Server hardware'
       items:
+        -
+          uuid: 6a12ea452d444c8ca5aec2698709d979
+          name: 'HPE Synergy: Get enclosures'
+          type: DEPENDENT
+          key: hpe.synergy.data.enclosures
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of enclosures.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.enclosures.members.[0]'
+          master_item:
+            key: hpe.synergy.data.get
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: c0049d63dffe4cdaafa806796051e06b
           name: 'HPE Synergy: Get errors'
@@ -93,7 +114,7 @@ zabbix_export:
                     }
                 },
             
-                getVersion: function () {
+                checkVersion: function () {
                     if (Synergy.api_version !== null) {
                         return;
                     }
@@ -103,7 +124,7 @@ zabbix_export:
             
                     response = request.post(Synergy.params.base_url + 'rest/version');
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    if (request.getStatus() !== 200) {
                         throw 'Get version request failed with status code ' + request.getStatus() + ': ' + response;
                     }
             
@@ -119,8 +140,12 @@ zabbix_export:
                         throw 'No data received by get version request.';
                     }
             
-                    if ('currentVersion' in version_data) {
-                        Synergy.api_version = version_data['currentVersion'];
+                    if ('currentVersion' in version_data && 'minimumVersion' in version_data) {
+                        if (version_data['minimumVersion'] <= 1200 && version_data['currentVersion'] >= 1200) {
+                            Synergy.api_version = 1200;
+                        } else {
+                            throw 'API version is not supported.';
+                        }
                     } else {
                         throw 'Get version response does not contain version.';
                     }
@@ -140,7 +165,7 @@ zabbix_export:
                         'password': Synergy.params.password
                     }));
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    if (request.getStatus() !== 200) {
                         throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
                     }
             
@@ -210,7 +235,7 @@ zabbix_export:
                 Synergy.setParams(JSON.parse(value));
             
                 try {
-                    Synergy.getVersion();
+                    Synergy.checkVersion();
                 }
                 catch (error) {
                     data.errors.version = error.toString();
@@ -726,7 +751,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.data.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -738,7 +763,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.enclosures.members.[0].applianceBays'
+                - $.applianceBays
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1027,7 +1052,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.data.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -1039,7 +1064,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.enclosures.members.[0].crossBars'
+                - $.crossBars
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1465,7 +1490,7 @@ zabbix_export:
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.data.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -1477,7 +1502,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.enclosures.members.[0].deviceBays'
+                - $.deviceBays
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -3125,7 +3150,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.data.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -3137,7 +3162,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.enclosures.members.[0].fanBays'
+                - $.fanBays
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -3979,7 +4004,7 @@ zabbix_export:
                       tag: scope
                       value: notice
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.data.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -3991,7 +4016,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.enclosures.members.[0].managerBays'
+                - $.managerBays
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -5024,7 +5049,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.data.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#ENCLOSURE_NAME}'
@@ -5036,7 +5061,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.enclosures.members.[0].partitions'
+                - $.partitions
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -5375,7 +5400,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.data.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -5387,7 +5412,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.enclosures.members.[0].powerSupplyBays'
+                - $.powerSupplyBays
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

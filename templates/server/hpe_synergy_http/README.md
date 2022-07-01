@@ -9,14 +9,14 @@ It works without any external scripts and uses the script item.
 
 This template was tested on:
 
-- HPE Synergy, version 12000 Frame
+- HPE Synergy, version 12000 Frame with API version 1200
 
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Link template to the host.
-2. Configure macros {$HPE.PRIMERA.API.USERNAME} and {$HPE.PRIMERA.API.PASSWORD}.
+2. Configure macros {$HPE.SYNERGY.API.USERNAME} and {$HPE.SYNERGY.API.PASSWORD}.
 
 ## Zabbix configuration
 
@@ -40,21 +40,21 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Appliance discovery |<p>A list of the appliance bays in the enclosure.</p> |DEPENDENT |hpe.synergy.appliances.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.enclosures.members.[0].applianceBays`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Cross bars discovery |<p>SDX cross fabric module connects to all compute devices installed in the system enclosure and brings in the capability of hard partitioning. Crossbar details are relevant only for enclosures with type "SDX".</p> |DEPENDENT |hpe.synergy.crossbars.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.enclosures.members.[0].crossBars`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Appliance discovery |<p>A list of the appliance bays in the enclosure.</p> |DEPENDENT |hpe.synergy.appliances.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.applianceBays`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Cross bars discovery |<p>SDX cross fabric module connects to all compute devices installed in the system enclosure and brings in the capability of hard partitioning. Crossbar details are relevant only for enclosures with type "SDX".</p> |DEPENDENT |hpe.synergy.crossbars.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.crossBars`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Datacenters discovery |<p>A list of the datacenters.</p> |DEPENDENT |hpe.synergy.datacenters.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.datacenters.members`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Devices discovery |<p>A list of device bays in the enclosure.</p> |DEPENDENT |hpe.synergy.devices.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.enclosures.members.[0].deviceBays`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Devices discovery |<p>A list of device bays in the enclosure.</p> |DEPENDENT |hpe.synergy.devices.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.deviceBays`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Enclosures discovery |<p>A list of enclosures resources.</p> |DEPENDENT |hpe.synergy.enclosures.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.enclosures.members`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Ethernet networks discovery |<p>A list of the ethernet networks.</p> |DEPENDENT |hpe.synergy.ethernet.networks.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.["ethernet-networks"].members`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Fabrics discovery |<p>A list of the fabrics.</p> |DEPENDENT |hpe.synergy.fabrics.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.fabrics.members`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Fans discovery |<p>A list of the fan bays in the enclosure.</p> |DEPENDENT |hpe.synergy.fans.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.enclosures.members.[0].fanBays`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Fans discovery |<p>A list of the fan bays in the enclosure.</p> |DEPENDENT |hpe.synergy.fans.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.fanBays`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |FC networks discovery |<p>A list of the FC networks.</p> |DEPENDENT |hpe.synergy.fc.networks.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.["fc-networks"].members`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Hypervisor managers discovery |<p>A list of the hypervisor managers.</p> |DEPENDENT |hpe.synergy.hypervisor.managers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.["hypervisor-managers"].members`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Interconnects discovery |<p>Interconnects are centrally managed by their containing logical interconnect. The interconnect provides a physical view of detailed downlink and uplink port state and configuration, including the current link state, speed, port role (uplink, downlink, or stacking), current pluggable media, power state, and immediate connected neighbor.</p> |DEPENDENT |hpe.synergy.interconnects.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.interconnects.members`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Logical enclosures discovery |<p>A list of the logical enclosures.</p> |DEPENDENT |hpe.synergy.logical_enclosures.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.["logical-enclosures"].members`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Managers discovery |<p>A list of the Synergy Frame Link Module bays.</p> |DEPENDENT |hpe.synergy.frame_link_modules.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.enclosures.members.[0].managerBays`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|nPar discovery |<p>Electrically isolated hardware partition (nPar). Partition details are relevant only for enclosures with type "SDX".</p> |DEPENDENT |hpe.synergy.npar.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.enclosures.members.[0].partitions`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Power supplies discovery |<p>List of power supply bays in the enclosure.</p> |DEPENDENT |hpe.synergy.ps.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.enclosures.members.[0].powerSupplyBays`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Managers discovery |<p>A list of the Synergy Frame Link Module bays.</p> |DEPENDENT |hpe.synergy.frame_link_modules.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.managerBays`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|nPar discovery |<p>Electrically isolated hardware partition (nPar). Partition details are relevant only for enclosures with type "SDX".</p> |DEPENDENT |hpe.synergy.npar.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.partitions`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Power supplies discovery |<p>List of power supply bays in the enclosure.</p> |DEPENDENT |hpe.synergy.ps.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.powerSupplyBays`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Racks discovery |<p>A list of the racks.</p> |DEPENDENT |hpe.synergy.racks.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.racks.members`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Server hardware discovery |<p>The server hardware resource is a representation of a physical server.</p> |DEPENDENT |hpe.synergy.server_hardware.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.["server-hardware"].members`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Storage pools discovery |<p>A list of the storage pools.</p> |DEPENDENT |hpe.synergy.storage_pools.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.["storage-pools"].members`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
@@ -68,6 +68,7 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |HPE |HPE Synergy: Get data |<p>The JSON with result of API requests.</p> |SCRIPT |hpe.synergy.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |HPE |HPE Synergy: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |hpe.synergy.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|HPE |HPE Synergy: Get enclosures |<p>A list of enclosures.</p> |DEPENDENT |hpe.synergy.data.enclosures<p>**Preprocessing**:</p><p>- JSONPATH: `$.enclosures.members.[0]`</p> |
 |HPE |HPE Synergy: Service ping |<p>Checks if the service is running and accepting TCP connections.</p> |SIMPLE |net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{HOST.CONN}","{$HPE.SYNERGY.API.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |HPE |Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Model |<p>The model name for the appliance.</p> |DEPENDENT |hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",model]<p>**Preprocessing**:</p><p>- JSONPATH: `$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].model.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |HPE |Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part number |<p>The part number of the appliance.</p> |DEPENDENT |hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]<p>**Preprocessing**:</p><p>- JSONPATH: `$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].partNumber.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
