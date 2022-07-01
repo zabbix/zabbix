@@ -25,25 +25,25 @@ require_once dirname(__FILE__).'/../common/testFormHost.php';
  *
  * @onBefore prepareUpdateData
  */
-class testFormHostConfiguration extends testFormHost {
+class testFormHostFromConfiguration extends testFormHost {
 
 	public $link = 'zabbix.php?action=host.list';
 
-	public function testFormHostConfiguration_Layout() {
+	public function testFormHostFromConfiguration_Layout() {
 		$this->checkHostLayout();
 	}
 
 	/**
 	 * @dataProvider getCreateData
 	 */
-	public function testFormHostConfiguration_Create($data) {
+	public function testFormHostFromConfiguration_Create($data) {
 		$this->checkHostCreate($data);
 	}
 
 	/**
 	 * @dataProvider getValidationUpdateData
 	 */
-	public function testFormHostConfiguration_ValidationUpdate($data) {
+	public function testFormHostFromConfiguration_ValidationUpdate($data) {
 		$this->checkHostUpdate($data);
 	}
 
@@ -52,21 +52,21 @@ class testFormHostConfiguration extends testFormHost {
 	 *
 	 * @dataProvider getUpdateData
 	 */
-	public function testFormHostConfiguration_Update($data) {
+	public function testFormHostFromConfiguration_Update($data) {
 		$this->checkHostUpdate($data);
 	}
 
 	/**
 	 * Update the host without any changes and check host and interfaces hashes.
 	 */
-	public function testFormHostConfiguration_SimpleUpdate() {
+	public function testFormHostFromConfiguration_SimpleUpdate() {
 		$this->checkHostSimpleUpdate();
 	}
 
 	/**
 	 * @dataProvider getCloneData
 	 */
-	public function testFormHostConfiguration_Clone($data) {
+	public function testFormHostFromConfiguration_Clone($data) {
 		$this->cloneHost($data);
 
 		// Check that items aren't cloned from original host.
@@ -76,7 +76,7 @@ class testFormHostConfiguration extends testFormHost {
 	/**
 	 * @dataProvider getCloneData
 	 */
-	public function testFormHostConfiguration_FullClone($data) {
+	public function testFormHostFromConfiguration_FullClone($data) {
 		$this->cloneHost($data, 'Full clone');
 
 		// Check that items cloned from original host.
@@ -86,14 +86,14 @@ class testFormHostConfiguration extends testFormHost {
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testFormHostConfiguration_Cancel($data) {
+	public function testFormHostFromConfiguration_Cancel($data) {
 		$this->checkCancel($data);
 	}
 
 	/**
 	 * @dataProvider getDeleteData
 	 */
-	public function testFormHostConfiguration_Delete($data) {
+	public function testFormHostFromConfiguration_Delete($data) {
 		$this->checkDelete($data);
 	}
 }

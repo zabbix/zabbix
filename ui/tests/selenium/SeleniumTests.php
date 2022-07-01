@@ -59,11 +59,11 @@ require_once dirname(__FILE__).'/geomaps/testFormAdministrationGeneralGeomaps.ph
 require_once dirname(__FILE__).'/geomaps/testGeomapWidgetScreenshots.php';
 
 // Hosts.
-require_once dirname(__FILE__).'/hosts/testFormHostConfiguration.php';
+require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
+require_once dirname(__FILE__).'/hosts/testFormHostFromMonitoring.php';
+require_once dirname(__FILE__).'/hosts/testFormHostFromStandalone.php';
 require_once dirname(__FILE__).'/hosts/testFormHostLinkTemplates.php';
-require_once dirname(__FILE__).'/hosts/testFormHostMonitoring.php';
 require_once dirname(__FILE__).'/hosts/testFormHostPrototype.php';
-require_once dirname(__FILE__).'/hosts/testFormHostStandalone.php';
 require_once dirname(__FILE__).'/hosts/testPageHostInterfaces.php';
 require_once dirname(__FILE__).'/hosts/testPageHostPrototypes.php';
 require_once dirname(__FILE__).'/hosts/testPageHosts.php';
@@ -271,11 +271,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testGeomapWidgetScreenshots');
 
 		// Hosts.
-		$suite->addTestSuite('testFormHostConfiguration');
+		$suite->addTestSuite('testFormHostFromConfiguration');
+		$suite->addTestSuite('testFormHostFromMonitoring');
+		$suite->addTestSuite('testFormHostFromStandalone');
 		$suite->addTestSuite('testFormHostLinkTemplates');
-		$suite->addTestSuite('testFormHostMonitoring');
 		$suite->addTestSuite('testFormHostPrototype');
-		$suite->addTestSuite('testFormHostStandalone');
 		$suite->addTestSuite('testPageHostInterfaces');
 		$suite->addTestSuite('testPageHostPrototypes');
 		$suite->addTestSuite('testPageHosts');
