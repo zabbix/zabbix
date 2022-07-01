@@ -139,8 +139,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 			[
 				[
 					'ldap_settings' => [
-						'Host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
+						'Host' => 'ipa.demo1.freeipa.org',
+						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 						'Search attribute' => 'uid'
 					],
 					'test_settings' => [
@@ -176,8 +176,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				[
 					'ldap_settings' => [
 						'Name' => 'Test Name',
-						'Host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
+						'Host' => 'ipa.demo1.freeipa.org',
+						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 						'Search attribute' => 'uid',
 						'Bind DN' => 'test_DN',
 						'Bind password' => 'test_password',
@@ -187,8 +187,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						'Search filter' => 'filter'
 					],
 					'test_settings' => [
-						'Login' => 'galieleo',
-						'User password' => 'password'
+						'Login' => 'employee',
+						'User password' => 'Secret123'
 					],
 					'test_error' => 'Login failed',
 					'test_error_details' => [
@@ -201,16 +201,16 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				[
 					'ldap_settings' => [
 						'Name' => 'Test Name',
-						'Host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
+						'Host' => 'ipa.demo1.freeipa.org',
+						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 						'Search attribute' => 'uid',
 						'Bind DN' => 'test_DN',
 						'Bind password' => 'test_password',
 						'Description' => 'Test description'
 					],
 					'test_settings' => [
-						'Login' => 'galieleo',
-						'User password' => 'password'
+						'Login' => 'employee',
+						'User password' => 'Secret123'
 					],
 					'test_error' => 'Login failed',
 					'test_error_details' => [
@@ -223,13 +223,13 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'ldap_settings' => [
-						'Host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
+						'Host' => 'ipa.demo1.freeipa.org',
+						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 						'Search attribute' => 'uid'
 					],
 					'test_settings' => [
-						'Login' => 'galieleo',
-						'User password' => 'password'
+						'Login' => 'employee',
+						'User password' => 'Secret123'
 					]
 				]
 			]
