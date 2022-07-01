@@ -30,7 +30,7 @@ class CItemTypeDependent extends CItemType {
 	 */
 	public static function getCreateValidationRules(array $item): array {
 		return [
-			'master_itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			'master_itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		];
 	}
 
@@ -42,8 +42,8 @@ class CItemTypeDependent extends CItemType {
 			'master_itemid' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function () use ($db_item): bool {
 										return $db_item['type'] != ITEM_TYPE_DEPENDENT;
-									}, 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-									['else' => true, 'type' => API_ID, 'flags' => API_NOT_EMPTY]
+									}, 'type' => API_ID, 'flags' => API_REQUIRED],
+									['else' => true, 'type' => API_ID]
 			]]
 		];
 	}
