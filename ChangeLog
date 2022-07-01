@@ -1,6 +1,19 @@
+Changes for 6.0.7rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.6
+
+6.0.6rc1 was released as 6.0.6 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.6rc1
 
 New features:
+.......PS. [ZBXNEXT-7813] updated MariaDB maximum supported version to 10.7 (arimdjonoks)
 ..F....... [ZBXNEXT-7769] added support of PHP 8.1 to LDAP authentication (gcalenko)
 ..F....... [ZBXNEXT-7722] fixed runtime errors when using Zabbix with PHP 8.1 (agriscenko)
 ...G.....T [ZBXNEXT-6891] removed mongodb implementation, updated template to work with new plugin (esneiders, ychukina)
@@ -8,9 +21,15 @@ New features:
 .........T [ZBXNEXT-7630] added templates for HPE MSA 2060 and MSA 2040 (drasihov)
 
 Bug fixes:
+........S. [ZBX-21145] changed host, item and trigger tag merging logic during template linking and LLD to reduce database updates (wiper)
+..F....PS. [ZBX-20638] fixed handling of DB version higher than supported (agriscenko, dgoloscapov)
+........S. [ZBX-20750] fixed excessive escaping of special characters in audit log details, triggers and graphs (akozlovs)
+..F....... [ZBX-21015] fixed web scenario tags disappearing from Monitoring -> Hosts -> Web scenario on page autorefresh (agriscenko)
+..F....... [ZBX-20960] fixed SVG graph widget throwing error when attempting to plot item with valid user macro defined in history storage period (agriscenko)
+..F....... [ZBX-20965] fixed positioning of change indicator in Item value widget (dpetra)
 ..F.....S. [ZBX-20994] fixed access limitation for Oracle DB to list tables accessible to the user (asestakovs)
 .......PS. [ZBX-21123] fixed crash when VMware VC was not available at the first moment when starting zabbix_server (MVekslers)
-........S. [ZBX-21044] fixed javascript preprocessing output conversion to utf-8 (kprutkovs)
+........S. [ZBX-21044] fixed JavaScript preprocessing output conversion to utf-8 (kprutkovs)
 ..F....... [ZBX-20534] fixed popup layout for importing when horizontal scroll was not visible (rlataria)
 ..F....... [ZBX-21185] fixed pattern selector when item name contains square brackets (miks)
 ..F....... [ZBX-20669] fixed focus on fields when clicking on labels (esekace)
@@ -35,6 +54,8 @@ A.F....... [ZBX-20233] fixed handling of empty configuration parameters $ZBX_SER
 .........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
 ..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
 ........S. [ZBX-21111] fixed HA manager stopping (kprutkovs)
+...GI..PS. [ZBX-20105] removed bogus dependency on libxml2 from agent (yurii)
+....I..... [ZBX-21066] fixed libopenssl.m4 when dealing with lib/64 in openssl 3 (yurii)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.5
@@ -1942,6 +1963,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.26rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.25
+
+5.0.25rc1 was released as 5.0.25 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.25rc1
@@ -4459,6 +4492,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.43rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.42
+
+4.0.42rc1 was released as 4.0.42 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.42rc1
