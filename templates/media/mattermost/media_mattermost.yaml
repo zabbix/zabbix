@@ -499,7 +499,7 @@ zabbix_export:
             isShort
         ) {
             var message = {
-                fallbac: params.alert_subject,
+                fallback: params.alert_subject,
                 title: params.alert_subject,
                 color: event_severity_color,
                 title_link: problem_url,
