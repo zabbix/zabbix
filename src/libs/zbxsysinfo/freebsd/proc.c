@@ -31,9 +31,6 @@
 #	define ZBX_COMMLEN		MAXCOMLEN
 #	define ZBX_PROC_PID		kp_proc.p_pid
 #	define ZBX_PROC_PPID		kp_eproc.e_ppid
-#	define ZBX_PROC_JID		kp_eproc.e_jobc
-#	define ZBX_PROC_TID		kp_proc.p_wakeup
-#	define ZBX_PROC_TNAME		kp_proc.p_nice
 #	define ZBX_PROC_COMM		kp_proc.p_comm
 #	define ZBX_PROC_STAT		kp_proc.p_stat
 #	define ZBX_PROC_TSIZE		kp_eproc.e_vm.vm_tsize
@@ -821,13 +818,18 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
 
+#if (__FreeBSD_version) < 500000
+				proc_data->tid = proc_data->jid = 0;
+				proc_data->tname = NULL;
+#else
 				proc_data->tid = proc_thread[k].ZBX_PROC_TID;
+				proc_data->jid = proc_thread[k].ZBX_PROC_JID;
 				proc_data->tname = zbx_strdup(NULL, proc_thread[k].ZBX_PROC_TNAME);
+#endif
 				proc_data->pid = proc_thread[k].ZBX_PROC_PID;
 				proc_data->ppid = proc_thread[k].ZBX_PROC_PPID;
-				proc_data->jid = proc_thread[k].ZBX_PROC_JID;
 #if HAVE_LIBJAIL
-				proc_data->jname = jail_getname(proc_thread[k].ZBX_PROC_JID);
+				proc_data->jname = jail_getname(proc_data->jid);
 #else
 				proc_data->jname = NULL;
 #endif
@@ -887,11 +889,15 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (ZBX_PROC_MODE_PROCESS == zbx_proc_mode)
 			{
+#if (__FreeBSD_version) < 500000
+				proc_data->jid = 0;
+#else
+				proc_data->jid = proc[i].ZBX_PROC_JID;
+#endif
 				proc_data->pid = proc[i].ZBX_PROC_PID;
 				proc_data->ppid = proc[i].ZBX_PROC_PPID;
-				proc_data->jid = proc[i].ZBX_PROC_JID;
 #if HAVE_LIBJAIL
-				proc_data->jname = jail_getname(proc[i].ZBX_PROC_JID);
+				proc_data->jname = jail_getname(proc_data->jid);
 #else
 				proc_data->jname = NULL;
 #endif
@@ -976,8 +982,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "pid", pdata->pid);
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
-			zbx_json_addstring(&j, "jname", pdata->jname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "jname", pdata->jname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "group", ZBX_NULL2EMPTY_STR(pdata->group), ZBX_JSON_TYPE_STRING);
@@ -1005,8 +1011,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "pid", pdata->pid);
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
-			zbx_json_addstring(&j, "jname", pdata->jname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "jname", pdata->jname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "group", ZBX_NULL2EMPTY_STR(pdata->group), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "uid", pdata->uid);
