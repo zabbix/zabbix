@@ -1806,7 +1806,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   line-height: 18px;
   overflow: hidden; }
   .expandable-subfilter.ten-lines {
-    max-height: calc(18px * 10); }
+    max-height: calc(20px * 10); }
   .expandable-subfilter > div {
     display: inline; }
   .expandable-subfilter .hidden {
@@ -2592,7 +2592,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
 
 .subfilter {
   margin-right: 10px;
-  white-space: nowrap; }
+  white-space: nowrap;
+  line-height: 14px;
+  height: 16px;
+  margin-bottom: 2px; }
 
 .subfilter-enabled {
   background-color: #333333;
