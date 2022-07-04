@@ -83,6 +83,12 @@ require_once dirname(__FILE__).'/items/testItemTypeSelection.php';
 require_once dirname(__FILE__).'/items/testPageItemPrototypes.php';
 require_once dirname(__FILE__).'/items/testPageItems.php';
 
+// LLD.
+require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
+require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
+require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
@@ -111,7 +117,6 @@ require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
 require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
-require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testPasswordComplexity.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
@@ -149,10 +154,7 @@ require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
-require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
-require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
-require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosAdministrationGeneral.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
@@ -198,7 +200,6 @@ require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
 require_once dirname(__FILE__).'/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/testInheritanceWeb.php';
-require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
@@ -297,6 +298,13 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageItemPrototypes');
 		$suite->addTestSuite('testPageItems');
 
+		// LLD.
+		$suite->addTestSuite('testFormLowLevelDiscovery');
+		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
+		$suite->addTestSuite('testFormTestLowLevelDiscovery');
+		$suite->addTestSuite('testInheritanceDiscoveryRule');
+		$suite->addTestSuite('testPageLowLevelDiscovery');
+
 
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
@@ -320,7 +328,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageTriggerUrl');
 		$suite->addTestSuite('testPageTriggerPrototypes');
 		$suite->addTestSuite('testPageLatestData');
-		$suite->addTestSuite('testPageLowLevelDiscovery');
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMassUpdateItems');
@@ -367,10 +374,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHostGroup');
-		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testFormLogin');
-		$suite->addTestSuite('testFormLowLevelDiscovery');
-		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
 		$suite->addTestSuite('testFormMacrosHost');
 		$suite->addTestSuite('testFormMacrosHostPrototype');
@@ -415,7 +419,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceGraph');
 		$suite->addTestSuite('testInheritanceGraphPrototype');
 		$suite->addTestSuite('testInheritanceWeb');
-		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testInheritanceHostPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testLanguage');
