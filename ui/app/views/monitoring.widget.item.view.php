@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -168,6 +168,13 @@ function drawValueCell(array $cell_data): array {
 		$item_content_div->addItem($item_decimals_div);
 	}
 
+	// Units AFTER value.
+	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == WIDGET_ITEM_POS_AFTER) {
+		$item_content_div->addItem($units_div);
+	}
+
+	$item_cell[] = $item_content_div;
+
 	if (array_key_exists('change_indicator', $cell_data['parts'])) {
 		$change_data = $cell_data['parts']['change_indicator'];
 		$item_change_div = (new CDiv())->addClass('change-indicator');
@@ -190,13 +197,6 @@ function drawValueCell(array $cell_data): array {
 		$item_change_div->addItem(new CSvgArrow($arrow_data));
 		$item_content_div->addItem($item_change_div);
 	}
-
-	// Units AFTER value.
-	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == WIDGET_ITEM_POS_AFTER) {
-		$item_content_div->addItem($units_div);
-	}
-
-	$item_cell[] = $item_content_div;
 
 	// Units BELOW value.
 	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == WIDGET_ITEM_POS_BELOW) {

@@ -69,7 +69,7 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 
 	level = duk_to_int(ctx, 0);
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 1), &message))
+	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 1), &message))
 	{
 		message = zbx_strdup(message, duk_to_string(ctx, 1));
 		zbx_replace_invalid_utf8(message);

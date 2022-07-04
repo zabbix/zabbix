@@ -27,15 +27,16 @@ import (
 	"sort"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/alias"
 	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/plugins/external"
 )
 
@@ -538,6 +539,8 @@ func (m *Manager) init() {
 }
 
 func (m *Manager) Start() {
+	log.Infof("%s", comms.GetPluginVersionMessage())
+
 	monitor.Register(monitor.Scheduler)
 	go m.run()
 }

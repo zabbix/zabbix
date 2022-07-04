@@ -24,12 +24,13 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/plugin/comms"
 	"zabbix.com/plugins/external"
 )
 
@@ -47,6 +48,10 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 		if err := conf.Unmarshal(p, &o, false); err != nil {
 			// not an external plugin, just ignore the error
 			continue
+		}
+
+		if err := checkPath(o.System.Path); err != nil {
+			return "", err
 		}
 
 		paths[name] = o.System.Path
@@ -114,6 +119,14 @@ func initExternalPlugin(name string, p *external.Plugin, options *agent.AgentOpt
 	}
 
 	return
+}
+
+func checkPath(path string) error {
+	if !filepath.IsAbs(path) {
+		return fmt.Errorf("failed to start plugin %s, path must be absolute", path)
+	}
+
+	return nil
 }
 
 func validate(p *external.Plugin, options interface{}) error {

@@ -2014,6 +2014,7 @@ typedef struct
 	zbx_vector_ptr_t	group_prototypes;	/* list of group prototypes */
 	zbx_vector_macros_t	hostmacros;		/* list of user macros */
 	zbx_vector_db_tag_ptr_t	tags;			/* list of host prototype tags */
+	zbx_vector_db_tag_ptr_t	new_tags;		/* list of host prototype template tags */
 	zbx_vector_interfaces_t	interfaces;		/* list of interfaces */
 	char			*host;
 	char			*name_orig;
@@ -2031,8 +2032,8 @@ typedef struct
 	unsigned char		discover;
 	unsigned char		custom_interfaces_orig;
 	unsigned char		custom_interfaces;
-	char			inventory_mode_orig;
-	char			inventory_mode;
+	signed char		inventory_mode_orig;
+	signed char		inventory_mode;
 	zbx_uint64_t		templateid_host;
 }
 zbx_host_prototype_t;
@@ -2105,6 +2106,8 @@ static void	DBhost_prototype_clean(zbx_host_prototype_t *host_prototype)
 	zbx_vector_macros_destroy(&host_prototype->hostmacros);
 	zbx_vector_db_tag_ptr_clear_ext(&host_prototype->tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&host_prototype->tags);
+	zbx_vector_db_tag_ptr_clear_ext(&host_prototype->new_tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&host_prototype->new_tags);
 	zbx_vector_interfaces_clear_ext(&host_prototype->interfaces, DBhost_interface_free);
 	zbx_vector_interfaces_destroy(&host_prototype->interfaces);
 	DBgroup_prototypes_clean(&host_prototype->group_prototypes);
@@ -2191,6 +2194,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		zbx_vector_ptr_create(&host_prototype->group_prototypes);
 		zbx_vector_macros_create(&host_prototype->hostmacros);
 		zbx_vector_db_tag_ptr_create(&host_prototype->tags);
+		zbx_vector_db_tag_ptr_create(&host_prototype->new_tags);
 		zbx_vector_interfaces_create(&host_prototype->interfaces);
 		host_prototype->host = zbx_strdup(NULL, row[2]);
 		host_prototype->name = zbx_strdup(NULL, row[3]);
@@ -2207,7 +2211,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		if (SUCCEED == DBis_null(row[7]))
 			host_prototype->inventory_mode = HOST_INVENTORY_DISABLED;
 		else
-			host_prototype->inventory_mode = (char)atoi(row[7]);
+			host_prototype->inventory_mode = (signed char)atoi(row[7]);
 
 		host_prototype->inventory_mode_orig = HOST_INVENTORY_DISABLED;
 
@@ -2252,7 +2256,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 				if (host_prototype->itemid == itemid && 0 == strcmp(host_prototype->host, row[2]))
 				{
-					char	inventory_mode_null_processed;
+					signed char	inventory_mode_null_processed;
 
 					ZBX_STR2UINT64(host_prototype->hostid, row[1]);
 
@@ -2283,7 +2287,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 					if (SUCCEED == DBis_null(row[8]))
 						inventory_mode_null_processed = HOST_INVENTORY_DISABLED;
 					else
-						inventory_mode_null_processed = (char)atoi(row[8]);
+						inventory_mode_null_processed = (signed char)atoi(row[8]);
 
 					if (host_prototype->inventory_mode != inventory_mode_null_processed)
 					{
@@ -2956,20 +2960,18 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
  *                                                                            *
  * Parameters: host_prototypes - [IN/OUT] list of host prototypes             *
  *                                   should be sorted by templateid           *
- *             del_tagids      - [OUT] list of host tagids which              *
- *                                   should be deleted                        *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
  ******************************************************************************/
-static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_vector_uint64_t *del_tagids)
+static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	hostids;
-	zbx_uint64_t		hostid, tagid;
+	zbx_uint64_t		hostid;
 	zbx_host_prototype_t	*host_prototype = NULL;
 	zbx_db_tag_t		*tag;
 	int			i;
@@ -3010,7 +3012,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 
 		tag = zbx_db_tag_create(row[1], row[2]);
 		tag->tagid = 0;
-		zbx_vector_db_tag_ptr_append(&host_prototype->tags, tag);
+		zbx_vector_db_tag_ptr_append(&host_prototype->new_tags, tag);
 	}
 	DBfree_result(result);
 
@@ -3028,11 +3030,9 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 		zbx_vector_uint64_append(&hostids, host_prototype->hostid);
 	}
 
-	/* replace existing tags with the new tags */
 	if (0 != hostids.values_num)
 	{
-		int			tag_index = 0;
-		zbx_host_prototype_t	*host_prototype_local = NULL;
+		host_prototype = NULL;
 
 		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -3045,55 +3045,37 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			ZBX_STR2UINT64(tagid, row[0]);
-			ZBX_STR2UINT64(hostid, row[1]);
+			ZBX_DBROW2UINT64(hostid, row[1]);
 
-			if (NULL == host_prototype_local || host_prototype_local->hostid != hostid)
+			if (NULL == host_prototype || host_prototype->hostid != hostid)
 			{
-				tag_index = 0;
-
 				for (i = 0; i < host_prototypes->values_num; i++)
 				{
-					host_prototype_local = (zbx_host_prototype_t *)host_prototypes->values[i];
+					host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 
-					if (host_prototype_local->hostid == hostid)
+					if (host_prototype->hostid == hostid)
 						break;
 				}
 
-				if (NULL != host_prototype_local && host_prototype_local->hostid != hostid)
+				if (NULL == host_prototype || host_prototype->hostid != hostid)
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
 				}
 			}
 
-			if (NULL == host_prototype_local)
-				continue;
-
-			if (tag_index < host_prototype_local->tags.values_num)
-			{
-				host_prototype_local->tags.values[tag_index]->tagid = tagid;
-				host_prototype_local->tags.values[tag_index]->flags |= ZBX_FLAG_DB_TAG_UPDATE_TAG |
-						ZBX_FLAG_DB_TAG_UPDATE_VALUE;
-
-				host_prototype_local->tags.values[tag_index]->tag_orig = zbx_strdup(NULL, row[2]);
-				host_prototype_local->tags.values[tag_index]->value_orig = zbx_strdup(NULL, row[3]);
-			}
-			else
-			{
-				zbx_vector_uint64_append(del_tagids, tagid);
-
-				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype_local->hostid,
-						host_prototype_local->host);
-				zbx_audit_host_prototype_update_json_delete_tag(host_prototype_local->hostid, tagid);
-			}
-
-			tag_index++;
+			tag = zbx_db_tag_create(row[2], row[3]);
+			ZBX_DBROW2UINT64(tag->tagid, row[0]);
+			zbx_vector_db_tag_ptr_append(&host_prototype->tags, tag);
 		}
 		DBfree_result(result);
 	}
 
-	zbx_vector_uint64_sort(del_tagids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	for (i = 0; i < host_prototypes->values_num; i++)
+	{
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+		(void)zbx_merge_tags(&host_prototype->tags, &host_prototype->new_tags, NULL, NULL);
+	}
 
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_free(sql);
@@ -3477,7 +3459,6 @@ static void	DBhost_prototypes_interface_snmp_prepare_sql(zbx_uint64_t hostid, co
  * Parameters: host_prototypes      - [IN] vector of host prototypes          *
  *             del_hosttemplateids  - [IN] host template ids for delete       *
  *             del_hostmacroids     - [IN] host macro ids for delete          *
- *             del_tagids           - [IN] tag ids for delete                 *
  *             del_interfaceids     - [IN] interface ids for delete           *
  *             del_snmpids          - [IN] SNMP interface ids for delete      *
  *             db_insert_htemplates - [IN/OUT] templates insert structure     *
@@ -3485,8 +3466,8 @@ static void	DBhost_prototypes_interface_snmp_prepare_sql(zbx_uint64_t hostid, co
  ******************************************************************************/
 static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		const zbx_vector_uint64_t *del_hosttemplateids, const zbx_vector_uint64_t *del_hostmacroids,
-		const zbx_vector_uint64_t *del_tagids, const zbx_vector_uint64_t *del_interfaceids,
-		const zbx_vector_uint64_t *del_snmpids, zbx_db_insert_t *db_insert_htemplates)
+		const zbx_vector_uint64_t *del_interfaceids, const zbx_vector_uint64_t *del_snmpids,
+		zbx_db_insert_t *db_insert_htemplates)
 {
 	char				*sql1 = NULL, *sql2 = NULL, *name_esc, *value_esc;
 	size_t				sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
@@ -3505,12 +3486,13 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 					db_insert_hmacro, db_insert_tag, db_insert_iface, db_insert_snmp,
 					db_insert_inventory_mode;
 	zbx_vector_db_tag_ptr_t		upd_tags;
-	zbx_vector_uint64_t		del_inventory_modes_hostids;
+	zbx_vector_uint64_t		del_inventory_modes_hostids, del_tagids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_db_tag_ptr_create(&upd_tags);
 	zbx_vector_uint64_create(&del_inventory_modes_hostids);
+	zbx_vector_uint64_create(&del_tagids);
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
@@ -3590,6 +3572,13 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 							tag->tagid, tag->value_orig, tag->value);
 				}
 			}
+			else if (ZBX_FLAG_DB_TAG_REMOVE == tag->flags)
+			{
+				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
+						host_prototype->host);
+				zbx_audit_host_prototype_update_json_delete_tag(host_prototype->hostid, tag->tagid);
+				zbx_vector_uint64_append(&del_tagids, tag->tagid);
+			}
 		}
 
 		for (j = 0; j < host_prototype->interfaces.values_num; j++)
@@ -3634,7 +3623,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	if (0 != new_hosts_templates)
 		hosttemplateid = DBget_maxid_num("hosts_templates", new_hosts_templates);
 
-	if (0 != del_hosttemplateids->values_num || 0 != del_hostmacroids->values_num || 0 != del_tagids->values_num ||
+	if (0 != del_hosttemplateids->values_num || 0 != del_hostmacroids->values_num || 0 != del_tagids.values_num ||
 			0 != del_snmpids->values_num || 0 != del_interfaceids->values_num ||
 			0 != del_inventory_modes_hostids.values_num)
 	{
@@ -3658,11 +3647,11 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 	}
 
-	if (0 != del_tagids->values_num)
+	if (0 != del_tagids.values_num)
 	{
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from host_tag where");
-		DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hosttagid", del_tagids->values,
-				del_tagids->values_num);
+		DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hosttagid", del_tagids.values,
+				del_tagids.values_num);
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 	}
 
@@ -3833,7 +3822,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 				}
 
 				zbx_audit_host_prototype_update_json_update_inventory_mode(host_prototype->hostid,
-						host_prototype->inventory_mode_orig, host_prototype->inventory_mode);
+						(int)host_prototype->inventory_mode_orig,
+						(int)host_prototype->inventory_mode);
 			}
 		}
 
@@ -4196,7 +4186,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	}
 
 	if (SUCCEED == res && (NULL != sql2 || 0 != del_hosttemplateids->values_num ||
-			0 != del_hostmacroids->values_num || 0 != del_tagids->values_num ||
+			0 != del_hostmacroids->values_num || 0 != del_tagids.values_num ||
 			0 != del_interfaceids->values_num || 0 != del_snmpids->values_num ||
 			0 != del_inventory_modes_hostids.values_num))
 	{
@@ -4212,6 +4202,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 
 	zbx_vector_db_tag_ptr_destroy(&upd_tags);
 	zbx_vector_uint64_destroy(&del_inventory_modes_hostids);
+	zbx_vector_uint64_destroy(&del_tagids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -4244,26 +4235,24 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
 
 	if (0 != host_prototypes.values_num)
 	{
-		zbx_vector_uint64_t	del_hosttemplateids, del_group_prototypeids, del_macroids, del_tagids,
-					del_interfaceids, del_snmp_interfaceids;
+		zbx_vector_uint64_t	del_hosttemplateids, del_group_prototypeids, del_macroids, del_interfaceids,
+					del_snmp_interfaceids;
 
 		zbx_vector_uint64_create(&del_hosttemplateids);
 		zbx_vector_uint64_create(&del_group_prototypeids);
 		zbx_vector_uint64_create(&del_macroids);
-		zbx_vector_uint64_create(&del_tagids);
 		zbx_vector_uint64_create(&del_interfaceids);
 		zbx_vector_uint64_create(&del_snmp_interfaceids);
 
 		DBhost_prototypes_templates_make(&host_prototypes, &del_hosttemplateids);
 		DBhost_prototypes_groups_make(&host_prototypes, &del_group_prototypeids);
 		DBhost_prototypes_macros_make(&host_prototypes, &del_macroids);
-		DBhost_prototypes_tags_make(&host_prototypes, &del_tagids);
+		DBhost_prototypes_tags_make(&host_prototypes);
 		DBhost_prototypes_interfaces_make(&host_prototypes, &del_interfaceids, &del_snmp_interfaceids);
-		DBhost_prototypes_save(&host_prototypes, &del_hosttemplateids, &del_macroids, &del_tagids,
+		DBhost_prototypes_save(&host_prototypes, &del_hosttemplateids, &del_macroids,
 				&del_interfaceids, &del_snmp_interfaceids, db_insert_htemplates);
 		DBgroup_prototypes_delete(&del_group_prototypeids);
 
-		zbx_vector_uint64_destroy(&del_tagids);
 		zbx_vector_uint64_destroy(&del_macroids);
 		zbx_vector_uint64_destroy(&del_group_prototypeids);
 		zbx_vector_uint64_destroy(&del_snmp_interfaceids);

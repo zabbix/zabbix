@@ -38,6 +38,7 @@ void	zbx_sha256_init(sha256_ctx *ctx);
 void	zbx_sha256_process_bytes(const void *buffer, size_t len, sha256_ctx *ctx);
 void	*zbx_sha256_finish(sha256_ctx *ctx, void *resbuf);
 void	zbx_sha256_hash(const char *in, char *out);
+void	zbx_sha256_hash_len(const char *in, size_t len, char *out);
 
 void*	zbx_sha256_hash_for_hmac(const void* data, const size_t datalen, void* out, const size_t outlen);
 

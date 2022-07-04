@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"time"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 const StateNotSupported = 1

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:34Z'
+  date: '2022-07-01T09:59:17Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -719,7 +719,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.blk_read_time
+                - $.blk_write_time
             -
               type: MULTIPLIER
               parameters:
@@ -760,6 +760,19 @@ zabbix_export:
             -
               tag: component
               value: system
+          triggers:
+            -
+              uuid: 1d67b13f47134a538708c2a14dcfa6b1
+              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.sum.checksum_failures.rate)>0'
+              name: 'Dbstat: Checksum failures detected'
+              priority: AVERAGE
+              description: |
+                Data page checksum failures were detected on that DB instance.
+                https://www.postgresql.org/docs/current/checksums.html
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 0106dfc55ace4dacaff00ce2c98de2ea
           name: 'Dbstat: Conflicts'
@@ -1523,6 +1536,19 @@ zabbix_export:
                 -
                   tag: database
                   value: '{#DBNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 5995403b904349d296227647ca318f5b
+                  expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.checksum_failures.rate["{#DBNAME}"])>0'
+                  name: 'DB {#DBNAME}: Checksum failures detected'
+                  priority: AVERAGE
+                  description: |
+                    Data page checksum failures were detected on that database.
+                    https://www.postgresql.org/docs/current/checksums.html
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 4eb67f16bc2948a7927ed58c9d037466
               name: 'DB {#DBNAME}: Detected conflicts per second'
@@ -2688,8 +2714,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
+                        host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: pg_stat_database metrics'
-                        host: 'PostgreSQL by Zabbix agent 2'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -2712,8 +2738,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
+                        host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: Locks'
-                        host: 'PostgreSQL by Zabbix agent 2'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -2736,8 +2762,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
+                        host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: Size'
-                        host: 'PostgreSQL by Zabbix agent 2'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -2761,8 +2787,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'DB {#DBNAME}: Number of bloating tables'
                         host: 'PostgreSQL by Zabbix agent 2'
+                        name: 'DB {#DBNAME}: Number of bloating tables'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2785,8 +2811,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'DB {#DBNAME}: Queries'
                         host: 'PostgreSQL by Zabbix agent 2'
+                        name: 'DB {#DBNAME}: Queries'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -2810,8 +2836,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'DB {#DBNAME}: Slow queries'
                         host: 'PostgreSQL by Zabbix agent 2'
+                        name: 'DB {#DBNAME}: Slow queries'
       valuemaps:
         -
           uuid: 9f38c01c325248d4b538c0582432b541

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -52,7 +52,7 @@ zbx_add_post_js("var filterTypeSwitcher".
 
 // First column.
 $filter_column_1
-	->addRow((new CLabel(_('Host groups'), 'filter_groupid_ms')),
+	->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
 			'object_name' => 'hostGroup',
@@ -69,7 +69,7 @@ $filter_column_1
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	)
-	->addRow((new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostid_ms')),
+	->addRow((new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
 			'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
@@ -96,7 +96,7 @@ $filter_column_1
 	);
 
 if ($data['filter_data']['hosts']) {
-	$filter_column_1->addRow(_('Value mapping'),
+	$filter_column_1->addRow(new CLabel(_('Value mapping'), 'filter_valuemapids__ms'),
 		(new CMultiSelect([
 			'name' => 'filter_valuemapids[]',
 			'object_name' => 'valuemap_names',

@@ -341,7 +341,7 @@ class testUserRolesPermissions extends CWebTest {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 			$row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag');
 			$row->getColumn('Ack')->query('link:No')->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
 			$this->changeRoleRule([$data['action'] => !$action_status]);
 
@@ -1414,7 +1414,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		// Filter out unnecessary services.
 		$this->query('id:filter_tags_0_tag')->waitUntilVisible()->one()->fill('action');
-		$this->query('id:filter_tags_0_operator')->asZDropdown()->waitUntilVisible()->one()->fill('Does not exist');
+		$this->query('id:filter_tags_0_operator')->asDropdown()->waitUntilVisible()->one()->fill('Does not exist');
 
 		// Apply filter in order to see the list of available services.
 		$this->query('name:filter_set')->waitUntilClickable()->one()->click();
