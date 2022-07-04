@@ -3388,7 +3388,7 @@ double	str2double(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: str2uint64                                                       *
+ * Function: str2uint64whole                                                  *
  *                                                                            *
  * Purpose: convert string containing number, whole number in decimal         *
  *          notation or whole number in scientific notation to 64bit unsigned *
