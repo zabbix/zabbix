@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-20 12:45+0000\n"
+"PO-Revision-Date: 2022-07-03 11:18+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -5118,7 +5118,7 @@ msgstr "ימים"
 
 #: app/views/popup.acknowledge.edit.php:102
 msgid "Deactivates manual suppression."
-msgstr ""
+msgstr "משבית התעלמות ידנית."
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:391
 msgid "Debug"
@@ -6113,7 +6113,7 @@ msgstr "הצגת תרשים"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:436
 msgid "Display min/max/avg"
-msgstr ""
+msgstr "הצגת מזערי/מרבי/ממוצע"
 
 #: include/views/monitoring.sysmap.edit.php:152
 msgid "Display problems"
@@ -10977,7 +10977,7 @@ msgstr "תרשים של השעה האחרונה"
 #: include/classes/widgets/CWidgetHelper.php:1373
 msgctxt "missing data function"
 msgid "Last known"
-msgstr ""
+msgstr "האחרון הידוע"
 
 #: jsLoader.php:378
 msgid "Last month graph"
