@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 class testFormGraphs extends CWebTest {
 
+	const HOST = 'Simple form test host';
+
 	/**
 	 * Flag for graph prototype.
 	 */
@@ -71,7 +73,14 @@ class testFormGraphs extends CWebTest {
 						['field' => 'id:ymax_name', 'visible' => false], // Y axis MAX item input.
 						['field' => 'id:itemsTable', 'visible' => true]
 					],
-					'item_columns' => ['', '', 'Name', 'Function', 'Draw style', 'Y axis side', 'Color', 'Action']
+					'items' => [
+						'item_columns' => ['', '', 'Name', 'Function', 'Draw style', 'Y axis side', 'Color', 'Action'],
+						'dropdowns' => [
+							'calc_fnc' => ['all', 'min', 'avg', 'max'],
+							'drawtype' => ['Line', 'Filled region', 'Bold line', 'Dot', 'Dashed line', 'Gradient line'],
+							'yaxisside' => ['Left', 'Right']
+						]
+					]
 				]
 			],
 			[
@@ -100,7 +109,13 @@ class testFormGraphs extends CWebTest {
 						['field' => 'id:ymax_name', 'visible' => false], // Y axis MAX item input.
 						['field' => 'id:itemsTable', 'visible' => true]
 					],
-					'item_columns' => ['', '', 'Name', 'Function', 'Y axis side', 'Color', 'Action']
+					'items' => [
+						'item_columns' => ['', '', 'Name', 'Function', 'Y axis side', 'Color', 'Action'],
+						'dropdowns' => [
+							'calc_fnc' => ['min', 'avg', 'max'],
+							'yaxisside' => ['Left', 'Right']
+						]
+					]
 				]
 			],
 			[
@@ -129,7 +144,13 @@ class testFormGraphs extends CWebTest {
 						['field' => 'id:show_3d', 'value' => false],
 						['field' => 'id:itemsTable', 'visible' => true]
 					],
-					'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Color', 'Action']
+					'items' => [
+						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Color', 'Action'],
+						'dropdowns' => [
+							'type' => ['Simple', 'Graph sum'],
+							'calc_fnc' => ['min', 'avg', 'max', 'last']
+						]
+					]
 				]
 			],
 			[
@@ -158,7 +179,13 @@ class testFormGraphs extends CWebTest {
 						['field' => 'id:show_3d', 'value' => false],
 						['field' => 'id:itemsTable', 'visible' => true]
 					],
-					'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Color', 'Action']
+					'items' => [
+						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Color', 'Action'],
+						'dropdowns' => [
+							'type' => ['Simple', 'Graph sum'],
+							'calc_fnc' => ['min', 'avg', 'max', 'last']
+						]
+					]
 				]
 			],
 			[
@@ -203,7 +230,7 @@ class testFormGraphs extends CWebTest {
 		];
 	}
 
-	public function checkGraphLayout($data) {
+	public function checkGraphFormLayout($data) {
 		$this->page->login()->open($this->url)->waitUntilReady();
 		$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
 				->one()->click();
@@ -257,7 +284,7 @@ class testFormGraphs extends CWebTest {
 		};
 
 		// Check items functions fields depending on graph type.
-		if (array_key_exists('item_columns', $data)) {
+		if (array_key_exists('items', $data)) {
 			$form->invalidate();
 			$items_container = $form->getFieldContainer('Items');
 
@@ -270,7 +297,14 @@ class testFormGraphs extends CWebTest {
 			$dialog->query('link', $item['name'])->waitUntilClickable()->one()->click();
 			$dialog->waitUntilNotPresent();
 
-			$this->assertEquals($data['item_columns'], $form->query('id:itemsTable')->asTable()->one()->getHeadersText());
+			$this->assertEquals($data['items']['item_columns'], $form->query('id:itemsTable')->asTable()->one()->getHeadersText());
+
+			// Check items functions dropdown options depending on graph type.
+			foreach ($data['items']['dropdowns'] as $function => $options) {
+				$this->assertEquals($options, $items_container->query('xpath:.//z-select[@name="items[0]['.$function.']"]')
+						->asDropdown()->one()->getOptions()->asText()
+				);
+			}
 		}
 	}
 
@@ -497,7 +531,7 @@ class testFormGraphs extends CWebTest {
 			foreach ($data['yaxis_items'] as $y => $yaxis_item) {
 				$form->query(($this->prototype) ? 'id:yaxis_'.$y.'_prototype' : 'id:yaxis_'.$y)->waitUntilClickable()->one()->click();
 				$dialog = COverlayDialogElement::find()->one();
-				$dialog->query('link', $yaxis_item['value'])->waitUntilClickable()->one()->click();
+				$dialog->query('link', $yaxis_item)->waitUntilClickable()->one()->click();
 				$dialog->waitUntilNotPresent();
 			}
 		}
@@ -515,7 +549,7 @@ class testFormGraphs extends CWebTest {
 
 				// Check that added item link appeared.
 				$item_row = $items_container->query('xpath:.//tr[@id="items_'.$i.'"]')->one()->waitUntilPresent();
-				$this->assertTrue($item_row->query('link', $item['host'].': '.$item['item'])->one()->isClickable());
+				$this->assertTrue($item_row->query('link', self::HOST.': '.$item['item'])->one()->isClickable());
 
 				// Add line styling functions.
 				if (array_key_exists('functions', $item)) {
@@ -554,7 +588,7 @@ class testFormGraphs extends CWebTest {
 			// Check Y axis Item values fake multiselects.
 			if (array_key_exists('yaxis_items', $data)) {
 				foreach ($data['yaxis_items'] as $y => $yaxis_item) {
-					$this->assertEquals($yaxis_item['host'].': '.$yaxis_item['value'],
+					$this->assertEquals(self::HOST.': '.$yaxis_item,
 							$form->query('id:y'.$y.'_name')->one()->getAttribute('value')
 					);
 				}
@@ -569,7 +603,7 @@ class testFormGraphs extends CWebTest {
 			// Check saved items names.
 			foreach ($data['items'] as $i => $item) {
 				$item_row = $items_container->query('xpath:.//tr[@id="items_'.$i.'"]')->one()->waitUntilPresent();
-				$this->assertTrue($item_row->query('link', $item['host'].': '.$item['item'])->one()->isClickable());
+				$this->assertTrue($item_row->query('link', self::HOST.': '.$item['item'])->one()->isClickable());
 
 				// Check lines styling functions.
 				if (array_key_exists('functions', $item)) {

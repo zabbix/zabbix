@@ -33,7 +33,7 @@ class testFormGraph extends testFormGraphs {
 	 * @dataProvider getLayoutData
 	 */
 	public function testFormGraph_Layout($data) {
-		$this->checkGraphLayout($data);
+		$this->checkGraphFormLayout($data);
 	}
 
 	public function getGraphData() {
@@ -46,7 +46,6 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem',
 							'color' => ''
 						]
@@ -69,7 +68,6 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem'
 						]
 					],
@@ -91,7 +89,6 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem'
 						]
 					],
@@ -108,7 +105,6 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem'
 						]
 					]
@@ -122,7 +118,6 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem'
 						]
 					],
@@ -143,7 +138,6 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
 							'color'=> 'AB47BC',
 							'functions' => [
@@ -152,7 +146,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb2" of scenario "testFormWeb2".',
 							'color'=> 'FFA000',
 							'functions' => [
@@ -161,7 +154,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
 							'color'=> 'FFA001',
 							'functions' => [
@@ -194,12 +186,11 @@ class testFormGraph extends testFormGraphs {
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item'),
 					],
 					'yaxis_items' => [
-						'min' => ['host' => 'Simple form test host', 'value' => 'Failed step of scenario "testFormWeb1".'],
-						'max' => ['host' => 'Simple form test host', 'value' => 'Download speed for scenario "testFormWeb1".']
+						'min' => 'Failed step of scenario "testFormWeb1".',
+						'max' => 'Download speed for scenario "testFormWeb1".'
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem',
 							'color'=> 'BBDEFB',
 							'functions' => [
@@ -209,7 +200,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem2',
 							'color'=> 'FBC02D',
 							'functions' => [
@@ -219,7 +209,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem3',
 							'color'=> '7B1FA2',
 							'functions' => [
@@ -229,7 +218,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem3',
 							'color'=> 'FFE082',
 							'functions' => [
@@ -239,7 +227,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem4',
 							'color'=> '7F3700',
 							'functions' => [
@@ -268,7 +255,6 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem',
 							'color'=> '00897B',
 							'functions' => [
@@ -277,7 +263,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem',
 							'color'=> 'C3C3C3',
 							'functions' => [
@@ -286,7 +271,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem',
 							'color'=> '00897B',
 							'functions' => [
@@ -307,7 +291,6 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Failed step of scenario "testFormWeb1".',
 							'color'=> 'D2D2D2',
 							'functions' => [
@@ -316,7 +299,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Failed step of scenario "testFormWeb2".',
 							'color'=> 'C0CA33',
 							'functions' => [
@@ -337,7 +319,6 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Failed step of scenario "testFormWeb3".',
 							'color'=> 'AB47BC',
 							'functions' => [
@@ -346,7 +327,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Failed step of scenario "testFormWeb4".',
 							'color'=> 'FFA000',
 							'functions' => [
@@ -367,7 +347,6 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
 							'color'=> 'AB47BC',
 							'functions' => [
@@ -376,7 +355,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb2" of scenario "testFormWeb2".',
 							'color'=> 'FFA000',
 							'functions' => [
@@ -397,7 +375,6 @@ class testFormGraph extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
 							'color'=> 'AB47BC',
 							'functions' => [
@@ -406,7 +383,6 @@ class testFormGraph extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb4" of scenario "testFormWeb4".',
 							'color'=> 'FFA000',
 							'functions' => [

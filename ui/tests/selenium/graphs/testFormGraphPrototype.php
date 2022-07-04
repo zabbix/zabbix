@@ -34,7 +34,7 @@ class testFormGraphPrototype extends testFormGraphs {
 	 * @dataProvider getLayoutData
 	 */
 	public function testFormGraphPrototype_Layout($data) {
-		$this->checkGraphLayout($data);
+		$this->checkGraphFormLayout($data);
 	}
 
 	public function getGraphPrototypeData() {
@@ -47,7 +47,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'testFormItem'
 						]
 					],
@@ -66,7 +65,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					'items' =>[
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype1',
 							'color' => ''
 						]
@@ -85,7 +83,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					'items' =>[
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype1'
 						]
 					]
@@ -100,7 +97,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					'items' =>[
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype1'
 						]
 					],
@@ -120,7 +116,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					'items' =>[
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype1',
 							'color'=> 'AB47BC',
 							'functions' => [
@@ -130,7 +125,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype2',
 							'color'=> 'FFA000',
 							'functions' => [
@@ -140,7 +134,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype3',
 							'color'=> 'FFA001',
 							'functions' => [
@@ -166,7 +159,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					'items' =>[
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype1',
 							'color'=> 'AB47BC',
 							'functions' => [
@@ -175,7 +167,6 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
 							'color'=> 'FFA000',
 							'functions' => [
@@ -209,13 +200,12 @@ class testFormGraphPrototype extends testFormGraphs {
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item'),
 					],
 					'yaxis_items' => [
-						'min' => ['host' => 'Simple form test host', 'value' => 'testFormItemPrototype1'],
-						'max' => ['host' => 'Simple form test host', 'value' => 'testFormItemPrototype2']
+						'min' => 'testFormItemPrototype1',
+						'max' => 'testFormItemPrototype2'
 					],
 					'items' =>[
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype1',
 							'color'=> 'BBDEFB',
 							'functions' => [
@@ -226,7 +216,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype2',
 							'color'=> 'FBC02D',
 							'functions' => [
@@ -237,7 +226,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype3',
 							'color'=> '7B1FA2',
 							'functions' => [
@@ -248,7 +236,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype4',
 							'color'=> 'FFE082',
 							'functions' => [
@@ -259,7 +246,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemReuse',
 							'color'=> '7F3700',
 							'functions' => [
@@ -289,7 +275,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					'items' =>[
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype1',
 							'color'=> '00897B',
 							'functions' => [
@@ -299,7 +284,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype2',
 							'color'=> 'C3C3C3',
 							'functions' => [
@@ -309,7 +293,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype3',
 							'color'=> '00897B',
 							'functions' => [
@@ -331,7 +314,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					'items' =>[
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype1',
 							'color'=> 'D2D2D2',
 							'functions' => [
@@ -341,7 +323,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype2',
 							'color'=> 'C0CA33',
 							'functions' => [
@@ -363,7 +344,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					'items' =>[
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype3',
 							'color'=> 'AB47BC',
 							'functions' => [
@@ -373,7 +353,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype4',
 							'color'=> 'FFA000',
 							'functions' => [
@@ -395,7 +374,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					'items' =>[
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype1',
 							'color'=> 'AB47BC',
 							'functions' => [
@@ -405,7 +383,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype2',
 							'color'=> 'FFA000',
 							'functions' => [
@@ -414,7 +391,6 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
 							'color'=> 'AB47BC',
 							'functions' => [
@@ -423,7 +399,6 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb4" of scenario "testFormWeb4".',
 							'color'=> 'FFA000',
 							'functions' => [
@@ -444,7 +419,6 @@ class testFormGraphPrototype extends testFormGraphs {
 					],
 					'items' =>[
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
 							'color'=> 'AB47BC',
 							'functions' => [
@@ -453,7 +427,6 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'host' => 'Simple form test host',
 							'item' => 'Response code for step "testFormWeb4" of scenario "testFormWeb4".',
 							'color'=> 'FFA000',
 							'functions' => [
@@ -463,7 +436,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype1',
 							'color'=> 'AB47BC',
 							'functions' => [
@@ -473,7 +445,6 @@ class testFormGraphPrototype extends testFormGraphs {
 						],
 						[
 							'prototype' => true,
-							'host' => 'Simple form test host',
 							'item' => 'testFormItemPrototype2',
 							'color'=> 'FFA000',
 							'functions' => [
