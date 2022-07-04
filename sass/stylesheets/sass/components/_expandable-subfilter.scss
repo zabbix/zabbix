@@ -8,7 +8,7 @@
 	overflow: hidden;
 
 	&.ten-lines {
-		max-height: calc(#{$line-height} * 10);
+		max-height: calc(#{$line-height + 2} * 10);
 	}
 
 	> div {
