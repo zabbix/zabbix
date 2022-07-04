@@ -46,6 +46,13 @@ class CPieGraphDraw extends CGraphDraw {
 			'webitems' => true
 		]);
 
+		if (!$items) {
+			$items = API::ItemPrototype()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid'],
+				'itemids' => [$itemid]
+			]);
+		}
+
 		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		$this->items[$this->num] = reset($items);
@@ -145,6 +152,12 @@ class CPieGraphDraw extends CGraphDraw {
 			'output' => ['itemid', 'hostid', 'value_type', 'units', 'history', 'trends'],
 			'itemids' => array_column($this->items, 'itemid'),
 			'webitems' => true,
+			'preservekeys' => true
+		]);
+
+		$db_items = $db_items + API::ItemPrototype()->get([
+			'output' => ['itemid', 'hostid', 'value_type', 'units', 'history', 'trends'],
+			'itemids' => array_column($this->items, 'itemid'),
 			'preservekeys' => true
 		]);
 
