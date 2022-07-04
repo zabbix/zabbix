@@ -3388,6 +3388,47 @@ double	str2double(const char *str)
 
 /******************************************************************************
  *                                                                            *
+ * Function: str2uint64                                                       *
+ *                                                                            *
+ * Purpose: convert string containing number, whole number in decimal         *
+ *          notation or whole number in scientific notation to 64bit unsigned *
+ *          integer                                                           *
+ *                                                                            *
+ * Parameters: str   - string to convert                                      *
+ *             value - a pointer to converted value                           *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned integer                    *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Comments: the function automatically processes suffixes                    *
+ *                                                                            *
+ ******************************************************************************/
+int	str2uint64whole(const char *str, zbx_uint64_t *value)
+{
+	double	value_dbl;
+
+	if (SUCCEED == str2uint64(str, ZBX_UNIT_SYMBOLS, value))
+		return SUCCEED;
+
+	if ('-' == *str)
+		return FAIL;
+
+	if (FAIL == is_double_suffix(str, ZBX_FLAG_DOUBLE_SUFFIX))
+		return FAIL;
+
+	value_dbl = str2double(str);
+
+	if (floor(value_dbl) == value_dbl)
+	{
+		*value = value_dbl;
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: is_hostname_char                                                 *
  *                                                                            *
  * Return value:  SUCCEED - the char is allowed in the host name              *
