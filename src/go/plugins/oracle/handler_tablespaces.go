@@ -21,7 +21,6 @@ package oracle
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -29,9 +28,11 @@ import (
 )
 
 const (
-	temp = "TEMPORARY"
-	perm = "PERMANENT"
-	undo = "UNDO"
+	temp          = "TEMPORARY"
+	perm          = "PERMANENT"
+	undo          = "UNDO"
+	defaultPERMTS = "USERS"
+	defaultTEMPTS = "TEMP"
 )
 
 func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]string,
@@ -65,16 +66,14 @@ func getQuery(params map[string]string) (string, error) {
 	ts := params["Tablespace"]
 	t := params["Type"]
 
-	if ts == "" {
-		if t != "" {
-			return "", zbxerr.ErrorInvalidParams.Wrap(errors.New("table-space name must also be provided"))
-		}
-
+	if ts == "" && t == "" {
 		return getFullQuery(), nil
 	}
 
-	if t == "" {
-		return "", zbxerr.ErrorInvalidParams.Wrap(errors.New("table-space type must also be provided"))
+	var err error
+	ts, t, err = prepValues(ts, t)
+	if err != nil {
+		return "", zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
 	var query string
@@ -89,6 +88,26 @@ func getQuery(params map[string]string) (string, error) {
 	}
 
 	return query, nil
+}
+
+func prepValues(ts, t string) (outTableSpace string, outType string, err error) {
+	if ts != "" && t != "" {
+		return ts, t, nil
+	}
+
+	if ts == "" {
+		if t == perm {
+			return defaultPERMTS, t, nil
+		}
+
+		if t == temp {
+			return defaultTEMPTS, t, nil
+		}
+
+		return "", "", fmt.Errorf("incorrect type %s", t)
+	}
+
+	return ts, perm, nil
 }
 
 func getFullQuery() string {
