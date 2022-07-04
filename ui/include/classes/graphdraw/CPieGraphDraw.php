@@ -41,7 +41,7 @@ class CPieGraphDraw extends CGraphDraw {
 	/********************************************************************************************************/
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_'],
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid'],
 			'itemids' => [$itemid],
 			'webitems' => true
 		]);
