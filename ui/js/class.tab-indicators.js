@@ -1299,18 +1299,18 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const legend_node = document.getElementById('legend');
+		const legend = document.getElementById('legend');
 
-		if (legend_node !== null) {
-			legend_node.addEventListener('click', () => {
+		if (legend !== null) {
+			legend.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
 		}
 
-		const legend_lines_node = document.getElementById('legend_lines');
+		const legend_lines = document.getElementById('legend_lines');
 
 		if (legend_lines !== null) {
-			legend_lines_node.parentNode.addEventListener('change', () => {
+			legend_lines.parentNode.addEventListener('change', () => {
 				this.addAttributes(element);
 			});
 		}
