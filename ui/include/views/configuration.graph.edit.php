@@ -202,7 +202,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMinData[] = (new CMultiSelect([
 			'name' => 'ymin_itemid',
-			'object_name' => 'ymin_itemid',
+			'object_name' => 'items',
 			'data' => $ymin_axis_ms_data,
 			'multiple' => false,
 			'disabled' => $readonly,
@@ -296,7 +296,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMaxData[] = (new CMultiSelect([
 			'name' => 'ymax_itemid',
-			'object_name' => 'ymax_itemid',
+			'object_name' => 'items',
 			'data' => $ymax_axis_ms_data,
 			'multiple' => false,
 			'disabled' => $readonly,
