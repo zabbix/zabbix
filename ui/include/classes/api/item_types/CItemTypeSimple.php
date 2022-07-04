@@ -23,6 +23,11 @@ class CItemTypeSimple extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_SIMPLE;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['interfaceid', 'username', 'password', 'delay'];
 
 	/**
@@ -31,8 +36,8 @@ class CItemTypeSimple extends CItemType {
 	public static function getCreateValidationRules(array $item): array {
 		return [
 			'interfaceid' =>	self::getCreateFieldRule('interfaceid', $item),
-			'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
+			'username' =>		self::getCreateFieldRule('username', $item),
+			'password' =>		self::getCreateFieldRule('password', $item),
 			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
 	}
@@ -43,8 +48,8 @@ class CItemTypeSimple extends CItemType {
 	public static function getUpdateValidationRules(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRule('interfaceid', $db_item),
-			'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
+			'username' =>		self::getUpdateFieldRule('username', $db_item),
+			'password' =>		self::getUpdateFieldRule('password', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
@@ -55,8 +60,8 @@ class CItemTypeSimple extends CItemType {
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRuleInherited('interfaceid', $db_item),
-			'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
+			'username' =>		self::getUpdateFieldRuleInherited('username', $db_item),
+			'password' =>		self::getUpdateFieldRuleInherited('password', $db_item),
 			'delay' =>			self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
@@ -66,10 +71,10 @@ class CItemTypeSimple extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'interfaceid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'username' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'password' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'delay' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'interfaceid' =>	self::getUpdateFieldRuleDiscovered('interfaceid'),
+			'username' =>		self::getUpdateFieldRuleDiscovered('username'),
+			'password' =>		self::getUpdateFieldRuleDiscovered('password'),
+			'delay' =>			self::getUpdateFieldRuleDiscovered('delay'),
 		];
 	}
 }

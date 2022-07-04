@@ -23,6 +23,11 @@ class CItemTypeCalculated extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_CALCULATED;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['params', 'delay'];
 
 	/**
@@ -30,7 +35,7 @@ class CItemTypeCalculated extends CItemType {
 	 */
 	public static function getCreateValidationRules(array $item): array {
 		return [
-			'params' =>	['type' => API_CALC_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'params')],
+			'params' =>	self::getCreateFieldRule('params', $item),
 			'delay' =>	self::getCreateFieldRule('delay', $item)
 		];
 	}
@@ -40,16 +45,7 @@ class CItemTypeCalculated extends CItemType {
 	 */
 	public static function getUpdateValidationRules(array $db_item): array {
 		return [
-			'params' =>	['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function () use ($db_item): bool {
-								return in_array($db_item['type'], [
-									ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-									ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
-									ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
-								]);
-							}, 'type' => API_CALC_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'params')],
-							['else' => true, 'type' => API_CALC_FORMULA, 'length' => DB::getFieldLength('items', 'params')]
-			]],
+			'params' =>	self::getUpdateFieldRule('params', $db_item),
 			'delay' =>	self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
@@ -59,7 +55,7 @@ class CItemTypeCalculated extends CItemType {
 	 */
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
-			'params' =>	['type' => API_CALC_FORMULA, 'length' => DB::getFieldLength('items', 'params')],
+			'params' =>	self::getUpdateFieldRuleInherited('params', $db_item),
 			'delay' =>	self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
@@ -69,8 +65,8 @@ class CItemTypeCalculated extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'params' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'delay' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'params' =>	self::getUpdateFieldRuleDiscovered('params'),
+			'delay' =>	self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}
 }

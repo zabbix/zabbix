@@ -23,6 +23,11 @@ class CItemTypeHttpAgent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_HTTPAGENT;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['url', 'query_fields', 'request_method', 'timeout', 'post_type', 'posts', 'headers',
 		'status_codes', 'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy', 'authtype', 'username',
 		'password', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'interfaceid',
@@ -39,7 +44,6 @@ class CItemTypeHttpAgent extends CItemType {
 			'url' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'url')],
 			'query_fields' =>		['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
 			'request_method' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]), 'default' => DB::getDefault('items', 'request_method')],
-			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')],
 			'post_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]), 'default' => DB::getDefault('items', 'post_type')],
 			'posts' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_RAW], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'posts')],
@@ -55,30 +59,19 @@ class CItemTypeHttpAgent extends CItemType {
 			]],
 			'output_format' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON])],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'http_proxy')],
-			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]), 'default' => DB::getDefault('items', 'authtype')],
-			'username' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'username')]
-			]],
-			'password' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'password')]
-			]],
+			'interfaceid' =>		self::getCreateFieldRule('interface', $item),
+			'authtype' =>			self::getCreateFieldRule('authtype', $item),
+			'username' =>			self::getCreateFieldRule('username', $item),
+			'password' =>			self::getCreateFieldRule('password', $item),
 			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
 			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
-			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
-										['else' => true, 'type' => API_EMPTY_ID]
-			]],
+			'timeout' =>			self::getCreateFieldRule('timeout', $item),
 			'delay' =>				self::getCreateFieldRule('delay', $item),
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), 'default' => DB::getDefault('items', 'allow_traps')],
-			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
-										['else' => true, 'type' => API_IP_RANGES, 'in' => DB::getDefault('items', 'trapper_hosts')]
-			]]
+			'trapper_hosts' =>		self::getCreateFieldRule('trapper_hosts', $item)
 		];
 	}
 
@@ -97,7 +90,6 @@ class CItemTypeHttpAgent extends CItemType {
 			]],
 			'query_fields' =>		['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
 			'request_method' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD])],
-			'timeout' =>			self::getUpdateFieldRule('timeout', $db_item),
 			'post_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML])],
 			'posts' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_RAW], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'posts')],
@@ -119,32 +111,19 @@ class CItemTypeHttpAgent extends CItemType {
 			]],
 			'output_format' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON])],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'http_proxy')],
-			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]), 'default' => DB::getDefault('items', 'authtype')],
-			'username' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'username')]
-			]],
-			'password' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'password')]
-			]],
+			'interfaceid' =>		self::getUpdateFieldRule('interfaceid', $db_item),
+			'authtype' =>			self::getUpdateFieldRule('authtype', $db_item),
+			'username' =>			self::getUpdateFieldRule('username', $db_item),
+			'password' =>			self::getUpdateFieldRule('password', $db_item),
 			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
 			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
-			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => static function () use ($db_item): bool {
-											return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-										}, 'type' => API_ID],
-										['else' => true, 'type' => API_EMPTY_ID]
-			]],
+			'timeout' =>			self::getUpdateFieldRule('timeout', $db_item),
 			'delay' =>				self::getUpdateFieldRule('delay', $db_item),
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
-			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
-										['else' => true, 'type' => API_IP_RANGES, 'in' => DB::getDefault('items', 'trapper_hosts')]
-			]]
+			'trapper_hosts' =>		self::getUpdateFieldRule('trapper_hosts', $db_item)
 		];
 	}
 
@@ -156,7 +135,6 @@ class CItemTypeHttpAgent extends CItemType {
 			'url' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'query_fields' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'request_method' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'timeout' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'post_type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'posts' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'headers' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -165,21 +143,19 @@ class CItemTypeHttpAgent extends CItemType {
 			'retrieve_mode' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'output_format' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'http_proxy' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'authtype' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'username' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'password' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'interfaceid' =>		self::getUpdateFieldRuleInherited('interfaceid', $db_item),
+			'authtype' =>			self::getUpdateFieldRuleInherited('authtype', $db_item),
+			'username' =>			self::getUpdateFieldRuleInherited('username', $db_item),
+			'password' =>			self::getUpdateFieldRuleInherited('password', $db_item),
 			'verify_peer' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'verify_host' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'ssl_cert_file' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'ssl_key_file' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'ssl_key_password' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'interfaceid' =>		self::getUpdateFieldRuleInherited('interfaceid', $db_item),
+			'timeout' =>			self::getUpdateFieldRuleInherited('timeout', $db_item),
 			'delay' =>				self::getUpdateFieldRuleInherited('delay', $db_item),
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
-			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
-										['else' => true, 'type' => API_IP_RANGES, 'in' => DB::getDefault('items', 'trapper_hosts')]
-			]]
+			'trapper_hosts' =>		self::getUpdateFieldRuleInherited('trapper_hosts', $db_item)
 		];
 	}
 
@@ -191,7 +167,6 @@ class CItemTypeHttpAgent extends CItemType {
 			'url' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'query_fields' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'request_method' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'timeout' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'post_type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'posts' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'headers' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
@@ -200,18 +175,19 @@ class CItemTypeHttpAgent extends CItemType {
 			'retrieve_mode' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'output_format' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'http_proxy' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'authtype' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'username' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'password' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'interfaceid' =>		self::getUpdateFieldRuleDiscovered('interfaceid'),
+			'authtype' =>			self::getUpdateFieldRuleDiscovered('authtype'),
+			'username' =>			self::getUpdateFieldRuleDiscovered('username'),
+			'password' =>			self::getUpdateFieldRuleDiscovered('password'),
 			'verify_peer' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'verify_host' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'ssl_cert_file' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'ssl_key_file' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'ssl_key_password' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'interfaceid' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'delay' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'timeout' =>			self::getUpdateFieldRuleDiscovered('timeout'),
+			'delay' =>				self::getUpdateFieldRuleDiscovered('delay'),
 			'allow_traps' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'trapper_hosts' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'trapper_hosts' =>		self::getUpdateFieldRuleDiscovered('trapper_hosts')
 		];
 	}
 }

@@ -23,6 +23,11 @@ class CItemTypeSnmp extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_SNMP;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['interfaceid', 'snmp_oid', 'delay'];
 
 	/**
@@ -68,9 +73,9 @@ class CItemTypeSnmp extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'interfaceid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'interfaceid' =>	self::getUpdateFieldRuleDiscovered('interfaceid'),
 			'snmp_oid' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'delay' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}
 }

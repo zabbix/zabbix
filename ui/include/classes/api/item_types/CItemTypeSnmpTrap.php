@@ -23,6 +23,11 @@ class CItemTypeSnmpTrap extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_SNMPTRAP;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['interfaceid'];
 
 	/**
@@ -57,7 +62,7 @@ class CItemTypeSnmpTrap extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'interfaceid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'interfaceid' =>	self::getUpdateFieldRuleDiscovered('interfaceid')
 		];
 	}
 }

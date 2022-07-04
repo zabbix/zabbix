@@ -23,6 +23,11 @@ class CItemTypeIpmi extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_IPMI;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['interfaceid', 'ipmi_sensor', 'delay'];
 
 	/**
@@ -72,9 +77,9 @@ class CItemTypeIpmi extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'interfaceid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'interfaceid' =>	self::getUpdateFieldRuleDiscovered('interfaceid'),
 			'ipmi_sensor' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'delay' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}
 }

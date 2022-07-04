@@ -23,6 +23,11 @@ class CItemTypeDependent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_DEPENDENT;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['master_itemid'];
 
 	/**

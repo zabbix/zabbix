@@ -23,21 +23,24 @@ class CItemTypeScript extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_SCRIPT;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['parameters', 'params', 'timeout', 'delay'];
 
 	/**
 	 * @inheritDoc
 	 */
 	public static function getCreateValidationRules(array $item): array {
-		$is_item_prototype = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
 		return [
 			'parameters' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 								'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_parameter', 'name')],
 								'value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_parameter', 'value')]
 			]],
-			'params' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
-			'timeout' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')],
+			'params' =>		self::getCreateFieldRule('params', $item),
+			'timeout' =>	self::getCreateFieldRule('timeout', $item),
 			'delay' =>		self::getCreateFieldRule('delay', $item)
 		];
 	}
@@ -63,8 +66,8 @@ class CItemTypeScript extends CItemType {
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
 			'parameters' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'params' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'timeout' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'params' =>		self::getUpdateFieldRuleInherited('params', $db_item),
+			'timeout' =>	self::getUpdateFieldRuleInherited('timeout', $db_item),
 			'delay' =>		self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
@@ -75,9 +78,9 @@ class CItemTypeScript extends CItemType {
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
 			'parameters' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'params' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'timeout' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'delay' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'params' =>		self::getUpdateFieldRuleDiscovered('params'),
+			'timeout' =>	self::getUpdateFieldRuleDiscovered('timeout'),
+			'delay' =>		self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}
 }

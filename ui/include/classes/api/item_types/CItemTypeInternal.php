@@ -23,6 +23,11 @@ class CItemTypeInternal extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_INTERNAL;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['delay'];
 
 	/**
@@ -57,7 +62,7 @@ class CItemTypeInternal extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'delay' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'delay' =>	self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}
 }

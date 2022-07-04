@@ -23,6 +23,11 @@ class CItemTypeTrapper extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_TRAPPER;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['trapper_hosts'];
 
 	/**
@@ -30,7 +35,7 @@ class CItemTypeTrapper extends CItemType {
 	 */
 	public static function getCreateValidationRules(array $item): array {
 		return [
-			'trapper_hosts' =>	['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')]
+			'trapper_hosts' =>	self::getCreateFieldRule('trapper_hosts', $item)
 		];
 	}
 
@@ -38,7 +43,9 @@ class CItemTypeTrapper extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRules(array $db_item): array {
-		return self::getCreateValidationRules([]);
+		return [
+			'trapper_hosts' =>	self::getUpdateFieldRule('trapper_hosts', $db_item)
+		];
 	}
 
 	/**
@@ -53,7 +60,7 @@ class CItemTypeTrapper extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'trapper_hosts' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'trapper_hosts' =>	self::getUpdateFieldRuleDiscovered('trapper_hosts')
 		];
 	}
 }

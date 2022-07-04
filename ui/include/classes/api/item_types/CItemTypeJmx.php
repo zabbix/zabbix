@@ -23,6 +23,11 @@ class CItemTypeJmx extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_JMX;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay'];
 
 	/**
@@ -32,8 +37,8 @@ class CItemTypeJmx extends CItemType {
 		return [
 			'interfaceid' =>	self::getCreateFieldRule('interfaceid', $item),
 			'jmx_endpoint' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'jmx_endpoint'), 'default' => ZBX_DEFAULT_JMX_ENDPOINT],
-			'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
+			'username' =>		self::getCreateFieldRule('username', $item),
+			'password' =>		self::getCreateFieldRule('password', $item),
 			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
 	}
@@ -50,8 +55,8 @@ class CItemTypeJmx extends CItemType {
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'jmx_endpoint')],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'jmx_endpoint')]
 			]],
-			'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
+			'username' =>		self::getUpdateFieldRule('username', $db_item),
+			'password' =>		self::getUpdateFieldRule('password', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
@@ -63,8 +68,8 @@ class CItemTypeJmx extends CItemType {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRuleInherited('interfaceid', $db_item),
 			'jmx_endpoint' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'jmx_endpoint')],
-			'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
+			'username' =>		self::getUpdateFieldRuleInherited('username', $db_item),
+			'password' =>		self::getUpdateFieldRuleInherited('password', $db_item),
 			'delay' =>			self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
@@ -74,11 +79,11 @@ class CItemTypeJmx extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'interfaceid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'interfaceid' =>	self::getUpdateFieldRuleDiscovered('interfaceid'),
 			'jmx_endpoint' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'username' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'password' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'delay' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'username' =>		self::getUpdateFieldRuleDiscovered('username'),
+			'password' =>		self::getUpdateFieldRuleDiscovered('password'),
+			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}
 }

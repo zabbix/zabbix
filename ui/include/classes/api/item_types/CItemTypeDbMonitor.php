@@ -23,6 +23,11 @@ class CItemTypeDbMonitor extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_DB_MONITOR;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['username', 'password', 'params', 'delay'];
 
 	/**
@@ -30,9 +35,9 @@ class CItemTypeDbMonitor extends CItemType {
 	 */
 	public static function getCreateValidationRules(array $item): array {
 		return [
-			'username' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-			'password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
-			'params' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
+			'username' =>	self::getCreateFieldRule('username', $item),
+			'password' =>	self::getCreateFieldRule('password', $item),
+			'params' =>		self::getCreateFieldRule('params', $item),
 			'delay' =>		self::getCreateFieldRule('delay', $item)
 		];
 	}
@@ -42,8 +47,8 @@ class CItemTypeDbMonitor extends CItemType {
 	 */
 	public static function getUpdateValidationRules(array $db_item): array {
 		return [
-			'username' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-			'password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
+			'username' =>	self::getUpdateFieldRule('username', $db_item),
+			'password' =>	self::getUpdateFieldRule('password', $db_item),
 			'params' =>		self::getUpdateFieldRule('params', $db_item),
 			'delay' =>		self::getUpdateFieldRule('delay', $db_item)
 		];
@@ -54,9 +59,9 @@ class CItemTypeDbMonitor extends CItemType {
 	 */
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
-			'username' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-			'password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
-			'params' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
+			'username' =>	self::getUpdateFieldRuleInherited('username', $db_item),
+			'password' =>	self::getUpdateFieldRuleInherited('password', $db_item),
+			'params' =>		self::getUpdateFieldRuleInherited('params', $db_item),
 			'delay' =>		self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
@@ -66,10 +71,10 @@ class CItemTypeDbMonitor extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'username' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'password' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'params' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'delay' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'username' =>	self::getUpdateFieldRuleDiscovered('username'),
+			'password' =>	self::getUpdateFieldRuleDiscovered('password'),
+			'params' =>		self::getUpdateFieldRuleDiscovered('params'),
+			'delay' =>		self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}
 }

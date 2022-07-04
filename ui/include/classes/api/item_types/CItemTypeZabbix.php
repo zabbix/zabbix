@@ -23,6 +23,11 @@ class CItemTypeZabbix extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_ZABBIX;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['interfaceid', 'delay'];
 
 	/**
@@ -60,8 +65,8 @@ class CItemTypeZabbix extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'interfaceid' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'delay' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'interfaceid' =>	self::getUpdateFieldRuleDiscovered('interfaceid'),
+			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}
 }

@@ -23,6 +23,11 @@ class CItemTypeZabbixActive extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
+	const TYPE = ITEM_TYPE_ZABBIX_ACTIVE;
+
+	/**
+	 * @inheritDoc
+	 */
 	const FIELD_NAMES = ['delay'];
 
 	/**
@@ -30,12 +35,7 @@ class CItemTypeZabbixActive extends CItemType {
 	 */
 	public static function getCreateValidationRules(array $item): array {
 		return [
-			'delay' =>	['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function (array $data): bool {
-								return strncmp($data['key_'], 'mqtt.get', 8) !== 0;
-							}] + self::getCreateFieldRule('delay', $item),
-							['else' => true, 'type' => API_ITEM_DELAY, 'in' => DB::getDefault('items', 'delay')]
-			]]
+			'delay' =>	self::getCreateFieldRule('delay', $item)
 		];
 	}
 
@@ -43,19 +43,8 @@ class CItemTypeZabbixActive extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRules(array $db_item): array {
-		$is_item_prototype = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
 		return [
-			'delay' =>	['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function (array $data) use ($db_item): bool {
-								return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-									|| (strncmp($data['key_'], 'mqtt.get', 8) !== 0 && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
-							}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
-							['if' => static function (array $data): bool {
-								return strncmp($data['key_'], 'mqtt.get', 8) !== 0;
-							}, 'type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
-							['else' => true, 'type' => API_ITEM_DELAY, 'in' => DB::getDefault('items', 'delay')]
-			]]
+			'delay' =>	self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
 
@@ -64,12 +53,7 @@ class CItemTypeZabbixActive extends CItemType {
 	 */
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
-			'delay' =>	['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function (array $data): bool {
-								return strncmp($data['key_'], 'mqtt.get', 8) !== 0;
-							}] + self::getUpdateFieldRuleInherited('delay', $db_item),
-							['else' => true, 'type' => API_ITEM_DELAY, 'in' => DB::getDefault('items', 'delay')]
-			]]
+			'delay' =>	self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
 
@@ -78,7 +62,7 @@ class CItemTypeZabbixActive extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'delay' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+			'delay' =>	self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}
 }
