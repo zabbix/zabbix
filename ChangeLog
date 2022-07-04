@@ -1,3 +1,8 @@
+Changes for 6.2.0
+
+6.2.0rc3 was released as 6.2.0 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.2.0rc3
 
 New features:
@@ -171,8 +176,12 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.7rc1
 
 New features:
+.........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
+.........T [ZBX-20473] fixed evaluation period macro in disk space triggers for NetApp FAS3220 template (drasihov)
+.........T [ZBX-19205] fixed item preprocessing in PostgreSQL by Zabbix agent 2 template (drasihov)
+A.F.....S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (agriscenko, mprihodko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.6
@@ -2138,8 +2147,12 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.26rc1
 
 New features:
+.........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
+.........T [ZBX-20473] fixed evaluation period macro in disk space triggers for NetApp FAS3220 template (drasihov)
+....I....T [ZBX-19205] fixed item preprocessing in PostgreSQL by Zabbix agent 2 template, removed duplicate PostgreSQL templates from templates.tmpl (drasihov)
+........S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (mprihodko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.25
