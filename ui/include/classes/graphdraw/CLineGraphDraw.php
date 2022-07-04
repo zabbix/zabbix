@@ -546,6 +546,14 @@ class CLineGraphDraw extends CGraphDraw {
 				'itemids' => [$this->ymin_itemid],
 				'webitems' => true
 			]);
+
+			if (!$items) {
+				$items = API::ItemPrototype()->get([
+					'output' => ['itemid', 'value_type'],
+					'itemids' => [$this->ymin_itemid]
+				]);
+			}
+
 			$item = $items[0];
 
 			if ($item) {
@@ -622,6 +630,14 @@ class CLineGraphDraw extends CGraphDraw {
 				'itemids' => [$this->ymax_itemid],
 				'webitems' => true
 			]);
+
+			if (!$items) {
+				$items = API::ItemPrototype()->get([
+					'output' => ['itemid', 'value_type'],
+					'itemids' => [$this->ymax_itemid]
+				]);
+			}
+
 			$item = $items[0];
 
 			if ($item) {
