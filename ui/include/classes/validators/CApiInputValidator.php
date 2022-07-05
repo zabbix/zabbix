@@ -2120,12 +2120,6 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$time_unit_in = timeUnitToSeconds($rule['in'], true);
-
-		if ($time_unit_in !== null) {
-			$rule['in'] = $time_unit_in;
-		}
-
 		return self::checkInt32In($rule, $seconds, $path, $error);
 	}
 
