@@ -78,7 +78,11 @@
 		var testable_item_types = item_form.testable_item_types,
 			type = parseInt(jQuery('#type').val(), 10),
 			key = jQuery('#key').val(),
-			is_http_agent_type = (type == <?= ITEM_TYPE_HTTPAGENT ?>);
+			is_required = (type != <?= ITEM_TYPE_HTTPAGENT ?>
+				&& type != <?= ITEM_TYPE_SSH ?>
+				&& type != <?= ITEM_TYPE_TELNET ?>
+				&& type != <?= ITEM_TYPE_SIMPLE ?>
+				&& type != <?= ITEM_TYPE_EXTERNAL ?>);
 
 		if (type == <?= ITEM_TYPE_SIMPLE ?> && (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping')) {
 			jQuery('#test_item').prop('disabled', true);
@@ -104,8 +108,8 @@
 			);
 		}
 
-		$('label[for=interfaceid]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', !is_http_agent_type);
-		$('input[name=interfaceid]').prop('aria-required', !is_http_agent_type);
+		$('label[for=interfaceid]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', is_required);
+		$('input[name=interfaceid]').prop('aria-required', is_required);
 	}
 
 	jQuery(document).ready(function($) {
