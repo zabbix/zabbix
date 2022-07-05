@@ -58,7 +58,7 @@ class CZabbixServer {
 	const ZBX_TCP_EXPECT_DATA = 2;
 
 	/**
-	 * Max number of bytes to read from the response for each each iteration.
+	 * Max number of bytes to read from the response for each iteration.
 	 */
 	const READ_BYTES_LIMIT = 8192;
 

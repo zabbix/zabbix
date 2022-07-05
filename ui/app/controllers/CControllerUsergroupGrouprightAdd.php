@@ -40,13 +40,9 @@ class CControllerUsergroupGrouprightAdd extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
-			);
+			$this->setResponse((new CControllerResponseData([
+				'main_block' => json_encode(['messages' => getMessages()->toString()])
+			]))->disableView());
 		}
 
 		return $ret;
@@ -63,12 +59,12 @@ class CControllerUsergroupGrouprightAdd extends CController {
 			'include_subgroups' => '0'
 		];
 
-		list($groupids, $subgroupids) = $new_group_right['include_subgroups']
+		[$groupids, $subgroupids] = $new_group_right['include_subgroups']
 			? [[], $new_group_right['groupids']]
 			: [$new_group_right['groupids'], []];
 
 		$this->setResponse(new CControllerResponseData([
-			'group_rights' => collapseHostGroupRights(applyHostGroupRights(
+			'group_rights' => collapseGroupRights(applyHostGroupRights(
 				$this->getInput('group_rights'), $groupids, $subgroupids, $new_group_right['permission']
 			)),
 			'user' => [

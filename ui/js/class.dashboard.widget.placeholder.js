@@ -113,7 +113,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		}
 
 		return this;
-	};
+	}
 
 	/**
 	 * Resize the new widget placeholder. Use to update visibility of the label of the placeholder.
@@ -129,7 +129,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		}
 
 		return this;
-	};
+	}
 
 	/**
 	 * Show new widget placeholder at given position.
@@ -147,7 +147,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		this.resize();
 
 		return this;
-	};
+	}
 
 	/**
 	 * Show new widget placeholder at the default position.
@@ -165,7 +165,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		this.resize();
 
 		return this;
-	};
+	}
 
 	/**
 	 * Hide new widget placeholder.
@@ -176,5 +176,5 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		this._target.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN);
 
 		return this;
-	};
+	}
 }

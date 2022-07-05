@@ -93,7 +93,8 @@ class testUserMacro extends CAPITest {
 					'value' => 'test',
 					'type' => '0',
 					'hostid' => '90020',
-					'description' => ''
+					'description' => '',
+					'automatic' => '0'
 				]
 			],
 			[

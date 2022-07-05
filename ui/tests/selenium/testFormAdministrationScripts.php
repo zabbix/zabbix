@@ -99,7 +99,7 @@ class testFormAdministrationScripts extends CWebTest {
 						'Description' => 'Test description',
 						'User group' => 'Selenium user group',
 						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Templates',
+						'xpath://div[@id="groupid"]/..' => 'Zabbix servers',
 						'Required host permissions' => 'Write',
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Execute script?'
@@ -130,7 +130,7 @@ class testFormAdministrationScripts extends CWebTest {
 						'Timeout' => '60s',
 						'Description' => 'Test description',
 						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Templates'
+						'xpath://div[@id="groupid"]/..' => 'Zabbix servers'
 					],
 					'Parameters' => [
 						[
@@ -160,7 +160,7 @@ class testFormAdministrationScripts extends CWebTest {
 						'Description' => 'Test description',
 						'User group' => 'Selenium user group',
 						'Host group' => 'Selected',
-						'xpath://div[@id="groupid"]/..' => 'Templates',
+						'xpath://div[@id="groupid"]/..' => 'Zabbix servers',
 						'Required host permissions' => 'Write',
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Execute script?'

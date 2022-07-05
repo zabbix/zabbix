@@ -104,7 +104,7 @@ PREPARE_AUDIT_HOST_UPDATE_H(custom_interfaces, int)
 
 void	zbx_audit_host_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid);
 void	zbx_audit_host_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
-		const char *macro, const char *value, const char *description, int type);
+		const char *macro, const char *value, const char *description, int type, int automatic);
 
 #define PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO_H(resource, type1)					\
 void	zbx_audit_host_update_json_update_hostmacro_##resource(zbx_uint64_t hostid,		\
@@ -115,14 +115,15 @@ PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO_H(type, int)
 
 void	zbx_audit_host_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid);
 
-void	zbx_audit_host_update_json_add_tag(zbx_uint64_t hostid, zbx_uint64_t tagid, const char* tag,
-		const char* value);
+void	zbx_audit_host_update_json_add_tag(zbx_uint64_t hostid, zbx_uint64_t tagid, const char* tag, const char* value,
+		int automatic);
 
 void	zbx_audit_host_update_json_update_tag_tag(zbx_uint64_t hostid, zbx_uint64_t tagid,
 		const char* tag_old, const char *tag_new);
-
 void	zbx_audit_host_update_json_update_tag_value(zbx_uint64_t hostid, zbx_uint64_t tagid,
 		const char* value_old, const char *value_new);
+void	zbx_audit_host_update_json_update_tag_type(zbx_uint64_t hostid, zbx_uint64_t tagid,
+		int automatic_old, int automatic_new);
 
 void	zbx_audit_host_update_json_delete_tag(zbx_uint64_t hostid, zbx_uint64_t tagid);
 
@@ -172,7 +173,7 @@ PREPARE_AUDIT_TEMPLATE_DELETE_H(host_prototype)
 void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid);
 
 void	zbx_audit_host_prototype_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
-		const char *macro, const char *value, const char *description, int type);
+		const char *macro, const char *value, const char *description, int type, int automatic);
 void	zbx_audit_host_update_json_update_hostmacro_create_entry(zbx_uint64_t hostid,
 		zbx_uint64_t hostmacroid);
 void	zbx_audit_host_prototype_update_json_update_hostmacro_create_entry(zbx_uint64_t hostid,
@@ -187,7 +188,7 @@ PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(type, int)
 void	zbx_audit_host_prototype_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid);
 
 void	zbx_audit_host_prototype_update_json_add_tag(zbx_uint64_t hostid, zbx_uint64_t tagid, const char* tag,
-		const char* value);
+		const char* value, int automatic);
 void	zbx_audit_host_prototype_update_json_update_tag_create_entry(zbx_uint64_t hostid, zbx_uint64_t tagid);
 void	zbx_audit_host_update_json_update_tag_create_entry(zbx_uint64_t hostid, zbx_uint64_t tagid);
 void	zbx_audit_host_prototype_update_json_update_tag_tag(zbx_uint64_t hostid, zbx_uint64_t tagid,

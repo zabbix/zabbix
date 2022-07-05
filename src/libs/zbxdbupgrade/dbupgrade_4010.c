@@ -19,7 +19,7 @@
 
 #include "dbupgrade.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 extern unsigned char	program_type;
 

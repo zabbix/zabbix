@@ -27,7 +27,7 @@
 #	include "errmsg.h"
 #	include "mysqld_error.h"
 #elif defined(HAVE_ORACLE)
-#	include "dbschema.h"
+#	include "zbxdbschema.h"
 #	include "oci.h"
 #elif defined(HAVE_POSTGRESQL)
 #	include <libpq-fe.h>
@@ -1943,6 +1943,18 @@ static size_t	zbx_db_bytea_unescape(u_char *io)
 }
 #endif
 
+
+#if defined(HAVE_ORACLE)
+static void	db_set_fetch_error(int dberr)
+{
+	if (0 < txn_level)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "fetch failed, setting transaction as failed");
+		txn_error = dberr;
+	}
+}
+#endif
+
 DB_ROW	zbx_db_fetch(DB_RESULT result)
 {
 #if defined(HAVE_ORACLE)
@@ -1976,6 +1988,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 				&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
 		{
 			zbx_db_errlog(ERR_Z3006, rc, zbx_oci_error(rc, NULL), NULL);
+			db_set_fetch_error(ZBX_DB_FAIL);
 			return NULL;
 		}
 
@@ -1986,6 +1999,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			case 3113:	/* ORA-03113: end-of-file on communication channel */
 			case 3114:	/* ORA-03114: not connected to ORACLE */
 				zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
+				db_set_fetch_error(ZBX_DB_DOWN);
 				return NULL;
 			default:
 				rc = OCIAttrGet((void *)result->stmthp, (ub4)OCI_HTYPE_STMT, (void *)&rows_fetched,
@@ -1994,6 +2008,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 				if (OCI_SUCCESS != rc || 1 != rows_fetched)
 				{
 					zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
+					db_set_fetch_error(ZBX_DB_FAIL);
 					return NULL;
 				}
 		}
@@ -2015,6 +2030,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			if (OCI_INVALID_HANDLE != rc2)
 			{
 				zbx_db_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL), NULL);
+				db_set_fetch_error(ZBX_DB_FAIL);
 				return NULL;
 			}
 			else
@@ -2023,6 +2039,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		else if (OCI_SUCCESS != (rc2 = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm)))
 		{
 			zbx_db_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL), NULL);
+			db_set_fetch_error(ZBX_DB_FAIL);
 			return NULL;
 		}
 
@@ -2039,6 +2056,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 					(dvoid *)NULL, (OCICallbackLobRead)NULL, (ub2)0, csfrm)))
 			{
 				zbx_db_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL), NULL);
+				db_set_fetch_error(ZBX_DB_FAIL);
 				return NULL;
 			}
 		}

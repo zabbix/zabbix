@@ -22,7 +22,7 @@
 
 #include "common.h"
 #include "zbxjson.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 
 typedef struct
 {
@@ -89,7 +89,7 @@ typedef struct
 	zbx_vector_ptr_t	lld_rows;
 	zbx_vector_ptr_t	preproc_ops;
 	zbx_vector_ptr_t	item_params;
-	zbx_vector_ptr_t	item_tags;
+	zbx_vector_db_tag_ptr_t	item_tags;
 }
 zbx_lld_item_prototype_t;
 
@@ -198,7 +198,7 @@ typedef struct
 	zbx_vector_ptr_t	preproc_ops;
 	zbx_vector_ptr_t	dependent_items;
 	zbx_vector_ptr_t	item_params;
-	zbx_vector_ptr_t	item_tags;
+	zbx_vector_db_tag_ptr_t	item_tags;
 	zbx_vector_db_tag_ptr_t	override_tags;
 	unsigned char		status;
 	unsigned char		type_orig;
@@ -231,7 +231,7 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *severity,
 		zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status, unsigned char *discover);
 void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_vector_uint64_t *lnk_templateids,
-		char *inventory_mode, zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status,
+		signed char *inventory_mode, zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status,
 		unsigned char *discover);
 void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *discover);
 

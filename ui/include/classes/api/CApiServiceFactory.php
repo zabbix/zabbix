@@ -71,6 +71,7 @@ class CApiServiceFactory extends CRegistryFactory {
 		'task' => CTask::class,
 		'template' => CTemplate::class,
 		'templatedashboard' => CTemplateDashboard::class,
+		'templategroup' => CTemplateGroup::class,
 		'token' => CToken::class,
 		'trend' => CTrend::class,
 		'trigger' => CTrigger::class,

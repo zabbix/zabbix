@@ -1,0 +1,82 @@
+---
+hosts:
+  - hostid: 0
+    macros:
+    - macroid: 1
+      macro: "{$M0}"
+      value: "0"
+    - macroid: 14
+      macro: "{$NODE}"
+      value: "00"
+    - macroid: 15
+      macro: "{$BASE}"
+      value: "0000"
+    templates: []
+  - hostid: 1
+    macros:
+    - macroid: 2
+      macro: "{$M1}"
+      value: "1"
+    - macroid: 16
+      macro: "{$NODE}"
+      value: "10"
+    templates: []
+  - hostid: 2
+    macros: []
+    templates: [1]
+  - hostid: 3
+    macros: []
+    templates: [2]
+  - hostid: 4
+    macros:
+    - macroid: 5
+      macro: "{$M4}"
+      value: "4"
+    - macroid: 6
+      macro: "{$NODE:four}"
+      value: "41"
+    - macroid: 7
+      macro: "{$BASE:four-zero-zero}"
+      value: "400"
+    templates: []
+  - hostid: 5
+    macros:
+    - macroid: 8
+      macro: "{$M5}"
+      value: "5"
+    - macroid: 9
+      macro: "{$NODE:five}"
+      value: "50"
+    - macroid: 10
+      macro: "{$BASE:five}"
+      value: "500"
+    templates: [2]
+  - hostid: 6
+    macros:
+    - macroid: 11
+      macro: "{$M6}"
+      value: "6"
+    - macroid: 12
+      macro: "{$NODE:six}"
+      value: "60"
+    - macroid: 13
+      macro: "{$BASE:six}"
+      value: "600"
+    templates: []
+  - hostid: 7
+    macros: []
+    templates: []
+  - hostid: 8
+    macros:
+    - macroid: 20
+      macro: "{$M8}"
+      value: "8"
+    - macroid: 21
+      macro: "{$NODE:eight}"
+      value: "80"
+    - macroid: 22
+      macro: "{$BASE:eight}"
+      value: "800"
+    templates: [1]
+vault: []
+...

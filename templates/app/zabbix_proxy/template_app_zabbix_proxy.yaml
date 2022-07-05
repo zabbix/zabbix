@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:01:48Z'
-  groups:
+  date: '2022-06-07T19:37:59Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -726,7 +726,7 @@ zabbix_export:
               name: 'Zabbix proxy: has been restarted'
               event_name: 'Zabbix proxy: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1020,8 +1020,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix proxy health'
                         name: 'Zabbix proxy: Zabbix proxy performance'
-                        host: 'Zabbix proxy health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1036,8 +1036,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix proxy health'
                         name: 'Zabbix proxy: Zabbix data gathering process busy %'
-                        host: 'Zabbix proxy health'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1052,8 +1052,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix proxy: Zabbix internal process busy %'
                         host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Zabbix internal process busy %'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1069,8 +1069,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix proxy: Zabbix cache usage, % used'
                         host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Zabbix cache usage, % used'
   graphs:
     -
       uuid: 40b649050cb8420888abcae129eafe27

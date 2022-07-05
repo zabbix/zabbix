@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-14T13:17:29Z'
-  groups:
+  date: '2022-06-07T19:33:12Z'
+  template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -2555,8 +2555,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.cpu.util
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.cpu.util
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2571,8 +2571,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: Memory usage'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Memory usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2595,8 +2595,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'CockroachDB: Storage [{#STORE}]: Capacity'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Storage [{#STORE}]: Capacity'
                 -
                   type: GRAPH_CLASSIC
                   'y': '15'
@@ -2611,8 +2611,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: Disk: r/w, rate'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Disk: r/w, rate'
                 -
                   type: GRAPH_CLASSIC
                   'y': '20'
@@ -2627,8 +2627,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: Disk: r/w IOPS, rate'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Disk: r/w IOPS, rate'
                 -
                   type: GRAPH_CLASSIC
                   'y': '25'
@@ -2643,8 +2643,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.disk.iops.in_progress.rate
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.disk.iops.in_progress.rate
                 -
                   type: GRAPH_CLASSIC
                   'y': '30'
@@ -2659,8 +2659,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: Network traffic'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Network traffic'
         -
           uuid: 41dce007bcf54762ad321ac944a8b63e
           name: Replication
@@ -2688,8 +2688,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'CockroachDB: Storage [{#STORE}]: Ranges'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Storage [{#STORE}]: Ranges'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -2712,8 +2712,8 @@ zabbix_export:
                       type: ITEM_PROTOTYPE
                       name: itemid
                       value:
-                        key: 'cockroachdb.replication.[{#STORE},lease_holders]'
                         host: 'CockroachDB by HTTP'
+                        key: 'cockroachdb.replication.[{#STORE},lease_holders]'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2736,8 +2736,8 @@ zabbix_export:
                       type: ITEM_PROTOTYPE
                       name: itemid
                       value:
-                        key: 'cockroachdb.rebalancing.queries.average.[{#STORE},rate]'
                         host: 'CockroachDB by HTTP'
+                        key: 'cockroachdb.rebalancing.queries.average.[{#STORE},rate]'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '15'
@@ -2760,8 +2760,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'CockroachDB: Storage [{#STORE}]: Replica quiescence'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Storage [{#STORE}]: Replica quiescence'
         -
           uuid: 0d9a3feb76ad403dac7379dbe04298f0
           name: Runtime
@@ -2781,8 +2781,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.live_count
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.live_count
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2797,8 +2797,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: Memory usage'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Memory usage'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -2813,8 +2813,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.go.goroutines.count
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.go.goroutines.count
                 -
                   type: GRAPH_CLASSIC
                   'y': '15'
@@ -2829,8 +2829,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.gc.runs.rate
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.gc.runs.rate
                 -
                   type: GRAPH_CLASSIC
                   'y': '20'
@@ -2845,8 +2845,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.gc.pause_time
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.gc.pause_time
                 -
                   type: GRAPH_CLASSIC
                   'y': '25'
@@ -2861,8 +2861,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: CPU Time'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: CPU Time'
                 -
                   type: GRAPH_CLASSIC
                   'y': '30'
@@ -2877,8 +2877,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.clock.offset
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.clock.offset
         -
           uuid: ac89b176f2c34fc1b885ee1ed43df590
           name: 'Slow requests'
@@ -2906,8 +2906,8 @@ zabbix_export:
                       type: ITEM_PROTOTYPE
                       name: itemid
                       value:
-                        key: 'cockroachdb.slow_requests.[{#STORE},raft_proposals]'
                         host: 'CockroachDB by HTTP'
+                        key: 'cockroachdb.slow_requests.[{#STORE},raft_proposals]'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2922,8 +2922,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.slow_requests.rpc
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.slow_requests.rpc
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2946,8 +2946,8 @@ zabbix_export:
                       type: ITEM_PROTOTYPE
                       name: itemid
                       value:
-                        key: 'cockroachdb.slow_requests.[{#STORE},lease_acquisitions]'
                         host: 'CockroachDB by HTTP'
+                        key: 'cockroachdb.slow_requests.[{#STORE},lease_acquisitions]'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '15'
@@ -2970,8 +2970,8 @@ zabbix_export:
                       type: ITEM_PROTOTYPE
                       name: itemid
                       value:
-                        key: 'cockroachdb.slow_requests.[{#STORE},latch_acquisitions]'
                         host: 'CockroachDB by HTTP'
+                        key: 'cockroachdb.slow_requests.[{#STORE},latch_acquisitions]'
         -
           uuid: b1086a92f1b54c45be99efd996b33457
           name: SQL
@@ -2991,8 +2991,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
+                        host: 'CockroachDB by HTTP'
                         key: cockroachdb.sql.sessions
-                        host: 'CockroachDB by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3007,8 +3007,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
+                        host: 'CockroachDB by HTTP'
                         key: cockroachdb.sql.transactions.open
-                        host: 'CockroachDB by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -3023,8 +3023,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
+                        host: 'CockroachDB by HTTP'
                         key: cockroachdb.sql.statements.active
-                        host: 'CockroachDB by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3040,8 +3040,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: SQL: Traffic'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: SQL: Traffic'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -3056,8 +3056,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: SQL statements'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: SQL statements'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3073,8 +3073,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.sql.statements.errors.rate
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.sql.statements.errors.rate
                 -
                   type: GRAPH_CLASSIC
                   'y': '15'
@@ -3089,8 +3089,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.sql.statements.contention.rate
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.sql.statements.contention.rate
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3106,8 +3106,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.sql.statements.flows.active.rate
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.sql.statements.flows.active.rate
                 -
                   type: GRAPH_CLASSIC
                   'y': '20'
@@ -3122,8 +3122,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: SQL transactions'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: SQL transactions'
                 -
                   type: GRAPH_CLASSIC
                   'y': '25'
@@ -3138,8 +3138,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.memory.sql
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.memory.sql
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3155,8 +3155,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.sql.schema_changes.rate
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.sql.schema_changes.rate
                 -
                   type: GRAPH_CLASSIC
                   'y': '30'
@@ -3171,8 +3171,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: cockroachdb.sql.statements.denials.rate
                         host: 'CockroachDB by HTTP'
+                        key: cockroachdb.sql.statements.denials.rate
         -
           uuid: aa41ca45023c4d0eb126596f89f20f98
           name: Storage
@@ -3200,8 +3200,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'CockroachDB: Storage [{#STORE}]: Capacity'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Storage [{#STORE}]: Capacity'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -3224,8 +3224,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
+                        host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: Storage [{#STORE}]: Bytes'
-                        host: 'CockroachDB by HTTP'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -3248,8 +3248,8 @@ zabbix_export:
                       type: ITEM_PROTOTYPE
                       name: itemid
                       value:
+                        host: 'CockroachDB by HTTP'
                         key: 'cockroachdb.rocksdb.[{#STORE},read_amp]'
-                        host: 'CockroachDB by HTTP'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -3273,8 +3273,8 @@ zabbix_export:
                       type: ITEM_PROTOTYPE
                       name: itemid
                       value:
-                        key: 'cockroachdb.rocksdb.[{#STORE},sstables]'
                         host: 'CockroachDB by HTTP'
+                        key: 'cockroachdb.rocksdb.[{#STORE},sstables]'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -3289,8 +3289,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: File descriptors'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: File descriptors'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3306,8 +3306,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CockroachDB: Time series'
                         host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Time series'
       valuemaps:
         -
           uuid: 2e7ddaadebce4b1089dcf01a91d01293

@@ -114,7 +114,7 @@ class testFormTagsHostPrototype extends testFormTags {
 
 		// Check disabled fields.
 		foreach ($tags_table->getRows() as $row) {
-			foreach (['Name', 'Value', 'Action'] as $field) {
+			foreach (['Name', 'Value', ''] as $field) {
 				$this->assertFalse($row->getColumn($field)->children()->one()->detect()->isEnabled());
 			}
 		}

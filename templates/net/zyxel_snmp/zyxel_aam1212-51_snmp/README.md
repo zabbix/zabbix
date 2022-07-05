@@ -92,7 +92,7 @@ There are no template links in this template.
 |ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX} |<p>The reductions in amplitude of the downstream and upstream DSL signals.</p> |`min(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}` |WARNING | |
 |ZYXEL AAM1212-51 / IES-612: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state |<p>Please check the power supply</p> |`last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}` |AVERAGE | |
 |ZYXEL AAM1212-51 / IES-612: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL AAM1212-51 IES-612 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|ZYXEL AAM1212-51 / IES-612: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|ZYXEL AAM1212-51 / IES-612: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX} alarm |<p>The slot reported an error.</p> |`find(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.slot.alarm,,"like","moduleNoDefect")=0` |AVERAGE | |
 |ZYXEL AAM1212-51 / IES-612: Temperature {#ZYXEL.TEMP.ID} is in critical state |<p>Please check the temperature</p> |`last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}` |AVERAGE | |
 

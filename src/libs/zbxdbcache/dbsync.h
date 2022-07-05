@@ -39,6 +39,7 @@
 #define ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY	__UINT64_C(0x0010)
 #define ZBX_DBSYNC_UPDATE_HOST_GROUPS		__UINT64_C(0x0020)
 #define ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS	__UINT64_C(0x0040)
+#define ZBX_DBSYNC_UPDATE_MACROS		__UINT64_C(0x0080)
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	define ZBX_HOST_TLS_OFFSET	4
@@ -107,8 +108,11 @@ struct zbx_dbsync
 	zbx_uint64_t	remove_num;
 };
 
-void	zbx_dbsync_init_env(ZBX_DC_CONFIG *cache);
-void	zbx_dbsync_free_env(void);
+void	zbx_dbsync_env_init(ZBX_DC_CONFIG *cache);
+int	zbx_dbsync_env_prepare(unsigned char mode);
+void	zbx_dbsync_env_flush_changelog(void);
+void	zbx_dbsync_env_clear(void);
+int	zbx_dbsync_env_changelog_num(void);
 
 void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);

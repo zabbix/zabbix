@@ -146,6 +146,9 @@ static zbx_vmcheck_t	vmchecks[] =
 
 	{"cl.perfcounter", VMCHECK_FUNC(check_vcenter_cl_perfcounter)},
 
+	{"rp.cpu.usage", VMCHECK_FUNC(check_vcenter_rp_cpu_usage)},
+	{"rp.memory", VMCHECK_FUNC(check_vcenter_rp_memory)},
+
 	{NULL, NULL}
 };
 

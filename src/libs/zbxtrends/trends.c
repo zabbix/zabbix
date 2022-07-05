@@ -20,7 +20,7 @@
 #include "trends.h"
 
 #include "common.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 
 static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
