@@ -351,6 +351,9 @@ class testDashboardPages extends CWebTest {
 			CPopupMenuElement::find()->waitUntilVisible()->one()->select('Paste page');
 			$dashboard->waitUntilReady();
 
+			// Wait until the second page appears.
+			$this->query('xpath://li[@class="sortable-item"][2]')->waitUntilVisible()->one();
+
 			// Copied page added.
 			$titles_before[] = 'first_page_copy';
 
@@ -729,7 +732,7 @@ class testDashboardPages extends CWebTest {
 		$this->assertEquals('Dashboard page properties', $page_dialog->getTitle());
 		$this->assertEquals(['Name', 'Page display period'], $page_form->getLabels()->asText());
 		$this->assertEquals(['Default (30 seconds)', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes',
-				'30 minutes', '1 hour'], $page_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText()
+				'30 minutes', '1 hour'], $page_form->query('name:display_period')->asDropdown()->one()->getOptions()->asText()
 		);
 		$page_dialog->query('button:Cancel')->one()->click();
 	}

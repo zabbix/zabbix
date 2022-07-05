@@ -28,8 +28,8 @@ import (
 	"strconv"
 	"time"
 
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/log"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/pkg/zbxcomms"
 )
 

@@ -207,13 +207,13 @@ typedef struct
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK | ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES)
 	zbx_uint64_t		flags;
 	const struct zbx_json_parse	*jp_row;
-	char			inventory_mode;
-	char			inventory_mode_orig;
+	signed char		inventory_mode;
+	signed char		inventory_mode_orig;
 	unsigned char		status;
 	unsigned char		custom_interfaces;
 	unsigned char		custom_interfaces_orig;
 	zbx_uint64_t		proxy_hostid_orig;
-	char			ipmi_authtype_orig;
+	signed char		ipmi_authtype_orig;
 	unsigned char		ipmi_privilege_orig;
 	char			*ipmi_username_orig;
 	char			*ipmi_password_orig;
@@ -302,7 +302,7 @@ typedef struct
 zbx_lld_group_rights_t;
 
 static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
-		const zbx_vector_ptr_t *lld_macros, char **info);
+		const zbx_vector_ptr_t *lld_macros, char **error);
 
 typedef struct
 {
@@ -405,7 +405,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, zbx_uint64_t proxy_hostid,
-		char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username, const char *ipmi_password,
+		signed char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username, const char *ipmi_password,
 		unsigned char tls_connect, unsigned char tls_accept, const char *tls_issuer,
 		const char *tls_subject, const char *tls_psk_identity, const char *tls_psk)
 {
@@ -466,9 +466,9 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_PROXY;
 		}
 
-		if ((char)atoi(row[7]) != ipmi_authtype)
+		if ((signed char)atoi(row[7]) != ipmi_authtype)
 		{
-			host->ipmi_authtype_orig = (char)atoi(row[7]);
+			host->ipmi_authtype_orig = (signed char)atoi(row[7]);
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH;
 		}
 
@@ -529,7 +529,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		if (SUCCEED == DBis_null(row[11]))
 			host->inventory_mode_orig = HOST_INVENTORY_DISABLED;
 		else
-			host->inventory_mode_orig = (char)atoi(row[11]);
+			host->inventory_mode_orig = (signed char)atoi(row[11]);
 
 		zbx_vector_uint64_create(&host->new_groupids);
 		zbx_vector_uint64_create(&host->lnk_templateids);
@@ -818,9 +818,9 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 }
 
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
-		char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
+		signed char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros,
-		char **info, unsigned char custom_iface)
+		unsigned char custom_iface, char **error)
 {
 	char			*buffer = NULL;
 	int			i, host_found = 0;
@@ -968,7 +968,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 	if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 	{
 		zbx_vector_db_tag_ptr_append_array(&tmp_tags, tags->values, tags->values_num);
-		lld_host_update_tags(host, &tmp_tags, lld_macros, info);
+		lld_host_update_tags(host, &tmp_tags, lld_macros, error);
 
 		if (0 != lnk_templateids.values_num)
 		{
@@ -2210,80 +2210,6 @@ static void	lld_proto_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate host tag field                                           *
- *                                                                            *
- * Parameters: name      - [IN] the field name (tag, value)                   *
- *             field     - [IN] the field value                               *
- *             field_len - [IN] the field length                              *
- *             info      - [OUT] error information                            *
- *                                                                            *
- ******************************************************************************/
-static int	lld_tag_validate_field(const char *name, const char *field, size_t field_len, char **info)
-{
-	if (SUCCEED != zbx_is_utf8(field))
-	{
-		char	*field_utf8;
-
-		field_utf8 = zbx_strdup(NULL, field);
-		zbx_replace_invalid_utf8(field_utf8);
-		*info = zbx_strdcatf(*info, "Cannot create host tag: %s \"%s\" has invalid UTF-8 sequence.\n",
-				name, field_utf8);
-		zbx_free(field_utf8);
-		return FAIL;
-	}
-
-	if (zbx_strlen_utf8(field) > field_len)
-	{
-		*info = zbx_strdcatf(*info, "Cannot create host tag: %s \"%128s...\" is too long.\n", name, field);
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: validate host tag                                                 *
- *                                                                            *
- * Parameters: tags     - [IN] the current host tags                          *
- *             tags_num - [IN] the number of host tags                        *
- *             name     - [IN] the new tag name                               *
- *             value    - [IN] the new tag value                              *
- *             info     - [OUT] error information                             *
- *                                                                            *
- ******************************************************************************/
-static int	lld_tag_validate(zbx_db_tag_t **tags, int tags_num, const char *name, const char *value, char **info)
-{
-	int	i;
-
-	if ('\0' == *name)
-	{
-		*info = zbx_strdcatf(*info, "Cannot create host tag: empty tag name.\n");
-		return FAIL;
-	}
-
-	if (SUCCEED != lld_tag_validate_field("name", name, TAG_NAME_LEN, info))
-		return FAIL;
-
-	if (SUCCEED != lld_tag_validate_field("value", value, TAG_VALUE_LEN, info))
-		return FAIL;
-
-	for (i = 0; i < tags_num; i++)
-	{
-		if (0 == strcmp(tags[i]->tag, name) && 0 == strcmp(tags[i]->value, value))
-		{
-			*info = zbx_strdcatf(*info, "Cannot create host tag: tag \"%s\",\"%s\" already exists.\n",
-					name, value);
-
-			return FAIL;
-		}
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: update host tags                                                  *
  *                                                                            *
  * Parameters: host       - [IN] a host with existing tags, sorted by tag +   *
@@ -2301,10 +2227,10 @@ static int	lld_tag_validate(zbx_db_tag_t **tags, int tags_num, const char *name,
  *                                                                            *
  ******************************************************************************/
 static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
-		const zbx_vector_ptr_t *lld_macros, char **info)
+		const zbx_vector_ptr_t *lld_macros, char **error)
 {
 	int			i;
-	zbx_db_tag_t		*host_tag, *proto_tag;
+	zbx_db_tag_t		*proto_tag;
 	zbx_vector_db_tag_ptr_t	new_tags;
 	char			*tag = NULL, *value = NULL;
 
@@ -2320,9 +2246,6 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 		substitute_lld_macros(&tag, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 		substitute_lld_macros(&value, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 
-		if (SUCCEED != lld_tag_validate(new_tags.values, new_tags.values_num, tag, value, info))
-			continue;
-
 		proto_tag = zbx_db_tag_create(tag, value);
 		zbx_vector_db_tag_ptr_append(&new_tags, proto_tag);
 
@@ -2330,51 +2253,13 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 		zbx_free(value);
 	}
 
-	zbx_vector_db_tag_ptr_sort(&new_tags, zbx_db_tag_compare_func);
-
-	zbx_vector_db_tag_ptr_reserve(&host->tags, (size_t)new_tags.values_num);
-
-	/* update host tags or flag them for removal */
-	for (i = 0; i < host->tags.values_num; i++)
+	if (SUCCEED != zbx_merge_tags(&host->tags, &new_tags, "host", error))
 	{
-		host_tag = (zbx_db_tag_t *)host->tags.values[i];
-		if (i < new_tags.values_num)
+		if (0 == host->hostid)
 		{
-			proto_tag = (zbx_db_tag_t *)new_tags.values[i];
-
-			if (0 != strcmp(host_tag->tag, proto_tag->tag))
-			{
-				host_tag->tag_orig = zbx_strdup(NULL, host_tag->tag);
-				host_tag->tag = zbx_strdup(host_tag->tag, proto_tag->tag);
-				host_tag->flags |= ZBX_FLAG_DB_TAG_UPDATE_TAG;
-			}
-
-			if (0 != strcmp(host_tag->value, proto_tag->value))
-			{
-				host_tag->value_orig = zbx_strdup(NULL, host_tag->value);
-				host_tag->value = zbx_strdup(host_tag->value, proto_tag->value);
-				host_tag->flags |= ZBX_FLAG_DB_TAG_UPDATE_VALUE;
-			}
+			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
+			*error = zbx_strdcatf(*error, "Cannot create host: tag validation failed.\n");
 		}
-		else
-			host_tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
-	}
-
-	/* add missing tags */
-	if (i < new_tags.values_num)
-	{
-		int	j;
-
-		/* set uninitialized properties of new tags that will be moved to host */
-		for (j = i; j < new_tags.values_num; j++)
-		{
-			proto_tag = (zbx_db_tag_t *)new_tags.values[j];
-			proto_tag->tagid = 0;
-			proto_tag->flags = 0;
-		}
-
-		zbx_vector_db_tag_ptr_append_array(&host->tags, new_tags.values + i, new_tags.values_num - i);
-		new_tags.values_num = i;
 	}
 
 	zbx_free(tag);
@@ -2648,8 +2533,8 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
  *                                                                            *
  ******************************************************************************/
 static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, const char *host_proto,
-		zbx_uint64_t proxy_hostid, char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username,
-		const char *ipmi_password, unsigned char tls_connect,
+		zbx_uint64_t proxy_hostid, signed char ipmi_authtype, unsigned char ipmi_privilege,
+		const char *ipmi_username, const char *ipmi_password, unsigned char tls_connect,
 		unsigned char tls_accept, const char *tls_issuer, const char *tls_subject, const char *tls_psk_identity,
 		const char *tls_psk, const zbx_vector_uint64_t *del_hostgroupids)
 {
@@ -2935,7 +2820,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					(int)ipmi_authtype, (int)ipmi_privilege, ipmi_username, ipmi_password,
 					(int)host->status, (int)ZBX_FLAG_DISCOVERY_CREATED, (int)tls_connect,
 					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk,
-					host->custom_interfaces, host->inventory_mode);
+					host->custom_interfaces, (int)host->inventory_mode);
 		}
 		else
 		{
@@ -2986,7 +2871,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					d = ",";
 
 					zbx_audit_host_update_json_update_ipmi_authtype(host->hostid,
-							host->ipmi_authtype_orig, (int)ipmi_authtype);
+							(int)host->ipmi_authtype_orig, (int)ipmi_authtype);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV))
 				{
@@ -4443,7 +4328,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	zbx_uint64_t		proxy_hostid;
 	char			*ipmi_username = NULL, *ipmi_password, *tls_issuer, *tls_subject, *tls_psk_identity,
 				*tls_psk;
-	char			ipmi_authtype, inventory_mode_proto;
+	signed char		ipmi_authtype, inventory_mode_proto;
 	unsigned char		ipmi_privilege, tls_connect, tls_accept;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -4459,7 +4344,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	if (NULL != (row = DBfetch(result)))
 	{
 		ZBX_DBROW2UINT64(proxy_hostid, row[0]);
-		ipmi_authtype = (char)atoi(row[1]);
+		ipmi_authtype = (signed char)atoi(row[1]);
 		ZBX_STR2UCHAR(ipmi_privilege, row[2]);
 		ipmi_username = zbx_strdup(NULL, row[3]);
 		ipmi_password = zbx_strdup(NULL, row[4]);
@@ -4520,7 +4405,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		if (SUCCEED == DBis_null(row[5]))
 			inventory_mode_proto = HOST_INVENTORY_DISABLED;
 		else
-			inventory_mode_proto = (char)atoi(row[5]);
+			inventory_mode_proto = (signed char)atoi(row[5]);
 
 		lld_hosts_get(parent_hostid, &hosts, proxy_hostid, ipmi_authtype, ipmi_privilege, ipmi_username,
 				ipmi_password, tls_connect, tls_accept, tls_issuer, tls_subject,
@@ -4541,7 +4426,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			if (NULL == (host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto,
-					status, discover, &tags, lld_row, lld_macro_paths, error, use_custom_interfaces)))
+					status, discover, &tags, lld_row, lld_macro_paths, use_custom_interfaces,
+					error)))
 			{
 				continue;
 			}

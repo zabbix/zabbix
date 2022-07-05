@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -37,7 +37,7 @@ $filter = (new CFilter())
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
-				new CLabel(_('SLA'), 'filter_slaid'),
+				new CLabel(_('SLA'), 'filter_slaid_ms'),
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_slaid',
@@ -57,7 +57,7 @@ $filter = (new CFilter())
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				),
-				new CLabel(_('Service'), 'filter_serviceid'),
+				new CLabel(_('Service'), 'filter_serviceid_ms'),
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_serviceid',

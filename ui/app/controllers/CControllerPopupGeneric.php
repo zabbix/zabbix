@@ -380,7 +380,7 @@ class CControllerPopupGeneric extends CController {
 			],
 			'sla' => [
 				'title' => _('SLA'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'slaid,name',
 				'form' => [
 					'name' => 'slaform',
@@ -902,7 +902,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'items':
 				foreach ($records as $itemid => $row) {
-					$records[$row['name']] = ['itemid' => $row['name']] + $row;
+					$records[$row['name']] = ['pattern' => $row['name']] + $row;
 					unset($records[$itemid]);
 				}
 				break;

@@ -1028,7 +1028,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #ifdef HAVE_POSTGRESQL
 	if (ZBX_HK_MODE_DISABLED != config->config->hk.history_mode &&
 			ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
-			0 == zbx_strcmp_null(config->config->db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
 		config->config->hk.history_mode = ZBX_HK_MODE_PARTITION;
 	}
@@ -1047,7 +1047,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #ifdef HAVE_POSTGRESQL
 	if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode &&
 			ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
-			0 == zbx_strcmp_null(config->config->db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
 		config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
 	}
@@ -7354,7 +7354,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned 
 	if (ZBX_ITEM_GET_INVENTORY & mode)
 	{
 		if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories, &src_host->hostid)))
-			dst_host->inventory_mode = (char)host_inventory->inventory_mode;
+			dst_host->inventory_mode = (signed char)host_inventory->inventory_mode;
 		else
 			dst_host->inventory_mode = HOST_INVENTORY_DISABLED;
 	}

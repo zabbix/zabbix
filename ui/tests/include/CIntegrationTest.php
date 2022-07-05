@@ -324,15 +324,16 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @param string $component              component name
 	 * @param string $waitLogLineOverride    already log line to use to consider component as running
+	 * @param bool $skip_pid    skip PID check
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
-	protected static function waitForStartup($component, $waitLogLineOverride = '') {
+	protected static function waitForStartup($component, $waitLogLineOverride = '', $skip_pid = false) {
 		self::validateComponent($component);
 
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 			$pid = @file_get_contents(self::getPidPath($component));
-			if ($pid && is_numeric($pid) && posix_kill($pid, 0)) {
+			if ($skip_pid == true || ($pid && is_numeric($pid) && posix_kill($pid, 0))) {
 				switch ($component) {
 					case self::COMPONENT_SERVER_HANODE1:
 						self::waitForLogLineToBePresent($component, 'HA manager started', false, 5, 1);
@@ -360,6 +361,25 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Checks absence of pid file after kill.
+	 *
+	 * @param string $component    component name
+	 *
+	 */
+	private static function checkPidKilled($component) {
+
+		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
+			if (!file_exists(self::getPidPath($component))) {
+				return true;
+			}
+
+			sleep(self::WAIT_ITERATION_DELAY);
+		}
+
+		return false;
+	}
+
+	/**
 	 * Wait for component to stop.
 	 *
 	 * @param string $component    component name
@@ -369,12 +389,44 @@ class CIntegrationTest extends CAPITest {
 	protected static function waitForShutdown($component) {
 		self::validateComponent($component);
 
-		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
-			if (!file_exists(self::getPidPath($component))) {
+		if (self::checkPidKilled($component)) {
+			return;
+		}
+
+		$pid = @file_get_contents(self::getPidPath($component));
+
+		$pids = explode("\n", shell_exec('pgrep -P '.$pid));
+		$pids_count = count($pids);
+		$iterations = 0;
+
+		do {
+			for ($i = count($pids) -1; $i >= 0; $i--) {
+				$child_pid = $pids[$i];
+
+				if  (is_numeric($child_pid) && posix_kill($child_pid, 0)) {
+					posix_kill($child_pid, SIGKILL);
+					sleep(10 * self::WAIT_ITERATION_DELAY);
+
+					if (!posix_kill($child_pid, 0)) {
+						break;
+					}
+				}
+			}
+
+			if (self::checkPidKilled($component)) {
 				return;
 			}
 
-			sleep(self::WAIT_ITERATION_DELAY);
+			$pids = explode("\n", shell_exec('pgrep -P '.$pid));
+			$iterations++;
+		} while (count($pids) > 0 && $iterations < $pids_count );
+
+		if  (is_numeric($pid) && posix_kill($pid, 0)) {
+			posix_kill($pid, SIGKILL);
+
+			if (self::checkPidKilled($component)) {
+				return;
+			}
 		}
 
 		throw new Exception('Failed to wait for component "'.$component.'" to stop.');
@@ -522,10 +574,11 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @param string $component    component name
 	 * @param string $waitLogLineOverride    already log line to use to consider component as running
+	 * @param bool $skip_pid    skip PID check
 	 *
 	 * @throws Exception    on missing configuration or failed start
 	 */
-	protected function startComponent($component, $waitLogLineOverride = '') {
+	protected function startComponent($component, $waitLogLineOverride = '', $skip_pid = false) {
 		self::validateComponent($component);
 
 		$config = PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf';
@@ -552,7 +605,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		self::executeCommand($bin_path, ['-c', $config], $background);
-		self::waitForStartup($component, $waitLogLineOverride);
+		self::waitForStartup($component, $waitLogLineOverride, $skip_pid );
 	}
 
 	/**
