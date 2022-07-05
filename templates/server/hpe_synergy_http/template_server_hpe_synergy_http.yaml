@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-07-01T10:50:32Z'
+  date: '2022-07-05T06:05:08Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -354,7 +354,7 @@ zabbix_export:
       discovery_rules:
         -
           uuid: 73d93ade7489472fae4e68b05de52291
-          name: 'Appliance discovery'
+          name: 'Appliance bays discovery'
           type: DEPENDENT
           key: hpe.synergy.appliances.discovery
           delay: '0'
@@ -362,7 +362,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: d3be63fe949c4960ba5a66c546b4ebcd
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Power state'
+              name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Power state'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",bay_power_state]'
               delay: '0'
@@ -422,7 +422,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 08e834ca1ea04357b13d0383cfba8503
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Model'
+              name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Model'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",model]'
               delay: '0'
@@ -453,7 +453,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: df7ef9ae030c417e9c3a9b64d22c2bb9
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part number'
+              name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part number'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]'
               delay: '0'
@@ -484,7 +484,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 7921c3c8ac07452d9a0cc47436d10aac
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Powered on'
+              name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Powered on'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",powered_on]'
               delay: '0'
@@ -519,7 +519,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: d4501f70c9e74f5dbe11ab608629c666
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Presence'
+              name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Presence'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",presence]'
               delay: '0'
@@ -589,7 +589,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: f352ca846fa34ba698b28f8d8883a14d
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial number'
+              name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial number'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
@@ -620,7 +620,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 6d47ed045d904cc780c538a330ba0895
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Spare part number'
+              name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Spare part number'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",spare_part_number]'
               delay: '0'
@@ -651,7 +651,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 836036ba1abb43bbaaabddaa8bb438d3
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Status'
+              name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Status'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status]'
               delay: '0'
@@ -665,7 +665,7 @@ zabbix_export:
                 Unknown - The health status is not yet known or cannot be determined.
                 Warning - Needs attention soon.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -723,7 +723,7 @@ zabbix_export:
                 -
                   uuid: d79a138fe0cd4f918e664380af8da355
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0'
-                  name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status'
+                  name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status'
                   priority: HIGH
                   description: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.'
                   tags:
@@ -733,7 +733,7 @@ zabbix_export:
                 -
                   uuid: c4acd5d5451d437ab5366b24643577be
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4'
-                  name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
+                  name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
                   priority: WARNING
                   description: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
                   tags:
@@ -743,7 +743,7 @@ zabbix_export:
                 -
                   uuid: 7b8b298e334e409da6dabf6476c80dbf
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1'
-                  name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled'
+                  name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled'
                   priority: INFO
                   description: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] currently not operational.'
                   tags:
@@ -966,7 +966,7 @@ zabbix_export:
                 Unknown - The health status is not yet known or cannot be determined.
                 Warning - Needs attention soon.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1157,7 +1157,7 @@ zabbix_export:
                 -
                   uuid: 4f0d8ded588f4175911edff4efd4d1cd
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=1'
-                  name: 'Datacenter [{#NAME}]: Add failed'
+                  name: 'Datacenter [{#NAME}]: Add error'
                   priority: AVERAGE
                   description: 'Datacenter [{#NAME}] add failed.'
                   tags:
@@ -1210,7 +1210,7 @@ zabbix_export:
                 Critical - needs immediate attention.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2204,7 +2204,7 @@ zabbix_export:
                 Unknown - The health status is not yet known or cannot be determined.
                 Warning - Needs attention soon.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2455,7 +2455,7 @@ zabbix_export:
                 Critical - needs immediate attention.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2604,7 +2604,7 @@ zabbix_export:
                 Critical - needs immediate attention.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3064,7 +3064,7 @@ zabbix_export:
                 Unknown - The health status is not yet known or cannot be determined.
                 Warning - Needs attention soon.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3219,7 +3219,7 @@ zabbix_export:
                 Critical - needs immediate attention.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3429,7 +3429,7 @@ zabbix_export:
                 Unknown - The health status is not yet known or cannot be determined.
                 Warning - Needs attention soon.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3612,7 +3612,7 @@ zabbix_export:
                 Unknown - The health status is not yet known or cannot be determined.
                 Warning - Needs attention soon.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3918,7 +3918,7 @@ zabbix_export:
                 Unknown - The health status is not yet known or cannot be determined.
                 Warning - Needs attention soon.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4124,7 +4124,7 @@ zabbix_export:
                 Unknown - The health status is not yet known or cannot be determined.
                 Warning - Needs attention soon.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4454,7 +4454,7 @@ zabbix_export:
                 Unknown - The health status is not yet known or cannot be determined.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4668,7 +4668,7 @@ zabbix_export:
                 Critical - needs immediate attention.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -5314,7 +5314,7 @@ zabbix_export:
                 Unknown - The health status is not yet known or cannot be determined.
                 Warning - Needs attention soon.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -5505,7 +5505,7 @@ zabbix_export:
                 -
                   uuid: 3a4eebe27b2046d3af9f6b7dca4f1aeb
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=1'
-                  name: 'Rack [{#NAME}]: Add failed'
+                  name: 'Rack [{#NAME}]: Add error'
                   priority: AVERAGE
                   description: 'Rack [{#NAME}] add failed.'
                   tags:
@@ -5561,7 +5561,7 @@ zabbix_export:
                 Critical - needs immediate attention.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -6345,7 +6345,7 @@ zabbix_export:
                 Critical - needs attention soon.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -6692,7 +6692,7 @@ zabbix_export:
                 -
                   uuid: ae6ac88132f14763ba1ab0488d78d79d
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=0'
-                  name: 'Storage pool [{#NAME}]: Add failed'
+                  name: 'Storage pool [{#NAME}]: Add error'
                   priority: AVERAGE
                   description: 'Storage pool [{#NAME}] add failed.'
                   tags:
@@ -6751,7 +6751,7 @@ zabbix_export:
                 Critical - needs immediate attention.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7074,7 +7074,7 @@ zabbix_export:
                 -
                   uuid: cfdbabe4ff584b96a961e395b3a4cda8
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=0'
-                  name: 'Storage system [{#NAME}]: Add failed'
+                  name: 'Storage system [{#NAME}]: Add error'
                   priority: AVERAGE
                   description: 'Storage system [{#NAME}] add failed.'
                   tags:
@@ -7133,7 +7133,7 @@ zabbix_export:
                 Critical - needs immediate attention.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7433,7 +7433,7 @@ zabbix_export:
                 -
                   uuid: b13d8a034a214bb5bd82d9e573d06e7b
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=0'
-                  name: 'Storage volume [{#NAME}]: Add failed'
+                  name: 'Storage volume [{#NAME}]: Add error'
                   priority: AVERAGE
                   description: 'Storage volume [{#NAME}] add failed.'
                   tags:
@@ -7492,7 +7492,7 @@ zabbix_export:
                 Critical - needs immediate attention.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7669,7 +7669,7 @@ zabbix_export:
                 Critical - needs immediate attention.
                 Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
-                name: Status
+                name: 'Health status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7867,6 +7867,25 @@ zabbix_export:
             -
               value: '10'
               newvalue: Unknown
+        -
+          uuid: 05742432aca048ca96684ba52bd058ae
+          name: 'Health status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Critical
+            -
+              value: '1'
+              newvalue: Disabled
+            -
+              value: '2'
+              newvalue: OK
+            -
+              value: '3'
+              newvalue: Unknown
+            -
+              value: '4'
+              newvalue: Warning
         -
           uuid: 6cd4b888faa442c19392b959f1605179
           name: 'Hypervisor manager state'
@@ -8200,25 +8219,6 @@ zabbix_export:
             -
               value: '8'
               newvalue: Unknown
-        -
-          uuid: 05742432aca048ca96684ba52bd058ae
-          name: Status
-          mappings:
-            -
-              value: '0'
-              newvalue: Critical
-            -
-              value: '1'
-              newvalue: Disabled
-            -
-              value: '2'
-              newvalue: OK
-            -
-              value: '3'
-              newvalue: Unknown
-            -
-              value: '4'
-              newvalue: Warning
         -
           uuid: e20d58a33c3b4a8891dda5da8b86cd5a
           name: 'Storage volume state'
