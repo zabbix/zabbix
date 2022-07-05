@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @dataSource TopHostsWidget
  *
- * @backup widget, profiles, items
+ * @backup widget, profiles
  *
  * @onAfter clearData
  */
@@ -2146,7 +2146,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$dashboardids = CDBHelper::getColumn("SELECT * from dashboard where name LIKE 'top_host_%'", 'dashboardid');
 		CDataHelper::call('dashboard.delete', $dashboardids);
 
-		$itemids = CDBHelper::getColumn("SELECT * from items where name LIKE 'top_host_trap%'", 'itemid');
-		CDataHelper::call('dashboard.delete', $dashboardids);
+		$itemids = CDBHelper::getColumn("SELECT * from items where name LIKE 'top_hosts_trap%'", 'itemid');
+		CDataHelper::call('item.delete', $itemids);
 	}
 }
