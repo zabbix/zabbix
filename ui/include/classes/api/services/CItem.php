@@ -622,7 +622,7 @@ class CItem extends CItemGeneral {
 
 		$db_items = DBfetchArrayAssoc(DBselect(
 			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,'.
-				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.master_itemid,i.flags,'.
+				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
 				'h.status AS host_status'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
