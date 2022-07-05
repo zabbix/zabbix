@@ -141,7 +141,7 @@ abstract class CItemType {
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'mqtt.get', 8) !== 0;
 							}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
-							['else' => true, 'type' => API_ITEM_DELAY, 'in' => DB::getDefault('items', 'delay')]
+							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'delay')]
 						]];
 
 					default:
@@ -153,7 +153,7 @@ abstract class CItemType {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
-							['else' => true, 'type' => API_IP_RANGES, 'in' => DB::getDefault('items', 'trapper_hosts')]
+							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'trapper_hosts')]
 						]];
 
 					case  ITEM_TYPE_TRAPPER:
@@ -283,7 +283,7 @@ abstract class CItemType {
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'mqtt.get', 8) !== 0;
 							}, 'type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
-							['else' => true, 'type' => API_ITEM_DELAY, 'in' => DB::getDefault('items', 'delay')]
+							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'delay')]
 						]];
 
 					default:
@@ -301,7 +301,7 @@ abstract class CItemType {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
-							['else' => true, 'type' => API_IP_RANGES, 'in' => DB::getDefault('items', 'trapper_hosts')]
+							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'trapper_hosts')]
 						]];
 
 					case  ITEM_TYPE_TRAPPER:
@@ -381,7 +381,7 @@ abstract class CItemType {
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'mqtt.get', 8) !== 0;
 							}, 'type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
-							['else' => true, 'type' => API_ITEM_DELAY, 'in' => DB::getDefault('items', 'delay')]
+							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'delay')]
 						]];
 
 					default:
@@ -393,7 +393,7 @@ abstract class CItemType {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
-							['else' => true, 'type' => API_IP_RANGES, 'in' => DB::getDefault('items', 'trapper_hosts')]
+							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'trapper_hosts')]
 						]];
 
 					case  ITEM_TYPE_TRAPPER:
