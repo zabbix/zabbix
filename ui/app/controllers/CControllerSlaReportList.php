@@ -226,7 +226,7 @@ class CControllerSlaReportList extends CController {
 		}
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('SLA Report'));
+		$response->setTitle(_('SLA report'));
 		$this->setResponse($response);
 	}
 }
