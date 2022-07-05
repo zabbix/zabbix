@@ -90,6 +90,12 @@ require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
 require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 
+// Macros.
+require_once dirname(__FILE__).'/macros/testFormMacrosAdministrationGeneral.php';
+require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
+require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
+require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
+
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 
@@ -155,10 +161,6 @@ require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
-require_once dirname(__FILE__).'/macros/testFormMacrosAdministrationGeneral.php';
-require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
-require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
-require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
@@ -305,6 +307,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
 
+		// Macros.
+		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
+		$suite->addTestSuite('testFormMacrosHost');
+		$suite->addTestSuite('testFormMacrosHostPrototype');
+		$suite->addTestSuite('testFormMacrosTemplate');
+
 
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
@@ -375,10 +383,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormLogin');
-		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
-		$suite->addTestSuite('testFormMacrosHost');
-		$suite->addTestSuite('testFormMacrosHostPrototype');
-		$suite->addTestSuite('testFormMacrosTemplate');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormServicesServices');
