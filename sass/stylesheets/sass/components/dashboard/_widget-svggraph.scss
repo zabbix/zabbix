@@ -83,6 +83,12 @@ form.dashboard-widget-svggraph {
 		margin-left: 15px;
 		padding-left: 0;
 
+		&.sortable {
+			overflow: visible;
+			margin-top: -5px;
+			margin-bottom: -5px;
+		}
+
 		.list-accordion-item-head {
 			padding: 0;
 		}
@@ -90,7 +96,9 @@ form.dashboard-widget-svggraph {
 
 	.list-accordion-item {
 		position: relative;
-		margin-bottom: 10px;
+		width: 100%;
+		padding: 5px 0;
+		list-style-type: none;
 
 		&.list-accordion-item-opened {
 			&::before {

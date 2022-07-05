@@ -344,7 +344,7 @@ $tabs->addTab('macroTab', _('Macros'),
 				[
 					'macros' => $data['macros'],
 					'parent_hostid' => $data['parent_host']['hostid'],
-					'readonly' => $data['readonly']
+					'readonly' => $data['templates']
 				]
 			),
 			'macros_container'

@@ -3689,6 +3689,10 @@ msgstr "템플릿의 모순된 링크는 할 수 없습니다."
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
 
+#: include/classes/core/ZBase.php:563
+msgid "Class not found."
+msgstr ""
+
 #: include/views/configuration.httpconf.list.php:221
 #: include/views/configuration.item.list.php:301
 msgid "Clear history"

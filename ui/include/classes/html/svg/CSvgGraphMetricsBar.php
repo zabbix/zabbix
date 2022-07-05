@@ -64,25 +64,14 @@ class CSvgGraphMetricsBar extends CSvgGroup {
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 		);
 
-		foreach ($this->path as $point) {
-			if (array_key_exists(3, $point)) {
-				[$x, $y, $label, $width, $group_x] = $point;
-
-				$this->addItem(
-					(new CSvgPolygon(
-						[
-							[round($x - floor($width / 2)), ceil($this->options['y_zero'])],
-							[round($x - floor($width / 2)), ceil($y)],
-							[round($x + ceil($width / 2)), ceil($y)],
-							[round($x + ceil($width / 2)), ceil($this->options['y_zero'])]
-						]
-					))
-						// Value.
-						->setAttribute('label', $label)
-						// X for tooltip.
-						->setAttribute('data-px', floor($group_x))
-				);
-			}
+		foreach ($this->path as [$x1, $x2, $y1, $y2, $label, $tooltip_x]) {
+			$this->addItem(
+				(new CSvgPolygon(
+					[[$x1, $y2], [$x2, $y2], [$x2, $y1], [$x1, $y1]]
+				))
+					->setAttribute('label', $label)
+					->setAttribute('data-px', $tooltip_x)
+			);
 		}
 	}
 
