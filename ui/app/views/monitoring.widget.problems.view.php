@@ -207,6 +207,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
 				$problem['name'], CSeverityHelper::getName((int) $problem['severity'])
 			))
+			->addClass(ZBX_STYLE_WORDBREAK)
 	];
 
 	if ($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $opdata) {
