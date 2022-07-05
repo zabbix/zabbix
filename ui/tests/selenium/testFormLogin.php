@@ -126,8 +126,8 @@ class testFormLogin extends CWebTest {
 	 * user permissions. When expected view is opened with the user, function is logging out of system.
 	 * Additionally function checks if database is gathering correct data.
 	 *
-	 * @onBefore removeGuestFromDisabledGroup
-	 * @onAfter addGuestToDisabledGroup
+	 * @onBeforeOnce removeGuestFromDisabledGroup
+	 * @onAfterOnce addGuestToDisabledGroup
 	 *
 	 * @dataProvider getLoginLogoutData
 	 **/
