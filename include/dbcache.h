@@ -567,6 +567,7 @@ typedef struct
 	unsigned char	type;
 	unsigned char	error_handler;
 	char		*params;
+	char		*params_orig;
 	char		*error_handler_params;
 }
 zbx_preproc_op_t;
@@ -581,6 +582,7 @@ typedef struct
 	int			dep_itemids_num;
 	int			preproc_ops_num;
 	int			update_time;
+	int			macro_update;
 
 	zbx_uint64_pair_t	*dep_itemids;
 	zbx_preproc_op_t	*preproc_ops;

@@ -217,7 +217,7 @@ static void	preprocessor_sync_configuration(zbx_preprocessing_manager_t *manager
 		zbx_hashset_iter_reset(&manager->item_config, &iter);
 		while (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_iter_next(&iter)))
 		{
-			if (ts >= item->update_time)
+			if (ts >= item->update_time && 0 == item->macro_update)
 				continue;
 
 			if (NULL == (vault = (zbx_preproc_history_t *)zbx_hashset_search(&manager->history_cache,

@@ -7904,6 +7904,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 	const zbx_dc_preproc_op_t	*dc_op;
 	zbx_preproc_item_t		*item, item_local;
 	zbx_hashset_iter_t		iter;
+	zbx_hashset_t			ids;
 	zbx_preproc_op_t		*op;
 	int				i;
 	zbx_dc_um_handle_t		*um_handle;
@@ -7914,7 +7915,9 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 	if (0 != *timestamp && *timestamp == config->item_sync_ts)
 		goto out;
 
-	zbx_hashset_clear(items);
+	zbx_hashset_create(&ids, MAX((size_t)items->num_data, 1000), ZBX_DEFAULT_UINT64_HASH_FUNC,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	*timestamp = config->item_sync_ts;
 
 	RDLOCK_CACHE;
@@ -7925,21 +7928,46 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 		if (FAIL == dc_preproc_item_init(&item_local, dc_preprocitem->itemid))
 			continue;
 
+		if (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_search(items, &item_local)))
+		{
+			if (item->preproc_ops_num == dc_preprocitem->preproc_ops.values_num &&
+					item->update_time == dc_preprocitem->update_time)
+			{
+				item->macro_update = 0;
+
+				for (i = 0; i < dc_preprocitem->preproc_ops.values_num; i++)
+				{
+					dc_op = (const zbx_dc_preproc_op_t *)dc_preprocitem->preproc_ops.values[i];
+					op = &item->preproc_ops[i];
+
+					op->params_orig = zbx_strdup(NULL, dc_op->params);
+				}
+				zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
+				continue;
+			}
+			else
+				zbx_hashset_remove_direct(items, item);
+		}
+
 		item = (zbx_preproc_item_t *)zbx_hashset_insert(items, &item_local, sizeof(item_local));
 
 		item->preproc_ops_num = dc_preprocitem->preproc_ops.values_num;
 		item->preproc_ops = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) * item->preproc_ops_num);
 		item->update_time = dc_preprocitem->update_time;
+		item->macro_update = 0;
 
 		for (i = 0; i < dc_preprocitem->preproc_ops.values_num; i++)
 		{
 			dc_op = (const zbx_dc_preproc_op_t *)dc_preprocitem->preproc_ops.values[i];
 			op = &item->preproc_ops[i];
 			op->type = dc_op->type;
-			op->params = zbx_strdup(NULL, dc_op->params);
+			op->params = NULL;
+			op->params_orig = zbx_strdup(NULL, dc_op->params);
 			op->error_handler = dc_op->error_handler;
 			op->error_handler_params = zbx_strdup(NULL, dc_op->error_handler_params);
 		}
+
+		zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
 	}
 
 	zbx_hashset_iter_reset(&config->masteritems, &iter);
@@ -7986,23 +8014,46 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 
 	UNLOCK_CACHE;
 
+	zbx_hashset_iter_reset(items, &iter);
+	while (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL == zbx_hashset_search(&ids, &item->itemid))
+			zbx_hashset_iter_remove(&iter);
+	}
+
 	um_handle = zbx_dc_open_user_macros();
 
 	zbx_hashset_iter_reset(items, &iter);
 	while (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
-
 		for (i = 0; i < item->preproc_ops_num; i++)
 		{
-			(void)zbx_dc_expand_user_macros(um_handle, &item->preproc_ops[i].params, &item->hostid, 1,
-					NULL);
 			(void)zbx_dc_expand_user_macros(um_handle, &item->preproc_ops[i].error_handler_params,
 					&item->hostid, 1, NULL);
+
+			if (NULL != strstr(item->preproc_ops[i].params_orig, "{$"))
+			{
+				(void)zbx_dc_expand_user_macros(um_handle, &item->preproc_ops[i].params_orig,
+						&item->hostid, 1, NULL);
+
+				if (NULL != item->preproc_ops[i].params &&
+						0 != strcmp(item->preproc_ops[i].params,
+								item->preproc_ops[i].params_orig))
+				{
+					item->macro_update = 1;
+				}
+			}
+
+			zbx_free(item->preproc_ops[i].params);
+			item->preproc_ops[i].params = item->preproc_ops[i].params_orig;
+			item->preproc_ops[i].params_orig = NULL;
 		}
 
 	}
 
 	zbx_dc_close_user_macros(um_handle);
+
+	zbx_hashset_destroy(&ids);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() items:%d", __func__, items->num_data);
 }
