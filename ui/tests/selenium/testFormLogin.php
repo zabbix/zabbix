@@ -196,25 +196,29 @@ class testFormLogin extends CWebTest {
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 **/
 	public static function removeGuestFromDisabledGroup() {
-		CDataHelper::call('user.update', [
-			[
-				'userid' => '2',
-				'usrgrps' => [
-					['usrgrpid' => '8']
-				]
-			]
-		]);
+		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');		
+		
+//		CDataHelper::call('user.update', [
+//			[
+//				'userid' => '2',
+//				'usrgrps' => [
+//					['usrgrpid' => '8']
+//				]
+//			]
+//		]);
 	}
 
 	public function addGuestToDisabledGroup() {
-		CDataHelper::call('user.update', [
-			[
-				'userid' => '2',
-				'usrgrps' => [
-					['usrgrpid' => '8'],
-					['usrgrpid' => '9']
-				]
-			]
-		]);
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');		
+		
+//		CDataHelper::call('user.update', [
+//			[
+//				'userid' => '2',
+//				'usrgrps' => [
+//					['usrgrpid' => '8'],
+//					['usrgrpid' => '9']
+//				]
+//			]
+//		]);
 	}
 }
