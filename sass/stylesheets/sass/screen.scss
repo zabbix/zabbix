@@ -6194,85 +6194,88 @@ $range-input-width: 31px;
 
 // HOST INTERFACES
 
-.interface-container {
-	width: fit-content;
-	width: -moz-fit-content;
-	padding-left: 0;
-
-	&:not(.interface-container-header):not(:empty) {
-		margin-bottom: 5px;
-
-		& ~ .interface-container:not(:empty) {
-			border-top: 1px solid $form-border-color;
-			padding-top: 10px;
-		}
-	}
-
-	&:empty {
-		display: none;
-	}
-
-	.interface-row {
-		display: grid;
-		grid-template-columns: 26px 36px 225px 175px 85px 100px 20px 1fr;
-		grid-template-rows: 24px 1fr;
-		gap: 5px;
-
-		&:not(:first-of-type) {
-			margin-top: 5px;
-		}
-
-		&[data-type] .interface-cell-details {
-			display: none;
-			grid-column: 1/-1;
-		}
-
-		.interface-cell {
-			align-self: center;
-
-			.interface-btn-toggle {
-				display: none;
-				@extend .btn-link;
-			}
-
-			&.interface-cell-header {
-				color: $font-alt-color;
-				text-align: left;
-			}
-
-			.table-forms-td-left,
-			.table-forms-td-right {
-				padding-bottom: 0;
-			}
-		}
+.table-forms-td-right {
+	.interfaces {
+		margin-top: 5px;
 	}
 }
 
-// Host interface accordion for SNMP specific styles.
-.interface-row.list-accordion-item[data-type="2"] {
-	&.list-accordion-item-closed {
-		.interface-btn-toggle {
-			@extend .btn-widget-expand;
+.interfaces {
+	display: grid;
+	grid-template-columns: 26px repeat(7, max-content);
+	margin-bottom: 5px;
+	line-height: 24px;
+
+	.interface-container {
+		display: contents;
+
+		&.interface-container-header {
+			.interface-cell {
+				padding: 0 5px 0 0;
+				color: $font-alt-color;
+			}
+
+			.interface-cell-action {
+				grid-column: span 2;
+			}
 		}
 
-		.list-accordion-item-body {
-			display: none;
+		&:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) {
+			.interface-cell:not(.interface-cell-details) {
+				padding-top: 10px;
+				margin-top: 5px;
+				border-top: 1px solid $form-border-color;
+			}
 		}
 	}
 
-	&.list-accordion-item-opened {
-		.interface-btn-toggle {
-			@extend .btn-widget-collapse;
-		}
+	.interface-row {
+		display: contents;
 
-		.list-accordion-item-body {
-			display: block;
+		&[data-type="2"] {
+			.interface-btn-toggle {
+				@extend %btn-widget-defaults;
+
+				display: inline-block;
+				width: 24px;
+				height: 24px;
+				background: url($sprite-path) no-repeat -6px -690px;
+			}
+
+			.list-accordion-item-body {
+				display: none;
+				padding-top: 0;
+			}
+
+			&.list-accordion-item-opened {
+				.interface-btn-toggle {
+					background: url($sprite-path) no-repeat -6px -655px;
+				}
+
+				.list-accordion-item-body {
+					display: block;
+				}
+			}
+		}
+	}
+
+	.interface-cell {
+		padding: 5px 5px 5px 0;
+
+		&.interface-cell-details {
+			display: none;
+			grid-column: 1 / -1;
 		}
 	}
 
 	.interface-btn-toggle {
-		display: inline-block;
-		@extend %btn-widget;
+		display: none;
+		vertical-align: top;
+	}
+
+	.no-interface {
+		grid-column: 1 / -1;
+		color: $font-alt-color;
 	}
 }
 

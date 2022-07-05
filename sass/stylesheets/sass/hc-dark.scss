@@ -1549,3 +1549,21 @@ td.inactive-bg {
 		content: "";
 	}
 }
+
+// HOST INTERFACES
+
+.interfaces {
+	.interface-row {
+		&[data-type="2"] {
+			.interface-btn-toggle {
+				background-position: -318px -690px;
+			}
+
+			&.list-accordion-item-opened {
+				.interface-btn-toggle {
+					background-position: -318px -655px;
+				}
+			}
+		}
+	}
+}

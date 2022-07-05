@@ -3842,7 +3842,7 @@ button {
     background-color: #414141;
     border-color: #768d99; }
 
-.btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active, .interface-container .interface-row .interface-cell .interface-btn-toggle {
+.btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
   position: relative;
   background-color: transparent;
   border: 0;
@@ -3852,14 +3852,14 @@ button {
   font-size: inherit;
   padding: 0;
   min-height: inherit; }
-  .btn-link:focus, .interface-container .interface-row .interface-cell .interface-btn-toggle:focus {
+  .btn-link:focus {
     outline: none;
     margin-bottom: -2px !important;
     border-bottom: 2px solid rgba(71, 150, 196, 0.5);
     box-shadow: 0 0 0 0 !important; }
-  .btn-link[disabled], .interface-container .interface-row .interface-cell [disabled].interface-btn-toggle {
+  .btn-link[disabled] {
     background-color: transparent; }
-    .btn-link[disabled]:hover, .interface-container .interface-row .interface-cell [disabled].interface-btn-toggle:hover {
+    .btn-link[disabled]:hover {
       background-color: transparent; }
 
 .btn-kiosk {
@@ -3904,10 +3904,10 @@ button {
 .btn-widget-action {
   background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -618px; }
 
-.btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle {
+.btn-widget-collapse {
   background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -654px; }
 
-.btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle {
+.btn-widget-expand {
   background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -689px; }
 
 .btn-widget-edit {
@@ -4187,7 +4187,7 @@ button {
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
 
-.btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
+.btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .btn-widget-expand, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock {
   width: 24px;
   height: 24px;
   margin: 2px 2px 0 0; }
@@ -4196,13 +4196,13 @@ button {
   width: 24px;
   height: 24px; }
 
-.filter-container.tabfilter-container .icon-edit, .btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle, .btn-dashboard-conf {
+.filter-container.tabfilter-container .icon-edit, .btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .btn-widget-expand, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .btn-dashboard-conf, .interfaces .interface-row[data-type="2"] .interface-btn-toggle {
   border: 0;
   min-height: 0;
   padding: 0;
   opacity: .5;
   transition: opacity .2s ease-out; }
-  .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-dashboard-page-properties, [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, [disabled].btn-widget-expand, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle, [disabled].btn-dashboard-conf, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-dashboard-page-properties:hover, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, [disabled].btn-widget-expand:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:hover, [disabled].btn-dashboard-conf:hover, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-dashboard-page-properties:focus, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, [disabled].btn-widget-expand:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:focus, [disabled].btn-dashboard-conf:focus, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-dashboard-page-properties:active, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, [disabled].btn-widget-expand:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:active, [disabled].btn-dashboard-conf:active {
+  .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-dashboard-page-properties, [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, [disabled].btn-widget-expand, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, [disabled].btn-dashboard-conf, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-dashboard-page-properties:hover, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, [disabled].btn-widget-expand:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, [disabled].btn-dashboard-conf:hover, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:hover, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-dashboard-page-properties:focus, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, [disabled].btn-widget-expand:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, [disabled].btn-dashboard-conf:focus, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:focus, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-dashboard-page-properties:active, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, [disabled].btn-widget-expand:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, [disabled].btn-dashboard-conf:active, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:active {
     background-color: transparent;
     opacity: .25; }
 
@@ -4231,7 +4231,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .inaccessible .subfilter-enabled {
   color: #b2b2b2; }
 
-.filter-container.tabfilter-container .icon-edit:hover, .btn-dashboard-page-properties:hover, .btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .btn-widget-expand:hover, .btn-widget-edit:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:hover, .btn-dashboard-conf:hover, .filter-container.tabfilter-container .icon-edit:focus, .btn-dashboard-page-properties:focus, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:focus, .btn-dashboard-conf:focus, .filter-container.tabfilter-container .icon-edit:active, .btn-dashboard-page-properties:active, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .btn-widget-expand:active, .btn-widget-edit:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:active, .btn-dashboard-conf:active {
+.filter-container.tabfilter-container .icon-edit:hover, .btn-dashboard-page-properties:hover, .btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .btn-widget-expand:hover, .btn-widget-edit:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .btn-dashboard-conf:hover, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:hover, .filter-container.tabfilter-container .icon-edit:focus, .btn-dashboard-page-properties:focus, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .btn-dashboard-conf:focus, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:focus, .filter-container.tabfilter-container .icon-edit:active, .btn-dashboard-page-properties:active, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .btn-widget-expand:active, .btn-widget-edit:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .btn-dashboard-conf:active, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:active {
   background-color: transparent;
   opacity: 1; }
 
@@ -5955,7 +5955,7 @@ svg {
   .preprocessing-list select {
     width: 100%;
     min-width: 0; }
-  .preprocessing-list .btn-link:not(:last-of-type), .preprocessing-list .interface-container .interface-row .interface-cell .interface-btn-toggle:not(:last-of-type), .interface-container .interface-row .interface-cell .preprocessing-list .interface-btn-toggle:not(:last-of-type) {
+  .preprocessing-list .btn-link:not(:last-of-type) {
     margin-right: 10px; }
   .preprocessing-list .preprocessing-list-head,
   .preprocessing-list .preprocessing-list-foot,
@@ -6757,44 +6757,50 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
   /* for IE11 only. Fixed cell height if table has 100% height */
   .host-avail-widget td {
     height: 100%; } }
-.interface-container {
-  width: fit-content;
-  width: -moz-fit-content;
-  padding-left: 0; }
-  .interface-container:not(.interface-container-header):not(:empty) {
-    margin-bottom: 5px; }
-    .interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) {
-      border-top: 1px solid #4f4f4f;
-      padding-top: 10px; }
-  .interface-container:empty {
-    display: none; }
-  .interface-container .interface-row {
-    display: grid;
-    grid-template-columns: 26px 36px 225px 175px 85px 100px 20px 1fr;
-    grid-template-rows: 24px 1fr;
-    gap: 5px; }
-    .interface-container .interface-row:not(:first-of-type) {
-      margin-top: 5px; }
-    .interface-container .interface-row[data-type] .interface-cell-details {
-      display: none;
-      grid-column: 1/-1; }
-    .interface-container .interface-row .interface-cell {
-      align-self: center; }
-      .interface-container .interface-row .interface-cell .interface-btn-toggle {
-        display: none; }
-      .interface-container .interface-row .interface-cell.interface-cell-header {
-        color: #737373;
-        text-align: left; }
-      .interface-container .interface-row .interface-cell .table-forms-td-left,
-      .interface-container .interface-row .interface-cell .table-forms-td-right {
-        padding-bottom: 0; }
+.table-forms-td-right .interfaces {
+  margin-top: 5px; }
 
-.interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .list-accordion-item-body {
-  display: none; }
-.interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .list-accordion-item-body {
-  display: block; }
-.interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
-  display: inline-block; }
+.interfaces {
+  display: grid;
+  grid-template-columns: 26px repeat(7, max-content);
+  margin-bottom: 5px;
+  line-height: 24px; }
+  .interfaces .interface-container {
+    display: contents; }
+    .interfaces .interface-container.interface-container-header .interface-cell {
+      padding: 0 5px 0 0;
+      color: #737373; }
+    .interfaces .interface-container.interface-container-header .interface-cell-action {
+      grid-column: span 2; }
+    .interfaces .interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) .interface-cell:not(.interface-cell-details) {
+      padding-top: 10px;
+      margin-top: 5px;
+      border-top: 1px solid #4f4f4f; }
+  .interfaces .interface-row {
+    display: contents; }
+    .interfaces .interface-row[data-type="2"] .interface-btn-toggle {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -690px; }
+    .interfaces .interface-row[data-type="2"] .list-accordion-item-body {
+      display: none;
+      padding-top: 0; }
+    .interfaces .interface-row[data-type="2"].list-accordion-item-opened .interface-btn-toggle {
+      background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -655px; }
+    .interfaces .interface-row[data-type="2"].list-accordion-item-opened .list-accordion-item-body {
+      display: block; }
+  .interfaces .interface-cell {
+    padding: 5px 5px 5px 0; }
+    .interfaces .interface-cell.interface-cell-details {
+      display: none;
+      grid-column: 1 / -1; }
+  .interfaces .interface-btn-toggle {
+    display: none;
+    vertical-align: top; }
+  .interfaces .no-interface {
+    grid-column: 1 / -1;
+    color: #737373; }
 
 .debug-modal.overlay-dialogue.modal .overlay-dialogue-body {
   overflow-x: auto; }
