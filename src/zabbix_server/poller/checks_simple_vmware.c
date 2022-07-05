@@ -615,8 +615,7 @@ static int	custquery_read_result(zbx_vmware_cust_query_t *custom_query, AGENT_RE
 {
 	if (0 != (custom_query->state & ZBX_VMWARE_CQ_ERROR))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, custom_query->error));
-
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Custom query error: %s", custom_query->error));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -758,12 +757,6 @@ int	check_vcenter_cluster_property(AGENT_REQUEST *request, const char *username,
 	else if (NULL == custom_query)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown vmware property query."));
-		goto unlock;
-	}
-
-	if (0 != (custom_query->state & ZBX_VMWARE_CQ_ERROR))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, custom_query->error));
 		goto unlock;
 	}
 
@@ -1605,12 +1598,6 @@ int	check_vcenter_hv_property(AGENT_REQUEST *request, const char *username, cons
 	else if (NULL == custom_query)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown vmware property query."));
-		goto unlock;
-	}
-
-	if (0 != (custom_query->state & ZBX_VMWARE_CQ_ERROR))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, custom_query->error));
 		goto unlock;
 	}
 
@@ -3421,7 +3408,7 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 
 	if (0 != (custom_query->state & ZBX_VMWARE_CQ_ERROR))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, custom_query->error));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Custom query error: %s", custom_query->error));
 		goto unlock;
 	}
 
@@ -4081,12 +4068,6 @@ int	check_vcenter_vm_property(AGENT_REQUEST *request, const char *username, cons
 	else if (NULL == custom_query)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown vmware property query."));
-		goto unlock;
-	}
-
-	if (0 != (custom_query->state & ZBX_VMWARE_CQ_ERROR))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, custom_query->error));
 		goto unlock;
 	}
 

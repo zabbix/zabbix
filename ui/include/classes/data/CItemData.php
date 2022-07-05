@@ -1426,7 +1426,7 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.hv.property[<url>,<uuid>,<prop>]' => [
-				'description' => _('VMware hyoervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path'),
+				'description' => _('VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.hv.sensor.health.state[<url>,<uuid>]' => [
