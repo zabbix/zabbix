@@ -554,13 +554,18 @@ class CLineGraphDraw extends CGraphDraw {
 				]);
 			}
 
-			$item = $items[0];
+			if ($items) {
+				$item = $items[0];
 
-			if ($item) {
-				$history = Manager::History()->getLastValues([$item]);
-				if (isset($history[$item['itemid']])) {
-					return $history[$item['itemid']][0]['value'];
+				if ($item) {
+					$history = Manager::History()->getLastValues([$item]);
+					if (isset($history[$item['itemid']])) {
+						return $history[$item['itemid']][0]['value'];
+					}
 				}
+			}
+			else {
+				$this->ymin_type = GRAPH_YAXIS_TYPE_CALCULATED;
 			}
 		}
 
@@ -638,13 +643,18 @@ class CLineGraphDraw extends CGraphDraw {
 				]);
 			}
 
-			$item = $items[0];
+			if ($items) {
+				$item = $items[0];
 
-			if ($item) {
-				$history = Manager::History()->getLastValues([$item]);
-				if (isset($history[$item['itemid']])) {
-					return $history[$item['itemid']][0]['value'];
+				if ($item) {
+					$history = Manager::History()->getLastValues([$item]);
+					if (isset($history[$item['itemid']])) {
+						return $history[$item['itemid']][0]['value'];
+					}
 				}
+			}
+			else {
+				$this->ymax_type = GRAPH_YAXIS_TYPE_CALCULATED;
 			}
 		}
 
