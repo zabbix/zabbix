@@ -1,1 +1,1 @@
-...G...... [ZBX-21135] fixed to not stop the agent in case of broken windows performance counters (asestakovs)
+...G...... [ZBX-21135] added fix to prevent agent from stopping in case of broken windows performance counters (asestakovs)
