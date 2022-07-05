@@ -525,7 +525,7 @@ class CItem extends CItemGeneral {
 			'host_status' =>	['type' => API_ANY],
 			'flags' =>			['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
+									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid')]
 			]],
 			'hostid' =>			['type' => API_ANY],
