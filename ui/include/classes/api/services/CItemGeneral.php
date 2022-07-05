@@ -230,8 +230,8 @@ abstract class CItemGeneral extends CApiService {
 				'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
 				'params' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', static::PREPROC_TYPES_WITH_PARAMS)], 'type' => API_PREPROC_PARAMS, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($flags & API_ALLOW_LLD_MACRO), 'preproc_type' => ['field' => 'type'], 'length' => DB::getFieldLength('item_preproc', 'params')],
-												['else' => true, 'type' => API_PREPROC_PARAMS, 'in' => DB::getDefault('item_preproc', 'params')]
-											]],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('item_preproc', 'params')]
+				]],
 				'error_handler' =>			['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', array_diff(static::PREPROC_TYPES_WITH_ERR_HANDLING, [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]))], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
 												['if' => ['field' => 'type', 'in' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
