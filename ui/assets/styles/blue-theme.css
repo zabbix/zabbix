@@ -4904,7 +4904,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: table;
   position: absolute;
   z-index: 1000;
-  padding: 13px 10px 10px;
+  padding: 17px 10px 10px;
   background-color: #ffffff;
   border: 1px solid #ccd5d9;
   border-bottom-color: #c9d3d7;
@@ -4922,7 +4922,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
-    margin: 0 10px; }
+    margin: 0 10px;
+    padding: 13px 10px 10px; }
     .overlay-dialogue.modal .dashboard-widget-head {
       margin-bottom: 14px; }
       .overlay-dialogue.modal .dashboard-widget-head .icon-doc-link {

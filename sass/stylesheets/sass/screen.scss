@@ -3076,7 +3076,7 @@ $form-icon-btn: (
 	display: table;
 	position: absolute;
 	z-index: 1000;
-	padding: 13px 10px 10px;
+	padding: 17px 10px 10px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
@@ -3102,6 +3102,7 @@ $form-icon-btn: (
 		position: fixed;
 		overflow: hidden;
 		margin: 0 10px;
+		padding: 13px 10px 10px;
 
 		.dashboard-widget-head {
 			margin-bottom: 14px;
