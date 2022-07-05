@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-07-05T06:05:08Z'
+  date: '2022-07-05T06:29:44Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -2955,7 +2955,7 @@ zabbix_export:
                 OK - Fan bay has no issues.
                 Unknown - Unknown fan's state.
               valuemap:
-                name: State
+                name: 'Resource state'
               preprocessing:
                 -
                   type: JSONPATH
@@ -8111,6 +8111,28 @@ zabbix_export:
               value: '9'
               newvalue: Unknown
         -
+          uuid: ba5903d60953477aafd313d3688c8dd8
+          name: 'Resource state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Degraded
+            -
+              value: '1'
+              newvalue: Failed
+            -
+              value: '2'
+              newvalue: Misplaced
+            -
+              value: '3'
+              newvalue: Missing
+            -
+              value: '4'
+              newvalue: OK
+            -
+              value: '5'
+              newvalue: Unknown
+        -
           uuid: a545b93c790741a29b726f04f03cbc8f
           name: 'Server hardware state'
           mappings:
@@ -8166,28 +8188,6 @@ zabbix_export:
             -
               value: '1'
               newvalue: Up
-        -
-          uuid: ba5903d60953477aafd313d3688c8dd8
-          name: State
-          mappings:
-            -
-              value: '0'
-              newvalue: Degraded
-            -
-              value: '1'
-              newvalue: Failed
-            -
-              value: '2'
-              newvalue: Misplaced
-            -
-              value: '3'
-              newvalue: Missing
-            -
-              value: '4'
-              newvalue: OK
-            -
-              value: '5'
-              newvalue: Unknown
         -
           uuid: 647f5a6d2ce54e78af163f8676f3f1e0
           name: 'State reason'
