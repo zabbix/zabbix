@@ -109,11 +109,6 @@ include __DIR__.'/itemtest.js.php';
 					&& type != <?= ITEM_TYPE_IPMI ?>
 			)
 
-			if (type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>
-					|| type == <?= ITEM_TYPE_SIMPLE ?> || type == <?= ITEM_TYPE_EXTERNAL ?>) {
-				$('#js-item-interface-label').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-			}
-
 			if (type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) {
 				$('label[for=username]').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 				$('input[name=username]').attr('aria-required', 'true');
