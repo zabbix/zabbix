@@ -128,6 +128,15 @@ class testItem extends CAPITest {
 			];
 		}
 
+		$interface_optional = [];
+
+		foreach ($item_type_tests as $item_type_test) {
+			if (itemTypeInterface($item_type_test['request_data']['type']) == INTERFACE_TYPE_OPT) {
+				unset($item_type_test['request_data']['interfaceid']);
+				$interface_optional[] = $item_type_test;
+			}
+		}
+
 		return [
 			[
 				'request_data' => [
@@ -261,33 +270,20 @@ class testItem extends CAPITest {
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "0".'
 			],
 
-			'HTTP Agent item without direct interface' => [
+			'SNMP Agent item requires interface' => [
 				'request_data' => [
 					'hostid' => '50009',
 					'name' => 'NoInterfaceItem123',
 					'key_' => '1234',
 					'interfaceid' => 0,
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'type' => ITEM_TYPE_HTTPAGENT,
-					'delay' => '30s',
-					'url' => '192.168.0.1'
-				],
-				'expected_error' => null
-			],
-			'Sample/Simple Check item requires interface' => [
-				'request_data' => [
-					'hostid' => '50009',
-					'name' => 'NoInterfaceItem123',
-					'key_' => '1234',
-					'interfaceid' => 0,
-					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'type' => ITEM_TYPE_SIMPLE,
-					'delay' => '30s',
-					'url' => '192.168.0.1'
+					'type' => ITEM_TYPE_SNMP,
+					'delay' => '30s'
 				],
 				'expected_error' => 'No interface found.'
 			]
-		] + $item_type_tests;
+		] + $item_type_tests + $interface_optional;
 	}
 
 	/**
