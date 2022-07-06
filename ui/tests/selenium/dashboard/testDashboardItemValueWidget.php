@@ -700,6 +700,9 @@ class testDashboardItemValueWidget extends CWebTest {
 	 * @param boolean $update	updating is performed
 	 */
 	public function checkWidgetForm($data, $update = false) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid');
+		}
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
@@ -722,13 +725,11 @@ class testDashboardItemValueWidget extends CWebTest {
 			}
 		}
 
-		$values = $form->getFields()->asValues();
-
+		$values = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 		$form->submit();
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid');
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid'));
 		}
@@ -750,7 +751,7 @@ class testDashboardItemValueWidget extends CWebTest {
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $dashboard->getWidget($header)->edit();
-			$this->assertEquals($values, $saved_form->getFields()->asValues());
+			$this->assertEquals($values, $saved_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
 
 			// As form is quite complex, show_header field should be checked separately.
 			if (array_key_exists('show_header', $data['fields'])) {

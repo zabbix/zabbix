@@ -35,7 +35,7 @@ class CColorPickerElement extends CElement {
 	 * @return type
 	 */
 	public function getInput() {
-		return $this->query('xpath:.//input')->waitUntilVisible()->one();
+		return $this->query('xpath:.//input')->one();
 	}
 
 	/**
