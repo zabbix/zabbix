@@ -128,12 +128,19 @@ class testItem extends CAPITest {
 			];
 		}
 
-		$interface_optional = [];
+		$interfaces_tests = [];
+		$optional = [ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_HTTPAGENT];
+		$required = [ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_IPMI, ITEM_TYPE_ZABBIX, ITEM_TYPE_JMX];
 
 		foreach ($item_type_tests as $item_type_test) {
-			if (itemTypeInterface($item_type_test['request_data']['type']) == INTERFACE_TYPE_OPT) {
+			if (in_array($item_type_test['request_data']['type'], $optional)) {
 				unset($item_type_test['request_data']['interfaceid']);
-				$interface_optional[] = $item_type_test;
+				$interfaces_tests[] = $item_type_test;
+			}
+			else if (in_array($item_type_test['request_data']['type'], $required)) {
+				unset($item_type_test['request_data']['interfaceid']);
+				$item_type_test['expected_error'] = 'No interface found.';
+				$interfaces_tests[] = $item_type_test;
 			}
 		}
 
@@ -268,22 +275,8 @@ class testItem extends CAPITest {
 					]
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "0".'
-			],
-
-			'SNMP Agent item requires interface' => [
-				'request_data' => [
-					'hostid' => '50009',
-					'name' => 'NoInterfaceItem123',
-					'key_' => '1234',
-					'interfaceid' => 0,
-					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
-					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'type' => ITEM_TYPE_SNMP,
-					'delay' => '30s'
-				],
-				'expected_error' => 'No interface found.'
 			]
-		] + $item_type_tests + $interface_optional;
+		] + $item_type_tests + $interfaces_tests;
 	}
 
 	/**
