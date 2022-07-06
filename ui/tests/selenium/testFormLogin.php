@@ -195,7 +195,7 @@ class testFormLogin extends CWebTest {
 	/**
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 **/
-	public static function removeGuestFromDisabledGroup() {
+	public function removeGuestFromDisabledGroup() {
 		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
 
 //		CDataHelper::call('user.update', [
@@ -208,7 +208,7 @@ class testFormLogin extends CWebTest {
 //		]);
 	}
 
-	public function addGuestToDisabledGroup() {
+	public static function addGuestToDisabledGroup() {
 		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 
 //		CDataHelper::call('user.update', [
