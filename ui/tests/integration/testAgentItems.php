@@ -489,6 +489,26 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'result' => 2
+		],
+		[
+			'key' => 'proc.get[,,zabbix_agentd.*]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'result' => [
+				[
+					'pid' => 'pgrep zabbix_agentd',
+					'ppid' => self::formatPsCmd('ppid', 'zabbix_agentd'),
+					'name' => self::formatProcfsCmd('Name'),
+					'cmdline' => self::formatPsCmd('cmd', 'zabbix_agentd'),
+					'user' => self::formatPsCmd('euser', 'zabbix_agentd'),
+					'group' => self::formatPsCmd('rgroup', 'zabbix_agentd'),
+					'uid' => self::formatPsCmd('euid', 'zabbix_agentd'),
+					'gid' => self::formatPsCmd('rgid', 'zabbix_agentd'),
+					'threads' => self::formatPsCmd('nlwp', 'zabbix_agentd')
+				]
+			]
 		]
 	];
 
@@ -864,6 +884,14 @@ class testAgentItems extends CIntegrationTest {
 				$result[$k] = exec($res);
 			}
 		}
+	}
+
+	private static function formatPsCmd(string $column, string $component) {
+		return "ps --no-headers -o $column:1 -C $component";
+	}
+
+	private static function formatProcfsCmd(string $param) {
+		return "grep $param /proc/`pgrep zabbix_agent`/status | awk \'BEGIN { FS="[\t]" } ; { print $2 }\'";
 	}
 }
 
