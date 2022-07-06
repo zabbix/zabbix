@@ -126,6 +126,8 @@ abstract class CItemGeneral extends CApiService {
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRules($db_item);
 			}
 
+			$api_input_rules['fields'] += CItemType::getDefaultValidationRules();
+
 			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}

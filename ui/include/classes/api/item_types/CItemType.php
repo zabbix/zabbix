@@ -420,4 +420,59 @@ abstract class CItemType {
 				return ['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED];
 		}
 	}
+
+	/**
+	 * @return array
+	 */
+	final public static function getDefaultValidationRules(): array {
+		return [
+			// Common item type fields.
+			'interfaceid' =>		['type' => API_ID, 'in' => '0'],
+			'authtype' =>			['type' => API_INT32, 'in' => DB::getDefault('items', 'authtype')],
+			'username' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'username')],
+			'password' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'password')],
+			'params' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'params')],
+			'timeout' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'timeout')],
+			'delay' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'delay')],
+			'trapper_hosts' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'trapper_hosts')],
+
+			// Dependent item type spcecific fields.
+			'master_itemid' =>		['type' => API_ID, 'in' => '0'],
+
+			// HTTP Agent item type spcecific fields.
+			'url' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'url')],
+			'query_fields' =>		['type' => API_OBJECTS, 'length' => 0],
+			'request_method' =>		['type' => API_INT32, 'in' => DB::getDefault('items', 'request_method')],
+			'post_type' =>			['type' => API_INT32, 'in' => DB::getDefault('items', 'post_type')],
+			'posts' =>				['type' => API_INT32, 'in' => DB::getDefault('items', 'posts')],
+			'headers' =>			['type' => API_OBJECT, 'fields' => []],
+			'status_codes' =>		['type' => API_INT32_RANGES, 'in' => DB::getDefault('items', 'status_codes')],
+			'follow_redirects' =>	['type' => API_INT32, 'in' => DB::getDefault('items', 'follow_redirects')],
+			'retrieve_mode' =>		['type' => API_INT32, 'in' => DB::getDefault('items', 'retrieve_mode')],
+			'output_format' =>		['type' => API_INT32, 'in' => DB::getDefault('items', 'output_format')],
+			'http_proxy' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'http_proxy')],
+			'verify_peer' =>		['type' => API_INT32, 'in' => DB::getDefault('items', 'verify_peer')],
+			'verify_host' =>		['type' => API_INT32, 'in' => DB::getDefault('items', 'verify_host')],
+			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'ssl_cert_file')],
+			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'ssl_key_file')],
+			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'ssl_key_password')],
+			'allow_traps' =>		['type' => API_INT32, 'in' => DB::getDefault('items', 'allow_traps')],
+
+			// IPMI item type spcecific fields.
+			'ipmi_sensor' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'ipmi_sensor')],
+
+			// JMX item type spcecific fields.
+			'jmx_endpoint' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'jmx_endpoint')],
+
+			// Script item type spcecific fields.
+			'parameters' =>			['type' => API_OBJECTS, 'length' => 0],
+
+			// SNMP item type spcecific fields.
+			'snmp_oid' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'snmp_oid')],
+
+			// SSH item type spcecific fields.
+			'publickey' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'publickey')],
+			'privatekey' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'privatekey')]
+		];
+	}
 }
