@@ -1201,27 +1201,9 @@ class GraphAxesTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
 			this.addAttributes(element);
 		});
-
-		for (const checkbox of document.querySelectorAll('#lefty, #righty, #axisx')) {
-			checkbox.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
-		}
-
-		for (const input of document.querySelectorAll('#lefty_min, #lefty_max, #lefty_units')) {
-			input.addEventListener('change', () => {
-				this.addAttributes(element);
-			});
-		}
-
-		for (const input of document.querySelectorAll('#righty_min, #righty_max, #righty_units')) {
-			input.addEventListener('change', () => {
-				this.addAttributes(element);
-			});
-		}
 	}
 }
 
@@ -1273,12 +1255,9 @@ class GraphDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const names = ['source', 'simple_triggers', 'working_time', 'percentile_left', 'percentile_right'];
-
-		for (const name of names) {
-			const inputs = document.querySelectorAll("[name='" + name + "']");
-			[...inputs].map((elem) => elem.addEventListener('click', () => this.addAttributes(element)));
-		}
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes(element);
+		});
 	}
 }
 
@@ -1299,13 +1278,9 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#graph_time');
-
-		if (target_node !== null) {
-			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
-		}
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes(element);
+		});
 	}
 }
 
@@ -1348,17 +1323,9 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		for (const checkbox of document.querySelectorAll('#legend, #legend_statistic')) {
-			checkbox.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
-		}
-
-		for (const input of document.querySelectorAll('#legend_lines, #legend_columns')) {
-			input.parentNode.addEventListener('change', () => {
-				this.addAttributes(element);
-			});
-		}
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes(element);
+		});
 	}
 }
 
@@ -1379,13 +1346,9 @@ class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#show_problems');
-
-		if (target_node !== null) {
-			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
-		}
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes(element);
+		});
 	}
 }
 

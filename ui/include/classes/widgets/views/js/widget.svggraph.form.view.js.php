@@ -734,8 +734,8 @@ window.widget_svggraph_form = new class {
 		document.getElementById('righty_static_units').disabled = !righty_on
 			|| document.getElementById('righty_units').value != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>;
 
-		// Trigger event to update tab indicator.
-		document.dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));
+		// Trigger event to update tab indicators.
+		document.getElementById('tabs').dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));
 	}
 
 	_updatePreview() {
