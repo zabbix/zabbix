@@ -1028,6 +1028,10 @@ class MediaTabIndicatorItem extends TabIndicatorItem {
 
 class MediatypeOptionsTabIndicatorItem extends TabIndicatorItem {
 
+	static DEFAULT_MAXSESSIONS_TYPE = 'one';
+	static DEFAULT_MAXATTEMPTS = 3;
+	static DEFAULT_ATTEMPT_INTERVAL = '10s';
+
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
@@ -1035,19 +1039,22 @@ class MediatypeOptionsTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const maxsessions_type = document.querySelector('[name="maxsessions_type"]:checked');
 
-		if (maxsessions_type !== null && maxsessions_type.value !== 'one') {
+		if (maxsessions_type !== null
+				&& maxsessions_type.value !== MediatypeOptionsTabIndicatorItem.DEFAULT_MAXSESSIONS_TYPE) {
 			return true;
 		}
 
 		const maxattempts = document.getElementById('maxattempts');
 
-		if (maxattempts !== null && maxattempts.value != 3) {
+		if (maxattempts !== null
+				&& maxattempts.value != MediatypeOptionsTabIndicatorItem.DEFAULT_MAXATTEMPTS) {
 			return true;
 		}
 
 		const attempt_interval = document.getElementById('attempt_interval');
 
-		if (attempt_interval !== null && attempt_interval.value !== '10s') {
+		if (attempt_interval !== null
+				&& attempt_interval.value !== MediatypeOptionsTabIndicatorItem.DEFAULT_ATTEMPT_INTERVAL) {
 			return true;
 		}
 
