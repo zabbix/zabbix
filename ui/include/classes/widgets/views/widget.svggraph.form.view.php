@@ -121,9 +121,6 @@ $scripts[] =
 
 			'onLeftYChange();'.
 			'onRightYChange();'.
-
-			// Trigger event to update tab indicator.
-			'document.dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));'.
 		'}'.
 
 		'var form_fields = $form.serializeJSON();'.
@@ -173,6 +170,9 @@ $scripts[] =
 			'}'.
 		'});'.
 		'$preview_container.data(preview_data);'.
+
+		// Trigger event to update tab indicators.
+		'document.getElementById("tabs").dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));'.
 	'}';
 
 $scripts[] =
