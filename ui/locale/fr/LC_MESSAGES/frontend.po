@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-06-21 20:56+0000\n"
+"PO-Revision-Date: 2022-06-26 14:19+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -640,7 +640,7 @@ msgstr "Journal des actions"
 #: app/views/administration.script.list.php:51
 #: app/views/administration.script.list.php:90
 msgid "Action operation"
-msgstr "Opération d'action"
+msgstr "Action d'opération"
 
 #: actionconf.php:293
 msgid "Action updated"
@@ -3630,7 +3630,7 @@ msgstr "Classe %1$s introuvable pour l'action %2$s."
 
 #: include/classes/core/ZBase.php:494
 msgid "Class not found."
-msgstr ""
+msgstr "Classe non trouvée."
 
 #: include/views/configuration.httpconf.list.php:217
 #: include/views/configuration.item.list.php:297
@@ -4662,7 +4662,7 @@ msgstr "D"
 #: jsLoader.php:183
 msgctxt "abbreviation of severity level"
 msgid "D"
-msgstr ""
+msgstr "D"
 
 #: include/classes/import/validators/C10XmlValidator.php:321
 msgctxt "XML date format"
@@ -4969,7 +4969,7 @@ msgstr "Décembre"
 #: app/controllers/CControllerPopupTriggerExpr.php:1154
 #: include/classes/widgets/forms/CWidgetFormItem.php:150
 msgid "Decimal places"
-msgstr ""
+msgstr "Nombre de décimales"
 
 #: include/classes/helpers/CServiceHelper.php:150
 msgid "Decrease by"
@@ -5396,7 +5396,7 @@ msgstr "Délimiteur"
 
 #: app/views/administration.user.edit.php:619
 msgid "Denied methods"
-msgstr ""
+msgstr "Méthodes interdites"
 
 #: app/partials/administration.usergroup.grouprights.html.php:71
 #: app/views/administration.usergroup.edit.php:133 include/perm.inc.php:33
@@ -5406,7 +5406,7 @@ msgstr "Interdit"
 
 #: app/views/administration.userrole.edit.php:290
 msgid "Deny list"
-msgstr ""
+msgstr "Interdire la liste"
 
 #: app/views/popup.massupdate.trigger.php:150
 #: include/views/configuration.trigger.prototype.edit.php:618
@@ -5888,7 +5888,7 @@ msgstr "Statistiques d'écriture du disque. Retourne un entier avec le type parm
 
 #: app/views/popup.tophosts.column.edit.php:147
 msgid "Display"
-msgstr ""
+msgstr "Affichage"
 
 #: app/views/administration.trigdisplay.edit.php:89
 msgid "Display OK triggers for"
@@ -5928,7 +5928,7 @@ msgstr "Options d'affichage"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:812
 msgid "Division denominator"
-msgstr ""
+msgstr "Dénominateur"
 
 #: app/views/popup.lldoperation.php:190 app/views/popup.massupdate.item.php:293
 #: include/views/configuration.item.edit.php:848
@@ -6529,7 +6529,7 @@ msgstr "Erreur! Impossible de démarrer le serveur Zabbix en raison d'une versio
 #: app/partials/administration.system.info.php:159
 #: app/partials/administration.system.info.php:172
 msgid "Error! Unable to start Zabbix server."
-msgstr ""
+msgstr "Erreur ! Impossible de démarrer le serveur Zabbix."
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -6756,7 +6756,7 @@ msgstr "Expiré le %1$s."
 #: app/views/administration.user.token.list.php:93
 #: app/views/administration.user.token.view.php:48
 msgid "Expires at"
-msgstr "Expire à"
+msgstr "Expire le"
 
 #: app/views/administration.token.list.php:61
 #: app/views/administration.user.token.list.php:44
@@ -7206,7 +7206,7 @@ msgstr "De"
 
 #: app/views/administration.miscconfig.edit.php:33
 msgid "Frontend URL"
-msgstr ""
+msgstr "URL du serveur"
 
 #: app/views/administration.usergroup.edit.php:78
 #: app/views/administration.usergroup.edit.php:86
@@ -7259,7 +7259,7 @@ msgstr "Général"
 #: app/partials/scheduledreport.subscription.php:34
 #: app/views/popup.scheduledreport.subscription.php:100
 msgid "Generate report by"
-msgstr ""
+msgstr "Rapport générer par"
 
 #: chart4.php:172
 #, c-format
@@ -7275,7 +7275,7 @@ msgstr "Cartes géographiques"
 
 #: include/classes/widgets/CWidgetConfig.php:58
 msgid "Geomap"
-msgstr ""
+msgstr "Carte géographique"
 
 #: include/locales.inc.php:42
 msgid "Georgian (ka_GE)"
@@ -7815,7 +7815,7 @@ msgstr "Le nettoyage de l'historique n'est pas supporté si la compression est a
 
 #: app/controllers/CControllerAuditLogList.php:198
 msgid "History clear"
-msgstr ""
+msgstr "Effacement d'historique"
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "History cleared"
@@ -8305,7 +8305,7 @@ msgstr "Je confirme la suppression de toutes les macros"
 
 #: app/partials/massupdate.valuemaps.tab.php:84
 msgid "I confirm to remove all value mappings"
-msgstr ""
+msgstr "Je confirme la suppression de toutes les tables de correspondances"
 
 #: include/discovery.inc.php:60
 msgid "ICMP ping"
@@ -8537,7 +8537,7 @@ msgstr "Si vous pensez que ce message n'est pas correct, veuillez consulter votr
 
 #: app/views/administration.miscconfig.edit.php:124
 msgid "Iframe sandboxing exceptions"
-msgstr ""
+msgstr "Exceptions d'utilisation de l'attribut sandbox des Iframe"
 
 #: include/classes/helpers/CServiceHelper.php:151
 msgid "Ignore this service"
@@ -8725,7 +8725,7 @@ msgstr "Inclure"
 
 #: app/views/administration.mediatype.edit.php:240
 msgid "Include event menu entry"
-msgstr ""
+msgstr "Inclure dans le menu de l'événement"
 
 #: app/views/administration.usergroup.edit.php:140
 #: app/views/administration.usergroup.edit.php:191
@@ -9143,7 +9143,7 @@ msgstr "Réponse incorrecte reçue du serveur Zabbix \"%1$s\"."
 #: app/controllers/CControllerSlaCreateUpdate.php:111
 #, c-format
 msgid "Incorrect schedule: %1$s."
-msgstr ""
+msgstr "Horaire incorrect : %1$s."
 
 #: include/classes/api/services/CEvent.php:491
 #: include/classes/api/services/CProblem.php:356
@@ -9522,7 +9522,7 @@ msgstr "Valeur incorrecte pour le champ \"%1$s\" : %2$s."
 
 #: include/classes/helpers/CServiceHelper.php:149
 msgid "Increase by"
-msgstr ""
+msgstr "Augmenté de"
 
 #: app/views/popup.tophosts.column.edit.php:152
 msgid "Indicators"
@@ -9576,7 +9576,7 @@ msgstr "Informations à propos d'un service. Retourne un entier avec param state
 
 #: include/views/configuration.host.prototype.edit.php:251
 msgid "Inherit"
-msgstr ""
+msgstr "Hérité"
 
 #: app/partials/configuration.filter.items.php:198
 #: include/views/configuration.triggers.list.php:112
@@ -9597,7 +9597,7 @@ msgstr "Tags hérités et d'élément"
 
 #: app/partials/configuration.tags.tab.php:135
 msgid "Inherited and scenario tags"
-msgstr ""
+msgstr "Tags héritées et de scénario"
 
 #: include/views/configuration.template.edit.php:193
 msgid "Inherited and template macros"
@@ -10753,7 +10753,7 @@ msgstr "Letton (lv_LV)"
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:48
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:121
 msgid "Layout"
-msgstr ""
+msgstr "Disposition"
 
 #: include/classes/widgets/CWidgetHelper.php:937
 #: include/classes/widgets/CWidgetHelper.php:1012
@@ -11013,7 +11013,7 @@ msgstr "Tentatives de connexion"
 
 #: app/views/administration.miscconfig.edit.php:93
 msgid "Login blocking interval"
-msgstr ""
+msgstr "Intervalle de blocage des connexions"
 
 #: include/classes/validators/CLdapAuthValidator.php:87
 msgid "Login name or password is incorrect."
@@ -11198,7 +11198,7 @@ msgstr "Manuel"
 #: app/views/administration.script.list.php:53
 #: app/views/administration.script.list.php:134
 msgid "Manual event action"
-msgstr ""
+msgstr "Action manuelle d'événement"
 
 #: app/views/administration.script.edit.php:101
 #: app/views/administration.script.list.php:52
@@ -11404,7 +11404,7 @@ msgstr "Nombre maximal de colonnes et de lignes dans les tableaux d'aperçu"
 
 #: app/views/administration.gui.edit.php:137
 msgid "Max period for time selector"
-msgstr ""
+msgstr "Période maximale pour le sélecteur de temps"
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -11496,7 +11496,7 @@ msgstr "Le test du type de média a échoué."
 
 #: app/views/js/popup.mediatypetest.edit.js.php:108
 msgid "Media type test log"
-msgstr ""
+msgstr "Journal du test du type de média"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:142
 msgid "Media type test successful."
@@ -11543,11 +11543,11 @@ msgstr "Mémoire utilisée par un processeur en octets. Retourne un entier"
 
 #: app/views/administration.mediatype.edit.php:255
 msgid "Menu entry URL"
-msgstr ""
+msgstr "URL de l'entrée de menu"
 
 #: app/views/administration.mediatype.edit.php:246
 msgid "Menu entry name"
-msgstr ""
+msgstr "Nom de l'entrée de menu"
 
 #: app/views/administration.script.edit.php:106
 msgid "Menu path"
@@ -11883,24 +11883,24 @@ msgstr "Sourdine"
 
 #: app/views/monitoring.dashboard.list.php:94
 msgid "My"
-msgstr ""
+msgstr "A moi"
 
 #: include/classes/helpers/CServiceHelper.php:37
 #: include/classes/helpers/CServiceHelper.php:47
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: jsLoader.php:188
 msgctxt "abbreviation of severity level"
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: include/classes/helpers/CServiceHelper.php:42
 #: include/classes/helpers/CServiceHelper.php:52
 #: include/classes/helpers/CServiceHelper.php:62
 #: include/classes/helpers/CServiceHelper.php:72
 msgid "N%"
-msgstr ""
+msgstr "N%"
 
 #: include/classes/helpers/CSlaHelper.php:183
 msgid "N/A"
@@ -12147,23 +12147,23 @@ msgstr "Cartes réseau"
 
 #: app/views/administration.miscconfig.edit.php:134
 msgid "Network timeout"
-msgstr "Timeout réseau"
+msgstr "Délai réseau dépassé"
 
 #: app/views/administration.miscconfig.edit.php:162
 msgid "Network timeout for item test"
-msgstr "Timeout réseau pour le test de l'élément"
+msgstr "Délai réseau dépassé pour le test de l'élément"
 
 #: app/views/administration.miscconfig.edit.php:148
 msgid "Network timeout for media type test"
-msgstr "Timeout réseau pour le test du type de média"
+msgstr "Délai réseau dépassé pour le test du type de média"
 
 #: app/views/administration.miscconfig.edit.php:170
 msgid "Network timeout for scheduled report test"
-msgstr "Timeout réseau pour le test de rapport planifié"
+msgstr "Délai réseau dépassé pour le test de rapport planifié"
 
 #: app/views/administration.miscconfig.edit.php:156
 msgid "Network timeout for script execution"
-msgstr "Timeout réseau pour l'exécution du script"
+msgstr "Délai réseau dépassé pour l'exécution du script"
 
 #: include/classes/data/CItemData.php:1513
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
@@ -12939,7 +12939,7 @@ msgstr "Nombre d'éléments dans l'historique du proxy qui ne sont pas encore en
 
 #: include/classes/data/CItemData.php:1668
 msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
-msgstr ""
+msgstr "Nombre d'éléments dans la queue qui rencontrent un délai de from à to secondes, incluses."
 
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -13353,7 +13353,7 @@ msgstr "Opérateur"
 
 #: app/views/popup.triggerexpr.php:114
 msgid "Operator functions"
-msgstr ""
+msgstr "Fonctions d'opérateur"
 
 #: app/views/administration.mediatype.edit.php:345
 msgid "Options"
@@ -13389,11 +13389,11 @@ msgstr "Ou"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:131
 msgid "Order"
-msgstr ""
+msgstr "Tri"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:145
 msgid "Order column"
-msgstr ""
+msgstr "Colonne de tri"
 
 #: app/partials/massupdate.macros.tab.php:119
 #: app/partials/massupdate.valuemaps.tab.php:89
@@ -13479,7 +13479,7 @@ msgstr "Statistiques de trafic sortant sur une interface réseau. Retourne un en
 
 #: app/views/popup.scriptexec.php:47
 msgid "Output"
-msgstr ""
+msgstr "Sortie"
 
 #: include/classes/api/services/CDashboardGeneral.php:336
 #, c-format
@@ -13748,7 +13748,7 @@ msgstr "Page %1$d"
 
 #: app/views/dashboard.page.properties.edit.php:55
 msgid "Page display period"
-msgstr ""
+msgstr "Période d'affichage de la page"
 
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
@@ -13976,7 +13976,7 @@ msgstr "Période"
 #: app/controllers/CControllerPopupTriggerExpr.php:109
 #: app/controllers/CControllerPopupTriggerExpr.php:1096
 msgid "Period shift"
-msgstr ""
+msgstr "Décalage de période"
 
 #: app/views/popup.maintenance.period.php:69
 #: include/views/configuration.maintenance.edit.php:45
@@ -14137,7 +14137,7 @@ msgstr "Consommation d'énergie, <url> - URL du service VMware, <uuid> - Nom d'h
 
 #: app/controllers/CControllerPopupTriggerExpr.php:864
 msgid "Power value"
-msgstr ""
+msgstr "Valeur de puissance"
 
 #: include/classes/setup/CSetupWizard.php:70
 #: include/classes/setup/CSetupWizard.php:753
@@ -14368,7 +14368,7 @@ msgstr "Pourcentage d'utilisation du processeur pour un processus. Retourne un f
 
 #: app/views/administration.mediatype.edit.php:234
 msgid "Process tags"
-msgstr ""
+msgstr "Traiter les tags"
 
 #: include/classes/helpers/CMenuHelper.php:395
 msgid "Profile"
@@ -14612,7 +14612,7 @@ msgstr "Accès en lecture-écriture aux services avec tag"
 
 #: include/classes/data/CItemData.php:909
 msgid "Reads modbus data. Returns various types"
-msgstr ""
+msgstr "Lit les données modbus. Renvoie différents types"
 
 #: include/actions.inc.php:60
 msgid "Received value"
@@ -14953,7 +14953,7 @@ msgstr "Renommer"
 #: app/controllers/CControllerScheduledReportUpdate.php:86
 #: app/partials/scheduledreport.formgrid.html.php:135
 msgid "Repeat on"
-msgstr ""
+msgstr "Répéter les"
 
 #: app/partials/scheduledreport.table.html.php:41
 msgid "Repeats"
@@ -15057,7 +15057,7 @@ msgstr "Requis"
 
 #: app/views/administration.script.edit.php:242
 msgid "Required host permissions"
-msgstr "Permissions d'hôte requses"
+msgstr "Permissions d'hôte requises"
 
 #: app/views/administration.proxy.list.php:83
 msgid "Required performance (vps)"
@@ -15454,7 +15454,7 @@ msgstr "Le SLA avec l'ID \"%1$s\" n'est pas disponible."
 #: app/views/monitoring.widget.slareport.view.php:98
 #: app/views/slareport.list.php:163
 msgid "SLI"
-msgstr ""
+msgstr "SLI"
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
@@ -15462,7 +15462,7 @@ msgstr ""
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:115 app/views/slareport.list.php:162
 msgid "SLO"
-msgstr ""
+msgstr "SLO"
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
@@ -15479,7 +15479,7 @@ msgstr "SMTP"
 #: app/views/administration.mediatype.edit.php:74
 #: app/views/administration.mediatype.list.php:96
 msgid "SMTP email"
-msgstr "adresse SMTP"
+msgstr "Adresse SMTP"
 
 #: app/views/administration.mediatype.edit.php:69
 #: app/views/administration.mediatype.list.php:95
@@ -15489,7 +15489,7 @@ msgstr "SMTP helo"
 #: app/views/administration.mediatype.edit.php:61
 #: app/views/administration.mediatype.list.php:94
 msgid "SMTP server"
-msgstr "serveur SMTP"
+msgstr "Serveur SMTP"
 
 #: app/views/administration.mediatype.edit.php:66
 msgid "SMTP server port"
@@ -15862,7 +15862,7 @@ msgstr "Cycle"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1121
 msgid "Season deviation window"
-msgstr ""
+msgstr "Fenêtre de déviation du cycle"
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
@@ -15997,7 +15997,7 @@ msgstr "Envoyer uniquement à"
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:72
 #: app/views/popup.media.php:79 app/views/popup.mediatypetest.edit.php:61
 msgid "Send to"
-msgstr "Envoyer"
+msgstr "Envoyer à"
 
 #: jsLoader.php:278
 msgid "Send to back"
@@ -16106,7 +16106,7 @@ msgstr[1] "Services supprimés"
 #: app/views/administration.userrole.edit.php:144
 #: app/views/administration.userrole.edit.php:185
 msgid "Service list"
-msgstr ""
+msgstr "Liste des services"
 
 #: include/actions.inc.php:68
 msgid "Service name"
@@ -16119,7 +16119,7 @@ msgstr "Port du service"
 #: app/views/popup.mediatype.message.php:61
 #: include/classes/helpers/CMediatypeHelper.php:121
 msgid "Service recovery"
-msgstr ""
+msgstr "Reprise de service"
 
 #: app/views/popup.condition.common.php:153
 msgid "Service tag name"
@@ -16140,7 +16140,7 @@ msgstr "Type de service"
 #: app/views/popup.mediatype.message.php:64
 #: include/classes/helpers/CMediatypeHelper.php:144
 msgid "Service update"
-msgstr ""
+msgstr "Mise à jour de service"
 
 #: app/controllers/CControllerServiceUpdate.php:187
 msgid "Service updated"
@@ -16293,7 +16293,7 @@ msgstr "La criticité a diminué"
 
 #: jsLoader.php:154
 msgid "Severity filter"
-msgstr ""
+msgstr "Filtre de sévérité"
 
 #: include/actions.inc.php:1780
 msgctxt "screen reader"
@@ -16938,7 +16938,7 @@ msgstr "Chaîne de caractères"
 
 #: app/views/popup.triggerexpr.php:116
 msgid "String functions"
-msgstr ""
+msgstr "Fonctions de chaîne de caractères"
 
 #: include/items.inc.php:1820 include/items.inc.php:1824
 #: include/items.inc.php:1828 include/items.inc.php:1832
@@ -16972,7 +16972,7 @@ msgstr "Sous-carte"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:168
 msgid "Subscription"
-msgstr ""
+msgstr "Abonnement"
 
 #: app/partials/scheduledreport.formgrid.html.php:187
 msgid "Subscriptions"
@@ -17391,7 +17391,7 @@ msgstr "Les modèles \"%1$s\" sont déliés de l'hôte \"%2$s\"."
 
 #: app/partials/configuration.host.edit.html.php:215
 msgid "Templates linked by host discovery cannot be unlinked."
-msgstr ""
+msgstr "Les modèles liés par la découverte d'hôte ne peuvent pas être dissociés."
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
@@ -17493,7 +17493,7 @@ msgstr "La méthode \"%1$s.%2$s\" doit être appelée sans le paramètre \"auth\
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
-msgstr ""
+msgstr "Le modèle d'URL est utilisé pour charger et afficher la couche de tuiles sur les cartes géographiques."
 
 #: include/classes/db/DbBackend.php:130
 #, c-format
@@ -17537,7 +17537,7 @@ msgstr "La dépendance du prototype de déclencheur \"%1$s\" vers le prototype d
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
-msgstr ""
+msgstr "Les paramètres suivants sont pris en charge :"
 
 #: include/html.inc.php:691
 #, c-format
@@ -17698,15 +17698,15 @@ msgstr "Jeudi"
 
 #: app/views/administration.geomaps.edit.php:77
 msgid "Tile URL"
-msgstr ""
+msgstr "URL des tuiles"
 
 #: app/views/administration.geomaps.edit.php:65
 msgid "Tile provider"
-msgstr ""
+msgstr "Fournisseur de cartes"
 
 #: app/views/administration.geomaps.edit.php:58
 msgid "Tile provider attribution data displayed in a small text box on the map."
-msgstr ""
+msgstr "Les données du fournisseur de tuiles sont affichées dans une petite zone de texte sur la carte."
 
 #: report4.php:191
 msgid "Till"
@@ -17750,7 +17750,7 @@ msgstr "Période par défaut du filtre horaire"
 
 #: include/classes/data/CItemData.php:1677
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
-msgstr ""
+msgstr "Moment du dernier accès au proxy. Name - nom du proxy. Les paramètres valides sont : lastaccess - horodatage Unix, delay - secondes."
 
 #: include/actions.inc.php:51
 #: include/classes/widgets/views/widget.svggraph.form.view.php:306
@@ -17925,7 +17925,7 @@ msgstr "Traiter comme 0"
 
 #: include/classes/data/CItemData.php:1705
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
-msgstr ""
+msgstr "Statistiques du cache de la fonction de tendance. Les paramètres valides sont : all, hits, phits, misses, pmisses, items, pitems et requests."
 
 #: app/controllers/CControllerPopupLldOperation.php:227
 #: app/views/popup.lldoperation.php:206 app/views/popup.massupdate.item.php:306
@@ -18027,7 +18027,7 @@ msgstr "Le déclencheur \"%1$s\" dépend du déclencheur \"%2$s\", qui n'existe 
 
 #: app/controllers/CControllerMenuPopup.php:644
 msgid "Trigger URL"
-msgstr ""
+msgstr "URL du déclencheur"
 
 #: include/classes/helpers/CMenuHelper.php:199
 #: include/views/configuration.action.list.php:33
@@ -18681,12 +18681,12 @@ msgstr "Enlever la sourdine"
 #: app/partials/administration.system.info.php:160
 #, c-format
 msgid "Unsupported %1$s database server version. Must be at least %2$s."
-msgstr ""
+msgstr "Version du serveur de base de données %1$s non supportée. Doit être d'au moins (%2$s)."
 
 #: app/partials/administration.system.info.php:173
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
-msgstr ""
+msgstr "Version du serveur de base de données %1$s non supportée. Ne doit pas être supérieur à %2$s."
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -18878,7 +18878,7 @@ msgstr "Valeur par défaut"
 
 #: app/partials/configuration.host.edit.html.php:216
 msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
-msgstr ""
+msgstr "Utilisez le formulaire de configuration du prototype d'hôte pour supprimer automatiquement les modèles liés lors de la découverte à venir."
 
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
 msgid "Use if severity"
@@ -18886,7 +18886,7 @@ msgstr "Utiliser si sévérité"
 
 #: app/views/administration.miscconfig.edit.php:119
 msgid "Use iframe sandboxing"
-msgstr ""
+msgstr "Utiliser l'attribut sandbox des iframe"
 
 #: app/views/administration.mediatype.list.php:85
 #: app/views/administration.script.list.php:76
@@ -19467,11 +19467,11 @@ msgstr "État de maintenance de l'hyperviseur VVMware, <url> - URL du service VM
 
 #: app/views/administration.miscconfig.edit.php:104
 msgid "Valid URI schemes"
-msgstr ""
+msgstr "Schémas d'URI valides"
 
 #: app/views/administration.miscconfig.edit.php:99
 msgid "Validate URI schemes"
-msgstr ""
+msgstr "Valider les schémas d'URI"
 
 #: include/items.inc.php:1864 include/items.inc.php:1868
 #: include/items.inc.php:1872 include/items.inc.php:1876
@@ -19604,7 +19604,7 @@ msgstr "Tables de correspondance"
 
 #: include/classes/data/CItemData.php:913
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
-msgstr ""
+msgstr "Valeur du sujet MQTT. Le format des données renvoyées dépend du contenu du sujet. Si des caractères génériques sont utilisés, renvoie les valeurs du sujet au format JSON"
 
 #: include/classes/data/CItemData.php:989
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
@@ -19761,7 +19761,7 @@ msgstr "M"
 #: jsLoader.php:186
 msgctxt "abbreviation of severity level"
 msgid "W"
-msgstr ""
+msgstr "A"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/views/administration.trigdisplay.edit.php:118
@@ -19781,12 +19781,12 @@ msgstr "Message d'alerte"
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
-msgstr ""
+msgstr "Avertissement ! Impossible de récupérer la version de la base de données."
 
 #: app/partials/administration.system.info.php:166
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
-msgstr ""
+msgstr "Avertissement ! Version du serveur de base de données %1$s non supportée. Doit être d'au moins %2$s."
 
 #: app/partials/administration.system.info.php:167
 #, c-format
@@ -19796,7 +19796,7 @@ msgstr "Avertissement! Version du serveur de base de données %1$s non supporté
 #: app/partials/administration.system.info.php:179
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
-msgstr ""
+msgstr "Avertissement ! Version du serveur de base de données %1$s non supportée. Ne doit pas être supérieur à %2$s."
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -20495,7 +20495,7 @@ msgstr "une unité de temps est nécessaire"
 
 #: include/classes/validators/CApiInputValidator.php:2888
 msgid "a timestamp is too large"
-msgstr ""
+msgstr "un horodatage est trop grand"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:333
 msgid "abs() - Absolute value"
@@ -20667,7 +20667,7 @@ msgstr "atan() - L'arctangente d'une valeur sous forme d'angle, exprimée en rad
 
 #: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
-msgstr ""
+msgstr "atan2() - L'arctangente des coordonnées d'ordonnée (exprue) et d'abscisse spécifiées sous forme d'angle, exprimées en radians"
 
 #: include/events.inc.php:63
 msgid "autoregistered host"
@@ -20694,11 +20694,11 @@ msgstr "avg() - Valeur moyenne d'une période T"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1053
 msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
-msgstr ""
+msgstr "baselinedev() - Renvoie le nombre d'écarts entre les périodes de données dans les cycles et la dernière période de données"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1060
 msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
-msgstr ""
+msgstr "baselinewma() - Calcule la référence en faisant la moyenne des périodes de données sur les cycles"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
@@ -21240,7 +21240,7 @@ msgstr "dans"
 
 #: app/views/popup.valuemap.edit.php:81
 msgid "in range"
-msgstr "dans la plage"
+msgstr "est dans la plage"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:652
 msgid "in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)"
@@ -21368,7 +21368,7 @@ msgstr "nombre de paramètres invalide dans la fonction \"%1$s\""
 #: include/classes/validators/CApiInputValidator.php:1042
 #: include/classes/validators/CApiInputValidator.php:2608
 msgid "invalid range expression"
-msgstr ""
+msgstr "plage invalide"
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:105
 #: include/classes/validators/CApiInputValidator.php:1882
@@ -21491,7 +21491,7 @@ msgstr "logseverity() - Retourne la gravité de la dernière entrée du journal 
 
 #: app/controllers/CControllerPopupTriggerExpr.php:750
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
-msgstr ""
+msgstr "logsource() - Source du dernier paramètre de correspondance de l'entrée de journal V pour la période T (1 - correspondance, 0 - pas de correspondance)"
 
 #: include/events.inc.php:65
 msgid "low-level discovery rule"
@@ -21878,7 +21878,7 @@ msgstr "rand() - Une valeur entière aléatoire"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:886
 msgid "rate() - Returns per-second average rate for monotonically increasing counters"
-msgstr ""
+msgstr "rate() - Renvoie le taux moyen par seconde pour les compteurs croissants de manière monotone"
 
 #: include/classes/api/services/CService.php:2392
 #, c-format

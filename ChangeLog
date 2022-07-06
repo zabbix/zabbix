@@ -1,3 +1,19 @@
+Changes for 6.0.7rc1
+
+New features:
+.........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
+
+Bug fixes:
+.........T [ZBX-20473] fixed evaluation period macro in disk space triggers for NetApp FAS3220 template (drasihov)
+.........T [ZBX-19205] fixed item preprocessing in PostgreSQL by Zabbix agent 2 template (drasihov)
+A.F.....S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (agriscenko, mprihodko)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.6
+
+6.0.6rc1 was released as 6.0.6 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.6rc1
 
 New features:
@@ -1951,6 +1967,22 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.26rc1
+
+New features:
+.........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
+
+Bug fixes:
+.........T [ZBX-20473] fixed evaluation period macro in disk space triggers for NetApp FAS3220 template (drasihov)
+....I....T [ZBX-19205] fixed item preprocessing in PostgreSQL by Zabbix agent 2 template, removed duplicate PostgreSQL templates from templates.tmpl (drasihov)
+........S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (mprihodko)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.25
+
+5.0.25rc1 was released as 5.0.25 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.25rc1
@@ -4468,6 +4500,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.43rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.42
+
+4.0.42rc1 was released as 4.0.42 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.42rc1
