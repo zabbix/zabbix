@@ -654,12 +654,13 @@ void	*__zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, con
 		if (1 == info->allow_oom)
 			return NULL;
 
+		zbx_shmem_dump_stats(LOG_LEVEL_CRIT, info);
+		zbx_backtrace();
+
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): out of memory (requested " ZBX_FS_SIZE_T " bytes)",
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
-		zbx_shmem_dump_stats(LOG_LEVEL_CRIT, info);
-		zbx_backtrace();
 		exit(EXIT_FAILURE);
 	}
 
@@ -687,12 +688,13 @@ void	*__zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, vo
 		if (1 == info->allow_oom)
 			return NULL;
 
+		zbx_shmem_dump_stats(LOG_LEVEL_CRIT, info);
+		zbx_backtrace();
+
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): out of memory (requested " ZBX_FS_SIZE_T " bytes)",
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
-		zbx_shmem_dump_stats(LOG_LEVEL_CRIT, info);
-		zbx_backtrace();
 		exit(EXIT_FAILURE);
 	}
 
