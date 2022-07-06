@@ -7979,6 +7979,10 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 
 			item = (zbx_preproc_item_t *)zbx_hashset_insert(items, &item_local, sizeof(item_local));
 		}
+		else
+			zbx_free(item->dep_itemids);
+
+		zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
 
 		item->dep_itemids_num = 0;
 		item->dep_itemids = (zbx_uint64_pair_t *)zbx_malloc(NULL, sizeof(zbx_uint64_pair_t) *
@@ -8009,6 +8013,8 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 
 			zbx_hashset_insert(items, &item_local, sizeof(item_local));
 		}
+
+		zbx_hashset_insert(&ids, &item_local.itemid, sizeof(item_local.itemid));
 	}
 
 	UNLOCK_CACHE;
