@@ -7929,8 +7929,6 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 		if (FAIL == dc_preproc_item_init(&item_local, dc_preprocitem->itemid))
 			continue;
 
-		zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
-
 		if (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_search(items, &item_local)))
 		{
 			if (item->update_time == dc_preprocitem->update_time &&
@@ -7944,6 +7942,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 					op->params_orig = zbx_strdup(NULL, dc_op->params);
 				}
 
+				zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
 				continue;
 			}
 			else
@@ -7966,6 +7965,8 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 			op->error_handler = dc_op->error_handler;
 			op->error_handler_params = zbx_strdup(NULL, dc_op->error_handler_params);
 		}
+
+		zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
 	}
 
 	zbx_hashset_iter_reset(&config->masteritems, &iter);
