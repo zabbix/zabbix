@@ -34,7 +34,7 @@ class CItemBaseHelper {
 
 		if ($defaults === null) {
 			$defaults = DB::getDefaults('items')
-				+ array_fill_keys(['valuemapid', 'interfaceid', 'master_itemid', 'ruleid'], ZEROID);
+				+ array_fill_keys(['valuemapid', 'interfaceid', 'master_itemid', 'ruleid'], 0);
 		}
 
 		return $with_related_objects
@@ -56,7 +56,7 @@ class CItemBaseHelper {
 	 *                                          Empty in case a fatal input (parsing) error encountered.
 	 */
 	public static function extractItems(array $items, array $db_items = null): array {
-		$item_defaults = ['itemid' => ZEROID] + self::getFieldDefaults();
+		$item_defaults = ['itemid' => 0] + self::getFieldDefaults();
 
 		foreach ($items as $i => $item) {
 			$item = CArrayHelper::renameKeys($item, [

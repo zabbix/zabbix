@@ -2250,7 +2250,7 @@ class CHostPrototype extends CHostBase {
 		DB::delete('hostmacro', ['hostid' => $hostids]);
 		DB::delete('host_inventory', ['hostid' => $hostids]);
 		DB::update('hosts', [
-			'values' => ['templateid' => ZEROID],
+			'values' => ['templateid' => 0],
 			'where' => ['hostid' => $hostids]
 		]);
 		DB::delete('hosts', ['hostid' => $hostids]);

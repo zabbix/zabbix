@@ -114,9 +114,6 @@ class CApiInputValidator {
 			case API_ID:
 				return self::validateId($rule, $data, $path, $error);
 
-			case API_EMPTY_ID:
-				return self::validateEmptyId($rule, $data, $path, $error);
-
 			case API_BOOLEAN:
 				return self::validateBoolean($rule, $data, $path, $error);
 
@@ -290,7 +287,6 @@ class CApiInputValidator {
 			case API_FLOAT:
 			case API_FLOATS:
 			case API_ID:
-			case API_EMPTY_ID:
 			case API_BOOLEAN:
 			case API_FLAG:
 			case API_OUTPUT:
@@ -1177,14 +1173,15 @@ class CApiInputValidator {
 	 * Identifier validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL, API_NOT_EMPTY
+	 * @param int    $rule['flags'] (optional) API_ALLOW_NULL, API_NOT_EMPTY
+	 * @param string $rule['in']    (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
 	 *
 	 * @return bool
 	 */
-	private static function validateId($rule, &$data, $path, &$error) {
+	private static function validateId(array $rule, &$data, string $path, string &$error) :bool {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
 		if (($flags & API_ALLOW_NULL) && $data === null) {
@@ -1216,33 +1213,38 @@ class CApiInputValidator {
 			}
 		}
 
+		if (!self::checkIdIn($rule, $data, $path, $error)) {
+			return false;
+		}
+
 		return true;
 	}
 
 	/**
-	 * Empty identifier validator.
-	 *
 	 * @param array  $rule
-	 * @param mixed  $data
+	 * @param int    $rule['in'] (optional)
+	 * @param string $data
 	 * @param string $path
 	 * @param string $error
 	 *
 	 * @return bool
 	 */
-	private static function validateEmptyId(array $rule, &$data, string $path, string &$error): bool {
-		if (!is_scalar($data) || is_bool($data) || is_double($data) || !ctype_digit(strval($data))) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+	private static function checkIdIn(array $rule, string $data, string $path, string &$error): bool {
+		if (!array_key_exists('in', $rule)) {
+			return true;
+		}
+
+		if ($rule['in'] !== '0') {
+			$error = 'Incorrect validation rules.';
 
 			return false;
 		}
 
-		if ($data != 0) {
-			$error =  _s('Invalid parameter "%1$s": %2$s.', $path, _('should be empty'));
+		if ($data !== '0') {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('value must be %1$s', '0'));
 
 			return false;
 		}
-
-		$data = '0';
 
 		return true;
 	}

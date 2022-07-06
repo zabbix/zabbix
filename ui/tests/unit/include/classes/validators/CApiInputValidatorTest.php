@@ -1722,64 +1722,64 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/id": a number is expected.'
 			],
 			[
-				['type' => API_EMPTY_ID],
+				['type' => API_ID, 'in' => '0'],
 				0,
 				'/1/id',
 				'0'
 			],
 			[
-				['type' => API_EMPTY_ID],
+				['type' => API_ID, 'in' => '0'],
 				'0',
 				'/1/id',
 				'0'
 			],
 			[
-				['type' => API_EMPTY_ID],
+				['type' => API_ID, 'in' => '0'],
 				'000000',
 				'/1/id',
 				'0'
 			],
 			[
-				['type' => API_EMPTY_ID],
+				['type' => API_ID, 'in' => '0'],
 				true,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
 			],
 			[
-				['type' => API_EMPTY_ID],
+				['type' => API_ID, 'in' => '0'],
 				null,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
 			],
 			[
-				['type' => API_EMPTY_ID],
+				['type' => API_ID, 'in' => '0'],
 				[],
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
 			],
 			[
-				['type' => API_EMPTY_ID],
+				['type' => API_ID, 'in' => '0'],
 				0.0,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
 			],
 			[
-				['type' => API_EMPTY_ID],
+				['type' => API_ID, 'in' => '0'],
 				1.23E+11,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
 			],
 			[
-				['type' => API_EMPTY_ID],
+				['type' => API_ID, 'in' => '0'],
 				108,
 				'/1/id',
-				'Invalid parameter "/1/id": should be empty.'
+				'Invalid parameter "/1/id": value must be 0.'
 			],
 			[
-				['type' => API_EMPTY_ID],
+				['type' => API_ID, 'in' => '0'],
 				'108',
 				'/1/id',
-				'Invalid parameter "/1/id": should be empty.'
+				'Invalid parameter "/1/id": value must be 0.'
 			],
 			[
 				['type' => API_BOOLEAN],

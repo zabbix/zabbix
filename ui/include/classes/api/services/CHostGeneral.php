@@ -458,7 +458,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 				else {
 					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = [
-						'values' => ['templateid' => ZEROID],
+						'values' => ['templateid' => 0],
 						'where' => ['triggerid' => $db_trigger['triggerid']]
 					];
 				}
@@ -542,7 +542,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 				else {
 					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = [
-						'values' => ['templateid' => ZEROID],
+						'values' => ['templateid' => 0],
 						'where' => ['graphid' => $db_graph['graphid']]
 					];
 				}
@@ -624,7 +624,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			else {
 				$upd_item = $db_item;
-				$upd_item['templateid'] = ZEROID;
+				$upd_item['templateid'] = 0;
 
 				if ($db_item['host_status'] == HOST_STATUS_TEMPLATE) {
 					$upd_item['uuid'] = generateUuidV4();
@@ -691,7 +691,7 @@ abstract class CHostGeneral extends CHostBase {
 
 			while ($host_prototype = DBfetch($host_prototypes)) {
 				$upd_host_prototype = $host_prototype;
-				$upd_host_prototype['templateid'] = ZEROID;
+				$upd_host_prototype['templateid'] = 0;
 
 				if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
 					$upd_host_prototype['uuid'] = generateUuidV4();
@@ -707,7 +707,7 @@ abstract class CHostGeneral extends CHostBase {
 				API::getApiService('hostprototype')->updateForce($upd_host_prototypes, $db_upd_host_prototypes);
 
 				DB::update('group_prototype', [
-					'values' => ['templateid' => ZEROID],
+					'values' => ['templateid' => 0],
 					'where' => ['hostid' => array_keys($upd_host_prototypes)]
 				]);
 			}
@@ -734,7 +734,7 @@ abstract class CHostGeneral extends CHostBase {
 				$upd_httptests[$httptest['httptestid']] = true;
 			}
 			else {
-				$upd_httptest = ['templateid' => ZEROID];
+				$upd_httptest = ['templateid' => 0];
 
 				if ($httptest['host_status'] == HOST_STATUS_TEMPLATE) {
 					$upd_httptest['uuid'] = generateUuidV4();
@@ -1111,7 +1111,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 				else {
 					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = [
-						'values' => ['templateid' => ZEROID],
+						'values' => ['templateid' => 0],
 						'where' => ['triggerid' => $db_trigger['triggerid']]
 					];
 				}
@@ -1195,7 +1195,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 				else {
 					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = [
-						'values' => ['templateid' => ZEROID],
+						'values' => ['templateid' => 0],
 						'where' => ['graphid' => $db_graph['graphid']]
 					];
 				}
@@ -1280,7 +1280,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			else {
 				$upd_item = $db_item;
-				$upd_item['templateid'] = ZEROID;
+				$upd_item['templateid'] = 0;
 
 				if ($db_item['host_status'] == HOST_STATUS_TEMPLATE) {
 					$upd_item['uuid'] = generateUuidV4();
@@ -1353,7 +1353,7 @@ abstract class CHostGeneral extends CHostBase {
 
 			while ($host_prototype = DBfetch($host_prototypes)) {
 				$upd_host_prototype = $host_prototype;
-				$upd_host_prototype['templateid'] = ZEROID;
+				$upd_host_prototype['templateid'] = 0;
 
 				if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
 					$upd_host_prototype['uuid'] = generateUuidV4();
@@ -1369,7 +1369,7 @@ abstract class CHostGeneral extends CHostBase {
 				API::getApiService('hostprototype')->updateForce($upd_host_prototypes, $db_upd_host_prototypes);
 
 				DB::update('group_prototype', [
-					'values' => ['templateid' => ZEROID],
+					'values' => ['templateid' => 0],
 					'where' => ['hostid' => array_keys($upd_host_prototypes)]
 				]);
 			}
@@ -1396,7 +1396,7 @@ abstract class CHostGeneral extends CHostBase {
 				$upd_httptests[$httptest['httptestid']] = true;
 			}
 			else {
-				$upd_httptest = ['templateid' => ZEROID];
+				$upd_httptest = ['templateid' => 0];
 
 				if ($httptest['host_status'] == HOST_STATUS_TEMPLATE) {
 					$upd_httptest['uuid'] = generateUuidV4();

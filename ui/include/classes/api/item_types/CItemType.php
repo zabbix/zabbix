@@ -75,13 +75,13 @@ abstract class CItemType {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
-							['else' => true, 'type' => API_EMPTY_ID]
+							['else' => true, 'type' => API_ID, 'in' => '0']
 						]];
 
 					default:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID, 'flags' => API_REQUIRED],
-							['else' => true, 'type' => API_EMPTY_ID]
+							['else' => true, 'type' => API_ID, 'in' => '0']
 						]];
 				}
 
@@ -179,7 +179,7 @@ abstract class CItemType {
 							['if' => static function () use ($db_item): bool {
 								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 							}, 'type' => API_ID],
-							['else' => true, 'type' => API_EMPTY_ID]
+							['else' => true, 'type' => API_ID, 'in' => '0']
 						]];
 
 					default:
@@ -193,7 +193,7 @@ abstract class CItemType {
 							['if' => static function () use ($db_item): bool {
 								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 							}, 'type' => API_ID],
-							['else' => true, 'type' => API_EMPTY_ID]
+							['else' => true, 'type' => API_ID, 'in' => '0']
 						]];
 				}
 
@@ -325,7 +325,7 @@ abstract class CItemType {
 					['if' => static function () use ($db_item): bool {
 						return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 					}, 'type' => API_ID],
-					['else' => true, 'type' => API_EMPTY_ID]
+					['else' => true, 'type' => API_ID, 'in' => '0']
 				]];
 
 			case 'authtype':

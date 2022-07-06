@@ -1580,7 +1580,7 @@ class CHost extends CHostGeneral {
 		// delete host
 		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::update('hosts', [
-			'values' => ['templateid' => ZEROID],
+			'values' => ['templateid' => 0],
 			'where' => ['hostid' => $hostids, 'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE]
 		]);
 		DB::delete('hosts', ['hostid' => $hostids]);

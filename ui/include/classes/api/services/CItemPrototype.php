@@ -419,7 +419,7 @@ class CItemPrototype extends CItemGeneral {
 			]],
 			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
-									['else' => true, 'type' => API_EMPTY_ID]
+									['else' => true, 'type' => API_ID, 'in' => '0']
 			]],
 			'logtimefmt' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => ITEM_VALUE_TYPE_LOG], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'logtimefmt')],
@@ -578,7 +578,7 @@ class CItemPrototype extends CItemGeneral {
 			]],
 			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
-									['else' => true, 'type' => API_EMPTY_ID]
+									['else' => true, 'type' => API_ID, 'in' => '0']
 			]],
 			'logtimefmt' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => ITEM_VALUE_TYPE_LOG], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'logtimefmt')],
@@ -1025,7 +1025,7 @@ class CItemPrototype extends CItemGeneral {
 		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
 		DB::update('items', [
-			'values' => ['templateid' => ZEROID, 'master_itemid' => ZEROID],
+			'values' => ['templateid' => 0, 'master_itemid' => 0],
 			'where' => ['itemid' => $del_itemids]
 		]);
 		DB::delete('items', ['itemid' => $del_itemids]);

@@ -72,7 +72,7 @@ class CDiscoveryRuleManager {
 		DB::delete('item_tag', ['itemid' => $ruleids]);
 		DB::delete('item_preproc', ['itemid' => $ruleids]);
 		DB::update('items', [
-			'values' => ['templateid' => ZEROID],
+			'values' => ['templateid' => 0],
 			'where' => ['itemid' => $ruleids]
 		]);
 		DB::delete('items', ['itemid' => $ruleids]);

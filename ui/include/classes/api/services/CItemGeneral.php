@@ -100,7 +100,7 @@ abstract class CItemGeneral extends CApiService {
 			if ($db_item === null) {
 				$api_input_rules['fields'] += $item_type::getCreateValidationRules($item);
 			}
-			elseif ($db_item['templateid'] != ZEROID) {
+			elseif ($db_item['templateid'] != 0) {
 				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 					$item += array_intersect_key($db_item, array_flip(['allow_traps']));
 				}
@@ -664,7 +664,7 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected static function checkKeyAlreadyInherited(array $item, array $row): void {
 		if (bccomp($item['hostid'], $row['parent_hostid']) == 0 && $row['key_'] === $item['key_']
-				&& $row['templateid'] != ZEROID) {
+				&& $row['templateid'] != 0) {
 			$item_hosts = DB::select('hosts', [
 				'output' => ['host'],
 				'hostids' => [$row['hostid']]
@@ -848,7 +848,7 @@ abstract class CItemGeneral extends CApiService {
 			foreach ($items as $i => $item) {
 				// Item is (or switched type) to dependent; is changed along with its master-item.
 				if ($item['type'] == ITEM_TYPE_DEPENDENT
-						|| (array_key_exists('master_itemid', $item) && $item['master_itemid'] != ZEROID)) {
+						|| (array_key_exists('master_itemid', $item) && $item['master_itemid'] != 0)) {
 					$dep_items[$i] = $item;
 					unset($items[$i]);
 				}
@@ -1611,7 +1611,7 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($items as $i => $item) {
 			$interface_type = itemTypeInterface($item['type']);
 
-			if ($interface_type != INTERFACE_TYPE_OPT && $item['interfaceid'] != ZEROID) {
+			if ($interface_type != INTERFACE_TYPE_OPT && $item['interfaceid'] != 0) {
 				if (!array_key_exists($item['interfaceid'], $db_interfaces)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
@@ -1764,7 +1764,7 @@ abstract class CItemGeneral extends CApiService {
 				unset($items[$i]);
 			}
 			elseif (array_key_exists('itemid', $item)) {
-				if ($db_items[$item['itemid']]['master_itemid'] != ZEROID) {
+				if ($db_items[$item['itemid']]['master_itemid'] != 0) {
 					$del_links[$item['itemid']] = $db_items[$item['itemid']]['master_itemid'];
 				}
 			}
@@ -1787,7 +1787,7 @@ abstract class CItemGeneral extends CApiService {
 		$root_itemids = [];
 
 		foreach ($dep_item_links as $itemid => $master_itemid) {
-			if ($master_itemid == ZEROID) {
+			if ($master_itemid == 0) {
 				$root_itemids[] = $itemid;
 			}
 		}
@@ -1874,7 +1874,7 @@ abstract class CItemGeneral extends CApiService {
 				));
 			}
 
-			if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE && $db_master_item['ruleid'] != ZEROID) {
+			if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE && $db_master_item['ruleid'] != 0) {
 				$item_ruleid = array_key_exists('itemid', $item)
 					? $item['ruleid']
 					: $db_items[$item['itemid']]['ruleid'];
@@ -1918,7 +1918,7 @@ abstract class CItemGeneral extends CApiService {
 
 				$links[$db_master_item['itemid']] = $db_master_item['master_itemid'];
 
-				if ($db_master_item['master_itemid'] != ZEROID) {
+				if ($db_master_item['master_itemid'] != 0) {
 					$master_itemids[$db_master_item['master_itemid']] = true;
 				}
 			}
@@ -1939,7 +1939,7 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($items as $i => $item) {
 			$master_itemid = $item['master_itemid'];
 
-			while ($master_itemid != ZEROID) {
+			while ($master_itemid != 0) {
 				if ($master_itemid == $item['itemid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/master_itemid', _('circular item dependency is not allowed')
@@ -1974,7 +1974,7 @@ abstract class CItemGeneral extends CApiService {
 				$upd_item_links[$item['master_itemid']][] = $item['itemid'];
 			}
 			else {
-				$ins_links[$item['master_itemid']][] = ZEROID;
+				$ins_links[$item['master_itemid']][] = 0;
 			}
 		}
 
@@ -2332,7 +2332,7 @@ abstract class CItemGeneral extends CApiService {
 		$item_indexes = [];
 
 		foreach ($items as $i => $item) {
-			if (array_key_exists('valuemapid', $item) && $item['valuemapid'] != ZEROID
+			if (array_key_exists('valuemapid', $item) && $item['valuemapid'] != 0
 					&& ($db_items === null
 						|| bccomp($item['valuemapid'], $db_items[$item['itemid']]['valuemapid']) != 0)) {
 				$item_indexes[$item['valuemapid']][] = $i;

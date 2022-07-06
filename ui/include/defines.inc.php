@@ -503,8 +503,6 @@ define('ZBX_ITEM_DELAY_DEFAULT',			'1m');
 define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
 define('ZBX_ITEM_SCHEDULING_DEFAULT',		'wd1-5h9-18');
 
-define('ZEROID', 0);
-
 define('ITEM_TYPE_ZABBIX',			0);
 define('ITEM_TYPE_SNMPV1',			1); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_SNMP instead.
 define('ITEM_TYPE_TRAPPER',			2);
@@ -1463,7 +1461,6 @@ define('API_XML',					62);
 define('API_PREPROC_PARAMS',		63);
 define('API_PROMETHEUS_PATTERN',	64);
 define('API_PROMETHEUS_LABEL',		65);
-define('API_EMPTY_ID',				66);
 
 // flags
 define('API_REQUIRED',					0x00001);
