@@ -1584,6 +1584,8 @@ class CApiInputValidator {
 			return true;
 		}
 
+		$e = '';
+
 		if (($flags & API_NORMALIZE) && self::validateId([], $data, '', $e)) {
 			$data = [$data];
 		}
