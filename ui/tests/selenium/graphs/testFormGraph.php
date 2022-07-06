@@ -22,12 +22,73 @@ require_once dirname(__FILE__).'/../common/testFormGraphs.php';
 
 /**
  * @backup graphs
+ *
+ * @onBefore prepareGraphsData
+ *
+ * @onAfter clearData
  */
 class testFormGraph extends testFormGraphs {
 
-	const HOSTID = 40001; // Simple form test host.
-
 	public $url = 'graphs.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host';
+
+	public function prepareGraphsData() {
+		// Create items on given host.
+		$items_data = [];
+		foreach (self::$items['items'] as $name => $fields) {
+			$items_data[] = [
+				'hostid' => self::HOSTID,
+				'name' => $name,
+				'key_' => $name,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => $fields['value_type']
+			];
+		}
+
+		$items = CDataHelper::call('item.create', $items_data);
+		$this->assertArrayHasKey('itemids', $items);
+		$itemids = CDataHelper::getIds('name');
+
+		self::$items['graph_trap_int']['itemid'] = $itemids['graph_trap_int'];
+		self::$items['graph_trap_float']['itemid'] = $itemids['graph_trap_float'];
+		self::$items['graph_trap_text']['itemid'] = $itemids['graph_trap_text'];
+
+		// Create graphs with previously created items..
+		$prepared_graphs = [
+			[
+				'name' => 'Graph for update',
+				'itemid' => self::$items['graph_trap_int']['itemid']
+			],
+			[
+				'name' => 'Graph for delete',
+				'itemid' => self::$items['graph_trap_float']['itemid']
+			],
+			[
+				'name' => 'Duplicated graph',
+				'itemid' => self::$items['graph_trap_float']['itemid']
+			],
+			[
+				'name' => 'Graph for clone',
+				'itemid' => self::$items['graph_trap_int']['itemid']
+			]
+		];
+
+		$graphs_data = [];
+		foreach ($prepared_graphs as $graph) {
+			$graphs_data[] = [
+				'name' => $graph['name'],
+				'width' => 850,
+				'height' => 335,
+				'gitems' => [
+					[
+						'itemid' => $graph['itemid'],
+						'color'=> 'FDD835'
+					]
+				]
+			];
+		}
+
+		CDataHelper::call('graph.create', $graphs_data);
+	}
 
 	/**
 	 * @dataProvider getLayoutData
@@ -50,7 +111,6 @@ class testFormGraph extends testFormGraphs {
 							'color' => ''
 						]
 					],
-					'error' => 'Cannot add graph',
 					'details' => [
 						'Empty color.'
 					]
@@ -58,48 +118,6 @@ class testFormGraph extends testFormGraphs {
 			],
 			[
 				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Max equals min value'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:yaxismin' => 0.1,
-						'id:yaxismax' => 0.1
-					],
-					'items' =>[
-						[
-							'item' => 'testFormItem'
-						]
-					],
-					'error' => ($this->prototype) ? 'Cannot add graph prototype' : 'Cannot add graph',
-					'details' => [
-						'Y axis MAX value must be greater than Y axis MIN value.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Max less than min'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:yaxismin' => 0.2,
-						'id:yaxismax' => 0.1
-					],
-					'items' =>[
-						[
-							'item' => 'testFormItem'
-						]
-					],
-					'error' => ($this->prototype) ? 'Cannot add graph prototype' : 'Cannot add graph',
-					'details' => [
-						'Y axis MAX value must be greater than Y axis MIN value.'
-					]
-				]
-			],
-			[
-				[
 					'fields' => [
 						'Name' => 'Normal graph'
 					],
@@ -114,16 +132,15 @@ class testFormGraph extends testFormGraphs {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Normal graph'
+						'Name' => 'Duplicated graph'
 					],
 					'items' =>[
 						[
 							'item' => 'testFormItem'
 						]
 					],
-					'error' => 'Cannot add graph',
 					'details' => [
-						'Graph with name "Normal graph" already exists in graphs or graph prototypes.'
+						'Graph with name "Duplicated graph" already exists in graphs or graph prototypes.'
 					]
 				]
 			],
@@ -162,9 +179,48 @@ class testFormGraph extends testFormGraphs {
 							]
 						]
 					],
-					'error' => 'Cannot add graph',
 					'details' => [
 						'Cannot add more than one item with type "Graph sum" on graph "Exploded graph duplicated Graph sum type".'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Max equals min value'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => 0.1,
+						'id:yaxismax' => 0.1
+					],
+					'items' =>[
+						[
+							'item' => 'testFormItem'
+						]
+					],
+					'details' => [
+						'Y axis MAX value must be greater than Y axis MIN value.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Max less than min'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => 0.2,
+						'id:yaxismax' => 0.1
+					],
+					'items' =>[
+						[
+							'item' => 'testFormItem'
+						]
+					],
+					'details' => [
+						'Y axis MAX value must be greater than Y axis MIN value.'
 					]
 				]
 			],
@@ -390,17 +446,29 @@ class testFormGraph extends testFormGraphs {
 								'calc_fnc' => 'last'
 							]
 						]
-					]
+					],
+					'last_case' => true
 				]
 			]
 		];
 	}
 
 	/**
+	 * @backupOnce graphs
+	 *
 	 * @dataProvider getCommonGraphData
 	 * @dataProvider getGraphData
 	 */
 	public function testFormGraph_Create($data) {
+		$this->checkGraphForm($data);
+	}
+
+	/**
+	 * @dataProvider getCommonGraphData
+	 * @dataProvider getGraphData
+	 */
+	public function testFormGraph_Update($data) {
+		$this->update = true;
 		$this->checkGraphForm($data);
 	}
 }

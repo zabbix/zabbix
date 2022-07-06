@@ -24,7 +24,9 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 class testFormGraphs extends CWebTest {
 
-	const HOST = 'Simple form test host';
+	const HOST = 'Simple form test host'; // Item id = 40001.
+	const HOSTID = 40001;                 // Simple form test host.
+	const LLDID = 133800;                 // testFormDiscoveryRule on Simple form test host.
 
 	/**
 	 * Flag for graph prototype.
@@ -32,9 +34,45 @@ class testFormGraphs extends CWebTest {
 	public $prototype = false;
 
 	/**
+	 * Flag for update scenario.
+	 */
+	public $update = false;
+
+	/**
 	 * URL for opening graph or graph prototype form.
 	 */
 	public $url;
+
+	/**
+	 * Name of graph for update scenario.
+	 *
+	 */
+	private static $update_graph = 'Graph for update';
+
+	/**
+	 * Id for item used in graph prototype.
+	 *
+	 * @var integer
+	 */
+	protected static $itemid;
+
+	/**
+	 * Ids of items for creating graphs.
+	 *
+	 * @var array
+	 */
+	protected static $items = [
+		'items' => [
+			'graph_trap_int' => ['value_type' => ITEM_VALUE_TYPE_UINT64, 'itemid' => null],
+			'graph_trap_float' => ['value_type' => ITEM_VALUE_TYPE_FLOAT, 'itemid' => null],
+			'graph_trap_text' => ['value_type' => ITEM_VALUE_TYPE_TEXT, 'itemid' => null]
+		],
+		'item_prototypes' => [
+			'graph_prototype_trap_int' => ['value_type' => ITEM_VALUE_TYPE_UINT64, 'itemid' => null],
+			'graph_prototype_trap_float' => ['value_type' => ITEM_VALUE_TYPE_FLOAT, 'itemid' => null],
+			'graph_prototype_trap_text' => ['value_type' => ITEM_VALUE_TYPE_TEXT, 'itemid' => null]
+		]
+	];
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -504,7 +542,6 @@ class testFormGraphs extends CWebTest {
 					'fields' => [
 						'Name' => 'Empty item'.($this->prototype ? ' {#KEY}' : NULL)
 					],
-					'error' => ($this->prototype) ? 'Cannot add graph prototype' : 'Cannot add graph',
 					'details' => [
 						'Missing items for '.($this->prototype ? 'graph prototype' : 'graph').' "Empty item'.
 								($this->prototype ? ' {#KEY}' : NULL).'".'
@@ -521,10 +558,32 @@ class testFormGraphs extends CWebTest {
 		}
 
 		$this->page->login()->open($this->url)->waitUntilReady();
-		$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
+
+		if ($this->update) {
+			$this->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
+		}
+		else {
+			$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
 				->one()->click();
+		}
+
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
+
+		// Clear all items from graph to change them to new ones from data provider.
+		if ($this->update) {
+			$items_container = $form->getFieldContainer('Items');
+			$items_count = $items_container->query('xpath:.//tr[contains(@id, "items_")]')->count();
+
+			for ($i = 0; $i < $items_count; $i++) {
+				// After each deletion item buttons reset their position, so upper items locator is always 0.
+				$remove_button = $items_container->query('xpath:.//button[@id="items_0_remove"]')->one();
+				$remove_button->waitUntilClickable()->click();
+				$remove_button->waitUntilNotPresent();
+			}
+		}
+
 		$form->fill($data['fields']);
+		$items_container = $form->getFieldContainer('Items');
 
 		// Fill Y axis Item values separately because field is not real multiselect.
 		if (array_key_exists('yaxis_items', $data)) {
@@ -535,8 +594,6 @@ class testFormGraphs extends CWebTest {
 				$dialog->waitUntilNotPresent();
 			}
 		}
-
-		$items_container = $form->getFieldContainer('Items');
 
 		// Add items or item prototypes to graph.
 		if (array_key_exists('items', $data)) {
@@ -570,11 +627,30 @@ class testFormGraphs extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, $data['error'], $data['details']);
+			if (CTestArrayHelper::get($data, 'error')) {
+				$error = $data['error'];
+			}
+			else {
+				$error = $this->update
+					? ($this->prototype ? 'Cannot update graph prototype' : 'Cannot update graph')
+					: ($this->prototype ? 'Cannot add graph prototype' : 'Cannot add graph');
+			}
+			$this->assertMessage(TEST_BAD, $error, $data['details']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, ($this->prototype ? 'Graph prototype added' : 'Graph added'));
+			// Write new name to update graph for next case, but if it's last case return to initial name 'Graph for update'.
+			if ($this->update) {
+				self::$update_graph = CTestArrayHelper::get($data, 'last_case', false)
+					? 'Graph for update'
+					: $data['fields']['Name'];
+			}
+
+			$message = $this->update
+				? ($this->prototype ? 'Graph prototype updated' : 'Graph updated')
+				: ($this->prototype ? 'Graph prototype added' : 'Graph added');
+
+			$this->assertMessage(TEST_GOOD, $message);
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.
 					zbx_dbstr($data['fields']['Name']))
 			);
@@ -583,7 +659,7 @@ class testFormGraphs extends CWebTest {
 			$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilReady()
 					->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 			$form->invalidate();
-//			$form->checkValue($data['fields']);
+			$form->checkValue($data['fields']);
 
 			// Check Y axis Item values fake multiselects.
 			if (array_key_exists('yaxis_items', $data)) {
@@ -623,5 +699,22 @@ class testFormGraphs extends CWebTest {
 				}
 			}
 		}
+	}
+
+	public function clearData() {
+		// Delete items.
+		CDataHelper::call('item.delete', [
+				self::$items['graph_trap_int']['itemid'],
+				self::$items['graph_trap_float']['itemid'],
+				self::$items['graph_trap_text']['itemid'],
+				self::$itemid
+		]);
+
+		// Delete item prototypes.
+		CDataHelper::call('itemprototype.delete', [
+				self::$items['graph_prototype_trap_int']['itemid'],
+				self::$items['graph_prototype_trap_float']['itemid'],
+				self::$items['graph_prototype_trap_text']['itemid']
+		]);
 	}
 }

@@ -18,6 +18,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+use Facebook\WebDriver\Interactions\WebDriverActions;
+use Facebook\WebDriver\JavaScriptExecutor;
+use Facebook\WebDriver\WebDriver;
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverCapabilities;
+use Facebook\WebDriver\WebDriverCommandExecutor;
+use Facebook\WebDriver\WebDriverElement;
+use Facebook\WebDriver\WebDriverHasInputDevices;
+use Facebook\WebDriver\WebDriverNavigation;
+use Facebook\WebDriver\WebDriverOptions;
+use Facebook\WebDriver\WebDriverWait;
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
@@ -441,6 +454,12 @@ class CFormElement extends CElement {
 	public function checkValue($expected, $raise_exception = true) {
 		if ($expected && is_array($expected)) {
 			foreach ($expected as $field => $value) {
+				if ($value instanceof \Closure) {
+					$function = new ReflectionFunction($value);
+					$variables = $function->getStaticVariables();
+					$value = $variables['value'];
+				}
+
 				if ($this->checkFieldValue($field, $value, $raise_exception) === false) {
 					return false;
 				}

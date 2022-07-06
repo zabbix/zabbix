@@ -22,10 +22,12 @@ require_once dirname(__FILE__).'/../common/testFormGraphs.php';
 
 /**
  * @backup graphs
+ *
+ * @onBefore prepareGraphPrototypesData
+ *
+ * @onAfter clearData
  */
 class testFormGraphPrototype extends testFormGraphs {
-
-	CONST LLDID = 133800; // testFormDiscoveryRule on Simple form test host.
 
 	public $prototype = true;
 	public $url = 'graphs.php?parent_discoveryid='.self::LLDID.'&context=host';
@@ -35,6 +37,82 @@ class testFormGraphPrototype extends testFormGraphs {
 	 */
 	public function testFormGraphPrototype_Layout($data) {
 		$this->checkGraphFormLayout($data);
+	}
+
+	public function prepareGraphPrototypesData() {
+		// Create item on given host.
+		$items = CDataHelper::call('item.create', [
+			'hostid' => self::HOSTID,
+			'name' => 'item_graph_ptototype_test',
+			'key_' => 'item_graph_ptototype_test',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_FLOAT
+		]);
+		$this->assertArrayHasKey('itemids', $items);
+		$itemids = CDataHelper::getIds('name');
+
+		self::$itemid = $itemids['item_graph_ptototype_test'];
+
+		// Create item prototypes on given host with given LLD.
+		foreach (self::$items['item_prototypes'] as $name => $fields) {
+			$item_prototypes_data[] = [
+				'hostid' => self::HOSTID,
+				'ruleid' => self::LLDID,
+				'name' => $name,
+				'key_' => $name.'[{#KEY}]',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => $fields['value_type']
+			];
+		}
+
+		$item_prototypes = CDataHelper::call('itemprototype.create', $item_prototypes_data);
+		$this->assertArrayHasKey('itemids', $item_prototypes);
+		$item_prototype_ids = CDataHelper::getIds('name');
+
+		self::$items['graph_prototype_trap_int']['itemid'] = $item_prototype_ids['graph_prototype_trap_int'];
+		self::$items['graph_prototype_trap_float']['itemid'] = $item_prototype_ids['graph_prototype_trap_float'];
+		self::$items['graph_prototype_trap_text']['itemid'] = $item_prototype_ids['graph_prototype_trap_text'];
+
+		// Create graphs with previously created items..
+		$prepared_graph_prototypes = [
+			[
+				'name' => 'Graph for update',
+				'itemid' => self::$items['graph_prototype_trap_int']['itemid']
+			],
+			[
+				'name' => 'Duplicated graph prototype',
+				'itemid' => self::$items['graph_prototype_trap_int']['itemid']
+			],
+			[
+				'name' => 'Graph prototype for delete',
+				'itemid' => self::$items['graph_prototype_trap_float']['itemid']
+			],
+			[
+				'name' => 'Graph prototype for clone',
+				'itemid' => self::$items['graph_prototype_trap_int']['itemid']
+			]
+		];
+
+		$graph_prototypes_data = [];
+		foreach ($prepared_graph_prototypes as $graph_prototype) {
+			$graph_prototypes_data[] = [
+				'name' => $graph_prototype['name'],
+				'width' => 999,
+				'height' => 222,
+				'gitems' => [
+					[
+						'itemid' => $graph_prototype['itemid'],
+						'color'=> '5C6BC0'
+					],
+					[
+						'itemid' => self::$itemid,
+						'color'=> '66BB6A'
+					]
+				]
+			];
+		}
+
+		CDataHelper::call('graphprototype.create', $graph_prototypes_data);
 	}
 
 	public function getGraphPrototypeData() {
@@ -50,7 +128,6 @@ class testFormGraphPrototype extends testFormGraphs {
 							'item' => 'testFormItem'
 						]
 					],
-					'error' => 'Cannot add graph prototype',
 					'details' => [
 						'Graph prototype "Empty item prototype {#KEY}" must have at least one item prototype.'
 					]
@@ -69,7 +146,6 @@ class testFormGraphPrototype extends testFormGraphs {
 							'color' => ''
 						]
 					],
-					'error' => 'Cannot add graph prototype',
 					'details' => [
 						'Empty color.'
 					]
@@ -92,7 +168,7 @@ class testFormGraphPrototype extends testFormGraphs {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Normal graph prototype without LLD macro'
+						'Name' => 'Duplicated graph prototype'
 					],
 					'items' =>[
 						[
@@ -100,9 +176,8 @@ class testFormGraphPrototype extends testFormGraphs {
 							'item' => 'testFormItemPrototype1'
 						]
 					],
-					'error' => 'Cannot add graph prototype',
 					'details' => [
-						'Graph with name "Normal graph prototype without LLD macro" already exists in graphs or graph prototypes.'
+						'Graph with name "Duplicated graph prototype" already exists in graphs or graph prototypes.'
 					]
 				]
 			],
@@ -142,7 +217,6 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						]
 					],
-					'error' => 'Cannot add graph prototype',
 					'details' => [
 						'Cannot add more than one item with type "Graph sum" on graph prototype "Exploded graph prototype'.
 								' duplicated Graph sum type".'
@@ -175,7 +249,6 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						]
 					],
-					'error' => 'Cannot add graph prototype',
 					'details' => [
 						'Cannot add more than one item with type "Graph sum" on graph prototype "Exploded graph protoype '.
 								'duplicated Graph sum type mixed".'
@@ -300,6 +373,48 @@ class testFormGraphPrototype extends testFormGraphs {
 								'yaxisside' => 'Right'
 							]
 						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Max equals min value'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => 0.1,
+						'id:yaxismax' => 0.1
+					],
+					'items' =>[
+						[
+							'prototype' => true,
+							'item' => 'testFormItemPrototype1'
+						]
+					],
+					'details' => [
+						'Y axis MAX value must be greater than Y axis MIN value.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Max less than min'.($this->prototype ? ' {#KEY}' : NULL),
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => 0.2,
+						'id:yaxismax' => 0.1
+					],
+					'items' =>[
+						[
+							'prototype' => true,
+							'item' => 'testFormItemPrototype1'
+						]
+					],
+					'details' => [
+						'Y axis MAX value must be greater than Y axis MIN value.'
 					]
 				]
 			],
@@ -459,10 +574,21 @@ class testFormGraphPrototype extends testFormGraphs {
 	}
 
 	/**
+	 * @backupOnce graphs
+	 *
 	 * @dataProvider getCommonGraphData
 	 * @dataProvider getGraphPrototypeData
 	 */
 	public function testFormGraphPrototype_Create($data) {
+		$this->checkGraphForm($data);
+	}
+
+	/**
+	 * @dataProvider getCommonGraphData
+	 * @dataProvider getGraphPrototypeData
+	 */
+	public function testFormGraphPrototype_Update($data) {
+		$this->update = true;
 		$this->checkGraphForm($data);
 	}
 }
