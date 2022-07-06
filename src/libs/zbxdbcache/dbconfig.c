@@ -7980,7 +7980,19 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 			item = (zbx_preproc_item_t *)zbx_hashset_insert(items, &item_local, sizeof(item_local));
 		}
 		else
-			zbx_free(item->dep_itemids);
+		{
+			if (NULL == zbx_hashset_search(&ids, &item->itemid))
+			{
+				if (FAIL == dc_preproc_item_init(&item_local, dc_masteritem->itemid))
+					continue;
+
+				/* remove preprocessing and reset dep_itemids */
+				zbx_hashset_remove_direct(items, item);
+				item = (zbx_preproc_item_t *)zbx_hashset_insert(items, &item_local, sizeof(item_local));
+			}
+			else
+				zbx_free(item->dep_itemids);
+		}
 
 		zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
 
@@ -8006,15 +8018,27 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 		if (ITEM_TYPE_INTERNAL != dc_item->type)
 			continue;
 
-		if (NULL == zbx_hashset_search(items, &dc_item->itemid))
+		if (NULL == (item = zbx_hashset_search(items, &dc_item->itemid)))
 		{
 			if (FAIL == dc_preproc_item_init(&item_local, dc_item->itemid))
 				continue;
 
-			zbx_hashset_insert(items, &item_local, sizeof(item_local));
+			item = zbx_hashset_insert(items, &item_local, sizeof(item_local));
+		}
+		else
+		{
+			if (NULL == zbx_hashset_search(&ids, &item->itemid))
+			{
+				if (FAIL == dc_preproc_item_init(&item_local, dc_masteritem->itemid))
+					continue;
+
+				/* remove preprocessing and dependent */
+				zbx_hashset_remove_direct(items, item);
+				item = (zbx_preproc_item_t *)zbx_hashset_insert(items, &item_local, sizeof(item_local));
+			}
 		}
 
-		zbx_hashset_insert(&ids, &item_local.itemid, sizeof(item_local.itemid));
+		zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
 	}
 
 	UNLOCK_CACHE;
