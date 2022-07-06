@@ -109,7 +109,7 @@ require_once dirname(__FILE__).'/items/testFormItemPrototype.php';
 require_once dirname(__FILE__).'/items/testFormTestItem.php';
 require_once dirname(__FILE__).'/items/testFormTestItemPrototype.php';
 require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
-require_once dirname(__FILE__).'/testFormLogin.php';
+//require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/testFormMacrosHost.php';
@@ -310,7 +310,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTestItem');
 		$suite->addTestSuite('testFormTestItemPrototype');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
-		$suite->addTestSuite('testFormLogin');
+//		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormMacrosHost');
