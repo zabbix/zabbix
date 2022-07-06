@@ -7881,6 +7881,7 @@ static int	dc_preproc_item_init(zbx_preproc_item_t *item, zbx_uint64_t itemid)
 	item->preproc_ops = NULL;
 	item->preproc_ops_num = 0;
 	item->update_time = 0;
+	item->macro_update = ZBX_PREPROC_MACRO_UPDATE_FALSE;
 
 	return SUCCEED;
 }
@@ -7930,11 +7931,9 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 
 		if (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_search(items, &item_local)))
 		{
-			if (item->preproc_ops_num == dc_preprocitem->preproc_ops.values_num &&
-					item->update_time == dc_preprocitem->update_time)
+			if (item->update_time == dc_preprocitem->update_time &&
+					item->preproc_ops_num == dc_preprocitem->preproc_ops.values_num)
 			{
-				item->macro_update = 0;
-
 				for (i = 0; i < dc_preprocitem->preproc_ops.values_num; i++)
 				{
 					dc_op = (const zbx_dc_preproc_op_t *)dc_preprocitem->preproc_ops.values[i];
@@ -7942,6 +7941,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 
 					op->params_orig = zbx_strdup(NULL, dc_op->params);
 				}
+
 				zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
 				continue;
 			}
@@ -7954,7 +7954,6 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 		item->preproc_ops_num = dc_preprocitem->preproc_ops.values_num;
 		item->preproc_ops = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) * item->preproc_ops_num);
 		item->update_time = dc_preprocitem->update_time;
-		item->macro_update = 0;
 
 		for (i = 0; i < dc_preprocitem->preproc_ops.values_num; i++)
 		{
@@ -8040,7 +8039,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 						0 != strcmp(item->preproc_ops[i].params,
 								item->preproc_ops[i].params_orig))
 				{
-					item->macro_update = 1;
+					item->macro_update = ZBX_PREPROC_MACRO_UPDATE_TRUE;
 				}
 			}
 

@@ -572,6 +572,9 @@ typedef struct
 }
 zbx_preproc_op_t;
 
+#define ZBX_PREPROC_MACRO_UPDATE_TRUE	1
+#define ZBX_PREPROC_MACRO_UPDATE_FALSE	0
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
