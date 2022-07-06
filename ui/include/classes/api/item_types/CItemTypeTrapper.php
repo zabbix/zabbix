@@ -52,7 +52,9 @@ class CItemTypeTrapper extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
-		return self::getCreateValidationRules([]);
+		return [
+			'trapper_hosts' =>	self::getUpdateFieldRuleInherited('trapper_hosts', $db_item)
+		];
 	}
 
 	/**
