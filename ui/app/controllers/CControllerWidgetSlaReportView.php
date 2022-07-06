@@ -76,11 +76,16 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 					$data['has_permissions_error'] = true;
 				}
 				else {
+					$timezone = new DateTimeZone($data['sla']['timezone'] !== ZBX_DEFAULT_TIMEZONE
+						? $data['sla']['timezone']
+						: CTimezoneHelper::getSystemTimezone()
+					);
+
 					$range_time_parser = new CRangeTimeParser();
 
 					if ($fields['date_from'] !== ''
 							&& $range_time_parser->parse($fields['date_from']) == CParser::PARSE_SUCCESS) {
-						$period_from = $range_time_parser->getDateTime(true)->getTimestamp();
+						$period_from = $range_time_parser->getDateTime(true, $timezone)->getTimestamp();
 					}
 					else {
 						$period_from = null;
@@ -88,7 +93,7 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 
 					if ($fields['date_to'] !== ''
 							&& $range_time_parser->parse($fields['date_to']) == CParser::PARSE_SUCCESS) {
-						$period_to = $range_time_parser->getDateTime(false)->getTimestamp();
+						$period_to = $range_time_parser->getDateTime(false, $timezone)->getTimestamp();
 					}
 					else {
 						$period_to = null;
