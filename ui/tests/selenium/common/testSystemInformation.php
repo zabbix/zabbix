@@ -77,7 +77,7 @@ class testSystemInformation extends CWebTest {
 				'ha_nodeid' => 'ckvaw9wlf0001tn7psxgh3wfo',
 				'name' => 'Active node',
 				'address' => $DB['SERVER'],
-				'port' => $DB['PORT'],
+				'port' => 0,
 				'lastaccess' => self::$active_lastaccess,
 				'status' => 3,
 				'ha_sessionid' => 'ckvaw9wjo0000td7p8j66e74x'
@@ -174,7 +174,7 @@ class testSystemInformation extends CWebTest {
 			// Check Zabbix server address and port for each record in the HA cluster nodes table.
 			if ($name === 'Active node') {
 				self::$skip_fields[] = $row->getColumn('Address');
-				$this->assertEquals($DB['SERVER'].':'.$DB['PORT'], $row->getColumn('Address')->getText());
+				$this->assertEquals($DB['SERVER'].':0', $row->getColumn('Address')->getText());
 			}
 		}
 
@@ -182,7 +182,7 @@ class testSystemInformation extends CWebTest {
 		 * Check and hide the active Zabbix server address in widget that is working in System stats mode or in the part
 		 * of the report that displays the overall system statistics.
 		 */
-		$this->assertEquals($DB['SERVER'].':'.$DB['PORT'], $server_address->getText());
+		$this->assertEquals($DB['SERVER'].':0', $server_address->getText());
 		self::$skip_fields[] = $server_address;
 
 		// Hide the footer of the report as it contains Zabbix version.
