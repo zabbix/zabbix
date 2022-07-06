@@ -18,23 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../common/testSlaReport.php';
 
 /**
  * @backup profiles
  *
  * @dataSource Services, Sla
  */
-class testPageServicesSlaReport extends CWebTest {
-
-	use TableTrait;
-
-	private static $creation_time;
-	private static $creation_day;
-	private static $reporting_periods = [];
-
-	const SLA_CREATION_TIME = 1619827200;
+class testPageServicesSlaReport extends testSlaReport {
 
 	public function testPageServicesSlaReport_GeneralLayout() {
 		$this->page->login()->open('zabbix.php?action=slareport.list');
@@ -101,98 +92,6 @@ class testPageServicesSlaReport extends CWebTest {
 		$this->assertEquals('Select SLA to display SLA report.', $this->query('class:list-table')->one()->getText());
 	}
 
-	public function getDateTimeData() {
-		self::$creation_time = CDataHelper::get('Sla.creation_time');
-		self::$creation_day = date('Y-m-d', self::$creation_time);
-
-		foreach (['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Annually'] as $reporting_period) {
-			$period_values = [];
-
-			switch ($reporting_period) {
-				case 'Daily':
-					// By default the last 20 periods are displayed.
-					for ($i = 0; $i < 20; $i++) {
-						$day = strtotime('today '.-$i.' day');
-						$period_values[$i]['value'] = date('Y-m-d', $day);
-						$period_values[$i]['start'] = $day;
-						$period_values[$i]['end'] = strtotime('tomorrow '.-$i.' day - 1 second');
-					}
-					break;
-
-				case 'Weekly':
-					for ($i = 1; $i <= 20; $i++) {
-						$start = strtotime('next Sunday '.-$i.' week');
-
-						// On Sundays calculation is different to avoid selecting the previous week instead of current.
-//						$start = (date('w', $start) == date('w')) ? strtotime(date("Y-m-d", $start)." +7 days") : $start;
-						$end = strtotime(date('M-d', $start).' + 6 days');
-
-						$period_values[$i]['value'] = date('Y-m-d', $start).' – '.date('m-d', $end);
-						$period_values[$i]['start'] = $start;
-						$period_values[$i]['end'] = strtotime(date("M-d", $start)." + 1 week - 1 second");
-					}
-					break;
-
-				case 'Monthly':
-					// Get the number of Months to be displayed.
-					$months = ((date('Y', time()) - date('Y', self::SLA_CREATION_TIME)) * 12) + ((date('m', time()) -
-							date('m', self::SLA_CREATION_TIME))
-					);
-
-					for ($i = 0; $i <= $months; $i++) {
-						$month = strtotime('this month '.-$i.' month');
-						$period_values[$i]['value'] = date('Y-m', $month);
-						$period_values[$i]['start'] = strtotime(date('Y-m', time()).' '.-$i.' month');
-						$period_values[$i]['end'] = strtotime(date('Y-m', time()).' '.(-$i+1).' month - 1 second');
-					}
-					break;
-
-				case 'Quarterly':
-					$quarters = ['01 – 03', '04 – 06', '07 – 09', '10 – 12'];
-					$current_year = date('Y', time());
-					$current_month = date('m', time());
-
-					for ($year = date('Y', self::SLA_CREATION_TIME); $year <= date('Y', time()); $year++) {
-						foreach ($quarters as $quarter) {
-							// Get the last month of the quarter under attention.
-							$period_end = ltrim(stristr($quarter, '– '), '– ');
-							$period_start = substr($quarter, 0, strpos($quarter, " –"));
-
-							// Skip the quarters before SQL creation in SLA creation year.
-							if ($year === date('Y', self::SLA_CREATION_TIME) && $period_end < $current_month) {
-
-								continue;
-							}
-
-							// Write periods into reference array if period end is not later than current month.
-							if ($year < $current_year || ($year == $current_year && $period_end <= $current_month)) {
-								$period_values[$i]['value'] = $year.'-'.$quarter;
-								$period_values[$i]['start'] = strtotime($year.'-'.$period_start);
-								$period_values[$i]['end'] = strtotime($year.'-'.$period_end.' + 1 month - 1 second');
-
-							}
-						}
-					}
-					$period_values = array_reverse($period_values);
-					break;
-
-				case 'Annually':
-					// Get the number of Years to be displayed.
-					$years = (date('Y', time()) - date('Y', self::SLA_CREATION_TIME));
-
-					for ($i = 0; $i <= $years; $i++) {
-						$year = strtotime('this year '.-$i.' years');
-						$period_values[$i]['value'] = date('Y', $year);
-						$period_values[$i]['start'] = strtotime(date('Y', $year).'-01-01');
-						$period_values[$i]['end'] = strtotime(date('Y', $year).'-01-01 +1 year -1 second');
-					}
-					break;
-			}
-
-			self::$reporting_periods[$reporting_period] = $period_values;
-		}
-	}
-
 	public function getSlaDataWithService() {
 		return [
 			// Daily with downtime.
@@ -206,6 +105,7 @@ class testPageServicesSlaReport extends CWebTest {
 					'downtimes' => [
 						'names' => ['EXCLUDED DOWNTIME', 'Second downtime']
 					],
+					'check_sorting' => true,
 					'expected' => [
 						'SLO' => '11.111'
 					]
@@ -280,6 +180,17 @@ class testPageServicesSlaReport extends CWebTest {
 						'SLI' => 100
 					]
 				]
+			],
+			// Incorrect SLA and Service combination.
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Annual',
+						'Service' => 'Child 1'
+					],
+					'reporting_period' => 'Annually',
+					'no_data' => true
+				]
 			]
 		];
 	}
@@ -290,167 +201,1457 @@ class testPageServicesSlaReport extends CWebTest {
 	 * @onBefore getDateTimeData
 	 */
 	public function testPageServicesSlaReport_LayoutWithService($data) {
-		$this->page->login()->open('zabbix.php?action=slareport.list');
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+		$this->openSlaReport($data['filter']);
+		$this->checkLayoutWithService($data);
+	}
 
-		// TODO: Remove the below workaround with changing multiselect fill modes after ZBX-21264 is fixed.
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-		$filter_form->fill($data['filter']);
-		$filter_form->submit();
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
+	public function getSlaDataWithoutService() {
+		return [
+			// Daily with downtime.
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Daily'
+					],
+					'reporting_period' => 'Daily',
+					'downtimes' => true,
+					'expected' => [
+						'SLO' => '11.111',
+						'services' => ['Service with problem']
+					]
+				]
+			],
+			// Daily without downtime.
+			[
+				[
+					'filter' => [
+						'SLA' => 'Update SLA'
+					],
+					'reporting_period' => 'Daily',
+					'expected' => [
+						'SLO' => '99.99',
+						'SLI' => 100,
+						'services' => ['Parent for 2 levels of child services']
+					]
+				]
+			],
+			// Weekly SLA.
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Weekly'
+					],
+					'reporting_period' => 'Weekly',
+					'expected' => [
+						'SLO' => '55.5555',
+						'SLI' => 100,
+						'services' => ['Service with multiple service tags', 'Simple actions service']
+					]
+				]
+			],
+			// Monthly SLA.
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly'
+					],
+					'reporting_period' => 'Monthly',
+					'expected' => [
+						'SLO' => '22.22',
+						'SLI' => 100,
+						'services' => ['Service with multiple service tags', 'Simple actions service']
+					]
+				]
+			],
+			// Quarterly SLA.
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Quarterly'
+					],
+					'reporting_period' => 'Quarterly',
+					'expected' => [
+						'SLO' => '33.33',
+						'SLI' => 100,
+						'services' => ['Service with multiple service tags', 'Simple actions service']
+					]
+				]
+			],
+			// Annual SLA.
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Annual'
+					],
+					'reporting_period' => 'Annually',
+					'expected' => [
+						'SLO' => '44.44',
+						'SLI' => 100,
+						'services' => ['Service with problem']
+					]
+				]
+			]
+		];
+	}
 
-		$load_time = time();
+	/**
+	 * @dataProvider getSlaDataWithoutService
+	 *
+	 * @onBefore getDateTimeData
+	 */
+	public function testPageServicesSlaReport_LayoutWithoutService($data) {
+		$this->openSlaReport($data['filter']);
+		$this->checkLayoutWithoutService($data);
+	}
+
+	public function testPageServicesSlaReport_Sort() {
+		$data = [
+			'filter' => ['SLA' => 'SLA Monthly'],
+			'expected' => ['Service with multiple service tags', 'Simple actions service']
+		];
+		$this->openSlaReport($data['filter']);
 
 		$table = $this->query('class:list-table')->asTable()->one();
+		$column_header = $table->query('xpath:.//th/a[text()="Service"]')->one();
 
-		$period_headers = [
-			'Daily' => 'Day',
-			'Weekly' => 'Week',
-			'Monthly' => 'Month',
-			'Quarterly' => 'Quarter',
-			'Annually' => 'Year'
+		// Check initial sorting of services.
+		$this->assertTableDataColumn($data['expected'], 'Service');
+
+		// Check updated service sorting.
+		foreach(['asc', 'desc'] as $sorting) {
+			$expected = ($sorting === 'desc') ? $data['expected'] : array_reverse($data['expected']);
+			$column_header->click();
+			$this->assertTableDataColumn($expected, 'Service');
+		}
+	}
+
+	public function getSlaDataWithServiceAndCustomDates() {
+		return [
+			// Daily with custom dates.
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Daily',
+						'Service' => 'Service with problem',
+						'From' => '2020-02-28',
+						'To' => '2020-03-02'
+					],
+					'reporting_period' => 'Daily',
+					'expected_periods' => [
+						'2020-03-03',		// TODO: remove line this when ZBX-21290 will be fixed.
+						'2020-03-02',
+						'2020-03-01',
+						'2020-02-29',
+						'2020-02-28'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Daily',
+						'Service' => 'Service with problem',
+						'From' => '2021-06-29'
+					],
+					'reporting_period' => 'Daily',
+					'expected_periods' => [
+						'2021-07-18',
+						'2021-07-17',
+						'2021-07-16',
+						'2021-07-15',
+						'2021-07-14',
+						'2021-07-13',
+						'2021-07-12',
+						'2021-07-11',
+						'2021-07-10',
+						'2021-07-09',
+						'2021-07-08',
+						'2021-07-07',
+						'2021-07-06',
+						'2021-07-05',
+						'2021-07-04',
+						'2021-07-03',
+						'2021-07-02',
+						'2021-07-01',
+						'2021-06-30',
+						'2021-06-29'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Daily',
+						'Service' => 'Service with problem',
+						'To' => '2021-06-29'
+					],
+					'reporting_period' => 'Daily',
+					'expected_periods' => [
+						'2021-06-30',		// TODO: remove line this when ZBX-21290 will be fixed.
+						'2021-06-29',
+						'2021-06-28',
+						'2021-06-27',
+						'2021-06-26',
+						'2021-06-25',
+						'2021-06-24',
+						'2021-06-23',
+						'2021-06-22',
+						'2021-06-21',
+						'2021-06-20',
+						'2021-06-19',
+						'2021-06-18',
+						'2021-06-17',
+						'2021-06-16',
+						'2021-06-15',
+						'2021-06-14',
+						'2021-06-13',
+						'2021-06-12',
+						'2021-06-11'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Daily',
+						'Service' => 'Service with problem',
+						'To' => '2021-05-06'
+					],
+					'reporting_period' => 'Daily',
+					'expected_periods' => [
+						'2021-05-07',		// TODO: remove line this when ZBX-21290 will be fixed.
+						'2021-05-06',
+						'2021-05-05',
+						'2021-05-04',
+						'2021-05-03',
+						'2021-05-02',
+						'2021-05-01'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Daily',
+						'Service' => 'Service with problem',
+						'From' => 'yesterday'
+					],
+					'reporting_period' => 'Daily',
+					'expected_periods' => []
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Daily',
+						'From' => '2021-06-29',
+						'To' => '2021-07-05'
+					],
+					'reporting_period' => 'Daily',
+					'expected_periods' => [
+						'2021-06-29',
+						'2021-06-30',
+						'2021-07-01',
+						'2021-07-02',
+						'2021-07-03',
+						'2021-07-04',
+						'2021-07-05',
+						'2021-07-06'		// TODO: remove line this when ZBX-21290 will be fixed.
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Daily',
+						'From' => '2021-12-20'
+					],
+					'reporting_period' => 'Daily',
+					'expected_periods' => [
+						'2021-12-20',
+						'2021-12-21',
+						'2021-12-22',
+						'2021-12-23',
+						'2021-12-24',
+						'2021-12-25',
+						'2021-12-26',
+						'2021-12-27',
+						'2021-12-28',
+						'2021-12-29',
+						'2021-12-30',
+						'2021-12-31',
+						'2022-01-01',
+						'2022-01-02',
+						'2022-01-03',
+						'2022-01-04',
+						'2022-01-05',
+						'2022-01-06',
+						'2022-01-07',
+						'2022-01-08'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Daily',
+						'To' => '2022-01-08'
+					],
+					'reporting_period' => 'Daily',
+					'expected_periods' => [
+						'2021-12-21',
+						'2021-12-22',
+						'2021-12-23',
+						'2021-12-24',
+						'2021-12-25',
+						'2021-12-26',
+						'2021-12-27',
+						'2021-12-28',
+						'2021-12-29',
+						'2021-12-30',
+						'2021-12-31',
+						'2022-01-01',
+						'2022-01-02',
+						'2022-01-03',
+						'2022-01-04',
+						'2022-01-05',
+						'2022-01-06',
+						'2022-01-07',
+						'2022-01-08',
+						'2022-01-09'		// TODO: remove line this when ZBX-21290 will be fixed.
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Daily',
+						'To' => '2021-05-06'
+					],
+					'reporting_period' => 'Daily',
+					'expected_periods' => [
+						'2021-05-01',
+						'2021-05-02',
+						'2021-05-03',
+						'2021-05-04',
+						'2021-05-05',
+						'2021-05-06',
+						'2021-05-07'		// TODO: remove line this when ZBX-21290 will be fixed.
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Daily',
+						'From' => 'yesterday'
+					],
+					'reporting_period' => 'Daily',
+					'expected_periods' => []
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Weekly',
+						'Service' => 'Simple actions service',
+						'From' => '2021-09-25',
+						'To' => '2021-10-04'
+					],
+					'reporting_period' => 'Weekly',
+					'expected_periods' => [
+						'2021-10-03 – 10-09',
+						'2021-09-26 – 10-02',
+						'2021-09-19 – 09-25'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Weekly',
+						'Service' => 'Simple actions service',
+						'From' => '2021-09-25'
+					],
+					'reporting_period' => 'Weekly',
+					'expected_periods' => [
+						'2022-01-30 – 02-05',
+						'2022-01-23 – 01-29',
+						'2022-01-16 – 01-22',
+						'2022-01-09 – 01-15',
+						'2022-01-02 – 01-08',
+						'2021-12-26 – 01-01',
+						'2021-12-19 – 12-25',
+						'2021-12-12 – 12-18',
+						'2021-12-05 – 12-11',
+						'2021-11-28 – 12-04',
+						'2021-11-21 – 11-27',
+						'2021-11-14 – 11-20',
+						'2021-11-07 – 11-13',
+						'2021-10-31 – 11-06',
+						'2021-10-24 – 10-30',
+						'2021-10-17 – 10-23',
+						'2021-10-10 – 10-16',
+						'2021-10-03 – 10-09',
+						'2021-09-26 – 10-02',
+						'2021-09-19 – 09-25'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Weekly',
+						'Service' => 'Simple actions service',
+						'To' => '2022-02-02'
+					],
+					'reporting_period' => 'Weekly',
+					'expected_periods' => [
+						'2022-01-30 – 02-05',
+						'2022-01-23 – 01-29',
+						'2022-01-16 – 01-22',
+						'2022-01-09 – 01-15',
+						'2022-01-02 – 01-08',
+						'2021-12-26 – 01-01',
+						'2021-12-19 – 12-25',
+						'2021-12-12 – 12-18',
+						'2021-12-05 – 12-11',
+						'2021-11-28 – 12-04',
+						'2021-11-21 – 11-27',
+						'2021-11-14 – 11-20',
+						'2021-11-07 – 11-13',
+						'2021-10-31 – 11-06',
+						'2021-10-24 – 10-30',
+						'2021-10-17 – 10-23',
+						'2021-10-10 – 10-16',
+						'2021-10-03 – 10-09',
+						'2021-09-26 – 10-02',
+						'2021-09-19 – 09-25'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Weekly',
+						'Service' => 'Simple actions service',
+						'To' => '2021-06-01'
+					],
+					'reporting_period' => 'Weekly',
+					'expected_periods' => [
+						'2021-05-30 – 06-05',
+						'2021-05-23 – 05-29',
+						'2021-05-16 – 05-22',
+						'2021-05-09 – 05-15',
+						'2021-05-02 – 05-08',
+						'2021-04-25 – 05-01'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Weekly',
+						'Service' => 'Simple actions service',
+						'From' => 'today - 2 weeks'
+					],
+					'reporting_period' => 'Weekly',
+					'expected_periods' => []
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Weekly',
+						'From' => '2021-12-29',
+						'To' => '2022-01-09'
+					],
+					'reporting_period' => 'Weekly',
+					'expected_periods' => [
+						'2021-12-26 – 01-01',
+						'2022-01-02 – 01-08',
+						'2022-01-09 – 01-15'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Weekly',
+						'From' => '2021-12-29'
+					],
+					'reporting_period' => 'Weekly',
+					'expected_periods' => [
+						'2021-12-26 – 01-01',
+						'2022-01-02 – 01-08',
+						'2022-01-09 – 01-15',
+						'2022-01-16 – 01-22',
+						'2022-01-23 – 01-29',
+						'2022-01-30 – 02-05',
+						'2022-02-06 – 02-12',
+						'2022-02-13 – 02-19',
+						'2022-02-20 – 02-26',
+						'2022-02-27 – 03-05',
+						'2022-03-06 – 03-12',
+						'2022-03-13 – 03-19',
+						'2022-03-20 – 03-26',
+						'2022-03-27 – 04-02',
+						'2022-04-03 – 04-09',
+						'2022-04-10 – 04-16',
+						'2022-04-17 – 04-23',
+						'2022-04-24 – 04-30',
+						'2022-05-01 – 05-07',
+						'2022-05-08 – 05-14'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Weekly',
+						'To' => '2022-05-13'
+					],
+					'reporting_period' => 'Weekly',
+					'expected_periods' => [
+						'2021-12-26 – 01-01',
+						'2022-01-02 – 01-08',
+						'2022-01-09 – 01-15',
+						'2022-01-16 – 01-22',
+						'2022-01-23 – 01-29',
+						'2022-01-30 – 02-05',
+						'2022-02-06 – 02-12',
+						'2022-02-13 – 02-19',
+						'2022-02-20 – 02-26',
+						'2022-02-27 – 03-05',
+						'2022-03-06 – 03-12',
+						'2022-03-13 – 03-19',
+						'2022-03-20 – 03-26',
+						'2022-03-27 – 04-02',
+						'2022-04-03 – 04-09',
+						'2022-04-10 – 04-16',
+						'2022-04-17 – 04-23',
+						'2022-04-24 – 04-30',
+						'2022-05-01 – 05-07',
+						'2022-05-08 – 05-14'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Weekly',
+						'To' => '2021-06-01'
+					],
+					'reporting_period' => 'Weekly',
+					'expected_periods' => [
+						'2021-04-25 – 05-01',
+						'2021-05-02 – 05-08',
+						'2021-05-09 – 05-15',
+						'2021-05-16 – 05-22',
+						'2021-05-23 – 05-29',
+						'2021-05-30 – 06-05'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Weekly',
+						'From' => 'today - 3 weeks'
+					],
+					'reporting_period' => 'Weekly',
+					'expected_periods' => []
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'Service' => 'Simple actions service',
+						'From' => '2020-01-01',
+						'To' => '2020-02-29'
+
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => [
+						'2020-03',		// TODO: remove line this when ZBX-21290 will be fixed.
+						'2020-02',
+						'2020-01'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'Service' => 'Simple actions service',
+						'From' => '2020-01-01'
+
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => [
+						'2021-08',
+						'2021-07',
+						'2021-06',
+						'2021-05',
+						'2021-04',
+						'2021-03',
+						'2021-02',
+						'2021-01',
+						'2020-12',
+						'2020-11',
+						'2020-10',
+						'2020-09',
+						'2020-08',
+						'2020-07',
+						'2020-06',
+						'2020-05',
+						'2020-04',
+						'2020-03',
+						'2020-02',
+						'2020-01'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'Service' => 'Simple actions service',
+						'To' => '2023-02-15'
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => [
+						'2023-02',
+						'2023-01',
+						'2022-12',
+						'2022-11',
+						'2022-10',
+						'2022-09',
+						'2022-08',
+						'2022-07',
+						'2022-06',
+						'2022-05',
+						'2022-04',
+						'2022-03',
+						'2022-02',
+						'2022-01',
+						'2021-12',
+						'2021-11',
+						'2021-10',
+						'2021-09',
+						'2021-08',
+						'2021-07'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'Service' => 'Simple actions service',
+						'To' => '2021-08-01'
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => [
+						'2021-08',
+						'2021-07',
+						'2021-06',
+						'2021-05'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'Service' => 'Simple actions service',
+						'From' => 'today - 2 months'
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => []
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'From' => '2020-01-01',
+						'To' => '2020-02-29'
+
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => [
+						'2020-01',
+						'2020-02',
+						'2020-03'		// TODO: remove line this when ZBX-21290 will be fixed.
+
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'From' => '2020-01-01'
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => [
+						'2020-01',
+						'2020-02',
+						'2020-03',
+						'2020-04',
+						'2020-05',
+						'2020-06',
+						'2020-07',
+						'2020-08',
+						'2020-09',
+						'2020-10',
+						'2020-11',
+						'2020-12',
+						'2021-01',
+						'2021-02',
+						'2021-03',
+						'2021-04',
+						'2021-05',
+						'2021-06',
+						'2021-07',
+						'2021-08'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'To' => '2023-02-15'
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => [
+						'2021-07',
+						'2021-08',
+						'2021-09',
+						'2021-10',
+						'2021-11',
+						'2021-12',
+						'2022-01',
+						'2022-02',
+						'2022-03',
+						'2022-04',
+						'2022-05',
+						'2022-06',
+						'2022-07',
+						'2022-08',
+						'2022-09',
+						'2022-10',
+						'2022-11',
+						'2022-12',
+						'2023-01',
+						'2023-02'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'To' => '2021-08-01'
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => [
+						'2021-05',
+						'2021-06',
+						'2021-07',
+						'2021-08'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'From' => 'today - 2 months'
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => []
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Quarterly',
+						'Service' => 'Simple actions service',
+						'From' => '2021-05-01',
+						'To' => '2021-10-01'
+
+					],
+					'reporting_period' => 'Quarterly',
+					'expected_periods' => [
+						'2021-10 – 12',
+						'2021-07 – 09',
+						'2021-04 – 06'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Quarterly',
+						'Service' => 'Simple actions service',
+						'From' => '2017-12-03'
+					],
+					'reporting_period' => 'Quarterly',
+					'expected_periods' => [
+						'2022-07 – 09',
+						'2022-04 – 06',
+						'2022-01 – 03',
+						'2021-10 – 12',
+						'2021-07 – 09',
+						'2021-04 – 06',
+						'2021-01 – 03',
+						'2020-10 – 12',
+						'2020-07 – 09',
+						'2020-04 – 06',
+						'2020-01 – 03',
+						'2019-10 – 12',
+						'2019-07 – 09',
+						'2019-04 – 06',
+						'2019-01 – 03',
+						'2018-10 – 12',
+						'2018-07 – 09',
+						'2018-04 – 06',
+						'2018-01 – 03',
+						'2017-10 – 12'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Quarterly',
+						'Service' => 'Simple actions service',
+						'To' => '2026-05-01'
+					],
+					'reporting_period' => 'Quarterly',
+					'expected_periods' => [
+						'2026-04 – 06',
+						'2026-01 – 03',
+						'2025-10 – 12',
+						'2025-07 – 09',
+						'2025-04 – 06',
+						'2025-01 – 03',
+						'2024-10 – 12',
+						'2024-07 – 09',
+						'2024-04 – 06',
+						'2024-01 – 03',
+						'2023-10 – 12',
+						'2023-07 – 09',
+						'2023-04 – 06',
+						'2023-01 – 03',
+						'2022-10 – 12',
+						'2022-07 – 09',
+						'2022-04 – 06',
+						'2022-01 – 03',
+						'2021-10 – 12',
+						'2021-07 – 09'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Quarterly',
+						'Service' => 'Simple actions service',
+						'To' => '2021-08-01'
+					],
+					'reporting_period' => 'Quarterly',
+					'expected_periods' => [
+						'2021-07 – 09',
+						'2021-04 – 06'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Quarterly',
+						'Service' => 'Simple actions service',
+						'From' => 'today - 6 months'
+					],
+					'reporting_period' => 'Quarterly',
+					'expected_periods' => []
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Quarterly',
+						'From' => '2021-05-01',
+						'To' => '2021-10-01'
+
+					],
+					'reporting_period' => 'Quarterly',
+					'expected_periods' => [
+						'2021-04 – 06',
+						'2021-07 – 09',
+						'2021-10 – 12'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Quarterly',
+						'From' => '2017-12-03'
+					],
+					'reporting_period' => 'Quarterly',
+					'expected_periods' => [
+						'2017-10 – 12',
+						'2018-01 – 03',
+						'2018-04 – 06',
+						'2018-07 – 09',
+						'2018-10 – 12',
+						'2019-01 – 03',
+						'2019-04 – 06',
+						'2019-07 – 09',
+						'2019-10 – 12',
+						'2020-01 – 03',
+						'2020-04 – 06',
+						'2020-07 – 09',
+						'2020-10 – 12',
+						'2021-01 – 03',
+						'2021-04 – 06',
+						'2021-07 – 09',
+						'2021-10 – 12',
+						'2022-01 – 03',
+						'2022-04 – 06',
+						'2022-07 – 09'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Quarterly',
+						'To' => '2026-05-01'
+					],
+					'reporting_period' => 'Quarterly',
+					'expected_periods' => [
+						'2021-07 – 09',
+						'2021-10 – 12',
+						'2022-01 – 03',
+						'2022-04 – 06',
+						'2022-07 – 09',
+						'2022-10 – 12',
+						'2023-01 – 03',
+						'2023-04 – 06',
+						'2023-07 – 09',
+						'2023-10 – 12',
+						'2024-01 – 03',
+						'2024-04 – 06',
+						'2024-07 – 09',
+						'2024-10 – 12',
+						'2025-01 – 03',
+						'2025-04 – 06',
+						'2025-07 – 09',
+						'2025-10 – 12',
+						'2026-01 – 03',
+						'2026-04 – 06'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Quarterly',
+						'To' => '2021-08-01'
+					],
+					'reporting_period' => 'Quarterly',
+					'expected_periods' => [
+						'2021-04 – 06',
+						'2021-07 – 09'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Quarterly',
+						'From' => 'today - 6 months'
+					],
+					'reporting_period' => 'Quarterly',
+					'expected_periods' => []
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Annual',
+						'Service' => 'Service with problem',
+						'From' => '2020-05-01',
+						'To' => '2025-12-31'
+
+					],
+					'reporting_period' => 'Annually',
+					'expected_periods' => [
+						'2026',
+						'2025',
+						'2024',
+						'2023',
+						'2022',
+						'2021',
+						'2020'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Annual',
+						'Service' => 'Service with problem',
+						'From' => '2002-12-03'
+					],
+					'reporting_period' => 'Annually',
+					'expected_periods' => [
+						'2021',
+						'2020',
+						'2019',
+						'2018',
+						'2017',
+						'2016',
+						'2015',
+						'2014',
+						'2013',
+						'2012',
+						'2011',
+						'2010',
+						'2009',
+						'2008',
+						'2007',
+						'2006',
+						'2005',
+						'2004',
+						'2003',
+						'2002'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Annual',
+						'Service' => 'Service with problem',
+						'To' => '2037-01-01'
+					],
+					'reporting_period' => 'Annually',
+					'expected_periods' => [
+						'2037',
+						'2036',
+						'2035',
+						'2034',
+						'2033',
+						'2032',
+						'2031',
+						'2030',
+						'2029',
+						'2028',
+						'2027',
+						'2026',
+						'2025',
+						'2024',
+						'2023',
+						'2022',
+						'2021'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Annual',
+						'Service' => 'Service with problem',
+						'From' => 'today - 13 months'
+					],
+					'reporting_period' => 'Annually',
+					'expected_periods' => []
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Annual',
+						'From' => '2019-05-01',
+						'To' => '2024-10-01'
+
+					],
+					'reporting_period' => 'Annually',
+					'expected_periods' => [
+						'2019',
+						'2020',
+						'2021',
+						'2022',
+						'2023',
+						'2024'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Annual',
+						'From' => '2002-12-03'
+					],
+					'reporting_period' => 'Annually',
+					'expected_periods' => [
+						'2002',
+						'2003',
+						'2004',
+						'2005',
+						'2006',
+						'2007',
+						'2008',
+						'2009',
+						'2010',
+						'2011',
+						'2012',
+						'2013',
+						'2014',
+						'2015',
+						'2016',
+						'2017',
+						'2018',
+						'2019',
+						'2020',
+						'2021'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Annual',
+						'To' => '2037-02-01'
+					],
+					'reporting_period' => 'Annually',
+					'expected_periods' => [
+						'2021',
+						'2022',
+						'2023',
+						'2024',
+						'2025',
+						'2026',
+						'2027',
+						'2028',
+						'2029',
+						'2030',
+						'2031',
+						'2032',
+						'2033',
+						'2034',
+						'2035',
+						'2036',
+						'2037'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Annual',
+						'From' => 'today - 13 months'
+					],
+					'reporting_period' => 'Annually',
+					'expected_periods' => []
+				]
+			],
+			// Using non-complete date in From and To fields.
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'From' => '2021',
+						'To' => '2021'
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => [
+						'2021-01',
+						'2021-02',
+						'2021-03',
+						'2021-04',
+						'2021-05',
+						'2021-06',
+						'2021-07',
+						'2021-08',
+						'2021-09',
+						'2021-10',
+						'2021-11',
+						'2021-12',
+						'2022-01'		// TODO: remove line this when ZBX-21290 will be fixed.
+					]
+				]
+			],
+			// Returning more than 20 periods with service.
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'Service' => 'Simple actions service',
+						'From' => '2020-01-01',
+						'To' => '2022-12-10'
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => [
+						'2022-12',
+						'2022-11',
+						'2022-10',
+						'2022-09',
+						'2022-08',
+						'2022-07',
+						'2022-06',
+						'2022-05',
+						'2022-04',
+						'2022-03',
+						'2022-02',
+						'2022-01',
+						'2021-12',
+						'2021-11',
+						'2021-10',
+						'2021-09',
+						'2021-08',
+						'2021-07',
+						'2021-06',
+						'2021-05',
+						'2021-04',
+						'2021-03',
+						'2021-02',
+						'2021-01',
+						'2020-12',
+						'2020-11',
+						'2020-10',
+						'2020-09',
+						'2020-08',
+						'2020-07',
+						'2020-06',
+						'2020-05',
+						'2020-04',
+						'2020-03',
+						'2020-02',
+						'2020-01'
+					]
+				]
+			],
+			// Returning more than 20 periods without service.
+			[
+				[
+					'filter' => [
+						'SLA' => 'SLA Monthly',
+						'From' => '2020-01-01',
+						'To' => '2022-12-10'
+					],
+					'reporting_period' => 'Monthly',
+					'expected_periods' => [
+						'2020-01',
+						'2020-02',
+						'2020-03',
+						'2020-04',
+						'2020-05',
+						'2020-06',
+						'2020-07',
+						'2020-08',
+						'2020-09',
+						'2020-10',
+						'2020-11',
+						'2020-12',
+						'2021-01',
+						'2021-02',
+						'2021-03',
+						'2021-04',
+						'2021-05',
+						'2021-06',
+						'2021-07',
+						'2021-08',
+						'2021-09',
+						'2021-10',
+						'2021-11',
+						'2021-12',
+						'2022-01',
+						'2022-02',
+						'2022-03',
+						'2022-04',
+						'2022-05',
+						'2022-06',
+						'2022-07',
+						'2022-08',
+						'2022-09',
+						'2022-10',
+						'2022-11',
+						'2022-12'
+					]
+				]
+			],
+			// "To" value chronologically before "From" value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'filter' => [
+						'SLA' => 'SLA Daily',
+						'From' => '2022-06-25',
+						'To' => '2022-06-23'
+					],
+					'error' => '"From" date must be less than "To" date.'
+				]
+			]
+			// TODO: Uncomment the below cases and correct error messages when ZBX-21264 is fixed.
+//			// Non existing date in From field.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'From' => '2022-06-32'
+//					],
+//					'error' => 'Incorrect value for field "From": a date is expected.'
+//				]
+//			],
+//			// Non existing date in To field.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'To' => '2022-06-32'
+//					],
+//					'error' => 'Incorrect value for field "To": a date is expected.'
+//				]
+//			],
+//			// Leading space in To field.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'To' => ' 2022-06-13'
+//					],
+//					'error' => 'Incorrect value for field "To": a date is expected.'
+//				]
+//			],
+//			// Trailing space in To field.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'From' => '2022-06-13 '
+//					],
+//					'error' => 'Incorrect value for field "To": a date is expected.'
+//				]
+//			],
+//			// Wrong value format in "From" field.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'From' => '13-12-2022'
+//					],
+//					'error' => 'Incorrect value for field "From": a date is expected.'
+//				]
+//			],
+//			// Wrong value format in "To" field.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'To' => '12/31/2022'
+//					],
+//					'error' => 'Incorrect value for field "To": a date is expected.'
+//				]
+//			],
+//			// Unix time in "From" field.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'From' => '1641340800'
+//					],
+//					'error' => 'Incorrect value for field "From": a date is expected.'
+//				]
+//			],
+//			// Unix time in "To" field.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'To' => '1641340800'
+//					],
+//					'error' => 'Incorrect value for field "To": a date is expected.'
+//				]
+//			],
+//			// Field "From" too far in the past.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'From' => '1969-12-31'
+//					],
+//					'error' => 'Invalid parameter "/period_from": value must be one of 0-2147483647.'
+//				]
+//			],
+//			// Field "From" too far in the future.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'From' => '2039-01-01'
+//					],
+//					'error' => 'Invalid parameter "/period_from": a number is too large.'
+//				]
+//			],
+//			// Field "To" too far in the past.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'To' => '1969-12-31'
+//					],
+//					'error' => 'Invalid parameter "/period_to": value must be one of 0-2147483647.'
+//				]
+//			],
+//			// Field "To" too far in the future.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'filter' => [
+//						'SLA' => 'SLA Daily',
+//						'To' => '2039-01-01'
+//					],
+//					'error' => 'Invalid parameter "/period_to": a number is too large.'
+//				]
+//			]
 		];
-		$this->assertEquals([$period_headers[$data['reporting_period']], 'SLO', 'SLI', 'Uptime', 'Downtime',
-				'Error budget', 'Excluded downtimes'], $table->getHeadersText()
-		);
-
-		/**
-		 * This test is written taking into account that only SLA with daily reporting period has ongoing downtimes.
-		 * Checking downtimes for other reporting periods would require a more complex solution.
-		 */
-		if (array_key_exists('downtimes', $data)) {
-			$downtime_values = [];
-
-			/***
-			 * If the date has changed since data source was executed, then Downtimes will be divided into 2 days.
-			 * Such case is covered in the else statement.
-			 */
-			if (date('Y-m-d', time()) === self::$creation_day) {
-				foreach ($data['downtimes']['names'] as $downtime_name) {
-					/**
-					 * A second or two can pass from Downtime duration calculation till report is loaded.
-					 * So an array of expected results is created.
-					 */
-					$single_downtime = [];
-					for ($i = 0; $i <= 2; $i++) {
-						$single_downtime[] = date('Y-m-d H:i', self::$creation_time).' '.$downtime_name.': '
-								.convertUnitsS($load_time - self::$creation_time + $i);
-					}
-
-					$downtime_values[$downtime_name] = $single_downtime;
-
-					unset($single_downtime);
-				}
-				// Check that each of the obtained downtimes is present in the created reference arrays.
-				$row = $table->findRow($period_headers[$data['reporting_period']], self::$creation_day);
-				$this->checkDowntimePresent($row, $downtime_values);
-			}
-			else {
-				foreach ([date('Y-m-d', time()), self::$creation_day] as $day) {
-					if ($day === self::$creation_day) {
-						foreach ($data['downtimes']['names'] as $downtime_name) {
-							// The time is not dependent on view load time, so no nee for "for" cycle.
-							$single_downtime = [];
-							$single_downtime[] = date('Y-m-d H:i', self::$creation_time).' '.$downtime_name.': '
-									.convertUnitsS(strtotime('today') - self::$creation_time);
-							$downtime_values[] = $single_downtime;
-
-							unset($single_downtime);
-						}
-					}
-					else {
-						foreach ($data['downtimes']['names'] as $downtime_name) {
-							$single_downtime = [];
-							for ($i = 0; $i <= 2; $i++) {
-								$single_downtime[] = date('Y-m-d H:i', strtotime('today')).' '.$downtime_name.': '
-										.convertUnitsS($load_time - strtotime('today') + $i);
-							}
-							$downtime_values[] = $single_downtime;
-
-							unset($single_downtime);
-						}
-					}
-
-					$row = $table->findRow($period_headers[$data['reporting_period']], $day);
-					$this->checkDowntimePresent($row, $downtime_values);
-				}
-			}
-		}
-		else {
-			foreach (self::$reporting_periods[$data['reporting_period']] as $period) {
-				$row = $table->findRow($period_headers[$data['reporting_period']], $period['value']);
-				$this->assertEquals('', $row->getColumn('Excluded downtimes')->getText());
-			}
-		}
-
-		foreach (self::$reporting_periods[$data['reporting_period']] as $period) {
-			$row = $table->findRow($period_headers[$data['reporting_period']], $period['value']);
-			$this->assertEquals($data['expected']['SLO'].'%', $row->getColumn('SLO')->getText());
-
-			if (array_key_exists('SLI', $data['expected']) && $period['end'] > self::$creation_time) {
-				$this->assertEquals($data['expected']['SLI'], $row->getColumn('SLI')->getText());
-
-				// Check Uptime and Error budget values
-				$uptime = $row->getColumn('Uptime')->getText();
-				if ($period['end'] > $load_time) {
-					$reference_uptime = [];
-					$start_date = ($period['start'] < self::$creation_time) ? self::$creation_time : $period['start'];
-
-					for ($i = 0; $i <= 2; $i++) {
-						$reference_uptime[] = convertUnitsS($load_time - $start_date + $i);
-					}
-
-					$this->assertTrue(in_array($uptime, $reference_uptime));
-
-					// Calculate the error budet based on the actual uptime and compare with actual error budget.
-					$uptime_seconds = 0;
-					foreach (explode(' ', $uptime) as $time_unit) {
-						$uptime_seconds = $uptime_seconds + timeUnitToSeconds($time_unit);
-					}
-
-					$error_budget = convertUnitsS(intval($uptime_seconds / floatval($data['expected']['SLO']) * 100)
-							- $uptime_seconds
-					);
-					$this->assertEquals($error_budget, $row->getColumn('Error budget')->getText());
-
-				}
-				else {
-					$reference_uptime = [];
-					for ($i = 0; $i <= 2; $i++) {
-						$reference_uptime[] = convertUnitsS($period['end'] - self::$creation_time + $i);
-					}
-					$this->assertTrue(in_array($uptime, $reference_uptime));
-
-					$this->assertEquals('0', $row->getColumn('Error budget')->getText());
-				}
-			}
-			else {
-				$this->assertEquals('N/A', $row->getColumn('SLI')->getText());
-				$this->assertEquals('0', $row->getColumn('Uptime')->getText());
-				$this->assertEquals('0', $row->getColumn('Error budget')->getText());
-			}
-
-			$this->assertEquals('0', $row->getColumn('Downtime')->getText());
-
-		}
 	}
 
-	private function checkDowntimePresent($row, $downtime_values) {
-		// Split column value into downtimes.
-		foreach (explode("\n", $row->getColumn('Excluded downtimes')->getText()) as $downtime) {
-			// Record if downtime found in reference downtime arrays.
-			$match_found = false;
-			foreach ($downtime_values as $downtime_array) {
-				if (in_array($downtime, $downtime_array)) {
-					$match_found = true;
-				}
-			}
-			$this->assertTrue($match_found);
+	/**
+	 * @dataProvider getSlaDataWithServiceAndCustomDates
+	 *
+	 * @onBefore getDateTimeData
+	 */
+	public function testPageServicesSlaReport_CheckCustomPeriods ($data) {
+		// Construct the expected result array if such is not present in the data provider.
+		if (CTestArrayHelper ::get($data, 'expected_periods') === []) {
+			$data['expected_periods'] = $this->getPeriodDataWithCustomDates($data);
+			$data['filter']['From'] = date('Y-m-d', strtotime($data['filter']['From']));
 		}
-	}
 
-	public function testPageServicesSlaReport_LayoutWithoutService() {
-		var_dump('hello');
+		$this->openSlaReport($data['filter']);
+
+		$this->checkCustomPeriods($data);
 	}
 
 	private function assertDialogContents($dialog_data) {
