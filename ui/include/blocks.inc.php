@@ -716,7 +716,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 					? [$problem['name'], ' (', $opdata, ')']
 					: $problem['name']
 				)
-			),
+			)->addClass(ZBX_STYLE_WORDBREAK),
 			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 			zbx_date2age($problem['clock']),
 			$problem_update_link,

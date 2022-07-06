@@ -1112,7 +1112,7 @@ class CScreenProblem extends CScreenBase {
 					$this->data['filter']['compact_view']
 						? (new CDiv($description))->addClass(ZBX_STYLE_ACTION_CONTAINER)
 						: $description,
-					($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
+					($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata->addClass(ZBX_STYLE_WORDBREAK) : null,
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),

@@ -463,7 +463,8 @@ switch ($data['popup_type']) {
 							json_encode($options['reference']).', '.
 							json_encode($item_pattern).', '.
 							$options['parentid'].
-						');'.$js_action_onclick),
+						');'.$js_action_onclick)
+						->addClass(ZBX_STYLE_WORDBREAK),
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
