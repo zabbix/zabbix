@@ -3383,7 +3383,8 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 		goto unlock;
 	}
 
-	if (NULL == (custom_query = zbx_vmware_service_get_cust_query(service, type, dvs->id, key_esc, query_type, mode))
+	if (NULL == (custom_query =
+			zbx_vmware_service_get_cust_query(service, type, dvs->id, key_esc, query_type, mode))
 			&& (SUCCEED != custquery_param_create(key_esc, &query_params)
 			|| SUCCEED != dvs_param_validate(&query_params,
 			service->major_version * 10 + service->minor_version)))
