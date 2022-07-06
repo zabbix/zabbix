@@ -7942,6 +7942,9 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 					op->params_orig = zbx_strdup(NULL, dc_op->params);
 				}
 
+				item->dep_itemids_num = 0;
+				zbx_free(item->dep_itemids);
+
 				zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
 				continue;
 			}
@@ -7990,8 +7993,6 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 				zbx_hashset_remove_direct(items, item);
 				item = (zbx_preproc_item_t *)zbx_hashset_insert(items, &item_local, sizeof(item_local));
 			}
-			else
-				zbx_free(item->dep_itemids);
 		}
 
 		zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
@@ -8029,7 +8030,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 		{
 			if (NULL == zbx_hashset_search(&ids, &item->itemid))
 			{
-				if (FAIL == dc_preproc_item_init(&item_local, dc_masteritem->itemid))
+				if (FAIL == dc_preproc_item_init(&item_local, dc_item->itemid))
 					continue;
 
 				/* remove preprocessing and dependent */
