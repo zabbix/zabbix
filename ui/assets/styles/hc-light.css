@@ -3917,7 +3917,6 @@ select {
   opacity: 0; }
   .checkbox-radio + label span {
     position: relative;
-    top: 1px;
     display: inline-block;
     width: 14px;
     height: 14px;
