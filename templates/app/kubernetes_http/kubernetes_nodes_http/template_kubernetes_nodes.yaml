@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:33:38Z'
+  version: '6.4'
+  date: '2022-07-07T11:07:51Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -22,7 +22,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -285,11 +285,11 @@ zabbix_export:
               name: api_endpoint
               value: '{$KUBE.API.ENDPOINT.URL}'
             -
-              name: endpoint_name
-              value: '{$KUBE.NODES.ENDPOINT.NAME}'
-            -
               name: token
               value: '{$KUBE.API.TOKEN}'
+            -
+              name: endpoint_name
+              value: '{$KUBE.NODES.ENDPOINT.NAME}'
           tags:
             -
               tag: component
@@ -382,6 +382,13 @@ zabbix_export:
                   try {
                       var input = JSON.parse(value),
                           output = [];
+                          api_url = '{$KUBE.API.ENDPOINT.URL}',
+                          hostname = api_url.match(/\/\/(.+):/);
+                  
+                      if (typeof hostname[1] === 'undefined') {
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
+                          throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+                      };
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
                           Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + input);
@@ -408,7 +415,8 @@ zabbix_export:
                                       '{#IP}': internalIP,
                                       '{#ROLES}': node.status.roles,
                                       '{#ARCH}': node.metadata.labels['kubernetes.io/arch'] || '',
-                                      '{#OS}': node.metadata.labels['kubernetes.io/os'] || ''
+                                      '{#OS}': node.metadata.labels['kubernetes.io/os'] || '',
+                                      '{#CLUSTER_HOSTNAME}': hostname[1]
                                   });
                               }
                               else {
@@ -1452,7 +1460,7 @@ zabbix_export:
                     name: Applications
               group_prototypes:
                 -
-                  name: 'Kubernetes/Nodes/Role: {#ROLES}'
+                  name: '{#CLUSTER_HOSTNAME}: Kubernetes/Nodes/Role: {#ROLES}'
               templates:
                 -
                   name: 'Linux by Zabbix agent'
