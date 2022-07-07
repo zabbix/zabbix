@@ -123,7 +123,6 @@ class testFormGraphs extends CWebTest {
 			],
 			[
 				[
-					'check_defaults' => true,
 					'change_fields' => [
 						'Graph type' => CFormElement::RELOADABLE_FILL('Stacked'),
 					],
@@ -292,13 +291,15 @@ class testFormGraphs extends CWebTest {
 				$this->assertFalse($items_container->query('button:Add prototype')->exists());
 				$this->assertFalse($form->query('id:discover')->exists());
 			}
-
+			// Uncomment when ZBX-21311 is fixed.
+			/*
 			$form->selectTab('Preview');
 			$this->page->waitUntilReady();
 			$this->assertTrue($this->query('xpath://div[@id="previewChart"]/img')->waitUntilPresent()->one()->isVisible());
 
 			$form->selectTab($this->prototype ? 'Graph prototype' : 'Graph');
 			$this->page->waitUntilReady();
+			*/
 		}
 
 		$form->fill($data['change_fields']);
