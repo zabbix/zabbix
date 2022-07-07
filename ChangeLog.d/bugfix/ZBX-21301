@@ -1,1 +1,1 @@
-.......PS. [ZBX-21020] fixed ambiguity and inability to set character set for MariaDB connection by setting utf8mb3 character instead of utf8 (vso)
+.......PS. [ZBX-21301] fixed ambiguity and inability to set character set for MariaDB connection by setting utf8mb3 character instead of utf8 (vso)
