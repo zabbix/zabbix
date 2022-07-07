@@ -112,6 +112,33 @@ extern "C" void	zbx_co_uninitialize()
 		CoUninitialize();
 }
 
+extern "C" static void	get_error_code_text(HRESULT hres, char **error)
+{
+	IWbemStatusCodeText	*pStatus = NULL;
+	SCODE			sc;
+
+	sc = CoCreateInstance(CLSID_WbemStatusCodeText, 0, CLSCTX_INPROC_SERVER, IID_IWbemStatusCodeText,
+			(LPVOID *) &pStatus);
+
+	if(S_OK == sc)
+	{
+		BSTR	bstr = 0;
+
+		sc = pStatus->GetErrorCodeText(hres, 0, 0, &bstr);
+		if (S_OK == sc)
+		{
+			*error = zbx_unicode_to_utf8((wchar_t *)bstr);
+			SysFreeString(bstr);
+			bstr = 0;
+		}
+		pStatus->Release();
+	}
+	else
+		zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve text for status code");
+
+	pStatus->Release();
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: parse_first_first                                                *
@@ -149,7 +176,13 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 		goto out2;
 	}
 
-	if (FAILED(hres) || 0 == uReturn)
+	if (FAILED(hres))
+	{
+		get_error_code_text(hres, error);
+		goto out2;
+	}
+
+	if (0 == uReturn)
 		goto out2;
 
 	hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
@@ -191,33 +224,6 @@ out1:
 	pclsObj->Release();
 out2:	
 	return ret;
-}
-
-extern "C" static void	get_error_code_text(HRESULT hres, char **error)
-{
-	IWbemStatusCodeText	*pStatus = NULL;
-	SCODE			sc;
-
-	sc = CoCreateInstance(CLSID_WbemStatusCodeText, 0, CLSCTX_INPROC_SERVER, IID_IWbemStatusCodeText,
-			(LPVOID *) &pStatus);
-
-	if(S_OK == sc)
-	{
-		BSTR	bstr = 0;
-
-		sc = pStatus->GetErrorCodeText(hres, 0, 0, &bstr);
-		if (S_OK == sc)
-		{
-			*error = zbx_unicode_to_utf8((wchar_t *)bstr);
-			SysFreeString(bstr);
-			bstr = 0;
-		}
-		pStatus->Release();
-	}
-	else
-		zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve text for status code");
-
-	pStatus->Release();
 }
 
 /******************************************************************************
