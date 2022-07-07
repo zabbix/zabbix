@@ -394,10 +394,7 @@ if ($hostid == 0 && count($filter['hosts']) == 1) {
 	$hostid = reset($filter['hosts'])['id'];
 }
 
-if (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('group_graphid')) {
-	$data = getCopyElementsFormData('group_graphid', _('Graphs'));
-}
-elseif (isset($_REQUEST['form'])) {
+if (isset($_REQUEST['form'])) {
 	$data = [
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
