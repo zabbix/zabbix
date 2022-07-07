@@ -541,6 +541,11 @@ msgstr "Доступ к услугам"
 msgid "Ack"
 msgstr "Подтверждено"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "Подтверждено"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "Подтвердить"
@@ -634,6 +639,11 @@ msgstr "Подтвержденные РЕШЕННЫЕ события"
 msgid "Action"
 msgstr "Действие"
 
+#: app/views/monitoring.widget.actionlog.view.php:37
+msgctxt "compact table header"
+msgid "Action"
+msgstr "Действие"
+
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
@@ -702,6 +712,11 @@ msgstr "Действие обновлено"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "Действия"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "Действия"
 
@@ -1652,6 +1667,11 @@ msgstr "Отчет о доступности"
 #: app/views/monitoring.widget.hostavail.view.php:58
 #: app/views/monitoring.widget.hostavail.view.php:102
 #: include/classes/html/CHostAvailability.php:80
+msgid "Available"
+msgstr "Доступен"
+
+#: app/views/monitoring.widget.hostavail.view.php:37
+msgctxt "compact table header"
 msgid "Available"
 msgstr "Доступен"
 
@@ -3847,6 +3867,10 @@ msgstr "Закольцованное соединение шаблонов не 
 msgid "Class %1$s not found for action %2$s."
 msgstr "Класс %1$s не найден для действия %2$s."
 
+#: include/classes/core/ZBase.php:563
+msgid "Class not found."
+msgstr ""
+
 #: include/views/configuration.httpconf.list.php:221
 #: include/views/configuration.item.list.php:301
 msgid "Clear history"
@@ -5173,6 +5197,11 @@ msgstr "Функции даты и времени"
 msgid "Day"
 msgstr "День"
 
+#: include/classes/helpers/CSlaHelper.php:68
+msgctxt "compact table header"
+msgid "Day"
+msgstr "День"
+
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
 msgstr "За день до вчера"
@@ -6093,6 +6122,11 @@ msgstr "Обнаружение виртуальных машин VMware, <url> -
 msgid "Discovery rule"
 msgstr "Правило обнаружения"
 
+#: app/views/monitoring.widget.discovery.view.php:33
+msgctxt "compact table header"
+msgid "Discovery rule"
+msgstr "Правило обнаружения"
+
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -6320,6 +6354,11 @@ msgstr "Загрузить конфигурационный файл"
 msgid "Downtime"
 msgstr "Недоступен"
 
+#: app/views/monitoring.widget.slareport.view.php:100
+msgctxt "compact table header"
+msgid "Downtime"
+msgstr "Недоступен"
+
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
 #: include/classes/widgets/CWidgetHelper.php:969
@@ -6381,6 +6420,11 @@ msgstr "Дубликат userid \"%1$s\" в пользователях у кар
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:1156 include/events.inc.php:289
 #: include/views/configuration.action.edit.php:174
+msgid "Duration"
+msgstr "Длительность"
+
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
 msgid "Duration"
 msgstr "Длительность"
 
@@ -6812,6 +6856,11 @@ msgstr "Ошибка"
 msgid "Error budget"
 msgstr ""
 
+#: app/views/monitoring.widget.slareport.view.php:101
+msgctxt "compact table header"
+msgid "Error budget"
+msgstr ""
+
 #: include/db.inc.php:518
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
@@ -6950,6 +6999,11 @@ msgstr ""
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
+msgid "Excluded downtimes"
+msgstr ""
+
+#: app/views/monitoring.widget.slareport.view.php:102
+msgctxt "compact table header"
 msgid "Excluded downtimes"
 msgstr ""
 
@@ -7154,6 +7208,11 @@ msgstr "Задержка при аварийном переключении: %1$
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "Неудачно"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "Неудачно"
 
@@ -8218,6 +8277,12 @@ msgstr[0] "Узел сети"
 msgstr[1] "Узлы сети"
 msgstr[2] "Узлы сети"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "Узел сети"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8307,6 +8372,13 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
+msgid "Host group"
+msgstr "Группа узлов сети"
+
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
 msgid "Host group"
 msgstr "Группа узлов сети"
 
@@ -9899,6 +9971,12 @@ msgstr "Бесконечно"
 #: include/views/configuration.triggers.edit.php:228
 #: include/views/configuration.triggers.edit.php:430
 #: include/views/configuration.triggers.list.php:200
+msgid "Info"
+msgstr "Инфо"
+
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
 msgid "Info"
 msgstr "Инфо"
 
@@ -11998,6 +12076,11 @@ msgstr "Путь в меню"
 msgid "Message"
 msgstr "Сообщение"
 
+#: app/views/monitoring.widget.actionlog.view.php:44
+msgctxt "compact table header"
+msgid "Message"
+msgstr "Сообщение"
+
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
 msgstr "Формат сообщения"
@@ -12266,6 +12349,11 @@ msgstr "Моноширинный"
 msgid "Month"
 msgstr "Месяц"
 
+#: include/classes/helpers/CSlaHelper.php:70
+msgctxt "compact table header"
+msgid "Month"
+msgstr "Месяц"
+
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
 #: app/views/popup.maintenance.period.php:78 app/views/popup.sla.edit.php:76
@@ -12524,6 +12612,11 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.list.php:52
 #: include/views/monitoring.sysmap.list.php:71 items.php:46 maintenance.php:40
 #: report2.php:509 sysmaps.php:38 trigger_prototypes.php:37 triggers.php:45
+msgid "Name"
+msgstr "Имя"
+
+#: app/views/monitoring.widget.plaintext.view.php:49
+msgctxt "compact table header"
 msgid "Name"
 msgstr "Имя"
 
@@ -13323,6 +13416,11 @@ msgstr "Доступ отсутствует."
 msgid "Not available"
 msgstr "Недоступен"
 
+#: app/views/monitoring.widget.hostavail.view.php:38
+msgctxt "compact table header"
+msgid "Not available"
+msgstr "Недоступен"
+
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
 msgstr "Не классифицировано"
@@ -13611,6 +13709,11 @@ msgstr "Выкл"
 msgid "Ok"
 msgstr "Ok"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "Ok"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13753,6 +13856,11 @@ msgstr "Операция не имеет шаблон для функциони�
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr "Оперативные данные"
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr "Оперативные данные"
 
@@ -14736,6 +14844,12 @@ msgstr "Уровень привилегий"
 msgid "Problem"
 msgstr "Проблема"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "Проблема"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "Проблема создана"
@@ -14964,6 +15078,11 @@ msgstr "Файл публичного ключа"
 msgid "Quarter"
 msgstr ""
 
+#: include/classes/helpers/CSlaHelper.php:71
+msgctxt "compact table header"
+msgid "Quarter"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
 msgstr ""
@@ -15109,6 +15228,12 @@ msgstr "Недавние проблемы"
 msgid "Recipient"
 msgstr "Получатель"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "Получатель"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr "Получатель уже существует."
@@ -15153,6 +15278,11 @@ msgstr "Операции восстановления"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "Время восстановления"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "Время восстановления"
 
@@ -15964,11 +16094,22 @@ msgstr "SLA с ID \"%1$s\" недоступен."
 msgid "SLI"
 msgstr "SLI"
 
+#: app/views/monitoring.widget.slareport.view.php:98
+msgctxt "compact table header"
+msgid "SLI"
+msgstr "SLI"
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
+msgid "SLO"
+msgstr "SLO"
+
+#: app/views/monitoring.widget.slareport.view.php:38
+#: app/views/monitoring.widget.slareport.view.php:97
+msgctxt "compact table header"
 msgid "SLO"
 msgstr "SLO"
 
@@ -16601,6 +16742,11 @@ msgstr ""
 msgid "Service"
 msgstr "Услуга"
 
+#: app/views/monitoring.widget.slareport.view.php:37
+msgctxt "compact table header"
+msgid "Service"
+msgstr "Услуга"
+
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
 #, c-format
@@ -16798,6 +16944,12 @@ msgstr "Настройки"
 #: include/views/configuration.triggers.list.php:189
 #: include/views/reports.toptriggers.php:75
 #: include/views/reports.toptriggers.php:86
+msgid "Severity"
+msgstr "Важность"
+
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
 msgid "Severity"
 msgstr "Важность"
 
@@ -17350,6 +17502,13 @@ msgstr "Статистика и доступность кэша записи в 
 msgid "Status"
 msgstr "Состояние"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "Состояние"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr "Правило вычисления состояния"
@@ -17790,6 +17949,11 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
+msgid "Tags"
+msgstr "Теги"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
 msgid "Tags"
 msgstr "Теги"
 
@@ -18335,6 +18499,12 @@ msgstr "До"
 msgid "Time"
 msgstr "Время"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "Время"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Время конкретного процесса Zabbix или группы процессов (задаётся <типом> и <режимом>) проведённое в <состоянии> в процентах."
@@ -18398,6 +18568,11 @@ msgstr "Время ожидания"
 msgid "Timestamp"
 msgstr "Отметка времени"
 
+#: app/views/monitoring.widget.plaintext.view.php:33
+msgctxt "compact table header"
+msgid "Timestamp"
+msgstr "Отметка времени"
+
 #: app/views/sla.list.php:91
 msgid "Timezone"
 msgstr ""
@@ -18452,6 +18627,11 @@ msgstr ""
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "Всего"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "Всего"
 
@@ -18965,6 +19145,12 @@ msgstr "Два и более полей не могут занимать одн�
 msgid "Type"
 msgstr "Тип"
 
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
+msgid "Type"
+msgstr "Тип"
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "Тип (полная детализация)"
@@ -19218,6 +19404,11 @@ msgstr "Единицы измерения"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -19475,6 +19666,11 @@ msgstr "Карты верхнего уровня"
 #: app/views/monitoring.widget.slareport.view.php:99
 #: app/views/slareport.list.php:165
 #: include/classes/screens/CScreenDiscovery.php:120
+msgid "Uptime"
+msgstr "Доступен"
+
+#: app/views/monitoring.widget.slareport.view.php:99
+msgctxt "compact table header"
 msgid "Uptime"
 msgstr "Доступен"
 
@@ -20224,6 +20420,11 @@ msgstr "Валидация"
 msgid "Value"
 msgstr "Значение"
 
+#: app/views/monitoring.widget.plaintext.view.php:51
+msgctxt "compact table header"
+msgid "Value"
+msgstr "Значение"
+
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
 #, c-format
@@ -20584,6 +20785,11 @@ msgstr "Среда"
 msgid "Week"
 msgstr "Неделя"
 
+#: include/classes/helpers/CSlaHelper.php:69
+msgctxt "compact table header"
+msgid "Week"
+msgstr "Неделя"
+
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/popup.maintenance.period.php:77 app/views/popup.sla.edit.php:75
@@ -20678,6 +20884,11 @@ msgstr "С именем проблемы"
 msgid "With problems"
 msgstr "С проблемами"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "С проблемами"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr ""
@@ -20691,6 +20902,11 @@ msgid "Without data"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "Без проблем"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "Без проблем"
 
@@ -20882,6 +21098,11 @@ msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:122
 #: include/classes/helpers/CSlaHelper.php:62 report4.php:118 report4.php:154
+msgid "Year"
+msgstr "Год"
+
+#: include/classes/helpers/CSlaHelper.php:72
+msgctxt "compact table header"
 msgid "Year"
 msgstr "Год"
 

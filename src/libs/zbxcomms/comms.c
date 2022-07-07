@@ -24,10 +24,8 @@
 #include "tls.h"
 #endif
 #include "common.h"
-#include "base64.h"
 #include "log.h"
 #include "zbxcompress.h"
-#include "zbxxml.h"
 
 #ifdef _WINDOWS
 #	ifndef _WIN32_WINNT_WIN7

@@ -446,6 +446,7 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 			ZBX_DBROW2UINT64(changelog_local.changelogid, row[0]);
 			changelog_local.clock = atoi(row[1]);
 			zbx_hashset_insert(&dbsync_env.changelog, &changelog_local, sizeof(changelog_local));
+			changelog_num++;
 		}
 	}
 	else

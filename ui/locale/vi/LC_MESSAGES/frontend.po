@@ -500,6 +500,11 @@ msgstr ""
 msgid "Ack"
 msgstr "Ghi nhận"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "Ghi nhận"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "Ghi nhận"
@@ -593,6 +598,11 @@ msgstr " Sự kiện được ghi nhận giải quyết"
 msgid "Action"
 msgstr "Hành động"
 
+#: app/views/monitoring.widget.actionlog.view.php:37
+msgctxt "compact table header"
+msgid "Action"
+msgstr "Hành động"
+
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
@@ -657,6 +667,11 @@ msgstr "Hành động đã cập nhật"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "Hành động"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "Hành động"
 
@@ -1607,6 +1622,11 @@ msgstr "Thông báo tính sẵn sàng"
 #: app/views/monitoring.widget.hostavail.view.php:58
 #: app/views/monitoring.widget.hostavail.view.php:102
 #: include/classes/html/CHostAvailability.php:80
+msgid "Available"
+msgstr "Sẵn sàng"
+
+#: app/views/monitoring.widget.hostavail.view.php:37
+msgctxt "compact table header"
 msgid "Available"
 msgstr "Sẵn sàng"
 
@@ -3693,6 +3713,10 @@ msgstr "Liên kết thông tư template không được cho phép."
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
 
+#: include/classes/core/ZBase.php:563
+msgid "Class not found."
+msgstr ""
+
 #: include/views/configuration.httpconf.list.php:221
 #: include/views/configuration.item.list.php:301
 msgid "Clear history"
@@ -5001,6 +5025,11 @@ msgstr ""
 msgid "Day"
 msgstr "Ngày"
 
+#: include/classes/helpers/CSlaHelper.php:68
+msgctxt "compact table header"
+msgid "Day"
+msgstr "Ngày"
+
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
 msgstr "Ngày trước hôm qua"
@@ -5921,6 +5950,11 @@ msgstr ""
 msgid "Discovery rule"
 msgstr "Quy tắc phát hiện"
 
+#: app/views/monitoring.widget.discovery.view.php:33
+msgctxt "compact table header"
+msgid "Discovery rule"
+msgstr "Quy tắc phát hiện"
+
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -6143,6 +6177,11 @@ msgstr "Tải xuống tệp tin cấu hình"
 msgid "Downtime"
 msgstr "Thời gian down"
 
+#: app/views/monitoring.widget.slareport.view.php:100
+msgctxt "compact table header"
+msgid "Downtime"
+msgstr "Thời gian down"
+
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
 #: include/classes/widgets/CWidgetHelper.php:969
@@ -6204,6 +6243,11 @@ msgstr "Tạo bản sao id người dùng \"%1$s\" trong người dùng cho sơ 
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:1156 include/events.inc.php:289
 #: include/views/configuration.action.edit.php:174
+msgid "Duration"
+msgstr "Khoảng thời gian"
+
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
 msgid "Duration"
 msgstr "Khoảng thời gian"
 
@@ -6635,6 +6679,11 @@ msgstr "Lỗi"
 msgid "Error budget"
 msgstr ""
 
+#: app/views/monitoring.widget.slareport.view.php:101
+msgctxt "compact table header"
+msgid "Error budget"
+msgstr ""
+
 #: include/db.inc.php:518
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
@@ -6771,6 +6820,11 @@ msgstr ""
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
+msgid "Excluded downtimes"
+msgstr ""
+
+#: app/views/monitoring.widget.slareport.view.php:102
+msgctxt "compact table header"
 msgid "Excluded downtimes"
 msgstr ""
 
@@ -6975,6 +7029,11 @@ msgstr ""
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "Đã thất bại"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "Đã thất bại"
 
@@ -8033,6 +8092,12 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "Host"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8118,6 +8183,13 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
+msgid "Host group"
+msgstr "Nhóm host"
+
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
 msgid "Host group"
 msgstr "Nhóm host"
 
@@ -9702,6 +9774,12 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:228
 #: include/views/configuration.triggers.edit.php:430
 #: include/views/configuration.triggers.list.php:200
+msgid "Info"
+msgstr "Thông tin"
+
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
 msgid "Info"
 msgstr "Thông tin"
 
@@ -11773,6 +11851,11 @@ msgstr ""
 msgid "Message"
 msgstr "Tin nhắn"
 
+#: app/views/monitoring.widget.actionlog.view.php:44
+msgctxt "compact table header"
+msgid "Message"
+msgstr "Tin nhắn"
+
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
 msgstr ""
@@ -12028,6 +12111,11 @@ msgstr "Không gian nhỏ"
 #: app/controllers/CControllerPopupTriggerExpr.php:121
 #: app/views/popup.maintenance.period.php:104
 #: include/classes/helpers/CSlaHelper.php:60 report4.php:165
+msgid "Month"
+msgstr "Tháng"
+
+#: include/classes/helpers/CSlaHelper.php:70
+msgctxt "compact table header"
 msgid "Month"
 msgstr "Tháng"
 
@@ -12289,6 +12377,11 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.list.php:52
 #: include/views/monitoring.sysmap.list.php:71 items.php:46 maintenance.php:40
 #: report2.php:509 sysmaps.php:38 trigger_prototypes.php:37 triggers.php:45
+msgid "Name"
+msgstr "Tên"
+
+#: app/views/monitoring.widget.plaintext.view.php:49
+msgctxt "compact table header"
 msgid "Name"
 msgstr "Tên"
 
@@ -13088,6 +13181,11 @@ msgstr ""
 msgid "Not available"
 msgstr "Không sẵn sàng"
 
+#: app/views/monitoring.widget.hostavail.view.php:38
+msgctxt "compact table header"
+msgid "Not available"
+msgstr "Không sẵn sàng"
+
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
 msgstr "Chưa phân loại"
@@ -13376,6 +13474,11 @@ msgstr "Off"
 msgid "Ok"
 msgstr "Ok"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "Ok"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13516,6 +13619,11 @@ msgstr "Thao tác không có template để hoạt động."
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr ""
 
@@ -14499,6 +14607,12 @@ msgstr "Cấp đặc quyền"
 msgid "Problem"
 msgstr "Vấn đề"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "Vấn đề"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "Vấn đề được tạo"
@@ -14725,6 +14839,11 @@ msgstr "Key file công khai"
 msgid "Quarter"
 msgstr ""
 
+#: include/classes/helpers/CSlaHelper.php:71
+msgctxt "compact table header"
+msgid "Quarter"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
 msgstr ""
@@ -14870,6 +14989,12 @@ msgstr "Vấn đề gần đây"
 msgid "Recipient"
 msgstr "Người nhận"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "Người nhận"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr ""
@@ -14914,6 +15039,11 @@ msgstr "Phục hồi hoạt động"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "Thời gian phục hồi"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "Thời gian phục hồi"
 
@@ -15717,11 +15847,22 @@ msgstr ""
 msgid "SLI"
 msgstr ""
 
+#: app/views/monitoring.widget.slareport.view.php:98
+msgctxt "compact table header"
+msgid "SLI"
+msgstr ""
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
+msgid "SLO"
+msgstr ""
+
+#: app/views/monitoring.widget.slareport.view.php:38
+#: app/views/monitoring.widget.slareport.view.php:97
+msgctxt "compact table header"
 msgid "SLO"
 msgstr ""
 
@@ -16346,6 +16487,11 @@ msgstr ""
 msgid "Service"
 msgstr "Dịch vụ"
 
+#: app/views/monitoring.widget.slareport.view.php:37
+msgctxt "compact table header"
+msgid "Service"
+msgstr "Dịch vụ"
+
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
 #, c-format
@@ -16542,6 +16688,12 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:189
 #: include/views/reports.toptriggers.php:75
 #: include/views/reports.toptriggers.php:86
+msgid "Severity"
+msgstr "Mức độ quan trọng"
+
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
 msgid "Severity"
 msgstr "Mức độ quan trọng"
 
@@ -17094,6 +17246,13 @@ msgstr ""
 msgid "Status"
 msgstr "Trạng thái"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "Trạng thái"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr ""
@@ -17534,6 +17693,11 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
+msgid "Tags"
+msgstr "Thẻ"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
 msgid "Tags"
 msgstr "Thẻ"
 
@@ -18073,6 +18237,12 @@ msgstr "Cho tới"
 msgid "Time"
 msgstr "Thời gian"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "Thời gian"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Thời gian một quy trình Zabbix cụ thể hoặc một nhóm các quy trình (được xác định bởi <type> và <mode>) được chi tiêu theo <state> theo tỷ lệ phần trăm."
@@ -18136,6 +18306,11 @@ msgstr "Hết giờ"
 msgid "Timestamp"
 msgstr "Nhãn thời gian"
 
+#: app/views/monitoring.widget.plaintext.view.php:33
+msgctxt "compact table header"
+msgid "Timestamp"
+msgstr "Nhãn thời gian"
+
 #: app/views/sla.list.php:91
 msgid "Timezone"
 msgstr ""
@@ -18190,6 +18365,11 @@ msgstr ""
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "Tổng cộng"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "Tổng cộng"
 
@@ -18695,6 +18875,12 @@ msgstr ""
 msgid "Type"
 msgstr "Kiểu"
 
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
+msgid "Type"
+msgstr "Kiểu"
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "Kiểu (đầy đủ chi tiết)"
@@ -18951,6 +19137,11 @@ msgstr "Đơn vị"
 msgid "Unknown"
 msgstr "Không rõ"
 
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
+msgid "Unknown"
+msgstr "Không rõ"
+
 #: app/views/reports.auditlog.list.php:119
 msgid "Unknown action"
 msgstr "Hành động không rõ"
@@ -19203,6 +19394,11 @@ msgstr "Các bản đồ ở mức cao hơn"
 #: app/views/monitoring.widget.slareport.view.php:99
 #: app/views/slareport.list.php:165
 #: include/classes/screens/CScreenDiscovery.php:120
+msgid "Uptime"
+msgstr "Thời gian chạy"
+
+#: app/views/monitoring.widget.slareport.view.php:99
+msgctxt "compact table header"
 msgid "Uptime"
 msgstr "Thời gian chạy"
 
@@ -19942,6 +20138,11 @@ msgstr ""
 msgid "Value"
 msgstr "Giá trị"
 
+#: app/views/monitoring.widget.plaintext.view.php:51
+msgctxt "compact table header"
+msgid "Value"
+msgstr "Giá trị"
+
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
 #, c-format
@@ -20298,6 +20499,11 @@ msgstr "Thứ tư"
 msgid "Week"
 msgstr ""
 
+#: include/classes/helpers/CSlaHelper.php:69
+msgctxt "compact table header"
+msgid "Week"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/popup.maintenance.period.php:77 app/views/popup.sla.edit.php:75
@@ -20392,6 +20598,11 @@ msgstr ""
 msgid "With problems"
 msgstr "Các vấn đề"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "Các vấn đề"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr ""
@@ -20405,6 +20616,11 @@ msgid "Without data"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "Ngoài các vấn đề"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "Ngoài các vấn đề"
 
@@ -20596,6 +20812,11 @@ msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:122
 #: include/classes/helpers/CSlaHelper.php:62 report4.php:118 report4.php:154
+msgid "Year"
+msgstr "Năm"
+
+#: include/classes/helpers/CSlaHelper.php:72
+msgctxt "compact table header"
 msgid "Year"
 msgstr "Năm"
 

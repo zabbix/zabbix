@@ -336,12 +336,10 @@ svg a {
     top: 0;
     left: 0;
     transition: left .2s, top .2s; }
-    .sortable .sortable-list .sortable-item {
+    .sortable .sortable-list .sortable-item:not(.sortable-dragging) {
       transition: left .2s, top .2s; }
   .sortable.sortable-dragging .sortable-item {
     position: absolute; }
-    .sortable.sortable-dragging .sortable-item.sortable-dragging {
-      display: none; }
 
 html,
 body {
@@ -1719,11 +1717,17 @@ form.dashboard-grid-widget-svggraph .list-vertical-accordion {
   position: relative;
   margin-left: 15px;
   padding-left: 0; }
+  form.dashboard-grid-widget-svggraph .list-vertical-accordion.sortable {
+    overflow: visible;
+    margin-top: -5px;
+    margin-bottom: -5px; }
   form.dashboard-grid-widget-svggraph .list-vertical-accordion .list-accordion-item-head {
     padding: 0; }
 form.dashboard-grid-widget-svggraph .list-accordion-item {
   position: relative;
-  margin-bottom: 10px; }
+  width: 100%;
+  padding: 5px 0;
+  list-style-type: none; }
   form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
     content: ' ';
     position: absolute;
@@ -1802,7 +1806,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   line-height: 18px;
   overflow: hidden; }
   .expandable-subfilter.ten-lines {
-    max-height: calc(18px * 10); }
+    max-height: calc(20px * 10); }
   .expandable-subfilter > div {
     display: inline; }
   .expandable-subfilter .hidden {
@@ -2588,7 +2592,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
 
 .subfilter {
   margin-right: 10px;
-  white-space: nowrap; }
+  white-space: nowrap;
+  line-height: 14px;
+  height: 16px;
+  margin-bottom: 2px; }
 
 .subfilter-enabled {
   background-color: #333333;
@@ -2815,7 +2822,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 14px;
-  color: #ffffff;
+  color: #555555;
   border-bottom: 1px solid #888888;
   background: #333333; }
 .toc .toc-arrow {
@@ -3336,6 +3343,8 @@ form.is-loading {
     .list-table.sticky-footer tfoot tr:first-of-type td, .list-table.sticky-footer tfoot tr:first-of-type th {
       border-top: 2px solid #7b7b7b;
       border-bottom: 0; }
+  .list-table td .checkbox-radio + label span {
+    top: -2px; }
 
 .table-paging {
   text-align: center;
@@ -3793,6 +3802,10 @@ form.is-loading {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
+    .table-forms .table-forms-td-right .checkbox-radio + label span {
+      top: -1px; }
+    .table-forms .table-forms-td-right .checkbox-list .checkbox-radio + label span {
+      top: -3px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -3870,11 +3883,13 @@ input {
     color: #000000 !important; }
 
 textarea {
+  margin: 0;
+  padding: 4px 5px;
+  overflow: auto;
   font-family: Arial, Tahoma, Verdana, sans-serif;
   font-size: 1em;
-  padding: 4px 5px;
-  margin: 0;
-  overflow: auto; }
+  line-height: normal;
+  vertical-align: top; }
   textarea[readonly] {
     color: #000000 !important; }
     textarea[readonly]:focus {
@@ -3891,7 +3906,8 @@ select {
   select[multiple] {
     padding: 4px 5px;
     width: 300px;
-    height: 150px; }
+    height: 150px;
+    vertical-align: top; }
     select[multiple] option {
       padding: 0; }
   select[readonly] {
@@ -3903,7 +3919,7 @@ select {
 
 .form-input-margin {
   display: inline-block;
-  margin: 0 4px 0 0; }
+  margin: 0 3px 0 0; }
 
 .checkbox-radio {
   position: absolute !important;
@@ -3956,8 +3972,9 @@ select {
     display: inline-block;
     width: 14px;
     height: 14px;
-    margin: -4px 4px 0 0;
-    bottom: -3px;
+    margin-right: 4px;
+    top: -2px;
+    vertical-align: middle;
     border: 1px solid #888888;
     background-color: #ffffff; }
     .checkbox-radio + label span:active {
@@ -4422,6 +4439,10 @@ button {
       color: #ffffff;
       background-color: #333333;
       border-bottom: 0; }
+
+.calendar-control .icon-cal {
+  position: relative;
+  top: -1px; }
 
 .header-kioskmode-controls {
   position: fixed;
@@ -5286,7 +5307,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .svg-graph-preview {
   margin-top: 10px;
-  width: 1080px;
+  min-width: 1120px;
   height: 300px;
   position: relative; }
   .svg-graph-preview > div {
@@ -5843,19 +5864,23 @@ span.is-loading {
 
 .dashboard-grid-widget-content, div.dashboard-grid-widget-item, .msg-details ul, z-select button.focusable,
 .z-select button.focusable, z-select .list,
-.z-select .list, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .overflow-table {
+.z-select .list, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .overflow-table, .import-compare .toc,
+.import-compare .diff {
   scrollbar-width: thin; }
   .dashboard-grid-widget-content::-webkit-scrollbar, div.dashboard-grid-widget-item::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
   .z-select button.focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
-  .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
+  .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
+  .import-compare .diff::-webkit-scrollbar {
     width: 9px; }
   .dashboard-grid-widget-content::-webkit-scrollbar-track, div.dashboard-grid-widget-item::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
   .z-select button.focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
-  .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
+  .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
+  .import-compare .diff::-webkit-scrollbar-track {
     background-color: #999999; }
   .dashboard-grid-widget-content::-webkit-scrollbar-thumb, div.dashboard-grid-widget-item::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
   .z-select button.focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
-  .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
+  .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
+  .import-compare .diff::-webkit-scrollbar-thumb {
     background-color: #f9f9f9;
     border: 1px solid #adadad; }
 
@@ -6148,7 +6173,8 @@ svg {
 .preprocessing-list {
   display: block;
   max-width: 930px;
-  min-width: 800px; }
+  min-width: 800px;
+  position: relative; }
   .preprocessing-list > li {
     display: block;
     position: relative; }
@@ -7092,7 +7118,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .import-compare {
   display: flex;
-  max-height: calc(100vh - 190px); }
+  max-height: calc(100vh - 220px); }
   .import-compare .toc {
     flex: 20%;
     overflow-y: auto;

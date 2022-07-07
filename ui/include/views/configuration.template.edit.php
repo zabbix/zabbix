@@ -192,7 +192,8 @@ $tabs->addTab('macroTab', _('Macros'),
 			->setModern(true)
 		)
 		->addRow(null, new CPartial($tmpl, [
-			'macros' => $data['macros']
+			'macros' => $data['macros'],
+			'readonly' => $data['readonly']
 		]), 'macros_container'),
 	TAB_INDICATOR_MACROS
 );

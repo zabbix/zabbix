@@ -119,6 +119,7 @@ zbx_host_template_link_type;
 #define ZBX_ITEM_SSL_CERT_FILE_LEN_MAX		(ZBX_ITEM_SSL_CERT_FILE_LEN + 1)
 #define ZBX_ITEM_SSL_KEY_FILE_LEN		255
 #define ZBX_ITEM_SSL_KEY_FILE_LEN_MAX		(ZBX_ITEM_SSL_KEY_FILE_LEN + 1)
+
 #if defined(HAVE_ORACLE)
 #	define ZBX_ITEM_PARAM_LEN		2048
 #	define ZBX_ITEM_DESCRIPTION_LEN		2048
@@ -134,6 +135,10 @@ zbx_host_template_link_type;
 #define ZBX_ITEM_PARAMETER_NAME_LEN		255
 #define ZBX_ITEM_PARAMETER_VALUE_LEN		2048
 #define ZBX_ITEM_TAG_FIELD_LEN			255
+
+/* common tag/value field lengths for all tags */
+#define ZBX_DB_TAG_NAME_LEN			255
+#define ZBX_DB_TAG_VALUE_LEN			255
 
 #define ZBX_HISTORY_STR_VALUE_LEN		255
 #define ZBX_HISTORY_TEXT_VALUE_LEN		65535
@@ -436,11 +441,11 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
-void	DBextract_version_info(struct zbx_db_version_info_t *version_info);
-void	DBflush_version_requirements(const char *version);
-int	DBcheck_capabilities(zbx_uint32_t db_version);
-
+void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
+void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info);
+void	zbx_db_flush_version_requirements(const char *version);
 #ifdef HAVE_POSTGRESQL
+int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
 char	*zbx_db_get_schema_esc(void);
 #endif
 
@@ -732,21 +737,30 @@ typedef struct
 	char		*tag;
 	char		*value_orig;
 	char		*value;
+	int		automatic;
+	int		automatic_orig;
 #define ZBX_FLAG_DB_TAG_UNSET			__UINT64_C(0x00000000)
-#define ZBX_FLAG_DB_TAG_UPDATE_TAG		__UINT64_C(0x00000001)
+#define ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC	__UINT64_C(0x00000001)
 #define ZBX_FLAG_DB_TAG_UPDATE_VALUE		__UINT64_C(0x00000002)
+#define ZBX_FLAG_DB_TAG_UPDATE_TAG		__UINT64_C(0x00000004)
 #define ZBX_FLAG_DB_TAG_REMOVE			__UINT64_C(0x80000000)
-#define ZBX_FLAG_DB_TAG_UPDATE	(ZBX_FLAG_DB_TAG_UPDATE_TAG | ZBX_FLAG_DB_TAG_UPDATE_VALUE)
+#define ZBX_FLAG_DB_TAG_UPDATE	(ZBX_FLAG_DB_TAG_UPDATE_TAG | ZBX_FLAG_DB_TAG_UPDATE_VALUE|	\
+		ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC)
 	zbx_uint64_t	flags;
 }
 zbx_db_tag_t;
+
+ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
+
+#define ZBX_DB_TAG_NORMAL	0
+#define ZBX_DB_TAG_AUTOMATIC	1
 
 zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value);
 void		zbx_db_tag_free(zbx_db_tag_t *tag);
 int		zbx_db_tag_compare_func(const void *d1, const void *d2);
 int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
 
-ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
+int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, const char *owner, char **error);
 
 typedef enum
 {
@@ -791,5 +805,7 @@ int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint
 void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
+
+int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
 
 #endif /* ZABBIX_DBHIGH_H */

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-06 13:20+0000\n"
+"PO-Revision-Date: 2022-07-01 15:19+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -258,7 +258,7 @@ msgstr "%1$s, 已选择"
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "第 %1$s 个百分位：%2$s"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -294,7 +294,7 @@ msgstr "(仅超级管理员能创建群组)"
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "（由主机自动发现创建）"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
@@ -504,6 +504,11 @@ msgstr "访问服务"
 msgid "Ack"
 msgstr "确认"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "确认"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "确认"
@@ -597,6 +602,11 @@ msgstr "确认已解决的事件"
 msgid "Action"
 msgstr "动作"
 
+#: app/views/monitoring.widget.actionlog.view.php:37
+msgctxt "compact table header"
+msgid "Action"
+msgstr "动作"
+
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
@@ -661,6 +671,11 @@ msgstr "动作已更新"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "动作"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "动作"
 
@@ -874,7 +889,7 @@ msgstr "添加主机"
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
 msgid "Add host trigger"
-msgstr ""
+msgstr "添加主机触发器"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
@@ -1270,7 +1285,7 @@ msgstr "应用权限和标签过滤器到所有分组"
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "将权限应用于所有子组"
 
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.maintenance.list.php:105
@@ -1280,7 +1295,7 @@ msgstr "接近中"
 
 #: include/classes/widgets/CWidgetHelper.php:1443
 msgid "Approximation"
-msgstr ""
+msgstr "近似值"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1411,7 +1426,7 @@ msgstr "必须至少设置一个操作。"
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "必须至少启用一个参数“%1$s”或“%2$s”。"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
@@ -1607,6 +1622,11 @@ msgstr "可用性报表"
 #: app/views/monitoring.widget.hostavail.view.php:58
 #: app/views/monitoring.widget.hostavail.view.php:102
 #: include/classes/html/CHostAvailability.php:80
+msgid "Available"
+msgstr "可用"
+
+#: app/views/monitoring.widget.hostavail.view.php:37
+msgctxt "compact table header"
 msgid "Available"
 msgstr "可用"
 
@@ -1962,7 +1982,7 @@ msgstr "无法添加主机"
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "无法添加主机组"
 
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
@@ -2046,7 +2066,7 @@ msgstr "无法添加模板"
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "无法添加模板组"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2309,7 +2329,7 @@ msgstr[0] "无法删除主机 %1$s 因为维护 \"%2$s\" 必须包含至少一�
 #: app/controllers/CControllerHostGroupDelete.php:75
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
-msgstr[0] ""
+msgstr[0] "无法删除主机组"
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
@@ -2320,7 +2340,7 @@ msgstr[0] "无法删除主机组 %1$s 因为维护 \"%2$s\" 必须包含至少�
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
-msgstr ""
+msgstr "无法删除主机组"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2434,7 +2454,7 @@ msgstr "无法删除模板"
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
-msgstr[0] ""
+msgstr[0] "无法删除模板组"
 
 #: include/classes/api/services/CGraphPrototype.php:374
 msgid "Cannot delete templated graph prototype."
@@ -2991,7 +3011,7 @@ msgstr "无法获取响应, 检查与Zabbix服务器 \"%1$s\" 的连接."
 #: app/controllers/CControllerPopupMassupdateHost.php:362
 #, c-format
 msgid "Cannot remove the tag with name \"%1$s\" and value \"%2$s\", defined in a host prototype, from host \"%3$s\"."
-msgstr ""
+msgstr "无法从主机“%3$s”中删除在主机原型中定义的名称为“%1$s”且值为“%2$s”的标签。"
 
 #: include/classes/api/services/CUser.php:556
 msgid "Cannot rename guest user."
@@ -3271,7 +3291,7 @@ msgstr "无法更新主机的加密设置，配置两端的设置规则不正确
 #: app/controllers/CControllerHostGroupUpdate.php:43
 #: app/controllers/CControllerHostGroupUpdate.php:105
 msgid "Cannot update host group"
-msgstr ""
+msgstr "无法更新主机组"
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:341
 msgid "Cannot update host prototype"
@@ -3403,7 +3423,7 @@ msgstr "无法更新模板"
 #: app/controllers/CControllerTemplateGroupUpdate.php:41
 #: app/controllers/CControllerTemplateGroupUpdate.php:94
 msgid "Cannot update template group"
-msgstr ""
+msgstr "无法更新模板组"
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:351
 msgid "Cannot update templates"
@@ -3690,6 +3710,10 @@ msgstr "不允许循环模板链接。"
 msgid "Class %1$s not found for action %2$s."
 msgstr "在动作%2$s未在分组%1$s中找到。"
 
+#: include/classes/core/ZBase.php:563
+msgid "Class not found."
+msgstr "未找到分类。"
+
 #: include/views/configuration.httpconf.list.php:221
 #: include/views/configuration.item.list.php:301
 msgid "Clear history"
@@ -3964,7 +3988,7 @@ msgstr "配置主机"
 
 #: app/controllers/CControllerHostGroupEdit.php:89
 msgid "Configuration of host group"
-msgstr ""
+msgstr "主机组配置"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
@@ -4034,11 +4058,11 @@ msgstr "配置脚本"
 
 #: app/controllers/CControllerTemplateGroupEdit.php:88
 msgid "Configuration of template group"
-msgstr ""
+msgstr "模板组配置"
 
 #: app/controllers/CControllerTemplateGroupList.php:123
 msgid "Configuration of template groups"
-msgstr ""
+msgstr "模板组配置"
 
 #: templates.php:27
 msgid "Configuration of templates"
@@ -4100,7 +4124,7 @@ msgstr "确认文字"
 
 #: app/views/popup.acknowledge.edit.php:114
 msgid "Confirms the problem is noticed (acknowledging user will be recorded). Status change triggers action update operation."
-msgstr ""
+msgstr "确认发现问题（确认用户将被记录）。状态改变将触发动作更新相应操作。"
 
 #: include/classes/setup/CSetupWizard.php:907
 msgid "Congratulations! You have successfully installed Zabbix frontend."
@@ -4575,7 +4599,7 @@ msgstr "创建模板"
 #: app/views/configuration.templategroup.list.php:33
 #: app/views/configuration.templategroup.list.php:35
 msgid "Create template group"
-msgstr ""
+msgstr "创建模板组"
 
 #: include/views/configuration.triggers.list.php:153 jsLoader.php:357
 msgid "Create trigger"
@@ -4623,7 +4647,7 @@ msgstr "创建 Web 场景（首先选择主机）"
 
 #: include/views/configuration.httpconf.list.php:108
 msgid "Create web scenario (select template first)"
-msgstr "创建 Web 场景(先选择模板)"
+msgstr "创建 Web 场景(首先选择模板)"
 
 #: app/partials/service.list.edit.php:57 app/partials/service.list.php:54
 #: app/views/administration.token.list.php:137
@@ -5008,6 +5032,11 @@ msgstr "日期和时间函数"
 msgid "Day"
 msgstr "日"
 
+#: include/classes/helpers/CSlaHelper.php:68
+msgctxt "compact table header"
+msgid "Day"
+msgstr "日"
+
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
 msgstr "前天"
@@ -5034,7 +5063,7 @@ msgstr "天数"
 
 #: app/views/popup.acknowledge.edit.php:102
 msgid "Deactivates manual suppression."
-msgstr ""
+msgstr "停用手动抑制。"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:391
 msgid "Debug"
@@ -5085,7 +5114,7 @@ msgstr "必须指定默认 LDAP 服务器。"
 
 #: app/views/administration.userrole.edit.php:123
 msgid "Default access to new UI elements"
-msgstr "默认访问新的UI元素"
+msgstr "默认访问新的界面元素"
 
 #: app/views/administration.userrole.edit.php:343
 msgid "Default access to new actions"
@@ -5347,7 +5376,7 @@ msgstr "删除所选的群组?"
 #: app/views/js/configuration.hostgroup.list.js.php:104
 #: app/views/popup.hostgroup.edit.php:50
 msgid "Delete selected host group?"
-msgstr ""
+msgstr "删除选定的主机组？"
 
 #: include/views/configuration.hostgroups.list.php:205
 msgid "Delete selected host groups?"
@@ -5445,11 +5474,11 @@ msgstr "删除所选形状？"
 #: app/views/js/configuration.templategroup.list.js.php:70
 #: app/views/popup.templategroup.edit.php:50
 msgid "Delete selected template group?"
-msgstr ""
+msgstr "删除选定的模板组？"
 
 #: app/views/js/configuration.templategroup.list.js.php:69
 msgid "Delete selected template groups?"
-msgstr ""
+msgstr "删除选定的模板组？"
 
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
@@ -5556,7 +5585,7 @@ msgstr "已弃用"
 #: include/classes/validators/CApiInputValidator.php:1302
 #, c-format
 msgid "Deprecated parameter \"%1$s\" cannot be used with \"%2$s\"."
-msgstr ""
+msgstr "将被弃用的参数“%1$s”不能与“%2$s”一起使用。"
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -5928,6 +5957,11 @@ msgstr "发现 VMware 虚拟机，<url> - VMware 服务 URL。返回 JSON"
 msgid "Discovery rule"
 msgstr "自动发现规则"
 
+#: app/views/monitoring.widget.discovery.view.php:33
+msgctxt "compact table header"
+msgid "Discovery rule"
+msgstr "自动发现规则"
+
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -6026,7 +6060,7 @@ msgstr "显示图表"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:436
 msgid "Display min/max/avg"
-msgstr ""
+msgstr "显示最小值/最大值/平均值"
 
 #: include/views/monitoring.sysmap.edit.php:152
 msgid "Display problems"
@@ -6149,6 +6183,11 @@ msgstr "下载配置文件"
 msgid "Downtime"
 msgstr "断线时间"
 
+#: app/views/monitoring.widget.slareport.view.php:100
+msgctxt "compact table header"
+msgid "Downtime"
+msgstr "断线时间"
+
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
 #: include/classes/widgets/CWidgetHelper.php:969
@@ -6210,6 +6249,11 @@ msgstr "用户ID \"%1$s\" 与 \"%2$s\" 冲突"
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:1156 include/events.inc.php:289
 #: include/views/configuration.action.edit.php:174
+msgid "Duration"
+msgstr "持续时间"
+
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
 msgid "Duration"
 msgstr "持续时间"
 
@@ -6641,6 +6685,11 @@ msgstr "错误"
 msgid "Error budget"
 msgstr "误差范围"
 
+#: app/views/monitoring.widget.slareport.view.php:101
+msgctxt "compact table header"
+msgid "Error budget"
+msgstr "误差范围"
+
 #: include/db.inc.php:518
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
@@ -6777,6 +6826,11 @@ msgstr "排除停机时间"
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
+msgid "Excluded downtimes"
+msgstr "排除停机时间"
+
+#: app/views/monitoring.widget.slareport.view.php:102
+msgctxt "compact table header"
 msgid "Excluded downtimes"
 msgstr "排除停机时间"
 
@@ -6981,6 +7035,11 @@ msgstr "故障转移延迟：%1$s"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "已失败"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "已失败"
 
@@ -7241,11 +7300,11 @@ msgstr "首"
 #: app/controllers/CControllerPopupTriggerExpr.php:268
 #: app/controllers/CControllerPopupTriggerExpr.php:297
 msgid "Fit"
-msgstr "适合"
+msgstr "曲线拟合"
 
 #: include/views/js/monitoring.sysmaps.js.php:117
 msgid "Fit to map"
-msgstr "调整至符合拓扑图"
+msgstr "调整至拓扑图"
 
 #: include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:255
@@ -7464,12 +7523,12 @@ msgstr "转到 \"%1$s\""
 
 #: include/classes/helpers/CPagerHelper.php:188
 msgid "Go to first page"
-msgstr "跳转到第一页"
+msgstr "返回首页"
 
 #: include/classes/helpers/CPagerHelper.php:233
 #, c-format
 msgid "Go to last page, %1$s"
-msgstr "跳转到最后一页，%1$s"
+msgstr "跳转到尾页，%1$s"
 
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
@@ -8040,6 +8099,12 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "主机"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "主机"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8057,7 +8122,7 @@ msgstr "主机 \"%1$s\" 没有设置主机组"
 #: include/classes/api/services/CProxy.php:448
 #, c-format
 msgid "Host \"%1$s\" is monitored by proxy \"%2$s\"."
-msgstr "主机 \"%1$s\" 是由agent代理程序 \"%2$s\" 监控的."
+msgstr "主机 \"%1$s\" 是由proxy  \"%2$s\" 监控的。"
 
 #: include/actions.inc.php:55
 msgid "Host IP"
@@ -8128,6 +8193,13 @@ msgstr "主机图形"
 msgid "Host group"
 msgstr "主机群组"
 
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
+msgid "Host group"
+msgstr "主机群组"
+
 #: include/classes/api/services/CHostGroup.php:760
 #, c-format
 msgid "Host group \"%1$s\" already exists."
@@ -8141,7 +8213,7 @@ msgstr "主机群组“%1$s”不能被删除，因为它被用于全局脚本"
 #: include/classes/api/services/CHostGroup.php:631
 #, c-format
 msgid "Host group \"%1$s\" is group for discovered hosts and cannot be deleted."
-msgstr ""
+msgstr "主机组“%1$s”属于自动发现的主机组，无法手动删除。"
 
 #: include/classes/api/services/CHostGroup.php:642
 #, c-format
@@ -8150,12 +8222,12 @@ msgstr "主机群组 \"%1$s\" 为内建的且不能被删除"
 
 #: app/controllers/CControllerHostGroupCreate.php:62
 msgid "Host group added"
-msgstr ""
+msgstr "主机组已添加"
 
 #: app/controllers/CControllerHostGroupDelete.php:60
 msgid "Host group deleted"
 msgid_plural "Host groups deleted"
-msgstr[0] ""
+msgstr[0] "主机组已删除"
 
 #: include/views/js/monitoring.sysmaps.js.php:109
 msgid "Host group elements"
@@ -8167,7 +8239,7 @@ msgstr "主机群组标签类型"
 
 #: app/controllers/CControllerHostGroupUpdate.php:97
 msgid "Host group updated"
-msgstr ""
+msgstr "主机组已更新"
 
 #: include/classes/api/services/CDashboardGeneral.php:560
 #: include/classes/api/services/CScript.php:814
@@ -8265,7 +8337,7 @@ msgstr "主机网络"
 
 #: app/views/administration.usergroup.edit.php:274
 msgid "Host permissions"
-msgstr ""
+msgstr "主机权限"
 
 #: app/controllers/CControllerAuditLogList.php:221
 #: app/views/popup.lldoperation.php:54
@@ -9104,7 +9176,7 @@ msgstr "接口的值不正确"
 #: include/classes/api/services/CHost.php:2241
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
-msgstr "主机名称 \"%1$s\" 使用了不支持的字符串。"
+msgstr "主机名称 \"%1$s\" 中有不支持的字符。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1805
 #, c-format
@@ -9673,7 +9745,7 @@ msgstr "增长"
 #: app/views/popup.acknowledge.edit.php:90 include/actions.inc.php:1774
 #: include/actions.inc.php:2216 include/html.inc.php:978
 msgid "Indefinitely"
-msgstr ""
+msgstr "无限期"
 
 #: app/views/popup.tophosts.column.edit.php:152
 msgid "Indicators"
@@ -9709,6 +9781,12 @@ msgstr "无穷"
 #: include/views/configuration.triggers.edit.php:228
 #: include/views/configuration.triggers.edit.php:430
 #: include/views/configuration.triggers.list.php:200
+msgid "Info"
+msgstr "信息"
+
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
 msgid "Info"
 msgstr "信息"
 
@@ -10412,7 +10490,7 @@ msgstr "监控项在“不支持”的状态"
 
 #: include/classes/widgets/views/js/widget.svggraph.form.view.js.php:268
 msgid "Item list"
-msgstr ""
+msgstr "项目列表"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1564
 msgid "Item not selected"
@@ -10420,7 +10498,7 @@ msgstr "项目未被选择"
 
 #: include/classes/widgets/views/js/widget.svggraph.form.view.js.php:262
 msgid "Item pattern"
-msgstr ""
+msgstr "项目图案"
 
 #: include/classes/api/services/CItemGeneral.php:1254
 #, c-format
@@ -10871,7 +10949,7 @@ msgstr "最近一小时"
 #: include/classes/widgets/CWidgetHelper.php:1373
 msgctxt "missing data function"
 msgid "Last known"
-msgstr ""
+msgstr "最后已知"
 
 #: jsLoader.php:378
 msgid "Last month graph"
@@ -11414,12 +11492,12 @@ msgstr "手动执行主机操作"
 
 #: app/views/popup.acknowledge.edit.php:83
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
-msgstr ""
+msgstr "手动问题抑制。日期时间可输入相对和绝对时间格式。"
 
 #: include/html.inc.php:1009
 #, c-format
 msgid "Manually by: %1$s"
-msgstr ""
+msgstr "手动：%1$s"
 
 #: include/actions.inc.php:2070
 msgid "Manually closed"
@@ -11780,6 +11858,11 @@ msgstr "菜单路径"
 msgid "Message"
 msgstr "消息"
 
+#: app/views/monitoring.widget.actionlog.view.php:44
+msgctxt "compact table header"
+msgid "Message"
+msgstr "消息"
+
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
 msgstr "消息格式"
@@ -12035,6 +12118,11 @@ msgstr "等宽字体"
 #: app/controllers/CControllerPopupTriggerExpr.php:121
 #: app/views/popup.maintenance.period.php:104
 #: include/classes/helpers/CSlaHelper.php:60 report4.php:165
+msgid "Month"
+msgstr "月"
+
+#: include/classes/helpers/CSlaHelper.php:70
+msgctxt "compact table header"
 msgid "Month"
 msgstr "月"
 
@@ -12299,6 +12387,11 @@ msgstr "NTLM"
 msgid "Name"
 msgstr "名称"
 
+#: app/views/monitoring.widget.plaintext.view.php:49
+msgctxt "compact table header"
+msgid "Name"
+msgstr "名称"
+
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
 #: app/views/administration.user.list.php:108
@@ -12440,7 +12533,7 @@ msgstr "添加主机"
 #: app/views/configuration.hostgroup.edit.php:52
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
-msgstr ""
+msgstr "新建主机组"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -12465,7 +12558,7 @@ msgstr "添加标签名"
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
-msgstr ""
+msgstr "新建模板组"
 
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
@@ -12668,7 +12761,7 @@ msgstr "要执行的动作的库存模式没有被设定。"
 
 #: include/classes/widgets/CWidgetHelper.php:1240
 msgid "No item selected."
-msgstr ""
+msgstr "未选择。"
 
 #: include/items.inc.php:742
 #, c-format
@@ -13068,7 +13161,7 @@ msgstr "并非所有模板都链接到“%1$s”。"
 #: include/classes/api/services/CUserMacro.php:569
 #, c-format
 msgid "Not allowed to modify automatic user macro \"%1$s\"."
-msgstr ""
+msgstr "不允许修改用户宏“%1$s”。"
 
 #: include/classes/api/services/CUser.php:577
 msgid "Not allowed to set language for user \"guest\"."
@@ -13092,6 +13185,11 @@ msgstr "未经授权。"
 #: app/views/monitoring.widget.hostavail.view.php:62
 #: app/views/monitoring.widget.hostavail.view.php:103
 #: include/classes/html/CHostAvailability.php:81
+msgid "Not available"
+msgstr "不可用"
+
+#: app/views/monitoring.widget.hostavail.view.php:38
+msgctxt "compact table header"
 msgid "Not available"
 msgstr "不可用"
 
@@ -13154,7 +13252,7 @@ msgstr "可用 DS 路径的数量，<url> - VMware 服务 URL，<uuid> - VMware 
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:463
 msgid "Number of columns"
-msgstr ""
+msgstr "列数"
 
 #: include/classes/data/CItemData.php:882
 msgid "Number of currently open file descriptors. Returns integer"
@@ -13383,6 +13481,11 @@ msgstr "关"
 msgid "Ok"
 msgstr "正常"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "正常"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13523,6 +13626,11 @@ msgstr "操作无对应的模板。"
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr "操作数据"
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr "操作数据"
 
@@ -14000,7 +14108,7 @@ msgstr "参数 \"%1$s\" 已被弃用。"
 #: include/classes/api/services/CTemplateGroup.php:1226
 #, c-format
 msgid "Parameter \"%1$s\" must be enabled."
-msgstr ""
+msgstr "必须启用参数“%1$s”。"
 
 #: app/views/administration.mediatype.edit.php:213
 #: app/views/administration.script.edit.php:181
@@ -14144,7 +14252,7 @@ msgstr "图案"
 
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
-msgstr "暂停操作以制止问题"
+msgstr "针对被抑制的问题暂停操作"
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -14506,6 +14614,12 @@ msgstr "优先权层级"
 msgid "Problem"
 msgstr "问题"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "问题"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "问题已创建"
@@ -14549,7 +14663,7 @@ msgstr "问题已解决"
 
 #: app/views/administration.usergroup.edit.php:275
 msgid "Problem tag filter"
-msgstr ""
+msgstr "问题标签过滤器"
 
 #: app/views/popup.service.edit.php:59 app/views/popup.service.edit.php:269
 #: app/views/popup.services.php:62
@@ -14732,6 +14846,11 @@ msgstr "公钥文件"
 msgid "Quarter"
 msgstr "季"
 
+#: include/classes/helpers/CSlaHelper.php:71
+msgctxt "compact table header"
+msgid "Quarter"
+msgstr "季"
+
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
 msgstr "季度"
@@ -14877,6 +14996,12 @@ msgstr "最近的问题"
 msgid "Recipient"
 msgstr "接收者"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "接收者"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr "收件人已经存在。"
@@ -14921,6 +15046,11 @@ msgstr "恢复操作"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "恢复时间"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "恢复时间"
 
@@ -15154,7 +15284,7 @@ msgstr "移除"
 #: app/partials/hostmacros.inherited.list.html.php:121
 msgctxt "verb"
 msgid "Remove"
-msgstr ""
+msgstr "移除"
 
 #: app/partials/massupdate.macros.tab.php:127
 #: app/partials/massupdate.valuemaps.tab.php:98
@@ -15292,7 +15422,7 @@ msgstr "请求正文"
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.prototype.edit.php:340
 msgid "Request body type"
-msgstr "请求 body 类型"
+msgstr "请求正文类型"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:71
 msgid "Request created successfully"
@@ -15555,7 +15685,7 @@ msgstr "返回ICMP ping包丢失的百分数."
 #: app/partials/hostmacros.inherited.list.html.php:105
 #: app/partials/hostmacros.list.html.php:77 jsLoader.php:331
 msgid "Revert"
-msgstr ""
+msgstr "恢复"
 
 #: include/classes/html/CMacroValue.php:94
 msgid "Revert changes"
@@ -15724,11 +15854,22 @@ msgstr "ID 为“%1$s”的 SLA 不可用。"
 msgid "SLI"
 msgstr "SLI"
 
+#: app/views/monitoring.widget.slareport.view.php:98
+msgctxt "compact table header"
+msgid "SLI"
+msgstr "SLI"
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
+msgid "SLO"
+msgstr "SLO"
+
+#: app/views/monitoring.widget.slareport.view.php:38
+#: app/views/monitoring.widget.slareport.view.php:97
+msgctxt "compact table header"
 msgid "SLO"
 msgstr "SLO"
 
@@ -16353,6 +16494,11 @@ msgstr "服务器"
 msgid "Service"
 msgstr "服务"
 
+#: app/views/monitoring.widget.slareport.view.php:37
+msgctxt "compact table header"
+msgid "Service"
+msgstr "服务"
+
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
 #, c-format
@@ -16548,6 +16694,12 @@ msgstr "设置"
 #: include/views/configuration.triggers.list.php:189
 #: include/views/reports.toptriggers.php:75
 #: include/views/reports.toptriggers.php:86
+msgid "Severity"
+msgstr "严重性"
+
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
 msgid "Severity"
 msgstr "严重性"
 
@@ -16787,7 +16939,7 @@ msgstr "简单图形"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:168
 msgid "Simple triggers"
-msgstr ""
+msgstr "简单触发器"
 
 #: include/views/configuration.trigger.prototype.edit.php:507
 #: include/views/configuration.triggers.edit.php:536
@@ -17100,6 +17252,13 @@ msgstr "Zabbix 写缓存的统计和可用性。缓存 - 值之一（模式：al
 msgid "Status"
 msgstr "状态"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "状态"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr "状态计算规则"
@@ -17313,19 +17472,19 @@ msgstr "支持的宏："
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:101
 #: app/views/popup.acknowledge.edit.php:82
 msgid "Suppress"
-msgstr ""
+msgstr "抑制"
 
 #: include/classes/helpers/CRoleHelper.php:471
 msgid "Suppress problems"
-msgstr ""
+msgstr "抑制问题"
 
 #: include/actions.inc.php:1761
 msgid "Suppress until"
-msgstr ""
+msgstr "抑制到"
 
 #: include/actions.inc.php:1771 include/classes/screens/CScreenProblem.php:1259
 msgid "Suppressed"
-msgstr ""
+msgstr "抑制"
 
 #: include/html.inc.php:973
 #, c-format
@@ -17543,6 +17702,11 @@ msgstr "标签值"
 msgid "Tags"
 msgstr "标记"
 
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
+msgid "Tags"
+msgstr "标记"
+
 #: include/views/configuration.copy.elements.php:69
 #: include/views/configuration.trigger.prototype.edit.php:202
 #: include/views/configuration.trigger.prototype.edit.php:401
@@ -17591,7 +17755,7 @@ msgstr "模板 \"%1$s\" 不能没有主机组。"
 #: include/classes/api/services/CTemplateGroup.php:942
 #, c-format
 msgid "Template \"%1$s\" cannot be without template group."
-msgstr ""
+msgstr "模板“%1$s”必须选择模板组。"
 
 #: include/classes/import/importers/CHostImporter.php:54
 #, c-format
@@ -17629,25 +17793,25 @@ msgstr "模板群组"
 #: include/classes/api/services/CTemplateGroup.php:540
 #, c-format
 msgid "Template group \"%1$s\" already exists."
-msgstr ""
+msgstr "模板组“%1$s”已存在。"
 
 #: app/controllers/CControllerTemplateGroupCreate.php:62
 msgid "Template group added"
-msgstr ""
+msgstr "模板组已添加"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:60
 msgid "Template group deleted"
 msgid_plural "Template groups deleted"
-msgstr[0] ""
+msgstr[0] "模板组已删除"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
-msgstr ""
+msgstr "模板组已更新"
 
 #: include/classes/api/services/CUserGroup.php:487
 #, c-format
 msgid "Template group with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "模板组（ID “%1$s”）不可用。"
 
 #: app/controllers/CControllerPopupGeneric.php:197
 #: app/controllers/CControllerPopupImportCompare.php:168
@@ -17665,7 +17829,7 @@ msgstr ""
 #: include/views/configuration.template.list.php:45
 #: include/views/configuration.triggers.list.php:33
 msgid "Template groups"
-msgstr ""
+msgstr "模板组"
 
 #: app/views/popup.import.php:34
 msgid "Template linkage"
@@ -17681,7 +17845,7 @@ msgstr "模版名称"
 
 #: app/views/administration.usergroup.edit.php:273
 msgid "Template permissions"
-msgstr ""
+msgstr "模板权限"
 
 #: report2.php:396
 msgid "Template trigger"
@@ -18079,6 +18243,12 @@ msgstr "直到"
 msgid "Time"
 msgstr "时间"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "时间"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "特定 Zabbix 进程或一组进程（由 <type> 和 <mode> 标识）在 <state> 中花费的时间百分比。"
@@ -18142,6 +18312,11 @@ msgstr "超时"
 msgid "Timestamp"
 msgstr "时间戳"
 
+#: app/views/monitoring.widget.plaintext.view.php:33
+msgctxt "compact table header"
+msgid "Timestamp"
+msgstr "时间戳"
+
 #: app/views/sla.list.php:91
 msgid "Timezone"
 msgstr "时区"
@@ -18196,6 +18371,11 @@ msgstr "前排主机"
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "合计"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "合计"
 
@@ -18577,7 +18757,7 @@ msgstr "触发器示警度"
 
 #: app/views/popup.condition.common.php:228
 msgid "Trigger source"
-msgstr ""
+msgstr "触发源"
 
 #: jsLoader.php:367
 msgid "Trigger status \"OK\""
@@ -18698,6 +18878,12 @@ msgstr "两个或多个字段不能占用相同的空间。"
 #: include/views/js/monitoring.sysmaps.js.php:660
 #: include/views/js/monitoring.sysmaps.js.php:815
 #: include/views/monitoring.sysmap.edit.php:398
+msgid "Type"
+msgstr "类型"
+
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
 msgid "Type"
 msgstr "类型"
 
@@ -18895,7 +19081,7 @@ msgstr "解除锁定所选的用户?"
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
-msgstr ""
+msgstr "撤消问题确认。"
 
 #: include/classes/core/ZBase.php:574
 #, c-format
@@ -18954,6 +19140,11 @@ msgstr "单位"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
+msgid "Unknown"
+msgstr "未知的"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
 msgid "Unknown"
 msgstr "未知的"
 
@@ -19060,22 +19251,22 @@ msgstr "自动发现规则\"%1$s\"的过滤器不支持参数\"%2$s\"."
 
 #: app/views/popup.acknowledge.edit.php:102
 msgid "Unsuppress"
-msgstr ""
+msgstr "未抑制"
 
 #: include/actions.inc.php:1785 include/actions.inc.php:2235
 #: include/classes/screens/CScreenProblem.php:1262
 msgid "Unsuppressed"
-msgstr ""
+msgstr "未抑制"
 
 #: app/views/monitoring.widget.problems.view.php:174 include/blocks.inc.php:668
 #: include/classes/screens/CScreenProblem.php:1026
 #, c-format
 msgid "Unsuppressed by: %1$s"
-msgstr ""
+msgstr "未被抑制：%1$s"
 
 #: app/views/popup.acknowledge.edit.php:91
 msgid "Until"
-msgstr ""
+msgstr "直到"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:98
 #: include/classes/services/CTabFilterProfile.php:95
@@ -19209,6 +19400,11 @@ msgstr "上层拓扑图"
 #: app/views/monitoring.widget.slareport.view.php:99
 #: app/views/slareport.list.php:165
 #: include/classes/screens/CScreenDiscovery.php:120
+msgid "Uptime"
+msgstr "在线时间"
+
+#: app/views/monitoring.widget.slareport.view.php:99
+msgctxt "compact table header"
 msgid "Uptime"
 msgstr "在线时间"
 
@@ -19948,6 +20144,11 @@ msgstr "验证"
 msgid "Value"
 msgstr "ֵ值"
 
+#: app/views/monitoring.widget.plaintext.view.php:51
+msgctxt "compact table header"
+msgid "Value"
+msgstr "ֵ值"
+
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
 #, c-format
@@ -20304,6 +20505,11 @@ msgstr "周三"
 msgid "Week"
 msgstr "星期"
 
+#: include/classes/helpers/CSlaHelper.php:69
+msgctxt "compact table header"
+msgid "Week"
+msgstr "星期"
+
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/popup.maintenance.period.php:77 app/views/popup.sla.edit.php:75
@@ -20398,6 +20604,11 @@ msgstr "带有问题名称"
 msgid "With problems"
 msgstr "异常设备"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "异常设备"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "使用此设置，此列中将仅显示数字项目。"
@@ -20411,6 +20622,11 @@ msgid "Without data"
 msgstr "无数据"
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "正常设备"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "正常设备"
 
@@ -20605,6 +20821,11 @@ msgstr "YYYY-MM-DDThh:mm:ssZ"
 msgid "Year"
 msgstr "年"
 
+#: include/classes/helpers/CSlaHelper.php:72
+msgctxt "compact table header"
+msgid "Year"
+msgstr "年"
+
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93
 msgid "Yearly"
@@ -20669,7 +20890,7 @@ msgstr "您无法切换当前选择的主机。"
 
 #: app/views/popup.generic.php:88
 msgid "You cannot switch templates for current selection."
-msgstr ""
+msgstr "当前所选不能切换模板。"
 
 #: include/classes/api/services/CAuditLog.php:73
 #: include/classes/api/services/CHaNode.php:45
@@ -21110,7 +21331,7 @@ msgstr "avg() - 周期 T 内的平均值"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1053
 msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
-msgstr "baselinedev() - 返回季节数据周期与最后一个数据周期之间的偏差数"
+msgstr "baselinedev() - 返回前几个时间段相同数据周期与最后一个数据周期之间的偏差（stddevpop算法）"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1060
 msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
@@ -21808,7 +22029,7 @@ msgstr "函数“%1$s”中的第六个参数无效"
 
 #: include/classes/validators/CApiInputValidator.php:3078
 msgid "invalid template group name"
-msgstr ""
+msgstr "无效的模板组名称"
 
 #: include/classes/validators/CHistFunctionValidator.php:65
 #, c-format
@@ -21817,7 +22038,7 @@ msgstr "函数“%1$s”中的第三个参数无效"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:101
 msgid "invalid time"
-msgstr ""
+msgstr "无效时间"
 
 #: app/controllers/CControllerWidgetTopHostsView.php:422
 #: include/classes/graphdraw/CLineGraphDraw.php:250
@@ -22177,7 +22398,7 @@ msgstr "没有创建和编辑拓扑图权限"
 
 #: include/classes/api/services/CEvent.php:863
 msgid "no permissions to suppress problems"
-msgstr ""
+msgstr "无权抑制问题"
 
 #: include/classes/api/services/CEvent.php:774
 msgid "no permissions to unacknowledge problems"
@@ -22185,7 +22406,7 @@ msgstr "无权取消已确认的问题"
 
 #: include/classes/api/services/CEvent.php:864
 msgid "no permissions to unsuppress problems"
-msgstr ""
+msgstr "无权取消抑制问题"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:836
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"

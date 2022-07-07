@@ -18,18 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.2.0rc1');
-define('ZABBIX_API_VERSION',	'6.2.0');
-define('ZABBIX_EXPORT_VERSION',	'6.2');
+define('ZABBIX_VERSION',		'6.4.0alpha1');
+define('ZABBIX_API_VERSION',	'6.4.0');
+define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6010097);
+define('ZABBIX_DB_VERSION',		6020000);
 
-define('DB_VERSION_SUPPORTED',				0);
-define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
-define('DB_VERSION_HIGHER_THAN_MAXIMUM',	2);
-define('DB_VERSION_FAILED_TO_RETRIEVE',		3);
-define('DB_VERSION_NOT_SUPPORTED_ERROR',	4);
-define('DB_VERSION_NOT_SUPPORTED_WARNING',	5);
+define('DB_VERSION_SUPPORTED',						0);
+define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
+define('DB_VERSION_HIGHER_THAN_MAXIMUM',			2);
+define('DB_VERSION_FAILED_TO_RETRIEVE',				3);
+define('DB_VERSION_NOT_SUPPORTED_ERROR',			4);
+define('DB_VERSION_NOT_SUPPORTED_WARNING',			5);
+define('DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR',		6);
+define('DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING',	7);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2022');
@@ -155,6 +157,15 @@ define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 
 define('ZBX_DB_EXTENSION_TIMESCALEDB', 'timescaledb');
+
+define('ZBX_EXT_ERR_UNDEFINED',							0);
+define('ZBX_EXT_SUCCEED',								1);
+define('ZBX_TIMESCALEDB_POSTGRES_TOO_OLD',				2);
+define('ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE',	3);
+define('ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM',	4);
+define('ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED',			5);
+define('ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM',	6);
+define('ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY',			7);
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
 
@@ -2059,6 +2070,10 @@ define('ZBX_STYLE_SIGNIN_CONTAINER', 'signin-container');
 define('ZBX_STYLE_SIGNIN_LINKS', 'signin-links');
 define('ZBX_STYLE_SIGNIN_LOGO', 'signin-logo');
 define('ZBX_STYLE_SIGN_IN_TXT', 'sign-in-txt');
+define('ZBX_STYLE_SORTABLE', 'sortable');
+define('ZBX_STYLE_SORTABLE_LIST', 'sortable-list');
+define('ZBX_STYLE_SORTABLE_ITEM', 'sortable-item');
+define('ZBX_STYLE_SORTABLE_DRAG_HANDLE', 'sortable-drag-handle');
 define('ZBX_STYLE_STATUS_AVERAGE_BG', 'status-average-bg');
 define('ZBX_STYLE_STATUS_CONTAINER', 'status-container');
 define('ZBX_STYLE_STATUS_DARK_GREY', 'status-dark-grey');

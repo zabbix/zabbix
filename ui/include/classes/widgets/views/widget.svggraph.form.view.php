@@ -42,7 +42,6 @@ $jq_templates = [];
 $graph_preview = (new CDiv())
 	->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)
 	->addItem((new CDiv())->setId('svg-graph-preview'));
-	// ->addStyle('height: 10px !important; overflow: hidden;'); // FIXME: debug
 
 $form_tabs = (new CTabView())
 	->addTab('data_set',  _('Data set'), getDatasetTab($fields, $jq_templates, $form->getName()),
@@ -66,16 +65,15 @@ $scripts[] = $form_tabs->makeJavascript();
 $form
 	->addItem($form_list)
 	->addItem($graph_preview)
-	// ->addItem((new CDiv())->addStyle('width: 960px;'))	// TODO: debug
-	->addItem($form_tabs)
-	->addItem(
-		(new CScriptTag('
-			widget_svggraph_form.init('.json_encode([
-				'form_id' => $form->getId(),
-				'form_tabs_id' => $form_tabs->getId()
-			]).');
-		'))->setOnDocumentReady()
-	);
+	->addItem($form_tabs);
+
+$scripts[] = '
+	widget_svggraph_form.init('.json_encode([
+		'form_id' => $form->getId(),
+		'form_tabs_id' => $form_tabs->getId(),
+		'color_palette' => CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE
+	]).');
+';
 
 return [
 	'form' => $form,
@@ -111,7 +109,6 @@ function getGraphDataSetItemRow(): string {
 	]))
 		->addClass('sortable')
 		->addClass('single-item-table-row')
-		->setAttribute('data-number', '#{rowNum}')
 		->toString();
 }
 
@@ -127,7 +124,9 @@ function getDatasetTab(array $fields, array &$jq_templates, string $form_name): 
 	return (new CFormGrid())
 		->addItem([
 			CWidgetHelper::getLabel($fields['ds']),
-			new CFormField(CWidgetHelper::getGraphDataSet($fields['ds'], $form_name))
+			(new CFormField(CWidgetHelper::getGraphDataSet($fields['ds'], $form_name)))
+				->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
+			(new CFormField(CWidgetHelper::getGraphDataSetFooter()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
 		]);
 }
 
