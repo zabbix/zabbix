@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 The template to monitor HashiCorp Consul by Zabbix that works without any external scripts.  
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -18,13 +18,18 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Template need to use Authorization via API token.
 
 Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.TOKEN}.  
 Also, see the Macros section for a list of macros used to set trigger values.  
+
+This template support [Consul namespaces](https://www.consul.io/docs/enterprise/namespaces). You can set macro {$CONSUL.NAMESPACE}, if you interested in only one service namespace. Do not specify this macro to get all of services.  
+In case of Open Source version leave this macro empty.
+
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
+*NOTE.* You may be interested in Envoy Proxy by HTTP [template](../envoy_proxy_http).
 
 
 ## Zabbix configuration
@@ -42,6 +47,7 @@ No specific Zabbix configuration is required.
 |{$CONSUL.LLD.FILTER.NODE_NAME.NOT_MATCHES} |<p>Filter to exclude discovered nodes.</p> |`CHANGE IF NEEDED` |
 |{$CONSUL.LLD.FILTER.SERVICE_NAME.MATCHES} |<p>Filter of discoverable discovered services.</p> |`.*` |
 |{$CONSUL.LLD.FILTER.SERVICE_NAME.NOT_MATCHES} |<p>Filter to exclude discovered services.</p> |`CHANGE IF NEEDED` |
+|{$CONSUL.NAMESPACE} |<p>Consul service namespace. Enterprise only, in case of Open Source version leave this macro empty. Do not specify this macro to get all of services.</p> |`` |
 |{$CONSUL.SERVICE_NODES.CRITICAL.MAX.AVG} |<p>Maximum number of service nodes in status 'critical' for trigger expression. Can be used with context.</p> |`0` |
 |{$CONSUL.TOKEN} |<p>Consul auth token.</p> |`<PUT YOUR AUTH TOKEN>` |
 
@@ -66,7 +72,7 @@ There are no template links in this template.
 |Consul |Consul: Nodes: warning |<p>Number of agents on current dc with serf health status 'warning'.</p> |DEPENDENT |consul.nodes_warning<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Status == "warning")].length()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Consul |Consul: Services: total |<p>Number of services on current dc.</p> |DEPENDENT |consul.services_total<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return Object.keys(JSON.parse(value)).length; `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Consul |Consul: Node ["{#NODE_NAME}"]: Serf Health |<p>Node Serf Health Status.</p> |DEPENDENT |consul.serf.health["{#NODE_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Node == "{#NODE_NAME}" && @.CheckID == "serfHealth")].Status.first()`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Consul |Consul: Service ["{#SERVICE_NAME}"]: Nodes passing |<p>-</p> |DEPENDENT |consul.service.nodes_passing["{#SERVICE_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Node == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == 'passing')].length()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Consul |Consul: Service ["{#SERVICE_NAME}"]: Nodes passing |<p>-</p> |DEPENDENT |consul.service.nodes_passing["{#SERVICE_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Service.Service == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == 'passing')].length()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Consul |Consul: Service ["{#SERVICE_NAME}"]: Nodes warning |<p>-</p> |DEPENDENT |consul.service.nodes_warning["{#SERVICE_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Service.Service == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == 'warning')].length()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Consul |Consul: Service ["{#SERVICE_NAME}"]: Nodes critical |<p>-</p> |DEPENDENT |consul.service.nodes_critical["{#SERVICE_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Service.Service == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == 'critical')].length()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Consul cluster |Consul cluster: Cluster leader |<p>Current leader address.</p> |HTTP_AGENT |consul.get_leader<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- TRIM: `"`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
