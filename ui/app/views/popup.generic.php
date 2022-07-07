@@ -392,7 +392,7 @@ switch ($data['popup_type']) {
 				$host = reset($item['hosts']);
 				$item['hostname'] = $host['name'];
 
-				$description = new CLink($item['name'], 'javascript:void(0);');
+				$description = (new CLink($item['name'], 'javascript:void(0);'))->addClass(ZBX_STYLE_WORDBREAK);
 				$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
 
 				$checkbox_key = is_numeric($item[$options['srcfld1']])
