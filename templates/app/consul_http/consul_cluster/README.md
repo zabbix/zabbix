@@ -29,7 +29,7 @@ This template support [Consul namespaces](https://www.consul.io/docs/enterprise/
 In case of Open Source version leave this macro empty.
 
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
-*NOTE.* You may be interested in Envoy Proxy by HTTP [template](../envoy_proxy_http).
+*NOTE.* You maybe are interested in Envoy Proxy by HTTP [template](../envoy_proxy_http).
 
 
 ## Zabbix configuration
