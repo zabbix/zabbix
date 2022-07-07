@@ -1203,7 +1203,11 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 			init_result(request->value.result);
 		}
 		else
-			free_result(request->value.result);
+		{
+			/* preserve eventlog related information */
+			if (ITEM_VALUE_TYPE_LOG != request->value_type)
+				free_result(request->value.result);
+		}
 
 		if (ITEM_STATE_NOTSUPPORTED == request->value.state)
 			request->value.state = ITEM_STATE_NORMAL;
