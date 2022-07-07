@@ -402,9 +402,6 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE		__UINT64_C(0x0000000000000100)
 #define ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED		__UINT64_C(0x0000000000000200)
 
-/* possible values for database extensions (if flag ZBX_CONFIG_FLAGS_DB_EXTENSION set) */
-#define ZBX_CONFIG_DB_EXTENSION_TIMESCALE		"timescaledb"
-
 typedef struct
 {
 	zbx_uint64_t	hostid;
