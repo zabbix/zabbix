@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 The template is developed for monitoring DBMS PostgreSQL and its forks.
 
 
@@ -14,7 +14,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 1\. Create PostgreSQL user for monitoring (`<password>` at your discretion):
 
@@ -95,7 +95,7 @@ There are no template links in this template.
 |PostgreSQL |Archive: Count of files in archive_status need to archive |<p>-</p> |DEPENDENT |pgsql.archive.count_files_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.count_files`</p> |
 |PostgreSQL |Archive: Count of files need to archive |<p>Size of files to archive</p> |DEPENDENT |pgsql.archive.size_files_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.size_files`</p> |
 |PostgreSQL |Dbstat: Blocks read time |<p>Time spent reading data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_read_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_read_time`</p><p>- MULTIPLIER: `0.001`</p> |
-|PostgreSQL |Dbstat: Blocks write time |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_write_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_read_time`</p><p>- MULTIPLIER: `0.001`</p> |
+|PostgreSQL |Dbstat: Blocks write time |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_write_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_write_time`</p><p>- MULTIPLIER: `0.001`</p> |
 |PostgreSQL |Dbstat: Checksum failures |<p>Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled. This metric included in PostgreSQL 12</p> |DEPENDENT |pgsql.dbstat.sum.checksum_failures.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checksum_failures`</p><p>- MATCHES_REGEX: `^\d*$`</p><p>- CHANGE_PER_SECOND</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> -1`</p> |
 |PostgreSQL |Dbstat: Committed transactions |<p>Number of transactions that have been committed</p> |DEPENDENT |pgsql.dbstat.sum.xact_commit.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.xact_commit`</p><p>- CHANGE_PER_SECOND</p> |
 |PostgreSQL |Dbstat: Conflicts |<p>Number of queries canceled due to conflicts with recovery.  (Conflicts occur only on standby servers; see pg_stat_database_conflicts for details.)</p> |DEPENDENT |pgsql.dbstat.sum.conflicts.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.conflicts`</p><p>- CHANGE_PER_SECOND</p> |
