@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-20T11:03:30Z'
+  date: '2022-07-07T21:30:47Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -47,7 +47,7 @@ zabbix_export:
           headers:
             -
               name: X-Consul-Token
-              value: '{$CONSUL.API.TOKEN}'
+              value: '{$CONSUL.TOKEN}'
             -
               name: X-Consul-Namespace
               value: '{$CONSUL.NAMESPACE}'
@@ -74,7 +74,7 @@ zabbix_export:
           headers:
             -
               name: X-Consul-Token
-              value: '{$CONSUL.API.TOKEN}'
+              value: '{$CONSUL.TOKEN}'
             -
               name: X-Consul-Namespace
               value: '{$CONSUL.NAMESPACE}'
@@ -112,7 +112,7 @@ zabbix_export:
           headers:
             -
               name: X-Consul-Token
-              value: '{$CONSUL.API.TOKEN}'
+              value: '{$CONSUL.TOKEN}'
           tags:
             -
               tag: component
@@ -152,7 +152,7 @@ zabbix_export:
           headers:
             -
               name: X-Consul-Token
-              value: '{$CONSUL.API.TOKEN}'
+              value: '{$CONSUL.TOKEN}'
           tags:
             -
               tag: component
@@ -182,7 +182,7 @@ zabbix_export:
           headers:
             -
               name: X-Consul-Token
-              value: '{$CONSUL.API.TOKEN}'
+              value: '{$CONSUL.TOKEN}'
           tags:
             -
               tag: component
@@ -472,7 +472,7 @@ zabbix_export:
               headers:
                 -
                   name: X-Consul-Token
-                  value: '{$CONSUL.API.TOKEN}'
+                  value: '{$CONSUL.TOKEN}'
                 -
                   name: X-Consul-Namespace
                   value: '{$CONSUL.NAMESPACE}'
