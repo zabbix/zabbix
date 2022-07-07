@@ -25,7 +25,7 @@ Template need to use Authorization via API token.
 Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.TOKEN}.  
 Also, see the Macros section for a list of macros used to set trigger values.  
 
-This template support [Consul namespaces](https://www.consul.io/docs/enterprise/namespaces). You can set macro {$CONSUL.NAMESPACE}, if you interested in only one service namespace. Do not specify this macro to get all of services.  
+This template support [Consul namespaces](https://www.consul.io/docs/enterprise/namespaces). You can set macro {$CONSUL.NAMESPACE}, if you are interested in only one service namespace. Do not specify this macro to get all of services.  
 In case of Open Source version leave this macro empty.
 
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
