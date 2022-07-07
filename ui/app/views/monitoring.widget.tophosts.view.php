@@ -24,23 +24,23 @@
  * @var array $data
  */
 
-$headers = [];
+$header = [];
 
 foreach ($data['configuration'] as $column_config) {
 	if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
 		if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
-			$headers[] = (new CColHeader($column_config['name']))->addClass(ZBX_STYLE_CENTER);
+			$header[] = (new CColHeader($column_config['name']))->addClass(ZBX_STYLE_CENTER);
 		}
 		else {
-			$headers[] = (new CColHeader($column_config['name']))->setColSpan(2);
+			$header[] = (new CColHeader($column_config['name']))->setColSpan(2);
 		}
 	}
 	else {
-		$headers[] = $column_config['name'];
+		$header[] = $column_config['name'];
 	}
 }
 
-$table = (new CTableInfo())->setHeader($headers);
+$table = (new CTableInfo())->setHeader($header);
 
 foreach ($data['rows'] as $columns) {
 	$row = [];

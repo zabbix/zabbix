@@ -21,13 +21,19 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 // indicator of sort field
 $sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_UP);
 
 $table = (new CTableInfo())
-	->setHeader([[_('Host group'), $sort_div], _('Ok'), _('Failed'), _('Unknown')])
+	->setHeader([
+		[_x('Host group', 'compact table header'), $sort_div],
+		_x('Ok', 'compact table header'),
+		_x('Failed', 'compact table header'),
+		_x('Unknown', 'compact table header')
+	])
 	->setHeadingColumn(0);
 
 $url = $data['allowed_ui_hosts']

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:33:11Z'
+  date: '2022-07-01T06:44:50Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -325,7 +325,7 @@ zabbix_export:
                     datetime_end_str = datetime_end.toISOString();
             
                 var data = {
-                    "query": "{viewer {zones(filter: {zoneTag: " + Cloudflare.params.zone + "}) {\
+                    "query": "{viewer {zones(filter: {zoneTag: \"" + Cloudflare.params.zone + "\"}) {\
                     httpRequests1hGroups(limit: 100 filter: {\
                         datetime_geq: \"" + datetime_start_str + "\",  datetime_leq: \"" + datetime_end_str + "\"\
                         }) {\
@@ -836,8 +836,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: Bandwidth'
+                        host: 'Cloudflare by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -852,8 +852,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: Web requests'
+                        host: 'Cloudflare by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -868,8 +868,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: DNS requests'
+                        host: 'Cloudflare by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -885,8 +885,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: Caching'
+                        host: 'Cloudflare by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -901,8 +901,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: HTTP responses ratio over time'
+                        host: 'Cloudflare by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -918,8 +918,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: IPs and threats'
+                        host: 'Cloudflare by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   'y': '15'
@@ -934,8 +934,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: HTTP response codes over time'
+                        host: 'Cloudflare by HTTP'
   graphs:
     -
       uuid: 09e113216680490c9dd15805474bcac7

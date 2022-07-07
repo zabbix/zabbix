@@ -1233,8 +1233,7 @@ class CWidgetHelper {
 						->addClass(ZBX_STYLE_NOWRAP)
 				]))
 					->addClass(ZBX_STYLE_SORTABLE)
-					->addClass('single-item-table-row')
-					->setAttribute('data-number', $i + 1);
+					->addClass('single-item-table-row');
 			}
 
 			$empty_msg_block = (new CDiv(_('No item selected.')))->addClass('no-items-message');

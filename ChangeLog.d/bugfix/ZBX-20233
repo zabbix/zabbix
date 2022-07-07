@@ -1,0 +1,1 @@
+A.F....... [ZBX-20233] fixed handling of empty configuration parameters $ZBX_SERVER and $ZBX_SERVER_PORT the same as if they were not defined (Sasha)

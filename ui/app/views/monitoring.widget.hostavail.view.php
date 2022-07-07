@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $type_field_names = [
@@ -31,7 +32,13 @@ $type_field_names = [
 ];
 
 $header = [
-	STYLE_HORIZONTAL => ['', _('Available'), _('Not available'), _('Unknown'), _('Total')],
+	STYLE_HORIZONTAL => [
+		'',
+		_x('Available', 'compact table header'),
+		_x('Not available', 'compact table header'),
+		_x('Unknown', 'compact table header'),
+		_x('Total', 'compact table header')
+	],
 	STYLE_VERTICAL => ['']
 ];
 
