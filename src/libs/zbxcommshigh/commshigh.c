@@ -20,10 +20,8 @@
 #include "zbxcommshigh.h"
 
 #include "common.h"
-#include "base64.h"
 #include "zbxjson.h"
 #include "log.h"
-#include "zbxxml.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32)
 #include "zbxnix.h"
@@ -341,97 +339,6 @@ int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error)
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-int	zbx_commshigh_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
-		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
-		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
-		char *severity, size_t severity_len)
-{
-	int	i, ret = SUCCEED;
-	char	*data_b64 = NULL;
-
-	assert(NULL != host && 0 != host_len);
-	assert(NULL != key && 0 != key_len);
-	assert(NULL != data && 0 != data_len);
-	assert(NULL != lastlogsize && 0 != lastlogsize_len);
-	assert(NULL != timestamp && 0 != timestamp_len);
-	assert(NULL != source && 0 != source_len);
-	assert(NULL != severity && 0 != severity_len);
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "host", &data_b64))
-	{
-		str_base64_decode(data_b64, host, (int)host_len - 1, &i);
-		host[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-	{
-		*host = '\0';
-		ret = FAIL;
-	}
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "key", &data_b64))
-	{
-		str_base64_decode(data_b64, key, (int)key_len - 1, &i);
-		key[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-	{
-		*key = '\0';
-		ret = FAIL;
-	}
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "data", &data_b64))
-	{
-		str_base64_decode(data_b64, data, (int)data_len - 1, &i);
-		data[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-	{
-		*data = '\0';
-		ret = FAIL;
-	}
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "lastlogsize", &data_b64))
-	{
-		str_base64_decode(data_b64, lastlogsize, (int)lastlogsize_len - 1, &i);
-		lastlogsize[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*lastlogsize = '\0';
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "timestamp", &data_b64))
-	{
-		str_base64_decode(data_b64, timestamp, (int)timestamp_len - 1, &i);
-		timestamp[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*timestamp = '\0';
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "source", &data_b64))
-	{
-		str_base64_decode(data_b64, source, (int)source_len - 1, &i);
-		source[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*source = '\0';
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "severity", &data_b64))
-	{
-		str_base64_decode(data_b64, severity, (int)severity_len - 1, &i);
-		severity[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*severity = '\0';
 
 	return ret;
 }
