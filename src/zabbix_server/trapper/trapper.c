@@ -982,7 +982,6 @@ static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 	return SUCCEED;
 }
 
-
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
 		const zbx_config_tls_t *zbx_config_tls)
 {
@@ -1052,20 +1051,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_TASKS))
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-				{
 					zbx_send_task_data(sock, ts, zbx_config_tls);
-				}
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-				{
 					zbx_recv_proxy_data(sock, &jp, ts);
-				}
 				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-				{
 					zbx_send_proxy_data(sock, ts, zbx_config_tls);
-				}
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
 			{
@@ -1148,7 +1141,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 		if ('<' == *s)	/* XML protocol */
 		{
-			zbx_comms_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
+			zbx_commshigh_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
 					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp,
 					sizeof(timestamp), source, sizeof(source), severity, sizeof(severity));
 
@@ -1213,8 +1206,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts, const 
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
 {
-	ZBX_THREAD_TRAPPER_ARGS	*trapper_args_in = (ZBX_THREAD_TRAPPER_ARGS *)
-							(((zbx_thread_args_t *)args)->args);
+	zbx_thread_trapper_args	*trapper_args_in = (zbx_thread_trapper_args *)
+			(((zbx_thread_args_t *)args)->args);
 	double			sec = 0.0;
 	zbx_socket_t		s;
 	int			ret;

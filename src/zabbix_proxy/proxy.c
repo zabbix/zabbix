@@ -840,19 +840,19 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSConnect",			&(zbx_config_tls->connect),	TYPE_STRING,
+		{"TLSConnect",			&(zbx_config_tls->connect),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSAccept",			&(zbx_config_tls->accept),	TYPE_STRING_LIST,
+		{"TLSAccept",			&(zbx_config_tls->accept),		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&(zbx_config_tls->ca_file),	TYPE_STRING,
+		{"TLSCAFile",			&(zbx_config_tls->ca_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&(zbx_config_tls->crl_file),	TYPE_STRING,
+		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSServerCertIssuer",	&(zbx_config_tls->server_cert_issuer),	TYPE_STRING,
+		{"TLSServerCertIssuer",		&(zbx_config_tls->server_cert_issuer),	TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSServerCertSubject",	&(zbx_config_tls->server_cert_subject),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCertFile",		&(zbx_config_tls->cert_file),		TYPE_STRING,
+		{"TLSCertFile",			&(zbx_config_tls->cert_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSKeyFile",			&(zbx_config_tls->key_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -862,15 +862,15 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),	TYPE_STRING,
+		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),	TYPE_STRING,
+		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),	TYPE_STRING,
+		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -983,6 +983,9 @@ static void	zbx_on_exit(int ret)
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();
 #endif
+
+	zbx_config_tls_clean(zbx_config_tls);
+
 	exit(EXIT_SUCCESS);
 }
 
@@ -1002,6 +1005,9 @@ int	main(int argc, char **argv)
 
 	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
+
+	zbx_config_tls_init(zbx_config_tls);
+
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
@@ -1074,9 +1080,6 @@ int	main(int argc, char **argv)
 	/* required for simple checks */
 	init_metrics();
 
-	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
-	zbx_init_config_tls_t(zbx_config_tls);
-
 	zbx_load_config(&t);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
@@ -1142,11 +1145,20 @@ static void	zbx_check_db(void)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	zbx_socket_t	listen_sock;
-	char		*error = NULL;
-	int		i, db_type, ret;
-	zbx_rtc_t	rtc;
-	zbx_timespec_t	rtc_timeout = {1, 0};
+	zbx_socket_t			listen_sock;
+	char				*error = NULL;
+	int				i, db_type, ret;
+	zbx_rtc_t			rtc;
+	zbx_timespec_t			rtc_timeout = {1, 0};
+
+	zbx_thread_args_t		thread_args;
+	zbx_thread_poller_args		poller_args = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
+	zbx_thread_heart_args		heart_args = {zbx_config_tls, get_program_type};
+	zbx_thread_proxyconfig_args	proxyconfig_args = {zbx_config_tls, get_program_type};
+	zbx_thread_datasender_args	datasender_args = {zbx_config_tls, get_program_type};
+	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_tls, get_program_type};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
+	zbx_thread_trapper_args		trapper_args = {zbx_config_tls, get_program_type, &listen_sock};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1373,15 +1385,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	for (i = 0; i < threads_num; i++)
 	{
-		zbx_thread_args_t		thread_args;
-		ZBX_THREAD_POLLER_ARGS		POLLER_ARGS = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
-		ZBX_THREAD_HEART_ARGS		HEART_ARGS = {zbx_config_tls, get_program_type};
-		ZBX_THREAD_PROXYCONFIG_ARGS	PROXYCONFIG_ARGS = {zbx_config_tls, get_program_type};
-		ZBX_THREAD_DATASENDER_ARGS	DATASENDER_ARGS = {zbx_config_tls, get_program_type};
-		ZBX_THREAD_TASKMANAGER_ARGS	TASKMANAGER_ARGS = {zbx_config_tls, get_program_type};
-		ZBX_THREAD_DISCOVERER_ARGS	DISCOVERER_ARGS = {zbx_config_tls, get_program_type};
-		ZBX_THREAD_TRAPPER_ARGS		TRAPPER_ARGS = {zbx_config_tls, get_program_type, &listen_sock};
-
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.process_type, &thread_args.process_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -1394,31 +1397,31 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_args.process_type)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
-				thread_args.args = &PROXYCONFIG_ARGS;
+				thread_args.args = &proxyconfig_args;
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
 				if (FAIL == zbx_rtc_wait_config_sync(&rtc))
 					goto out;
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
-				thread_args.args = &TRAPPER_ARGS;
+				thread_args.args = &trapper_args;
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HEARTBEAT:
-				thread_args.args = &HEART_ARGS;
+				thread_args.args = &heart_args;
 				zbx_thread_start(heart_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
-				thread_args.args = &DATASENDER_ARGS;
+				thread_args.args = &datasender_args;
 				zbx_thread_start(datasender_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
-				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_NORMAL;
-				thread_args.args = &POLLER_ARGS;
+				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_UNREACHABLE:
-				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-				thread_args.args = &POLLER_ARGS;
+				poller_args.poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
@@ -1431,7 +1434,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(httppoller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERER:
-				thread_args.args = &DISCOVERER_ARGS;
+				thread_args.args = &discoverer_args;
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
@@ -1439,8 +1442,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
-				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_JAVA;
-				thread_args.args = &POLLER_ARGS;
+				poller_args.poller_type = ZBX_POLLER_TYPE_JAVA;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
@@ -1461,7 +1464,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 #endif
 			case ZBX_PROCESS_TYPE_TASKMANAGER:
-				thread_args.args = &TASKMANAGER_ARGS;
+				thread_args.args = &taskmanager_args;
 				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
@@ -1475,8 +1478,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
-				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_ODBC;
-				thread_args.args = &POLLER_ARGS;
+				poller_args.poller_type = ZBX_POLLER_TYPE_ODBC;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 		}

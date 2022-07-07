@@ -83,7 +83,8 @@ typedef struct
 	char		*cipher_cmd;	/* not used in agent, server, proxy, config file parameter 'tls-cipher' */
 } zbx_config_tls_t;
 
-void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls);
+void	zbx_config_tls_init(zbx_config_tls_t *zbx_config_tls);
+void	zbx_config_tls_clean(zbx_config_tls_t *zbx_config_tls);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
@@ -231,11 +232,6 @@ void	zbx_udp_close(zbx_socket_t *s);
 #ifdef _WINDOWS
 int	zbx_socket_start(char **error);
 #endif
-
-int	zbx_comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
-		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
-		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
-		char *severity, size_t severity_len);
 
 int	zbx_telnet_test_login(ZBX_SOCKET socket_fd);
 int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);

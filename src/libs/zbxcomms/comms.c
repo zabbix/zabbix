@@ -20,31 +20,6 @@
 #include "zbxcomms.h"
 #include "comms.h"
 
-void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls)
-{
-	zbx_config_tls->connect_mode		= ZBX_TCP_SEC_UNENCRYPTED;
-	zbx_config_tls->accept_modes		= ZBX_TCP_SEC_UNENCRYPTED;
-
-	zbx_config_tls->connect			= NULL;
-	zbx_config_tls->accept			= NULL;
-	zbx_config_tls->ca_file			= NULL;
-	zbx_config_tls->crl_file		= NULL;
-	zbx_config_tls->server_cert_issuer	= NULL;
-	zbx_config_tls->server_cert_subject	= NULL;
-	zbx_config_tls->cert_file		= NULL;
-	zbx_config_tls->key_file		= NULL;
-	zbx_config_tls->psk_identity		= NULL;
-	zbx_config_tls->psk_file		= NULL;
-	zbx_config_tls->cipher_cert13		= NULL;
-	zbx_config_tls->cipher_cert		= NULL;
-	zbx_config_tls->cipher_psk13		= NULL;
-	zbx_config_tls->cipher_psk		= NULL;
-	zbx_config_tls->cipher_all13		= NULL;
-	zbx_config_tls->cipher_all		= NULL;
-	zbx_config_tls->cipher_cmd13		= NULL;
-	zbx_config_tls->cipher_cmd		= NULL;
-}
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #include "tls.h"
 #endif
@@ -80,6 +55,57 @@ extern ZBX_THREAD_LOCAL char	info_buf[256];
 
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
+
+void	zbx_config_tls_init(zbx_config_tls_t *zbx_config_tls)
+{
+	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
+
+	zbx_config_tls->connect_mode		= ZBX_TCP_SEC_UNENCRYPTED;
+	zbx_config_tls->accept_modes		= ZBX_TCP_SEC_UNENCRYPTED;
+
+	zbx_config_tls->connect			= NULL;
+	zbx_config_tls->accept			= NULL;
+	zbx_config_tls->ca_file			= NULL;
+	zbx_config_tls->crl_file		= NULL;
+	zbx_config_tls->server_cert_issuer	= NULL;
+	zbx_config_tls->server_cert_subject	= NULL;
+	zbx_config_tls->cert_file		= NULL;
+	zbx_config_tls->key_file		= NULL;
+	zbx_config_tls->psk_identity		= NULL;
+	zbx_config_tls->psk_file		= NULL;
+	zbx_config_tls->cipher_cert13		= NULL;
+	zbx_config_tls->cipher_cert		= NULL;
+	zbx_config_tls->cipher_psk13		= NULL;
+	zbx_config_tls->cipher_psk		= NULL;
+	zbx_config_tls->cipher_all13		= NULL;
+	zbx_config_tls->cipher_all		= NULL;
+	zbx_config_tls->cipher_cmd13		= NULL;
+	zbx_config_tls->cipher_cmd		= NULL;
+}
+
+void	zbx_config_tls_clean(zbx_config_tls_t *zbx_config_tls)
+{
+	zbx_free(zbx_config_tls->connect);
+	zbx_free(zbx_config_tls->accept);
+	zbx_free(zbx_config_tls->ca_file);
+	zbx_free(zbx_config_tls->crl_file);
+	zbx_free(zbx_config_tls->server_cert_issuer);
+	zbx_free(zbx_config_tls->server_cert_subject);
+	zbx_free(zbx_config_tls->cert_file);
+	zbx_free(zbx_config_tls->key_file);
+	zbx_free(zbx_config_tls->psk_identity);
+	zbx_free(zbx_config_tls->psk_file);
+	zbx_free(zbx_config_tls->cipher_cert13);
+	zbx_free(zbx_config_tls->cipher_cert);
+	zbx_free(zbx_config_tls->cipher_psk13);
+	zbx_free(zbx_config_tls->cipher_psk);
+	zbx_free(zbx_config_tls->cipher_all13);
+	zbx_free(zbx_config_tls->cipher_all);
+	zbx_free(zbx_config_tls->cipher_cmd13);
+	zbx_free(zbx_config_tls->cipher_cmd);
+
+	zbx_free(zbx_config_tls);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -2437,96 +2463,4 @@ void	zbx_udp_close(zbx_socket_t *s)
 
 	zbx_socket_free(s);
 	zbx_socket_close(s->socket);
-}
-
-/* TODO: move remaining comms functions from libzbxcommon */
-int	zbx_comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
-		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
-		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
-		char *severity, size_t severity_len)
-{
-	int	i, ret = SUCCEED;
-	char	*data_b64 = NULL;
-
-	assert(NULL != host && 0 != host_len);
-	assert(NULL != key && 0 != key_len);
-	assert(NULL != data && 0 != data_len);
-	assert(NULL != lastlogsize && 0 != lastlogsize_len);
-	assert(NULL != timestamp && 0 != timestamp_len);
-	assert(NULL != source && 0 != source_len);
-	assert(NULL != severity && 0 != severity_len);
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "host", &data_b64))
-	{
-		str_base64_decode(data_b64, host, (int)host_len - 1, &i);
-		host[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-	{
-		*host = '\0';
-		ret = FAIL;
-	}
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "key", &data_b64))
-	{
-		str_base64_decode(data_b64, key, (int)key_len - 1, &i);
-		key[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-	{
-		*key = '\0';
-		ret = FAIL;
-	}
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "data", &data_b64))
-	{
-		str_base64_decode(data_b64, data, (int)data_len - 1, &i);
-		data[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-	{
-		*data = '\0';
-		ret = FAIL;
-	}
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "lastlogsize", &data_b64))
-	{
-		str_base64_decode(data_b64, lastlogsize, (int)lastlogsize_len - 1, &i);
-		lastlogsize[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*lastlogsize = '\0';
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "timestamp", &data_b64))
-	{
-		str_base64_decode(data_b64, timestamp, (int)timestamp_len - 1, &i);
-		timestamp[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*timestamp = '\0';
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "source", &data_b64))
-	{
-		str_base64_decode(data_b64, source, (int)source_len - 1, &i);
-		source[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*source = '\0';
-
-	if (SUCCEED == zbx_xml_get_data_dyn(xml, "severity", &data_b64))
-	{
-		str_base64_decode(data_b64, severity, (int)severity_len - 1, &i);
-		severity[i] = '\0';
-		zbx_xml_free_data_dyn(&data_b64);
-	}
-	else
-		*severity = '\0';
-
-	return ret;
 }

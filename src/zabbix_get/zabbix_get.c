@@ -319,10 +319,9 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	progname = get_program_name(argv[0]);
+	zbx_config_tls_init(zbx_config_tls);
 
-	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
-	zbx_init_config_tls_t(zbx_config_tls);
+	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -495,15 +494,11 @@ int	main(int argc, char **argv)
 		goto out;
 	}
 
-	if (NULL != zbx_config_tls->connect || NULL != zbx_config_tls->ca_file ||
-			NULL != zbx_config_tls->crl_file ||
-			NULL != zbx_config_tls->server_cert_issuer ||
-			NULL != zbx_config_tls->server_cert_subject ||
+	if (NULL != zbx_config_tls->connect || NULL != zbx_config_tls->ca_file || NULL != zbx_config_tls->crl_file ||
+			NULL != zbx_config_tls->server_cert_issuer || NULL != zbx_config_tls->server_cert_subject ||
 			NULL != zbx_config_tls->cert_file || NULL != zbx_config_tls->key_file ||
-			NULL != zbx_config_tls->psk_identity ||
-			NULL != zbx_config_tls->psk_file ||
-			NULL != zbx_config_tls->cipher_cmd13 ||
-			NULL != zbx_config_tls->cipher_cmd)
+			NULL != zbx_config_tls->psk_identity || NULL != zbx_config_tls->psk_file ||
+			NULL != zbx_config_tls->cipher_cmd13 || NULL != zbx_config_tls->cipher_cmd)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, get_program_type);
@@ -541,6 +536,7 @@ out:
 #endif
 	}
 #endif
+	zbx_config_tls_clean(zbx_config_tls);
 #if defined(_WINDOWS)
 	while (0 == WSACleanup())
 		;

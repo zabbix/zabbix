@@ -29,7 +29,7 @@ typedef struct
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	unsigned char		poller_type;
 }
-ZBX_THREAD_POLLER_ARGS;
+zbx_thread_poller_args;
 
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_UNAVAILABLE_DELAY;

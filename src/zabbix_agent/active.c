@@ -28,7 +28,6 @@
 #include "zbxjson.h"
 #include "zbxregexp.h"
 
-extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern ZBX_THREAD_LOCAL char		*CONFIG_HOSTNAME;
@@ -1410,12 +1409,13 @@ static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *
 
 ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
-	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args, *activechks_args_in;
+	zbx_thread_activechk_args	activechk_args, *activechks_args_in;
 	time_t				nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0,
 					heartbeat_nextcheck = 0;
+
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
-	activechks_args_in = (ZBX_THREAD_ACTIVECHK_ARGS *)((((zbx_thread_args_t *)args))->args);
+	activechks_args_in = (zbx_thread_activechk_args *)((((zbx_thread_args_t *)args))->args);
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;

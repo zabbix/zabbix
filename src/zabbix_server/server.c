@@ -181,7 +181,7 @@ static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 zbx_cuid_t	ha_sessionid;
 static char	*CONFIG_PID_FILE = NULL;
 
-unsigned char  program_type    = ZBX_PROGRAM_TYPE_SERVER;
+unsigned char	program_type = ZBX_PROGRAM_TYPE_SERVER;
 static unsigned char	get_program_type(void)
 {
 	return program_type;
@@ -896,25 +896,25 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&(zbx_config_tls->ca_file),	TYPE_STRING,
+		{"TLSCAFile",			&(zbx_config_tls->ca_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&(zbx_config_tls->crl_file),	TYPE_STRING,
+		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&(zbx_config_tls->cert_file),TYPE_STRING,
+		{"TLSCertFile",			&(zbx_config_tls->cert_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&(zbx_config_tls->key_file),	TYPE_STRING,
+		{"TLSKeyFile",			&(zbx_config_tls->key_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),	TYPE_STRING,
+		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),	TYPE_STRING,
+		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),	TYPE_STRING,
+		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1056,6 +1056,8 @@ static void	zbx_on_exit(int ret)
 	setproctitle_free_env();
 #endif
 
+	zbx_config_tls_clean(zbx_config_tls);
+
 	exit(EXIT_SUCCESS);
 }
 
@@ -1075,6 +1077,8 @@ int	main(int argc, char **argv)
 
 	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
+
+	zbx_config_tls_init(zbx_config_tls);
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
@@ -1147,9 +1151,6 @@ int	main(int argc, char **argv)
 
 	/* required for simple checks */
 	init_metrics();
-
-	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
-	zbx_init_config_tls_t(zbx_config_tls);
 
 	zbx_load_config(&t);
 
@@ -1268,8 +1269,17 @@ static void	zbx_check_db(void)
  ******************************************************************************/
 static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc)
 {
-	int	i, ret = SUCCEED;
-	char	*error = NULL;
+	int				i, ret = SUCCEED;
+	char				*error = NULL;
+
+	zbx_thread_args_t		thread_args;
+	zbx_thread_poller_args		poller_args = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
+	zbx_thread_trapper_args		trapper_args = {zbx_config_tls, get_program_type, listen_sock};
+	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type};
+	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, get_program_type};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
+	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
+							zbx_config_tls->key_file};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1343,16 +1353,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	for (i = 0; i < threads_num; i++)
 	{
-		zbx_thread_args_t		thread_args;
-		ZBX_THREAD_POLLER_ARGS		POLLER_ARGS = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
-		ZBX_THREAD_TRAPPER_ARGS		TRAPPER_ARGS = {zbx_config_tls, get_program_type, listen_sock};
-		ZBX_THREAD_ESCALATOR_ARGS	ESCALATOR_ARGS = {zbx_config_tls, get_program_type};
-		ZBX_THREAD_PROXY_POLLER_ARGS	PROXY_POLLER_ARGS = {zbx_config_tls, get_program_type};
-		ZBX_THREAD_DISCOVERER_ARGS	DISCOVERER_ARGS = {zbx_config_tls, get_program_type};
-		ZBX_THREAD_REPORT_WRITER_ARGS	REPORT_WRITER_ARGS = {zbx_config_tls->ca_file,
-						zbx_config_tls->cert_file,
-						zbx_config_tls->key_file};
-
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.process_type, &thread_args.process_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -1404,17 +1404,17 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_vc_enable();
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
-				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_NORMAL;
-				thread_args.args = &POLLER_ARGS;
+				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_UNREACHABLE:
-				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-				thread_args.args = &POLLER_ARGS;
+				poller_args.poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
-				thread_args.args = &TRAPPER_ARGS;
+				thread_args.args = &trapper_args;
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
@@ -1433,7 +1433,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(httppoller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERER:
-				thread_args.args = &DISCOVERER_ARGS;
+				thread_args.args = &discoverer_args;
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
@@ -1441,19 +1441,19 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ESCALATOR:
-				thread_args.args = &ESCALATOR_ARGS;
+				thread_args.args = &escalator_args;
 				zbx_thread_start(escalator_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
-				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_JAVA;
-				thread_args.args = &POLLER_ARGS;
+				poller_args.poller_type = ZBX_POLLER_TYPE_JAVA;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
 				zbx_thread_start(snmptrapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PROXYPOLLER:
-				thread_args.args = &PROXY_POLLER_ARGS;
+				thread_args.args = &proxy_poller_args;
 				zbx_thread_start(proxypoller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SELFMON:
@@ -1492,8 +1492,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(alert_syncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTORYPOLLER:
-				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_HISTORY;
-				thread_args.args = &POLLER_ARGS;
+				poller_args.poller_type = ZBX_POLLER_TYPE_HISTORY;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
@@ -1504,15 +1504,15 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(report_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTWRITER:
-				thread_args.args = &REPORT_WRITER_ARGS;
+				thread_args.args = &report_writer_args;
 				zbx_thread_start(report_writer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
 				zbx_thread_start(trigger_housekeeper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
-				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_ODBC;
-				thread_args.args = &POLLER_ARGS;
+				poller_args.poller_type = ZBX_POLLER_TYPE_ODBC;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 		}

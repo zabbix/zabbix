@@ -112,7 +112,6 @@ static void	zbx_tag_filter_free(zbx_tag_filter_t *tag_filter)
 }
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static void	add_message_alert(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event, zbx_uint64_t actionid,
@@ -3392,12 +3391,13 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
  ******************************************************************************/
 ZBX_THREAD_ENTRY(escalator_thread, args)
 {
-	ZBX_THREAD_ESCALATOR_ARGS	*escalator_args_in = (ZBX_THREAD_ESCALATOR_ARGS *)
-			(((zbx_thread_args_t *)args)->args);
-	int		now, nextcheck, sleeptime = -1, escalations_count = 0, old_escalations_count = 0;
-	double		sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t		last_stat_time;
-	zbx_config_t	cfg;
+	zbx_thread_escalator_args	*escalator_args_in = (zbx_thread_escalator_args *)
+							(((zbx_thread_args_t *)args)->args);
+	int				now, nextcheck, sleeptime = -1, escalations_count = 0,
+					old_escalations_count = 0;
+	double				sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t				last_stat_time;
+	zbx_config_t			cfg;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;

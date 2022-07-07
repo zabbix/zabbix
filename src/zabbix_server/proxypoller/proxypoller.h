@@ -31,7 +31,7 @@ typedef struct
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 }
-ZBX_THREAD_PROXY_POLLER_ARGS;
+zbx_thread_proxy_poller_args;
 
 ZBX_THREAD_ENTRY(proxypoller_thread, args);
 

@@ -23,7 +23,6 @@
 #include "sysinfo.h"
 #include "log.h"
 
-extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
@@ -107,15 +106,16 @@ static void	zbx_listener_sigusr_handler(int flags)
 ZBX_THREAD_ENTRY(listener_thread, args)
 {
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	char		*msg = NULL;
+	char				*msg = NULL;
 #endif
-	int		ret;
-	zbx_socket_t	s;
-	ZBX_THREAD_LISTENER_ARGS	*init_child_args_in;
+	int				ret;
+	zbx_socket_t			s;
+	zbx_thread_listener_args	*init_child_args_in;
+
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
-	init_child_args_in = (ZBX_THREAD_LISTENER_ARGS *)((((zbx_thread_args_t *)args))->args);
+	init_child_args_in = (zbx_thread_listener_args *)((((zbx_thread_args_t *)args))->args);
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;

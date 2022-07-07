@@ -45,7 +45,6 @@
 #include "zbxcomms.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 /******************************************************************************
@@ -927,7 +926,7 @@ exit:
 
 ZBX_THREAD_ENTRY(poller_thread, args)
 {
-	ZBX_THREAD_POLLER_ARGS	*poller_args_in = (ZBX_THREAD_POLLER_ARGS *)(((zbx_thread_args_t *)args)->args);
+	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
 	int			nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
 	double			sec, total_sec = 0.0, old_total_sec = 0.0;

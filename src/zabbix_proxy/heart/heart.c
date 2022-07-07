@@ -28,7 +28,6 @@
 #include "zbxcommshigh.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern zbx_vector_ptr_t	zbx_addrs;
@@ -87,11 +86,10 @@ clean:
  ******************************************************************************/
 ZBX_THREAD_ENTRY(heart_thread, args)
 {
-	ZBX_THREAD_HEART_ARGS	*heart_args_in = (ZBX_THREAD_HEART_ARGS *)
-			(((zbx_thread_args_t *)args)->args);
-	int	start, sleeptime = 0, res;
-	double	sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t	last_stat_time;
+	zbx_thread_heart_args	*heart_args_in = (zbx_thread_heart_args *) (((zbx_thread_args_t *)args)->args);
+	int			start, sleeptime = 0, res;
+	double			sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t			last_stat_time;
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

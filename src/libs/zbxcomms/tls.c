@@ -128,9 +128,9 @@ static int	zbx_openssl_init_ssl(int opts, void *settings)
 }
 #endif
 
-static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
+static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 
-static ZBX_THREAD_LOCAL char		*my_psk_identity	= NULL;
+static ZBX_THREAD_LOCAL const char	*my_psk_identity	= NULL;
 static ZBX_THREAD_LOCAL size_t		my_psk_identity_len	= 0;
 static ZBX_THREAD_LOCAL char		*my_psk			= NULL;
 static ZBX_THREAD_LOCAL size_t		my_psk_len		= 0;
@@ -459,8 +459,8 @@ static void	zbx_tls_parameter_not_empty(char * const *param, const zbx_config_tl
  *                                                                                    *
  * Parameters:                                                                        *
  *     type           - [IN] type of TLS validation error                             *
- *     param1         - [IN] address of the first global parameter variable           *
- *     param2         - [IN] address of the second global parameter variable (if any) *
+ *     param1         - [IN] first configuration parameter                            *
+ *     param2         - [IN] second configuration parameter (if there is any)         *
  *     zbx_config_tls - [IN]                                                          *
  *                                                                                    *
  **************************************************************************************/
@@ -593,9 +593,9 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2, con
  *                                                                            *
  * Parameters:                                                                *
  *     type           - [IN] type of TLS validation error                     *
- *     param1         - [IN] address of the first global parameter variable   *
- *     param2         - [IN] address of the second global parameter variable  *
- *     param3         - [IN] address of the third global parameter variable   *
+ *     param1         - [IN] first configuration parameter                    *
+ *     param2         - [IN] second configuration parameter                   *
+ *     param3         - [IN] third configuration parameter                    *
  *     zbx_config_tls - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
@@ -638,29 +638,29 @@ static void	zbx_tls_validation_error2(int type, char **param1, char **param2, ch
 	exit(EXIT_FAILURE);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: check for allowed combinations of TLS configuration parameters    *
- *          and also initialize the program_type callback                     *
- *                                                                            *
- * Comments:                                                                  *
- *     Valid combinations:                                                    *
- *         - either all 3 certificate parameters - config_tls_cert_file,      *
- *           config_tls_key_file, config_tls_ca_file  - are defined and not   *
- *           empty or none of them. Parameter config_tls_crl_file is optional *
- *           but may be defined only together with the 3 certificate          *
- *           parameters,                                                      *
- *         - either both PSK parameters - config_tls_psk_identity and         *
- *           config_tls_psk_file - are defined and not empty or none of them, *
- *           (if config_tls_psk_identity is defined it must be a valid UTF-8  *
- *           string),                                                         *
- *         - in active agent, active proxy, zabbix_get, and zabbix_sender the *
- *           certificate and PSK parameters must match the value of           *
- *           config_tls_connect parameter,                                    *
- *         - in passive agent and passive proxy the certificate and PSK       *
- *           parameters must match the value of config_tls_accept parameter.  *
- *                                                                            *
- ******************************************************************************/
+/**********************************************************************************************
+ *                                                                                            *
+ * Purpose: check for allowed combinations of TLS configuration parameters                    *
+ *          and also initialize the program_type callback                                     *
+ *                                                                                            *
+ * Comments:                                                                                  *
+ *     Valid combinations:                                                                    *
+ *         - either all 3 certificate parameters - zbx_config_tls->config_tls_cert_file,      *
+ *           zbx_config_tls->config_tls_key_file, zbx_config_tls->config_tls_ca_file  -       *
+ *           are defined and not empty or none of them. Parameter                             *
+ *           zbx_config_tls->config_tls_crl_file is optional but may be defined only together *
+ *           with the 3 certificate parameters,                                               *
+ *         - either both PSK parameters - zbx_config_tls->config_tls_psk_identity and         *
+ *           zbx_config_tls->config_tls_psk_file - are defined and not empty or none of them, *
+ *           (if zbx_config_tls->config_tls_psk_identity is defined it must be a valid UTF-8  *
+ *           string),                                                                         *
+ *         - in active agent, active proxy, zabbix_get, and zabbix_sender the                 *
+ *           certificate and PSK parameters must match the value of                           *
+ *           zbx_config_tls->config_tls_connect parameter,                                    *
+ *         - in passive agent and passive proxy the certificate and PSK                       *
+ *           parameters must match the value of zbx_config_tls->config_tls_accept parameter.  *
+ *                                                                                            *
+ *********************************************************************************************/
 void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active_forks,
 		int config_passive_forks, zbx_get_program_type_f zbx_get_program_type_cb_arg)
 {
@@ -690,20 +690,20 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 	/* parse and validate 'TLSConnect' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) and '--tls-connect' */
 	/* parameter (in zabbix_get and zabbix_sender) */
 
-	if (NULL != (zbx_config_tls->connect))
+	if (NULL != zbx_config_tls->connect)
 	{
-		if (0 == strcmp((zbx_config_tls->connect), ZBX_TCP_SEC_UNENCRYPTED_TXT))
+		if (0 == strcmp(zbx_config_tls->connect, ZBX_TCP_SEC_UNENCRYPTED_TXT))
 		{
 			zbx_config_tls->connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
 		}
-		else if (0 == strcmp((zbx_config_tls->connect), ZBX_TCP_SEC_TLS_CERT_TXT))
+		else if (0 == strcmp(zbx_config_tls->connect, ZBX_TCP_SEC_TLS_CERT_TXT))
 		{
 			zbx_config_tls->connect_mode = ZBX_TCP_SEC_TLS_CERT;
 		}
-		else if (0 == strcmp((zbx_config_tls->connect), ZBX_TCP_SEC_TLS_PSK_TXT))
+		else if (0 == strcmp(zbx_config_tls->connect, ZBX_TCP_SEC_TLS_PSK_TXT))
 		{
 #if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
-			(zbx_config_tls->connect_mode) = ZBX_TCP_SEC_TLS_PSK;
+			zbx_config_tls->connect_mode = ZBX_TCP_SEC_TLS_PSK;
 #else
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_NO_PSK, &(zbx_config_tls->connect), NULL,
 					zbx_config_tls);
@@ -718,7 +718,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 
 	/* parse and validate 'TLSAccept' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) */
 
-	if (NULL != (zbx_config_tls->accept))
+	if (NULL != zbx_config_tls->accept)
 	{
 		char		*s, *p, *delim;
 		unsigned int	accept_modes_tmp = 0;	/* 'accept_modes' is shared between threads on */
@@ -726,7 +726,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 							/* variable, modify it and write into */
 							/* 'accept_modes' when done. */
 
-		p = s = zbx_strdup(NULL, (zbx_config_tls->accept));
+		p = s = zbx_strdup(NULL, zbx_config_tls->accept);
 
 		while (1)
 		{
@@ -772,7 +772,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 
 	/* either both a certificate and a private key must be defined or none of them */
 
-	if (NULL != (zbx_config_tls->cert_file) && NULL == (zbx_config_tls->key_file))
+	if (NULL != zbx_config_tls->cert_file && NULL == zbx_config_tls->key_file)
 	{
 		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->cert_file),
 				&(zbx_config_tls->key_file), zbx_config_tls);
@@ -1180,7 +1180,7 @@ static unsigned int	zbx_psk_client_cb(SSL *ssl, const char *hint, char *identity
 static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned char *psk,
 		unsigned int max_psk_len)
 {
-	char		*psk_loc;
+	const char	*psk_loc;
 	size_t		psk_len = 0;
 	int		psk_bin_len;
 	unsigned char	tls_psk_hex[HOST_TLS_PSK_LEN_MAX], psk_buf[HOST_TLS_PSK_LEN / 2];
@@ -1206,7 +1206,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 				goto fail;
 			}
 
-			psk_loc = (char *)psk_buf;
+			psk_loc = (const char *)psk_buf;
 			psk_len = (size_t)psk_bin_len;
 		}
 
@@ -1291,7 +1291,7 @@ static void	zbx_check_psk_identity_len(size_t psk_identity_len)
 /******************************************************************************
  *                                                                            *
  * Purpose:                                                                   *
- *     read a pre-shared key from a configured file and convert it from       *
+ *     read a pre-shared key from a file and convert it from                  *
  *     textual representation (ASCII hex digit string) to a binary            *
  *     representation (byte string)                                           *
  *                                                                            *
@@ -1304,7 +1304,7 @@ static void	zbx_check_psk_identity_len(size_t psk_identity_len)
  *     at runtime.                                                            *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_read_psk_file(char *config_tls_psk_file)
+static void	zbx_read_psk_file(char *file_name)
 {
 	FILE		*f;
 	size_t		len;
@@ -1313,15 +1313,15 @@ static void	zbx_read_psk_file(char *config_tls_psk_file)
 							/* 1 byte for terminating '\0' */
 	char		buf_bin[HOST_TLS_PSK_LEN / 2];	/* up to 256 bytes of binary PSK */
 
-	if (NULL == (f = fopen(config_tls_psk_file, "r")))
+	if (NULL == (f = fopen(file_name, "r")))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot open file \"%s\": %s", config_tls_psk_file, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot open file \"%s\": %s", file_name, zbx_strerror(errno));
 		goto out;
 	}
 
 	if (NULL == fgets(buf, (int)sizeof(buf), f))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot read from file \"%s\" or file empty", config_tls_psk_file);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot read from file \"%s\" or file empty", file_name);
 		goto out;
 	}
 
@@ -1329,27 +1329,27 @@ static void	zbx_read_psk_file(char *config_tls_psk_file)
 
 	if (0 == (len = strlen(buf)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "file \"%s\" is empty", config_tls_psk_file);
+		zabbix_log(LOG_LEVEL_CRIT, "file \"%s\" is empty", file_name);
 		goto out;
 	}
 
 	if (HOST_TLS_PSK_LEN_MIN > len)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too short. Minimum is %d hex-digits",
-				config_tls_psk_file, HOST_TLS_PSK_LEN_MIN);
+				file_name, HOST_TLS_PSK_LEN_MIN);
 		goto out;
 	}
 
 	if (HOST_TLS_PSK_LEN < len)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too long. Maximum is %d hex-digits",
-				config_tls_psk_file, HOST_TLS_PSK_LEN);
+				file_name, HOST_TLS_PSK_LEN);
 		goto out;
 	}
 
 	if (0 >= (len_bin = zbx_hex2bin((unsigned char *)buf, (unsigned char *)buf_bin, sizeof(buf_bin))))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid PSK in file \"%s\"", config_tls_psk_file);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid PSK in file \"%s\"", file_name);
 		goto out;
 	}
 
@@ -1361,7 +1361,7 @@ static void	zbx_read_psk_file(char *config_tls_psk_file)
 out:
 	if (NULL != f && 0 != fclose(f))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot close file \"%s\": %s", config_tls_psk_file, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot close file \"%s\": %s", file_name, zbx_strerror(errno));
 		ret = FAIL;
 	}
 
@@ -2238,7 +2238,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *zbx_config_tls)
 	{
 		/* validation of zbx_config_tls was not called and program_type was not set */
 		THIS_SHOULD_NEVER_HAPPEN;
-		return;
+		exit(EXIT_FAILURE);
 	}
 #ifndef _WINDOWS
 	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */
@@ -2567,7 +2567,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *zbx_config_tls)
 	{
 		/* validation of zbx_config_tls was not called and program_type was not set */
 		THIS_SHOULD_NEVER_HAPPEN;
-		return;
+		exit(EXIT_FAILURE);
 	}
 #ifndef _WINDOWS
 	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */

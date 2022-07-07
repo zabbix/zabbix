@@ -138,8 +138,7 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_c
 		goto out;
 	}
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update",
-			zbx_config_tls))
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update", zbx_config_tls))
 	{
 		goto out;
 	}

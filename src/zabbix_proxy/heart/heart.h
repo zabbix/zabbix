@@ -31,7 +31,7 @@ typedef struct
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 }
-ZBX_THREAD_HEART_ARGS;
+zbx_thread_heart_args;
 
 ZBX_THREAD_ENTRY(heart_thread, args);
 

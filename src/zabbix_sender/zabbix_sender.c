@@ -268,7 +268,7 @@ const char	*help_message[] = {
 	NULL	/* end of text */
 };
 
-zbx_config_tls_t	*zbx_config_tls = NULL;
+static zbx_config_tls_t	*zbx_config_tls = NULL;
 
 int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
 int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
@@ -398,12 +398,12 @@ typedef struct
 	zbx_config_tls_t		*zbx_config_tls;
 	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
 }
-ZBX_THREAD_SENDVAL_ARGS;
+zbx_thread_sendval_args;
 
 #define SUCCEED_PARTIAL	2
 
 #if !defined(_WINDOWS)
-static void	zbx_thread_handle_pipe_response(ZBX_THREAD_SENDVAL_ARGS *sendval_args)
+static void	zbx_thread_handle_pipe_response(zbx_thread_sendval_args *sendval_args)
 {
 	int	offset;
 	char	buffer[sizeof(int)], *ptr = buffer;
@@ -491,10 +491,10 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, zbx_thread_args_t *th
 		}
 #if !defined(_WINDOWS)
 		else
-			zbx_thread_handle_pipe_response((ZBX_THREAD_SENDVAL_ARGS *)threads_args[i].args);
+			zbx_thread_handle_pipe_response((zbx_thread_sendval_args *)threads_args[i].args);
 
-		close(((ZBX_THREAD_SENDVAL_ARGS *)threads_args[i].args)->fds[0]);
-		close(((ZBX_THREAD_SENDVAL_ARGS *)threads_args[i].args)->fds[1]);
+		close(((zbx_thread_sendval_args *)threads_args[i].args)->fds[0]);
+		close(((zbx_thread_sendval_args *)threads_args[i].args)->fds[1]);
 #endif
 
 		threads[i] = ZBX_THREAD_HANDLE_NULL;
@@ -678,12 +678,12 @@ static void	zbx_set_sender_signal_handlers(void)
 
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
-	ZBX_THREAD_SENDVAL_ARGS		*sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
+	zbx_thread_sendval_args		*sendval_args = (zbx_thread_sendval_args *)((zbx_thread_args_t *)args)->args;
 	int				ret = FAIL;
 	zbx_socket_t			sock;
 #if !defined(_WINDOWS)
-	int			i;
-	zbx_addr_t		*last_addr;
+	int				i;
+	zbx_addr_t			*last_addr;
 
 	last_addr = (zbx_addr_t *)sendval_args->addrs->values[0];
 
@@ -782,7 +782,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
  *                value at least at one destination failed                    *
  *                                                                            *
  ******************************************************************************/
-static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_status)
+static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_status)
 {
 	int			i, ret;
 	ZBX_THREAD_HANDLE	*threads = NULL;
@@ -1078,45 +1078,37 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			case '1':
-				zbx_config_tls->connect = zbx_strdup(zbx_config_tls->connect,
-						zbx_optarg);
+				zbx_config_tls->connect = zbx_strdup(zbx_config_tls->connect, zbx_optarg);
 				break;
 			case '2':
-				zbx_config_tls->ca_file = zbx_strdup(zbx_config_tls->ca_file,
-						zbx_optarg);
+				zbx_config_tls->ca_file = zbx_strdup(zbx_config_tls->ca_file, zbx_optarg);
 				break;
 			case '3':
-				zbx_config_tls->crl_file = zbx_strdup(zbx_config_tls->crl_file,
-						zbx_optarg);
+				zbx_config_tls->crl_file = zbx_strdup(zbx_config_tls->crl_file, zbx_optarg);
 				break;
 			case '4':
-				zbx_config_tls->server_cert_issuer =
-						zbx_strdup(zbx_config_tls->server_cert_issuer, zbx_optarg);
+				zbx_config_tls->server_cert_issuer = zbx_strdup(zbx_config_tls->server_cert_issuer,
+						zbx_optarg);
 				break;
 			case '5':
-				zbx_config_tls->server_cert_subject =
-						zbx_strdup(zbx_config_tls->server_cert_subject, zbx_optarg);
+				zbx_config_tls->server_cert_subject = zbx_strdup(zbx_config_tls->server_cert_subject,
+						zbx_optarg);
 				break;
 			case '6':
-				zbx_config_tls->cert_file = zbx_strdup(zbx_config_tls->cert_file,
-						zbx_optarg);
+				zbx_config_tls->cert_file = zbx_strdup(zbx_config_tls->cert_file, zbx_optarg);
 				break;
 			case '7':
-				zbx_config_tls->key_file = zbx_strdup(zbx_config_tls->key_file,
-						zbx_optarg);
+				zbx_config_tls->key_file = zbx_strdup(zbx_config_tls->key_file, zbx_optarg);
 				break;
 			case '8':
-				zbx_config_tls->psk_identity =
-						zbx_strdup(zbx_config_tls->psk_identity, zbx_optarg);
+				zbx_config_tls->psk_identity = zbx_strdup(zbx_config_tls->psk_identity, zbx_optarg);
 				break;
 			case '9':
-				zbx_config_tls->psk_file = zbx_strdup(zbx_config_tls->psk_file,
-						zbx_optarg);
+				zbx_config_tls->psk_file = zbx_strdup(zbx_config_tls->psk_file, zbx_optarg);
 				break;
 			case 'A':
 #if defined(HAVE_OPENSSL)
-				zbx_config_tls->cipher_cmd13 =
-						zbx_strdup(zbx_config_tls->cipher_cmd13, zbx_optarg);
+				zbx_config_tls->cipher_cmd13 = zbx_strdup(zbx_config_tls->cipher_cmd13, zbx_optarg);
 #elif defined(HAVE_GNUTLS)
 				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
 						" Zabbix sender was compiled with GnuTLS");
@@ -1124,8 +1116,7 @@ static void	parse_commandline(int argc, char **argv)
 #endif
 				break;
 			case 'B':
-				zbx_config_tls->cipher_cmd =
-						zbx_strdup(zbx_config_tls->cipher_cmd, zbx_optarg);
+				zbx_config_tls->cipher_cmd = zbx_strdup(zbx_config_tls->cipher_cmd, zbx_optarg);
 				break;
 #else
 			case '1':
@@ -1500,14 +1491,13 @@ int	main(int argc, char **argv)
 {
 	char			*error = NULL;
 	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
-	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = NULL;
+	zbx_thread_sendval_args	*sendval_args = NULL;
+
+	zbx_config_tls_init(zbx_config_tls);
 
 	progname = get_program_name(argv[0]);
 
 	parse_commandline(argc, argv);
-
-	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
-	zbx_init_config_tls_t(zbx_config_tls);
 
 	if (NULL != CONFIG_FILE)
 		zbx_load_config(CONFIG_FILE);
@@ -1553,11 +1543,13 @@ int	main(int argc, char **argv)
 	signal(SIGALRM, main_signal_handler);
 	signal(SIGPIPE, main_signal_handler);
 #endif
-	if (NULL != zbx_config_tls->connect || NULL != zbx_config_tls->ca_file ||
+	if (NULL != zbx_config_tls->connect ||
+			NULL != zbx_config_tls->ca_file ||
 			NULL != zbx_config_tls->crl_file ||
 			NULL != zbx_config_tls->server_cert_issuer ||
 			NULL != zbx_config_tls->server_cert_subject ||
-			NULL != zbx_config_tls->cert_file || NULL != zbx_config_tls->key_file ||
+			NULL != zbx_config_tls->cert_file ||
+			NULL != zbx_config_tls->key_file ||
 			NULL != zbx_config_tls->psk_identity ||
 			NULL != zbx_config_tls->psk_file ||
 			NULL != zbx_config_tls->cipher_cert13 ||
@@ -1584,8 +1576,8 @@ int	main(int argc, char **argv)
 #endif
 	}
 
-	sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)zbx_calloc(sendval_args, destinations_count,
-			sizeof(ZBX_THREAD_SENDVAL_ARGS));
+	sendval_args = (zbx_thread_sendval_args *)zbx_calloc(sendval_args, destinations_count,
+			sizeof(zbx_thread_sendval_args));
 
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
@@ -1874,6 +1866,7 @@ exit:
 #endif
 	}
 #endif
+	zbx_config_tls_clean(zbx_config_tls);
 	zabbix_close_log();
 #ifndef _WINDOWS
 	zbx_locks_destroy();
@@ -1885,7 +1878,6 @@ exit:
 #if !defined(_WINDOWS) && defined(HAVE_PTHREAD_PROCESS_SHARED)
 	zbx_locks_disable();
 #endif
-
 	if (FAIL == ret)
 		ret = EXIT_FAILURE;
 

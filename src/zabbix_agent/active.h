@@ -48,7 +48,7 @@ typedef struct
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 }
-ZBX_THREAD_ACTIVECHK_ARGS;
+zbx_thread_activechk_args;
 
 typedef struct
 {

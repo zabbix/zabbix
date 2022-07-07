@@ -157,6 +157,7 @@ static int get_log_value(log_result_t *result, int index, char **value, int *sta
 
 	if (index == result->values.values_num)
 		return FAIL;
+
 	log = (log_value_t *)result->values.values[index];
 	*value = log->value;
 	*state = log->state;
@@ -213,7 +214,7 @@ static void free_prep_vec(zbx_vector_pre_persistent_lp_t vect)
 	zbx_free(vect);
 }
 
-void	zbx_init_config_tls_t_g_version(zbx_config_tls_t *zbx_config_tls, unsigned int accept, unsigned int connect,
+void	zbx_config_tls_init_g_version(zbx_config_tls_t *zbx_config_tls, unsigned int accept, unsigned int connect,
 		char *PSKIdentity, char *PSKKey, char *CAFile, char *CRLFile, char *CertFile, char *KeyFile,
 		char *ServerCertIssuer, char *ServerCertSubject)
 {
@@ -345,7 +346,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		return
 	}
 	if (nil != tlsConfig) {
-		C.zbx_init_config_tls_t_g_version(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
+		C.zbx_config_tls_init_g_version(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
 			(C.CString)(tlsConfig.PSKIdentity), (C.CString)(tlsConfig.PSKKey),
 			(C.CString)(tlsConfig.CAFile), (C.CString)(tlsConfig.CRLFile), (C.CString)(tlsConfig.CertFile),
 			(C.CString)(tlsConfig.KeyFile), (C.CString)(tlsConfig.ServerCertIssuer),

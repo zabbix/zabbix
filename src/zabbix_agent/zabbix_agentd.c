@@ -242,7 +242,7 @@ ZBX_THREAD_LOCAL unsigned char	process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN *
 ZBX_THREAD_LOCAL int		process_num;
 ZBX_THREAD_LOCAL int		server_num	= 0;
 
-static ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
+static zbx_thread_activechk_args	*config_active_args = NULL;
 
 int	CONFIG_ALERTER_FORKS		= 0;
 int	CONFIG_DISCOVERER_FORKS		= 0;
@@ -730,18 +730,18 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 
 	forks = CONFIG_ACTIVE_FORKS;
 	CONFIG_ACTIVE_FORKS += new_forks;
-	CONFIG_ACTIVE_ARGS = (ZBX_THREAD_ACTIVECHK_ARGS *)zbx_realloc(CONFIG_ACTIVE_ARGS,
-			sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * (size_t)CONFIG_ACTIVE_FORKS);
+	config_active_args = (zbx_thread_activechk_args *)zbx_realloc(config_active_args,
+			sizeof(zbx_thread_activechk_args) * (size_t)CONFIG_ACTIVE_FORKS);
 
 	for (i = 0; i < new_forks; i++, forks++)
 	{
-		zbx_vector_ptr_create(&CONFIG_ACTIVE_ARGS[forks].addrs);
-		zbx_addr_copy(&CONFIG_ACTIVE_ARGS[forks].addrs, addrs);
+		zbx_vector_ptr_create(&config_active_args[forks].addrs);
+		zbx_addr_copy(&config_active_args[forks].addrs, addrs);
 
-		CONFIG_ACTIVE_ARGS[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
+		config_active_args[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
 				hostnames->values[i] : "");
-		CONFIG_ACTIVE_ARGS[forks].zbx_config_tls = zbx_config_tls;
-		CONFIG_ACTIVE_ARGS[forks].zbx_get_program_type_cb_arg = get_program_type;
+		config_active_args[forks].zbx_config_tls = zbx_config_tls;
+		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
 	}
 
 	return SUCCEED;
@@ -899,13 +899,13 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"PerfCounterEn",		&CONFIG_PERF_COUNTERS_EN,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 #endif
-		{"TLSConnect",			&(zbx_config_tls->connect),	TYPE_STRING,
+		{"TLSConnect",			&(zbx_config_tls->connect),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSAccept",			&(zbx_config_tls->accept),	TYPE_STRING_LIST,
+		{"TLSAccept",			&(zbx_config_tls->accept),		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&(zbx_config_tls->ca_file),	TYPE_STRING,
+		{"TLSCAFile",			&(zbx_config_tls->ca_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&(zbx_config_tls->crl_file),	TYPE_STRING,
+		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSServerCertIssuer",		&(zbx_config_tls->server_cert_issuer),	TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -913,21 +913,21 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"TLSCertFile",			&(zbx_config_tls->cert_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&(zbx_config_tls->key_file),			TYPE_STRING,
+		{"TLSKeyFile",			&(zbx_config_tls->key_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKIdentity",		&(zbx_config_tls->psk_identity),		TYPE_STRING,
+		{"TLSPSKIdentity",		&(zbx_config_tls->psk_identity),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&(zbx_config_tls->psk_file),			TYPE_STRING,
+		{"TLSPSKFile",			&(zbx_config_tls->psk_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),		TYPE_STRING,
+		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),		TYPE_STRING,
+		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),		TYPE_STRING,
+		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1061,6 +1061,7 @@ static void	zbx_on_exit(int ret)
 	zbx_tls_free();
 	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
 #endif
+	zbx_config_tls_clean(zbx_config_tls);
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();
 #endif
@@ -1209,7 +1210,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	for (i = 0; i < threads_num; i++)
 	{
 		zbx_thread_args_t		*thread_args;
-		ZBX_THREAD_LISTENER_ARGS	LISTENER_ARGS = {&listen_sock, zbx_config_tls, get_program_type};
+		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 
@@ -1228,11 +1229,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(collector_thread, thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LISTENER:
-				thread_args->args = &LISTENER_ARGS;
+				thread_args->args = &listener_args;
 				zbx_thread_start(listener_thread, thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
-				thread_args->args = &CONFIG_ACTIVE_ARGS[j++];
+				thread_args->args = &config_active_args[j++];
 				zbx_thread_start(active_checks_thread, thread_args, &threads[i]);
 				break;
 		}
@@ -1340,7 +1341,7 @@ int	main(int argc, char **argv)
 	/* Instead, the system sends the error to the calling process.*/
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
-
+	zbx_config_tls_init(zbx_config_tls);
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
@@ -1363,9 +1364,6 @@ int	main(int argc, char **argv)
 
 	/* this is needed to set default hostname in zbx_load_config() */
 	init_metrics();
-
-	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
-	zbx_init_config_tls_t(zbx_config_tls);
 
 	switch (t.task)
 	{
@@ -1492,6 +1490,5 @@ int	main(int argc, char **argv)
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 #endif
-	zbx_free(zbx_config_tls);
 	exit(EXIT_SUCCESS);
 }

@@ -36,7 +36,7 @@ typedef struct
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	zbx_socket_t		*listen_sock;
 }
-ZBX_THREAD_TRAPPER_ARGS;
+zbx_thread_trapper_args;
 
 ZBX_THREAD_ENTRY(trapper_thread, args);
 

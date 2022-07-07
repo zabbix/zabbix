@@ -420,14 +420,13 @@ static void	force_config_sync(void)
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
-	ZBX_THREAD_TASKMANAGER_ARGS	*taskmanager_args_in = (ZBX_THREAD_TASKMANAGER_ARGS *)
-			(((zbx_thread_args_t *)args)->args);
+	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
+							(((zbx_thread_args_t *)args)->args);
+	static int			cleanup_time = 0;
 
-	static int	cleanup_time = 0;
-
-	double			sec1, sec2;
-	int			tasks_num, sleeptime, nextcheck;
-	zbx_ipc_async_socket_t	rtc;
+	double				sec1, sec2;
+	int				tasks_num, sleeptime, nextcheck;
+	zbx_ipc_async_socket_t		rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;

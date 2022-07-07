@@ -149,13 +149,13 @@ out:
  ******************************************************************************/
 ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 {
-	ZBX_THREAD_PROXYCONFIG_ARGS	*proxyconfig_args_in = (ZBX_THREAD_PROXYCONFIG_ARGS *)
-			(((zbx_thread_args_t *)args)->args);
-	size_t			data_size;
-	double			sec;
-	zbx_ipc_async_socket_t	rtc;
-	int			sleeptime;
-	zbx_synced_new_config_t	synced = ZBX_SYNCED_NEW_CONFIG_NO;
+	zbx_thread_proxyconfig_args	*proxyconfig_args_in = (zbx_thread_proxyconfig_args *)
+							(((zbx_thread_args_t *)args)->args);
+	size_t				data_size;
+	double				sec;
+	zbx_ipc_async_socket_t		rtc;
+	int				sleeptime;
+	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
