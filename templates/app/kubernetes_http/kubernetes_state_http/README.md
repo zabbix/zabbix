@@ -3,13 +3,13 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 The template to monitor Kubernetes state that work without any external scripts. 
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
 
 Template `Kubernetes cluster state by HTTP` — collects metrics by HTTP agent from kube-state-metrics endpoint and Kubernetes API.
 
-Don't forget change macros {$KUBE.API.ENDPOINT.URL} and {$KUBE.API.TOKEN}.
+Don't forget change macros {$KUBE.API.URL} and {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
 
@@ -20,12 +20,22 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
 
+Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.0) in your Kubernetes cluster.
 Internal service metrics are collected from kube-state-metrics endpoint.
+
 Template needs to use Authorization via API token.
 
-Don't forget change macros {$KUBE.API.ENDPOINT.URL} and {$KUBE.API.TOKEN}.
+Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
+
+Get the generated service account token using the command
+
+`kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
+
+Then set it to the macro `{$KUBE.API.TOKEN}`.  
+Set `{$KUBE.STATE.ENDPOINT.NAME}` with Kube state metrics endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-kube-state-metrics`.
+
 Also, see the Macros section for a list of macros used to set trigger values.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
 
