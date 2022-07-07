@@ -760,6 +760,19 @@ zabbix_export:
             -
               tag: component
               value: system
+          triggers:
+            -
+              uuid: 1d67b13f47134a538708c2a14dcfa6b1
+              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.sum.checksum_failures.rate)>0'
+              name: 'Dbstat: Checksum failures detected'
+              priority: AVERAGE
+              description: |
+                Data page checksum failures were detected on that DB instance.
+                https://www.postgresql.org/docs/current/checksums.html
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 0106dfc55ace4dacaff00ce2c98de2ea
           name: 'Dbstat: Conflicts'
@@ -1523,6 +1536,19 @@ zabbix_export:
                 -
                   tag: database
                   value: '{#DBNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 5995403b904349d296227647ca318f5b
+                  expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.checksum_failures.rate["{#DBNAME}"])>0'
+                  name: 'DB {#DBNAME}: Checksum failures detected'
+                  priority: AVERAGE
+                  description: |
+                    Data page checksum failures were detected on that database.
+                    https://www.postgresql.org/docs/current/checksums.html
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 4eb67f16bc2948a7927ed58c9d037466
               name: 'DB {#DBNAME}: Detected conflicts per second'
