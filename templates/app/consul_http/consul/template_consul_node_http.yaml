@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-17T15:36:35Z'
+  date: '2022-06-20T11:03:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -392,7 +392,8 @@ zabbix_export:
                         'id': service,
                         'name': service_stats['Service']['Service'],
                         'status': service_stats['AggregatedStatus'],
-                        'checks': service_stats["Checks"]
+                        'checks': service_stats['Checks'],
+                        'namespace': typeof service_stats['Service']['Namespace'] === 'undefined' ? 'None' : service_stats['Service']['Namespace']
                     });
                 });
             
@@ -1525,6 +1526,7 @@ zabbix_export:
               uuid: fa78d269c01548a083085a3a98e5a59b
               expression: 'last(/HashiCorp Consul Node by HTTP/consul.version,#1)<>last(/HashiCorp Consul Node by HTTP/consul.version,#2) and length(last(/HashiCorp Consul Node by HTTP/consul.version))>0'
               name: 'Consul: Version has been changed'
+              event_name: 'Consul: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Consul version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1694,6 +1696,15 @@ zabbix_export:
                 value: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              -
+                macro: '{#SERVICE_NAMESPACE}'
+                value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#SERVICE_NAMESPACE}'
+                value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Discover metrics for services that are registered with the local agent.'
           item_prototypes:
             -
@@ -1729,6 +1740,9 @@ zabbix_export:
                 -
                   tag: component
                   value: service
+                -
+                  tag: namespace
+                  value: '{#SERVICE_NAMESPACE}'
                 -
                   tag: service
                   value: '{#SERVICE_NAME}'
@@ -1786,6 +1800,9 @@ zabbix_export:
                   tag: component
                   value: service
                 -
+                  tag: namespace
+                  value: '{#SERVICE_NAMESPACE}'
+                -
                   tag: service
                   value: '{#SERVICE_NAME}'
             -
@@ -1825,6 +1842,9 @@ zabbix_export:
                   tag: component
                   value: service
                 -
+                  tag: namespace
+                  value: '{#SERVICE_NAMESPACE}'
+                -
                   tag: service
                   value: '{#SERVICE_NAME}'
           master_item:
@@ -1846,6 +1866,7 @@ zabbix_export:
                           '{#TYPE}': 'aggregated_status',
                           '{#SERVICE_NAME}': service.name,
                           '{#SERVICE_ID}': service.id,
+                          '{#SERVICE_NAMESPACE}': service.namespace
                       });
                   
                       if (service['checks'] !== 0) {
@@ -1854,6 +1875,7 @@ zabbix_export:
                                   '{#TYPE}': 'service_check',
                                   '{#SERVICE_NAME}': service.name,
                                   '{#SERVICE_ID}': service.id,
+                                  '{#SERVICE_NAMESPACE}': service.namespace,
                                   '{#SERVICE_CHECK_ID}': check["CheckID"],
                                   '{#SERVICE_CHECK_NAME}': check["Name"]
                               });
@@ -2312,13 +2334,13 @@ zabbix_export:
           value: 'CHANGE IF NEEDED'
           description: 'Filter to exclude discovered services on local node.'
         -
-          macro: '{$CONSUL.LLD.FILTER.SERVICE_CHECK_NAME.MATCHES}'
+          macro: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable discovered service checks on local node.'
+          description: 'Filter of discoverable discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to ''None''.'
         -
-          macro: '{$CONSUL.LLD.FILTER.SERVICE_CHECK_NAME.NOT_MATCHES}'
+          macro: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES}'
           value: 'CHANGE IF NEEDED'
-          description: 'Filter to exclude discovered service checks on local node.'
+          description: 'Filter to exclude discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to ''None''.'
         -
           macro: '{$CONSUL.NODE.API.URL}'
           value: 'http://localhost:8500'
