@@ -25,9 +25,8 @@
 ?>
 
 window.copy_popup = new class {
-	init({form_name, copy_targetids, action}) {
+	init({form_name, action}) {
 		this.form_name = form_name;
-		this.copy_targetids = copy_targetids;
 		this.overlay = overlays_stack.getById('copy');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -36,7 +35,7 @@ window.copy_popup = new class {
 
 		$('[name="copy_type"]').on('change', this.changeTargetType);
 
-		this.changeTargetType(copy_targetids);
+		this.changeTargetType();
 	}
 
 	changeTargetType() {
@@ -98,10 +97,6 @@ window.copy_popup = new class {
 
 	submit() {
 		const fields = getFormFields(this.form);
-
-		if (this.copy_targetids !== null) {
-			fields.copy_targetids = this.copy_targetids;
-		}
 
 		this.overlay.setLoading();
 

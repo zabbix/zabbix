@@ -32,8 +32,6 @@ $form = (new CForm('post', (new CUrl())->getUrl()))
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->setAttribute('action', $data['action'])
 	->addVar('action', $data['action'])
-	->addVar($data['elements_field'], $data['elements'])
-	->addVar('hostid', $data['hostid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 if (array_key_exists('itemids', $data)) {
@@ -56,7 +54,7 @@ $form_grid = (new CFormGrid())
 	->setName('elements_form_list')
 	->addItem([
 		(new CLabel(_('Target type'), 'copy_type')),
-		(new CRadioButtonList('copy_type', (int) $data['copy_type']))
+		(new CRadioButtonList('copy_type', COPY_TYPE_TO_HOST_GROUP))
 			->addValue(_('Host groups'), COPY_TYPE_TO_HOST_GROUP)
 			->addValue(_('Hosts'), COPY_TYPE_TO_HOST)
 			->addValue(_('Templates'), COPY_TYPE_TO_TEMPLATE)
@@ -76,7 +74,6 @@ $form
 		(new CScriptTag('
 			copy_popup.init('.json_encode([
 				'form_name' => $form->getName(),
-				'copy_targetids' => $data['copy_targetids'],
 				'action' => $action
 			]).');
 		'))->setOnDocumentReady()
@@ -94,7 +91,6 @@ $buttons = [
 
 $output = [
 	'header' => $header,
-	'copy_targetids' => $data['copy_targetids'],
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().$this->readJsFile('popup.copy.js.php')
