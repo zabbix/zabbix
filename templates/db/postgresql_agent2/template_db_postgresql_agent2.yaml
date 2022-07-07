@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:37Z'
+  date: '2022-07-01T10:19:00Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Databases
@@ -719,7 +719,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.blk_read_time
+                - $.blk_write_time
             -
               type: MULTIPLIER
               parameters:
