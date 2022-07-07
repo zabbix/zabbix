@@ -216,11 +216,9 @@ if ($data['templateid'] === null) {
 
 $form->addItem($form_list);
 
-$form->addItem(
-	(new CScriptTag('
-		widget_item_form.init();
-	'))->setOnDocumentReady()
-);
+$scripts[] = '
+	widget_item_form.init();
+';
 
 return [
 	'form' => $form,
