@@ -32,6 +32,7 @@
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
 
+static zbx_get_program_type_f           zbx_get_program_type_cb = NULL;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
@@ -63,7 +64,7 @@ static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeo
 		case ZBX_TCP_SEC_TLS_PSK:
 			zabbix_log(LOG_LEVEL_ERR, "TLS connection is configured to be used with passive proxy \"%s\""
 					" but support for TLS was not compiled into %s.", proxy->host,
-					get_program_type_string(proxy_poller_args_in->zbx_get_program_type_cb_arg()));
+					get_program_type_string(zbx_get_program_type_cb()));
 			ret = CONFIG_ERROR;
 			goto out;
 #endif
@@ -606,9 +607,10 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
+	zbx_get_program_type_cb = proxy_poller_args_in->zbx_get_program_type_cb_arg;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(proxy_poller_args_in->zbx_get_program_type_cb_arg()), server_num,
+			get_program_type_string(zbx_get_program_type_cb()), server_num,
 			get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
