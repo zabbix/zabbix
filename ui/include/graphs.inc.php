@@ -400,16 +400,16 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
 		elseif ($error) {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'key_'],
-				'selectHosts' => ['hostid', 'host'],
 				'itemids' => [$gitem['itemid']],
 				'webitems' => true
 			]);
 
-			if (!$items) {
-				return false;
-			}
+			$hosts = API::Host()->get([
+				'output' => ['hostid', 'host'],
+				'hostids' => [$destinationHostId],
+			]);
 
-			error(_s('Missing key "%1$s" for host "%2$s".', $items[0]['key_'], $items[0]['hosts'][0]['host']));
+			error(_s('Missing key "%1$s" for host "%2$s".', $items[0]['key_'], $hosts[0]['host']));
 
 			return false;
 		}
