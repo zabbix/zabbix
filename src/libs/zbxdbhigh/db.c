@@ -760,11 +760,46 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-void	DBextract_version_info(struct zbx_db_version_info_t *version_info)
+void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
 {
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	zbx_dbms_version_info_extract(version_info);
 	DBclose();
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: connects to DB and tries to detect DB extension version info      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
+{
+#ifdef HAVE_POSTGRESQL
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	/* in case of major upgrade, db_extension may be missing */
+	if (FAIL == DBfield_exists("config", "db_extension"))
+		goto out;
+
+	if (NULL == (result = DBselect("select db_extension from config")))
+		goto out;
+
+	if (NULL == (row = DBfetch(result)))
+		goto clean;
+
+	version_info->extension = zbx_strdup(NULL, row[0]);
+
+	zbx_tsdb_info_extract(version_info);
+clean:
+	DBfree_result(result);
+out:
+	DBclose();
+#else
+	ZBX_UNUSED(version_info);
+#endif
 }
 
 /******************************************************************************
@@ -774,7 +809,7 @@ void	DBextract_version_info(struct zbx_db_version_info_t *version_info)
  * Parameters: version - [IN] entry of DB versions                            *
  *                                                                            *
  ******************************************************************************/
-void	DBflush_version_requirements(const char *version)
+void	zbx_db_flush_version_requirements(const char *version)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -792,9 +827,9 @@ void	DBflush_version_requirements(const char *version)
  * Parameters: allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
  *                                                                               *
  *********************************************************************************/
-int	DBcheck_version_info(struct zbx_db_version_info_t *info, int allow_unsupported)
+int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported)
 {
-	DBextract_version_info(info);
+	zbx_db_extract_version_info(info);
 
 	if (DB_VERSION_NOT_SUPPORTED_ERROR == info->flag ||
 			DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag || DB_VERSION_LOWER_THAN_MINIMUM == info->flag)
@@ -865,77 +900,122 @@ int	DBcheck_version_info(struct zbx_db_version_info_t *info, int allow_unsupport
 	return SUCCEED;
 }
 
-
+#ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
- * Purpose: checks DBMS for optional features and exit if is not suitable     *
+ * Purpose: checks if TimescaleDB version is allowed and if it supports       *
+ *          compression                                                       *
  *                                                                            *
- * Parameters: db_version - [IN] version of DB                                *
+ * Parameters: allow_unsupported_ver - [IN] flag that indicates whether to    *
+ *                                          allow unsupported versions of     *
+ *                                          TimescaleDB or not                *
+ *             db_version_info       - [IN/OUT] information about version of  *
+ *                                              DB and its extensions         *
  *                                                                            *
- * Return value: SUCCEED - if optional features were checked successfully     *
+ * Return value: SUCCEED - if there are no critical errors                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	DBcheck_capabilities(zbx_uint32_t db_version)
+int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver)
 {
 	int	ret = SUCCEED;
-#ifdef HAVE_POSTGRESQL
 
-#define MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB	100002
-#define MIN_TIMESCALEDB_VERSION			10500
-	int		timescaledb_version;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	if (FAIL == DBfield_exists("config", "db_extension"))
+	if (0 != zbx_strcmp_null(db_version_info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+	{
 		goto out;
+	}
 
-	if (NULL == (result = DBselect("select db_extension from config")))
+	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 and newer */
+	/* in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition.    */
+	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0.  */
+	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > db_version_info->current_version)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "PostgreSQL version %lu is not supported with TimescaleDB, minimum"
+				" required is %d.", (unsigned long)db_version_info->current_version,
+				ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_POSTGRES_TOO_OLD;
+		ret = FAIL;
 		goto out;
-
-	if (NULL == (row = DBfetch(result)))
-		goto clean;
-
-	if (0 != zbx_strcmp_null(row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
-		goto clean;
-
-	ret = FAIL;	/* In case of major upgrade, db_extension may be missing */
-
-	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
-	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > db_version)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %lu is not supported with TimescaleDB, minimum is %d",
-				(unsigned long)db_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
-		goto clean;
 	}
 
-	if (0 == (timescaledb_version = zbx_tsdb_get_version()))
+	if (DB_VERSION_FAILED_TO_RETRIEVE == db_version_info->ext_flag)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot determine TimescaleDB version");
-		goto clean;
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE;
+		ret = FAIL;
+		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: %d", timescaledb_version);
-
-	if (MIN_TIMESCALEDB_VERSION > timescaledb_version)
+	if (DB_VERSION_LOWER_THAN_MINIMUM == db_version_info->ext_flag)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "TimescaleDB version %d is not supported, minimum is %d",
-				timescaledb_version, MIN_TIMESCALEDB_VERSION);
-		goto clean;
+		zabbix_log(LOG_LEVEL_WARNING, "Version must be at least %d. Recommended version should be at least"
+				" %s %s.", ZBX_TIMESCALE_MIN_VERSION, ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY,
+				ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM;
+		ret = FAIL;
+		goto out;
 	}
 
-	ret = SUCCEED;
-clean:
-	DBfree_result(result);
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info->ext_flag)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %u is not officially supported. Recommended version"
+				" should be at least %s %s.", db_version_info->ext_current_version,
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED;
+
+		if (0 == allow_unsupported_ver)
+		{
+			ret = FAIL;
+			goto out;
+		}
+
+		db_version_info->ext_flag = DB_VERSION_NOT_SUPPORTED_WARNING;
+	}
+
+	if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info->ext_flag)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should not be higher than %s %s.",
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MAX_VERSION_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM;
+
+		if (0 == allow_unsupported_ver)
+		{
+			db_version_info->ext_flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
+			ret = FAIL;
+			goto out;
+		}
+
+		db_version_info->ext_flag = DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING;
+	}
+
+	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT > db_version_info->ext_current_version)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Current TimescaleDB version is %u. TimescaleDB license and compression"
+				" availability detection is possible starting from TimescaleDB 2.0.",
+				db_version_info->ext_current_version);
+		zbx_tsdb_set_compression_availability(ON);
+		goto out;
+	}
+
+	if (0 != zbx_strcmp_null(db_version_info->ext_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Detected license [%s] does not support compression. Compression is"
+				" supported in %s.", ZBX_NULL2EMPTY_STR(db_version_info->ext_lic),
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY;
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
+			ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+
+	if (ZBX_EXT_ERR_UNDEFINED == db_version_info->ext_err_code)
+		db_version_info->ext_err_code = ZBX_EXT_SUCCEED;
+
+	zbx_tsdb_set_compression_availability(ON);
 out:
-	DBclose();
-#else
-	ZBX_UNUSED(db_version);
-#endif
 	return ret;
 }
+#endif
 
 #define MAX_EXPRESSIONS	950
 
