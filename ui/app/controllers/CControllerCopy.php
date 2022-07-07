@@ -30,14 +30,13 @@ class CControllerCopy extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' => 'string|in host,template',
 			'copy_targetids' => 'array|not_empty',
 			'itemids' =>  'array_id',
 			'triggerids' => 'array_id',
 			'graphids' => 'array_id',
 			'copy_type' => 'in '.implode(',', [
 				COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP
-				])
+			])
 		];
 
 		$ret = $this->validateInput($fields);
