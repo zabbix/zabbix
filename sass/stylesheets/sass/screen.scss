@@ -4975,6 +4975,7 @@ svg {
 	display: block;
 	max-width: 930px;
 	min-width: 800px;
+	position: relative;
 
 	> li {
 		display: block;
@@ -6397,7 +6398,7 @@ z-select,
 
 .import-compare {
 	display: flex;
-	max-height: calc(100vh - 190px);
+	max-height: calc(100vh - 220px);
 
 	.toc {
 		flex: 20%;
@@ -6410,6 +6411,11 @@ z-select,
 		margin-left: 5px;
 		overflow: auto;
 		border: 1px dashed $form-border-color;
+	}
+
+	.toc,
+	.diff {
+		@extend %webkit-scrollbar;
 	}
 }
 

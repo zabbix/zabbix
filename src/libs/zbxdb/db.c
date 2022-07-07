@@ -64,15 +64,15 @@ struct zbx_db_result
 #endif
 };
 
-static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
-static int	txn_error = ZBX_DB_OK;	/* failed transaction */
-static int	txn_end_error = ZBX_DB_OK;	/* transaction result */
+static int		txn_level = 0;	/* transaction level, nested transactions are not supported */
+static int		txn_error = ZBX_DB_OK;	/* failed transaction */
+static int		txn_end_error = ZBX_DB_OK;	/* transaction result */
 
-static char	*last_db_strerror = NULL;	/* last database error message */
+static char		*last_db_strerror = NULL;	/* last database error message */
 
-extern int	CONFIG_LOG_SLOW_QUERIES;
+extern int		CONFIG_LOG_SLOW_QUERIES;
 
-static int	db_auto_increment;
+static int		db_auto_increment;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;

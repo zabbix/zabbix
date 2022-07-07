@@ -17,27 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
+#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 
 extern unsigned char	program_type;
 
 /*
- * 6.2 maintenance database patches
+ * 6.4 development database patches
  */
 
 #ifndef HAVE_SQLITE3
 
-static int	DBpatch_6020000(void)
+/*static int	DBpatch_6030000(void)
 {
-	return SUCCEED;
-}
+	*** first upgrade patch ***
+}*/
 
 #endif
 
-DBPATCH_START(6020)
+DBPATCH_START(6030)
 
 /* version, duplicates flag, mandatory flag */
 
-DBPATCH_ADD(6020000, 0, 1)
+/*DBPATCH_ADD(6030000, 0, 1)*/
 
 DBPATCH_END()

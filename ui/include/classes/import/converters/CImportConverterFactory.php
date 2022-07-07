@@ -37,7 +37,8 @@ class CImportConverterFactory extends CRegistryFactory {
 			'5.0' => 'C50ImportConverter',
 			'5.2' => 'C52ImportConverter',
 			'5.4' => 'C54ImportConverter',
-			'6.0' => 'C60ImportConverter'
+			'6.0' => 'C60ImportConverter',
+			'6.2' => 'C62ImportConverter'
 		]);
 	}
 }

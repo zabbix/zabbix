@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,27 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "dbupgrade.h"
 
-extern unsigned char	program_type;
-
-/*
- * 6.2 maintenance database patches
+/**
+ * Converter for converting import data from 6.2 to 6.4.
  */
+class C62ImportConverter extends CConverter {
 
-#ifndef HAVE_SQLITE3
+	/**
+	 * Convert import data from 6.2 to 6.4 version.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function convert(array $data): array {
+		$data['zabbix_export']['version'] = '6.4';
 
-static int	DBpatch_6020000(void)
-{
-	return SUCCEED;
+		return $data;
+	}
 }
-
-#endif
-
-DBPATCH_START(6020)
-
-/* version, duplicates flag, mandatory flag */
-
-DBPATCH_ADD(6020000, 0, 1)
-
-DBPATCH_END()

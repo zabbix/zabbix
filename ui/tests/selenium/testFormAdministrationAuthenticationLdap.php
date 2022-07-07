@@ -536,7 +536,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				[
 					'ldap_settings' => [
 						[
-							'Host' => 'ldap.forumsys.com'
+							'Host' => 'ipa.demo1.freeipa.org'
 						]
 					],
 					'ldap_error' => 'Invalid LDAP configuration',
@@ -553,8 +553,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				[
 					'ldap_settings' => [
 						[
-							'Host' => 'ldap.forumsys.com',
-							'Base DN' => 'dc=example,dc=com'
+							'Host' => 'ipa.demo1.freeipa.org',
+						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org'
 						]
 					],
 					'ldap_error' => 'Invalid LDAP configuration',
@@ -570,8 +570,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				[
 					'ldap_settings' => [
 						[
-							'Host' => 'ldap.forumsys.com',
-							'Base DN' => 'dc=example,dc=com',
+							'Host' => 'ipa.demo1.freeipa.org',
+							'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 							'Search attribute' => 'uid'
 						]
 					],
@@ -692,13 +692,13 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 					'expected' => TEST_GOOD,
 					'ldap_settings' => [
 						[
-							'Name' => 'AAAA',
-							'Host' => 'ldap.forumsys.com',
+							'Name' => 'LDAP',
+							'Host' => 'ipa.demo1.freeipa.org',
 							'Port' => '389',
-							'Base DN' => 'dc=example,dc=com',
+							'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 							'Search attribute' => 'uid',
-							'Bind DN' => 'cn=read-only-admin,dc=example,dc=com',
-							'Bind password' => 'password',
+							'Bind DN' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+							'Bind password' => 'Secret123',
 							'Description' => 'description',
 							'Advanced configuration' => true,
 							'StartTLS' => true,
@@ -706,12 +706,12 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						]
 					],
 					'db_check' => [
-						'name' => 'AAAA',
-						'host' => 'ldap.forumsys.com',
+						'name' => 'LDAP',
+						'host' => 'ipa.demo1.freeipa.org',
 						'port' => '389',
-						'base_dn' => 'dc=example,dc=com',
-						'bind_dn' => 'cn=read-only-admin,dc=example,dc=com',
-						'bind_password' => 'password',
+						'base_dn' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+						'bind_dn' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+						'bind_password' => 'Secret123',
 						'search_attribute' => 'uid'
 					]
 				]

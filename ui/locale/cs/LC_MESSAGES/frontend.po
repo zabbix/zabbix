@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-29 08:09+0000\n"
+"PO-Revision-Date: 2022-06-29 12:11+0000\n"
 "Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -11624,7 +11624,7 @@ msgstr ""
 #: app/views/administration.script.list.php:53
 #: app/views/administration.script.list.php:131
 msgid "Manual host action"
-msgstr ""
+msgstr "Ruční akce zařízení"
 
 #: app/views/popup.acknowledge.edit.php:83
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
@@ -12892,7 +12892,7 @@ msgstr "Nenalezené žádné rozhraní."
 
 #: jsLoader.php:321
 msgid "No interfaces are defined."
-msgstr ""
+msgstr "Nejsou definována žádná rozhraní."
 
 #: app/controllers/CControllerActionOperationValidate.php:169
 msgid "No inventory mode specified for action operation."
@@ -12905,7 +12905,7 @@ msgstr "Nebyla vybrána žádná položka."
 #: include/items.inc.php:742
 #, c-format
 msgid "No item with item ID \"%1$s\"."
-msgstr ""
+msgstr "Žádná položka s ID \"%1$s\"."
 
 #: chart3.php:145 chart7.php:56
 msgid "No items defined."
@@ -13398,7 +13398,7 @@ msgstr "Počet povolených položek na hostitele."
 
 #: app/partials/administration.system.info.php:40
 msgid "Number of hosts (enabled/disabled)"
-msgstr ""
+msgstr "Počet zařízení (povolených/zakázáných)"
 
 #: app/partials/administration.system.info.php:55
 msgid "Number of items (enabled/disabled/not supported)"
@@ -13705,7 +13705,7 @@ msgstr "Pouze super administrátoři mohou ustanovit vlastníka dashboardu."
 
 #: include/classes/api/services/CReport.php:334
 msgid "Only super admins can set report owner."
-msgstr ""
+msgstr "Vlastníka přehledu mohou nastavit pouze super administrátoři."
 
 #: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
@@ -13801,7 +13801,7 @@ msgstr "Operátor"
 
 #: app/views/popup.triggerexpr.php:114
 msgid "Operator functions"
-msgstr ""
+msgstr "Funkce operátorů"
 
 #: app/views/administration.mediatype.edit.php:347
 msgid "Options"
@@ -14234,7 +14234,7 @@ msgstr "Parametr \"%1$s\" je zastaralý."
 #: include/classes/api/services/CTemplateGroup.php:1226
 #, c-format
 msgid "Parameter \"%1$s\" must be enabled."
-msgstr ""
+msgstr "Parametr \"%1$s\" musí být povolen."
 
 #: app/views/administration.mediatype.edit.php:213
 #: app/views/administration.script.edit.php:181
@@ -14775,7 +14775,7 @@ msgstr "Problém na"
 #: app/views/popup.mediatype.message.php:52
 #: include/classes/helpers/CMediatypeHelper.php:64
 msgid "Problem recovery"
-msgstr ""
+msgstr "Vyřešení problému"
 
 #: include/actions.inc.php:2062
 msgid "Problem resolved"
@@ -14783,7 +14783,7 @@ msgstr "Problém vyřešen"
 
 #: app/views/administration.usergroup.edit.php:275
 msgid "Problem tag filter"
-msgstr ""
+msgstr "Filtr problémových tagů"
 
 #: app/views/popup.service.edit.php:59 app/views/popup.service.edit.php:269
 #: app/views/popup.services.php:62
@@ -15235,11 +15235,11 @@ msgstr "Regulární výrazy"
 
 #: app/controllers/CControllerPopupScheduledReportList.php:52
 msgid "Related reports"
-msgstr ""
+msgstr "Související reporty"
 
 #: jsLoader.php:151
 msgid "Release to create a widget."
-msgstr ""
+msgstr "Uvolněním vytvoříte widget."
 
 #: include/views/general.login.php:77
 msgid "Remember me for 30 days"
@@ -15618,7 +15618,7 @@ msgstr "Obnovit původní hodnoty"
 
 #: jsLoader.php:174
 msgid "Reset to initial view"
-msgstr ""
+msgstr "Obnovit výchozí zobrazení"
 
 #: jsLoader.php:293
 msgid "Resolved"
@@ -15915,7 +15915,7 @@ msgstr ""
 
 #: app/controllers/CControllerSlaReportList.php:229
 msgid "SLA Report"
-msgstr ""
+msgstr "Report SLA"
 
 #: app/controllers/CControllerSlaCreate.php:114
 msgid "SLA created"
@@ -16635,7 +16635,7 @@ msgstr[2] "Služby byly smazány"
 #: app/views/administration.userrole.edit.php:146
 #: app/views/administration.userrole.edit.php:187
 msgid "Service list"
-msgstr ""
+msgstr "Seznam služeb"
 
 #: include/actions.inc.php:68
 msgid "Service name"
@@ -17558,11 +17558,11 @@ msgstr "Podpora"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
-msgstr ""
+msgstr "Podporované formáty:"
 
 #: include/classes/widgets/views/widget.item.form.view.php:59
 msgid "Supported macros:"
-msgstr ""
+msgstr "Podporovaná makra:"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:101
 #: app/views/popup.acknowledge.edit.php:82
@@ -17571,11 +17571,11 @@ msgstr "Potlačit"
 
 #: include/classes/helpers/CRoleHelper.php:471
 msgid "Suppress problems"
-msgstr ""
+msgstr "Potlačit problémy"
 
 #: include/actions.inc.php:1761
 msgid "Suppress until"
-msgstr ""
+msgstr "Potlačit do"
 
 #: include/actions.inc.php:1771 include/classes/screens/CScreenProblem.php:1259
 msgid "Suppressed"
@@ -18076,7 +18076,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:79
 msgid "Test report generating"
-msgstr ""
+msgstr "Vygenerování zkušebního reportu"
 
 #: app/views/administration.regex.edit.php:120
 msgid "Test string"
@@ -18140,7 +18140,7 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
-msgstr ""
+msgstr "Jsou podporovány následující zástupné symboly:"
 
 #: include/html.inc.php:691
 #, c-format
