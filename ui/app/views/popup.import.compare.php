@@ -170,8 +170,8 @@ else {
 		'script_inline' => trim($this->readJsFile('popup.import.compare.js.php')),
 		'body' => !$data['diff']
 			? (new CTableInfo())
-					->setNoDataMessage(_('No changes.'))
-					->toString()
+				->setNoDataMessage(_('No changes.'))
+				->toString()
 			: (new CForm())
 				->addClass('import-compare')
 				->addVar('import_overlayid', $data['import_overlayid'])

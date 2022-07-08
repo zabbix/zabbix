@@ -154,17 +154,18 @@ class CTabView extends CDiv {
 	}
 
 	public function makeJavascript() {
+		$tab_name = ':tab.'.$this->id;
 		$create_event = '';
 
 		if ($this->selectedTab !== null) {
 			$create_event = 'create: function() {'.
-				'sessionStorage.setItem(ZBX_SESSION_NAME + "_tab", '.json_encode($this->selectedTab).');'.
+				'sessionStorage.setItem(ZBX_SESSION_NAME + "'.$tab_name.'", '.json_encode($this->selectedTab).');'.
 			'},';
 			$active_tab = 'active: '.json_encode($this->selectedTab).',';
 		}
 		else {
 			$active_tab = 'active: function() {'.
-				'return sessionStorage.getItem(ZBX_SESSION_NAME + "_tab") || 0;'.
+				'return sessionStorage.getItem(ZBX_SESSION_NAME + "'.$tab_name.'") || 0;'.
 			'}(),';
 		}
 
@@ -177,14 +178,14 @@ class CTabView extends CDiv {
 					$disabled_tabs.
 					$active_tab.
 					'activate: function(event, ui) {'.
-						'sessionStorage.setItem(ZBX_SESSION_NAME + "_tab", ui.newTab.index().toString());'.
+						'sessionStorage.setItem(ZBX_SESSION_NAME + "'.$tab_name.'", ui.newTab.index().toString());'.
 						'jQuery.cookie("tab", ui.newTab.index().toString());'.
 						$this->tab_change_js.
 					'}'.
 				'})'.
 				// Prevent changing the cookie value in a different tab.
 				'.parent().on("submit", function() {'.
-					'jQuery.cookie("tab", sessionStorage.getItem(ZBX_SESSION_NAME + "_tab") || 0);'.
+					'jQuery.cookie("tab", sessionStorage.getItem(ZBX_SESSION_NAME + "'.$tab_name.'") || 0);'.
 				'});';
 	}
 }

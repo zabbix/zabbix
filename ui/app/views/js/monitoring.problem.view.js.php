@@ -157,7 +157,7 @@
 		refreshResults() {
 			const url = new Curl();
 			const screen = window.flickerfreeScreen.screens['problem'];
-			const data = $.extend(this.filter_defaults, this.global_timerange, url.getArgumentsObject());
+			const data = Object.assign({}, this.filter_defaults, this.global_timerange, url.getArgumentsObject());
 
 			data.inventory = data.inventory
 				? data.inventory.filter(inventory => 'value' in inventory && inventory.value !== '')

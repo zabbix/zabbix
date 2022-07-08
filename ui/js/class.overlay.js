@@ -167,14 +167,14 @@ Overlay.prototype.recoverFocus = function() {
 Overlay.prototype.containFocus = function() {
 	var focusable = jQuery(':focusable', this.$dialogue);
 
-	focusable.off('keydown');
+	focusable.off('keydown.containFocus');
 
 	if (focusable.length > 1) {
 		var first_focusable = focusable.filter(':first'),
 			last_focusable = focusable.filter(':last');
 
 		first_focusable
-			.on('keydown', function(e) {
+			.on('keydown.containFocus', function(e) {
 				// TAB and SHIFT
 				if (e.which == 9 && e.shiftKey) {
 					last_focusable.focus();
@@ -183,7 +183,7 @@ Overlay.prototype.containFocus = function() {
 			});
 
 		last_focusable
-			.on('keydown', function(e) {
+			.on('keydown.containFocus', function(e) {
 				// TAB and not SHIFT
 				if (e.which == 9 && !e.shiftKey) {
 					first_focusable.focus();
@@ -193,7 +193,7 @@ Overlay.prototype.containFocus = function() {
 	}
 	else {
 		focusable
-			.on('keydown', function(e) {
+			.on('keydown.containFocus', function(e) {
 				if (e.which == 9) {
 					return false;
 				}

@@ -83,13 +83,15 @@
 				});
 			});
 
-			document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
-				this.form.querySelectorAll('[name^=saml_]').forEach(field => {
-					if (!field.isSameNode(e.target)) {
-						field.disabled = !e.target.checked;
-					}
+			if (document.getElementById('saml_auth_enabled') !== null) {
+				document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
+					this.form.querySelectorAll('[name^=saml_]').forEach(field => {
+						if (!field.isSameNode(e.target)) {
+							field.disabled = !e.target.checked;
+						}
+					});
 				});
-			});
+			}
 
 			this.form.addEventListener('submit', (e) => {
 				if (!this._authFormSubmit()) {

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if ($data['error'] !== null) {
@@ -29,7 +30,7 @@ if ($data['error'] !== null) {
 else {
 	$table = (new CTableInfo())
 		->setHeader([
-			_('Discovery rule'),
+			_x('Discovery rule', 'compact table header'),
 			_x('Up', 'discovery results in dashboard'),
 			_x('Down', 'discovery results in dashboard')
 		])

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 // indicator of sort field
@@ -30,13 +31,21 @@ $sort_div = (new CSpan())
 // create alert table
 $table = (new CTableInfo())
 	->setHeader([
-		($data['sortfield'] === 'clock') ? [_('Time'), $sort_div] : _('Time'),
-		_('Action'),
-		($data['sortfield'] === 'mediatypeid') ? [_('Type'), $sort_div] : _('Type'),
-		($data['sortfield'] === 'sendto') ? [_('Recipient'), $sort_div] : _('Recipient'),
-		_('Message'),
-		($data['sortfield'] === 'status') ? [_('Status'), $sort_div] : _('Status'),
-		_('Info')
+		($data['sortfield'] === 'clock')
+			? [_x('Time', 'compact table header'), $sort_div]
+			: _x('Time', 'compact table header'),
+		_x('Action', 'compact table header'),
+		($data['sortfield'] === 'mediatypeid')
+			? [_x('Type', 'compact table header'), $sort_div]
+			: _x('Type', 'compact table header'),
+		($data['sortfield'] === 'sendto')
+			? [_x('Recipient', 'compact table header'), $sort_div]
+			: _x('Recipient', 'compact table header'),
+		_x('Message', 'compact table header'),
+		($data['sortfield'] === 'status')
+			? [_x('Status', 'compact table header'), $sort_div]
+			: _x('Status', 'compact table header'),
+		_x('Info', 'compact table header')
 	]);
 
 foreach ($data['alerts'] as $alert) {
