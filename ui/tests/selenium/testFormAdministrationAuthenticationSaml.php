@@ -145,7 +145,6 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'Encrypt' => ['Name ID', 'Assertions'],
 						'Case-sensitive login' => true
 					],
-					'check_disabled' => true,
 					'db_check' => [
 						'saml_auth_enabled' => '1',
 						'saml_idp_entityid' => 'IdP_saml_zabbix.com',
