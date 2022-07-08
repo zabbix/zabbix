@@ -656,7 +656,7 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['type',  'key_']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['type', 'key_']);
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
