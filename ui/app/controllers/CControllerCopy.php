@@ -104,7 +104,10 @@ class CControllerCopy extends CController {
 	}
 
 	protected function copyItems() {
-		$copy_targetids = $this->getInput('copy_targetids');
+		$copy_targetids = null;
+		if ( $this->hasInput('copy_targetids')) {
+			$copy_targetids = $this->getInput('copy_targetids');
+		}
 		$copy_type = $this->getInput('copy_type');
 		$itemids = $this->getInput('itemids');
 
@@ -164,7 +167,10 @@ class CControllerCopy extends CController {
 	}
 
 	protected function copyTriggers() {
-		$copy_targetids = $this->getInput('copy_targetids');
+		$copy_targetids = null;
+		if ( $this->hasInput('copy_targetids')) {
+			$copy_targetids = $this->getInput('copy_targetids');
+		}
 		$copy_type = $this->getInput('copy_type');
 		$triggerids = $this->getInput('triggerids');
 
@@ -225,59 +231,61 @@ class CControllerCopy extends CController {
 	}
 
 	protected function copyGraphs() {
-		if ($this->getAction() === 'copy.graphs') {
+		$copy_targetids = null;
+		if ( $this->hasInput('copy_targetids')) {
 			$copy_targetids = $this->getInput('copy_targetids');
-			$copy_type = $this->getInput('copy_type');
-			$graphids = $this->getInput('graphids');
-			$result = true;
+		}
+		$copy_type = $this->getInput('copy_type');
+		$graphids = $this->getInput('graphids');
+		$result = true;
 
-			$options = [
-				'output' => ['hostid'],
-				'editable' => true,
-				'templated_hosts' => true
-			];
+		$options = [
+			'output' => ['hostid'],
+			'editable' => true,
+			'templated_hosts' => true
+		];
 
-			// hosts or templates
-			if ($copy_type == COPY_TYPE_TO_HOST || $copy_type == COPY_TYPE_TO_TEMPLATE) {
-				$options['hostids'] = $copy_targetids;
-			}
-			// host groups or template groups
-			else {
-				$options['groupids'] = $copy_targetids;
-			}
-			$dbHosts = API::Host()->get($options);
+		// hosts or templates
+		if ($copy_type == COPY_TYPE_TO_HOST || $copy_type == COPY_TYPE_TO_TEMPLATE) {
+			$options['hostids'] = $copy_targetids;
+		}
+		// host groups or template groups
+		else {
+			$options['groupids'] = $copy_targetids;
+		}
+		$dbHosts = API::Host()->get($options);
 
-			foreach ($graphids as $graphid) {
-				foreach ($dbHosts as $host) {
-					if (!copyGraphToHost($graphid, $host['hostid'])) {
-						$result = false;
-					}
+		foreach ($graphids as $graphid) {
+			foreach ($dbHosts as $host) {
+				if (!copyGraphToHost($graphid, $host['hostid'])) {
+					$result = false;
 				}
 			}
-			$graphs_count = count($graphids);
+		}
+		$graphs_count = count($graphids);
 
-			if ($copy_targetids > 0) {
-				if ($result) {
-					$output['success']['title'] = _n('Graph copied', 'Graphs copied', $graphs_count);
+		if ($copy_targetids > 0) {
+			if ($result) {
+				$output['success']['title'] = _n('Graph copied', 'Graphs copied', $graphs_count);
 
-					if ($messages = get_and_clear_messages()) {
-						$output['success']['messages'] = array_column($messages, 'message');
-					}
-				}
-				else {
-					$output['error'] = [
-						'title' => _n('Cannot copy graph', 'Cannot copy graphs', $graphs_count),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					];
+				if ($messages = get_and_clear_messages()) {
+					$output['success']['messages'] = array_column($messages, 'message');
 				}
 			}
 			else {
 				$output['error'] = [
-					'title' => _('No target selected.')
+					'title' => _n('Cannot copy graph', 'Cannot copy graphs', $graphs_count),
+					'messages' => array_column(get_and_clear_messages(), 'message')
 				];
 			}
-
-			return $output;
 		}
+		else {
+			$output['error'] = [
+				'title' => _('No target selected.')
+			];
+		}
+
+		return $output;
+
 	}
 }
