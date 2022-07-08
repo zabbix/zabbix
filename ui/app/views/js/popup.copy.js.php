@@ -33,7 +33,7 @@ window.copy_popup = new class {
 		this.curl = new Curl('zabbix.php');
 		this.curl.setArgument('action', action);
 
-		$('[name="copy_type"]').on('change', this.changeTargetType);
+		$('#copy_type').on('change', this.changeTargetType);
 
 		this.changeTargetType();
 	}
@@ -45,25 +45,24 @@ window.copy_popup = new class {
 			css: {
 				width: '<?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px'
 			},
-				'aria-required': true
-			}),
-			helper_options = {
-				id: 'copy_targetids',
-				name: 'copy_targetids[]',
-				objectOptions: {
-					editable: true
-				},
+			'aria-required': true
+		}),
+		helper_options = {
+			id: 'copy_targetids',
+			name: 'copy_targetids[]',
+			objectOptions: {
+				editable: true
+			},
 			popup: {
-					parameters: {
-						dstfrm: view.form_name,
-						dstfld1: 'copy_targetids',
-						writeonly: 1,
-						multiselect: 1
+				parameters: {
+					dstfld1: 'copy_targetids',
+					writeonly: 1,
+					multiselect: 1
 					}
 				}
-			}
+		};
 
-			switch ($('#copy_type').find('input[name=copy_type]:checked').val()) {
+		switch ($('#copy_type').find('input[name=copy_type]:checked').val()) {
 			case '<?= COPY_TYPE_TO_HOST_GROUP ?>':
 				helper_options.object_name = 'hostGroup';
 				helper_options.popup.parameters.srctbl = 'host_groups';

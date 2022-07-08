@@ -83,7 +83,6 @@ class CControllerPopupCopy extends CController {
 	protected function doAction() {
 		$data = [
 			'action' => $this->getAction(),
-			'form_refresh' => getRequest('form_refresh')
 		];
 
 		if ($data['action'] === 'popup.copy.items') {

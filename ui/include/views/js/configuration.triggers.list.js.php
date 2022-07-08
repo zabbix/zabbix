@@ -84,12 +84,13 @@
 		},
 
 		openCopyPopup() {
-			const form = document.activeElement.closest('form');
-			const parameters = {};
-			parameters.triggerids = Object.keys(chkbxRange.getSelectedIds());
-			parameters.context = form.querySelector('#form_context').value
+			const form = document.querySelector('form[name="triggersForm"]');
+			const parameters = {
+				triggerids: Object.keys(chkbxRange.getSelectedIds()),
+				context: form.querySelector('#form_context').value
+			};
 
-			return PopUp('popup.copy.triggers', parameters, {
+			PopUp('popup.copy.triggers', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});

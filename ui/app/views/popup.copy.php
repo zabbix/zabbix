@@ -27,11 +27,9 @@
 
 $output = [];
 // create form
-$form = (new CForm('post', (new CUrl())->getUrl()))
+$form = (new CForm())
 	->setName('elements_form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->setAttribute('action', $data['action'])
-	->addVar('action', $data['action'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 if (array_key_exists('itemids', $data)) {
@@ -51,25 +49,22 @@ elseif (array_key_exists('graphids', $data)) {
 }
 
 $form_grid = (new CFormGrid())
-	->setName('elements_form_list')
 	->addItem([
 		(new CLabel(_('Target type'), 'copy_type')),
-		(new CRadioButtonList('copy_type', COPY_TYPE_TO_HOST_GROUP))
-			->addValue(_('Host groups'), COPY_TYPE_TO_HOST_GROUP)
-			->addValue(_('Hosts'), COPY_TYPE_TO_HOST)
-			->addValue(_('Templates'), COPY_TYPE_TO_TEMPLATE)
-			->addValue(_('Template groups'), COPY_TYPE_TO_TEMPLATE_GROUP)
-			->setModern(true)
-			->setName('copy_type')
+		new CFormField(
+			(new CRadioButtonList('copy_type', COPY_TYPE_TO_HOST_GROUP))
+				->addValue(_('Host groups'), COPY_TYPE_TO_HOST_GROUP)
+				->addValue(_('Hosts'), COPY_TYPE_TO_HOST)
+				->addValue(_('Templates'), COPY_TYPE_TO_TEMPLATE)
+				->addValue(_('Template groups'), COPY_TYPE_TO_TEMPLATE_GROUP)
+				->setModern(true)
+				->setName('copy_type')
+		)
 	])
 	->addItem([
 		(new CLabel(_('Target'), 'copy_targetids_ms'))->setAsteriskMark(),
-		(new CDiv())->setId('copy_targets')
-	]);
-
-$form->addItem($form_grid);
-
-$form
+		(new CFormField())->setId('copy_targets')
+	])
 	->addItem(
 		(new CScriptTag('
 			copy_popup.init('.json_encode([
@@ -78,6 +73,8 @@ $form
 			]).');
 		'))->setOnDocumentReady()
 	);
+
+$form->addItem($form_grid);
 
 $buttons = [
 	[
