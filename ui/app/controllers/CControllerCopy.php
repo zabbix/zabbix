@@ -56,33 +56,49 @@ class CControllerCopy extends CController {
 
 	protected function checkPermissions(): bool {
 		$action = $this->getAction();
+		$copy_type = $this->getInput('copy_type');
 
-		if ($action == 'copy.items') {
-			$entity = API::Item()->get([
-				'output' => [],
-				'itemids' => $this->getInput('itemids'),
-				'editable' => true
-			]);
-			$element_count = count($this->getInput('itemids'));
+		if (($copy_type == COPY_TYPE_TO_HOST && !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS))) {
+			return false;
 		}
-		elseif ($action == 'copy.triggers') {
-			$entity = API::Trigger()->get([
-				'output' => [],
-				'triggerids' => $this->getInput('triggerids'),
-				'editable' => true
-			]);
-			$element_count = count($this->getInput('triggerids'));
+		elseif ($copy_type == COPY_TYPE_TO_TEMPLATE
+				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
+			return false;
 		}
-		elseif ($action == 'copy.graphs') {
-			$entity = API::Graph()->get([
-				'output' => [],
-				'graphids' => $this->getInput('graphids'),
-				'editable' => true
-			]);
-			$element_count = count($this->getInput('graphids'));
+		elseif ($copy_type == COPY_TYPE_TO_TEMPLATE_GROUP
+				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS)) {
+			return false;
+		}
+		elseif ($copy_type == COPY_TYPE_TO_HOST_GROUP
+				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS)) {
+			return false;
 		}
 
-		return $element_count === count($entity);
+		if ($action === 'copy.items' && $this->hasInput('itemids')) {
+			$items_count = API::Item()->get([
+				'countOutput' => true,
+				'itemids' => $this->getInput('itemids')
+			]);
+
+			return $items_count == count($this->getInput('itemids'));
+		}
+		elseif ($action === 'copy.triggers' && $this->hasInput('triggerids')) {
+			$triggers_count = API::Trigger()->get([
+				'countOutput' => true,
+				'triggerids' => $this->getInput('triggerids')
+			]);
+
+			return $triggers_count == count($this->getInput('triggerids'));
+		}
+		elseif ($action === 'copy.graphs' && $this->hasInput('graphids')) {
+			$graphs_count = API::Graph()->get([
+				'countOutput' => true,
+				'graphids' => $this->getInput('graphids')
+			]);
+
+			return $graphs_count == count($this->getInput('graphids'));
+		}
+		return false;
 	}
 
 	protected function doAction() {

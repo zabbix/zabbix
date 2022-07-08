@@ -44,43 +44,40 @@ class CControllerPopupCopy extends CController {
 	}
 
 	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS) ||
-				!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS) ||
-				!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES) ||
-				!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS)) {
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS)
+				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS)) {
 			return false;
 		}
 
 		$action = $this->getAction();
 
-		if ($action == 'popup.copy.items') {
-			$entity = API::Item()->get([
-				'output' => [],
-				'itemids' => $this->getInput('itemids'),
-				'editable' => true
+		if ($action === 'popup.copy.items' && $this->hasInput('itemids')) {
+			$items_count = API::Item()->get([
+				'countOutput' => true,
+				'itemids' => $this->getInput('itemids')
 			]);
-			$element_count = count($this->getInput('itemids'));
-		}
 
-		elseif ($action == 'popup.copy.triggers') {
-			$entity = API::Trigger()->get([
-				'output' => [],
-				'triggerids' => $this->getInput('triggerids'),
-				'editable' => true
+			return $items_count == count($this->getInput('itemids'));
+		}
+		elseif ($action === 'popup.copy.triggers' && $this->hasInput('triggerids')) {
+			$triggers_count = API::Trigger()->get([
+				'countOutput' => true,
+				'triggerids' => $this->getInput('triggerids')
 			]);
-			$element_count = count($this->getInput('triggerids'));
-		}
 
-		elseif ($action == 'popup.copy.graphs') {
-			$entity = API::Graph()->get([
-				'output' => [],
-				'graphids' => $this->getInput('graphids'),
-				'editable' => true
+			return $triggers_count == count($this->getInput('triggerids'));
+		}
+		elseif ($action === 'popup.copy.graphs' && $this->hasInput('graphids')) {
+			$graphs_count = API::Graph()->get([
+				'countOutput' => true,
+				'graphids' => $this->getInput('graphids')
 			]);
-			$element_count = count($this->getInput('graphids'));
-		}
 
-		return $element_count === count($entity);
+			return $graphs_count == count($this->getInput('graphids'));
+		}
+		return false;
 	}
 
 	protected function doAction() {
