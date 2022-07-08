@@ -41,8 +41,9 @@ $form_list = (new CFormList())
 		new CVar('sysmapid', $data['sysmap']['sysmapid']),
 		(new CTextBox('sysmapname', $data['sysmap']['name'], true))
 			->setAttribute('onChange',
-				'javascript: if(jQuery("#'.$form->getName().' input[type=text]:first").val() === ""){'.
-					'jQuery("#widget-dialogue-form input[type=text]:first").val(this.value);}')
+				'javascript: if(jQuery("#'.$form->getId().' input[type=text]:first").val() === ""){'.
+					'jQuery("#'.$form->getId().' input[type=text]:first").val(this.value);}'
+			)
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('select', _('Select')))
