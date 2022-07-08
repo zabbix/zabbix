@@ -30,7 +30,7 @@ $hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_te
 
 $filter_column1 = (new CFormList())
 	->addRow(
-		new CLabel($data['context'] === 'host' ? _('Host groups') : _('Template groups'), 'filter_groupids'),
+		new CLabel($data['context'] === 'host' ? _('Host groups') : _('Template groups'), 'filter_groupids__ms'),
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
 			'object_name' => $data['context'] === 'host' ? 'hostGroup' : 'templateGroup',
@@ -48,7 +48,7 @@ $filter_column1 = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
 	->addRow(
-		new CLabel($data['context'] === 'host' ? _('Hosts') : _('Templates'), 'filter_hostids'),
+		(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
