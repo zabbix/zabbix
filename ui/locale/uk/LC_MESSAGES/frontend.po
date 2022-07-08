@@ -281,6 +281,11 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, обрано"
 
+#: include/classes/graph/CSvgGraph.php:1262
+#, c-format
+msgid "%1$sth percentile: %2$s"
+msgstr ""
+
 #: include/func.inc.php:1947
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -314,6 +319,12 @@ msgstr "(0 - використовувати замовчування дії)"
 #: include/views/configuration.hostgroups.list.php:37
 msgid "(Only super admins can create groups)"
 msgstr "(Тільки супер адміністратори можуть створювати групи)"
+
+#: app/partials/configuration.tags.tab.php:84
+#: app/partials/hostmacros.inherited.list.html.php:190
+#: app/partials/hostmacros.list.html.php:87
+msgid "(created by host discovery)"
+msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
@@ -529,6 +540,11 @@ msgstr ""
 msgid "Ack"
 msgstr "Підтверджено"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "Підтверджено"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "Підтвердити"
@@ -622,6 +638,11 @@ msgstr "Підтверджені ВИРІШЕНІ події"
 msgid "Action"
 msgstr "Дія"
 
+#: app/views/monitoring.widget.actionlog.view.php:37
+msgctxt "compact table header"
+msgid "Action"
+msgstr "Дія"
+
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
@@ -690,6 +711,11 @@ msgstr "Дію оновлено"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "Дії"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "Дії"
 
@@ -898,6 +924,12 @@ msgstr ""
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Додати вузел мережі"
+
+#: app/views/popup.massupdate.trigger.php:155
+#: include/views/configuration.trigger.prototype.edit.php:685
+#: include/views/configuration.triggers.edit.php:669
+msgid "Add host trigger"
+msgstr ""
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
@@ -1291,11 +1323,19 @@ msgstr "Задіяти"
 msgid "Apply permissions and tag filters to all subgroups"
 msgstr "Задіяти права та фільтри тегів до всіх підгруп"
 
+#: app/partials/configuration.templategroup.edit.html.php:47
+msgid "Apply permissions to all subgroups"
+msgstr ""
+
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.maintenance.list.php:105
 msgctxt "maintenance status"
 msgid "Approaching"
 msgstr "Наближається"
+
+#: include/classes/widgets/CWidgetHelper.php:1443
+msgid "Approximation"
+msgstr ""
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1426,6 +1466,11 @@ msgstr ""
 #: include/views/configuration.action.edit.php:522
 msgid "At least one operation must exist."
 msgstr "Принаймні одна операція має існувати."
+
+#: include/classes/api/services/CHostGroup.php:1594
+#, c-format
+msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
+msgstr ""
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
@@ -1621,6 +1666,11 @@ msgstr "Звіт про доступність"
 #: app/views/monitoring.widget.hostavail.view.php:58
 #: app/views/monitoring.widget.hostavail.view.php:102
 #: include/classes/html/CHostAvailability.php:80
+msgid "Available"
+msgstr "Доступний"
+
+#: app/views/monitoring.widget.hostavail.view.php:37
+msgctxt "compact table header"
 msgid "Available"
 msgstr "Доступний"
 
@@ -1842,6 +1892,10 @@ msgstr ""
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1429
+msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
 msgstr ""
@@ -1969,6 +2023,11 @@ msgstr "Не вдалося додати групу"
 msgid "Cannot add host"
 msgstr "Не вдалося додати вузел мережі"
 
+#: app/controllers/CControllerHostGroupCreate.php:40
+#: app/controllers/CControllerHostGroupCreate.php:70
+msgid "Cannot add host group"
+msgstr ""
+
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
 msgstr "Не вдалося додати прототип вузла мережі"
@@ -2049,6 +2108,11 @@ msgstr "Не вдалося додати під-карти. Досягнуто �
 #: templates.php:205
 msgid "Cannot add template"
 msgstr "Не вдалося додати шаблон"
+
+#: app/controllers/CControllerTemplateGroupCreate.php:40
+#: app/controllers/CControllerTemplateGroupCreate.php:70
+msgid "Cannot add template group"
+msgstr ""
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2155,6 +2219,11 @@ msgid_plural "Cannot copy triggers"
 msgstr[0] "Не вдалося скопіювати тригер"
 msgstr[1] "Не вдалося скопіювати тригери"
 msgstr[2] "Не вдалося скопіювати тригери"
+
+#: include/triggers.inc.php:246
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
+msgstr ""
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2325,6 +2394,13 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
+#: app/controllers/CControllerHostGroupDelete.php:75
+msgid "Cannot delete host group"
+msgid_plural "Cannot delete host groups"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2332,6 +2408,11 @@ msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must c
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: app/controllers/CControllerHostGroupDelete.php:39
+#: app/controllers/CControllerTemplateGroupDelete.php:39
+msgid "Cannot delete host groups"
+msgstr ""
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2456,6 +2537,13 @@ msgstr ""
 #: templates.php:462 templates.php:476 templates.php:542
 msgid "Cannot delete template"
 msgstr "Не вдалося видалити шаблон"
+
+#: app/controllers/CControllerTemplateGroupDelete.php:75
+msgid "Cannot delete template group"
+msgid_plural "Cannot delete template groups"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/classes/api/services/CGraphPrototype.php:374
 msgid "Cannot delete templated graph prototype."
@@ -2917,6 +3005,11 @@ msgstr ""
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr ""
 
+#: include/classes/api/services/CHostBase.php:644
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
@@ -2931,6 +3024,11 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:802
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:641
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:381
@@ -2952,6 +3050,16 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:799
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:502
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:638
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:705
@@ -3047,6 +3155,11 @@ msgstr ""
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Не вдалося прочитати відповідь, перевірте з'єднання з Zabbix сервером \"%1$s\"."
 
+#: app/controllers/CControllerPopupMassupdateHost.php:362
+#, c-format
+msgid "Cannot remove the tag with name \"%1$s\" and value \"%2$s\", defined in a host prototype, from host \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:556
 msgid "Cannot rename guest user."
 msgstr "Не вдалось перейменувати гостьового користувача."
@@ -3134,6 +3247,26 @@ msgstr "Не вдалося від'єднати і очистити веб сц�
 #: include/classes/api/services/CHost.php:1095
 msgid "Cannot unlink template"
 msgstr "Не вдалося від'єднати шаблон"
+
+#: include/classes/api/services/CHostBase.php:331
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:415
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:414
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:330
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
@@ -3306,6 +3439,11 @@ msgstr "Не вдалося оновити вузел мережі"
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Не вдалося оновити налаштування шифрування вузла мережі. Потрібно вказати налаштування з'єднання для обох сторін."
 
+#: app/controllers/CControllerHostGroupUpdate.php:43
+#: app/controllers/CControllerHostGroupUpdate.php:105
+msgid "Cannot update host group"
+msgstr ""
+
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:341
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
@@ -3436,6 +3574,11 @@ msgstr "Не вдалося оновити успадкований із шаб�
 #: templates.php:209
 msgid "Cannot update template"
 msgstr "Не вдалося оновити шаблон"
+
+#: app/controllers/CControllerTemplateGroupUpdate.php:41
+#: app/controllers/CControllerTemplateGroupUpdate.php:94
+msgid "Cannot update template group"
+msgstr ""
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:351
 msgid "Cannot update templates"
@@ -3726,6 +3869,10 @@ msgstr "Приєднання шаблону, утворююче кільце, н
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
 
+#: include/classes/core/ZBase.php:563
+msgid "Class not found."
+msgstr ""
+
 #: include/views/configuration.httpconf.list.php:221
 #: include/views/configuration.item.list.php:301
 msgid "Clear history"
@@ -3998,6 +4145,10 @@ msgstr "Налаштування графіків"
 msgid "Configuration of host"
 msgstr ""
 
+#: app/controllers/CControllerHostGroupEdit.php:89
+msgid "Configuration of host group"
+msgstr ""
+
 #: hostgroups.php:25
 msgid "Configuration of host groups"
 msgstr "Налаштування груп вузлів мережі"
@@ -4064,6 +4215,14 @@ msgstr "Налаштування регулярних виразів"
 msgid "Configuration of scripts"
 msgstr "Налаштування скриптів"
 
+#: app/controllers/CControllerTemplateGroupEdit.php:88
+msgid "Configuration of template group"
+msgstr ""
+
+#: app/controllers/CControllerTemplateGroupList.php:123
+msgid "Configuration of template groups"
+msgstr ""
+
 #: templates.php:27
 msgid "Configuration of templates"
 msgstr "Налаштування шаблонів"
@@ -4121,6 +4280,10 @@ msgstr "Налаштування з'єднання з БД"
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "Текст підтвердження"
+
+#: app/views/popup.acknowledge.edit.php:114
+msgid "Confirms the problem is noticed (acknowledging user will be recorded). Status change triggers action update operation."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:907
 msgid "Congratulations! You have successfully installed Zabbix frontend."
@@ -4588,6 +4751,11 @@ msgstr ""
 msgid "Create template"
 msgstr "Створити шаблон"
 
+#: app/views/configuration.templategroup.list.php:33
+#: app/views/configuration.templategroup.list.php:35
+msgid "Create template group"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:153 jsLoader.php:357
 msgid "Create trigger"
 msgstr "Створити тригер"
@@ -5021,6 +5189,11 @@ msgstr ""
 msgid "Day"
 msgstr "День"
 
+#: include/classes/helpers/CSlaHelper.php:68
+msgctxt "compact table header"
+msgid "Day"
+msgstr "День"
+
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
 msgstr "Позавчора"
@@ -5044,6 +5217,10 @@ msgstr "День в тиждень"
 #: app/views/popup.sla.excludeddowntime.edit.php:63
 msgid "Days"
 msgstr "Днів"
+
+#: app/views/popup.acknowledge.edit.php:102
+msgid "Deactivates manual suppression."
+msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:391
 msgid "Debug"
@@ -5352,6 +5529,12 @@ msgstr "Видалити вибрану групу?"
 msgid "Delete selected groups?"
 msgstr "Видалити вибрані групи?"
 
+#: app/views/configuration.hostgroup.edit.php:45
+#: app/views/js/configuration.hostgroup.list.js.php:104
+#: app/views/popup.hostgroup.edit.php:50
+msgid "Delete selected host group?"
+msgstr ""
+
 #: include/views/configuration.hostgroups.list.php:205
 msgid "Delete selected host groups?"
 msgstr "Видалити вибрані групи вузлів мережі?"
@@ -5443,6 +5626,16 @@ msgstr ""
 #: jsLoader.php:274
 msgid "Delete selected shapes?"
 msgstr "Видалити обрані фігури?"
+
+#: app/views/configuration.templategroup.edit.php:45
+#: app/views/js/configuration.templategroup.list.js.php:70
+#: app/views/popup.templategroup.edit.php:50
+msgid "Delete selected template group?"
+msgstr ""
+
+#: app/views/js/configuration.templategroup.list.js.php:69
+msgid "Delete selected template groups?"
+msgstr ""
 
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
@@ -5544,6 +5737,11 @@ msgstr "Статус розгортання"
 
 #: include/classes/widgets/CWidgetHelper.php:62
 msgid "Deprecated"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:1302
+#, c-format
+msgid "Deprecated parameter \"%1$s\" cannot be used with \"%2$s\"."
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:287
@@ -5916,6 +6114,11 @@ msgstr ""
 msgid "Discovery rule"
 msgstr "Правило виявлення"
 
+#: app/views/monitoring.widget.discovery.view.php:33
+msgctxt "compact table header"
+msgid "Discovery rule"
+msgstr "Правило виявлення"
+
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -6018,6 +6221,10 @@ msgstr "Відображати тригери ОК протягом"
 #: app/partials/monitoring.latest.view.html.php:283
 msgid "Display graph"
 msgstr "Показати графік"
+
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:436
+msgid "Display min/max/avg"
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:152
 msgid "Display problems"
@@ -6140,6 +6347,11 @@ msgstr "Завантажити конфігураційний файл"
 msgid "Downtime"
 msgstr "Недоступний"
 
+#: app/views/monitoring.widget.slareport.view.php:100
+msgctxt "compact table header"
+msgid "Downtime"
+msgstr "Недоступний"
+
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
 #: include/classes/widgets/CWidgetHelper.php:969
@@ -6201,6 +6413,11 @@ msgstr "Дублікат userid \"%1$s\" у користувачів для ка
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:1156 include/events.inc.php:289
 #: include/views/configuration.action.edit.php:174
+msgid "Duration"
+msgstr "Тривалість"
+
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
 msgid "Duration"
 msgstr "Тривалість"
 
@@ -6632,6 +6849,11 @@ msgstr "Помилка"
 msgid "Error budget"
 msgstr ""
 
+#: app/views/monitoring.widget.slareport.view.php:101
+msgctxt "compact table header"
+msgid "Error budget"
+msgstr ""
+
 #: include/db.inc.php:518
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
@@ -6770,6 +6992,11 @@ msgstr ""
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
+msgid "Excluded downtimes"
+msgstr ""
+
+#: app/views/monitoring.widget.slareport.view.php:102
+msgctxt "compact table header"
 msgid "Excluded downtimes"
 msgstr ""
 
@@ -6974,6 +7201,11 @@ msgstr ""
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "Помилковий"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "Помилковий"
 
@@ -8038,6 +8270,12 @@ msgstr[0] "Вузел мережі"
 msgstr[1] "Вузли мережі"
 msgstr[2] "Вузли мережі"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "Вузел мережі"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8130,6 +8368,13 @@ msgstr ""
 msgid "Host group"
 msgstr "Група вузлів мережі"
 
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
+msgid "Host group"
+msgstr "Група вузлів мережі"
+
 #: include/classes/api/services/CHostGroup.php:760
 #, c-format
 msgid "Host group \"%1$s\" already exists."
@@ -8140,10 +8385,26 @@ msgstr "Група вузлів мережі \"%1$s\" вже існує."
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Група вузлів мережі \"%1$s\" не може бути видалена, так як вона використовується в глобальному скрипті."
 
+#: include/classes/api/services/CHostGroup.php:631
+#, c-format
+msgid "Host group \"%1$s\" is group for discovered hosts and cannot be deleted."
+msgstr ""
+
 #: include/classes/api/services/CHostGroup.php:642
 #, c-format
 msgid "Host group \"%1$s\" is internal and cannot be deleted."
 msgstr ""
+
+#: app/controllers/CControllerHostGroupCreate.php:62
+msgid "Host group added"
+msgstr ""
+
+#: app/controllers/CControllerHostGroupDelete.php:60
+msgid "Host group deleted"
+msgid_plural "Host groups deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/views/js/monitoring.sysmaps.js.php:109
 msgid "Host group elements"
@@ -8152,6 +8413,10 @@ msgstr "Елементи групи вузлів мережі"
 #: include/views/monitoring.sysmap.edit.php:166
 msgid "Host group label type"
 msgstr "Тип ярлика до групи вузлів мережі"
+
+#: app/controllers/CControllerHostGroupUpdate.php:97
+msgid "Host group updated"
+msgstr ""
 
 #: include/classes/api/services/CDashboardGeneral.php:560
 #: include/classes/api/services/CScript.php:814
@@ -8246,6 +8511,10 @@ msgstr "Ім'я вузла мережі"
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Мережі вузла мережі"
+
+#: app/views/administration.usergroup.edit.php:274
+msgid "Host permissions"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:221
 #: app/views/popup.lldoperation.php:54
@@ -9656,6 +9925,11 @@ msgstr "Некоректне значення для поля \"%1$s\": %2$s."
 msgid "Increase by"
 msgstr ""
 
+#: app/views/popup.acknowledge.edit.php:90 include/actions.inc.php:1774
+#: include/actions.inc.php:2216 include/html.inc.php:978
+msgid "Indefinitely"
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:152
 msgid "Indicators"
 msgstr ""
@@ -9690,6 +9964,12 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:228
 #: include/views/configuration.triggers.edit.php:430
 #: include/views/configuration.triggers.list.php:200
+msgid "Info"
+msgstr "Інфо"
+
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
 msgid "Info"
 msgstr "Інфо"
 
@@ -10397,9 +10677,17 @@ msgstr[2] "Елементи даних активовано"
 msgid "Item in \"not supported\" state"
 msgstr "Елемент даних в стані \"не підтримується\""
 
+#: include/classes/widgets/views/js/widget.svggraph.form.view.js.php:268
+msgid "Item list"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1564
 msgid "Item not selected"
 msgstr "Елемент даних не вибрано"
+
+#: include/classes/widgets/views/js/widget.svggraph.form.view.js.php:262
+msgid "Item pattern"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1254
 #, c-format
@@ -10859,6 +11147,13 @@ msgstr "Остання перевірка"
 msgid "Last hour graph"
 msgstr "Графік за останню годину"
 
+#: include/classes/widgets/CWidgetHelper.php:943
+#: include/classes/widgets/CWidgetHelper.php:1019
+#: include/classes/widgets/CWidgetHelper.php:1373
+msgctxt "missing data function"
+msgid "Last known"
+msgstr ""
+
 #: jsLoader.php:378
 msgid "Last month graph"
 msgstr "Графік за останній місяць"
@@ -11058,6 +11353,10 @@ msgstr "Список пустий"
 
 #: include/classes/data/CItemData.php:983
 msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1021
+msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr ""
 
 #: include/classes/data/CItemData.php:1126
@@ -11394,6 +11693,15 @@ msgstr ""
 msgid "Manual host action"
 msgstr ""
 
+#: app/views/popup.acknowledge.edit.php:83
+msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
+msgstr ""
+
+#: include/html.inc.php:1009
+#, c-format
+msgid "Manually by: %1$s"
+msgstr ""
+
 #: include/actions.inc.php:2070
 msgid "Manually closed"
 msgstr "Закритий вручну"
@@ -11725,6 +12033,10 @@ msgstr "Члени групи"
 msgid "Memory limit: %1$s"
 msgstr "Ліміт пам'яті: %1$s"
 
+#: include/classes/data/CItemData.php:1433
+msgid "Memory metrics of VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id, <mode> - consumed(default)/ballooned/overhead memory"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1210
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Розмір пам'яті в байтах або у відсотках від загальної. Повертає ціле число в байтах; дробове для відсотків"
@@ -11754,6 +12066,11 @@ msgstr ""
 #: include/actions.inc.php:1976 include/actions.inc.php:2083
 #: include/views/administration.auditacts.list.php:69
 #: include/views/administration.auditacts.list.php:100
+msgid "Message"
+msgstr "Повідомлення"
+
+#: app/views/monitoring.widget.actionlog.view.php:44
+msgctxt "compact table header"
 msgid "Message"
 msgstr "Повідомлення"
 
@@ -12025,6 +12342,11 @@ msgstr "Моноширинний"
 msgid "Month"
 msgstr "Місяць"
 
+#: include/classes/helpers/CSlaHelper.php:70
+msgctxt "compact table header"
+msgid "Month"
+msgstr "Місяць"
+
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
 #: app/views/popup.maintenance.period.php:78 app/views/popup.sla.edit.php:76
@@ -12286,6 +12608,11 @@ msgstr "NTLM"
 msgid "Name"
 msgstr "Ім'я"
 
+#: app/views/monitoring.widget.plaintext.view.php:49
+msgctxt "compact table header"
+msgid "Name"
+msgstr "Ім'я"
+
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
 #: app/views/administration.user.list.php:108
@@ -12424,6 +12751,11 @@ msgstr ""
 msgid "New host"
 msgstr ""
 
+#: app/views/configuration.hostgroup.edit.php:52
+#: app/views/popup.hostgroup.edit.php:59
+msgid "New host group"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
 msgstr ""
@@ -12442,6 +12774,11 @@ msgstr ""
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
+msgstr ""
+
+#: app/views/configuration.templategroup.edit.php:52
+#: app/views/popup.templategroup.edit.php:59
+msgid "New template group"
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:187
@@ -12642,6 +12979,10 @@ msgstr ""
 #: app/controllers/CControllerActionOperationValidate.php:169
 msgid "No inventory mode specified for action operation."
 msgstr "Не вказано режим інвентарних даних для операції дії."
+
+#: include/classes/widgets/CWidgetHelper.php:1240
+msgid "No item selected."
+msgstr ""
 
 #: include/items.inc.php:742
 #, c-format
@@ -13037,6 +13378,12 @@ msgstr ""
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr ""
 
+#: include/classes/api/services/CHostBase.php:1639
+#: include/classes/api/services/CUserMacro.php:569
+#, c-format
+msgid "Not allowed to modify automatic user macro \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:577
 msgid "Not allowed to set language for user \"guest\"."
 msgstr ""
@@ -13059,6 +13406,11 @@ msgstr ""
 #: app/views/monitoring.widget.hostavail.view.php:62
 #: app/views/monitoring.widget.hostavail.view.php:103
 #: include/classes/html/CHostAvailability.php:81
+msgid "Not available"
+msgstr "Недоступний"
+
+#: app/views/monitoring.widget.hostavail.view.php:38
+msgctxt "compact table header"
 msgid "Not available"
 msgstr "Недоступний"
 
@@ -13119,6 +13471,10 @@ msgstr "Кількість CPU. Повертає ціле число"
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
 msgstr ""
 
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:463
+msgid "Number of columns"
+msgstr ""
+
 #: include/classes/data/CItemData.php:882
 msgid "Number of currently open file descriptors. Returns integer"
 msgstr ""
@@ -13142,6 +13498,10 @@ msgstr "Кількість елементів даних в базі даних 
 #: include/classes/data/CItemData.php:1654
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Кількість елементів даних в історії проксі, які ще не були відправлені на сервер"
+
+#: include/classes/data/CItemData.php:1729
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -13342,6 +13702,11 @@ msgstr "Вимкн"
 msgid "Ok"
 msgstr "Ок"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "Ок"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13484,6 +13849,11 @@ msgstr "Операція не має шаблону для функціонув�
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr ""
 
@@ -13957,6 +14327,11 @@ msgstr "Параметр"
 #, c-format
 msgid "Parameter \"%1$s\" is deprecated."
 msgstr "Параметр \"%1$s\" застарів."
+
+#: include/classes/api/services/CTemplateGroup.php:1226
+#, c-format
+msgid "Parameter \"%1$s\" must be enabled."
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:213
 #: app/views/administration.script.edit.php:181
@@ -14462,6 +14837,12 @@ msgstr "Рівень привілеїв"
 msgid "Problem"
 msgstr "Проблема"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "Проблема"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "Виникла Проблема"
@@ -14502,6 +14883,10 @@ msgstr ""
 #: include/actions.inc.php:2062
 msgid "Problem resolved"
 msgstr "Проблему вирішено"
+
+#: app/views/administration.usergroup.edit.php:275
+msgid "Problem tag filter"
+msgstr ""
 
 #: app/views/popup.service.edit.php:59 app/views/popup.service.edit.php:269
 #: app/views/popup.services.php:62
@@ -14686,6 +15071,11 @@ msgstr "Файл публічного ключа"
 msgid "Quarter"
 msgstr ""
 
+#: include/classes/helpers/CSlaHelper.php:71
+msgctxt "compact table header"
+msgid "Quarter"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
 msgstr ""
@@ -14831,6 +15221,12 @@ msgstr "Останні проблеми"
 msgid "Recipient"
 msgstr "Отримувач"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "Отримувач"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr ""
@@ -14875,6 +15271,11 @@ msgstr "Операції відновлення"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "Час відновлення"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "Час відновлення"
 
@@ -15105,6 +15506,12 @@ msgstr "Віддалена команда"
 #: jsLoader.php:279 jsLoader.php:325
 msgid "Remove"
 msgstr "Видалити"
+
+#: app/partials/hostmacros.inherited.list.html.php:116
+#: app/partials/hostmacros.inherited.list.html.php:121
+msgctxt "verb"
+msgid "Remove"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:127
 #: app/partials/massupdate.valuemaps.tab.php:98
@@ -15474,6 +15881,10 @@ msgstr ""
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr "Повертає JSON об'єкт, який містить внутрішні метрики Zabbix сервер або проксі ."
 
+#: include/classes/data/CItemData.php:1673
+msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1614
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Повертає доступність певного типу перевірок на вузлі мережі. Значення цього елементу даних відповідає іконкам доступності в списку вузлів мережі. Допустимі типи: agent, snmp, ipmi, jmx."
@@ -15497,6 +15908,11 @@ msgstr ""
 #: include/classes/data/CItemData.php:850
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Повертає відсоток втрачених ICMP ping пакетів."
+
+#: app/partials/hostmacros.inherited.list.html.php:105
+#: app/partials/hostmacros.list.html.php:77 jsLoader.php:331
+msgid "Revert"
+msgstr ""
 
 #: include/classes/html/CMacroValue.php:94
 msgid "Revert changes"
@@ -15671,11 +16087,22 @@ msgstr ""
 msgid "SLI"
 msgstr ""
 
+#: app/views/monitoring.widget.slareport.view.php:98
+msgctxt "compact table header"
+msgid "SLI"
+msgstr ""
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
+msgid "SLO"
+msgstr ""
+
+#: app/views/monitoring.widget.slareport.view.php:38
+#: app/views/monitoring.widget.slareport.view.php:97
+msgctxt "compact table header"
 msgid "SLO"
 msgstr ""
 
@@ -16308,6 +16735,11 @@ msgstr ""
 msgid "Service"
 msgstr "Послуга"
 
+#: app/views/monitoring.widget.slareport.view.php:37
+msgctxt "compact table header"
+msgid "Service"
+msgstr "Послуга"
+
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
 #, c-format
@@ -16506,6 +16938,12 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:189
 #: include/views/reports.toptriggers.php:75
 #: include/views/reports.toptriggers.php:86
+msgid "Severity"
+msgstr "Важливість"
+
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
 msgid "Severity"
 msgstr "Важливість"
 
@@ -16741,6 +17179,10 @@ msgstr "Прототип простого графіку"
 
 #: app/views/monitoring.charts.view.php:85
 msgid "Simple graphs"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:168
+msgid "Simple triggers"
 msgstr ""
 
 #: include/views/configuration.trigger.prototype.edit.php:507
@@ -17054,6 +17496,13 @@ msgstr ""
 msgid "Status"
 msgstr "Стан"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "Стан"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr ""
@@ -17262,6 +17711,23 @@ msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:59
 msgid "Supported macros:"
+msgstr ""
+
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:101
+#: app/views/popup.acknowledge.edit.php:82
+msgid "Suppress"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:471
+msgid "Suppress problems"
+msgstr ""
+
+#: include/actions.inc.php:1761
+msgid "Suppress until"
+msgstr ""
+
+#: include/actions.inc.php:1771 include/classes/screens/CScreenProblem.php:1259
+msgid "Suppressed"
 msgstr ""
 
 #: include/html.inc.php:973
@@ -17480,6 +17946,11 @@ msgstr ""
 msgid "Tags"
 msgstr "Теги"
 
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
+msgid "Tags"
+msgstr "Теги"
+
 #: include/views/configuration.copy.elements.php:69
 #: include/views/configuration.trigger.prototype.edit.php:202
 #: include/views/configuration.trigger.prototype.edit.php:401
@@ -17525,6 +17996,11 @@ msgstr "Шаблон \"%1$s\" вже існує."
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "Шаблон \"%1$s\" не може бути без групи вузлів мережі."
 
+#: include/classes/api/services/CTemplateGroup.php:942
+#, c-format
+msgid "Template \"%1$s\" cannot be without template group."
+msgstr ""
+
 #: include/classes/import/importers/CHostImporter.php:54
 #, c-format
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
@@ -17558,6 +18034,49 @@ msgstr "Шаблон видалено"
 msgid "Template group"
 msgstr "Група шаблону"
 
+#: include/classes/api/services/CTemplateGroup.php:540
+#, c-format
+msgid "Template group \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerTemplateGroupCreate.php:62
+msgid "Template group added"
+msgstr ""
+
+#: app/controllers/CControllerTemplateGroupDelete.php:60
+msgid "Template group deleted"
+msgid_plural "Template groups deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerTemplateGroupUpdate.php:86
+msgid "Template group updated"
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:487
+#, c-format
+msgid "Template group with ID \"%1$s\" is not available."
+msgstr ""
+
+#: app/controllers/CControllerPopupGeneric.php:197
+#: app/controllers/CControllerPopupImportCompare.php:168
+#: app/controllers/CControllerUsergroupTemplateGrouprightAdd.php:36
+#: app/partials/configuration.filter.items.php:58
+#: app/views/configuration.templategroup.list.php:30
+#: app/views/popup.import.php:29 app/views/popup.massupdate.template.php:84
+#: app/views/search.php:410 include/classes/helpers/CMenuHelper.php:170
+#: include/classes/helpers/CRoleHelper.php:406
+#: include/views/configuration.copy.elements.php:62
+#: include/views/configuration.graph.list.php:93
+#: include/views/configuration.host.discovery.list.php:69
+#: include/views/configuration.httpconf.list.php:31
+#: include/views/configuration.template.edit.php:148
+#: include/views/configuration.template.list.php:45
+#: include/views/configuration.triggers.list.php:33
+msgid "Template groups"
+msgstr ""
+
 #: app/views/popup.import.php:34
 msgid "Template linkage"
 msgstr "Зв'язки з шаблонами"
@@ -17569,6 +18088,10 @@ msgstr "Макроси з шаблону"
 #: include/views/configuration.template.edit.php:56 templates.php:41
 msgid "Template name"
 msgstr "Ім'я шаблону"
+
+#: app/views/administration.usergroup.edit.php:273
+msgid "Template permissions"
+msgstr ""
 
 #: report2.php:396
 msgid "Template trigger"
@@ -17970,6 +18493,12 @@ msgstr "До"
 msgid "Time"
 msgstr "Час"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "Час"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Час конкретного процесу Zabbix або групи процесів (задається <типом> та <режимом>), проведений у <стані> у відсотках."
@@ -18033,6 +18562,11 @@ msgstr "Час очікування"
 msgid "Timestamp"
 msgstr "Час виникнення (штамп)"
 
+#: app/views/monitoring.widget.plaintext.view.php:33
+msgctxt "compact table header"
+msgid "Timestamp"
+msgstr "Час виникнення (штамп)"
+
 #: app/views/sla.list.php:91
 msgid "Timezone"
 msgstr ""
@@ -18087,6 +18621,11 @@ msgstr ""
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "Всього"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "Всього"
 
@@ -18198,6 +18737,61 @@ msgstr "Тригер \"%1$s\" вже існує у \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Тригер \"%1$s\" належить шаблонам з різними зв'язками."
 
+#: include/triggers.inc.php:372 include/triggers.inc.php:433
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/triggers.inc.php:373 include/triggers.inc.php:434
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2679
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2678
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2572
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2305
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2300
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2316
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2423
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2808
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2807
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
@@ -18303,6 +18897,66 @@ msgstr "Прототип тригера \"%1$s\" вже існує в \"%2$s\"."
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr "Прототип тригера \"%1$s\" належить шаблонам з різними зв'язками."
 
+#: include/classes/api/services/CDiscoveryRule.php:916
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:915
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2684
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2683
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2573
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2424
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2813
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2812
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2306
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2301
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2317
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:1325
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
+msgstr ""
+
 #: include/classes/api/services/CTriggerGeneral.php:1715
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
@@ -18358,6 +19012,10 @@ msgstr "Прототипи тригерів оновлено"
 #: app/views/administration.user.edit.php:743 include/actions.inc.php:45
 msgid "Trigger severity"
 msgstr "Важливість тригера"
+
+#: app/views/popup.condition.common.php:228
+msgid "Trigger source"
+msgstr ""
 
 #: jsLoader.php:367
 msgid "Trigger status \"OK\""
@@ -18478,6 +19136,12 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:660
 #: include/views/js/monitoring.sysmaps.js.php:815
 #: include/views/monitoring.sysmap.edit.php:398
+msgid "Type"
+msgstr "Тип"
+
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
 msgid "Type"
 msgstr "Тип"
 
@@ -18673,6 +19337,10 @@ msgstr "Разблокувати"
 msgid "Unblock selected users?"
 msgstr "Розблокувати вибраних користувачів?"
 
+#: app/views/popup.acknowledge.edit.php:125
+msgid "Undo problem acknowledgement."
+msgstr ""
+
 #: include/classes/core/ZBase.php:574
 #, c-format
 msgid "Unexpected response for action %1$s."
@@ -18730,6 +19398,11 @@ msgstr "Одиниця виміру"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
+msgid "Unknown"
+msgstr "Невідомо"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
 msgid "Unknown"
 msgstr "Невідомо"
 
@@ -18835,6 +19508,25 @@ msgstr "Непідтримуваний параметр \"%2$s\" для прав
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr "Непідтримуваний параметр \"%2$s\" для фільтру в правилі виявлення \"%1$s\"."
+
+#: app/views/popup.acknowledge.edit.php:102
+msgid "Unsuppress"
+msgstr ""
+
+#: include/actions.inc.php:1785 include/actions.inc.php:2235
+#: include/classes/screens/CScreenProblem.php:1262
+msgid "Unsuppressed"
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:174 include/blocks.inc.php:668
+#: include/classes/screens/CScreenProblem.php:1026
+#, c-format
+msgid "Unsuppressed by: %1$s"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:91
+msgid "Until"
+msgstr ""
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:98
 #: include/classes/services/CTabFilterProfile.php:95
@@ -18968,6 +19660,11 @@ msgstr "Карти верхнього рівня"
 #: app/views/monitoring.widget.slareport.view.php:99
 #: app/views/slareport.list.php:165
 #: include/classes/screens/CScreenDiscovery.php:120
+msgid "Uptime"
+msgstr "Доступний"
+
+#: app/views/monitoring.widget.slareport.view.php:99
+msgctxt "compact table header"
 msgid "Uptime"
 msgstr "Доступний"
 
@@ -19717,6 +20414,11 @@ msgstr "Валідація"
 msgid "Value"
 msgstr "Значення"
 
+#: app/views/monitoring.widget.plaintext.view.php:51
+msgctxt "compact table header"
+msgid "Value"
+msgstr "Значення"
+
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
 #, c-format
@@ -19750,6 +20452,10 @@ msgstr "Статистика кешу значень. Допустимі реж�
 
 #: include/classes/helpers/CCookieHelper.php:75
 msgid "Value cannot be empty."
+msgstr ""
+
+#: include/classes/data/CItemData.php:1017
+msgid "Value data for value name in Windows Registry key."
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:247
@@ -20073,6 +20779,11 @@ msgstr "Середа"
 msgid "Week"
 msgstr ""
 
+#: include/classes/helpers/CSlaHelper.php:69
+msgctxt "compact table header"
+msgid "Week"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/popup.maintenance.period.php:77 app/views/popup.sla.edit.php:75
@@ -20167,6 +20878,11 @@ msgstr ""
 msgid "With problems"
 msgstr "З проблемами"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "З проблемами"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr ""
@@ -20180,6 +20896,11 @@ msgid "Without data"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "Без проблем"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "Без проблем"
 
@@ -20374,6 +21095,11 @@ msgstr "YYYY-MM-DDThh:mm:ssZ"
 msgid "Year"
 msgstr "Рік"
 
+#: include/classes/helpers/CSlaHelper.php:72
+msgctxt "compact table header"
+msgid "Year"
+msgstr "Рік"
+
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93
 msgid "Yearly"
@@ -20434,6 +21160,10 @@ msgstr "Ви не увійшли в систему"
 
 #: app/views/popup.generic.php:80
 msgid "You cannot switch hosts for current selection."
+msgstr ""
+
+#: app/views/popup.generic.php:88
+msgid "You cannot switch templates for current selection."
 msgstr ""
 
 #: include/classes/api/services/CAuditLog.php:73
@@ -21568,9 +22298,17 @@ msgstr ""
 msgid "invalid sixth parameter in function \"%1$s\""
 msgstr ""
 
+#: include/classes/validators/CApiInputValidator.php:3078
+msgid "invalid template group name"
+msgstr ""
+
 #: include/classes/validators/CHistFunctionValidator.php:65
 #, c-format
 msgid "invalid third parameter in function \"%1$s\""
+msgstr ""
+
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:101
+msgid "invalid time"
 msgstr ""
 
 #: app/controllers/CControllerWidgetTopHostsView.php:422
@@ -21929,8 +22667,16 @@ msgstr ""
 msgid "no permissions to create and edit maps"
 msgstr ""
 
+#: include/classes/api/services/CEvent.php:863
+msgid "no permissions to suppress problems"
+msgstr ""
+
 #: include/classes/api/services/CEvent.php:774
 msgid "no permissions to unacknowledge problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:864
+msgid "no permissions to unsuppress problems"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:836

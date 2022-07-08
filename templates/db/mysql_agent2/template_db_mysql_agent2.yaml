@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:11Z'
-  groups:
+  date: '2022-06-07T19:36:29Z'
+  template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1722,8 +1722,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'MySQL by Zabbix agent 2'
                         name: 'MySQL: Operations'
-                        host: 'MySQL by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1738,8 +1738,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'MySQL by Zabbix agent 2'
                         name: 'MySQL: Queries'
-                        host: 'MySQL by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1754,8 +1754,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'MySQL by Zabbix agent 2'
                         name: 'MySQL: Connections'
-                        host: 'MySQL by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1771,8 +1771,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'MySQL: Bandwidth'
                         host: 'MySQL by Zabbix agent 2'
+                        name: 'MySQL: Bandwidth'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -1787,8 +1787,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'MySQL: InnoDB buffer pool'
                         host: 'MySQL by Zabbix agent 2'
+                        name: 'MySQL: InnoDB buffer pool'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1804,8 +1804,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'MySQL: Threads'
                         host: 'MySQL by Zabbix agent 2'
+                        name: 'MySQL: Threads'
       valuemaps:
         -
           uuid: f2e8233fcf0a4dd2b53a82ca48436a88

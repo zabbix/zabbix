@@ -1,0 +1,12 @@
+.grid-columns {
+	display: grid;
+	align-items: start;
+
+	&.columns-2 {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	&.columns-3 {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}

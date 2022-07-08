@@ -21,7 +21,11 @@
 
 /**
  * Clock widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
@@ -147,11 +151,9 @@ $form_list
 
 $form->addItem($form_list);
 
-$form->addItem(
-	(new CScriptTag('
-		widget_clock_form.init();
-	'))->setOnDocumentReady()
-);
+$scripts[] = '
+	widget_clock_form.init();
+';
 
 return [
 	'form' => $form,

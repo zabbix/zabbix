@@ -282,7 +282,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Templates/Databases'
+						'Template groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
 					'rows' => 85
@@ -367,7 +367,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => [
+						'Template groups' => [
 							'Inheritance test'
 						],
 						'Templates' => [
@@ -441,7 +441,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Templates/Operating systems',
+						'Template groups' => 'Templates/Operating systems',
 						'Type' => 'Dependent item'
 					],
 					'context' => 'template',

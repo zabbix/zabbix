@@ -20,13 +20,12 @@
 #include "datasender.h"
 
 #include "zbxcommshigh.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxnix.h"
 #include "proxy.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
-#include "zbxcrypto.h"
 #include "zbxcompress.h"
 #include "zbxavailability.h"
 

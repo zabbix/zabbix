@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $inline_js = '';
@@ -183,28 +184,57 @@ switch ($data['type']) {
 					$operator->addValue($value, $key);
 				}
 
-				$trigger_multiselect = (new CMultiSelect([
-					'name' => 'value[]',
-					'object_name' => 'triggers',
-					'default_value' => 0,
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'triggers',
-							'srcfld1' => 'triggerid',
-							'dstfrm' => $form->getName(),
-							'dstfld1' => 'trigger_new_condition',
-							'editable' => true
+				$trigger_multiselect = $data['trigger_context'] === 'host'
+					? (new CMultiSelect([
+						'name' => 'value[]',
+						'object_name' => 'triggers',
+						'default_value' => 0,
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'triggers',
+								'srcfld1' => 'triggerid',
+								'dstfrm' => $form->getName(),
+								'dstfld1' => 'trigger_new_condition',
+								'with_triggers' => true,
+								'real_hosts' => true,
+								'editable' => true
+							]
 						]
-					]
-				]))
-					->setId('trigger_new_condition')
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
+					]))
+						->setId('trigger_new_condition')
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					: (new CMultiSelect([
+						'name' => 'value[]',
+						'object_name' => 'triggers',
+						'default_value' => 0,
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'template_triggers',
+								'srcfld1' => 'triggerid',
+								'dstfrm' => $form->getName(),
+								'dstfld1' => 'trigger_new_condition',
+								'with_triggers' => true,
+								'editable' => true
+							]
+						]
+					]))
+						->setId('trigger_new_condition')
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 				$inline_js .= $trigger_multiselect->getPostJS();
 
 				$form_list
 					->addRow(_('Operator'), $operator)
+					->addRow(_('Trigger source'),
+						(new CRadioButtonList('trigger_context', $data['trigger_context']))
+							->addValue(_('Host'), 'host')
+							->addValue(_('Template'), 'template')
+							->setModern(true)
+					)
 					->addRow(new CLabel(_('Triggers'), 'trigger_new_condition_ms'), $trigger_multiselect);
+
+				$inline_js .= '$(() => $("#trigger_context").on("change",'
+					.'(e) => reloadPopup($(e.target).closest("form").get(0), "popup.condition.actions")));';
 				break;
 
 			// Trigger severity form elements.

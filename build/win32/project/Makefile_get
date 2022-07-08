@@ -32,7 +32,6 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
-	..\..\..\src\libs\zbxcommon\variant.o \
 	..\..\..\src\libs\zbxcommon\str.o \
 	..\..\..\src\libs\zbxcommon\time.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
@@ -50,6 +49,7 @@ OBJS = \
 	..\..\..\src\libs\zbxlog\log.o \
 	..\..\..\src\libs\zbxmutexs\mutexs.o \
 	..\..\..\src\libs\zbxsymbols\symbols.o \
+	..\..\..\src\libs\zbxvariant\variant.o \
 	..\..\..\src\libs\zbxthreads\threads.o \
 	..\..\..\src\zabbix_get\zabbix_get.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \

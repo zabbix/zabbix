@@ -466,21 +466,41 @@ class testDocumentationLinks extends CWebTest {
 			// #45 Host groups list view.
 			[
 				[
-					'url' => 'hostgroups.php',
+					'url' => 'zabbix.php?action=hostgroup.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hostgroups'
 				]
 			],
-			// #46 Create host group view.
+			// #46 Create host group popup.
 			[
 				[
-					'url' => 'hostgroups.php?form=create',
+					'url' => 'zabbix.php?action=hostgroup.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create host group'
+						]
+					],
+					'open_button' => 'button:Create host group',
 					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
 				]
 			],
-			// #47 Update host group view.
+			// #47 Edit host group popup.
 			[
 				[
-					'url' => 'hostgroups.php?form=update&groupid=5',
+					'url' => 'zabbix.php?action=hostgroup.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath://a[text()="Zabbix servers"]'
+						]
+					],
+					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+				]
+			],
+			// #47.1 Create host group form view (standalone).
+			[
+				[
+					'url' => 'zabbix.php?action=hostgroup.edit',
 					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
 				]
 			],
@@ -1800,7 +1820,51 @@ class testDocumentationLinks extends CWebTest {
 					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
 				]
+			],
+			/** TODO: uncomment and change doc links after ZBXNEXT-2592
+			// #205 Template groups list view.
+			[
+				[
+					'url' => 'zabbix.php?action=templategroup.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hostgroups'
+				]
+			],
+			// #206 Create template group popup.
+			[
+				[
+					'url' => 'zabbix.php?action=templategroup.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create template group'
+						]
+					],
+					'open_button' => 'button:Create template group',
+					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+				]
+			],
+			// #207 Edit template group popup.
+			[
+				[
+					'url' => 'zabbix.php?action=templategroup.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath://a[text()="Templates"]'
+						]
+					],
+					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+				]
+			],
+			// #208 Create template group form view (standalone).
+			[
+				[
+					'url' => 'zabbix.php?action=templategroup.edit',
+					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+				]
 			]
+			 *
+			 */
 		];
 	}
 

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 // indicator of sort field
@@ -35,7 +36,9 @@ $url_details = $data['allowed_ui_problems']
 $show_timeline = ($data['sortfield'] === 'clock' && $data['fields']['show_timeline']);
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
 
-$header_time = new CColHeader(($data['sortfield'] === 'clock') ? [_('Time'), $sort_div] : _('Time'));
+$header_time = new CColHeader(($data['sortfield'] === 'clock')
+	? [_x('Time', 'compact table header'), $sort_div]
+	: _x('Time', 'compact table header'));
 
 if ($show_timeline) {
 	$header = [
@@ -52,20 +55,32 @@ $show_opdata = $data['fields']['show_opdata'];
 
 $table = (new CTableInfo())
 	->setHeader(array_merge($header, [
-		$show_recovery_data ? _('Recovery time') : null,
-		$show_recovery_data ? _('Status') : null,
-		_('Info'),
-		($data['sortfield'] === 'host') ? [_('Host'), $sort_div] : _('Host'),
+		$show_recovery_data
+			? _x('Recovery time', 'compact table header')
+			: null,
+		$show_recovery_data
+			? _x('Status', 'compact table header')
+			: null,
+		_x('Info', 'compact table header'),
+		($data['sortfield'] === 'host')
+			? [_x('Host', 'compact table header'), $sort_div]
+			: _x('Host', 'compact table header'),
 		[
-			($data['sortfield'] === 'name') ? [_('Problem'), $sort_div] : _('Problem'),
+			($data['sortfield'] === 'name')
+				? [_x('Problem', 'compact table header'), $sort_div]
+				: _x('Problem', 'compact table header'),
 			' &bullet; ',
-			($data['sortfield'] === 'severity') ? [_('Severity'), $sort_div] : _('Severity')
+			($data['sortfield'] === 'severity')
+				? [_x('Severity', 'compact table header'), $sort_div]
+				: _x('Severity', 'compact table header')
 		],
-		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,
-		_('Duration'),
-		_('Ack'),
-		_('Actions'),
-		$data['fields']['show_tags'] ? _('Tags') : null
+		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY)
+			? _x('Operational data', 'compact table header')
+			: null,
+			_x('Duration', 'compact table header'),
+			_x('Ack', 'compact table header'),
+			_x('Actions', 'compact table header'),
+		$data['fields']['show_tags'] ? _x('Tags', 'compact table header') : null
 	]));
 
 $today = strtotime('today');
@@ -79,7 +94,8 @@ $allowed = [
 	'ui_problems' => $data['allowed_ui_problems'],
 	'add_comments' => $data['allowed_add_comments'],
 	'change_severity' => $data['allowed_change_severity'],
-	'acknowledge' => $data['allowed_acknowledge']
+	'acknowledge' => $data['allowed_acknowledge'],
+	'suppress' => $data['allowed_suppress']
 ];
 
 foreach ($data['data']['problems'] as $eventid => $problem) {
@@ -95,16 +111,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$can_be_closed = false;
 	}
 	else {
-		$in_closing = false;
-
-		foreach ($problem['acknowledges'] as $acknowledge) {
-			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-				$in_closing = true;
-				$can_be_closed = false;
-				break;
-			}
-		}
-
+		$can_be_closed = !hasEventCloseAction($problem['acknowledges']);
+		$in_closing = !$can_be_closed;
 		$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 		$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 		$value_clock = $in_closing ? time() : $problem['clock'];
@@ -166,8 +174,32 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
-	if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
-		$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
+	if (array_key_exists('suppression_data', $problem)) {
+		if (count($problem['suppression_data']) == 1
+				&& $problem['suppression_data'][0]['maintenanceid'] == 0
+				&& isEventRecentlyUnsuppressed($problem['acknowledges'], $unsuppression_action)) {
+			// Show blinking button if the last manual suppression was recently revoked.
+			$user_unsuppressed = array_key_exists($unsuppression_action['userid'], $data['data']['users'])
+				? getUserFullname($data['data']['users'][$unsuppression_action['userid']])
+				: _('Inaccessible user');
+
+			$info_icons[] = (new CSimpleButton())
+				->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
+				->addClass('blink')
+				->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
+		}
+		elseif ($problem['suppression_data']) {
+			$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data'], false);
+		}
+		elseif (isEventRecentlySuppressed($problem['acknowledges'], $suppression_action)) {
+			// Show blinking button if suppression was made but is not yet processed by server.
+			$info_icons[] = makeSuppressedProblemIcon([[
+				'suppress_until' => $suppression_action['suppress_until'],
+				'username' => array_key_exists($suppression_action['userid'], $data['data']['users'])
+					? getUserFullname($data['data']['users'][$suppression_action['userid']])
+					: _('Inaccessible user')
+			]], true);
+		}
 	}
 
 	$opdata = null;
@@ -260,7 +292,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	// Create acknowledge link.
 	$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-			|| $can_be_closed)
+			|| $can_be_closed || $allowed['suppress'])
 		? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT)

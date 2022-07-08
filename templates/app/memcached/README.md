@@ -86,7 +86,7 @@ There are no template links in this template.
 |Memcached: Too many throttled connections |<p>Number of times a client connection was throttled is too high.</p><p>When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.</p> |`min(/Memcached by Zabbix agent 2/memcached.connections.throttled.rate,5m)>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}` |WARNING | |
 |Memcached: Total number of connected clients is too high |<p>When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.</p> |`min(/Memcached by Zabbix agent 2/memcached.connections.current,5m)/last(/Memcached by Zabbix agent 2/memcached.connections.max)*100>{$MEMCACHED.CONN.PRC.MAX.WARN}` |WARNING | |
 |Memcached: Version has changed |<p>Memcached version has changed. Ack to close.</p> |`last(/Memcached by Zabbix agent 2/memcached.version,#1)<>last(/Memcached by Zabbix agent 2/memcached.version,#2) and length(last(/Memcached by Zabbix agent 2/memcached.version))>0` |INFO |<p>Manual close: YES</p> |
-|Memcached: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Memcached by Zabbix agent 2/memcached.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Memcached: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Memcached by Zabbix agent 2/memcached.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |Memcached: Memory usage is too high |<p>-</p> |`min(/Memcached by Zabbix agent 2/memcached.stats.bytes,5m)/last(/Memcached by Zabbix agent 2/memcached.config.limit_maxbytes)*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}` |WARNING | |
 
 ## Feedback

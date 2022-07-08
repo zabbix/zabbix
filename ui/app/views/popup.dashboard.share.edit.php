@@ -149,6 +149,7 @@ $form
 
 $output = [
 	'header' => _('Dashboard sharing'),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::DASHBOARD_SHARE_EDIT),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:14Z'
-  groups:
+  date: '2022-06-22T11:26:07Z'
+  template_groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -20,7 +20,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/416694-discussion-thread-for-official-zabbix-template-netapp-fas3220
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/SAN
@@ -370,7 +370,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -720,7 +720,7 @@ zabbix_export:
                   name: 'Node {#NODE.NAME}: has been restarted'
                   event_name: 'Node {#NODE.NAME}: has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1688,7 +1688,7 @@ zabbix_export:
           description: 'Maximum percentage of disk used. Can be used with {#FSNAME} as context.'
         -
           macro: '{$FAS3220.FS.TIME}'
-          value: 10G
+          value: 10m
           description: 'The time during which disk usage may exceed the threshold. Can be used with {#FSNAME} as context.'
         -
           macro: '{$FAS3220.FS.TYPE.MATCHES}'

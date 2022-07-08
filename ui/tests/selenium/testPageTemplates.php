@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
+ * @backup profiles
+ *
  * @dataSource TagFilter
  */
 class testPageTemplates extends CLegacyWebTest {
@@ -43,7 +45,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Host groups')->select('Templates/SAN');
+		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->submit();
 		$this->zbxTestTextPresent($this->templateName);
 
@@ -111,7 +113,7 @@ class testPageTemplates extends CLegacyWebTest {
 	public function testPageTemplates_FilterTemplateByName() {
 		$this->zbxTestLogin('templates.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Host groups')->select('Templates/SAN');
+		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->getField('Name')->fill($this->templateName);
 		$filter->submit();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='$this->templateName']");
@@ -119,8 +121,6 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	public function testPageTemplates_FilterByLinkedTemplate() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
 		$this->zbxTestLogin('templates.php');
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
@@ -138,7 +138,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->fill([
-			'Host groups'	=> 'Templates',
+			'Template groups' => 'Templates',
 			'Name' => '123template!@#$%^&*()_"='
 		]);
 		$filter->submit();
@@ -392,7 +392,7 @@ class testPageTemplates extends CLegacyWebTest {
 
 		// Check that correct result displayed.
 		if (array_key_exists('absent_templates', $data)) {
-			$filtering = $this->getTableResult('Name');
+			$filtering = $this->getTableColumnData('Name');
 			foreach ($data['absent_templates'] as $absence) {
 				if (($key = array_search($absence, $filtering))) {
 					unset($filtering[$key]);

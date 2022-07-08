@@ -20,7 +20,7 @@
 #ifndef ZABBIX_HTTPMACRO_H
 #define ZABBIX_HTTPMACRO_H
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 typedef struct
 {

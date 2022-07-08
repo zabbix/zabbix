@@ -25,7 +25,7 @@
 #include "../poller/checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxserver.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxtasks.h"
 #include "zbxembed.h"
@@ -328,9 +328,12 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
  ***********************************************************************************/
 int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len)
 {
-	int	ret = FAIL;
+	int			ret = FAIL;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	switch (script->type)
 	{
@@ -365,6 +368,8 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);
 			goto out;
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 
 	ret = SUCCEED;
 out:

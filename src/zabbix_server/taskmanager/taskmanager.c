@@ -19,6 +19,7 @@
 
 #include "taskmanager.h"
 
+#include "../db_lengths.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
@@ -26,17 +27,22 @@
 #include "zbxtasks.h"
 #include "../events.h"
 #include "../actions.h"
-#include "export.h"
+#include "zbxexport.h"
 #include "zbxdiag.h"
 #include "zbxservice.h"
 #include "zbxjson.h"
 #include "zbxrtc.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_proxy.h"
+#include "dbcache.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
 #define ZBX_TASKMANAGER_TIMEOUT		5
+
+#define ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS		32
+#define ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS	64
+#define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -502,7 +508,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		zbx_dc_reschedule_items(&itemids, time(NULL), proxy_hostids);
 
 		sql_offset = 0;
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < tasks.values_num; i++)
 		{
@@ -536,7 +542,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 			DBexecute("%s", sql);
@@ -744,7 +750,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t *rtc, const char *data)
 {
 	struct zbx_json_parse	jp;
-	char			hostname[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char			hostname[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	zbx_uint64_t		proxyid;
 
 	if (FAIL == zbx_json_open(data, &jp))
@@ -780,6 +786,116 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 	zbx_audit_prepare();
 	zbx_audit_proxy_config_reload(proxyid, hostname);
 	zbx_audit_flush();
+}
+
+static void	tm_process_temp_suppression(const char *data)
+{
+	struct zbx_json_parse	jp;
+	char			tmp_eventid[MAX_ID_LEN], tmp_userid[MAX_ID_LEN], tmp_ts[MAX_ID_LEN], tmp_action[12];
+	zbx_uint64_t		eventid, userid, action;
+	unsigned int		ts;
+
+	if (FAIL == zbx_json_open(data, &jp))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request");
+		return;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_EVENTID, tmp_eventid, sizeof(tmp_eventid), NULL) ||
+			FAIL == is_uint64(tmp_eventid, &eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
+				" \"%s\" tag", ZBX_PROTO_TAG_EVENTID);
+		return;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_USERID, tmp_userid, sizeof(tmp_userid), NULL) ||
+			FAIL == is_uint64(tmp_userid, &userid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
+				" \"%s\" tag", ZBX_PROTO_TAG_USERID);
+		return;
+	}
+
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ACTION, tmp_action, sizeof(tmp_action), NULL))
+	{
+		if (0 == strcmp(ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS, tmp_action))
+		{
+			action = ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS;
+		}
+		else if (0 == strcmp(ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS, tmp_action))
+		{
+			action = ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to "
+				"retrieve \"%s\" tag's value '%s'", ZBX_PROTO_TAG_ACTION, tmp_action);
+
+			return;
+		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
+				" \"%s\" tag", ZBX_PROTO_TAG_ACTION);
+		return;
+	}
+
+	if (ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS == action)
+	{
+		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SUPPRESS_UNTIL, tmp_ts, sizeof(tmp_ts), NULL) ||
+				FAIL == is_uint32(tmp_ts, &ts))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
+					" \"%s\" tag", ZBX_PROTO_TAG_SUPPRESS_UNTIL);
+			return;
+		}
+
+	}
+
+	if (SUCCEED != DBlock_record("users", userid, NULL, 0))
+		return;
+
+	if (ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS == action ||
+			(ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME != ts && time(NULL) >= ts))
+	{
+		DBexecute("delete from event_suppress where eventid=" ZBX_FS_UI64 " and maintenanceid is null",
+				eventid);
+	}
+	else if (ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS == action)
+	{
+		DB_ROW		row;
+		DB_RESULT	result;
+
+		if (SUCCEED != DBlock_record("events", eventid, NULL, 0))
+			return;
+
+		result = DBselect("select event_suppressid,suppress_until from event_suppress where eventid="
+				ZBX_FS_UI64 " and maintenanceid is null" ZBX_FOR_UPDATE, eventid);
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			DBexecute("update event_suppress set suppress_until=%u,userid=" ZBX_FS_UI64
+					" where event_suppressid=%s", ts, userid, row[0]);
+		}
+		else
+		{
+			zbx_db_insert_t	db_insert;
+
+			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid",
+					"suppress_until", "userid", NULL);
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, ts, userid);
+
+			zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
+			zbx_db_insert_execute(&db_insert);
+			zbx_db_insert_clean(&db_insert);
+		}
+
+		DBfree_result(result);
+	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
 }
 
 /******************************************************************************
@@ -839,6 +955,10 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
 				break;
 			case ZBX_TM_DATA_TYPE_PROXY_HOSTNAME:
 				tm_process_passive_proxy_cache_reload_request(rtc, row[2]);
+				zbx_vector_uint64_append(&done_taskids, taskid);
+				break;
+			case ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION:
+				tm_process_temp_suppression(row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
 			default:
@@ -1082,7 +1202,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 {
 	struct zbx_json_parse	jp, jp_data;
 	const char		*ptr;
-	char			name[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char			name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	zbx_vector_ptr_t	tasks_active;
 	zbx_vector_str_t	proxynames_log;
 	char			*names_success = NULL;

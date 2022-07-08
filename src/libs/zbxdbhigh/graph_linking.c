@@ -19,7 +19,7 @@
 
 #include "graph_linking.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_graph.h"
 
@@ -27,13 +27,13 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	gitemid;
-	char		key[ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char		key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	int		drawtype_orig;
 	int		drawtype_new;
 	int		sortorder_orig;
 	int		sortorder_new;
-	char		color_orig[GRAPH_ITEM_COLOR_LEN_MAX];
-	char		color_new[GRAPH_ITEM_COLOR_LEN_MAX];
+	char		color_orig[ZBX_GRAPH_ITEM_COLOR_LEN_MAX];
+	char		color_new[ZBX_GRAPH_ITEM_COLOR_LEN_MAX];
 	int		yaxisside_orig;
 	int		yaxisside_new;
 	int		calc_fnc_orig;
@@ -405,7 +405,7 @@ static int	get_templates_graphs_data(const zbx_vector_uint64_t *templateids,
 
 		zbx_vector_graphs_copies_append(graphs_copies_templates, graph_copy);
 		zbx_vector_uint64_append(templates_graphs_ids, graph_copy->graphid);
-		zbx_vector_str_append(templates_graphs_names, DBdyn_escape_string(graph_copy->name));
+		zbx_vector_str_append(templates_graphs_names, zbx_strdup(NULL,graph_copy->name));
 	}
 clean:
 	DBfree_result(result);
@@ -850,19 +850,15 @@ static void	prepare_graph_for_insert(graphs_items_entry_t *graphs_items_template
 		zbx_vector_graphs_copies_t *graphs_copies_insert, zbx_graph_copy_t *template_graph_copy)
 {
 	zbx_graph_copy_t	*graph_copy;
-	char			*esc_name;
 
-	esc_name = DBdyn_escape_string(template_graph_copy->name);
-	graph_copy = zbx_graph_copy_init_new(0, esc_name, template_graph_copy->width, template_graph_copy->height,
-			template_graph_copy->yaxismin, template_graph_copy->yaxismax,
+	graph_copy = zbx_graph_copy_init_new(0, template_graph_copy->name, template_graph_copy->width,
+			template_graph_copy->height, template_graph_copy->yaxismin, template_graph_copy->yaxismax,
 			template_graph_copy->show_work_period, template_graph_copy->show_triggers,
 			template_graph_copy->graphtype, template_graph_copy->show_legend, template_graph_copy->show_3d,
 			template_graph_copy->percent_left, template_graph_copy->percent_right,
 			template_graph_copy->ymin_type, template_graph_copy->ymax_type,
 			template_graph_copy->ymin_itemid, template_graph_copy->ymax_itemid, template_graph_copy->flags,
 			template_graph_copy->discover, graphs_items_template_entry_temp->graphid);
-
-	zbx_free(esc_name);
 
 	zbx_vector_graphs_copies_append(graphs_copies_insert, graph_copy);
 }
@@ -1143,8 +1139,8 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 	zbx_graph_copy_t	*found;
 
 	zbx_hashset_iter_reset(host_graphs_main_data, &iter1);
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	DBbegin_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
 
 	while (SUCCEED == res && NULL != (found = (zbx_graph_copy_t *)zbx_hashset_iter_next(&iter1)))
 	{
@@ -1339,7 +1335,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 		}
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == res && 16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 	{
@@ -1351,7 +1347,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 
 	if (SUCCEED == res)
 	{
-		DBend_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
+		zbx_DBend_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
 
 		if (16 < sql_offset2 && (ZBX_DB_OK > DBexecute("%s", sql2)))
 		{
@@ -1387,13 +1383,10 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 
 	for (i = 0; i < graphs_copies_insert->values_num; i++)
 	{
-		char			*graph_copy_name;
 		zbx_graph_copy_t	*graph_copy = graphs_copies_insert->values[i];
 		graphs_items_entry_t	*graphs_items_template_entry_found, graphs_items_template_entry_temp_t;
 
-		graph_copy_name = DBdyn_escape_string(graph_copy->name);
-
-		zbx_db_insert_add_values(&db_insert, graphid, graph_copy_name, graph_copy->width,
+		zbx_db_insert_add_values(&db_insert, graphid, graph_copy->name, graph_copy->width,
 				graph_copy->height, graph_copy->yaxismin, graph_copy->yaxismax, graph_copy->templateid,
 				(int)graph_copy->show_work_period, (int)(graph_copy->show_triggers),
 				(int)(graph_copy->graphtype), (int)(graph_copy->show_legend),
@@ -1402,8 +1395,8 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 				graph_copy->ymin_itemid, graph_copy->ymax_itemid,
 				(int)(graph_copy->flags), (int)(graph_copy->discover));
 
-		zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_ADD, graphid, graph_copy_name, (int)(graph_copy->flags));
-		zbx_audit_graph_update_json_add_data(graphid, graph_copy_name, graph_copy->width,
+		zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_ADD, graphid, graph_copy->name, (int)(graph_copy->flags));
+		zbx_audit_graph_update_json_add_data(graphid, graph_copy->name, graph_copy->width,
 				graph_copy->height, graph_copy->yaxismin, graph_copy->yaxismax, graph_copy->templateid,
 				(int)graph_copy->show_work_period, (int)(graph_copy->show_triggers),
 				(int)(graph_copy->graphtype), (int)(graph_copy->show_legend),
@@ -1411,8 +1404,6 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 				(int)(graph_copy->ymin_type), (int)(graph_copy->ymax_type),
 				graph_copy->ymin_itemid, graph_copy->ymax_itemid,
 				(int)(graph_copy->flags), (int)(graph_copy->discover));
-
-		zbx_free(graph_copy_name);
 
 		graphs_items_template_entry_temp_t.graphid = graph_copy->templateid;
 

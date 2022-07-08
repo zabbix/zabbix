@@ -207,7 +207,6 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'dstfrm' => $graphForm->getName(),
 					'dstfld1' => 'ymin_itemid',
 					'dstfld2' => 'ymin_name',
-					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
 				]).', view.getOnlyHostParam()), {dialogue_class: "modal-popup-generic"});'
@@ -282,7 +281,6 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'dstfrm' => $graphForm->getName(),
 					'dstfld1' => 'ymax_itemid',
 					'dstfld2' => 'ymax_name',
-					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
 				]).', view.getOnlyHostParam()), {dialogue_class: "modal-popup-generic"});'
@@ -367,8 +365,7 @@ $parameters_add = [
 	'dstfrm' => $graphForm->getName(),
 	'numeric' => '1',
 	'writeonly' => '1',
-	'multiselect' => '1',
-	'with_webitems' => '1'
+	'multiselect' => '1'
 ];
 if ($data['normal_only']) {
 	$parameters_add['normal_only'] = '1';

@@ -931,7 +931,7 @@ class testPageServicesServices extends CWebTest {
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
 		$this->assertTableStats($start_rows_count);
-		$start_contents = $this->getTableResult('Name');
+		$start_contents = $this->getTableColumnData('Name');
 
 		// Filling fields with needed services info.
 		$form->fill(['id:filter_name' => 'Server 3']);
@@ -950,7 +950,7 @@ class testPageServicesServices extends CWebTest {
 		$reset_count =  $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_count);
 		$this->assertTableStats($reset_count);
-		$this->assertEquals($start_contents, $this->getTableResult('Name'));
+		$this->assertEquals($start_contents, $this->getTableColumnData('Name'));
 	}
 
 	public function testPageServicesServices_AddChild() {
@@ -1759,12 +1759,13 @@ class testPageServicesServices extends CWebTest {
 			// Remove the additional rules from previous test cases.
 			$form->getFieldContainer('Additional rules')->query('button:Remove')->all(false)->click();
 
-			// Fill in configuration of each Addirional rule separately.
+			// Fill in configuration of each Additional rule separately.
 			foreach ($data['parent']['Additional rules'] as $rule_fields) {
 				$form->getFieldContainer('Additional rules')->query('button:Add')->waitUntilClickable()->one()->click();
 				$rules_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
 				$rules_form->fill($rule_fields);
 				$rules_form->submit();
+				$rules_form->waitUntilNotVisible();
 			}
 		}
 

@@ -23,6 +23,7 @@
  * Single item widget.
  *
  * @var CView $this
+ * @var array $data
  */
 
 $fields = $data['dialogue']['fields'];
@@ -35,7 +36,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
-$scripts = [];
+$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.item.form.view.js.php')];
 
 $field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
 	$form->getName()
@@ -138,7 +139,9 @@ $form_list
 				->addClass('form-field')
 				->addClass('field-fluid'),
 
-			CWidgetHelper::getLabel($fields['units_pos']),
+			CWidgetHelper::getLabel($fields['units_pos'], null,
+				_('Position is ignored for s, uptime and unixtime units.')
+			),
 			(new CDiv(CWidgetHelper::getSelect($fields['units_pos'])))->addClass('form-field'),
 
 			CWidgetHelper::getLabel($fields['units_size']),
@@ -215,79 +218,9 @@ if ($data['templateid'] === null) {
 
 $form->addItem($form_list);
 
-// Append color picker to widget body instead of whole HTML body. Process checkboxes and form block visibility.
-$scripts[] =
-	'window.setIndicatorColor = function (color) {'.
-		'const indicator_ids = '.json_encode([
-			'up_color' => 'change-indicator-up',
-			'down_color' => 'change-indicator-down',
-			'updown_color' => 'change-indicator-updown'
-		]).';'.
-
-		'if (this.name in indicator_ids) {'.
-			'const indicator = document.getElementById(indicator_ids[this.name]);'.
-			'indicator.querySelector("polygon").style.fill = (color !== "") ? "#" + color : "";'.
-		'}'.
-	'};'.
-
-	'$(".'.ZBX_STYLE_COLOR_PICKER.' input", $(".overlay-dialogue-body"))'.
-		'.colorpicker({appendTo: ".overlay-dialogue-body", use_default: true, onUpdate: window.setIndicatorColor});'.
-
-	'var $show = $(\'input[id^="show_"]\', "#widget-dialogue-form").not("#show_header");'.
-
-	'$("#adv_conf").change(function() {'.
-		'$show.trigger("change");'.
-
-		'$("#bg-color-row")'.
-			'.toggle(this.checked)'.
-			'.find("input")'.
-			'.prop("disabled", !this.checked);'.
-	'});'.
-
-	// Prevent unchecking last "Show" checkbox.
-	'$show.on("click", () => Boolean($show.filter(":checked").length));'.
-
-	'$show.change(function() {'.
-		'let adv_conf_checked = $("#adv_conf").prop("checked");'.
-
-		'switch($(this).val()) {'.
-			'case "'.WIDGET_ITEM_SHOW_DESCRIPTION.'":'.
-				'$("#description-row")'.
-					'.toggle(adv_conf_checked && this.checked)'.
-					'.find("input, textarea")'.
-					'.prop("disabled", !adv_conf_checked || !this.checked);'.
-				'break;'.
-
-			'case "'.WIDGET_ITEM_SHOW_VALUE.'":'.
-				'$("#value-row")'.
-					'.toggle(adv_conf_checked && this.checked)'.
-					'.find("input")'.
-					'.prop("disabled", !adv_conf_checked || !this.checked);'.
-				'break;'.
-
-			'case "'.WIDGET_ITEM_SHOW_TIME.'":'.
-				'$("#time-row")'.
-					'.toggle(adv_conf_checked && this.checked)'.
-					'.find("input")'.
-					'.prop("disabled", !adv_conf_checked || !this.checked);'.
-				'break;'.
-
-			'case "'.WIDGET_ITEM_SHOW_CHANGE_INDICATOR.'":'.
-				'$("#change-indicator-row")'.
-					'.toggle(adv_conf_checked && this.checked)'.
-					'.find("input")'.
-					'.prop("disabled", !adv_conf_checked || !this.checked);'.
-				'break;'.
-		'}'.
-	'});'.
-
-	'$("#adv_conf").trigger("change");'.
-
-	'$("#units_show").change(function() {'.
-		'$("#units, #units_pos, #units_size, #units_bold, #units_color").prop("disabled", !this.checked);'.
-	'});'.
-
-	'$("#units_show").trigger("change");';
+$scripts[] = '
+	widget_item_form.init();
+';
 
 return [
 	'form' => $form,

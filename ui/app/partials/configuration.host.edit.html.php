@@ -196,7 +196,7 @@ $host_tab
 		))
 	])
 	->addItem([
-		(new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),
+		(new CLabel(_('Host groups'), 'groups__ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
 				'name' => 'groups[]',
@@ -312,7 +312,8 @@ $ipmi_tab = (new CFormGrid())
 $tags_tab = new CPartial('configuration.tags.tab', [
 	'source' => 'host',
 	'tags' => $data['host']['tags'],
-	'readonly' => $host_is_discovered,
+	'with_automatic' => true,
+	'readonly' => false,
 	'tabs_id' => 'host-tabs'
 ]);
 
@@ -326,7 +327,7 @@ $macros_tab = (new CFormList('macrosFormList'))
 	->addRow(null,
 		new CPartial('hostmacros.list.html', [
 			'macros' => $data['host']['macros'],
-			'readonly' => $host_is_discovered
+			'readonly' => false
 		]), 'macros_container'
 	);
 

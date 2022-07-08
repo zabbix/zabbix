@@ -42,6 +42,7 @@
 #include "zbxhttp.h"
 #include "log.h"
 #include "zbxavailability.h"
+#include "zbxcomms.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -117,7 +118,7 @@ static void	interface_set_availability(DC_INTERFACE *dc_interface, const zbx_int
 		*pavailable = availability->available;
 
 	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_ERROR))
-		zbx_strlcpy(perror, availability->error, INTERFACE_ERROR_LEN_MAX);
+		zbx_strlcpy(perror, availability->error, ZBX_INTERFACE_ERROR_LEN_MAX);
 
 	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM))
 		*perrors_from = availability->errors_from;
@@ -417,8 +418,12 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields, unsigned
 
 void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, unsigned char expand_macros)
 {
-	int	i;
-	char	*port = NULL, error[ITEM_ERROR_LEN_MAX];
+	int			i;
+	char			*port = NULL, error[ZBX_ITEM_ERROR_LEN_MAX];
+	zbx_dc_um_handle_t	*um_handle;
+
+	if (MACRO_EXPAND_YES == expand_macros)
+		um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < num; i++)
 	{
@@ -666,6 +671,10 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 	}
 
 	zbx_free(port);
+
+	if (MACRO_EXPAND_YES == expand_macros)
+		zbx_dc_close_user_macros(um_handle);
+
 }
 
 void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, zbx_vector_ptr_t *add_results,

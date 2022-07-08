@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,13 +85,12 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['column']), $column);
 $form_list->addRow(CWidgetHelper::getLabel($fields['count']), CWidgetHelper::getIntegerBox($fields['count']));
 
 $form->addItem($form_list);
-$form->addItem(
-	(new CScriptTag('
-		widget_tophosts_form.init('.json_encode([
-			'form_id' => $form->getId()
-		]).');
-	'))->setOnDocumentReady()
-);
+
+$scripts[] = '
+	widget_tophosts_form.init('.json_encode([
+		'form_id' => $form->getId()
+	]).');
+';
 
 return [
 	'form' => $form,

@@ -21,14 +21,12 @@
 #define ZABBIX_TEMPLATE_H
 
 #include "common.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 
 typedef struct _zbx_template_item_preproc_t zbx_template_item_preproc_t;
 ZBX_PTR_VECTOR_DECL(item_preproc_ptr, zbx_template_item_preproc_t *)
-
-ZBX_PTR_VECTOR_DECL(item_tag_ptr, zbx_db_tag_t *)
 
 typedef struct _zbx_template_item_param_t zbx_template_item_param_t;
 ZBX_PTR_VECTOR_DECL(item_param_ptr, zbx_template_item_param_t *)
@@ -190,8 +188,8 @@ typedef struct
 	zbx_vector_ptr_t		dependent_items;
 	zbx_vector_item_preproc_ptr_t	item_preprocs;
 	zbx_vector_item_preproc_ptr_t	template_preprocs;
-	zbx_vector_item_tag_ptr_t	item_tags;
-	zbx_vector_item_tag_ptr_t	template_tags;
+	zbx_vector_db_tag_ptr_t		item_tags;
+	zbx_vector_db_tag_ptr_t		template_tags;
 	zbx_vector_item_param_ptr_t	item_params;
 	zbx_vector_item_param_ptr_t	template_params;
 	zbx_vector_lld_macro_ptr_t	item_lld_macros;

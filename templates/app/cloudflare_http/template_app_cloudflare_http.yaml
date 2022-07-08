@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:13Z'
-  groups:
+  date: '2022-07-01T06:44:50Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -325,7 +325,7 @@ zabbix_export:
                     datetime_end_str = datetime_end.toISOString();
             
                 var data = {
-                    "query": "{viewer {zones(filter: {zoneTag: " + Cloudflare.params.zone + "}) {\
+                    "query": "{viewer {zones(filter: {zoneTag: \"" + Cloudflare.params.zone + "\"}) {\
                     httpRequests1hGroups(limit: 100 filter: {\
                         datetime_geq: \"" + datetime_start_str + "\",  datetime_leq: \"" + datetime_end_str + "\"\
                         }) {\
