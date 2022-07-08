@@ -54,8 +54,10 @@ extern ZBX_THREAD_LOCAL char	info_buf[256];
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
-void	zbx_config_tls_init(zbx_config_tls_t *zbx_config_tls)
+zbx_config_tls_t	*zbx_config_tls_init(void)
 {
+	zbx_config_tls_t	*zbx_config_tls;
+
 	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
 
 	zbx_config_tls->connect_mode		= ZBX_TCP_SEC_UNENCRYPTED;
@@ -79,6 +81,8 @@ void	zbx_config_tls_init(zbx_config_tls_t *zbx_config_tls)
 	zbx_config_tls->cipher_all		= NULL;
 	zbx_config_tls->cipher_cmd13		= NULL;
 	zbx_config_tls->cipher_cmd		= NULL;
+
+	return zbx_config_tls;
 }
 
 void	zbx_config_tls_clean(zbx_config_tls_t *zbx_config_tls)

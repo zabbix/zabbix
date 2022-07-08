@@ -1341,7 +1341,7 @@ int	main(int argc, char **argv)
 	/* Instead, the system sends the error to the calling process.*/
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
-	zbx_config_tls_init(zbx_config_tls);
+	zbx_config_tls = zbx_config_tls_init();
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif

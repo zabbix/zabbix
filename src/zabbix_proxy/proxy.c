@@ -1006,7 +1006,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
 
-	zbx_config_tls_init(zbx_config_tls);
+	zbx_config_tls = zbx_config_tls_init();
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);

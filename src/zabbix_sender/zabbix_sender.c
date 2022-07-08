@@ -1493,7 +1493,7 @@ int	main(int argc, char **argv)
 	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
 	zbx_thread_sendval_args	*sendval_args = NULL;
 
-	zbx_config_tls_init(zbx_config_tls);
+	zbx_config_tls = zbx_config_tls_init();
 
 	progname = get_program_name(argv[0]);
 

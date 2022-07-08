@@ -319,7 +319,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	zbx_config_tls_init(zbx_config_tls);
+	zbx_config_tls = zbx_config_tls_init();
 
 	progname = get_program_name(argv[0]);
 
