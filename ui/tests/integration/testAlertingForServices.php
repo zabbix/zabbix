@@ -99,7 +99,7 @@ class testAlertingForServices extends CIntegrationTest {
 			'type' => 0,
 			'recovery_mode' => 0,
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
-			'expression' => 'last(/' . self::HOSTNAME . '/' . self::TRAPPER_KEY . ')=1',
+			'expression' => 'last(/' . self::HOSTNAME . '/' . self::TRAPPER_KEY . ')=1'
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['triggerids']);
@@ -223,7 +223,7 @@ class testAlertingForServices extends CIntegrationTest {
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
 		$response = $this->callUntilDataIsPresent('event.get', [
-			'objectids' => self::$triggerid,
+			'objectids' => self::$triggerid
 		], 25, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$eventid = $response['result'][0]['eventid'];
@@ -349,7 +349,7 @@ class testAlertingForServices extends CIntegrationTest {
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
 		$response = $this->callUntilDataIsPresent('event.get', [
-			'objectids' => self::$triggerid,
+			'objectids' => self::$triggerid
 		], 25, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$eventid = $response['result'][0]['eventid'];
@@ -443,7 +443,7 @@ class testAlertingForServices extends CIntegrationTest {
 					],
 					'opmessage_grp' => [['usrgrpid' => 7]]
 				]
-			],
+			]
 		]);
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['actionids']);
@@ -511,7 +511,7 @@ class testAlertingForServices extends CIntegrationTest {
 					],
 					'opmessage_grp' => [['usrgrpid' => 7]]
 				]
-			],
+			]
 		]);
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['actionids']);
@@ -557,7 +557,7 @@ class testAlertingForServices extends CIntegrationTest {
 			'type' => 0,
 			'recovery_mode' => 0,
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
-			'expression' => 'last(/' . self::HOSTNAME . '/' . self::TRAPPER_KEY . ')=1',
+			'expression' => 'last(/' . self::HOSTNAME . '/' . self::TRAPPER_KEY . ')=1'
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['triggerids']);
