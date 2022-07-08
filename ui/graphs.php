@@ -64,6 +64,7 @@ $fields = [
 	'group_graphid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
 	'copy_targetids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
 	'context' =>			[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
+	'readonly' =>			[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete","graph.updatediscover"'),	null],
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
@@ -467,10 +468,11 @@ elseif (isset($_REQUEST['form'])) {
 		'group_gid' => getRequest('group_gid', []),
 		'hostid' => $hostid,
 		'normal_only' => getRequest('normal_only'),
-		'context' => getRequest('context')
+		'context' => getRequest('context'),
+		'readonly' => getRequest('readonly', 0)
 	];
 
-	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
+	if ($data['graphid'] != 0 && ($data['readonly'] || !$data['form_refresh'])) {
 		$options = [
 			'graphids' => $data['graphid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -577,7 +579,7 @@ elseif (isset($_REQUEST['form'])) {
 		}
 	}
 
-	if (empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
+	if ($data['graphid'] == 0 && !$data['form_refresh']) {
 		$data['show_legend'] = $_REQUEST['show_legend'] = 1;
 		$data['show_work_period'] = $_REQUEST['show_work_period'] = 1;
 		$data['show_triggers'] = $_REQUEST['show_triggers'] = 1;
