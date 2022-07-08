@@ -76,6 +76,7 @@ if (array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CRE
 $readonly = false;
 if ($is_templated || $discovered_graph) {
 	$readonly = true;
+	$graphForm->addItem((new CVar('readonly', 1))->removeId());
 }
 
 if ($discovered_graph) {
@@ -435,8 +436,11 @@ if ($data['parent_discoveryid']) {
 
 // Append tabs to form.
 $graphTab = (new CTabView())
-	->setSelected(0)
 	->addTab('graphTab', ($data['parent_discoveryid'] === null) ? _('Graph') : _('Graph prototype'), $graphFormList);
+
+if (!$data['form_refresh']) {
+	$graphTab->setSelected(0);
+}
 
 /*
  * Preview tab
