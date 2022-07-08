@@ -93,7 +93,7 @@ abstract class CItemGeneral extends CApiService {
 		$checked_fields = array_fill_keys($field_names, ['type' => API_ANY]);
 
 		foreach ($items as $i => &$item) {
-			$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => $checked_fields];
+			$api_input_rules = ['type' => API_OBJECT, 'fields' => $checked_fields];
 			$db_item = ($db_items === null) ? null : $db_items[$item['itemid']];
 			$item_type = CItemTypeFactory::getObject($item['type']);
 
