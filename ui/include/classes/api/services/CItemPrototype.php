@@ -514,7 +514,7 @@ class CItemPrototype extends CItemGeneral {
 				$api_input_rules = self::getInheritedValidationRules();
 			}
 			else {
-				$item += array_intersect_key($db_item, array_flip(['key_', 'value_type']));
+				$item += array_intersect_key($db_item, array_flip(['value_type']));
 
 				$api_input_rules = self::getValidationRules();
 			}
@@ -522,14 +522,14 @@ class CItemPrototype extends CItemGeneral {
 			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
-
-			$item += array_intersect_key($db_item, array_flip(['type']));
 		}
 		unset($item);
 
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['type', 'key_']);
+
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'key_', 'host_status', 'flags']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'host_status', 'flags']);
 
 		self::validateUniqueness($items);
 
