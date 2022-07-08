@@ -4051,6 +4051,13 @@ msgstr "Сжатие записей старше чем"
 msgid "Compression"
 msgstr "Сжатие"
 
+#: app/views/administration.housekeeping.edit.php:164
+#: app/views/administration.housekeeping.edit.php:169
+#: app/views/administration.housekeeping.edit.php:174
+#: app/views/administration.housekeeping.edit.php:184
+msgid "Compression is not supported."
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
 msgstr "Одновременные сессии"
@@ -5801,6 +5808,10 @@ msgstr "Детали"
 msgid "Details of web scenario"
 msgstr "Подробности о веб-сценарии"
 
+#: app/views/administration.housekeeping.edit.php:195
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr "Период обнаружения"
@@ -6874,6 +6885,13 @@ msgstr "Сообщение об ошибке"
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr "Ошибка! Zabbix сервер не может стартовать из-за слишком старой версии сервера базы данных (%1$s). Минимальная разрешённая версия %2$s"
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
+msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -12164,6 +12182,11 @@ msgstr "Минимально требуемый макс. размер загр�
 msgid "Minimum required PHP version is %1$s."
 msgstr "Минимально требуемая версия PHP - %1$s."
 
+#: app/views/administration.housekeeping.edit.php:175
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %1$s (configuration option \"max_execution_time\")."
@@ -14676,6 +14699,10 @@ msgstr "Португальский (pt_PT)"
 msgid "Position"
 msgstr "Расположение"
 
+#: include/classes/widgets/views/widget.item.form.view.php:143
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "Post поля"
@@ -14683,6 +14710,10 @@ msgstr "Post поля"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "Тип Post"
+
+#: app/views/administration.housekeeping.edit.php:165
+msgid "PostgreSQL database server version is too old."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -19297,6 +19328,14 @@ msgstr "Не удалось загрузить API параметры настр
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Не удалось перезаписать существующий файл конфигурации."
 
+#: app/views/administration.housekeeping.edit.php:160
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:170
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr "Не удалось получить версию базы данных."
@@ -19481,6 +19520,26 @@ msgstr "Отсоединить от шаблонов"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Включить звук"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:179
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:189
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -20684,10 +20743,24 @@ msgstr "Предупреждение"
 msgid "Warning message"
 msgstr "Предупреждающее сообщение"
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr "Внимание! Ваш сервер базы данных версии %1$s слишком старый. Необходима как минимум версия %2$s"
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
+msgstr ""
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."

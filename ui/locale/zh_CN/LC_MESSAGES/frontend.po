@@ -3894,6 +3894,13 @@ msgstr "压缩早于"
 msgid "Compression"
 msgstr "压缩"
 
+#: app/views/administration.housekeeping.edit.php:164
+#: app/views/administration.housekeeping.edit.php:169
+#: app/views/administration.housekeeping.edit.php:174
+#: app/views/administration.housekeeping.edit.php:184
+msgid "Compression is not supported."
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
 msgstr "并发会话"
@@ -5636,6 +5643,10 @@ msgstr "详情"
 msgid "Details of web scenario"
 msgstr "Web 场景详情"
 
+#: app/views/administration.housekeeping.edit.php:195
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr "检测周期"
@@ -6703,6 +6714,13 @@ msgstr "错误信息"
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr "错误！由于 %1$s 数据库服务器版本不受支持，无法启动 Zabbix 服务器。必须至少为 (%2$s)"
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
+msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -11946,6 +11964,11 @@ msgstr "所需求的最小PHP上传文件大小是%1$s (配置项\"upload_max_fi
 msgid "Minimum required PHP version is %1$s."
 msgstr "所需的最低 PHP 版本为 %1$s。"
 
+#: app/views/administration.housekeeping.edit.php:175
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %1$s (configuration option \"max_execution_time\")."
@@ -14446,6 +14469,10 @@ msgstr "葡萄牙语 (pt_PT)"
 msgid "Position"
 msgstr "位置"
 
+#: include/classes/widgets/views/widget.item.form.view.php:143
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "发布字段"
@@ -14453,6 +14480,10 @@ msgstr "发布字段"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "发布类型"
+
+#: app/views/administration.housekeeping.edit.php:165
+msgid "PostgreSQL database server version is too old."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -19033,6 +19064,14 @@ msgstr "无法加载设置API的参数。"
 msgid "Unable to overwrite the existing configuration file."
 msgstr "无法覆盖已经存在的配置文件。"
 
+#: app/views/administration.housekeeping.edit.php:160
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:170
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr "无法检索数据库版本。"
@@ -19217,6 +19256,26 @@ msgstr "自模板断开链接"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "取消静音"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:179
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:189
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -20408,10 +20467,24 @@ msgstr "告警"
 msgid "Warning message"
 msgstr "告警信息"
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr "警告！%1$s 数据库服务器版本不支持。至少应为 (%2$s)"
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
+msgstr ""
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."

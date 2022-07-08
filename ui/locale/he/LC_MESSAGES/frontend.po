@@ -3970,6 +3970,13 @@ msgstr "דחיסת רשומות קדומות ל־"
 msgid "Compression"
 msgstr "דחיסה"
 
+#: app/views/administration.housekeeping.edit.php:164
+#: app/views/administration.housekeeping.edit.php:169
+#: app/views/administration.housekeeping.edit.php:174
+#: app/views/administration.housekeeping.edit.php:184
+msgid "Compression is not supported."
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
 msgstr "הפעלות בו־זמנית"
@@ -5716,6 +5723,10 @@ msgstr "פרטים"
 msgid "Details of web scenario"
 msgstr "פרטי תרחיש רשת"
 
+#: app/views/administration.housekeeping.edit.php:195
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr "תקופת זיהוי"
@@ -6786,6 +6797,13 @@ msgstr "הודעת שגיאה"
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr "שגיאה! לא ניתן להפעיל את שרת ה־Zabbix עקב גרסת מסד נתונים %1$s שאינה נתמכת. חייבת להיות לפחות (%2$s)"
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
+msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -12052,6 +12070,11 @@ msgstr "גודל הקובץ המזערי להעלאה הנדרש ל־PHP הוא 
 msgid "Minimum required PHP version is %1$s."
 msgstr "גרסת ה־PHP הנמוכה ביותר הנדרשת היא %1$s."
 
+#: app/views/administration.housekeeping.edit.php:175
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %1$s (configuration option \"max_execution_time\")."
@@ -14558,6 +14581,10 @@ msgstr "פורטוגלית (pt_PT)"
 msgid "Position"
 msgstr "מיקום"
 
+#: include/classes/widgets/views/widget.item.form.view.php:143
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "שדות Post"
@@ -14565,6 +14592,10 @@ msgstr "שדות Post"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "סוג Post"
+
+#: app/views/administration.housekeeping.edit.php:165
+msgid "PostgreSQL database server version is too old."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -19162,6 +19193,14 @@ msgstr "לא ניתן לטעון את משתני API ההגדרות."
 msgid "Unable to overwrite the existing configuration file."
 msgstr "לא ניתן לשכתב על קובץ התצורה הקיים."
 
+#: app/views/administration.housekeeping.edit.php:160
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:170
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr "לא ניתן לקבל את גרסת מסד הנתונים."
@@ -19346,6 +19385,26 @@ msgstr "הפרדה מתבניות"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "ביטול השתקה"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:179
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:189
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -20543,10 +20602,24 @@ msgstr "אזהרה"
 msgid "Warning message"
 msgstr "הודעת אזהרה"
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת. עליה להיות לפחות (%2$s)"
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
+msgstr ""
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
