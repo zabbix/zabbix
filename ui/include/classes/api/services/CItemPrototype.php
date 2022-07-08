@@ -482,25 +482,20 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$count = $this->get([
-			'countOutput' => true,
+		$db_items = $this->get([
+			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
+				'logtimefmt', 'description', 'status', 'discover'
+			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
-			'editable' => true
+			'editable' => true,
+			'preservekeys' => true
 		]);
 
-		if ($count != count($items)) {
+		if (count($db_items) != count($items)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,i.logtimefmt,'.
-				'i.description,i.status,i.discover,i.hostid,i.templateid,i.flags,h.status AS host_status,'.
-				'id.parent_itemid AS ruleid'.
-			' FROM items i,hosts h,item_discovery id'.
-			' WHERE i.hostid=h.hostid'.
-				' AND i.itemid=id.itemid'.
-				' AND '.dbConditionId('i.itemid', array_column($items, 'itemid'))
-		), 'itemid');
+		$this->addInternalFields($db_items);
 
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
@@ -531,8 +526,6 @@ class CItemPrototype extends CItemGeneral {
 			$item += array_intersect_key($db_item, array_flip(['type']));
 		}
 		unset($item);
-
-		self::addDbFieldsByType($items, $db_items);
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
@@ -667,52 +660,53 @@ class CItemPrototype extends CItemGeneral {
 	 * @param array $hostids
 	 */
 	public function syncTemplates(array $templateids, array $hostids): void {
-		$db_item_prototypes = DBfetchArrayAssoc(DBselect(
-			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,i.logtimefmt,'.
-				'i.description,i.status,i.discover,i.hostid,i.templateid,i.flags,h.status AS host_status,'.
-				'id.parent_itemid AS ruleid'.
-			' FROM items i,hosts h,item_discovery id'.
-			' WHERE i.hostid=h.hostid'.
-				' AND i.itemid=id.itemid'.
-				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
-				' AND '.dbConditionId('i.hostid', $templateids)
-		), 'itemid');
+		$db_items = DB::select('items', [
+			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
+				'logtimefmt', 'description', 'status', 'discover'
+			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			'filter' => [
+				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
+				'hostid' => $templateids
+			],
+			'preservekeys' => true
+		]);
 
-		if (!$db_item_prototypes) {
+		if (!$db_items) {
 			return;
 		}
 
-		$item_prototypes = [];
+		$this->addInternalFields($db_items);
 
-		foreach ($db_item_prototypes as $db_item_prototype) {
-			$item_prototype = array_intersect_key($db_item_prototype, array_flip(['itemid', 'type']));
+		$items = [];
 
-			if ($db_item_prototype['type'] == ITEM_TYPE_SCRIPT) {
-				$item_prototype += ['parameters' => []];
+		foreach ($db_items as $db_item) {
+			$item = array_intersect_key($db_item, array_flip(['itemid', 'type']));
+
+			if ($db_item['type'] == ITEM_TYPE_SCRIPT) {
+				$item += ['parameters' => []];
 			}
 
-			$item_prototypes[] = $item_prototype + [
+			$items[] = $item + [
 				'preprocessing' => [],
 				'tags' => []
 			];
 		}
 
-		self::addDbFieldsByType($item_prototypes, $db_item_prototypes);
-		self::addAffectedObjects($item_prototypes, $db_item_prototypes);
+		self::addAffectedObjects($items, $db_items);
 
-		$item_prototypes = array_values($db_item_prototypes);
+		$items = array_values($db_items);
 
-		foreach ($item_prototypes as &$item_prototype) {
-			if (array_key_exists('parameters', $item_prototype)) {
-				$item_prototype['parameters'] = array_values($item_prototype['parameters']);
+		foreach ($items as &$item) {
+			if (array_key_exists('parameters', $item)) {
+				$item['parameters'] = array_values($item['parameters']);
 			}
 
-			$item_prototype['preprocessing'] = array_values($item_prototype['preprocessing']);
-			$item_prototype['tags'] = array_values($item_prototype['tags']);
+			$item['preprocessing'] = array_values($item['preprocessing']);
+			$item['tags'] = array_values($item['tags']);
 		}
-		unset($item_prototype);
+		unset($item);
 
-		$this->inherit($item_prototypes, [], $hostids);
+		$this->inherit($items, [], $hostids);
 	}
 
 	/**

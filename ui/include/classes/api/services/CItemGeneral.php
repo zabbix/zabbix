@@ -495,24 +495,29 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function getChildObjectsUsingTemplateid(array $items, array $db_items): array {
 		if ($this instanceof CItemPrototype) {
-			$upd_db_items = DBfetchArrayAssoc(DBselect(
-				'SELECT i.itemid,i.hostid,i.key_,i.templateid,i.type,i.value_type,i.name,i.history,i.master_itemid,'.
-					'h.status as host_status,id.parent_itemid AS ruleid'.
-				' FROM hosts h,items i'.
-				' LEFT JOIN item_discovery id ON id.itemid=i.itemid'.
-				' WHERE h.hostid=i.hostid'.
-					' AND '.dbConditionInt('i.templateid', array_column($items, 'itemid'))
-			), 'itemid');
+			$upd_db_items = DB::select('items', [
+				'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
+					'logtimefmt', 'description', 'status', 'discover'
+				], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+				'filter' => [
+					'templateid' => array_column($items, 'itemid')
+				],
+				'preservekeys' => true
+			]);
 		}
 		else {
-			$upd_db_items = DBfetchArrayAssoc(DBselect(
-				'SELECT i.itemid,i.hostid,i.key_,i.templateid,i.type,i.value_type,i.name,i.history,i.master_itemid,'.
-					'h.status as host_status'.
-				' FROM hosts h,items i'.
-				' WHERE h.hostid=i.hostid'.
-					' AND '.dbConditionInt('i.templateid', array_column($items, 'itemid'))
-			), 'itemid');
+			$upd_db_items = DB::select('items', [
+				'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
+					'inventory_link', 'logtimefmt', 'description', 'status'
+				], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+				'filter' => [
+					'templateid' => array_keys($db_items)
+				],
+				'preservekeys' => true
+			]);
 		}
+
+		$this->addInternalFields($upd_db_items);
 
 		if ($upd_db_items) {
 			$upd_items = [];
@@ -529,7 +534,6 @@ abstract class CItemGeneral extends CApiService {
 				$upd_items[] = $upd_item;
 			}
 
-			self::addDbFieldsByType($upd_items, $upd_db_items);
 			self::addAffectedObjects($upd_items, $upd_db_items);
 		}
 
@@ -588,37 +592,54 @@ abstract class CItemGeneral extends CApiService {
 		$hostids_condition = ($hostids !== null) ? ' AND '.dbConditionId('ht.hostid', $hostids) : '';
 
 		if ($this instanceof CItemPrototype) {
-			$result = DBselect(
-				'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,'.
-					'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
-					'i.master_itemid,h.status AS host_status,ht.templateid AS parent_hostid,id.parent_itemid AS ruleid'.
-				' FROM hosts h,hosts_templates ht,items i'.
-				' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
-				' WHERE i.hostid=h.hostid'.
-					' AND i.hostid=ht.hostid'.
-					' AND '.dbConditionString('i.key_', array_unique(array_column($items, 'key_'))).
-					$hostids_condition
-			);
+			$key_db_items = DBfetchArrayAssoc(DBselect(
+				'SELECT ht.hostid,i.itemid,i.templateid,i.flags,h.status AS host_status,id.parent_itemid AS ruleid,'.
+					'ht.templateid AS parent_hostid'.
+				' FROM hosts_templates ht,items i,hosts h,item_discovery id'.
+				' WHERE ht.hostid=i.hostid'.
+					' AND ht.hostid=h.hostid'.
+					' AND i.itemid=id.itemid'.
+					' AND '.dbConditionId('ht.templateid', array_unique(array_column($items, 'hostid'))).
+					' AND '.dbConditionString('i.key_', array_unique(array_column($items, 'key_')))
+			), 'itemid');
+
+			$options = [
+				'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
+					'logtimefmt', 'description', 'status', 'discover'
+				], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+				'itemids' => array_keys($key_db_items)
+			];
 		}
 		else {
-			$result = DBselect(
-				'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,'.
-					'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
-					'i.master_itemid,h.status AS host_status,ht.templateid AS parent_hostid'.
-				' FROM items i,hosts h,hosts_templates ht'.
-				' WHERE i.hostid=h.hostid'.
-					' AND i.hostid=ht.hostid'.
+			$key_db_items = DBfetchArrayAssoc(DBselect(
+				'SELECT ht.hostid,i.itemid,i.templateid,i.flags,h.status AS host_status,ht.templateid AS parent_hostid'.
+				' FROM hosts_templates ht,items i,hosts h'.
+				' WHERE ht.hostid=i.hostid'.
+					' AND ht.hostid=h.hostid'.
+					' AND '.dbConditionId('ht.templateid', array_unique(array_column($items, 'hostid'))).
 					' AND '.dbConditionString('i.key_', array_unique(array_column($items, 'key_'))).
 					$hostids_condition
-			);
+			), 'itemid');
+
+			$options = [
+				'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
+					'inventory_link', 'logtimefmt', 'description', 'status'
+				], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+				'itemids' => array_keys($key_db_items)
+			];
 		}
+
+		$result = DBselect(DB::makeSql('items', $options));
 
 		while ($row = DBfetch($result)) {
 			foreach ($items as $i => $item) {
-				self::checkKeyAlreadyInherited($item, $row);
+				if (bccomp($item['hostid'], $key_db_items[$row['itemid']]['parent_hostid']) == 0
+						&& $row['key_'] === $item['key_']) {
+					$upd_db_item = $row + $key_db_items[$row['itemid']];
 
-				if (bccomp($item['hostid'], $row['parent_hostid']) == 0 && $row['key_'] === $item['key_']) {
-					$upd_db_items[$row['itemid']] = $row;
+					self::checkObjectAlreadyInherited($item, $upd_db_item);
+
+					$upd_db_items[$row['itemid']] = $upd_db_item;
 					$parent_indexes[$row['itemid']] = $i;
 				}
 			}
@@ -651,7 +672,6 @@ abstract class CItemGeneral extends CApiService {
 				$upd_items[] = $upd_item;
 			}
 
-			static::addDbFieldsByType($upd_items, $upd_db_items);
 			static::addAffectedObjects($upd_items, $upd_db_items);
 		}
 
@@ -660,24 +680,25 @@ abstract class CItemGeneral extends CApiService {
 
 	/**
 	 * @param array $item
-	 * @param array $row
+	 * @param array $upd_db_item
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkKeyAlreadyInherited(array $item, array $row): void {
-		if (bccomp($item['hostid'], $row['parent_hostid']) == 0 && $row['key_'] === $item['key_']
-				&& $row['templateid'] != 0) {
-			$item_hosts = DB::select('hosts', [
+	private static function checkObjectAlreadyInherited(array $item, array $upd_db_item): void {
+		if ($upd_db_item['templateid'] != 0) {
+			$target_is_host = in_array($upd_db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
+
+			$hosts = DB::select('hosts', [
 				'output' => ['host'],
-				'hostids' => [$row['hostid']]
+				'hostids' => $upd_db_item['hostid']
 			]);
+
 			$template = DBfetch(DBselect(
 				'SELECT h.host'.
 				' FROM items i,hosts h'.
 				' WHERE i.hostid=h.hostid'.
-					' AND '.dbConditionId('i.itemid', [$row['templateid']])
+					' AND '.dbConditionId('i.itemid', [$upd_db_item['templateid']])
 			));
-			$target_is_host = in_array($row['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 
 			switch ($item['flags']) {
 				case ZBX_FLAG_DISCOVERY_NORMAL:
@@ -700,7 +721,9 @@ abstract class CItemGeneral extends CApiService {
 					break;
 			}
 
-			self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $row['key_'], $item_hosts[0]['host'], $template['host']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $upd_db_item['key_'], $hosts[0]['host'],
+				$template['host']
+			));
 		}
 	}
 
@@ -2363,70 +2386,31 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Add the specific fields of item types with its values into $db_items.
-	 * In case when item type is changed, fields of existing type and new type are added.
+	 * Add the internally used fields to the given $db_items.
 	 *
-	 * @param array $items
 	 * @param array $db_items
 	 */
-	protected static function addDbFieldsByType(array $items, array &$db_items): void {
-		$types = [];
-		$item_indexes = [];
-		$only_template_items = true;
-
-		foreach ($items as $i => $item) {
-			$db_item = $db_items[$item['itemid']];
-
-			$types += [$db_item['type'] => true];
-
-			if ($item['type'] != $db_item['type']) {
-				$types += [$item['type'] => true];
-				$item_indexes[$item['itemid']] = $i;
-			}
-
-			if ($db_item['host_status'] != HOST_STATUS_TEMPLATE) {
-				$only_template_items = false;
-			}
+	protected function addInternalFields(array &$db_items): void {
+		if ($this instanceof CItemPrototype) {
+			$result = DBselect(
+				'SELECT i.itemid,i.hostid,i.templateid,i.flags,h.status AS host_status,id.parent_itemid AS ruleid'.
+				' FROM items i,hosts h,item_discovery id'.
+				' WHERE i.hostid=h.hostid'.
+					' AND i.itemid=id.itemid'.
+					' AND '.dbConditionId('i.itemid', array_keys($db_items))
+			);
+		}
+		else {
+			$result = DBselect(
+				'SELECT i.itemid,i.hostid,i.templateid,i.flags,h.status AS host_status'.
+				' FROM items i,hosts h'.
+				' WHERE i.hostid=h.hostid'.
+					' AND '.dbConditionId('i.itemid', array_keys($db_items))
+			);
 		}
 
-		$output = array_flip(['itemid', 'key_']);
-		$type_field_names = [];
-
-		foreach ($types as $type => $foo) {
-			$field_names = array_flip(CItemTypeFactory::getObject($type)::FIELD_NAMES);
-
-			if ($only_template_items && array_key_exists('interfaceid', $field_names)) {
-				unset($field_names['interfaceid']);
-			}
-
-			if ($type == ITEM_TYPE_SCRIPT) {
-				unset($field_names['parameters']);
-			}
-
-			$output += $field_names;
-			$type_field_names[$type] = $field_names;
-		}
-
-		$options = [
-			'output' => array_keys($output),
-			'itemids' => array_keys($db_items)
-		];
-		$_db_items = DBselect(DB::makeSql('items', $options));
-
-		while ($_db_item = DBfetch($_db_items)) {
-			$item = array_key_exists($_db_item['itemid'], $item_indexes)
-				? $items[$item_indexes[$_db_item['itemid']]]
-				: null;
-			$field_names = ($item !== null) ? $type_field_names[$item['type']] : [];
-
-			$db_item = $db_items[$_db_item['itemid']];
-			$field_names += $type_field_names[$db_item['type']];
-
-			if ($db_item['host_status'] == HOST_STATUS_TEMPLATE && array_key_exists('interfaceid', $field_names)) {
-				unset($field_names['interfaceid']);
-			}
-
-			$db_items[$_db_item['itemid']] += array_intersect_key($_db_item, $field_names);
+		while ($row = DBfetch($result)) {
+			$db_items[$row['itemid']] += $row;
 		}
 	}
 

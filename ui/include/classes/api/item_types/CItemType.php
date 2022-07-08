@@ -32,7 +32,33 @@ abstract class CItemType {
 	 *
 	 * @var array
 	 */
-	const FIELD_NAMES = [];
+	const FIELD_NAMES = [
+		// The fields used for multiple item types.
+		'interfaceid', 'authtype', 'username', 'password', 'params', 'timeout', 'delay', 'trapper_hosts',
+
+		// Dependent item type spcecific fields.
+		'master_itemid',
+
+		// HTTP Agent item type spcecific fields.
+		'url', 'query_fields', 'request_method', 'post_type', 'posts',
+		'headers', 'status_codes', 'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy',
+		'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'allow_traps',
+
+		// IPMI item type spcecific fields.
+		'ipmi_sensor',
+
+		// JMX item type spcecific fields.
+		'jmx_endpoint',
+
+		// Script item type spcecific fields.
+		'parameters',
+
+		// SNMP item type spcecific fields.
+		'snmp_oid',
+
+		// SSH item type spcecific fields.
+		'publickey', 'privatekey'
+	];
 
 	/**
 	 * @param array $item

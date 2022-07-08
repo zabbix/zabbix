@@ -610,24 +610,20 @@ class CItem extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$count = $this->get([
-			'countOutput' => true,
+		$db_items = $this->get([
+			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
+				'inventory_link', 'logtimefmt', 'description', 'status'
+			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
-			'editable' => true
+			'editable' => true,
+			'preservekeys' => true
 		]);
 
-		if ($count != count($items)) {
+		if (count($db_items) != count($items)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,'.
-				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
-				'h.status AS host_status'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionId('i.itemid', array_column($items, 'itemid'))
-		), 'itemid');
+		$this->addInternalFields($db_items);
 
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
@@ -661,8 +657,6 @@ class CItem extends CItemGeneral {
 			$item += array_intersect_key($db_item, array_flip(['type']));
 		}
 		unset($item);
-
-		self::addDbFieldsByType($items, $db_items);
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
@@ -820,19 +814,22 @@ class CItem extends CItemGeneral {
 	 * @param array $hostids
 	 */
 	public function syncTemplates(array $templateids, array $hostids): void {
-		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,'.
-				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
-				'h.status AS host_status'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL]).
-				' AND '.dbConditionId('i.hostid', $templateids)
-		), 'itemid');
+		$db_items = DB::select('items', [
+			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
+				'inventory_link', 'logtimefmt', 'description', 'status'
+			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			'filter' => [
+				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+				'hostid' => $templateids
+			],
+			'preservekeys' => true
+		]);
 
 		if (!$db_items) {
 			return;
 		}
+
+		$this->addInternalFields($db_items);
 
 		$items = [];
 
@@ -849,7 +846,6 @@ class CItem extends CItemGeneral {
 			];
 		}
 
-		self::addDbFieldsByType($items, $db_items);
 		self::addAffectedObjects($items, $db_items);
 
 		$items = array_values($db_items);
