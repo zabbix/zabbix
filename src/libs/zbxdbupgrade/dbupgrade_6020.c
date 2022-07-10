@@ -22,22 +22,22 @@
 extern unsigned char	program_type;
 
 /*
- * 6.0 maintenance database patches
+ * 6.2 maintenance database patches
  */
 
 #ifndef HAVE_SQLITE3
 
-static int	DBpatch_6000000(void)
+static int	DBpatch_6020000(void)
 {
 	return SUCCEED;
 }
 
 #endif
 
-DBPATCH_START(6000)
+DBPATCH_START(6020)
 
 /* version, duplicates flag, mandatory flag */
 
-DBPATCH_ADD(6000000, 0, 1)
+DBPATCH_ADD(6020000, 0, 1)
 
 DBPATCH_END()
