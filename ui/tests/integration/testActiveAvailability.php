@@ -157,7 +157,7 @@ class testActiveAvailability extends CIntegrationTest {
 			'interfaceid' => self::$interfaceid,
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'value_type' => ITEM_VALUE_TYPE_TEXT,
-			'delay' => '1s',
+			'delay' => '1s'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
