@@ -5610,19 +5610,18 @@ $range-input-width: 31px;
 
 .range-control {
 	position: relative;
-	display: inline-block;
-	vertical-align: middle;
+	display: inline-flex;
 
 	input[type=range] {
+		width: calc(100% + 10px);
+		height: 20px;
+		margin: 2px -5px;
+		padding: 0;
+		vertical-align: top;
+		opacity: 0;
 		cursor: pointer;
 		-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
 		-moz-appearance: none; /* Hides the slider so that custom slider can be made */
-		width: calc(100% + 10px);
-		opacity: 0;
-		vertical-align: middle;
-		margin: 0 -5px;
-		padding: 0;
-		height: 20px;
 
 		&:focus {
 			outline: none;
@@ -5631,9 +5630,9 @@ $range-input-width: 31px;
 		/* Special styling for WebKit/Blink */
 		&::-webkit-slider-thumb,
 		&::-moz-range-thumb {
-			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
 			height: $range-thumb-size;
 			width: $range-thumb-size;
+			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
 			opacity: 0;
 		}
 
@@ -5645,23 +5644,21 @@ $range-input-width: 31px;
 
 	input[type=text] {
 		width: $range-input-width;
-		float: right;
 	}
 
 	> div {
 		position: relative;
 		width: calc(100% - 10px - #{$range-input-width});
-		margin: 2px $range-thumb-size 0 0;
-		float: left;
+		margin-right: $range-thumb-size;
 	}
 
 	.range-control-track,
 	.range-control-progress {
 		position: absolute;
 		top: 50%;
-		margin-top: -$range-track-height / 2;
 		left: 0;
 		height: $range-track-height;
+		margin-top: -$range-track-height / 2;
 		cursor: pointer;
 	}
 
@@ -5677,12 +5674,12 @@ $range-input-width: 31px;
 	.range-control-thumb {
 		position: absolute;
 		top: 50%;
-		margin-top: -$range-thumb-size / 2;
-		margin-left: -$range-thumb-size / 2;
 		width: $range-thumb-size;
 		height: $range-thumb-size;
-		border-radius: 50%;
+		margin-top: -$range-thumb-size / 2;
+		margin-left: -$range-thumb-size / 2;
 		background: $range-thumb-color;
+		border-radius: 50%;
 	}
 
 	&.range-control-focus {
@@ -5712,16 +5709,16 @@ $range-input-width: 31px;
 
 	datalist {
 		position: absolute;
+		top: 50%;
 		display: flex;
 		width: 100%;
-		top: 50%;
 		margin-top: -$range-track-height / 2;
 
 		option {
-			padding: 0;
-			font-size: 0;
 			flex: 1 0 0;
 			height: $range-track-height;
+			padding: 0;
+			font-size: 0;
 			border-left: 1px solid $body-bg-color;
 		}
 	}
