@@ -988,7 +988,7 @@ function make_trigger_details($trigger, $eventid) {
 	$table = (new CTableInfo())
 		->addRow([
 			new CCol(_n('Host', 'Hosts', count($hosts))),
-			new CCol($hostNames)
+			(new CCol($hostNames))->addClass(ZBX_STYLE_WORDBREAK)
 		])
 		->addRow([
 			new CCol(_('Trigger')),
@@ -999,7 +999,7 @@ function make_trigger_details($trigger, $eventid) {
 		])
 		->addRow([
 			_('Severity'),
-			CSeverityHelper::makeSeverityCell((int) $trigger['priority'])
+			CSeverityHelper::makeSeverityCell((int) $trigger['priority'])->addClass(ZBX_STYLE_WORDBREAK)
 		]);
 
 	$trigger = CMacrosResolverHelper::resolveTriggerExpressions(zbx_toHash($trigger, 'triggerid'), [
