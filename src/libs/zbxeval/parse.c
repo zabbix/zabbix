@@ -693,6 +693,7 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
 	return end - str;
 
 #undef MVAR_HOST_HOST
+#undef MVAR_ITEM_KEY
 }
 
 /******************************************************************************
