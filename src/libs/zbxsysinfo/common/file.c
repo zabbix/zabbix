@@ -1272,8 +1272,8 @@ static char	*get_print_time(time_t st_raw)
 static char	*canonicalize_path(const char *fullname)
 {
 	int			i, up_level = 0;
-	char			*name, *p2;
-	const char		*p1 = &fullname[1];
+	char			*name;
+	const char		*p_start = &fullname[1], *p_to_delimiter;
 	size_t			name_alloc = 0, name_offset = 0;
 	zbx_vector_str_t	names;
 
@@ -1281,17 +1281,17 @@ static char	*canonicalize_path(const char *fullname)
 
 	do
 	{
-		if (NULL != (p2 = strchr(p1, '/')))
+		if (NULL != (p_to_delimiter = strchr(p_start, '/')))
 		{
-			name = zbx_dsprintf(NULL, "%.*s", (int)(p2 - p1), p1);
-			p1 = p2 + 1;
+			name = zbx_dsprintf(NULL, "%.*s", (int)(p_to_delimiter - p_start), p_start);
+			p_start = p_to_delimiter + 1;
 		}
 		else
-			name = zbx_strdup(NULL, p1);
+			name = zbx_strdup(NULL, p_start);
 
 		zbx_vector_str_append(&names, name);
 	}
-	while (NULL != p2);
+	while (NULL != p_to_delimiter);
 
 	name = NULL;
 
@@ -1343,21 +1343,29 @@ static int	get_dir_names(const char *filename, char **basename, char **dirname, 
 	if (NULL == (*pathname = _fullpath(NULL, filename, 0)))
 		return FAIL;
 #else
-	char	resolved_path[PATH_MAX + 1], *name = NULL;
-	size_t	name_alloc = 0, name_offset = 0;
-
 	if ( '/' != filename[0])
 	{
-		if (NULL == getcwd(resolved_path, PATH_MAX))
+		char	resolved_path[PATH_MAX + 1], *name = NULL;
+		size_t	name_alloc = 0, name_offset = 0;
+
+#define ZBX_UNREACHABLE_STR		"(unreachable)"
+#define ZBX_UNREACHABLE_STR_LEN		ZBX_CONST_STRLEN(ZBX_UNREACHABLE_STR)
+
+		if (NULL == getcwd(resolved_path, PATH_MAX) || 0 == strncmp(ZBX_UNREACHABLE_STR, resolved_path,
+				ZBX_UNREACHABLE_STR_LEN))
+		{
 			return FAIL;
+		}
 
 		zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "%s/%s", resolved_path, filename);
+
+		*pathname = canonicalize_path(name);
+		zbx_free(name);
+#undef ZBX_UNREACHABLE_STR_LEN
+#undef ZBX_UNREACHABLE_STR
 	}
 	else
-		name = zbx_strdup(NULL, filename);
-
-	*pathname = canonicalize_path(name);
-	zbx_free(name);
+		*pathname = canonicalize_path(filename);
 #endif
 
 	ptr1 = *pathname;
