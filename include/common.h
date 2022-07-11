@@ -1284,6 +1284,7 @@ int	zbx_cesu8_to_utf8(const char *cesu8, char **utf8);
 void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
+int	str2uint64whole(const char *str, zbx_uint64_t *value);
 
 /* time and memory size suffixes */
 #define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
