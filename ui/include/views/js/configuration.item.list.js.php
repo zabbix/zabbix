@@ -62,10 +62,8 @@
 			document.querySelector('.js-copy').addEventListener('click', () => {
 				this.openCopyPopup();
 			});
-			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-execute-now')) {
-					this.massCheckNow();
-				}
+			document.querySelector('.js-execute-now').addEventListener('click', () => {
+			this.massCheckNow();
 			});
 		},
 

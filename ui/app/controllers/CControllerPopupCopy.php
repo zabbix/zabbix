@@ -89,7 +89,7 @@ class CControllerPopupCopy extends CController {
 			$data['itemids'] = $this->getInput('itemids');
 		}
 		elseif ($data['action'] === 'popup.copy.triggers') {
-			$data['triggerids'] =  $this->getInput('triggerids');
+			$data['triggerids'] = $this->getInput('triggerids');
 		}
 		elseif ($data['action'] === 'popup.copy.graphs') {
 			$data['graphids'] = $this->getInput('graphids');

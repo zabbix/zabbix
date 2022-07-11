@@ -1,5 +1,5 @@
 <?php
-//declare(strict_types=0);
+//declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -50,7 +50,7 @@ elseif (array_key_exists('graphids', $data)) {
 
 $form_grid = (new CFormGrid())
 	->addItem([
-		(new CLabel(_('Target type'), 'copy_type')),
+		new CLabel(_('Target type'), 'copy_type'),
 		new CFormField(
 			(new CRadioButtonList('copy_type', COPY_TYPE_TO_HOST_GROUP))
 				->addValue(_('Host groups'), COPY_TYPE_TO_HOST_GROUP)
