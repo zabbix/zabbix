@@ -46,7 +46,7 @@ $filter_column_left = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 	)
 	->addRow(
-		new CLabel($data['context'] === 'host' ? _('Hosts') : _('Templates'), 'filter_hosts__ms'),
+		(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',

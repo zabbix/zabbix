@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 // indicator of sort field
@@ -35,7 +36,9 @@ $url_details = $data['allowed_ui_problems']
 $show_timeline = ($data['sortfield'] === 'clock' && $data['fields']['show_timeline']);
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
 
-$header_time = new CColHeader(($data['sortfield'] === 'clock') ? [_('Time'), $sort_div] : _('Time'));
+$header_time = new CColHeader(($data['sortfield'] === 'clock')
+	? [_x('Time', 'compact table header'), $sort_div]
+	: _x('Time', 'compact table header'));
 
 if ($show_timeline) {
 	$header = [
@@ -52,20 +55,32 @@ $show_opdata = $data['fields']['show_opdata'];
 
 $table = (new CTableInfo())
 	->setHeader(array_merge($header, [
-		$show_recovery_data ? _('Recovery time') : null,
-		$show_recovery_data ? _('Status') : null,
-		_('Info'),
-		($data['sortfield'] === 'host') ? [_('Host'), $sort_div] : _('Host'),
+		$show_recovery_data
+			? _x('Recovery time', 'compact table header')
+			: null,
+		$show_recovery_data
+			? _x('Status', 'compact table header')
+			: null,
+		_x('Info', 'compact table header'),
+		($data['sortfield'] === 'host')
+			? [_x('Host', 'compact table header'), $sort_div]
+			: _x('Host', 'compact table header'),
 		[
-			($data['sortfield'] === 'name') ? [_('Problem'), $sort_div] : _('Problem'),
+			($data['sortfield'] === 'name')
+				? [_x('Problem', 'compact table header'), $sort_div]
+				: _x('Problem', 'compact table header'),
 			' &bullet; ',
-			($data['sortfield'] === 'severity') ? [_('Severity'), $sort_div] : _('Severity')
+			($data['sortfield'] === 'severity')
+				? [_x('Severity', 'compact table header'), $sort_div]
+				: _x('Severity', 'compact table header')
 		],
-		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,
-		_('Duration'),
-		_('Ack'),
-		_('Actions'),
-		$data['fields']['show_tags'] ? _('Tags') : null
+		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY)
+			? _x('Operational data', 'compact table header')
+			: null,
+			_x('Duration', 'compact table header'),
+			_x('Ack', 'compact table header'),
+			_x('Actions', 'compact table header'),
+		$data['fields']['show_tags'] ? _x('Tags', 'compact table header') : null
 	]));
 
 $today = strtotime('today');
