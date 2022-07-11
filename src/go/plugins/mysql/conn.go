@@ -28,11 +28,11 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 
+	"git.zabbix.com/ap/plugin-support/uri"
 	"zabbix.com/pkg/tlsconfig"
-	"zabbix.com/pkg/uri"
 
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type MyClient interface {

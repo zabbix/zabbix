@@ -1,0 +1,3806 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-13T22:05:41Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 28e31ef9402d4c1ba2fbc730a288d2d8
+      template: 'TrueNAS SNMP'
+      name: 'TrueNAS SNMP'
+      description: |
+        Template for monitoring TrueNAS by SNMP
+        Setup:
+          1. Import template into Zabbix
+          2. Enable SNMP daemon at Services in TrueNAS web interface https://www.truenas.com/docs/core/services/snmp
+          3. Link template to the host
+        
+        
+        MIBs used:
+        HOST-RESOURCES-MIB
+        SNMPv2-MIB
+        UCD-DISKIO-MIB
+        UCD-SNMP-MIB
+        FREENAS-MIB
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: c6e16d985fac4070a076c41be78bc29e
+          name: 'TrueNAS: ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          history: 7d
+          description: |
+            Host accessibility by ICMP.
+            0 - ICMP ping fails.
+            1 - ICMP ping successful.
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 91468c2218da45b3b1de62575471094e
+              expression: 'max(/TrueNAS SNMP/icmpping,#3)=0'
+              name: 'TrueNAS: Unavailable by ICMP ping'
+              priority: HIGH
+              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 9b420a4b29c6455ab2540a8601c70cb5
+          name: 'TrueNAS: ICMP loss'
+          type: SIMPLE
+          key: icmppingloss
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of lost packets.'
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: e6a39a1bc5d54f49aacc811f6942ef2b
+              expression: 'min(/TrueNAS SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/TrueNAS SNMP/icmppingloss,5m)<100'
+              name: 'TrueNAS: High ICMP ping loss'
+              opdata: 'Loss: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'ICMP packets loss detected.'
+              dependencies:
+                -
+                  name: 'TrueNAS: Unavailable by ICMP ping'
+                  expression: 'max(/TrueNAS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 3788e73db5d64245b9ee3819fdfcf4d5
+          name: 'TrueNAS: ICMP response time'
+          type: SIMPLE
+          key: icmppingsec
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'ICMP ping response time (in seconds).'
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 4931e6a368b841eeb846b8bc59fea513
+              expression: 'avg(/TrueNAS SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              name: 'TrueNAS: High ICMP ping response time'
+              opdata: 'Value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Average ICMP response time is too big.'
+              dependencies:
+                -
+                  name: 'TrueNAS: Unavailable by ICMP ping'
+                  expression: 'max(/TrueNAS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 0ee6f31c4e49445083a7db5cf9508b17
+          name: 'TrueNAS: System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: system.contact
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: b41b8db2212848db83a6a0d9369fecdd
+          name: 'TrueNAS: Interrupts per second'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.11.59.0
+          key: system.cpu.intr
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            Number of interrupts processed.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 4283476959894b78956973be95d33e72
+          name: 'TrueNAS: Load average (1m avg)'
+          type: SNMP_AGENT
+          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-1"]'
+          key: system.cpu.load.avg1
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            The 1 minute load averages.
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: a7885b68d6644a2ab5875e742a7bc06f
+          name: 'TrueNAS: Load average (5m avg)'
+          type: SNMP_AGENT
+          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-5"]'
+          key: system.cpu.load.avg5
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            The 5 minutes load averages.
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 5263b1258bd24219a3f1a7d11012b316
+          name: 'TrueNAS: Load average (15m avg)'
+          type: SNMP_AGENT
+          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-15"]'
+          key: system.cpu.load.avg15
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            The 15 minutes load averages.
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 94366f840edc4686a230682d623f1f41
+          name: 'TrueNAS: Number of CPUs'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.3.3.1.1]'
+          key: system.cpu.num
+          history: 7d
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD.
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  //count the number of cores
+                  return JSON.parse(value).length;
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: c8740f4489c04eedb072869e27f68a60
+          name: 'TrueNAS: Context switches per second'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.11.60.0
+          key: system.cpu.switches
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            Number of context switches.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 992e99f0114f4f7589de8dacb56c8c28
+          name: 'TrueNAS: System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: system.descr
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            System description of the host.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 140ebe2bbc744575b0a0776168432666
+          name: 'TrueNAS: System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: system.location
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node. If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 213d20b760c3424f9257cc9fa77c40fb
+          name: 'TrueNAS: System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: system.name
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            System host name.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: d931601db9244884b6e411d4be2c297e
+              expression: 'last(/TrueNAS SNMP/system.name,#1)<>last(/TrueNAS SNMP/system.name,#2) and length(last(/TrueNAS SNMP/system.name))>0'
+              name: 'TrueNAS: System name has changed'
+              event_name: 'TrueNAS: System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
+        -
+          uuid: fc6ed50ea4764ee6852ecd45b667f8df
+          name: 'TrueNAS: System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: system.objectid
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining what kind of box is being managed.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: e61f086a8a3942569e6c7f67b24e8f86
+          name: 'TrueNAS: Free swap space'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.4.0
+          key: system.swap.free
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            The amount of swap space currently unused or available.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 2a075af85eed44c8adba2cb7bc657b40
+          name: 'TrueNAS: Free swap space in %'
+          type: CALCULATED
+          key: system.swap.pfree
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: 'last(//system.swap.free)/last(//system.swap.total)*100'
+          description: 'The free space of swap volume/file in percent.'
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
+        -
+          uuid: b0fc3cd77ed348bb955fc98d8636ab76
+          name: 'TrueNAS: Total swap space'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.3.0
+          key: system.swap.total
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            The total amount of swap space configured for this host.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
+        -
+          uuid: a5f8ef4ba55e450d863d2237e940fad5
+          name: 'TrueNAS: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: system.uptime
+          delay: 30s
+          history: 7d
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            System uptime in 'N days, hh:mm:ss' format.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: 7ea3e6590e28476ea9876e26546af2d3
+              expression: 'last(/TrueNAS SNMP/system.uptime)<10m'
+              name: 'TrueNAS: has been restarted'
+              event_name: 'TrueNAS: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 2eaaabc61df64756a35aec95650abf7c
+          name: 'TrueNAS: ARC target size of cache'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.4.6.0
+          key: truenas.zfs.arc.c
+          history: 7d
+          units: B
+          description: |
+            MIB: FREENAS-MIB
+            ARC target size of cache in bytes.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: a4ae886ac205413c85df7c527a9aadb3
+          name: 'TrueNAS: ARC data size'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.4.3.0
+          key: truenas.zfs.arc.data
+          history: 7d
+          units: B
+          description: |
+            MIB: FREENAS-MIB
+            ARC data size used in bytes.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: e3c72ceecec2478685e4bd5983e48c12
+          name: 'TrueNAS: ARC cache hit ratio'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.4.9.0
+          key: truenas.zfs.arc.hit.ratio
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: FREENAS-MIB
+            ARC cache hit ration percentage.
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: f4c6c12561944975999b59c30744b375
+          name: 'TrueNAS: ARC hits'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.4.4.0
+          key: truenas.zfs.arc.hits
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: FREENAS-MIB
+            Total amount of cache hits in the ARC per second.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: db3cee6cf685446ca880e3ba0c7a51f1
+          name: 'TrueNAS: ARC metadata size'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.4.2.0
+          key: truenas.zfs.arc.meta
+          history: 7d
+          units: B
+          description: |
+            MIB: FREENAS-MIB
+            ARC metadata size used in bytes.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: d39e5b7524054b5c8121a5b67506fc52
+          name: 'TrueNAS: ARC cache miss ratio'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.4.10.0
+          key: truenas.zfs.arc.miss.ratio
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: FREENAS-MIB
+            ARC cache miss ration percentage.
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: 51b0901f89ca49f18b5af0c6325190ad
+          name: 'TrueNAS: ARC misses'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.4.5.0
+          key: truenas.zfs.arc.misses
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: FREENAS-MIB
+            Total amount of cache misses in the ARC per second.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: 5b00055c79174a65af5168b47fb4dbd1
+          name: 'TrueNAS: ARC target size of MRU'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.4.7.0
+          key: truenas.zfs.arc.p
+          history: 7d
+          units: B
+          description: |
+            MIB: FREENAS-MIB
+            ARC target size of MRU in bytes.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: a677b4991bc94e5b929bcf9f6a0c08ee
+          name: 'TrueNAS: ARC size'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.4.1.0
+          key: truenas.zfs.arc.size
+          history: 7d
+          units: B
+          description: |
+            MIB: FREENAS-MIB
+            ARC size in bytes.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: 2b2ca373849045969f6dbcd411a7e688
+          name: 'TrueNAS: L2ARC hits'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.5.1.0
+          key: truenas.zfs.l2arc.hits
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: FREENAS-MIB
+            Hits to the L2 cache per second.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: ff6827a36cc9451f801dcf5a433378de
+          name: 'TrueNAS: L2ARC misses'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.5.2.0
+          key: truenas.zfs.l2arc.misses
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: FREENAS-MIB
+            Misses to the L2 cache per second.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: d3408357df26465794eeb6d6706ee05a
+          name: 'TrueNAS: L2ARC read rate'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.5.3.0
+          key: truenas.zfs.l2arc.read
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: |
+            MIB: FREENAS-MIB
+            Read rate from L2 cache in bytes per second.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: ab95d192720b4f5fa897fed6f1aa40e2
+          name: 'TrueNAS: L2ARC size'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.5.5.0
+          key: truenas.zfs.l2arc.size
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: |
+            MIB: FREENAS-MIB
+            L2ARC size in bytes.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: 1e04b61c5b0242b095c41495f9f28b57
+          name: 'TrueNAS: L2ARC write rate'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.5.4.0
+          key: truenas.zfs.l2arc.write
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: |
+            MIB: FREENAS-MIB
+            Write rate from L2 cache in bytes per second.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: a504d960680346ad863c5f2117301200
+          name: 'TrueNAS: ZIL operations 1 second'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.6.1.0
+          key: truenas.zfs.zil.ops1
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: FREENAS-MIB
+            The ops column parsed from the command zilstat 1 1.
+          tags:
+            -
+              tag: component
+              value: log
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: d82112c728704383b873289f0b8bbce6
+          name: 'TrueNAS: ZIL operations 5 seconds'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.6.2.0
+          key: truenas.zfs.zil.ops5
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: FREENAS-MIB
+            The ops column parsed from the command zilstat 5 1.
+          tags:
+            -
+              tag: component
+              value: log
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: 598dda71f21a410a82ba5b96e1564166
+          name: 'TrueNAS: ZIL operations 10 seconds'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.50536.1.6.3.0
+          key: truenas.zfs.zil.ops10
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: FREENAS-MIB
+            The ops column parsed from the command zilstat 10 1.
+          tags:
+            -
+              tag: component
+              value: log
+            -
+              tag: component
+              value: zfs
+        -
+          uuid: 43901b6beb7f4f559464775863d19976
+          name: 'TrueNAS: Available memory'
+          type: CALCULATED
+          key: vm.memory.available
+          history: 7d
+          units: B
+          params: last(//vm.memory.free)+last(//vm.memory.buffers)+last(//vm.memory.cached)
+          description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 3b6007f808e04eefafe236737773ce7f
+          name: 'TrueNAS: Memory (buffers)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.14.0
+          key: vm.memory.buffers
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            The total amount of real or virtual memory currently allocated for use as memory buffers.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: ab4c02a4c1fc4ef69a31e9b83a1a9263
+          name: 'TrueNAS: Memory (cached)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.15.0
+          key: vm.memory.cached
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            The total amount of real or virtual memory currently allocated for use as cached memory.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: d55491912c814481b0931e836838e9b0
+          name: 'TrueNAS: Free memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.6.0
+          key: vm.memory.free
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            The amount of real/physical memory currently unused or available.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: e3802f02a4364e6bb37fb7fe780c4137
+          name: 'TrueNAS: Total memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.5.0
+          key: vm.memory.total
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            Total memory in Bytes.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: c70fad7e758e480fbae726a677a29ead
+          name: 'TrueNAS: Memory utilization'
+          type: CALCULATED
+          key: vm.memory.util
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: '(last(//vm.memory.total)-(last(//vm.memory.free)+last(//vm.memory.buffers)+last(//vm.memory.cached)))/last(//vm.memory.total)*100'
+          description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
+          tags:
+            -
+              tag: component
+              value: memory
+          triggers:
+            -
+              uuid: 3ee054e3d944441d9fd174e13b6a59ee
+              expression: 'min(/TrueNAS SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+              name: 'TrueNAS: High memory utilization'
+              event_name: 'TrueNAS: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+              dependencies:
+                -
+                  name: 'TrueNAS: Lack of available memory'
+                  expression: 'min(/TrueNAS SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/TrueNAS SNMP/vm.memory.total)>0'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 76b7f3e3ec0044718bf3a9c254c1f832
+          name: 'TrueNAS: SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          description: |
+            Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - not available
+            1 - available
+            2 - unknown
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 207abb1786ea4a39a7d569e54ee7cdb2
+              expression: 'max(/TrueNAS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'TrueNAS: No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              dependencies:
+                -
+                  name: 'TrueNAS: Unavailable by ICMP ping'
+                  expression: 'max(/TrueNAS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      discovery_rules:
+        -
+          uuid: cc40c0d4ea184b12bf15056f103a4654
+          name: 'CPU discovery'
+          type: DEPENDENT
+          key: cpu.discovery
+          delay: '0'
+          description: 'This discovery will create set of per core CPU metrics from UCD-SNMP-MIB, using {#CPU.COUNT} in preprocessing. That''s the only reason why LLD is used.'
+          item_prototypes:
+            -
+              uuid: 03eaea043f2b4aee9ccc562ae5390656
+              name: 'TrueNAS: CPU idle time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.11.0
+              key: 'system.cpu.idle[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                The time the CPU has spent doing nothing.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: 378d399d09bd4197b20f575f023a9423
+              name: 'TrueNAS: CPU interrupt time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.56.0
+              key: 'system.cpu.interrupt[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                The amount of time the CPU has been servicing hardware interrupts.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //to get utilization in %, divide by N, where N is number of cores.
+                      return value/{#CPU.COUNT}
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: bd17c78973cf482a8916645847a9814f
+              name: 'TrueNAS: CPU iowait time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.54.0
+              key: 'system.cpu.iowait[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                Amount of time the CPU has been waiting for I/O to complete.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //to get utilization in %, divide by N, where N is number of cores.
+                      return value/{#CPU.COUNT}
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: e25d8fe2e3b24fff86fe2d91e9b4f16e
+              name: 'TrueNAS: CPU nice time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.51.0
+              key: 'system.cpu.nice[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                The time the CPU has spent running users' processes that have been niced.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //to get utilization in %, divide by N, where N is number of cores.
+                      return value/{#CPU.COUNT}
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: 6782830d2a25423fb0db137d66b2f2dd
+              name: 'TrueNAS: CPU system time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.52.0
+              key: 'system.cpu.system[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                The time the CPU has spent running the kernel and its processes.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //to get utilization in %, divide by N, where N is number of cores.
+                      return value/{#CPU.COUNT}
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: d38eaa9cf17a4778b0b6dfea897e3e6e
+              name: 'TrueNAS: CPU user time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.50.0
+              key: 'system.cpu.user[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                The time the CPU has spent running users' processes that are not niced.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //to get utilization in %, divide by N, where N is number of cores.
+                      return value/{#CPU.COUNT}
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: 40f51efcbf47483f84c843c00bd1e034
+              name: 'TrueNAS: CPU utilization'
+              type: DEPENDENT
+              key: 'system.cpu.util[{#SNMPINDEX}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'CPU utilization in %.'
+              preprocessing:
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //Calculate utilization
+                      return (100 - value)
+              master_item:
+                key: 'system.cpu.idle[{#SNMPINDEX}]'
+              tags:
+                -
+                  tag: component
+                  value: cpu
+              trigger_prototypes:
+                -
+                  uuid: 776551cd5322405e8d7c2b9c30b3a82b
+                  expression: 'min(/TrueNAS SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  name: 'TrueNAS: High CPU utilization'
+                  event_name: 'TrueNAS: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  dependencies:
+                    -
+                      name: 'TrueNAS: Load average is too high'
+                      expression: |
+                        min(/TrueNAS SNMP/system.cpu.load.avg1,5m)/last(/TrueNAS SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
+                        and last(/TrueNAS SNMP/system.cpu.load.avg5)>0
+                        and last(/TrueNAS SNMP/system.cpu.load.avg15)>0
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+          graph_prototypes:
+            -
+              uuid: ef6bd369fc964266a4324f314d5dbdc2
+              name: 'TrueNAS: CPU usage{#SINGLETON}'
+              type: STACKED
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'system.cpu.system[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'system.cpu.user[{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'system.cpu.nice[{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'system.cpu.iowait[{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'system.cpu.interrupt[{#SNMPINDEX}]'
+            -
+              uuid: 11de3174f0e24212bedd1ef81429db9d
+              name: 'TrueNAS: CPU utilization{#SINGLETON}'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'system.cpu.util[{#SNMPINDEX}]'
+          master_item:
+            key: system.cpu.num
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  //count the number of CPU cores
+                  return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}":""}])
+        -
+          uuid: ebf01415c97e4cbaa84d39a392af7c37
+          name: 'Network interfaces discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          key: net.if.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: L
+          description: 'Discovering interfaces from IF-MIB.'
+          item_prototypes:
+            -
+              uuid: 71257fe84dde4281854f4f74f0ea1e4c
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Inbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+              key: 'net.if.in.discards[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of inbound packets which were chosen to be discarded
+                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be to free up buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system,
+                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: d5d20ce0e2c9429b9b0c5eea23d3dca5
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Inbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              key: 'net.if.in.errors[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 89a43ff26b204fceb91108740ece1ee3
+                  expression: 'min(/TrueNAS SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/TrueNAS SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High input error rate'
+                  event_name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  opdata: 'errors in: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
+                  dependencies:
+                    -
+                      name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/TrueNAS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: a7f3b11533ac411d8133e6e859f63d61
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Bits received'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              key: 'net.if.in[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 35c209485ac34a7ebebe7c4785f448b5
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Outbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+              key: 'net.if.out.discards[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of outbound packets which were chosen to be discarded
+                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be to free up buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system,
+                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 07adb0c51d6b4f34ab21e48744cad18d
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Outbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              key: 'net.if.out.errors[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+              trigger_prototypes:
+                -
+                  uuid: c1cfeff568e2421ba06648ca55bcfef5
+                  expression: 'min(/TrueNAS SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/TrueNAS SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High output error rate'
+                  event_name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  opdata: 'errors out: {ITEM.LASTVALUE2}'
+                  priority: WARNING
+                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
+                  dependencies:
+                    -
+                      name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/TrueNAS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 4406d8a768ce41c6b383657e22cbf4a1
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Bits sent'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'net.if.out[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 94231ecd77da47b49ee2df1afd302e97
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Speed'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              key: 'net.if.speed[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 50bfa188160747b98c3ee4043cb60a96
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'net.if.status[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The current operational state of the interface.
+                - The testing(3) state indicates that no operational packet scan be passed
+                - If ifAdminStatus is down(2) then ifOperStatus should be down(2)
+                - If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic
+                - It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)
+                - It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state
+                - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
+              valuemap:
+                name: 'IF-MIB::ifOperStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+              trigger_prototypes:
+                -
+                  uuid: ba6767729f78405aba8d09bf14b3a0fa
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/TrueNAS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 2f37ffca1e2e47ebadef5a4ed316dd90
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Interface type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+              key: 'net.if.type[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The type of interface.
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
+                through updating the syntax of the IANAifType textual convention.
+              valuemap:
+                name: 'IF-MIB::ifType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+          trigger_prototypes:
+            -
+              uuid: fcc3734390c645f3a4ad5d694675fa3a
+              expression: |
+                change(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])>0
+                and (
+                last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=6 or
+                last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=7 or
+                last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=11 or
+                last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=62 or
+                last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=69 or
+                last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=117
+                )
+                and
+                (last(/TrueNAS SNMP/net.if.status[{#SNMPINDEX}])<>2)
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                (change(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or
+                (last(/TrueNAS SNMP/net.if.status[{#SNMPINDEX}])=2)
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before'
+              opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
+              dependencies:
+                -
+                  name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/TrueNAS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+            -
+              uuid: 94adfef34fca4421b88f9253de55554e
+              expression: |
+                (avg(/TrueNAS SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])>0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/TrueNAS SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])'
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage'
+              event_name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              dependencies:
+                -
+                  name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/TrueNAS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 9ed09a6968b0416d9ac556ca35a04db4
+              expression: |
+                (avg(/TrueNAS SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])>0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/TrueNAS SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])'
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage'
+              event_name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              dependencies:
+                -
+                  name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/TrueNAS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+          graph_prototypes:
+            -
+              uuid: bff9db9816624e2e89975084afa60323
+              name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Network traffic'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'net.if.in[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  drawtype: BOLD_LINE
+                  color: 2774A4
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'net.if.out[{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  yaxisside: RIGHT
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'net.if.out.errors[{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  yaxisside: RIGHT
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'net.if.in.errors[{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  yaxisside: RIGHT
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'net.if.out.discards[{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  yaxisside: RIGHT
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'net.if.in.discards[{#SNMPINDEX}]'
+        -
+          uuid: b3906a308e4c4631a96a4aa188d22c74
+          name: 'Disks temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#DISK_NAME},.1.3.6.1.4.1.50536.3.1.2]'
+          key: truenas.disk.temp.discovery
+          delay: 1h
+          description: 'Disks temperature discovery from FREENAS-MIB.'
+          item_prototypes:
+            -
+              uuid: 7de2508fff174bd78b4ea0424a67fbf9
+              name: 'TrueNAS: Disk [{#DISK_NAME}]: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.3.1.3.{#SNMPINDEX}'
+              key: 'truenas.disk.temp[{#DISK_NAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: C
+              description: |
+                MIB: FREENAS-MIB
+                The temperature of this HDD in mC.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DISK_NAME}'
+              trigger_prototypes:
+                -
+                  uuid: fda99a2e62064414af85c1137cbf0aef
+                  expression: 'avg(/TrueNAS SNMP/truenas.disk.temp[{#DISK_NAME}],5m) > {$TEMPERATURE.MAX.CRIT:"{#DISK_NAME}"}'
+                  name: 'TrueNAS: Disk [{#DISK_NAME}]: Average disk temperature is too high'
+                  event_name: 'TrueNAS: Disk [{#DISK_NAME}]: Average disk temperature is too high (over {$TEMPERATURE.MAX.CRIT:"{#DISK_NAME}"}C for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Disk temperature is high.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: 73194e7637a84dca976b218e9f4248c2
+                  expression: 'avg(/TrueNAS SNMP/truenas.disk.temp[{#DISK_NAME}],5m) > {$TEMPERATURE.MAX.WARN:"{#DISK_NAME}"}'
+                  name: 'TrueNAS: Disk [{#DISK_NAME}]: Average disk temperature is too high'
+                  event_name: 'TrueNAS: Disk [{#DISK_NAME}]: Average disk temperature is too high (over {$TEMPERATURE.MAX.WARN:"{#DISK_NAME}"}C for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Disk temperature is high.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: f3d22d302e274b12927afd9453bb787a
+          name: 'ZFS datasets discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#DATASET_NAME},.1.3.6.1.4.1.50536.1.2.1.1.2,{#DATASET_ALLOC_UNITS},.1.3.6.1.4.1.50536.1.2.1.1.3]'
+          key: truenas.zfs.dataset.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#DATASET_NAME}'
+                value: '{$DATASET.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#DATASET_NAME}'
+                value: '{$DATASET.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'ZFS datasets discovery from FREENAS-MIB.'
+          item_prototypes:
+            -
+              uuid: 3c3eab95b8e74e608fe3b7abab98c76b
+              name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Available space'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.2.1.1.6.{#SNMPINDEX}'
+              key: 'truenas.dataset.avail[{#DATASET_NAME}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: FREENAS-MIB
+                The available size of the dataset in bytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#DATASET_ALLOC_UNITS}'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: dataset
+                  value: '{#DATASET_NAME}'
+            -
+              uuid: fd6b3a3ebfb041b3a9026fb1b4370ec7
+              name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Usage in %'
+              type: CALCULATED
+              key: 'truenas.dataset.pused[{#DATASET_NAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              params: 'last(//truenas.dataset.used[{#DATASET_NAME}]) * 100 / last(//truenas.dataset.size.total[{#DATASET_NAME}])'
+              description: 'The used size of the dataset in %.'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: dataset
+                  value: '{#DATASET_NAME}'
+            -
+              uuid: 5ead1929891a4152b581f9adf35ce4ce
+              name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Total space'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.2.1.1.4.{#SNMPINDEX}'
+              key: 'truenas.dataset.size.total[{#DATASET_NAME}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: FREENAS-MIB
+                The size of the dataset in bytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#DATASET_ALLOC_UNITS}'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: dataset
+                  value: '{#DATASET_NAME}'
+            -
+              uuid: 0e24fceacd64430abed01294ffd28104
+              name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Used space'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.2.1.1.5.{#SNMPINDEX}'
+              key: 'truenas.dataset.used[{#DATASET_NAME}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: FREENAS-MIB
+                The used size of the dataset in bytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#DATASET_ALLOC_UNITS}'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: dataset
+                  value: '{#DATASET_NAME}'
+          trigger_prototypes:
+            -
+              uuid: f759e058ef5345d884662f51db0c222e
+              expression: 'min(/TrueNAS SNMP/truenas.dataset.pused[{#DATASET_NAME}],5m) > {$DATASET.PUSED.MAX.WARN:"{#DATASET_NAME}"} and last(/TrueNAS SNMP/truenas.dataset.avail[{#DATASET_NAME}]) < {$DATASET.FREE.MIN.WARN:"{#POOLNAME}"}'
+              name: 'TrueNAS: Dataset [{#DATASET_NAME}]: High space usage'
+              event_name: 'TrueNAS: Dataset [{#DATASET_NAME}]: High space usage (more than {$DATASET.PUSED.MAX.WARN:"{#DATASET_NAME}"}% used)'
+              opdata: 'Current usage: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: |
+                Two conditions should match: First, space utilization should be above {$DATASET.PUSED.MAX.WARN:"{#DATASET_NAME}"}%.
+                Second condition: The dataset free space is less than {$DATASET.FREE.MIN.WARN:"{#POOLNAME}"}.
+              dependencies:
+                -
+                  name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Very high space usage'
+                  expression: 'min(/TrueNAS SNMP/truenas.dataset.pused[{#DATASET_NAME}],5m) > {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"} and last(/TrueNAS SNMP/truenas.dataset.avail[{#DATASET_NAME}]) < {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: f0e37c1f63aa4e3090c0dc8c4f0dfe9b
+              expression: 'min(/TrueNAS SNMP/truenas.dataset.pused[{#DATASET_NAME}],5m) > {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"} and last(/TrueNAS SNMP/truenas.dataset.avail[{#DATASET_NAME}]) < {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}'
+              name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Very high space usage'
+              event_name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Very high space usage (more than {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}% used)'
+              opdata: 'Current usage: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: |
+                Two conditions should match: First, space utilization should be above {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}%.
+                Second condition: The dataset free space is less than {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}.
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+          graph_prototypes:
+            -
+              uuid: 38637298316543bdb9f2c291285f8077
+              name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Space usage'
+              width: '600'
+              height: '340'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                -
+                  color: '969696'
+                  calc_fnc: LAST
+                  type: GRAPH_SUM
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'truenas.dataset.size.total[{#DATASET_NAME}]'
+                -
+                  sortorder: '1'
+                  color: C80000
+                  calc_fnc: LAST
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'truenas.dataset.used[{#DATASET_NAME}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: edde9729f6304a9b83d31a1c62356fdd
+          name: 'ZFS pools discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#POOLNAME},.1.3.6.1.4.1.50536.1.1.1.1.2,{#POOL_ALLOC_UNITS},.1.3.6.1.4.1.50536.1.1.1.1.3]'
+          key: truenas.zfs.pools.discovery
+          delay: 1h
+          description: 'ZFS pools discovery from FREENAS-MIB.'
+          item_prototypes:
+            -
+              uuid: 2727c62d279f46b0938b1ef6c3b70fe5
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Available space'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.1.1.1.6.{#SNMPINDEX}'
+              key: 'truenas.zpool.avail[{#POOLNAME}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: FREENAS-MIB
+                The available size of the storage pool in bytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#POOL_ALLOC_UNITS}'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
+            -
+              uuid: 382c3a50845f4d96a44dc22704768d41
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Health'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.1.1.1.7.{#SNMPINDEX}'
+              key: 'truenas.zpool.health[{#POOLNAME}]'
+              history: 7d
+              description: |
+                MIB: FREENAS-MIB
+                The current health of the containing pool, as reported by zpool status.
+              valuemap:
+                name: 'FREENAS-MIB::ZPoolHealthType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 676c2abdd102484a92db3501ccc2ca51
+                  expression: 'last(/TrueNAS SNMP/truenas.zpool.health[{#POOLNAME}]) <> 0'
+                  name: 'TrueNAS: Pool [{#POOLNAME}]: Status is not online'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check pool status.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 5f972063f958463ab132b8d478092bd8
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Usage in %'
+              type: CALCULATED
+              key: 'truenas.zpool.pused[{#POOLNAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              params: 'last(//truenas.zpool.used[{#POOLNAME}]) * 100 / last(//truenas.zpool.size.total[{#POOLNAME}])'
+              description: 'The used size of the storage pool in %.'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
+            -
+              uuid: b5766173631a47ee8c58e24f5c0523b5
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Read rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.1.1.1.10.{#SNMPINDEX}'
+              key: 'truenas.zpool.read.bytes[{#POOLNAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: |
+                MIB: FREENAS-MIB
+                The bandwidth of all read operations (including metadata), expressed as units per second (averaged since system booted).
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#POOL_ALLOC_UNITS}'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
+            -
+              uuid: f32abc8617c6466d8a92219def967bd8
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Read operations rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.1.1.1.8.{#SNMPINDEX}'
+              key: 'truenas.zpool.read.ops[{#POOLNAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: IOPS
+              description: |
+                MIB: FREENAS-MIB
+                The number of read I/O operations sent to the pool or device, including metadata requests (averaged since system booted).
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
+            -
+              uuid: 567422ecdcec49faac94540f64a05e3a
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Total space'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.1.1.1.4.{#SNMPINDEX}'
+              key: 'truenas.zpool.size.total[{#POOLNAME}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: FREENAS-MIB
+                The size of the storage pool in bytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#POOL_ALLOC_UNITS}'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
+            -
+              uuid: fe5cf78cdcdd4386982f5cd204d99283
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Used space'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.1.1.1.5.{#SNMPINDEX}'
+              key: 'truenas.zpool.used[{#POOLNAME}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: FREENAS-MIB
+                The used size of the storage pool in bytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#POOL_ALLOC_UNITS}'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
+            -
+              uuid: d11e981ec16c4da0aee6842bdddfe2fd
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Write rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.1.1.1.11.{#SNMPINDEX}'
+              key: 'truenas.zpool.write.bytes[{#POOLNAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: |
+                MIB: FREENAS-MIB
+                The bandwidth of all write operations, expressed as units per second (averaged since system booted).
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#POOL_ALLOC_UNITS}'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
+            -
+              uuid: e4bfc421633a433ca1b895fa4f5cf96e
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Write operations rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.1.1.1.9.{#SNMPINDEX}'
+              key: 'truenas.zpool.write.ops[{#POOLNAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: IOPS
+              description: |
+                MIB: FREENAS-MIB
+                The number of write I/O operations sent to the pool or device (averaged since system booted).
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#POOLNAME}'
+          trigger_prototypes:
+            -
+              uuid: 18eef491c14b4f768400b4acca5c7e80
+              expression: 'min(/TrueNAS SNMP/truenas.zpool.pused[{#POOLNAME}],5m) > {$ZPOOL.PUSED.MAX.WARN:"{#POOLNAME}"} and last(/TrueNAS SNMP/truenas.zpool.avail[{#POOLNAME}]) < {$ZPOOL.FREE.MIN.WARN:"{#POOLNAME}"}'
+              name: 'TrueNAS: Pool [{#POOLNAME}]: High space usage'
+              event_name: 'TrueNAS: Pool [{#POOLNAME}]: High space usage (more than {$ZPOOL.PUSED.MAX.WARN:"{#POOLNAME}"}% used)'
+              opdata: 'Current usage: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: |
+                Two conditions should match: First, space utilization should be above {$ZPOOL.PUSED.MAX.WARN:"{#POOLNAME}"}%.
+                Second condition: The pool free space is less than {$ZPOOL.FREE.MIN.WARN:"{#POOLNAME}"}.
+              dependencies:
+                -
+                  name: 'TrueNAS: Pool [{#POOLNAME}]: Very high space usage'
+                  expression: 'min(/TrueNAS SNMP/truenas.zpool.pused[{#POOLNAME}],5m) > {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"} and last(/TrueNAS SNMP/truenas.zpool.avail[{#POOLNAME}]) < {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: ab01140b8a724c1cbb79be032de8c8b5
+              expression: 'min(/TrueNAS SNMP/truenas.zpool.pused[{#POOLNAME}],5m) > {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"} and last(/TrueNAS SNMP/truenas.zpool.avail[{#POOLNAME}]) < {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}'
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Very high space usage'
+              event_name: 'TrueNAS: Pool [{#POOLNAME}]: Very high space usage (more than {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}% used)'
+              opdata: 'Current usage: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: |
+                Two conditions should match: First, space utilization should be above {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}%.
+                Second condition: The pool free space is less than {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}.
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+          graph_prototypes:
+            -
+              uuid: 8c2ed6ea842941b3b306efe87df844be
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Read/write rates'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'truenas.zpool.read.bytes[{#POOLNAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'truenas.zpool.write.bytes[{#POOLNAME}]'
+            -
+              uuid: 497e60420e314ec3a3de904042ae4756
+              name: 'TrueNAS: Pool [{#POOLNAME}]: Space usage'
+              width: '600'
+              height: '340'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                -
+                  color: '969696'
+                  calc_fnc: LAST
+                  type: GRAPH_SUM
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'truenas.zpool.size.total[{#POOLNAME}]'
+                -
+                  sortorder: '1'
+                  color: C80000
+                  calc_fnc: LAST
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'truenas.zpool.used[{#POOLNAME}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: dfeb1df58c024b27a0a65206d896975c
+          name: 'ZFS volumes discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZVOL_NAME},.1.3.6.1.4.1.50536.1.3.1.1.2,{#ZVOL_ALLOC_UNITS},.1.3.6.1.4.1.50536.1.3.1.1.3]'
+          key: truenas.zfs.zvols.discovery
+          delay: 1h
+          description: 'ZFS volumes discovery from FREENAS-MIB.'
+          item_prototypes:
+            -
+              uuid: 26967102b3a946c997fbbdcc5c2d78bc
+              name: 'TrueNAS: ZFS volume [{#ZVOL_NAME}]: Available space'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.3.1.1.6.{#SNMPINDEX}'
+              key: 'truenas.zvol.avail[{#ZVOL_NAME}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: FREENAS-MIB
+                The available of the ZFS volume in bytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#ZVOL_ALLOC_UNITS}'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: volume
+                  value: '{#ZVOL_NAME}'
+            -
+              uuid: cc01786aff804d6998b039525214ddbd
+              name: 'TrueNAS: ZFS volume [{#ZVOL_NAME}]: Total space'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.3.1.1.4.{#SNMPINDEX}'
+              key: 'truenas.zvol.size.total[{#ZVOL_NAME}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: FREENAS-MIB
+                The size of the ZFS volume in bytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#ZVOL_ALLOC_UNITS}'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: volume
+                  value: '{#ZVOL_NAME}'
+            -
+              uuid: a722d904125d46729c29ad4283d0b1b0
+              name: 'TrueNAS: ZFS volume [{#ZVOL_NAME}]: Used space'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.50536.1.3.1.1.5.{#SNMPINDEX}'
+              key: 'truenas.zvol.used[{#ZVOL_NAME}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: FREENAS-MIB
+                The used size of the ZFS volume in bytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#ZVOL_ALLOC_UNITS}'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: volume
+                  value: '{#ZVOL_NAME}'
+          graph_prototypes:
+            -
+              uuid: 18746b4b3cfb4d1baf06df7b05a047f9
+              name: 'TrueNAS: ZFS volume [{#ZVOL_NAME}]: Space usage'
+              width: '600'
+              height: '340'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                -
+                  color: '969696'
+                  calc_fnc: LAST
+                  type: GRAPH_SUM
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'truenas.zvol.size.total[{#ZVOL_NAME}]'
+                -
+                  sortorder: '1'
+                  color: C80000
+                  calc_fnc: LAST
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'truenas.zvol.used[{#ZVOL_NAME}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 1f992aa87f9e4074a8cba928b2017a03
+          name: 'Block devices discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#DEVNAME},1.3.6.1.4.1.2021.13.15.1.1.2]'
+          key: vfs.dev.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#DEVNAME}'
+                value: '{$VFS.DEV.DEVNAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#DEVNAME}'
+                value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable).'
+          item_prototypes:
+            -
+              uuid: ba220c4106cb4bff9dd60c92aee7919a
+              name: 'TrueNAS: [{#DEVNAME}]: Disk read rate'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.5.{#SNMPINDEX}'
+              key: 'vfs.dev.read.rate[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '!r/s'
+              description: |
+                MIB: UCD-DISKIO-MIB
+                The number of read accesses from this device since boot.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
+            -
+              uuid: 0dd2f25f1d2a45f2ae265d8550fe7d45
+              name: 'TrueNAS: [{#DEVNAME}]: Disk utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.9.{#SNMPINDEX}'
+              key: 'vfs.dev.util[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-DISKIO-MIB
+                The 1 minute average load of disk (%).
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
+            -
+              uuid: 1549def5cf23434b8d0a19ac951eb2ff
+              name: 'TrueNAS: [{#DEVNAME}]: Disk write rate'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.6.{#SNMPINDEX}'
+              key: 'vfs.dev.write.rate[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '!w/s'
+              description: |
+                MIB: UCD-DISKIO-MIB
+                The number of write accesses from this device since boot.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
+          graph_prototypes:
+            -
+              uuid: c6e277b4a9e949df9e7bfd6adefc65b5
+              name: 'TrueNAS: [{#DEVNAME}]: Read/write rates'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'vfs.dev.read.rate[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'TrueNAS SNMP'
+                    key: 'vfs.dev.write.rate[{#SNMPINDEX}]'
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: truenas
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+          description: 'Threshold of CPU utilization for warning trigger in %.'
+        -
+          macro: '{$DATASET.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$DATASET.FREE.MIN.WARN}'
+          value: 5G
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$DATASET.NAME.MATCHES}'
+          value: .+
+          description: 'This macro is used in datasets discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$DATASET.NAME.NOT_MATCHES}'
+          value: '^(boot|.+\.system(.+)?$)'
+          description: 'This macro is used in datasets discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$DATASET.PUSED.MAX.CRIT}'
+          value: '90'
+          description: 'Threshold of used dataset space for average severity trigger in %.'
+        -
+          macro: '{$DATASET.PUSED.MAX.WARN}'
+          value: '80'
+          description: 'Threshold of used dataset space for warning trigger in %.'
+        -
+          macro: '{$ICMP_LOSS_WARN}'
+          value: '20'
+          description: 'Threshold of ICMP packets loss for warning trigger in %.'
+        -
+          macro: '{$ICMP_RESPONSE_TIME_WARN}'
+          value: '0.15'
+          description: 'Threshold of average ICMP response time for warning trigger in seconds.'
+        -
+          macro: '{$IF.ERRORS.WARN}'
+          value: '2'
+          description: 'Threshold of error packets rate for warning trigger. Can be used with interface name as context.'
+        -
+          macro: '{$IF.UTIL.MAX}'
+          value: '90'
+          description: 'Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context.'
+        -
+          macro: '{$IFCONTROL}'
+          value: '1'
+          description: 'Macro for operational state of the interface for link down trigger. Can be used with interface name as context.'
+        -
+          macro: '{$LOAD_AVG_PER_CPU.MAX.WARN}'
+          value: '1.5'
+          description: 'Load per CPU considered sustainable. Tune if needed.'
+        -
+          macro: '{$MEMORY.AVAILABLE.MIN}'
+          value: 20M
+          description: 'Threshold of available memory for trigger in bytes.'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+          description: 'Threshold of memory utilization for trigger in %'
+        -
+          macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+          value: '^.*'
+          description: 'This macro is used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
+          value: ^2$
+          description: 'Ignore down(2) administrative status'
+        -
+          macro: '{$NET.IF.IFALIAS.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFDESCR.MATCHES}'
+          value: '.*'
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFNAME.MATCHES}'
+          value: '^em[0-9]+$'
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
+          value: ^$
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+          value: '^.*$'
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+          value: ^6$
+          description: 'Ignore notPresent(6)'
+        -
+          macro: '{$NET.IF.IFTYPE.MATCHES}'
+          value: '.*'
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP availability trigger.'
+        -
+          macro: '{$SWAP.PFREE.MIN.WARN}'
+          value: '50'
+          description: 'Threshold of free swap space for warning trigger in %.'
+        -
+          macro: '{$TEMPERATURE.MAX.CRIT}'
+          value: '65'
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$TEMPERATURE.MAX.WARN}'
+          value: '50'
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$VFS.DEV.DEVNAME.MATCHES}'
+          value: .+
+          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
+          value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|cd[0-9]*|pass[0-9]*|zram[0-9]*)'
+          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$ZPOOL.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$ZPOOL.FREE.MIN.WARN}'
+          value: 5G
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$ZPOOL.PUSED.MAX.CRIT}'
+          value: '90'
+          description: 'Threshold of used pool space for average severity trigger in %.'
+        -
+          macro: '{$ZPOOL.PUSED.MAX.WARN}'
+          value: '80'
+          description: 'Threshold of used pool space for warning trigger in %.'
+      valuemaps:
+        -
+          uuid: 1ce70fc8edf2449ea6a0c687f359441a
+          name: 'FREENAS-MIB::ZPoolHealthType'
+          mappings:
+            -
+              value: '0'
+              newvalue: online
+            -
+              value: '1'
+              newvalue: degraded
+            -
+              value: '2'
+              newvalue: faulted
+            -
+              value: '3'
+              newvalue: offline
+            -
+              value: '4'
+              newvalue: unavail
+            -
+              value: '5'
+              newvalue: removed
+        -
+          uuid: 4f6e0ca65b9e49ddbf8888120a0e904c
+          name: 'IF-MIB::ifOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: up
+            -
+              value: '2'
+              newvalue: down
+            -
+              value: '3'
+              newvalue: testing
+            -
+              value: '4'
+              newvalue: unknown
+            -
+              value: '5'
+              newvalue: dormant
+            -
+              value: '6'
+              newvalue: notPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+        -
+          uuid: bc968f23f59943c3b7213b3dd937cf16
+          name: 'IF-MIB::ifType'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: regular1822
+            -
+              value: '3'
+              newvalue: hdh1822
+            -
+              value: '4'
+              newvalue: ddnX25
+            -
+              value: '5'
+              newvalue: rfc877x25
+            -
+              value: '6'
+              newvalue: ethernetCsmacd
+            -
+              value: '7'
+              newvalue: iso88023Csmacd
+            -
+              value: '8'
+              newvalue: iso88024TokenBus
+            -
+              value: '9'
+              newvalue: iso88025TokenRing
+            -
+              value: '10'
+              newvalue: iso88026Man
+            -
+              value: '11'
+              newvalue: starLan
+            -
+              value: '12'
+              newvalue: proteon10Mbit
+            -
+              value: '13'
+              newvalue: proteon80Mbit
+            -
+              value: '14'
+              newvalue: hyperchannel
+            -
+              value: '15'
+              newvalue: fddi
+            -
+              value: '16'
+              newvalue: lapb
+            -
+              value: '17'
+              newvalue: sdlc
+            -
+              value: '18'
+              newvalue: ds1
+            -
+              value: '19'
+              newvalue: e1
+            -
+              value: '20'
+              newvalue: basicISDN
+            -
+              value: '21'
+              newvalue: primaryISDN
+            -
+              value: '22'
+              newvalue: propPointToPointSerial
+            -
+              value: '23'
+              newvalue: ppp
+            -
+              value: '24'
+              newvalue: softwareLoopback
+            -
+              value: '25'
+              newvalue: eon
+            -
+              value: '26'
+              newvalue: ethernet3Mbit
+            -
+              value: '27'
+              newvalue: nsip
+            -
+              value: '28'
+              newvalue: slip
+            -
+              value: '29'
+              newvalue: ultra
+            -
+              value: '30'
+              newvalue: ds3
+            -
+              value: '31'
+              newvalue: sip
+            -
+              value: '32'
+              newvalue: frameRelay
+            -
+              value: '33'
+              newvalue: rs232
+            -
+              value: '34'
+              newvalue: para
+            -
+              value: '35'
+              newvalue: arcnet
+            -
+              value: '36'
+              newvalue: arcnetPlus
+            -
+              value: '37'
+              newvalue: atm
+            -
+              value: '38'
+              newvalue: miox25
+            -
+              value: '39'
+              newvalue: sonet
+            -
+              value: '40'
+              newvalue: x25ple
+            -
+              value: '41'
+              newvalue: iso88022llc
+            -
+              value: '42'
+              newvalue: localTalk
+            -
+              value: '43'
+              newvalue: smdsDxi
+            -
+              value: '44'
+              newvalue: frameRelayService
+            -
+              value: '45'
+              newvalue: v35
+            -
+              value: '46'
+              newvalue: hssi
+            -
+              value: '47'
+              newvalue: hippi
+            -
+              value: '48'
+              newvalue: modem
+            -
+              value: '49'
+              newvalue: aal5
+            -
+              value: '50'
+              newvalue: sonetPath
+            -
+              value: '51'
+              newvalue: sonetVT
+            -
+              value: '52'
+              newvalue: smdsIcip
+            -
+              value: '53'
+              newvalue: propVirtual
+            -
+              value: '54'
+              newvalue: propMultiplexor
+            -
+              value: '55'
+              newvalue: ieee80212
+            -
+              value: '56'
+              newvalue: fibreChannel
+            -
+              value: '57'
+              newvalue: hippiInterface
+            -
+              value: '58'
+              newvalue: frameRelayInterconnect
+            -
+              value: '59'
+              newvalue: aflane8023
+            -
+              value: '60'
+              newvalue: aflane8025
+            -
+              value: '61'
+              newvalue: cctEmul
+            -
+              value: '62'
+              newvalue: fastEther
+            -
+              value: '63'
+              newvalue: isdn
+            -
+              value: '64'
+              newvalue: v11
+            -
+              value: '65'
+              newvalue: v36
+            -
+              value: '66'
+              newvalue: g703at64k
+            -
+              value: '67'
+              newvalue: g703at2mb
+            -
+              value: '68'
+              newvalue: qllc
+            -
+              value: '69'
+              newvalue: fastEtherFX
+            -
+              value: '70'
+              newvalue: channel
+            -
+              value: '71'
+              newvalue: ieee80211
+            -
+              value: '72'
+              newvalue: ibm370parChan
+            -
+              value: '73'
+              newvalue: escon
+            -
+              value: '74'
+              newvalue: dlsw
+            -
+              value: '75'
+              newvalue: isdns
+            -
+              value: '76'
+              newvalue: isdnu
+            -
+              value: '77'
+              newvalue: lapd
+            -
+              value: '78'
+              newvalue: ipSwitch
+            -
+              value: '79'
+              newvalue: rsrb
+            -
+              value: '80'
+              newvalue: atmLogical
+            -
+              value: '81'
+              newvalue: ds0
+            -
+              value: '82'
+              newvalue: ds0Bundle
+            -
+              value: '83'
+              newvalue: bsc
+            -
+              value: '84'
+              newvalue: async
+            -
+              value: '85'
+              newvalue: cnr
+            -
+              value: '86'
+              newvalue: iso88025Dtr
+            -
+              value: '87'
+              newvalue: eplrs
+            -
+              value: '88'
+              newvalue: arap
+            -
+              value: '89'
+              newvalue: propCnls
+            -
+              value: '90'
+              newvalue: hostPad
+            -
+              value: '91'
+              newvalue: termPad
+            -
+              value: '92'
+              newvalue: frameRelayMPI
+            -
+              value: '93'
+              newvalue: x213
+            -
+              value: '94'
+              newvalue: adsl
+            -
+              value: '95'
+              newvalue: radsl
+            -
+              value: '96'
+              newvalue: sdsl
+            -
+              value: '97'
+              newvalue: vdsl
+            -
+              value: '98'
+              newvalue: iso88025CRFPInt
+            -
+              value: '99'
+              newvalue: myrinet
+            -
+              value: '100'
+              newvalue: voiceEM
+            -
+              value: '101'
+              newvalue: voiceFXO
+            -
+              value: '102'
+              newvalue: voiceFXS
+            -
+              value: '103'
+              newvalue: voiceEncap
+            -
+              value: '104'
+              newvalue: voiceOverIp
+            -
+              value: '105'
+              newvalue: atmDxi
+            -
+              value: '106'
+              newvalue: atmFuni
+            -
+              value: '107'
+              newvalue: atmIma
+            -
+              value: '108'
+              newvalue: pppMultilinkBundle
+            -
+              value: '109'
+              newvalue: ipOverCdlc
+            -
+              value: '110'
+              newvalue: ipOverClaw
+            -
+              value: '111'
+              newvalue: stackToStack
+            -
+              value: '112'
+              newvalue: virtualIpAddress
+            -
+              value: '113'
+              newvalue: mpc
+            -
+              value: '114'
+              newvalue: ipOverAtm
+            -
+              value: '115'
+              newvalue: iso88025Fiber
+            -
+              value: '116'
+              newvalue: tdlc
+            -
+              value: '117'
+              newvalue: gigabitEthernet
+            -
+              value: '118'
+              newvalue: hdlc
+            -
+              value: '119'
+              newvalue: lapf
+            -
+              value: '120'
+              newvalue: v37
+            -
+              value: '121'
+              newvalue: x25mlp
+            -
+              value: '122'
+              newvalue: x25huntGroup
+            -
+              value: '123'
+              newvalue: trasnpHdlc
+            -
+              value: '124'
+              newvalue: interleave
+            -
+              value: '125'
+              newvalue: fast
+            -
+              value: '126'
+              newvalue: ip
+            -
+              value: '127'
+              newvalue: docsCableMaclayer
+            -
+              value: '128'
+              newvalue: docsCableDownstream
+            -
+              value: '129'
+              newvalue: docsCableUpstream
+            -
+              value: '130'
+              newvalue: a12MppSwitch
+            -
+              value: '131'
+              newvalue: tunnel
+            -
+              value: '132'
+              newvalue: coffee
+            -
+              value: '133'
+              newvalue: ces
+            -
+              value: '134'
+              newvalue: atmSubInterface
+            -
+              value: '135'
+              newvalue: l2vlan
+            -
+              value: '136'
+              newvalue: l3ipvlan
+            -
+              value: '137'
+              newvalue: l3ipxvlan
+            -
+              value: '138'
+              newvalue: digitalPowerline
+            -
+              value: '139'
+              newvalue: mediaMailOverIp
+            -
+              value: '140'
+              newvalue: dtm
+            -
+              value: '141'
+              newvalue: dcn
+            -
+              value: '142'
+              newvalue: ipForward
+            -
+              value: '143'
+              newvalue: msdsl
+            -
+              value: '144'
+              newvalue: ieee1394
+            -
+              value: '145'
+              newvalue: if-gsn
+            -
+              value: '146'
+              newvalue: dvbRccMacLayer
+            -
+              value: '147'
+              newvalue: dvbRccDownstream
+            -
+              value: '148'
+              newvalue: dvbRccUpstream
+            -
+              value: '149'
+              newvalue: atmVirtual
+            -
+              value: '150'
+              newvalue: mplsTunnel
+            -
+              value: '151'
+              newvalue: srp
+            -
+              value: '152'
+              newvalue: voiceOverAtm
+            -
+              value: '153'
+              newvalue: voiceOverFrameRelay
+            -
+              value: '154'
+              newvalue: idsl
+            -
+              value: '155'
+              newvalue: compositeLink
+            -
+              value: '156'
+              newvalue: ss7SigLink
+            -
+              value: '157'
+              newvalue: propWirelessP2P
+            -
+              value: '158'
+              newvalue: frForward
+            -
+              value: '159'
+              newvalue: rfc1483
+            -
+              value: '160'
+              newvalue: usb
+            -
+              value: '161'
+              newvalue: ieee8023adLag
+            -
+              value: '162'
+              newvalue: bgppolicyaccounting
+            -
+              value: '163'
+              newvalue: frf16MfrBundle
+            -
+              value: '164'
+              newvalue: h323Gatekeeper
+            -
+              value: '165'
+              newvalue: h323Proxy
+            -
+              value: '166'
+              newvalue: mpls
+            -
+              value: '167'
+              newvalue: mfSigLink
+            -
+              value: '168'
+              newvalue: hdsl2
+            -
+              value: '169'
+              newvalue: shdsl
+            -
+              value: '170'
+              newvalue: ds1FDL
+            -
+              value: '171'
+              newvalue: pos
+            -
+              value: '172'
+              newvalue: dvbAsiIn
+            -
+              value: '173'
+              newvalue: dvbAsiOut
+            -
+              value: '174'
+              newvalue: plc
+            -
+              value: '175'
+              newvalue: nfas
+            -
+              value: '176'
+              newvalue: tr008
+            -
+              value: '177'
+              newvalue: gr303RDT
+            -
+              value: '178'
+              newvalue: gr303IDT
+            -
+              value: '179'
+              newvalue: isup
+            -
+              value: '180'
+              newvalue: propDocsWirelessMaclayer
+            -
+              value: '181'
+              newvalue: propDocsWirelessDownstream
+            -
+              value: '182'
+              newvalue: propDocsWirelessUpstream
+            -
+              value: '183'
+              newvalue: hiperlan2
+            -
+              value: '184'
+              newvalue: propBWAp2Mp
+            -
+              value: '185'
+              newvalue: sonetOverheadChannel
+            -
+              value: '186'
+              newvalue: digitalWrapperOverheadChannel
+            -
+              value: '187'
+              newvalue: aal2
+            -
+              value: '188'
+              newvalue: radioMAC
+            -
+              value: '189'
+              newvalue: atmRadio
+            -
+              value: '190'
+              newvalue: imt
+            -
+              value: '191'
+              newvalue: mvl
+            -
+              value: '192'
+              newvalue: reachDSL
+            -
+              value: '193'
+              newvalue: frDlciEndPt
+            -
+              value: '194'
+              newvalue: atmVciEndPt
+            -
+              value: '195'
+              newvalue: opticalChannel
+            -
+              value: '196'
+              newvalue: opticalTransport
+            -
+              value: '197'
+              newvalue: propAtm
+            -
+              value: '198'
+              newvalue: voiceOverCable
+            -
+              value: '199'
+              newvalue: infiniband
+            -
+              value: '200'
+              newvalue: teLink
+            -
+              value: '201'
+              newvalue: q2931
+            -
+              value: '202'
+              newvalue: virtualTg
+            -
+              value: '203'
+              newvalue: sipTg
+            -
+              value: '204'
+              newvalue: sipSig
+            -
+              value: '205'
+              newvalue: docsCableUpstreamChannel
+            -
+              value: '206'
+              newvalue: econet
+            -
+              value: '207'
+              newvalue: pon155
+            -
+              value: '208'
+              newvalue: pon622
+            -
+              value: '209'
+              newvalue: bridge
+            -
+              value: '210'
+              newvalue: linegroup
+            -
+              value: '211'
+              newvalue: voiceEMFGD
+            -
+              value: '212'
+              newvalue: voiceFGDEANA
+            -
+              value: '213'
+              newvalue: voiceDID
+            -
+              value: '214'
+              newvalue: mpegTransport
+            -
+              value: '215'
+              newvalue: sixToFour
+            -
+              value: '216'
+              newvalue: gtp
+            -
+              value: '217'
+              newvalue: pdnEtherLoop1
+            -
+              value: '218'
+              newvalue: pdnEtherLoop2
+            -
+              value: '219'
+              newvalue: opticalChannelGroup
+            -
+              value: '220'
+              newvalue: homepna
+            -
+              value: '221'
+              newvalue: gfp
+            -
+              value: '222'
+              newvalue: ciscoISLvlan
+            -
+              value: '223'
+              newvalue: actelisMetaLOOP
+            -
+              value: '224'
+              newvalue: fcipLink
+            -
+              value: '225'
+              newvalue: rpr
+            -
+              value: '226'
+              newvalue: qam
+            -
+              value: '227'
+              newvalue: lmp
+            -
+              value: '228'
+              newvalue: cblVectaStar
+            -
+              value: '229'
+              newvalue: docsCableMCmtsDownstream
+            -
+              value: '230'
+              newvalue: adsl2
+            -
+              value: '231'
+              newvalue: macSecControlledIF
+            -
+              value: '232'
+              newvalue: macSecUncontrolledIF
+            -
+              value: '233'
+              newvalue: aviciOpticalEther
+            -
+              value: '234'
+              newvalue: atmbond
+            -
+              value: '235'
+              newvalue: voiceFGDOS
+            -
+              value: '236'
+              newvalue: mocaVersion1
+            -
+              value: '237'
+              newvalue: ieee80216WMAN
+            -
+              value: '238'
+              newvalue: adsl2plus
+            -
+              value: '239'
+              newvalue: dvbRcsMacLayer
+            -
+              value: '240'
+              newvalue: dvbTdm
+            -
+              value: '241'
+              newvalue: dvbRcsTdma
+            -
+              value: '242'
+              newvalue: x86Laps
+            -
+              value: '243'
+              newvalue: wwanPP
+            -
+              value: '244'
+              newvalue: wwanPP2
+            -
+              value: '245'
+              newvalue: voiceEBS
+            -
+              value: '246'
+              newvalue: ifPwType
+            -
+              value: '247'
+              newvalue: ilan
+            -
+              value: '248'
+              newvalue: pip
+            -
+              value: '249'
+              newvalue: aluELP
+            -
+              value: '250'
+              newvalue: gpon
+            -
+              value: '251'
+              newvalue: vdsl2
+            -
+              value: '252'
+              newvalue: capwapDot11Profile
+            -
+              value: '253'
+              newvalue: capwapDot11Bss
+            -
+              value: '254'
+              newvalue: capwapWtpVirtualRadio
+            -
+              value: '255'
+              newvalue: bits
+            -
+              value: '256'
+              newvalue: docsCableUpstreamRfPort
+            -
+              value: '257'
+              newvalue: cableDownstreamRfPort
+            -
+              value: '258'
+              newvalue: vmwareVirtualNic
+            -
+              value: '259'
+              newvalue: ieee802154
+            -
+              value: '260'
+              newvalue: otnOdu
+            -
+              value: '261'
+              newvalue: otnOtu
+            -
+              value: '262'
+              newvalue: ifVfiType
+            -
+              value: '263'
+              newvalue: g9981
+            -
+              value: '264'
+              newvalue: g9982
+            -
+              value: '265'
+              newvalue: g9983
+            -
+              value: '266'
+              newvalue: aluEpon
+            -
+              value: '267'
+              newvalue: aluEponOnu
+            -
+              value: '268'
+              newvalue: aluEponPhysicalUni
+            -
+              value: '269'
+              newvalue: aluEponLogicalLink
+            -
+              value: '270'
+              newvalue: aluGponOnu
+            -
+              value: '271'
+              newvalue: aluGponPhysicalUni
+            -
+              value: '272'
+              newvalue: vmwareNicTeam
+            -
+              value: '277'
+              newvalue: docsOfdmDownstream
+            -
+              value: '278'
+              newvalue: docsOfdmaUpstream
+            -
+              value: '279'
+              newvalue: gfast
+            -
+              value: '280'
+              newvalue: sdci
+            -
+              value: '281'
+              newvalue: xboxWireless
+            -
+              value: '282'
+              newvalue: fastdsl
+            -
+              value: '283'
+              newvalue: docsCableScte55d1FwdOob
+            -
+              value: '284'
+              newvalue: docsCableScte55d1RetOob
+            -
+              value: '285'
+              newvalue: docsCableScte55d2DsOob
+            -
+              value: '286'
+              newvalue: docsCableScte55d2UsOob
+            -
+              value: '287'
+              newvalue: docsCableNdf
+            -
+              value: '288'
+              newvalue: docsCableNdr
+            -
+              value: '289'
+              newvalue: ptm
+            -
+              value: '290'
+              newvalue: ghn
+        -
+          uuid: dd1bf7f8b7b642d584528240a25df254
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          uuid: 6b810f3744284881b60277cc0d96dfa9
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+  triggers:
+    -
+      uuid: 6c1708d53693435c87cd27f1568345c1
+      expression: 'min(/TrueNAS SNMP/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/TrueNAS SNMP/system.swap.total)>0'
+      name: 'TrueNAS: High swap space usage'
+      event_name: 'TrueNAS: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
+      opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
+      priority: WARNING
+      description: 'This trigger is ignored, if there is no swap configured.'
+      dependencies:
+        -
+          name: 'TrueNAS: High memory utilization'
+          expression: 'min(/TrueNAS SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+        -
+          name: 'TrueNAS: Lack of available memory'
+          expression: 'min(/TrueNAS SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/TrueNAS SNMP/vm.memory.total)>0'
+      tags:
+        -
+          tag: scope
+          value: capacity
+        -
+          tag: scope
+          value: performance
+    -
+      uuid: 0a04cc4789a14f1090232fce196c0e4d
+      expression: 'min(/TrueNAS SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/TrueNAS SNMP/vm.memory.total)>0'
+      name: 'TrueNAS: Lack of available memory'
+      event_name: 'TrueNAS: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
+      priority: AVERAGE
+      description: 'The system is running out of memory.'
+      tags:
+        -
+          tag: scope
+          value: capacity
+        -
+          tag: scope
+          value: performance
+    -
+      uuid: c923ea2cc04848de911ad9a41defaff6
+      expression: |
+        min(/TrueNAS SNMP/system.cpu.load.avg1,5m)/last(/TrueNAS SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
+        and last(/TrueNAS SNMP/system.cpu.load.avg5)>0
+        and last(/TrueNAS SNMP/system.cpu.load.avg15)>0
+      name: 'TrueNAS: Load average is too high'
+      event_name: 'TrueNAS: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+      opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
+      priority: AVERAGE
+      description: 'Per CPU load average is too high. Your system may be slow to respond.'
+      tags:
+        -
+          tag: scope
+          value: performance
+  graphs:
+    -
+      uuid: 621f703356cb4522bef8f1c89732c9cb
+      name: 'TrueNAS: ARC hit ratio'
+      type: STACKED
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'TrueNAS SNMP'
+            key: truenas.zfs.arc.hit.ratio
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'TrueNAS SNMP'
+            key: truenas.zfs.arc.miss.ratio
+    -
+      uuid: 977c98430b1241988206b56b3fc40091
+      name: 'TrueNAS: CPU jumps'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'TrueNAS SNMP'
+            key: system.cpu.switches
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'TrueNAS SNMP'
+            key: system.cpu.intr
+    -
+      uuid: 5c95f63eaaf049cab4884b2785c5d382
+      name: 'TrueNAS: Memory usage'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: 'TrueNAS SNMP'
+            key: vm.memory.total
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'TrueNAS SNMP'
+            key: vm.memory.available
+    -
+      uuid: a36f52864942457894638adef660a775
+      name: 'TrueNAS: Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'TrueNAS SNMP'
+            key: vm.memory.util
+    -
+      uuid: bd67954025d145c8a0eb2f21d53a52f5
+      name: 'TrueNAS: Swap usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'TrueNAS SNMP'
+            key: system.swap.free
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'TrueNAS SNMP'
+            key: system.swap.total
+    -
+      uuid: f7a0b78f1f814e2b94cec941168eafaa
+      name: 'TrueNAS: System load'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'TrueNAS SNMP'
+            key: system.cpu.load.avg1
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'TrueNAS SNMP'
+            key: system.cpu.load.avg5
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'TrueNAS SNMP'
+            key: system.cpu.load.avg15
+        -
+          sortorder: '3'
+          color: A54F10
+          yaxisside: RIGHT
+          item:
+            host: 'TrueNAS SNMP'
+            key: system.cpu.num

@@ -20,7 +20,7 @@
 package main
 
 import (
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 // Plugin -

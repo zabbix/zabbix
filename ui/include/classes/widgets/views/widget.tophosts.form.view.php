@@ -74,8 +74,9 @@ $column = CWidgetHelper::getSelect($fields['column']);
 if (!$fields['column']->getValues()) {
 	$column = (new CDiv(_('Add item column')))->addClass(
 		($fields['column']->getFlags() & CWidgetField::FLAG_DISABLED)
-		? ZBX_STYLE_DISABLED
-		: null);
+			? ZBX_STYLE_DISABLED
+			: null
+	);
 }
 
 $form_list->addRow(CWidgetHelper::getLabel($fields['column']), $column);

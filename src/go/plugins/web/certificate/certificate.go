@@ -30,10 +30,10 @@ import (
 	"strings"
 	"time"
 
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/uri"
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type Output struct {

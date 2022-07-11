@@ -23,7 +23,7 @@ import (
 	"encoding/binary"
 	"unsafe"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/win32"
 )
 

@@ -17,15 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "diag.h"
+
 #include "common.h"
-#include "zbxalgo.h"
-#include "memalloc.h"
 #include "../../libs/zbxdbcache/valuecache.h"
 #include "zbxlld.h"
 #include "zbxalert.h"
 #include "zbxdiag.h"
-
-#include "diag.h"
 
 /******************************************************************************
  *                                                                            *

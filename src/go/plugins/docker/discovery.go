@@ -22,7 +22,7 @@ package docker
 import (
 	"encoding/json"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type containerDiscovery struct {

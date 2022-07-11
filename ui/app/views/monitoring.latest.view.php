@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -27,6 +27,7 @@ $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
+$this->addJsFile('class.expandable.subfilter.js');
 
 $this->includeJsFile('monitoring.latest.view.js.php');
 
@@ -45,7 +46,9 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = (new CTabFilter())
 		->setId('monitoring_latest_filter')
 		->setOptions($data['tabfilter_options'])
-		->addSubfilter(new CPartial('monitoring.latest.subfilter', $data['subfilters']))
+		->addSubfilter(new CPartial('monitoring.latest.subfilter',
+			array_intersect_key($data, array_flip(['subfilters', 'subfilters_expanded'])))
+		)
 		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
 	foreach ($data['filter_tabs'] as $tab) {

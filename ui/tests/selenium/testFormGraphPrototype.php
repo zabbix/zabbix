@@ -363,7 +363,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='name']", 'readonly');
@@ -375,7 +374,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Width');
 		$this->zbxTestAssertVisibleId('width');
 		$this->zbxTestAssertAttribute("//input[@id='width']", 'maxlength', 5);
-		$this->zbxTestAssertAttribute("//input[@id='width']", 'size', 20);
 		$this->zbxTestAssertElementValue('width', 900);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='width']", 'readonly');
@@ -387,7 +385,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Height');
 		$this->zbxTestAssertVisibleId('height');
 		$this->zbxTestAssertAttribute("//input[@id='height']", 'maxlength', 5);
-		$this->zbxTestAssertAttribute("//input[@id='height']", 'size', 20);
 		$this->zbxTestAssertElementValue('height', 200);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='height']", 'readonly');
@@ -634,7 +631,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			case 'Fixed':
 				$this->zbxTestAssertVisibleId('yaxismin');
 					$this->zbxTestAssertAttribute("//input[@id='yaxismin']", 'maxlength', 255);
-					$this->zbxTestAssertAttribute("//input[@id='yaxismin']", 'size', 20);
 					$this->zbxTestAssertElementValue('yaxismin', 0);
 
 					$this->zbxTestAssertElementNotPresentId('ymin_name');
@@ -665,7 +661,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			case 'Fixed':
 				$this->zbxTestAssertVisibleId('yaxismax');
 					$this->zbxTestAssertAttribute("//input[@id='yaxismax']", 'maxlength', 255);
-					$this->zbxTestAssertAttribute("//input[@id='yaxismax']", 'size', 20);
 					$this->zbxTestAssertElementValue('yaxismax', 100);
 
 					$this->zbxTestAssertElementNotPresentId('ymax_name');
@@ -1062,7 +1057,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraphPrototype_SimpleCreate($data) {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$this->zbxTestLogin('graphs.php?parent_discoveryid=133800&context=host&form=Create+graph+prototype');
 
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
@@ -1091,7 +1085,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestClick('add_item');
 			$this->zbxTestLaunchOverlayDialog('Items');
 
-			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+			$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')->asMultiselect()->one();
 			$host->fill([
 				'values' => $this->host,
 				'context' => $this->hostGroup

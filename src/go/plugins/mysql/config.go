@@ -20,8 +20,8 @@
 package mysql
 
 import (
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 // Session is a general structure for storing sessions' configuration.

@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "mutexs.h"
-#include "log.h"
-
 #include "memalloc.h"
+
+#include "common.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -655,12 +654,14 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 		if (1 == info->allow_oom)
 			return NULL;
 
+		zbx_mem_dump_stats(LOG_LEVEL_CRIT, info);
+		zbx_backtrace();
+
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): out of memory (requested " ZBX_FS_SIZE_T " bytes)",
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
-		zbx_mem_dump_stats(LOG_LEVEL_CRIT, info);
-		zbx_backtrace();
+
 		exit(EXIT_FAILURE);
 	}
 
@@ -688,12 +689,14 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 		if (1 == info->allow_oom)
 			return NULL;
 
+		zbx_mem_dump_stats(LOG_LEVEL_CRIT, info);
+		zbx_backtrace();
+
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): out of memory (requested " ZBX_FS_SIZE_T " bytes)",
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
-		zbx_mem_dump_stats(LOG_LEVEL_CRIT, info);
-		zbx_backtrace();
+
 		exit(EXIT_FAILURE);
 	}
 

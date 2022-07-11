@@ -135,15 +135,15 @@ class CWidgetHelper {
 	 * @return CLabel
 	 */
 	public static function getLabel($field, $class = null, $hint = null) {
-		if ($field instanceof CWidgetFieldSelect) {
-			return (new CLabel($field->getLabel(), 'label-'.$field->getName()))
-				->setAsteriskMark(self::isAriaRequired($field))
-				->addClass($class);
-		}
-
 		$help_icon = ($hint !== null)
 			? makeHelpIcon($hint)
 			: null;
+
+		if ($field instanceof CWidgetFieldSelect) {
+			return (new CLabel([$field->getLabel(), $help_icon], 'label-'.$field->getName()))
+				->setAsteriskMark(self::isAriaRequired($field))
+				->addClass($class);
+		}
 
 		return (new CLabel([$field->getLabel(), $help_icon], $field->getName()))
 			->setAsteriskMark(self::isAriaRequired($field))
@@ -238,6 +238,7 @@ class CWidgetHelper {
 			'object_name' => 'hosts',
 			'data' => $field->getValue(),
 			'placeholder' => $field->getPlaceholder(),
+			'wildcard_allowed' => 1,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
@@ -597,7 +598,7 @@ class CWidgetHelper {
 		];
 		$table = (new CTable())
 			->setId('list_'.$field->getName())
-			->setHeader((new CRowHeader($header))->addClass($columns ? null : ZBX_STYLE_DISPLAY_NONE));
+			->setHeader($header);
 		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
 
 		foreach ($columns as $column_index => $column) {
@@ -797,6 +798,7 @@ class CWidgetHelper {
 							'object_name' => 'hosts',
 							'data' => $value['hosts'],
 							'placeholder' => _('host pattern'),
+							'wildcard_allowed' => 1,
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'hosts',
@@ -818,6 +820,7 @@ class CWidgetHelper {
 							'data' => $value['items'],
 							'placeholder' => _('item pattern'),
 							'multiple' => true,
+							'wildcard_allowed' => 1,
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'items',
@@ -1156,6 +1159,7 @@ class CWidgetHelper {
 							'object_name' => 'hosts',
 							'data' => $value['hosts'],
 							'placeholder' => _('host pattern'),
+							'wildcard_allowed' => 1,
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'hosts',
@@ -1173,6 +1177,7 @@ class CWidgetHelper {
 							'object_name' => 'items',
 							'data' => $value['items'],
 							'placeholder' => _('item pattern'),
+							'wildcard_allowed' => 1,
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'items',

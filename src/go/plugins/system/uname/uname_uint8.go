@@ -1,3 +1,4 @@
+//go:build (linux && arm) || (linux && ppc64le) || (linux && s390x)
 // +build linux,arm linux,ppc64le linux,s390x
 
 /*
@@ -32,4 +33,3 @@ func arrayToString(unameArray *[65]uint8) string {
 	}
 	return string(byteString[:indexLength])
 }
-

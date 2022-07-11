@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:49:32Z'
+  date: '2022-04-06T19:27:30Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -330,7 +330,8 @@ zabbix_export:
             -
               uuid: 3104295848c5497085f397b8f3e06ef6
               expression: 'max(/Hadoop by HTTP/hadoop.namenode.percent_remaining,15m)<{$HADOOP.CAPACITY_REMAINING.MIN.WARN}'
-              name: 'NameNode: Cluster capacity remaining is low (below {$HADOOP.CAPACITY_REMAINING.MIN.WARN}% for 15m)'
+              name: 'NameNode: Cluster capacity remaining is low'
+              event_name: 'NameNode: Cluster capacity remaining is low (below {$HADOOP.CAPACITY_REMAINING.MIN.WARN}% for 15m)'
               priority: WARNING
               description: 'A good practice is to ensure that disk use never exceeds 80 percent capacity.'
               tags:
@@ -443,7 +444,8 @@ zabbix_export:
             -
               uuid: 9fac0ae651ab40a08551945eb0a93b68
               expression: 'nodata(/Hadoop by HTTP/hadoop.namenode.uptime,30m)=1'
-              name: 'NameNode: Failed to fetch NameNode API page (or no data for 30m)'
+              name: 'NameNode: Failed to fetch NameNode API page'
+              event_name: 'NameNode: Failed to fetch NameNode API page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -458,7 +460,8 @@ zabbix_export:
             -
               uuid: 84d866bc0dc3486d9c5dc9beefec8d31
               expression: 'last(/Hadoop by HTTP/hadoop.namenode.uptime)<10m'
-              name: 'NameNode: Service has been restarted (uptime < 10m)'
+              name: 'NameNode: Service has been restarted'
+              event_name: 'NameNode: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -743,7 +746,8 @@ zabbix_export:
             -
               uuid: 7d4d026992344602a199966a8308a571
               expression: 'nodata(/Hadoop by HTTP/hadoop.resourcemanager.uptime,30m)=1'
-              name: 'ResourceManager: Failed to fetch ResourceManager API page (or no data for 30m)'
+              name: 'ResourceManager: Failed to fetch ResourceManager API page'
+              event_name: 'ResourceManager: Failed to fetch ResourceManager API page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -758,7 +762,8 @@ zabbix_export:
             -
               uuid: ade7cc30a4184ef89ed896bae56e0b18
               expression: 'last(/Hadoop by HTTP/hadoop.resourcemanager.uptime)<10m'
-              name: 'ResourceManager: Service has been restarted (uptime < 10m)'
+              name: 'ResourceManager: Service has been restarted'
+              event_name: 'ResourceManager: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -783,7 +788,8 @@ zabbix_export:
             -
               uuid: 4e4a6ab28fe5492d8fe4e291b8a586dc
               expression: 'min(/Hadoop by HTTP/net.tcp.service.perf["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"],5m)>{$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN}'
-              name: 'NameNode: Service response time is too high (over {$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN} for 5m)'
+              name: 'NameNode: Service response time is too high'
+              event_name: 'NameNode: Service response time is too high (over {$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
@@ -811,7 +817,8 @@ zabbix_export:
             -
               uuid: e8e55f4c7e9e4823927a8c1345d3b941
               expression: 'min(/Hadoop by HTTP/net.tcp.service.perf["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"],5m)>{$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN}'
-              name: 'ResourceManager: Service response time is too high (over {$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN} for 5m)'
+              name: 'ResourceManager: Service response time is too high'
+              event_name: 'ResourceManager: Service response time is too high (over {$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
@@ -1115,7 +1122,8 @@ zabbix_export:
                 -
                   uuid: 3eccb9daf76f4bde88b424cf6f2d21f6
                   expression: 'nodata(/Hadoop by HTTP/hadoop.datanode.uptime[{#HOSTNAME}],30m)=1'
-                  name: '{#HOSTNAME}: Failed to fetch DataNode API page (or no data for 30m)'
+                  name: '{#HOSTNAME}: Failed to fetch DataNode API page'
+                  event_name: '{#HOSTNAME}: Failed to fetch DataNode API page (or no data for 30m)'
                   priority: WARNING
                   description: 'Zabbix has not received data for items for the last 30 minutes.'
                   manual_close: 'YES'
@@ -1130,7 +1138,8 @@ zabbix_export:
                 -
                   uuid: e40298d300764251abcf93d5df3d9a67
                   expression: 'last(/Hadoop by HTTP/hadoop.datanode.uptime[{#HOSTNAME}])<10m'
-                  name: '{#HOSTNAME}: Service has been restarted (uptime < 10m)'
+                  name: '{#HOSTNAME}: Service has been restarted'
+                  event_name: '{#HOSTNAME}: Service has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
@@ -1433,7 +1442,8 @@ zabbix_export:
                 -
                   uuid: 6f8a6308d4334dd9bebe7af2fa3fb831
                   expression: 'nodata(/Hadoop by HTTP/hadoop.nodemanager.uptime[{#HOSTNAME}],30m)=1'
-                  name: '{#HOSTNAME}: Failed to fetch NodeManager API page (or no data for 30m)'
+                  name: '{#HOSTNAME}: Failed to fetch NodeManager API page'
+                  event_name: '{#HOSTNAME}: Failed to fetch NodeManager API page (or no data for 30m)'
                   priority: WARNING
                   description: 'Zabbix has not received data for items for the last 30 minutes.'
                   manual_close: 'YES'
@@ -1448,7 +1458,8 @@ zabbix_export:
                 -
                   uuid: 05f3cf8ed34f4a708df508f0e50e119d
                   expression: 'last(/Hadoop by HTTP/hadoop.nodemanager.uptime[{#HOSTNAME}])<10m'
-                  name: '{#HOSTNAME}: Service has been restarted (uptime < 10m)'
+                  name: '{#HOSTNAME}: Service has been restarted'
+                  event_name: '{#HOSTNAME}: Service has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'

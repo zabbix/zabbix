@@ -219,7 +219,8 @@ function setupLocale(string $language, ?string &$error = ''): bool {
 	$locale_set = false;
 	$error = '';
 
-	init_mbstrings();
+	ini_set('default_charset', 'UTF-8');
+	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 
 	// Since LC_MESSAGES may be unavailable on some systems, try to set all of the locales and then make adjustments.
 	foreach ($locale_variants as $locale) {

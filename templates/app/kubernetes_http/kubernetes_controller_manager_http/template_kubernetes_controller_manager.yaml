@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T09:51:58Z'
+  date: '2022-04-06T19:27:51Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -147,7 +147,8 @@ zabbix_export:
             -
               uuid: 13c32daebddd454bb5908a9a27c3a76f
               expression: 'min(/Kubernetes Controller manager by HTTP/kubernetes.controller.client_http_requests_500.rate,5m)>{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}'
-              name: 'Kubernetes Controller Manager: Too many HTTP client errors (over {$KUBE.CONTROLLER.HTTP.CLIENT.ERROR} for 5m)'
+              name: 'Kubernetes Controller Manager: Too many HTTP client errors'
+              event_name: 'Kubernetes Controller Manager: Too many HTTP client errors (over {$KUBE.CONTROLLER.HTTP.CLIENT.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes Controller manager is experiencing high error rate (with 5xx HTTP code).'
               tags:
@@ -193,7 +194,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get raw metrics from Controller instance /metrics endpoint'
+          description: 'Get raw metrics from Controller instance /metrics endpoint.'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -204,7 +205,7 @@ zabbix_export:
           headers:
             -
               name: Authorization
-              value: 'Bearer {$KUBE.CONTROLLER.TOKEN}'
+              value: 'Bearer {$KUBE.API.TOKEN}'
           tags:
             -
               tag: component
@@ -381,7 +382,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.workqueue.discovery
           delay: '0'
-          description: 'Discovery raw data and percentile items of workqueues.'
           item_prototypes:
             -
               uuid: 70277a128a254462ad0bf7a023738ba0
@@ -389,10 +389,11 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.controller.duration_seconds_bucket[{#LE},"{#NAME}"]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               discover: NO_DISCOVER
               value_type: FLOAT
-              description: 'How long in seconds processing an item from workqueue takes'
+              description: 'How long in seconds processing an item from workqueue takes.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -416,7 +417,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.controller.queue_duration_seconds_bucket[{#LE},"{#NAME}"]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               discover: NO_DISCOVER
               value_type: FLOAT
               description: 'How long in seconds an item stays in workqueue before being requested.'
@@ -816,7 +818,7 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === "workqueue_adds_total"){
+                      if (item.name === 'workqueue_adds_total') {
                           var label_name = item.labels.name;
                   
                           if (lookup[label_name]) {
@@ -827,9 +829,8 @@ zabbix_export:
                               '{#TYPE}': 'totals',
                               '{#NAME}': label_name
                           });
-                  
-                        }
-                      else if  (item.name === "workqueue_work_duration_seconds_bucket"){
+                      }
+                      else if  (item.name === 'workqueue_work_duration_seconds_bucket') {
                           result.push({
                               '{#TYPE}': 'buckets',
                               '{#NAME}': item.labels.name,
@@ -842,7 +843,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           overrides:
             -
               name: 'bucket item'
@@ -885,6 +886,9 @@ zabbix_export:
           value: 'kubernetes controller manager'
       macros:
         -
+          macro: '{$KUBE.API.TOKEN}'
+          description: 'API Authorization Token'
+        -
           macro: '{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}'
           value: '2'
           description: 'Maximum number of HTTP client requests failures used for trigger'
@@ -892,9 +896,6 @@ zabbix_export:
           macro: '{$KUBE.CONTROLLER.SERVER.URL}'
           value: 'http://localhost:10252/metrics'
           description: 'Instance URL'
-        -
-          macro: '{$KUBE.CONTROLLER.TOKEN}'
-          description: 'Controller Authorization Token'
       valuemaps:
         -
           uuid: fa1732213d27418a88a61c964d93e9d7

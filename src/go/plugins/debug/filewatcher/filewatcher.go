@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/watch"
 
 	"github.com/fsnotify/fsnotify"

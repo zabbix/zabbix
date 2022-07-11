@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-28T13:13:18Z'
+  date: '2022-04-06T19:33:40Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -32,7 +32,7 @@ zabbix_export:
               value: network
           triggers:
             -
-              uuid: b299d73cebcd430c8bfc54cf9b84e853
+              uuid: aee485c125f94e37ac97c3ce1a654757
               expression: 'max(/FTP Service/net.tcp.service[ftp],#3)=0'
               name: 'FTP service is down on {HOST.NAME}'
               priority: AVERAGE

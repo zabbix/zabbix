@@ -24,11 +24,11 @@ import (
 	"sync"
 	"time"
 
-	"zabbix.com/pkg/uri"
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 
+	"git.zabbix.com/ap/plugin-support/log"
 	"github.com/memcachier/mc/v3"
-	"zabbix.com/pkg/log"
 )
 
 const poolSize = 1

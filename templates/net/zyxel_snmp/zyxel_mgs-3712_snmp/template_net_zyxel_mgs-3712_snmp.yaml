@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:42:16Z'
+  date: '2022-04-06T19:36:12Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -106,7 +106,8 @@ zabbix_export:
             -
               uuid: b1ca06637dbe4c9ca84e2811e780d5d5
               expression: 'min(/ZYXEL MGS-3712 SNMP/zyxel.3712.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL MGS-3712: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'ZYXEL MGS-3712: High CPU utilization'
+              event_name: 'ZYXEL MGS-3712: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -303,7 +304,8 @@ zabbix_export:
             -
               uuid: 4a9495748e09477ca5f12443fff533c9
               expression: 'last(/ZYXEL MGS-3712 SNMP/zyxel.3712.serialnumber,#1)<>last(/ZYXEL MGS-3712 SNMP/zyxel.3712.serialnumber,#2) and length(last(/ZYXEL MGS-3712 SNMP/zyxel.3712.serialnumber))>0'
-              name: 'ZYXEL MGS-3712: Device has been replaced (new serial number received)'
+              name: 'ZYXEL MGS-3712: Device has been replaced'
+              event_name: 'ZYXEL MGS-3712: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -339,7 +341,8 @@ zabbix_export:
             -
               uuid: eefe29ad784d40d3980a4cb1118dd816
               expression: 'last(/ZYXEL MGS-3712 SNMP/zyxel.3712.uptime)<10m'
-              name: 'ZYXEL MGS-3712: has been restarted (uptime < 10m)'
+              name: 'ZYXEL MGS-3712: has been restarted'
+              event_name: 'ZYXEL MGS-3712: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1092,7 +1095,8 @@ zabbix_export:
                 -
                   uuid: e9d242819d7345a0b44cc14a392f05fa
                   expression: 'last(/ZYXEL MGS-3712 SNMP/zyxel.3712.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
-                  name: 'ZYXEL MGS-3712: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL MGS-3712: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL MGS-3712: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
                   tags:
@@ -1102,7 +1106,8 @@ zabbix_export:
                 -
                   uuid: 177c2fe88ec24e3d9a5ea9f6b3f346d9
                   expression: 'last(/ZYXEL MGS-3712 SNMP/zyxel.3712.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
-                  name: 'ZYXEL MGS-3712: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL MGS-3712: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL MGS-3712: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
                   tags:
@@ -1278,7 +1283,8 @@ zabbix_export:
                 -
                   uuid: aaa3492aa0c64e8a973d1a755fd24f50
                   expression: 'last(/ZYXEL MGS-3712 SNMP/zyxel.3712.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS-3712 SNMP/zyxel.3712.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS-3712 SNMP/zyxel.3712.sfp.serialnumber[{#SNMPINDEX}]))>0'
-                  name: 'ZYXEL MGS-3712: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  name: 'ZYXEL MGS-3712: SFP {#SNMPINDEX} has been replaced'
+                  event_name: 'ZYXEL MGS-3712: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
                   manual_close: 'YES'

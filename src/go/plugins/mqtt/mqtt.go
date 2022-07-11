@@ -35,10 +35,10 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/watch"
 )

@@ -20,7 +20,6 @@
 #ifndef ZABBIX_LLD_H
 #define ZABBIX_LLD_H
 
-#include "common.h"
 #include "zbxalgo.h"
 
 void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts, unsigned char meta,

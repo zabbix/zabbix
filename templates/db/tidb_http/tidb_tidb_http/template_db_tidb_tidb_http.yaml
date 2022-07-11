@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:39:26Z'
+  date: '2022-04-06T19:35:30Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -77,7 +77,8 @@ zabbix_export:
             -
               uuid: 4125d55d9931455091d2f3a0b25e9678
               expression: 'min(/TiDB by HTTP/tidb.ddl_waiting_jobs,5m)>{$TIDB.DDL.WAITING.MAX.WARN}'
-              name: 'TiDB: Too many DDL waiting jobs (over {$TIDB.DDL.WAITING.MAX.WARN} for 5m)'
+              name: 'TiDB: Too many DDL waiting jobs'
+              event_name: 'TiDB: Too many DDL waiting jobs (over {$TIDB.DDL.WAITING.MAX.WARN} for 5m)'
               priority: WARNING
               tags:
                 -
@@ -112,7 +113,8 @@ zabbix_export:
             -
               uuid: b4948f37af804c01a2b8887f9e89ec90
               expression: 'min(/TiDB by HTTP/tidb.domain_load_schema.failed.rate,5m)>{$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN}'
-              name: 'TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN} for 5m)'
+              name: 'TiDB: Too many schema lease errors'
+              event_name: 'TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN} for 5m)'
               priority: AVERAGE
               tags:
                 -
@@ -258,7 +260,8 @@ zabbix_export:
             -
               uuid: 575a4821ed8c4a1881b7f9bd264b1929
               expression: 'min(/TiDB by HTTP/tidb.heap_bytes,5m)>{$TIDB.HEAP.USAGE.MAX.WARN}'
-              name: 'TiDB: Heap memory usage is too high (over {$TIDB.HEAP.USAGE.MAX.WARN} for 5m)'
+              name: 'TiDB: Heap memory usage is too high'
+              event_name: 'TiDB: Heap memory usage is too high (over {$TIDB.HEAP.USAGE.MAX.WARN} for 5m)'
               priority: WARNING
               tags:
                 -
@@ -294,7 +297,8 @@ zabbix_export:
             -
               uuid: eb3c09904fa843d78401b00eff4f6a08
               expression: 'max(/TiDB by HTTP/tidb.monitor_keep_alive.rate,5m)<{$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN}'
-              name: 'TiDB: Too few keep alive operations (less {$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN} for 5m)'
+              name: 'TiDB: Too few keep alive operations'
+              event_name: 'TiDB: Too few keep alive operations (less {$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN} for 5m)'
               priority: AVERAGE
               description: 'Indicates whether the TiDB process still exists. If the number of times for tidb_monitor_keep_alive_total increases less than 10 per minute, the TiDB process might already exit and an alert is triggered.'
               tags:
@@ -330,7 +334,8 @@ zabbix_export:
             -
               uuid: c3c1f6eab224453b92534d5393aca2b7
               expression: 'min(/TiDB by HTTP/tidb.monitor_time_jump_back.rate,5m)>{$TIDB.TIME_JUMP_BACK.MAX.WARN}'
-              name: 'TiDB: Too many time jump backs (over {$TIDB.TIME_JUMP_BACK.MAX.WARN} for 5m)'
+              name: 'TiDB: Too many time jump backs'
+              event_name: 'TiDB: Too many time jump backs (over {$TIDB.TIME_JUMP_BACK.MAX.WARN} for 5m)'
               priority: WARNING
               tags:
                 -
@@ -580,7 +585,8 @@ zabbix_export:
             -
               uuid: b077eb1afe6a4da79707987324fb40c8
               expression: 'min(/TiDB by HTTP/tidb.session_schema_lease_error.outdate.rate,5m)>{$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN}'
-              name: 'TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN} for 5m)'
+              name: 'TiDB: Too many schema lease errors'
+              event_name: 'TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN} for 5m)'
               priority: AVERAGE
               description: 'The latest schema information is not reloaded in TiDB within one lease.'
               tags:
@@ -809,7 +815,8 @@ zabbix_export:
             -
               uuid: d3cb81c46e414ff2a7e411a877b899ef
               expression: 'min(/TiDB by HTTP/tidb.tikvclient_region_err.rate,5m)>{$TIDB.REGION_ERROR.MAX.WARN}'
-              name: 'TiDB: Too many region related errors (over {$TIDB.REGION_ERROR.MAX.WARN} for 5m)'
+              name: 'TiDB: Too many region related errors'
+              event_name: 'TiDB: Too many region related errors (over {$TIDB.REGION_ERROR.MAX.WARN} for 5m)'
               priority: AVERAGE
               tags:
                 -
@@ -871,7 +878,8 @@ zabbix_export:
             -
               uuid: 91adc4c6b9364693891faf58c8cced75
               expression: 'last(/TiDB by HTTP/tidb.uptime)<10m'
-              name: 'TiDB: has been restarted (uptime < 10m)'
+              name: 'TiDB: has been restarted'
+              event_name: 'TiDB: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -908,7 +916,8 @@ zabbix_export:
             -
               uuid: 5f863fc0944848fdad145f42c94dbea3
               expression: 'last(/TiDB by HTTP/tidb.version,#1)<>last(/TiDB by HTTP/tidb.version,#2) and length(last(/TiDB by HTTP/tidb.version))>0'
-              name: 'TiDB: Version has changed (new version: {ITEM.VALUE})'
+              name: 'TiDB: Version has changed'
+              event_name: 'TiDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'TiDB version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1216,7 +1225,8 @@ zabbix_export:
                 -
                   uuid: 2d24956d0a4f459fad155590376696c1
                   expression: 'min(/TiDB by HTTP/tidb.tikvclient_gc_action.rate[{#TYPE}],5m)>{$TIDB.GC_ACTIONS.ERRORS.MAX.WARN}'
-                  name: 'TiDB: Too many failed GC-related operations (over {$TIDB.GC_ACTIONS.ERRORS.MAX.WARN} in 5m)'
+                  name: 'TiDB: Too many failed GC-related operations'
+                  event_name: 'TiDB: Too many failed GC-related operations (over {$TIDB.GC_ACTIONS.ERRORS.MAX.WARN} in 5m)'
                   discover: NO_DISCOVER
                   priority: WARNING
                   tags:
@@ -1384,7 +1394,8 @@ zabbix_export:
     -
       uuid: cfd6ba0dbf294b9e9ab6afc7d44be7b3
       expression: 'min(/TiDB by HTTP/tidb.process_open_fds,5m)/last(/TiDB by HTTP/tidb.process_max_fds)*100>{$TIDB.OPEN.FDS.MAX.WARN}'
-      name: 'TiDB: Current number of open files is too high (over {$TIDB.OPEN.FDS.MAX.WARN}% for 5m)'
+      name: 'TiDB: Current number of open files is too high'
+      event_name: 'TiDB: Current number of open files is too high (over {$TIDB.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
       description: 'Heavy file descriptor usage (i.e., near the process''s file descriptor limit) indicates a potential file descriptor exhaustion issue.'
       tags:

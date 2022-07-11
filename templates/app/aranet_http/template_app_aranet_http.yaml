@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:47:29Z'
+  date: '2022-04-06T19:26:59Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -417,7 +417,8 @@ zabbix_export:
                 -
                   uuid: 6a931421d804418085e586dfc0e11311
                   expression: 'max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}'
-                  name: '{#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
+                  name: '{#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"'
+                  event_name: '{#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: HIGH
                   tags:
                     -
@@ -426,11 +427,12 @@ zabbix_export:
                 -
                   uuid: d729130760f9418baa40fb9eeb8a3ca4
                   expression: 'max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.WARN:"{#SENSOR_NAME}"}'
-                  name: '{#METRIC}: Low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.BATT.VOLTAGE.MIN.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
+                  name: '{#METRIC}: Low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"'
+                  event_name: '{#METRIC}: Low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.BATT.VOLTAGE.MIN.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: WARNING
                   dependencies:
                     -
-                      name: '{#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
+                      name: '{#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"'
                       expression: 'max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}'
                   tags:
                     -
@@ -503,7 +505,8 @@ zabbix_export:
                 -
                   uuid: 9d88ae8357b444728c63844462d25f83
                   expression: 'min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}'
-                  name: '{#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
+                  name: '{#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"'
+                  event_name: '{#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: HIGH
                   tags:
                     -
@@ -512,11 +515,12 @@ zabbix_export:
                 -
                   uuid: cc54c75ee607485981388da0f7f99ea2
                   expression: 'min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.WARN:"{#SENSOR_NAME}"}'
-                  name: '{#METRIC}: High CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.CO2.MAX.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
+                  name: '{#METRIC}: High CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"'
+                  event_name: '{#METRIC}: High CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.CO2.MAX.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: WARNING
                   dependencies:
                     -
-                      name: '{#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
+                      name: '{#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"'
                       expression: 'min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}'
                   tags:
                     -
@@ -778,7 +782,8 @@ zabbix_export:
                 -
                   uuid: 9697528bedd64aca9da1e6343182fe0c
                   expression: 'min(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}'
-                  name: '{#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
+                  name: '{#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"'
+                  event_name: '{#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: HIGH
                   tags:
                     -
@@ -787,11 +792,12 @@ zabbix_export:
                 -
                   uuid: 85c1be625bc940588671bc43e6ed6a8a
                   expression: 'max(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.HUMIDITY.MIN.WARN:"{#SENSOR_NAME}"}'
-                  name: '{#METRIC}: Low humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.HUMIDITY.MIN.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
+                  name: '{#METRIC}: Low humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"'
+                  event_name: '{#METRIC}: Low humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.HUMIDITY.MIN.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: WARNING
                   dependencies:
                     -
-                      name: '{#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
+                      name: '{#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"'
                       expression: 'min(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}'
                   tags:
                     -
@@ -930,7 +936,8 @@ zabbix_export:
                 -
                   uuid: b0aa8bb4e07e47b5824595b824081d75
                   expression: 'last(/Aranet Cloud/aranet.last_update["{#GATEWAY_ID}", "{#SENSOR_ID}"]) > {$ARANET.LAST_UPDATE.MAX.WARN:"{#SENSOR_NAME}"}'
-                  name: '{#METRIC}: Sensor data "[{#GATEWAY_NAME}] {#SENSOR_NAME}" is not updated (more than {$ARANET.LAST_UPDATE.MAX.WARN:"{#SENSOR_NAME}"})'
+                  name: '{#METRIC}: Sensor data "[{#GATEWAY_NAME}] {#SENSOR_NAME}" is not updated'
+                  event_name: '{#METRIC}: Sensor data "[{#GATEWAY_NAME}] {#SENSOR_NAME}" is not updated (more than {$ARANET.LAST_UPDATE.MAX.WARN:"{#SENSOR_NAME}"})'
                   priority: WARNING
                   tags:
                     -

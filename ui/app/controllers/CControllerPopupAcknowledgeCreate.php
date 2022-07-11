@@ -138,7 +138,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		while ($eventid_groups['readable']) {
 			$data = $this->getAcknowledgeOptions($eventid_groups);
 			/*
-			 * No actions to perform. This can happen only if user has selected action he have no permissions to do
+			 * No actions to perform. This can happen only if user has selected action he has no permissions to do
 			 * for any of selected events. This can happen, when you will perform one action on multiple problems,
 			 * where only some of these problems can perform this action (ex. close problem).
 			 */

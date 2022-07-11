@@ -1,3 +1,4 @@
+//go:build linux && amd64
 // +build linux,amd64
 
 /*
@@ -26,7 +27,7 @@ import (
 	"regexp"
 	"testing"
 
-	"zabbix.com/pkg/std"
+	"git.zabbix.com/ap/plugin-support/std"
 	"zabbix.com/pkg/zbxregexp"
 )
 

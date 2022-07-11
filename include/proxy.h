@@ -20,8 +20,6 @@
 #ifndef ZABBIX_PROXY_H
 #define ZABBIX_PROXY_H
 
-#include "zbxjson.h"
-#include "comms.h"
 #include "dbcache.h"
 
 #define ZBX_PROXYMODE_ACTIVE	0

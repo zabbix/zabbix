@@ -20,8 +20,6 @@
 #ifndef ZABBIX_ZBXEVAL_H
 #define ZABBIX_ZBXEVAL_H
 
-#include "common.h"
-#include "zbxalgo.h"
 #include "zbxvariant.h"
 
 /*
@@ -105,12 +103,12 @@
 
 /* expression parsing rules */
 
-#define	ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION	(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
+#define	ZBX_EVAL_PARSE_TRIGGER_EXPRESSION	(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
 						ZBX_EVAL_PARSE_FUNCTIONID | ZBX_EVAL_PARSE_FUNCTION 	|\
 						ZBX_EVAL_PARSE_MATH | ZBX_EVAL_PARSE_COMPARE 		|\
 						ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_VAR)
 
-#define	ZBX_EVAL_PARSE_CALC_EXPRESSSION		(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
+#define	ZBX_EVAL_PARSE_CALC_EXPRESSION		(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
 						ZBX_EVAL_PARSE_ITEM_QUERY | ZBX_EVAL_PARSE_FUNCTION	|\
 						ZBX_EVAL_PARSE_MATH | ZBX_EVAL_PARSE_COMPARE 		|\
 						ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_VAR 		|\
@@ -138,16 +136,16 @@
 
 /* composite rules */
 
-#define ZBX_EVAL_TRIGGER_EXPRESSION	(ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | \
+#define ZBX_EVAL_TRIGGER_EXPRESSION	(ZBX_EVAL_PARSE_TRIGGER_EXPRESSION | \
 					ZBX_EVAL_PARSE_CONST_INDEX | \
 					ZBX_EVAL_PROCESS_ERROR)
 
-#define ZBX_EVAL_TRIGGER_EXPRESSION_LLD	(ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | \
+#define ZBX_EVAL_TRIGGER_EXPRESSION_LLD	(ZBX_EVAL_PARSE_TRIGGER_EXPRESSION | \
 					ZBX_EVAL_PARSE_LLDMACRO | \
 					ZBX_EVAL_COMPOSE_LLD | \
 					ZBX_EVAL_COMPOSE_FUNCTIONID)
 
-#define ZBX_EVAL_CALC_EXPRESSION_LLD	(ZBX_EVAL_PARSE_CALC_EXPRESSSION | \
+#define ZBX_EVAL_CALC_EXPRESSION_LLD	(ZBX_EVAL_PARSE_CALC_EXPRESSION | \
 					ZBX_EVAL_PARSE_LLDMACRO | \
 					ZBX_EVAL_COMPOSE_LLD)
 
@@ -282,5 +280,5 @@ int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *val
 int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error);
-void	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result);
+int	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result, char **error);
 #endif

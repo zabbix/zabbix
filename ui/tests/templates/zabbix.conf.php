@@ -4,7 +4,7 @@ global $DB;
 
 $DB['TYPE']				= '{DBTYPE}';
 $DB['SERVER']			= '{DBHOST}';
-$DB['PORT']				= '0';
+$DB['PORT']				= '{DBPORT}';
 $DB['DATABASE']			= '{DBNAME}';
 $DB['USER']				= '{DBUSER}';
 $DB['PASSWORD']			= '{DBPASSWORD}';
@@ -36,7 +36,7 @@ if (!defined('PHPUNIT_BASEDIR')) {
 	}
 
 	function formatCallStack() {
-		$calls = debug_backtrace(0);
+		$calls = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
 		// never show the call to this method
 		array_shift($calls);

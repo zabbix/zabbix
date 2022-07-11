@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -118,7 +118,6 @@ $left_column
 			->setChecked($data['age_state'] == 1)
 			->setUncheckedValue(0)
 			->setId('age_state_#{uniqid}'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$filter_age,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		_('days')

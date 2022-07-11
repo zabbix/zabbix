@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
 #include "threads.h"
 #include "comms.h"
 #include "cfg.h"
@@ -1861,6 +1859,9 @@ exit:
 	}
 #endif
 	zabbix_close_log();
+#ifndef _WINDOWS
+	zbx_locks_destroy();
+#endif
 #if defined(_WINDOWS)
 	while (0 == WSACleanup())
 		;

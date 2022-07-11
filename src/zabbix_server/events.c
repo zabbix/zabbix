@@ -17,15 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
-#include "log.h"
-
-#include "actions.h"
 #include "events.h"
+
+#include "log.h"
+#include "actions.h"
 #include "zbxserver.h"
 #include "export.h"
-#include "zbxservice.h"
 #include "service_protocol.h"
 
 /* event recovery data */
@@ -1089,7 +1086,7 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, DB_EV
 			case ZBX_CORR_OPERATION_CLOSE_NEW:
 				/* generate OK event to close the new event */
 
-				/* check if this event was not been closed by another correlation rule */
+				/* check if this event has not been closed by another correlation rule */
 				if (NULL != zbx_hashset_search(&event_recovery, &event->eventid))
 					break;
 
@@ -1216,7 +1213,7 @@ static void	correlate_event_by_global_rules(DB_EVENT *event, zbx_problem_state_t
 			if (ZBX_PROBLEM_STATE_RESOLVED == *problem_state)
 			{
 				/* with no open problems all conditions involving old events will fail       */
-				/* so there are no need to check old events. Instead re-check if correlation */
+				/* so there is no need to check old events. Instead re-check if correlation  */
 				/* still matches the new event and must be processed in new event scope.     */
 				if (CORRELATION_MATCH == correlation_match_new_event(correlation, event, FAIL))
 					zbx_vector_ptr_append(&corr_new, correlation);

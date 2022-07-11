@@ -22,7 +22,7 @@ package main
 import (
 	"fmt"
 
-	"zabbix.com/pkg/plugin/container"
+	"git.zabbix.com/ap/plugin-support/plugin/container"
 )
 
 func main() {

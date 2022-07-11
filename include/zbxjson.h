@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZJSON_H
 #define ZABBIX_ZJSON_H
 
+#include "zbxtypes.h"
+
 #define ZBX_PROTO_TAG_CLOCK			"clock"
 #define ZBX_PROTO_TAG_NS			"ns"
 #define ZBX_PROTO_TAG_DATA			"data"

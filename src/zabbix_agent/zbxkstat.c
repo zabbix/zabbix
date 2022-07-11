@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxkstat.h"
 
 #if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 
-#include "zbxkstat.h"
 #include "mutexs.h"
 #include "log.h"
 #include "stats.h"
@@ -46,12 +45,16 @@ static zbx_mutex_t	kstat_lock = ZBX_MUTEX_NULL;
  ******************************************************************************/
 static int	zbx_kstat_refresh(char **error)
 {
+	int	ret;
 	kid_t	kid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (-1 == (kid = kstat_chain_update(kc)))
 	{
 		*error = zbx_dsprintf(*error, "failed to update kstat chain: %s", zbx_strerror(errno));
-		return FAIL;
+		ret = FAIL;
+		goto out;
 	}
 
 	if (0 != kid)
@@ -60,10 +63,14 @@ static int	zbx_kstat_refresh(char **error)
 	if (NULL == (kc_vminfo = kstat_lookup(kc, "unix", -1, "vminfo")))
 	{
 		*error = zbx_dsprintf(*error, "failed to find vminfo data: %s", zbx_strerror(errno));
-		return FAIL;
+		ret = FAIL;
+		goto out;
 	}
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -81,6 +88,8 @@ int	zbx_kstat_init(zbx_kstat_t *kstat, char **error)
 {
 	char	*errmsg = NULL;
 	int	ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == (kc = kstat_open()))
 	{
@@ -102,20 +111,32 @@ int	zbx_kstat_init(zbx_kstat_t *kstat, char **error)
 out:
 	if (SUCCEED != ret && NULL != kc)
 	{
-		kstat_close(kc);
+		if (-1 == kstat_close(kc))
+			zabbix_log(LOG_LEVEL_DEBUG, "Failed to close kstat");
 		kc = NULL;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
 
 void	zbx_kstat_destroy(void)
 {
-	if (NULL == kc)
-		return;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	kstat_close(kc);
+	if (NULL == kc)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "kc is NULL");
+		goto out;
+	}
+
+	if (-1 == kstat_close(kc))
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to close kstat");
+
 	zbx_mutex_destroy(&kstat_lock);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -131,13 +152,19 @@ void	zbx_kstat_collect(zbx_kstat_t *kstat)
 	char		*error = NULL;
 	vminfo_t	vminfo;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	while (-1 == (kid = kstat_read(kc, kc_vminfo, &vminfo)) || kc_id != kid)
 	{
+		if (-1 == kid)
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot collect kstat data, kstat_read: %s", ZBX_NULL2STR(error));
+
 		if (SUCCEED != zbx_kstat_refresh(&error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot collect kstat data: %s", error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot collect kstat data, kstat_refresh: %s",
+					ZBX_NULL2STR(error));
 			zbx_free(error);
-			return;
+			goto out;
 		}
 	}
 
@@ -145,9 +172,15 @@ void	zbx_kstat_collect(zbx_kstat_t *kstat)
 
 	kstat->vminfo_index ^= 1;
 	kstat->vminfo[kstat->vminfo_index].freemem = vminfo.freemem;
-	kstat->vminfo[kstat->vminfo_index].updates = vminfo.updates;
+	kstat->vminfo[kstat->vminfo_index].updates = time(NULL);
 
 	zbx_mutex_unlock(kstat_lock);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "vm_index: %d, freemem: " ZBX_FS_UI64 ", updates: " ZBX_FS_UI64,
+			(int)kstat->vminfo_index, kstat->vminfo[kstat->vminfo_index].freemem,
+			kstat->vminfo[kstat->vminfo_index].updates);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -165,15 +198,15 @@ void	zbx_kstat_collect(zbx_kstat_t *kstat)
  ******************************************************************************/
 int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)
 {
-	int			ret = FAIL, last, prev;
+	int			sysconf_pagesize, last, prev, ret = FAIL;
 	zbx_kstat_vminfo_t	*vminfo;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): collector:%p", __func__, collector);
+
 	zbx_mutex_lock(kstat_lock);
+
 	if (NULL == collector)
-	{
-		*error = zbx_strdup(*error, "Collector is not started.");
 		goto out;
-	}
 
 	last = collector->kstat.vminfo_index;
 	prev = last ^ 1;
@@ -181,12 +214,34 @@ int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)
 
 	if (0 != vminfo[prev].updates && vminfo[prev].updates < vminfo[last].updates)
 	{
+		if (-1 == (sysconf_pagesize = sysconf(_SC_PAGESIZE)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "sysconf(_SC_PAGESIZE) failed, errno is: %s", zbx_strerror(errno));
+			goto out;
+		}
+
 		*value = (vminfo[last].freemem - vminfo[prev].freemem) /
-				(vminfo[last].updates - vminfo[prev].updates) * sysconf(_SC_PAGESIZE);
+				(vminfo[last].updates - vminfo[prev].updates) * sysconf_pagesize;
 		ret = SUCCEED;
 	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "no new vminfo update is available");
 out:
 	zbx_mutex_unlock(kstat_lock);
+
+	if (NULL == collector)
+	{
+		*error = zbx_strdup(*error, "Collector is not started.");
+		zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started");
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "last: %d, prev: %d, vminfo[prev].updates: " ZBX_FS_UI64
+				", vminfo[last].updates: " ZBX_FS_UI64, last, prev, vminfo[prev].updates,
+				vminfo[last].updates);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }

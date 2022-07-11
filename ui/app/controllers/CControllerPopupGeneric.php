@@ -380,7 +380,7 @@ class CControllerPopupGeneric extends CController {
 			],
 			'sla' => [
 				'title' => _('SLA'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'slaid,name',
 				'form' => [
 					'name' => 'slaform',
@@ -902,7 +902,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'items':
 				foreach ($records as $itemid => $row) {
-					$records[$row['name']] = ['itemid' => $row['name']] + $row;
+					$records[$row['name']] = ['pattern' => $row['name']] + $row;
 					unset($records[$itemid]);
 				}
 				break;
@@ -1183,11 +1183,13 @@ class CControllerPopupGeneric extends CController {
 			case 'graph_prototypes':
 				$options += [
 					'output' => API_OUTPUT_EXTEND,
-					'selectHosts' => ['name'],
+					'selectHosts' => ['hostid', 'name'],
 					'hostids' => $this->hostids ? $this->hostids : null
 				];
 
 				if ($this->source_table === 'graph_prototypes') {
+					$options['selectDiscoveryRule'] = ['hostid'];
+
 					$records = (!$this->host_preselect_required || $this->hostids)
 						? API::GraphPrototype()->get($options)
 						: [];

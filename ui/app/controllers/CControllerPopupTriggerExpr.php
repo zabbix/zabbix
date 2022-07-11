@@ -713,6 +713,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'length' => [
 				'types' => [ZBX_FUNCTION_TYPE_STRING],
 				'description' => _('length() - Length of last (most recent) T value in characters'),
+				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
@@ -1526,7 +1527,7 @@ class CControllerPopupTriggerExpr extends CController {
 					$last_functions = [
 						'abs', 'acos', 'ascii', 'asin', 'atan', 'atan2', 'between', 'bitand', 'bitlength', 'bitlshift',
 						'bitnot', 'bitor', 'bitrshift', 'bitxor', 'bytelength', 'cbrt', 'ceil', 'char', 'concat', 'cos',
-						'cosh', 'cot', 'degrees', 'exp', 'expm1', 'floor', 'in', 'insert', 'left', 'log', 'log10',
+						'cosh', 'cot', 'degrees', 'exp', 'expm1', 'floor', 'in', 'insert', 'left', 'length', 'log', 'log10',
 						'ltrim', 'mid', 'mod', 'power', 'radians', 'repeat', 'replace', 'right', 'round', 'signum',
 						'sin', 'sinh', 'sqrt', 'tan', 'trim', 'truncate'
 					];
@@ -1601,7 +1602,7 @@ class CControllerPopupTriggerExpr extends CController {
 			$this->setResponse(new CControllerResponseData(
 				$data + [
 					'title' => _('Condition'),
-					'errors' => hasErrorMesssages() ? getMessages() : null,
+					'errors' => hasErrorMessages() ? getMessages() : null,
 					'user' => [
 						'debug_mode' => $this->getDebugMode()
 					]

@@ -105,7 +105,7 @@ class CControllerPopupTopHostsColumnEdit extends CController {
 			$this->setResponse(new CControllerResponseData([
 				'action'			=> $this->getAction(),
 				'thresholds_colors'	=> CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
-				'errors' 			=> hasErrorMesssages() ? getMessages() : null,
+				'errors' 			=> hasErrorMessages() ? getMessages() : null,
 				'user' 				=> [
 					'debug_mode' => $this->getDebugMode()
 				]

@@ -99,7 +99,8 @@ class CPage {
 			$options->addArguments([
 				'--no-sandbox',
 				'--enable-font-antialiasing=false',
-				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT
+				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT,
+				'--disable-dev-shm-usage'
 			]);
 
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);

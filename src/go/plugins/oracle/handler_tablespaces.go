@@ -23,7 +23,7 @@ import (
 	"context"
 	"strings"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]string,

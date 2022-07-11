@@ -70,10 +70,13 @@ typedef struct
 }
 zbx_addr_t;
 
+typedef struct
+{
+	int	(*cfg_custom_parameter_parser_func)(const char *value, const struct cfg_line *cfg);
+}	cfg_custom_parameter_parser_t;
+
 void	zbx_addr_copy(zbx_vector_ptr_t *addr_to, const zbx_vector_ptr_t *addr_from);
 void	zbx_addr_free(zbx_addr_t *addr);
-
-typedef int	(*cfg_custom_parameter_parser_t)(const char *value, struct cfg_line *cfg);
 
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit);
 

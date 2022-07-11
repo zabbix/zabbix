@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:42:41Z'
+  date: '2022-04-06T19:27:00Z'
   groups:
     -
       uuid: 1d12408342854fd5a4436dd6d5d1bd4a
@@ -473,7 +473,8 @@ zabbix_export:
             -
               uuid: 0ae0a5b6123a42dd9722219e5e5839df
               expression: 'min(/Asterisk by HTTP/asterisk.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}'
-              name: 'Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m)'
+              name: 'Asterisk: Total number of active channels of IAX trunks is too high'
+              event_name: 'Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m)'
               priority: WARNING
               description: 'The IAX trunks may not be able to process new calls.'
               tags:
@@ -579,7 +580,8 @@ zabbix_export:
             -
               uuid: 9b158fe0efb4416cb6ad5d53b38c3e38
               expression: 'min(/Asterisk by HTTP/asterisk.pjsip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}'
-              name: 'Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m)'
+              name: 'Asterisk: Total number of active channels of PJSIP trunks is too high'
+              event_name: 'Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m)'
               priority: WARNING
               description: 'The PJSIP trunks may not be able to process new calls.'
               tags:
@@ -666,7 +668,8 @@ zabbix_export:
             -
               uuid: d2fde5d26d284a129346a12ba0949b60
               expression: 'min(/Asterisk by HTTP/asterisk.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}'
-              name: 'Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m)'
+              name: 'Asterisk: Total number of active channels of SIP trunks is too high'
+              event_name: 'Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m)'
               priority: WARNING
               description: 'The SIP trunks may not be able to process new calls.'
               tags:
@@ -812,7 +815,8 @@ zabbix_export:
             -
               uuid: 35ca01e504a548db9d4db8be1390d6b9
               expression: 'nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1'
-              name: 'Asterisk: Failed to fetch AMI page (or no data for 30m)'
+              name: 'Asterisk: Failed to fetch AMI page'
+              event_name: 'Asterisk: Failed to fetch AMI page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -827,7 +831,8 @@ zabbix_export:
             -
               uuid: 100d38b62c1d4ce298a9fadfbab19e4c
               expression: 'last(/Asterisk by HTTP/asterisk.uptime)<10m'
-              name: 'Asterisk: has been restarted (uptime < 10m)'
+              name: 'Asterisk: has been restarted'
+              event_name: 'Asterisk: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -860,7 +865,8 @@ zabbix_export:
             -
               uuid: 4e99b65188264ba1aa80e24662f9b3cd
               expression: 'last(/Asterisk by HTTP/asterisk.uptime_reload)<10m'
-              name: 'Asterisk: has been reloaded (uptime < 10m)'
+              name: 'Asterisk: has been reloaded'
+              event_name: 'Asterisk: has been reloaded (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -893,7 +899,8 @@ zabbix_export:
             -
               uuid: f1a260626ae6446d89e1e725e14c1098
               expression: 'last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0'
-              name: 'Asterisk: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Asterisk: Version has changed'
+              event_name: 'Asterisk: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Asterisk version has changed. Ack to close.'
               manual_close: 'YES'
@@ -918,7 +925,8 @@ zabbix_export:
             -
               uuid: dbc74502be01498194003dc1a3d90014
               expression: 'min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}'
-              name: 'Asterisk: Service response time is too high (over {$AMI.RESPONSE_TIME.MAX.WARN} for 5m)'
+              name: 'Asterisk: Service response time is too high'
+              event_name: 'Asterisk: Service response time is too high (over {$AMI.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
@@ -995,7 +1003,8 @@ zabbix_export:
                 -
                   uuid: e2a6c7a9b6234e2aae20c9aa480f9ef1
                   expression: 'min(/Asterisk by HTTP/asterisk.iax.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
-                  name: 'IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
+                  name: 'IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high'
+                  event_name: 'IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The IAX trunk may not be able to process new calls.'
                   tags:
@@ -1094,7 +1103,8 @@ zabbix_export:
                 -
                   uuid: f192d555011c42c28c6a8f52c0388fe1
                   expression: 'min(/Asterisk by HTTP/asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
-                  name: 'PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
+                  name: 'PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high'
+                  event_name: 'PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The PJSIP trunk may not be able to process new calls.'
                   tags:
@@ -1214,7 +1224,8 @@ zabbix_export:
                 -
                   uuid: 4f72c6a755be465287f36b8b12d3175b
                   expression: 'min(/Asterisk by HTTP/asterisk.queue.callers[{#QUEUE}],10m)>{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}'
-                  name: '"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m)'
+                  name: '"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high'
+                  event_name: '"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m)'
                   priority: WARNING
                   description: 'There is a large number of calls in the queue.'
                   tags:
@@ -1291,7 +1302,8 @@ zabbix_export:
                 -
                   uuid: 51820b1326f84f51ba0e561946275133
                   expression: 'min(/Asterisk by HTTP/asterisk.sip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
-                  name: 'SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
+                  name: 'SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high'
+                  event_name: 'SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The SIP trunk may not be able to process new calls.'
                   tags:

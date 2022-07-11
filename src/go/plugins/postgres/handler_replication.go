@@ -25,8 +25,8 @@ import (
 	"errors"
 	"strconv"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/jackc/pgx/v4"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // replicationHandler gets info about recovery state if all is OK or nil otherwise.

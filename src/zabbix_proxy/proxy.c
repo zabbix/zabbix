@@ -17,26 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "proxy.h"
 
 #include "cfg.h"
-#include "pid.h"
 #include "db.h"
-#include "dbcache.h"
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
-#include "proxy.h"
 
 #include "sysinfo.h"
 #include "zbxmodules.h"
-#include "zbxserver.h"
 
 #include "zbxnix.h"
 #include "daemon.h"
 #include "zbxself.h"
-#include "../libs/zbxnix/control.h"
 
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
 #include "../zabbix_server/discoverer/discoverer.h"
@@ -55,12 +50,10 @@
 #include "../zabbix_server/vmware/vmware.h"
 #include "setproctitle.h"
 #include "zbxcrypto.h"
-#include "zbxipcservice.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
 #include "../zabbix_server/availability/avail_manager.h"
 #include "zbxvault.h"
-#include "zbxdiag.h"
 #include "sighandler.h"
 #include "zbxrtc.h"
 
@@ -1047,34 +1040,10 @@ static void	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
 
-	DBextract_version_info(&db_version_info);
-
-	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag)
+	if (FAIL == zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS))
 	{
-		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
-		{
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix proxy due to unsupported %s database server"
-					" version (%s)", db_version_info.database,
-					db_version_info.friendly_current_version);
-			zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s)",
-					db_version_info.friendly_min_supported_version);
-			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
-			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
-					" in Zabbix proxy configuration file at your own risk.");
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			exit(EXIT_FAILURE);
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database server version (%s)",
-					db_version_info.database, db_version_info.friendly_current_version);
-			zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s)",
-					db_version_info.friendly_min_supported_version);
-			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
-			zabbix_log(LOG_LEVEL_ERR, " ");
-		}
+		zbx_free(db_version_info.friendly_current_version);
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_free(db_version_info.friendly_current_version);
@@ -1267,12 +1236,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	DBcheck_character_set();
 	zbx_check_db();
 
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
-
-	DBcheck_character_set();
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS

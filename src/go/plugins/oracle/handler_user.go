@@ -23,7 +23,7 @@ import (
 	"context"
 	"database/sql"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 func userHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {

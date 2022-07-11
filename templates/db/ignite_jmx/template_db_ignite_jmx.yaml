@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:39:15Z'
+  date: '2022-04-06T19:27:42Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -316,7 +316,8 @@ zabbix_export:
             -
               uuid: 480b7cc1a967436b8620f9552f8ac4f6
               expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
-              name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
+              name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high'
+              event_name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.'
               tags:
@@ -326,12 +327,13 @@ zabbix_export:
             -
               uuid: 67eddf17affd49b7844cd0846bc56f7d
               expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$IGNITE.CHECKPOINT.PUSED.MAX.WARN}'
-              name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.WARN} in 5m)'
+              name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high'
+              event_name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.'
               dependencies:
                 -
-                  name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
+                  name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high'
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
               tags:
                 -
@@ -340,7 +342,8 @@ zabbix_export:
             -
               uuid: 736fbc965aa448309d022de34354decf
               expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
-              name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+              name: 'Data region {#JMXNAME}: Data region utilization is too high'
+              event_name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Data region utilization is high. Increase data region size or delete any data.'
               tags:
@@ -350,12 +353,13 @@ zabbix_export:
             -
               uuid: 6ded19e7616b45f08e37e716d8256c5e
               expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.WARN}'
-              name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m)'
+              name: 'Data region {#JMXNAME}: Data region utilization is too high'
+              event_name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Data region utilization is high. Increase data region size or delete any data.'
               dependencies:
                 -
-                  name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+                  name: 'Data region {#JMXNAME}: Data region utilization is too high'
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
               tags:
                 -
@@ -480,7 +484,8 @@ zabbix_export:
                 -
                   uuid: 81587d91606348a6b5385d4b59331adf
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.HIGH}'
-                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long'
+                  event_name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
                   priority: HIGH
                   description: 'PME duration is over {$IGNITE.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.'
                   tags:
@@ -490,12 +495,13 @@ zabbix_export:
                 -
                   uuid: 0de7ca62c7044e48a8931cf0dfe8ce34
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.WARN}'
-                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.WARN} for 5 min)'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long'
+                  event_name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.WARN} for 5 min)'
                   priority: WARNING
                   description: 'PME duration is over {$IGNITE.PME.DURATION.MAX.WARN}ms.'
                   dependencies:
                     -
-                      name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
+                      name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long'
                       expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.HIGH}'
                   tags:
                     -
@@ -539,12 +545,13 @@ zabbix_export:
                 -
                   uuid: 8c4ddb0485464c409077f86241956a56
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentThreadCount],15m) > {$IGNITE.THREADS.COUNT.MAX.WARN}'
-                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high (over {$IGNITE.THREADS.COUNT.MAX.WARN} for 15 min)'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high'
+                  event_name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high (over {$IGNITE.THREADS.COUNT.MAX.WARN} for 15 min)'
                   priority: WARNING
                   description: 'Number of running threads is over {$IGNITE.THREADS.COUNT.MAX.WARN}.'
                   dependencies:
                     -
-                      name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
+                      name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long'
                       expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$IGNITE.PME.DURATION.MAX.HIGH}'
                   tags:
                     -
@@ -571,7 +578,8 @@ zabbix_export:
                 -
                   uuid: a723fdecd1b34609b92bb351b1b44a46
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",CurrentWaitingJobs],15m) > {$IGNITE.JOBS.QUEUE.MAX.WARN}'
-                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high (over {$IGNITE.JOBS.QUEUE.MAX.WARN} for 15 min)'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high'
+                  event_name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high (over {$IGNITE.JOBS.QUEUE.MAX.WARN} for 15 min)'
                   priority: WARNING
                   description: 'Number of queued jobs is over {$IGNITE.JOBS.QUEUE.MAX.WARN}.'
                   tags:
@@ -953,7 +961,8 @@ zabbix_export:
                 -
                   uuid: 08a1f4bd227e4f96b501a4681bf9fc8f
                   expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion]))>0'
-                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed'
+                  event_name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
                   manual_close: 'YES'
@@ -1012,7 +1021,8 @@ zabbix_export:
                 -
                   uuid: d90f8b10d32240d882317bf9fb628eae
                   expression: 'nodata(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1'
-                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data (or no data for 10m)'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data'
+                  event_name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data (or no data for 10m)'
                   priority: WARNING
                   description: 'Zabbix has not received data for items for the last 10 minutes.'
                   manual_close: 'YES'
@@ -1023,7 +1033,8 @@ zabbix_export:
                 -
                   uuid: f3415dd32a3b450f80b29b83bd54fdef
                   expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime])<10m'
-                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime < 10m)'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: has been restarted'
+                  event_name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
@@ -1193,6 +1204,7 @@ zabbix_export:
                   uuid: 82e24abcc7874382a2af0018a4a001e1
                   expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator]))>0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed'
+                  event_name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
                   manual_close: 'YES'
@@ -1589,6 +1601,7 @@ zabbix_export:
                   uuid: b500b51a688d4b55942ce7311e82c54f
                   expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches]))>0'
                   name: 'Cache group [{#JMXNAME}]: List of caches has changed'
+                  event_name: 'Cache group [{#JMXNAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: 'List of caches has changed. Significant changes have occurred in the cluster. Ack to close.'
                   manual_close: 'YES'
@@ -1926,7 +1939,8 @@ zabbix_export:
                 -
                   uuid: 1d29e40969d54e9090724c8a774eaf4d
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",QueueSize],5m) > {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}'
-                  name: 'Thread pool [{#JMXNAME}]: Too many messages in queue (over {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"} for 5 min)'
+                  name: 'Thread pool [{#JMXNAME}]: Too many messages in queue'
+                  event_name: 'Thread pool [{#JMXNAME}]: Too many messages in queue (over {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"} for 5 min)'
                   priority: AVERAGE
                   description: 'Number of messages in queue more than {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}.'
                   tags:

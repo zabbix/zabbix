@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-31T15:01:10Z'
+  date: '2022-04-06T19:33:21Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -83,12 +83,13 @@ zabbix_export:
             -
               uuid: 0f984c4458ae4a7f9388b1edb42090bf
               expression: 'min(/MySQL by Zabbix agent 2/mysql.aborted_connects.rate,5m)>{$MYSQL.ABORTED_CONN.MAX.WARN}'
-              name: 'MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)'
+              name: 'MySQL: Server has aborted connections'
+              event_name: 'MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)'
               priority: AVERAGE
               description: 'The number of failed attempts to connect to the MySQL server is more than {$MYSQL.ABORTED_CONN.MAX.WARN} in the last 5 minutes.'
               dependencies:
                 -
-                  name: 'MySQL: Refused connections (max_connections limit reached)'
+                  name: 'MySQL: Refused connections'
                   expression: 'last(/MySQL by Zabbix agent 2/mysql.connection_errors_max_connections.rate)>0'
               tags:
                 -
@@ -159,7 +160,8 @@ zabbix_export:
             -
               uuid: d785a37fe8d7484d9998e47e0e1d741f
               expression: 'max(/MySQL by Zabbix agent 2/mysql.buffer_pool_utilization,5m)<{$MYSQL.BUFF_UTIL.MIN.WARN}'
-              name: 'MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
+              name: 'MySQL: Buffer pool utilization is too low'
+              event_name: 'MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
               priority: WARNING
               description: 'The buffer pool utilization is less than {$MYSQL.BUFF_UTIL.MIN.WARN}% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
               tags:
@@ -412,7 +414,8 @@ zabbix_export:
             -
               uuid: 15cd0177e955459ba0862425755583a0
               expression: 'last(/MySQL by Zabbix agent 2/mysql.connection_errors_max_connections.rate)>0'
-              name: 'MySQL: Refused connections (max_connections limit reached)'
+              name: 'MySQL: Refused connections'
+              event_name: 'MySQL: Refused connections (max_connections limit reached)'
               priority: AVERAGE
               description: 'Number of refused connections due to the max_connections limit being reached.'
               tags:
@@ -522,7 +525,8 @@ zabbix_export:
             -
               uuid: 8c4e0c429c8241e28b930bfce7e29be8
               expression: 'min(/MySQL by Zabbix agent 2/mysql.created_tmp_disk_tables.rate,5m)>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}'
-              name: 'MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)'
+              name: 'MySQL: Number of on-disk temporary tables created per second is high'
+              event_name: 'MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'Possibly the application using the database is in need of query optimization.'
               tags:
@@ -557,7 +561,8 @@ zabbix_export:
             -
               uuid: 322b61acd92e46f787e96486d2553886
               expression: 'min(/MySQL by Zabbix agent 2/mysql.created_tmp_files.rate,5m)>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}'
-              name: 'MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)'
+              name: 'MySQL: Number of temporary files created per second is high'
+              event_name: 'MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'Possibly the application using the database is in need of query optimization.'
               tags:
@@ -595,7 +600,8 @@ zabbix_export:
             -
               uuid: 86ed19d4ddc84f0da4a77c1dcbdf8c60
               expression: 'min(/MySQL by Zabbix agent 2/mysql.created_tmp_tables.rate,5m)>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
-              name: 'MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)'
+              name: 'MySQL: Number of internal temporary tables created per second is high'
+              event_name: 'MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'Possibly the application using the database is in need of query optimization.'
               tags:
@@ -1119,7 +1125,8 @@ zabbix_export:
             -
               uuid: 8ffcb17b0a644c5e8a2842b34d5713a8
               expression: 'min(/MySQL by Zabbix agent 2/mysql.slow_queries.rate,5m)>{$MYSQL.SLOW_QUERIES.MAX.WARN}'
-              name: 'MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)'
+              name: 'MySQL: Server has slow queries'
+              event_name: 'MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The number of slow queries is more than {$MYSQL.SLOW_QUERIES.MAX.WARN} in the last 5 minutes.'
               tags:
@@ -1231,7 +1238,8 @@ zabbix_export:
             -
               uuid: 6f4edf8bfca0477b8b28a8ff811476b3
               expression: 'nodata(/MySQL by Zabbix agent 2/mysql.uptime,30m)=1'
-              name: 'MySQL: Failed to fetch info data (or no data for 30m)'
+              name: 'MySQL: Failed to fetch info data'
+              event_name: 'MySQL: Failed to fetch info data (or no data for 30m)'
               priority: INFO
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               dependencies:
@@ -1245,7 +1253,8 @@ zabbix_export:
             -
               uuid: db5159889cb94f27840e6f4974ee5c0e
               expression: 'last(/MySQL by Zabbix agent 2/mysql.uptime)<10m'
-              name: 'MySQL: Service has been restarted (uptime < 10m)'
+              name: 'MySQL: Service has been restarted'
+              event_name: 'MySQL: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'MySQL uptime is less than 10 minutes.'
               tags:
@@ -1273,7 +1282,8 @@ zabbix_export:
             -
               uuid: e22c2e2213d74df98d344a95c8a96b6d
               expression: 'last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"],#1)<>last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"],#2) and length(last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]))>0'
-              name: 'MySQL: Version has changed (new version value received: {ITEM.VALUE})'
+              name: 'MySQL: Version has changed'
+              event_name: 'MySQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'MySQL version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1507,7 +1517,8 @@ zabbix_export:
                 -
                   uuid: 373e215000a64e05b0379f186141067f
                   expression: 'min(/MySQL by Zabbix agent 2/mysql.replication.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}'
-                  name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
+                  name: 'MySQL: Replication lag is too high'
+                  event_name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
                   priority: WARNING
                   tags:
                     -

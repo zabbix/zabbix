@@ -25,7 +25,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"zabbix.com/pkg/log"
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/pkg/win32"
 
 	"golang.org/x/sys/windows"

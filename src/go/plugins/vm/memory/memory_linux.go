@@ -22,8 +22,8 @@ package memory
 import (
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/procfs"
-	"zabbix.com/pkg/zbxerr"
 )
 
 func (p *Plugin) exportVMMemorySize(mode string) (result interface{}, err error) {

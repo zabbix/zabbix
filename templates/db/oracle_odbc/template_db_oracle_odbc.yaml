@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T09:45:15Z'
+  date: '2022-04-06T19:33:30Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -807,7 +807,8 @@ zabbix_export:
             -
               uuid: 618a3e3c82dc4ccba82477afdd100a98
               expression: 'last(/Oracle by ODBC/oracle.instance_hostname,#1)<>last(/Oracle by ODBC/oracle.instance_hostname,#2) and length(last(/Oracle by ODBC/oracle.instance_hostname))>0'
-              name: 'Oracle: Instance hostname has changed (new hostname received: {ITEM.VALUE})'
+              name: 'Oracle: Instance hostname has changed'
+              event_name: 'Oracle: Instance hostname has changed (new hostname received: {ITEM.VALUE})'
               priority: INFO
               description: 'Oracle DB Instance hostname has changed. Ack to close.'
               manual_close: 'YES'
@@ -840,7 +841,8 @@ zabbix_export:
             -
               uuid: 2fe53d1d931e4eb38fef10a3171c1665
               expression: 'last(/Oracle by ODBC/oracle.instance_name,#1)<>last(/Oracle by ODBC/oracle.instance_name,#2) and length(last(/Oracle by ODBC/oracle.instance_name))>0'
-              name: 'Oracle: Instance name has changed (new name received: {ITEM.VALUE})'
+              name: 'Oracle: Instance name has changed'
+              event_name: 'Oracle: Instance name has changed (new name received: {ITEM.VALUE})'
               priority: INFO
               description: 'Oracle DB Instance name has changed. Ack to close.'
               manual_close: 'YES'
@@ -1143,7 +1145,8 @@ zabbix_export:
             -
               uuid: 1348b1e854e64d34b6b00be118f045c3
               expression: 'max(/Oracle by ODBC/oracle.redo_logs_available,5m) < {$ORACLE.REDO.MIN.WARN}'
-              name: 'Oracle: Number of REDO logs available for switching is too low (less {$ORACLE.REDO.MIN.WARN} for 5 min)'
+              name: 'Oracle: Number of REDO logs available for switching is too low'
+              event_name: 'Oracle: Number of REDO logs available for switching is too low (less {$ORACLE.REDO.MIN.WARN} for 5 min)'
               priority: WARNING
               description: 'Number of available for log switching inactive/unused REDOs is low (Database down risk)'
               tags:
@@ -1264,7 +1267,8 @@ zabbix_export:
             -
               uuid: 7099e4a160c1446395b9e5b721db7b38
               expression: 'min(/Oracle by ODBC/oracle.session_concurrency_rate,5m) > {$ORACLE.CONCURRENCY.MAX.WARN}'
-              name: 'Oracle: Too high database concurrency (over {$ORACLE.CONCURRENCY.MAX.WARN}% for 5 min)'
+              name: 'Oracle: Too high database concurrency'
+              event_name: 'Oracle: Too high database concurrency (over {$ORACLE.CONCURRENCY.MAX.WARN}% for 5 min)'
               priority: WARNING
               description: 'Concurrency rate is over {$ORACLE.CONCURRENCY.MAX.WARN}%. A high contention value does not indicate the root cause of the problem, but is a signal to search for it. In the case of high competition, an analysis of resource consumption should be carried out, the most "heavy" queries made in the database, possibly - session tracing. All this will help determine the root cause and possible optimization points both in the database configuration and in the logic of building queries of the application itself.'
               tags:
@@ -1357,7 +1361,8 @@ zabbix_export:
             -
               uuid: 9a75f3a039094ca89c2ba7e3fa93b1a8
               expression: 'min(/Oracle by ODBC/oracle.session_lock_rate,5m) > {$ORACLE.SESSIONS.LOCK.MAX.WARN}'
-              name: 'Oracle: Too many locked sessions (over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% for 5 min)'
+              name: 'Oracle: Too many locked sessions'
+              event_name: 'Oracle: Too many locked sessions (over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% for 5 min)'
               priority: WARNING
               description: 'Number of locked sessions is over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.'
               tags:
@@ -1388,7 +1393,8 @@ zabbix_export:
             -
               uuid: a8f5ec966f5e4c72baad1380eda4d0a2
               expression: 'min(/Oracle by ODBC/oracle.session_long_time_locked,5m) > {$ORACLE.SESSION.LONG.LOCK.MAX.WARN}'
-              name: 'Oracle: Too many sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s (over {$ORACLE.SESSION.LONG.LOCK.MAX.WARN} for 5 min)'
+              name: 'Oracle: Too many sessions locked'
+              event_name: 'Oracle: Too many sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s (over {$ORACLE.SESSION.LONG.LOCK.MAX.WARN} for 5 min)'
               priority: WARNING
               description: 'Number of sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME} seconds is too high. Long-term locks can negatively affect database performance, therefore, if they are detected, you should first find the most difficult queries from the database point of view and analyze possible resource leaks.'
               tags:
@@ -1570,7 +1576,8 @@ zabbix_export:
             -
               uuid: 8facfa98bcd3447ea53d0a3d09ada933
               expression: 'max(/Oracle by ODBC/oracle.shared_pool_free,5m)<{$ORACLE.SHARED.FREE.MIN.WARN}'
-              name: 'Oracle: Shared pool free is too low (less {$ORACLE.SHARED.FREE.MIN.WARN}% for 5m)'
+              name: 'Oracle: Shared pool free is too low'
+              event_name: 'Oracle: Shared pool free is too low (less {$ORACLE.SHARED.FREE.MIN.WARN}% for 5m)'
               priority: WARNING
               description: 'The shared pool free memory percent has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% in the last 5 minutes.'
               tags:
@@ -1712,7 +1719,8 @@ zabbix_export:
             -
               uuid: 03a4fb1d6e684c9b82c1317699c71468
               expression: 'nodata(/Oracle by ODBC/oracle.uptime,5m)=1'
-              name: 'Oracle: Failed to fetch info data (or no data for 5m)'
+              name: 'Oracle: Failed to fetch info data'
+              event_name: 'Oracle: Failed to fetch info data (or no data for 5m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 5 minutes. The database might be unavailable for connecting.'
               dependencies:
@@ -1726,7 +1734,8 @@ zabbix_export:
             -
               uuid: 431201a1ce0d47948751c7e4e6bbeb92
               expression: 'last(/Oracle by ODBC/oracle.uptime)<10m'
-              name: 'Oracle: has been restarted (uptime < 10m)'
+              name: 'Oracle: has been restarted'
+              event_name: 'Oracle: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1759,7 +1768,8 @@ zabbix_export:
             -
               uuid: a909d8cccacf4470a3e2da88b4e5c3d5
               expression: 'last(/Oracle by ODBC/oracle.user_expire_password)  < {$ORACLE.EXPIRE.PASSWORD.MIN.WARN}'
-              name: 'Oracle: Zabbix account will expire soon (under {$ORACLE.EXPIRE.PASSWORD.MIN.WARN} days)'
+              name: 'Oracle: Zabbix account will expire soon'
+              event_name: 'Oracle: Zabbix account will expire soon (under {$ORACLE.EXPIRE.PASSWORD.MIN.WARN} days)'
               priority: WARNING
               description: 'Password for zabbix user in the database will expire soon.'
               tags:
@@ -1816,7 +1826,8 @@ zabbix_export:
             -
               uuid: a5dd4fe627c44afebdfe7beeefc4ec3d
               expression: 'last(/Oracle by ODBC/oracle.version,#1)<>last(/Oracle by ODBC/oracle.version,#2) and length(last(/Oracle by ODBC/oracle.version))>0'
-              name: 'Oracle: Version has changed (new version value received: {ITEM.VALUE})'
+              name: 'Oracle: Version has changed'
+              event_name: 'Oracle: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'Oracle DB version has changed. Ack to close.'
               manual_close: 'YES'
@@ -2038,7 +2049,8 @@ zabbix_export:
                 -
                   uuid: 756a8b4b04bc4aadab6b4b4cc856ad32
                   expression: 'min(/Oracle by ODBC/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
-                  name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
+                  name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
+                  event_name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
                   priority: HIGH
                   description: 'Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}'
                   tags:
@@ -2048,12 +2060,13 @@ zabbix_export:
                 -
                   uuid: d65971e0f3994dfcbcbde145c9866678
                   expression: 'min(/Oracle by ODBC/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.WARN}'
-                  name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)'
+                  name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
+                  event_name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)'
                   priority: WARNING
                   description: 'Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}'
                   dependencies:
                     -
-                      name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
+                      name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
                       expression: 'min(/Oracle by ODBC/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
                   tags:
                     -
@@ -2195,7 +2208,8 @@ zabbix_export:
                 -
                   uuid: 9bf80a9372ef4b3898fd5a4f0c3cec7c
                   expression: 'last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#2)'
-                  name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
+                  name: 'Oracle Database ''{#DBNAME}'': Open status has changed'
+                  event_name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle DB open status has changed. Ack to close.'
                   manual_close: 'YES'
@@ -2252,7 +2266,8 @@ zabbix_export:
                 -
                   uuid: fb5ccc917a8344d7945b8867a1982d6b
                   expression: 'last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#2)'
-                  name: 'Oracle Database ''{#DBNAME}'': Role has changed (new value received: {ITEM.VALUE})'
+                  name: 'Oracle Database ''{#DBNAME}'': Role has changed'
+                  event_name: 'Oracle Database ''{#DBNAME}'': Role has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle DB role has changed. Ack to close.'
                   manual_close: 'YES'
@@ -2329,7 +2344,8 @@ zabbix_export:
                 -
                   uuid: 3dbb9379f8024924b197037acfbbdac4
                   expression: 'last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#2)'
-                  name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
+                  name: 'Oracle Database ''{#DBNAME}'': Open status has changed'
+                  event_name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle DB open status has changed. Ack to close.'
                   manual_close: 'YES'
@@ -2492,7 +2508,8 @@ zabbix_export:
                 -
                   uuid: 05c2af5a765842a1a70f2f67355db1b3
                   expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#2)'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace status has changed (new value received: {ITEM.VALUE})'
+                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace status has changed'
+                  event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle tablespace status has changed. Ack to close.'
                   manual_close: 'YES'
@@ -2561,7 +2578,8 @@ zabbix_export:
                 -
                   uuid: 78c293ae7ded42b0b05d50af99762017
                   expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
+                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high'
+                  event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
                   tags:
                     -
@@ -2570,11 +2588,12 @@ zabbix_export:
                 -
                   uuid: e6f2cb4ade52464b97f5e0f5e05ab61b
                   expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
+                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high'
+                  event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
+                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high'
                       expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
                   tags:
                     -
@@ -2611,11 +2630,12 @@ zabbix_export:
                 -
                   uuid: 9469e51bd69e4baba82de4fd4e5eb14c
                   expression: 'min(/Oracle by ODBC/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
+                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
+                  event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
+                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
                       expression: 'min(/Oracle by ODBC/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
                   tags:
                     -
@@ -2624,7 +2644,8 @@ zabbix_export:
                 -
                   uuid: a8aa7255866d4a5ba71d2f89a1d234fe
                   expression: 'min(/Oracle by ODBC/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
+                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
+                  event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
                   tags:
                     -
@@ -2933,7 +2954,8 @@ zabbix_export:
     -
       uuid: 38471058988c46f4b81af9f77637914a
       expression: 'min(/Oracle by ODBC/oracle.processes_count,5m) * 100 / last(/Oracle by ODBC/oracle.processes_limit) > {$ORACLE.PROCESSES.MAX.WARN}'
-      name: 'Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min)'
+      name: 'Oracle: Too many active processes'
+      event_name: 'Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Active processes are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available number of processes.'
       tags:
@@ -2943,7 +2965,8 @@ zabbix_export:
     -
       uuid: 4a055da31f09489ea0f03e4582ee4333
       expression: 'min(/Oracle by ODBC/oracle.session_count,5m) * 100 / last(/Oracle by ODBC/oracle.session_limit) > {$ORACLE.SESSIONS.MAX.WARN}'
-      name: 'Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min)'
+      name: 'Oracle: Too many active sessions'
+      event_name: 'Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions.'
       tags:
@@ -2953,7 +2976,8 @@ zabbix_export:
     -
       uuid: 5752d92063f84aaa818bc85b135cd4fd
       expression: 'min(/Oracle by ODBC/oracle.db_files_count,5m) * 100 / last(/Oracle by ODBC/oracle.db_files_limit) > {$ORACLE.DB.FILE.MAX.WARN}'
-      name: 'Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)'
+      name: 'Oracle: Too many database files'
+      event_name: 'Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafile files limit.'
       tags:
@@ -2963,7 +2987,8 @@ zabbix_export:
     -
       uuid: 476001f0f52a45f59942d73c643371c1
       expression: 'min(/Oracle by ODBC/oracle.total_pga_used,5m) * 100 / last(/Oracle by ODBC/oracle.pga_target) > {$ORACLE.PGA.USE.MAX.WARN}'
-      name: 'Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)'
+      name: 'Oracle: Total PGA inuse is too high'
+      event_name: 'Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.'
       tags:

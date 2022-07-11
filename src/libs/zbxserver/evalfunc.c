@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
+#include "evalfunc.h"
+
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
@@ -28,7 +28,6 @@
 #include "anomalystl.h"
 
 #include "evalfunc_common.h"
-#include "evalfunc.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
@@ -602,7 +601,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check is function to be evaluated for NOTSUPPORTED items          *
+ * Purpose: check if function is to be evaluated for NOTSUPPORTED items       *
  *                                                                            *
  * Parameters: fn - [IN] function name                                        *
  *                                                                            *
@@ -3720,7 +3719,8 @@ out:
 int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function, const char *parameter,
 		const zbx_timespec_t *ts, char **error)
 {
-	int	ret;
+	int		ret;
+	const char	*ptr;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s(/%s/%s,%s)' ts:'%s\'", __func__,
 			function, item->host.host, item->key_orig, parameter, zbx_timespec_str(ts));
@@ -3856,6 +3856,11 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	else if (0 == strncmp(function, "baseline", 8))
 	{
 		ret = evaluate_BASELINE(value, item, function + 8, parameter, ts, error);
+	}
+	else if (NULL != (ptr = strstr(function, "_foreach")) && ZBX_CONST_STRLEN("_foreach") == strlen(ptr))
+	{
+		*error = zbx_dsprintf(*error, "single item query is not supported by \"%s\" function", function);
+		ret = FAIL;
 	}
 	else
 	{

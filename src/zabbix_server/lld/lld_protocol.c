@@ -17,14 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "lld_protocol.h"
+#include "zbxlld.h"
+
 #include "log.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
-#include "lld_protocol.h"
 #include "sysinfo.h"
-#include "zbxlld.h"
-#include "lld_manager.h"
 
 zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t itemid, zbx_uint64_t hostid,
 		const char *value, const zbx_timespec_t *ts, unsigned char meta, zbx_uint64_t lastlogsize, int mtime,

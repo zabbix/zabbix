@@ -20,6 +20,8 @@
 #ifndef ZABBIX_SETPROCTITLE_H
 #define ZABBIX_SETPROCTITLE_H
 
+#include "sysinc.h"
+
 #if defined(__linux__)				/* Linux */
 #       define PS_OVERWRITE_ARGV
 #elif defined(_AIX)				/* AIX */

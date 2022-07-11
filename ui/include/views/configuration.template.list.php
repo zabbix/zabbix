@@ -280,8 +280,9 @@ $form->addItem([
 			'popup.massupdate.template' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"return openMassupdatePopup('popup.massupdate.template', {}, {
-							dialogue_class: 'modal-popup-static'
+						"openMassupdatePopup('popup.massupdate.template', {}, {
+							dialogue_class: 'modal-popup-static',
+							trigger_element: this
 						});"
 					)
 					->addClass(ZBX_STYLE_BTN_ALT)

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-31T08:51:59Z'
+  date: '2022-04-06T19:33:14Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -911,7 +911,8 @@ zabbix_export:
             -
               uuid: fd5dcb256d4547da9c432c1b9c01b0ae
               expression: 'last(/Morningstar SunSaver MPPT SNMP/status.uptime)<10m'
-              name: 'Status: Device has been restarted (uptime < 10m)'
+              name: 'Status: Device has been restarted'
+              event_name: 'Status: Device has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -922,7 +923,8 @@ zabbix_export:
             -
               uuid: 72e6e08faed647a98a027bd25b6a7106
               expression: 'nodata(/Morningstar SunSaver MPPT SNMP/status.uptime,5m)=1'
-              name: 'Status: Failed to fetch data (or no data for 5m)'
+              name: 'Status: Failed to fetch data'
+              event_name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 5 minutes'
               manual_close: 'YES'
@@ -1004,7 +1006,8 @@ zabbix_export:
             -
               uuid: cc121c44be05440a82d3344c530456e5
               expression: 'min(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
-              name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
+              name: 'Temperature: Critically high battery temperature'
+              event_name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
@@ -1014,7 +1017,8 @@ zabbix_export:
             -
               uuid: 9e0d552b93ae402d98c327420c99d160
               expression: 'max(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
-              name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              name: 'Temperature: Critically low battery temperature'
+              event_name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
@@ -1024,12 +1028,13 @@ zabbix_export:
             -
               uuid: 95b600e280b94949b41422eb60def010
               expression: 'min(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
-              name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
+              name: 'Temperature: High battery temperature'
+              event_name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
+                  name: 'Temperature: Critically high battery temperature'
                   expression: 'min(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
               tags:
                 -
@@ -1038,12 +1043,13 @@ zabbix_export:
             -
               uuid: e351922a0a8c4c53972d9477d47af528
               expression: 'max(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
-              name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              name: 'Temperature: Low battery temperature'
+              event_name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+                  name: 'Temperature: Critically low battery temperature'
                   expression: 'max(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
               tags:
                 -
@@ -1109,7 +1115,8 @@ zabbix_export:
                 -
                   uuid: bf4ad2cee8cf41baafa3d81df5fbe4d3
                   expression: 'min(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
-                  name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
+                  name: 'Battery: Critically high battery voltage'
+                  event_name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   tags:
@@ -1119,7 +1126,8 @@ zabbix_export:
                 -
                   uuid: 2aedfef9b8764881a4768e6b32793820
                   expression: 'max(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
-                  name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
+                  name: 'Battery: Critically low battery voltage'
+                  event_name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   tags:
@@ -1129,12 +1137,13 @@ zabbix_export:
                 -
                   uuid: bec4c7a6a1ab44a4adc8e4286b9a41d9
                   expression: 'min(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
-                  name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
+                  name: 'Battery: High battery voltage'
+                  event_name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
+                      name: 'Battery: Critically high battery voltage'
                       expression: 'min(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   tags:
                     -
@@ -1143,12 +1152,13 @@ zabbix_export:
                 -
                   uuid: c06425d8a0a24b5f80fd0591be61b3f0
                   expression: 'max(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
-                  name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
+                  name: 'Battery: Low battery voltage'
+                  event_name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
+                      name: 'Battery: Critically low battery voltage'
                       expression: 'max(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   tags:
                     -

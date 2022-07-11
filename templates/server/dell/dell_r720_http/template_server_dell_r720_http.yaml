@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T18:35:18Z'
+  date: '2022-04-06T19:27:15Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -114,7 +114,8 @@ zabbix_export:
             -
               uuid: 53caaec2a0664e879f85c263a43715c3
               expression: 'last(/DELL PowerEdge R720 by HTTP/dell.server.hw.serialnumber,#1)<>last(/DELL PowerEdge R720 by HTTP/dell.server.hw.serialnumber,#2) and length(last(/DELL PowerEdge R720 by HTTP/dell.server.hw.serialnumber))>0'
-              name: 'Dell R720: Device has been replaced (new serial number received)'
+              name: 'Dell R720: Device has been replaced'
+              event_name: 'Dell R720: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -1262,7 +1263,8 @@ zabbix_export:
                 -
                   uuid: efaef650ead54921b101e0fe4bb4381a
                   expression: 'last(/DELL PowerEdge R720 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R720 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R720 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0'
-                  name: 'Dell R720: {#DISK_NAME} has been replaced (new serial number received)'
+                  name: 'Dell R720: {#DISK_NAME} has been replaced'
+                  event_name: 'Dell R720: {#DISK_NAME} has been replaced (new serial number received)'
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Ack to close'
                   manual_close: 'YES'

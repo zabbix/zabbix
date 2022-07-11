@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:51:08Z'
+  date: '2022-04-06T19:33:27Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -105,7 +105,8 @@ zabbix_export:
             -
               uuid: 91c9dab8147a4d0086019119e4e55b5e
               expression: 'min(/Nginx Plus by HTTP/nginx.connections.dropped,5m) > {$NGINX.DROP_RATE.MAX.WARN}'
-              name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
+              name: 'Nginx: High connections drop rate'
+              event_name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.'
               tags:
@@ -261,7 +262,8 @@ zabbix_export:
             -
               uuid: e444c708371748bd831bba6c8d9a92e0
               expression: 'length(last(/Nginx Plus by HTTP/nginx.info.error))>0'
-              name: 'Nginx: Server response error (text: {ITEM.VALUE})'
+              name: 'Nginx: Server response error'
+              event_name: 'Nginx: Server response error (text: {ITEM.VALUE})'
               priority: HIGH
               tags:
                 -
@@ -319,7 +321,8 @@ zabbix_export:
             -
               uuid: 396fb4be618e45578566971d5399d611
               expression: 'nodata(/Nginx Plus by HTTP/nginx.info.uptime,30m)=1'
-              name: 'Nginx: Failed to fetch info data (or no data for 30m)'
+              name: 'Nginx: Failed to fetch info data'
+              event_name: 'Nginx: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for metrics for the last 30 minutes'
               manual_close: 'YES'
@@ -330,7 +333,8 @@ zabbix_export:
             -
               uuid: 95622a29bd58444b9f0bd985db99f922
               expression: 'last(/Nginx Plus by HTTP/nginx.info.uptime)<10m'
-              name: 'Nginx: has been restarted (uptime < 10m)'
+              name: 'Nginx: has been restarted'
+              event_name: 'Nginx: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -367,7 +371,8 @@ zabbix_export:
             -
               uuid: a91ff018fe4f4a1495b08adeb2b0005f
               expression: 'last(/Nginx Plus by HTTP/nginx.info.version,#1)<>last(/Nginx Plus by HTTP/nginx.info.version,#2) and length(last(/Nginx Plus by HTTP/nginx.info.version))>0'
-              name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Nginx: Version has changed'
+              event_name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Nginx version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1825,7 +1830,8 @@ zabbix_export:
             -
               uuid: e7b4782a796b4710b50a96f3d24c8208
               expression: 'sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))'
-              name: 'Nginx: Too many HTTP requests with code 4xx (over {$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}% for 5m)'
+              name: 'Nginx: Too many HTTP requests with code 4xx'
+              event_name: 'Nginx: Too many HTTP requests with code 4xx (over {$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}% for 5m)'
               priority: WARNING
               tags:
                 -
@@ -1834,7 +1840,8 @@ zabbix_export:
             -
               uuid: f542573d149547d3844f635bf2a87120
               expression: 'sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))'
-              name: 'Nginx: Too many HTTP requests with code 5xx (over {$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}% for 5m)'
+              name: 'Nginx: Too many HTTP requests with code 5xx'
+              event_name: 'Nginx: Too many HTTP requests with code 5xx (over {$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}% for 5m)'
               priority: HIGH
               tags:
                 -

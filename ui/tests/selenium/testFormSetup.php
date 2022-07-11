@@ -271,7 +271,7 @@ class testFormSetup extends CWebTest {
 		// Check layout via screenshot for dark theme.
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
-		// Complite the setup and check in DB that the default timezone was applied.
+		// Complete the setup and check in DB that the default timezone was applied.
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Finish')->one()->click();
@@ -282,7 +282,7 @@ class testFormSetup extends CWebTest {
 	public function testFormSetup_summarySection() {
 		$this->openSpecifiedSection('Pre-installation summary');
 
-		// Check that Zabbix server name sield is not displayed if its not populated.
+		// Check that Zabbix server name field is not displayed if it is not populated.
 		$this->assertFalse($this->query('xpath://span[text()="Zabbix server name"]')->one(false)->isValid());
 		$this->query('button:Back')->one()->click();
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
@@ -326,7 +326,7 @@ class testFormSetup extends CWebTest {
 
 		// Check screenshot of the Pre-installation summary section.
 		$skip_fields = [];
-		foreach(['Database server', 'Database name'] as $skip_field) {
+		foreach(['Database server', 'Database port', 'Database name'] as $skip_field) {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($skip_field).']/../../div[@class="table-forms-td-right"]';
 			$skip_fields[] = $this->query($xpath)->one();
 		}
@@ -460,7 +460,7 @@ class testFormSetup extends CWebTest {
 						'value' => '/etc/apache2/magic'
 					],
 					'tls_encryption' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// Wrong "Database TLS key file" field format.
@@ -486,7 +486,7 @@ class testFormSetup extends CWebTest {
 					],
 					'tls_encryption' => true,
 					'fill_ca_file' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// Wrong "Database TLS certificate file" field format.
@@ -512,7 +512,7 @@ class testFormSetup extends CWebTest {
 					],
 					'tls_encryption' => true,
 					'fill_ca_file' => true,
-					'mysql_error' => 'Database error code 2002'
+					'mysql_error' => 'Error connecting to database. Empty cipher.'
 				]
 			],
 			// With "Database TLS encryption" set.

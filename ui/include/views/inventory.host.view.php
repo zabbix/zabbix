@@ -73,7 +73,7 @@ foreach ($data['host']['interfaces'] as $interface) {
 
 $header_is_set = false;
 
-foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
+foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
 	if ($interfaces[$type]) {
 		$ifTab = (new CTable());
 

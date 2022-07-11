@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:42:07Z'
+  date: '2022-04-06T19:36:04Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -262,7 +262,8 @@ zabbix_export:
             -
               uuid: 7528520bca7c4524b7451aeaca440cc5
               expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.serialnumber,#1)<>last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.serialnumber,#2) and length(last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.serialnumber))>0'
-              name: 'ZYXEL AAM1212-51 / IES-612: Device has been replaced (new serial number received)'
+              name: 'ZYXEL AAM1212-51 / IES-612: Device has been replaced'
+              event_name: 'ZYXEL AAM1212-51 / IES-612: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -379,7 +380,8 @@ zabbix_export:
             -
               uuid: 819190f68248439292fc4622c3eec5a9
               expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.uptime)<10m'
-              name: 'ZYXEL AAM1212-51 / IES-612: has been restarted (uptime < 10m)'
+              name: 'ZYXEL AAM1212-51 / IES-612: has been restarted'
+              event_name: 'ZYXEL AAM1212-51 / IES-612: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -478,7 +480,8 @@ zabbix_export:
                 -
                   uuid: 0c78247a1003496abab584a526777a40
                   expression: 'min(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.atuc.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
-                  name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
+                  name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX}'
+                  event_name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
                   tags:
@@ -554,7 +557,8 @@ zabbix_export:
                 -
                   uuid: 14cbae6c16c245b09ed46e0cc01a556c
                   expression: 'min(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.atuc.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
-                  name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
+                  name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX}'
+                  event_name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
                   tags:
@@ -598,7 +602,8 @@ zabbix_export:
                 -
                   uuid: e917c9a8d6bb4af3a40c6c5b41f90c22
                   expression: 'min(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
-                  name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
+                  name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX}'
+                  event_name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
                   tags:
@@ -674,7 +679,8 @@ zabbix_export:
                 -
                   uuid: 125b08332e2f409985cade88ab3842f1
                   expression: 'min(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.atur.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
-                  name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
+                  name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX}'
+                  event_name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
                   tags:

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -42,15 +42,27 @@
 				continue;
 			}
 
+			let curl;
+			if (list.object === 'deptrigger_prototype') {
+				curl = new Curl('trigger_prototypes.php', false);
+				curl.setArgument('form', 'update');
+				curl.setArgument('parent_discoveryid', '<?= $data['parent_discoveryid'] ?>');
+				curl.setArgument('triggerid', value.triggerid);
+				curl.setArgument('context', '<?= $data['context'] ?>');
+			}
+			else {
+				curl = new Curl('triggers.php', false);
+				curl.setArgument('form', 'update');
+				curl.setArgument('triggerid', value.triggerid);
+				curl.setArgument('context', '<?= $data['context'] ?>');
+			}
+
 			document
 				.querySelector('#dependency-table tr:last-child')
 				.insertAdjacentHTML('afterend', tmpl.evaluate({
 					triggerid: value.triggerid,
 					name: value.name,
-					url: ((list.object === 'deptrigger_prototype')
-							? 'trigger_prototypes.php?form=update&parent_discoveryid=<?= $data['parent_discoveryid'] ?>&triggerid='
-							: 'triggers.php?form=update&triggerid=')
-						+ value.triggerid
+					url: curl.getUrl()
 				}));
 		}
 	}

@@ -90,7 +90,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			$this->assertEquals($limit, $this->query('id', $id)->one()->getAttribute('maxlength'));
 		}
 
-		$this->query('xpath://span[@class="icon-info status-red"]')->one()->click();
+		$this->query('xpath://a[@class="icon-info status-red"]')->one()->click();
 		$this->assertEquals(
 			'You are not able to choose some of the languages,'.
 				' because locales for them are not installed on the web server.',
@@ -1006,7 +1006,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				// Days count for the case when current or past year is leap year.
 				$days_count = CDateTimeHelper::countDays();
 				$this->assertEquals('Maximum time period to display is '.$days_count.' days.',
-						$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
+						$this->query('class:time-input-error')->waitUntilVisible()->one()->getText());
 				break;
 		}
 	}

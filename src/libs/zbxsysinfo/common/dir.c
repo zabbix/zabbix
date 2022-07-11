@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "dir.h"
+
 #include "common.h"
 #include "sysinfo.h"
-#include "dir.h"
 #include "zbxregexp.h"
 #include "log.h"
 
@@ -863,7 +864,7 @@ int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
  *                                                                            *
  * Return value: boolean failure flag                                         *
  *                                                                            *
- * Comments: under Widows we only support entry types "file" and "dir"        *
+ * Comments: under Windows we only support entry types "file" and "dir"       *
  *                                                                            *
  *****************************************************************************/
 #if defined(_WINDOWS) || defined(__MINGW32__)

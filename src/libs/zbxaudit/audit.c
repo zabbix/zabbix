@@ -17,15 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "audit.h"
+
 #include "log.h"
 #include "zbxjson.h"
 #include "dbcache.h"
 
-#include "audit.h"
-
-#define AUDIT_USERID	0
-#define AUDIT_USERNAME	"System"
-#define AUDIT_IP	""
+#define AUDIT_USERID		__UINT64_C(0)
+#define AUDIT_USERID_SQL	"null"
+#define AUDIT_USERNAME		"System"
+#define AUDIT_IP		""
 
 static int		audit_mode;
 static zbx_hashset_t	zbx_audit;
@@ -310,15 +311,11 @@ void	zbx_audit_flush(void)
 		if (AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
 				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
 		{
-			char	*details_esc;
-
-			details_esc = DBdyn_escape_string((*audit_entry)->details_json.buffer);
-
 			zbx_db_insert_add_values(&db_insert_audit, (*audit_entry)->audit_cuid, AUDIT_USERID,
 					AUDIT_USERNAME, (int)time(NULL), (*audit_entry)->audit_action, AUDIT_IP,
 					(*audit_entry)->id, (*audit_entry)->name, (*audit_entry)->resource_type,
-					recsetid_cuid, 0 == strcmp(details_esc, "{}") ? "" : details_esc);
-			zbx_free(details_esc);
+					recsetid_cuid, 0 == strcmp((*audit_entry)->details_json.buffer, "{}") ? "" :
+					(*audit_entry)->details_json.buffer);
 		}
 	}
 
@@ -369,8 +366,8 @@ int	zbx_audit_flush_once(void)
 
 		ret = DBexecute_once("insert into auditlog (auditid,userid,username,"
 				"clock,action,ip,%s,resourcename,resourcetype,recordsetid,details) values"
-				" ('%s',%d,'%s','%d','%d','%s','%s','%s',%d,'%s','%s')",
-				pfield, (*audit_entry)->audit_cuid, AUDIT_USERID, AUDIT_USERNAME, (int)time(NULL),
+				" ('%s'," AUDIT_USERID_SQL ",'%s','%d','%d','%s','%s','%s',%d,'%s','%s')",
+				pfield, (*audit_entry)->audit_cuid, AUDIT_USERNAME, (int)time(NULL),
 				(*audit_entry)->audit_action, AUDIT_IP, pvalue, name_esc, (*audit_entry)->resource_type,
 				recsetid_cuid, 0 == strcmp(details_esc, "{}") ? "" : details_esc);
 

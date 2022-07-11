@@ -833,7 +833,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->assertHeader('User roles');
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
-		$this->assertEquals($roles, $this->query('id:user-type')->one()->asZDropdown()->getOptions()->asText());
+		$this->assertEquals($roles, $this->query('id:user-type')->one()->asDropdown()->getOptions()->asText());
 
 		// Unchecking API, button and radio button becomes disabled.
 		$form->fill(['Enabled' => false]);
@@ -850,7 +850,7 @@ class testFormUserRoles extends CWebTest {
 
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach ($roles as $role) {
-			$this->query('id:user-type')->one()->asZDropdown()->select($role);
+			$this->query('id:user-type')->one()->asDropdown()->select($role);
 
 			if ($role === 'Super admin') {
 				$form->invalidate();
@@ -1451,7 +1451,7 @@ class testFormUserRoles extends CWebTest {
 					if (is_array($tags)) {
 						if (count($tags) > 3) {
 							$table->findRow('Name', $service['Name'])->getColumn($tag_type)
-									->query('class:icon-wzrd-action')->one()->click();
+									->query('class:icon-wizard-action')->one()->click();
 							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
 							foreach ($tags as $tag) {
 								$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")

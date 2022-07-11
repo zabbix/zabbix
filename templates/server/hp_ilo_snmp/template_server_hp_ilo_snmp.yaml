@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:36:14Z'
+  date: '2022-04-06T19:35:25Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -255,7 +255,8 @@ zabbix_export:
             -
               uuid: 7e8d377e1b49469a8b19b94e6dad97ce
               expression: 'last(/HP iLO SNMP/system.hw.serialnumber,#1)<>last(/HP iLO SNMP/system.hw.serialnumber,#2) and length(last(/HP iLO SNMP/system.hw.serialnumber))>0'
-              name: 'Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -313,7 +314,8 @@ zabbix_export:
             -
               uuid: df3c9e64b0f844ddac8f40f6df956595
               expression: 'last(/HP iLO SNMP/system.name,#1)<>last(/HP iLO SNMP/system.name,#2) and length(last(/HP iLO SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -427,7 +429,8 @@ zabbix_export:
             -
               uuid: 261749b9936c4a26b48d660f01435fb7
               expression: 'last(/HP iLO SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -958,7 +961,8 @@ zabbix_export:
                 -
                   uuid: 87bcd812474b44729da19f49344ba976
                   expression: 'last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HP iLO SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
-                  name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
+                  name: '{#DISK_LOCATION}: Disk has been replaced'
+                  event_name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
                   manual_close: 'YES'

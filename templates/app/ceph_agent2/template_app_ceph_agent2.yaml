@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T09:59:53Z'
+  date: '2022-04-06T19:27:02Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -61,7 +61,8 @@ zabbix_export:
             -
               uuid: 716f166b3943443aba70a4faed882ffb
               expression: 'last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2) and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0'
-              name: 'Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})'
+              name: 'Ceph: Minimum monitor release version has changed'
+              event_name: 'Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Ceph version has changed. Ack to close.'
               manual_close: 'YES'

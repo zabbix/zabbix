@@ -31,6 +31,13 @@ abstract class CItemGeneral extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	public const INTERFACE_TYPES_BY_PRIORITY = [
+		INTERFACE_TYPE_AGENT,
+		INTERFACE_TYPE_SNMP,
+		INTERFACE_TYPE_JMX,
+		INTERFACE_TYPE_IPMI
+	];
+
 	const ERROR_EXISTS_TEMPLATE = 'existsTemplate';
 	const ERROR_EXISTS = 'exists';
 	const ERROR_NO_INTERFACE = 'noInterface';
@@ -312,10 +319,13 @@ abstract class CItemGeneral extends CApiService {
 					$item['hostid'] = $fullItem['hostid'];
 				}
 
-				// if a templated item is being assigned to an interface with a different type, ignore it
+				// If a templated item is being assigned to an interface with a different type, ignore it.
 				$itemInterfaceType = itemTypeInterface($dbItems[$item['itemid']]['type']);
-				if ($fullItem['templateid'] && isset($item['interfaceid']) && isset($interfaces[$item['interfaceid']])
-						&& $itemInterfaceType !== INTERFACE_TYPE_ANY && $interfaces[$item['interfaceid']]['type'] != $itemInterfaceType) {
+
+				if ($itemInterfaceType !== INTERFACE_TYPE_ANY && $itemInterfaceType !== INTERFACE_TYPE_OPT
+						&& $fullItem['templateid']
+						&& array_key_exists('interfaceid', $item) && array_key_exists($item['interfaceid'], $interfaces)
+						&& $interfaces[$item['interfaceid']]['type'] != $itemInterfaceType) {
 
 					unset($item['interfaceid']);
 				}
@@ -408,25 +418,29 @@ abstract class CItemGeneral extends CApiService {
 				$item['trends'] = '0';
 			}
 
-			// check if the item requires an interface
+			// Check if the item requires an interface.
 			if ($host['status'] == HOST_STATUS_TEMPLATE) {
 				unset($item['interfaceid']);
 			}
 			else {
-				$itemInterfaceType = itemTypeInterface($fullItem['type']);
+				$item_interface_type = itemTypeInterface($fullItem['type']);
 
-				if ($itemInterfaceType !== false) {
+				if ($item_interface_type !== false) {
 					if (!array_key_exists('interfaceid', $fullItem) || !$fullItem['interfaceid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
+						if ($item_interface_type != INTERFACE_TYPE_OPT) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
+						}
 					}
-					elseif (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
+					elseif (!array_key_exists($fullItem['interfaceid'], $interfaces)
+							|| bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
 					}
-					elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY && $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
+					elseif ($item_interface_type !== INTERFACE_TYPE_ANY && $item_interface_type !== INTERFACE_TYPE_OPT
+							&& $interfaces[$fullItem['interfaceid']]['type'] != $item_interface_type) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
 					}
 				}
-				// no interface required, just set it to null
+				// No interface required, just set it to zero.
 				else {
 					$item['interfaceid'] = 0;
 				}
@@ -713,6 +727,31 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Return first main interface matched from list of preferred types, or NULL.
+	 *
+	 * @param array $interfaces  An array of interfaces to choose from.
+	 *
+	 * @return ?array
+	 */
+	public static function findInterfaceByPriority(array $interfaces): ?array {
+		$interface_by_type = [];
+
+		foreach ($interfaces as $interface) {
+			if ($interface['main'] == INTERFACE_PRIMARY) {
+				$interface_by_type[$interface['type']] = $interface;
+			}
+		}
+
+		foreach (self::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
+			if (array_key_exists($interface_type, $interface_by_type)) {
+				return $interface_by_type[$interface_type];
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Returns the interface that best matches the given item.
 	 *
 	 * @param array $item_type  An item type
@@ -723,27 +762,24 @@ abstract class CItemGeneral extends CApiService {
 	 *							false, if the item does not need an interface
 	 */
 	public static function findInterfaceForItem($item_type, array $interfaces) {
-		$interface_by_type = [];
-		foreach ($interfaces as $interface) {
-			if ($interface['main'] == 1) {
-				$interface_by_type[$interface['type']] = $interface;
-			}
-		}
-
-		// find item interface type
 		$type = itemTypeInterface($item_type);
 
-		// the item can use any interface
-		if ($type == INTERFACE_TYPE_ANY) {
-			$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
-			foreach ($interface_types as $interface_type) {
-				if (array_key_exists($interface_type, $interface_by_type)) {
-					return $interface_by_type[$interface_type];
-				}
-			}
+		if ($type == INTERFACE_TYPE_OPT) {
+			return false;
+		}
+		elseif ($type == INTERFACE_TYPE_ANY) {
+			return self::findInterfaceByPriority($interfaces);
 		}
 		// the item uses a specific type of interface
 		elseif ($type !== false) {
+			$interface_by_type = [];
+
+			foreach ($interfaces as $interface) {
+				if ($interface['main'] == INTERFACE_PRIMARY) {
+					$interface_by_type[$interface['type']] = $interface;
+				}
+			}
+
 			return array_key_exists($type, $interface_by_type) ? $interface_by_type[$type] : [];
 		}
 		// the item does not need an interface
@@ -1052,6 +1088,10 @@ abstract class CItemGeneral extends CApiService {
 
 				if ($chd_item !== null) {
 					$new_item['itemid'] = $chd_item['itemid'];
+
+					if ($new_item['type'] == ITEM_TYPE_HTTPAGENT) {
+						$new_item['interfaceid'] = null;
+					}
 				}
 				else {
 					unset($new_item['itemid']);
@@ -2566,6 +2606,10 @@ abstract class CItemGeneral extends CApiService {
 			$rules['interfaceid'] = [
 				'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY
 			];
+
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				unset($rules['interfaceid']['flags']);
+			}
 		}
 
 		if (array_key_exists('trapper_hosts', $item) && $item['trapper_hosts'] !== ''

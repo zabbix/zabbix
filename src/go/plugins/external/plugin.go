@@ -28,8 +28,8 @@ import (
 	"sync"
 	"time"
 
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/plugin/comms"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 )
 
 var startLock sync.Mutex
@@ -59,6 +59,7 @@ func (p *Plugin) Register() (response *comms.RegisterResponse, err error) {
 func (p *Plugin) ExecutePlugin() {
 	startLock.Lock()
 	defer startLock.Unlock()
+
 	p.cmd = exec.Command(p.Path, p.Socket, strconv.FormatBool(p.Initial))
 
 	err := p.cmd.Start()

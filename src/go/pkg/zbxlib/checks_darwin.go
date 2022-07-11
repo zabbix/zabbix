@@ -31,8 +31,6 @@ package zbxlib
 #include "sysinfo.h"
 
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -59,10 +57,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
 	case "system.localtime":
 		return unsafe.Pointer(C.SYSTEM_LOCALTIME)
-	case "net.dns":
-		return unsafe.Pointer(C.NET_DNS)
-	case "net.dns.record":
-		return unsafe.Pointer(C.NET_DNS_RECORD)
 	case "system.boottime":
 		return unsafe.Pointer(C.SYSTEM_BOOTTIME)
 	case "net.tcp.listen":

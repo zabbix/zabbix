@@ -26,8 +26,8 @@ import (
 	"syscall"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/windows"
-	"zabbix.com/pkg/zbxerr"
 )
 
 type userInfo struct {

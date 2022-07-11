@@ -25,10 +25,10 @@ import (
 	"reflect"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxlib"
 )
 
@@ -206,7 +206,7 @@ func (t *exporterTask) perform(s Scheduler) {
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
 	var nextcheck time.Time
-	nextcheck, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now)
+	nextcheck, _, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now)
 	if err != nil {
 		return
 	}

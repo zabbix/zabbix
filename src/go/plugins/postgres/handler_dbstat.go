@@ -24,8 +24,8 @@ import (
 	"errors"
 	"fmt"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/jackc/pgx/v4"
-	"zabbix.com/pkg/zbxerr"
 )
 
 const pgVersionWithChecksum = 120000

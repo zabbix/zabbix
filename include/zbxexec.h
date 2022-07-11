@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXEXEC_H
 #define ZABBIX_ZBXEXEC_H
 
+#include "sysinc.h"
+
 #define ZBX_EXIT_CODE_CHECKS_DISABLED	0
 #define ZBX_EXIT_CODE_CHECKS_ENABLED	1
 

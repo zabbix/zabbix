@@ -26,7 +26,7 @@ import (
 	"strconv"
 	"strings"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 const (

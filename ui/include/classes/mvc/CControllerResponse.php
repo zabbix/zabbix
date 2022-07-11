@@ -39,9 +39,9 @@ abstract class CControllerResponse {
 			CMessageHelper::restoreScheduleMessages();
 		}
 
-		(new CPageHeader(_('Loading...')))->display();
+		(new CPageHeader(_('Loading...'), CWebUser::getLang()))->display();
 
-		echo '<body lang="'.CWebUser::getLang().'">';
+		echo '<body>';
 
 		echo $this
 			->getForm()

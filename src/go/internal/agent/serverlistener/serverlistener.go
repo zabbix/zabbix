@@ -25,10 +25,10 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/zbxcomms"
 	"zabbix.com/pkg/zbxnet"

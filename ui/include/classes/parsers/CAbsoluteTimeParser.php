@@ -106,19 +106,20 @@ class CAbsoluteTimeParser extends CParser {
 	}
 
 	/**
-	 * Returns date in "YYYY-MM-DD hh:mm:ss" format.
+	 * Get DateTime object with its value set to either start or end of the period derived from the date/time specified.
 	 *
-	 * @param bool   $is_start  If set to true date will be modified to lowest value, example "2018" will be returned
-	 *                          as "2018-01-01 00:00:00", otherwise "2018-12-31 23:59:59".
+	 * @param                   $is_start
+	 * @param DateTimeZone|null $timezone
 	 *
+	 * @throws Exception
 	 * @return DateTime|null
 	 */
-	public function getDateTime($is_start) {
+	public function getDateTime($is_start, DateTimeZone $timezone = null) {
 		if ($this->date === '') {
 			return null;
 		}
 
-		$date = new DateTime($this->date);
+		$date = new DateTime($this->date, $timezone);
 
 		if ($is_start) {
 			return $date;
@@ -137,11 +138,11 @@ class CAbsoluteTimeParser extends CParser {
 		}
 
 		if (!array_key_exists('i', $this->tokens)) {
-			return new DateTime($date->format('Y-m-d H:59:59'));
+			return new DateTime($date->format('Y-m-d H:59:59'), $timezone);
 		}
 
 		if (!array_key_exists('s', $this->tokens)) {
-			return new DateTime($date->format('Y-m-d H:i:59'));
+			return new DateTime($date->format('Y-m-d H:i:59'), $timezone);
 		}
 
 		return $date;

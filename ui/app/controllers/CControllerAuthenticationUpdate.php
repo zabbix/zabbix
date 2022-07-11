@@ -256,7 +256,9 @@ class CControllerAuthenticationUpdate extends CController {
 			: $this->validateDefaultAuth();
 
 		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
-			$auth_valid &= $this->validateSamlAuth();
+			if (!$this->validateSamlAuth()) {
+				$auth_valid = false;
+			}
 		}
 
 		if (!$auth_valid) {

@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "perfmon.h"
+
 #include "common.h"
 #include "stats.h"
-#include "perfmon.h"
 #include "log.h"
 
 static ZBX_THREAD_LOCAL zbx_perf_counter_id_t	*PerfCounterList = NULL;

@@ -21,10 +21,11 @@
 
 #ifdef HAVE_OPENIPMI
 
+#include "ipmi_protocol.h"
+
 #include "zbxserialize.h"
 #include "zbxserver.h"
 
-#include "ipmi_protocol.h"
 
 zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hostid, zbx_uint64_t objectid,
 		const char *addr, unsigned short port, signed char authtype, unsigned char privilege,

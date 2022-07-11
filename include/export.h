@@ -20,6 +20,8 @@
 #ifndef ZABBIX_EXPORT_H
 #define ZABBIX_EXPORT_H
 
+#include "sysinc.h"
+
 #define ZBX_FLAG_EXPTYPE_EVENTS		1
 #define ZBX_FLAG_EXPTYPE_HISTORY	2
 #define ZBX_FLAG_EXPTYPE_TRENDS		4

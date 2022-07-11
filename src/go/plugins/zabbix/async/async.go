@@ -20,7 +20,7 @@
 package zabbixasync
 
 import (
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/zbxlib"
 )
 

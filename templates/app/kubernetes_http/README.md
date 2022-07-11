@@ -11,12 +11,12 @@ Templates for Kubernetes monitoring
 
 | Name                                  | Readme                                                 | Template                                                                          |
 |---------------------------------------|--------------------------------------------------------|-----------------------------------------------------------------------------------|
-| Kubernetes nodes by HTTP              | [Readme](kubernetes_nodes_http/README.md)              | [Template](kubernetes_nodes_http/template_kube_nodes.yaml)                        |
-| Kubernetes cluster state by HTTP      | [Readme](kubernetes_state_http/README.md)              | [Template](kubernetes_state_http/template_kube_state.yaml)                        |
-| Kubernetes API server by HTTP         | [Readme](kubernetes_api_server_http/README.md)         | [Template](kubernetes_api_server_http/kubernetes_api_servers.yaml)                |
-| Kubernetes Controller manager by HTTP | [Readme](kubernetes_controller_manager_http/README.md) | [Template](kubernetes_controller_manager_http/kubernetes_controller_manager.yaml) |
-| Kubernetes Scheduler by HTTP          | [Readme](kubernetes_scheduler_http/README.md)          | [Template](kubernetes_scheduler_http/kubernetes_scheduler.yaml)                   |
-| Kubernetes kubelet by HTTP            | [Readme](kubernetes_kubelet_http/README.md)            | [Template](kubernetes_kubelet_http/template_kube_kubelet.yaml)                    |
+| Kubernetes nodes by HTTP              | [Readme](kubernetes_nodes_http/README.md)              | [Template](kubernetes_nodes_http/template_kubernetes_nodes.yaml)                        |
+| Kubernetes cluster state by HTTP      | [Readme](kubernetes_state_http/README.md)              | [Template](kubernetes_state_http/template_kubernetes_state.yaml)                        |
+| Kubernetes API server by HTTP         | [Readme](kubernetes_api_server_http/README.md)         | [Template](kubernetes_api_server_http/template_kubernetes_api_servers.yaml)                |
+| Kubernetes Controller manager by HTTP | [Readme](kubernetes_controller_manager_http/README.md) | [Template](kubernetes_controller_manager_http/template_kubernetes_controller_manager.yaml) |
+| Kubernetes Scheduler by HTTP          | [Readme](kubernetes_scheduler_http/README.md)          | [Template](kubernetes_scheduler_http/template_kubernetes_scheduler.yaml)                   |
+| Kubernetes kubelet by HTTP            | [Readme](kubernetes_kubelet_http/README.md)            | [Template](kubernetes_kubelet_http/template_kubernetes_kubelet.yaml)                    |
 
 Templates are of two types:
 
@@ -35,12 +35,13 @@ Templates are of two types:
 * Get the token automatically created when you install Zabbix Helm Chart.
 
 ```bash
-kubectl get secret zabbix-service-account -n zabbix -o jsonpath={.data.token} | base64 -d
+kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d
 ```
 
 * Create a generic host for the nodes and assign to it the "Kubernetes nodes by HTTP" template.
 * Set macros according to the [template instructions](kubernetes_nodes_http/README.md).
 * Create a cluster state host and assign the "Kubernetes cluster state by HTTP" template to it.
+* Specify a dummy host interface required for HTTP items.
 * Set macros according to the [template instructions](kubernetes_state_http/README.md).
 
 > It is strongly recommended to use filtering macros when configuring templates, as on a large cluster the number of discoverable objects can reduce the performance of the monitoring system.

@@ -26,10 +26,10 @@ import (
 	"net/http"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/version"
 )
 

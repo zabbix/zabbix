@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:37:09Z'
+  date: '2022-04-06T19:35:30Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -166,7 +166,8 @@ zabbix_export:
             -
               uuid: 9f47a19f6f424df598e74c5a653ebf27
               expression: 'last(/TiDB PD by HTTP/pd.uptime)<10m'
-              name: 'PD: has been restarted (uptime < 10m)'
+              name: 'PD: has been restarted'
+              event_name: 'PD: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -203,7 +204,8 @@ zabbix_export:
             -
               uuid: 6fb6045405af4c89b09750f57ada472a
               expression: 'last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0'
-              name: 'PD: Version has changed (new version: {ITEM.VALUE})'
+              name: 'PD: Version has changed'
+              event_name: 'PD: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'PD version has changed. Ack to close.'
               manual_close: 'YES'
@@ -534,7 +536,8 @@ zabbix_export:
             -
               uuid: 843d566b33bc401390c2a633d08bb033
               expression: 'min(/TiDB PD by HTTP/pd.cluster_status.storage_size[{#SINGLETON}],5m)/last(/TiDB PD by HTTP/pd.cluster_status.storage_capacity[{#SINGLETON}])*100>{$PD.STORAGE_USAGE.MAX.WARN}'
-              name: 'TiDB cluster: Current storage usage is too high (over {$PD.STORAGE_USAGE.MAX.WARN}% for 5m)'
+              name: 'TiDB cluster: Current storage usage is too high'
+              event_name: 'TiDB cluster: Current storage usage is too high (over {$PD.STORAGE_USAGE.MAX.WARN}% for 5m)'
               priority: WARNING
               description: 'Over {$PD.STORAGE_USAGE.MAX.WARN}% of the cluster space is occupied.'
               tags:
@@ -886,7 +889,8 @@ zabbix_export:
                 -
                   uuid: 1f80bd81d11345f59699617113a0cad5
                   expression: 'min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>{$PD.MISS_REGION.MAX.WARN}'
-                  name: 'TiDB cluster: Too many missed regions (over {$PD.MISS_REGION.MAX.WARN} in 5m)'
+                  name: 'TiDB cluster: Too many missed regions'
+                  event_name: 'TiDB cluster: Too many missed regions (over {$PD.MISS_REGION.MAX.WARN} in 5m)'
                   discover: NO_DISCOVER
                   priority: WARNING
                   description: 'The number of Region replicas is smaller than the value of max-replicas. When a TiKV machine is down and its downtime exceeds max-down-time, it usually leads to missing replicas for some Regions during a period of time. When a TiKV node is made offline, it might result in a small number of Regions with missing replicas.'

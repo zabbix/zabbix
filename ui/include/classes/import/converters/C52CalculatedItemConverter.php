@@ -95,8 +95,8 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 	}
 
 	/**
-	 * Check if each particular host reference would be linked through at least one functions according the new trigger
-	 * expression syntax.
+	 * Check if each particular host reference would be linked through at least one functions according to the new
+	 * trigger expression syntax.
 	 *
 	 * @param array $tokens
 	 *

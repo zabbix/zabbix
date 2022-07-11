@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T09:45:46Z'
+  date: '2022-04-06T19:27:03Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -160,7 +160,8 @@ zabbix_export:
             -
               uuid: 7fcf46583d2b42f4be6758e85784f28f
               expression: 'last(/Cisco ASAv SNMP/cisco.asav.uptime)<10m'
-              name: 'Cisco ASAv: has been restarted (uptime < 10m)'
+              name: 'Cisco ASAv: has been restarted'
+              event_name: 'Cisco ASAv: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -232,7 +233,8 @@ zabbix_export:
                 -
                   uuid: 2e90218795b94ee8b3c01dd79d2dd8b3
                   expression: 'min(/Cisco ASAv SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
-                  name: 'Cisco ASAv: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  name: 'Cisco ASAv: High CPU utilization'
+                  event_name: 'Cisco ASAv: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -309,7 +311,8 @@ zabbix_export:
                 -
                   uuid: 688975747f664a15a3bca9dd3e1e0b01
                   expression: 'min(/Cisco ASAv SNMP/cisco.asav.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: 'Cisco ASAv: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: 'Cisco ASAv: High memory utilization'
+                  event_name: 'Cisco ASAv: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -1167,7 +1170,8 @@ zabbix_export:
                 -
                   uuid: c9f9bff9e9cd4519807c5be583670d02
                   expression: 'last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0'
-                  name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced (new serial number received)'
+                  name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced'
+                  event_name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced (new serial number received)'
                   priority: INFO
                   description: '{#CISCO.ASAV.PHYS.NAME} serial number has changed. Ack to close'
                   manual_close: 'YES'

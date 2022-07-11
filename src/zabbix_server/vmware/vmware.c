@@ -17,22 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "vmware.h"
+
+#include "mutexs.h"
 
 /* LIBXML2 is used */
 #ifdef HAVE_LIBXML2
 #	include <libxml/parser.h>
-#	include <libxml/tree.h>
 #	include <libxml/xpath.h>
 #endif
 
 #include "memalloc.h"
 #include "log.h"
-#include "zbxalgo.h"
 #include "daemon.h"
 #include "zbxself.h"
-
-#include "vmware.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
 /*
@@ -233,10 +231,6 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_COUNTERINFO()										\
 	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
 
-#define ZBX_XPATH_DATASTORE_MOUNT()									\
-	"/*/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='DatastoreHostMount']"			\
-	"/*[local-name()='mountInfo']/*[local-name()='path']"
-
 #define ZBX_XPATH_HV_DATASTORES()									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
 	"/*[local-name()='val']/*[@type='Datastore']"
@@ -271,10 +265,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
 		"/*[local-name()='val']"
 
-#define ZBX_XPATH_HV_SENSOR_STATUS(sensor)								\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"					\
-		"[text()='runtime.healthSystemRuntime.systemHealthInfo']]"				\
-		"/*[local-name()='val']/*[local-name()='numericSensorInfo']"				\
+#define ZBX_XPATH_HV_SENSOR_STATUS(node, sensor)							\
+	ZBX_XPATH_PROP_NAME(node) "/*[local-name()='HostNumericSensorInfo']"				\
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
 
@@ -363,8 +355,8 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP("summary.hardware.uuid"), 		/* ZBX_VMWARE_HVPROP_HW_UUID */
 	ZBX_HVPROPMAP("summary.hardware.vendor"), 		/* ZBX_VMWARE_HVPROP_HW_VENDOR */
 	ZBX_HVPROPMAP("summary.quickStats.overallMemoryUsage"),	/* ZBX_VMWARE_HVPROP_MEMORY_USED */
-	{"runtime.healthSystemRuntime.systemHealthInfo", 	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
-			ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"), NULL},
+	{NULL, ZBX_XPATH_HV_SENSOR_STATUS("runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
+			"VMware Rollup Health State"), NULL},	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
 	ZBX_HVPROPMAP("summary.quickStats.uptime"),		/* ZBX_VMWARE_HVPROP_UPTIME */
 	ZBX_HVPROPMAP("summary.config.product.version"),		/* ZBX_VMWARE_HVPROP_VERSION */
 	ZBX_HVPROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
@@ -975,9 +967,7 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 {
 	vmware_shared_strfree(datastore->name);
 	vmware_shared_strfree(datastore->id);
-
-	if (NULL != datastore->uuid)
-		vmware_shared_strfree(datastore->uuid);
+	vmware_shared_strfree(datastore->uuid);
 
 	vmware_vector_str_uint64_pair_shared_clean(&datastore->hv_uuids_access);
 	zbx_vector_str_uint64_pair_destroy(&datastore->hv_uuids_access);
@@ -1096,6 +1086,7 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 static void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
 {
 	vmware_shared_strfree(dsname->name);
+	vmware_shared_strfree(dsname->uuid);
 	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
 
 	__vm_mem_free_func(dsname);
@@ -1535,6 +1526,7 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 	dsname = (zbx_vmware_dsname_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dsname_t));
 
 	dsname->name = vmware_shared_strdup(src->name);
+	dsname->uuid = vmware_shared_strdup(src->uuid);
 
 	VMWARE_VECTOR_CREATE(&dsname->hvdisks, vmware_hvdisk);
 	zbx_vector_vmware_hvdisk_reserve(&dsname->hvdisks, src->hvdisks.values_num);
@@ -1783,6 +1775,7 @@ static void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
 {
 	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
 	zbx_free(dsname->name);
+	zbx_free(dsname->uuid);
 	zbx_free(dsname);
 }
 
@@ -2984,7 +2977,6 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 				"<ns0:propSet>"							\
 					"<ns0:type>Datastore</ns0:type>"			\
 					"<ns0:pathSet>summary</ns0:pathSet>"			\
-					"<ns0:pathSet>host</ns0:pathSet>"			\
 					"<ns0:pathSet>info</ns0:pathSet>"			\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
@@ -3022,7 +3014,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	name = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("name"));
 
-	if (NULL != (path = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_MOUNT())))
+	if (NULL != (path = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("url"))))
 	{
 		if ('\0' != *path)
 		{
@@ -3040,6 +3032,12 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 			uuid = zbx_strdup(NULL, ptr + 1);
 		}
 		zbx_free(path);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() datastore uuid not present for id:'%s'", __func__, id);
+		zbx_free(name);
+		goto out;
 	}
 
 	if (ZBX_VMWARE_TYPE_VSPHERE == service->type)
@@ -3151,6 +3149,9 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	for (i = 0; i < props_num; i++)
 	{
+		if (NULL == propmap[i].name)
+			continue;
+
 		zbx_strlcat(props, "<ns0:pathSet>", sizeof(props));
 		zbx_strlcat(props, propmap[i].name, sizeof(props));
 		zbx_strlcat(props, "</ns0:pathSet>", sizeof(props));
@@ -3399,6 +3400,23 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_ds_uuid_compare                                           *
+ *                                                                            *
+ * Purpose: sorting function to sort Datastore vector by uuid                 *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_ds_uuid_compare(const void *d1, const void *d2)
+{
+	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
+	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
+
+	return strcmp(ds1->uuid, ds2->uuid);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_ds_name_compare                                           *
+ *                                                                            *
  * Purpose: sorting function to sort Datastore vector by name                 *
  *                                                                            *
  ******************************************************************************/
@@ -3516,7 +3534,6 @@ clean:
 }
 
 /******************************************************************************
- * Function: vmware_v4mask2pefix                                              *
  *                                                                            *
  * Purpose: Convert ipv4 netmask to cidr prefix                               *
  *                                                                            *
@@ -3547,7 +3564,6 @@ static int	vmware_v4mask2pefix(const char *mask)
 }
 
 /******************************************************************************
- * Function: vmware_hv_ip_search                                              *
  *                                                                            *
  * Purpose: Search HV management interface ip value from a xml data           *
  *                                                                            *
@@ -3817,8 +3833,10 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		hv_ds_access.name = zbx_strdup(NULL, hv->uuid);
 		hv_ds_access.value = vmware_hv_get_ds_access(details, ds->id);
 		zbx_vector_str_uint64_pair_append_ptr(&ds->hv_uuids_access, &hv_ds_access);
+
 		dsname = (zbx_vmware_dsname_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dsname_t));
 		dsname->name = zbx_strdup(NULL, ds->name);
+		dsname->uuid = zbx_strdup(NULL, ds->uuid);
 		zbx_vector_vmware_hvdisk_create(&dsname->hvdisks);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): for %d diskextents check multipath at ds:\"%s\"", __func__,
 				ds->diskextents.values_num, ds->name);
@@ -5303,7 +5321,7 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 	if (SUCCEED != vmware_service_get_contents(easyhandle, &version, &fullname, error))
 		goto out;
 
-	if (0 == (service->state & ZBX_VMWARE_STATE_NEW) && 0 == strcmp(service->version, version))
+	if (0 != (service->state & ZBX_VMWARE_STATE_READY) && 0 == strcmp(service->version, version))
 	{
 		ret = SUCCEED;
 		goto out;
@@ -5638,7 +5656,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 				zbx_str_uint64_pair_name_compare);
 	}
 
-	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_name_compare);
+	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_uuid_compare);
 
 	if (0 == service->eventlog.req_sz && 0 == evt_pause)
 	{
@@ -6928,8 +6946,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_xml_node_read_value                                          *
- *                                                                            *
  * Purpose: retrieve a value from xml data relative to the specified node     *
  *                                                                            *
  * Parameters: doc    - [IN] the XML document                                 *
@@ -6999,8 +7015,6 @@ static char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_xml_doc_read_num                                             *
- *                                                                            *
  * Purpose: retrieves numeric xpath value                                     *
  *                                                                            *
  * Parameters: xdoc  - [IN] xml document                                      *
@@ -7037,8 +7051,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_xml_read_values                                              *
- *                                                                            *
  * Purpose: populate array of values from an xml data                         *
  *                                                                            *
  * Parameters: xdoc   - [IN] XML document                                     *
@@ -7055,8 +7067,6 @@ static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_xml_node_read_values                                         *
  *                                                                            *
  * Purpose: populate array of values from an xml data                         *
  *                                                                            *

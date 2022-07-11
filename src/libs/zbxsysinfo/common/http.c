@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "http.h"
+
 #include "common.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 #include "comms.h"
-
-#include "http.h"
 
 extern int	CONFIG_TIMEOUT;
 

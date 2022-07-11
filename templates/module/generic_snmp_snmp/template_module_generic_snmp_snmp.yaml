@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-28T13:22:58Z'
+  date: '2022-04-06T19:33:51Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -227,7 +227,8 @@ zabbix_export:
             -
               uuid: 072bf35ea9d04c559ada5cb13d4b6802
               expression: 'last(/Generic SNMP/system.name,#1)<>last(/Generic SNMP/system.name,#2) and length(last(/Generic SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -286,7 +287,8 @@ zabbix_export:
             -
               uuid: 6f00359af55f45909bdecbad234c7654
               expression: 'last(/Generic SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'

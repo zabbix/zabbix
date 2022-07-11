@@ -1633,9 +1633,7 @@ class CUser extends CApiService {
 	public function loginByUsername($username, $case_sensitive = null, $default_auth = null) {
 		// Check whether the method is called via an API call or from a local php file.
 		if ($case_sensitive === null || $default_auth === null) {
-			return self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect method "%1$s.%2$s".', 'user', 'loginByUsername')
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect method "%1$s.%2$s".', 'user', 'loginByUsername'));
 		}
 
 		$user_data = $this->findAccessibleUser($username, $case_sensitive, $default_auth, false);

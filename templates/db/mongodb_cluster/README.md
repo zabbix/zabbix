@@ -9,7 +9,6 @@ Most of the metrics are collected in one go, thanks to Zabbix bulk data collecti
 
 `MongoDB cluster by Zabbix agent 2` — collects metrics from mongos proxy(router) by polling zabbix-agent2.
 
-
 This template was tested on:
 
 - MongoDB, version 4.0.21, 4.4.3
@@ -17,7 +16,6 @@ This template was tested on:
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
-
 
 1. Setup and configure zabbix-agent2 compiled with the MongoDB monitoring plugin.
 2. Set the {$MONGODB.CONNSTRING} such as <protocol(host:port)> or named session of mongos proxy(router).
@@ -29,7 +27,6 @@ All sharded Mongodb nodes (mongod) will be discovered with attached template "Mo
 
 
 Test availability: `zabbix_get -s mongos.node -k 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]"`
-
 
 ## Zabbix configuration
 
@@ -77,7 +74,7 @@ There are no template links in this template.
 |MongoDB sharded cluster |MongoDB cluster: Operations: query, rate |<p>The number of queries received the mongos instance per second.</p> |DEPENDENT |mongodb.opcounters.query.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.opcounters.query`</p><p>- CHANGE_PER_SECOND</p> |
 |MongoDB sharded cluster |MongoDB cluster: Operations: insert, rate |<p>The number of insert operations received the mongos instance per second.</p> |DEPENDENT |mongodb.opcounters.insert.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.opcounters.insert`</p><p>- CHANGE_PER_SECOND</p> |
 |MongoDB sharded cluster |MongoDB cluster: Operations: getmore, rate |<p>"The number of “getmore” operations the mongos per second. This counter can be high even if the query count is low.</p><p>Secondary nodes send getMore operations as part of the replication process."</p> |DEPENDENT |mongodb.opcounters.getmore.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.opcounters.getmore`</p><p>- CHANGE_PER_SECOND</p> |
-|MongoDB sharded cluster |MongoDB cluster: Last seen configserver |<p>The latest optime of the CSRS primary that the mongos has seen.</p> |DEPENDENT |mongodb.last_seen_config_server<p>**Preprocessing**:</p><p>- JAVASCRIPT: `data = JSON.parse(value) return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32) `</p> |
+|MongoDB sharded cluster |MongoDB cluster: Last seen configserver |<p>The latest optime of the CSRS primary that the mongos has seen.</p> |DEPENDENT |mongodb.last_seen_config_server<p>**Preprocessing**:</p><p>- JSONPATH: `$.sharding.lastSeenConfigServerOpTime.ts.T`</p> |
 |MongoDB sharded cluster |MongoDB cluster: Configserver heartbeat |<p>Difference between the latest optime of the CSRS primary that the mongos has seen and cluster time.</p> |DEPENDENT |mongodb.config_server_heartbeat<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |MongoDB sharded cluster |MongoDB cluster: Bytes in, rate |<p>The total number of bytes that the server has received over network connections initiated by clients or other mongod/mongos instances per second.</p> |DEPENDENT |mongodb.network.bytes_in.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.network.bytesIn`</p><p>- CHANGE_PER_SECOND</p> |
 |MongoDB sharded cluster |MongoDB cluster: Bytes out, rate |<p>The total number of bytes that the server has sent over network connections initiated by clients or other mongod/mongos instances per second.</p> |DEPENDENT |mongodb.network.bytes_out.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.network.bytesOut`</p><p>- CHANGE_PER_SECOND</p> |
@@ -92,7 +89,7 @@ There are no template links in this template.
 |MongoDB sharded cluster |MongoDB cluster: Connection pool: available |<p>The total number of available outgoing connections from the current mongos instance to other members of the sharded cluster.</p> |DEPENDENT |mongodb.connection_pool.available<p>**Preprocessing**:</p><p>- JSONPATH: `$.totalAvailable`</p> |
 |MongoDB sharded cluster |MongoDB cluster: Connection pool: in use |<p>Reports the total number of outgoing connections from the current mongos instance to other members of the sharded cluster set that are currently in use.</p> |DEPENDENT |mongodb.connection_pool.in_use<p>**Preprocessing**:</p><p>- JSONPATH: `$.totalInUse`</p> |
 |MongoDB sharded cluster |MongoDB cluster: Connection pool: refreshing |<p>Reports the total number of outgoing connections from the current mongos instance to other members of the sharded cluster that are currently being refreshed.</p> |DEPENDENT |mongodb.connection_pool.refreshing<p>**Preprocessing**:</p><p>- JSONPATH: `$.totalRefreshing`</p> |
-|MongoDB sharded cluster |MongoDB cluster: Cursor: open no timeout |<p>Number of open cursors with the option DBQuery.Option.noTimeout set to prevent timeout after a period of inactivity.</p> |DEPENDENT |mongodb.metrics.cursor.open.no_timeout<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cursor.open.noTimeout`</p> |
+|MongoDB sharded cluster |MongoDB cluster: Cursor: open no timeout |<p>Number of open cursors with the option DBQuery.Option.noTimeout set to prevent timeout after a period of inactivity.</p> |DEPENDENT |mongodb.metrics.cursor.open.no_timeout<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cursor.open.noTimeout`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |MongoDB sharded cluster |MongoDB cluster: Cursor: open pinned |<p>Number of pinned open cursors.</p> |DEPENDENT |mongodb.cursor.open.pinned<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cursor.open.pinned`</p> |
 |MongoDB sharded cluster |MongoDB cluster: Cursor: open total |<p>Number of cursors that MongoDB is maintaining for clients.</p> |DEPENDENT |mongodb.cursor.open.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cursor.open.total`</p> |
 |MongoDB sharded cluster |MongoDB cluster: Cursor: timed out, rate |<p>Number of cursors that time out, per second.</p> |DEPENDENT |mongodb.cursor.timed_out.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cursor.timedOut`</p><p>- CHANGE_PER_SECOND</p> |
@@ -124,12 +121,12 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |MongoDB cluster: Connection to mongos proxy is unavailable |<p>Connection to mongos proxy instance is currently unavailable.</p> |`last(/MongoDB cluster by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0` |HIGH | |
-|MongoDB cluster: Version has changed (new version: {ITEM.VALUE}) |<p>MongoDB cluster version has changed. Ack to close.</p> |`last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix agent 2/mongodb.version))>0` |INFO |<p>Manual close: YES</p> |
-|MongoDB cluster: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/MongoDB cluster by Zabbix agent 2/mongodb.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|MongoDB cluster: Failed to fetch info data (or no data for 10m) |<p>Zabbix has not received data for items for the last 10 minutes</p> |`nodata(/MongoDB cluster by Zabbix agent 2/mongodb.uptime,10m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- MongoDB cluster: Connection to mongos proxy is unavailable</p> |
-|MongoDB cluster: Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN} |<p>"Too few available connections.</p><p>Consider this value in combination with the value of connections current to understand the connection load on the database"</p> |`max(/MongoDB cluster by Zabbix agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}` |WARNING | |
-|MongoDB cluster: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m) |<p>-</p> |`min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}` |WARNING | |
-|MongoDB cluster: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m) |<p>-</p> |`min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}` |WARNING | |
+|MongoDB cluster: Version has changed |<p>MongoDB cluster version has changed. Ack to close.</p> |`last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix agent 2/mongodb.version))>0` |INFO |<p>Manual close: YES</p> |
+|MongoDB cluster: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/MongoDB cluster by Zabbix agent 2/mongodb.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|MongoDB cluster: Failed to fetch info data |<p>Zabbix has not received data for items for the last 10 minutes</p> |`nodata(/MongoDB cluster by Zabbix agent 2/mongodb.uptime,10m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- MongoDB cluster: Connection to mongos proxy is unavailable</p> |
+|MongoDB cluster: Available connections is low |<p>"Too few available connections.</p><p>Consider this value in combination with the value of connections current to understand the connection load on the database"</p> |`max(/MongoDB cluster by Zabbix agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}` |WARNING | |
+|MongoDB cluster: Too many cursors opened by MongoDB for clients |<p>-</p> |`min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}` |WARNING | |
+|MongoDB cluster: Too many cursors are timing out |<p>-</p> |`min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}` |WARNING | |
 
 ## Feedback
 

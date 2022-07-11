@@ -31,7 +31,7 @@ ZBX_VECTOR_IMPL(ppcache, zbx_preproc_cache_ref_t)
  * Parameters: cache - [IN] the preprocessing cache                           *
  *             type  - [IN] the preprocessing step type                       *
  *                                                                            *
- * Return value: The preprocessing step cache or NULL if it the type was not  *
+ * Return value: The preprocessing step cache or NULL if its type was not     *
  *               cached.                                                      *
  *                                                                            *
  ******************************************************************************/
@@ -56,7 +56,7 @@ void	*zbx_preproc_cache_get(zbx_preproc_cache_t *cache, unsigned char type)
  *             type  - [IN] the preprocessing step type                       *
  *             impl  - [IN] the preprocessing step cache                      *
  *                                                                            *
- * Return value: The preprocessing step cache or NULL if it the type was not  *
+ * Return value: The preprocessing step cache or NULL if its type was not     *
  *               cached.                                                      *
  *                                                                            *
  ******************************************************************************/

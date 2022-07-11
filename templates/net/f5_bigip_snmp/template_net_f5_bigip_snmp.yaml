@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:44:41Z'
+  date: '2022-04-06T19:27:26Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -71,7 +71,8 @@ zabbix_export:
             -
               uuid: f93a7ff7cc614c0b84789f325ebb662b
               expression: 'count(/F5 Big-IP SNMP/bigip.failover,10m,"ne","3")>8 and count(/F5 Big-IP SNMP/bigip.failover,10m,"ne","4")>6'
-              name: 'F5 BIG-IP: Cluster not in sync: {ITEM.VALUE}'
+              name: 'F5 BIG-IP: Cluster not in sync'
+              event_name: 'F5 BIG-IP: Cluster not in sync: {ITEM.VALUE}'
               opdata: '{ITEM.LASTVALUE}'
               priority: WARNING
               manual_close: 'YES'
@@ -293,7 +294,8 @@ zabbix_export:
             -
               uuid: 8a55167ddebb43f2ac8f6d028aef87c2
               expression: 'last(/F5 Big-IP SNMP/bigip.serialnumber,#1)<>last(/F5 Big-IP SNMP/bigip.serialnumber,#2) and length(last(/F5 Big-IP SNMP/bigip.serialnumber))>0'
-              name: 'F5 BIG-IP: Chassis has been replaced (new serial number received)'
+              name: 'F5 BIG-IP: Chassis has been replaced'
+              event_name: 'F5 BIG-IP: Chassis has been replaced (new serial number received)'
               priority: INFO
               description: 'Chassis serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -331,7 +333,8 @@ zabbix_export:
             -
               uuid: 098fe258e8cc4216b0c1800913ba8e18
               expression: 'last(/F5 Big-IP SNMP/bigip.syncstatus)=2'
-              name: 'F5 BIG-IP: Changes have been made on the device not sync to the device group: {ITEM.VALUE}'
+              name: 'F5 BIG-IP: Changes have been made on the device not sync'
+              event_name: 'F5 BIG-IP: Changes have been made on the device not sync to the device group: {ITEM.VALUE}'
               opdata: '{ITEM.LASTVALUE}'
               priority: WARNING
               description: 'Changes have been made on the device not sync to the device group, requires user intervention'
@@ -343,7 +346,8 @@ zabbix_export:
             -
               uuid: eb3517626c6d425f9b88a2bc35641ab6
               expression: 'last(/F5 Big-IP SNMP/bigip.syncstatus)=4'
-              name: 'F5 BIG-IP: The device is inconsistent with the device group: {ITEM.VALUE}'
+              name: 'F5 BIG-IP: The device is inconsistent with the device group'
+              event_name: 'F5 BIG-IP: The device is inconsistent with the device group: {ITEM.VALUE}'
               opdata: '{ITEM.LASTVALUE}'
               priority: WARNING
               description: 'The device is inconsistent with the device group, requires user intervention'
@@ -462,7 +466,8 @@ zabbix_export:
             -
               uuid: 551fd3b77d144ed58f138865e4862901
               expression: 'last(/F5 Big-IP SNMP/bigip.uptime)<10m'
-              name: 'F5 BIG-IP: has been restarted (uptime < 10m)'
+              name: 'F5 BIG-IP: has been restarted'
+              event_name: 'F5 BIG-IP: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -660,7 +665,8 @@ zabbix_export:
                 -
                   uuid: 015ce3f5d10749aca1d871a1d26c51c5
                   expression: 'last(/F5 Big-IP SNMP/bigip.cert.expiration.date[{#CERT.NAME}]) - 86400 * {$BIGIP.CERT.MIN} < now()'
-                  name: 'F5 BIG-IP: Less than {$BIGIP.CERT.MIN} days left until the certificate expires ({#CERT.NAME})'
+                  name: 'F5 BIG-IP: Certificate expires ({#CERT.NAME})'
+                  event_name: 'F5 BIG-IP: Less than {$BIGIP.CERT.MIN} days left until the certificate expires ({#CERT.NAME})'
                   opdata: 'Expires: {ITEM.VALUE}'
                   priority: WARNING
                   description: 'Please check certificate'
@@ -868,7 +874,8 @@ zabbix_export:
                 -
                   uuid: 452167aafe594e3faa3748e6dc470fb1
                   expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}'
-                  name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C'
+                  name: 'F5 BIG-IP: Chassis temperature'
+                  event_name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C'
                   opdata: '{ITEM.LASTVALUE}'
                   priority: HIGH
                   tags:
@@ -878,12 +885,13 @@ zabbix_export:
                 -
                   uuid: 00c0212fcb8049309bf0b3de2b2363b4
                   expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.WARN}'
-                  name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.WARN} °C'
+                  name: 'F5 BIG-IP: Chassis temperature'
+                  event_name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.WARN} °C'
                   opdata: '{ITEM.LASTVALUE}'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C'
+                      name: 'F5 BIG-IP: Chassis temperature'
                       expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}'
                   tags:
                     -
@@ -1443,7 +1451,8 @@ zabbix_export:
                   expression: 'last(/F5 Big-IP SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])>{$BIGIP.CPU.UTIL.WARN.MAX}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/F5 Big-IP SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])<{$BIGIP.CPU.UTIL.WARN.MIN}'
-                  name: 'F5 BIG-IP: High CPU utilization (over {$BIGIP.CPU.UTIL.WARN.MAX}% for 5m)'
+                  name: 'F5 BIG-IP: High CPU utilization'
+                  event_name: 'F5 BIG-IP: High CPU utilization (over {$BIGIP.CPU.UTIL.WARN.MAX}% for 5m)'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
                   tags:
@@ -1918,7 +1927,8 @@ zabbix_export:
               expression: 'last(/F5 Big-IP SNMP/bigip.disktable.freeblocks[{#PART.NAME}])/last(/F5 Big-IP SNMP/bigip.disktable.totalblocks[{#PART.NAME}])*100<{$BIGIP.FS.FREE.WARN.MIN:"{#PART.NAME}"}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'last(/F5 Big-IP SNMP/bigip.disktable.freeblocks[{#PART.NAME}])/last(/F5 Big-IP SNMP/bigip.disktable.totalblocks[{#PART.NAME}])*100>{$BIGIP.FS.FREE.WARN.MAX:"{#PART.NAME}"}'
-              name: 'F5 BIG-IP: Low free space in file system [{#PART.NAME}] (less than {$BIGIP.FS.FREE.WARN.MIN}% for 5m)'
+              name: 'F5 BIG-IP: Low free space in file system [{#PART.NAME}]'
+              event_name: 'F5 BIG-IP: Low free space in file system [{#PART.NAME}] (less than {$BIGIP.FS.FREE.WARN.MIN}% for 5m)'
               priority: WARNING
               description: 'The system is running out of free space.'
               manual_close: 'YES'
@@ -2078,7 +2088,8 @@ zabbix_export:
               expression: 'last(/F5 Big-IP SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total[{#HOST.ID}])*100>{$BIGIP.MEMORY.UTIL.WARN.MAX}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'last(/F5 Big-IP SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total[{#HOST.ID}])*100<{$BIGIP.MEMORY.UTIL.WARN.MIN}'
-              name: 'F5 BIG-IP: High memory utilization in host [{#HOST.ID}] (over {$BIGIP.MEMORY.UTIL.WARN.MAX}%)'
+              name: 'F5 BIG-IP: High memory utilization in host [{#HOST.ID}]'
+              event_name: 'F5 BIG-IP: High memory utilization in host [{#HOST.ID}] (over {$BIGIP.MEMORY.UTIL.WARN.MAX}%)'
               priority: WARNING
               description: 'The system is running out of free memory.'
               tags:
@@ -2090,7 +2101,8 @@ zabbix_export:
               expression: 'last(/F5 Big-IP SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MAX}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'last(/F5 Big-IP SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MIN}'
-              name: 'F5 BIG-IP: High swap utilization in host [{#HOST.ID}] (over {$BIGIP.SWAP.UTIL.WARN.MAX}%)'
+              name: 'F5 BIG-IP: High swap utilization in host [{#HOST.ID}]'
+              event_name: 'F5 BIG-IP: High swap utilization in host [{#HOST.ID}] (over {$BIGIP.SWAP.UTIL.WARN.MAX}%)'
               priority: WARNING
               description: 'The system is running out of free swap memory.'
               tags:
@@ -2675,7 +2687,8 @@ zabbix_export:
             -
               uuid: 2d9214768b684ba880703d738ac52099
               expression: 'last(/F5 Big-IP SNMP/bigip.net.in.error[{#IF.NAME}])>last(/F5 Big-IP SNMP/bigip.net.in.error[{#IF.NAME}],#2) or last(/F5 Big-IP SNMP/bigip.net.out.error[{#IF.NAME}])>last(/F5 Big-IP SNMP/bigip.net.out.error[{#IF.NAME}],#2)'
-              name: 'F5 BIG-IP: There are errors on the network interface ({#IF.NAME})'
+              name: 'F5 BIG-IP: There are errors on the network interface'
+              event_name: 'F5 BIG-IP: There are errors on the network interface ({#IF.NAME})'
               priority: AVERAGE
               tags:
                 -

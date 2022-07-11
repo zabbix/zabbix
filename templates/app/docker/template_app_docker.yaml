@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:00:19Z'
+  date: '2022-04-06T19:27:21Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -734,7 +734,8 @@ zabbix_export:
             -
               uuid: 2c62bb4d95684e6984447027d117ff4d
               expression: 'nodata(/Docker by Zabbix agent 2/docker.name,30m)=1'
-              name: 'Docker: Failed to fetch info data (or no data for 30m)'
+              name: 'Docker: Failed to fetch info data'
+              event_name: 'Docker: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
               manual_close: 'YES'
@@ -985,7 +986,8 @@ zabbix_export:
             -
               uuid: f5f4fb1337264ac2bec6b6505dfe180b
               expression: 'last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0'
-              name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Docker: Version has changed'
+              event_name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Docker version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1255,6 +1257,7 @@ zabbix_export:
                   uuid: ee70b91196494eccb54772b22051a456
                   expression: 'last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2) and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0'
                   name: 'Container {#NAME}: An error has occurred in the container'
+                  event_name: 'Container {#NAME}: Version has changed (new version: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'Container {#NAME} has an error. Ack to close.'
                   manual_close: 'YES'

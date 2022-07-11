@@ -20,7 +20,6 @@
 #ifndef ZABBIX_LOGFILES_H
 #define ZABBIX_LOGFILES_H
 
-#include "md5.h"
 #include "../metrics.h"
 #include "persistent_state.h"
 

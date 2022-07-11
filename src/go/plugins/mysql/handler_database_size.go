@@ -22,7 +22,7 @@ package mysql
 import (
 	"context"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 func databaseSizeHandler(ctx context.Context, conn MyClient,

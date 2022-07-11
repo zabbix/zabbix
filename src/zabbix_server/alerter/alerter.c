@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "alerter.h"
+
 #include "log.h"
 #include "daemon.h"
 #include "zbxmedia.h"
@@ -27,8 +28,6 @@
 #include "dbcache.h"
 #include "alerter_protocol.h"
 #include "zbxembed.h"
-
-#include "alerter.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 

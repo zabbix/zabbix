@@ -122,12 +122,12 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |PHP-FPM: Service is down |<p>-</p> |`last(/PHP-FPM by HTTP/php-fpm.ping)=0 or nodata(/PHP-FPM by HTTP/php-fpm.ping,3m)=1` |HIGH |<p>Manual close: YES</p> |
-|PHP-FPM: Version has changed (new version: {ITEM.VALUE}) |<p>PHP-FPM version has changed. Ack to close.</p> |`last(/PHP-FPM by HTTP/php-fpm.version,#1)<>last(/PHP-FPM by HTTP/php-fpm.version,#2) and length(last(/PHP-FPM by HTTP/php-fpm.version))>0` |INFO |<p>Manual close: YES</p> |
-|PHP-FPM: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/PHP-FPM by HTTP/php-fpm.uptime,30m)=1` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- PHP-FPM: Service is down</p> |
-|PHP-FPM: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/PHP-FPM by HTTP/php-fpm.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|PHP-FPM: Manager  changed (new value received: {ITEM.VALUE}) |<p>PHP-FPM manager changed. Ack to close.</p> |`last(/PHP-FPM by HTTP/php-fpm.process_manager,#1)<>last(/PHP-FPM by HTTP/php-fpm.process_manager,#2)` |INFO |<p>Manual close: YES</p> |
+|PHP-FPM: Version has changed |<p>PHP-FPM version has changed. Ack to close.</p> |`last(/PHP-FPM by HTTP/php-fpm.version,#1)<>last(/PHP-FPM by HTTP/php-fpm.version,#2) and length(last(/PHP-FPM by HTTP/php-fpm.version))>0` |INFO |<p>Manual close: YES</p> |
+|PHP-FPM: Failed to fetch info data |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/PHP-FPM by HTTP/php-fpm.uptime,30m)=1` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- PHP-FPM: Service is down</p> |
+|PHP-FPM: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/PHP-FPM by HTTP/php-fpm.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|PHP-FPM: Manager  changed |<p>PHP-FPM manager changed. Ack to close.</p> |`last(/PHP-FPM by HTTP/php-fpm.process_manager,#1)<>last(/PHP-FPM by HTTP/php-fpm.process_manager,#2)` |INFO |<p>Manual close: YES</p> |
 |PHP-FPM: Detected slow requests |<p>PHP-FPM detected slow request. A slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p> |`min(/PHP-FPM by HTTP/php-fpm.slow_requests,#3)>0` |WARNING | |
-|PHP-FPM: Queue utilization is high (over {$PHP_FPM.QUEUE.WARN.MAX}% for 15m) |<p>The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.</p> |`min(/PHP-FPM by HTTP/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}` |WARNING | |
+|PHP-FPM: Queue utilization is high |<p>The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.</p> |`min(/PHP-FPM by HTTP/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}` |WARNING | |
 
 ## Feedback
 

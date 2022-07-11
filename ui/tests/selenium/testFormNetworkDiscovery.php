@@ -577,7 +577,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 							break;
 						case 'type':
 							$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('type'));
-							$this->query('name:type')->asZDropdown()->one()->select($value);
+							$this->query('name:type')->asDropdown()->one()->select($value);
 							break;
 						case 'ports':
 							$this->zbxTestInputTypeOverwrite('ports', $value);

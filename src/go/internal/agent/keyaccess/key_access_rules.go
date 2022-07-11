@@ -25,9 +25,9 @@ import (
 	"math"
 	"sort"
 
-	"zabbix.com/pkg/conf"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/wildcard"
 )
 

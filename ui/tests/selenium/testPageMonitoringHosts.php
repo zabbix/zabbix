@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testPageMonitoringHosts extends CWebTest {
 
-	use FilterTrait;
+	use TagTrait;
 	use TableTrait;
 
 	/**
@@ -781,7 +781,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?port=10051&action=host.view&groupids%5B%5D=4');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
-		$this->setFilterSelector('id:tags_0');
+		$this->setTagSelector('id:tags_0');
 		$this->setTags($data['tag_options']['tags']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
@@ -1107,6 +1107,69 @@ class testPageMonitoringHosts extends CWebTest {
 		}
 		if ($host_name === 'ЗАББИКС Сервер' && $column === 'Dashboards') {
 			$this->assertEquals('ЗАББИКС Сервер', $this->query('xpath://ul[@class="breadcrumbs"]/li[2]')->one()->getText());
+		}
+	}
+
+	public static function getCheckCountersData() {
+		return [
+			[
+				[
+					'host' => 'Host ZBX6663',
+					'counters' => [
+						[
+							'column' => 'Latest data',
+							'counter' => 14
+						],
+						[
+							'column' => 'Problems',
+							'counter' => null
+						],
+						[
+							'column' => 'Graphs',
+							'counter' => 2
+						],
+						[
+							'column' => 'Web',
+							'counter' => 2
+						]
+					]
+				]
+			],
+			[
+				[
+					'host' => 'ЗАББИКС Сервер',
+					'counters' => [
+						[
+							'column' => 'Dashboards',
+							'counter' => 4
+						],
+						[
+							'column' => 'Problems',
+							'counter' => "1\n5"
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCheckCountersData
+	 */
+	public function testPageMonitoringHosts_CheckCounters($data) {
+		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['host']);
+
+		foreach ($data['counters'] as $counter) {
+			if ($counter['column'] === 'Problems') {
+				$text = ($counter['counter'] === null) ? $counter['column'] : $counter['counter'];
+				$this->assertEquals($text, $row->getColumn($counter['column'])->getText());
+			}
+			else {
+				$this->assertEquals($counter['column'].' '.$counter['counter'],
+						$row->getColumn($counter['column'])->getText()
+				);
+			}
 		}
 	}
 }

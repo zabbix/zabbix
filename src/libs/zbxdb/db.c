@@ -64,20 +64,21 @@ struct zbx_db_result
 #endif
 };
 
-static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
-static int	txn_error = ZBX_DB_OK;	/* failed transaction */
-static int	txn_end_error = ZBX_DB_OK;	/* transaction result */
+static int		txn_level = 0;	/* transaction level, nested transactions are not supported */
+static int		txn_error = ZBX_DB_OK;	/* failed transaction */
+static int		txn_end_error = ZBX_DB_OK;	/* transaction result */
 
-static char	*last_db_strerror = NULL;	/* last database error message */
+static char		*last_db_strerror = NULL;	/* last database error message */
 
-extern int	CONFIG_LOG_SLOW_QUERIES;
+extern int		CONFIG_LOG_SLOW_QUERIES;
 
-static int	db_auto_increment;
+static int		db_auto_increment;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
+static char			*ZBX_CHARSET = NULL;
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
 
@@ -106,6 +107,7 @@ static unsigned int		ZBX_PG_BYTEAOID = 0;
 static int			ZBX_TSDB_VERSION = -1;
 static zbx_uint32_t		ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
+static int 			ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
 static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
@@ -379,6 +381,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
+	const char	*charset;
 #if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;
 #else
@@ -569,6 +572,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
+
+	charset = NULL == ZBX_CHARSET ? "utf8" : ZBX_CHARSET;
+	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
+	if (ZBX_DB_OK == ret && 0 != mysql_set_character_set(conn, charset))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"%s\"", charset);
 
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
@@ -2493,7 +2501,8 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
  *                                                                            *
  * Purpose: prepare json for front-end with the DB current, minimum and       *
  *          maximum versions and a flag that indicates if the version         *
- *          satisfies the requirements                                        *
+ *          satisfies the requirements, and other information as well as      *
+ *          information about DB extension in a similar way                   *
  *                                                                            *
  * Parameters:  json                     - [IN/OUT] json data                 *
  *              info                     - [IN] info to serialize             *
@@ -2519,6 +2528,40 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 	zbx_json_addint64(json, "flag", info->flag);
 	zbx_json_close(json);
+
+	if (NULL != info->extension)
+	{
+		zbx_json_addobject(json, NULL);
+		zbx_json_addstring(json, "database", info->extension, ZBX_JSON_TYPE_STRING);
+
+		if (DB_VERSION_FAILED_TO_RETRIEVE != info->ext_flag)
+		{
+			zbx_json_addstring(json, "current_version",
+					info->ext_friendly_current_version, ZBX_JSON_TYPE_STRING);
+		}
+
+		zbx_json_addstring(json, "min_version", info->ext_friendly_min_version, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, "max_version", info->ext_friendly_max_version, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, "min_supported_version", info->ext_friendly_min_supported_version,
+				ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addint64(json, "flag", info->ext_flag);
+		zbx_json_addint64(json, "extension_err_code", info->ext_err_code);
+#ifdef HAVE_POSTGRESQL
+		if (0 == zbx_strcmp_null(info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+		{
+			if (ON == zbx_tsdb_get_compression_availability())
+			{
+				zbx_json_addstring(json, "compression_availability", "true", ZBX_JSON_TYPE_INT);
+			}
+			else
+			{
+				zbx_json_addstring(json, "compression_availability", "false", ZBX_JSON_TYPE_INT);
+			}
+		}
+#endif
+		zbx_json_close(json);
+	}
 }
 
 /******************************************************************************
@@ -2787,7 +2830,44 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)zbx_dbms_version_get());
 }
 
-#if defined(HAVE_POSTGRESQL)
+#ifdef HAVE_POSTGRESQL
+/***************************************************************************************************************
+ *                                                                                                             *
+ * Purpose: retrieves TimescaleDB extension info, including license string and numeric version value           *
+ *                                                                                                             *
+ **************************************************************************************************************/
+void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
+{
+	int	tsdb_ver;
+
+	if (0 != zbx_strcmp_null(version_info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+		return;
+
+	tsdb_ver = zbx_tsdb_get_version();
+
+	version_info->ext_current_version = (zbx_uint32_t)tsdb_ver;
+	version_info->ext_min_version = ZBX_TIMESCALE_MIN_VERSION;
+	version_info->ext_max_version = ZBX_TIMESCALE_MAX_VERSION;
+	version_info->ext_min_supported_version = ZBX_TIMESCALE_MIN_SUPPORTED_VERSION;
+
+	version_info->ext_friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d", RIGHT2(tsdb_ver/10000),
+			RIGHT2(tsdb_ver/100), RIGHT2(tsdb_ver));
+
+	version_info->ext_friendly_min_version = ZBX_TIMESCALE_MIN_VERSION_FRIENDLY;
+	version_info->ext_friendly_max_version = ZBX_TIMESCALE_MAX_VERSION_FRIENDLY;
+	version_info->ext_friendly_min_supported_version = ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY;
+
+	version_info->ext_flag = zbx_db_version_check(version_info->extension, version_info->ext_current_version,
+			version_info->ext_min_version, version_info->ext_max_version,
+			version_info->ext_min_supported_version);
+
+	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT <= tsdb_ver)
+		version_info->ext_lic = zbx_tsdb_get_license();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: [%d], license: [%s]", tsdb_ver,
+		ZBX_NULL2EMPTY_STR(version_info->ext_lic));
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: returns TimescaleDB (TSDB) version as integer: MMmmuu             *
@@ -2850,13 +2930,67 @@ out:
 	return ver;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrievs TimescaleDB (TSDB) license information                   *
+ *                                                                            *
+ * Return value: license information from datase as string                    *
+ *               "apache"    for TimescaleDB Apache 2 Edition                 *
+ *               "timescale" for TimescaleDB Community Edition                *
+ *                                                                            *
+ * Comments: returns a pointer to allocated memory                            *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_tsdb_get_license(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*tsdb_lic = NULL;
+
+	result = zbx_db_select("show timescaledb.license");
+
+	if ((DB_RESULT)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch(result)))
+	{
+		tsdb_lic = zbx_strdup(NULL, row[0]);
+	}
+
+	DBfree_result(result);
+
+	return tsdb_lic;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sets TimescaleDB (TSDB) compression availability                  *
+ *                                                                            *
+ * Parameters:  compression_availabile - [IN] compression availability        *
+ *              0 (OFF): compression is not available                         *
+ *              1 (ON): compression is available                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tsdb_set_compression_availability(int compression_availabile)
+{
+	ZBX_TIMESCALE_COMPRESSION_AVAILABLE = compression_availabile;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrievs TimescaleDB (TSDB) compression availability              *
+ *                                                                            *
+ * Return value: compression availability as as integer                       *
+ *               0 (OFF): compression is not available                        *
+ *               1 (ON): compression is available                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tsdb_get_compression_availability(void)
+{
+	return ZBX_TIMESCALE_COMPRESSION_AVAILABLE;
+}
 #endif
 
 #if defined(HAVE_MYSQL)
 void zbx_db_set_character_set(const char *char_set)
 {
-	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
-	if (0 != mysql_set_character_set(conn, char_set))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"%s\"", char_set);
+	ZBX_CHARSET = zbx_strdup(ZBX_CHARSET, char_set);
 }
 #endif

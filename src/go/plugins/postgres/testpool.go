@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 /*
@@ -26,7 +27,8 @@ import (
 	"fmt"
 	"os"
 	"time"
-	"zabbix.com/pkg/log"
+
+	"git.zabbix.com/ap/plugin-support/log"
 )
 
 var sharedConn *PGConn

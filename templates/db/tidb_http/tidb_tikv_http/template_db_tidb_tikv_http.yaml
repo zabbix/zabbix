@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:37:43Z'
+  date: '2022-04-06T19:35:31Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -151,7 +151,8 @@ zabbix_export:
             -
               uuid: 31eca27ff6ce4ed78ee428ed3b8d8806
               expression: 'min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}'
-              name: 'TiKV: Too many coprocessor request error (over {$TIKV.COPOCESSOR.ERRORS.MAX.WARN} in 5m)'
+              name: 'TiKV: Too many coprocessor request error'
+              event_name: 'TiKV: Too many coprocessor request error (over {$TIKV.COPOCESSOR.ERRORS.MAX.WARN} in 5m)'
               priority: WARNING
               tags:
                 -
@@ -531,7 +532,8 @@ zabbix_export:
             -
               uuid: 0f21c02b8e1c45d9bbe0c3313cea1a23
               expression: 'min(/TiDB TiKV by HTTP/tikv.scheduler_contex,5m)>{$TIKV.PENDING_COMMANDS.MAX.WARN}'
-              name: 'TiKV: Too many pending commands (over {$TIKV.PENDING_COMMANDS.MAX.WARN} for 5m)'
+              name: 'TiKV: Too many pending commands'
+              event_name: 'TiKV: Too many pending commands (over {$TIKV.PENDING_COMMANDS.MAX.WARN} for 5m)'
               priority: AVERAGE
               tags:
                 -
@@ -716,7 +718,8 @@ zabbix_export:
             -
               uuid: ca06602fa0b64a2ba0c51ed4835c52b2
               expression: 'last(/TiDB TiKV by HTTP/tikv.uptime)<10m'
-              name: 'TiKV: has been restarted (uptime < 10m)'
+              name: 'TiKV: has been restarted'
+              event_name: 'TiKV: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -747,7 +750,8 @@ zabbix_export:
             -
               uuid: f26874f910e34933983685ae43a90bee
               expression: 'min(/TiDB TiKV by HTTP/tikv.worker_pending_task,5m)>{$TIKV.PENDING_TASKS.MAX.WARN}'
-              name: 'TiKV: Too many pending tasks (over {$TIKV.PENDING_TASKS.MAX.WARN} for 5m)'
+              name: 'TiKV: Too many pending tasks'
+              event_name: 'TiKV: Too many pending tasks (over {$TIKV.PENDING_TASKS.MAX.WARN} for 5m)'
               priority: AVERAGE
               tags:
                 -
@@ -1054,7 +1058,8 @@ zabbix_export:
                 -
                   uuid: 1f65b64824d64852aaa609df5f3e27fd
                   expression: 'min(/TiDB TiKV by HTTP/tikv.messages.failure.rate[{#STORE_ID},{#TYPE}],5m)>{$TIKV.STORE.ERRORS.MAX.WARN}'
-                  name: 'TiKV: Store_id {#STORE_ID}: Too many failure messages "{#TYPE}" (over {$TIKV.STORE.ERRORS.MAX.WARN} in 5m)'
+                  name: 'TiKV: Store_id {#STORE_ID}: Too many failure messages "{#TYPE}"'
+                  event_name: 'TiKV: Store_id {#STORE_ID}: Too many failure messages "{#TYPE}" (over {$TIKV.STORE.ERRORS.MAX.WARN} in 5m)'
                   discover: NO_DISCOVER
                   priority: WARNING
                   description: 'Indicates that the remote TiKV cannot be connected.'

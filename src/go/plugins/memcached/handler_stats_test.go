@@ -24,7 +24,7 @@ import (
 	"reflect"
 	"testing"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 
 	"github.com/memcachier/mc/v3"
 )

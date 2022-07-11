@@ -26,7 +26,7 @@ import (
 	"io"
 	"os"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Export -

@@ -8,7 +8,7 @@ This guide describes how to integrate your Zabbix installation with Github issue
 1\. Create or use existing user in Github with permission to create issues and 
 issue comments in desired repositories.
 
-2\. Please create an **personal access token** according to the original [instruction](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token).
+2\. Please create a **personal access token** according to the original [instruction](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token).
 
 
 Example of permissions for private repository.
@@ -26,7 +26,7 @@ The configuration consists of a _media type_ in Zabbix, which will invoke the we
 
 2\. Change in the imported media the values of the variable github_token.
 
-Change github_url only in case if will integrate with Github Enterprise.
+Change github_url only for integrations with Github Enterprise.
 
 For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/6.0/manual/config/notifications/media/webhook).
 

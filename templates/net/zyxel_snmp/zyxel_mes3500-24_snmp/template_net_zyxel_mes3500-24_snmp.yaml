@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:42:14Z'
+  date: '2022-04-06T19:36:11Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -107,7 +107,8 @@ zabbix_export:
             -
               uuid: 911d1c7e921f43af8ab3c0035be57a27
               expression: 'min(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL MES3500-24: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'ZYXEL MES3500-24: High CPU utilization'
+              event_name: 'ZYXEL MES3500-24: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -304,7 +305,8 @@ zabbix_export:
             -
               uuid: a475d29129664eec82fc7ed85cb74df9
               expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber,#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber,#2) and length(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber))>0'
-              name: 'ZYXEL MES3500-24: Device has been replaced (new serial number received)'
+              name: 'ZYXEL MES3500-24: Device has been replaced'
+              event_name: 'ZYXEL MES3500-24: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -340,7 +342,8 @@ zabbix_export:
             -
               uuid: c389b0db83bc404e8cb84ce65db79700
               expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.uptime)<10m'
-              name: 'ZYXEL MES3500-24: has been restarted (uptime < 10m)'
+              name: 'ZYXEL MES3500-24: has been restarted'
+              event_name: 'ZYXEL MES3500-24: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -381,7 +384,8 @@ zabbix_export:
                 -
                   uuid: 66802198e0764ee29cdf557378b5566b
                   expression: 'min(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: 'ZYXEL MES3500-24: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: 'ZYXEL MES3500-24: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool'
+                  event_name: 'ZYXEL MES3500-24: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -1078,7 +1082,8 @@ zabbix_export:
                 -
                   uuid: ef830e34f83347bebba87a72208d805b
                   expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
-                  name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
                   tags:
@@ -1088,7 +1093,8 @@ zabbix_export:
                 -
                   uuid: 229f44666e6043a1a8e34437ad24e3ae
                   expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
-                  name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
                   tags:
@@ -1264,7 +1270,8 @@ zabbix_export:
                 -
                   uuid: f84b378d79b74174842cc49af29c2a0c
                   expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}]))>0'
-                  name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX} has been replaced'
+                  event_name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
                   manual_close: 'YES'

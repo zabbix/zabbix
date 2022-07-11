@@ -1,0 +1,1940 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-05-11T08:29:52Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 0368ca599bbb49729587b9c43ac83084
+      template: 'Envoy Proxy by HTTP'
+      name: 'Envoy Proxy by HTTP'
+      description: |
+        Get Envoy Proxy metrics by HTTP agent from metrics endpoint.
+        https://www.envoyproxy.io/docs/envoy/v1.20.0/operations/stats_overview
+        
+        Don't forget to change macros {$ENVOY.URL}, {$ENVOY.METRICS.PATH}.
+        Some metrics may not be collected depending on your Envoy Proxy instance version and configuration.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: c5c90eeb0c424cc8ade0b795f2c1bb45
+          name: 'Envoy Proxy: Clusters, active'
+          type: DEPENDENT
+          key: envoy.cluster_manager.active_clusters
+          delay: '0'
+          history: 7d
+          description: 'Number of currently active (warmed) clusters.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_cluster_manager_active_clusters
+                - value
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: cluster
+        -
+          uuid: f994b20217444723b6a1aad5b9a07cd0
+          name: 'Envoy Proxy: Clusters, added rate'
+          type: DEPENDENT
+          key: envoy.cluster_manager.cluster_added.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total clusters added (either via static config or CDS) per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_cluster_manager_cluster_added
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: cluster
+        -
+          uuid: 0286c5deba924ce8b79e3b1f6c9e033c
+          name: 'Envoy Proxy: Clusters, modified rate'
+          type: DEPENDENT
+          key: envoy.cluster_manager.cluster_modified.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total clusters modified (via CDS) per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_cluster_manager_cluster_modified
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: cluster
+        -
+          uuid: 5c3475b88a044d0bb779a3ee455d2618
+          name: 'Envoy Proxy: Clusters, removed rate'
+          type: DEPENDENT
+          key: envoy.cluster_manager.cluster_removed.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total clusters removed (via CDS) per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_cluster_manager_cluster_removed
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: cluster
+        -
+          uuid: 9bb29e3b322e40c3aaa14f2e0911cc68
+          name: 'Envoy Proxy: Clusters, updates rate'
+          type: DEPENDENT
+          key: envoy.cluster_manager.cluster_updated.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total cluster updates per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_cluster_manager_cluster_updated
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: cluster
+        -
+          uuid: 9c3503fc553a409ab897f287b882f055
+          name: 'Envoy Proxy: Clusters, warming'
+          type: DEPENDENT
+          key: envoy.cluster_manager.warming_clusters
+          delay: '0'
+          history: 7d
+          description: 'Number of currently warming (not active) clusters.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_cluster_manager_warming_clusters
+                - value
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: cluster
+        -
+          uuid: cc10052300624df3bf869279dd5e7b49
+          name: 'Envoy Proxy: Filesystem, flushed by timer rate'
+          type: DEPENDENT
+          key: envoy.filesystem.flushed_by_timer.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of times internal flush buffers are written to a file due to flush timeout per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_filesystem_flushed_by_timer
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: filesystem
+        -
+          uuid: b3c050dd60d44c0599bc44c9a21621d9
+          name: 'Envoy Proxy: Filesystem, reopen failed rate'
+          type: DEPENDENT
+          key: envoy.filesystem.reopen_failed.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of times a file was failed to be opened per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_filesystem_reopen_failed
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: filesystem
+        -
+          uuid: 2f400ee513c841f6b7a4fa48834f4a9c
+          name: 'Envoy Proxy: Filesystem, write completed rate'
+          type: DEPENDENT
+          key: envoy.filesystem.write_completed.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of times a file was written per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_filesystem_write_completed
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: filesystem
+        -
+          uuid: ae48575f37494e0e9ccfa2c390f5bf68
+          name: 'Envoy Proxy: Filesystem, write failed rate'
+          type: DEPENDENT
+          key: envoy.filesystem.write_failed.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of times an error occurred during a file write operation per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_filesystem_write_failed
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: filesystem
+        -
+          uuid: c6baf4c4e99f4516a23f87c089252a82
+          name: 'Envoy Proxy: Get node metrics'
+          type: HTTP_AGENT
+          key: envoy.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get server metrics.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          url: '{$ENVOY.URL}{$ENVOY.METRICS.PATH}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 579f47037749460e974433ef6cfe3202
+          name: 'Envoy Proxy: Listeners, added'
+          type: DEPENDENT
+          key: envoy.listener_manager.listener_added.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total listeners added (either via static config or LDS) per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_listener_manager_listener_added
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: listener
+        -
+          uuid: a259d191fcce48458a9f671a1a2dd6aa
+          name: 'Envoy Proxy: Listeners, create failure'
+          type: DEPENDENT
+          key: envoy.listener_manager.listener_create_failure.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total failed listener object additions to workers per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_listener_manager_listener_create_failure
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: listener
+        -
+          uuid: c036b55d5aea45f9b0e9c44ea279e2ed
+          name: 'Envoy Proxy: Listeners, create success'
+          type: DEPENDENT
+          key: envoy.listener_manager.listener_create_success.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total listener objects successfully added to workers per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_listener_manager_listener_create_success
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: listener
+        -
+          uuid: b217c7aaa415495089d079a2f81ead2d
+          name: 'Envoy Proxy: Listeners, stopped'
+          type: DEPENDENT
+          key: envoy.listener_manager.listener_stopped.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total listeners stopped per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_listener_manager_listener_stopped
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: listener
+        -
+          uuid: 7ba3e4be89514d53b8ebaad8e9ba58d0
+          name: 'Envoy Proxy: Listeners, active'
+          type: DEPENDENT
+          key: envoy.listener_manager.total_listeners_active
+          delay: '0'
+          history: 7d
+          description: 'Number of currently active listeners.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_listener_manager_total_listeners_active
+                - function
+                - sum
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: listener
+        -
+          uuid: f01f1236cd1a4661b67633836a61537e
+          name: 'Envoy Proxy: Listeners, draining'
+          type: DEPENDENT
+          key: envoy.listener_manager.total_listeners_draining
+          delay: '0'
+          history: 7d
+          description: 'Number of currently draining listeners.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_listener_manager_total_listeners_draining
+                - function
+                - sum
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: listener
+        -
+          uuid: a1a01a7df5364a098fdf96b9de20558d
+          name: 'Envoy Proxy: Listener, warming'
+          type: DEPENDENT
+          key: envoy.listener_manager.total_listeners_warming
+          delay: '0'
+          history: 7d
+          description: 'Number of currently warming listeners.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_listener_manager_total_listeners_warming
+                - function
+                - sum
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: listener
+        -
+          uuid: feeab802ed9a44559ded48ea67aba23e
+          name: 'Envoy Proxy: Listener manager, initialized'
+          type: DEPENDENT
+          key: envoy.listener_manager.workers_started
+          delay: '0'
+          history: 7d
+          description: 'A boolean (1 if started and 0 otherwise) that indicates whether listeners have been initialized on workers.'
+          valuemap:
+            name: 'Envoy listener manager'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_listener_manager_workers_started
+                - value
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: listener-manager
+        -
+          uuid: b8e3b2a5614e4460abe10be443641621
+          name: 'Envoy Proxy: Server concurrency'
+          type: DEPENDENT
+          key: envoy.server.concurrency
+          delay: '0'
+          history: 7d
+          description: 'Number of worker threads.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_server_concurrency
+                - value
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: application
+        -
+          uuid: 91cbea325a634d8a8fc256782a7e004d
+          name: 'Envoy Proxy: Certificate expiration, day before'
+          type: DEPENDENT
+          key: envoy.server.days_until_first_cert_expiring
+          delay: '0'
+          history: 7d
+          units: '!Days'
+          description: 'Number of days until the next certificate being managed will expire.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_server_days_until_first_cert_expiring
+                - value
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: certificate
+          triggers:
+            -
+              uuid: d025e1c521ee4f53acd896d96609beec
+              expression: 'last(/Envoy Proxy by HTTP/envoy.server.days_until_first_cert_expiring)<{$ENVOY.CERT.MIN}'
+              name: 'Envoy Proxy: SSL certificate expires soon'
+              event_name: 'Envoy Proxy: SSL certificate expires soon (less than {$CERT.EXPIRY.MIN} days)'
+              opdata: 'Expires: {ITEM.VALUE}'
+              priority: WARNING
+              description: 'Please check certificate. Less than {$ENVOY.CERT.MIN} days left until the next certificate being managed will expire.'
+              tags:
+                -
+                  tag: scope
+                  value: security
+        -
+          uuid: d8fc1e89c2e14f5e86ea1378fee22a0b
+          name: 'Envoy Proxy: Server live'
+          type: DEPENDENT
+          key: envoy.server.live
+          delay: '0'
+          history: 7d
+          description: '1 if the server is not currently draining, 0 otherwise.'
+          valuemap:
+            name: 'Envoy server live'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_server_live
+                - value
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: 4b50974e6b7444c8a47da589239247a9
+          name: 'Envoy Proxy: Memory allocated'
+          type: DEPENDENT
+          key: envoy.server.memory_allocated
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Current amount of allocated memory in bytes. Total of both new and old Envoy processes on hot restart.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_server_memory_allocated
+                - value
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 05b2fe80bbc54b58b19166c921ba244a
+          name: 'Envoy Proxy: Memory heap size'
+          type: DEPENDENT
+          key: envoy.server.memory_heap_size
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Current reserved heap size in bytes. New Envoy process heap size on hot restart.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_server_memory_heap_size
+                - value
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: a1842c747e5b44a39746037b3f844f4f
+          name: 'Envoy Proxy: Memory physical size'
+          type: DEPENDENT
+          key: envoy.server.memory_physical_size
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Current estimate of total bytes of the physical memory. New Envoy process physical memory size on hot restart.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_server_memory_physical_size
+                - value
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: a13b35ef1e9f4697953a935239b146d9
+          name: 'Envoy Proxy: Connections, parent'
+          type: DEPENDENT
+          key: envoy.server.parent_connections
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total connections of the old Envoy process on hot restart.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_server_parent_connections
+                - value
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: connections
+        -
+          uuid: 701e69bdd408408c8b516e130ed31725
+          name: 'Envoy Proxy: Server state'
+          type: DEPENDENT
+          key: envoy.server.state
+          delay: '0'
+          history: 7d
+          description: |
+            State of the server.
+            Live - (default) ⁣Server is live and serving traffic.
+            Draining - ⁣Server is draining listeners in response to external health checks failing.
+            Pre initializing - ⁣Server has not yet completed cluster manager initialization.
+            Initializing - Server is running the cluster manager initialization callbacks (e.g., RDS).
+          valuemap:
+            name: 'Envoy server state'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_server_state
+                - value
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: b90a6241e1294fdc8502426b7582c1c2
+              expression: 'last(/Envoy Proxy by HTTP/envoy.server.state) > 0'
+              name: 'Envoy Proxy: Server state is not live'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 8b2f3702af20404aa1c75498098aff02
+          name: 'Envoy Proxy: Connections, total'
+          type: DEPENDENT
+          key: envoy.server.total_connections
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total connections of both new and old Envoy processes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_server_total_connections
+                - value
+                - ''
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: connections
+        -
+          uuid: ee3c3a89aed34257999e6106fddbc8a4
+          name: 'Envoy Proxy: Uptime'
+          type: DEPENDENT
+          key: envoy.server.uptime
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Current server uptime in seconds.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - envoy_server_uptime
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: envoy.get_metrics
+          tags:
+            -
+              tag: component
+              value: application
+          triggers:
+            -
+              uuid: 173c90200dd1451db10b8ea8b018bc54
+              expression: 'nodata(/Envoy Proxy by HTTP/envoy.server.uptime,10m)=1'
+              name: 'Envoy Proxy: Failed to fetch metrics data'
+              event_name: 'Envoy Proxy: Failed to fetch metrics data (or no data for 10m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 10 minutes.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 01e29535e00143c9a64fe844f637f17e
+              expression: 'last(/Envoy Proxy by HTTP/envoy.server.uptime)<10m'
+              name: 'Envoy Proxy: Service has been restarted'
+              event_name: 'Envoy Proxy: Service has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+      discovery_rules:
+        -
+          uuid: e5e43b5959744fdd94f103df8d33f635
+          name: 'Cluster metrics discovery'
+          type: DEPENDENT
+          key: envoy.lld.cluster
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: 6040df76d67048aaa4217dc14a2db3ed
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Membership, degraded'
+              type: DEPENDENT
+              key: 'envoy.cluster.membership_degraded["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Current cluster degraded total.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_membership_degraded{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+            -
+              uuid: 0368ecc40bc54a70bae3c81509bad062
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Membership, healthy'
+              type: DEPENDENT
+              key: 'envoy.cluster.membership_healthy["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Current cluster healthy total (inclusive of both health checking and outlier detection).'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_membership_healthy{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+            -
+              uuid: a4cd74b439e3483499e30ffefdb36976
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Membership, total'
+              type: DEPENDENT
+              key: 'envoy.cluster.membership_total["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Current cluster membership total.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_membership_total{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+            -
+              uuid: d453ade473ae4beaab06afa117814a1b
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Membership, unhealthy'
+              type: CALCULATED
+              key: 'envoy.cluster.membership_unhealthy["{#CLUSTER_NAME}"]'
+              history: 7d
+              params: 'last(//envoy.cluster.membership_total["{#CLUSTER_NAME}"]) - last(//envoy.cluster.membership_healthy["{#CLUSTER_NAME}"])'
+              description: 'Current cluster unhealthy.'
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+              trigger_prototypes:
+                -
+                  uuid: 7542707fd247445cb9eaa51d01e76d5e
+                  expression: 'last(/Envoy Proxy by HTTP/envoy.cluster.membership_unhealthy["{#CLUSTER_NAME}"]) > 0'
+                  name: 'Envoy Proxy: There are unhealthy clusters'
+                  opdata: 'Current number: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: b5c802ae97a0449cbbb7f43a2510fd56
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Connections, active'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_cx_active["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Current cluster total active connections.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_cx_active{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: connections
+            -
+              uuid: c7106f0670764bc297920a5e62768c55
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Upstream bytes in, rate'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_cx_rx_bytes_total.rate["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Total received connection bytes per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_cx_rx_bytes_total{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: network
+            -
+              uuid: d180e76ccb3a456b8100c4669173c0f7
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Connections, total'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_cx_total["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Current cluster total connections.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_cx_total{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: connections
+            -
+              uuid: d024405b571946939fa20d495ef6c7d8
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Upstream bytes out, rate'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_cx_tx_bytes_total.rate["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Total sent connection bytes per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_cx_tx_bytes_total{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: network
+            -
+              uuid: f6724ac1954e4c71a95a01a441d46e5d
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests 2xx, rate'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_rq_2x.rate["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Aggregate HTTP response codes per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_rq_xx{envoy_cluster_name = "{#CLUSTER_NAME}", envoy_response_code_class="2"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: requests
+            -
+              uuid: 248d268966ed4999916d77b340f82fa1
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests 3xx, rate'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_rq_3x.rate["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Aggregate HTTP response codes per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_rq_xx{envoy_cluster_name = "{#CLUSTER_NAME}", envoy_response_code_class="3"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: requests
+            -
+              uuid: 65e956c129e2436896f1a3d46a1f9090
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests 4xx, rate'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_rq_4x.rate["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Aggregate HTTP response codes per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_rq_xx{envoy_cluster_name = "{#CLUSTER_NAME}", envoy_response_code_class="4"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: requests
+            -
+              uuid: a85872e72792460e97d8fd322e0919a1
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests 5xx, rate'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_rq_5x.rate["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Aggregate HTTP response codes per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_rq_xx{envoy_cluster_name = "{#CLUSTER_NAME}", envoy_response_code_class="5"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: requests
+            -
+              uuid: a06b43daf8e2493eb61d27cea8baba79
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests active'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_rq_active["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total active requests.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_rq_active{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: requests
+            -
+              uuid: bd1c6766c9e047f1a40f6b1f22f00623
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests completed, rate'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_rq_completed.rate["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total upstream requests completed per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_rq_completed{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: requests
+            -
+              uuid: 267c3d01aa614dbdb0f0dcbe3ab2e11b
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests pending'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_rq_pending_active["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total active requests pending a connection pool connection.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_rq_pending_active{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: requests
+            -
+              uuid: 2489b20b43044020a3ace164f6049af6
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests timeout, rate'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_rq_timeout.rate["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Current cluster requests that timed out waiting for a response per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_rq_timeout{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: requests
+            -
+              uuid: b807e34a608042419d69eae46aa4338c
+              name: 'Envoy Proxy: Cluster ["{#CLUSTER_NAME}"]: Requests total, rate'
+              type: DEPENDENT
+              key: 'envoy.cluster.upstream_rq_total.rate["{#CLUSTER_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Current cluster request total per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_cluster_upstream_rq_total{envoy_cluster_name = "{#CLUSTER_NAME}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: cluster
+                  value: '{#CLUSTER_NAME}'
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: component
+                  value: requests
+          graph_prototypes:
+            -
+              uuid: a1ecd91cb0a44c39923d4b806aae4039
+              name: 'Envoy Proxy: [{#CLUSTER_NAME}] HTTP requests'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Envoy Proxy by HTTP'
+                    key: 'envoy.cluster.upstream_rq_2x.rate["{#CLUSTER_NAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Envoy Proxy by HTTP'
+                    key: 'envoy.cluster.upstream_rq_3x.rate["{#CLUSTER_NAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Envoy Proxy by HTTP'
+                    key: 'envoy.cluster.upstream_rq_4x.rate["{#CLUSTER_NAME}"]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Envoy Proxy by HTTP'
+                    key: 'envoy.cluster.upstream_rq_5x.rate["{#CLUSTER_NAME}"]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'Envoy Proxy by HTTP'
+                    key: 'envoy.cluster.upstream_rq_total.rate["{#CLUSTER_NAME}"]'
+            -
+              uuid: 46f4d9b835274a7dafdda64563f482a9
+              name: 'Envoy Proxy: [{#CLUSTER_NAME}] Upstream traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Envoy Proxy by HTTP'
+                    key: 'envoy.cluster.upstream_cx_rx_bytes_total.rate["{#CLUSTER_NAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Envoy Proxy by HTTP'
+                    key: 'envoy.cluster.upstream_cx_tx_bytes_total.rate["{#CLUSTER_NAME}"]'
+          master_item:
+            key: envoy.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - envoy_cluster_membership_total
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                          var envoy_cluster_name = item.labels.envoy_cluster_name;
+                  
+                          if (lookup[envoy_cluster_name]) {
+                              return;
+                          }
+                          lookup[envoy_cluster_name] = 1;
+                          result.push({
+                              '{#CLUSTER_NAME}': envoy_cluster_name
+                          });
+                  });
+                  
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: ea40e02e3b4e40ea989612949a1a8bef
+          name: 'HTTP metrics discovery'
+          type: DEPENDENT
+          key: envoy.lld.http
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: f4106316b7a44555bd2fcb98ed291a23
+              name: 'Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Connections, active'
+              type: DEPENDENT
+              key: 'envoy.http.downstream_cx_active["{#CONN_MANAGER}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total active connections.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_http_downstream_cx_active{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}'
+                    - function
+                    - sum
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: http
+                -
+                  tag: connection-manager
+                  value: '{#CONN_MANAGER}'
+            -
+              uuid: d5f88107012a4a41a86cb9a76bf8ebc5
+              name: 'Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Bytes in, rate'
+              type: DEPENDENT
+              key: 'envoy.http.downstream_cx_rx_bytes_total.rate["{#CONN_MANAGER}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total bytes received per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_http_downstream_cx_rx_bytes_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: http
+                -
+                  tag: connection-manager
+                  value: '{#CONN_MANAGER}'
+            -
+              uuid: cff73e6c597d4103bdf6445b0910a434
+              name: 'Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Connections, rate'
+              type: DEPENDENT
+              key: 'envoy.http.downstream_cx_total["{#CONN_MANAGER}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Rps
+              description: 'Total connections per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_http_downstream_cx_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: http
+                -
+                  tag: connection-manager
+                  value: '{#CONN_MANAGER}'
+            -
+              uuid: a0bc5e6a55af4fa29869f05c1c0943f6
+              name: 'Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Bytes out, rate'
+              type: DEPENDENT
+              key: 'envoy.http.downstream_cx_tx_bytes_tota.rate["{#CONN_MANAGER}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total bytes sent per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_http_downstream_cx_tx_bytes_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: http
+                -
+                  tag: connection-manager
+                  value: '{#CONN_MANAGER}'
+            -
+              uuid: 19ce2a7cc34c4b49ad0117c62241eabf
+              name: 'Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Requests, active'
+              type: DEPENDENT
+              key: 'envoy.http.downstream_rq_active["{#CONN_MANAGER}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total active requests.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_http_downstream_rq_active{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}'
+                    - function
+                    - sum
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: http
+                -
+                  tag: connection-manager
+                  value: '{#CONN_MANAGER}'
+            -
+              uuid: df31ba8ca0db4b2daade17a9a54273cf
+              name: 'Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Requests timeout, rate'
+              type: DEPENDENT
+              key: 'envoy.http.downstream_rq_timeout["{#CONN_MANAGER}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total requests closed due to a timeout on the request path per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_http_downstream_rq_timeout{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: http
+                -
+                  tag: connection-manager
+                  value: '{#CONN_MANAGER}'
+            -
+              uuid: 87cc859a403348a2b7bcfa398b3150c8
+              name: 'Envoy Proxy: HTTP ["{#CONN_MANAGER}"]: Requests, rate'
+              type: DEPENDENT
+              key: 'envoy.http.downstream_rq_total.rate["{#CONN_MANAGER}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Rps
+              description: 'Total active connections per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_http_downstream_rq_total{envoy_http_conn_manager_prefix = "{#CONN_MANAGER}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: http
+                -
+                  tag: connection-manager
+                  value: '{#CONN_MANAGER}'
+          graph_prototypes:
+            -
+              uuid: 71b114ee64d34d74a32b18e2f7d25d8c
+              name: 'Envoy Proxy: [{#CLUSTER_NAME}] Downstream traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Envoy Proxy by HTTP'
+                    key: 'envoy.http.downstream_cx_rx_bytes_total.rate["{#CONN_MANAGER}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Envoy Proxy by HTTP'
+                    key: 'envoy.http.downstream_cx_tx_bytes_tota.rate["{#CONN_MANAGER}"]'
+          master_item:
+            key: envoy.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - envoy_http_downstream_rq_total
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                          var envoy_http_conn_manager_prefix = item.labels.envoy_http_conn_manager_prefix;
+                  
+                          if (lookup[envoy_http_conn_manager_prefix]) {
+                              return;
+                          }
+                          lookup[envoy_http_conn_manager_prefix] = 1;
+                          result.push({
+                              '{#CONN_MANAGER}': envoy_http_conn_manager_prefix
+                          });
+                  });
+                  
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 953541f62c8c461795c2ebed7f4f52cf
+          name: 'Listeners metrics discovery'
+          type: DEPENDENT
+          key: envoy.lld.listeners
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: 3ecae47c57984a6ab5ff854ce2e5415e
+              name: 'Envoy Proxy: Listener ["{#LISTENER_ADDRESS}"]: Connections, active'
+              type: DEPENDENT
+              key: 'envoy.listener.downstream_cx_active["{#LISTENER_ADDRESS}"]'
+              delay: '0'
+              history: 7d
+              description: 'Total active connections.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_listener_downstream_cx_active{envoy_listener_address = "{#LISTENER_ADDRESS}"}'
+                    - function
+                    - sum
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: listener
+                -
+                  tag: listener-address
+                  value: '{#LISTENER_ADDRESS}'
+            -
+              uuid: 7cc50e3001ac4a8ca433529c52a56e83
+              name: 'Envoy Proxy: Listener ["{#LISTENER_ADDRESS}"]: Connections, rate'
+              type: DEPENDENT
+              key: 'envoy.listener.downstream_cx_total.rate["{#LISTENER_ADDRESS}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total connections per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_listener_downstream_cx_total{envoy_listener_address = "{#LISTENER_ADDRESS}"}'
+                    - function
+                    - sum
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: listener
+                -
+                  tag: listener-address
+                  value: '{#LISTENER_ADDRESS}'
+            -
+              uuid: 5c155a0d2fd14623ba51670e4083ecee
+              name: 'Envoy Proxy: Listener ["{#LISTENER_ADDRESS}"]: Sockets, undergoing'
+              type: DEPENDENT
+              key: 'envoy.listener.downstream_pre_cx_active["{#LISTENER_ADDRESS}"]'
+              delay: '0'
+              history: 7d
+              description: 'Sockets currently undergoing listener filter processing.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'envoy_listener_downstream_pre_cx_active{envoy_listener_address = "{#LISTENER_ADDRESS}"}'
+                    - function
+                    - sum
+              master_item:
+                key: envoy.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: listener
+                -
+                  tag: listener-address
+                  value: '{#LISTENER_ADDRESS}'
+          master_item:
+            key: envoy.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - envoy_listener_downstream_cx_active
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                          var envoy_listener_address = item.labels.envoy_listener_address;
+                  
+                          if (lookup[envoy_listener_address]) {
+                              return;
+                          }
+                          lookup[envoy_listener_address] = 1;
+                          result.push({
+                              '{#LISTENER_ADDRESS}': envoy_listener_address
+                          });
+                  });
+                  
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: envoy-proxy
+      macros:
+        -
+          macro: '{$ENVOY.CERT.MIN}'
+          value: '7'
+          description: 'Minimum number of days before certificate expiration used for trigger expression.'
+        -
+          macro: '{$ENVOY.METRICS.PATH}'
+          value: /stats/prometheus
+          description: 'The path Zabbix will scrape metrics in prometheus format from.'
+        -
+          macro: '{$ENVOY.URL}'
+          value: 'http://localhost:9901'
+          description: 'Instance URL.'
+      valuemaps:
+        -
+          uuid: 2152e7a114f3489eb6ea80b948c0db5c
+          name: 'Envoy listener manager'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Not started'
+            -
+              value: '1'
+              newvalue: Started
+        -
+          uuid: c05c038099d74d11b6fef057518a1fc9
+          name: 'Envoy server live'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Not Live'
+            -
+              value: '1'
+              newvalue: Live
+        -
+          uuid: f467d440b03e4dab8cc4b15f87185eb5
+          name: 'Envoy server state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Live
+            -
+              value: '1'
+              newvalue: Draining
+            -
+              value: '2'
+              newvalue: 'Pre initializing'
+            -
+              value: '3'
+              newvalue: Initializing
+  graphs:
+    -
+      uuid: 9cf06c8169944ee2974499a4f2764903
+      name: 'Envoy Proxy: Clusters'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.cluster_manager.active_clusters
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.cluster_manager.warming_clusters
+    -
+      uuid: 6453eec1ce9141b0a505d278f842ea1c
+      name: 'Envoy Proxy: Clusters operations'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.cluster_manager.cluster_removed.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.cluster_manager.cluster_updated.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.cluster_manager.cluster_modified.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.cluster_manager.cluster_added.rate
+    -
+      uuid: 0ac65256c79e4eb992afae8fdb7035c9
+      name: 'Envoy Proxy: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.server.parent_connections
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.server.memory_heap_size
+    -
+      uuid: d06a958289aa4c7a84851f5c9333e746
+      name: 'Envoy Proxy: Filesystem operations'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.filesystem.reopen_failed.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.filesystem.flushed_by_timer.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.filesystem.write_completed.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.filesystem.write_failed.rate
+    -
+      uuid: d3d8733f333942849eadabb86049b5bf
+      name: 'Envoy Proxy: Listener manager'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.listener_manager.total_listeners_warming
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.listener_manager.total_listeners_draining
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.listener_manager.total_listeners_active
+    -
+      uuid: 90ef97d5dfd44349bc08c89acc0b7ec3
+      name: 'Envoy Proxy: Listeners operations'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.listener_manager.listener_create_failure.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.listener_manager.listener_create_success.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.listener_manager.listener_added.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.listener_manager.listener_stopped.rate
+    -
+      uuid: ca3646c18e79468d884af478afab7b0e
+      name: 'Envoy Proxy: Memory usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.server.memory_physical_size
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.server.memory_heap_size
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Envoy Proxy by HTTP'
+            key: envoy.server.memory_allocated

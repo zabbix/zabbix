@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:47:24Z'
+  date: '2022-04-06T19:27:31Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -83,7 +83,8 @@ zabbix_export:
             -
               uuid: e76d5b82b0ad421ea62cd1dc069e036b
               expression: 'last(/HAProxy by Zabbix agent/haproxy.uptime)<10m'
-              name: 'HAProxy: has been restarted (uptime < 10m)'
+              name: 'HAProxy: has been restarted'
+              event_name: 'HAProxy: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -121,7 +122,8 @@ zabbix_export:
             -
               uuid: db6ef8f306f64f0f81a590e4b45b370c
               expression: 'last(/HAProxy by Zabbix agent/haproxy.version,#1)<>last(/HAProxy by Zabbix agent/haproxy.version,#2) and length(last(/HAProxy by Zabbix agent/haproxy.version))>0'
-              name: 'HAProxy: Version has changed (new version: {ITEM.VALUE})'
+              name: 'HAProxy: Version has changed'
+              event_name: 'HAProxy: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'HAProxy version has changed. Ack to close.'
               manual_close: 'YES'
@@ -147,7 +149,8 @@ zabbix_export:
             -
               uuid: 4e881047bbd54c5984922d1189567ece
               expression: 'min(/HAProxy by Zabbix agent/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}'
-              name: 'HAProxy: Service response time is too high (over {$HAPROXY.RESPONSE_TIME.MAX.WARN} for 5m)'
+              name: 'HAProxy: Service response time is too high'
+              event_name: 'HAProxy: Service response time is too high (over {$HAPROXY.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
@@ -445,7 +448,8 @@ zabbix_export:
                 -
                   uuid: 892d6f67eeff4520aadbf4f3841f8174
                   expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.eresp.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_ERESP.MAX.WARN}'
-                  name: 'HAProxy backend {#PXNAME}: Number of responses with error is more than {$HAPROXY.BACK_ERESP.MAX.WARN} for 5m'
+                  name: 'HAProxy backend {#PXNAME}: Number of responses with error is high'
+                  event_name: 'HAProxy backend {#PXNAME}: Number of responses with error is more than {$HAPROXY.BACK_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on backend, whose responses yielded an error, is more than {$HAPROXY.BACK_ERESP.MAX.WARN}.'
                   tags:
@@ -613,7 +617,8 @@ zabbix_export:
                 -
                   uuid: 89ccc4b4a55349c7869c2202881dcb2a
                   expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.qcur[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_QCUR.MAX.WARN}'
-                  name: 'HAProxy backend {#PXNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN} for 5m'
+                  name: 'HAProxy backend {#PXNAME}: Current number of requests unassigned in queue is high'
+                  event_name: 'HAProxy backend {#PXNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests on backend unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN}.'
                   tags:
@@ -652,7 +657,8 @@ zabbix_export:
                 -
                   uuid: 1aff4be13f0f4aee8a512d4b962215a6
                   expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.qtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_QTIME.MAX.WARN}'
-                  name: 'HAProxy backend {#PXNAME}: Average time spent in queue is more than {$HAPROXY.BACK_QTIME.MAX.WARN} for 5m'
+                  name: 'HAProxy backend {#PXNAME}: Average time spent in queue is high'
+                  event_name: 'HAProxy backend {#PXNAME}: Average time spent in queue is more than {$HAPROXY.BACK_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_QTIME.MAX.WARN}.'
                   tags:
@@ -691,7 +697,8 @@ zabbix_export:
                 -
                   uuid: e0dd27ac272a4fbf9495c09f3291db8f
                   expression: 'min(/HAProxy by Zabbix agent/haproxy.backend.rtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_RTIME.MAX.WARN}'
-                  name: 'HAProxy backend {#PXNAME}: Average response time is more than {$HAPROXY.BACK_RTIME.MAX.WARN} for 5m'
+                  name: 'HAProxy backend {#PXNAME}: Average response time is high'
+                  event_name: 'HAProxy backend {#PXNAME}: Average response time is more than {$HAPROXY.BACK_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average backend response time (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_RTIME.MAX.WARN}.'
                   tags:
@@ -925,14 +932,14 @@ zabbix_export:
             key: haproxy.get.nodes
           lld_macro_paths:
             -
-              lld_macro: '{#MODE}'
-              path: $.mode
-            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
+            -
+              lld_macro: '{#MODE}'
+              path: $.mode
           overrides:
             -
               name: 'Discard HTTP status codes'
@@ -1064,7 +1071,8 @@ zabbix_export:
                 -
                   uuid: 269d5e491e3d41b6be5257c8a8a85efb
                   expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend.dreq.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.FRONT_DREQ.MAX.WARN}'
-                  name: 'HAProxy frontend {#PXNAME}: Number of requests denied is more than {$HAPROXY.FRONT_DREQ.MAX.WARN} for 5m'
+                  name: 'HAProxy frontend {#PXNAME}: Number of requests denied is high'
+                  event_name: 'HAProxy frontend {#PXNAME}: Number of requests denied is more than {$HAPROXY.FRONT_DREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests denied due to security concerns (ACL-restricted) is more than {$HAPROXY.FRONT_DREQ.MAX.WARN}.'
                   tags:
@@ -1102,7 +1110,8 @@ zabbix_export:
                 -
                   uuid: 8361fb028aed4bd9bf3356249699d424
                   expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend.ereq.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.FRONT_EREQ.MAX.WARN}'
-                  name: 'HAProxy frontend {#PXNAME}: Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN} for 5m'
+                  name: 'HAProxy frontend {#PXNAME}: Number of request errors is high'
+                  event_name: 'HAProxy frontend {#PXNAME}: Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN}.'
                   tags:
@@ -1387,7 +1396,8 @@ zabbix_export:
                 -
                   uuid: 9af44a07b1a347979492063ee756b025
                   expression: 'min(/HAProxy by Zabbix agent/haproxy.frontend.sutil[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.FRONT_SUTIL.MAX.WARN}'
-                  name: 'HAProxy frontend {#PXNAME}: Session utilization is more than {$HAPROXY.FRONT_SUTIL.MAX.WARN}% for 5m'
+                  name: 'HAProxy frontend {#PXNAME}: Session utilization is high'
+                  event_name: 'HAProxy frontend {#PXNAME}: Session utilization is more than {$HAPROXY.FRONT_SUTIL.MAX.WARN}% for 5m'
                   priority: WARNING
                   description: 'Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy''s configuration to allow more sessions, or migrate your HAProxy server to a bigger box.'
                   tags:
@@ -1480,14 +1490,14 @@ zabbix_export:
             key: haproxy.get.nodes
           lld_macro_paths:
             -
-              lld_macro: '{#MODE}'
-              path: $.mode
-            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
+            -
+              lld_macro: '{#MODE}'
+              path: $.mode
           overrides:
             -
               name: 'Discard HTTP status codes'
@@ -1814,7 +1824,8 @@ zabbix_export:
                 -
                   uuid: 5a982a97f812468eb8e7163f06f0ee77
                   expression: 'min(/HAProxy by Zabbix agent/haproxy.server.eresp.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_ERESP.MAX.WARN}'
-                  name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with error is more than {$HAPROXY.SERVER_ERESP.MAX.WARN} for 5m'
+                  name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with error is high'
+                  event_name: 'HAProxy {#PXNAME} {#SVNAME}: Number of responses with error is more than {$HAPROXY.SERVER_ERESP.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Number of requests on server, whose responses yielded an error, is more than {$HAPROXY.SERVER_ERESP.MAX.WARN}.'
                   tags:
@@ -2030,7 +2041,8 @@ zabbix_export:
                 -
                   uuid: b88e0b4baa2e4738a161a7fc437d6e1c
                   expression: 'min(/HAProxy by Zabbix agent/haproxy.server.qcur[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_QCUR.MAX.WARN}'
-                  name: 'HAProxy {#PXNAME} {#SVNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN} for 5m'
+                  name: 'HAProxy {#PXNAME} {#SVNAME}: Current number of requests unassigned in queue is high'
+                  event_name: 'HAProxy {#PXNAME} {#SVNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN}.'
                   tags:
@@ -2107,7 +2119,8 @@ zabbix_export:
                 -
                   uuid: abf3d9e3f6fa43d8bf722bcc58c37388
                   expression: 'min(/HAProxy by Zabbix agent/haproxy.server.qtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_QTIME.MAX.WARN}'
-                  name: 'HAProxy {#PXNAME} {#SVNAME}: Average time spent in queue is more than {$HAPROXY.SERVER_QTIME.MAX.WARN} for 5m'
+                  name: 'HAProxy {#PXNAME} {#SVNAME}: Average time spent in queue is high'
+                  event_name: 'HAProxy {#PXNAME} {#SVNAME}: Average time spent in queue is more than {$HAPROXY.SERVER_QTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_QTIME.MAX.WARN}.'
                   tags:
@@ -2149,7 +2162,8 @@ zabbix_export:
                 -
                   uuid: 51ae2aca459b453cb433c5cc0f043a25
                   expression: 'min(/HAProxy by Zabbix agent/haproxy.server.rtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_RTIME.MAX.WARN}'
-                  name: 'HAProxy {#PXNAME} {#SVNAME}: Average response time is more than {$HAPROXY.SERVER_RTIME.MAX.WARN} for 5m'
+                  name: 'HAProxy {#PXNAME} {#SVNAME}: Average response time is high'
+                  event_name: 'HAProxy {#PXNAME} {#SVNAME}: Average response time is more than {$HAPROXY.SERVER_RTIME.MAX.WARN} for 5m'
                   priority: WARNING
                   description: 'Average server response time (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_RTIME.MAX.WARN}.'
                   tags:
@@ -2390,14 +2404,14 @@ zabbix_export:
             key: haproxy.get.nodes
           lld_macro_paths:
             -
-              lld_macro: '{#MODE}'
-              path: $.mode
-            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
+            -
+              lld_macro: '{#MODE}'
+              path: $.mode
           overrides:
             -
               name: 'Discard HTTP status codes'

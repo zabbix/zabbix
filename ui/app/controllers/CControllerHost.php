@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 
 /*
 ** Zabbix
@@ -188,6 +188,15 @@ abstract class CControllerHost extends CController {
 			'suppressed' => ($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false
 		]);
 
+		$items = API::Item()->get([
+			'countOutput' => true,
+			'groupCount' => true,
+			'hostids' => array_keys($hosts),
+			'webitems' =>true,
+			'monitored' => true
+		]);
+		$items_count = array_combine(array_column($items, 'hostid'), array_column($items, 'rowscount'));
+
 		// Group all problems per host per severity.
 		$host_problems = [];
 		foreach ($problems as $problem) {
@@ -197,6 +206,8 @@ abstract class CControllerHost extends CController {
 		}
 
 		foreach ($hosts as &$host) {
+			$host['items_count'] = array_key_exists($host['hostid'], $items_count) ? $items_count[$host['hostid']] : 0;
+
 			// Count number of dashboards for each host.
 			$host['dashboards'] = count(getHostDashboards($host['hostid']));
 

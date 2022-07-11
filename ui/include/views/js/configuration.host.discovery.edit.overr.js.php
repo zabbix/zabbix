@@ -22,7 +22,6 @@
 /**
  * @var CView $this
  */
-insert_javascript_for_visibilitybox();
 ?>
 <script type="text/x-jquery-tmpl" id="lldoverride-row-templated">
 	<?= (new CRow([
@@ -658,7 +657,7 @@ insert_javascript_for_visibilitybox();
 	}
 
 	/**
-	 * Opens popup for a override.
+	 * Opens popup for an override.
 	 *
 	 * @param {number} no
 	 */
@@ -667,7 +666,7 @@ insert_javascript_for_visibilitybox();
 	};
 
 	/**
-	 * This object represents a override of web scenario.
+	 * This object represents an override of web scenario.
 	 *
 	 * @param {object} data  Optional override initial data.
 	 */

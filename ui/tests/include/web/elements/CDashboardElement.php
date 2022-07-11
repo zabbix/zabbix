@@ -178,7 +178,8 @@ class CDashboardElement extends CElement {
 		$this->checkIfEditable();
 		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
 				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
-				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Delete')->waitUntilNotVisible();
+				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()
+				->select('Delete')->waitUntilNotVisible();
 
 		return $this;
 	}

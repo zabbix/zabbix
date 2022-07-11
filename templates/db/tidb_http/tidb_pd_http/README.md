@@ -89,13 +89,13 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |PD: Instance is not responding |<p>-</p> |`last(/TiDB PD by HTTP/pd.status)=0` |AVERAGE | |
-|PD: Version has changed (new version: {ITEM.VALUE}) |<p>PD version has changed. Ack to close.</p> |`last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0` |INFO |<p>Manual close: YES</p> |
-|PD: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/TiDB PD by HTTP/pd.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|PD: Version has changed |<p>PD version has changed. Ack to close.</p> |`last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0` |INFO |<p>Manual close: YES</p> |
+|PD: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/TiDB PD by HTTP/pd.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |TiDB cluster: There are offline TiKV nodes |<p>PD has not received a TiKV heartbeat for a long time.</p> |`last(/TiDB PD by HTTP/pd.cluster_status.store_down[{#SINGLETON}])>0` |AVERAGE | |
 |TiDB cluster: There are low space TiKV nodes |<p>Indicates that there is no sufficient space on the TiKV node.</p> |`last(/TiDB PD by HTTP/pd.cluster_status.store_low_space[{#SINGLETON}])>0` |AVERAGE | |
 |TiDB cluster: There are disconnected TiKV nodes |<p>PD does not receive a TiKV heartbeat within 20 seconds. Normally a TiKV heartbeat comes in every 10 seconds.</p> |`last(/TiDB PD by HTTP/pd.cluster_status.store_disconnected[{#SINGLETON}])>0` |WARNING | |
-|TiDB cluster: Current storage usage is too high (over {$PD.STORAGE_USAGE.MAX.WARN}% for 5m) |<p>Over {$PD.STORAGE_USAGE.MAX.WARN}% of the cluster space is occupied.</p> |`min(/TiDB PD by HTTP/pd.cluster_status.storage_size[{#SINGLETON}],5m)/last(/TiDB PD by HTTP/pd.cluster_status.storage_capacity[{#SINGLETON}])*100>{$PD.STORAGE_USAGE.MAX.WARN}` |WARNING | |
-|TiDB cluster: Too many missed regions (over {$PD.MISS_REGION.MAX.WARN} in 5m) |<p>The number of Region replicas is smaller than the value of max-replicas. When a TiKV machine is down and its downtime exceeds max-down-time, it usually leads to missing replicas for some Regions during a period of time. When a TiKV node is made offline, it might result in a small number of Regions with missing replicas.</p> |`min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>{$PD.MISS_REGION.MAX.WARN}` |WARNING | |
+|TiDB cluster: Current storage usage is too high |<p>Over {$PD.STORAGE_USAGE.MAX.WARN}% of the cluster space is occupied.</p> |`min(/TiDB PD by HTTP/pd.cluster_status.storage_size[{#SINGLETON}],5m)/last(/TiDB PD by HTTP/pd.cluster_status.storage_capacity[{#SINGLETON}])*100>{$PD.STORAGE_USAGE.MAX.WARN}` |WARNING | |
+|TiDB cluster: Too many missed regions |<p>The number of Region replicas is smaller than the value of max-replicas. When a TiKV machine is down and its downtime exceeds max-down-time, it usually leads to missing replicas for some Regions during a period of time. When a TiKV node is made offline, it might result in a small number of Regions with missing replicas.</p> |`min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>{$PD.MISS_REGION.MAX.WARN}` |WARNING | |
 |TiDB cluster: There are unresponsive peers |<p>The number of Regions with an unresponsive peer reported by the Raft leader.</p> |`min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>0` |WARNING | |
 
 ## Feedback

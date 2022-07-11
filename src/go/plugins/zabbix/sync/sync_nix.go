@@ -24,8 +24,6 @@ package zabbixsync
 
 func getMetrics() []string {
 	return []string{
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "Performs DNS query.",
 		"vfs.dir.get", "Directory entry list.",
 	}
 }

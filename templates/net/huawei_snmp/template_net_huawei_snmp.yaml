@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T14:23:56Z'
+  date: '2022-04-14T11:00:43Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -231,7 +231,8 @@ zabbix_export:
             -
               uuid: 740f78d69b20405da79525365fdc29fe
               expression: 'last(/Huawei VRP SNMP/system.name,#1)<>last(/Huawei VRP SNMP/system.name,#2) and length(last(/Huawei VRP SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -290,9 +291,10 @@ zabbix_export:
             -
               uuid: c8c41677f4ba463b90cea501e9112483
               expression: 'last(/Huawei VRP SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -447,10 +449,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d28db9267b9d488f8f359dd7d14d2ac1
-                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
+                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#ENT_NAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
-                  name: '{#ENT_NAME}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#ENT_NAME}"}-3'
+                  name: '{#ENT_NAME}: Temperature is above critical threshold'
+                  event_name: '{#ENT_NAME}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#ENT_NAME}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -463,18 +466,19 @@ zabbix_export:
                       value: performance
                 -
                   uuid: c54c36491adf4a488d11f2538b337129
-                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
+                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#ENT_NAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
-                  name: '{#ENT_NAME}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#ENT_NAME}"}-3'
+                  name: '{#ENT_NAME}: Temperature is above warning threshold'
+                  event_name: '{#ENT_NAME}: Temperature is above warning threshold: >{$TEMP_WARN:"{#ENT_NAME}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                   dependencies:
                     -
-                      name: '{#ENT_NAME}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
-                      expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
-                      recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                      name: '{#ENT_NAME}: Temperature is above critical threshold'
+                      expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#ENT_NAME}"}'
+                      recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#ENT_NAME}"}-3'
                   tags:
                     -
                       tag: scope
@@ -484,10 +488,11 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 7b2cffb3ad47440d8b79b39958794ed9
-                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#ENT_NAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
-                  name: '{#ENT_NAME}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  recovery_expression: 'min(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#ENT_NAME}"}+3'
+                  name: '{#ENT_NAME}: Temperature is too low'
+                  event_name: '{#ENT_NAME}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#ENT_NAME}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -518,7 +523,8 @@ zabbix_export:
                 -
                   uuid: 66bfe7805cae4447a32a6e5877e1231b
                   expression: 'min(/Huawei VRP SNMP/system.cpu.util[hwEntityCpuUsage.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
-                  name: '{#ENT_NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  name: '{#ENT_NAME}: High CPU utilization'
+                  event_name: '{#ENT_NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -550,7 +556,8 @@ zabbix_export:
                 -
                   uuid: e379ca4d50a3434e82841e8884a84656
                   expression: 'last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
-                  name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
+                  name: '{#ENT_NAME}: Device has been replaced'
+                  event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
@@ -608,7 +615,7 @@ zabbix_export:
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: 'System name has changed (new name: {ITEM.VALUE})'
+                      name: 'System name has changed'
                       expression: 'last(/Huawei VRP SNMP/system.name,#1)<>last(/Huawei VRP SNMP/system.name,#2) and length(last(/Huawei VRP SNMP/system.name))>0'
                   tags:
                     -
@@ -635,7 +642,8 @@ zabbix_export:
                 -
                   uuid: 2d93533c7cc74dc9a85e280605e21e7d
                   expression: 'min(/Huawei VRP SNMP/vm.memory.util[hwEntityMemUsage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: '{#ENT_NAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '{#ENT_NAME}: High memory utilization'
+                  event_name: '{#ENT_NAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -1004,7 +1012,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
                 through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'IF-MIB::ifType'
@@ -1066,7 +1074,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Huawei VRP SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Huawei VRP SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
                 avg(/Huawei VRP SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Huawei VRP SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1089,7 +1098,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Huawei VRP SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Huawei VRP SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'

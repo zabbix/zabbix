@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-31T08:52:08Z'
+  date: '2022-04-06T19:33:16Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -782,7 +782,8 @@ zabbix_export:
             -
               uuid: aab5be196ac64dc69883c3109fcd094f
               expression: 'last(/Morningstar TriStar MPPT SNMP/status.uptime)<10m'
-              name: 'Status: Device has been restarted (uptime < 10m)'
+              name: 'Status: Device has been restarted'
+              event_name: 'Status: Device has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -793,7 +794,8 @@ zabbix_export:
             -
               uuid: db9317cb9a6645d2bd8f4760f7579c17
               expression: 'nodata(/Morningstar TriStar MPPT SNMP/status.uptime,5m)=1'
-              name: 'Status: Failed to fetch data (or no data for 5m)'
+              name: 'Status: Failed to fetch data'
+              event_name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 5 minutes'
               manual_close: 'YES'
@@ -855,7 +857,8 @@ zabbix_export:
             -
               uuid: 5ec1c2e4786048fc889a37a12a2f4ad6
               expression: 'min(/Morningstar TriStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
-              name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
+              name: 'Temperature: Critically high battery temperature'
+              event_name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
@@ -865,7 +868,8 @@ zabbix_export:
             -
               uuid: 84c059ff133f4f4d8145615c0a98eb50
               expression: 'max(/Morningstar TriStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
-              name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              name: 'Temperature: Critically low battery temperature'
+              event_name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
@@ -875,12 +879,13 @@ zabbix_export:
             -
               uuid: 11d2b988cfec425c9ffb082e9c78490d
               expression: 'min(/Morningstar TriStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
-              name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
+              name: 'Temperature: High battery temperature'
+              event_name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
+                  name: 'Temperature: Critically high battery temperature'
                   expression: 'min(/Morningstar TriStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
               tags:
                 -
@@ -889,12 +894,13 @@ zabbix_export:
             -
               uuid: 46122992e8a04c7bb7a8c8037a2da74a
               expression: 'max(/Morningstar TriStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
-              name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              name: 'Temperature: Low battery temperature'
+              event_name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+                  name: 'Temperature: Critically low battery temperature'
                   expression: 'max(/Morningstar TriStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
               tags:
                 -
@@ -963,7 +969,8 @@ zabbix_export:
                 -
                   uuid: cf9bb1b6e84d4b03b38f13c1c1d4905c
                   expression: 'min(/Morningstar TriStar MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
-                  name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
+                  name: 'Battery: Critically high battery voltage'
+                  event_name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   tags:
@@ -973,7 +980,8 @@ zabbix_export:
                 -
                   uuid: d977ded736704d748ca49595f3658b89
                   expression: 'max(/Morningstar TriStar MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
-                  name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
+                  name: 'Battery: Critically low battery voltage'
+                  event_name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   tags:
@@ -983,12 +991,13 @@ zabbix_export:
                 -
                   uuid: 00deb7608b3e4444bd4833f5b8ae5875
                   expression: 'min(/Morningstar TriStar MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
-                  name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
+                  name: 'Battery: High battery voltage'
+                  event_name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
+                      name: 'Battery: Critically high battery voltage'
                       expression: 'min(/Morningstar TriStar MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   tags:
                     -
@@ -997,12 +1006,13 @@ zabbix_export:
                 -
                   uuid: 2877138cdfb0448a9a83eb807b5da24a
                   expression: 'max(/Morningstar TriStar MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
-                  name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
+                  name: 'Battery: Low battery voltage'
+                  event_name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
+                      name: 'Battery: Critically low battery voltage'
                       expression: 'max(/Morningstar TriStar MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   tags:
                     -

@@ -29,6 +29,9 @@ import (
 
 	_ "zabbix.com/plugins"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/agent/remotecontrol"
@@ -38,8 +41,6 @@ import (
 	"zabbix.com/internal/agent/serverlistener"
 	"zabbix.com/internal/agent/statuslistener"
 	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/pidfile"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"
@@ -300,7 +301,7 @@ func main() {
 	})
 
 	if argVersion {
-		version.Display()
+		version.Display([]string{fmt.Sprintf("Plugin support version %d.%d\n", comms.MajorVersion, comms.MinorVersion)})
 		os.Exit(0)
 	}
 

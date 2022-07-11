@@ -1,4 +1,4 @@
-<?php  declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 ?>
 <?= (new CScriptTemplate('valuemap-rename-row-tmpl'))->addItem(
@@ -113,3 +114,4 @@
 		</td>
 	</tr>
 </script>
+

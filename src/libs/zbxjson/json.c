@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "json.h"
+
 #include "zbxjson.h"
 #include "json_parser.h"
-#include "json.h"
 #include "jsonpath.h"
 
 /******************************************************************************
@@ -477,9 +477,7 @@ int	zbx_json_close(struct zbx_json *j)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return type of pointed value                                      *
- *                                                                            *
- * Return value: type of pointed value                                        *
+ * Return value: type of input value                                          *
  *                                                                            *
  ******************************************************************************/
 static zbx_json_type_t	__zbx_json_type(const char *p)
@@ -506,9 +504,7 @@ static zbx_json_type_t	__zbx_json_type(const char *p)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return position of right bracket                                  *
- *                                                                            *
- * Return value: position of right bracket                                    *
+ * Return value: position of the right bracket                                *
  *               NULL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/

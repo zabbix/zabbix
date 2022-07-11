@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -138,7 +138,9 @@ $form_list
 				->addClass('form-field')
 				->addClass('field-fluid'),
 
-			CWidgetHelper::getLabel($fields['units_pos']),
+			CWidgetHelper::getLabel($fields['units_pos'], null,
+				_('Position is ignored for s, uptime and unixtime units.')
+			),
 			(new CDiv(CWidgetHelper::getSelect($fields['units_pos'])))->addClass('form-field'),
 
 			CWidgetHelper::getLabel($fields['units_size']),

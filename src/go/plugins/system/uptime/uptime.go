@@ -22,8 +22,8 @@ package uptime
 import (
 	"errors"
 
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/std"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/std"
 )
 
 // Plugin -

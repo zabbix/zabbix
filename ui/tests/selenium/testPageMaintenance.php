@@ -61,7 +61,7 @@ class testPageMaintenance extends CLegacyWebTest {
 		$sqlTimeperiods = "select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid) order by timeperiodid";
 		$oldHashTimeperiods = CDBHelper::getHash($sqlTimeperiods);
 
-		$this->zbxTestLogin('maintenance.php');;
+		$this->zbxTestLogin('maintenance.php');
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestClickLinkText($name);

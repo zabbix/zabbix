@@ -20,13 +20,13 @@ of Zabbix with the OpenSSL project OpenSSL library (or with modified
 versions of it that use the same license as the OpenSSL library), and
 distribute the linked executables.
 
-Please see http://www.zabbix.com/ for detailed information about Zabbix.
+Please see https://www.zabbix.com/ for detailed information about Zabbix.
 
 On-line Zabbix documentation is available at
-http://www.zabbix.com/documentation/5.0/manual/ .
+https://www.zabbix.com/documentation/6.0/manual/ .
 
 Zabbix installation instructions can be found at
-http://www.zabbix.com/documentation/5.0/manual/installation/ .
+https://www.zabbix.com/documentation/6.0/manual/installation/ .
 
 If you are installing Zabbix from packages the instructions can be found at
-http://www.zabbix.com/documentation/5.0/manual/installation/install_from_packages .
+https://www.zabbix.com/documentation/6.0/manual/installation/install_from_packages/ .

@@ -26,8 +26,8 @@ import (
 	"net"
 	"unsafe"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"golang.org/x/sys/windows"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/win32"
 )
 

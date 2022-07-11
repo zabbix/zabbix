@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T18:35:39Z'
+  date: '2022-04-06T19:27:19Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -114,7 +114,8 @@ zabbix_export:
             -
               uuid: 0d3a4dd2772f41029e599766fff1e651
               expression: 'last(/DELL PowerEdge R820 by HTTP/dell.server.hw.serialnumber,#1)<>last(/DELL PowerEdge R820 by HTTP/dell.server.hw.serialnumber,#2) and length(last(/DELL PowerEdge R820 by HTTP/dell.server.hw.serialnumber))>0'
-              name: 'Dell R820: Device has been replaced (new serial number received)'
+              name: 'Dell R820: Device has been replaced'
+              event_name: 'Dell R820: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -1265,7 +1266,8 @@ zabbix_export:
                 -
                   uuid: 6a2ad425b7654a58825a5032194204bd
                   expression: 'last(/DELL PowerEdge R820 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R820 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R820 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0'
-                  name: 'Dell R820: {#DISK_NAME} has been replaced (new serial number received)'
+                  name: 'Dell R820: {#DISK_NAME} has been replaced'
+                  event_name: 'Dell R820: {#DISK_NAME} has been replaced (new serial number received)'
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Ack to close'
                   manual_close: 'YES'

@@ -173,9 +173,12 @@ static void	*tfc_realloc_func(void *old, size_t size)
 static void	tfc_free_func(void *ptr)
 {
 	if (ptr >= (void *)cache->slots && ptr < (void *)(cache->slots + cache->slots_num))
-		return tfc_free_slot(ptr);
+	{
+		tfc_free_slot(ptr);
+		return;
+	}
 
-	return __tfc_mem_free_func(ptr);
+	__tfc_mem_free_func(ptr);
 }
 
 /******************************************************************************
@@ -476,10 +479,10 @@ int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functio
 		ts_time = end;
 		localtime_r(&ts_time, &tm_end);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s(%04d.%02d.%02d/%02d, %04d.%02d.%02d/%02d)",
-				__func__, itemid, tfc_function_str(function), tm_start.tm_year + 1900,
-				tm_start.tm_mon + 1, tm_start.tm_mday, tm_start.tm_hour, tm_end.tm_year + 1900,
-				tm_end.tm_mon + 1, tm_end.tm_mday, tm_end.tm_hour);
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s(%04d.%02d.%02d/%02d,"
+				" %04d.%02d.%02d/%02d)", __func__, itemid, tfc_function_str(function),
+				tm_start.tm_year + 1900, tm_start.tm_mon + 1, tm_start.tm_mday, tm_start.tm_hour,
+				tm_end.tm_year + 1900, tm_end.tm_mon + 1, tm_end.tm_mday, tm_end.tm_hour);
 	}
 
 	data_local.itemid = itemid;
@@ -556,10 +559,11 @@ void	zbx_tfc_put_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functi
 		else
 			zbx_print_double(buf, sizeof(buf), value);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s(%04d.%02d.%02d/%02d, %04d.%02d.%02d/%02d)"
-				"=%s state:%s", __func__, itemid, tfc_function_str(function), tm_start.tm_year + 1900,
-				tm_start.tm_mon + 1, tm_start.tm_mday, tm_start.tm_hour, tm_end.tm_year + 1900,
-				tm_end.tm_mon + 1, tm_end.tm_mday, tm_end.tm_hour, buf, tfc_state_str(state));
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s(%04d.%02d.%02d/%02d,"
+				" %04d.%02d.%02d/%02d)=%s state:%s", __func__, itemid, tfc_function_str(function),
+				tm_start.tm_year + 1900, tm_start.tm_mon + 1, tm_start.tm_mday, tm_start.tm_hour,
+				tm_end.tm_year + 1900, tm_end.tm_mon + 1, tm_end.tm_mday, tm_end.tm_hour, buf,
+				tfc_state_str(state));
 	}
 
 	data_local.itemid = itemid;

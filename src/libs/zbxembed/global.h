@@ -20,6 +20,8 @@
 #ifndef ZABBIX_GLOBAL_H
 #define ZABBIX_GLOBAL_H
 
+#include "zbxembed.h"
+
 void	es_init_global_functions(zbx_es_t *es);
 
 #endif

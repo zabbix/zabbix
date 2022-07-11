@@ -43,7 +43,7 @@ $fields = [
 	'name' =>				[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'width' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Width')],
 	'height' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Height')],
-	'graphtype' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),	'isset({add}) || isset({update})'],
+	'graphtype' =>			[T_ZBX_INT, O_OPT, P_SYS,		IN('0,1,2,3'),	'isset({add}) || isset({update})'],
 	'show_3d' =>			[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null],
 	'show_legend' =>		[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null],
 	'ymin_type' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null],
@@ -62,6 +62,7 @@ $fields = [
 	'group_graphid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
 	'copy_targetids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
 	'context' =>			[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
+	'readonly' =>			[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete","graph.updatediscover"'),	null],
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
@@ -96,7 +97,14 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 }
 check_fields($fields);
 
-$gitems = getRequest('items', []);
+$gitems = [];
+foreach (getRequest('items', []) as $gitem) {
+	if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
+			&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+			&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+		$gitems[] = $gitem;
+	}
+}
 
 $_REQUEST['show_3d'] = getRequest('show_3d', 0);
 $_REQUEST['show_legend'] = getRequest('show_legend', 0);
@@ -370,7 +378,9 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 		DBstart();
 		foreach (getRequest('group_graphid') as $graphid) {
 			foreach ($dbHosts as $host) {
-				$result &= (bool) copyGraphToHost($graphid, $host['hostid']);
+				if (!copyGraphToHost($graphid, $host['hostid'])) {
+					$result = false;
+				}
 			}
 		}
 		$result = DBend($result);
@@ -493,10 +503,11 @@ elseif (isset($_REQUEST['form'])) {
 		'group_gid' => getRequest('group_gid', []),
 		'hostid' => $hostid,
 		'normal_only' => getRequest('normal_only'),
-		'context' => getRequest('context')
+		'context' => getRequest('context'),
+		'readonly' => getRequest('readonly', 0)
 	];
 
-	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
+	if ($data['graphid'] != 0 && ($data['readonly'] || !$data['form_refresh'])) {
 		$options = [
 			'graphids' => $data['graphid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -553,7 +564,7 @@ elseif (isset($_REQUEST['form'])) {
 		// templates
 		$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
-			$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
+			$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		// items
@@ -591,7 +602,6 @@ elseif (isset($_REQUEST['form'])) {
 		$data['visible'] = getRequest('visible');
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
-		$data['visible'] = getRequest('visible');
 		$data['items'] = $gitems;
 		$data['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
 		$data['templates'] = [];
@@ -604,7 +614,7 @@ elseif (isset($_REQUEST['form'])) {
 		}
 	}
 
-	if (empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
+	if ($data['graphid'] == 0 && !$data['form_refresh']) {
 		$data['show_legend'] = $_REQUEST['show_legend'] = 1;
 		$data['show_work_period'] = $_REQUEST['show_work_period'] = 1;
 		$data['show_triggers'] = $_REQUEST['show_triggers'] = 1;
@@ -623,15 +633,17 @@ elseif (isset($_REQUEST['form'])) {
 			'preservekeys' => true
 		]);
 
-		foreach ($data['items'] as &$item) {
-			$host = reset($items[$item['itemid']]['hosts']);
+		if ($items) {
+			foreach ($data['items'] as &$item) {
+				$host = reset($items[$item['itemid']]['hosts']);
 
-			$item['host'] = $host['name'];
-			$item['hostid'] = $items[$item['itemid']]['hostid'];
-			$item['name'] = $items[$item['itemid']]['name'];
-			$item['flags'] = $items[$item['itemid']]['flags'];
+				$item['host'] = $host['name'];
+				$item['hostid'] = $items[$item['itemid']]['hostid'];
+				$item['name'] = $items[$item['itemid']]['name'];
+				$item['flags'] = $items[$item['itemid']]['flags'];
+			}
+			unset($item);
 		}
-		unset($item);
 	}
 
 	// Set ymin_item_name.

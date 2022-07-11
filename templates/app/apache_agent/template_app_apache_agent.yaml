@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:48:44Z'
+  date: '2022-04-06T19:26:57Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -146,7 +146,8 @@ zabbix_export:
             -
               uuid: 7872d9665c234f45941ca26206e0255c
               expression: 'last(/Apache by Zabbix agent/apache.uptime)<10m'
-              name: 'Apache: has been restarted (uptime < 10m)'
+              name: 'Apache: has been restarted'
+              event_name: 'Apache: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -183,7 +184,8 @@ zabbix_export:
             -
               uuid: 5124b17918f545758ca5c936332f51cd
               expression: 'last(/Apache by Zabbix agent/apache.version,#1)<>last(/Apache by Zabbix agent/apache.version,#2) and length(last(/Apache by Zabbix agent/apache.version))>0'
-              name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Apache: Version has changed'
+              event_name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Apache version has changed. Ack to close.'
               manual_close: 'YES'
@@ -456,7 +458,8 @@ zabbix_export:
             -
               uuid: 128905793a4b4a1db5a49f87e87d3383
               expression: 'min(/Apache by Zabbix agent/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}'
-              name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              name: 'Apache: Service response time is too high'
+              event_name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
@@ -621,7 +624,8 @@ zabbix_export:
             -
               uuid: 0166ec63913e4bbea25c54b458b3213a
               expression: 'nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1'
-              name: 'Apache: Failed to fetch status page (or no data for 30m)'
+              name: 'Apache: Failed to fetch status page'
+              event_name: 'Apache: Failed to fetch status page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'

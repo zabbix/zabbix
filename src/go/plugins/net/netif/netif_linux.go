@@ -27,8 +27,8 @@ import (
 	"strconv"
 	"strings"
 
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/std"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/std"
 )
 
 const (

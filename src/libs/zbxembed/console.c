@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "console.h"
+
 #include "common.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "zbxembed.h"
 #include "embed.h"
 #include "duktape.h"
-#include "console.h"
 
 /******************************************************************************
  *                                                                            *
@@ -75,7 +75,7 @@ static duk_ret_t	es_log_message(duk_context *ctx, int level)
 
 	if (0 == duk_is_null_or_undefined(ctx, -1))
 	{
-		if (SUCCEED != zbx_cesu8_to_utf8(msg_raw, &msg_output))
+		if (SUCCEED != es_duktape_string_decode(msg_raw, &msg_output))
 		{
 			msg_output = zbx_strdup(msg_output, msg_raw);
 			zbx_replace_invalid_utf8(msg_output);

@@ -670,10 +670,10 @@ class CLegacyWebTest extends CWebTest {
 			foreach ($this->query($type, $id)->all() as $element) {
 				switch ($element->getTagName()) {
 					case 'select':
-						return $element->asDropdown();
+						return $element->asList();
 
 					case 'z-select':
-						return $element->asZDropdown();
+						return $element->asDropdown();
 				}
 			}
 		}

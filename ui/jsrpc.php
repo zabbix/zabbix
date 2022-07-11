@@ -268,7 +268,7 @@ switch ($data['method']) {
 			case 'graph_prototypes':
 				$options = [
 					'output' => ['graphid', 'name'],
-					'selectHosts' => ['name'],
+					'selectHosts' => ['hostid', 'name'],
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
@@ -277,6 +277,8 @@ switch ($data['method']) {
 				];
 
 				if ($data['object_name'] === 'graph_prototypes') {
+					$options['selectDiscoveryRule'] = ['hostid'];
+
 					$records = API::GraphPrototype()->get($options);
 				}
 				else {
@@ -290,10 +292,18 @@ switch ($data['method']) {
 				}
 
 				foreach ($records as $record) {
+					if ($data['object_name'] === 'graphs') {
+						$host_name = $record['hosts'][0]['name'];
+					}
+					else {
+						$host_names = array_column($record['hosts'], 'name', 'hostid');
+						$host_name = $host_names[$record['discoveryRule']['hostid']];
+					}
+
 					$result[] = [
 						'id' => $record['graphid'],
 						'name' => $record['name'],
-						'prefix' => $record['hosts'][0]['name'].NAME_DELIMITER
+						'prefix' => $host_name.NAME_DELIMITER
 					];
 				}
 				break;
@@ -617,8 +627,7 @@ switch ($data['method']) {
 
 	case 'patternselect.get':
 		$search = (array_key_exists('search', $data) && $data['search'] !== '') ? $data['search'] : null;
-		$wildcard_enabled = (strpos($search, '*') !== false);
-		$result = [];
+		$wildcard_enabled = array_key_exists('wildcard_allowed', $data) && strpos($search, '*') !== false;
 
 		switch ($data['object_name']) {
 			case 'hosts':
@@ -638,10 +647,7 @@ switch ($data['method']) {
 					'output' => ['name'],
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'searchWildcardsEnabled' => $wildcard_enabled,
-					'filter' => [
-						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT],
-						'flags' => ZBX_FLAG_DISCOVERY_NORMAL
-					],
+					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
 					'limit' => $limit

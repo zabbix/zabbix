@@ -20,6 +20,8 @@
 #ifndef ZABBIX_HISTORY_COMPRESSION_H
 #define ZABBIX_HISTORY_COMPRESSION_H
 
+#include "dbcache.h"
+
 void	hk_history_compression_init(void);
 void	hk_history_compression_update(zbx_config_db_t *cfg);
 

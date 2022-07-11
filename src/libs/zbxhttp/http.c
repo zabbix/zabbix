@@ -52,8 +52,8 @@ size_t	zbx_curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 	return size * nmemb;
 }
 
-int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header,
-		zbx_http_response_t *body, void *header_cb, void *body_cb, char *errbuf, char **error)
+int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header, zbx_http_response_t *body,
+		zbx_curl_cb_t header_cb, zbx_curl_cb_t body_cb, char *errbuf, char **error)
 {
 	CURLcode	err;
 

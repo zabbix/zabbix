@@ -21,6 +21,8 @@
 
 #ifdef HAVE_OPENIPMI
 
+#include "ipmi_poller.h"
+
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
@@ -28,7 +30,6 @@
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
 
-#include "ipmi_poller.h"
 
 #define ZBX_IPMI_MANAGER_CLEANUP_DELAY		SEC_PER_DAY
 

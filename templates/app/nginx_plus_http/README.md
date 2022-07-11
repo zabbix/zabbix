@@ -193,14 +193,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Nginx: Server response error (text: {ITEM.VALUE}) |<p>-</p> |`length(last(/Nginx Plus by HTTP/nginx.info.error))>0` |HIGH | |
-|Nginx: Version has changed (new version: {ITEM.VALUE}) |<p>Nginx version has changed. Ack to close.</p> |`last(/Nginx Plus by HTTP/nginx.info.version,#1)<>last(/Nginx Plus by HTTP/nginx.info.version,#2) and length(last(/Nginx Plus by HTTP/nginx.info.version))>0` |INFO |<p>Manual close: YES</p> |
-|Nginx: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Nginx Plus by HTTP/nginx.info.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Nginx: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for metrics for the last 30 minutes</p> |`nodata(/Nginx Plus by HTTP/nginx.info.uptime,30m)=1` |WARNING |<p>Manual close: YES</p> |
-|Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m) |<p>The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p> |`min(/Nginx Plus by HTTP/nginx.connections.dropped,5m) > {$NGINX.DROP_RATE.MAX.WARN}` |WARNING | |
+|Nginx: Server response error |<p>-</p> |`length(last(/Nginx Plus by HTTP/nginx.info.error))>0` |HIGH | |
+|Nginx: Version has changed |<p>Nginx version has changed. Ack to close.</p> |`last(/Nginx Plus by HTTP/nginx.info.version,#1)<>last(/Nginx Plus by HTTP/nginx.info.version,#2) and length(last(/Nginx Plus by HTTP/nginx.info.version))>0` |INFO |<p>Manual close: YES</p> |
+|Nginx: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Nginx Plus by HTTP/nginx.info.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Nginx: Failed to fetch info data |<p>Zabbix has not received data for metrics for the last 30 minutes</p> |`nodata(/Nginx Plus by HTTP/nginx.info.uptime,30m)=1` |WARNING |<p>Manual close: YES</p> |
+|Nginx: High connections drop rate |<p>The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p> |`min(/Nginx Plus by HTTP/nginx.connections.dropped,5m) > {$NGINX.DROP_RATE.MAX.WARN}` |WARNING | |
 |Nginx: HTTP upstream server is not in UP or DOWN state. |<p>-</p> |`find(/Nginx Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/Nginx Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0` |WARNING | |
-|Nginx: Too many HTTP requests with code 4xx (over {$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}% for 5m) |<p>-</p> |`sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))` |WARNING | |
-|Nginx: Too many HTTP requests with code 5xx (over {$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}% for 5m) |<p>-</p> |`sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))` |HIGH | |
+|Nginx: Too many HTTP requests with code 4xx |<p>-</p> |`sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))` |WARNING | |
+|Nginx: Too many HTTP requests with code 5xx |<p>-</p> |`sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))` |HIGH | |
 |Nginx: Stream upstream server is not in UP or DOWN state. |<p>-</p> |`find(/Nginx Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/Nginx Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0` |WARNING | |
 
 ## Feedback

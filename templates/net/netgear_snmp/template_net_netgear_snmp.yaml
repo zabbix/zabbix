@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T14:53:29Z'
+  date: '2022-04-14T11:07:02Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -167,7 +167,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: FASTPATH-SWITCHING-MIB
-            CPU utilization in %
+            CPU utilization in %.
           preprocessing:
             -
               type: REGEX
@@ -182,7 +182,8 @@ zabbix_export:
             -
               uuid: 1e47f984c5514205aad2be5db1157fd2
               expression: 'min(/Netgear Fastpath SNMP/system.cpu.util[agentSwitchCpuProcessTotalUtilization.0],5m)>{$CPU.UTIL.CRIT}'
-              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -262,7 +263,8 @@ zabbix_export:
             -
               uuid: eba057a7ef5743ecb2c037476c97fc38
               expression: 'last(/Netgear Fastpath SNMP/system.hw.serialnumber,#1)<>last(/Netgear Fastpath SNMP/system.hw.serialnumber,#2) and length(last(/Netgear Fastpath SNMP/system.hw.serialnumber))>0'
-              name: 'Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -320,7 +322,8 @@ zabbix_export:
             -
               uuid: 61e82ab169374a51a1ebd876cc7813a8
               expression: 'last(/Netgear Fastpath SNMP/system.name,#1)<>last(/Netgear Fastpath SNMP/system.name,#2) and length(last(/Netgear Fastpath SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -386,7 +389,7 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: 'System name has changed (new name: {ITEM.VALUE})'
+                  name: 'System name has changed'
                   expression: 'last(/Netgear Fastpath SNMP/system.name,#1)<>last(/Netgear Fastpath SNMP/system.name,#2) and length(last(/Netgear Fastpath SNMP/system.name))>0'
               tags:
                 -
@@ -418,9 +421,10 @@ zabbix_export:
             -
               uuid: d68e4595fd4c4e5a9307b268cfe06b3e
               expression: 'last(/Netgear Fastpath SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -469,7 +473,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '(last(//vm.memory.total[agentSwitchCpuProcessMemAvailable.0])-last(//vm.memory.available[agentSwitchCpuProcessMemFree.0]))/last(//vm.memory.total[agentSwitchCpuProcessMemAvailable.0])*100'
-          description: 'Memory utilization in %'
+          description: 'Memory utilization in %.'
           tags:
             -
               tag: component
@@ -478,7 +482,8 @@ zabbix_export:
             -
               uuid: 21c1a017dcc14148a9020207a6fd7488
               expression: 'min(/Netgear Fastpath SNMP/vm.memory.util[memoryUsedPercentage.0],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -902,7 +907,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
                 through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'IF-MIB::ifType'
@@ -964,7 +969,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Netgear Fastpath SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Netgear Fastpath SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
                 avg(/Netgear Fastpath SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Netgear Fastpath SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -987,7 +993,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Netgear Fastpath SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Netgear Fastpath SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1138,10 +1145,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 222b4523c61144d1a91bb1b5cbd63caf
-                  expression: 'avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
+                  expression: 'avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:""}+3'
-                  name: '#{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  recovery_expression: 'min(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
+                  name: '#{#SNMPVALUE}: Temperature is too low'
+                  event_name: '#{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -1155,12 +1163,13 @@ zabbix_export:
             -
               uuid: bead54e2d2f34d45bafb41600e84ac2d
               expression: |
-                avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}
+                avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
                 or
                 last(/Netgear Fastpath SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
-              name: '#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+              recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+              name: '#{#SNMPVALUE}: Temperature is above critical threshold'
+              event_name: '#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1174,23 +1183,24 @@ zabbix_export:
             -
               uuid: f3444dbde8344a1782449ec4260972d1
               expression: |
-                avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}
+                avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}
                 or
                 last(/Netgear Fastpath SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:""}-3'
-              name: '#{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+              recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
+              name: '#{#SNMPVALUE}: Temperature is above warning threshold'
+              event_name: '#{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
               dependencies:
                 -
-                  name: '#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  name: '#{#SNMPVALUE}: Temperature is above critical threshold'
                   expression: |
-                    avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}
+                    avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
                     or
                     last(/Netgear Fastpath SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
-                  recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
               tags:
                 -
                   tag: scope

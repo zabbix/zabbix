@@ -31,12 +31,12 @@ import (
 	"strconv"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/zbxerr"
 )
 
 type requestBody struct {

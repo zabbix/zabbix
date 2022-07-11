@@ -17,13 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "hardware.h"
+
 #include "../common/zbxsysinfo_common.h"
 #include "sysinfo.h"
 #include <sys/mman.h>
 #include <setjmp.h>
 #include <signal.h>
 #include "zbxalgo.h"
-#include "hardware.h"
 #include "zbxregexp.h"
 #include "log.h"
 

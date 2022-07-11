@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"zabbix.com/pkg/uri"
+	"git.zabbix.com/ap/plugin-support/uri"
 )
 
 type Details struct {

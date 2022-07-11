@@ -17,11 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxalgo.h"
 #include "eval.h"
-
-#include "zbxeval.h"
 
 /* The tag expression token is virtual token used during item query filter processing. */
 #define ZBX_EVAL_TOKEN_TAG_EXPRESSION		(1000)

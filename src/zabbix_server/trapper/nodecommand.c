@@ -17,19 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "comms.h"
+#include "nodecommand.h"
+
 #include "zbxserver.h"
-#include "db.h"
 #include "log.h"
+#include "trapper_auth.h"
+
 #include "../scripts/scripts.h"
 #include "../../libs/zbxaudit/audit.h"
-
-#include "trapper_auth.h"
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
-
-#include "nodecommand.h"
 
 /******************************************************************************
  *                                                                            *

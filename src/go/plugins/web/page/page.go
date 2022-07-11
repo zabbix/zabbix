@@ -27,9 +27,9 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/web"
 	"zabbix.com/pkg/zbxregexp"
 )

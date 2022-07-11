@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:02:13Z'
+  date: '2022-04-06T19:26:55Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -72,6 +72,7 @@ zabbix_export:
                   uuid: 7902d81681874aa3acf33d90316f9864
                   expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#1)<>last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#2) and length(last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion]))>0'
                   name: 'Broker {#JMXBROKERNAME}: Version has been changed'
+                  event_name: 'Broker {#JMXBROKERNAME}: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Broker {#JMXBROKERNAME} version has changed. Ack to close.'
                   manual_close: 'YES'
@@ -118,7 +119,8 @@ zabbix_export:
                 -
                   uuid: e805b8cca9744940affc3bdd234a7587
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}'
-                  name: 'Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
+                  name: 'Broker {#JMXBROKERNAME}: Memory usage is too high'
+                  event_name: 'Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
                   priority: HIGH
                   tags:
                     -
@@ -127,11 +129,12 @@ zabbix_export:
                 -
                   uuid: 3e741e339fff422fae67b5333faa1e20
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}'
-                  name: 'Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}%)'
+                  name: 'Broker {#JMXBROKERNAME}: Memory usage is too high'
+                  event_name: 'Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}%)'
                   priority: AVERAGE
                   dependencies:
                     -
-                      name: 'Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
+                      name: 'Broker {#JMXBROKERNAME}: Memory usage is too high'
                       expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}'
                   tags:
                     -
@@ -176,7 +179,8 @@ zabbix_export:
                 -
                   uuid: 2e1c9f92c87f446ebab68ac638c713c5
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},StorePercentUsage],{$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}'
-                  name: 'Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
+                  name: 'Broker {#JMXBROKERNAME}: Storage usage is too high'
+                  event_name: 'Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
                   priority: HIGH
                   tags:
                     -
@@ -185,11 +189,12 @@ zabbix_export:
                 -
                   uuid: 271b33edce84439a91d6a253f45e5bf6
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},StorePercentUsage],{$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}'
-                  name: 'Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}%)'
+                  name: 'Broker {#JMXBROKERNAME}: Storage usage is too high'
+                  event_name: 'Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}%)'
                   priority: AVERAGE
                   dependencies:
                     -
-                      name: 'Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
+                      name: 'Broker {#JMXBROKERNAME}: Storage usage is too high'
                       expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},StorePercentUsage],{$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}'
                   tags:
                     -
@@ -234,7 +239,8 @@ zabbix_export:
                 -
                   uuid: 422252a81e3e4261bbd7f331f48c6257
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TempPercentUsage],{$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.TEMP.MAX.HIGH}'
-                  name: 'Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)'
+                  name: 'Broker {#JMXBROKERNAME}: Temp usage is too high'
+                  event_name: 'Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)'
                   priority: HIGH
                   tags:
                     -
@@ -243,11 +249,12 @@ zabbix_export:
                 -
                   uuid: acb8f6e0762f48c2bd4c03f2a55b2f44
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TempPercentUsage],{$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.TEMP.MAX.WARN}'
-                  name: 'Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)'
+                  name: 'Broker {#JMXBROKERNAME}: Temp usage is too high'
+                  event_name: 'Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)'
                   priority: AVERAGE
                   dependencies:
                     -
-                      name: 'Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)'
+                      name: 'Broker {#JMXBROKERNAME}: Temp usage is too high'
                       expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TempPercentUsage],{$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.TEMP.MAX.HIGH}'
                   tags:
                     -
@@ -271,7 +278,8 @@ zabbix_export:
                 -
                   uuid: 6906f0a1ef804da4a1203ca9d96ab8a0
                   expression: 'max(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TotalConsumerCount],{$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})<{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
-                  name: 'Broker {#JMXBROKERNAME}: Consumers count is too low (below {$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})'
+                  name: 'Broker {#JMXBROKERNAME}: Consumers count is too low'
+                  event_name: 'Broker {#JMXBROKERNAME}: Consumers count is too low (below {$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})'
                   priority: HIGH
                   tags:
                     -
@@ -321,7 +329,8 @@ zabbix_export:
                 -
                   uuid: a3ab7bca031c45059418fa82a3c67369
                   expression: 'avg(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TotalEnqueueCount],{$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})>avg(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TotalEnqueueCount],{$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})'
-                  name: 'Broker {#JMXBROKERNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"}'
+                  name: 'Broker {#JMXBROKERNAME}: Message enqueue rate is higher than dequeue rate'
+                  event_name: 'Broker {#JMXBROKERNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"}'
                   priority: AVERAGE
                   description: 'Enqueue rate is higher than dequeue rate. It may indicate performance problems.'
                   tags:
@@ -346,7 +355,8 @@ zabbix_export:
                 -
                   uuid: 2ee6ad72a98143b59d8d1136fffdbe50
                   expression: 'max(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TotalProducerCount],{$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})<{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
-                  name: 'Broker {#JMXBROKERNAME}: Producers count is too low (below {$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})'
+                  name: 'Broker {#JMXBROKERNAME}: Producers count is too low'
+                  event_name: 'Broker {#JMXBROKERNAME}: Producers count is too low (below {$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})'
                   priority: HIGH
                   tags:
                     -
@@ -376,7 +386,8 @@ zabbix_export:
                 -
                   uuid: 6abb3813bb52465aa4a5f4bebfe999c3
                   expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},UptimeMillis])<10m'
-                  name: 'Broker {#JMXBROKERNAME}: Broker has been restarted (uptime < 10m)'
+                  name: 'Broker {#JMXBROKERNAME}: Broker has been restarted'
+                  event_name: 'Broker {#JMXBROKERNAME}: Broker has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
@@ -596,7 +607,8 @@ zabbix_export:
                 -
                   uuid: a498405c5b764c1ea9f0e151adf94ed7
                   expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ExpiredCount])>{$ACTIVEMQ.EXPIRED.WARN:"{#JMXDESTINATIONNAME}"}'
-                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count higher than {$ACTIVEMQ.EXPIRED.WARN:"{#JMXDESTINATIONNAME}"}'
+                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count is high'
+                  event_name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count higher than {$ACTIVEMQ.EXPIRED.WARN:"{#JMXDESTINATIONNAME}"}'
                   priority: AVERAGE
                   description: 'This metric represents the number of messages that expired before they could be delivered. If you expect all messages to be delivered and acknowledged within a certain amount of time, you can set an expiration for each message, and investigate if your ExpiredCount metric rises above zero.'
                   tags:
@@ -622,7 +634,8 @@ zabbix_export:
                 -
                   uuid: 197ab32730a84f79ba1b1e827a10e175
                   expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},MemoryPercentUsage])>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}'
-                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}%)'
+                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high'
+                  event_name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}%)'
                   priority: HIGH
                   tags:
                     -
@@ -631,7 +644,8 @@ zabbix_export:
                 -
                   uuid: 1e4e3a969b434c6d972251f8c9b3f2a7
                   expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},MemoryPercentUsage])>{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}'
-                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}%)'
+                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high'
+                  event_name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}%)'
                   priority: AVERAGE
                   tags:
                     -
@@ -669,7 +683,8 @@ zabbix_export:
                 -
                   uuid: f1c49943152c407088e3bf288b650b41
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},QueueSize],{$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"})>{$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} and {$ACTIVEMQ.QUEUE.ENABLED:"{#JMXDESTINATIONNAME}"}=1'
-                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size higher than {$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"}'
+                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size is high'
+                  event_name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size higher than {$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"}'
                   priority: AVERAGE
                   description: 'Queue size is higher than threshold. It may indicate performance problems.'
                   tags:
@@ -682,7 +697,8 @@ zabbix_export:
               expression: 'max(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ConsumerCount],{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})<{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and last(/Apache ActiveMQ by JMX/jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.CONSUMERS.COUNT: "{#JMXDESTINATIONNAME}"}])>{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ConsumerCount],{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})>={$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}'
-              name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count is too low (below {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})'
+              name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count is too low'
+              event_name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count is too low (below {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
@@ -692,7 +708,8 @@ zabbix_export:
             -
               uuid: 344a0b83a5444d009aa56e97c1c0171b
               expression: 'avg(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},EnqueueCount],{$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})>avg(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},DequeueCount],{$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})'
-              name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"}'
+              name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Message enqueue rate is higher than dequeue rate'
+              event_name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"}'
               priority: AVERAGE
               description: 'Enqueue rate is higher than dequeue rate. It may indicate performance problems.'
               tags:
@@ -704,7 +721,8 @@ zabbix_export:
               expression: 'max(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ProducerCount],{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})<{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and last(/Apache ActiveMQ by JMX/jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}])>{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ProducerCount],{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})>={$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}'
-              name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count is too low (below {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})'
+              name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count is too low'
+              event_name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count is too low (below {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})'
               priority: AVERAGE
               manual_close: 'YES'
               tags:

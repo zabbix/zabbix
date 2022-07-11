@@ -25,10 +25,10 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/mediocregopher/radix/v3"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/uri"
-	"zabbix.com/pkg/zbxerr"
 )
 
 const hkInterval = 10

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:01:43Z'
+  date: '2022-04-06T19:36:04Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -594,7 +594,8 @@ zabbix_export:
             -
               uuid: ac27f2d8b34546d1bdc6d7ab858c04a1
               expression: 'min(/Zookeeper by HTTP/zookeeper.outstanding_requests,5m)>{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}'
-              name: 'Zookeeper: Too many queued requests (over {$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}% for 5 min)'
+              name: 'Zookeeper: Too many queued requests'
+              event_name: 'Zookeeper: Too many queued requests (over {$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}% for 5 min)'
               priority: AVERAGE
               description: 'Number of queued requests in the server. This goes up when the server receives more requests than it can process.'
               manual_close: 'YES'
@@ -703,7 +704,8 @@ zabbix_export:
             -
               uuid: 494624353875401eaf65f7eb0273ca35
               expression: 'last(/Zookeeper by HTTP/zookeeper.server_state,#1)<>last(/Zookeeper by HTTP/zookeeper.server_state,#2) and length(last(/Zookeeper by HTTP/zookeeper.server_state))>0'
-              name: 'Zookeeper: Server mode has changed (new mode: {ITEM.VALUE})'
+              name: 'Zookeeper: Server mode has changed'
+              event_name: 'Zookeeper: Server mode has changed (new mode: {ITEM.VALUE})'
               priority: INFO
               description: 'Zookeeper node state has changed. Ack to close.'
               manual_close: 'YES'
@@ -763,7 +765,8 @@ zabbix_export:
             -
               uuid: db35b5c75fc543ef8ffe766a0671fd6d
               expression: 'nodata(/Zookeeper by HTTP/zookeeper.uptime,10m)=1'
-              name: 'Zookeeper: Failed to fetch info data (or no data for 10m)'
+              name: 'Zookeeper: Failed to fetch info data'
+              event_name: 'Zookeeper: Failed to fetch info data (or no data for 10m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 10 minutes'
               manual_close: 'YES'
@@ -774,7 +777,8 @@ zabbix_export:
             -
               uuid: d023c72f35e441d2bf5bbc3c1f9d0dad
               expression: 'last(/Zookeeper by HTTP/zookeeper.uptime)<10m'
-              name: 'Zookeeper: has been restarted (uptime < 10m)'
+              name: 'Zookeeper: has been restarted'
+              event_name: 'Zookeeper: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -816,7 +820,8 @@ zabbix_export:
             -
               uuid: 2a091bcfafe84ea9aee5238ce5e25651
               expression: 'last(/Zookeeper by HTTP/zookeeper.version,#1)<>last(/Zookeeper by HTTP/zookeeper.version,#2) and length(last(/Zookeeper by HTTP/zookeeper.version))>0'
-              name: 'Zookeeper: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Zookeeper: Version has changed'
+              event_name: 'Zookeeper: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Zookeeper version has changed. Ack to close.'
               manual_close: 'YES'
@@ -1173,7 +1178,8 @@ zabbix_export:
                 -
                   uuid: 004e26cca4934d1992b3c894f36b5643
                   expression: 'min(/Zookeeper by HTTP/zookeeper.pending_syncs[{#SINGLETON}],5m)>{$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}'
-                  name: 'Zookeeper: Too many pending syncs (over {$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}% for 5 min)'
+                  name: 'Zookeeper: Too many pending syncs'
+                  event_name: 'Zookeeper: Too many pending syncs (over {$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}% for 5 min)'
                   priority: AVERAGE
                   manual_close: 'YES'
                   tags:
@@ -1313,7 +1319,8 @@ zabbix_export:
     -
       uuid: 53a97045bfd8473899849e429e3e7017
       expression: 'min(/Zookeeper by HTTP/zookeeper.open_file_descriptor_count,5m) * 100 / last(/Zookeeper by HTTP/zookeeper.max_file_descriptor_count) > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}'
-      name: 'Zookeeper: Too many file descriptors used (over {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% for 5 min)'
+      name: 'Zookeeper: Too many file descriptors used'
+      event_name: 'Zookeeper: Too many file descriptors used (over {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.'
       tags:

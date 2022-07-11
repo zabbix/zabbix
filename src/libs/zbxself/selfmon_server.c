@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
 #include "selfmon.h"
+
+#include "common.h"
 
 extern int	CONFIG_REPORTMANAGER_FORKS;
 extern int	CONFIG_REPORTWRITER_FORKS;

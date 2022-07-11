@@ -17,16 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "preprocessing.h"
+
 #include "common.h"
 #include "log.h"
 #include "zbxserialize.h"
-#include "zbxipcservice.h"
-#include "preproc.h"
 #include "preproc_history.h"
 #include "item_preproc.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
-
-#include "preprocessing.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1

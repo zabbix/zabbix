@@ -51,7 +51,7 @@
 				fields = $form.find('[name^=http_]');
 			}
 			else if ($(this).is('#ldap_configured')) {
-				fields = $form.find('[name^=ldap_],button[name=change_bind_password]');
+				fields = $form.find('[name^=ldap_],#bind-password-btn');
 			}
 			else {
 				fields = $form.find('[name^=saml_]');
@@ -62,15 +62,22 @@
 				.prop('disabled', !this.checked);
 		});
 
-		$form.find('button#change_bind_password').click(function() {
-			$form.find('[name=action]')
-				.val($form.find('[name=action_passw_change]').val());
-
-			submitFormWithParam('form_auth', 'change_bind_password', '1');
-		});
+		$form.find('#bind-password-btn').on('click', showPasswordField);
 
 		$form.find('[name=ldap_test]').click(function() {
 			warn = false;
 		});
 	});
+
+	function showPasswordField(e) {
+		const form_field = e.target.parentNode;
+		const password_field = form_field.querySelector('[name="ldap_bind_password"]');
+
+		password_field.disabled = false;
+		password_field.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+
+		form_field.removeChild(e.target);
+
+		document.getElementById('change_bind_password').value = 1;
+	}
 </script>

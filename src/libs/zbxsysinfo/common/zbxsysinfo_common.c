@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxsysinfo_common.h"
+
 #include "sysinfo.h"
 #include "log.h"
 #include "file.h"
@@ -26,8 +28,6 @@
 #include "system.h"
 #include "zabbix_stats.h"
 #include "zbxexec.h"
-
-#include "zbxsysinfo_common.h"
 
 #if !defined(_WINDOWS)
 #	define VFS_TEST_FILE "/etc/passwd"

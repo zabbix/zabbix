@@ -130,7 +130,7 @@ class testPageDashboardWidgets extends CWebTest {
 	 */
 	public function testPageDashboardWidgets_checkProblemHostsWidget() {
 		// Authorize user and open the page with the desired widget.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1000');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=100100');
 
 		// Find dashboard element.
 		$dashboard = CDashboardElement::find()->one();
@@ -236,7 +236,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		// Set type to "Clock".
-		$form->getField('Type')->asZDropdown()->select('Clock');
+		$form->getField('Type')->asDropdown()->select('Clock');
 		// Wait until overlay is reloaded.
 		$overlay->waitUntilReady();
 		// Set name of widget.

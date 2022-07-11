@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -115,7 +115,7 @@ class CControllerPopupTabFilterEdit extends CController {
 
 		$data += [
 			'title' => _('Filter properties'),
-			'errors' => hasErrorMesssages() ? getMessages() : null,
+			'errors' => hasErrorMessages() ? getMessages() : null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -43,7 +43,6 @@ class CRangeControl extends CTextBox {
 
 		$this->setValue($value);
 		$this->addClass(static::ZBX_STYLE_CLASS);
-		return $this;
 	}
 
 	public function setValue($value) {

@@ -22,7 +22,7 @@ package main
 import (
 	"errors"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 // Plugin -

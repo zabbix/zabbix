@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:29:54Z'
+  date: '2022-04-06T19:27:48Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -75,7 +75,8 @@ zabbix_export:
             -
               uuid: 5ec22ac264d445769039bd4c13e41bf7
               expression: 'min(/Jenkins by HTTP/jenkins.descriptor.ratio,5m)>{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}'
-              name: 'Jenkins: Current number of used files is too high (over {$JENKINS.FILE_DESCRIPTORS.MAX.WARN}% for 5m)'
+              name: 'Jenkins: Current number of used files is too high'
+              event_name: 'Jenkins: Current number of used files is too high (over {$JENKINS.FILE_DESCRIPTORS.MAX.WARN}% for 5m)'
               priority: WARNING
               tags:
                 -
@@ -1623,7 +1624,8 @@ zabbix_export:
             -
               uuid: 7d20942598a648ebb2e03f9acdb3e5e3
               expression: 'last(/Jenkins by HTTP/jenkins.system.uptime)<10m'
-              name: 'Jenkins: has been restarted (uptime < 10m)'
+              name: 'Jenkins: has been restarted'
+              event_name: 'Jenkins: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1770,7 +1772,8 @@ zabbix_export:
             -
               uuid: 3dd66b51ed1b4fc2a250daf3e9999e4f
               expression: 'last(/Jenkins by HTTP/jenkins.version,#1)<>last(/Jenkins by HTTP/jenkins.version,#2) and length(last(/Jenkins by HTTP/jenkins.version))>0'
-              name: 'Jenkins: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Jenkins: Version has changed'
+              event_name: 'Jenkins: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Jenkins version has changed. Ack to close.'
               manual_close: 'YES'

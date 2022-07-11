@@ -33,6 +33,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "components/dashboard/widget-item";
 @import "components/dashboard/widget-tophosts";
 @import "components/diff";
+@import "components/expandable-subfilter";
 @import "components/form-search";
 @import "components/inline-filter";
 @import "components/menu-main";
@@ -324,6 +325,18 @@ form {
 		}
 	}
 
+	td {
+		.icon-maintenance {
+			margin: 0 0 -3px 4px;
+		}
+
+		.icon-depend-up,
+		.icon-depend-down,
+		.icon-ackn {
+			margin: 0 4px -3px 0;
+		}
+	}
+
 	&.compact-view {
 		tr {
 			&[class*='flh-'] {
@@ -346,7 +359,7 @@ form {
 								background-color: rgba($font-color, .5);
 							}
 
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-position: -165px -624px;
 							}
 
@@ -372,7 +385,7 @@ form {
 								border-bottom-color: rgba(0, 0, 0, .5);
 							}
 
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-position: -165px -624px;
 							}
 
@@ -393,7 +406,7 @@ form {
 
 							[class*='icon-depend-'],
 							.icon-description,
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-color: transparent;
 							}
 						}
@@ -434,7 +447,6 @@ form {
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, .1);
 			color: $font-color;
 			height: 22px;
-			line-height: 1;
 			vertical-align: middle;
 			white-space: nowrap;
 
@@ -444,16 +456,12 @@ form {
 				&::after {
 					margin: 0;
 					line-height: 14px;
+					top: 0;
 				}
 
 				&:last-of-type {
 					margin-right: 0;
 				}
-			}
-
-			[class*='icon-depend-'] {
-				width: 12px;
-				margin-right: 0;
 			}
 
 			.rel-container {
@@ -482,21 +490,32 @@ form {
 				}
 			}
 
-			.icon-maint {
-				position: relative;
-				display: inline-block;
+			.icon-maintenance {
 				height: 12px;
 				width: 12px;
-				margin: 3px 1px 2px 2px !important;
+				margin: 3px 1px 2px 4px;
 
 				&::before {
 					height: 12px;
 					width: 12px;
-					background-position: -48px -804px;
+					background-position: -49px -805px;
 				}
 			}
 
-			.icon-wzrd-action {
+			.icon-depend-up,
+			.icon-depend-down {
+				width: 12px;
+			}
+
+			.icon-depend-up::before {
+				background-position: -49px -731px;
+			}
+
+			.icon-depend-down::before {
+				background-position: -49px -767px;
+			}
+
+			.icon-wizard-action {
 				background: url($sprite-path) no-repeat -6px -624px;
 				height: 12px;
 				min-height: 12px;
@@ -1580,10 +1599,6 @@ input {
 		@extend %form-input-style;
 	}
 
-	&[type="checkbox"] {
-		@extend %form-check-radio-style;
-	}
-
 	&[type="radio"] {
 		@extend %form-check-radio-style;
 	}
@@ -1676,6 +1691,35 @@ select {
 }
 
 .checkbox-radio {
+	position: absolute !important;
+	top: auto !important;
+	z-index: 1;
+	width: 16px !important;
+	height: 16px !important;
+	opacity: 0;
+
+	& + label {
+		span {
+			position: relative;
+			display: inline-block;
+			width: 14px;
+			height: 14px;
+			margin-right: 4px;
+			vertical-align: text-bottom;
+			background-color: $form-bg-color;
+			border: 1px solid $form-border-color;
+
+			&:active {
+				border-color: $form-border-color;
+			}
+		}
+
+		&.label-pos-left span {
+			margin-left: 4px;
+			margin-right: 0;
+		}
+	}
+
 	&:checked[readonly] + label span {
 		transition: none;
 
@@ -1686,7 +1730,7 @@ select {
 
 	&[readonly] {
 		&,
-		+ label {
+		& + label {
 			pointer-events: none;
 
 			span {
@@ -1697,7 +1741,7 @@ select {
 	}
 
 	&[type="checkbox"] {
-		+ label span {
+		& + label span {
 			border-radius: 2px;
 		}
 
@@ -1724,7 +1768,7 @@ select {
 	}
 
 	&[type="radio"] {
-		+ label span {
+		& + label span {
 			border-radius: 50%;
 		}
 
@@ -1747,33 +1791,6 @@ select {
 				background-color: $form-border-color !important;
 			}
 		}
-	}
-
-	position: absolute !important;
-	top: auto !important;
-	width: 16px !important;
-	height: 16px !important;
-	opacity: 0;
-	z-index: 1;
-
-	+ label span {
-		position: relative;
-		display: inline-block;
-		width: 14px;
-		height: 14px;
-		margin: -4px 4px 0 0;
-		bottom: -3px;
-		border: 1px solid $form-border-color;
-		background-color: $form-bg-color;
-
-		&:active {
-			border-color: $form-border-color;
-		}
-	}
-
-	+ label.label-pos-left span {
-		margin-left: 6px;
-		margin-right: 1px;
 	}
 
 	&:focus + label span {
@@ -1913,6 +1930,22 @@ button {
 				background-color: $btn-font-color;
 			}
 		}
+	}
+}
+
+.btn-tag {
+	@extend .tag;
+
+	min-height: unset;
+	outline: none;
+	border: none;
+
+	&:hover {
+		text-decoration: underline;
+		background-color: $ui-bg-selected-color;
+	}
+	&:focus {
+		background-color: $ui-bg-selected-color;
 	}
 }
 
@@ -2532,23 +2565,42 @@ button[disabled] {
 }
 
 $var-icons: (
-	maint: url($sprite-path) no-repeat -46px -802px,
-	depend-up: url($sprite-path) no-repeat -49px -729px,
-	depend-down: url($sprite-path) no-repeat -49px -765px,
-	ackn: url($sprite-path) no-repeat -45px -693px
+	maintenance: url($sprite-path) no-repeat -47px -803px,
+	depend-up: url($sprite-path) no-repeat -47px -731px,
+	depend-down: url($sprite-path) no-repeat -47px -767px,
+	ackn: url($sprite-path) no-repeat -47px -694px
 );
 
 // Dynamically generated classes:
-//  .icon-maint
+//  .icon-maintenance
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
-		margin: 0 18px 0 0;
+		position: relative;
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border-radius: 2px;
+
 		&::before {
-			background: $bgimage;
 			@extend %var-icons;
+			background: $bgimage;
+			width: 14px;
+			height: 14px;
+			left: 1px;
+			top: 1px;
+		}
+
+		&:link,
+		&:hover,
+		&:focus {
+			border-bottom: none;
+		}
+
+		&:focus {
+			box-shadow: 0 0 0 2px $btn-border-focus-color;
 		}
 	}
 }
@@ -2590,12 +2642,12 @@ $trigger-expression-tree-icons: (
 
 $form-icon-btn: (
 	cal: url($sprite-path) no-repeat -42px -834px,
-	wzrd-action: url($sprite-path) no-repeat -6px -617px
+	wizard-action: url($sprite-path) no-repeat -6px -617px
 );
 
 // Dynamically generated classes:
 //  .icon-cal
-//  .icon-wzrd-action
+//  .icon-wizard-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
@@ -2654,6 +2706,16 @@ $form-icon-btn: (
 	cursor: pointer;
 	margin: -12px 0 -4px;
 
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: 1px solid;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
+
 	&::before {
 		content: '';
 		display: inline-block;
@@ -2663,6 +2725,22 @@ $form-icon-btn: (
 		width: 14px;
 		height: 14px;
 		background: url($sprite-path) no-repeat -47px -659px;
+	}
+
+	&.status-red {
+		&:link,
+		&:hover,
+		&:focus {
+			border-color: darken(desaturate($alt-red, 10%), 9%);
+		}
+	}
+
+	&.status-yellow {
+		&:link,
+		&:hover,
+		&:focus {
+			border-color: darken(desaturate($alt-yellow, 9%), 20%);
+		}
 	}
 }
 
@@ -2861,8 +2939,8 @@ $form-icon-btn: (
 	min-width: 166px;
 	max-width: 250px;
 	background-color: $ui-bg-color;
-	border: 1px solid $action-border-color;
-	border-bottom-color: darken($action-border-color, 1%);
+	border: 1px solid $overlay-border-color;
+	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
 	&:focus {
@@ -2956,8 +3034,8 @@ $form-icon-btn: (
 		width: 12px;
 		height: 12px;
 		background-color: $ui-bg-color;
-		border-top: 1px solid $action-border-color;
-		border-left: 1px solid $action-border-color;
+		border-top: 1px solid $overlay-border-color;
+		border-left: 1px solid $overlay-border-color;
 		transform: rotate(45deg);
 	}
 }
@@ -2968,8 +3046,8 @@ $form-icon-btn: (
 	z-index: 1000;
 	padding: 15px 10px 10px;
 	background-color: $ui-bg-color;
-	border: 1px solid $action-border-color;
-	border-bottom-color: darken($action-border-color, 1%);
+	border: 1px solid $overlay-border-color;
+	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
 	&.modal {
@@ -3018,14 +3096,7 @@ $form-icon-btn: (
 			z-select {
 				text-align: left;
 				padding: inherit;
-			}
 
-			li {
-				display: inline;
-				padding-left: 10px;
-			}
-
-			z-select {
 				li {
 					display: block;
 					padding-left: 5px;
@@ -4381,7 +4452,7 @@ span {
 .menu-popup-preloader,
 .hintbox-preloader {
 	background: $preloader-bg-color;
-	border: 1px solid $action-border-color;
+	border: 1px solid $overlay-border-color;
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 	height: 128px;
 	width: 128px;
@@ -4806,12 +4877,7 @@ svg {
 	li {
 		overflow: hidden;
 		text-overflow: ellipsis;
-		line-height: 20px;
-
-		label {
-			line-height: 16px;
-			vertical-align: bottom;
-		}
+		line-height: 24px;
 	}
 }
 
@@ -4833,6 +4899,7 @@ svg {
 
 	display: flex;
 	flex-wrap: wrap;
+	align-items: start;
 
 	&.columns-nowrap {
 		flex-wrap: nowrap;
@@ -4891,6 +4958,7 @@ svg {
 	display: block;
 	max-width: 930px;
 	min-width: 800px;
+	position: relative;
 
 	> li {
 		display: block;
@@ -5305,6 +5373,19 @@ svg {
 	}
 }
 
+.icon-invisible {
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+		border-radius: 2px;
+	}
+}
+
 button {
 	&.icon-action-command,
 	&.icon-action-close,
@@ -5434,7 +5515,19 @@ button {
 }
 
 .icon-description {
-	margin: 0 0 0 5px;
+	margin: 0 0 -5px 5px;
+	vertical-align: baseline;
+	border-radius: 2px;
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
 
 	&::after {
 		content: '?';
@@ -5489,6 +5582,16 @@ button {
 		font-weight: bold;
 		color: $btn-font-color;
 	}
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
 }
 
 #expressions_list .ui-sortable-helper {
@@ -5507,29 +5610,29 @@ $range-input-width: 31px;
 
 .range-control {
 	position: relative;
-	display: inline-block;
-	vertical-align: middle;
+	display: inline-flex;
 
 	input[type=range] {
+		width: calc(100% + 10px);
+		height: 20px;
+		margin: 2px -5px;
+		padding: 0;
+		vertical-align: top;
+		opacity: 0;
 		cursor: pointer;
 		-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
 		-moz-appearance: none; /* Hides the slider so that custom slider can be made */
-		width: calc(100% + 10px);
-		opacity: 0;
-		vertical-align: middle;
-		margin: 0 -5px;
-		padding: 0;
-		height: 20px;
 
 		&:focus {
 			outline: none;
 		}
 
 		/* Special styling for WebKit/Blink */
-		&::-webkit-slider-thumb {
-			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+		&::-webkit-slider-thumb,
+		&::-moz-range-thumb {
 			height: $range-thumb-size;
 			width: $range-thumb-size;
+			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
 			opacity: 0;
 		}
 
@@ -5541,23 +5644,21 @@ $range-input-width: 31px;
 
 	input[type=text] {
 		width: $range-input-width;
-		float: right;
 	}
 
 	> div {
 		position: relative;
 		width: calc(100% - 10px - #{$range-input-width});
-		margin: 2px $range-thumb-size 0 0;
-		float: left;
+		margin-right: $range-thumb-size;
 	}
 
 	.range-control-track,
 	.range-control-progress {
 		position: absolute;
 		top: 50%;
-		margin-top: -$range-track-height / 2;
 		left: 0;
 		height: $range-track-height;
+		margin-top: -$range-track-height / 2;
 		cursor: pointer;
 	}
 
@@ -5573,12 +5674,12 @@ $range-input-width: 31px;
 	.range-control-thumb {
 		position: absolute;
 		top: 50%;
-		margin-top: -$range-thumb-size / 2;
-		margin-left: -$range-thumb-size / 2;
 		width: $range-thumb-size;
 		height: $range-thumb-size;
-		border-radius: 50%;
+		margin-top: -$range-thumb-size / 2;
+		margin-left: -$range-thumb-size / 2;
 		background: $range-thumb-color;
+		border-radius: 50%;
 	}
 
 	&.range-control-focus {
@@ -5608,16 +5709,16 @@ $range-input-width: 31px;
 
 	datalist {
 		position: absolute;
+		top: 50%;
 		display: flex;
 		width: 100%;
-		top: 50%;
 		margin-top: -$range-track-height / 2;
 
 		option {
-			padding: 0;
-			font-size: 0;
 			flex: 1 0 0;
 			height: $range-track-height;
+			padding: 0;
+			font-size: 0;
 			border-left: 1px solid $body-bg-color;
 		}
 	}
@@ -6353,7 +6454,7 @@ z-select,
 
 .import-compare {
 	display: flex;
-	max-height: calc(100vh - 190px);
+	max-height: calc(100vh - 220px);
 
 	.toc {
 		flex: 20%;
@@ -6366,6 +6467,11 @@ z-select,
 		margin-left: 5px;
 		overflow: auto;
 		border: 1px dashed $form-border-color;
+	}
+
+	.toc,
+	.diff {
+		@extend %webkit-scrollbar;
 	}
 }
 
@@ -6444,9 +6550,9 @@ z-select,
 	background-position: -117px -506px !important;
 }
 .geomap-filter {
-	border: 2px solid rgba($ui-border-color, .4);
+	border: 1px solid $overlay-border-color;
 	background-color: $ui-bg-color;
-	padding: 10px 30px 5px 10px;
+	padding: 5px 20px 5px 10px;
 	position: absolute;
 	margin-right: -2px;
 	margin-top: 5px;
@@ -6454,7 +6560,7 @@ z-select,
 	right: 0;
 }
 .geomap-filter.collapsed {
-	display: table;
+	display: block;
 }
 .geomap-filter li {
 	width: calc(100% + 20px);
@@ -6473,6 +6579,11 @@ z-select,
 	margin-top: 5px;
 	height: 30px;
 	width: 30px;
+}
+.leaflet-marker-icon:focus {
+	box-shadow: 0 0 0 2px $btn-border-focus-color;
+	border-radius: 2px;
+	outline: none;
 }
 .marker-cluster span {
 	line-height: 30px;

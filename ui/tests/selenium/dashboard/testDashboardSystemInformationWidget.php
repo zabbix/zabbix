@@ -153,7 +153,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			[
 				'old_name' => 'HA nodes view',
 				'fields' => [
-					'Name' => 'Updated to Sysem Info view',
+					'Name' => 'Updated to System Info view',
 					'Show' => 'System stats',
 					'Refresh interval' => '10 minutes'
 				]
@@ -214,7 +214,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		// No content of the widget in High availability nodes view should be visible to User and Admin user roles.
 		$this->assertEquals('No permissions to referred object or it does not exist!', $nodes_table->getText());
 
-		// HA cluster satus should not be visible to User and Admin role users.
+		// HA cluster status should not be visible to User and Admin role users.
 		$info_table = $dashboard->getWidget('System stats view')->asTable();
 		$this->assertFalse($info_table->findRow('Parameter', 'High availability cluster')->isValid());
 	}

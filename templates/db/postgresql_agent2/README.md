@@ -19,7 +19,7 @@ This template was tested on:
 1\. Create PostgreSQL user for monitoring (`<password>` at your discretion):
 
 ```bash
-CREATE USER 'zbx_monitor' WITH PASSWORD '<PASSWORD>' INHERIT;
+CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_dir(text) TO zbx_monitor;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_stat_file(text) TO zbx_monitor;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_waldir() TO zbx_monitor;
@@ -55,6 +55,8 @@ No specific Zabbix configuration is required.
 |{$PG.LLD.FILTER.APPLICATION} |<p>-</p> |`(.+)` |
 |{$PG.LLD.FILTER.DBNAME} |<p>-</p> |`(.+)` |
 |{$PG.PASSWORD} |<p>-</p> |`postgres` |
+|{$PG.QUERY_ETIME.MAX.WARN} |<p>Execution time limit for count of slow queries.</p> |`30` |
+|{$PG.SLOW_QUERIES.MAX.WARN} |<p>Slow queries count threshold for a trigger.</p> |`5` |
 |{$PG.URI} |<p>-</p> |`tcp://localhost:5432` |
 |{$PG.USER} |<p>-</p> |`postgres` |
 
@@ -93,7 +95,7 @@ There are no template links in this template.
 |PostgreSQL |Archive: Count of files in archive_status need to archive |<p>-</p> |DEPENDENT |pgsql.archive.count_files_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.count_files`</p> |
 |PostgreSQL |Archive: Count of files need to archive |<p>Size of files to archive</p> |DEPENDENT |pgsql.archive.size_files_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.size_files`</p> |
 |PostgreSQL |Dbstat: Blocks read time |<p>Time spent reading data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_read_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_read_time`</p><p>- MULTIPLIER: `0.001`</p> |
-|PostgreSQL |Dbstat: Blocks write time |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_write_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_read_time`</p><p>- MULTIPLIER: `0.001`</p> |
+|PostgreSQL |Dbstat: Blocks write time |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_write_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_write_time`</p><p>- MULTIPLIER: `0.001`</p> |
 |PostgreSQL |Dbstat: Checksum failures |<p>Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled. This metric included in PostgreSQL 12</p> |DEPENDENT |pgsql.dbstat.sum.checksum_failures.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checksum_failures`</p><p>- MATCHES_REGEX: `^\d*$`</p><p>- CHANGE_PER_SECOND</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> -1`</p> |
 |PostgreSQL |Dbstat: Committed transactions |<p>Number of transactions that have been committed</p> |DEPENDENT |pgsql.dbstat.sum.xact_commit.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.xact_commit`</p><p>- CHANGE_PER_SECOND</p> |
 |PostgreSQL |Dbstat: Conflicts |<p>Number of queries canceled due to conflicts with recovery.  (Conflicts occur only on standby servers; see pg_stat_database_conflicts for details.)</p> |DEPENDENT |pgsql.dbstat.sum.conflicts.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.conflicts`</p><p>- CHANGE_PER_SECOND</p> |
@@ -150,8 +152,8 @@ There are no template links in this template.
 |PostgreSQL |DB {#DBNAME}: Rollbacks per second |<p>Total number of transactions in this database that have been rolled back</p> |DEPENDENT |pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].xact_rollback`</p><p>- CHANGE_PER_SECOND</p> |
 |PostgreSQL |DB {#DBNAME}: Backends connected |<p>Number of backends currently connected to this database</p> |DEPENDENT |pgsql.dbstat.numbackends["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].numbackends`</p> |
 |PostgreSQL |DB {#DBNAME}: Checksum failures |<p>Number of data page checksum failures detected in this database</p> |DEPENDENT |pgsql.dbstat.checksum_failures.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].checksum_failures`</p><p>- MATCHES_REGEX: `^\d*$`</p><p>- CHANGE_PER_SECOND</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> -1`</p> |
-|PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Time spent reading data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.blk_read_time.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blk_read_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND</p> |
-|PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.blk_write_time.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blk_write_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND</p> |
+|PostgreSQL |DB {#DBNAME}: Disk blocks read time |<p>Time spent reading data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.blk_read_time.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blk_read_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND</p> |
+|PostgreSQL |DB {#DBNAME}: Disk blocks write time |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.blk_write_time.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blk_write_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND</p> |
 |PostgreSQL |DB {#DBNAME}: Num of accessexclusive locks |<p>Number of accessexclusive locks for each database</p> |DEPENDENT |pgsql.locks.accessexclusive["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].accessexclusive`</p> |
 |PostgreSQL |DB {#DBNAME}: Num of accessshare locks |<p>Number of accessshare locks for each database</p> |DEPENDENT |pgsql.locks.accessshare["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].accessshare`</p> |
 |PostgreSQL |DB {#DBNAME}: Num of exclusive locks |<p>Number of exclusive locks for each database</p> |DEPENDENT |pgsql.locks.exclusive["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].exclusive`</p> |
@@ -161,6 +163,15 @@ There are no template links in this template.
 |PostgreSQL |DB {#DBNAME}: Num of shareupdateexclusive locks |<p>Number of shareupdateexclusive locks for each database</p> |DEPENDENT |pgsql.locks.shareupdateexclusive["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].shareupdateexclusive`</p> |
 |PostgreSQL |DB {#DBNAME}: Num of share locks |<p>Number of share locks for each database</p> |DEPENDENT |pgsql.locks.share["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].share`</p> |
 |PostgreSQL |DB {#DBNAME}: Num of total locks |<p>Number of total locks for each database</p> |DEPENDENT |pgsql.locks.total["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].total`</p> |
+|PostgreSQL |DB {#DBNAME}: Queries max maintenance time |<p>Max maintenance query time</p> |DEPENDENT |pgsql.queries.mro.time_max["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].mro_time_max`</p> |
+|PostgreSQL |DB {#DBNAME}: Queries max query time |<p>Max query time</p> |DEPENDENT |pgsql.queries.query.time_max["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].query_time_max`</p> |
+|PostgreSQL |DB {#DBNAME}: Queries max transaction time |<p>Max transaction query time</p> |DEPENDENT |pgsql.queries.tx.time_max["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].tx_time_max`</p> |
+|PostgreSQL |DB {#DBNAME}: Queries slow maintenance count |<p>Slow maintenance query count</p> |DEPENDENT |pgsql.queries.mro.slow_count["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].mro_slow_count`</p> |
+|PostgreSQL |DB {#DBNAME}: Queries slow query count |<p>Slow query count</p> |DEPENDENT |pgsql.queries.query.slow_count["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].query_slow_count`</p> |
+|PostgreSQL |DB {#DBNAME}: Queries slow transaction count |<p>Slow transaction query count</p> |DEPENDENT |pgsql.queries.tx.slow_count["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].tx_slow_count`</p> |
+|PostgreSQL |DB {#DBNAME}: Queries sum maintenance time |<p>Sum maintenance query time</p> |DEPENDENT |pgsql.queries.mro.time_sum["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].mro_time_sum`</p> |
+|PostgreSQL |DB {#DBNAME}: Queries sum query time |<p>Sum query time</p> |DEPENDENT |pgsql.queries.query.time_sum["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].query_time_sum`</p> |
+|PostgreSQL |DB {#DBNAME}: Queries sum transaction time |<p>Sum transaction query time</p> |DEPENDENT |pgsql.queries.tx.time_sum["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].tx_time_sum`</p> |
 |Zabbix raw items |PostgreSQL: Get bgwriter |<p>https://www.postgresql.org/docs/12/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</p> |ZABBIX_PASSIVE |pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 |Zabbix raw items |PostgreSQL: Get archive |<p>Collect archive status metrics</p> |ZABBIX_PASSIVE |pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 |Zabbix raw items |PostgreSQL: Get dbstat |<p>Collect all metrics from pg_stat_database per database</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p> |ZABBIX_PASSIVE |pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
@@ -169,17 +180,21 @@ There are no template links in this template.
 |Zabbix raw items |PostgreSQL: Get WAL |<p>Collect WAL metrics</p> |ZABBIX_PASSIVE |pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 |Zabbix raw items |PostgreSQL: Get locks |<p>Collect all metrics from pg_locks per database</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p> |ZABBIX_PASSIVE |pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 |Zabbix raw items |PostgreSQL: Get replication |<p>Collect metrics from the pg_stat_replication, which contains information about the WAL sender process, showing statistics about replication to that sender's connected standby server.</p> |ZABBIX_PASSIVE |pgsql.replication.process["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix raw items |PostgreSQL: Get queries |<p>Collect all metrics by query execution time</p> |ZABBIX_PASSIVE |pgsql.queries["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"] |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m) |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}` |AVERAGE | |
+|Dbstat: Checksum failures detected |<p>Data page checksum failures were detected on that DB instance.</p><p>https://www.postgresql.org/docs/current/checksums.html</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.sum.checksum_failures.rate)>0` |AVERAGE | |
+|Connections sum: Total number of connections is too high |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}` |AVERAGE | |
 |PostgreSQL: Oldest xid is too big |<p>-</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) > 18000000` |AVERAGE | |
-|PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE}) |<p>-</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) < 600` |AVERAGE | |
+|PostgreSQL: Service has been restarted |<p>-</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) < 600` |AVERAGE | |
 |PostgreSQL: Service is down |<p>-</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.ping["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"])=0` |HIGH | |
-|DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m) |<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.</p><p>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}` |AVERAGE | |
-|DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m) |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}` |HIGH | |
+|DB {#DBNAME}: Too many recovery conflicts |<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.</p><p>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}` |AVERAGE | |
+|DB {#DBNAME}: Deadlock occurred |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}` |HIGH | |
+|DB {#DBNAME}: Checksum failures detected |<p>Data page checksum failures were detected on that database.</p><p>https://www.postgresql.org/docs/current/checksums.html</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.checksum_failures.rate["{#DBNAME}"])>0` |AVERAGE | |
+|DB {#DBNAME}: Too many slow queries |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}` |WARNING | |
 
 ## Feedback
 

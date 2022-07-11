@@ -17,19 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "httptest.h"
 
-#include "db.h"
 #include "log.h"
-#include "dbcache.h"
 #include "preproc.h"
 #include "daemon.h"
-
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
-
-#include "httptest.h"
 #include "httpmacro.h"
 
 typedef struct

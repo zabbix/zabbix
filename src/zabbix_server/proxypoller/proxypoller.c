@@ -17,16 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "proxypoller.h"
+
 #include "common.h"
 #include "daemon.h"
-#include "comms.h"
 #include "zbxself.h"
-
-#include "proxypoller.h"
 #include "zbxserver.h"
-#include "dbcache.h"
 #include "db.h"
-#include "zbxjson.h"
 #include "log.h"
 #include "proxy.h"
 #include "zbxcrypto.h"
@@ -527,6 +524,7 @@ static int	process_proxy(void)
 		if (proxy.last_cfg_error_time < DCconfig_get_last_sync_time())
 		{
 			char	*port = NULL;
+			int	check_tasks = 0;
 
 			proxy.addr = proxy.addr_orig;
 
@@ -548,6 +546,9 @@ static int	process_proxy(void)
 					goto error;
 			}
 
+			if (proxy.proxy_tasks_nextcheck <= now)
+				check_tasks = 1;
+
 			if (proxy.proxy_data_nextcheck <= now)
 			{
 
@@ -556,14 +557,17 @@ static int	process_proxy(void)
 				do
 				{
 					if (FAIL == zbx_hc_check_proxy(proxy.hostid))
-						goto error;
+						break;
 
 					if (SUCCEED != (ret = proxy_get_data(&proxy, &more)))
 						goto error;
+
+					check_tasks = 0;
 				}
 				while (ZBX_PROXY_DATA_MORE == more);
 			}
-			else if (proxy.proxy_tasks_nextcheck <= now)
+
+			if (1 == check_tasks)
 			{
 				if (SUCCEED != (ret = proxy_get_tasks(&proxy)))
 					goto error;

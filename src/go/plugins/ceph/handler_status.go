@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"strings"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type cephStatus struct {

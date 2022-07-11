@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-31T08:51:54Z'
+  date: '2022-04-06T19:33:13Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -933,7 +933,8 @@ zabbix_export:
             -
               uuid: dea364bf454746bca6be38d7e0759d06
               expression: 'last(/Morningstar ProStar PWM SNMP/status.uptime)<10m'
-              name: 'Status: Device has been restarted (uptime < 10m)'
+              name: 'Status: Device has been restarted'
+              event_name: 'Status: Device has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -944,7 +945,8 @@ zabbix_export:
             -
               uuid: 16c1444a745a47e59fd22bd1a64baef3
               expression: 'nodata(/Morningstar ProStar PWM SNMP/status.uptime,5m)=1'
-              name: 'Status: Failed to fetch data (or no data for 5m)'
+              name: 'Status: Failed to fetch data'
+              event_name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 5 minutes'
               manual_close: 'YES'
@@ -1021,7 +1023,8 @@ zabbix_export:
             -
               uuid: 46eb3a0e80294a4db8324d56337ed712
               expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
-              name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
+              name: 'Temperature: Critically high battery temperature'
+              event_name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
@@ -1031,7 +1034,8 @@ zabbix_export:
             -
               uuid: c3f3ba5b2cab4481bb62fa8527554e96
               expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
-              name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              name: 'Temperature: Critically low battery temperature'
+              event_name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
@@ -1041,12 +1045,13 @@ zabbix_export:
             -
               uuid: 80aaf1de029b4d6eadce9f2a946f6dde
               expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
-              name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
+              name: 'Temperature: High battery temperature'
+              event_name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
+                  name: 'Temperature: Critically high battery temperature'
                   expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
               tags:
                 -
@@ -1055,12 +1060,13 @@ zabbix_export:
             -
               uuid: cf1db336ea124f9a9fd6eb367f93f0e8
               expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
-              name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              name: 'Temperature: Low battery temperature'
+              event_name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
-                  name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+                  name: 'Temperature: Critically low battery temperature'
                   expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
               tags:
                 -
@@ -1116,7 +1122,8 @@ zabbix_export:
                 -
                   uuid: e89cf2b8066840c2876642f0d8db1edd
                   expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
-                  name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
+                  name: 'Battery: Critically high battery voltage'
+                  event_name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   tags:
@@ -1126,7 +1133,8 @@ zabbix_export:
                 -
                   uuid: 8356aba9afb242b09902873a5f0e1d47
                   expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
-                  name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
+                  name: 'Battery: Critically low battery voltage'
+                  event_name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   tags:
@@ -1136,12 +1144,13 @@ zabbix_export:
                 -
                   uuid: 77f130af976c43edb8c823de5cbd57b2
                   expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
-                  name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
+                  name: 'Battery: High battery voltage'
+                  event_name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
+                      name: 'Battery: Critically high battery voltage'
                       expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   tags:
                     -
@@ -1150,12 +1159,13 @@ zabbix_export:
                 -
                   uuid: 6c288c8b28db4f8e95c8ad2aa8b838ef
                   expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
-                  name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
+                  name: 'Battery: Low battery voltage'
+                  event_name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
+                      name: 'Battery: Critically low battery voltage'
                       expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   tags:
                     -

@@ -171,8 +171,6 @@ class CLdap {
 			}
 
 			$this->bound = 1;
-
-			return true;
 		}
 		else {
 			// see if we can find the user
@@ -193,11 +191,9 @@ class CLdap {
 			}
 
 			$this->bound = 1;
-
-			return true;
 		}
 
-		return false;
+		return true;
 	}
 
 	private function getUserData($user) {
@@ -229,7 +225,7 @@ class CLdap {
 			$filter = '(ObjectClass=*)';
 		}
 		$sr = @ldap_search($this->ds, $base, $filter);
-		$result = is_resource($sr) ? @ldap_get_entries($this->ds, $sr) : [];
+		$result = $sr !== false ? @ldap_get_entries($this->ds, $sr) : [];
 
 		// don't accept more or less than one response
 		if (!$result || $result['count'] != 1) {
@@ -246,7 +242,7 @@ class CLdap {
 		$info['name'] = $user_result['cn'][0];
 		$info['grps'] = [];
 
-		// overwrite if other attribs are specified.
+		// overwrite if other attributes are specified.
 		if (is_array($this->cnf['mapping'])) {
 			foreach ($this->cnf['mapping'] as $localkey => $key) {
 				$info[$localkey] = isset($user_result[$key])?$user_result[$key][0]:null;

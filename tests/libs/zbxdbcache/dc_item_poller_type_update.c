@@ -32,7 +32,6 @@
 
 #include "common.h"
 #include "mutexs.h"
-#define ZBX_DBCONFIG_IMPL
 #include "dbcache.h"
 #include "dbconfig.h"
 #include "dc_item_poller_type_update_test.h"

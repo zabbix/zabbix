@@ -65,8 +65,8 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Cert: SSL certificate is invalid |<p>SSL certificate has expired or it is issued for another domain.</p> |`find(/Website certificate by Zabbix agent 2/cert.validation,,"like","invalid")=1` |HIGH | |
-|Cert: SSL certificate expires soon (less than {$CERT.EXPIRY.WARN} days) |<p>The SSL certificate should be updated or it will become untrusted.</p> |`(last(/Website certificate by Zabbix agent 2/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}` |WARNING |<p>**Depends on**:</p><p>- Cert: SSL certificate is invalid</p> |
-|Cert: Fingerprint has changed (new version: {ITEM.VALUE}) |<p>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</p><p>There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</p> |`last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint) <> last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint,#2)` |INFO |<p>Manual close: YES</p> |
+|Cert: SSL certificate expires soon |<p>The SSL certificate should be updated or it will become untrusted.</p> |`(last(/Website certificate by Zabbix agent 2/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}` |WARNING |<p>**Depends on**:</p><p>- Cert: SSL certificate is invalid</p> |
+|Cert: Fingerprint has changed |<p>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</p><p>There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</p> |`last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint) <> last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint,#2)` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 

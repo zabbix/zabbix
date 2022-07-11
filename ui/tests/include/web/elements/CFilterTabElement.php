@@ -55,7 +55,7 @@ class CFilterTabElement extends CElement {
 	 * Select tab by name.
 	 *
 	 * @param string $name		filter name to be selected
-	 * @param integer $count	filter number, if there is several filters with same name
+	 * @param integer $count	filter number, if there are several filters with same name
 	 */
 	public function selectTab($name, $count = null) {
 		$xpath = 'xpath:(.//a[@class="tabfilter-item-link" and text()='.CXPathHelper::escapeQuotes($name).'])';
@@ -72,7 +72,7 @@ class CFilterTabElement extends CElement {
 	 * Select filter properties.
 	 *
 	 * @param string $name		filter name to be selected
-	 * @param integer $count	filter number, if there is several filters with same name
+	 * @param integer $count	filter number, if there are several filters with same name
 	 */
 	public function editProperties($name = null, $count = null) {
 		if ($name !== null) {

@@ -25,8 +25,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type cephResponse struct {

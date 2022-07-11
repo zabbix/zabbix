@@ -452,17 +452,18 @@ switch ($data['popup_type']) {
 		else {
 			foreach ($data['table_records'] as &$item) {
 				$host = reset($item['hosts']);
+				$item_pattern = array_key_exists('pattern', $item) ? $item['pattern'] : $item['itemid'];
 
 				$table->addRow([
 					$data['multiselect']
-						? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid'])
+						? new CCheckBox('item['.$item['itemid'].']', $item_pattern)
 						: null,
 					(new CLink($item['name'], 'javascript:void(0);'))
 						->onClick('javascript: addValue('.
 							json_encode($options['reference']).', '.
-							json_encode($item['itemid']).', '.
+							json_encode($item_pattern).', '.
 							$options['parentid'].
-							');'.$js_action_onclick),
+						');'.$js_action_onclick),
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
@@ -473,7 +474,7 @@ switch ($data['popup_type']) {
 				]);
 
 				$item = [
-					'id' => $item['itemid'],
+					'id' => $item_pattern,
 					'itemid' => $item['itemid'],
 					'name' => $options['patternselect']
 						? $item['name']
@@ -526,12 +527,25 @@ switch ($data['popup_type']) {
 				$graphtype
 			]);
 
+			if ($options['patternselect']) {
+				$graph_name = $graph['name'];
+			}
+			else {
+				if ($data['popup_type'] === 'graphs') {
+					$host_name = $graph['hosts'][0]['name'];
+				}
+				else {
+					$host_names = array_column($graph['hosts'], 'name', 'hostid');
+					$host_name = $host_names[$graph['discoveryRule']['hostid']];
+				}
+
+				$graph_name = $host_name.NAME_DELIMITER.$graph['name'];
+			}
+
 			// For returned data array.
 			$graph = [
 				'id' => $graph['graphid'],
-				'name' => $options['patternselect']
-					? $graph['name']
-					: reset($graph['hosts'])['name'].NAME_DELIMITER.$graph['name']
+				'name' => $graph_name
 			];
 		}
 		unset($graph);

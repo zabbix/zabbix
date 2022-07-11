@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -49,8 +49,8 @@ $form_grid = (new CFormGrid())
 		(new CLabel(_('Start time'), 'start_time'))->setAsteriskMark(),
 		new CFormField(
 			(new CDateSelector('start_time', $data['form']['start_time']))
-				->setDateFormat(DATE_TIME_FORMAT)
-				->setPlaceholder(DATE_TIME_FORMAT_PLACEHOLDER)
+				->setDateFormat(ZBX_DATE_TIME)
+				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 				->setAriaRequired()
 		)
 	])

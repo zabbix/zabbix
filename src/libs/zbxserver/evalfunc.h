@@ -20,6 +20,9 @@
 #ifndef ZABBIX_EVALFUNC_H
 #define ZABBIX_EVALFUNC_H
 
+#include "zbxtypes.h"
+#include "dbcache.h"
+
 int	zbx_evaluatable_for_notsupported(const char *fn);
 int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error);

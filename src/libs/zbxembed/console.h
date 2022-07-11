@@ -20,6 +20,8 @@
 #ifndef ZABBIX_CONSOLE_H
 #define ZABBIX_CONSOLE_H
 
+#include "zbxembed.h"
+
 int	zbx_es_init_console(zbx_es_t *es, char **error);
 
 #endif

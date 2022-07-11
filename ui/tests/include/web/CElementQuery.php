@@ -31,8 +31,8 @@ require_once dirname(__FILE__).'/elements/CTableElement.php';
 require_once dirname(__FILE__).'/elements/CTableRowElement.php';
 require_once dirname(__FILE__).'/elements/CWidgetElement.php';
 require_once dirname(__FILE__).'/elements/CDashboardElement.php';
+require_once dirname(__FILE__).'/elements/CListElement.php';
 require_once dirname(__FILE__).'/elements/CDropdownElement.php';
-require_once dirname(__FILE__).'/elements/CZDropdownElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxElement.php';
 require_once dirname(__FILE__).'/elements/COverlayDialogElement.php';
 require_once dirname(__FILE__).'/elements/CMainMenuElement.php';
@@ -312,8 +312,12 @@ class CElementQuery implements IWaitable {
 	 *
 	 * @return WebDriverWait
 	 */
-	public static function wait() {
-		return static::getDriver()->wait(20, self::WAIT_ITERATION);
+	public static function wait($timeout = 20, $iteration = null) {
+		if ($iteration === null) {
+			$iteration = self::WAIT_ITERATION;
+		}
+
+		return static::getDriver()->wait($timeout, self::WAIT_ITERATION);
 	}
 
 	/**
@@ -539,8 +543,8 @@ class CElementQuery implements IWaitable {
 				'/input[@name][not(@type) or @type="text" or @type="password"][not(@style) or not(contains(@style,"display: none"))]',
 				'/textarea[@name]'
 			],
-			'CDropdownElement'			=> '/select[@name]',
-			'CZDropdownElement'			=> '/z-select[@name]',
+			'CListElement'				=> '/select[@name]',
+			'CDropdownElement'			=> '/z-select[@name]',
 			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
 			'CMultiselectElement'		=> [
 				'/div[contains(@class, "multiselect-control")]',

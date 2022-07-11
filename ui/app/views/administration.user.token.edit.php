@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -60,10 +60,10 @@ $token_from_list = (new CFormList())
 			->setChecked($data['expires_state'])
 			->setUncheckedValue('0')
 	)
-	->addRow((new CLabel(_('Expires at')))->setAsteriskMark(),
+	->addRow((new CLabel(_('Expires at'), 'expires_at'))->setAsteriskMark(),
 		(new CDateSelector('expires_at', $data['expires_at']))
-			->setDateFormat(DATE_TIME_FORMAT_SECONDS)
-			->setPlaceholder(DATE_TIME_FORMAT_SECONDS_PLACEHOLDER)
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 			->setAriaRequired(),
 		'expires-at-row'
 	)
@@ -72,7 +72,6 @@ $token_from_list = (new CFormList())
 			->setChecked($data['status'] == ZBX_AUTH_TOKEN_ENABLED)
 			->setUncheckedValue(ZBX_AUTH_TOKEN_DISABLED)
 	);
-
 
 $token_view = (new CTabView())->addTab('token', '', $token_from_list);
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

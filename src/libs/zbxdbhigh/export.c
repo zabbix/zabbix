@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
 #include "export.h"
+
+#include "log.h"
 
 #define ZBX_OPTION_EXPTYPE_EVENTS	"events"
 #define ZBX_OPTION_EXPTYPE_HISTORY	"history"

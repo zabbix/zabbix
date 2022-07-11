@@ -17,29 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "config.h"
 
 #ifdef HAVE_SQLITE3
 #	error SQLite is not supported as a main Zabbix database backend.
 #endif
 
+#include "export.h"
+#include "zbxself.h"
+#include "sighandler.h"
+
 #include "cfg.h"
-#include "pid.h"
-#include "db.h"
-#include "dbcache.h"
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
-
-#include "sysinfo.h"
 #include "zbxmodules.h"
-#include "zbxserver.h"
-
 #include "zbxnix.h"
 #include "daemon.h"
-#include "zbxself.h"
-#include "../libs/zbxnix/control.h"
 
 #include "alerter/alerter.h"
 #include "alerter/alert_manager.h"
@@ -74,11 +69,9 @@
 #include "zbxcrypto.h"
 #include "zbxhistory.h"
 #include "postinit.h"
-#include "export.h"
 #include "zbxvault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
-#include "sighandler.h"
 #include "zbxrtc.h"
 #include "zbxha.h"
 
@@ -241,7 +234,7 @@ int	CONFIG_VMWARE_FREQUENCY		= 60;
 int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
 int	CONFIG_VMWARE_TIMEOUT		= 10;
 
-zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
+zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 32 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
@@ -1101,45 +1094,18 @@ static void	zbx_check_db(void)
 	struct zbx_json			db_version_json;
 	int				result = SUCCEED;
 
-	DBextract_version_info(&db_version_info);
+	memset(&db_version_info, 0, sizeof(db_version_info));
+	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
 
-	if (db_version_info.current_version < db_version_info.min_version)
+	if (SUCCEED == result)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Error! Current %s database server version is too old (%s)",
-				db_version_info.database, db_version_info.friendly_current_version);
-		zabbix_log(LOG_LEVEL_ERR, "Must be a least %s", db_version_info.friendly_min_version);
-		result = FAIL;
-	}
-	else if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag)
-	{
-		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
-		{
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix server due to unsupported %s database server"
-					" version (%s)", db_version_info.database,
-					db_version_info.friendly_current_version);
-			zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s)",
-					db_version_info.friendly_min_supported_version);
-			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
-			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
-					" in Zabbix server configuration file at your own risk.");
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			result = FAIL;
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database server version (%s)",
-					db_version_info.database, db_version_info.friendly_current_version);
-			zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s)",
-					db_version_info.friendly_min_supported_version);
-			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			db_version_info.flag = DB_VERSION_NOT_SUPPORTED_WARNING;
-		}
+		zbx_db_extract_dbextension_info(&db_version_info);
 	}
 
-	if(SUCCEED == result && (SUCCEED != DBcheck_capabilities(db_version_info.current_version) ||
+	if (SUCCEED == result && (
+#ifdef HAVE_POSTGRESQL
+			SUCCEED != zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
+#endif
 			SUCCEED != DBcheck_version()))
 	{
 		result = FAIL;
@@ -1147,7 +1113,7 @@ static void	zbx_check_db(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if(SUCCEED == DBfield_exists("config", "dbversion_status"))
+	if (SUCCEED == DBfield_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -1164,14 +1130,17 @@ static void	zbx_check_db(void)
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)
-			zbx_history_check_version(&db_version_json);
+			zbx_history_check_version(&db_version_json, &result);
 
-		DBflush_version_requirements(db_version_json.buffer);
+		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
 	}
 
 	DBclose();
 	zbx_free(db_version_info.friendly_current_version);
+	zbx_free(db_version_info.extension);
+	zbx_free(db_version_info.ext_friendly_current_version);
+	zbx_free(db_version_info.ext_lic);
 
 	if(SUCCEED != result)
 	{
@@ -1687,9 +1656,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		return FAIL;
 	}
 
-	zbx_check_db();
-
 	DBcheck_character_set();
+	zbx_check_db();
 
 	if (SUCCEED != DBcheck_double_type())
 	{
@@ -1806,6 +1774,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
+		if (ZBX_NODE_STATUS_ERROR == ha_status)
+			break;
+
 		now = time(NULL);
 
 		if (ZBX_NODE_STATUS_UNKNOWN != ha_status && ha_status != ha_status_old)
@@ -1898,6 +1869,13 @@ void	zbx_on_exit(int ret)
 		zbx_locks_disable();
 #endif
 
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		DBconnect(ZBX_DB_CONNECT_EXIT);
+		free_database_cache(ZBX_SYNC_ALL);
+		DBclose();
+	}
+
 	if (SUCCEED != zbx_ha_stop(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
@@ -1909,13 +1887,6 @@ void	zbx_on_exit(int ret)
 	{
 		free_metrics();
 		zbx_ipc_service_free_env();
-
-		DBconnect(ZBX_DB_CONNECT_EXIT);
-
-		free_database_cache(ZBX_SYNC_ALL);
-
-		DBclose();
-
 		free_configuration_cache();
 
 		/* free history value cache */

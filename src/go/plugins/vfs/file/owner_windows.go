@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 /*
@@ -24,8 +25,8 @@ package file
 import (
 	"errors"
 	"fmt"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/windows"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // Export -

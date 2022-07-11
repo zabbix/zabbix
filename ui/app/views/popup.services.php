@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -36,6 +36,7 @@ $controls = (new CForm())
 	->setName('services_filter_form')
 	->addVar('title', $data['title'])
 	->addVar('exclude_serviceids', $data['exclude_serviceids'])
+	->addVar('multiple', $data['is_multiple'] ? null : 0)
 	->addItem(
 		(new CList())
 			->addClass(ZBX_STYLE_INLINE_FILTER)

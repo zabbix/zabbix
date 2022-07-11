@@ -20,8 +20,8 @@
 package docker
 
 import (
-	"zabbix.com/pkg/metric"
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/metric"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 type metricMeta struct {

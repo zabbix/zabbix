@@ -335,7 +335,7 @@ class CItem extends CItemGeneral {
 
 				$sqlParts['from']['hosts'] = 'hosts h';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host'], false, true);
+				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
 			if (array_key_exists('flags', $options['filter'])

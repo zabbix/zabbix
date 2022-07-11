@@ -27,12 +27,12 @@ import (
 	"testing"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/alias"
-	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 )
 
 // getNextCheck calculates simplified nextcheck based on the specified delay string and current time
@@ -1893,7 +1893,7 @@ func Test_getCapacity(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getCapacity(tt.args.optsRaw, "test"); got != tt.want {
+			if got, _ := getPluginOptions(tt.args.optsRaw, "test"); got != tt.want {
 				t.Errorf("getCapacity() = %v, want %v", got, tt.want)
 			}
 		})

@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "trends.h"
+
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "zbxtrends.h"
-#include "trends.h"
 
 static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
 		"unknown error",

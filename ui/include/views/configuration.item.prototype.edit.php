@@ -585,15 +585,15 @@ $item_tab->addItem([
 	(new CFormField($master_item))->setId('js-item-master-item-field')
 ]);
 
-// Append interfaces to form list.
-$select_interface = getInterfaceSelect($data['interfaces'])
-	->setId('interface-select')
-	->setValue($data['interfaceid'])
-	->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
-	->setFocusableElementId('interfaceid')
-	->setAriaRequired();
-
 if ($data['display_interfaces']) {
+	$select_interface = getInterfaceSelect($data['interfaces'])
+		->setId('interface-select')
+		->setValue($data['interfaceid'])
+		->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
+		->setFocusableElementId('interfaceid')
+		->setAriaRequired()
+		->setReadonly($readonly);
+
 	$item_tab->addItem([
 		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
 			->setAsteriskMark()
@@ -623,7 +623,7 @@ $item_tab->addItem([
 
 $item_tab
 	->addItem([
-		(new CLabel(_('IPMI sensor')))->setId('js-item-impi-sensor-label'),
+		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
 		(new CFormField((new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-impi-sensor-field')
@@ -650,7 +650,7 @@ $item_tab
 		))->setId('js-item-jmx-endpoint-field')
 	])
 	->addItem([
-		(new CLabel(_('User name')))->setId('js-item-username-label'),
+		(new CLabel(_('User name'), 'username'))->setId('js-item-username-label'),
 		(new CFormField((new CTextBox('username', $data['username'], false, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->disableAutocomplete()
@@ -675,7 +675,7 @@ $item_tab
 		))->setId('js-item-private-key-field')
 	])
 	->addItem([
-		(new CLabel(_('Password')))->setId('js-item-password-label'),
+		(new CLabel(_('Password'), 'password'))->setId('js-item-password-label'),
 		(new CFormField((new CTextBox('password', $data['password'], false, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->disableAutocomplete()
@@ -712,7 +712,7 @@ $item_tab
 		))->setId('js-item-formula-field')
 	])
 	->addItem([
-		(new CLabel(_('Units')))->setId('js-item-units-label'),
+		(new CLabel(_('Units'), 'units'))->setId('js-item-units-label'),
 		(new CFormField((new CTextBox('units', $data['units'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)))
 			->setId('js-item-units-field')
 	])
@@ -807,7 +807,7 @@ $item_tab
 		]))->setId('js-item-trends-field')
 	])
 	->addItem([
-		(new CLabel(_('Log time format')))->setId('js-item-log-time-format-label'),
+		(new CLabel(_('Log time format'), 'logtimefmt'))->setId('js-item-log-time-format-label'),
 		(new CFormField(
 			(new CTextBox('logtimefmt', $data['logtimefmt'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-log-time-format-field')
@@ -847,14 +847,14 @@ $item_tab
 		))->setId('js-item-allow-traps-field')
 	])
 	->addItem([
-		(new CLabel(_('Allowed hosts')))->setId('js-item-trapper-hosts-label'),
+		(new CLabel(_('Allowed hosts'), 'trapper_hosts'))->setId('js-item-trapper-hosts-label'),
 		(new CFormField((new CTextBox('trapper_hosts', $data['trapper_hosts']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-trapper-hosts-field')
 	])
 	// Append description to form list.
 	->addItem([
-		new CLabel(_('Description')),
+		new CLabel(_('Description'), 'description'),
 		new CFormField((new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('items', 'description'))
@@ -862,11 +862,11 @@ $item_tab
 	])
 	// Append status to form list.
 	->addItem([
-		new CLabel(_('Create enabled')),
+		new CLabel(_('Create enabled'), 'status'),
 		new CFormField((new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE))
 	])
 	->addItem([
-		new CLabel(_('Discover')),
+		new CLabel(_('Discover'), 'discover'),
 		new CFormField((new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 			->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
 			->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
@@ -951,7 +951,8 @@ $widget->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'form_name' => $form->getName()
+		'form_name' => $form->getName(),
+		'trends_default' => $data['trends_default']
 	]).');
 '))
 	->setOnDocumentReady()

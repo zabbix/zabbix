@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TELNET_H
 #define ZABBIX_TELNET_H
 
-#include "sysinfo.h"
+#include "module.h"
 #include "comms.h"
 
 #define WAIT_READ	0

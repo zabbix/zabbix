@@ -100,7 +100,8 @@ class CControllerImageCreate extends CController {
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot add image'));
 
-			return $this->setResponse($response);
+			$this->setResponse($response);
+			return;
 		}
 
 		$options = [

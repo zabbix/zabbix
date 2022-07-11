@@ -105,7 +105,7 @@ class testFormValueMappings extends CWebTest {
 
 		// Check types.
 		$value_column = $row->getColumn('Value')->query('xpath:.//input')->one();
-		$dropdown = $row->query('name:mappings[1][type]')->asZDropdown()->one();
+		$dropdown = $row->query('name:mappings[1][type]')->asDropdown()->one();
 		$types = ['equals', 'is greater than or equals', 'is less than or equals', 'in range', 'regexp', 'default'];
 		$this->assertEquals($types, $dropdown->getOptions()->asText());
 

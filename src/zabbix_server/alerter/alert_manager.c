@@ -17,20 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "alert_manager.h"
 
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "zbxipcservice.h"
-#include "zbxalgo.h"
 #include "zbxserver.h"
 #include "alerter_protocol.h"
-#include "alert_manager.h"
 #include "zbxmedia.h"
 #include "zbxembed.h"
 #include "zbxserialize.h"
-#include "zbxalert.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
@@ -79,7 +75,7 @@ extern char	*CONFIG_ALERT_SCRIPTS_PATH;
  *     alertpools
  *         alerts
  *
- * Media type queue is sorted by the timestamp of the miminum item of its alertpool queue.
+ * Media type queue is sorted by the timestamp of the minimum item of its alertpool queue.
  * Alert pool queue is sorted by the timestamp of the minimum item of its alerts queue.
  * Alerts queue is sorted by the alert scheduled send timestamp.
  *
@@ -163,7 +159,7 @@ zbx_am_dispatch_t;
 /* alerter data */
 typedef struct
 {
-	/* the connected aleter client */
+	/* the connected alerter client */
 	zbx_ipc_client_t	*client;
 
 	zbx_am_alert_t		*alert;

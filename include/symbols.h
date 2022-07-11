@@ -20,6 +20,8 @@
 #ifndef ZABBIX_SYMBOLS_H
 #define ZABBIX_SYMBOLS_H
 
+#include "sysinc.h"
+
 #if defined(_WINDOWS) || defined(__MINGW32__)
 
 /* some definitions which are not available on older MS Windows versions */

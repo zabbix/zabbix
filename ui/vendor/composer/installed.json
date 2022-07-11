@@ -1,27 +1,120 @@
 [
     {
-        "name": "symfony/deprecation-contracts",
-        "version": "v2.1.3",
-        "version_normalized": "2.1.3.0",
+        "name": "onelogin/php-saml",
+        "version": "4.0.0",
+        "version_normalized": "4.0.0.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/symfony/deprecation-contracts.git",
-            "reference": "5e20b83385a77593259c9f8beb2c43cd03b2ac14"
+            "url": "https://github.com/onelogin/php-saml.git",
+            "reference": "f30f5062f3653c4d2082892d207f4dc3e577d979"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/5e20b83385a77593259c9f8beb2c43cd03b2ac14",
-            "reference": "5e20b83385a77593259c9f8beb2c43cd03b2ac14",
+            "url": "https://api.github.com/repos/onelogin/php-saml/zipball/f30f5062f3653c4d2082892d207f4dc3e577d979",
+            "reference": "f30f5062f3653c4d2082892d207f4dc3e577d979",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=7.3",
+            "robrichards/xmlseclibs": ">=3.1.1"
+        },
+        "require-dev": {
+            "pdepend/pdepend": "^2.8.0",
+            "php-coveralls/php-coveralls": "^2.0",
+            "phploc/phploc": "^4.0 || ^5.0 || ^6.0 || ^7.0",
+            "phpunit/phpunit": "^9.5",
+            "sebastian/phpcpd": "^4.0 || ^5.0 || ^6.0 ",
+            "squizlabs/php_codesniffer": "^3.5.8"
+        },
+        "suggest": {
+            "ext-curl": "Install curl lib to be able to use the IdPMetadataParser for parsing remote XMLs",
+            "ext-dom": "Install xml lib",
+            "ext-openssl": "Install openssl lib in order to handle with x509 certs (require to support sign and encryption)",
+            "ext-zlib": "Install zlib"
+        },
+        "time": "2021-03-02T10:19:19+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "OneLogin\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "OneLogin PHP SAML Toolkit",
+        "homepage": "https://developers.onelogin.com/saml/php",
+        "keywords": [
+            "SAML2",
+            "onelogin",
+            "saml"
+        ]
+    },
+    {
+        "name": "robrichards/xmlseclibs",
+        "version": "3.1.1",
+        "version_normalized": "3.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/robrichards/xmlseclibs.git",
+            "reference": "f8f19e58f26cdb42c54b214ff8a820760292f8df"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/robrichards/xmlseclibs/zipball/f8f19e58f26cdb42c54b214ff8a820760292f8df",
+            "reference": "f8f19e58f26cdb42c54b214ff8a820760292f8df",
+            "shasum": ""
+        },
+        "require": {
+            "ext-openssl": "*",
+            "php": ">= 5.4"
+        },
+        "time": "2020-09-05T13:00:25+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "RobRichards\\XMLSecLibs\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "description": "A PHP library for XML Security",
+        "homepage": "https://github.com/robrichards/xmlseclibs",
+        "keywords": [
+            "security",
+            "signature",
+            "xml",
+            "xmldsig"
+        ]
+    },
+    {
+        "name": "symfony/deprecation-contracts",
+        "version": "v2.5.1",
+        "version_normalized": "2.5.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/deprecation-contracts.git",
+            "reference": "e8b495ea28c1d97b5e0c121748d6f9b53d075c66"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/e8b495ea28c1d97b5e0c121748d6f9b53d075c66",
+            "reference": "e8b495ea28c1d97b5e0c121748d6f9b53d075c66",
             "shasum": ""
         },
         "require": {
             "php": ">=7.1"
         },
-        "time": "2020-06-06T08:49:21+00:00",
+        "time": "2022-01-02T09:53:40+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "2.1-dev"
+                "dev-main": "2.5-dev"
             },
             "thanks": {
                 "name": "symfony/contracts",
@@ -67,30 +160,33 @@
     },
     {
         "name": "symfony/polyfill-ctype",
-        "version": "v1.18.1",
-        "version_normalized": "1.18.1.0",
+        "version": "v1.25.0",
+        "version_normalized": "1.25.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/polyfill-ctype.git",
-            "reference": "1c302646f6efc070cd46856e600e5e0684d6b454"
+            "reference": "30885182c981ab175d4d034db0f6f469898070ab"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/1c302646f6efc070cd46856e600e5e0684d6b454",
-            "reference": "1c302646f6efc070cd46856e600e5e0684d6b454",
+            "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/30885182c981ab175d4d034db0f6f469898070ab",
+            "reference": "30885182c981ab175d4d034db0f6f469898070ab",
             "shasum": ""
         },
         "require": {
-            "php": ">=5.3.3"
+            "php": ">=7.1"
+        },
+        "provide": {
+            "ext-ctype": "*"
         },
         "suggest": {
             "ext-ctype": "For best performance"
         },
-        "time": "2020-07-14T12:35:20+00:00",
+        "time": "2021-10-20T20:35:02+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.18-dev"
+                "dev-main": "1.23-dev"
             },
             "thanks": {
                 "name": "symfony/polyfill",
@@ -99,12 +195,12 @@
         },
         "installation-source": "dist",
         "autoload": {
-            "psr-4": {
-                "Symfony\\Polyfill\\Ctype\\": ""
-            },
             "files": [
                 "bootstrap.php"
-            ]
+            ],
+            "psr-4": {
+                "Symfony\\Polyfill\\Ctype\\": ""
+            }
         },
         "notification-url": "https://packagist.org/downloads/",
         "license": [

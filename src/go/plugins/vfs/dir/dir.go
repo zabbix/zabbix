@@ -25,8 +25,8 @@ import (
 	"regexp"
 	"strings"
 
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 var impl Plugin

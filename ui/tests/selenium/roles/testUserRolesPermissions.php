@@ -341,7 +341,7 @@ class testUserRolesPermissions extends CWebTest {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 			$row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag');
 			$row->getColumn('Ack')->query('link:No')->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
 			$this->changeRoleRule([$data['action'] => !$action_status]);
 
@@ -529,6 +529,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		foreach ([true, false] as $action_status) {
 			$page_number = $this->query('xpath://ul[@class="menu-main"]/li/a')->count();
+			$all_pages = [];
 
 			for ($i = 1; $i <= $page_number; ++$i) {
 				$all_pages[] = $this->query('xpath:(//ul[@class="menu-main"]/li/a)['.$i.']')->one()->getText();
@@ -537,7 +538,6 @@ class testUserRolesPermissions extends CWebTest {
 			if ($action_status) {
 				$this->assertEquals($pages_before, $all_pages);
 				$this->changeRoleRule(['5th Module' => false]);
-				$all_pages = [];
 			}
 			else {
 				$pages_after = array_values(array_diff($pages_before, ['Module 5 menu']));
@@ -1414,7 +1414,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		// Filter out unnecessary services.
 		$this->query('id:filter_tags_0_tag')->waitUntilVisible()->one()->fill('action');
-		$this->query('id:filter_tags_0_operator')->asZDropdown()->waitUntilVisible()->one()->fill('Does not exist');
+		$this->query('id:filter_tags_0_operator')->asDropdown()->waitUntilVisible()->one()->fill('Does not exist');
 
 		// Apply filter in order to see the list of available services.
 		$this->query('name:filter_set')->waitUntilClickable()->one()->click();

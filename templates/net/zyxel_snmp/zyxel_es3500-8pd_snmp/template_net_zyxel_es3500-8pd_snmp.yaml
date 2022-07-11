@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:42:08Z'
+  date: '2022-04-06T19:36:05Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -107,7 +107,8 @@ zabbix_export:
             -
               uuid: 3cf67f911a854d2ebeb9e006f3f97738
               expression: 'min(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL ES3500-8PD: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'ZYXEL ES3500-8PD: High CPU utilization'
+              event_name: 'ZYXEL ES3500-8PD: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -304,7 +305,8 @@ zabbix_export:
             -
               uuid: 83548aba74c148e28e6611d5abfb9694
               expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber,#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber,#2) and length(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber))>0'
-              name: 'ZYXEL ES3500-8PD: Device has been replaced (new serial number received)'
+              name: 'ZYXEL ES3500-8PD: Device has been replaced'
+              event_name: 'ZYXEL ES3500-8PD: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
@@ -340,7 +342,8 @@ zabbix_export:
             -
               uuid: eb7a268bfa324366953221e3c1788127
               expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.uptime)<10m'
-              name: 'ZYXEL ES3500-8PD: has been restarted (uptime < 10m)'
+              name: 'ZYXEL ES3500-8PD: has been restarted'
+              event_name: 'ZYXEL ES3500-8PD: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -381,7 +384,8 @@ zabbix_export:
                 -
                   uuid: c59c3730eea44cf7a842fe46aa12fa3d
                   expression: 'min(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: 'ZYXEL ES3500-8PD: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: 'ZYXEL ES3500-8PD: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool'
+                  event_name: 'ZYXEL ES3500-8PD: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -1078,7 +1082,8 @@ zabbix_export:
                 -
                   uuid: 8ce109a9f09b41458a4e9d8698238ad0
                   expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
-                  name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
                   tags:
@@ -1088,7 +1093,8 @@ zabbix_export:
                 -
                   uuid: 6ecef48a1fdd4e16afe9472f59e0ad1a
                   expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
-                  name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
                   tags:
@@ -1264,7 +1270,8 @@ zabbix_export:
                 -
                   uuid: 46739144d51b441886d544829749cf21
                   expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}]))>0'
-                  name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX} has been replaced'
+                  event_name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
                   manual_close: 'YES'

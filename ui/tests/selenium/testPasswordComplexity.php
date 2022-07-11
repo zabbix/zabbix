@@ -121,7 +121,7 @@ class testPasswordComplexity extends CWebTest {
 
 		foreach ($hintboxes as $hintbox) {
 			// Summon the hint-box.
-			$form->query('xpath://label[text()='.zbx_dbstr($hintbox['field']).']//span')->one()->click();
+			$form->query('xpath://label[text()='.zbx_dbstr($hintbox['field']).']//a')->one()->click();
 			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
 
 			// Assert text.
@@ -1081,8 +1081,8 @@ class testPasswordComplexity extends CWebTest {
 		}
 
 		if (array_key_exists('hint', $data)) {
-			// Summon hint-box and assert text accordigly to password complexity settings, then close hint-box.
-			$user_form->query('xpath://label[text()="Password"]//span')->one()->click();
+			// Summon hint-box and assert text accordingly to password complexity settings, then close hint-box.
+			$user_form->query('xpath://label[text()="Password"]//a')->one()->click();
 			$hint = $user_form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
 			$this->assertEquals($data['hint'], $hint->one()->getText());
 			$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
@@ -1090,7 +1090,7 @@ class testPasswordComplexity extends CWebTest {
 		}
 		else {
 			// If password can be 1 symbol long and doesn't have any complexity rules hint is not shown at all.
-			$this->assertFalse($user_form->query('xpath://label[text()="Password"]//span')->exists());
+			$this->assertFalse($user_form->query('xpath://label[text()="Password"]//a')->exists());
 		}
 
 		$user_form->fill([

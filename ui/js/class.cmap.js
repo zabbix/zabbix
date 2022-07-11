@@ -1146,7 +1146,6 @@ ZABBIX.apps.map = (function($) {
 
 						default:
 							throw 'Unsupported element type found in copy buffer!';
-							break;
 					}
 
 					if (element) {
@@ -1700,8 +1699,7 @@ ZABBIX.apps.map = (function($) {
 
 			// create dom
 			this.domNode = $('<div>', {
-					style: 'position: absolute; z-index: 1;\
-						background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
+					style: 'position: absolute; z-index: 1; background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
 				})
 				.appendTo(this.sysmap.container)
 				.addClass('cursor-pointer sysmap_shape')
@@ -3337,8 +3335,7 @@ ZABBIX.apps.map = (function($) {
 					element,
 					elementTypeText,
 					i,
-					ln,
-					name;
+					ln;
 
 				$('#massList tbody').empty();
 
@@ -4007,7 +4004,7 @@ jQuery(function ($) {
 	 * new top and left position must be calculated. If the overlay dialogue is opened for the first time, position is
 	 * set depending on map size and canvas top position. This makes map more visible at first. In case popup window is
 	 * dragged outside visible view port or window is resized, popup will again be repositioned so it doesn't go outside
-	 * the viewport. In case the popup is too large, position it with a small margin depenging on whether is too long
+	 * the viewport. In case the popup is too large, position it with a small margin depending on whether is too long
 	 * or too wide.
 	 */
 	$.fn.positionOverlayDialogue = function () {

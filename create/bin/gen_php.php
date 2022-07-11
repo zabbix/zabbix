@@ -24,6 +24,9 @@ function parse_schema($path) {
 
 				$field = trim($str[0]);
 				$type = trim($str[1]);
+				if ($table === 'triggers' && $field === 'description' && $type === 't_shorttext') {
+					$type = 't_varchar(255)';
+				}
 				$default = trim($str[2]);
 				$null = trim($str[3]);
 				$ref_table = isset($str[6]) ? trim($str[6]) : null;

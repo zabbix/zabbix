@@ -143,14 +143,14 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 	return $output;
 }
 
-function makeItemSubfilter(array &$filter_data, array $items = [], string $context) {
+function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 	// subfilters
 	$table_subfilter = (new CTableInfo())
 		->addRow([
 			new CTag('h4', true, [
 				_('Subfilter'), SPACE, (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
 			])
-		]);
+		], ZBX_STYLE_HOVER_NOBG);
 
 	// array contains subfilters and number of items in each
 	$item_params = [
@@ -185,7 +185,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name === 'subfilter_tags') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 
 			if ($show_item) {
@@ -205,7 +208,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_hosts') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				$host = reset($item['hosts']);
@@ -223,7 +229,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_types') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				$item_params['types'][$item['type']]['count']++;
@@ -244,7 +253,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_value_types') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				$item_params['value_types'][$item['value_type']]['count']++;
@@ -264,7 +276,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_status') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				$item_params['status'][$item['status']]['count']++;
@@ -284,7 +299,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_state') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				$item_params['state'][$item['state']]['count']++;
@@ -304,7 +322,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_inherited') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				if ($item['templateid'] == 0) {
@@ -329,7 +350,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_with_triggers') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				if (count($item['triggers']) == 0) {
@@ -354,7 +378,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name == 'subfilter_discovered') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 			if ($show_item) {
 				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
@@ -391,7 +418,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name === 'subfilter_trends') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 
 			if ($show_item) {
@@ -423,7 +453,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name === 'subfilter_history') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 
 			if ($show_item) {
@@ -467,7 +500,10 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 				if ($name === 'subfilter_interval') {
 					continue;
 				}
-				$show_item &= $value;
+				if (!$value) {
+					$show_item = false;
+					break;
+				}
 			}
 
 			if ($show_item) {
@@ -478,9 +514,7 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 
 	// output
 	if (count($item_params['tags']) > 1) {
-		$tags_output = prepareTagsSubfilterOutput($item_params['tags'], $filter_data['subfilter_tags'],
-			'subfilter_tags'
-		);
+		$tags_output = prepareTagsSubfilterOutput($item_params['tags'], $filter_data['subfilter_tags']);
 		$table_subfilter->addRow([$tags_output]);
 	}
 
@@ -885,7 +919,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 
 		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 	}
 
@@ -1539,8 +1573,15 @@ function getCopyElementsFormData($elements_field, $title = null) {
 		'elements' => getRequest($elements_field, []),
 		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_HOST_GROUP),
 		'copy_targetids' => getRequest('copy_targetids', []),
-		'hostid' => getRequest('hostid', 0)
+		'hostid' => 0
 	];
+
+	$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
+	$filter_hostids = getRequest('filter_hostids', CProfile::getArray($prefix.'triggers.filter_hostids', []));
+
+	if (count($filter_hostids) == 1) {
+		$data['hostid'] = reset($filter_hostids);
+	}
 
 	if (!$data['elements'] || !is_array($data['elements'])) {
 		show_error_message(_('Incorrect list of items.'));
@@ -1708,7 +1749,7 @@ function getTriggerFormData(array $data) {
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
 			getTriggerParentTemplates([$trigger], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		if ($data['show_inherited_tags']) {

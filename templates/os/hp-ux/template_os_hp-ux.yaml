@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:40:47Z'
+  date: '2022-04-06T19:27:33Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -310,7 +310,8 @@ zabbix_export:
             -
               uuid: ce008290ad6341b98386adf9ea5c315b
               expression: 'max(/HP-UX by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
               description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
               manual_close: 'YES'

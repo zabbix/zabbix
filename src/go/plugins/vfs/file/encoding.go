@@ -36,11 +36,11 @@ import (
 func decode(encoder string, inbuf []byte) (outbuf []byte) {
 
 	if "" == encoder {
-		if len(inbuf)>3 && 0xef == inbuf[0] && 0xbb == inbuf[1] && 0xbf == inbuf[2] {
+		if len(inbuf) > 3 && 0xef == inbuf[0] && 0xbb == inbuf[1] && 0xbf == inbuf[2] {
 			encoder = "UTF-8"
-		} else if len(inbuf)>2 && 0xff == inbuf[0] && 0xfe == inbuf[1] {
+		} else if len(inbuf) > 2 && 0xff == inbuf[0] && 0xfe == inbuf[1] {
 			encoder = "UTF-16LE"
-		} else if len(inbuf)>2 && 0xfe == inbuf[0] && 0xff == inbuf[1] {
+		} else if len(inbuf) > 2 && 0xfe == inbuf[0] && 0xff == inbuf[1] {
 			encoder = "UTF-16BE"
 		} else {
 			return inbuf
@@ -76,7 +76,7 @@ func decode(encoder string, inbuf []byte) (outbuf []byte) {
 	}
 	outbuf = outbuf[:len(outbuf)-int(outbytes)]
 	C.iconv_close(cd)
-	if len(outbuf)>3 && 0xef == outbuf[0] && 0xbb == outbuf[1] && 0xbf == outbuf[2] {
+	if len(outbuf) > 3 && 0xef == outbuf[0] && 0xbb == outbuf[1] && 0xbf == outbuf[2] {
 		outbuf = outbuf[3:]
 	}
 	return

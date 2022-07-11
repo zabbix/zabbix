@@ -17,16 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "dbsyncer.h"
 
-#include "db.h"
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "sighandler.h"
 
 #include "dbcache.h"
-#include "dbsyncer.h"
 #include "export.h"
 
 extern int				CONFIG_HISTSYNCER_FREQUENCY;

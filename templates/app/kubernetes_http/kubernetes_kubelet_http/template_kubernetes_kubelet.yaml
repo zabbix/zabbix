@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-14T14:27:52Z'
+  date: '2022-04-06T19:27:51Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: e785916967c14544b59c3644c3edda3a
-      template: 'Kubernetes kubelet by HTTP'
-      name: 'Kubernetes kubelet by HTTP'
+      template: 'Kubernetes Kubelet by HTTP'
+      name: 'Kubernetes Kubelet by HTTP'
       description: |
         Get Kubernetes kubelet metrics by HTTP agent from Prometheus metrics endpoint.
         
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -28,13 +28,12 @@ zabbix_export:
           name: 'Kubernetes: Get cadvisor metrics'
           type: HTTP_AGENT
           key: kube.cadvisor.metrics
-          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Collecting raw Kubelet metrics from /metrics/cadvisor endpoint.'
           timeout: 10s
-          url: '{$KUBE.KUBELET.URL}/metrics/cadvisor'
+          url: '{$KUBE.KUBELET.URL}{$KUBE.KUBELET.CADVISOR.ENDPOINT}'
           status_codes: '200, 403'
           headers:
             -
@@ -134,13 +133,12 @@ zabbix_export:
           name: 'Kubernetes: Get kubelet metrics'
           type: HTTP_AGENT
           key: kube.kubelet.metrics
-          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Collecting raw Kubelet metrics from /metrics endpoint.'
           timeout: 10s
-          url: '{$KUBE.KUBELET.URL}/metrics'
+          url: '{$KUBE.KUBELET.URL}{$KUBE.KUBELET.METRIC.ENDPOINT}'
           status_codes: '200, 403'
           headers:
             -
@@ -262,13 +260,12 @@ zabbix_export:
           name: 'Kubernetes: Get pods'
           type: HTTP_AGENT
           key: kube.pods
-          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Collecting raw Kubelet metrics from /pods endpoint.'
           timeout: 10s
-          url: '{$KUBE.KUBELET.URL}/pods'
+          url: '{$KUBE.KUBELET.URL}{$KUBE.KUBELET.PODS.ENDPOINT}'
           status_codes: '200, 403'
           headers:
             -
@@ -285,6 +282,7 @@ zabbix_export:
           type: DEPENDENT
           key: kube.kubelet.container.memory.cache.discovery
           delay: '0'
+          lifetime: '0'
           item_prototypes:
             -
               uuid: 8f8b1df2a801475a92604544b2019b2e
@@ -306,7 +304,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -342,7 +340,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -378,7 +376,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -414,7 +412,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -450,7 +448,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -486,7 +484,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -528,12 +526,17 @@ zabbix_export:
                       }
                   })
                   return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
         -
           uuid: b98223fcf0ee4a558035ed23de0d2616
           name: 'Pods discovery'
           type: DEPENDENT
           key: kube.kubelet.pods.discovery
           delay: '0'
+          lifetime: '0'
           item_prototypes:
             -
               uuid: 41e8f027979a462983789f1f45a9e332
@@ -633,6 +636,10 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
         -
           uuid: cb42f71e6bfb4661861e3601e31eeaa6
           name: 'REST client requests discovery'
@@ -659,7 +666,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 3h
               master_item:
                 key: kube.kubelet.metrics
               tags:
@@ -701,6 +708,10 @@ zabbix_export:
                       }
                   })
                   return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
         -
           uuid: 6feb0006bb364a8f9295495c92741c16
           name: 'Runtime operations discovery'
@@ -714,7 +725,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.kublet.runtime_ops_duration_seconds_bucket[{#LE},"{#OP_TYPE}"]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Duration in seconds of runtime operations. Broken down by operation type.'
@@ -827,25 +839,25 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Kubernetes kubelet by HTTP'
+                    host: 'Kubernetes Kubelet by HTTP'
                     key: 'kube.kublet.runtime_ops_duration_seconds_p90["{#OP_TYPE}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Kubernetes kubelet by HTTP'
+                    host: 'Kubernetes Kubelet by HTTP'
                     key: 'kube.kublet.runtime_ops_duration_seconds_p95["{#OP_TYPE}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'Kubernetes kubelet by HTTP'
+                    host: 'Kubernetes Kubelet by HTTP'
                     key: 'kube.kublet.runtime_ops_duration_seconds_p99["{#OP_TYPE}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'Kubernetes kubelet by HTTP'
+                    host: 'Kubernetes Kubelet by HTTP'
                     key: 'kube.kublet.runtime_ops_duration_seconds_p50["{#OP_TYPE}"]'
           master_item:
             key: kube.kubelet.metrics
@@ -863,7 +875,7 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === 'kubelet_runtime_operations_total') {
+                      if (item.name === 'kubelet_runtime_operations_total'){
                           var op_type = item.labels.operation_type;
                   
                           if (lookup[op_type]) {
@@ -875,8 +887,8 @@ zabbix_export:
                               '{#OP_TYPE}': op_type
                           });
                       }
-
-                      else if (item.name === 'kubelet_runtime_operations_duration_seconds_bucket') {
+                  
+                      else if (item.name === 'kubelet_runtime_operations_duration_seconds_bucket'){
                           var labels = item.labels.operation_type + item.labels.le;
                   
                           if (lookup_histogram[labels]) {
@@ -895,7 +907,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 3h
           overrides:
             -
               name: 'bucket item'
@@ -941,5 +953,18 @@ zabbix_export:
           macro: '{$KUBE.API.TOKEN}'
           description: 'Service account bearer token'
         -
+          macro: '{$KUBE.KUBELET.CADVISOR.ENDPOINT}'
+          value: /metrics/cadvisor
+          description: 'cAdvisor metrics from Kubelet /metrics/cadvisor endpoint'
+        -
+          macro: '{$KUBE.KUBELET.METRIC.ENDPOINT}'
+          value: /metrics
+          description: 'Kubelet /metrics endpoint'
+        -
+          macro: '{$KUBE.KUBELET.PODS.ENDPOINT}'
+          value: /pods
+          description: 'Kubelet /pods endpoint'
+        -
           macro: '{$KUBE.KUBELET.URL}'
           value: 'https://localhost:10250'
+          description: 'Instance URL'

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -24,10 +24,13 @@
  * @var array    $data
  */
 
+$subfilters_expanded = array_key_exists('subfilters_expanded', $data) ? $data['subfilters_expanded'] : [];
+$subfilters = $data['subfilters'];
+
 $subfilter_options = [];
 
 foreach (['hostids', 'tagnames', 'data'] as $key) {
-	if (!array_key_exists($key, $data) || count($data[$key]) <= 1) {
+	if (!array_key_exists($key, $subfilters) || count($subfilters[$key]) <= 1) {
 		$subfilter_options[$key] = null;
 		continue;
 	}
@@ -36,18 +39,18 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 	}
 
 	// Remove non-selected filter fields with 0 occurrences.
-	$data[$key] = array_filter($data[$key], function ($field) {
+	$subfilters[$key] = array_filter($subfilters[$key], function ($field) {
 		return ($field['selected'] || $field['count'] != 0);
 	});
 
-	$subfilter_used = (bool) array_filter($data[$key], function ($field) {
+	$subfilter_used = (bool) array_filter($subfilters[$key], function ($field) {
 		return $field['selected'];
 	});
 
-	$subfilter_options_count = count($data[$key]);
-	$data[$key] = CControllerLatest::getTopPrioritySubfilters($data[$key]);
+	$subfilter_options_count = count($subfilters[$key]);
+	$subfilters[$key] = CControllerLatest::getTopPrioritySubfilters($subfilters[$key]);
 
-	foreach ($data[$key] as $value => $element) {
+	foreach ($subfilters[$key] as $value => $element) {
 		if ($element['selected']) {
 			$subfilter_options[$key][] = (new CSpan([
 				(new CLinkAction($element['name']))->onClick(CHtml::encode(
@@ -84,14 +87,16 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 	}
 }
 
-if (count($data['tags']) > 0) {
+if (count($subfilters['tags']) > 0) {
 	$subfilter_options['tags'] = [];
 
-	$subfilter_used = (bool) array_filter($data['tags'], function ($field) {
+	$subfilter_used = (bool) array_filter($subfilters['tags'], function ($field) {
 		return (bool) array_sum(array_column($field, 'selected'));
 	});
+	$tags_expanded = array_key_exists('tags', $subfilters_expanded);
 
-	foreach (CControllerLatest::getTopPriorityTagValueSubfilters($data['tags']) as $tags_group) {
+	$index = 0;
+	foreach (CControllerLatest::getTopPriorityTagValueSubfilters($subfilters['tags']) as $tags_group) {
 		$tag = $tags_group['name'];
 
 		$tag_values = array_map(function ($element) use ($tag, $subfilter_used) {
@@ -132,18 +137,24 @@ if (count($data['tags']) > 0) {
 			}
 		}, $tags_group['values']);
 
-		$tag_values_row = (count($data['tags'][$tag]) > CControllerLatest::SUBFILTERS_VALUES_PER_ROW)
-			? [$tag_values, new CSpan('...')]
-			: $tag_values;
+		$tag_values = $tags_group['trimmed'] ? [$tag_values, new CSpan('...')] : $tag_values;
 
 		$subfilter_options['tags'][$tag] = (new CDiv([
 			new CTag('label', true, $tag.': '),
-			(new CDiv($tag_values_row))->addClass('subfilter-options')
+			(new CExpandableSubfilter('tagnames', $tag_values, array_key_exists('tagnames', $subfilters_expanded)))
+				->addClass(CExpandableSubfilter::ZBX_STYLE_EXPANDABLE_TEN_LINES)
+				->addClass('subfilter-options')
 		]))->addClass('subfilter-option-grid');
+
+		if (!$tags_expanded && ++$index > CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS) {
+			$subfilter_options['tags'][$tag]->addClass('display-none');
+		}
 	}
 
-	if (count($data['tags']) > CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS) {
-		$subfilter_options['tags'][] = new CSpan('...');
+	if (!$tags_expanded && count($subfilter_options['tags']) > CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS) {
+		$subfilter_options['tags'][] = (new CButton('expand_tag_values'))
+			->setAttribute('data-name', 'tags')
+			->addClass(ZBX_STYLE_ICON_WIZARD_ACTION);
 	}
 }
 else {
@@ -155,12 +166,14 @@ else {
 		new CTag('h4', true, [
 			_('Subfilter'), ' ', (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
 		])
-	]])
+	]], ZBX_STYLE_HOVER_NOBG)
 	->addRow(
 		$subfilter_options['hostids']
 			? [[
 				new CTag('h3', true, _('Hosts')),
-				$subfilter_options['hostids']
+				(new CExpandableSubfilter('hostids', $subfilter_options['hostids'],
+					array_key_exists('hostids', $subfilters_expanded)
+				))->addClass(CExpandableSubfilter::ZBX_STYLE_EXPANDABLE_TEN_LINES)
 			]]
 			: null
 	)
@@ -168,7 +181,9 @@ else {
 		$subfilter_options['tagnames']
 			? [[
 				new CTag('h3', true, _('Tags')),
-				$subfilter_options['tagnames']
+				(new CExpandableSubfilter('tagnames', $subfilter_options['tagnames'],
+					array_key_exists('tagnames', $subfilters_expanded)
+				))->addClass(CExpandableSubfilter::ZBX_STYLE_EXPANDABLE_TEN_LINES)
 			]]
 			: null
 	)

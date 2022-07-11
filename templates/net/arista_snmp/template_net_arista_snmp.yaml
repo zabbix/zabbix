@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T13:51:46Z'
+  date: '2022-04-10T20:33:50Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -218,7 +218,8 @@ zabbix_export:
             -
               uuid: 6737f0672c244e048509358d220874a6
               expression: 'min(/Arista SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -300,7 +301,8 @@ zabbix_export:
             -
               uuid: 362d455c9d9944cea7c37d58bcabc0a0
               expression: 'last(/Arista SNMP/system.name,#1)<>last(/Arista SNMP/system.name,#2) and length(last(/Arista SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -359,9 +361,10 @@ zabbix_export:
             -
               uuid: e3907a8b6aba4512a24a677ed31e4362
               expression: 'last(/Arista SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -467,7 +470,8 @@ zabbix_export:
                 -
                   uuid: 218209a40ec54a489738345c4485be83
                   expression: 'last(/Arista SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Arista SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Arista SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
-                  name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
+                  name: '{#ENT_NAME}: Device has been replaced'
+                  event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
@@ -510,7 +514,8 @@ zabbix_export:
                 -
                   uuid: 660fd32236464fd69409099c67478ff5
                   expression: 'min(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
-                  name: '{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m'
+                  name: '{#SENSOR_INFO}: Fan speed is above the critical threshold'
+                  event_name: '{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses fan sensor values defined in the device.'
@@ -525,7 +530,8 @@ zabbix_export:
                 -
                   uuid: b1131f42627047ca9629693b91d9185e
                   expression: 'min(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
-                  name: '{#SENSOR_INFO}: Fan speed is above the warning threshold of {#THRESHOLD_HI_WARN}rpm for 5m'
+                  name: '{#SENSOR_INFO}: Fan speed is above the warning threshold'
+                  event_name: '{#SENSOR_INFO}: Fan speed is above the warning threshold of {#THRESHOLD_HI_WARN}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses fan sensor values defined in the device.'
@@ -534,7 +540,7 @@ zabbix_export:
                       name: '{#SENSOR_INFO}: Fan is in critical state'
                       expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                     -
-                      name: '{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m'
+                      name: '{#SENSOR_INFO}: Fan speed is above the critical threshold'
                       expression: 'min(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   tags:
                     -
@@ -543,7 +549,8 @@ zabbix_export:
                 -
                   uuid: 0cd8e252a77b4c90a155e57aab963e5e
                   expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
-                  name: '{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m'
+                  name: '{#SENSOR_INFO}: Fan speed is below the critical threshold'
+                  event_name: '{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses fan sensor values defined in the device.'
@@ -558,7 +565,8 @@ zabbix_export:
                 -
                   uuid: d37c360fea9143bab6ff07699ed4acb1
                   expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
-                  name: '{#SENSOR_INFO}: Fan speed is below the warning threshold of {#THRESHOLD_LO_WARN}rpm for 5m'
+                  name: '{#SENSOR_INFO}: Fan speed is below the warning threshold'
+                  event_name: '{#SENSOR_INFO}: Fan speed is below the warning threshold of {#THRESHOLD_LO_WARN}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses fan sensor values defined in the device.'
@@ -567,7 +575,7 @@ zabbix_export:
                       name: '{#SENSOR_INFO}: Fan is in critical state'
                       expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                     -
-                      name: '{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m'
+                      name: '{#SENSOR_INFO}: Fan speed is below the critical threshold'
                       expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   tags:
                     -
@@ -1007,7 +1015,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
                 through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'IF-MIB::ifType'
@@ -1069,7 +1077,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Arista SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Arista SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
                 avg(/Arista SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Arista SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1092,7 +1101,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Arista SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Arista SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1359,7 +1369,8 @@ zabbix_export:
                 -
                   uuid: 791d55e21828472e93c97d8fa4f96d26
                   expression: 'min(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
-                  name: '{#SENSOR_INFO}: Temperature is above the critical threshold of {#THRESHOLD_HI_CRIT}°C for 5m'
+                  name: '{#SENSOR_INFO}: Temperature is above the critical threshold'
+                  event_name: '{#SENSOR_INFO}: Temperature is above the critical threshold of {#THRESHOLD_HI_CRIT}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values defined in the device.'
@@ -1370,13 +1381,14 @@ zabbix_export:
                 -
                   uuid: c65457a8a6d4427995626ff9ff12e339
                   expression: 'min(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
-                  name: '{#SENSOR_INFO}: Temperature is above the warning threshold of {#THRESHOLD_HI_WARN}°C for 5m'
+                  name: '{#SENSOR_INFO}: Temperature is above the warning threshold'
+                  event_name: '{#SENSOR_INFO}: Temperature is above the warning threshold of {#THRESHOLD_HI_WARN}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values defined in the device.'
                   dependencies:
                     -
-                      name: '{#SENSOR_INFO}: Temperature is above the critical threshold of {#THRESHOLD_HI_CRIT}°C for 5m'
+                      name: '{#SENSOR_INFO}: Temperature is above the critical threshold'
                       expression: 'min(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   tags:
                     -
@@ -1385,7 +1397,8 @@ zabbix_export:
                 -
                   uuid: b521cd99d9fb4f6f9d1241ac33c01a86
                   expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
-                  name: '{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m'
+                  name: '{#SENSOR_INFO}: Temperature is below the critical threshold'
+                  event_name: '{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values defined in the device.'
@@ -1396,13 +1409,14 @@ zabbix_export:
                 -
                   uuid: 750888bd98fa475dba03591945416b89
                   expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
-                  name: '{#SENSOR_INFO}: Temperature is below the warning threshold of {#THRESHOLD_LO_WARN}°C for 5m'
+                  name: '{#SENSOR_INFO}: Temperature is below the warning threshold'
+                  event_name: '{#SENSOR_INFO}: Temperature is below the warning threshold of {#THRESHOLD_LO_WARN}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values defined in the device.'
                   dependencies:
                     -
-                      name: '{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m'
+                      name: '{#SENSOR_INFO}: Temperature is below the critical threshold'
                       expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   tags:
                     -
@@ -1575,14 +1589,15 @@ zabbix_export:
               uuid: f4bfac8d247144b3bebac7245248553e
               expression: |
                 last(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Arista SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                ((last(/Arista SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is critically low'
+              event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 5G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -1596,22 +1611,23 @@ zabbix_export:
               uuid: 9912ab9619ce46b88afe358ab50a2c4f
               expression: |
                 last(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Arista SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<10G or timeleft(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+                ((last(/Arista SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is low'
+              event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 10G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  name: '{#FSNAME}: Disk space is critically low'
                   expression: |
                     last(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Arista SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                    ((last(/Arista SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1723,7 +1739,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: 'last(//vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(//vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100'
-              description: 'Memory utilization in %'
+              description: 'Memory utilization in %.'
               tags:
                 -
                   tag: component
@@ -1732,7 +1748,8 @@ zabbix_export:
                 -
                   uuid: 6b9010e0ad4e4549ac91a91d4bb3983a
                   expression: 'min(/Arista SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '{#MEMNAME}: High memory utilization'
+                  event_name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -1791,7 +1808,8 @@ zabbix_export:
                 -
                   uuid: 1c78dea0380a4bf68b05c1323a208c3a
                   expression: 'min(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
-                  name: '{#SENSOR_INFO}: Voltage is above the critical threshold of {#THRESHOLD_HI_CRIT}V for 5m'
+                  name: '{#SENSOR_INFO}: Voltage is above the critical threshold'
+                  event_name: '{#SENSOR_INFO}: Voltage is above the critical threshold of {#THRESHOLD_HI_CRIT}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses voltage sensor values defined in the device.'
@@ -1802,13 +1820,14 @@ zabbix_export:
                 -
                   uuid: 08b4f59d66ea45eaa95426a27586c4bd
                   expression: 'min(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
-                  name: '{#SENSOR_INFO}: Voltage is above the warning threshold of {#THRESHOLD_HI_WARN}V for 5m'
+                  name: '{#SENSOR_INFO}: Voltage is above the warning threshold'
+                  event_name: '{#SENSOR_INFO}: Voltage is above the warning threshold of {#THRESHOLD_HI_WARN}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses voltage sensor values defined in the device.'
                   dependencies:
                     -
-                      name: '{#SENSOR_INFO}: Voltage is above the critical threshold of {#THRESHOLD_HI_CRIT}V for 5m'
+                      name: '{#SENSOR_INFO}: Voltage is above the critical threshold'
                       expression: 'min(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   tags:
                     -
@@ -1817,7 +1836,8 @@ zabbix_export:
                 -
                   uuid: d2df35a764234716a286a8019e6c9411
                   expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
-                  name: '{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m'
+                  name: '{#SENSOR_INFO}: Voltage is below the critical threshold'
+                  event_name: '{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses voltage sensor values defined in the device.'
@@ -1828,13 +1848,14 @@ zabbix_export:
                 -
                   uuid: 481908babd3f44b3a73f3e0a628fe6d4
                   expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
-                  name: '{#SENSOR_INFO}: Voltage is below the warning threshold of {#THRESHOLD_LO_WARN}V for 5m'
+                  name: '{#SENSOR_INFO}: Voltage is below the warning threshold'
+                  event_name: '{#SENSOR_INFO}: Voltage is below the warning threshold of {#THRESHOLD_LO_WARN}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses voltage sensor values defined in the device.'
                   dependencies:
                     -
-                      name: '{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m'
+                      name: '{#SENSOR_INFO}: Voltage is below the critical threshold'
                       expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   tags:
                     -
@@ -2002,6 +2023,14 @@ zabbix_export:
         -
           macro: '{$SNMP.TIMEOUT}'
           value: 5m
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
         -
           macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+

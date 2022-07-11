@@ -17,14 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
+#include "proxyconfig.h"
+
 #include "log.h"
 #include "daemon.h"
 #include "proxy.h"
 #include "zbxself.h"
 
-#include "proxyconfig.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
@@ -67,11 +66,16 @@ static void	process_configuration_sync(size_t *data_size)
 	reserved = j.buffer_size;
 	zbx_json_free(&j);
 
+	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+
 	if (FAIL == connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
 			configured_tls_connect_mode, CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING))	/* retry till have a connection */
 	{
+		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		goto out;
 	}
+
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	if (SUCCEED != get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
 	{

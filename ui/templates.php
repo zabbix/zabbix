@@ -328,24 +328,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 
-			if (!copyItems($cloneTemplateId, $input_templateid)) {
+			if (!copyItems($cloneTemplateId, $input_templateid, true)) {
 				throw new Exception();
 			}
 
 			// copy triggers
-			$dbTriggers = API::Trigger()->get([
-				'output' => ['triggerid'],
-				'hostids' => $cloneTemplateId,
-				'inherited' => false
-			]);
-
-			if ($dbTriggers) {
-				$result &= copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'),
-						$input_templateid, $cloneTemplateId);
-
-				if (!$result) {
-					throw new Exception();
-				}
+			if (!copyTriggersToHosts([$input_templateid], $cloneTemplateId)) {
+				throw new Exception();
 			}
 
 			// copy graphs
@@ -367,10 +356,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			]);
 
 			if ($dbDiscoveryRules) {
-				$result &= API::DiscoveryRule()->copy([
+				if (!API::DiscoveryRule()->copy([
 					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
 					'hostids' => [$input_templateid]
-				]);
+				])) {
+					$result = false;
+				}
 
 				if (!$result) {
 					throw new Exception();

@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "service.h"
 
+#include "common.h"
 #include "cfg.h"
 #include "log.h"
 #include "alias.h"

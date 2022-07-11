@@ -21,7 +21,7 @@ package webcertificate
 import (
 	"testing"
 
-	"zabbix.com/pkg/uri"
+	"git.zabbix.com/ap/plugin-support/uri"
 )
 
 func Test_getParameters(t *testing.T) {

@@ -23,7 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 const (

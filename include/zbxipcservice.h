@@ -20,7 +20,6 @@
 #ifndef ZABBIX_ZBXIPCSERVICE_H
 #define ZABBIX_ZBXIPCSERVICE_H
 
-#include "common.h"
 #include "zbxalgo.h"
 
 #define ZBX_IPC_SOCKET_BUFFER_SIZE	4096

@@ -1,3 +1,4 @@
+//go:build oracle_tests
 // +build oracle_tests
 
 /*
@@ -26,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"zabbix.com/pkg/uri"
+	"git.zabbix.com/ap/plugin-support/uri"
 
 	"github.com/omeid/go-yarn"
 )

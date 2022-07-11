@@ -28,7 +28,7 @@ import (
 	"strings"
 	"unicode"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/tls"
 )
 

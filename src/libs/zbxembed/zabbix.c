@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zabbix.h"
+
 #include "common.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "zbxembed.h"
 #include "embed.h"
 #include "duktape.h"
-#include "zabbix.h"
 
 /******************************************************************************
  *                                                                            *
@@ -69,7 +69,7 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 
 	level = duk_to_int(ctx, 0);
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 1), &message))
+	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 1), &message))
 	{
 		message = zbx_strdup(message, duk_to_string(ctx, 1));
 		zbx_replace_invalid_utf8(message);
@@ -106,8 +106,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: es_zabbix_sleep                                                  *
- *                                                                            *
  * Purpose: sleep for given duration in milliseconds                          *
  *                                                                            *
  * Parameters: ctx - [IN] pointer to duk_context                              *
@@ -135,7 +133,7 @@ static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 	/* use duk_to_number() instead of duk_to_uint() to distinguish between zero value and error */
 	sleep_dbl = duk_to_number(ctx, 0);
 
-	if (0 != DUK_ISNAN((float)sleep_dbl) || 0.0 > sleep_dbl)
+	if (FP_NAN == fpclassify((float)sleep_dbl) || 0.0 > sleep_dbl)
 		return duk_error(ctx, DUK_ERR_EVAL_ERROR, "invalid Zabbix.sleep() duration");
 
 	if (DUK_UINT_MAX < sleep_dbl)

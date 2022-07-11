@@ -24,8 +24,8 @@ import (
 	"fmt"
 	"strings"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/mediocregopher/radix/v3"
-	"zabbix.com/pkg/zbxerr"
 )
 
 const globChars = "*?[]!"

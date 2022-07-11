@@ -17,14 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
-
 #include "stats.h"
 
-#ifndef _WINDOWS
-#	include "diskdevices.h"
-#endif
+#include "log.h"
 
 #include "mutexs.h"
 
@@ -35,11 +30,6 @@
 extern int get_cpu_num_win32(void);
 #else
 #	include "daemon.h"
-#	include "ipc.h"
-#endif
-
-#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
-#	include "zbxkstat.h"
 #endif
 
 ZBX_COLLECTOR_DATA	*collector = NULL;

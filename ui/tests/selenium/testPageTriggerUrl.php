@@ -81,7 +81,7 @@ class testPageTriggerUrl extends CWebTest {
 	 * Check trigger url in Trigger overview widget.
 	 */
 	public function testPageTriggerUrl_TriggerOverviewWidget($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1020');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10220');
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget('Group to check Overview');
 

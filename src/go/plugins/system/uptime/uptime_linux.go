@@ -27,7 +27,7 @@ import (
 	"strings"
 	"time"
 
-	"zabbix.com/pkg/std"
+	"git.zabbix.com/ap/plugin-support/std"
 )
 
 func getUptime() (uptime int, err error) {
