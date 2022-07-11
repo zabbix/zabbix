@@ -207,14 +207,13 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
 				$problem['name'], CSeverityHelper::getName((int) $problem['severity'])
 			))
-			->addClass(ZBX_STYLE_WORDBREAK)
 	];
 
 	if ($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $opdata) {
 		$problem_link = array_merge($problem_link, [' (', $opdata, ')']);
 	}
 
-	$description = (new CCol($problem_link));
+	$description = (new CCol($problem_link))->addClass(ZBX_STYLE_WORDBREAK);
 
 	$description_style = CSeverityHelper::getStyle((int) $problem['severity']);
 
