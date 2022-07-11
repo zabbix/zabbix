@@ -194,9 +194,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			);
 
 			if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
-				$opdata = (new CCol($opdata))
-					->addClass('opdata')
-					->addClass(ZBX_STYLE_WORDWRAP);
+				$opdata = (new CCol($opdata))->addClass('opdata');
 			}
 		}
 	}
