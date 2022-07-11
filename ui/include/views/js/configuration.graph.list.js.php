@@ -27,11 +27,8 @@
 <script>
 	const view = {
 		init() {
-			const form = document.querySelector('form[name="graphForm"]');
-			form.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-copy')) {
-					this.openCopyPopup();
-				}
+			document.querySelector('.js-copy').addEventListener('click', () => {
+				this.openCopyPopup();
 			});
 		},
 

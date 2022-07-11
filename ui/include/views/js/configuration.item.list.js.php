@@ -59,11 +59,8 @@
 		},
 
 		_initActions() {
-			const form = document.querySelector('form[name="itemsForm"]');
-			form.addEventListener('click', (e) => {
-					if (e.target.classList.contains('js-copy')) {
-						this.openCopyPopup();
-					}
+			document.querySelector('.js-copy').addEventListener('click', () => {
+				this.openCopyPopup();
 			});
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-execute-now')) {
