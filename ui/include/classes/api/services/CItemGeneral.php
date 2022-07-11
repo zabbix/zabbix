@@ -672,7 +672,7 @@ abstract class CItemGeneral extends CApiService {
 				$upd_items[] = $upd_item;
 			}
 
-			static::addAffectedObjects($upd_items, $upd_db_items);
+			self::addAffectedObjects($upd_items, $upd_db_items);
 		}
 
 		return $upd_db_items;

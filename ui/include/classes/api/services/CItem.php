@@ -1197,15 +1197,6 @@ class CItem extends CItemGeneral {
 		return $sqlParts;
 	}
 
-	/**
-	 * @param array $items
-	 * @param array $db_items
-	 */
-	protected static function addAffectedObjects(array $items, array &$db_items): void {
-		parent::addAffectedObjects($items, $db_items);
-		self::addAffectedTags($items, $db_items);
-	}
-
 		/**
 	 * Deletes items and related entities without permission check.
 	 *

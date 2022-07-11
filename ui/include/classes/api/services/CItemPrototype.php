@@ -874,14 +874,6 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * @param array $items
-	 * @param array $db_items
-	 */
-	protected static function addAffectedObjects(array $items, array &$db_items): void {
-		parent::addAffectedObjects($items, $db_items);
-	}
-
-	/**
 	 * Deletes item prototypes and related entities without permission check.
 	 *
 	 * @param array $db_items
