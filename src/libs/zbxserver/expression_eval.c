@@ -1987,6 +1987,7 @@ void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, cons
 		if (NULL != hi->host)
 		{
 			query->ref.host = zbx_strdup(query->ref.host, hi->host);
+			DBget_trigger_value(trigger, &query->ref.key, func_num, ZBX_REQUEST_ITEM_KEY);
 		}
 		else
 		{
