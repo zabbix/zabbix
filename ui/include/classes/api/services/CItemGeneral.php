@@ -2436,8 +2436,12 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($items as $item) {
 			$db_type = $db_items[$item['itemid']]['type'];
 
-			if (array_key_exists('parameters', $item) || ($item['type'] != $db_type && $db_type == ITEM_TYPE_SCRIPT)) {
+			if ((array_key_exists('parameters', $item) && $item['type'] == ITEM_TYPE_SCRIPT)
+					|| ($item['type'] != $db_type && $db_type == ITEM_TYPE_SCRIPT)) {
 				$itemids[] = $item['itemid'];
+				$db_items[$item['itemid']]['parameters'] = [];
+			}
+			elseif (array_key_exists('parameters', $item)) {
 				$db_items[$item['itemid']]['parameters'] = [];
 			}
 		}
