@@ -128,15 +128,26 @@ extern "C" static void	get_error_code_text(HRESULT hres, char **error)
 		if (S_OK == sc)
 		{
 			*error = zbx_unicode_to_utf8((wchar_t *)bstr);
+			zbx_rtrim(*error, "\n\r");
 			SysFreeString(bstr);
-			bstr = 0;
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "error code:" ZBX_FS_I64, hres);
+			zabbix_log(LOG_LEVEL_DEBUG, "GetErrorCodeText() failed with code:" ZBX_FS_I64 " when retrieving error"
+					" code for " ZBX_FS_I64, sc, hres);
 		}
 		pStatus->Release();
 	}
 	else
-		zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve text for status code");
+	{
+		*error = zbx_dsprintf(*error, "error code:" ZBX_FS_I64, hres);
+		zabbix_log(LOG_LEVEL_DEBUG, "CoCreateInstance() failed with code:" ZBX_FS_I64 " when retrieving error code"
+				" for:" ZBX_FS_I64, sc, hres);
+	}
 
-	pStatus->Release();
+	if (NULL != pStatus)
+		pStatus->Release();
 }
 
 /******************************************************************************
