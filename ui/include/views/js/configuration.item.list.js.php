@@ -59,11 +59,14 @@
 		},
 
 		_initActions() {
+			const form = document.querySelector('form[name="itemsForm"]');
+			form.addEventListener('click', (e) => {
+					if (e.target.classList.contains('js-copy')) {
+						this.openCopyPopup();
+					}
+			});
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-copy')) {
-					this.openCopyPopup();
-				}
-				else if (e.target.classList.contains('js-execute-now')) {
+				if (e.target.classList.contains('js-execute-now')) {
 					this.massCheckNow();
 				}
 			});
@@ -93,12 +96,13 @@
 		},
 
 		openCopyPopup() {
-			const form = document.activeElement.closest('form');
-			const parameters = {};
-			parameters.itemids = Object.keys(chkbxRange.getSelectedIds());
-			parameters.context = form.querySelector('#form_context').value
+			const form = document.querySelector('form[name="itemsForm"]');
+			const parameters = {
+				itemids: Object.keys(chkbxRange.getSelectedIds()),
+				context: form.querySelector('#form_context').value
+			};
 
-			return PopUp('popup.copy.items', parameters, {
+			PopUp('popup.copy.items', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});

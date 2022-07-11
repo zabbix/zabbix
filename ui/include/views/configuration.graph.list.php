@@ -280,6 +280,6 @@ $graphForm->addItem([
 $widget->addItem($graphForm);
 $widget->show();
 
-(new CScriptTag('view._initActions();'))
+(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();

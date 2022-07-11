@@ -26,8 +26,9 @@
 
 <script>
 	const view = {
-		_initActions() {
-			document.addEventListener('click', (e) => {
+		init() {
+			const form = document.querySelector('form[name="graphForm"]');
+			form.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-copy')) {
 					this.openCopyPopup();
 				}
@@ -58,12 +59,13 @@
 		},
 
 		openCopyPopup() {
-			const form = document.activeElement.closest('form');
-			const parameters = {};
-			parameters.graphids = Object.keys(chkbxRange.getSelectedIds());
-			parameters.context = form.querySelector('#form_context').value
+			const form = document.querySelector('form[name="graphForm"]');
+			const parameters = {
+				graphids: Object.keys(chkbxRange.getSelectedIds()),
+				context: form.querySelector('#form_context').value
+			};
 
-			return PopUp('popup.copy.graphs', parameters, {
+			PopUp('popup.copy.graphs', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});

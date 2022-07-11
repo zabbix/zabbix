@@ -33,7 +33,7 @@ window.copy_popup = new class {
 		this.curl = new Curl('zabbix.php');
 		this.curl.setArgument('action', action);
 
-		$('#copy_type').on('change', this.changeTargetType);
+		$('[name="copy_type"]').on('change', this.changeTargetType);
 
 		this.changeTargetType();
 	}

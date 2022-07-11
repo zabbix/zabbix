@@ -53,7 +53,8 @@
 		},
 
 		_initActions() {
-			document.addEventListener('click', (e) => {
+			const form = document.querySelector('form[name="triggersForm"]');
+			form.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-copy')) {
 					this.openCopyPopup();
 				}

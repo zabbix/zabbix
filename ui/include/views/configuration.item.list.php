@@ -68,7 +68,7 @@ $url = (new CUrl('items.php'))
 
 // create form
 $itemForm = (new CForm('post', $url))
-	->setName('items')
+	->setName('itemsForm')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
 	->addVar('context', $data['context'], 'form_context');
 
