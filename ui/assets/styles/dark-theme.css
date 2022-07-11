@@ -2635,8 +2635,9 @@ z-select,
       color: #f2f2f2;
       text-overflow: ellipsis;
       word-break: break-word;
-      white-space: pre-wrap;
-      user-select: none; }
+      user-select: none;
+      white-space: nowrap;
+      overflow: hidden; }
       z-select .list li.hover,
       .z-select .list li.hover {
         background-color: #454545; }
