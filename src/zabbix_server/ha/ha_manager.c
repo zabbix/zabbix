@@ -1124,6 +1124,14 @@ static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **e
 	if (ZBX_DB_OK > info->db_status)
 		goto out;
 
+	if (0 == ZBX_HA_IS_CLUSTER())
+	{
+		/* return empty json array in standalone mode */
+		*nodes_json = zbx_strdup(NULL, "[]");
+		ret = SUCCEED;
+		goto out;
+	}
+
 	if (SUCCEED != ha_db_get_time(info, &db_time))
 		goto out;
 
