@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-06T12:30:13Z'
+  date: '2022-07-11T10:45:54Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -908,27 +908,30 @@ zabbix_export:
                             || typeof events.DescribeEventsResponse.DescribeEventsResult.Events !== 'object') {
                             throw 'Cannot get alarms from AWS RDS API. Check debug log for more information.';
                         }
+                        events.DescribeEventsResponse.DescribeEventsResult.Events.forEach(function (event) {
+                            event.EventCategories = event.EventCategories.toString()
+                            result.push(event)
             
+                        });
                         payload.NextToken = events.DescribeEventsResponse.DescribeEventsResult.NextToken || '';
-                        result = result.concat(events.DescribeEventsResponse.DescribeEventsResult.Events)
             
                     };
             
                     return result;
+                    }
+                  }
+            
+                try {
+                    AwsRds.setParams(JSON.parse(value));
+            
+                    return JSON.stringify(AwsRds.getAlarms());
+                  }
+                catch (error) {
+                    error += (String(error).endsWith('.')) ? '' : '.';
+                    Zabbix.log(3, '[ AWS RDS ] ERROR: ' + error);
+            
+                    return JSON.stringify({ 'error': error });
                 }
-            }
-            
-            try {
-                AwsRds.setParams(JSON.parse(value));
-            
-                return JSON.stringify(AwsRds.getAlarms());
-            }
-            catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ AWS RDS ] ERROR: ' + error);
-            
-                return JSON.stringify({ 'error': error });
-            }
           description: 'DescribeEvents API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeEvents.html'
           preprocessing:
             -
@@ -2430,7 +2433,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'TThe undo logs that record committed transactions with delete-marked records. These records are scheduled to be processed by the InnoDB purge operation.'
+              description: 'The undo logs that record committed transactions with delete-marked records. These records are scheduled to be processed by the InnoDB purge operation.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2619,20 +2622,24 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 21b9df85f2e841c48204c7cb4fb5caeb
-              name: 'AWS RDS Events: ["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]: Date'
+              name: 'AWS RDS Events: [{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID} : Date'
               type: DEPENDENT
               key: 'aws.rds.event_date["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: TEXT
+              value_type: FLOAT
+              units: unixtime
               description: 'Provides the text of this event.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.AlarmName == "{#EVENT_CATEGORY}")].Date.first()'
+                    - '$.[?(@.SourceIdentifier == "{#EVENT_SOURCE_ID}" && @.SourceType == "{#EVENT_SOURCE_TYPE}" && @.EventCategories == "{#EVENT_CATEGORY}")].Date'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[-1]'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2643,9 +2650,12 @@ zabbix_export:
                 -
                   tag: component
                   value: events
+                -
+                  tag: event-categories
+                  value: '{#EVENT_CATEGORY}'
             -
               uuid: 10cf420329fa42c08266a5d38bc7678b
-              name: 'AWS RDS Events: ["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]: Message'
+              name: 'AWS RDS Events: [{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}: Message'
               type: DEPENDENT
               key: 'aws.rds.event_message["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]'
               delay: '0'
@@ -2657,8 +2667,12 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.AlarmName == "{#EVENT_CATEGORY}")].Message.first()'
+                    - '$.[?(@.SourceIdentifier == "{#EVENT_SOURCE_ID}" && @.SourceType == "{#EVENT_SOURCE_TYPE}" && @.EventCategories == "{#EVENT_CATEGORY}")].Message'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[-1]'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2669,6 +2683,9 @@ zabbix_export:
                 -
                   tag: component
                   value: events
+                -
+                  tag: event-categories
+                  value: '{#EVENT_CATEGORY}'
           master_item:
             key: aws.rds.get_events
           preprocessing:
@@ -2676,16 +2693,20 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - |
-                  var result = [];
-                  var events = JSON.parse(value);
+                  var lookup = {},
+                      result = [];
                   
-                  events.forEach(function(event) {
-                   result.push({
-                  '{#EVENT_CATEGORY}': event.EventCategories,
-                  '{#EVENT_SOURCE_ID}': event.SourceIdentifier,
-                  '{#EVENT_SOURCE_TYPE}': event.SourceType
-                    });
-                  });
+                  JSON.parse(value).forEach(function (event) {
+                      var filter = event.EventCategories+event.SourceIdentifier+event.SourceType;
+                      if (!(lookup[filter])) {
+                          lookup[filter] = 1;
+                     result.push({
+                    '{#EVENT_CATEGORY}': event.EventCategories,
+                    '{#EVENT_SOURCE_ID}': event.SourceIdentifier,
+                    '{#EVENT_SOURCE_TYPE}': event.SourceType
+                      });
+                      }
+                  })
                   
                   return JSON.stringify(result);
             -
@@ -3404,6 +3425,7 @@ zabbix_export:
           description: 'Amazon RDS Region code.'
         -
           macro: '{$AWS.SECRET.ACCESS.KEY}'
+          type: SECRET_TEXT
           description: 'Secret access key.'
       valuemaps:
         -
