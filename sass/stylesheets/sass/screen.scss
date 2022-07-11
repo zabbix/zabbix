@@ -447,7 +447,6 @@ form {
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, .1);
 			color: $font-color;
 			height: 22px;
-			line-height: 1;
 			vertical-align: middle;
 			white-space: nowrap;
 
@@ -1600,10 +1599,6 @@ input {
 		@extend %form-input-style;
 	}
 
-	&[type="checkbox"] {
-		@extend %form-check-radio-style;
-	}
-
 	&[type="radio"] {
 		@extend %form-check-radio-style;
 	}
@@ -1696,6 +1691,35 @@ select {
 }
 
 .checkbox-radio {
+	position: absolute !important;
+	top: auto !important;
+	z-index: 1;
+	width: 16px !important;
+	height: 16px !important;
+	opacity: 0;
+
+	& + label {
+		span {
+			position: relative;
+			display: inline-block;
+			width: 14px;
+			height: 14px;
+			margin-right: 4px;
+			vertical-align: text-bottom;
+			background-color: $form-bg-color;
+			border: 1px solid $form-border-color;
+
+			&:active {
+				border-color: $form-border-color;
+			}
+		}
+
+		&.label-pos-left span {
+			margin-left: 4px;
+			margin-right: 0;
+		}
+	}
+
 	&:checked[readonly] + label span {
 		transition: none;
 
@@ -1706,7 +1730,7 @@ select {
 
 	&[readonly] {
 		&,
-		+ label {
+		& + label {
 			pointer-events: none;
 
 			span {
@@ -1717,7 +1741,7 @@ select {
 	}
 
 	&[type="checkbox"] {
-		+ label span {
+		& + label span {
 			border-radius: 2px;
 		}
 
@@ -1744,7 +1768,7 @@ select {
 	}
 
 	&[type="radio"] {
-		+ label span {
+		& + label span {
 			border-radius: 50%;
 		}
 
@@ -1767,33 +1791,6 @@ select {
 				background-color: $form-border-color !important;
 			}
 		}
-	}
-
-	position: absolute !important;
-	top: auto !important;
-	width: 16px !important;
-	height: 16px !important;
-	opacity: 0;
-	z-index: 1;
-
-	+ label span {
-		position: relative;
-		display: inline-block;
-		width: 14px;
-		height: 14px;
-		margin: -4px 4px 0 0;
-		bottom: -3px;
-		border: 1px solid $form-border-color;
-		background-color: $form-bg-color;
-
-		&:active {
-			border-color: $form-border-color;
-		}
-	}
-
-	+ label.label-pos-left span {
-		margin-left: 6px;
-		margin-right: 1px;
 	}
 
 	&:focus + label span {
@@ -2942,8 +2939,8 @@ $form-icon-btn: (
 	min-width: 166px;
 	max-width: 250px;
 	background-color: $ui-bg-color;
-	border: 1px solid $action-border-color;
-	border-bottom-color: darken($action-border-color, 1%);
+	border: 1px solid $overlay-border-color;
+	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
 	&:focus {
@@ -3037,8 +3034,8 @@ $form-icon-btn: (
 		width: 12px;
 		height: 12px;
 		background-color: $ui-bg-color;
-		border-top: 1px solid $action-border-color;
-		border-left: 1px solid $action-border-color;
+		border-top: 1px solid $overlay-border-color;
+		border-left: 1px solid $overlay-border-color;
 		transform: rotate(45deg);
 	}
 }
@@ -3049,8 +3046,8 @@ $form-icon-btn: (
 	z-index: 1000;
 	padding: 15px 10px 10px;
 	background-color: $ui-bg-color;
-	border: 1px solid $action-border-color;
-	border-bottom-color: darken($action-border-color, 1%);
+	border: 1px solid $overlay-border-color;
+	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
 	&.modal {
@@ -4455,7 +4452,7 @@ span {
 .menu-popup-preloader,
 .hintbox-preloader {
 	background: $preloader-bg-color;
-	border: 1px solid $action-border-color;
+	border: 1px solid $overlay-border-color;
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 	height: 128px;
 	width: 128px;
@@ -4880,12 +4877,7 @@ svg {
 	li {
 		overflow: hidden;
 		text-overflow: ellipsis;
-		line-height: 20px;
-
-		label {
-			line-height: 16px;
-			vertical-align: bottom;
-		}
+		line-height: 24px;
 	}
 }
 
@@ -6561,9 +6553,9 @@ z-select,
 	background-position: -117px -506px !important;
 }
 .geomap-filter {
-	border: 2px solid rgba($ui-border-color, .4);
+	border: 1px solid $overlay-border-color;
 	background-color: $ui-bg-color;
-	padding: 10px 30px 5px 10px;
+	padding: 5px 20px 5px 10px;
 	position: absolute;
 	margin-right: -2px;
 	margin-top: 5px;
@@ -6571,7 +6563,7 @@ z-select,
 	right: 0;
 }
 .geomap-filter.collapsed {
-	display: table;
+	display: block;
 }
 .geomap-filter li {
 	width: calc(100% + 20px);

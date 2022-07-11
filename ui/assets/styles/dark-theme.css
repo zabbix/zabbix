@@ -2907,7 +2907,6 @@ form.is-loading {
     box-shadow: inset 0 -1px 0 0 rgba(242, 242, 242, 0.1);
     color: #f2f2f2;
     height: 22px;
-    line-height: 1;
     vertical-align: middle;
     white-space: nowrap; }
     .list-table.compact-view td [class*='icon-'] {
@@ -3650,19 +3649,31 @@ select {
 .checkbox-radio {
   position: absolute !important;
   top: auto !important;
+  z-index: 1;
   width: 16px !important;
   height: 16px !important;
-  opacity: 0;
-  z-index: 1; }
+  opacity: 0; }
+  .checkbox-radio + label span {
+    position: relative;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+    vertical-align: text-bottom;
+    background-color: #383838;
+    border: 1px solid #4f4f4f; }
+    .checkbox-radio + label span:active {
+      border-color: #4f4f4f; }
+  .checkbox-radio + label.label-pos-left span {
+    margin-left: 4px;
+    margin-right: 0; }
   .checkbox-radio:checked[readonly] + label span {
     transition: none; }
     .checkbox-radio:checked[readonly] + label span::after {
       border-color: #4f4f4f !important; }
-  .checkbox-radio[readonly],
-  .checkbox-radio[readonly] + label {
+  .checkbox-radio[readonly], .checkbox-radio[readonly] + label {
     pointer-events: none; }
-    .checkbox-radio[readonly] span,
-    .checkbox-radio[readonly] + label span {
+    .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span {
       transition: none; }
   .checkbox-radio[type="checkbox"] + label span {
     border-radius: 2px; }
@@ -3693,20 +3704,6 @@ select {
     border-radius: 50%; }
   .checkbox-radio[type="radio"]:checked[disabled] + label span::after {
     background-color: #4f4f4f !important; }
-  .checkbox-radio + label span {
-    position: relative;
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    margin: -4px 4px 0 0;
-    bottom: -3px;
-    border: 1px solid #4f4f4f;
-    background-color: #383838; }
-    .checkbox-radio + label span:active {
-      border-color: #4f4f4f; }
-  .checkbox-radio + label.label-pos-left span {
-    margin-left: 6px;
-    margin-right: 1px; }
   .checkbox-radio:focus + label span {
     border-color: #768d99; }
   .checkbox-radio:checked:focus + label span {
@@ -3718,7 +3715,7 @@ select {
   .checkbox-radio[disabled] + label span {
     transition: none; }
 
-input[type="checkbox"], input[type="radio"] {
+input[type="radio"] {
   margin: 0;
   padding: 0;
   border: 0;
@@ -4222,8 +4219,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
-.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span,
-.checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
+.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
   color: #525252;
   background-color: #2b2b2b !important;
   border-color: #3d3d3d; }
@@ -5872,10 +5868,7 @@ svg {
 .checkbox-list li {
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 20px; }
-  .checkbox-list li label {
-    line-height: 16px;
-    vertical-align: bottom; }
+  line-height: 24px; }
 
 .columns-wrapper {
   display: flex;
@@ -6412,47 +6405,44 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
 
 .range-control {
   position: relative;
-  display: inline-block;
-  vertical-align: middle; }
+  display: inline-flex; }
   .range-control input[type=range] {
+    width: calc(100% + 10px);
+    height: 20px;
+    margin: 2px -5px;
+    padding: 0;
+    vertical-align: top;
+    opacity: 0;
     cursor: pointer;
     -webkit-appearance: none;
     /* Hides the slider so that custom slider can be made */
     -moz-appearance: none;
     /* Hides the slider so that custom slider can be made */
-    width: calc(100% + 10px);
-    opacity: 0;
-    vertical-align: middle;
-    margin: 0 -5px;
-    padding: 0;
-    height: 20px;
     /* Special styling for WebKit/Blink */ }
     .range-control input[type=range]:focus {
       outline: none; }
     .range-control input[type=range]::-webkit-slider-thumb, .range-control input[type=range]::-moz-range-thumb {
-      margin-top: 1px;
-      /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
       height: 10px;
       width: 10px;
+      margin-top: 1px;
+      /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
       opacity: 0; }
     .range-control input[type=range]::-webkit-slider-runnable-track {
       height: 10px;
       opacity: 0; }
   .range-control input[type=text] {
-    width: 31px;
-    float: right; }
+    width: 31px; }
   .range-control > div {
     position: relative;
     width: calc(100% - 10px - 31px);
-    margin: 2px 10px 0 0;
-    float: left; }
+    margin-right: 10px; }
   .range-control .range-control-track,
   .range-control .range-control-progress {
     position: absolute;
     top: 50%;
-    margin-top: -1px;
     left: 0;
     height: 2px;
+    margin-top: -1px;
     cursor: pointer; }
   .range-control .range-control-track {
     width: 100%;
@@ -6462,12 +6452,12 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
   .range-control .range-control-thumb {
     position: absolute;
     top: 50%;
-    margin-top: -5px;
-    margin-left: -5px;
     width: 10px;
     height: 10px;
-    border-radius: 50%;
-    background: #4796c4; }
+    margin-top: -5px;
+    margin-left: -5px;
+    background: #4796c4;
+    border-radius: 50%; }
   .range-control.range-control-focus .range-control-thumb {
     margin-top: -6.66667px;
     margin-left: -6.66667px;
@@ -6484,15 +6474,15 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
       background: #c0c0c0; }
   .range-control datalist {
     position: absolute;
+    top: 50%;
     display: flex;
     width: 100%;
-    top: 50%;
     margin-top: -1px; }
     .range-control datalist option {
-      padding: 0;
-      font-size: 0;
       flex: 1 0 0;
       height: 2px;
+      padding: 0;
+      font-size: 0;
       border-left: 1px solid #0e1012; }
 
 .graph-legend {
@@ -6986,9 +6976,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   background-position: -117px -506px !important; }
 
 .geomap-filter {
-  border: 2px solid rgba(48, 48, 48, 0.4);
+  border: 1px solid #383838;
   background-color: #2b2b2b;
-  padding: 10px 30px 5px 10px;
+  padding: 5px 20px 5px 10px;
   position: absolute;
   margin-right: -2px;
   margin-top: 5px;
@@ -6996,7 +6986,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   right: 0; }
 
 .geomap-filter.collapsed {
-  display: table; }
+  display: block; }
 
 .geomap-filter li {
   width: calc(100% + 20px); }
