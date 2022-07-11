@@ -999,7 +999,7 @@ function make_trigger_details($trigger, $eventid) {
 		])
 		->addRow([
 			_('Severity'),
-			CSeverityHelper::makeSeverityCell((int) $trigger['priority'])->addClass(ZBX_STYLE_WORDBREAK)
+			CSeverityHelper::makeSeverityCell((int) $trigger['priority'])
 		]);
 
 	$trigger = CMacrosResolverHelper::resolveTriggerExpressions(zbx_toHash($trigger, 'triggerid'), [
