@@ -183,6 +183,18 @@ var colorPalette = (function() {
 
 			this.incrementNextColor();
 
+			let colors = [];
+
+			[...document.getElementsByClassName('color-picker-preview')].map((i) => {
+				if (i.title) {
+					colors.push(i.title);
+				}
+			});
+
+			if (colors.includes('#' + color)) {
+				color = palette[current_color];
+			}
+
 			return color;
 		},
 
