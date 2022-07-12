@@ -1586,6 +1586,7 @@ abstract class CItemGeneral extends CApiService {
 
 			if (!in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
 					|| $interface_type === false) {
+				unset($items[$i]);
 				continue;
 			}
 
