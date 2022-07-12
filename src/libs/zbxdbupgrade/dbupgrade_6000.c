@@ -201,6 +201,14 @@ static int	DBpatch_6000004(void)
 	return ret;
 }
 
+static int	DBpatch_6000005(void)
+{
+	const ZBX_FIELD	old_field = {"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("group_discovery", &field, &old_field);
+}
+
 #undef HTTPSTEP_ITEM_TYPE_RSPCODE
 #undef HTTPSTEP_ITEM_TYPE_TIME
 #undef HTTPSTEP_ITEM_TYPE_IN
@@ -218,5 +226,6 @@ DBPATCH_ADD(6000001, 0, 0)
 DBPATCH_ADD(6000002, 0, 0)
 DBPATCH_ADD(6000003, 0, 0)
 DBPATCH_ADD(6000004, 0, 0)
+DBPATCH_ADD(6000005, 0, 0)
 
 DBPATCH_END()
