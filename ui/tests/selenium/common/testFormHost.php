@@ -33,6 +33,18 @@ class testFormHost extends CWebTest {
 	use MacrosTrait;
 
 	/**
+	 * All objects created in dataSource DiscoveredHosts.
+	 */
+	const DISCOVERED_HOST = 'Discovered host test host from prototype 1'; // "LLD for Discovered host tests", Host: "Test of discovered host".
+	const DISCOVERED_HOSTID = 90000079;
+	const DISCOVERED_INTERFACEID = 90000080;
+	const TEMPLATE_NAMES = [
+		'Test of discovered host 1 template for unlink',
+		'Test of discovered host 2 template for clear',
+		'Test of discovered host Template'
+	];
+
+	/**
 	 * Attach Behaviors to the test.
 	 *
 	 * @return array
@@ -79,11 +91,6 @@ class testFormHost extends CWebTest {
 	 * @var array
 	 */
 	protected static $itemids;
-
-	protected static $template_names;
-	protected static $templateids;
-	protected static $discovered_hostid;
-	protected static $discovered_host;
 
 	/**
 	 * Default values of interfaces.
@@ -1480,6 +1487,7 @@ class testFormHost extends CWebTest {
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names]);
 		$interfaces_form->fill(CTestArrayHelper::get($data, 'interfaces', []));
 		$form->submit();
+		$this->page->WaitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -1888,6 +1896,10 @@ class testFormHost extends CWebTest {
 			case TEST_BAD:
 				$this->assertEquals($old_hash, CDBHelper::getHash($this->hosts_sql));
 				$this->assertMessage(TEST_BAD, 'Cannot delete host', $data['error']);
+
+				if (!$this->standalone) {
+					$form_type->close();
+				}
 		}
 	}
 
@@ -1920,7 +1932,8 @@ class testFormHost extends CWebTest {
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
 
-		$host_link = $table->findRow('Name', $host)->getColumn('Name')->query($this->monitoring ? 'tag:a' : "xpath:.//a[@onclick]")->waitUntilClickable();
+		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')
+				->query($this->monitoring ? 'tag:a' : "xpath:.//a[@onclick]")->waitUntilClickable();
 
 		if ($this->monitoring) {
 			$host_link->asPopupButton()->one()->select('Configuration');
@@ -1943,186 +1956,58 @@ class testFormHost extends CWebTest {
 		$this->assertEquals($count, CDBHelper::getCount($sql));
 	}
 
-	public static function prepareDiscoveryHostData() {
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90079,'Host prototype LLD','Host prototype LLD',0,'',4)");
-		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (90079, 90003)");
-		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50084,90079,1,1,1,'127.0.0.1','','10050')");
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99990, 90079, 4)");
-		DBexecute("INSERT INTO hosts_templates (hosttemplateid, hostid, templateid, link_type) VALUES (50012, 90079, 10001, 1)");
-	}
-
-	public static function prepareTemplatesData() {
-		self::$discovered_host = 'Host prototype LLD';
-		self::$discovered_hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr(self::$discovered_host));
-
-		// Create templates.
-		$templates = CDataHelper::createTemplates([
-			[
-				'host' => 'Template for link testing',
-				'groups' => [
-					'groupid' => 4
-				],
-				'tags' => [
-					[
-						'tag' => 'action',
-						'value' => 'simple'
-					],
-					[
-						'tag' => 'tag',
-						'value' => 'TEMPLATE'
-					],
-					[
-						'tag' => 'templateTag without value'
-					],
-					[
-						'tag' => 'common tag on template and element',
-						'value' => 'common value'
-					]
-				],
-				'items' => [
-					[
-						'name' => 'Template item',
-						'key_' => 'trap.template',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					],
-					[
-						'name' => 'Template item with tags',
-						'key_' => 'template.tags.clone',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'tags' => [
-							[
-								'tag' => 'a',
-								'value' => ':a'
-							],
-							[
-								'tag' => 'action',
-								'value' => 'fullclone'
-							],
-							[
-								'tag' => 'itemTag without value'
-							],
-							[
-								'tag' => 'common tag on template and element',
-								'value' => 'common value'
-							]
-						]
-					]
-				],
-				'discoveryrules' => [
-					[
-						'name' => 'Template trapper discovery',
-						'key_' => 'template_trap_discovery',
-						'type' => ITEM_TYPE_TRAPPER
-					]
-				]
-			],
-			[
-				'host' => '1 template for unlink',
-				'groups' => [
-					'groupid' => 4
-				],
-				'items' => [
-					[
-						'name' => 'Template1 item1',
-						'key_' => 'trap.template1',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					],
-					[
-						'name' => 'Template1 item2',
-						'key_' => 'template.item1',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-					]
-				]
-			],
-			[
-				'host' => '2 template for clear',
-				'groups' => [
-					'groupid' => 4
-				],
-				'items' => [
-					[
-						'name' => 'Template2 item1',
-						'key_' => 'trap.template2',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					],
-					[
-						'name' => 'Template2 item2',
-						'key_' => 'template.item2',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-					]
-				]
-			]
-		]);
-
-		foreach ($templates['templateids'] as $name => $value) {
-			self::$template_names[] = $name;
-			self::$templateids[] = $value;
-		}
-
-		// Link templates.
-		CDataHelper::call('host.update',[
-			'hostid' => self::$discovered_hostid,
-			'templates' => self::$templateids
-		]);
-	}
-
 	public function checkDiscoveredHostLayout() {
-		$this->checkItems();
-		$form = $this->openForm(($this->standalone ? $this->link.self::$discovered_hostid : $this->link), self::$discovered_host);
+		$form = $this->openForm(($this->standalone ? $this->link.self::DISCOVERED_HOSTID : $this->link), self::DISCOVERED_HOST);
 		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
 
 		// Check tabs available in the form.
-		$tabs = ['IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Host'];
-		$this->assertEquals(count($tabs), $form->query('xpath:.//li[@role="tab"]')->all()->count());
+		$tabs = ['Host', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption'];
+		$this->assertEquals($tabs, $form->getTabs());
+
 		foreach ($tabs as $tab) {
-			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab)."]")
-					->one()->isValid()
-			);
 			$form->selectTab($tab);
 
 			switch ($tab) {
 				case 'Host':
-					$lables = ['Discovered by', 'Host name', 'Templates', 'Groups', 'Interfaces', 'Description',
-							'Monitored by proxy', 'Enabled'];
-
-					foreach ($lables as $lable) {
-						$this->assertEquals($lable, ($form->getLabel($lable))->getText());
+					foreach (['Discovered by', 'Host name', 'Templates', 'Host groups', 'Interfaces', 'Description',
+							'Monitored by proxy', 'Enabled'] as $label) {
+						$this->assertEquals($label, $form->getLabel($label)->getText());
 					}
 
-					$this->assertEquals('Discovery rule 1',($form->getField('Discovered by')->getText()));
+					$this->assertEquals('LLD for Discovered host tests', $form->getField('Discovered by')->getText());
 
 					// Host tab fields maxlength attribute.
 					foreach (['Host name' => 128, 'Visible name' => 128, 'Description' => 65535] as $field => $maxlength) {
 						$this->assertEquals($maxlength, $form->getField($field)->getAttribute('maxlength'));
 					}
 
-					// Check host form disabled fields.
-					foreach (['Host name', 'Visible name', 'Groups', 'Monitored by proxy'] as $field) {
-						$this->assertFalse($form->getField($field)->isEnabled());
+					// Check field's editability and default values.
+					$host_fields = [
+						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'enabled' => false],
+						['name' => 'Visible name', 'value' => '', 'enabled' => false],
+						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
+						['name' => 'Host groups', 'value' => ['Zabbix servers'], 'enabled' => false],
+						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_ip', 'value' =>  '127.0.0.1', 'enabled' => false],
+						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_dns', 'value' =>  '', 'enabled' => false],
+						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_useip', 'value' =>  'IP', 'enabled' => false],
+						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_port', 'value' => 10050, 'enabled' => false],
+						['name' => 'id:interface_main_'.self::DISCOVERED_INTERFACEID , 'value' => self::DISCOVERED_INTERFACEID,
+								'enabled' => false],
+						['name' => 'Description', 'value' => '', 'enabled' => true],
+						['name' => 'Monitored by proxy', 'value' => '(no proxy)', 'enabled' => false],
+						['name' => 'Enabled', 'value' => true, 'enabled' => true]
+					];
+
+					foreach ($host_fields as $field) {
+						$this->assertTrue($form->getField($field['name'])->isEnabled($field['enabled']));
+						$this->assertEquals($field['value'], $form->getField($field['name'])->getValue());
 					}
 
-					$this->assertTrue($form->getField('Description')->isEnabled());
-					$host_fields = [
-						'Host name' => self::$discovered_host,
-						'Visible name' => '',
-						'Groups' => 'Zabbix servers',
-						'Description' => '',
-						'Monitored by proxy' => '(no proxy)'
-					];
-					$form->checkValue($host_fields);
-					$this->assertEquals(self::$discovered_host, $form->getField('Visible name')->getAttribute('placeholder'));
+					$this->assertEquals(self::DISCOVERED_HOST, $form->getField('Visible name')->getAttribute('placeholder'));
 
 					// Check hintbox.
 					$form->query('class:icon-help-hint')->one()->click();
 					$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
-
-					// Assert text.
 					$this->assertEquals("Templates linked by host discovery cannot be unlinked.".
 							"\nUse host prototype configuration form to remove automatically linked templates on upcoming discovery.",
 							$hint->one()->getText()
@@ -2132,222 +2017,102 @@ class testFormHost extends CWebTest {
 					$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
 					$hint->waitUntilNotPresent();
 
-					$template_table = $form->query('id:linked-templates')->asTable()->one()->waitUntilVisible();
-
-					foreach (self::$template_names as $name) {
-						$template_row = $template_table->findRow('Name', $name);
-					}
-
-					$this->assertEquals('', ($template_table->findRow('Name', 'Linux by Zabbix agent', true)->getColumn('Action')->getText()));
-					$this->assertEquals('(linked by host discovery)', $template_table->findRow('Name', 'Linux by Zabbix agent', true)
-							->getColumn('Name')->query("xpath:.//sup")->one()->getText()
-					);
-					$this->assertTrue($form->query("xpath://div[@class='linked-templates']//button[text()='Select']")
-							->one()->isClickable());
-					$this->assertFalse($form->query("xpath://div[@id='groups_']/following::div/button[text()='Select']")
-							->one()->isClickable());
-
-					$interfaces_form = ($form->getFieldContainer('Interfaces')->asHostInterfaceElement());
-					$this->assertEquals(['', 'Type', 'IP address', 'DNS name', 'Connect to', 'Port', 'Default'],
-							$interfaces_form->getHeadersText()
-					);
-
-					foreach (['IP address', 'DNS name', 'Port'] as $column) {
-					$this->assertFalse($interfaces_form->getRow('Agent')->getColumn($column)->query('tag:input')->one()->isEnabled());
-					}
-
-					foreach (['Connect to', 'Default'] as $column) {
-						$this->assertFalse($interfaces_form->getRow('Agent')->getColumn($column)->query("xpath:.//input[@type='radio']")
-								->one()->isEnabled()
-						);
-					}
-
-					$this->assertEquals('127.0.0.1', $interfaces_form->getRow('Agent')->getColumn('IP address')
-							->query('tag:input')->one()->getValue()
-					);
-					$this->assertEquals('10050', $interfaces_form->getRow('Agent')->getColumn('Port')
-							->query('tag:input')->one()->getValue()
-					);
-					$this->assertTrue($form->getField('Enabled')->isChecked());
+					$host_templates = [
+						['Name' => self::TEMPLATE_NAMES[0], 'Action' => 'UnlinkUnlink and clear'],
+						['Name' => self::TEMPLATE_NAMES[1], 'Action' => 'UnlinkUnlink and clear'],
+						['Name' => self::TEMPLATE_NAMES[2], 'Action' => 'UnlinkUnlink and clear']
+					];
+					$this->assertTableData($host_templates, 'id:linked-templates');
 					break;
 
 				case 'IPMI':
-					$ipmi_fields = [
+					$ipmi_values = [
 						'Authentication algorithm' => 'Default',
 						'Privilege level' => 'User',
 						'Username' => '',
 						'Password' => ''
 					];
-					$form->checkValue($ipmi_fields);
+					$form->checkValue($ipmi_values);
 
-					foreach (array_keys($ipmi_fields) as $lable) {
-						$this->assertEquals($lable, ($form->getLabel($lable))->getText());
-						$this->assertEquals(255, $form->getField($lable)->getAttribute('maxlength'));
-						$this->assertFalse($form->getField($lable)->isEnabled());
+					foreach (array_keys($ipmi_values) as $label) {
+						$this->assertEquals(255, $form->getField($label)->getAttribute('maxlength'));
+						$this->assertFalse($form->getField($label)->isEnabled());
 					}
-
 					break;
 
 				case 'Tags':
 					$tags_table = $form->query('id:tags-table')->asMultifieldTable()->one()->waitUntilVisible();
 
-					$result = [
+					$expected_tags = [
 						[
-							'tag' => '',
-							'value' => ''
-						]
-					];
-					$tags_table->checkValue($result);
-					$this->assertEquals(['Name', 'Value', 'Action'], $tags_table->getHeadersText());
-					$this->assertFalse($tags_table->getRow(0)->getColumn('Action')->query('button:Remove')->one()->isClickable());
-					$this->assertFalse($tags_table->query('button:Add')->one()->isClickable());
-
-					$fields = [
-						'Name' => [
-							'maxlength' => 255,
-							'placeholder' =>'tag'
+							'tag' => 'discovered',
+							'value' => 'true'
 						],
-						'Value' => [
-							'maxlength' => 255,
-							'placeholder' =>'value'
+						[
+							'tag' => 'host',
+							'value' => 'no'
 						]
 					];
+					$tags_table->checkValue($expected_tags);
 
-					foreach ($fields as $column => $attrs) {
-						foreach ($attrs as $attr_name => $attr_value) {
-							$this->assertEquals($attr_value, $tags_table->getRow(0)->getColumn($column)->query('tag:textarea')
-									->one()->getAttribute($attr_name)
-							);
-						}
+					$this->assertEquals(['Name', 'Value', ''], $tags_table->getHeadersText());
+					$tags_table->query('button:Add')->waitUntilClickable()->one()->click();
+
+					foreach (['id:tags_2_tag' => 'tag', 'id:tags_2_value' => 'value'] as $field => $placeholder) {
+						$this->assertEquals($placeholder, $form->getField($field)->getAttribute('placeholder'));
+						$this->assertEquals(255, $form->getField($field)->getAttribute('maxlength'));
 					}
-
 					break;
 
 				case 'Macros':
 					$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
+					$macros_table = $this->query('id:tbl_macros')->waitUntilVisible()->asMultifieldTable()->one();
 					$radio_switcher->select('Inherited and host macros');
-					$this->page->waitUntilReady();
-					$macros_table = $this->query('id:tbl_macros')->waitUntilVisible()->asTable()->one();
-					$this->assertEquals(['Macro', 'Effective value', '', '', 'Template value', '', 'Global value (configure)'], $macros_table->getHeadersText());
-					$count = $macros_table->getRows()->count() - 1;
-
-					$fields = [
-						'Macro' => [
-							'maxlength' => 255,
-							'placeholder' =>'{$MACRO}'
-						],
-						'Description' => [
-							'maxlength' => 65535,
-							'placeholder' =>'description'
-						]
-					];
-
-					for ($i = 0; $i < $count; $i += 2) {
-						$macro = $macros_table->getRow($i)->getColumn('Macro')->query('tag:textarea')->one();
-						$macro_value = $this->getValueField($macro->getValue());
-						$change_button = $macro_value->getNewValueButton();
-						$revert_button = $macro_value->getRevertButton();
-						$macro_description = $macros_table->getRow($i + 1)->query('tag:textarea')->one();
-
-						foreach ($fields['Macro'] as $attr_name => $attr_value) {
-							$this->assertEquals($attr_value, $macro->getAttribute($attr_name));
-						}
-
-						foreach ($fields['Description'] as $attr_name => $attr_value) {
-							$this->assertEquals($attr_value, $macro_description->getAttribute($attr_name));
-						}
-
-						$this->assertFalse($macro->isEnabled());
-
-						if ($macro_value->query("xpath:.//div")->one()->getAttribute('class') === 'input-secret') {
-						$this->assertFalse($macro_value->query("xpath:.//input")->one()->isEnabled());
-						$this->assertEquals(2048, $macro_value->query("xpath:.//input")->one()->getAttribute('maxlength'));
-						$this->assertFalse($change_button->isEnabled());
-						$this->assertFalse($revert_button->isClickable());
-						}
-						else {
-						$this->assertTrue($macro_value->query('xpath:./textarea')->one()->isAttributePresent('readonly'));
-						$this->assertEquals(2048, $macro_value->query('xpath:./textarea')->one()->getAttribute('maxlength'));
-						$this->assertEquals('value', $macro_value->query('xpath:./textarea')->one()->getAttribute('placeholder'));
-						$this->assertFalse($change_button->isValid());
-						$this->assertFalse($revert_button->isValid());
-						}
-
-						$this->assertFalse($macro_description->isEnabled());
-					}
-
+					$macros_table->waitUntilReloaded();
 					$radio_switcher->select('Host macros');
-					$this->page->waitUntilReady();
-					$this->assertEquals('No macros found.', $form->query("xpath://li[@id='macros_container']/div[@class='table-forms-td-right']")
-							->one()->getText());
+					$macros_table->waitUntilReloaded();
+					$macros_table->checkValue([['Macro' => '','Value' => '', 'Description' => '']]);
 					break;
 
-				Case 'Inventory':
-					$radio_switcher = $this->query('id:inventory_mode')->asSegmentedRadio()->waitUntilPresent()->one();
+				case 'Inventory':
+					$this->assertFalse($this->query('id:inventory_mode')->asSegmentedRadio()->waitUntilPresent()->one()->isEnabled());
 
-					foreach (['inventory_mode_0', 'inventory_mode_1', 'inventory_mode_2'] as $id) {
-						$this->assertFalse($radio_switcher->query('id:'.$id)->one()->isEnabled());
-					}
-
-					$labels = $form->query("xpath://div[@id='inventory-tab']//div/label")->all()->asText();
-
-					foreach ($labels as $label) {
+					foreach ($form->query("xpath://div[@id='inventory-tab']//div/label")->all()->asText() as $label) {
 						$this->assertFalse($form->getField($label)->isEnabled());
 					}
-
 					break;
 
-				Case 'Encryption':
-					$radio_switcher = $form->getField('Connections to host')->asSegmentedRadio()->waitUntilPresent();
-
-					foreach (['tls_connect_0', 'tls_connect_1', 'tls_connect_2'] as $id) {
-						$this->assertFalse($radio_switcher->query('id:'.$id)->one()->isEnabled());
-					}
-
-					foreach (['id:tls_in_none', 'id:tls_in_psk', 'id:tls_in_cert'] as $field) {
+				case 'Encryption':
+					foreach (['Connections to host', 'id:tls_in_none', 'id:tls_in_psk', 'id:tls_in_cert'] as $field) {
 						$this->assertFalse($form->getField($field)->isEnabled());
 					}
-					break;
 
-				default:
+					$this->assertTrue($form->getField('id:tls_in_none')->isChecked());
 					break;
 			}
 		}
 
-		$this->assertTrue($form_type->query('button', ['Update', 'Clone', 'Full clone', 'Delete', 'Cancel'])->one(false)->isValid());
+		$this->assertTrue($form_type->query('button', ['Update', 'Clone', 'Full clone', 'Delete', 'Cancel'])->one()->isClickable());
 
-		foreach (self::$template_names as $name) {
-			$template_row = $template_table->findRow('Name', $name);
-			(strpos($name, 'unlink') !== false) ?
-				$template_row->getColumn('Action')->query('button:Unlink')->one()->waitUntilVisible()->click() :
-				$template_row->getColumn('Action')->query('button:Unlink and clear')->one()->waitUntilVisible()->click();
+		if (!$this->standalone) {
+			$form_type->close();
 		}
-
-		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Host updated');
-		$this->checkItems(true);
 	}
 
-	private function checkItems($clear = false) {
-		if ($clear) {
-			$this->page->open('items.php?filter_set=1&filter_hostids%5B0%5D='.self::$discovered_hostid.'&context=host')->waitUntilReady();
-			$result = [
-				['Name' => 'Template1 item1'],
-				['Name' => 'Template1 item2']
-			];
-			$this->assertTableData($result, 'xpath://form[@name="items"]/table');
-		}
-		else {
-			$this->page->login()->open('items.php?filter_set=1&filter_hostids%5B0%5D='.self::$discovered_hostid.'&context=host')->waitUntilReady();
-			$result = [
-				['Name' => '1 template for unlink: Template1 item1'],
-				['Name' => '1 template for unlink: Template1 item2'],
-				['Name' => '2 template for clear: Template2 item1'],
-				['Name' => '2 template for clear: Template2 item2'],
-				['Name' => 'Template for link testing: Template item'],
-				['Name' => 'Template for link testing: Template item with tags']
-			];
-			$this->assertTableData($result, 'xpath://form[@name="items"]/table');
-		}
+	/**
+	 * Delete all created data after test.
+	 */
+	public static function clearData() {
+		$hostids = CDBHelper::getColumn("SELECT * FROM hosts".
+				" WHERE name LIKE 'Test of discovered host%'".
+					" AND status = 0", 'hostid'
+		);
+		CDataHelper::call('host.delete', $hostids);
+
+		$templateids = CDBHelper::getColumn("SELECT * FROM hosts".
+				" WHERE name LIKE 'Test of discovered host%'".
+					" AND status = 3", 'hostid'
+		);
+		CDataHelper::call('template.delete', $templateids);
 	}
 }

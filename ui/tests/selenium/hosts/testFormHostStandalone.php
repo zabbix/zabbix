@@ -21,9 +21,13 @@
 require_once dirname(__FILE__).'/../common/testFormHost.php';
 
 /**
+ * @dataSource DiscoveredHosts
+ *
  * @backup hosts
  *
- * @onBefore prepareUpdateData, prepareDiscoveryHostData, prepareTemplatesData
+ * @onBefore prepareUpdateData
+ *
+ * @onAfter clearData
  */
 class testFormHostStandalone extends testFormHost {
 
@@ -32,10 +36,6 @@ class testFormHostStandalone extends testFormHost {
 
 	public function testFormHostStandalone_Layout() {
 		$this->checkHostLayout();
-	}
-
-	public function testFormHostStandalone_DiscoveredHostLayout() {
-		$this->checkDiscoveredHostLayout();
 	}
 
 	/**
@@ -102,5 +102,63 @@ class testFormHostStandalone extends testFormHost {
 	 */
 	public function testFormHostStandalone_Delete($data) {
 		$this->checkDelete($data);
+	}
+
+	public function testFormHostStandalone_DiscoveredHostLayout() {
+		$this->checkDiscoveredHostLayout();
+	}
+
+	/**
+	 * Test for checking templated items linked to discovered host and unlinking them.
+	 * This test is implemented only for Standalone scenario.
+	 */
+	public function testFormHostStandalone_DiscoveredHostLinkTemplates() {
+		$hosts_items_link = 'items.php?filter_set=1&filter_hostids%5B0%5D='.self::DISCOVERED_HOSTID.'&context=host';
+		$this->page->login()->open($hosts_items_link)->waitUntilReady();
+
+		// Check items on Discovered host before unlinking templates.
+		$items_before_unlink = [
+				['Name' => 'Test of discovered host 1 template for unlink: Template1 item1'],
+				['Name' => 'Test of discovered host 1 template for unlink: Template1 item2'],
+				['Name' => 'Test of discovered host 2 template for clear: Template2 item1'],
+				['Name' => 'Test of discovered host 2 template for clear: Template2 item2'],
+				['Name' => 'Test of discovered host Template: Template item'],
+				['Name' => 'Test of discovered host Template: Template item with tag']
+		];
+
+		$this->assertTableData($items_before_unlink, 'xpath://form[@name="items"]/table');
+
+		// Open Discovered host form and unlink templates from it.
+		$this->page->open($this->link.self::DISCOVERED_HOSTID)->waitUntilReady();
+		$form = $this->query('id:host-form')->waitUntilReady()->asForm()->one();
+		$templates_table = $form->query('id:linked-templates')->asTable()->one()->waitUntilVisible();
+
+		$template_actions = [
+			'Test of discovered host 1 template for unlink' => 'Unlink',
+			'Test of discovered host 2 template for clear' => 'Unlink and clear'
+		];
+
+		foreach ($template_actions as $name => $action) {
+			$templates_table->findRow('Name', $name)->query('button', $action)->one()->waitUntilClickable()->click();
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Host updated');
+
+		// Open hosts items and check items on Discovered host after unlinking some templates.
+		$this->page->open($hosts_items_link)->waitUntilReady();
+
+		$items_after_unlink = [
+			// This template was not unlinked.
+			['Name' => 'Template1 item1'],
+			['Name' => 'Template1 item2'],
+
+			// This template was unlinked but not cleared.
+			['Name' => 'Test of discovered host Template: Template item'],
+			['Name' => 'Test of discovered host Template: Template item with tag']
+		];
+
+		$this->assertTableData($items_after_unlink, 'xpath://form[@name="items"]/table');
 	}
 }

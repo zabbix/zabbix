@@ -21,9 +21,11 @@
 require_once dirname(__FILE__).'/../common/testFormHost.php';
 
 /**
+ * @dataSource DiscoveredHosts
+ *
  * @backup hosts
  *
- * @onBefore prepareUpdateData, prepareDiscoveryHostData, prepareTemplatesData
+ * @onBefore prepareUpdateData
  */
 class testFormHostMonitoring extends testFormHost {
 
@@ -32,10 +34,6 @@ class testFormHostMonitoring extends testFormHost {
 
 	public function testFormHostMonitoring_Layout() {
 		$this->checkHostLayout();
-	}
-
-	public function testFormHostMonitoring_DiscoveredHostLayout() {
-		$this->checkDiscoveredHostLayout();
 	}
 
 	/**
@@ -100,6 +98,11 @@ class testFormHostMonitoring extends testFormHost {
 	 */
 	public function testFormHostMonitoring_Delete($data) {
 		$this->checkDelete($data);
+	}
+
+
+	public function testFormHostMonitoring_DiscoveredHostLayout() {
+		$this->checkDiscoveredHostLayout();
 	}
 }
 
