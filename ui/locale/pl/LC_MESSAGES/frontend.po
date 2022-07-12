@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-22 18:16+0000\n"
+"PO-Revision-Date: 2022-07-03 22:21+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -329,7 +329,7 @@ msgstr "(utworzone przez wykrywanie hostów)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
-msgstr "(połączone przez wykrywanie hostów)"
+msgstr "(podłączone przez wykrywanie hostów)"
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
@@ -541,6 +541,11 @@ msgstr "Dostęp do usług"
 msgid "Ack"
 msgstr "Potwierdzone"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "Potwierdzone"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "Potwierdzenie"
@@ -634,6 +639,11 @@ msgstr "Oznacz zdarzenia ROZWIĄZANE"
 msgid "Action"
 msgstr "Akcja"
 
+#: app/views/monitoring.widget.actionlog.view.php:37
+msgctxt "compact table header"
+msgid "Action"
+msgstr "Akcja"
+
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
@@ -702,6 +712,11 @@ msgstr "Zaktualizowano akcję"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "Akcje"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "Akcje"
 
@@ -1456,7 +1471,7 @@ msgstr "Przynajmnniej jedna operacja musi istnieć."
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "Musi być włączony co najmniej jeden parametr: \"%1$s\" lub \"%2$s\"."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
@@ -1652,6 +1667,11 @@ msgstr "Raport dostępności"
 #: app/views/monitoring.widget.hostavail.view.php:58
 #: app/views/monitoring.widget.hostavail.view.php:102
 #: include/classes/html/CHostAvailability.php:80
+msgid "Available"
+msgstr "Dostępny"
+
+#: app/views/monitoring.widget.hostavail.view.php:37
+msgctxt "compact table header"
 msgid "Available"
 msgstr "Dostępny"
 
@@ -1875,7 +1895,7 @@ msgstr "Procentowe zużycie CPU podczas okresu czasu, <url> - URL usługi VMware
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
-msgstr ""
+msgstr "Wykorzystanie procesora w hercach w okresie na VMware Resource Pool, <url> - adres URL usługi VMware, <rpid> - identyfikator puli zasobów VMware"
 
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
@@ -2965,12 +2985,12 @@ msgstr "Nie można dodać wyrażenia wyzwalacza"
 
 #: include/classes/api/services/CHost.php:1120
 msgid "Cannot link template"
-msgstr "Nie można połączyć szablonu"
+msgstr "Nie można podłączyć szablonu"
 
 #: include/classes/api/services/CHostBase.php:520
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do hosta \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do hosta \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:678
 #: include/classes/api/services/CHostBase.php:755
@@ -2986,12 +3006,12 @@ msgstr "Nie można podłączyć szablonu \"%1$s\" do hosta \"%2$s\" ze względu 
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do hosta \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do hosta \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podłączony dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do prototypu hosta \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do prototypu hosta \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podłączony dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:675
 #: include/classes/api/services/CHostBase.php:752
@@ -3007,17 +3027,17 @@ msgstr "Nie można podłączyć szablonu \"%1$s\" do prototypu hosta \"%2$s\" ze
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do prototypu hosta \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do prototypu hosta \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podłączony dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because circular linkage (%3$s) will occurs."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ spowoduje to linkowane kołowe (%3$s)."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ spowoduje to podłączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CHostBase.php:514
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podłączony dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:672
 #: include/classes/api/services/CHostBase.php:749
@@ -3033,12 +3053,12 @@ msgstr "Nie można podłączyć szablonu \"%1$s\" do szablonu \"%2$s\" ze wzglę
 #: include/classes/api/services/CHostBase.php:502
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ spowoduje to linkowane kołowe (%3$s)."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ spowoduje to podłączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podłączony dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:705
 #, c-format
@@ -3229,22 +3249,22 @@ msgstr "Nie można odłączyć szablonu"
 #: include/classes/api/services/CHostBase.php:331
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr "Nie można odlinkować szablonu \"%1$s\" od hosta \"%2$s\" z względu na zależność wyzwalacza \"%3$s\"."
+msgstr "Nie można odłączyć szablonu \"%1$s\" od hosta \"%2$s\" z względu na zależność wyzwalacza \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:415
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
-msgstr "Nie można odlinkować szablonu \"%1$s\" od szablonu \"%2$s\" z względu na zależność wyzwalacza \"%3$s\" na hoście \"%4$s\"."
+msgstr "Nie można odłączyć szablonu \"%1$s\" od szablonu \"%2$s\" z względu na zależność wyzwalacza \"%3$s\" na hoście \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:414
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
-msgstr "Nie można odlinkować szablonu \"%1$s\" od szablonu \"%2$s\" z względu na zależność wyzwalacza \"%3$s\" na szablonie \"%4$s\"."
+msgstr "Nie można odłączyć szablonu \"%1$s\" od szablonu \"%2$s\" z względu na zależność wyzwalacza \"%3$s\" na szablonie \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:330
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr "Nie można odlinkować szablonu \"%1$s\" od szablonu \"%2$s\" ze względu na zależność wyzwalacza \"%3$s\"."
+msgstr "Nie można odłączyć szablonu \"%1$s\" od szablonu \"%2$s\" ze względu na zależność wyzwalacza \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
@@ -3269,7 +3289,7 @@ msgstr "Nie można odłączyć szablonu \"%1$s\" bez szablonu \"%2$s\" od szablo
 #: include/classes/api/services/CHostGeneral.php:1037
 #, c-format
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
-msgstr "Nie można odlinkować wyzwalacza \"%1$s\", posiada on elementy z szablonu, który pozostaje podlinkowany do hosta."
+msgstr "Nie można odłączyć wyzwalacza \"%1$s\", posiada on elementy z szablonu, który pozostaje podłączony do hosta."
 
 #: include/classes/api/services/CAction.php:2636
 #, c-format
@@ -4261,7 +4281,7 @@ msgstr "Tekst potwierdzenia"
 
 #: app/views/popup.acknowledge.edit.php:114
 msgid "Confirms the problem is noticed (acknowledging user will be recorded). Status change triggers action update operation."
-msgstr ""
+msgstr "Potwierdza, że problem został zauważony (potwierdzenie użytkownika zostanie zarejestrowane). Zmiana statusu wyzwala operację aktualizacji akcji."
 
 #: include/classes/setup/CSetupWizard.php:907
 msgid "Congratulations! You have successfully installed Zabbix frontend."
@@ -5174,6 +5194,11 @@ msgstr "Funkcje czasu i daty"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:119
 #: include/classes/helpers/CSlaHelper.php:58 report4.php:177
+msgid "Day"
+msgstr "Dzień"
+
+#: include/classes/helpers/CSlaHelper.php:68
+msgctxt "compact table header"
 msgid "Day"
 msgstr "Dzień"
 
@@ -6097,6 +6122,11 @@ msgstr "Wykrywanie wirtualnych maszyn VMWare, <url> - URL usługi VMware. Zwraca
 msgid "Discovery rule"
 msgstr "Reguła wykrywania"
 
+#: app/views/monitoring.widget.discovery.view.php:33
+msgctxt "compact table header"
+msgid "Discovery rule"
+msgstr "Reguła wykrywania"
+
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -6324,6 +6354,11 @@ msgstr "Pobranie pliku konfiguracyjnego"
 msgid "Downtime"
 msgstr "Czas przerwy w pracy"
 
+#: app/views/monitoring.widget.slareport.view.php:100
+msgctxt "compact table header"
+msgid "Downtime"
+msgstr "Czas przerwy w pracy"
+
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
 #: include/classes/widgets/CWidgetHelper.php:969
@@ -6385,6 +6420,11 @@ msgstr "Powtórzone userid (id użytkownika) \"%1$s\" w użytkownikach dla mapy 
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:1156 include/events.inc.php:289
 #: include/views/configuration.action.edit.php:174
+msgid "Duration"
+msgstr "Czas trwania"
+
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
 msgid "Duration"
 msgstr "Czas trwania"
 
@@ -6816,6 +6856,11 @@ msgstr "Błąd"
 msgid "Error budget"
 msgstr "Dopuszczalna niedostępność"
 
+#: app/views/monitoring.widget.slareport.view.php:101
+msgctxt "compact table header"
+msgid "Error budget"
+msgstr "Dopuszczalna niedostępność"
+
 #: include/db.inc.php:518
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
@@ -6954,6 +6999,11 @@ msgstr "Wyłączony czas przestoju"
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
+msgid "Excluded downtimes"
+msgstr "Wyłączone czasy przestoju"
+
+#: app/views/monitoring.widget.slareport.view.php:102
+msgctxt "compact table header"
 msgid "Excluded downtimes"
 msgstr "Wyłączone czasy przestoju"
 
@@ -7158,6 +7208,11 @@ msgstr "Opóźnienie przełączenia: %1$s"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "Niepowodzenie"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "Niepowodzenie"
 
@@ -8222,6 +8277,12 @@ msgstr[0] "Host"
 msgstr[1] "Hosty"
 msgstr[2] "Hosty"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "Host"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8311,6 +8372,13 @@ msgstr "Wykresy hostów"
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
+msgid "Host group"
+msgstr "Grupa hostów"
+
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
 msgid "Host group"
 msgstr "Grupa hostów"
 
@@ -9906,6 +9974,12 @@ msgstr "Nieskończoność"
 msgid "Info"
 msgstr "Info"
 
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
+msgid "Info"
+msgstr "Info"
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -11085,7 +11159,7 @@ msgstr "Wykres z ostatniej godziny"
 #: include/classes/widgets/CWidgetHelper.php:1373
 msgctxt "missing data function"
 msgid "Last known"
-msgstr ""
+msgstr "Ostatni znany"
 
 #: jsLoader.php:378
 msgid "Last month graph"
@@ -11628,7 +11702,7 @@ msgstr "Ręczna akcja na hoście"
 
 #: app/views/popup.acknowledge.edit.php:83
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
-msgstr ""
+msgstr "Ręczne tłumienie problemów. Dane wejściowe data-godzina akceptują format czasu względnego i bezwzględnego."
 
 #: include/html.inc.php:1009
 #, c-format
@@ -11968,7 +12042,7 @@ msgstr "Ograniczenie pamięci: %1$s"
 
 #: include/classes/data/CItemData.php:1433
 msgid "Memory metrics of VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id, <mode> - consumed(default)/ballooned/overhead memory"
-msgstr ""
+msgstr "Metryki pamięci VMware Resource Pool, <url> - adres URL usługi VMware, <rpid> - identyfikator puli zasobów VMware, <mode> - pamięć zużyta (domyślnie)/ballooned/overhead"
 
 #: include/classes/data/CItemData.php:1210
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -11999,6 +12073,11 @@ msgstr "Ścieżka menu"
 #: include/actions.inc.php:1976 include/actions.inc.php:2083
 #: include/views/administration.auditacts.list.php:69
 #: include/views/administration.auditacts.list.php:100
+msgid "Message"
+msgstr "Wiadomość"
+
+#: app/views/monitoring.widget.actionlog.view.php:44
+msgctxt "compact table header"
 msgid "Message"
 msgstr "Wiadomość"
 
@@ -12270,6 +12349,11 @@ msgstr "Stała szerokość"
 msgid "Month"
 msgstr "Miesiąc"
 
+#: include/classes/helpers/CSlaHelper.php:70
+msgctxt "compact table header"
+msgid "Month"
+msgstr "Miesiąc"
+
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
 #: app/views/popup.maintenance.period.php:78 app/views/popup.sla.edit.php:76
@@ -12528,6 +12612,11 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.list.php:52
 #: include/views/monitoring.sysmap.list.php:71 items.php:46 maintenance.php:40
 #: report2.php:509 sysmaps.php:38 trigger_prototypes.php:37 triggers.php:45
+msgid "Name"
+msgstr "Nazwa"
+
+#: app/views/monitoring.widget.plaintext.view.php:49
+msgctxt "compact table header"
 msgid "Name"
 msgstr "Nazwa"
 
@@ -13300,7 +13389,7 @@ msgstr "Nie wszystkie szablony są podłączone\"%1$s\"."
 #: include/classes/api/services/CUserMacro.php:569
 #, c-format
 msgid "Not allowed to modify automatic user macro \"%1$s\"."
-msgstr ""
+msgstr "Nie można modyfikować automatycznego makra użytkownika \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:577
 msgid "Not allowed to set language for user \"guest\"."
@@ -13324,6 +13413,11 @@ msgstr "Nie autoryzowano."
 #: app/views/monitoring.widget.hostavail.view.php:62
 #: app/views/monitoring.widget.hostavail.view.php:103
 #: include/classes/html/CHostAvailability.php:81
+msgid "Not available"
+msgstr "Niedostępny"
+
+#: app/views/monitoring.widget.hostavail.view.php:38
+msgctxt "compact table header"
 msgid "Not available"
 msgstr "Niedostępny"
 
@@ -13414,7 +13508,7 @@ msgstr "Liczba pozycji w historii proxy, które jeszcze nie zostały wysłane do
 
 #: include/classes/data/CItemData.php:1729
 msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
-msgstr ""
+msgstr "Liczba pozycji w kolejce, które są opóźnione o od-do sekund włącznie."
 
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -13615,6 +13709,11 @@ msgstr "Wyłączone"
 msgid "Ok"
 msgstr "Ok"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "Ok"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13757,6 +13856,11 @@ msgstr "Operacja nie ma szablonu, na którym może działać."
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr "Dane operacyjne"
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr "Dane operacyjne"
 
@@ -14234,7 +14338,7 @@ msgstr "Parametr \"%1$s\" jest przestarzały."
 #: include/classes/api/services/CTemplateGroup.php:1226
 #, c-format
 msgid "Parameter \"%1$s\" must be enabled."
-msgstr ""
+msgstr "Parametr „%1$s” musi być włączony."
 
 #: app/views/administration.mediatype.edit.php:213
 #: app/views/administration.script.edit.php:181
@@ -14740,6 +14844,12 @@ msgstr "Poziom uprawnień"
 msgid "Problem"
 msgstr "Problem"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "Problem"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "Stworzony problem"
@@ -14968,6 +15078,11 @@ msgstr "Plik klucza publicznego"
 msgid "Quarter"
 msgstr "Kwartał"
 
+#: include/classes/helpers/CSlaHelper.php:71
+msgctxt "compact table header"
+msgid "Quarter"
+msgstr "Kwartał"
+
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
 msgstr "Kwartalnie"
@@ -15113,6 +15228,12 @@ msgstr "Ostatnie problemy"
 msgid "Recipient"
 msgstr "Odbiorca"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "Odbiorca"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr "Odbiorca już istnieje."
@@ -15157,6 +15278,11 @@ msgstr "Operacje przywracania"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "Czas przywrócenia"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "Czas przywrócenia"
 
@@ -15764,7 +15890,7 @@ msgstr "Zwraca objekt JSON zawierający serwer Zabbix lub wewnętrzny wskaźnik 
 
 #: include/classes/data/CItemData.php:1673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
-msgstr ""
+msgstr "Zwraca dostępność określonych typów sprawdzeń na hoście. Wartość tej pozycji odpowiada ikonom dostępności na liście hostów. Poprawne typy to: agent, active_agent, snmp, ipmi, jmx."
 
 #: include/classes/data/CItemData.php:1614
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
@@ -15793,7 +15919,7 @@ msgstr "Zwraca procent utraconych pakietów ping ICMP."
 #: app/partials/hostmacros.inherited.list.html.php:105
 #: app/partials/hostmacros.list.html.php:77 jsLoader.php:331
 msgid "Revert"
-msgstr ""
+msgstr "Przywróć"
 
 #: include/classes/html/CMacroValue.php:94
 msgid "Revert changes"
@@ -15968,11 +16094,22 @@ msgstr "SLA z ID \"%1$s\" nie jest dostępne."
 msgid "SLI"
 msgstr "SLI"
 
+#: app/views/monitoring.widget.slareport.view.php:98
+msgctxt "compact table header"
+msgid "SLI"
+msgstr "SLI"
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
+msgid "SLO"
+msgstr "SLO"
+
+#: app/views/monitoring.widget.slareport.view.php:38
+#: app/views/monitoring.widget.slareport.view.php:97
+msgctxt "compact table header"
 msgid "SLO"
 msgstr "SLO"
 
@@ -16605,6 +16742,11 @@ msgstr "Serwery"
 msgid "Service"
 msgstr "Usługa"
 
+#: app/views/monitoring.widget.slareport.view.php:37
+msgctxt "compact table header"
+msgid "Service"
+msgstr "Usługa"
+
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
 #, c-format
@@ -16802,6 +16944,12 @@ msgstr "Ustawienia"
 #: include/views/configuration.triggers.list.php:189
 #: include/views/reports.toptriggers.php:75
 #: include/views/reports.toptriggers.php:86
+msgid "Severity"
+msgstr "Poziom"
+
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
 msgid "Severity"
 msgstr "Poziom"
 
@@ -17354,6 +17502,13 @@ msgstr "Statystyki i dostępności zapisu pamięci Zabbix. Pamięć - jedna z wa
 msgid "Status"
 msgstr "Stan"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "Stan"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr "Zasada obliczania stanu"
@@ -17567,19 +17722,19 @@ msgstr "Wspierane makra:"
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:101
 #: app/views/popup.acknowledge.edit.php:82
 msgid "Suppress"
-msgstr ""
+msgstr "Stłum"
 
 #: include/classes/helpers/CRoleHelper.php:471
 msgid "Suppress problems"
-msgstr ""
+msgstr "Stłumione problemy"
 
 #: include/actions.inc.php:1761
 msgid "Suppress until"
-msgstr ""
+msgstr "Stłum do"
 
 #: include/actions.inc.php:1771 include/classes/screens/CScreenProblem.php:1259
 msgid "Suppressed"
-msgstr ""
+msgstr "Stłumiony"
 
 #: include/html.inc.php:973
 #, c-format
@@ -17797,6 +17952,11 @@ msgstr "Wartości znaczników"
 msgid "Tags"
 msgstr "Znaczniki"
 
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
+msgid "Tags"
+msgstr "Znaczniki"
+
 #: include/views/configuration.copy.elements.php:69
 #: include/views/configuration.trigger.prototype.edit.php:202
 #: include/views/configuration.trigger.prototype.edit.php:401
@@ -17903,7 +18063,7 @@ msgstr "Zaktualizowano grupę szablonów"
 #: include/classes/api/services/CUserGroup.php:487
 #, c-format
 msgid "Template group with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Grupa szablonów o ID \"%1$s\" jest niedostępna."
 
 #: app/controllers/CControllerPopupGeneric.php:197
 #: app/controllers/CControllerPopupImportCompare.php:168
@@ -18009,7 +18169,7 @@ msgstr "Szablony \"%1$s\" odłączone od hostów \"%2$s\"."
 
 #: app/partials/configuration.host.edit.html.php:187
 msgid "Templates linked by host discovery cannot be unlinked."
-msgstr "Szablonów połączonych przez wykrywanie hostów nie można odlinkować."
+msgstr "Szablonów połączonych przez wykrywanie hostów nie można odłączyć."
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
@@ -18339,6 +18499,12 @@ msgstr "Do"
 msgid "Time"
 msgstr "Czas"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "Czas"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Czas szczegóły procesu Zabbix lub grupy procesów (identyfikowane przez <type> i <mode>) zużywane na <state> w procentach."
@@ -18402,6 +18568,11 @@ msgstr "Przekroczenie czasu"
 msgid "Timestamp"
 msgstr "Odcisk czasowy"
 
+#: app/views/monitoring.widget.plaintext.view.php:33
+msgctxt "compact table header"
+msgid "Timestamp"
+msgstr "Odcisk czasowy"
+
 #: app/views/sla.list.php:91
 msgid "Timezone"
 msgstr "Strefa czasowa"
@@ -18456,6 +18627,11 @@ msgstr "TOP hosty"
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "Ogółem"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "Ogółem"
 
@@ -18570,57 +18746,57 @@ msgstr "Wyzwalacz \"%1$s\" należy do szablonów z różnymi odsyłaczami."
 #: include/triggers.inc.php:372 include/triggers.inc.php:433
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od nieistniejącego wyzwalacza \"%2$s\" na hoście \"%3$s\"."
 
 #: include/triggers.inc.php:373 include/triggers.inc.php:434
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od nieistniejącego wyzwalacza \"%2$s\" na szablonie \"%3$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2679
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z hosta \"%3$s\", ponieważ zależności od wyzwalaczy z podrzędnego szablonu lub hosta są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2678
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z szablonu \"%3$s\", ponieważ zależności od wyzwalaczy z podrzędnego szablonu lub hosta są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2572
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z szablonu \"%3$s\", ponieważ zależności od wyzwalaczy z szablonu nadrzędnego są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2305
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ dla hosta \"%4$s\" wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2300
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ dla szablonu \"%4$s\" wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2316
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2423
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ zależności wyzwalaczy hosta od wyzwalaczy szablonu są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2808
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ szablon \"%3$s\" nie jest połączony z hostem \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2807
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ szablon \"%3$s\" nie jest połączony z szablonem \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
@@ -18730,62 +18906,62 @@ msgstr "Prototyp wyzwalacza \"%1$s\"należy do szablonów z różnymi odsyłacza
 #: include/classes/api/services/CDiscoveryRule.php:916
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od nieistniejącego wyzwalacza \"%2$s\" na hoście \"%3$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:915
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od nieistniejącego wyzwalacza \"%2$s\" na szablonie\"%3$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2684
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z hosta \"%3$s\", ponieważ zależności od wyzwalaczy z podrzędnego szablonu lub hosta są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2683
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z szablonu \"%3$s\", ponieważ zależności od wyzwalaczy z podrzędnego szablonu lub hosta są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2573
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z szablonu \"%3$s\", ponieważ zależności od wyzwalaczy z szablonu nadrzędnego są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2424
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ zależności wyzwalaczy hosta od wyzwalaczy szablonu są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2813
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ szablon \"%3$s\" nie jest połączony z hostem \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2812
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ szablon \"%3$s\" nie jest połączony z szablonem \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2306
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od prototypu wyzwalacza \"%2$s\", ponieważ dla hosta \"%4$s\" wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2301
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od prototypu wyzwalacza \"%2$s\", ponieważ dla szablonu \"%4$s\" wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2317
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od prototypu wyzwalacza \"%2$s\", ponieważ wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:1325
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od prototypu wyzwalacza \"%2$s\", ponieważ zależności od prototypów wyzwalacza z innej reguły wykrywania niskopoziomowego są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:1715
 #, c-format
@@ -18845,7 +19021,7 @@ msgstr "Poziom wyzwalacza"
 
 #: app/views/popup.condition.common.php:228
 msgid "Trigger source"
-msgstr ""
+msgstr "Źródło wyzwalacza"
 
 #: jsLoader.php:367
 msgid "Trigger status \"OK\""
@@ -18966,6 +19142,12 @@ msgstr "Dwa lub więcej pól nie może zajmować tej samej przestrzeni."
 #: include/views/js/monitoring.sysmaps.js.php:660
 #: include/views/js/monitoring.sysmaps.js.php:815
 #: include/views/monitoring.sysmap.edit.php:398
+msgid "Type"
+msgstr "Typ"
+
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
 msgid "Type"
 msgstr "Typ"
 
@@ -19163,7 +19345,7 @@ msgstr "Odblokować wybranych użytkowników?"
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
-msgstr ""
+msgstr "Cofnij potwierdzenie problemu."
 
 #: include/classes/core/ZBase.php:574
 #, c-format
@@ -19222,6 +19404,11 @@ msgstr "Jednostki"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
+msgid "Unknown"
+msgstr "Nieznany"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
 msgid "Unknown"
 msgstr "Nieznany"
 
@@ -19330,18 +19517,18 @@ msgstr "Niewspierany parametr \"%2$s\" dla filtra reguły wykrywania \"%1$s\"."
 
 #: app/views/popup.acknowledge.edit.php:102
 msgid "Unsuppress"
-msgstr ""
+msgstr "Przestań tłumić"
 
 #: include/actions.inc.php:1785 include/actions.inc.php:2235
 #: include/classes/screens/CScreenProblem.php:1262
 msgid "Unsuppressed"
-msgstr ""
+msgstr "Poprzednio stłumiony"
 
 #: app/views/monitoring.widget.problems.view.php:174 include/blocks.inc.php:668
 #: include/classes/screens/CScreenProblem.php:1026
 #, c-format
 msgid "Unsuppressed by: %1$s"
-msgstr ""
+msgstr "Tłumienie anulowane przez: %1$s"
 
 #: app/views/popup.acknowledge.edit.php:91
 msgid "Until"
@@ -19482,6 +19669,11 @@ msgstr "Mapy wyższego poziomu"
 msgid "Uptime"
 msgstr "Czas pracy"
 
+#: app/views/monitoring.widget.slareport.view.php:99
+msgctxt "compact table header"
+msgid "Uptime"
+msgstr "Czas pracy"
+
 #: include/classes/data/CItemData.php:1686
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Czas działania serwera Zabbix w sekundach."
@@ -19504,7 +19696,7 @@ msgstr "Użyj domyślnej"
 
 #: app/partials/configuration.host.edit.html.php:188
 msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
-msgstr "Użyj formularza konfiguracji prototypu hosta, aby usunąć automatycznie podlinkowane szablony przy najbliższym wykryciu."
+msgstr "Użyj formularza konfiguracji prototypu hosta, aby usunąć automatycznie podłączone szablony przy najbliższym wykryciu."
 
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:88
 msgid "Use if severity"
@@ -19872,11 +20064,11 @@ msgstr "Użytkownicy"
 
 #: include/classes/data/CItemData.php:1255
 msgid "VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON"
-msgstr "VMware Distributed Virtual Switch, <url> — adres URL usługi VMware. Zwraca JSON"
+msgstr "VMware Distributed Virtual Switch, <url> - adres URL usługi VMware. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1259
 msgid "VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON"
-msgstr ""
+msgstr "Wrapper do VMware FetchDVPorts, <url> - adres URL usługi VMware, <filter> - obiekt danych VMware DistributedVirtualSwitchPortCriteria, <mode> - stan (domyślnie)/pełny. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1702
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
@@ -19892,7 +20084,7 @@ msgstr "Stan klastra VMware, <url> - URL usługi VMware, <uuid> - nazwa klastra 
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Centra danych VMware i ich identyfikatory, <url> - adres URL usługi VMware. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
@@ -19937,7 +20129,7 @@ msgstr "Nazwa klastra hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> -
 
 #: include/classes/data/CItemData.php:1275
 msgid "VMware hypervisor connection state, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Stan połączenia hiperwizora VMware, <url> - adres URL usługi VMware, <uuid> - nazwa hosta hiperwizora VMware"
 
 #: include/classes/data/CItemData.php:1278
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
@@ -19973,7 +20165,7 @@ msgstr "Statystyki wejścia sieci hipernadzorcy VMware, <url> - URL usługi VMwa
 
 #: include/classes/data/CItemData.php:1387
 msgid "VMware hypervisor network interface speed, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <ifname> - interface name"
-msgstr ""
+msgstr "Szybkość interfejsu sieciowego hiperwizora VMware, <url> - adres URL usługi VMware, <uuid> - nazwa hosta hiperwizora VMware, <ifname> - nazwa interfejsu"
 
 #: include/classes/data/CItemData.php:1362
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
@@ -19997,11 +20189,11 @@ msgstr "Użycie procesora hipernadzorcy VMware w Hz, <url> - URL usługi VMware,
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Wartość czujników hiperwizora VMware, <url> - adres URL usługi VMware, <uuid> - nazwa hosta hiperwizora VMware. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1355
 msgid "VMware hypervisor serialnumber, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Numer seryjny hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20049,7 +20241,7 @@ msgstr "Rozmiar skompresowanej pamięci maszyny wirtualnej VMware, <url> - URL u
 
 #: include/classes/data/CItemData.php:1431
 msgid "VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name"
-msgstr ""
+msgstr "Wartość niestandardowego atrybutu maszyny wirtualnej VMware, <url> - adres URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <name> - nazwa niestandardowego atrybutu"
 
 #: include/classes/data/CItemData.php:1434
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
@@ -20065,7 +20257,7 @@ msgstr "Statystyki zapisu urządzeń dyskowych maszyny wirtualnej VMware, <url> 
 
 #: include/classes/data/CItemData.php:1439
 msgid "VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Dysk maszyny wirtualnej VMware wymaga konsolidacji, <url> - adres URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
 #: include/classes/data/CItemData.php:1566
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
@@ -20121,11 +20313,11 @@ msgstr "Rozmiar pamięci współdzielonej maszyny wirtualnej VMware, <url> - URL
 
 #: include/classes/data/CItemData.php:1555
 msgid "VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "Stan migawki maszyny wirtualnej VMware, <url> - adres URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1559
 msgid "VMware virtual machine state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Stan maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20133,7 +20325,7 @@ msgstr "Rozmiar pamięci swapowanej maszyny wirtualnej VMware, <url> - URL usłu
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
-msgstr ""
+msgstr "Stan narzędzi maszyn wirtualnych VMware, <url> - adres URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <mode> - wersja lub stan"
 
 #: include/classes/data/CItemData.php:1486
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20228,6 +20420,11 @@ msgstr "Sprawdzenie"
 msgid "Value"
 msgstr "Wartość"
 
+#: app/views/monitoring.widget.plaintext.view.php:51
+msgctxt "compact table header"
+msgid "Value"
+msgstr "Wartość"
+
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
 #, c-format
@@ -20265,7 +20462,7 @@ msgstr "Wartość nie może być pusta."
 
 #: include/classes/data/CItemData.php:1017
 msgid "Value data for value name in Windows Registry key."
-msgstr ""
+msgstr "Dane wartości dla nazwy wartości w kluczu rejestru Windows."
 
 #: app/controllers/CControllerAuditLogList.php:247
 msgid "Value map"
@@ -20588,6 +20785,11 @@ msgstr "Środa"
 msgid "Week"
 msgstr "Tydzień"
 
+#: include/classes/helpers/CSlaHelper.php:69
+msgctxt "compact table header"
+msgid "Week"
+msgstr "Tydzień"
+
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/popup.maintenance.period.php:77 app/views/popup.sla.edit.php:75
@@ -20682,6 +20884,11 @@ msgstr "Z nazwą problemu"
 msgid "With problems"
 msgstr "Z problemami"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "Z problemami"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "To ustawienie sprawi, że w tej kolumnie wyświetlane będą jedynie pozycje liczbowe."
@@ -20695,6 +20902,11 @@ msgid "Without data"
 msgstr "Bez danych"
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "Bez problemów"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "Bez problemów"
 
@@ -20889,6 +21101,11 @@ msgstr "YYYY-MM-DDThh:mm:ssZ"
 msgid "Year"
 msgstr "Rok"
 
+#: include/classes/helpers/CSlaHelper.php:72
+msgctxt "compact table header"
+msgid "Year"
+msgstr "Rok"
+
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93
 msgid "Yearly"
@@ -20953,7 +21170,7 @@ msgstr "Nie można zamienić hostów dla bieżącego zaznaczenia."
 
 #: app/views/popup.generic.php:88
 msgid "You cannot switch templates for current selection."
-msgstr ""
+msgstr "Nie można zamienić szablonów dla bieżącego zaznaczenia."
 
 #: include/classes/api/services/CAuditLog.php:73
 #: include/classes/api/services/CHaNode.php:45
@@ -21573,7 +21790,7 @@ msgstr "nie można ustawić wartości parametru \"%1$s\""
 
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
-msgstr "nie można odlinkować"
+msgstr "nie można odłączyć"
 
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
@@ -22461,7 +22678,7 @@ msgstr "brak uprawnień do tworzenia i edycji map"
 
 #: include/classes/api/services/CEvent.php:863
 msgid "no permissions to suppress problems"
-msgstr ""
+msgstr "brak uprawnień do stłumienia problemów"
 
 #: include/classes/api/services/CEvent.php:774
 msgid "no permissions to unacknowledge problems"
@@ -22469,7 +22686,7 @@ msgstr "brak uprawnień do od potwierdzenia problemów"
 
 #: include/classes/api/services/CEvent.php:864
 msgid "no permissions to unsuppress problems"
-msgstr ""
+msgstr "brak uprawnień do wyłączenia tłumienia problemów"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:836
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"

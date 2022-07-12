@@ -441,11 +441,11 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
-void	DBextract_version_info(struct zbx_db_version_info_t *version_info);
-void	DBflush_version_requirements(const char *version);
-int	DBcheck_capabilities(zbx_uint32_t db_version);
-
+void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
+void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info);
+void	zbx_db_flush_version_requirements(const char *version);
 #ifdef HAVE_POSTGRESQL
+int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
 char	*zbx_db_get_schema_esc(void);
 #endif
 
@@ -757,8 +757,6 @@ ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
 
 zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value);
 void		zbx_db_tag_free(zbx_db_tag_t *tag);
-int		zbx_db_tag_compare_func(const void *d1, const void *d2);
-int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
 
 int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, const char *owner, char **error);
 
@@ -805,5 +803,7 @@ int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint
 void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
+
+int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
 
 #endif /* ZABBIX_DBHIGH_H */
