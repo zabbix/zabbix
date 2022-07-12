@@ -172,8 +172,6 @@ window.widget_svggraph_form = new class {
 				},
 				appendTo: '.overlay-dialogue-body'
 			});
-
-			colorPalette.incrementNextColor();
 		}
 
 		this._dataset_wrapper.addEventListener('click', (e) => {
@@ -319,7 +317,7 @@ window.widget_svggraph_form = new class {
 
 		this._dataset_wrapper.insertAdjacentHTML('beforeend', template.evaluate({
 			rowNum: this._dataset_index++,
-			color: (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>) ? '' : colorPalette.getNextColor()
+			color: (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>) ? '' : colorPalette.getNextColor(this._form)
 		}));
 
 		const dataset = this._getOpenedDataset();
@@ -476,7 +474,7 @@ window.widget_svggraph_form = new class {
 		}));
 
 		jQuery(`#items_${dataset_index}_${item_next_index}_color`)
-			.val(colorPalette.getNextColor())
+			.val(colorPalette.getNextColor(this._form))
 			.colorpicker();
 	}
 

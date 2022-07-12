@@ -178,24 +178,20 @@ var colorPalette = (function() {
 		 *
 		 * @return string	hexadecimal color code
 		 */
-		getNextColor: function() {
-			var color = palette[current_color];
+		getNextColor: function(form) {
+			const color_usage = [];
 
-			this.incrementNextColor();
-
-			let colors = [];
-
-			[...document.getElementsByClassName('color-picker-preview')].map((i) => {
-				if (i.title) {
-					colors.push(i.title);
-				}
-			});
-
-			if (colors.includes('#' + color)) {
-				color = palette[current_color];
+			for (const color of palette) {
+				color_usage[color] = 0;
 			}
 
-			return color;
+			for (const colorpicker of form.querySelectorAll('.color-picker input')) {
+				color_usage[colorpicker.value]++;
+			}
+
+			const least_frequent = Object.values(color_usage).sort()[0];
+
+			return Object.keys(color_usage).find(key => color_usage[key] == least_frequent);
 		},
 
 		/**
