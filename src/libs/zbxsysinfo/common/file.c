@@ -1296,8 +1296,7 @@ static char	*canonicalize_path(const char *fullname)
 
 	name = NULL;
 
-	/* casts to silence warning */
-	for (i = (int)((unsigned)names.values_num - 1); 0 <= i; i--)
+	for (i = names.values_num - 1; 0 <= i; i--)
 	{
 		char *ptr = names.values[i];
 
