@@ -32,6 +32,14 @@ static int	DBpatch_6020000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6020001(void)
+{
+	const ZBX_FIELD	old_field = {"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("group_discovery", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(6020)
@@ -39,5 +47,6 @@ DBPATCH_START(6020)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(6020000, 0, 1)
+DBPATCH_ADD(6020001, 0, 0)
 
 DBPATCH_END()
