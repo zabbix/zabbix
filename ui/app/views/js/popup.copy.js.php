@@ -58,8 +58,8 @@ window.copy_popup = new class {
 					dstfld1: 'copy_targetids',
 					writeonly: 1,
 					multiselect: 1
-					}
 				}
+			}
 		};
 
 		switch ($('#copy_type').find('input[name=copy_type]:checked').val()) {
@@ -99,14 +99,10 @@ window.copy_popup = new class {
 
 		this.overlay.setLoading();
 
-		this._post(this.curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
-		});
+		this._post(this.curl.getUrl(), fields);
 	}
 
-	_post(url, data, success_callback) {
+	_post(url, data) {
 		fetch(this.curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -117,13 +113,10 @@ window.copy_popup = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
-				else if('success' in response) {
-					addMessage(makeMessageBox('good', [], response.success.title, true, false));
-				}
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				return response;
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 			})
-			.then(success_callback)
 			.catch((exception) => {
 				for (const element of this.form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
@@ -149,4 +142,4 @@ window.copy_popup = new class {
 				this.overlay.unsetLoading();
 			});
 	}
-};
+}

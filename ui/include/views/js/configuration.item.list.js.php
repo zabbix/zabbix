@@ -60,7 +60,14 @@
 
 		_initActions() {
 			document.querySelector('.js-copy').addEventListener('click', () => {
-				this.openCopyPopup();
+				const overlay = this.openCopyPopup();
+				const dialogue = overlay.$dialogue[0];
+
+					dialogue.addEventListener('dialogue.submit', (e) => {
+					clearMessages();
+
+					addMessage(makeMessageBox('good', [], e.detail.title, true, false));
+					});
 			});
 			document.querySelector('.js-execute-now').addEventListener('click', () => {
 			this.massCheckNow();
@@ -97,7 +104,7 @@
 				context: form.querySelector('#form_context').value
 			};
 
-			PopUp('popup.copy.items', parameters, {
+			return PopUp('popup.copy.items', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});
