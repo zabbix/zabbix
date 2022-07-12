@@ -1582,44 +1582,80 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected static function checkHostInterfaces(array $items, array $db_items = null): void {
 		foreach ($items as $i => $item) {
+			$interface_type = itemTypeInterface($item['type']);
+
+			if (!in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+					|| $interface_type === false) {
+				continue;
+			}
+
+			$check = false;
+
 			if ($db_items === null) {
-				if (!array_key_exists('interfaceid', $item)) {
-					unset($items[$i]);
-					continue;
+				if (array_key_exists('interfaceid', $item)) {
+					if ($item['interfaceid'] != 0) {
+						$check = true;
+					}
+					elseif ($interface_type != INTERFACE_TYPE_OPT) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
+						));
+					}
 				}
 			}
 			else {
 				$db_item = $db_items[$item['itemid']];
 
-				if (!array_key_exists('interfaceid', $db_items[$item['itemid']])) {
-					unset($items[$i]);
-					continue;
+				if ($item['type'] == $db_item['type']) {
+					if (array_key_exists('interfaceid', $item)) {
+						if ($item['interfaceid'] != 0) {
+							if (bccomp($item['interfaceid'], $db_item['interfaceid']) != 0) {
+								$check = true;
+							}
+						}
+						elseif ($interface_type != INTERFACE_TYPE_OPT) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
+							));
+						}
+					}
 				}
 				else {
-					if ($item['type'] == $db_item['type']) {
-						if (!array_key_exists('interfaceid', $item)
-								|| bccomp($item['interfaceid'], $db_item['interfaceid']) == 0) {
-							unset($items[$i]);
-							continue;
+					$db_interface_type = itemTypeInterface($db_item['type']);
+
+					if (array_key_exists('interfaceid', $item)) {
+						if ($item['interfaceid'] != 0) {
+							if (bccomp($item['interfaceid'], $db_item['interfaceid']) != 0
+									|| ($interface_type != INTERFACE_TYPE_ANY
+										&& $interface_type != $db_interface_type)) {
+								$check = true;
+							}
+						}
+						elseif ($interface_type != INTERFACE_TYPE_OPT) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
+							));
 						}
 					}
 					else {
-						$interface_type = itemTypeInterface($item['type']);
-						$db_interface_type = itemTypeInterface($db_item['type']);
+						if ($db_item['interfaceid'] != 0) {
+							if ($interface_type != INTERFACE_TYPE_ANY && $interface_type != $db_interface_type) {
+								$item += ['interfaceid' => $db_item['interfaceid']];
 
-						if ($interface_type === false
-								|| ($db_interface_type !== false
-									&& (in_array($interface_type, [INTERFACE_TYPE_ANY, INTERFACE_TYPE_OPT])
-											|| $interface_type == $db_interface_type)
-									&& (!array_key_exists('interfaceid', $item)
-										|| bccomp($item['interfaceid'], $db_item['interfaceid']) == 0))) {
-							unset($items[$i]);
-							continue;
+								$check = true;
+							}
 						}
-
-						$item += ['interfaceid' => $db_item['interfaceid']];
+						elseif ($interface_type != INTERFACE_TYPE_OPT) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1), _s('the parameter "%1$s" is missing', 'interfaceid')
+							));
+						}
 					}
 				}
+			}
+
+			if (!$check) {
+				unset($items[$i]);
 			}
 		}
 
@@ -1634,25 +1670,22 @@ abstract class CItemGeneral extends CApiService {
 		]);
 
 		foreach ($items as $i => $item) {
-			$interface_type = itemTypeInterface($item['type']);
-
-			if ($interface_type != INTERFACE_TYPE_OPT && $item['interfaceid'] != 0) {
-				if (!array_key_exists($item['interfaceid'], $db_interfaces)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
-					));
-				}
-
-				if (bccomp($db_interfaces[$item['interfaceid']]['hostid'], $item['hostid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i + 1).'/interfaceid', _('cannot be the host interface ID from another host')
-					));
-				}
+			if (!array_key_exists($item['interfaceid'], $db_interfaces)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
+				));
 			}
 
-			if (!in_array($interface_type, [false, INTERFACE_TYPE_ANY, INTERFACE_TYPE_OPT])
-					&& (!$db_interfaces || !array_key_exists($item['interfaceid'], $db_interfaces)
-							|| $db_interfaces[$item['interfaceid']]['type'] != $interface_type)) {
+			if (bccomp($db_interfaces[$item['interfaceid']]['hostid'], $item['hostid']) != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/interfaceid', _('cannot be the host interface ID from another host')
+				));
+			}
+
+			$interface_type = itemTypeInterface($item['type']);
+
+			if (!in_array($interface_type, [INTERFACE_TYPE_ANY, INTERFACE_TYPE_OPT])
+					&& $db_interfaces[$item['interfaceid']]['type'] != $interface_type) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i + 1).'/interfaceid',
 					_s('the host interface ID of type "%1$s" is expected', interfaceType2str($interface_type))
