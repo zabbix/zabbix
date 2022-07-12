@@ -6890,16 +6890,14 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .global-macro-table .table-col-value,
 .global-macro-table .table-col-template-value,
-.global-macro-table .table-col-parent-value,
-.global-macro-table .table-col-global-value,
-.inherited-macros-table .table-col-value,
-.inherited-macros-table .table-col-template-value,
-.inherited-macros-table .table-col-parent-value,
-.inherited-macros-table .table-col-global-value,
 .host-macros-table .table-col-value,
-.host-macros-table .table-col-template-value,
-.host-macros-table .table-col-parent-value,
-.host-macros-table .table-col-global-value {
+.host-macros-table .table-col-template-value {
+  width: 300px; }
+
+.inherited-macros-table .table-col-value,
+.inherited-macros-table .table-col-parent-value,
+.inherited-macros-table .table-col-template-value,
+.inherited-macros-table .table-col-global-value {
   width: 300px; }
 
 .active-readonly[readonly] {
