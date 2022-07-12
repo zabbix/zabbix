@@ -27,15 +27,22 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 
+int	check_vcenter_cluster_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_cluster_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
-int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const char *password,
+
+int	check_vcenter_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_datastore_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -49,12 +56,20 @@ int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, 
 		AGENT_RESULT *result);
 int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RESULT *result,
+		zbx_vector_ptr_t *add_results);
+int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 
 int	check_vcenter_dvswitch_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
+int	check_vcenter_hv_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_connectionstate(AGENT_REQUEST *request, const char *username, const char *password,
@@ -136,6 +151,8 @@ int	check_vcenter_hv_hw_sensors_get(AGENT_REQUEST *request, const char *username
 int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
+int	check_vcenter_vm_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_vm_attribute(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
@@ -233,6 +250,8 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
+int	check_vcenter_dc_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_dc_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
