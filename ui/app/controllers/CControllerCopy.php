@@ -65,12 +65,8 @@ class CControllerCopy extends CController {
 				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
 			return false;
 		}
-		elseif ($copy_type == COPY_TYPE_TO_TEMPLATE_GROUP
-				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS)) {
-			return false;
-		}
-		elseif ($copy_type == COPY_TYPE_TO_HOST_GROUP
-				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS)) {
+
+		if (!$this->checkTargetPermissions($copy_type)) {
 			return false;
 		}
 
@@ -100,6 +96,51 @@ class CControllerCopy extends CController {
 		}
 
 		return false;
+	}
+
+	protected function checkTargetPermissions($copy_type) {
+		$result = true;
+		if ($this->hasInput('copy_targetids')) {
+			$copy_targetids = $this->getInput('copy_targetids');
+
+			if ($copy_type == COPY_TYPE_TO_HOST) {
+				$copy_targets = API::Host()->get([
+					'countOutput' => true,
+					'hostids' => $copy_targetids,
+					'editable' => true
+				]);
+				$result = $copy_targets == count($copy_targetids);
+			}
+			elseif ($copy_type == COPY_TYPE_TO_TEMPLATE) {
+				$copy_targets = API::Template()->get([
+					'countOutput' => true,
+					'templateids' => $copy_targetids,
+					'editable' => true
+				]);
+
+				$result = $copy_targets == count($copy_targetids);
+			}
+			elseif ($copy_type == COPY_TYPE_TO_HOST_GROUP) {
+				$copy_targets = array_keys(API::Host()->get([
+					'output' => [],
+					'groupids' => $copy_targetids,
+					'editable' => true,
+					'preservekeys' => true
+				]));
+				$result = $copy_targets > 0;
+			}
+			elseif ($copy_type == COPY_TYPE_TO_TEMPLATE_GROUP) {
+				$copy_targets = array_keys(API::Template()->get([
+					'output' => [],
+					'groupids' => $copy_targetids,
+					'editable' => true,
+					'preservekeys' => true,
+				]));
+				$result = $copy_targets > 0;
+			}
+		}
+
+		return $result;
 	}
 
 	protected function doAction() {
@@ -168,92 +209,57 @@ class CControllerCopy extends CController {
 	}
 
 	protected function copyItems($copy_targetids): bool {
-		$copy_type = $this->getInput('copy_type');
 		$itemids = $this->getInput('itemids');
-			// hosts or templates
-		if ($copy_type == COPY_TYPE_TO_HOST || $copy_type == COPY_TYPE_TO_TEMPLATE) {
-			$hostids = $copy_targetids;
-		} // host groups
-		elseif ($copy_type == COPY_TYPE_TO_HOST_GROUP) {
-			$hostids = [];
-			$db_hosts = API::Host()->get([
-				'groupids' => $copy_targetids
-			]);
-			foreach ($db_hosts as $db_host) {
-				$hostids[] = $db_host['hostid'];
-			}
-		} // template groups
-		elseif ($copy_type == COPY_TYPE_TO_TEMPLATE_GROUP) {
-			$hostids = array_keys(API::Template()->get([
-				'output' => [],
-				'groupids' => $copy_targetids,
-				'editable' => true,
-				'preservekeys' => true
-			]));
-		}
+		$hostids = $this->getTargetIds($copy_targetids);
 
 		return copyItemsToHosts($itemids, $hostids);
 	}
 
 	protected function copyTriggers($copy_targetids): bool {
-		$copy_type = $this->getInput('copy_type');
 		$triggerids = $this->getInput('triggerids');
-
-		if ($copy_targetids) {
-			// hosts or templates
-			if ($copy_type == COPY_TYPE_TO_HOST || $copy_type == COPY_TYPE_TO_TEMPLATE) {
-				$hostids = $copy_targetids;
-			} // host groups
-			elseif ($copy_type == COPY_TYPE_TO_HOST_GROUP) {
-				$hostids = [];
-				$db_hosts = API::Host()->get([
-					'groupids' => $copy_targetids
-				]);
-				foreach ($db_hosts as $db_host) {
-					$hostids[] = $db_host['hostid'];
-				}
-			} // template groups
-			elseif ($copy_type == COPY_TYPE_TO_TEMPLATE_GROUP) {
-				$hostids = array_keys(API::Template()->get([
-					'output' => [],
-					'groupids' => $copy_targetids,
-					'editable' => true,
-					'preservekeys' => true
-				]));
-			}
-		}
+		$hostids = $this->getTargetIds($copy_targetids);
 
 		return copyTriggersToHosts($hostids, getRequest('hostid'), $triggerids);
 	}
 
 	protected function copyGraphs($copy_targetids): bool {
 		$result = true;
-		$copy_type = $this->getInput('copy_type');
 		$graphids = $this->getInput('graphids');
+		$hostids = $this->getTargetIds($copy_targetids);
 
-		$options = [
-			'output' => ['hostid'],
-			'editable' => true,
-			'preservekeys' => true,
-			'templated_hosts' => true
-		];
-		// hosts or templates
-		if ($copy_type == COPY_TYPE_TO_HOST || $copy_type == COPY_TYPE_TO_TEMPLATE) {
-			$options['hostids'] = $copy_targetids;
-		} // host groups or template groups
-		else {
-			$options['groupids'] = $copy_targetids;
-		}
-		$dbHosts = API::Host()->get($options);
-
+		DBstart();
 		foreach ($graphids as $graphid) {
-			foreach ($dbHosts as $host) {
-				if (!copyGraphToHost($graphid, $host['hostid'])) {
+			foreach ($hostids as $host) {
+				if (!copyGraphToHost($graphid, $host)) {
 					$result = false;
 				}
 			}
 		}
 
-		return $result;
+		return DBend($result);
+	}
+
+	protected function getTargetIds($copy_targetids) {
+		$copy_type = $this->getInput('copy_type');
+
+		if ($copy_type == COPY_TYPE_TO_HOST || $copy_type == COPY_TYPE_TO_TEMPLATE) {
+			$hostids = $copy_targetids;
+		}
+		elseif ($copy_type == COPY_TYPE_TO_HOST_GROUP) {
+			$hostids = array_keys(API::Host()->get([
+				'output' => [],
+				'groupids' => $copy_targetids,
+				'preservekeys' => true
+			]));
+		}
+		elseif ($copy_type == COPY_TYPE_TO_TEMPLATE_GROUP) {
+			$hostids = array_keys(API::Template()->get([
+				'output' => [],
+				'groupids' => $copy_targetids,
+				'preservekeys' => true
+			]));
+		}
+
+		return $hostids;
 	}
 }
