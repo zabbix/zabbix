@@ -504,6 +504,11 @@ msgstr "访问服务"
 msgid "Ack"
 msgstr "确认"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "确认"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "确认"
@@ -597,6 +602,11 @@ msgstr "确认已解决的事件"
 msgid "Action"
 msgstr "动作"
 
+#: app/views/monitoring.widget.actionlog.view.php:37
+msgctxt "compact table header"
+msgid "Action"
+msgstr "动作"
+
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
@@ -661,6 +671,11 @@ msgstr "动作已更新"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "动作"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "动作"
 
@@ -1607,6 +1622,11 @@ msgstr "可用性报表"
 #: app/views/monitoring.widget.hostavail.view.php:58
 #: app/views/monitoring.widget.hostavail.view.php:102
 #: include/classes/html/CHostAvailability.php:80
+msgid "Available"
+msgstr "可用"
+
+#: app/views/monitoring.widget.hostavail.view.php:37
+msgctxt "compact table header"
 msgid "Available"
 msgstr "可用"
 
@@ -5012,6 +5032,11 @@ msgstr "日期和时间函数"
 msgid "Day"
 msgstr "日"
 
+#: include/classes/helpers/CSlaHelper.php:68
+msgctxt "compact table header"
+msgid "Day"
+msgstr "日"
+
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
 msgstr "前天"
@@ -5932,6 +5957,11 @@ msgstr "发现 VMware 虚拟机，<url> - VMware 服务 URL。返回 JSON"
 msgid "Discovery rule"
 msgstr "自动发现规则"
 
+#: app/views/monitoring.widget.discovery.view.php:33
+msgctxt "compact table header"
+msgid "Discovery rule"
+msgstr "自动发现规则"
+
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -6153,6 +6183,11 @@ msgstr "下载配置文件"
 msgid "Downtime"
 msgstr "断线时间"
 
+#: app/views/monitoring.widget.slareport.view.php:100
+msgctxt "compact table header"
+msgid "Downtime"
+msgstr "断线时间"
+
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
 #: include/classes/widgets/CWidgetHelper.php:969
@@ -6214,6 +6249,11 @@ msgstr "用户ID \"%1$s\" 与 \"%2$s\" 冲突"
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:1156 include/events.inc.php:289
 #: include/views/configuration.action.edit.php:174
+msgid "Duration"
+msgstr "持续时间"
+
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
 msgid "Duration"
 msgstr "持续时间"
 
@@ -6645,6 +6685,11 @@ msgstr "错误"
 msgid "Error budget"
 msgstr "误差范围"
 
+#: app/views/monitoring.widget.slareport.view.php:101
+msgctxt "compact table header"
+msgid "Error budget"
+msgstr "误差范围"
+
 #: include/db.inc.php:518
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
@@ -6781,6 +6826,11 @@ msgstr "排除停机时间"
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
+msgid "Excluded downtimes"
+msgstr "排除停机时间"
+
+#: app/views/monitoring.widget.slareport.view.php:102
+msgctxt "compact table header"
 msgid "Excluded downtimes"
 msgstr "排除停机时间"
 
@@ -6985,6 +7035,11 @@ msgstr "故障转移延迟：%1$s"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "已失败"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "已失败"
 
@@ -8044,6 +8099,12 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "主机"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "主机"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8129,6 +8190,13 @@ msgstr "主机图形"
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
+msgid "Host group"
+msgstr "主机群组"
+
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
 msgid "Host group"
 msgstr "主机群组"
 
@@ -9713,6 +9781,12 @@ msgstr "无穷"
 #: include/views/configuration.triggers.edit.php:228
 #: include/views/configuration.triggers.edit.php:430
 #: include/views/configuration.triggers.list.php:200
+msgid "Info"
+msgstr "信息"
+
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
 msgid "Info"
 msgstr "信息"
 
@@ -11784,6 +11858,11 @@ msgstr "菜单路径"
 msgid "Message"
 msgstr "消息"
 
+#: app/views/monitoring.widget.actionlog.view.php:44
+msgctxt "compact table header"
+msgid "Message"
+msgstr "消息"
+
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
 msgstr "消息格式"
@@ -12039,6 +12118,11 @@ msgstr "等宽字体"
 #: app/controllers/CControllerPopupTriggerExpr.php:121
 #: app/views/popup.maintenance.period.php:104
 #: include/classes/helpers/CSlaHelper.php:60 report4.php:165
+msgid "Month"
+msgstr "月"
+
+#: include/classes/helpers/CSlaHelper.php:70
+msgctxt "compact table header"
 msgid "Month"
 msgstr "月"
 
@@ -12300,6 +12384,11 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.list.php:52
 #: include/views/monitoring.sysmap.list.php:71 items.php:46 maintenance.php:40
 #: report2.php:509 sysmaps.php:38 trigger_prototypes.php:37 triggers.php:45
+msgid "Name"
+msgstr "名称"
+
+#: app/views/monitoring.widget.plaintext.view.php:49
+msgctxt "compact table header"
 msgid "Name"
 msgstr "名称"
 
@@ -13099,6 +13188,11 @@ msgstr "未经授权。"
 msgid "Not available"
 msgstr "不可用"
 
+#: app/views/monitoring.widget.hostavail.view.php:38
+msgctxt "compact table header"
+msgid "Not available"
+msgstr "不可用"
+
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
 msgstr "未分类"
@@ -13387,6 +13481,11 @@ msgstr "关"
 msgid "Ok"
 msgstr "正常"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "正常"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13527,6 +13626,11 @@ msgstr "操作无对应的模板。"
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr "操作数据"
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr "操作数据"
 
@@ -14510,6 +14614,12 @@ msgstr "优先权层级"
 msgid "Problem"
 msgstr "问题"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "问题"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "问题已创建"
@@ -14736,6 +14846,11 @@ msgstr "公钥文件"
 msgid "Quarter"
 msgstr "季"
 
+#: include/classes/helpers/CSlaHelper.php:71
+msgctxt "compact table header"
+msgid "Quarter"
+msgstr "季"
+
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
 msgstr "季度"
@@ -14881,6 +14996,12 @@ msgstr "最近的问题"
 msgid "Recipient"
 msgstr "接收者"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "接收者"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr "收件人已经存在。"
@@ -14925,6 +15046,11 @@ msgstr "恢复操作"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "恢复时间"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "恢复时间"
 
@@ -15728,11 +15854,22 @@ msgstr "ID 为“%1$s”的 SLA 不可用。"
 msgid "SLI"
 msgstr "SLI"
 
+#: app/views/monitoring.widget.slareport.view.php:98
+msgctxt "compact table header"
+msgid "SLI"
+msgstr "SLI"
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
+msgid "SLO"
+msgstr "SLO"
+
+#: app/views/monitoring.widget.slareport.view.php:38
+#: app/views/monitoring.widget.slareport.view.php:97
+msgctxt "compact table header"
 msgid "SLO"
 msgstr "SLO"
 
@@ -16357,6 +16494,11 @@ msgstr "服务器"
 msgid "Service"
 msgstr "服务"
 
+#: app/views/monitoring.widget.slareport.view.php:37
+msgctxt "compact table header"
+msgid "Service"
+msgstr "服务"
+
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
 #, c-format
@@ -16552,6 +16694,12 @@ msgstr "设置"
 #: include/views/configuration.triggers.list.php:189
 #: include/views/reports.toptriggers.php:75
 #: include/views/reports.toptriggers.php:86
+msgid "Severity"
+msgstr "严重性"
+
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
 msgid "Severity"
 msgstr "严重性"
 
@@ -17104,6 +17252,13 @@ msgstr "Zabbix 写缓存的统计和可用性。缓存 - 值之一（模式：al
 msgid "Status"
 msgstr "状态"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "状态"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr "状态计算规则"
@@ -17544,6 +17699,11 @@ msgstr "标签值"
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
+msgid "Tags"
+msgstr "标记"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
 msgid "Tags"
 msgstr "标记"
 
@@ -18083,6 +18243,12 @@ msgstr "直到"
 msgid "Time"
 msgstr "时间"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "时间"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "特定 Zabbix 进程或一组进程（由 <type> 和 <mode> 标识）在 <state> 中花费的时间百分比。"
@@ -18146,6 +18312,11 @@ msgstr "超时"
 msgid "Timestamp"
 msgstr "时间戳"
 
+#: app/views/monitoring.widget.plaintext.view.php:33
+msgctxt "compact table header"
+msgid "Timestamp"
+msgstr "时间戳"
+
 #: app/views/sla.list.php:91
 msgid "Timezone"
 msgstr "时区"
@@ -18200,6 +18371,11 @@ msgstr "前排主机"
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "合计"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "合计"
 
@@ -18705,6 +18881,12 @@ msgstr "两个或多个字段不能占用相同的空间。"
 msgid "Type"
 msgstr "类型"
 
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
+msgid "Type"
+msgstr "类型"
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "类型(全细节)"
@@ -18961,6 +19143,11 @@ msgstr "单位"
 msgid "Unknown"
 msgstr "未知的"
 
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
+msgid "Unknown"
+msgstr "未知的"
+
 #: app/views/reports.auditlog.list.php:119
 msgid "Unknown action"
 msgstr "未知的操作"
@@ -19213,6 +19400,11 @@ msgstr "上层拓扑图"
 #: app/views/monitoring.widget.slareport.view.php:99
 #: app/views/slareport.list.php:165
 #: include/classes/screens/CScreenDiscovery.php:120
+msgid "Uptime"
+msgstr "在线时间"
+
+#: app/views/monitoring.widget.slareport.view.php:99
+msgctxt "compact table header"
 msgid "Uptime"
 msgstr "在线时间"
 
@@ -19952,6 +20144,11 @@ msgstr "验证"
 msgid "Value"
 msgstr "ֵ值"
 
+#: app/views/monitoring.widget.plaintext.view.php:51
+msgctxt "compact table header"
+msgid "Value"
+msgstr "ֵ值"
+
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
 #, c-format
@@ -20308,6 +20505,11 @@ msgstr "周三"
 msgid "Week"
 msgstr "星期"
 
+#: include/classes/helpers/CSlaHelper.php:69
+msgctxt "compact table header"
+msgid "Week"
+msgstr "星期"
+
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/popup.maintenance.period.php:77 app/views/popup.sla.edit.php:75
@@ -20402,6 +20604,11 @@ msgstr "带有问题名称"
 msgid "With problems"
 msgstr "异常设备"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "异常设备"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "使用此设置，此列中将仅显示数字项目。"
@@ -20415,6 +20622,11 @@ msgid "Without data"
 msgstr "无数据"
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "正常设备"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "正常设备"
 
@@ -20606,6 +20818,11 @@ msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:122
 #: include/classes/helpers/CSlaHelper.php:62 report4.php:118 report4.php:154
+msgid "Year"
+msgstr "年"
+
+#: include/classes/helpers/CSlaHelper.php:72
+msgctxt "compact table header"
 msgid "Year"
 msgstr "年"
 

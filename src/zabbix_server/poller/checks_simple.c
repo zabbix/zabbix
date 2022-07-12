@@ -45,9 +45,11 @@ static zbx_vmcheck_t	vmchecks[] =
 {
 	{"cluster.discovery", VMCHECK_FUNC(check_vcenter_cluster_discovery)},
 	{"cluster.status", VMCHECK_FUNC(check_vcenter_cluster_status)},
+	{"cluster.tags.get", VMCHECK_FUNC(check_vcenter_cluster_tags_get)},
 	{"version", VMCHECK_FUNC(check_vcenter_version)},
 	{"fullname", VMCHECK_FUNC(check_vcenter_fullname)},
 	{"datastore.discovery", VMCHECK_FUNC(check_vcenter_datastore_discovery)},
+	{"datastore.tags.get", VMCHECK_FUNC(check_vcenter_datastore_tags_get)},
 	{"datastore.read", VMCHECK_FUNC(check_vcenter_datastore_read)},
 	{"datastore.size", VMCHECK_FUNC(check_vcenter_datastore_size)},
 	{"datastore.write", VMCHECK_FUNC(check_vcenter_datastore_write)},
@@ -83,6 +85,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.network.in", VMCHECK_FUNC(check_vcenter_hv_network_in)},
 	{"hv.network.out", VMCHECK_FUNC(check_vcenter_hv_network_out)},
 	{"hv.network.linkspeed", VMCHECK_FUNC(check_vcenter_hv_network_linkspeed)},
+	{"hv.tags.get", VMCHECK_FUNC(check_vcenter_hv_tags_get)},
 	{"hv.perfcounter", VMCHECK_FUNC(check_vcenter_hv_perfcounter)},
 	{"hv.power", VMCHECK_FUNC(check_vcenter_hv_power)},
 	{"hv.sensor.health.state", VMCHECK_FUNC(check_vcenter_hv_sensor_health_state)},
@@ -130,6 +133,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.storage.committed", VMCHECK_FUNC(check_vcenter_vm_storage_committed)},
 	{"vm.storage.unshared", VMCHECK_FUNC(check_vcenter_vm_storage_unshared)},
 	{"vm.storage.uncommitted", VMCHECK_FUNC(check_vcenter_vm_storage_uncommitted)},
+	{"vm.tags.get", VMCHECK_FUNC(check_vcenter_vm_tags_get)},
 	{"vm.storage.readoio", VMCHECK_FUNC(check_vcenter_vm_storage_readoio)},
 	{"vm.storage.writeoio", VMCHECK_FUNC(check_vcenter_vm_storage_writeoio)},
 	{"vm.storage.totalwritelatency", VMCHECK_FUNC(check_vcenter_vm_storage_totalwritelatency)},
@@ -143,6 +147,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.vfs.fs.size", VMCHECK_FUNC(check_vcenter_vm_vfs_fs_size)},
 
 	{"dc.discovery", VMCHECK_FUNC(check_vcenter_dc_discovery)},
+	{"dc.tags.get", VMCHECK_FUNC(check_vcenter_dc_tags_get)},
 
 	{"cl.perfcounter", VMCHECK_FUNC(check_vcenter_cl_perfcounter)},
 
