@@ -125,7 +125,7 @@ else {
 			}
 		}
 		else {
-			$row[] = (new CCol())->addClass(ZBX_STYLE_NOWRAP);
+			$row[] = new CCol();
 		}
 
 		// Parent host macro value.
