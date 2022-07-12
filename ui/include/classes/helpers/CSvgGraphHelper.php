@@ -63,12 +63,18 @@ class CSvgGraphHelper {
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
+		$svg_height = $height - ($legend !== null ? $legend->getLinesCount() * CSvgGraphLegend::LINE_HEIGHT : 0);
+
+		if (0 > $svg_height) {
+			$svg_height = 0;
+		}
+
 		$graph = (new CSvgGraph([
 			'displaying' => $options['displaying'],
 			'time_period' => $options['time_period'],
 			'axes' => $options['axes']
 		]))
-			->setSize($width, $height - ($legend !== null ? $legend->getLinesCount() * CSvgGraphLegend::LINE_HEIGHT : 0))
+			->setSize($width, $svg_height)
 			->addMetrics($metrics)
 			->addSimpleTriggers(self::getSimpleTriggers($metrics, $options['displaying']))
 			->addProblems(self::getProblems($metrics, $options['problems'], $options['time_period']))
@@ -128,7 +134,7 @@ class CSvgGraphHelper {
 
 			if ($hosts) {
 				$items = API::Item()->get([
-					'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type'],
+					'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
 					'selectHosts' => ['name'],
 					'hostids' => array_keys($hosts),
 					'webitems' => true,
@@ -186,7 +192,7 @@ class CSvgGraphHelper {
 			}
 
 			$items_db = API::Item()->get([
-				'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type'],
+				'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
 				'selectHosts' => ['name'],
 				'webitems' => true,
 				'filter' => [

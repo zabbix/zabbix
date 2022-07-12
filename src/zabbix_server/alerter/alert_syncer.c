@@ -493,7 +493,7 @@ static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params, zb
 	DB_ROW			row;
 	struct zbx_json_parse	jp, jp_tags;
 	const char		*pnext = NULL;
-	char			key[TAG_NAME_LEN * 4 + 1], value[TAG_VALUE_LEN * 4 + 1];
+	char			key[ZBX_DB_TAG_NAME_LEN * 4 + 1], value[ZBX_DB_TAG_VALUE_LEN * 4 + 1];
 	zbx_tag_t		*tag, tag_local = {.tag = key, .value = value};
 	int			event_tag_index, need_to_add_problem_tag = 0;
 	zbx_event_tags_t	*event_tags, local_event_tags;
@@ -552,10 +552,10 @@ static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params, zb
 		zbx_ltrim(key, ZBX_WHITESPACE);
 		zbx_ltrim(value, ZBX_WHITESPACE);
 
-		if (TAG_NAME_LEN < zbx_strlen_utf8(key))
-			key[zbx_strlen_utf8_nchars(key, TAG_NAME_LEN)] = '\0';
-		if (TAG_VALUE_LEN < zbx_strlen_utf8(value))
-			value[zbx_strlen_utf8_nchars(value, TAG_VALUE_LEN)] = '\0';
+		if (ZBX_DB_TAG_NAME_LEN < zbx_strlen_utf8(key))
+			key[zbx_strlen_utf8_nchars(key, ZBX_DB_TAG_NAME_LEN)] = '\0';
+		if (ZBX_DB_TAG_VALUE_LEN < zbx_strlen_utf8(value))
+			value[zbx_strlen_utf8_nchars(value, ZBX_DB_TAG_VALUE_LEN)] = '\0';
 
 		zbx_rtrim(key, ZBX_WHITESPACE);
 		zbx_rtrim(value, ZBX_WHITESPACE);

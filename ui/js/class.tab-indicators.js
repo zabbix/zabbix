@@ -541,7 +541,7 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#preprocessing .preprocessing-list-item')
+			.querySelectorAll('#preprocessing .preprocessing-list-item:not(.ui-sortable-placeholder)')
 			.length;
 	}
 
@@ -1086,12 +1086,12 @@ class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#data_sets .list-accordion-item')
+			.querySelectorAll('#data_set .list-accordion-item')
 			.length;
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#data_sets');
+		const target_node = document.querySelector('#data_set');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {

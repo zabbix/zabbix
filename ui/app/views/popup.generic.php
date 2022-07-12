@@ -538,17 +538,18 @@ switch ($data['popup_type']) {
 		else {
 			foreach ($data['table_records'] as &$item) {
 				$host = reset($item['hosts']);
+				$item_pattern = array_key_exists('pattern', $item) ? $item['pattern'] : $item['itemid'];
 
 				$table->addRow([
 					$data['multiselect']
-						? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid'])
+						? new CCheckBox('item['.$item['itemid'].']', $item_pattern)
 						: null,
 					(new CLink($item['name']))
 						->setAttribute('data-reference', $options['reference'])
-						->setAttribute('data-itemid', $item['itemid'])
+						->setAttribute('data-pattern', $item_pattern)
 						->setAttribute('data-parentid', $options['parentid'])
 						->onClick('
-							addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid ?? null);
+							addValue(this.dataset.reference, this.dataset.pattern, this.dataset.parentid ?? null);
 							popup_generic.closePopup(event);
 						'),
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
@@ -561,7 +562,7 @@ switch ($data['popup_type']) {
 				]);
 
 				$item = [
-					'id' => $item['itemid'],
+					'id' => $item_pattern,
 					'itemid' => $item['itemid'],
 					'name' => $options['patternselect']
 						? $item['name']

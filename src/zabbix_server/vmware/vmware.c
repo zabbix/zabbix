@@ -27,7 +27,6 @@
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "zbxnix.h"
-#include "zbxself.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
@@ -58,21 +57,14 @@
  */
 
 extern int		CONFIG_VMWARE_FREQUENCY;
-extern int		CONFIG_VMWARE_PERF_FREQUENCY;
 extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
 extern int		CONFIG_VMWARE_TIMEOUT;
-
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
-extern char				*CONFIG_SOURCE_IP;
+extern char		*CONFIG_SOURCE_IP;
 
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_shmem_malloc_func, \
 		__vm_shmem_realloc_func, __vm_shmem_free_func)
 
 #define ZBX_VMWARE_CACHE_UPDATE_PERIOD	CONFIG_VMWARE_FREQUENCY
-#define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
-#define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 #define ZBX_XML_DATETIME		26
 #define ZBX_INIT_UPD_XML_SIZE		(100 * ZBX_KIBIBYTE)
 #define zbx_xml_free_doc(xdoc)		if (NULL != xdoc)\
@@ -85,7 +77,7 @@ static zbx_shmem_info_t	*vmware_mem = NULL;
 
 ZBX_SHMEM_FUNC_IMPL(__vm, vmware_mem)
 
-static zbx_vmware_t	*vmware = NULL;
+zbx_vmware_t	*vmware = NULL;
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
@@ -1455,6 +1447,24 @@ static void	vmware_counter_shared_clean(zbx_vmware_counter_t *counter)
 	vmware_shared_strfree(counter->path);
 }
 
+static void	vmware_shared_tag_free(zbx_vmware_tag_t *value)
+{
+	vmware_shared_strfree(value->name);
+	vmware_shared_strfree(value->category);
+	vmware_shared_strfree(value->description);
+	__vm_shmem_free_func(value);
+}
+
+static void	vmware_shared_entity_tags_free(zbx_vmware_entity_tags_t *value)
+{
+
+	zbx_vector_vmware_tag_clear_ext(&value->tags, vmware_shared_tag_free);
+	zbx_vector_vmware_tag_destroy(&value->tags);
+	vmware_shared_strfree(value->uuid);
+	vmware_shared_strfree(value->error);
+	__vm_shmem_free_func(value);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service          *
@@ -1500,6 +1510,10 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 		vmware_counter_shared_clean(counter);
 
 	zbx_hashset_destroy(&service->counters);
+
+	zbx_vector_vmware_entity_tags_clear_ext(&service->data_tags.entity_tags, vmware_shared_entity_tags_free);
+	zbx_vector_vmware_entity_tags_destroy(&service->data_tags.entity_tags);
+	vmware_shared_strfree(service->data_tags.error);
 
 	__vm_shmem_free_func(service);
 
@@ -2272,7 +2286,6 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 
 	zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_datacenter_free);
 	zbx_vector_vmware_datacenter_destroy(&data->datacenters);
-
 
 	zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_resourcepool_free);
 	zbx_vector_vmware_resourcepool_destroy(&data->resourcepools);
@@ -3604,7 +3617,6 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_RESOURCEPOOL_PARENTID("%s"), id_esc);
 		id = zbx_xml_doc_read_value(xdoc , tmp);
 
-
 		if (NULL != id)	/* we do not include the last default 'ResourcePool' */
 		{
 			if (NULL == *path)
@@ -3623,7 +3635,6 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
 		zbx_free(name);
 	}
 	while (NULL != id);
-
 
 	if (SUCCEED == ret)
 	{
@@ -6871,7 +6882,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
  * Parameters: service      - [IN] the vmware service                         *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_update(zbx_vmware_service_t *service)
+int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 {
 	CURL			*easyhandle = NULL;
 	CURLoption		opt;
@@ -7077,7 +7088,7 @@ out:
 	zbx_vmware_lock();
 
 	/* remove UPDATING flag and set READY or FAILED flag */
-	service->state &= ~(ZBX_VMWARE_STATE_MASK | ZBX_VMWARE_STATE_UPDATING);
+	service->state &= ~ZBX_VMWARE_STATE_MASK;
 	service->state |= (SUCCEED == ret) ? ZBX_VMWARE_STATE_READY : ZBX_VMWARE_STATE_FAILED;
 
 	if (0 < data->events.values_num)
@@ -7175,6 +7186,8 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s \tprocessed:" ZBX_FS_SIZE_T " bytes of data. %s", __func__,
 			zbx_result_string(ret), (zbx_fs_size_t)page.alloc, msg);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -7542,7 +7555,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
  * Parameters: service      - [IN] the vmware service                         *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_update_perf(zbx_vmware_service_t *service)
+int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service)
 {
 #	define INIT_PERF_XML_SIZE	200 * ZBX_KIBIBYTE
 
@@ -7682,9 +7695,6 @@ out:
 		vmware_service_copy_perf_data(service, &perfdata);
 	}
 
-	service->state &= ~(ZBX_VMWARE_STATE_UPDATING_PERF);
-	service->lastperfcheck = time(NULL);
-
 	zbx_vmware_unlock();
 
 	zbx_vector_ptr_clear_ext(&perfdata, (zbx_mem_free_func_t)vmware_free_perfdata);
@@ -7695,6 +7705,8 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s \tprocessed " ZBX_FS_SIZE_T " bytes of data", __func__,
 			zbx_result_string(ret), (zbx_fs_size_t)page.alloc);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -7704,7 +7716,7 @@ out:
  * Parameters: service      - [IN] the vmware service                         *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_remove(zbx_vmware_service_t *service)
+void	zbx_vmware_service_remove(zbx_vmware_service_t *service)
 {
 	int	index;
 
@@ -7789,6 +7801,9 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.skip_old = 0;
 	service->eventlog.req_sz = 0;
 	service->eventlog.oom = 0;
+	service->jobs_num = 0;
+	VMWARE_VECTOR_CREATE(&service->data_tags.entity_tags, vmware_entity_tags);
+	service->data_tags.error = NULL;
 
 	zbx_hashset_create_ext(&service->entities, 100, vmware_perf_entity_hash_func,  vmware_perf_entity_compare_func,
 			NULL, __vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
@@ -7801,6 +7816,9 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 			NULL, __vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
 
 	zbx_vector_ptr_append(&vmware->services, service);
+	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_CONF);
+	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_PERFCOUNTERS);
+	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_REST_TAGS);
 
 	/* new service does not have any data - return NULL */
 	service = NULL;
@@ -8029,6 +8047,20 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t 
 
 	return pcq;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sorting function to sort zbx_binary_heap_elem_t by nextcheck      *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_job_compare_nextcheck(const void *d1, const void *d2)
+{
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
+
+	return ((const zbx_vmware_job_t *)e1->data)->nextcheck - ((const zbx_vmware_job_t *)e2->data)->nextcheck;
+}
+
 #endif
 
 /******************************************************************************
@@ -8068,6 +8100,9 @@ int	zbx_vmware_init(char **error)
 		__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
 	zbx_hashset_create(&evt_msg_strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func);
 	evt_req_chunk_size = zbx_shmem_required_chunk_size(sizeof(zbx_vmware_event_t));
+	zbx_binary_heap_create_ext(&vmware->jobs_queue, vmware_job_compare_nextcheck, ZBX_BINARY_HEAP_OPTION_EMPTY,
+			__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
+
 #endif
 	ret = SUCCEED;
 out:
@@ -8096,172 +8131,6 @@ void	zbx_vmware_destroy(void)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-#define	ZBX_VMWARE_TASK_IDLE		1
-#define	ZBX_VMWARE_TASK_UPDATE		2
-#define	ZBX_VMWARE_TASK_UPDATE_PERF	3
-#define	ZBX_VMWARE_TASK_REMOVE		4
-
-/******************************************************************************
- *                                                                            *
- * Purpose: the vmware collector main loop                                    *
- *                                                                            *
- ******************************************************************************/
-ZBX_THREAD_ENTRY(vmware_thread, args)
-{
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int			i, now, task, next_update, updated_services = 0, removed_services = 0,
-				old_updated_services = 0, old_removed_services = 0, sleeptime = -1;
-	zbx_vmware_service_t	*service = NULL;
-	double			sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t			last_stat_time;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
-
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-
-#define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
-
-	last_stat_time = time(NULL);
-
-	while (ZBX_IS_RUNNING())
-	{
-		sec = zbx_time();
-		zbx_update_env(sec);
-
-		if (0 != sleeptime)
-		{
-			zbx_setproctitle("%s #%d [updated %d, removed %d VMware services in " ZBX_FS_DBL " sec, "
-					"querying VMware services]", get_process_type_string(process_type), process_num,
-					old_updated_services, old_removed_services, old_total_sec);
-		}
-
-		do
-		{
-			task = ZBX_VMWARE_TASK_IDLE;
-
-			now = time(NULL);
-			next_update = now + POLLER_DELAY;
-
-			zbx_vmware_lock();
-
-			/* find a task to be performed on a vmware service */
-			for (i = 0; i < vmware->services.values_num; i++)
-			{
-				service = (zbx_vmware_service_t *)vmware->services.values[i];
-
-				/* check if the service isn't used and should be removed */
-				if (0 == (service->state & ZBX_VMWARE_STATE_BUSY) &&
-						now - service->lastaccess > ZBX_VMWARE_SERVICE_TTL)
-				{
-					service->state |= ZBX_VMWARE_STATE_REMOVING;
-					task = ZBX_VMWARE_TASK_REMOVE;
-					break;
-				}
-
-				/* check if the performance statistics should be updated */
-				if (0 != (service->state & ZBX_VMWARE_STATE_READY) &&
-						0 == (service->state & ZBX_VMWARE_STATE_UPDATING_PERF) &&
-						now - service->lastperfcheck >= ZBX_VMWARE_PERF_UPDATE_PERIOD)
-				{
-					service->state |= ZBX_VMWARE_STATE_UPDATING_PERF;
-					task = ZBX_VMWARE_TASK_UPDATE_PERF;
-					break;
-				}
-
-				/* check if the service data should be updated */
-				if (0 == (service->state & ZBX_VMWARE_STATE_UPDATING) &&
-						now - service->lastcheck >= ZBX_VMWARE_CACHE_UPDATE_PERIOD)
-				{
-					service->state |= ZBX_VMWARE_STATE_UPDATING;
-					task = ZBX_VMWARE_TASK_UPDATE;
-					break;
-				}
-
-				/* don't calculate nextcheck for services that are already updating something */
-				if (0 != (service->state & ZBX_VMWARE_STATE_BUSY))
-						continue;
-
-				/* calculate next service update time */
-
-				if (service->lastcheck + ZBX_VMWARE_CACHE_UPDATE_PERIOD < next_update)
-					next_update = service->lastcheck + ZBX_VMWARE_CACHE_UPDATE_PERIOD;
-
-				if (0 != (service->state & ZBX_VMWARE_STATE_READY))
-				{
-					if (service->lastperfcheck + ZBX_VMWARE_PERF_UPDATE_PERIOD < next_update)
-						next_update = service->lastperfcheck + ZBX_VMWARE_PERF_UPDATE_PERIOD;
-				}
-			}
-
-			zbx_vmware_unlock();
-
-			switch (task)
-			{
-				case ZBX_VMWARE_TASK_UPDATE:
-					vmware_service_update(service);
-					updated_services++;
-					break;
-				case ZBX_VMWARE_TASK_UPDATE_PERF:
-					vmware_service_update_perf(service);
-					updated_services++;
-					break;
-				case ZBX_VMWARE_TASK_REMOVE:
-					vmware_service_remove(service);
-					removed_services++;
-					break;
-			}
-		}
-		while (ZBX_VMWARE_TASK_IDLE != task && ZBX_IS_RUNNING());
-
-		total_sec += zbx_time() - sec;
-		now = time(NULL);
-
-		sleeptime = 0 < next_update - now ? next_update - now : 0;
-
-		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
-		{
-			if (0 == sleeptime)
-			{
-				zbx_setproctitle("%s #%d [updated %d, removed %d VMware services in " ZBX_FS_DBL " sec,"
-						" querying VMware services]", get_process_type_string(process_type),
-						process_num, updated_services, removed_services, total_sec);
-			}
-			else
-			{
-				zbx_setproctitle("%s #%d [updated %d, removed %d VMware services in " ZBX_FS_DBL " sec,"
-						" idle %d sec]", get_process_type_string(process_type), process_num,
-						updated_services, removed_services, total_sec, sleeptime);
-				old_updated_services = updated_services;
-				old_removed_services = removed_services;
-				old_total_sec = total_sec;
-			}
-			updated_services = 0;
-			removed_services = 0;
-			total_sec = 0.0;
-			last_stat_time = time(NULL);
-		}
-
-		zbx_sleep_loop(sleeptime);
-	}
-
-	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
-
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
-#undef STAT_INTERVAL
-#else
-	ZBX_UNUSED(args);
-	THIS_SHOULD_NEVER_HAPPEN;
-	zbx_thread_exit(EXIT_SUCCESS);
-#endif
 }
 
 /******************************************************************************
@@ -8308,3 +8177,132 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 
 	return SUCCEED;
 }
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create job to update vmware data periodically and increase        *
+ *          service ref counter                                               *
+ *                                                                            *
+ * Parameters: vmw      - [IN] the vmware object                              *
+ *             service  - [IN] the vmware service                             *
+ *             job_type - [IN] the vmware job type                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type)
+{
+	zbx_vmware_job_t	*job;
+	zbx_binary_heap_elem_t	elem_new = {.key = 0};
+
+	job = (zbx_vmware_job_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_job_t));
+	job->nextcheck = 0;
+	job->type = job_type;
+	job->service = service;
+	service->jobs_num++;
+	job->expired = FAIL;
+	elem_new.data = job;
+	zbx_binary_heap_insert(&vmw->jobs_queue, &elem_new);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: destroy vmware job and service removing                           *
+ *                                                                            *
+ * Parameters: job - [IN] the job object                                      *
+ *                                                                            *
+ * Return value: count of removed services                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
+{
+	zbx_vmware_service_t	*service = job->service;
+	int			jobs_num;
+
+	zbx_vmware_lock();
+
+	job->service->jobs_num--;
+	jobs_num = job->service->jobs_num;
+	__vm_shmem_free_func(job);
+
+	zbx_vmware_unlock();
+
+	if (0 == jobs_num)
+		zbx_vmware_service_remove(service);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() service jobs_num:%d", __func__, jobs_num);
+
+	return 0 == jobs_num ? 1 : 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set shared error of vmware job tags update                        *
+ *                                                                            *
+ * Parameters: error     - [IN] the error message of failure                  *
+ *             data_tags - [OUT] the data_tags container                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t *data_tags)
+{
+	zbx_vmware_lock();
+	vmware_shared_strfree(data_tags->error);
+	data_tags->error = vmware_shared_strdup(error);
+	zbx_vmware_unlock();
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: replace shared tags info                                          *
+ *                                                                            *
+ * Parameters: src - [IN] the collected tags info                             *
+ *             dst - [OUT] the shared tags container                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, zbx_vector_vmware_entity_tags_t *dst)
+{
+	int	i, j;
+
+	zbx_vmware_lock();
+
+	zbx_vector_vmware_entity_tags_clear_ext(dst, vmware_shared_entity_tags_free);
+
+	for (i = 0; i < src->values_num; i++)
+	{
+		zbx_vmware_entity_tags_t	*to_entity, *from_entity = src->values[i];
+
+		if (0 == from_entity->tags.values_num && NULL == from_entity->error)
+			continue;
+
+		to_entity = (zbx_vmware_entity_tags_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_entity_tags_t));
+		VMWARE_VECTOR_CREATE(&to_entity->tags, vmware_tag);
+		to_entity->uuid = vmware_shared_strdup(from_entity->uuid);
+		to_entity->obj_id = NULL;
+
+		if (NULL != from_entity->error)
+		{
+			to_entity->error = vmware_shared_strdup(from_entity->error);
+			continue;
+		}
+		else
+			to_entity->error = NULL;
+
+		for (j = 0; j < from_entity->tags.values_num; j++)
+		{
+			zbx_vmware_tag_t	*to_tag, *from_tag = from_entity->tags.values[j];
+
+			to_tag = (zbx_vmware_tag_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_tag_t));
+			to_tag->name = vmware_shared_strdup(from_tag->name);
+			to_tag->description = vmware_shared_strdup(from_tag->description);
+			to_tag->category = vmware_shared_strdup(from_tag->category);
+			to_tag->id = NULL;
+			zbx_vector_vmware_tag_append(&to_entity->tags, to_tag);
+		}
+
+		zbx_vector_vmware_entity_tags_append(dst, to_entity);
+	}
+
+	zbx_vmware_unlock();
+}
+
+#endif
