@@ -59,7 +59,7 @@ class CItemTypeHttpAgent extends CItemType {
 			]],
 			'output_format' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON])],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'http_proxy')],
-			'interfaceid' =>		self::getCreateFieldRule('interface', $item),
+			'interfaceid' =>		self::getCreateFieldRule('interfaceid', $item),
 			'authtype' =>			self::getCreateFieldRule('authtype', $item),
 			'username' =>			self::getCreateFieldRule('username', $item),
 			'password' =>			self::getCreateFieldRule('password', $item),
