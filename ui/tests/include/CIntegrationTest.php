@@ -386,45 +386,25 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
-	protected static function waitForShutdown($component) {
+	protected static function waitForShutdown($component, $pids) {
 		self::validateComponent($component);
+		$failed = 0;
 
 		if (self::checkPidKilled($component)) {
-			return;
-		}
-
-		$pid = @file_get_contents(self::getPidPath($component));
-
-		$pids = explode("\n", shell_exec('pgrep -P '.$pid));
-		$pids_count = count($pids);
-		$iterations = 0;
-
-		do {
-			for ($i = count($pids) -1; $i >= 0; $i--) {
+			for ($i = 0; $i < count($pids); $i++) {
 				$child_pid = $pids[$i];
 
 				if  (is_numeric($child_pid) && posix_kill($child_pid, 0)) {
 					posix_kill($child_pid, SIGKILL);
 					sleep(10 * self::WAIT_ITERATION_DELAY);
 
-					if (!posix_kill($child_pid, 0)) {
-						break;
+					if (posix_kill($child_pid, 0)) {
+						$failed++;
 					}
 				}
 			}
 
-			if (self::checkPidKilled($component)) {
-				return;
-			}
-
-			$pids = explode("\n", shell_exec('pgrep -P '.$pid));
-			$iterations++;
-		} while (count($pids) > 0 && $iterations < $pids_count );
-
-		if  (is_numeric($pid) && posix_kill($pid, 0)) {
-			posix_kill($pid, SIGKILL);
-
-			if (self::checkPidKilled($component)) {
+			if ($failed == 0) {
 				return;
 			}
 		}
@@ -619,10 +599,12 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		$pid = @file_get_contents(self::getPidPath($component));
+		$pids = [];
 		if ($pid && is_numeric($pid)) {
+			$pids = explode("\n", shell_exec('pgrep -P '.$pid));
 			posix_kill($pid, SIGTERM);
 		}
-		self::waitForShutdown($component);
+		self::waitForShutdown($component, $pids);
 	}
 
 	/**
