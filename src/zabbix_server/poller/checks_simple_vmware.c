@@ -137,6 +137,31 @@ static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_t *dvss, 
 	return dvss->values[i];
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return pointer to Datacenter data from vector with id             *
+ *                                                                            *
+ * Parameters: dcs - [IN] the vector with all Datacenters                     *
+ *             id  - [IN] the id of Datacenter                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *        zbx_vmware_datacenter_t* - the operation has completed successfully *
+ *        NULL                     - the operation has failed                 *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_datacenter_t	*dc_get(const zbx_vector_vmware_datacenter_t *dcs, const char *id)
+{
+	int			i;
+	zbx_vmware_datacenter_t	cmp;
+
+	cmp.id = (char *)id;
+
+	if (FAIL == (i = zbx_vector_vmware_datacenter_bsearch(dcs, &cmp, vmware_dc_id_compare)))
+		return NULL;
+
+	return dcs->values[i];
+}
+
 static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service, const char *uuid)
 {
 	zbx_vmware_vm_t		vm_local = {.uuid = (char *)uuid};
@@ -153,7 +178,6 @@ static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)hv);
 
 	return hv;
-
 }
 
 static zbx_vmware_vm_t	*service_vm_get(zbx_vmware_service_t *service, const char *uuid)
@@ -636,6 +660,79 @@ static int	custquery_read_result(zbx_vmware_cust_query_t *custom_query, AGENT_RE
 	return SYSINFO_RET_OK;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update json document with tags info                               *
+ *                                                                            *
+ * Parameters: entity_tags - [IN] the all tags and linked objects             *
+ *             uuid        - [IN] the vmware object uuid                      *
+ *             json_data   - [OUT] the json document                          *
+ *             error       - [OUT] the error of tags receiving (optional)     *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const char *uuid,
+		struct zbx_json *json_data, char **error)
+{
+	int				i;
+	zbx_vmware_entity_tags_t	entity_cmp;
+	zbx_vector_vmware_tag_t		*tags;
+
+	if (NULL != data_tags->error)
+	{
+		if (NULL != error)
+			*error = zbx_strdup(NULL, data_tags->error);
+
+		return;
+	}
+
+	entity_cmp.uuid = (char *)uuid;
+
+	if (FAIL == (i = zbx_vector_vmware_entity_tags_bsearch(&data_tags->entity_tags, &entity_cmp,
+			ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+	{
+		return;
+	}
+
+	if (NULL != error && NULL != data_tags->entity_tags.values[i]->error)
+	{
+		*error = zbx_strdup(NULL, data_tags->entity_tags.values[i]->error);
+		return;
+	}
+
+	tags = &data_tags->entity_tags.values[i]->tags;
+
+	for (i = 0; i < tags->values_num; i++)
+	{
+		zbx_vmware_tag_t	*tag = tags->values[i];
+
+		zbx_json_addobject(json_data, NULL);
+		zbx_json_addstring(json_data, "name", tag->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json_data, "description", tag->description, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json_data, "category", tag->category, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(json_data);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update json document with tags info by object id                  *
+ *                                                                            *
+ * Parameters: entity_tags - [IN] the all tags and linked objects             *
+ *             type        - [IN] the HostSystem, VirtualMachine etc          *
+ *             id          - [IN] the id of hv, vm etc                        *
+ *             json_data   - [OUT] the json document                          *
+ *             error       - [OUT] the error of tags receiving (optional)     *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_tags_id_json(const zbx_vmware_data_tags_t *data_tags, const char *type,
+		const char *id, struct zbx_json *json_data, char **error)
+{
+	char	uuid[MAX_STRING_LEN / 8];
+
+	zbx_snprintf(uuid, sizeof(uuid),"%s:%s", type, id);
+	vmware_tags_uuid_json(data_tags, uuid, json_data, error);
+}
+
 int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -682,9 +779,16 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 			zbx_json_addstring(&json_data, "rpid", rp->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "rpath", rp->path, ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&json_data, "vm_count", rp->vm_num);
+			zbx_json_addarray(&json_data, "tags");
+			vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id, &json_data,
+					NULL);
+			zbx_json_close(&json_data);
 			zbx_json_close(&json_data);
 		}
 
+		zbx_json_close(&json_data);
+		zbx_json_addarray(&json_data, "tags");
+		vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_CLUSTER, cluster->id, &json_data, NULL);
 		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
@@ -819,6 +923,69 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 	else
 		ret = SYSINFO_RET_FAIL;
 
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_cluster_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_service_t		*service;
+	zbx_vmware_cluster_t		*cl = NULL;
+	int				ret = SYSINFO_RET_FAIL;
+	const char			*url, *id;
+	struct zbx_json			json_data;
+	char				*error = NULL;
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	id = get_rparam(request, 1);
+
+	if ('\0' == *id)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (cl = cluster_get(&service->data->clusters, id)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown cluster id."));
+		goto unlock;
+	}
+
+	if (NULL != service->data_tags.error)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
+		goto unlock;
+	}
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_CLUSTER, cl->id, &json_data, &error);
+	zbx_json_close(&json_data);
+
+	if (NULL == error)
+	{
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+		ret = SYSINFO_RET_OK;
+	}
+	else
+		SET_STR_RESULT(result, error);
+
+	zbx_json_free(&json_data);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -1299,9 +1466,16 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "rpid", rp->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "rpath", rp->path, ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&json_data, "vm_count", rp->vm_num);
+			zbx_json_addarray(&json_data, "tags");
+			vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id, &json_data,
+					NULL);
+			zbx_json_close(&json_data);
 			zbx_json_close(&json_data);
 		}
 
+		zbx_json_close(&json_data);
+		zbx_json_addarray(&json_data, "tags");
+		vmware_tags_uuid_json(&service->data_tags, hv->uuid, &json_data, NULL);
 		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
@@ -1995,6 +2169,69 @@ out:
 	return ret;
 }
 
+int	check_vcenter_hv_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_service_t		*service;
+	zbx_vmware_hv_t			*hv = NULL;
+	int				ret = SYSINFO_RET_FAIL;
+	const char			*url, *uuid;
+	struct zbx_json			json_data;
+	char				*error = NULL;
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+
+	if ('\0' == *uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	if (NULL != service->data_tags.error)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
+		goto unlock;
+	}
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	vmware_tags_uuid_json(&service->data_tags, hv->uuid, &json_data, &error);
+	zbx_json_close(&json_data);
+
+	if (NULL == error)
+	{
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+		ret = SYSINFO_RET_OK;
+	}
+	else
+		SET_STR_RESULT(result, error);
+
+	zbx_json_free(&json_data);
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -2079,9 +2316,13 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", dsname->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", dsname->uuid, ZBX_JSON_TYPE_STRING);
 		zbx_json_adduint64(&json_data, "{#MULTIPATH.COUNT}", (unsigned int)total);
 		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}",
 				(unsigned int)dsname->hvdisks.values_num);
+		zbx_json_addarray(&json_data, "tags");
+		vmware_tags_uuid_json(&service->data_tags, dsname->uuid, &json_data, NULL);
+		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
 
@@ -3168,6 +3409,7 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 		zbx_vmware_datastore_t	*datastore = service->data->datastores.values[i];
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", datastore->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", datastore->uuid, ZBX_JSON_TYPE_STRING);
 		zbx_json_addobject(&json_data, "{#DATASTORE.EXTENT}");
 
 		for (j = 0; j < datastore->diskextents.values_num; j++)
@@ -3180,6 +3422,9 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 		}
 
 		zbx_json_close(&json_data);
+		zbx_json_addarray(&json_data, "tags");
+		vmware_tags_uuid_json(&service->data_tags, datastore->uuid, &json_data, NULL);
+		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
 
@@ -3190,6 +3435,69 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 	zbx_json_free(&json_data);
 
 	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_datastore_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_service_t		*service;
+	zbx_vmware_datastore_t		*ds = NULL;
+	int				ret = SYSINFO_RET_FAIL;
+	const char			*url, *uuid;
+	struct zbx_json			json_data;
+	char				*error = NULL;
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+
+	if ('\0' == *uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+		goto unlock;
+	}
+
+	if (NULL != service->data_tags.error)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
+		goto unlock;
+	}
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	vmware_tags_uuid_json(&service->data_tags, ds->uuid, &json_data, &error);
+	zbx_json_close(&json_data);
+
+	if (NULL == error)
+	{
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+		ret = SYSINFO_RET_OK;
+	}
+	else
+		SET_STR_RESULT(result, error);
+
+	zbx_json_free(&json_data);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -3811,6 +4119,9 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			}
 
 			zbx_json_close(&json_data);
+			zbx_json_addarray(&json_data, "tags");
+			vmware_tags_uuid_json(&service->data_tags, vm->uuid, &json_data, NULL);
+			zbx_json_close(&json_data);
 			zbx_json_close(&json_data);
 		}
 	}
@@ -4351,6 +4662,70 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 	return ret;
 }
 
+int	check_vcenter_vm_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_service_t		*service;
+	zbx_vmware_vm_t			*vm = NULL;
+	int				ret = SYSINFO_RET_FAIL;
+	const char			*url, *uuid;
+	struct zbx_json			json_data;
+	char				*error = NULL;
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+
+	if ('\0' == *uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
+	}
+
+	if (NULL != service->data_tags.error)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
+		goto unlock;
+	}
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	vmware_tags_uuid_json(&service->data_tags, vm->uuid, &json_data, &error);
+	zbx_json_close(&json_data);
+
+	if (NULL == error)
+	{
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+		ret = SYSINFO_RET_OK;
+	}
+	else
+		SET_STR_RESULT(result, error);
+
+	zbx_json_free(&json_data);
+
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -4693,6 +5068,9 @@ int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATACENTER}", datacenter->name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#DATACENTERID}", datacenter->id, ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&json_data, "tags");
+		vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_DC, datacenter->id, &json_data, NULL);
+		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
 
@@ -4703,6 +5081,78 @@ int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_json_free(&json_data);
 
 	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_dc_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_service_t		*service;
+	zbx_vmware_datacenter_t		*dc = NULL;
+	int				i, ret = SYSINFO_RET_FAIL;
+	const char			*url, *id;
+	struct zbx_json			json_data;
+	char				*error = NULL;
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	id = get_rparam(request, 1);
+
+	if ('\0' == *id)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	for (i = 0; i < service->data->datacenters.values_num; i++)
+	{
+		if (0 == strcmp(service->data->datacenters.values[i]->id, id))
+		{
+			dc = service->data->datacenters.values[i];
+			break;
+		}
+	}
+
+	if (NULL == dc)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datacenter id."));
+		goto unlock;
+	}
+
+	if (NULL != service->data_tags.error)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
+		goto unlock;
+	}
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_DC, dc->id, &json_data, &error);
+	zbx_json_close(&json_data);
+
+	if (NULL == error)
+	{
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+		ret = SYSINFO_RET_OK;
+	}
+	else
+		SET_STR_RESULT(result, error);
+
+	zbx_json_free(&json_data);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -5266,5 +5716,176 @@ out:
 
 	return ret;
 }
+
+
+static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_t *alarms, zbx_vector_str_t *ids,
+		AGENT_RESULT *result)
+{
+	int		i, ret = SYSINFO_RET_OK;
+	struct zbx_json	json_data;
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < ids->values_num; i++)
+	{
+		zbx_vmware_alarm_t	*alarm, cmp = {.key = ids->values[i]};
+		int			j;
+
+		if (FAIL == (j = zbx_vector_vmware_alarm_bsearch(alarms, &cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Alarm not found:%s", cmp.key));
+			ret = SYSINFO_RET_FAIL;
+			break;
+		}
+
+		alarm = alarms->values[j];
+
+		zbx_json_addobject(&json_data, NULL);
+		zbx_json_addstring(&json_data, "name", alarm->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "system_name", alarm->system_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "description", alarm->description, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "enabled", (1 == alarm->enabled ? "true" : "false"), ZBX_JSON_TYPE_INT);
+		zbx_json_addstring(&json_data, "key", alarm->key, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "time", alarm->time, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "overall_status", alarm->overall_status, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "acknowledged", (0 == alarm->acknowledged ? "false" : "true"),
+				ZBX_JSON_TYPE_INT);
+		zbx_json_close(&json_data);
+	}
+
+	zbx_json_close(&json_data);
+
+	if (SYSINFO_RET_OK == ret)
+		SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+
+	zbx_json_free(&json_data);
+
+	return ret;
+}
+
+#define	ALARMS_GET_START(num)									\
+	const char		*uuid_or_id, *url;						\
+	int			ret = SYSINFO_RET_FAIL;						\
+	zbx_vmware_service_t	*service;							\
+												\
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);					\
+												\
+	if (num != request->nparam)								\
+	{											\
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));	\
+		goto out;									\
+	}											\
+												\
+	url = get_rparam(request, 0);								\
+												\
+	if (num > 1 && (NULL == (uuid_or_id = get_rparam(request, 1)) || '\0' == *uuid_or_id))	\
+	{											\
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));		\
+		goto out;									\
+	}											\
+												\
+	zbx_vmware_lock();									\
+												\
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))	\
+		goto unlock
+
+#define	ALARMS_GET_END(ids)									\
+	ret = check_vcenter_alarm_get_common(&service->data->alarms, &ids, result);		\
+unlock:												\
+	zbx_vmware_unlock();									\
+out:												\
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));	\
+												\
+	return ret
+
+int	check_vcenter_hv_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_hv_t	*hv;
+
+	ALARMS_GET_START(2);
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid_or_id)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	ALARMS_GET_END(hv->alarm_ids);
+}
+
+int	check_vcenter_vm_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_vm_t	*vm;
+
+	ALARMS_GET_START(2);
+
+	if (NULL == (vm = service_vm_get(service, uuid_or_id)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
+	}
+
+	ALARMS_GET_END(vm->alarm_ids);
+}
+
+int	check_vcenter_datastore_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_datastore_t	*ds;
+
+	ALARMS_GET_START(2);
+
+	if (NULL == (ds = ds_get(&service->data->datastores, uuid_or_id)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+		goto unlock;
+	}
+
+	ALARMS_GET_END(ds->alarm_ids);
+}
+
+int	check_vcenter_dc_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_datacenter_t	*dc;
+
+	ALARMS_GET_START(2);
+
+	if (NULL == (dc = dc_get(&service->data->datacenters, uuid_or_id)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datacenter id."));
+		goto unlock;
+	}
+
+	ALARMS_GET_END(dc->alarm_ids);
+}
+
+int	check_vcenter_cluster_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_cluster_t	*cl;
+
+	ALARMS_GET_START(2);
+
+	if (NULL == (cl = cluster_get(&service->data->clusters, uuid_or_id)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown cluster id."));
+		goto unlock;
+	}
+
+	ALARMS_GET_END(cl->alarm_ids);
+}
+
+int	check_vcenter_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	ALARMS_GET_START(1);
+	ALARMS_GET_END(service->data->alarm_ids);
+}
+
+#undef	ALARMS_GET_START
+#undef	ALARMS_GET_END
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
