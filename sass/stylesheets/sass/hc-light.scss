@@ -40,6 +40,7 @@ $font-selected-color: #ffffff;
 $font-alt-color: #333333;
 $body-bg-color: #ffffff;
 $overlay-bg-color: #000000;
+$overlay-border-color: #383838;
 
 // Main menu
 $menu-main-color: #ffffff;
@@ -832,6 +833,18 @@ a.link-action {
 			.icon-wizard-action {
 				background: transparent url($sprite-path) no-repeat -165px -624px;
 			}
+		}
+	}
+}
+
+.overlay-dialogue {
+	.list-table {
+		th:first-child {
+			padding-left: 0px;
+		}
+
+		td:first-child {
+			padding-left: 42px;
 		}
 	}
 }
