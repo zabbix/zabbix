@@ -596,6 +596,10 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	 * @dataProvider getUpdateValueData
 	 **/
 	public function testFormAdministrationGeneralAuditLog_UpdateParameters($data) {
+		if($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash('SELECT * FROM config');
+		}
+
 		$this->page->login()->open('zabbix.php?action=audit.settings.edit')->waitUntilReady();
 		$form = $this->query('id:audit-settings')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['fields']);
@@ -614,9 +618,8 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			$form->submit()->waitUntilReloaded();
 		}
 		else {
-			$old_hash = CDBHelper::getHash('SELECT * FROM token ORDER BY tokenid');
 			$this->assertMessage(TEST_BAD, 'Cannot update configuration', $data['details']);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM token ORDER BY tokenid'));
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
 		}
 	}
 }
