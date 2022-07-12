@@ -120,6 +120,14 @@ static int	DBpatch_5000005(void)
 	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
 }
 
+static int	DBpatch_5000006(void)
+{
+	const ZBX_FIELD	old_field = {"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("group_discovery", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(5000)
@@ -132,5 +140,6 @@ DBPATCH_ADD(5000002, 0, 0)
 DBPATCH_ADD(5000003, 0, 0)
 DBPATCH_ADD(5000004, 0, 0)
 DBPATCH_ADD(5000005, 0, 0)
+DBPATCH_ADD(5000006, 0, 0)
 
 DBPATCH_END()
