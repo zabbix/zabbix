@@ -34,8 +34,8 @@ elseif ($data['sla']['status'] != ZBX_SLA_STATUS_ENABLED) {
 }
 elseif (!$data['has_serviceid']) {
 	$header = [
-		_('Service'),
-		_('SLO')
+		_x('Service', 'compact table header'),
+		_x('SLO', 'compact table header')
 	];
 
 	foreach ($data['sli']['periods'] as $period) {
@@ -93,13 +93,13 @@ elseif (!$data['has_serviceid']) {
 }
 else {
 	$report->setHeader([
-		CSlaHelper::getReportNames()[$data['sla']['period']],
-		_('SLO'),
-		_('SLI'),
-		_('Uptime'),
-		_('Downtime'),
-		_('Error budget'),
-		_('Excluded downtimes')
+		CSlaHelper::getReportNames(true)[$data['sla']['period']],
+		_x('SLO', 'compact table header'),
+		_x('SLI', 'compact table header'),
+		_x('Uptime', 'compact table header'),
+		_x('Downtime', 'compact table header'),
+		_x('Error budget', 'compact table header'),
+		_x('Excluded downtimes', 'compact table header')
 	]);
 
 	if ($data['sli']['serviceids']) {

@@ -65,15 +65,15 @@ $scripts[] = $form_tabs->makeJavascript();
 $form
 	->addItem($form_list)
 	->addItem($graph_preview)
-	->addItem($form_tabs)
-	->addItem(
-		(new CScriptTag('
-			widget_svggraph_form.init('.json_encode([
-				'form_id' => $form->getId(),
-				'form_tabs_id' => $form_tabs->getId()
-			]).');
-		'))->setOnDocumentReady()
-	);
+	->addItem($form_tabs);
+
+$scripts[] = '
+	widget_svggraph_form.init('.json_encode([
+		'form_id' => $form->getId(),
+		'form_tabs_id' => $form_tabs->getId(),
+		'color_palette' => CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE
+	]).');
+';
 
 return [
 	'form' => $form,
@@ -109,7 +109,6 @@ function getGraphDataSetItemRow(): string {
 	]))
 		->addClass('sortable')
 		->addClass('single-item-table-row')
-		->setAttribute('data-number', '#{rowNum}')
 		->toString();
 }
 

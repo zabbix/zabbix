@@ -496,15 +496,11 @@ class CApiInputValidator {
 		}
 
 		$data = array_values($data);
-		$rules = ['type' => API_COLOR];
-
-		if (array_key_exists('in', $rule)) {
-			$rules['in'] = $rule['in'];
-		}
+		$rule['type'] = API_COLOR;
 
 		foreach ($data as $index => &$value) {
 			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
-			if (!self::validateData($rules, $value, $subpath, $error)) {
+			if (!self::validateData($rule, $value, $subpath, $error)) {
 				return false;
 			}
 		}
