@@ -6404,8 +6404,11 @@ z-select,
 .inherited-macros-table,
 .host-macros-table {
 	.table-col-value,
-	.table-col-template-value {
+	.table-col-template-value,
+	.table-col-parent-value,
+	.table-col-global-value {
 		width: 300px;
+		white-space: nowrap;
 	}
 }
 

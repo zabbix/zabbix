@@ -49,7 +49,7 @@ else {
 		(new CTableColumn(_('Effective value')))->addClass('table-col-value'),
 		(new CTableColumn($data['readonly'] ? null : ''))->addClass('table-col-action'),
 		$is_hostprototype ? (new CTableColumn())->addClass('table-col-arrow') : null,
-		$is_hostprototype ? (new CTableColumn())->addClass('table-col-parent-value') : null,
+		$is_hostprototype ? (new CTableColumn(_('Parent host value')))->addClass('table-col-parent-value') : null,
 		(new CTableColumn())->addClass('table-col-arrow'),
 		(new CTableColumn(_('Template value')))->addClass('table-col-template-value'),
 		(new CTableColumn())->addClass('table-col-arrow'),
@@ -123,6 +123,9 @@ else {
 						->addClass('element-table-remove')
 				))->addClass(ZBX_STYLE_NOWRAP);
 			}
+		}
+		else {
+			$row[] = (new CCol())->addClass(ZBX_STYLE_NOWRAP);
 		}
 
 		// Parent host macro value.
