@@ -30,17 +30,12 @@
 
 #define ZBX_VMWARE_STATE_MASK		0x0FF
 
-#define ZBX_VMWARE_STATE_UPDATING	0x100
-#define ZBX_VMWARE_STATE_UPDATING_PERF	0x200
-#define ZBX_VMWARE_STATE_REMOVING	0x400
-
-#define ZBX_VMWARE_STATE_BUSY		(ZBX_VMWARE_STATE_UPDATING | ZBX_VMWARE_STATE_UPDATING_PERF \
-							| ZBX_VMWARE_STATE_REMOVING)
-
 /* the vmware performance counter state */
 #define ZBX_VMWARE_COUNTER_NEW		0x00
 #define ZBX_VMWARE_COUNTER_READY	0x01
 #define ZBX_VMWARE_COUNTER_UPDATING	0x10
+
+#define ZBX_VMWARE_SOAP_DC		"Datacenter"
 
 #define ZBX_VMWARE_EVENT_KEY_UNINITIALIZED	__UINT64_C(0xffffffffffffffff)
 
@@ -262,6 +257,42 @@ typedef struct
 }
 zbx_vmware_data_t;
 
+/* the vmware tags data */
+typedef struct
+{
+	char	*name;
+	char	*description;
+	char	*category;
+	char	*id;
+}
+zbx_vmware_tag_t;
+ZBX_PTR_VECTOR_DECL(vmware_tag, zbx_vmware_tag_t *)
+
+/* the vmware tags data for entity (hv, vm etc) */
+typedef struct
+{
+	char	*id;
+	char	*type;
+}
+zbx_vmware_obj_id_t;
+
+typedef struct
+{
+	char			*uuid;
+	zbx_vmware_obj_id_t	*obj_id;
+	char			*error;
+	zbx_vector_vmware_tag_t	tags;
+}
+zbx_vmware_entity_tags_t;
+ZBX_PTR_VECTOR_DECL(vmware_entity_tags, zbx_vmware_entity_tags_t *)
+
+typedef struct
+{
+	char				*error;
+	zbx_vector_vmware_entity_tags_t	entity_tags;
+}
+zbx_vmware_data_tags_t;
+
 /* the vmware service data */
 typedef struct
 {
@@ -276,7 +307,6 @@ typedef struct
 	int				state;
 
 	int				lastcheck;
-	int				lastperfcheck;
 
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
 	int				lastaccess;
@@ -302,6 +332,12 @@ typedef struct
 
 	/* lastlogsize when vmware.eventlog[] item was polled last time and skip old flag*/
 	zbx_vmware_eventlog_state_t	eventlog;
+
+	/* linked jobs count */
+	int				jobs_num;
+
+	/* the vmware entity (vm, hv etc) and linked tags */
+	zbx_vmware_data_tags_t		data_tags;
 }
 zbx_vmware_service_t;
 
@@ -314,8 +350,21 @@ typedef struct
 	zbx_vector_ptr_t	services;
 	zbx_hashset_t		strpool;
 	zbx_uint64_t		strpool_sz;
+	zbx_binary_heap_t	jobs_queue;
 }
 zbx_vmware_t;
+
+typedef struct
+{
+	int			nextcheck;
+#define ZBX_VMWARE_UPDATE_CONF		1
+#define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
+#define ZBX_VMWARE_UPDATE_REST_TAGS	3
+	int			type;
+	int			expired;
+	zbx_vmware_service_t	*service;
+}
+zbx_vmware_job_t;
 
 /* the vmware collector statistics */
 typedef struct
@@ -336,6 +385,16 @@ void	zbx_vmware_unlock(void);
 int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+int	zbx_vmware_service_update(zbx_vmware_service_t *service);
+int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service);
+int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service);
+void	zbx_vmware_service_remove(zbx_vmware_service_t *service);
+void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
+int	zbx_vmware_job_remove(zbx_vmware_job_t *job);
+void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t *data_tags);
+void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src,
+		zbx_vector_vmware_entity_tags_t *dst);
 
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 
