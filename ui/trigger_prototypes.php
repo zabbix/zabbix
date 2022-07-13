@@ -371,7 +371,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 
 		if (hasRequest('backurl')) {
-			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 			$response->redirect();
 		}
 	}
@@ -385,7 +385,7 @@ elseif (hasRequest('delete') && hasRequest('triggerid')) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 
 		if (hasRequest('backurl')) {
-			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 			$response->redirect();
 		}
 	}

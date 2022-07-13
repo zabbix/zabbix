@@ -74,6 +74,7 @@ class CControllerTokenCreate extends CController {
 					CMessageHelper::setErrorTitle(_('Cannot add API token'));
 					$this->setResponse($response);
 					break;
+
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
 					break;
@@ -116,8 +117,8 @@ class CControllerTokenCreate extends CController {
 			[['token' => $auth_token]] = API::Token()->generate($tokenids);
 
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgumentSID()
 				->setArgument('action', $this->getInput('action_dst'))
+				->setArgumentSID()
 			);
 
 			[$user] = (CWebUser::$data['userid'] != $token['userid'])
