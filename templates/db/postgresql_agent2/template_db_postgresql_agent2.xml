@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-06-28T12:31:45Z</date>
+   <date>2022-07-01T07:54:51Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -883,6 +883,15 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                <master_item>
                   <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&gt;0</expression>
+                     <name>Dbstat: Checksum failures detected</name>
+                     <priority>AVERAGE</priority>
+                     <description>Data page checksum failures were detected on that DB instance.&#13;
+https://www.postgresql.org/docs/current/checksums.html</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>Dbstat: Conflicts</name>
@@ -1684,6 +1693,15 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                      <master_item>
                         <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;0</expression>
+                           <name>DB {#DBNAME}: Checksum failures detected</name>
+                           <priority>AVERAGE</priority>
+                           <description>Data page checksum failures were detected on that database.&#13;
+https://www.postgresql.org/docs/current/checksums.html</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>DB {#DBNAME}: Detected conflicts per second</name>
