@@ -77,6 +77,7 @@ class CControllerTokenUpdate extends CController {
 					CMessageHelper::setErrorTitle(_('Cannot update API token'));
 					$this->setResponse($response);
 					break;
+
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
 					break;
