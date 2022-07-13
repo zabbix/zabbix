@@ -61,14 +61,14 @@
 	}
 
 	const item_form = {
-		init({interfaces, key_type_suggestions, testable_item_types, field_switches, interface_types}) {
+		init({interfaces, value_type_by_keys, keys_by_item_type, testable_item_types, field_switches, interface_types}) {
 			this.interfaces = interfaces;
 			this.testable_item_types = testable_item_types;
 			this.field_switches = field_switches;
 			this.interface_types = interface_types;
 
-			if (typeof key_type_suggestions !== 'undefined') {
-				item_type_lookup.init(key_type_suggestions);
+			if (typeof value_type_by_keys !== 'undefined' && keys_by_item_type !== 'undefined') {
+				item_type_lookup.init(value_type_by_keys, keys_by_item_type);
 			}
 		}
 	}
@@ -232,7 +232,9 @@
 	});
 
 	const item_type_lookup = {
-		key_type_suggestions: [],
+		value_type_by_keys: [],
+		key_type_suggestions: {},
+		keys_by_item_type: [],
 		preprocessing_active: false,
 		form: null,
 		key_field: null,
@@ -242,17 +244,16 @@
 		inferred_type: null,
 		item_type: null,
 
-		init(key_type_suggestions) {
-			this.key_type_suggestions = key_type_suggestions;
+		init(value_type_by_keys, keys_by_item_type) {
+			this.value_type_by_keys = value_type_by_keys;
+			this.keys_by_item_type = keys_by_item_type;
 			this.form = document.querySelector('#item-form, #item-prototype-form');
 			this.key_field = this.form.querySelector('[name=key]');
 			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
 			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
 			this.item_type = this.form.querySelector('[name=type]');
-			const item_types_with_defined_keys = <?=  json_encode([ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR,
-				ITEM_TYPE_JMX
-			]); ?>;
+
+			this.updateKeyTypeSuggestions();
 
 			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
 				this.item_tab_type_field.value = this.preprocessing_tab_type_field.value;
@@ -278,13 +279,11 @@
 
 			['change', 'input', 'help_items.paste'].forEach((event_type) => {
 				this.key_field.addEventListener(event_type, (e) => {
-					if (item_types_with_defined_keys.includes(parseInt(this.item_type.value))) {
-						if (this.preprocessing_active) {
-							return this.lookup(this.key_field.value, false);
-						}
-
-						this.lookup(this.key_field.value);
+					if (this.preprocessing_active) {
+						return this.lookup(this.key_field.value, false);
 					}
+
+					this.lookup(this.key_field.value);
 				});
 			});
 
@@ -294,6 +293,7 @@
 
 			this.item_type.addEventListener('change', () => {
 				this.updateHintDisplay();
+				this.updateKeyTypeSuggestions();
 			});
 
 			this.updatePreprocessingState();
@@ -326,6 +326,19 @@
 			);
 
 			this.item_tab_type_field.dispatchEvent(change_event);
+		},
+
+		updateKeyTypeSuggestions() {
+			if (this.item_type.value in this.keys_by_item_type) {
+				for (let [key, value] of Object.entries(this.value_type_by_keys)) {
+					if (this.keys_by_item_type[this.item_type.value].includes(key)) {
+						this.key_type_suggestions[key] = value;
+					}
+				}
+			}
+			else {
+				this.key_type_suggestions = {};
+			}
 		},
 
 		/**
