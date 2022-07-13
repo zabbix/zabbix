@@ -63,7 +63,7 @@ abstract class CHostBase extends CApiService {
 				}
 			}
 
-			if (array_key_exists('templates', $host) && $host['templates']) {
+			if (array_key_exists('templates', $host)) {
 				$templates = array_column($host['templates'], null, 'templateid');
 
 				if ($db_hosts === null) {
@@ -79,7 +79,7 @@ abstract class CHostBase extends CApiService {
 				}
 			}
 
-			if (array_key_exists('templates_clear', $host) && $host['templates_clear']) {
+			if (array_key_exists('templates_clear', $host)) {
 				$edit_templates += array_column($host['templates_clear'], null, 'templateid');
 			}
 		}

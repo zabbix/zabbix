@@ -828,9 +828,6 @@ class CHostPrototype extends CHostBase {
 				$hostids[] = $host_prototype['hostid'];
 				$db_host_prototypes[$host_prototype['hostid']]['interfaces'] = [];
 			}
-			elseif (array_key_exists('interfaces', $host_prototype)) {
-				$db_host_prototypes[$host_prototype['hostid']]['interfaces'] = [];
-			}
 		}
 
 		if (!$hostids) {
@@ -1051,15 +1048,14 @@ class CHostPrototype extends CHostBase {
 		), 'itemid');
 
 		foreach ($host_prototypes as $index => &$host_prototype) {
-			if (in_array($host_prototype['ruleid'], $templated_ruleids)) {
-				if (!array_key_exists('uuid', $host_prototype)) {
-					$host_prototype['uuid'] = generateUuidV4();
-				}
-			}
-			elseif (array_key_exists('uuid', $host_prototype)) {
+			if (!in_array($host_prototype['ruleid'], $templated_ruleids) && array_key_exists('uuid', $host_prototype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
 				);
+			}
+
+			if (in_array($host_prototype['ruleid'], $templated_ruleids) && !array_key_exists('uuid', $host_prototype)) {
+				$host_prototype['uuid'] = generateUuidV4();
 			}
 		}
 		unset($host_prototype);
@@ -1087,7 +1083,7 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the user doesn't have write permissions for the given LLD rules
 	 */
 	private static function checkDiscoveryRules(array $host_prototypes): void {
-		$ruleids = array_unique(array_column($host_prototypes, 'ruleid'));
+		$ruleids = array_keys(array_flip(array_column($host_prototypes, 'ruleid')));
 
 		$count = API::DiscoveryRule()->get([
 			'countOutput' => true,
@@ -1182,8 +1178,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function checkMainInterfaces(array $host_prototypes): void {
 		foreach ($host_prototypes as $i => $host_prototype) {
-			if ($host_prototype['custom_interfaces'] != HOST_PROT_INTERFACES_CUSTOM
-					|| !array_key_exists('interfaces', $host_prototype) || !$host_prototype['interfaces']) {
+			if (!array_key_exists('interfaces', $host_prototype)) {
 				continue;
 			}
 
