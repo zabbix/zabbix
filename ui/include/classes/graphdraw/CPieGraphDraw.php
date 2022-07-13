@@ -41,14 +41,16 @@ class CPieGraphDraw extends CGraphDraw {
 	/********************************************************************************************************/
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid'],
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid', 'history', 'trends'],
 			'itemids' => [$itemid],
 			'webitems' => true
 		]);
 
 		if (!$items) {
 			$items = API::ItemPrototype()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid'],
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid', 'history',
+					'trends'
+				],
 				'itemids' => [$itemid]
 			]);
 		}
@@ -148,21 +150,8 @@ class CPieGraphDraw extends CGraphDraw {
 		$config = select_config();
 		$items = [];
 
-		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'value_type', 'units', 'history', 'trends'],
-			'itemids' => array_column($this->items, 'itemid'),
-			'webitems' => true,
-			'preservekeys' => true
-		]);
-
-		$db_items = $db_items + API::ItemPrototype()->get([
-			'output' => ['itemid', 'hostid', 'value_type', 'units', 'history', 'trends'],
-			'itemids' => array_column($this->items, 'itemid'),
-			'preservekeys' => true
-		]);
-
 		for ($i = 0; $i < $this->num; $i++) {
-			$item = $db_items[$this->items[$i]['itemid']];
+			$item = $this->items[$i];
 
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
@@ -243,7 +232,7 @@ class CPieGraphDraw extends CGraphDraw {
 				$this->dataFrom = $item['source'];
 			}
 
-			switch ($this->items[$i]['calc_fnc']) {
+			switch ($item['calc_fnc']) {
 				case CALC_FNC_MIN:
 					$fncName = 'min';
 					break;
@@ -262,7 +251,7 @@ class CPieGraphDraw extends CGraphDraw {
 				? 0
 				: abs($this->data[$item['itemid']][$fncName]);
 
-			if ($this->items[$i]['calc_type'] == GRAPH_ITEM_SUM) {
+			if ($item['calc_type'] == GRAPH_ITEM_SUM) {
 				$this->background = $i;
 				$graph_sum = $item_value;
 			}
