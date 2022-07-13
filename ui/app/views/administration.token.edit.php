@@ -78,7 +78,7 @@ $token_from_list = (new CFormList())
 			->setChecked($data['expires_state'])
 			->setUncheckedValue('0')
 	)
-	->addRow((new CLabel(_('Expires at')))->setAsteriskMark(),
+	->addRow((new CLabel(_('Expires at'), 'expires_at'))->setAsteriskMark(),
 		(new CDateSelector('expires_at', $data['expires_at']))
 			->setDateFormat(ZBX_FULL_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))

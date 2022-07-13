@@ -91,16 +91,18 @@ AC_HELP_STRING([--with-libmodbus@<:@=DIR@:>@],[use MODBUS package @<:@default=no
 
   if test "x$want_libmodbus" = "xyes"; then
     AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-    PKG_PROG_PKG_CONFIG()
+    m4_ifdef([PKG_PROG_PKG_CONFIG], [PKG_PROG_PKG_CONFIG()], [:])
     test -z "$PKG_CONFIG" && AC_MSG_ERROR([Not found pkg-config library])
     m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
 
     if test "x$_libmodbus_dir" = "xno"; then
-      PKG_CHECK_EXISTS(libmodbus,[
-        LIBMODBUS_LIBS=`$PKG_CONFIG --libs libmodbus`
-      ],[
-        AC_MSG_ERROR([Not found libmodbus package])
-      ])
+      m4_ifdef([PKG_CHECK_EXISTS], [
+        PKG_CHECK_EXISTS(libmodbus,[
+          LIBMODBUS_LIBS=`$PKG_CONFIG --libs libmodbus`
+        ],[
+          AC_MSG_ERROR([Not found libmodbus package])
+        ])
+      ], [:])
       LIBMODBUS_CFLAGS=`$PKG_CONFIG --cflags libmodbus`
       LIBMODBUS_LDFLAGS=""
       _libmodbus_version=`$PKG_CONFIG --modversion libmodbus`

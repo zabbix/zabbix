@@ -37,6 +37,7 @@ class testAgentItems extends CIntegrationTest {
 	const TEST_LINK_BASE_NAME = 'test_link';
 	const TEST_FILE_NAME = '/tmp/'.self::TEST_FILE_BASE_NAME;
 	const TEST_LINK_NAME = '/tmp/'.self::TEST_LINK_BASE_NAME;
+	const TEST_LINK_NAME2 = '/tmp/'.self::TEST_LINK_BASE_NAME.'2';
 	const TEST_DIR_NAME = '/tmp/dir';
 	const TEST_DIR1_NAME = 'dir1';
 	const TEST_DIR_DIR1_NAME = self::TEST_DIR_NAME.'/'.self::TEST_DIR1_NAME;
@@ -269,7 +270,7 @@ class testAgentItems extends CIntegrationTest {
 				]
 		],
 		[
-			'key' => 'vfs.file.get['.self::TEST_LINK_NAME.']',
+			'key' => 'vfs.file.get['.self::TEST_LINK_NAME2.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
@@ -277,19 +278,19 @@ class testAgentItems extends CIntegrationTest {
 			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
 			'result' => [
 					'type' => 'sym',
-					'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME,
-					'user' => 'stat -c %U '.self::TEST_LINK_NAME,
-					'group' => 'stat -c %G '.self::TEST_LINK_NAME,
-					'uid' => 'stat -c %u '.self::TEST_LINK_NAME,
-					'gid' => 'stat -c %g '.self::TEST_LINK_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME2,
+					'user' => 'stat -c %U '.self::TEST_LINK_NAME2,
+					'group' => 'stat -c %G '.self::TEST_LINK_NAME2,
+					'uid' => 'stat -c %u '.self::TEST_LINK_NAME2,
+					'gid' => 'stat -c %g '.self::TEST_LINK_NAME2,
 					'size' => 14,
 					'time' => [
 						'modify' => '2021-03-29T14:59:09+03:00'
 					],
 					'timestamp' => [
-						'access' => 'stat -c %X '.self::TEST_LINK_NAME,
+						'access' => 'stat -c %X '.self::TEST_LINK_NAME2,
 						'modify' => self::TEST_MOD_TIMESTAMP,
-						'change' => 'stat -c %Z '.self::TEST_LINK_NAME
+						'change' => 'stat -c %Z '.self::TEST_LINK_NAME2
 					]
 				]
 		],
@@ -577,11 +578,15 @@ class testAgentItems extends CIntegrationTest {
 		$this->assertTrue(@file_put_contents(self::TEST_DIR_FILE_NAME, "1st line\n2nd line\n3rd line\n") !== false);
 		$this->assertTrue(@touch(self::TEST_DIR_FILE_NAME, self::TEST_MOD_TIMESTAMP));
 
-		// Write test symlink
+		// Write test symlinks
 		if (!file_exists(self::TEST_LINK_NAME)) {
 			$this->assertTrue(@symlink(self::TEST_FILE_NAME, self::TEST_LINK_NAME));
 		}
 		$this->assertTrue(@exec('touch -h -a -m -t 202103291459.09 '.self::TEST_LINK_NAME) !== false);
+		if (!file_exists(self::TEST_LINK_NAME2)) {
+			$this->assertTrue(@symlink(self::TEST_FILE_NAME, self::TEST_LINK_NAME2));
+		}
+		$this->assertTrue(@exec('touch -h -a -m -t 202103291459.09 '.self::TEST_LINK_NAME2) !== false);
 		if (!file_exists(self::TEST_DIR_LINK_NAME)) {
 			$this->assertTrue(@symlink(self::TEST_DIR_FILE_NAME, self::TEST_DIR_LINK_NAME));
 		}

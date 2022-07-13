@@ -5321,7 +5321,7 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 	if (SUCCEED != vmware_service_get_contents(easyhandle, &version, &fullname, error))
 		goto out;
 
-	if (0 == (service->state & ZBX_VMWARE_STATE_NEW) && 0 == strcmp(service->version, version))
+	if (0 != (service->state & ZBX_VMWARE_STATE_READY) && 0 == strcmp(service->version, version))
 	{
 		ret = SUCCEED;
 		goto out;

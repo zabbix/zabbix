@@ -6,15 +6,15 @@ This guide describes how to integrate your Zabbix 6.0 and higher installation wi
 
 ## Setting up a Slack bot
 
-1\. On the page [Your Apps](https://api.slack.com/apps) press **Create New App** and specify its name and workspace.
+1\. On the page [Your Apps](https://api.slack.com/apps) press **Create an App**, select **From scratch** and specify its name and workspace.
 
 2\. In the **Add features and functionality** section, select **Bots** and press **Review Scopes to Add**.
 
-3\. In the **Scopes** section, find **Scopes**, press **Add an OAuth Scope** and add **chat:write**, **im:write** and **groups:write** scopes.
+3\. In the **Scopes** section, find **Bot Token Scopes**, press **Add an OAuth Scope** and add **chat:write**, **im:write** and **groups:write** scopes.
 
-4\. Press **Install to Workspace** on the top of the page.
+4\. In the **Settings** section on the left side of the page press **Install App** and then **Install to Workspace**.
 
-5\. Now you have bot token, but you only need to use **Bot User OAuth Access Token**.
+5\. Press **Allow** and copy **Bot User OAuth Access Token**, which will be used to set up webhook.
 
 ## Zabbix Webhook configuration
 
@@ -50,4 +50,4 @@ For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.0/
 
 ## Supported Versions
 
-Zabbix 5.4
+Zabbix 6.0

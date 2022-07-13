@@ -1,0 +1,1 @@
+...G...... [ZBX-19001] fixed wmi.getall[] and wmi.get[] to report invalid queries (vso)
