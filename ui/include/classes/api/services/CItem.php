@@ -873,19 +873,42 @@ class CItem extends CItemGeneral {
 		$item_indexes = [];
 		$del_links = [];
 
-		foreach ($items as $i => $item) {
-			if (!array_key_exists('inventory_link', $item) || $item['inventory_link'] == 0
-					|| (array_key_exists('itemid', $item) && $item['inventory_link'] == $db_items[$item['itemid']])) {
-				unset($items[$i]);
-			}
-			else {
-				$item_indexes[$item['hostid']][] = $i;
+		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT];
 
-				if (array_key_exists('itemid', $item)) {
-					if ($db_items[$item['itemid']]['inventory_link'] != 0) {
-						$del_links[$item['hostid']][] = $db_items[$item['itemid']]['inventory_link'];
+		foreach ($items as $i => $item) {
+			$check = false;
+
+			if (in_array($item['value_type'], $value_types)) {
+				if (array_key_exists('inventory_link', $item)) {
+					if (!array_key_exists('itemid', $item)) {
+						if ($item['inventory_link'] != 0) {
+							$check = true;
+							$item_indexes[$item['hostid']][] = $i;
+						}
+					}
+					else {
+						if ($item['inventory_link'] != 0) {
+							if ($item['inventory_link'] != $db_items[$item['itemid']]['inventory_link']) {
+								$check = true;
+								$item_indexes[$item['hostid']][] = $i;
+
+								if ($db_items[$item['itemid']]['inventory_link'] != 0) {
+									$del_links[$item['hostid']][] = $db_items[$item['itemid']]['inventory_link'];
+								}
+							}
+						}
+						elseif ($db_items[$item['itemid']]['inventory_link'] != 0) {
+							$del_links[$item['hostid']][] = $db_items[$item['itemid']]['inventory_link'];
+						}
 					}
 				}
+			}
+			elseif (array_key_exists('itemid', $item) && $db_items[$item['itemid']]['inventory_link'] != 0) {
+				$del_links[$item['hostid']][] = $db_items[$item['itemid']]['inventory_link'];
+			}
+
+			if (!$check) {
+				unset($items[$i]);
 			}
 		}
 
