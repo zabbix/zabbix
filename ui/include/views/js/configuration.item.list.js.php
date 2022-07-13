@@ -64,13 +64,13 @@
 				const dialogue = overlay.$dialogue[0];
 
 					dialogue.addEventListener('dialogue.submit', (e) => {
-					clearMessages();
+						clearMessages();
 
-					addMessage(makeMessageBox('good', [], e.detail.title, true, false));
+						addMessage(makeMessageBox('good', [], e.detail.title, true, false));
 					});
 			});
 			document.querySelector('.js-execute-now').addEventListener('click', () => {
-			this.massCheckNow();
+				this.massCheckNow();
 			});
 		},
 
