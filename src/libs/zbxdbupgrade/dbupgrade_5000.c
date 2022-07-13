@@ -122,10 +122,9 @@ static int	DBpatch_5000005(void)
 
 static int	DBpatch_5000006(void)
 {
-	const ZBX_FIELD	old_field = {"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("group_discovery", &field, &old_field);
+	return DBmodify_field_type("group_discovery", &field, NULL);
 }
 
 #endif
