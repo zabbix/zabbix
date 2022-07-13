@@ -294,18 +294,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 		// Get fields from widget form to compare them with new widget after copying.
 		$widget = $dashboard->getWidget($name)->edit();
-
-		// Get values of original Clock or Item value widget.
-		if (stristr($name, 'Clock') || stristr($name, 'item value')) {
-			foreach ($widget->getLabels()->asText() as $label) {
-				$label = ($label === 'DescriptionSupported macros:{HOST.*}{ITEM.*}{INVENTORY.*}User macros') ? 'Description' : $label;
-				$original_form[] = [$label => $widget->getFieldContainer($label)->getText()];
-			}
-		}
-		else {
-			$fields = $widget->getFields();
-			$original_form = $fields->asValues();
-		}
+		$original_form = $widget->getFields()->asValues();
 
 		// Get tags of original widget.
 		if (stristr($name, 'Problem')) {
