@@ -841,7 +841,6 @@ class testFormGraph extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraph_SimpleCreate($data) {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$this->zbxTestLogin('graphs.php?hostid=40001&context=host&form=Create+graph');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 

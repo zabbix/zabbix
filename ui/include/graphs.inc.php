@@ -532,12 +532,15 @@ function get_next_color($palettetype = 0) {
  * @param resource 	$image
  * @param int		$fontsize
  * @param int 		$angle
- * @param int		$x
- * @param int 		$y
+ * @param int|float $x
+ * @param int|float $y
  * @param int		$color		a numeric color identifier from imagecolorallocate() or imagecolorallocatealpha()
  * @param string	$string
  */
 function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
+	$x = (int) $x;
+	$y = (int) $y;
+
 	if ((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) || ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME) {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 		imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);

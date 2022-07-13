@@ -31,6 +31,7 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/agent/remotecontrol"
@@ -300,7 +301,7 @@ func main() {
 	})
 
 	if argVersion {
-		version.Display()
+		version.Display([]string{fmt.Sprintf("Plugin support version %d.%d\n", comms.MajorVersion, comms.MinorVersion)})
 		os.Exit(0)
 	}
 

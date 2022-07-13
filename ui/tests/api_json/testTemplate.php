@@ -272,7 +272,7 @@ class testTemplate extends CAPITest {
 					['templateid' => $templateids[2]]
 				]
 			]
-		], 'Cannot link template "test-template-double-link-01" to template "test-template-double-link-04" because its parent template "test-template-double-link-01" will be linked twice.');
+		], 'Cannot link template "test-template-double-link-01" to template "test-template-double-link-04", because its parent template "test-template-double-link-01" would be linked twice.');
 	}
 
 	public function testTemplate_CreateTriggerDependency() {

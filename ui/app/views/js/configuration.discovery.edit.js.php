@@ -226,9 +226,9 @@
 	jQuery(function() {
 		addDCheck(<?= json_encode(array_values($data['drule']['dchecks'])) ?>);
 
-		jQuery('input:radio[name="uniqueness_criteria"][value=<?= json_encode($data['drule']['uniqueness_criteria']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="host_source"][value=<?= json_encode($data['drule']['host_source']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="name_source"][value=<?= json_encode($data['drule']['name_source']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="uniqueness_criteria"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['uniqueness_criteria']) ?>)+']').attr('checked', 'checked');
+		jQuery('input:radio[name="host_source"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['host_source']) ?>)+']').attr('checked', 'checked');
+		jQuery('input:radio[name="name_source"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['name_source']) ?>)+']').attr('checked', 'checked');
 
 		jQuery('#clone').click(function() {
 			jQuery('#update')

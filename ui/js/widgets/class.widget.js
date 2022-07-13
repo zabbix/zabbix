@@ -733,7 +733,9 @@ class CWidget extends CBaseComponent {
 			this._content_body.insertAdjacentHTML('beforeend', messages);
 		}
 
-		this._content_body.insertAdjacentHTML('beforeend', body);
+		if (body !== undefined) {
+			this._content_body.insertAdjacentHTML('beforeend', body);
+		}
 
 		if (debug !== undefined) {
 			this._content_body.insertAdjacentHTML('beforeend', debug);

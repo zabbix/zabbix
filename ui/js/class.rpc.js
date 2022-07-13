@@ -91,7 +91,7 @@ RPC.Call.prototype = {
 				request[key] = params.request[key];
 			});
 		}
-		request.data = JSON.stringify(body),
+		request.data = JSON.stringify(body);
 
 		new jQuery.ajax(RPC.rpcurl(), request);
 	},
@@ -132,4 +132,3 @@ RPC.Call.prototype = {
 		return false;
 	}
 };
-

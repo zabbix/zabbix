@@ -203,7 +203,7 @@ abstract class CTriggerGeneral extends CApiService {
 							'triggerid' => $chd_trigger['triggerid'],
 							'templateid' => $tpl_trigger['triggerid']
 						];
-						$db_triggers[] = $chd_trigger;
+						$db_triggers[$chd_trigger['triggerid']] = $chd_trigger;
 						$triggerids[] = $chd_trigger['triggerid'];
 
 						$check_duplicates = ($chd_trigger['description'] !== $new_trigger['description']
@@ -247,11 +247,12 @@ abstract class CTriggerGeneral extends CApiService {
 				];
 			}
 
-			foreach ($db_triggers as $tnum => $db_trigger) {
-				$db_triggers[$tnum]['tags'] = array_key_exists($db_trigger['triggerid'], $trigger_tags)
+			foreach ($db_triggers as &$db_trigger) {
+				$db_trigger['tags'] = array_key_exists($db_trigger['triggerid'], $trigger_tags)
 					? $trigger_tags[$db_trigger['triggerid']]
 					: [];
 			}
+			unset($db_trigger);
 
 			// Add discovery rule IDs.
 			if ($this instanceof CTriggerPrototype) {
@@ -268,9 +269,10 @@ abstract class CTriggerGeneral extends CApiService {
 					$drule_by_triggerid[$row['triggerid']] = $row['parent_itemid'];
 				}
 
-				foreach ($db_triggers as $tnum => $db_trigger) {
-					$db_triggers[$tnum]['discoveryRule']['itemid'] = $drule_by_triggerid[$db_trigger['triggerid']];
+				foreach ($db_triggers as &$db_trigger) {
+					$db_trigger['discoveryRule']['itemid'] = $drule_by_triggerid[$db_trigger['triggerid']];
 				}
+				unset($db_trigger);
 			}
 		}
 
@@ -508,9 +510,9 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Updates the children of the triggers on the given hosts and propagates the inheritance to all child hosts.
-	 * If the given triggers was assigned to a different template or a host, all of the child triggers, that became
-	 * obsolete will be deleted.
+	 * Updates children of triggers on the given hosts and propagates the inheritance to all child hosts.
+	 * All of the child triggers that became obsolete will be deleted if the given triggers were assigned to a different
+	 * template or host.
 	 *
 	 * @param array  $triggers
 	 * @param string $triggers[]['triggerid']
@@ -914,6 +916,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$descriptions = $this->populateHostIds($descriptions);
 		$this->checkAndAddUuid($triggers, $descriptions);
 		$this->checkDuplicates($descriptions);
+		$this->checkDependencies($triggers);
 	}
 
 	/**
@@ -963,8 +966,6 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException if validation failed.
 	 */
 	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
-		$db_triggers = [];
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['description', 'expression']], 'fields' => [
 			'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'description' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'description')],
@@ -1005,7 +1006,6 @@ abstract class CTriggerGeneral extends CApiService {
 				'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
 				'manual_close', 'opdata', 'event_name'
 			],
-			'selectDependencies' => ['triggerid'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -1035,21 +1035,17 @@ abstract class CTriggerGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
 
-		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->get($options),
-			['sources' => ['expression', 'recovery_expression']]
-		);
+		$db_triggers = $this->get($options);
 
-		$db_trigger_tags = $_db_triggers
-			? DB::select('trigger_tag', [
-				'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
-				'filter' => ['triggerid' => array_keys($_db_triggers)],
-				'preservekeys' => true
-			])
-			: [];
+		if (count($db_triggers) != count($triggers)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 
-		$_db_triggers = $this
-			->createRelationMap($db_trigger_tags, 'triggerid', 'triggertagid')
-			->mapMany($_db_triggers, $db_trigger_tags, 'tags');
+		$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers, [
+			'sources' => ['expression', 'recovery_expression']
+		]);
+
+		$this->addAffectedObjects($triggers, $db_triggers);
 
 		$read_only_fields = ['description', 'expression', 'recovery_mode', 'recovery_expression', 'correlation_mode',
 			'correlation_tag', 'manual_close'
@@ -1057,12 +1053,8 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$descriptions = [];
 
-		foreach ($triggers as $key => &$trigger) {
-			if (!array_key_exists($trigger['triggerid'], $_db_triggers)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-
-			$db_trigger = $_db_triggers[$trigger['triggerid']];
+		foreach ($triggers as &$trigger) {
+			$db_trigger = $db_triggers[$trigger['triggerid']];
 			$description = array_key_exists('description', $trigger)
 				? $trigger['description']
 				: $db_trigger['description'];
@@ -1110,14 +1102,309 @@ abstract class CTriggerGeneral extends CApiService {
 					'recovery_expression' => $trigger['recovery_expression']
 				];
 			}
-
-			$db_triggers[$key] = $db_trigger;
 		}
 		unset($trigger);
 
 		if ($descriptions) {
 			$descriptions = $this->populateHostIds($descriptions);
 			$this->checkDuplicates($descriptions);
+		}
+
+		$this->checkDependencies($triggers, $db_triggers);
+		$this->checkDependenciesLinks($triggers, $db_triggers);
+	}
+
+	/**
+	 * @param array $triggers
+	 * @param array $db_triggers
+	 */
+	private function addAffectedObjects(array $triggers, array &$db_triggers): void {
+		if ($this instanceof CTrigger) {
+			self::addAffectedHosts($triggers, $db_triggers);
+		}
+
+		self::addAffectedTags($triggers, $db_triggers);
+		self::addAffectedDependencies($triggers, $db_triggers);
+	}
+
+	/**
+	 * @param array $triggers
+	 * @param array $db_triggers
+	 */
+	protected static function addAffectedHosts(array $triggers, array &$db_triggers): void {
+		$triggerids = [];
+
+		foreach ($triggers as $trigger) {
+			$db_trigger = $db_triggers[$trigger['triggerid']];
+
+			if ((array_key_exists('expression', $trigger) && $trigger['expression'] !== $db_trigger['expression'])
+					|| (array_key_exists('recovery_expression', $trigger)
+						&& $trigger['recovery_expression'] !== $db_trigger['recovery_expression'])) {
+				$triggerids[] = $trigger['triggerid'];
+				$db_triggers[$trigger['triggerid']]['hosts'] = [];
+			}
+		}
+
+		if (!$triggerids) {
+			return;
+		}
+
+		$result = DBselect(
+			'SELECT DISTINCT f.triggerid,i.hostid'.
+			' FROM functions f,items i'.
+			' WHERE f.itemid=i.itemid'.
+				' AND '.dbConditionId('f.triggerid', $triggerids)
+		);
+
+		while ($row = DBfetch($result)) {
+			$db_triggers[$row['triggerid']]['hosts'][$row['hostid']] = true;
+		}
+	}
+
+	/**
+	 * @param array $triggers
+	 * @param array $db_triggers
+	 */
+	private static function addAffectedTags(array $triggers, array &$db_triggers): void {
+		$triggerids = [];
+
+		foreach ($triggers as $trigger) {
+			if (array_key_exists('tags', $trigger)) {
+				$triggerids[] = $trigger['triggerid'];
+				$db_triggers[$trigger['triggerid']]['tags'] = [];
+			}
+		}
+
+		if (!$triggerids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
+			'filter' => ['triggerid' => $triggerids]
+		];
+		$db_tags = DBselect(DB::makeSql('trigger_tag', $options));
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$db_triggers[$db_tag['triggerid']]['tags'][$db_tag['triggertagid']] =
+				array_diff_key($db_tag, array_flip(['triggerid']));
+		}
+	}
+
+	/**
+	 * @param array $triggers
+	 * @param array $db_triggers
+	 */
+	protected static function addAffectedDependencies(array $triggers, array &$db_triggers): void {
+		$triggerids = [];
+
+		foreach ($triggers as $trigger) {
+			$db_trigger = $db_triggers[$trigger['triggerid']];
+
+			if (array_key_exists('dependencies', $trigger) || array_key_exists('hosts', $db_trigger)) {
+				$triggerids[] = $trigger['triggerid'];
+				$db_triggers[$trigger['triggerid']]['dependencies'] = [];
+			}
+		}
+
+		if (!$triggerids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['triggerdepid', 'triggerid_down', 'triggerid_up'],
+			'filter' => ['triggerid_down' => $triggerids]
+		];
+		$db_deps = DBselect(DB::makeSql('trigger_depends', $options));
+
+		while ($db_dep = DBfetch($db_deps)) {
+			$db_triggers[$db_dep['triggerid_down']]['dependencies'][$db_dep['triggerdepid']] = [
+				'triggerdepid' => $db_dep['triggerdepid'],
+				'triggerid' => $db_dep['triggerid_up']
+			];
+		}
+	}
+
+	/**
+	 * Check trigger dependencies of the given triggers.
+	 *
+	 * @param array      $triggers
+	 * @param array|null $db_triggers
+	 *
+	 * @throws APIException
+	 */
+	private function checkDependencies(array $triggers, array $db_triggers = null): void {
+		$edit_triggerids_up = [];
+
+		foreach ($triggers as $trigger) {
+			if (!array_key_exists('dependencies', $trigger)) {
+				continue;
+			}
+
+			$triggerids_up = array_column($trigger['dependencies'], 'triggerid');
+
+			if ($db_triggers === null) {
+				$edit_triggerids_up += array_flip($triggerids_up);
+			}
+			else {
+				$db_triggerids_up = array_column($db_triggers[$trigger['triggerid']]['dependencies'], 'triggerid');
+
+				$ins_triggerids_up = array_flip(array_diff($triggerids_up, $db_triggerids_up));
+				$del_triggerids_up = array_flip(array_diff($db_triggerids_up, $triggerids_up));
+
+				$edit_triggerids_up += $ins_triggerids_up + $del_triggerids_up;
+			}
+		}
+
+		if (!$edit_triggerids_up) {
+			return;
+		}
+
+		$count = API::Trigger()->get([
+			'countOutput' => true,
+			'triggerids' => array_keys($edit_triggerids_up)
+		]);
+
+		if ($this instanceof CTriggerPrototype) {
+			$trigger_prototypes_up = API::TriggerPrototype()->get([
+				'output' => [],
+				'triggerids' => array_keys($edit_triggerids_up),
+				'preservekeys' => true
+			]);
+
+			$count += count($trigger_prototypes_up);
+		}
+
+		if ($count != count($edit_triggerids_up)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		if ($this instanceof CTriggerPrototype) {
+			$ins_dependencies = [];
+			$triggerids = [];
+
+			foreach ($triggers as $trigger) {
+				if (!array_key_exists('dependencies', $triggers)) {
+					continue;
+				}
+
+				$db_triggers_up = ($db_triggers !== null)
+					? array_column($db_triggers[$trigger['triggerid']]['dependencies'], null, 'triggerid')
+					: [];
+
+				foreach ($trigger['dependencies'] as $trigger_up) {
+					if (!array_key_exists($trigger_up['triggerid'], $db_triggers_up)
+							&& array_key_exists($trigger_up['triggerid'], $trigger_prototypes_up)) {
+						$ins_dependencies[$trigger_up['triggerid']][$trigger['triggerid']] = true;
+						$triggerids[$trigger['triggerid']] = true;
+					}
+				}
+			}
+
+			if (!$ins_dependencies) {
+				return;
+			}
+
+			$result = DBselect(
+				'SELECT DISTINCT f.triggerid,id.parent_itemid'.
+				' FROM functions f,item_discovery id'.
+				' WHERE f.itemid=id.itemid'.
+					' AND '.dbConditionId('f.triggerid', array_keys($ins_dependencies + $triggerids))
+			);
+
+			$lld_rules = [];
+
+			while ($row = DBfetch($result)) {
+				$lld_rules[$row['triggerid']] = $row['parent_itemid'];
+			}
+
+			foreach ($ins_dependencies as $triggerid_up => $triggerids) {
+				foreach ($triggerids as $triggerid) {
+					if (bccomp($lld_rules[$triggerid_up], $lld_rules[$triggerid]) != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because dependencies on trigger prototypes from another LLD rule are not allowed.')
+						);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check linkage of dependencies.
+	 *
+	 * @param array      $triggers
+	 * @param array|null $db_triggers
+	 */
+	protected function checkDependenciesLinks(array $triggers, array $db_triggers = null): void {
+		$ins_dependencies = [];
+		$del_dependencies = [];
+
+		foreach ($triggers as $trigger) {
+			if (!array_key_exists('dependencies', $trigger)) {
+				continue;
+			}
+
+			$db_triggers_up = ($db_triggers !== null)
+				? array_column($db_triggers[$trigger['triggerid']]['dependencies'], null, 'triggerid')
+				: [];
+
+			foreach ($trigger['dependencies'] as $trigger_up) {
+				if (array_key_exists($trigger_up['triggerid'], $db_triggers_up)) {
+					unset($db_triggers_up[$trigger_up['triggerid']]);
+				}
+				else {
+					$ins_dependencies[$trigger_up['triggerid']][$trigger['triggerid']] = true;
+				}
+			}
+
+			foreach ($db_triggers_up as $db_trigger_up) {
+				$del_dependencies[$db_trigger_up['triggerid']][$trigger['triggerid']] = true;
+			}
+		}
+
+		if ($ins_dependencies) {
+			if ($this instanceof CTriggerPrototype) {
+				$options = [
+					'output' => ['triggerid', 'flags'],
+					'triggerids' => array_keys($ins_dependencies)
+				];
+				$result = DBselect(DB::makeSql('triggers', $options));
+
+				$ins_dependencies_prototypes = [];
+
+				while ($row = DBfetch($result)) {
+					if ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+
+						/*
+						 * Trigger cannot depend on trigger prototypes, so it's enough to check circular dependencies
+						 * only among the trigger prototypes.
+						 */
+						$ins_dependencies_prototypes[$row['triggerid']] = $ins_dependencies[$row['triggerid']];
+
+						/*
+						 * Since the trigger prototypes can depend only on trigger prototypes from the same LLD rule,
+						 * for such dependencies it is not necessary to check the dependencies of host and template
+						 * triggers. Only dependencies on triggers are required to be checked.
+						 */
+						unset($ins_dependencies[$row['triggerid']]);
+					}
+				}
+			}
+
+			if ($db_triggers !== null) {
+				if ($this instanceof CTriggerPrototype && $ins_dependencies_prototypes) {
+					self::checkCircularDependencies($ins_dependencies_prototypes, $del_dependencies);
+				}
+				else {
+					self::checkCircularDependencies($ins_dependencies, $del_dependencies);
+				}
+			}
+
+			$trigger_hosts = self::getTriggerHosts($ins_dependencies);
+
+			self::checkDependenciesOfHostTriggers($ins_dependencies, $trigger_hosts);
+			self::checkDependenciesOfTemplateTriggers($ins_dependencies, $trigger_hosts);
 		}
 	}
 
@@ -1248,7 +1535,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$this->implode_expressions($triggers, $db_triggers, $triggers_functions, $inherited);
 
 		foreach ($triggers as $tnum => $trigger) {
-			$db_trigger = $db_triggers[$tnum];
+			$db_trigger = $db_triggers[$trigger['triggerid']];
 			$upd_trigger = ['values' => [], 'where' => ['triggerid' => $trigger['triggerid']]];
 
 			if (array_key_exists($tnum, $triggers_functions)) {
@@ -1361,7 +1648,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 		if (!$inherited) {
 			$resource = ($this instanceof CTrigger) ? CAudit::RESOURCE_TRIGGER : CAudit::RESOURCE_TRIGGER_PROTOTYPE;
-			$this->addAuditBulk(CAudit::ACTION_UPDATE, $resource, $save_triggers, zbx_toHash($db_triggers, 'triggerid'));
+			$this->addAuditBulk(CAudit::ACTION_UPDATE, $resource, $save_triggers, $db_triggers);
 		}
 	}
 
@@ -1379,9 +1666,9 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param int        $triggers[<tnum>]['recovery_mode']          [IN]
 	 * @param string     $triggers[<tnum>]['recovery_expression']    [IN/OUT]
 	 * @param array|null $db_triggers                                [IN]
-	 * @param string     $db_triggers[<tnum>]['triggerid']           [IN]
-	 * @param string     $db_triggers[<tnum>]['expression']          [IN]
-	 * @param string     $db_triggers[<tnum>]['recovery_expression'] [IN]
+	 * @param string     $db_triggers[<triggerid>]['triggerid']           [IN]
+	 * @param string     $db_triggers[<triggerid>]['expression']          [IN]
+	 * @param string     $db_triggers[<triggerid>]['recovery_expression'] [IN]
 	 * @param array      $triggers_functions                         [OUT] array of the new functions which must be
 	 *                                                                     inserted into DB
 	 * @param string     $triggers_functions[<tnum>][]['functionid'] [OUT]
@@ -1438,10 +1725,10 @@ abstract class CTriggerGeneral extends CApiService {
 		$hosts_keys = [];
 		$functions_num = 0;
 
-		foreach ($triggers as $tnum => $trigger) {
+		foreach ($triggers as $trigger) {
 			$expressions_changed = ($db_triggers === null
-				|| ($trigger['expression'] !== $db_triggers[$tnum]['expression']
-				|| $trigger['recovery_expression'] !== $db_triggers[$tnum]['recovery_expression']));
+				|| ($trigger['expression'] !== $db_triggers[$trigger['triggerid']]['expression']
+				|| $trigger['recovery_expression'] !== $db_triggers[$trigger['triggerid']]['recovery_expression']));
 
 			if (!$expressions_changed) {
 				continue;
@@ -1577,8 +1864,8 @@ abstract class CTriggerGeneral extends CApiService {
 
 		foreach ($triggers as $tnum => &$trigger) {
 			$expressions_changed = ($db_triggers === null
-				|| ($trigger['expression'] !== $db_triggers[$tnum]['expression']
-				|| $trigger['recovery_expression'] !== $db_triggers[$tnum]['recovery_expression']));
+				|| ($trigger['expression'] !== $db_triggers[$trigger['triggerid']]['expression']
+				|| $trigger['recovery_expression'] !== $db_triggers[$trigger['triggerid']]['recovery_expression']));
 
 			if (!$expressions_changed) {
 				continue;
@@ -1672,12 +1959,12 @@ abstract class CTriggerGeneral extends CApiService {
 
 			// Triggers with children cannot be moved from one template to another host or template.
 			if ($class === 'CTrigger' && $db_triggers !== null && $expressions_changed) {
-				$expression_parser->parse($db_triggers[$tnum]['expression']);
+				$expression_parser->parse($db_triggers[$trigger['triggerid']]['expression']);
 				$old_hosts1 = $expression_parser->getResult()->getHosts();
 				$old_hosts2 = [];
 
 				if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-					$expression_parser->parse($db_triggers[$tnum]['recovery_expression']);
+					$expression_parser->parse($db_triggers[$trigger['triggerid']]['recovery_expression']);
 					$old_hosts2 = $expression_parser->getResult()->getHosts();
 				}
 
@@ -1690,7 +1977,7 @@ abstract class CTriggerGeneral extends CApiService {
 				}
 
 				if ($is_moved) {
-					$moved_triggers[$db_triggers[$tnum]['triggerid']] = ['description' => $trigger['description']];
+					$moved_triggers[$trigger['triggerid']] = ['description' => $trigger['description']];
 				}
 			}
 
@@ -1717,7 +2004,7 @@ abstract class CTriggerGeneral extends CApiService {
 					));
 				}
 				elseif ($db_triggers !== null
-						&& !idcmp($lld_ruleids[0], $db_triggers[$tnum]['discoveryRule']['itemid'])) {
+						&& !idcmp($lld_ruleids[0], $db_triggers[$trigger['triggerid']]['discoveryRule']['itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update trigger prototype "%1$s": %2$s.',
 						$trigger['description'], _('trigger prototype cannot be moved to another template or host')
 					));
@@ -1742,8 +2029,8 @@ abstract class CTriggerGeneral extends CApiService {
 		// Replace func(/host/item) macros with {<functionid>}.
 		foreach ($triggers as $tnum => &$trigger) {
 			$expressions_changed = ($db_triggers === null
-				|| ($trigger['expression'] !== $db_triggers[$tnum]['expression']
-				|| $trigger['recovery_expression'] !== $db_triggers[$tnum]['recovery_expression']));
+				|| ($trigger['expression'] !== $db_triggers[$trigger['triggerid']]['expression']
+				|| $trigger['recovery_expression'] !== $db_triggers[$trigger['triggerid']]['recovery_expression']));
 
 			if (!$expressions_changed) {
 				continue;
@@ -1920,5 +2207,1040 @@ abstract class CTriggerGeneral extends CApiService {
 		);
 
 		$this->inherit($triggers, $data['hostids']);
+	}
+
+	/**
+	 * Checks if the given dependencies already exist.
+	 *
+	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkDependencyDuplicates(array $trigger_dependencies) {
+		$all_triggerids = [];
+
+		foreach ($trigger_dependencies as $triggerids) {
+			$all_triggerids += $triggerids;
+		}
+
+		$options = [
+			'output' => ['triggerid_down', 'triggerid_up'],
+			'filter' => [
+				'triggerid_down' => array_keys($all_triggerids),
+				'triggerid_up' => array_keys($trigger_dependencies)
+			]
+		];
+		$result = DBselect(DB::makeSql('trigger_depends', $options));
+
+		while ($row = DBfetch($result)) {
+			if (array_key_exists($row['triggerid_up'], $trigger_dependencies)
+					&& in_array($row['triggerid_down'], $trigger_dependencies[$row['triggerid_up']])) {
+				$duplicates = DB::select('triggers', [
+					'output' => ['description', 'flags'],
+					'triggerids' => [$row['triggerid_down'], $row['triggerid_up']],
+					'preservekeys' => true
+				]);
+
+				if ($duplicates[$row['triggerid_down']]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+					$error = _('The dependency of trigger "%1$s" on trigger "%2$s" already exists.');
+				}
+				else {
+					$error = ($duplicates[$row['triggerid_up']]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+						? _('The dependency of trigger prototype "%1$s" on trigger "%2$s" already exists.')
+						: _('The dependency of trigger prototype "%1$s" on trigger prototype "%2$s" already exists.');
+				}
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error,
+					$duplicates[$row['triggerid_down']]['description'],
+					$duplicates[$row['triggerid_up']]['description']
+				));
+			}
+		}
+	}
+
+	/**
+	 * Check whether circular linkage occurs as a result of the given changes in trigger dependencies.
+	 *
+	 * @param array $ins_dependencies[<triggerid_up>][<triggerid>]
+	 * @param array $del_dependencies[<triggerid_up>][<triggerid>]
+	 * @param bool  $inherited  Whether the check gets performed during inherit.
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkCircularDependencies(array $ins_dependencies, array $del_dependencies = [],
+			bool $inherited = false): void {
+		$links = [];
+		$_triggerids_down = $ins_dependencies;
+
+		do {
+			$options = [
+				'output' => ['triggerid_up', 'triggerid_down'],
+				'filter' => [
+					'triggerid_down' => array_keys($_triggerids_down)
+				]
+			];
+			$result = DBselect(DB::makeSql('trigger_depends', $options));
+
+			$_triggerids_down = [];
+
+			while ($row = DBfetch($result)) {
+				if (array_key_exists($row['triggerid_up'], $del_dependencies)
+						&& array_key_exists($row['triggerid_down'], $del_dependencies[$row['triggerid_up']])) {
+					continue;
+				}
+
+				if (!array_key_exists($row['triggerid_up'], $links)) {
+					$_triggerids_down[$row['triggerid_up']] = true;
+				}
+
+				$links[$row['triggerid_up']][$row['triggerid_down']] = true;
+			}
+		} while ($_triggerids_down);
+
+		foreach ($ins_dependencies as $triggerid_up => $triggerids) {
+			if (array_key_exists($triggerid_up, $links)) {
+				$links[$triggerid_up] += $triggerids;
+			}
+			else {
+				$links[$triggerid_up] = $triggerids;
+			}
+		}
+
+		foreach ($ins_dependencies as $triggerid_up => $triggerids) {
+			foreach ($triggerids as $triggerid => $foo) {
+				if (array_key_exists($triggerid, $links)) {
+					$links_path = [$triggerid => true];
+
+					if (self::circularLinkageExists($links, $triggerid_up, $links[$triggerid], $links_path)) {
+						$trigger_up_name = '';
+
+						$triggers = DB::select('triggers', [
+							'output' => ['description', 'flags'],
+							'triggerids' => array_keys($links_path + [$triggerid_up => true]),
+							'preservekeys' => true
+						]);
+
+						foreach ($triggers as $_triggerid => $trigger) {
+							$description = '"'.$trigger['description'].'"';
+
+							if (bccomp($_triggerid, $triggerid_up) == 0) {
+								$trigger_up_name = $description;
+							}
+							else {
+								$links_path[$_triggerid] = $description;
+							}
+						}
+
+						$circular_linkage = (bccomp($triggerid_up, $triggerid) == 0)
+							? $trigger_up_name.' -> '.$trigger_up_name
+							: $trigger_up_name.' -> '.implode(' -> ', $links_path).' -> '.$trigger_up_name;
+
+						if ($inherited) {
+							$host = DBfetch(DBselect(
+								'SELECT DISTINCT h.host,h.status'.
+								' FROM functions f,items i,hosts h'.
+								' WHERE f.itemid=i.itemid'.
+									' AND i.hostid=h.hostid'.
+									' AND '.dbConditionId('f.triggerid', [$triggerid_up])
+							));
+
+							if ($host['status'] == HOST_STATUS_TEMPLATE) {
+								$error = ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+									? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because a circular linkage (%3$s) would occur for template "%4$s".')
+									: _('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because a circular linkage (%3$s) would occur for template "%4$s".');
+							}
+							else {
+								$error = ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+									? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because a circular linkage (%3$s) would occur for host "%4$s".')
+									: _('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because a circular linkage (%3$s) would occur for host "%4$s".');
+							}
+
+							self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error,
+								$triggers[$triggerid]['description'], $triggers[$triggerid_up]['description'],
+								$circular_linkage, $host['host']
+							));
+						}
+						else {
+							$error = ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+								? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because a circular linkage (%3$s) would occur.')
+								: _('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because a circular linkage (%3$s) would occur.');
+
+							self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error,
+								$triggers[$triggerid]['description'], $triggers[$triggerid_up]['description'],
+								$circular_linkage
+							));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Recursively check whether the trigger, which a dependency is being set on, produces a circular linkage.
+	 *
+	 * @param array  $links[<triggerid_up>][<triggerid>]
+	 * @param string $triggerid_up
+	 * @param array  $triggerids[<triggerid>]
+	 * @param array  $links_path                          Circular linkage path, collected performing the check.
+	 *
+	 * @return bool
+	 */
+	private static function circularLinkageExists(array $links, string $triggerid_up, array $triggerids,
+			array &$links_path): bool {
+		if (array_key_exists($triggerid_up, $triggerids)) {
+			return true;
+		}
+
+		$_links_path = $links_path;
+
+		foreach ($triggerids as $triggerid => $foo) {
+			if (array_key_exists($triggerid, $links)) {
+				$links_path = $_links_path;
+				$triggerid_links = array_diff_key($links[$triggerid], $links_path);
+
+				if ($triggerid_links) {
+					$links_path[$triggerid] = true;
+
+					if (self::circularLinkageExists($links, $triggerid_up, $triggerid_links, $links_path)) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get hosts data of all triggers given in trigger dependencies array.
+	 *
+	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
+	 *
+	 * @return array
+	 */
+	public static function getTriggerHosts(array $trigger_dependencies): array {
+		$all_triggerids = $trigger_dependencies;
+
+		foreach ($trigger_dependencies as $triggerids) {
+			$all_triggerids += $triggerids;
+		}
+
+		$result = DBselect(
+			'SELECT DISTINCT f.triggerid,h.hostid,h.status'.
+			' FROM functions f,items i,hosts h'.
+			' WHERE f.itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
+				' AND '.dbConditionId('f.triggerid', array_keys($all_triggerids))
+		);
+
+		$trigger_hosts = [];
+
+		while ($row = DBfetch($result)) {
+			// Each trigger can have either only templateids or only hostids.
+			if ($row['status'] == HOST_STATUS_TEMPLATE) {
+				$trigger_hosts[$row['triggerid']]['templateids'][$row['hostid']] = true;
+			}
+			else {
+				$trigger_hosts[$row['triggerid']]['hostids'][$row['hostid']] = true;
+			}
+		}
+
+		return $trigger_hosts;
+	}
+
+	/**
+	 * Check whether the trigger dependencies are correctly set for host triggers.
+	 *
+	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
+	 * @param array $trigger_hosts
+	 *
+	 * @throws APIException
+	 */
+	public static function checkDependenciesOfHostTriggers(array $trigger_dependencies, array $trigger_hosts): void {
+		foreach ($trigger_dependencies as $triggerid_up => $triggerids) {
+			if (array_key_exists('templateids', $trigger_hosts[$triggerid_up])) {
+				foreach ($triggerids as $triggerid => $foo) {
+					if (array_key_exists('hostids', $trigger_hosts[$triggerid])) {
+						$triggers = DB::select('triggers', [
+							'output' => ['description', 'flags'],
+							'triggerids' => [$triggerid, $triggerid_up],
+							'preservekeys' => true
+						]);
+
+						$error = ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+							? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because dependencies of host triggers on template triggers are not allowed.')
+							: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s", because dependencies of host triggers on template triggers are not allowed.');
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
+							$triggers[$triggerid_up]['description']
+						));
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check whether the trigger dependencies are correctly set for template triggers.
+	 *
+	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
+	 * @param array $trigger_hosts
+	 *
+	 * @throws APIException
+	 */
+	public static function checkDependenciesOfTemplateTriggers(array $trigger_dependencies,
+			array $trigger_hosts): void {
+		/*
+		 * From the given trigger dependencies we should keep only the dependencies of the template triggers. There is
+		 * also no need to check the dependencies on triggers from the same template, because that is considered a
+		 * valid case. Thus, among the triggers that the template triggers depends on, we should only keep triggers from
+		 * other templates and hosts.
+		 */
+		foreach ($trigger_dependencies as $triggerid_up => $triggerids) {
+			$templateids_up = array_key_exists('templateids', $trigger_hosts[$triggerid_up])
+				? $trigger_hosts[$triggerid_up]['templateids']
+				: [];
+
+			foreach ($triggerids as $triggerid => $foo) {
+				/*
+				 * If trigger-up and dependent trigger have at least one common template, even if they also have
+				 * other templates, it is important to understand that at the moment of the trigger dependency
+				 * validation all of those different templates are already linked to all child templates,
+				 * so there is no need to check them again.
+				 */
+				if (!array_key_exists('templateids', $trigger_hosts[$triggerid])
+						|| array_intersect_key($templateids_up, $trigger_hosts[$triggerid]['templateids'])) {
+					unset($trigger_dependencies[$triggerid_up][$triggerid]);
+				}
+			}
+
+			if (!$trigger_dependencies[$triggerid_up]) {
+				unset($trigger_dependencies[$triggerid_up]);
+			}
+		}
+
+		if (!$trigger_dependencies) {
+			return;
+		}
+
+		self::checkTriggersUpNotFromParentTemplates($trigger_dependencies, $trigger_hosts);
+		self::checkTriggersUpNotFromChildTemplatesOrHosts($trigger_dependencies, $trigger_hosts);
+		self::checkTriggersUpTemplatesAreLinkedToChildTemplates($trigger_dependencies, $trigger_hosts);
+	}
+
+	/**
+	 * Check that the triggers-up of the given trigger dependencies do not come from parent templates of dependent
+	 * triggers.
+	 *
+	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
+	 * @param array $trigger_hosts
+	 *
+	 * @throws APIException
+	 */
+	private static function checkTriggersUpNotFromParentTemplates(array $trigger_dependencies, array $trigger_hosts): void {
+		$templateids = [];
+		$template_triggers_up = [];
+		$dependency_templates = [];
+
+		foreach ($trigger_dependencies as $triggerid_up => $triggerids) {
+			if (!array_key_exists('templateids', $trigger_hosts[$triggerid_up])) {
+				continue;
+			}
+
+			$templateids_up = [];
+
+			foreach ($trigger_hosts[$triggerid_up]['templateids'] as $templateid => $foo) {
+				$template_triggers_up[$templateid][] = $triggerid_up;
+				$templateids_up[$templateid] = true;
+			}
+
+			foreach ($triggerids as $triggerid => $foo) {
+				foreach ($trigger_hosts[$triggerid]['templateids'] as $templateid => $foo) {
+					if (!array_key_exists($templateid, $dependency_templates)) {
+						$dependency_templates[$templateid] = [];
+					}
+
+					$dependency_templates[$templateid] += $templateids_up;
+				}
+
+				$templateids += $trigger_hosts[$triggerid]['templateids'];
+			}
+		}
+
+		$_templateids = $templateids;
+		$template_links = [];
+
+		do {
+			$options = [
+				'output' => ['hostid', 'templateid'],
+				'filter' => ['hostid' => array_keys($_templateids)]
+			];
+			$result = DBselect(DB::makeSql('hosts_templates', $options));
+
+			$_templateids = [];
+
+			while ($row = DBfetch($result)) {
+				$template_links[$row['hostid']][$row['templateid']] = true;
+
+				if (!array_key_exists($row['templateid'], $template_links)) {
+					$_templateids[$row['templateid']] = true;
+				}
+			}
+		} while ($_templateids);
+
+		if (!$template_links) {
+			return;
+		}
+
+		// Check if the trigger-up is a trigger from the parent template of the dependent trigger.
+		foreach ($dependency_templates as $templateid => $templateids_up) {
+			if (array_key_exists($templateid, $template_links)) {
+				foreach ($templateids_up as $templateid_up => $foo) {
+					if (self::checkTemplateUpExistsInTemplateLinks($template_links, $templateid, $templateid_up)) {
+						foreach ($template_triggers_up[$templateid_up] as $triggerid_up) {
+							foreach ($trigger_dependencies[$triggerid_up] as $triggerid => $foo) {
+								if (array_key_exists($templateid, $trigger_hosts[$triggerid]['templateids'])) {
+									break 2;
+								}
+							}
+						}
+
+						$triggers = DB::select('triggers', [
+							'output' => ['description', 'flags'],
+							'triggerids' => [$triggerid, $triggerid_up],
+							'preservekeys' => true
+						]);
+
+						$templates = DB::select('hosts', [
+							'output' => ['host'],
+							'hostids' => $templateid_up
+						]);
+
+						$error = ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+							? _('Trigger "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s", because dependencies on triggers from the parent template are not allowed.')
+							: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s", because dependencies on triggers from the parent template are not allowed.');
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
+							$triggers[$triggerid_up]['description'], $templates[0]['host']
+						));
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check that the triggers-up of the given trigger dependencies are not from the child templates or hosts of the
+	 * dependent triggers.
+	 *
+	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
+	 * @param array $trigger_hosts
+	 *
+	 * @throws APIException
+	 */
+	private static function checkTriggersUpNotFromChildTemplatesOrHosts(array $trigger_dependencies,
+			array $trigger_hosts): void {
+		$templateids = [];
+		$template_triggers_up = [];
+		$dependency_templates = [];
+
+		foreach ($trigger_dependencies as $triggerid_up => $triggerids) {
+			$templateids_up = [];
+
+			if (array_key_exists('templateids', $trigger_hosts[$triggerid_up])) {
+				foreach ($trigger_hosts[$triggerid_up]['templateids'] as $templateid => $foo) {
+					$template_triggers_up[$templateid][] = $triggerid_up;
+					$templateids_up[$templateid] = true;
+				}
+			}
+			else {
+				foreach ($trigger_hosts[$triggerid_up]['hostids'] as $hostid => $foo) {
+					$template_triggers_up[$hostid][] = $triggerid_up;
+					$templateids_up[$hostid] = true;
+				}
+			}
+
+			foreach ($triggerids as $triggerid => $foo) {
+				foreach ($trigger_hosts[$triggerid]['templateids'] as $templateid => $foo) {
+					if (!array_key_exists($templateid, $dependency_templates)) {
+						$dependency_templates[$templateid] = [];
+					}
+
+					$dependency_templates[$templateid] += $templateids_up;
+				}
+
+				$templateids += $trigger_hosts[$triggerid]['templateids'];
+			}
+		}
+
+		$template_links = [];
+
+		do {
+			$options = [
+				'output' => ['hostid', 'templateid'],
+				'filter' => ['templateid' => array_keys($templateids)]
+			];
+			$result = DBselect(DB::makeSql('hosts_templates', $options));
+
+			$templateids = [];
+
+			while ($row = DBfetch($result)) {
+				$template_links[$row['templateid']][$row['hostid']] = true;
+
+				if (!array_key_exists($row['hostid'], $template_links)) {
+					$templateids[$row['hostid']] = true;
+				}
+			}
+		} while ($templateids);
+
+		if (!$template_links) {
+			return;
+		}
+
+		// Check if each trigger-up is a trigger from the child template or host of the dependent trigger.
+		foreach ($dependency_templates as $templateid => $templateids_up) {
+			if (array_key_exists($templateid, $template_links)) {
+				foreach ($templateids_up as $templateid_up => $foo) {
+					if (self::checkTemplateUpExistsInTemplateLinks($template_links, $templateid, $templateid_up)) {
+						foreach ($template_triggers_up[$templateid_up] as $triggerid_up) {
+							foreach ($trigger_dependencies[$triggerid_up] as $triggerid => $foo) {
+								if (array_key_exists($templateid, $trigger_hosts[$triggerid]['templateids'])) {
+									break 2;
+								}
+							}
+						}
+
+						$triggers = DB::select('triggers', [
+							'output' => ['description', 'flags'],
+							'triggerids' => [$triggerid, $triggerid_up],
+							'preservekeys' => true
+						]);
+
+						$templates = DB::select('hosts', [
+							'output' => ['host', 'status'],
+							'hostids' => $templateid_up
+						]);
+
+						if ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+							$error = ($templates[0]['status'] == HOST_STATUS_TEMPLATE)
+								? _('Trigger "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s", because dependencies on triggers from a child template or host are not allowed.')
+								: _('Trigger "%1$s" cannot depend on the trigger "%2$s" from the host "%3$s", because dependencies on triggers from a child template or host are not allowed.');
+						}
+						else {
+							$error = ($templates[0]['status'] == HOST_STATUS_TEMPLATE)
+								? _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s", because dependencies on triggers from a child template or host are not allowed.')
+								: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" from the host "%3$s", because dependencies on triggers from a child template or host are not allowed.');
+						}
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
+							$triggers[$triggerid_up]['description'], $templates[0]['host']
+						));
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Recursively check if the given template-up exists in the chain of the given template links.
+	 *
+	 * @param array  $template_links[<templateid>][<templateid_up>]
+	 * @param string $templateid
+	 * @param string $templateid_up
+	 *
+	 * @return bool
+	 */
+	private static function checkTemplateUpExistsInTemplateLinks(array $template_links, string $templateid,
+			string $templateid_up): bool {
+		if (array_key_exists($templateid_up, $template_links[$templateid])) {
+			return true;
+		}
+
+		foreach ($template_links[$templateid] as $_templateid => $foo) {
+			if (array_key_exists($_templateid, $template_links)
+					&& self::checkTemplateUpExistsInTemplateLinks($template_links, $_templateid, $templateid_up)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if the triggers-up templates of the given trigger dependencies are linked to child templates of the
+	 * dependent triggers.
+	 *
+	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
+	 * @param array $trigger_hosts
+	 *
+	 * @throws APIException
+	 */
+	private static function checkTriggersUpTemplatesAreLinkedToChildTemplates(array $trigger_dependencies,
+			array $trigger_hosts): void {
+		$templateids_up = [];
+		$templateids = [];
+
+		foreach ($trigger_dependencies as $triggerid_up => $triggerids) {
+			if (!array_key_exists('templateids', $trigger_hosts[$triggerid_up])) {
+				unset($trigger_dependencies[$triggerid_up]);
+				continue;
+			}
+
+			$templateids_up += $trigger_hosts[$triggerid_up]['templateids'];
+
+			foreach ($triggerids as $triggerid => $foo) {
+				$templateids += $trigger_hosts[$triggerid]['templateids'];
+			}
+		}
+
+		$options = [
+			'output' => ['templateid', 'hostid'],
+			'filter' => [
+				'templateid' => array_keys($templateids)
+			]
+		];
+		$result = DBselect(DB::makeSql('hosts_templates', $options));
+
+		$template_links = [];
+
+		while ($row = DBfetch($result)) {
+			$template_links[$row['templateid']][$row['hostid']] = [];
+		}
+
+		$result = DBselect(
+			'SELECT ht.templateid,ht.hostid,htt.templateid AS host_templateid'.
+			' FROM hosts_templates ht,hosts_templates htt'.
+			' WHERE ht.hostid=htt.hostid'.
+				' AND ht.templateid!=htt.templateid'.
+				' AND '.dbConditionId('ht.templateid', array_keys($templateids)).
+				' AND '.dbConditionId('htt.templateid', array_keys($templateids_up))
+		);
+
+		while ($row = DBfetch($result)) {
+			$template_links[$row['templateid']][$row['hostid']][$row['host_templateid']] = true;
+		}
+
+		foreach ($trigger_dependencies as $triggerid_up => $triggerids) {
+			/*
+			 * If trigger belongs to more than one template, then it is not possible to link only part of them to
+			 * another host or template. That means each template ID of that trigger would have the same hosts
+			 * in template links. And vice versa, if at least one of the trigger templates was not found in template
+			 * links, then the trigger is not inherited further.
+			 */
+			$templateid_up = key($trigger_hosts[$triggerid_up]['templateids']);
+
+			foreach ($triggerids as $triggerid => $foo) {
+				$templateid = key($trigger_hosts[$triggerid]['templateids']);
+
+				if (!array_key_exists($templateid, $template_links)) {
+					continue;
+				}
+
+				foreach ($template_links[$templateid] as $hostid => $host_templateids) {
+					if (!array_key_exists($templateid_up, $host_templateids)) {
+						$triggers = DB::select('triggers', [
+							'output' => ['description', 'flags'],
+							'triggerids' => [$triggerid, $triggerid_up],
+							'preservekeys' => true
+						]);
+
+						$hosts = DB::select('hosts', [
+							'output' => ['host', 'status'],
+							'hostids' => [$templateid_up, $hostid],
+							'preservekeys' => true
+						]);
+
+						if ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+							$error = ($hosts[$hostid]['status'] == HOST_STATUS_TEMPLATE)
+								? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because the template "%3$s" is not linked to the template "%4$s".')
+								: _('Trigger "%1$s" cannot depend on the trigger "%2$s", because the template "%3$s" is not linked to the host "%4$s".');
+						}
+						else {
+							$error = ($hosts[$hostid]['status'] == HOST_STATUS_TEMPLATE)
+								? _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s", because the template "%3$s" is not linked to the template "%4$s".')
+								: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s", because the template "%3$s" is not linked to the host "%4$s".');
+						}
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
+							$triggers[$triggerid_up]['description'], $hosts[$templateid_up]['host'],
+							$hosts[$hostid]['host']
+						));
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Update the trigger dependencies.
+	 *
+	 * @param array      $triggers
+	 * @param array|null $db_triggers
+	 */
+	public static function updateDependencies(array &$triggers, array $db_triggers = null): void {
+		$ins_trigger_deps = [];
+		$del_triggerdepids = [];
+		$edit_dependencies = [];
+
+		foreach ($triggers as &$trigger) {
+			if (!array_key_exists('dependencies', $trigger)) {
+				continue;
+			}
+
+			$db_triggers_up = ($db_triggers !== null)
+				? array_column($db_triggers[$trigger['triggerid']]['dependencies'], null, 'triggerid')
+				: [];
+
+			foreach ($trigger['dependencies'] as &$trigger_up) {
+				if (array_key_exists($trigger_up['triggerid'], $db_triggers_up)) {
+					$trigger_up['triggerdepid'] = $db_triggers_up[$trigger_up['triggerid']]['triggerdepid'];
+					unset($db_triggers_up[$trigger_up['triggerid']]);
+				}
+				else {
+					$ins_trigger_deps[] = [
+						'triggerid_down' => $trigger['triggerid'],
+						'triggerid_up' => $trigger_up['triggerid']
+					];
+
+					$edit_dependencies[$trigger['triggerid']][$trigger_up['triggerid']] = true;
+				}
+			}
+			unset($trigger_up);
+
+			foreach ($db_triggers_up as $db_trigger_up) {
+				$del_triggerdepids[] = $db_trigger_up['triggerdepid'];
+
+				$edit_dependencies[$trigger['triggerid']][$db_trigger_up['triggerid']] = false;
+			}
+		}
+		unset($trigger);
+
+		if ($del_triggerdepids) {
+			DB::delete('trigger_depends', ['triggerdepid' => $del_triggerdepids]);
+		}
+
+		if ($ins_trigger_deps) {
+			$triggerdepids = DB::insertBatch('trigger_depends', $ins_trigger_deps);
+		}
+
+		foreach ($triggers as &$trigger) {
+			if (!array_key_exists('dependencies', $trigger)) {
+				continue;
+			}
+
+			foreach ($trigger['dependencies'] as &$trigger_up) {
+				if (!array_key_exists('triggerdepid', $trigger_up)) {
+					$trigger_up['triggerdepid'] = array_shift($triggerdepids);
+				}
+			}
+			unset($trigger_up);
+		}
+		unset($trigger);
+
+		if ($edit_dependencies) {
+			$edit_dependencies = self::getTemplatedDependencies($edit_dependencies);
+
+			if ($edit_dependencies) {
+				self::inheritDependencies($edit_dependencies);
+			}
+		}
+	}
+
+	/**
+	 * Filter for dependencies whose dependent triggers belong to templates that are further linked
+	 * to some templates or hosts.
+	 *
+	 * @param array $edit_dependencies[<triggerid>][<triggerid_up>]
+	 *
+	 * @return array
+	 */
+	protected static function getTemplatedDependencies(array $edit_dependencies): array {
+		$triggerids = DBfetchColumn(DBselect(
+			'SELECT DISTINCT f.triggerid'.
+			' FROM functions f,items i,hosts h'.
+			' WHERE f.itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
+				' AND '.dbConditionId('f.triggerid', array_keys($edit_dependencies)).
+				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE]).
+				' AND EXISTS('.
+					'SELECT NULL'.
+					' FROM hosts_templates ht'.
+					' WHERE ht.templateid=i.hostid'.
+				')'
+		), 'triggerid');
+
+		return array_intersect_key($edit_dependencies, array_flip($triggerids));
+	}
+
+	/**
+	 * Inherit the given trigger dependencies.
+	 *
+	 * @param array $edit_dependencies[<triggerid>][<triggerid_up>]
+	 * @param array $hostids
+	 */
+	protected static function inheritDependencies(array $edit_dependencies, array $hostids = null): void {
+		$all_triggerids = $edit_dependencies;
+		$all_triggerids_up = [];
+
+		foreach ($edit_dependencies as $triggerids_up) {
+			$all_triggerids += $triggerids_up;
+			$all_triggerids_up += $triggerids_up;
+		}
+
+		$hostids_condition = ($hostids !== null) ? ' AND '.dbConditionId('i.hostid', $hostids) : '';
+
+		$result = DBselect(
+			'SELECT DISTINCT t.templateid,t.triggerid,t.flags,i.hostid'.
+			' FROM triggers t,functions f,items i'.
+			' WHERE t.triggerid=f.triggerid'.
+				' AND f.itemid=i.itemid'.
+				' AND '.dbConditionId('t.templateid', array_keys($all_triggerids)).
+				$hostids_condition
+		);
+
+		$trigger_flags = [];
+		$trigger_links = [];
+		$tpl_triggerids_up = [];
+
+		while ($row = DBfetch($result)) {
+			$trigger_links[$row['templateid']][$row['hostid']] = $row['triggerid'];
+			$trigger_flags[$row['triggerid']] = $row['flags'];
+
+			if (array_key_exists($row['templateid'], $all_triggerids_up)) {
+				$tpl_triggerids_up[$row['templateid']] = true;
+			}
+		}
+
+		$del_triggerdepids = [];
+		$_edit_dependencies = [];
+
+		if ($tpl_triggerids_up) {
+			if ($hostids === null) {
+				$result = DBselect(
+					'SELECT DISTINCT t.triggerid,td.triggerid_up,td.triggerdepid,i.hostid'.
+					' FROM triggers t,trigger_depends td,triggers tt,functions f,items i'.
+					' WHERE t.triggerid=td.triggerid_down'.
+						' AND td.triggerid_up=tt.triggerid'.
+						' AND tt.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND '.dbConditionId('t.templateid', array_keys($edit_dependencies)).
+						' AND '.dbConditionId('tt.templateid', array_keys($tpl_triggerids_up))
+				);
+			}
+			else {
+				$result = DBselect(
+					'SELECT DISTINCT t.triggerid,td.triggerid_up,td.triggerdepid,ii.hostid'.
+					' FROM triggers t,functions f,items i,trigger_depends td,triggers tt,functions ff,items ii'.
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND t.triggerid=td.triggerid_down'.
+						' AND td.triggerid_up=tt.triggerid'.
+						' AND tt.triggerid=ff.triggerid'.
+						' AND ff.itemid=ii.itemid'.
+						' AND '.dbConditionId('t.templateid', array_keys($edit_dependencies)).
+						' AND '.dbConditionId('i.hostid', $hostids).
+						' AND '.dbConditionId('tt.templateid', array_keys($tpl_triggerids_up))
+				);
+			}
+
+			$tpl_child_dependencies = [];
+
+			while ($row = DBfetch($result)) {
+				$tpl_child_dependencies[$row['triggerid']][$row['triggerid_up']][$row['hostid']] = $row['triggerdepid'];
+			}
+
+			foreach ($edit_dependencies as $triggerid => $triggerids_up) {
+				$triggerids_up = array_intersect_key($triggerids_up, $tpl_triggerids_up);
+
+				if (!$triggerids_up) {
+					continue;
+				}
+
+				foreach ($trigger_links[$triggerid] as $hostid => $child_triggerid) {
+					$upd_child_triggerids_up = [];
+
+					if (array_key_exists($child_triggerid, $tpl_child_dependencies)) {
+						foreach ($tpl_child_dependencies[$child_triggerid] as $child_triggerid_up => $hostids_up) {
+							$hostid_up = key($hostids_up);
+							$triggerdepid = reset($hostids_up);
+
+							if (in_array($child_triggerid_up, $upd_child_triggerids_up)
+									|| in_array($triggerdepid, $del_triggerdepids)) {
+								continue;
+							}
+
+							foreach ($triggerids_up as $triggerid_up => $add) {
+								if (array_key_exists($hostid_up, $trigger_links[$triggerid_up])
+										&& bccomp($child_triggerid_up, $trigger_links[$triggerid_up][$hostid_up]) == 0) {
+									if ($add) {
+										$upd_child_triggerids_up[] = $child_triggerid_up;
+									}
+									else {
+										$del_triggerdepids[] = $hostids_up[$hostid_up];
+
+										$_edit_dependencies[$child_triggerid][$child_triggerid_up] = false;
+									}
+								}
+							}
+						}
+					}
+
+					foreach ($triggerids_up as $triggerid_up => $add) {
+						if ($add) {
+							$child_triggerid_up = $trigger_links[$triggerid_up][$hostid];
+
+							if (!in_array($child_triggerid_up, $upd_child_triggerids_up)) {
+								$_edit_dependencies[$child_triggerid][$child_triggerid_up] = true;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		$host_triggerids_up = array_diff_key($all_triggerids_up, $tpl_triggerids_up);
+
+		if ($host_triggerids_up) {
+			if ($hostids === null) {
+				$result = DBselect(
+					'SELECT DISTINCT t.triggerid,td.triggerid_up,td.triggerdepid'.
+					' FROM triggers t,trigger_depends td'.
+					' WHERE t.triggerid=td.triggerid_down'.
+						' AND '.dbConditionId('t.templateid', array_keys($edit_dependencies)).
+						' AND '.dbConditionId('td.triggerid_up', array_keys($host_triggerids_up))
+				);
+			}
+			else {
+				$result = DBselect(
+					'SELECT DISTINCT t.triggerid,td.triggerid_up,td.triggerdepid'.
+					' FROM triggers t,functions f,items i,trigger_depends td'.
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND t.triggerid=td.triggerid_down'.
+						' AND '.dbConditionId('t.templateid', array_keys($edit_dependencies)).
+						' AND '.dbConditionId('i.hostid', $hostids).
+						' AND '.dbConditionId('td.triggerid_up', array_keys($host_triggerids_up))
+				);
+			}
+
+			$host_child_dependencies = [];
+
+			while ($row = DBfetch($result)) {
+				$host_child_dependencies[$row['triggerid']][$row['triggerid_up']] = $row['triggerdepid'];
+			}
+
+			foreach ($edit_dependencies as $triggerid => $triggerids_up) {
+				$triggerids_up = array_intersect_key($triggerids_up, $host_triggerids_up);
+
+				if (!$triggerids_up) {
+					continue;
+				}
+
+				foreach ($trigger_links[$triggerid] as $hostid => $child_triggerid) {
+					$upd_child_triggerids_up = [];
+
+					if (array_key_exists($child_triggerid, $host_child_dependencies)) {
+						foreach ($host_child_dependencies[$child_triggerid] as $child_triggerid_up => $triggerdepid) {
+							if (array_key_exists($child_triggerid_up, $triggerids_up)) {
+								$add = $triggerids_up[$child_triggerid_up];
+
+								if ($add) {
+									$upd_child_triggerids_up[] = $child_triggerid_up;
+								}
+								else {
+									$del_triggerdepids[] = $triggerdepid;
+
+									$_edit_dependencies[$child_triggerid][$child_triggerid_up] = false;
+								}
+							}
+						}
+					}
+
+					foreach ($triggerids_up as $triggerid_up => $add) {
+						if ($add && !in_array($triggerid_up, $upd_child_triggerids_up)) {
+							$_edit_dependencies[$child_triggerid][$triggerid_up] = true;
+						}
+					}
+				}
+			}
+		}
+
+		$ins_dependencies = [];
+		$del_dependencies = [];
+		$ins_trigger_deps = [];
+
+		foreach ($_edit_dependencies as $triggerid => $triggerids_up) {
+			foreach ($triggerids_up as $triggerid_up => $add) {
+				if ($add) {
+					if ($trigger_flags[$triggerid] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						if ($trigger_flags[$triggerid_up] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+							$ins_dependencies[$triggerid_up][$triggerid] = true;
+						}
+					}
+					else {
+						$ins_dependencies[$triggerid_up][$triggerid] = true;
+					}
+
+					$ins_trigger_deps[] = [
+						'triggerid_down' => $triggerid,
+						'triggerid_up' => $triggerid_up
+					];
+				}
+				else {
+					$del_dependencies[$triggerid_up][$triggerid] = true;
+				}
+			}
+		}
+
+		if ($ins_dependencies) {
+			self::checkCircularDependencies($ins_dependencies, $del_dependencies, true);
+		}
+
+		if ($del_triggerdepids) {
+			DB::delete('trigger_depends', ['triggerdepid' => $del_triggerdepids]);
+		}
+
+		if ($ins_trigger_deps) {
+			DB::insertBatch('trigger_depends', $ins_trigger_deps);
+		}
+
+		if ($_edit_dependencies) {
+			$_edit_dependencies = self::getTemplatedDependencies($_edit_dependencies);
+
+			if ($_edit_dependencies) {
+				self::inheritDependencies($_edit_dependencies);
+			}
+		}
+	}
+
+	/**
+	 * Inherit the trigger dependencies of the given templates to the given hosts.
+	 *
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	public static function syncTemplateDependencies(array $templateids, array $hostids): void {
+		$result = DBselect(
+			'SELECT DISTINCT f.triggerid,td.triggerid_up'.
+			' FROM items i,functions f,trigger_depends td'.
+			' WHERE i.itemid=f.itemid'.
+				' AND f.triggerid=td.triggerid_down'.
+				' AND '.dbConditionId('i.hostid', $templateids)
+		);
+
+		$edit_dependencies = [];
+
+		while ($row = DBfetch($result)) {
+			$edit_dependencies[$row['triggerid']][$row['triggerid_up']] = true;
+		}
+
+		if ($edit_dependencies) {
+			$edit_dependencies = self::getTemplatedDependencies($edit_dependencies);
+
+			if ($edit_dependencies) {
+				self::inheritDependencies($edit_dependencies, $hostids);
+			}
+		}
 	}
 }

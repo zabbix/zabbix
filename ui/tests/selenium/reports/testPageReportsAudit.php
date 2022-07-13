@@ -141,12 +141,17 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=auditlog.list')->waitUntilReady();
 		$this->page->assertTitle('Audit log');
 		$this->page->assertHeader('Audit log');
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+
+		if (!($form->getField('Users')->isVisible())) {
+			$this->query('id:ui-id-2')->waitUntilClickable()->one()->click();
+		}
 
 		if (self::$action_list === null) {
 			self::$action_list = $this->query('id:filter-actions')->one()->asCheckboxList();
 		}
 
-		return $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		return $form;
 	}
 
 	public function testPageReportsAudit_CheckLayout() {
@@ -166,7 +171,8 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 		foreach (['Apply', 'Reset'] as $button) {
 			$this->assertTrue($this->query("xpath://div[@class=\"filter-forms\"]//button[text()=".
-					CXPathHelper::escapeQuotes($button)."]")->one()->isClickable());
+					CXPathHelper::escapeQuotes($button)."]")->one()->isClickable()
+			);
 		}
 	}
 
@@ -178,11 +184,6 @@ class testPageReportsAudit extends CLegacyWebTest {
 	 */
 	public function testPageReportsAudit_Filter($action, $resourcetype) {
 		$form = $this->getFormAndActionList();
-
-		if (!($form->getField('Users')->isVisible())) {
-			$this->query('id:ui-id-2')->waitUntilClickable()->one()->click();
-		}
-
 		$form->getField('Users')->asMultiselect()->clear();
 		$form->getField('Resource')->asDropdown()->select($this->resourcetypes[$resourcetype]);
 

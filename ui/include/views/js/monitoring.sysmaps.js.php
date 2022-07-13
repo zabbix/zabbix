@@ -127,7 +127,7 @@ function createFontSelect(string $name): CSelect {
 							->setId('areaSizeHeight')
 					], 'areaSizeRow')
 					->addRow(_('Placing algorithm'),
-						(new CRadioButtonList(null, SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID))
+						(new CRadioButtonList('viewtype', SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID))
 							->addValue(_('Grid'), SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID)
 							->setModern(true),
 						'areaPlacingRow'

@@ -312,8 +312,12 @@ class CElementQuery implements IWaitable {
 	 *
 	 * @return WebDriverWait
 	 */
-	public static function wait() {
-		return static::getDriver()->wait(20, self::WAIT_ITERATION);
+	public static function wait($timeout = 20, $iteration = null) {
+		if ($iteration === null) {
+			$iteration = self::WAIT_ITERATION;
+		}
+
+		return static::getDriver()->wait($timeout, self::WAIT_ITERATION);
 	}
 
 	/**

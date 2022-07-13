@@ -29,13 +29,6 @@ if (typeof addPopupValues === 'undefined') {
 	window.addPopupValues = null;
 }
 
-if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
-	function zbx_widget_navtree_trigger(action, grid) {
-		var $navtree = jQuery('.navtree', grid['widget']['content_body']);
-
-		$navtree.zbx_navtree(action);
-	}
-}
 (function($) {
 	$.widget('zbx.sortable_tree', $.extend({}, $.ui.sortable.prototype, {
 		options: {
@@ -66,8 +59,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 
 		_mouseDrag: function(event) {
 			var o = this.options,
-				prev_offset_top,
-				scrolled;
+				prev_offset_top;
 
 			// Compute the helpers position.
 			this.position = this._generatePosition(event);
@@ -79,38 +71,37 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 
 			// Do scrolling.
 			if (this.options.scroll) {
-				scrolled = false;
 				if (this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
 
 					if ((this.overflowOffset.top + this.scrollParent[0].offsetHeight)
 							- event.pageY < o.scrollSensitivity) {
-						this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
+						this.scrollParent[0].scrollTop = this.scrollParent[0].scrollTop + o.scrollSpeed;
 					}
 					else if (event.pageY - this.overflowOffset.top < o.scrollSensitivity) {
-						this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop - o.scrollSpeed;
+						this.scrollParent[0].scrollTop = this.scrollParent[0].scrollTop - o.scrollSpeed;
 					}
 
 					if ((this.overflowOffset.left + this.scrollParent[0].offsetWidth)
 							- event.pageX < o.scrollSensitivity) {
-						this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft + o.scrollSpeed;
+						this.scrollParent[0].scrollLeft = this.scrollParent[0].scrollLeft + o.scrollSpeed;
 					}
 					else if (event.pageX - this.overflowOffset.left < o.scrollSensitivity) {
-						this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
+						this.scrollParent[0].scrollLeft = this.scrollParent[0].scrollLeft - o.scrollSpeed;
 					}
 				}
 				else {
 					if (event.pageY - $(document).scrollTop() < o.scrollSensitivity) {
-						scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
+						$(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
 					}
 					else if ($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity) {
-						scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
+						$(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
 					}
 
 					if (event.pageX - $(document).scrollLeft() < o.scrollSensitivity) {
-						scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
+						$(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
 					}
 					else if ($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity) {
-						scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
+						$(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
 					}
 
 				}

@@ -86,22 +86,24 @@ class CPieGraphDraw extends CGraphDraw {
 		$count *= $this->exploderad;
 		$anglemid = (int) (($anglestart + $angleend) / 2);
 
-		$y+= round($count * sin(deg2rad($anglemid)));
-		$x+= round($count * cos(deg2rad($anglemid)));
+		$y += round($count * sin(deg2rad($anglemid)));
+		$x += round($count * cos(deg2rad($anglemid)));
 
-		return [$x, $y];
+		return [(int) $x, (int) $y];
 	}
 
 	protected function calcExplodedRadius($sizeX, $sizeY, $count) {
 		$count *= $this->exploderad * 2;
 		$sizeX -= $count;
 		$sizeY -= $count;
-		return [$sizeX, $sizeY];
+
+		return [(int) $sizeX, (int) $sizeY];
 	}
 
 	protected function calc3DAngle($sizeX, $sizeY) {
 		$sizeY *= GRAPH_3D_ANGLE / 90;
-		return [$sizeX, round($sizeY)];
+
+		return [$sizeX, (int) round($sizeY)];
 	}
 
 	protected function selectData() {
@@ -432,8 +434,8 @@ class CPieGraphDraw extends CGraphDraw {
 			list($sizeX, $sizeY) = $this->calcExplodedRadius($sizeX, $sizeY, count($values));
 		}
 
-		$xc = $x = (int) $this->sizeX / 2 + $this->shiftXleft;
-		$yc = $y = (int) $this->sizeY / 2 + $this->shiftY;
+		$xc = $x = (int) ($this->sizeX / 2) + $this->shiftXleft;
+		$yc = $y = (int) ($this->sizeY / 2) + $this->shiftY;
 
 		$anglestart = 0;
 		$angleend = 0;
@@ -513,8 +515,8 @@ class CPieGraphDraw extends CGraphDraw {
 
 		list($sizeX, $sizeY) = $this->calc3DAngle($sizeX, $sizeY);
 
-		$xc = $x = (int) $this->sizeX / 2 + $this->shiftXleft;
-		$yc = $y = (int) $this->sizeY / 2 + $this->shiftY;
+		$xc = $x = (int) ($this->sizeX / 2) + $this->shiftXleft;
+		$yc = $y = (int) ($this->sizeY / 2) + $this->shiftY;
 
 		// bottom angle line
 		$anglestart = 0;
@@ -701,12 +703,8 @@ class CPieGraphDraw extends CGraphDraw {
 		$this->exploderad = (int) $this->sizeX / 100;
 		$this->exploderad3d = (int) $this->sizeX / 60;
 
-		if (function_exists('ImageColorExactAlpha') && function_exists('ImageCreateTrueColor') && @imagecreatetruecolor(1, 1)) {
-			$this->im = imagecreatetruecolor($this->fullSizeX, $this->fullSizeY);
-		}
-		else {
-			$this->im = imagecreate($this->fullSizeX, $this->fullSizeY);
-		}
+		$this->im = imagecreatetruecolor($this->fullSizeX, $this->fullSizeY);
+
 		$this->initColors();
 		$this->drawRectangle();
 		$this->drawHeader();

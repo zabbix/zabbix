@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-10-16T09:33:49Z'
+  date: '2022-06-07T04:55:32Z'
   media_types:
     -
       name: 'MS Teams'
@@ -144,7 +144,7 @@ zabbix_export:
                 facts = [],
                 body = {
                     themeColor: SEVERITY_COLORS[params.event_nseverity].replace('#', ''),
-                    summary: 'Zabbix',
+                    summary: params.alert_subject,
                     sections: [
                         {
                             markdown: 'false',

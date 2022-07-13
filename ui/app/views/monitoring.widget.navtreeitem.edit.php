@@ -39,24 +39,9 @@ $form_list = (new CFormList())
 	)
 	->addRow(_('Linked map'), [
 		new CVar('sysmapid', $data['sysmap']['sysmapid']),
-		(new CTextBox('sysmapname', $data['sysmap']['name'], true))
-			->setAttribute('onChange',
-				'javascript: if(jQuery("#'.$form->getName().' input[type=text]:first").val() === ""){'.
-					'jQuery("#widget-dialogue-form input[type=text]:first").val(this.value);}')
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+		(new CTextBox('sysmapname', $data['sysmap']['name'], true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('select', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick(
-				'return PopUp("popup.generic", '.json_encode([
-					'srctbl' => 'sysmaps',
-					'srcfld1' => 'sysmapid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'sysmapid',
-					'dstfld2' => 'sysmapname'
-				]).', {dialogue_class: "modal-popup-generic"});'
-			)
+		(new CButton('select', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
 	]);
 
 if ($data['depth'] >= WIDGET_NAVIGATION_TREE_MAX_DEPTH) {
@@ -69,10 +54,13 @@ else {
 	]);
 }
 
-$form->addItem($form_list);
+$form
+	->addItem($form_list)
+	->addItem((new CScriptTag('navtreeitem_edit_popup.init();'))->setOnDocumentReady());
 
 $output = [
-	'body' => $form->toString()
+	'body' => $form->toString(),
+	'script_inline' => $this->readJsFile('monitoring.widget.navtreeitem.edit.js.php')
 ];
 
 if (($messages = getMessages()) !== null) {

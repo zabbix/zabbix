@@ -46,7 +46,6 @@ class testFormFilter extends CWebTest {
 	 * @param array $data  given data provider
 	 */
 	public function checkFilters($data, $table_selector) {
-		$this->page->waitUntilReady();
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
 
 		switch ($data['expected']) {
@@ -59,7 +58,7 @@ class testFormFilter extends CWebTest {
 
 				// Checking that data exists after saving filter.
 				if (array_key_exists('filter_form', $data)) {
-					$form = $this->query('id:tabfilter_'.$data['tab_id'])->asForm()->one();
+					$form = $this->query('id:tabfilter_'.$data['tab_id'])->asForm()->waitUntilVisible()->one();
 					$form->checkValue($data['filter_form']);
 				}
 
@@ -225,7 +224,7 @@ class testFormFilter extends CWebTest {
 	 * @param string $user        test user with saved filters
 	 * @param string $password    password for user with saved filters
 	 */
-	public function createFilter($data, $user, $password) {
+	public function createFilter($data, $user, $password, $table_selector = 'class:list-table') {
 		$this->page->userLogin($user, $password);
 		$this->page->open($this->url)->waitUntilReady();
 
@@ -233,20 +232,24 @@ class testFormFilter extends CWebTest {
 		$xpath = 'xpath://li[@data-target="tabfilter_0"]';
 		if ($this->query($xpath)->one()->getAttribute('class') === 'tabfilter-item-label') {
 			$this->query($xpath.'/a')->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
 		}
-
-		$this->page->waitUntilReady();
 
 		if (array_key_exists('filter_form', $data)) {
 			$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
 			$home_form->fill($data['filter_form']);
 		}
+		$result_table = $this->query($table_selector)->one();
 
 		$this->query('button:Save as')->one()->click();
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->fill($data['filter']);
 		$dialog->submit();
-		$this->page->waitUntilReady();
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+			COverlayDialogElement::ensureNotPresent();
+			$result_table->waitUntilReloaded();
+			$this->page->waitUntilReady();
+		}
 	}
 
 	/**
@@ -283,7 +286,7 @@ class testFormFilter extends CWebTest {
 	 * @param string $filter_name	filter name, that need to be checked in properties, droplist and tab list
 	 */
 	public function checkName($filter_name) {
-		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
+		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->waitUntilVisible()->one();
 
 		// Checking that name of filter displayed on the tab.
 		$this->assertEquals($filter_name, $filter_container->getSelectedTabName());

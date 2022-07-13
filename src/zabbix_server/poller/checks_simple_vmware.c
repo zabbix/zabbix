@@ -2545,12 +2545,6 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		datastore = service->data->datastores.values[i];
 	}
 
-	if (NULL == datastore->uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
-		goto unlock;
-	}
-
 	if (FAIL == zbx_vmware_service_get_counterid(service, perfcounter, &counterid, &unit))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
