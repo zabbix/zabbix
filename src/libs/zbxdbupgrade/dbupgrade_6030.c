@@ -36,6 +36,23 @@ static int	DBpatch_6030000(void)
 	return DBmodify_field_type("group_discovery", &field, NULL);
 }
 
+static int	DBpatch_6030001(void)
+{
+	if (ZBX_DB_OK > DBexecute(
+			"update group_discovery gd"
+			" set name=("
+				"select gp.name"
+				" from group_prototype gp"
+				" where gd.parent_group_prototypeid=gp.group_prototypeid and"
+				" " ZBX_DB_CHAR_LENGTH(gd.name) "=64"
+			" )"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -43,5 +60,6 @@ DBPATCH_START(6030)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(6030000, 0, 1)
+DBPATCH_ADD(6030001, 0, 1)
 
 DBPATCH_END()
