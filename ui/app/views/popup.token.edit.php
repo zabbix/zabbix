@@ -99,13 +99,12 @@ $token_from_grid->addItem([
 		)
 	])
 	->addItem([
-		(new CLabel(_('Expires at')))->setAsteriskMark(),
+		(new CLabel(_('Expires at'), 'expires_at'))->setAsteriskMark(),
 		new CFormField(
 			(new CDateSelector('expires_at', $data['expires_at']))
 				->setDateFormat(DATE_TIME_FORMAT_SECONDS)
 				->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 				->setAriaRequired()
-				->setId('expires-at-row')
 		)
 	])
 	->addItem([

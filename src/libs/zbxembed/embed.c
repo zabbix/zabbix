@@ -121,6 +121,127 @@ static void	es_free(void *udata, void *ptr)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: decodes 3-byte utf-8 sequence                                     *
+ *                                                                            *
+ * Parameters: ptr - [IN] pointer to the 3 byte sequence                      *
+ *             out - [OUT] the decoded value                                  *
+ *                                                                            *
+ * Return value: SUCCEED                                                      *
+ *               FAIL                                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	utf8_decode_3byte_sequence(const char *ptr, zbx_uint32_t *out)
+{
+	*out = ((unsigned char)*ptr++ & 0xFu) << 12;
+	if (0x80 != (*ptr & 0xC0))
+		return FAIL;
+
+	*out |= ((unsigned char)*ptr++ & 0x3Fu) << 6;
+	if (0x80 != (*ptr & 0xC0))
+		return FAIL;
+
+	*out |= ((unsigned char)*ptr & 0x3Fu);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decodes duktape string into utf-8                                 *
+ *                                                                            *
+ * Parameters: duk_str - [IN] pointer to the first char of NULL terminated    *
+ *                       Duktape string                                       *
+ *             out_str - [OUT] on success, pointer to pointer to the first    *
+ *                       char of allocated NULL terminated UTF8 string        *
+ *                                                                            *
+ * Return value: SUCCEED                                                      *
+ *               FAIL                                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	es_duktape_string_decode(const char *duk_str, char **out_str)
+{
+	const char	*in, *end;
+	char		*out;
+	size_t		len;
+
+	len = strlen(duk_str);
+	out = *out_str = zbx_malloc(*out_str, len + 1);
+	end = duk_str + len;
+
+	for (in = duk_str; in < end;)
+	{
+		if (0x7f >= (unsigned char)*in)
+		{
+			*out++ = *in++;
+			continue;
+		}
+
+		if (0xdf >= (unsigned char)*in)
+		{
+			if (2 > end - in)
+				goto fail;
+
+			*out++ = *in++;
+			*out++ = *in++;
+			continue;
+		}
+
+		if (0xef >= (unsigned char)*in)
+		{
+			zbx_uint32_t	c1, c2, u;
+
+			if (3 > end - in || FAIL == utf8_decode_3byte_sequence(in, &c1))
+				goto fail;
+
+			if (0xd800 > c1 || 0xdbff < c1)
+			{
+				/* normal 3-byte sequence */
+				*out++ = *in++;
+				*out++ = *in++;
+				*out++ = *in++;
+				continue;
+			}
+
+			/* decode unicode supplementary character represented as surrogate pair */
+			in += 3;
+			if (3 > end - in || FAIL == utf8_decode_3byte_sequence(in, &c2) || 0xdc00 > c2 || 0xdfff < c2)
+				goto fail;
+
+			u = 0x10000 + ((((zbx_uint32_t)c1 & 0x3ff) << 10) | (c2 & 0x3ff));
+			*out++ = (char)(0xf0 |  u >> 18);
+			*out++ = (char)(0x80 | (u >> 12 & 0x3f));
+			*out++ = (char)(0x80 | (u >> 6 & 0x3f));
+			*out++ = (char)(0x80 | (u & 0x3f));
+			in += 3;
+			continue;
+		}
+
+		/* duktape can use the four-byte UTF-8 style supplementary character sequence */
+		if (0xf0 >= (unsigned char)*in)
+		{
+			if (4 > end - in)
+				goto fail;
+
+			*out++ = *in++;
+			*out++ = *in++;
+			*out++ = *in++;
+			*out++ = *in++;
+			continue;
+		}
+
+		goto fail;
+	}
+	*out = '\0';
+
+	return SUCCEED;
+fail:
+	zbx_free(*out_str);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: timeout checking callback                                         *
  *                                                                            *
  ******************************************************************************/
@@ -415,8 +536,8 @@ out:
  *           bytecode parameters.                                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **script_ret,
-	char **error)
+int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param,
+	char **script_ret, char **error)
 {
 	void		*buffer;
 	volatile int	ret = FAIL;
@@ -492,8 +613,11 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 			{
 				char	*output = NULL;
 
-				if (SUCCEED != (ret = zbx_cesu8_to_utf8(duk_safe_to_string(es->env->ctx, -1), &output)))
+				if (SUCCEED != (ret = es_duktape_string_decode(
+						duk_safe_to_string(es->env->ctx, -1), &output)))
+				{
 					*error = zbx_strdup(*error, "could not convert return value to utf8");
+				}
 				else
 					zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, output);
 

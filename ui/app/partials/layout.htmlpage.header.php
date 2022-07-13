@@ -24,7 +24,7 @@
  * @var array    $data
  */
 
-global $DB, $ZBX_SERVER, $ZBX_SERVER_NAME, $ZBX_SERVER_PORT;
+global $DB, $ZBX_SERVER_NAME;
 
 $theme = ZBX_DEFAULT_THEME;
 $scripts = $data['javascript']['files'];

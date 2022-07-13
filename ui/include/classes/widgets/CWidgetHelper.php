@@ -138,15 +138,15 @@ class CWidgetHelper {
 	 * @return CLabel
 	 */
 	public static function getLabel($field, $class = null, $hint = null) {
-		if ($field instanceof CWidgetFieldSelect) {
-			return (new CLabel($field->getLabel(), 'label-'.$field->getName()))
-				->setAsteriskMark(self::isAriaRequired($field))
-				->addClass($class);
-		}
-
 		$help_icon = ($hint !== null)
 			? makeHelpIcon($hint)
 			: null;
+
+		if ($field instanceof CWidgetFieldSelect) {
+			return (new CLabel([$field->getLabel(), $help_icon], 'label-'.$field->getName()))
+				->setAsteriskMark(self::isAriaRequired($field))
+				->addClass($class);
+		}
 
 		return (new CLabel([$field->getLabel(), $help_icon], $field->getName()))
 			->setAsteriskMark(self::isAriaRequired($field))
@@ -600,7 +600,7 @@ class CWidgetHelper {
 		];
 		$table = (new CTable())
 			->setId('list_'.$field->getName())
-			->setHeader((new CRowHeader($header))->addClass($columns ? null : ZBX_STYLE_DISPLAY_NONE));
+			->setHeader($header);
 		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
 
 		foreach ($columns as $column_index => $column) {
@@ -1233,8 +1233,7 @@ class CWidgetHelper {
 						->addClass(ZBX_STYLE_NOWRAP)
 				]))
 					->addClass(ZBX_STYLE_SORTABLE)
-					->addClass('single-item-table-row')
-					->setAttribute('data-number', $i + 1);
+					->addClass('single-item-table-row');
 			}
 
 			$empty_msg_block = (new CDiv(_('No item selected.')))->addClass('no-items-message');

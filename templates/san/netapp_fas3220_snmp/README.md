@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 The template to monitor SAN NetApp FAS3220 cluster by Zabbix SNMP agent.
 
 
@@ -14,7 +14,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 1\. Create a host for FAS3220 with cluster management IP as SNMPv2 interface.
 
@@ -37,7 +37,7 @@ No specific Zabbix configuration is required.
 |{$FAS3220.FS.NAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.*` |
 |{$FAS3220.FS.NAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`snapshot` |
 |{$FAS3220.FS.PUSED.MAX.CRIT} |<p>Maximum percentage of disk used. Can be used with {#FSNAME} as context.</p> |`90` |
-|{$FAS3220.FS.TIME} |<p>The time during which disk usage may exceed the threshold. Can be used with {#FSNAME} as context.</p> |`10G` |
+|{$FAS3220.FS.TIME} |<p>The time during which disk usage may exceed the threshold. Can be used with {#FSNAME} as context.</p> |`10m` |
 |{$FAS3220.FS.TYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p><p>Value should be integer:</p><p>  2 - flexibleVolume,</p><p>  3 - aggregate,</p><p>  4 - stripedAggregate,</p><p>  5 - stripedVolume.</p> |`.*` |
 |{$FAS3220.FS.TYPE.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p><p>Value should be integer:</p><p>  2 - flexibleVolume,</p><p>  3 - aggregate,</p><p>  4 - stripedAggregate,</p><p>  5 - stripedVolume.</p> |`CHANGE_IF_NEEDED` |
 |{$FAS3220.FS.USE.PCT} |<p>Macro define what threshold will be used for disk space trigger:</p><p>  0 - use Bytes ({$FAS3220.FS.AVAIL.MIN.CRIT})</p><p>  1 - use percents ({$FAS3220.FS.PUSED.MAX.CRIT})</p><p>Can be used with {#FSNAME} as context.</p> |`1` |

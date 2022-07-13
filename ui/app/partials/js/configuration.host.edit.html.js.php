@@ -156,7 +156,7 @@
 
 			$groups_ms.on('change', (e) => {
 				$groups_ms.multiSelect('setDisabledEntries',
-					[... document.querySelectorAll('[name^="groups["]')].map((input) => input.value)
+					[... this.form.querySelectorAll('[name^="groups["]')].map((input) => input.value)
 				);
 			});
 		},
