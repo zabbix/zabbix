@@ -30,7 +30,7 @@ class CControllerCopy extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'copy_targetids' => 'array|not_empty',
+			'copy_targetids' => 'required|array|not_empty',
 			'itemids' =>  'array_id',
 			'triggerids' => 'array_id',
 			'graphids' => 'array_id',
