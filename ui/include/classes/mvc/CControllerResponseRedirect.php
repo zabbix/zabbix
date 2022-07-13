@@ -25,7 +25,7 @@ class CControllerResponseRedirect extends CControllerResponse {
 		$url = $location->getUrl();
 		$url_parts = parse_url($url);
 
-		if (!$url_parts || !array_key_exists('host', $url_parts)) {
+		if (!$url_parts || array_key_exists('host', $url_parts)) {
 			access_deny(ACCESS_DENY_PAGE);
 		}
 
