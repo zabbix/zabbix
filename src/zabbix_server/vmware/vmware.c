@@ -241,9 +241,16 @@ static zbx_uint64_t	evt_req_chunk_size;
 			"</ns1:Body>"								\
 		"</SOAP-ENV:Envelope>"
 
-#define ZBX_XPATH_FAULTSTRING()										\
-	"/*/*/*[local-name()='Fault']/*[(local-name()='faultstring' or local-name()='detail')"		\
-	" and string-length(.) > 0][1]"
+#define ZBX_XPATH_FAULTSTRING(sz)									\
+	(MAX_STRING_LEN < sz ? ZBX_XPATH_FAULT_FAST("faultstring") : ZBX_XPATH_FAULT_SLOW)
+
+#define ZBX_XPATH_FAULT_FAST(name)									\
+	"/*/*/*[local-name()='Fault']/*[local-name()='" name "'][1]"
+
+#define ZBX_XPATH_FAULT_SLOW										\
+	"concat(substring(" ZBX_XPATH_FAULT_FAST("faultstring")", 1, string-length(.)),"		\
+	"substring(local-name(" ZBX_XPATH_FAULT_FAST("detail") ZBX_XPATH_LN("InvalidPropertyFault")	\
+	"), 1, string-length(.) * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ") = 0)))"
 
 #define ZBX_XPATH_REFRESHRATE()										\
 	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
@@ -749,8 +756,10 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 
 	if (NULL != fn_parent)
 		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", fn_parent, resp->data);
+	ZBX_XPATH_FAULT_SLOW;
 
-	if (SUCCEED == zbx_xml_try_read_value(resp->data, resp->offset, ZBX_XPATH_FAULTSTRING(), &doc, &val, error))
+	if (SUCCEED == zbx_xml_try_read_value(resp->data, resp->offset, ZBX_XPATH_FAULTSTRING(resp->offset), &doc,
+			&val, error))
 	{
 		if (NULL != val)
 		{
@@ -6789,8 +6798,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_cq_value_t *cq_values, zbx_vector_ptr_t *clusters, zbx_vector_vmware_resourcepool_t *resourcepools,
-		zbx_vmware_alarms_data_t *alarms_data, char **error)
+		zbx_vector_cq_value_t *cq_values, zbx_vector_ptr_t *clusters,
+		zbx_vector_vmware_resourcepool_t *resourcepools, zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
 	char			xpath[MAX_STRING_LEN];
 	int			i, ret = FAIL;
@@ -7429,12 +7438,27 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 static void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vmware_cq_value_t *cqv)
 {
 	char	xpath[MAX_STRING_LEN];
+	xmlNode	*node;
 
 	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_PROP_NAME("%s"), cqv->instance->key);
-	cqv->response = zbx_xml_doc_read_value(xdoc, xpath);
-	cqv->status = ZBX_VMWARE_CQV_VALUE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() SUCCEED id:%s key:%s response length:%d", fn_parent, cqv->instance->id,
+	if (NULL == (node = zbx_xml_doc_get(xdoc, xpath)))
+	{
+		cqv->response = NULL;
+		cqv->status = ZBX_VMWARE_CQV_VALUE;
+	}
+	else if (XML_TEXT_NODE == node->type)
+	{
+		cqv->response = zbx_xml_node_read_value(xdoc, node, ".");
+	}
+	else
+	{
+		cqv->response = zbx_strdup(NULL, "Only simple values can be returned.");
+		cqv->status = ZBX_VMWARE_CQV_ERROR;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() %s id:%s key:%s response length:%d",
+			ZBX_VMWARE_CQV_ERROR == cqv->status ? "FAIL" : "SUCCEED", fn_parent, cqv->instance->id,
 			cqv->instance->key, NULL == cqv->response ? -1 : (int)strlen(cqv->response));
 }
 
