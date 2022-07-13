@@ -2346,15 +2346,11 @@ class CConfigurationImport {
 			return;
 		}
 
-		$dashboards = $this->getFormattedTemplateDashboards();
+		$dashboard_importer = new CTemplateDashboardImporter($this->options, $this->referencer,
+			$this->importedObjectContainer
+		);
 
-		if ($dashboards) {
-			$dashboard_importer = new CTemplateDashboardImporter($this->options, $this->referencer,
-				$this->importedObjectContainer
-			);
-
-			$dashboard_importer->delete($dashboards);
-		}
+		$dashboard_importer->delete($this->getFormattedTemplateDashboards());
 	}
 
 	/**
@@ -2561,7 +2557,7 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedTemplateDashboards(): array {
 		if (!array_key_exists('templateDashboards', $this->formattedData)) {
-				$this->formattedData['templateDashboards'] = $this->adapter->getTemplateDashboards();
+			$this->formattedData['templateDashboards'] = $this->adapter->getTemplateDashboards();
 		}
 
 		return $this->formattedData['templateDashboards'];

@@ -251,7 +251,13 @@ $host_tab
 	->addItem([
 		new CLabel(_('Interfaces')),
 		new CFormField([
-			new CDiv([renderInterfaceHeaders(), $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]),
+			(new CDiv([
+				renderInterfaceHeaders(),
+				$agent_interfaces,
+				$snmp_interfaces,
+				$jmx_interfaces,
+				$ipmi_interfaces
+			]))->addClass(ZBX_STYLE_HOST_INTERFACES),
 			$host_is_discovered
 				? null
 				: new CDiv(
@@ -550,6 +556,5 @@ if (array_key_exists('buttons', $data)) {
 }
 
 $host_form
-	->addItem($data['warning'])
 	->addItem($tabs)
 	->show();
