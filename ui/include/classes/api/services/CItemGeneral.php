@@ -1817,15 +1817,52 @@ abstract class CItemGeneral extends CApiService {
 		$del_links = [];
 
 		foreach ($items as $i => $item) {
-			if (!array_key_exists('master_itemid', $item)
-					|| (array_key_exists('itemid', $item)
-						&& bccomp($item['master_itemid'], $db_items[$item['itemid']]['master_itemid']) == 0)) {
-				unset($items[$i]);
-			}
-			elseif (array_key_exists('itemid', $item)) {
-				if ($db_items[$item['itemid']]['master_itemid'] != 0) {
-					$del_links[$item['itemid']] = $db_items[$item['itemid']]['master_itemid'];
+			$check = false;
+
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				if (!array_key_exists('itemid', $item)) {
+					if ($item['master_itemid'] != 0) {
+						$check = true;
+					}
+					else {
+						$error = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+							? _('an item/item prototype ID is expected')
+							: _('an item ID is expected');
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.($i + 1).'/master_itemid', $error
+						));
+					}
 				}
+				else {
+					if (array_key_exists('master_itemid', $item)) {
+						if ($item['master_itemid'] != 0) {
+							if (bccomp($item['master_itemid'], $db_items[$item['itemid']]['master_itemid']) != 0) {
+								$check = true;
+
+								if ($db_items[$item['itemid']]['master_itemid'] != 0) {
+									$del_links[$item['itemid']] = $db_items[$item['itemid']]['master_itemid'];
+								}
+							}
+						}
+						else {
+							$error = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+								? _('an item/item prototype ID is expected')
+								: _('an item ID is expected');
+
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/master_itemid', $error
+							));
+						}
+					}
+				}
+			}
+			elseif (array_key_exists('itemid', $item) && $db_items[$item['itemid']]['type'] == ITEM_TYPE_DEPENDENT) {
+				$del_links[$item['itemid']] = $db_items[$item['itemid']]['master_itemid'];
+			}
+
+			if (!$check) {
+				unset($items[$i]);
 			}
 		}
 
