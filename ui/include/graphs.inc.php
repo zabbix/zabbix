@@ -399,13 +399,13 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
 		}
 		elseif ($error) {
 			$items = API::Item()->get([
-				'output' => ['itemid', 'key_'],
+				'output' => ['key_'],
 				'itemids' => [$gitem['itemid']],
 				'webitems' => true
 			]);
 
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'host'],
+				'output' => ['host'],
 				'hostids' => [$destinationHostId],
 			]);
 
