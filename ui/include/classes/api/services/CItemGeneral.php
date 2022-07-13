@@ -1958,7 +1958,7 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	private static function getDependentItemLinks(array $items, array $del_links): array {
 		$links = array_column($items, 'master_itemid', 'itemid');
-		$master_itemids = array_unique(array_column($items, 'master_itemid'));
+		$master_itemids = array_flip(array_column($items, 'master_itemid'));
 
 		while ($master_itemids) {
 			$options = [
