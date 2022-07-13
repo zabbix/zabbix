@@ -203,7 +203,7 @@ class CWidgetClock extends CWidget {
 		let options = {
 			hour: '2-digit',
 			minute: '2-digit',
-			hourCycle: this._time_format === CWidgetClock.HOUR_TWELVE ? 'h11' : 'h23'
+			hourCycle: this._time_format === CWidgetClock.HOUR_TWELVE ? 'h12' : 'h23'
 		};
 		let locale = navigator.language ?? CWidgetClock.DEFAULT_LOCALE;
 
