@@ -28,9 +28,8 @@ class CControllerAutoregUpdate extends CController {
 		if (!$ret) {
 			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'autoreg.edit')
-						->getUrl()
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))->setArgument('action', 'autoreg.edit')
 					);
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot update configuration'));

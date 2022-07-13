@@ -113,11 +113,11 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 			if (array_key_exists('passwd', $user)) {
 				redirect('index.php');
 			}
-			$response = new CControllerResponseRedirect(CMenuHelper::getFirstUrl());
+			$response = new CControllerResponseRedirect(new CUrl(CMenuHelper::getFirstUrl()));
 			CMessageHelper::setSuccessTitle(_('User updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=userprofile.edit');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'userprofile.edit'));
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot update user'));
 		}

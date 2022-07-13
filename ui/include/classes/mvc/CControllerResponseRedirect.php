@@ -19,18 +19,21 @@ class CControllerResponseRedirect extends CControllerResponse {
 	protected $formData = [];
 
 	/**
-	 * @param string|CUrl $location
+	 * @param CUrl $location
 	 */
-	public function __construct($location) {
-		if ($location instanceof CUrl) {
-			$location = $location->getUrl();
+	public function __construct(CUrl $location) {
+		$url = $location->getUrl();
+		$url_parts = parse_url($url);
+
+		if (!$url_parts || !array_key_exists('host', $url_parts)) {
+			access_deny(ACCESS_DENY_PAGE);
 		}
 
-		if (!CHtmlUrlValidator::validateSameSite($location)) {
+		if (!CHtmlUrlValidator::validateSameSite($url)) {
 			throw new CAccessDeniedException();
 		}
 
-		$this->location = $location;
+		$this->location = $url;
 	}
 
 	public function setFormData(array $formData): void {
