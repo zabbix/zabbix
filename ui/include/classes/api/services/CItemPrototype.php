@@ -482,18 +482,27 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_items = $this->get([
+		$count = $this->get([
+			'countOutput' => true,
+			'itemids' => array_column($items, 'itemid'),
+			'editable' => true
+		]);
+
+		if ($count != count($items)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		/*
+		 * The fields "headers" and "query_fields" in API are arrays, but there is necessary to get the values of these
+		 * fields as they stored in database.
+		 */
+		$db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
 				'logtimefmt', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
-			'editable' => true,
 			'preservekeys' => true
 		]);
-
-		if (count($db_items) != count($items)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
 
 		$this->addInternalFields($db_items);
 
