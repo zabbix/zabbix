@@ -638,7 +638,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2022-07-04 12:53:00',
+						'From' => '2027-07-04 12:53:00',
 						'To' => 'now'
 					],
 					'error' => 'Minimum time period to display is 1 minute.'
