@@ -45,9 +45,7 @@ class CControllerPopupCopy extends CController {
 
 	protected function checkPermissions() {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS)
-				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS)) {
+				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
 			return false;
 		}
 
@@ -77,12 +75,13 @@ class CControllerPopupCopy extends CController {
 
 			return $graphs_count == count($this->getInput('graphids'));
 		}
+
 		return false;
 	}
 
 	protected function doAction() {
 		$data = [
-			'action' => $this->getAction(),
+			'action' => $this->getAction()
 		];
 
 		if ($data['action'] === 'popup.copy.items') {

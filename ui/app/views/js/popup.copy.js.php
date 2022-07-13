@@ -25,8 +25,7 @@
 ?>
 
 window.copy_popup = new class {
-	init({form_name, action}) {
-		this.form_name = form_name;
+	init({action}) {
 		this.overlay = overlays_stack.getById('copy');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -103,7 +102,7 @@ window.copy_popup = new class {
 	}
 
 	_post(url, data) {
-		fetch(this.curl.getUrl(), {
+		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(data)

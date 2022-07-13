@@ -1,5 +1,4 @@
-<?php
-//declare(strict_types = 0);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -25,10 +24,8 @@
  * @var array $data
  */
 
-$output = [];
 // create form
 $form = (new CForm())
-	->setName('elements_form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
@@ -68,7 +65,6 @@ $form_grid = (new CFormGrid())
 	->addItem(
 		(new CScriptTag('
 			copy_popup.init('.json_encode([
-				'form_name' => $form->getName(),
 				'action' => $action
 			]).');
 		'))->setOnDocumentReady()

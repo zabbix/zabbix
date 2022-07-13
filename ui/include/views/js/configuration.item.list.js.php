@@ -63,14 +63,15 @@
 				const overlay = this.openCopyPopup();
 				const dialogue = overlay.$dialogue[0];
 
-					dialogue.addEventListener('dialogue.submit', (e) => {
+				dialogue.addEventListener('dialogue.submit', (e) => {
 					clearMessages();
 
 					addMessage(makeMessageBox('good', [], e.detail.title, true, false));
-					});
+				});
 			});
+
 			document.querySelector('.js-execute-now').addEventListener('click', () => {
-			this.massCheckNow();
+				this.massCheckNow();
 			});
 		},
 
@@ -98,10 +99,8 @@
 		},
 
 		openCopyPopup() {
-			const form = document.querySelector('form[name="itemsForm"]');
 			const parameters = {
-				itemids: Object.keys(chkbxRange.getSelectedIds()),
-				context: form.querySelector('#form_context').value
+				itemids: Object.keys(chkbxRange.getSelectedIds())
 			};
 
 			return PopUp('popup.copy.items', parameters, {

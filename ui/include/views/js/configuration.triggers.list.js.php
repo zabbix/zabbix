@@ -89,10 +89,8 @@
 		},
 
 		openCopyPopup() {
-			const form = document.querySelector('form[name="triggersForm"]');
 			const parameters = {
-				triggerids: Object.keys(chkbxRange.getSelectedIds()),
-				context: form.querySelector('#form_context').value
+				triggerids: Object.keys(chkbxRange.getSelectedIds())
 			};
 
 			return PopUp('popup.copy.triggers', parameters, {

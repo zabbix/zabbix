@@ -63,10 +63,8 @@
 		},
 
 		openCopyPopup() {
-			const form = document.querySelector('form[name="graphForm"]');
 			const parameters = {
-				graphids: Object.keys(chkbxRange.getSelectedIds()),
-				context: form.querySelector('#form_context').value
+				graphids: Object.keys(chkbxRange.getSelectedIds())
 			};
 
 			return PopUp('popup.copy.graphs', parameters, {
