@@ -555,13 +555,10 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			if ($items) {
-				$item = $items[0];
+				$history = Manager::History()->getLastValues($items);
 
-				if ($item) {
-					$history = Manager::History()->getLastValues([$item]);
-					if (isset($history[$item['itemid']])) {
-						return $history[$item['itemid']][0]['value'];
-					}
+				if ($history) {
+					return $history[$items[0]['itemid']][0]['value'];
 				}
 			}
 			else {
@@ -644,13 +641,10 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			if ($items) {
-				$item = $items[0];
+				$history = Manager::History()->getLastValues($items);
 
-				if ($item) {
-					$history = Manager::History()->getLastValues([$item]);
-					if (isset($history[$item['itemid']])) {
-						return $history[$item['itemid']][0]['value'];
-					}
+				if ($history) {
+					return $history[$items[0]['itemid']][0]['value'];
 				}
 			}
 			else {
