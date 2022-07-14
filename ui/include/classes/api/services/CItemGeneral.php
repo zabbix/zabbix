@@ -1960,7 +1960,7 @@ abstract class CItemGeneral extends CApiService {
 				'output' => ['itemid', 'hostid', 'master_itemid'],
 				'itemids' => $master_itemids,
 				'filter' => [
-					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
+					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
 				],
 				'preservekeys' => true
 			]);
@@ -2028,6 +2028,7 @@ abstract class CItemGeneral extends CApiService {
 			while ($db_master_item = DBfetch($db_master_items)) {
 				if (array_key_exists($db_master_item['itemid'], $del_links)
 						&& bccomp($db_master_item['master_itemid'], $del_links[$db_master_item['itemid']]) == 0) {
+					$links[$db_master_item['itemid']] = 0;
 					continue;
 				}
 
@@ -2055,14 +2056,10 @@ abstract class CItemGeneral extends CApiService {
 			$master_itemid = $item['master_itemid'];
 
 			while ($master_itemid != 0) {
-				if ($master_itemid == $item['itemid']) {
+				if (bccomp($master_itemid, $item['itemid']) == 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/master_itemid', _('circular item dependency is not allowed')
 					));
-				}
-
-				if (!array_key_exists($master_itemid, $dep_item_links)) {
-					break;
 				}
 
 				$master_itemid = $dep_item_links[$master_itemid];
