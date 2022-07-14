@@ -33,9 +33,7 @@ class testFormHost extends CWebTest {
 	/**
 	 * All objects created in dataSource DiscoveredHosts.
 	 */
-	const DISCOVERED_HOST = 'Discovered host test host from prototype 1'; // "LLD for Discovered host tests", Host: "Test of discovered host".
-	const DISCOVERED_HOSTID = 90000079;
-	const DISCOVERED_INTERFACEID = 90000080;
+	const DISCOVERED_HOST = 'Discovered host from prototype 1'; // "LLD for Discovered host tests", Host: "Test of discovered host".
 	const TEMPLATE_NAMES = [
 		'Test of discovered host 1 template for unlink',
 		'Test of discovered host 2 template for clear',
@@ -1955,12 +1953,19 @@ class testFormHost extends CWebTest {
 	}
 
 	public function checkDiscoveredHostLayout() {
-		$form = $this->openForm(($this->standalone ? $this->link.self::DISCOVERED_HOSTID : $this->link), self::DISCOVERED_HOST);
+		$form = $this->openForm((
+				($this->standalone)
+					? $this->link.CDataHelper::get('DiscoveredHosts.discovered_hostid')
+					: $this->link
+				), self::DISCOVERED_HOST
+		);
 		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
 
 		// Check tabs available in the form.
 		$tabs = ['Host', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption'];
 		$this->assertEquals($tabs, $form->getTabs());
+
+		$discovered_interface_id = CDataHelper::get('DiscoveredHosts.discovered_interfaceid');
 
 		foreach ($tabs as $tab) {
 			$form->selectTab($tab);
@@ -1980,14 +1985,14 @@ class testFormHost extends CWebTest {
 						['name' => 'Visible name', 'value' => '', 'maxlength' => 128, 'enabled' => false],
 						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
 						['name' => 'Host groups', 'value' => ['Zabbix servers'], 'enabled' => false],
-						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_ip', 'value' =>  '127.0.0.1',
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' =>  '127.0.0.1',
 								'maxlength' => 64, 'enabled' => false],
-						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_dns', 'value' =>  '',
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' =>  '',
 								'maxlength' => 255, 'enabled' => false],
-						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_useip', 'value' =>  'IP', 'enabled' => false],
-						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_port', 'value' => 10050,
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_useip', 'value' =>  'IP', 'enabled' => false],
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_port', 'value' => 10050,
 								'maxlength' => 64, 'enabled' => false],
-						['name' => 'id:interface_main_'.self::DISCOVERED_INTERFACEID , 'value' => self::DISCOVERED_INTERFACEID,
+						['name' => 'id:interface_main_'.$discovered_interface_id , 'value' => $discovered_interface_id,
 								'enabled' => false],
 						['name' => 'Description', 'value' => '', 'maxlength' => 65535, 'enabled' => true],
 						['name' => 'Monitored by proxy', 'value' => '(no proxy)', 'enabled' => false],
@@ -2103,22 +2108,5 @@ class testFormHost extends CWebTest {
 		if (!$this->standalone) {
 			$form_type->close();
 		}
-	}
-
-	/**
-	 * Delete all created data after test.
-	 */
-	public static function clearData() {
-		$hostids = CDBHelper::getColumn("SELECT * FROM hosts".
-				" WHERE name LIKE 'Test of discovered host%'".
-					" AND status = 0", 'hostid'
-		);
-		CDataHelper::call('host.delete', $hostids);
-
-		$templateids = CDBHelper::getColumn("SELECT * FROM hosts".
-				" WHERE name LIKE 'Test of discovered host%'".
-					" AND status = 3", 'hostid'
-		);
-		CDataHelper::call('template.delete', $templateids);
 	}
 }

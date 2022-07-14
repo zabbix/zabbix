@@ -20,7 +20,7 @@
 
 class DiscoveredHosts {
 
-	const DISCOVERED_HOST = 'Discovered host test host from prototype 1';
+	const DISCOVERED_HOST = 'Discovered host from prototype 1';
 	const DISCOVERED_HOSTID = 90000079;
 	const DISCOVERED_INTERFACEID = 90000080;
 	const DISCOVERED_HOST_GROUPID = 90000081;
@@ -130,6 +130,13 @@ class DiscoveredHosts {
 							]
 						]
 					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Template discovery rule',
+						'key_' => 'vfs.fs.discovery',
+						'type' => ITEM_TYPE_TRAPPER
+					]
 				]
 			],
 			[
@@ -147,6 +154,13 @@ class DiscoveredHosts {
 						'key_' => 'template.item1',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Template1 discovery rule',
+						'key_' => 'vfs.fs.discovery',
+						'type' => ITEM_TYPE_TRAPPER
 					]
 				]
 			],
@@ -166,6 +180,106 @@ class DiscoveredHosts {
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Template2 discovery rule',
+						'key_' => 'vfs.fs.discovery',
+						'type' => ITEM_TYPE_TRAPPER
+					]
+				]
+			]
+		]);
+
+		CDataHelper::call('graph.create', [
+			[
+				'name' => 'Template graph',
+				'width' => 850,
+				'height' => 480,
+				'gitems' => [
+					[
+						'itemid' => $templates['itemids']['Test of discovered host Template:trap.template'] ,
+						'color'=> '00AA00'
+					]
+				]
+			],
+			[
+				'name' => 'Template1 graph',
+				'width' => 850,
+				'height' => 480,
+				'gitems' => [
+					[
+						'itemid' => $templates['itemids']['Test of discovered host 1 template for unlink:trap.template1'],
+						'color'=> 'FFAA00'
+					]
+				]
+			],
+			[
+				'name' => 'Template2 graph',
+				'width' => 850,
+				'height' => 480,
+				'gitems' => [
+					[
+						'itemid' => $templates['itemids']['Test of discovered host 2 template for clear:template.item2'],
+						'color'=> '99AA00'
+					]
+				]
+			]
+		]);
+
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Template trigger',
+				'expression' => 'last(/Test of discovered host Template/trap.template)=0',
+				'priority' => 3
+			],
+			[
+				'description' => 'Template1 trigger',
+				'expression' => 'last(/Test of discovered host 1 template for unlink/trap.template1)=0',
+				'priority' => 1
+			],
+			[
+				'description' => 'Template2 trigger',
+				'expression' => 'last(/Test of discovered host 2 template for clear/trap.template2)=0',
+				'priority' => 4
+			]
+		]);
+
+		CDataHelper::call('httptest.create', [
+			[
+				'name' => 'Template web scenario',
+				'hostid' => $templates['templateids']['Test of discovered host Template'],
+				'steps' => [
+					[
+						'name' => 'Test name',
+						'url' => 'http://example.com',
+						'status_codes' => '200',
+						'no' => '1'
+					]
+				]
+			],
+			[
+				'name' => 'Template web scenario 1',
+				'hostid' => $templates['templateids']['Test of discovered host 1 template for unlink'],
+				'steps' => [
+					[
+						'name' => 'Test name 1',
+						'url' => 'http://example1.com',
+						'status_codes' => '200',
+						'no' => '1'
+					]
+				]
+			],
+			[
+				'name' => 'Template web scenario 2',
+				'hostid' => $templates['templateids']['Test of discovered host 2 template for clear'],
+				'steps' => [
+					[
+						'name' => 'Test name 2',
+						'url' => 'http://example2.com',
+						'status_codes' => '200',
+						'no' => '1'
+					]
 				]
 			]
 		]);
@@ -180,5 +294,10 @@ class DiscoveredHosts {
 			'hostid' => self::DISCOVERED_HOSTID,
 			'templates' => self::$templateids
 		]);
+
+		return [
+			'discovered_hostid' => self::DISCOVERED_HOSTID,
+			'discovered_interfaceid' => self::DISCOVERED_INTERFACEID
+		];
 	}
 }
