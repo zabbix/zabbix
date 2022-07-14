@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 
 extern unsigned char	program_type;
@@ -39,6 +40,23 @@ static int	DBpatch_6020001(void)
 	return DBmodify_field_type("group_discovery", &field, NULL);
 }
 
+static int	DBpatch_6020002(void)
+{
+	if (ZBX_DB_OK > DBexecute(
+			"update group_discovery gd"
+			" set name=("
+				"select gp.name"
+				" from group_prototype gp"
+				" where gd.parent_group_prototypeid=gp.group_prototypeid"
+			")"
+			" where " ZBX_DB_CHAR_LENGTH(gd.name) "=64"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6020)
@@ -47,5 +65,6 @@ DBPATCH_START(6020)
 
 DBPATCH_ADD(6020000, 0, 1)
 DBPATCH_ADD(6020001, 0, 0)
+DBPATCH_ADD(6020002, 0, 0)
 
 DBPATCH_END()
