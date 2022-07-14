@@ -279,7 +279,7 @@ static int	vmware_curl_init(const char *url, CURL **easyhandle, ZBX_HTTPPAGE *pa
 		goto out;
 	}
 
-	strscpy(&page->url[url_sz - ZBX_CONST_STRLEN("api")], "api");
+	memcpy(&page->url[url_sz - ZBX_CONST_STRLEN("api")], "api", ZBX_CONST_STRLEN("api"));
 	*headers = curl_slist_append(*headers, ZBX_XML_HEADER1);
 	*headers = curl_slist_append(*headers, ZBX_XML_HEADER2);
 
