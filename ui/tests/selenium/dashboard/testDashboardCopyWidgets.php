@@ -294,18 +294,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 		// Get fields from widget form to compare them with new widget after copying.
 		$widget = $dashboard->getWidget($name)->edit();
-
-		// Get values of original Clock or Item value widget.
-		if (stristr($name, 'Clock') || stristr($name, 'item value')) {
-			foreach ($widget->getLabels()->asText() as $label) {
-				$label = ($label === 'DescriptionSupported macros:{HOST.*}{ITEM.*}{INVENTORY.*}User macros') ? 'Description' : $label;
-				$original_form[] = [$label => $widget->getFieldContainer($label)->getText()];
-			}
-		}
-		else {
-			$fields = $widget->getFields();
-			$original_form = $fields->asValues();
-		}
+		$original_form = $widget->getFields()->asValues();
 
 		// Get tags of original widget.
 		if (stristr($name, 'Problem')) {
@@ -362,19 +351,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		}
 
 		$this->assertEquals($name, $copied_widget->getHeaderText());
-
-		// Get values of copied Clock or Item value widget.
-		if (stristr($name, 'Clock') || stristr($name, 'item value')) {
-			$copied_widget_form = $copied_widget->edit();
-			foreach ($copied_widget_form->getLabels()->asText() as $label) {
-				$label = ($label === 'DescriptionSupported macros:{HOST.*}{ITEM.*}{INVENTORY.*}User macros') ? 'Description' : $label;
-				$copied_form[] = [$label => $copied_widget_form->getFieldContainer($label)->getText()];
-			}
-		}
-		else {
-			$copied_fields = $copied_widget->edit()->getFields();
-			$copied_form = $copied_fields->asValues();
-		}
+		$copied_form = $copied_widget->edit()->getFields()->asValues();
 
 		// Check tags of original and copied widget.
 		if (stristr($name, 'Problem')) {
@@ -382,7 +359,6 @@ class testDashboardCopyWidgets extends CWebTest {
 					->asMultifieldTable()->one()->getValue();
 			$this->assertEquals($tags, $copied_tags);
 		}
-
 
 		$this->assertEquals($original_form, $copied_form);
 
