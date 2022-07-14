@@ -43,9 +43,9 @@ static int	DBpatch_6030001(void)
 			" set name=("
 				"select gp.name"
 				" from group_prototype gp"
-				" where gd.parent_group_prototypeid=gp.group_prototypeid and"
-				" " ZBX_DB_CHAR_LENGTH(gd.name) "=64"
-			" )"))
+				" where gd.parent_group_prototypeid=gp.group_prototypeid"
+			")"
+			" where " ZBX_DB_CHAR_LENGTH(gd.name) "=64"))
 	{
 		return FAIL;
 	}
