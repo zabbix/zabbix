@@ -1222,7 +1222,9 @@ int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlD
 
 	if (XPATH_STRING == xpathObj->type)
 	{
-		*value = zbx_strdup(NULL, (const char *)xpathObj->stringval);
+		if ('\0' != *xpathObj->stringval)
+			*value = zbx_strdup(NULL, (const char *)xpathObj->stringval);
+
 		goto clean;
 	}
 
