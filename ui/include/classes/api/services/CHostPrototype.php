@@ -1240,14 +1240,33 @@ class CHostPrototype extends CHostBase {
 		$del_interfaceids = [];
 
 		foreach ($host_prototypes as &$host_prototype) {
-			if (($db_host_prototypes === null && !array_key_exists('interfaces', $host_prototype))
-					|| ($db_host_prototypes !== null
-						&& !array_key_exists('interfaces', $db_host_prototypes[$host_prototype['hostid']]))) {
-				continue;
+			$update = false;
+
+			if ($db_host_prototypes === null) {
+				$update = ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM
+					&& array_key_exists('interfaces', $host_prototype)
+				);
+			}
+			else {
+				if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
+					$update = array_key_exists('interfaces', $host_prototype);
+				}
+				else {
+					$db_host_prototype = $db_host_prototypes[$host_prototype['hostid']];
+
+					if ($db_host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM
+							&& $db_host_prototype['interfaces']) {
+						$update = true;
+
+						if (!array_key_exists('interfaces', $host_prototype)) {
+							$host_prototype['interfaces'] = [];
+						}
+					}
+				}
 			}
 
-			if ($db_host_prototypes !== null && !array_key_exists('interfaces', $host_prototype)) {
-				$host_prototype['interfaces'] = [];
+			if (!$update) {
+				continue;
 			}
 
 			$db_interfaces = ($db_host_prototypes !== null)
