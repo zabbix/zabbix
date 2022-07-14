@@ -208,6 +208,23 @@ static int	DBpatch_6000005(void)
 	return DBmodify_field_type("group_discovery", &field, NULL);
 }
 
+static int	DBpatch_6000006(void)
+{
+	if (ZBX_DB_OK > DBexecute(
+			"update group_discovery gd"
+			" set name=("
+				"select gp.name"
+				" from group_prototype gp"
+				" where gd.parent_group_prototypeid=gp.group_prototypeid"
+			")"
+			" where " ZBX_DB_CHAR_LENGTH(gd.name) "=64"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #undef HTTPSTEP_ITEM_TYPE_RSPCODE
 #undef HTTPSTEP_ITEM_TYPE_TIME
 #undef HTTPSTEP_ITEM_TYPE_IN
@@ -226,5 +243,6 @@ DBPATCH_ADD(6000002, 0, 0)
 DBPATCH_ADD(6000003, 0, 0)
 DBPATCH_ADD(6000004, 0, 0)
 DBPATCH_ADD(6000005, 0, 0)
+DBPATCH_ADD(6000006, 0, 0)
 
 DBPATCH_END()
