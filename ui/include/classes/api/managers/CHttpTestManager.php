@@ -240,12 +240,12 @@ class CHttpTestManager {
 		}
 
 		if ($upd_test_items) {
-			API::getApiService('item')->updateForce($upd_test_items, $db_upd_test_items);
+			CItem::updateForce($upd_test_items, $db_upd_test_items);
 		}
 
 		// Old items must be deleted prior to createStepsReal() since identical items cannot be created in DB.
 		if ($del_step_items) {
-			API::getApiService('item')->deleteForce($del_step_items);
+			CItem::deleteForce($del_step_items);
 		}
 
 		foreach ($httptests as $key => $httptest) {
@@ -508,7 +508,7 @@ class CHttpTestManager {
 		}
 
 		if ($upd_items) {
-			API::getApiService('item')->updateForce($upd_items, $db_upd_items);
+			CItem::updateForce($upd_items, $db_upd_items);
 		}
 	}
 
@@ -754,7 +754,7 @@ class CHttpTestManager {
 			$ins_items[] = $item;
 		}
 
-		API::getApiService('item')->createForce($ins_items);
+		CItem::createForce($ins_items);
 		$itemids = array_column($ins_items, 'itemid');
 
 		$ins_httptestitems = [];
@@ -1069,7 +1069,7 @@ class CHttpTestManager {
 				$ins_items[] = $item;
 			}
 
-			API::getApiService('item')->createForce($ins_items);
+			CItem::createForce($ins_items);
 			$itemids = array_column($ins_items, 'itemid');
 
 			foreach ($step_items as $i => $item) {
@@ -1190,7 +1190,7 @@ class CHttpTestManager {
 		}
 
 		if ($upd_items) {
-			API::getApiService('item')->updateForce($upd_items, $db_upd_items);
+			CItem::updateForce($upd_items, $db_upd_items);
 		}
 
 		$this->updateHttpStepFields($websteps, 'update');
@@ -1253,7 +1253,7 @@ class CHttpTestManager {
 		}
 
 		if ($upd_items) {
-			API::getApiService('item')->updateForce($upd_items, $db_upd_items);
+			CItem::updateForce($upd_items, $db_upd_items);
 		}
 	}
 

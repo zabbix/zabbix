@@ -1001,7 +1001,7 @@ class CItemPrototype extends CItemGeneral {
 		), 'itemid');
 
 		if ($del_discovered_items) {
-			API::getApiService('item')->deleteForce($del_discovered_items);
+			CItem::deleteForce($del_discovered_items);
 		}
 
 		// Deleting trigger prototypes.

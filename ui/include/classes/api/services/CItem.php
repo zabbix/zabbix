@@ -1308,7 +1308,7 @@ class CItem extends CItemGeneral {
 		}
 
 		if ($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
-			API::getApiService('itemprototype')->deleteForce($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+			CItemPrototype::deleteForce($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			$del_itemids = array_diff_key($del_itemids, array_keys($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
 			unset($del_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 		}

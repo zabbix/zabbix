@@ -644,7 +644,7 @@ abstract class CHostGeneral extends CHostBase {
 				CDiscoveryRuleManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]));
 			}
 			else {
-				API::getApiService('item')->updateForce($upd_items[ZBX_FLAG_DISCOVERY_RULE],
+				CItem::updateForce($upd_items[ZBX_FLAG_DISCOVERY_RULE],
 					array_intersect_key($db_upd_items, $upd_items[ZBX_FLAG_DISCOVERY_RULE])
 				);
 			}
@@ -652,10 +652,10 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
 			if ($clear) {
-				API::getApiService('item')->deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
+				CItem::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
 			}
 			else {
-				API::getApiService('item')->updateForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL],
+				CItem::updateForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL],
 					array_intersect_key($db_upd_items, $upd_items[ZBX_FLAG_DISCOVERY_NORMAL])
 				);
 			}
@@ -663,10 +663,10 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 			if ($clear) {
-				API::getApiService('itemprototype')->deleteForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				CItemPrototype::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 			else {
-				API::getApiService('itemprototype')->updateForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE],
+				CItemPrototype::updateForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE],
 					array_intersect_key($db_upd_items, $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE])
 				);
 			}
@@ -1313,10 +1313,10 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
 			if ($clear) {
-				API::getApiService('item')->deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
+				CItem::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
 			}
 			else {
-				API::getApiService('item')->updateForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL],
+				CItem::updateForce($upd_items[ZBX_FLAG_DISCOVERY_NORMAL],
 					array_intersect_key($db_upd_items, $upd_items[ZBX_FLAG_DISCOVERY_NORMAL])
 				);
 			}
@@ -1324,10 +1324,10 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 			if ($clear) {
-				API::getApiService('itemprototype')->deleteForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				CItemPrototype::deleteForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 			else {
-				API::getApiService('itemprototype')->updateForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE],
+				CItemPrototype::updateForce($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE],
 					array_intersect_key($db_upd_items, $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE])
 				);
 			}
