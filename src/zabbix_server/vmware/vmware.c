@@ -242,15 +242,15 @@ static zbx_uint64_t	evt_req_chunk_size;
 		"</SOAP-ENV:Envelope>"
 
 #define ZBX_XPATH_FAULTSTRING(sz)									\
-	(MAX_STRING_LEN < sz ? ZBX_XPATH_FAULT_FAST("faultstring") : ZBX_XPATH_FAULT_SLOW)
+	(MAX_STRING_LEN < sz ? ZBX_XPATH_FAULT_FAST("faultstring") : ZBX_XPATH_FAULT_SLOW(MAX_STRING_LEN))
 
 #define ZBX_XPATH_FAULT_FAST(name)									\
-	"/*/*/*[local-name()='Fault']/*[local-name()='" name "'][1]"
+	"/*/*/*[local-name()='Fault'][1]/*[local-name()='" name "'][1]"
 
-#define ZBX_XPATH_FAULT_SLOW										\
-	"concat(substring(" ZBX_XPATH_FAULT_FAST("faultstring")", 1, string-length(.)),"		\
-	"substring(local-name(" ZBX_XPATH_FAULT_FAST("detail") ZBX_XPATH_LN("InvalidPropertyFault")	\
-	"), 1, string-length(.) * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ") = 0)))"
+#define ZBX_XPATH_FAULT_SLOW(max_len)									\
+	"concat(substring(" ZBX_XPATH_FAULT_FAST("faultstring")",1," ZBX_STR(max_len) "),"		\
+	"substring(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]"					\
+	"),1," ZBX_STR(max_len) " * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ")=0)))"
 
 #define ZBX_XPATH_REFRESHRATE()										\
 	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
@@ -756,7 +756,6 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 
 	if (NULL != fn_parent)
 		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", fn_parent, resp->data);
-	ZBX_XPATH_FAULT_SLOW;
 
 	if (SUCCEED == zbx_xml_try_read_value(resp->data, resp->offset, ZBX_XPATH_FAULTSTRING(resp->offset), &doc,
 			&val, error))
