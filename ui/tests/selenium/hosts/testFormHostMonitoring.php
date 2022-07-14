@@ -100,7 +100,6 @@ class testFormHostMonitoring extends testFormHost {
 		$this->checkDelete($data);
 	}
 
-
 	public function testFormHostMonitoring_DiscoveredHostLayout() {
 		$this->checkDiscoveredHostLayout();
 	}

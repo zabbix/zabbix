@@ -41,67 +41,70 @@ class DiscoveredHosts {
 	 * @return array
 	 */
 	public static function load() {
-		CDataHelper::reset();
-
-		CDataHelper::setSessionId(null);
-
 		$hosts = CDataHelper::call('host.create', [
-				'host' => 'Test of discovered host',
-				'groups' => [
-					['groupid' => 4]
-				],
-				'interfaces' => [
-					'type'=> 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => 10050
-				]
+			'host' => 'Test of discovered host',
+			'groups' => [
+				['groupid' => 4]
+			],
+			'interfaces' => [
+				'type'=> 1,
+				'main' => 1,
+				'useip' => 1,
+				'ip' => '127.0.0.1',
+				'dns' => '',
+				'port' => 10050
+			]
 		]);
 
 		self::$hostid = $hosts['hostids'][0];
 		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface'.
-				' WHERE hostid='.zbx_dbstr(self::$hostid));
+				' WHERE hostid='.zbx_dbstr(self::$hostid)
+		);
 
 		// Create discovery rule.
 		$llds = CDataHelper::call('discoveryrule.create', [
-				'name' => 'LLD for Discovered host tests',
-				'key_' => 'vfs.fs.discovery',
-				'hostid' => self::$hostid,
-				'type' => ITEM_TYPE_ZABBIX,
-				'interfaceid' => $interfaceid,
-				'delay' => 30
+			'name' => 'LLD for Discovered host tests',
+			'key_' => 'vfs.fs.discovery',
+			'hostid' => self::$hostid,
+			'type' => ITEM_TYPE_ZABBIX,
+			'interfaceid' => $interfaceid,
+			'delay' => 30
 		]);
 
 		$lldid = $llds['itemids'][0];
 
 		// Create host prototype.
 		$host_prototypes = CDataHelper::call('hostprototype.create', [
-				'host' => 'Host created from host prototype {#KEY}',
-				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
-				'tags' => [
-					'tag' => 'prototype',
-					'value' => 'true'
-				]
+			'host' => 'Host created from host prototype {#KEY}',
+			'ruleid' => $lldid,
+			'groupLinks' => [['groupid' => 4]],
+			'tags' => [
+				'tag' => 'prototype',
+				'value' => 'true'
+			]
 		]);
 
 		$host_prototypeid = $host_prototypes['hostids'][0];
 
 		// Emulate host discovery in DB.
 		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).
-				",".zbx_dbstr(self::DISCOVERED_HOST).",".zbx_dbstr(self::DISCOVERED_HOST).", 0, 4, '')");
+				",".zbx_dbstr(self::DISCOVERED_HOST).",".zbx_dbstr(self::DISCOVERED_HOST).", 0, 4, '')"
+		);
 		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).", ".
-				zbx_dbstr($host_prototypeid).")");
+				zbx_dbstr($host_prototypeid).")"
+		);
 		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
-				zbx_dbstr(self::DISCOVERED_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')");
+				zbx_dbstr(self::DISCOVERED_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
+		);
 		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID).
-				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", 4)");
+				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", 4)"
+		);
 		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (90000082, ".
-				zbx_dbstr(self::DISCOVERED_HOSTID).", 'discovered', 'true')");
+				zbx_dbstr(self::DISCOVERED_HOSTID).", 'discovered', 'true')"
+		);
 		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (90000083, ".
-				zbx_dbstr(self::DISCOVERED_HOSTID).", 'host', 'no')");
+				zbx_dbstr(self::DISCOVERED_HOSTID).", 'host', 'no')"
+		);
 
 		// Create templates.
 		$templates = CDataHelper::createTemplates([
@@ -143,7 +146,7 @@ class DiscoveredHosts {
 						'name' => 'Template1 item2',
 						'key_' => 'template.item1',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			],
@@ -161,7 +164,7 @@ class DiscoveredHosts {
 						'name' => 'Template2 item2',
 						'key_' => 'template.item2',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			]
@@ -173,7 +176,7 @@ class DiscoveredHosts {
 		}
 
 		// Link templates.
-		CDataHelper::call('host.update',[
+		CDataHelper::call('host.update', [
 			'hostid' => self::DISCOVERED_HOSTID,
 			'templates' => self::$templateids
 		]);

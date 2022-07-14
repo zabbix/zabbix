@@ -112,7 +112,7 @@ class testFormHostStandalone extends testFormHost {
 	 * Test for checking templated items linked to discovered host and unlinking them.
 	 * This test is implemented only for Standalone scenario.
 	 */
-	public function testFormHostStandalone_DiscoveredHostLinkTemplates() {
+	public function testFormHostStandalone_DiscoveredHostLinkedTemplates() {
 		$hosts_items_link = 'items.php?filter_set=1&filter_hostids%5B0%5D='.self::DISCOVERED_HOSTID.'&context=host';
 		$this->page->login()->open($hosts_items_link)->waitUntilReady();
 

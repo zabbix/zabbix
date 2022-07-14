@@ -22,7 +22,6 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
-require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 
 /**
  * Base class for Host form tests.
@@ -30,7 +29,6 @@ require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 class testFormHost extends CWebTest {
 
 	use TableTrait;
-	use MacrosTrait;
 
 	/**
 	 * All objects created in dataSource DiscoveredHosts.
@@ -1976,24 +1974,22 @@ class testFormHost extends CWebTest {
 
 					$this->assertEquals('LLD for Discovered host tests', $form->getField('Discovered by')->getText());
 
-					// Host tab fields maxlength attribute.
-					foreach (['Host name' => 128, 'Visible name' => 128, 'Description' => 65535] as $field => $maxlength) {
-						$this->assertEquals($maxlength, $form->getField($field)->getAttribute('maxlength'));
-					}
-
-					// Check field's editability and default values.
+					// Check fields' editability and default values.
 					$host_fields = [
-						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'enabled' => false],
-						['name' => 'Visible name', 'value' => '', 'enabled' => false],
+						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'maxlength' => 128, 'enabled' => false],
+						['name' => 'Visible name', 'value' => '', 'maxlength' => 128, 'enabled' => false],
 						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
 						['name' => 'Host groups', 'value' => ['Zabbix servers'], 'enabled' => false],
-						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_ip', 'value' =>  '127.0.0.1', 'enabled' => false],
-						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_dns', 'value' =>  '', 'enabled' => false],
+						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_ip', 'value' =>  '127.0.0.1',
+								'maxlength' => 64, 'enabled' => false],
+						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_dns', 'value' =>  '',
+								'maxlength' => 255, 'enabled' => false],
 						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_useip', 'value' =>  'IP', 'enabled' => false],
-						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_port', 'value' => 10050, 'enabled' => false],
+						['name' => 'id:interfaces_'.self::DISCOVERED_INTERFACEID.'_port', 'value' => 10050,
+								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interface_main_'.self::DISCOVERED_INTERFACEID , 'value' => self::DISCOVERED_INTERFACEID,
 								'enabled' => false],
-						['name' => 'Description', 'value' => '', 'enabled' => true],
+						['name' => 'Description', 'value' => '', 'maxlength' => 65535, 'enabled' => true],
 						['name' => 'Monitored by proxy', 'value' => '(no proxy)', 'enabled' => false],
 						['name' => 'Enabled', 'value' => true, 'enabled' => true]
 					];
@@ -2001,6 +1997,9 @@ class testFormHost extends CWebTest {
 					foreach ($host_fields as $field) {
 						$this->assertTrue($form->getField($field['name'])->isEnabled($field['enabled']));
 						$this->assertEquals($field['value'], $form->getField($field['name'])->getValue());
+						if (CTestArrayHelper::get($field, 'maxlength')) {
+							$this->assertEquals($field['maxlength'], $form->getField($field['name'])->getAttribute('maxlength'));
+						}
 					}
 
 					$this->assertEquals(self::DISCOVERED_HOST, $form->getField('Visible name')->getAttribute('placeholder'));
@@ -2023,6 +2022,11 @@ class testFormHost extends CWebTest {
 						['Name' => self::TEMPLATE_NAMES[2], 'Action' => 'UnlinkUnlink and clear']
 					];
 					$this->assertTableData($host_templates, 'id:linked-templates');
+
+					foreach (self::TEMPLATE_NAMES as $template) {
+						$this->assertTrue( $form->query('link', $template)->one()->isClickable());
+					}
+
 					break;
 
 				case 'IPMI':
@@ -2066,12 +2070,13 @@ class testFormHost extends CWebTest {
 
 				case 'Macros':
 					$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
-					$macros_table = $this->query('id:tbl_macros')->waitUntilVisible()->asMultifieldTable()->one();
+					$macros_table = $this->query('id:tbl_macros')->asMultifieldTable()->one();
+					$macros_table->checkValue([['Macro' => '','Value' => '', 'Description' => '']]);
 					$radio_switcher->select('Inherited and host macros');
 					$macros_table->waitUntilReloaded();
-					$radio_switcher->select('Host macros');
-					$macros_table->waitUntilReloaded();
-					$macros_table->checkValue([['Macro' => '','Value' => '', 'Description' => '']]);
+					$this->assertSame(['Macro', 'Effective value', '', '', 'Template value', '', 'Global value (configure)'],
+							$macros_table->getHeadersText()
+					);
 					break;
 
 				case 'Inventory':
@@ -2092,7 +2097,8 @@ class testFormHost extends CWebTest {
 			}
 		}
 
-		$this->assertTrue($form_type->query('button', ['Update', 'Clone', 'Full clone', 'Delete', 'Cancel'])->one()->isClickable());
+		$this->assertEquals(5, $form_type->query('button', ['Update', 'Clone', 'Full clone', 'Delete', 'Cancel'])->all()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
 		if (!$this->standalone) {
 			$form_type->close();
