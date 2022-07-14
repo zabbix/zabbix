@@ -968,8 +968,6 @@ class CScreenProblem extends CScreenBase {
 					$cell_r_clock = '';
 				}
 
-				$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed['close']);
-
 				if ($problem['r_eventid'] != 0) {
 					$value = TRIGGER_VALUE_FALSE;
 					$value_str = _('RESOLVED');
@@ -977,8 +975,10 @@ class CScreenProblem extends CScreenBase {
 					$can_be_closed = false;
 				}
 				else {
-					$can_be_closed = !hasEventCloseAction($problem['acknowledges']);
-					$in_closing = !$can_be_closed;
+					$in_closing = hasEventCloseAction($problem['acknowledges']);
+					$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed['close']
+						&& !$in_closing
+					);
 					$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 					$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 					$value_clock = $in_closing ? time() : $problem['clock'];
