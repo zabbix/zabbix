@@ -1181,7 +1181,8 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function checkMainInterfaces(array $host_prototypes): void {
 		foreach ($host_prototypes as $i => $host_prototype) {
-			if (!array_key_exists('interfaces', $host_prototype)) {
+			if ($host_prototype['custom_interfaces'] != HOST_PROT_INTERFACES_CUSTOM
+					|| !array_key_exists('interfaces', $host_prototype) || !$host_prototype['interfaces']) {
 				continue;
 			}
 
