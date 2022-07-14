@@ -90,7 +90,7 @@ class CSelectOptionGroup {
 	 */
 	public function toArray(): array {
 		$option_group = [
-			'label' => CHtml::encode($this->label),
+			'label' => $this->label,
 			'options' => []
 		];
 

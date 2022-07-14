@@ -255,6 +255,21 @@ class CSelect extends CTag {
 		return $options;
 	}
 
+	protected function startToString() {
+		$res = '<'.$this->tagname;
+		foreach ($this->attributes as $key => $value) {
+			if ($value === null) {
+				continue;
+			}
+
+			$value = $this->encode($value, $this->attrEncStrategy);
+			$res .= ' '.$key.'="'.$value.'"';
+		}
+		$res .= '>';
+
+		return $res;
+	}
+
 	public function toString($destroy = true) {
 		$this->setAttribute('name', $this->name);
 		$this->setAttribute('data-options', json_encode($this->toArray()));

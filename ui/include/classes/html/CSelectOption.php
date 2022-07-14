@@ -121,6 +121,6 @@ class CSelectOption {
 			$option['is_disabled'] = true;
 		}
 
-		return CHtml::encode($option);
+		return $option;
 	}
 }
