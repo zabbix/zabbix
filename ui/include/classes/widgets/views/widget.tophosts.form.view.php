@@ -103,15 +103,13 @@ $form_grid->addItem([
 	new CFormField(CWidgetHelper::getIntegerBox($fields['count']))
 ]);
 
-$form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('
-			widget_tophosts_form.init('.json_encode([
-				'form_id' => $form->getId()
-			]).');
-		'))->setOnDocumentReady()
-	);
+$form->addItem($form_grid);
+
+$scripts[] = '
+	widget_tophosts_form.init('.json_encode([
+		'form_id' => $form->getId()
+	]).');
+';
 
 return [
 	'form' => $form,

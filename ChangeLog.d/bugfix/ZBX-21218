@@ -1,0 +1,1 @@
+........S. [ZBX-21218] fixed deadlocks between server and frontend when discovering items with LLD (wiper)

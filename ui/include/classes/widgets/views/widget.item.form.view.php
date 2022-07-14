@@ -145,7 +145,9 @@ $form_grid->addItem([
 				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
 
-		CWidgetHelper::getLabel($fields['units_pos']),
+		CWidgetHelper::getLabel($fields['units_pos'], null,
+			_('Position is ignored for s, uptime and unixtime units.')
+		),
 		new CFormField(CWidgetHelper::getSelect($fields['units_pos'])),
 
 		CWidgetHelper::getLabel($fields['units_size']),
@@ -228,13 +230,11 @@ if ($data['templateid'] === null) {
 	]);
 }
 
-$form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('
-			widget_item_form.init();
-		'))->setOnDocumentReady()
-	);
+$form->addItem($form_grid);
+
+$scripts[] = '
+	widget_item_form.init();
+';
 
 return [
 	'form' => $form,

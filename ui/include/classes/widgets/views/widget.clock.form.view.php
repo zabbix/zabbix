@@ -164,15 +164,14 @@ $form_grid->addItem([
 		->addClass('fields-group-tzone')
 		->addClass('js-row-tzone')
 ]);
+
 $scripts[] = $fields['tzone_timezone']->getJavascript();
 
-$form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('
-			widget_clock_form.init();
-		'))->setOnDocumentReady()
-	);
+$form->addItem($form_grid);
+
+$scripts[] = '
+	widget_clock_form.init();
+';
 
 return [
 	'form' => $form,
