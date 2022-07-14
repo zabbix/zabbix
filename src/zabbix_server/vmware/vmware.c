@@ -7448,9 +7448,10 @@ static void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zb
 		cqv->response = NULL;
 		cqv->status = ZBX_VMWARE_CQV_VALUE;
 	}
-	else if (XML_TEXT_NODE == node->type)
+	else if (NULL != node->xmlChildrenNode && XML_TEXT_NODE == node->xmlChildrenNode->type)
 	{
 		cqv->response = zbx_xml_node_read_value(xdoc, node, ".");
+		cqv->status = ZBX_VMWARE_CQV_VALUE;
 	}
 	else
 	{
@@ -7458,9 +7459,10 @@ static void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zb
 		cqv->status = ZBX_VMWARE_CQV_ERROR;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() %s id:%s key:%s response length:%d",
-			ZBX_VMWARE_CQV_ERROR == cqv->status ? "FAIL" : "SUCCEED", fn_parent, cqv->instance->id,
-			cqv->instance->key, NULL == cqv->response ? -1 : (int)strlen(cqv->response));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() %s id:%s key:%s response length:%d node type:%d", fn_parent,
+			ZBX_VMWARE_CQV_ERROR == cqv->status ? "FAIL" : "SUCCEED", cqv->instance->id,
+			cqv->instance->key, NULL == cqv->response ? -1 : (int)strlen(cqv->response),
+			NULL != node && NULL != node->xmlChildrenNode ? node->xmlChildrenNode->type : -1);
 }
 
 /******************************************************************************
