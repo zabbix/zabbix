@@ -617,10 +617,7 @@ elseif (isset($_REQUEST['form'])) {
 		$options = [
 			'output' => ['itemid', 'hostid', 'name', 'key_'],
 			'selectHosts' => ['name'],
-			'itemids' => [
-				$data['ymax_itemid'] ? $data['ymax_itemid'] : '',
-				$data['ymin_itemid'] ? $data['ymin_itemid'] : ''
-			],
+			'itemids' => [$data['ymax_itemid'], $data['ymin_itemid']],
 			'webitems' => true,
 			'preservekeys' => true
 		];
