@@ -147,4 +147,10 @@ char		*zbx_db_dyn_escape_like_pattern(const char *src);
 
 int		zbx_db_strlen_n(const char *text, size_t maxlen);
 
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#	define ZBX_DB_CHAR_LENGTH(str)	"char_length(" #str ")"
+#else /* HAVE_ORACLE */
+#	define ZBX_DB_CHAR_LENGTH(str)	"length(" #str ")"
+#endif
+
 #endif
