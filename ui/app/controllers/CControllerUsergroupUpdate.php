@@ -39,10 +39,10 @@ class CControllerUsergroupUpdate extends CController {
 		if (!$ret) {
 			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'usergroup.edit')
-						->setArgument('usrgrpid', $this->getInput('usrgrpid'))
-						->getUrl()
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'usergroup.edit')
+							->setArgument('usrgrpid', $this->getInput('usrgrpid'))
 					);
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot update user group'));
