@@ -820,12 +820,15 @@ class CHostPrototype extends CHostBase {
 		$hostids = [];
 
 		foreach ($host_prototypes as $host_prototype) {
-			$db_custom_interfaces = $db_host_prototypes[$host_prototype['hostid']]['custom_interfaces'];
+			$interfaces_set = $host_prototype['custom_interfaces'];
+			$db_interfaces_set = $db_host_prototypes[$host_prototype['hostid']]['custom_interfaces'];
 
-			if (array_key_exists('interfaces', $host_prototype)
-					|| ($host_prototype['custom_interfaces'] != $db_custom_interfaces
-						&& $db_custom_interfaces == HOST_PROT_INTERFACES_CUSTOM)) {
+			if ((array_key_exists('interfaces', $host_prototype) && $interfaces_set == HOST_PROT_INTERFACES_CUSTOM)
+					|| ($interfaces_set != $db_interfaces_set && $db_interfaces_set == HOST_PROT_INTERFACES_CUSTOM)) {
 				$hostids[] = $host_prototype['hostid'];
+				$db_host_prototypes[$host_prototype['hostid']]['interfaces'] = [];
+			}
+			elseif (array_key_exists('interfaces', $host_prototype)) {
 				$db_host_prototypes[$host_prototype['hostid']]['interfaces'] = [];
 			}
 		}
