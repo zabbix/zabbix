@@ -7455,7 +7455,7 @@ static void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zb
 	}
 	else
 	{
-		cqv->response = zbx_strdup(NULL, "Only simple values can be returned.");
+		cqv->response = zbx_strdup(NULL, "only scalar values can be returned.");
 		cqv->status = ZBX_VMWARE_CQV_ERROR;
 	}
 
