@@ -200,13 +200,12 @@ class CWidgetClock extends CWidget {
 		const now = new Date();
 		now.setTime(now.getTime() - this._time_offset);
 
-		let options = {hour: '2-digit', minute: '2-digit', hour12: false};
-		let locale = CWidgetClock.DEFAULT_LOCALE;
-
-		if (this._time_format === CWidgetClock.HOUR_TWELVE) {
-			options['hour12'] = true;
-			locale = navigator.language ?? CWidgetClock.DEFAULT_LOCALE;
-		}
+		let options = {
+			hour: '2-digit',
+			minute: '2-digit',
+			hourCycle: this._time_format === CWidgetClock.HOUR_TWELVE ? 'h12' : 'h23'
+		};
+		let locale = navigator.language ?? CWidgetClock.DEFAULT_LOCALE;
 
 		if (this._show_seconds) {
 			options.second = '2-digit';
