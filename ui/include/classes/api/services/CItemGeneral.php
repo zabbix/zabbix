@@ -1223,13 +1223,32 @@ abstract class CItemGeneral extends CApiService {
 		$del_item_parameterids = [];
 
 		foreach ($items as &$item) {
-			if (($db_items === null && !array_key_exists('parameters', $item))
-					|| ($db_items !== null && !array_key_exists('parameters', $db_items[$item['itemid']]))) {
-				continue;
+			$update = false;
+
+			if ($db_items === null) {
+				if ($item['type'] == ITEM_TYPE_SCRIPT && array_key_exists('parameters', $item) && $item['parameters']) {
+					$update = true;
+				}
+			}
+			else {
+				if ($item['type'] == ITEM_TYPE_SCRIPT) {
+					if (array_key_exists('parameters', $item)) {
+						$update = true;
+					}
+				}
+				elseif ($db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT) {
+					if ($db_items[$item['itemid']]['parameters']) {
+						$update = true;
+
+						if (!array_key_exists('parameters', $item)) {
+							$item['parameters'] = [];
+						}
+					}
+				}
 			}
 
-			if ($db_items !== null && !array_key_exists('parameters', $item)) {
-				$item['parameters'] = [];
+			if (!$update) {
+				continue;
 			}
 
 			$db_item_parameters = ($db_items !== null)
