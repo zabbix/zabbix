@@ -1376,6 +1376,8 @@ static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs)
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)))
 		{
+			(void)zbx_tcp_recv(&s);	/* allow Zabbix server or Zabbix proxy to close connection */
+
 			if (last_ret == FAIL)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Successfully sent heartbeat message to [%s]:%d [%s]",
