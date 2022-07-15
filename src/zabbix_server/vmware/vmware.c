@@ -7527,6 +7527,8 @@ static void	vmware_service_props_load(CURL *easyhandle, zbx_vector_cq_value_t *c
 	zbx_xml_free_doc(doc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() count: %d / %d", __func__, count, total);
+
+#	undef ZBX_POST_OBJ_PROP
 }
 
 /******************************************************************************
