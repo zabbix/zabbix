@@ -1,1 +1,0 @@
-...G...... [ZBX-21310] fixed SSL_shutdown() error in zabbix_server.log when receiving active check heartbeat (vso)
