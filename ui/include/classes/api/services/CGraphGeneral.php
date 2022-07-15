@@ -546,8 +546,7 @@ abstract class CGraphGeneral extends CApiService {
 				if (!CApiInputValidator::validate($itemid_rules, $graph['ymin_itemid'], 'ymin_itemid', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
-				// Skip itemid if ymin_itemid stay the same.
-				elseif ($graph['ymin_itemid'] != $db_graphs[$graph['graphid']]['ymin_itemid']) {
+				else {
 					$itemIds[$graph['ymin_itemid']] = $graph['ymin_itemid'];
 				}
 			}
@@ -557,8 +556,7 @@ abstract class CGraphGeneral extends CApiService {
 				if (!CApiInputValidator::validate($itemid_rules, $graph['ymax_itemid'], 'ymax_itemid', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
-				// Skip itemid if ymax_itemid stay the same.
-				elseif ($graph['ymax_itemid'] != $db_graphs[$graph['graphid']]['ymax_itemid']) {
+				else {
 					$itemIds[$graph['ymax_itemid']] = $graph['ymax_itemid'];
 				}
 			}
@@ -735,7 +733,8 @@ abstract class CGraphGeneral extends CApiService {
 				if (!CApiInputValidator::validate($itemid_rules, $graph['ymin_itemid'], 'ymin_itemid', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
-				else {
+				// Skip itemid if ymin_itemid stay the same.
+				elseif ($graph['ymin_itemid'] != $db_graphs[$graph['graphid']]['ymin_itemid']) {
 					$itemIds[$graph['ymin_itemid']] = $graph['ymin_itemid'];
 				}
 			}
@@ -745,7 +744,8 @@ abstract class CGraphGeneral extends CApiService {
 				if (!CApiInputValidator::validate($itemid_rules, $graph['ymax_itemid'], 'ymax_itemid', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
-				else {
+				// Skip itemid if ymax_itemid stay the same.
+				elseif ($graph['ymax_itemid'] != $db_graphs[$graph['graphid']]['ymax_itemid']) {
 					$itemIds[$graph['ymax_itemid']] = $graph['ymax_itemid'];
 				}
 			}
