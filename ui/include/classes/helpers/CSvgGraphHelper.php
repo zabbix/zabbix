@@ -586,19 +586,8 @@ class CSvgGraphHelper {
 			if ($result) {
 				$metric_points = [];
 
-				$period = $metric['time_period']['time_to'] - $metric['time_period']['time_from'];
-				$approximation_tick_delta = ($period / $metric['options']['aggregate_interval']) > $width
-					? floor($period / $width)
-					: 0;
-
 				foreach ($result as $points) {
-					$tick = 0;
-
 					foreach ($points['data'] as $point) {
-						if ($point['tick'] > ($tick + $approximation_tick_delta)) {
-							$tick = $point['tick'];
-						}
-
 						if (array_key_exists('count', $point)) {
 							$metric_points[$point['tick']]['value'][] = $point['count'];
 						}
