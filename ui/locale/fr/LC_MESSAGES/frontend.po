@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-06-04 13:58+0000\n"
+"PO-Revision-Date: 2022-07-10 16:53+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -7625,7 +7625,7 @@ msgstr "Masque de sous-réseau de l'hôte"
 #: include/classes/widgets/forms/CWidgetFormClock.php:34
 #: include/views/monitoring.screen.constructor.edit.php:722
 msgid "Host time"
-msgstr "Temps de l'hôte"
+msgstr "Heure de l'hôte"
 
 #: include/classes/api/services/CHost.php:929
 msgid "Host update failed."
@@ -8076,7 +8076,7 @@ msgstr "Inclure"
 
 #: app/views/administration.mediatype.edit.php:240
 msgid "Include event menu entry"
-msgstr ""
+msgstr "Inclure dans le menu de l'événement"
 
 #: app/views/administration.usergroup.edit.php:139
 #: app/views/administration.usergroup.edit.php:190
@@ -10421,7 +10421,7 @@ msgstr "Letton (lv_LV)"
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:48
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:121
 msgid "Layout"
-msgstr ""
+msgstr "Disposition"
 
 #: include/classes/widgets/CWidgetHelper.php:769
 #: include/classes/widgets/CWidgetHelper.php:844
@@ -10645,7 +10645,7 @@ msgstr "Local"
 #: include/views/monitoring.history.php:292
 #: include/views/monitoring.screen.constructor.edit.php:720
 msgid "Local time"
-msgstr "Temps local"
+msgstr "Heure locale"
 
 #: include/hosts.inc.php:214
 msgid "Location"
@@ -11158,7 +11158,7 @@ msgstr "Le test du type de média a échoué."
 
 #: app/views/js/popup.mediatypetest.edit.js.php:109
 msgid "Media type test log"
-msgstr ""
+msgstr "Journal du test du type de média"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:139
 msgid "Media type test successful."
@@ -11206,11 +11206,11 @@ msgstr "Mémoire utilisée par un processeur en octets. Retourne un entier"
 
 #: app/views/administration.mediatype.edit.php:255
 msgid "Menu entry URL"
-msgstr ""
+msgstr "URL de l'entrée de menu"
 
 #: app/views/administration.mediatype.edit.php:246
 msgid "Menu entry name"
-msgstr ""
+msgstr "Nom de l'entrée de menu"
 
 #: app/partials/popup.operations.php:158
 #: app/views/monitoring.widget.actionlog.view.php:37
@@ -13524,7 +13524,7 @@ msgstr "Coller sans les liens externes"
 
 #: app/views/monitoring.charts.view.php:106
 msgid "Pattern"
-msgstr ""
+msgstr "Motif"
 
 #: actionconf.php:81 include/views/configuration.action.edit.php:160
 msgid "Pause operations for suppressed problems"
@@ -13941,7 +13941,7 @@ msgstr "Pourcentage d'utilisation du processeur pour un processus. Retourne un f
 
 #: app/views/administration.mediatype.edit.php:234
 msgid "Process tags"
-msgstr ""
+msgstr "Traiter les tags"
 
 #: include/items.inc.php:1859 include/items.inc.php:1863
 msgid "Prometheus"
@@ -15506,7 +15506,7 @@ msgstr "Serveur (proxy)"
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
 #: include/views/monitoring.screen.constructor.edit.php:721
 msgid "Server time"
-msgstr "Temps serveur"
+msgstr "Heure du serveur"
 
 #: app/controllers/CControllerAuditLogList.php:203
 #: app/views/popup.services.php:46 include/actions.inc.php:76
@@ -15878,7 +15878,7 @@ msgstr "Connectez-vous avec HTTP"
 
 #: include/views/general.login.php:49
 msgid "Sign in with Single Sign-On (SAML)"
-msgstr ""
+msgstr "Authentification avec Single Sign-On (SAML)"
 
 #: include/menu.inc.php:241 include/menu.inc.php:244
 msgid "Sign out"
@@ -17022,7 +17022,7 @@ msgstr "Temps écoulé :"
 
 #: include/classes/items/CHelpItems.php:1151
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
-msgstr ""
+msgstr "Moment du dernier accès au proxy. Name - nom du proxy. Les paramètres valides sont : lastaccess - horodatage Unix, delay - secondes."
 
 #: include/actions.inc.php:51
 #: include/classes/widgets/views/widget.svggraph.form.view.php:290
@@ -17044,7 +17044,7 @@ msgstr "Décalage temporel"
 #: include/classes/widgets/forms/CWidgetFormClock.php:31
 #: include/views/monitoring.screen.constructor.edit.php:714
 msgid "Time type"
-msgstr "Type temps"
+msgstr "Type d'heure"
 
 #: include/classes/setup/CFrontendSetup.php:236
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
@@ -17230,7 +17230,7 @@ msgstr "Le déclencheur \"%1$s\" dépend du déclencheur \"%2$s\", qui n'existe 
 
 #: app/controllers/CControllerMenuPopup.php:582
 msgid "Trigger URL"
-msgstr ""
+msgstr "URL du déclencheur"
 
 #: include/views/configuration.action.list.php:27
 msgid "Trigger actions"
@@ -18323,7 +18323,7 @@ msgstr "État du cluster VMware, <url> - URL du service VMware, <name> - Nom du 
 
 #: include/classes/items/CHelpItems.php:815
 msgid "VMware datacenters and their IDs. Returns JSON"
-msgstr ""
+msgstr "Datacenters VMware et leurs identifiants. Retourne un JSON"
 
 #: include/classes/items/CHelpItems.php:807
 #: include/classes/items/CHelpItems.php:851
@@ -18332,7 +18332,7 @@ msgstr "Statistiques de capacité du datastore VMware en octets ou en pourcentag
 
 #: include/classes/items/CHelpItems.php:799
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
-msgstr ""
+msgstr "Liste des hyperviseurs du datastore VMware, <url> - URL du service VMware, <datastore> - nom du datastore"
 
 #: include/classes/items/CHelpItems.php:803
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -18352,7 +18352,7 @@ msgstr "Uuid du BIOS de l'hyperviseur VMware, <url> - URL du service VMware, <uu
 
 #: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Capteurs d'état du fournisseur du matériel de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware. Retourne un JSON"
 
 #: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18364,7 +18364,7 @@ msgstr "Nom du cluster de l'hyperviseur VMware, <url> - URL du service VMware, <
 
 #: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
-msgstr ""
+msgstr "Nom du datacenter de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware. Retourne une chaîne de caractères"
 
 #: include/classes/items/CHelpItems.php:847
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
@@ -18376,15 +18376,15 @@ msgstr "Statistiques d'écriture du datastore de l'hyperviseur VMware, <url> - U
 
 #: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Liste des datastores de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
 #: include/classes/items/CHelpItems.php:927
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
-msgstr ""
+msgstr "Etat cumulatif des capteurs de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware. Retourne 0 - gris ; 1 - vert; 2 - jaune; 3 - rouge"
 
 #: include/classes/items/CHelpItems.php:899
 msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "État de maintenance de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
 #: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18464,7 +18464,7 @@ msgstr "Taille de la mémoire compressée d'une machine virtuelle VMware, <url> 
 
 #: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
-msgstr ""
+msgstr "Nom du datacenter de la machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware. Retourne une chaîne de caractères"
 
 #: include/classes/items/CHelpItems.php:1051
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
