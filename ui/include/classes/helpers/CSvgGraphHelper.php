@@ -600,10 +600,10 @@ class CSvgGraphHelper {
 						}
 
 						if (array_key_exists('count', $point)) {
-							$metric_points[$tick]['value'][] = $point['count'];
+							$metric_points[$point['tick']]['value'][] = $point['count'];
 						}
 						if (array_key_exists('value', $point)) {
-							$metric_points[$tick]['value'][] = $point['value'];
+							$metric_points[$point['tick']]['value'][] = $point['value'];
 						}
 					}
 				}
