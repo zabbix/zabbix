@@ -38,32 +38,36 @@ if ($data['usrgrpid'] != 0) {
 	$form->addVar('usrgrpid', $data['usrgrpid']);
 }
 
-$form_list = (new CFormList())
-	->addRow(
+$form_list = (new CFormGrid())
+	->addItem([
 		(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('maxlength', DB::getFieldLength('usrgrp', 'name'))
-	)
-	->addRow(
+		new CFormField(
+			(new CTextBox('name', $data['name']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
+				->setAttribute('maxlength', DB::getFieldLength('usrgrp', 'name'))
+		)
+	])
+	->addItem([
 		new CLabel(_('Users'), 'userids__ms'),
-		(new CMultiSelect([
-			'name' => 'userids[]',
-			'object_name' => 'users',
-			'data' => $data['users_ms'],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'users',
-					'srcfld1' => 'userid',
-					'srcfld2' => 'fullname',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'userids_'
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'userids[]',
+				'object_name' => 'users',
+				'data' => $data['users_ms'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'users',
+						'srcfld1' => 'userid',
+						'srcfld2' => 'fullname',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'userids_'
+					]
 				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+	]);
 
 if ($data['can_update_group']) {
 	$select_gui_access = (new CSelect('gui_access'))
@@ -84,32 +88,51 @@ if ($data['can_update_group']) {
 		->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 	$form_list
-		->addRow((new CLabel(_('Frontend access'), $select_gui_access->getFocusableElementId())), $select_gui_access)
-		->addRow((new CLabel(_('LDAP Server'), $userdirectory->getFocusableElementId())), $userdirectory)
-		->addRow(_('Enabled'), (new CCheckBox('users_status', GROUP_STATUS_ENABLED))
-			->setUncheckedValue(GROUP_STATUS_DISABLED)
-			->setChecked($data['users_status'] == GROUP_STATUS_ENABLED)
-		);
+		->addItem([
+			(new CLabel(_('Frontend access'), $select_gui_access->getFocusableElementId())),
+			new CFormField($select_gui_access)
+		])
+		->addItem([
+			(new CLabel(_('LDAP Server'), $userdirectory->getFocusableElementId())),
+			new CFormField($userdirectory)
+		])
+		->addItem([
+			new CLabel(_('Enabled')),
+			new CFormField(
+				(new CCheckBox('users_status', GROUP_STATUS_ENABLED))
+					->setUncheckedValue(GROUP_STATUS_DISABLED)
+					->setChecked($data['users_status'] == GROUP_STATUS_ENABLED)
+			)
+		]);
 }
 else {
 	$form_list
-		->addRow(_('Frontend access'),
-			(new CSpan(user_auth_type2str($data['gui_access'])))
-				->addClass('text-field')
-				->addClass('green')
-		)
-		->addRow(_('Enabled'),
-			(new CSpan(_('Enabled')))
-				->addClass('text-field')
-				->addClass('green')
-		);
+		->addItem([
+			new CLabel(_('Frontend access')),
+			new CFormField(
+				(new CSpan(user_auth_type2str($data['gui_access'])))
+					->addClass('text-field')
+					->addClass('green')
+			)
+		])
+		->addItem([
+			new CLabel(_('Enabled')),
+			new CFormField(
+				(new CSpan(_('Enabled')))
+					->addClass('text-field')
+					->addClass('green')
+			)
+		]);
 }
-
-$form_list->addRow(_('Debug mode'),
-	(new CCheckBox('debug_mode', GROUP_DEBUG_MODE_ENABLED))
-		->setUncheckedValue(GROUP_DEBUG_MODE_DISABLED)
-		->setChecked($data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
-);
+$form_list
+	->addItem([
+		new CLabel(_('Debug mode')),
+		new CFormField(
+			(new CCheckBox('advanced_configuration'))
+				->setUncheckedValue(GROUP_DEBUG_MODE_DISABLED)
+				->setChecked($data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
+		)
+	]);
 
 $template_permissions_form_grid = (new CFormGrid())->addItem([
 	new CLabel(_('Permissions')),
@@ -217,13 +240,17 @@ $host_permissions_form_grid
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'))
 	]);
 
-$tag_filter_form_list = new CFormList('tagFilterFormList');
-
-$tag_filter_form_list->addRow(_('Permissions'),
-	(new CDiv(new CPartial('administration.usergroup.tagfilters.html', ['tag_filters' => $data['tag_filters']])))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
+$tag_filter_form_list = (new CFormGrid())
+	->addItem([
+		new CLabel(_('Permissions')),
+		new CFormField(
+			(new CDiv(
+				new CPartial('administration.usergroup.tagfilters.html', ['tag_filters' => $data['tag_filters']])
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+	]);
 
 $new_tag_filter_table = (new CTable())
 	->setId('new-tag-filter-table')
@@ -262,11 +289,13 @@ $new_tag_filter_table = (new CTable())
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
-$tag_filter_form_list->addRow(null,
-	(new CDiv($new_tag_filter_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
+$tag_filter_form_list->addItem([
+	new CFormField(
+		(new CDiv($new_tag_filter_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	)
+]);
 
 $tabs = (new CTabView())
 	->addTab('user_group_tab', _('User group'), $form_list)
