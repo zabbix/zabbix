@@ -42,6 +42,11 @@ static int	DBpatch_6020001(void)
 
 static int	DBpatch_6020002(void)
 {
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#	define ZBX_DB_CHAR_LENGTH(str)	"char_length(" #str ")"
+#else /* HAVE_ORACLE */
+#	define ZBX_DB_CHAR_LENGTH(str)	"length(" #str ")"
+#endif
 	if (ZBX_DB_OK > DBexecute(
 			"update group_discovery gd"
 			" set name=("
@@ -55,6 +60,7 @@ static int	DBpatch_6020002(void)
 	}
 
 	return SUCCEED;
+#undef ZBX_DB_CHAR_LENGTH
 }
 
 #endif
