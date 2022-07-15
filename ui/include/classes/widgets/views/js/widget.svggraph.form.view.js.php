@@ -212,7 +212,7 @@ window.widget_svggraph_form = new class {
 			widget_svggraph_form._updateSingleItemsLinks();
 			widget_svggraph_form._initSingleItemSortable(widget_svggraph_form._getOpenedDataset());
 
-			widget_svggraph_form._updatePreview();
+			widget_svggraph_form.onGraphConfigChange();
 		}
 
 		this._updateSingleItemsLinks();
