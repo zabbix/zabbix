@@ -1803,7 +1803,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   line-height: 18px;
   overflow: hidden; }
   .expandable-subfilter.ten-lines {
-    max-height: calc(18px * 10); }
+    max-height: calc(20px * 10); }
   .expandable-subfilter > div {
     display: inline; }
   .expandable-subfilter .hidden {
@@ -2444,47 +2444,44 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
 
 .range-control {
   position: relative;
-  display: inline-block;
-  vertical-align: middle; }
+  display: inline-flex; }
   .range-control input[type=range] {
+    width: calc(100% + 10px);
+    height: 20px;
+    margin: 2px -5px;
+    padding: 0;
+    vertical-align: top;
+    opacity: 0;
     cursor: pointer;
     -webkit-appearance: none;
     /* Hides the slider so that custom slider can be made */
     -moz-appearance: none;
     /* Hides the slider so that custom slider can be made */
-    width: calc(100% + 10px);
-    opacity: 0;
-    vertical-align: middle;
-    margin: 0 -5px;
-    padding: 0;
-    height: 20px;
     /* Special styling for WebKit/Blink */ }
     .range-control input[type=range]:focus {
       outline: none; }
     .range-control input[type=range]::-webkit-slider-thumb, .range-control input[type=range]::-moz-range-thumb {
-      margin-top: 1px;
-      /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
       height: 10px;
       width: 10px;
+      margin-top: 1px;
+      /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
       opacity: 0; }
     .range-control input[type=range]::-webkit-slider-runnable-track {
       height: 10px;
       opacity: 0; }
   .range-control input[type=text] {
-    width: 31px;
-    float: right; }
+    width: 31px; }
   .range-control > div {
     position: relative;
     width: calc(100% - 10px - 31px);
-    margin: 2px 10px 0 0;
-    float: left; }
+    margin-right: 10px; }
   .range-control .range-control-track,
   .range-control .range-control-progress {
     position: absolute;
     top: 50%;
-    margin-top: -1px;
     left: 0;
     height: 2px;
+    margin-top: -1px;
     cursor: pointer; }
   .range-control .range-control-track {
     width: 100%;
@@ -2494,12 +2491,12 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .range-control .range-control-thumb {
     position: absolute;
     top: 50%;
-    margin-top: -5px;
-    margin-left: -5px;
     width: 10px;
     height: 10px;
-    border-radius: 50%;
-    background: #0275b8; }
+    margin-top: -5px;
+    margin-left: -5px;
+    background: #0275b8;
+    border-radius: 50%; }
   .range-control.range-control-focus .range-control-thumb {
     margin-top: -6.66667px;
     margin-left: -6.66667px;
@@ -2516,15 +2513,15 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       background: #c0c0c0; }
   .range-control datalist {
     position: absolute;
+    top: 50%;
     display: flex;
     width: 100%;
-    top: 50%;
     margin-top: -1px; }
     .range-control datalist option {
-      padding: 0;
-      font-size: 0;
       flex: 1 0 0;
       height: 2px;
+      padding: 0;
+      font-size: 0;
       border-left: 1px solid #ebeef0; }
 
 .service-info {
@@ -2603,7 +2600,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
 
 .subfilter {
   margin-right: 10px;
-  white-space: nowrap; }
+  white-space: nowrap;
+  line-height: 14px;
+  height: 16px;
+  margin-bottom: 2px; }
 
 .subfilter-enabled {
   background-color: #768d99;
@@ -2830,7 +2830,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 14px;
-  color: #ffffff;
+  color: #0275b8;
   border-bottom: 1px solid #ebeef0;
   background: #768d99; }
 .toc .toc-arrow {
@@ -2938,8 +2938,9 @@ z-select,
       color: #1f2c33;
       text-overflow: ellipsis;
       word-break: break-word;
-      white-space: pre-wrap;
-      user-select: none; }
+      user-select: none;
+      white-space: nowrap;
+      overflow: hidden; }
       z-select .list li.hover,
       .z-select .list li.hover {
         background-color: #e8f5ff; }
@@ -3205,7 +3206,6 @@ form.is-loading {
     box-shadow: inset 0 -1px 0 0 rgba(31, 44, 51, 0.1);
     color: #1f2c33;
     height: 22px;
-    line-height: 1;
     vertical-align: middle;
     white-space: nowrap; }
     .list-table.compact-view td [class*='icon-'] {
@@ -3374,8 +3374,6 @@ form.is-loading {
     .list-table.sticky-footer tfoot tr:first-of-type td, .list-table.sticky-footer tfoot tr:first-of-type th {
       border-top: 2px solid #dce2e5;
       border-bottom: 0; }
-  .list-table td .checkbox-radio + label span {
-    top: -2px; }
 
 .table-paging {
   text-align: center;
@@ -3833,10 +3831,6 @@ form.is-loading {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
-    .table-forms .table-forms-td-right .checkbox-radio + label span {
-      top: -1px; }
-    .table-forms .table-forms-td-right .checkbox-list .checkbox-radio + label span {
-      top: -3px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -3955,19 +3949,31 @@ select {
 .checkbox-radio {
   position: absolute !important;
   top: auto !important;
+  z-index: 1;
   width: 16px !important;
   height: 16px !important;
-  opacity: 0;
-  z-index: 1; }
+  opacity: 0; }
+  .checkbox-radio + label span {
+    position: relative;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+    vertical-align: text-bottom;
+    background-color: #ffffff;
+    border: 1px solid #acbbc2; }
+    .checkbox-radio + label span:active {
+      border-color: #acbbc2; }
+  .checkbox-radio + label.label-pos-left span {
+    margin-left: 4px;
+    margin-right: 0; }
   .checkbox-radio:checked[readonly] + label span {
     transition: none; }
     .checkbox-radio:checked[readonly] + label span::after {
       border-color: #acbbc2 !important; }
-  .checkbox-radio[readonly],
-  .checkbox-radio[readonly] + label {
+  .checkbox-radio[readonly], .checkbox-radio[readonly] + label {
     pointer-events: none; }
-    .checkbox-radio[readonly] span,
-    .checkbox-radio[readonly] + label span {
+    .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span {
       transition: none; }
   .checkbox-radio[type="checkbox"] + label span {
     border-radius: 2px; }
@@ -3998,21 +4004,6 @@ select {
     border-radius: 50%; }
   .checkbox-radio[type="radio"]:checked[disabled] + label span::after {
     background-color: #acbbc2 !important; }
-  .checkbox-radio + label span {
-    position: relative;
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    margin-right: 4px;
-    top: -2px;
-    vertical-align: middle;
-    border: 1px solid #acbbc2;
-    background-color: #ffffff; }
-    .checkbox-radio + label span:active {
-      border-color: #acbbc2; }
-  .checkbox-radio + label.label-pos-left span {
-    margin-left: 6px;
-    margin-right: 1px; }
   .checkbox-radio:focus + label span {
     border-color: #02659f; }
   .checkbox-radio:checked:focus + label span {
@@ -4024,7 +4015,7 @@ select {
   .checkbox-radio[disabled] + label span {
     transition: none; }
 
-input[type="checkbox"], input[type="radio"] {
+input[type="radio"] {
   margin: 0;
   padding: 0;
   border: 0;
@@ -4148,7 +4139,7 @@ button {
     background-color: #e8f5ff;
     border-color: #02659f; }
 
-.btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active, .interface-container .interface-row .interface-cell .interface-btn-toggle {
+.btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
   position: relative;
   background-color: transparent;
   border: 0;
@@ -4158,14 +4149,14 @@ button {
   font-size: inherit;
   padding: 0;
   min-height: inherit; }
-  .btn-link:focus, .interface-container .interface-row .interface-cell .interface-btn-toggle:focus {
+  .btn-link:focus {
     outline: none;
     margin-bottom: -2px !important;
     border-bottom: 2px solid rgba(2, 117, 184, 0.5);
     box-shadow: 0 0 0 0 !important; }
-  .btn-link[disabled], .interface-container .interface-row .interface-cell [disabled].interface-btn-toggle {
+  .btn-link[disabled] {
     background-color: transparent; }
-    .btn-link[disabled]:hover, .interface-container .interface-row .interface-cell [disabled].interface-btn-toggle:hover {
+    .btn-link[disabled]:hover {
       background-color: transparent; }
 
 .btn-kiosk {
@@ -4210,10 +4201,10 @@ button {
 .btn-widget-action {
   background: url("../img/icon-sprite.svg?20220519") no-repeat -6px -618px; }
 
-.btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle {
+.btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle {
   background: url("../img/icon-sprite.svg?20220519") no-repeat -6px -654px; }
 
-.btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle {
+.btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle {
   background: url("../img/icon-sprite.svg?20220519") no-repeat -6px -689px; }
 
 .btn-widget-edit {
@@ -4497,7 +4488,7 @@ button {
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(118, 141, 153, 0.5); }
 
-.btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
+.btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock {
   width: 24px;
   height: 24px;
   margin: 2px 2px 0 0; }
@@ -4506,13 +4497,13 @@ button {
   width: 24px;
   height: 24px; }
 
-.filter-container.tabfilter-container .icon-edit, .btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle, .btn-dashboard-conf {
+.filter-container.tabfilter-container .icon-edit, .btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .btn-dashboard-conf, .interfaces .interface-row[data-type="2"] .interface-btn-toggle {
   border: 0;
   min-height: 0;
   padding: 0;
   opacity: .5;
   transition: opacity .2s ease-out; }
-  .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-dashboard-page-properties, [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle, [disabled].btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle, [disabled].btn-dashboard-conf, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-dashboard-page-properties:hover, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:hover, [disabled].btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:hover, [disabled].btn-dashboard-conf:hover, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-dashboard-page-properties:focus, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:focus, [disabled].btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:focus, [disabled].btn-dashboard-conf:focus, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-dashboard-page-properties:active, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:active, [disabled].btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:active, [disabled].btn-dashboard-conf:active {
+  .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-dashboard-page-properties, [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle, [disabled].btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, [disabled].btn-dashboard-conf, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-dashboard-page-properties:hover, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:hover, [disabled].btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, [disabled].btn-dashboard-conf:hover, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:hover, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-dashboard-page-properties:focus, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:focus, [disabled].btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, [disabled].btn-dashboard-conf:focus, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:focus, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-dashboard-page-properties:active, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:active, [disabled].btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, [disabled].btn-dashboard-conf:active, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:active {
     background-color: transparent;
     opacity: .25; }
 
@@ -4532,8 +4523,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
-.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span,
-.checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
+.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
   color: #acbbc2;
   background-color: #ebebeb !important;
   border-color: #ccd5d9; }
@@ -4541,7 +4531,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
 
-.filter-container.tabfilter-container .icon-edit:hover, .btn-dashboard-page-properties:hover, .btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:hover, .btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:hover, .btn-widget-edit:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:hover, .btn-dashboard-conf:hover, .filter-container.tabfilter-container .icon-edit:focus, .btn-dashboard-page-properties:focus, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:focus, .btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:focus, .btn-widget-edit:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:focus, .btn-dashboard-conf:focus, .filter-container.tabfilter-container .icon-edit:active, .btn-dashboard-page-properties:active, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:active, .btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:active, .btn-widget-edit:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:active, .btn-dashboard-conf:active {
+.filter-container.tabfilter-container .icon-edit:hover, .btn-dashboard-page-properties:hover, .btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:hover, .btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:hover, .btn-widget-edit:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .btn-dashboard-conf:hover, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:hover, .filter-container.tabfilter-container .icon-edit:focus, .btn-dashboard-page-properties:focus, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:focus, .btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:focus, .btn-widget-edit:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .btn-dashboard-conf:focus, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:focus, .filter-container.tabfilter-container .icon-edit:active, .btn-dashboard-page-properties:active, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:active, .btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:active, .btn-widget-edit:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .btn-dashboard-conf:active, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:active {
   background-color: transparent;
   opacity: 1; }
 
@@ -5904,19 +5894,23 @@ span.is-loading {
 
 .dashboard-grid-widget-content, div.dashboard-grid-widget-item, .msg-details ul, z-select button.focusable,
 .z-select button.focusable, z-select .list,
-.z-select .list, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .overflow-table {
+.z-select .list, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .overflow-table, .import-compare .toc,
+.import-compare .diff {
   scrollbar-width: thin; }
   .dashboard-grid-widget-content::-webkit-scrollbar, div.dashboard-grid-widget-item::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
   .z-select button.focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
-  .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
+  .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
+  .import-compare .diff::-webkit-scrollbar {
     width: 9px; }
   .dashboard-grid-widget-content::-webkit-scrollbar-track, div.dashboard-grid-widget-item::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
   .z-select button.focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
-  .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
+  .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
+  .import-compare .diff::-webkit-scrollbar-track {
     background-color: rgba(172, 187, 194, 0.55); }
   .dashboard-grid-widget-content::-webkit-scrollbar-thumb, div.dashboard-grid-widget-item::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
   .z-select button.focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
-  .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
+  .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
+  .import-compare .diff::-webkit-scrollbar-thumb {
     background-color: rgba(135, 135, 135, 0.85);
     border: 1px solid rgba(122, 122, 122, 0.85); }
 
@@ -6144,10 +6138,7 @@ svg {
 .checkbox-list li {
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 20px; }
-  .checkbox-list li label {
-    line-height: 16px;
-    vertical-align: bottom; }
+  line-height: 24px; }
 
 .columns-wrapper {
   display: flex;
@@ -6209,7 +6200,8 @@ svg {
 .preprocessing-list {
   display: block;
   max-width: 930px;
-  min-width: 800px; }
+  min-width: 800px;
+  position: relative; }
   .preprocessing-list > li {
     display: block;
     position: relative; }
@@ -6227,7 +6219,7 @@ svg {
   .preprocessing-list select {
     width: 100%;
     min-width: 0; }
-  .preprocessing-list .btn-link:not(:last-of-type), .preprocessing-list .interface-container .interface-row .interface-cell .interface-btn-toggle:not(:last-of-type), .interface-container .interface-row .interface-cell .preprocessing-list .interface-btn-toggle:not(:last-of-type) {
+  .preprocessing-list .btn-link:not(:last-of-type) {
     margin-right: 10px; }
   .preprocessing-list .preprocessing-list-head,
   .preprocessing-list .preprocessing-list-foot,
@@ -6987,42 +6979,50 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
   /* for IE11 only. Fixed cell height if table has 100% height */
   .host-avail-widget td {
     height: 100%; } }
-.interface-container {
-  width: fit-content;
-  width: -moz-fit-content;
-  padding-left: 0; }
-  .interface-container:not(.interface-container-header):not(:empty) {
-    margin-bottom: 5px; }
-    .interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) {
-      border-top: 1px solid #acbbc2;
-      padding-top: 10px; }
-  .interface-container:empty {
-    display: none; }
-  .interface-container .interface-row {
-    display: grid;
-    grid-template-columns: 26px 36px 225px 175px 85px 100px 20px 1fr;
-    grid-template-rows: 24px 1fr;
-    gap: 5px; }
-    .interface-container .interface-row:not(:first-of-type) {
-      margin-top: 5px; }
-    .interface-container .interface-row[data-type] .interface-cell-details {
-      display: none;
-      grid-column: 1/-1; }
-    .interface-container .interface-row .interface-cell {
-      align-self: center; }
-      .interface-container .interface-row .interface-cell .interface-btn-toggle {
-        display: none; }
-      .interface-container .interface-row .interface-cell.interface-cell-header {
-        color: #768d99;
-        text-align: left; }
-      .interface-container .interface-row .interface-cell .table-forms-td-left,
-      .interface-container .interface-row .interface-cell .table-forms-td-right {
-        padding-bottom: 0; }
+.table-forms-td-right .interfaces {
+  margin-top: 5px; }
 
-.interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .list-accordion-item-body {
-  display: block; }
-.interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
-  display: inline-block; }
+.interfaces {
+  display: grid;
+  grid-template-columns: 26px repeat(7, max-content);
+  margin-bottom: 5px;
+  line-height: 24px; }
+  .interfaces .interface-container {
+    display: contents; }
+    .interfaces .interface-container.interface-container-header .interface-cell {
+      padding: 0 5px 0 0;
+      color: #768d99; }
+    .interfaces .interface-container.interface-container-header .interface-cell-action {
+      grid-column: span 2; }
+    .interfaces .interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) .interface-cell:not(.interface-cell-details) {
+      padding-top: 10px;
+      margin-top: 5px;
+      border-top: 1px solid #acbbc2; }
+  .interfaces .interface-row {
+    display: contents; }
+    .interfaces .interface-row[data-type="2"] .interface-btn-toggle {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background: url("../img/icon-sprite.svg?20220519") no-repeat -6px -690px; }
+    .interfaces .interface-row[data-type="2"] .list-accordion-item-body {
+      display: none;
+      padding-top: 0; }
+    .interfaces .interface-row[data-type="2"].list-accordion-item-opened .interface-btn-toggle {
+      background: url("../img/icon-sprite.svg?20220519") no-repeat -6px -655px; }
+    .interfaces .interface-row[data-type="2"].list-accordion-item-opened .list-accordion-item-body {
+      display: block; }
+  .interfaces .interface-cell {
+    padding: 5px 5px 5px 0; }
+    .interfaces .interface-cell.interface-cell-details {
+      display: none;
+      grid-column: 1 / -1; }
+  .interfaces .interface-btn-toggle {
+    display: none;
+    vertical-align: top; }
+  .interfaces .no-interface {
+    grid-column: 1 / -1;
+    color: #768d99; }
 
 .debug-modal.overlay-dialogue.modal .overlay-dialogue-body {
   overflow-x: auto; }
@@ -7153,7 +7153,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .import-compare {
   display: flex;
-  max-height: calc(100vh - 190px); }
+  max-height: calc(100vh - 220px); }
   .import-compare .toc {
     flex: 20%;
     overflow-y: auto;
@@ -7213,9 +7213,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   background-position: -117px -506px !important; }
 
 .geomap-filter {
-  border: 2px solid rgba(223, 228, 231, 0.4);
+  border: 1px solid #ccd5d9;
   background-color: #ffffff;
-  padding: 10px 30px 5px 10px;
+  padding: 5px 20px 5px 10px;
   position: absolute;
   margin-right: -2px;
   margin-top: 5px;
@@ -7223,7 +7223,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   right: 0; }
 
 .geomap-filter.collapsed {
-  display: table; }
+  display: block; }
 
 .geomap-filter li {
   width: calc(100% + 20px); }

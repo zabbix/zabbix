@@ -172,7 +172,7 @@ else {
 }
 
 $host_tab
-	->addRow(_('Templates'),
+	->addRow(new CLabel(_('Templates'), 'add_templates__ms'),
 		(count($templates_field_items) > 1)
 			? (new CDiv($templates_field_items))->addClass('linked-templates')
 			: $templates_field_items
@@ -204,7 +204,7 @@ $host_tab->addRow(
 
 // New group prototypes.
 $host_tab->addRow(
-	_('Group prototypes'),
+	new CLabel(_('Group prototypes'), 'group_prototypes'),
 	(new CDiv(
 		(new CTable())
 			->setId('tbl_group_prototypes')
@@ -251,7 +251,8 @@ $host_tab->addRow(
 			->setModern(true)
 			->setReadonly($host_prototype['templateid'] != 0),
 		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
-			->setId('interfaces-table'),
+			->setId('interfaces-table')
+			->addClass(ZBX_STYLE_HOST_INTERFACES),
 		new CDiv(
 			(new CButton('interface-add', _('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)

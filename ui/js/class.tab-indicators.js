@@ -617,7 +617,7 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#preprocessing .preprocessing-list-item')
+			.querySelectorAll('#preprocessing .preprocessing-list-item:not(.ui-sortable-placeholder)')
 			.length;
 	}
 
