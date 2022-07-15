@@ -67,7 +67,7 @@
 			this.field_switches = field_switches;
 			this.interface_types = interface_types;
 
-			if (typeof value_type_by_keys !== 'undefined' && keys_by_item_type !== 'undefined') {
+			if (typeof value_type_by_keys !== 'undefined' && typeof keys_by_item_type !== 'undefined') {
 				item_type_lookup.init(value_type_by_keys, keys_by_item_type);
 			}
 		}
@@ -329,15 +329,14 @@
 		},
 
 		updateKeyTypeSuggestions() {
+			this.key_type_suggestions = {};
+
 			if (this.item_type.value in this.keys_by_item_type) {
 				for (let [key, value] of Object.entries(this.value_type_by_keys)) {
 					if (this.keys_by_item_type[this.item_type.value].includes(key)) {
 						this.key_type_suggestions[key] = value;
 					}
 				}
-			}
-			else {
-				this.key_type_suggestions = {};
 			}
 		},
 
