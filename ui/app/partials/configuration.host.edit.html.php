@@ -295,31 +295,41 @@ $host_tab
 
 // IPMI tab.
 if ($host_is_discovered) {
-	$ipmi_authtype_select = [
-		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['host']['ipmi_authtype']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		new CVar('ipmi_authtype', $data['host']['ipmi_authtype'])
+	$ipmi_authtype_row = [
+		new CLabel(_('Authentication algorithm'), 'ipmi_authtype_name'),
+		new CFormField([
+			(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['host']['ipmi_authtype']), true))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			new CVar('ipmi_authtype', $data['host']['ipmi_authtype'])
+		])
 	];
-	$ipmi_privilege_select = [
-		(new CTextBox('ipmi_privilege_name', ipmiPrivileges($data['host']['ipmi_privilege']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		new CVar('ipmi_privilege', $data['host']['ipmi_privilege'])
+	$ipmi_privilege_row = [
+		new CLabel(_('Privilege level'), 'ipmi_privilege_name'),
+		new CFormField([
+			(new CTextBox('ipmi_privilege_name', ipmiPrivileges($data['host']['ipmi_privilege']), true))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			new CVar('ipmi_privilege', $data['host']['ipmi_privilege'])
+		])
 	];
 }
 else {
-	$ipmi_authtype_select = new CListBox('ipmi_authtype', $data['host']['ipmi_authtype'], 7, ipmiAuthTypes());
-	$ipmi_privilege_select = new CListBox('ipmi_privilege', $data['host']['ipmi_privilege'], 5, ipmiPrivileges());
+	$ipmi_authtype_row = [
+		new CLabel(_('Authentication algorithm'), 'ipmi_authtype'),
+		new CFormField(
+			new CListBox('ipmi_authtype', $data['host']['ipmi_authtype'], 7, ipmiAuthTypes())
+		)
+	];
+	$ipmi_privilege_row = [
+		new CLabel(_('Privilege level'), 'ipmi_privilege'),
+		new CFormField(
+			new CListBox('ipmi_privilege', $data['host']['ipmi_privilege'], 5, ipmiPrivileges())
+		)
+	];
 }
 
 $ipmi_tab = (new CFormGrid())
-	->addItem([
-		new CLabel(_('Authentication algorithm'), 'ipmi_authtype'),
-		new CFormField($ipmi_authtype_select)
-	])
-	->addItem([
-		new CLabel(_('Privilege level'), 'ipmi_privilege'),
-		new CFormField($ipmi_privilege_select)
-	])
+	->addItem($ipmi_authtype_row)
+	->addItem($ipmi_privilege_row)
 	->addItem([
 		new CLabel(_('Username'), 'ipmi_username'),
 		new CFormField(

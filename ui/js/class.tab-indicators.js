@@ -504,9 +504,14 @@ class IpmiTabIndicatorItem extends TabIndicatorItem {
 		const ipmi_authtype = document.getElementById('ipmi_authtype');
 
 		if (ipmi_authtype !== null) {
-			const options = ipmi_authtype.selectedOptions;
+			if (ipmi_authtype.type === 'select-multiple') {
+				const options = ipmi_authtype.selectedOptions;
 
-			if (options.length > 1 || options[0].value != IpmiTabIndicatorItem.IPMI_AUTHTYPE_DEFAULT) {
+				if (options.length > 1 || options[0].value != IpmiTabIndicatorItem.IPMI_AUTHTYPE_DEFAULT) {
+					return true;
+				}
+			}
+			else if (ipmi_authtype.value != IpmiTabIndicatorItem.IPMI_AUTHTYPE_DEFAULT) {
 				return true;
 			}
 		}
@@ -514,9 +519,14 @@ class IpmiTabIndicatorItem extends TabIndicatorItem {
 		const ipmi_privilege = document.getElementById('ipmi_privilege');
 
 		if (ipmi_privilege !== null) {
-			const options = ipmi_privilege.selectedOptions;
+			if (ipmi_privilege.type === 'select-multiple') {
+				const options = ipmi_privilege.selectedOptions;
 
-			if (options.length > 1 || options[0].value != IpmiTabIndicatorItem.IPMI_PRIVILEGE_USER) {
+				if (options.length > 1 || options[0].value != IpmiTabIndicatorItem.IPMI_PRIVILEGE_USER) {
+					return true;
+				}
+			}
+			else if (ipmi_privilege.value != IpmiTabIndicatorItem.IPMI_PRIVILEGE_USER) {
 				return true;
 			}
 		}
