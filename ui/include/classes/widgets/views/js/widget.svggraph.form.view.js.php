@@ -340,6 +340,7 @@ window.widget_svggraph_form = new class {
 			this._form.scrollHeight - this._$overlay_body.height()
 		));
 
+		this.onGraphConfigChange();
 		this._initDataSetSortable();
 	}
 
