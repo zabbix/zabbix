@@ -1,0 +1,1 @@
+...G...... [ZBX-20523] fixed symlink names expansion in vfs.dir.get and vfs.file.get (akozlovs)
