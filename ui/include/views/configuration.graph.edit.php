@@ -140,7 +140,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			$percentLeftCheckbox->setChecked(false);
 		}
 
-		$graphFormList->addRow(_('Percentile line (left)'), [$percentLeftCheckbox, SPACE, $percentLeftTextBox]);
+		$graphFormList->addRow(_('Percentile line (left)'), [$percentLeftCheckbox, ' ', $percentLeftTextBox]);
 
 		// Percent right.
 		$percentRightTextBox = (new CTextBox('percent_right', $data['percent_right'], $readonly, 7))
@@ -158,7 +158,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			$percentRightCheckbox->setChecked(false);
 		}
 
-		$graphFormList->addRow(_('Percentile line (right)'), [$percentRightCheckbox, SPACE, $percentRightTextBox]);
+		$graphFormList->addRow(_('Percentile line (right)'), [$percentRightCheckbox, ' ', $percentRightTextBox]);
 	}
 
 	$yaxisMinData = [];
@@ -174,8 +174,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 
 	if ($data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = (new CTextBox('yaxismin', $data['yaxismin'], $readonly))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+		$yaxisMinData[] = (new CTextBox('yaxismin', $data['yaxismin'], $readonly))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 	}
 	elseif ($data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismin', $data['yaxismin']);
@@ -269,13 +268,13 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 
 	if ($data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = (new CTextBox('yaxismax', $data['yaxismax'], $readonly))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+		$yaxisMaxData[] = (new CTextBox('yaxismax', $data['yaxismax'], $readonly))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 	}
 	elseif ($data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismax', $data['yaxismax']);
 
 		$ymax_axis_ms_data = [];
+
 		if ($data['ymax_itemid'] != 0) {
 			if (array_key_exists($data['ymax_itemid'], $data['yaxis_items'])) {
 				$ymax_axis_ms_data = [[
