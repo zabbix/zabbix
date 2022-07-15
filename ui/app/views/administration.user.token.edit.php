@@ -64,14 +64,14 @@ $token_from_list = (new CFormList())
 		(new CDateSelector('expires_at', $data['expires_at']))
 			->setDateFormat(ZBX_FULL_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-			->setAriaRequired()
+			->setAriaRequired(),
+		'expires-at-row'
 	)
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', ZBX_AUTH_TOKEN_ENABLED))
 			->setChecked($data['status'] == ZBX_AUTH_TOKEN_ENABLED)
 			->setUncheckedValue(ZBX_AUTH_TOKEN_DISABLED)
 	);
-
 
 $token_view = (new CTabView())->addTab('token', '', $token_from_list);
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
