@@ -361,13 +361,24 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 
 class TagsTabIndicatorItem extends TabIndicatorItem {
 
+	static ZBX_PROPERTY_INHERITED = 1;
+
 	constructor() {
 		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#tags-table tr.form_row > td:first-child > textarea:not(:placeholder-shown):not([readonly])')
+		return [...document.querySelectorAll('#tags-table .form_row')]
+			.filter((row) => {
+				const tag = row.querySelector('textarea[name$="[tag]"]');
+				const type = row.querySelector('input[name$="[type]"]');
+
+				if (type !== null && type.value == TagsTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
+					return false;
+				}
+
+				return tag !== null && tag.value !== '';
+			})
 			.length;
 	}
 
