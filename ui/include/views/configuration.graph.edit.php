@@ -196,7 +196,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			if (array_key_exists($data['ymin_itemid'], $data['yaxis_items'])) {
 				$ymin_axis_ms_data = [[
 					'id' => $data['ymin_itemid'],
-					'name' => $data['yaxis_items'][$data['ymin_itemid']]['name_expanded'],
+					'name' => $data['yaxis_items'][$data['ymin_itemid']]['name'],
 					'prefix' => $data['yaxis_items'][$data['ymin_itemid']]['hosts'][0]['name'].NAME_DELIMITER
 				]];
 			}
@@ -290,7 +290,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			if (array_key_exists($data['ymax_itemid'], $data['yaxis_items'])) {
 				$ymax_axis_ms_data = [[
 					'id' => $data['ymax_itemid'],
-					'name' => $data['yaxis_items'][$data['ymax_itemid']]['name_expanded'],
+					'name' => $data['yaxis_items'][$data['ymax_itemid']]['name'],
 					'prefix' => $data['yaxis_items'][$data['ymax_itemid']]['hosts'][0]['name'].NAME_DELIMITER
 				]];
 			}
@@ -354,8 +354,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 
 	$yaxismax_label = new CLabel(_('Y axis MAX value'), 'ymax_type_label');
 	if ($data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-		$yaxismax_label
-			->setAsteriskMark();
+		$yaxismax_label->setAsteriskMark();
 	}
 
 	$graphFormList->addRow($yaxismax_label, $yaxisMaxData);
