@@ -53,13 +53,15 @@ class testPageServicesSlaReport extends testSlaReport {
 			'field' => 'SLA',
 			'headers' => ['Name'],
 			'column_data' => [
-				'SLA Annual',
-				'SLA Daily',
-				'SLA Monthly',
-				'SLA Quarterly',
-				'SLA Weekly',
-				'SLA with schedule and downtime',
-				'SLA для удаления - 頑張って', 'Update SLA'
+				'Name' => [
+					'SLA Annual',
+					'SLA Daily',
+					'SLA Monthly',
+					'SLA Quarterly',
+					'SLA Weekly',
+					'SLA with schedule and downtime',
+					'SLA для удаления - 頑張って', 'Update SLA'
+				]
 			],
 			'table_selector' => 'xpath://form[@id="sla"]/table',
 			'buttons' => ['Cancel']
@@ -79,120 +81,16 @@ class testPageServicesSlaReport extends testSlaReport {
 		];
 
 		foreach ([$sla_data, $service_data] as $dialog_data) {
-			$this->assertDialogContents($dialog_data);
+			$this->checkDialogContents($dialog_data);
 		}
 
 		foreach (['From', 'To'] as $field_label) {
 			$field = $filter_form->getField($field_label)->query('xpath:./input')->one();
-			$field->highlight();
 			$this->assertEquals(10, $field->getAttribute('maxlength'));
 			$this->assertEquals('YYYY-MM-DD', $field->getAttribute('placeholder'));
 		}
 
 		$this->assertEquals('Select SLA to display SLA report.', $this->query('class:list-table')->one()->getText());
-	}
-
-	public function getSlaDataWithService() {
-		return [
-			// Daily with downtime.
-			[
-				[
-					'filter' => [
-						'SLA' => 'SLA Daily',
-						'Service' => 'Service with problem'
-					],
-					'reporting_period' => 'Daily',
-					'downtimes' => [
-						'names' => ['EXCLUDED DOWNTIME', 'Second downtime']
-					],
-					'check_sorting' => true,
-					'expected' => [
-						'SLO' => '11.111'
-					]
-				]
-			],
-			// Daily without downtime.
-			[
-				[
-					'filter' => [
-						'SLA' => 'Update SLA',
-						'Service' => 'Parent for 2 levels of child services'
-					],
-					'reporting_period' => 'Daily',
-					'expected' => [
-						'SLO' => '99.99',
-						'SLI' => 100
-					]
-				]
-			],
-			// Weekly SLA.
-			[
-				[
-					'filter' => [
-						'SLA' => 'SLA Weekly',
-						'Service' => 'Simple actions service'
-					],
-					'reporting_period' => 'Weekly',
-					'expected' => [
-						'SLO' => '55.5555',
-						'SLI' => 100
-					]
-				]
-			],
-			// Monthly SLA.
-			[
-				[
-					'filter' => [
-						'SLA' => 'SLA Monthly',
-						'Service' => 'Simple actions service'
-					],
-					'reporting_period' => 'Monthly',
-					'expected' => [
-						'SLO' => '22.22',
-						'SLI' => 100
-					]
-				]
-			],
-			// Quarterly SLA.
-			[
-				[
-					'filter' => [
-						'SLA' => 'SLA Quarterly',
-						'Service' => 'Simple actions service'
-					],
-					'reporting_period' => 'Quarterly',
-					'expected' => [
-						'SLO' => '33.33',
-						'SLI' => 100
-					]
-				]
-			],
-			// Annual SLA.
-			[
-				[
-					'filter' => [
-						'SLA' => 'SLA Annual',
-						'Service' => 'Service with problem'
-					],
-					'reporting_period' => 'Annually',
-					'expected' => [
-						'SLO' => '44.44',
-						'SLI' => 100
-					]
-				]
-			],
-			// Incorrect SLA and Service combination.
-			[
-				[
-					'filter' => [
-						'SLA' => 'SLA Annual',
-						'Service' => 'Child 1'
-					],
-					'reporting_period' => 'Annually',
-					'no_data' => true
-				]
-			]
-		];
 	}
 
 	/**
@@ -201,97 +99,8 @@ class testPageServicesSlaReport extends testSlaReport {
 	 * @onBefore getDateTimeData
 	 */
 	public function testPageServicesSlaReport_LayoutWithService($data) {
-		$this->openSlaReport($data['filter']);
+		$this->openSlaReport($data['fields']);
 		$this->checkLayoutWithService($data);
-	}
-
-	public function getSlaDataWithoutService() {
-		return [
-			// Daily with downtime.
-			[
-				[
-					'filter' => [
-						'SLA' => 'SLA Daily'
-					],
-					'reporting_period' => 'Daily',
-					'downtimes' => true,
-					'expected' => [
-						'SLO' => '11.111',
-						'services' => ['Service with problem']
-					]
-				]
-			],
-			// Daily without downtime.
-			[
-				[
-					'filter' => [
-						'SLA' => 'Update SLA'
-					],
-					'reporting_period' => 'Daily',
-					'expected' => [
-						'SLO' => '99.99',
-						'SLI' => 100,
-						'services' => ['Parent for 2 levels of child services']
-					]
-				]
-			],
-			// Weekly SLA.
-			[
-				[
-					'filter' => [
-						'SLA' => 'SLA Weekly'
-					],
-					'reporting_period' => 'Weekly',
-					'expected' => [
-						'SLO' => '55.5555',
-						'SLI' => 100,
-						'services' => ['Service with multiple service tags', 'Simple actions service']
-					]
-				]
-			],
-			// Monthly SLA.
-			[
-				[
-					'filter' => [
-						'SLA' => 'SLA Monthly'
-					],
-					'reporting_period' => 'Monthly',
-					'expected' => [
-						'SLO' => '22.22',
-						'SLI' => 100,
-						'services' => ['Service with multiple service tags', 'Simple actions service']
-					]
-				]
-			],
-			// Quarterly SLA.
-			[
-				[
-					'filter' => [
-						'SLA' => 'SLA Quarterly'
-					],
-					'reporting_period' => 'Quarterly',
-					'expected' => [
-						'SLO' => '33.33',
-						'SLI' => 100,
-						'services' => ['Service with multiple service tags', 'Simple actions service']
-					]
-				]
-			],
-			// Annual SLA.
-			[
-				[
-					'filter' => [
-						'SLA' => 'SLA Annual'
-					],
-					'reporting_period' => 'Annually',
-					'expected' => [
-						'SLO' => '44.44',
-						'SLI' => 100,
-						'services' => ['Service with problem']
-					]
-				]
-			]
-		];
 	}
 
 	/**
@@ -300,16 +109,16 @@ class testPageServicesSlaReport extends testSlaReport {
 	 * @onBefore getDateTimeData
 	 */
 	public function testPageServicesSlaReport_LayoutWithoutService($data) {
-		$this->openSlaReport($data['filter']);
+		$this->openSlaReport($data['fields']);
 		$this->checkLayoutWithoutService($data);
 	}
 
 	public function testPageServicesSlaReport_Sort() {
 		$data = [
-			'filter' => ['SLA' => 'SLA Monthly'],
+			'fields' => ['SLA' => 'SLA Monthly'],
 			'expected' => ['Service with multiple service tags', 'Simple actions service']
 		];
-		$this->openSlaReport($data['filter']);
+		$this->openSlaReport($data['fields']);
 
 		$table = $this->query('class:list-table')->asTable()->one();
 		$column_header = $table->query('xpath:.//th/a[text()="Service"]')->one();
@@ -325,12 +134,12 @@ class testPageServicesSlaReport extends testSlaReport {
 		}
 	}
 
-	public function getSlaDataWithServiceAndCustomDates() {
+	public function getSlaDataWithCustomDates() {
 		return [
 			// Daily with custom dates.
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Daily',
 						'Service' => 'Service with problem',
 						'From' => '2020-02-28',
@@ -348,7 +157,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Daily',
 						'Service' => 'Service with problem',
 						'From' => '2021-06-29'
@@ -380,7 +189,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Daily',
 						'Service' => 'Service with problem',
 						'To' => '2021-06-29'
@@ -412,7 +221,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Daily',
 						'Service' => 'Service with problem',
 						'To' => '2021-05-06'
@@ -431,7 +240,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Daily',
 						'Service' => 'Service with problem',
 						'From' => 'yesterday'
@@ -442,7 +251,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Daily',
 						'From' => '2021-06-29',
 						'To' => '2021-07-05'
@@ -462,7 +271,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Daily',
 						'From' => '2021-12-20'
 					],
@@ -493,7 +302,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Daily',
 						'To' => '2022-01-08'
 					],
@@ -524,7 +333,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Daily',
 						'To' => '2021-05-06'
 					],
@@ -542,7 +351,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Daily',
 						'From' => 'yesterday'
 					],
@@ -552,7 +361,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Weekly',
 						'Service' => 'Simple actions service',
 						'From' => '2021-09-25',
@@ -568,7 +377,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Weekly',
 						'Service' => 'Simple actions service',
 						'From' => '2021-09-25'
@@ -600,7 +409,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Weekly',
 						'Service' => 'Simple actions service',
 						'To' => '2022-02-02'
@@ -632,7 +441,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Weekly',
 						'Service' => 'Simple actions service',
 						'To' => '2021-06-01'
@@ -650,7 +459,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Weekly',
 						'Service' => 'Simple actions service',
 						'From' => 'today - 2 weeks'
@@ -661,7 +470,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Weekly',
 						'From' => '2021-12-29',
 						'To' => '2022-01-09'
@@ -676,7 +485,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Weekly',
 						'From' => '2021-12-29'
 					],
@@ -707,7 +516,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Weekly',
 						'To' => '2022-05-13'
 					],
@@ -738,7 +547,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Weekly',
 						'To' => '2021-06-01'
 					],
@@ -755,7 +564,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Weekly',
 						'From' => 'today - 3 weeks'
 					],
@@ -765,7 +574,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'Service' => 'Simple actions service',
 						'From' => '2020-01-01',
@@ -782,7 +591,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'Service' => 'Simple actions service',
 						'From' => '2020-01-01'
@@ -815,7 +624,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'Service' => 'Simple actions service',
 						'To' => '2023-02-15'
@@ -847,7 +656,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'Service' => 'Simple actions service',
 						'To' => '2021-08-01'
@@ -863,7 +672,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'Service' => 'Simple actions service',
 						'From' => 'today - 2 months'
@@ -874,7 +683,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'From' => '2020-01-01',
 						'To' => '2020-02-29'
@@ -891,7 +700,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'From' => '2020-01-01'
 					],
@@ -922,7 +731,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'To' => '2023-02-15'
 					],
@@ -953,7 +762,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'To' => '2021-08-01'
 					],
@@ -968,7 +777,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'From' => 'today - 2 months'
 					],
@@ -978,7 +787,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
 						'From' => '2021-05-01',
@@ -995,7 +804,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
 						'From' => '2017-12-03'
@@ -1027,7 +836,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
 						'To' => '2026-05-01'
@@ -1059,7 +868,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
 						'To' => '2021-08-01'
@@ -1073,7 +882,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
 						'From' => 'today - 6 months'
@@ -1084,7 +893,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'From' => '2021-05-01',
 						'To' => '2021-10-01'
@@ -1100,7 +909,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'From' => '2017-12-03'
 					],
@@ -1131,7 +940,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'To' => '2026-05-01'
 					],
@@ -1162,7 +971,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'To' => '2021-08-01'
 					],
@@ -1175,7 +984,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'From' => 'today - 6 months'
 					],
@@ -1185,7 +994,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Annual',
 						'Service' => 'Service with problem',
 						'From' => '2020-05-01',
@@ -1206,7 +1015,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Annual',
 						'Service' => 'Service with problem',
 						'From' => '2002-12-03'
@@ -1238,7 +1047,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Annual',
 						'Service' => 'Service with problem',
 						'To' => '2037-01-01'
@@ -1267,7 +1076,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Annual',
 						'Service' => 'Service with problem',
 						'From' => 'today - 13 months'
@@ -1278,7 +1087,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Annual',
 						'From' => '2019-05-01',
 						'To' => '2024-10-01'
@@ -1297,7 +1106,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Annual',
 						'From' => '2002-12-03'
 					],
@@ -1328,7 +1137,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Annual',
 						'To' => '2037-02-01'
 					],
@@ -1356,7 +1165,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			],
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Annual',
 						'From' => 'today - 13 months'
 					],
@@ -1367,7 +1176,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			// Using non-complete date in From and To fields.
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'From' => '2021',
 						'To' => '2021'
@@ -1393,7 +1202,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			// Returning more than 20 periods with service.
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'Service' => 'Simple actions service',
 						'From' => '2020-01-01',
@@ -1443,7 +1252,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			// Returning more than 20 periods without service.
 			[
 				[
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'From' => '2020-01-01',
 						'To' => '2022-12-10'
@@ -1493,7 +1302,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			[
 				[
 					'expected' => TEST_BAD,
-					'filter' => [
+					'fields' => [
 						'SLA' => 'SLA Daily',
 						'From' => '2022-06-25',
 						'To' => '2022-06-23'
@@ -1506,7 +1315,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'From' => '2022-06-32'
 //					],
@@ -1517,7 +1326,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'To' => '2022-06-32'
 //					],
@@ -1528,7 +1337,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'To' => ' 2022-06-13'
 //					],
@@ -1539,7 +1348,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'From' => '2022-06-13 '
 //					],
@@ -1550,7 +1359,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'From' => '13-12-2022'
 //					],
@@ -1561,7 +1370,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'To' => '12/31/2022'
 //					],
@@ -1572,7 +1381,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'From' => '1641340800'
 //					],
@@ -1583,7 +1392,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'To' => '1641340800'
 //					],
@@ -1594,7 +1403,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'From' => '1969-12-31'
 //					],
@@ -1605,7 +1414,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'From' => '2039-01-01'
 //					],
@@ -1616,7 +1425,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'To' => '1969-12-31'
 //					],
@@ -1627,7 +1436,7 @@ class testPageServicesSlaReport extends testSlaReport {
 //			[
 //				[
 //					'expected' => TEST_BAD,
-//					'filter' => [
+//					'fields' => [
 //						'SLA' => 'SLA Daily',
 //						'To' => '2039-01-01'
 //					],
@@ -1638,7 +1447,7 @@ class testPageServicesSlaReport extends testSlaReport {
 	}
 
 	/**
-	 * @dataProvider getSlaDataWithServiceAndCustomDates
+	 * @dataProvider getSlaDataWithCustomDates
 	 *
 	 * @onBefore getDateTimeData
 	 */
@@ -1646,54 +1455,23 @@ class testPageServicesSlaReport extends testSlaReport {
 		// Construct the expected result array if such is not present in the data provider.
 		if (CTestArrayHelper ::get($data, 'expected_periods') === []) {
 			$data['expected_periods'] = $this->getPeriodDataWithCustomDates($data);
-			$data['filter']['From'] = date('Y-m-d', strtotime($data['filter']['From']));
+			$data['fields']['From'] = date('Y-m-d', strtotime($data['fields']['From']));
 		}
 
-		$this->openSlaReport($data['filter']);
+		$this->openSlaReport($data['fields']);
 
 		$this->checkCustomPeriods($data);
 	}
 
-	private function assertDialogContents($dialog_data) {
-		$filter_form = $this->query('name:zbx_filter')->one()->asForm();
-		$filter_form->getField($dialog_data['field'])->query('button:Select')->one()->click();
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+	public function openSlaReport($filter_data) {
+		$this->page->login()->open('zabbix.php?action=slareport.list');
+		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 
-		$this->assertEquals($dialog_data['field'], $dialog->getTitle());
-
-		if ($dialog_data['field'] === 'Service') {
-			// Check filter form.
-			$filter_form = $dialog->query('name:services_filter_form')->one();
-			$this->assertEquals('Name', $filter_form->query('xpath:.//label')->one()->getText());
-			$filter_input = $filter_form->query('name:filter_name')->one();
-			$this->assertEquals(255, $filter_input->getAttribute('maxlength'));
-
-			// Filter out all unwanted services befoce checking table content.
-			$filter_input->fill($dialog_data['check_row']['Name']);
-			$filter_button = $dialog->query('button:Filter')->one();
-			$filter_button->click();
-			$dialog->waitUntilReady();
-
-			// Check the content of the services list.
-			$this->assertTableData([$dialog_data['check_row']], $dialog_data['table_selector']);
-
-			$filter_form->query('button:Reset')->one()->click();
-			$dialog->waitUntilReady();
-		}
-
-		$this->assertEquals($dialog_data['headers'], $dialog->query('class:list-table')->asTable()->one()->getHeadersText());
-
-		if (array_key_exists('column_data', $dialog_data)) {
-			$this->assertTableDataColumn($dialog_data['column_data'], 'Name', $dialog_data['table_selector']);
-		}
-		else {
-			$table = $dialog->query('class:list-table')->asTable()->one();
-			$this->assertEquals($dialog_data['rows_count'], $table->getRows()->count());
-		}
-
-		foreach ($dialog_data['buttons'] as $button) {
-			$this->assertTrue($dialog->query('button', $button)->one()->isClickable());
-		}
-		$dialog->close();
+		// TODO: Remove the below workaround with changing multiselect fill modes after ZBX-21264 is fixed.
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+		$filter_form->query('button:Reset')->one()->click();
+		$filter_form->fill($filter_data);
+		$filter_form->submit();
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 	}
 }

@@ -44,7 +44,7 @@ class Sla {
 				'name' => 'SLA with schedule and downtime',
 				'period' => 1,
 				'slo' => '12.3456',
-				'effective_date' => 1651352400,
+				'effective_date' => 1651363200,
 				'timezone' => 'Europe/Riga',
 				'service_tags' => [
 					[
@@ -60,7 +60,7 @@ class Sla {
 				'excluded_downtimes' => [
 					[
 						'name' => 'excluded downtime',
-						'period_from' => 1651352400,
+						'period_from' => 1651363200,
 						'period_to' => 1777593600
 					]
 				],

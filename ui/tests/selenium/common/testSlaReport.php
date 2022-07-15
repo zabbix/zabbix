@@ -37,10 +37,8 @@ class testSlaReport extends CWebTest {
 		];
 	}
 
-	private static $creation_time;
-	private static $creation_day;
-	private static $reporting_periods = [];
-	private static $period_headers = [
+	public static $reporting_periods = [];
+	public static $period_headers = [
 		'Daily' => 'Day',
 		'Weekly' => 'Week',
 		'Monthly' => 'Month',
@@ -48,7 +46,202 @@ class testSlaReport extends CWebTest {
 		'Annually' => 'Year'
 	];
 
+	private static $creation_time;
+	private static $creation_day;
+
 	const SLA_CREATION_TIME = 1619827200;
+
+	public function getSlaDataWithService() {
+		return [
+			// Daily with downtime.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'Service' => 'Service with problem'
+					],
+					'reporting_period' => 'Daily',
+					'downtimes' => [
+						'names' => ['EXCLUDED DOWNTIME', 'Second downtime']
+					],
+					'check_sorting' => true,
+					'expected' => [
+						'SLO' => '11.111'
+					]
+				]
+			],
+			// Daily without downtime.
+			[
+				[
+					'fields' => [
+						'SLA' => 'Update SLA',
+						'Service' => 'Parent for 2 levels of child services'
+					],
+					'reporting_period' => 'Daily',
+					'expected' => [
+						'SLO' => '99.99',
+						'SLI' => 100
+					]
+				]
+			],
+			// Weekly SLA.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Weekly',
+						'Service' => 'Simple actions service'
+					],
+					'reporting_period' => 'Weekly',
+					'expected' => [
+						'SLO' => '55.5555',
+						'SLI' => 100
+					]
+				]
+			],
+			// Monthly SLA.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Monthly',
+						'Service' => 'Simple actions service'
+					],
+					'reporting_period' => 'Monthly',
+					'expected' => [
+						'SLO' => '22.22',
+						'SLI' => 100
+					]
+				]
+			],
+			// Quarterly SLA.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Quarterly',
+						'Service' => 'Simple actions service'
+					],
+					'reporting_period' => 'Quarterly',
+					'expected' => [
+						'SLO' => '33.33',
+						'SLI' => 100
+					]
+				]
+			],
+			// Annual SLA.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Annual',
+						'Service' => 'Service with problem'
+					],
+					'reporting_period' => 'Annually',
+					'expected' => [
+						'SLO' => '44.44',
+						'SLI' => 100
+					]
+				]
+			],
+			// Incorrect SLA and Service combination.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Annual',
+						'Service' => 'Child 1'
+					],
+					'reporting_period' => 'Annually',
+					'no_data' => true
+				]
+			]
+		];
+	}
+
+	public function getSlaDataWithoutService() {
+		return [
+			// Daily with downtime.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Daily'
+					],
+					'reporting_period' => 'Daily',
+					'downtimes' => true,
+					'expected' => [
+						'SLO' => '11.111',
+						'services' => ['Service with problem']
+					]
+				]
+			],
+			// Daily without downtime.
+			[
+				[
+					'fields' => [
+						'SLA' => 'Update SLA'
+					],
+					'reporting_period' => 'Daily',
+					'expected' => [
+						'SLO' => '99.99',
+						'SLI' => 100,
+						'services' => ['Parent for 2 levels of child services']
+					]
+				]
+			],
+			// Weekly SLA.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Weekly'
+					],
+					'reporting_period' => 'Weekly',
+					'expected' => [
+						'SLO' => '55.5555',
+						'SLI' => 100,
+						'services' => ['Service with multiple service tags', 'Simple actions service']
+					]
+				]
+			],
+			// Monthly SLA.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Monthly'
+					],
+					'reporting_period' => 'Monthly',
+					'expected' => [
+						'SLO' => '22.22',
+						'SLI' => 100,
+						'services' => ['Service with multiple service tags', 'Simple actions service']
+					]
+				]
+			],
+			// Quarterly SLA.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Quarterly'
+					],
+					'reporting_period' => 'Quarterly',
+					'expected' => [
+						'SLO' => '33.33',
+						'SLI' => 100,
+						'services' => ['Service with multiple service tags', 'Simple actions service']
+					]
+				]
+			],
+			// Annual SLA.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Annual'
+					],
+					'reporting_period' => 'Annually',
+					'expected' => [
+						'SLO' => '44.44',
+						'SLI' => 100,
+						'services' => ['Service with problem']
+					]
+				]
+			]
+		];
+	}
 
 	public function getDateTimeData() {
 		self::$creation_time = CDataHelper::get('Sla.creation_time');
@@ -141,8 +334,13 @@ class testSlaReport extends CWebTest {
 		}
 	}
 
-	public function checkLayoutWithService($data) {
-		$table = $this->query('class:list-table')->asTable()->one();
+	public function checkLayoutWithService($data, $widget = false) {
+		if ($widget) {
+			$table = CDashboardElement::find()->one()->getWidget($data['fields']['Name'])->query('class:list-table')->asTable()->one();
+		}
+		else {
+			$table = $this->query('class:list-table')->asTable()->one();
+		}
 
 		if (!CTestArrayHelper::get($data, 'no_data')) {
 			$load_time = time();
@@ -150,8 +348,15 @@ class testSlaReport extends CWebTest {
 		}
 		else {
 			// Check empty result in case of selecting not related SLA and Service and proceed with next test.
-			$this->assertTableData();
-			$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+			if ($widget && !array_key_exists('expected', $data)) {
+				// TODO: remove this if condition and the statement under it when ZBX-21264 is fixed.
+				$this->assertEquals(['No permissions to referred object or it does not exist!'], $table->getRows()->asText());
+			}
+			else {
+				$string = (array_key_exists('expected', $data)) ? $data['expected'] : 'No data found.';
+				$this->assertEquals([$string], $table->getRows()->asText());
+			}
+			$this->assertFalse($table->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
 
 			return;
 		}
@@ -257,15 +462,18 @@ class testSlaReport extends CWebTest {
 						$uptime_seconds = $uptime_seconds + timeUnitToSeconds($time_unit);
 					}
 
-					$error_budget = convertUnitsS(intval($uptime_seconds / floatval($data['expected']['SLO']) * 100)
-							- $uptime_seconds
-					);
-					$this->assertEquals($error_budget, $row->getColumn('Error budget')->getText());
+					foreach ([0, 60, 120] as $buffer_seconds) {
+						$error_budget[] = convertUnitsS(intval($uptime_seconds / floatval($data['expected']['SLO']) * 100)
+							- $uptime_seconds + $buffer_seconds
+						);
+					}
+
+					$this->assertTrue(in_array($row->getColumn('Error budget')->getText(), $error_budget));
 
 				}
 				else {
 					$reference_uptime = [];
-					for ($i = 0; $i <= 2; $i++) {
+					for ($i = 0; $i <= 3; $i++) {
 						$reference_uptime[] = convertUnitsS($period['end'] - self::$creation_time + $i);
 					}
 					$this->assertTrue(in_array($uptime, $reference_uptime));
@@ -283,11 +491,27 @@ class testSlaReport extends CWebTest {
 		}
 	}
 
-	public function checkLayoutWithoutService($data) {
-		$reference_periods = self::$reporting_periods[$data['reporting_period']];
+	public function checkLayoutWithoutService($data, $widget = false) {
+		// This if condition is here specifically to check case when displaying disabled SLA on SLA report widget.
+		if (array_key_exists('no_data', $data)) {
+			$table = CDashboardElement::find()->one()->getWidget($data['fields']['Name'])->query('class:list-table')->asTable()->one();
+			$this->assertEquals([$data['expected']], $table->getRows()->asText());
 
-		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertTableStats(count($data['expected']['services']));
+			return;
+		}
+		$reference_periods = self::$reporting_periods[$data['reporting_period']];
+		$count = count($data['expected']['services']);
+
+		if ($widget) {
+			$table = CDashboardElement::find()->one()->getWidget($data['fields']['Name'])->query('class:list-table')->asTable()->one();
+			$this->assertEquals('Displaying '.$count.' of '.$count.' found',
+				$table->query('xpath:.//td[@class="list-table-footer"]')->one()->getText()
+			);
+		}
+		else {
+			$table = $this->query('class:list-table')->asTable()->one();
+			$this->assertTableStats($count);
+		}
 
 		$headers = ['Service', 'SLO'];
 		foreach (array_reverse($reference_periods) as $period) {
@@ -298,7 +522,7 @@ class testSlaReport extends CWebTest {
 		if (CTestArrayHelper::get($data, 'check_sorting')) {
 			foreach ($table->getHeaders() as $header) {
 				// Only "Service" column is sortable.
-				if ($header->getText() !== 'Service') {
+				if ($header->getText() !== 'Service' || $widget) {
 					$this->assertFalse($header->query('tag:a')->one(false)->isValid());
 				}
 			}
@@ -320,21 +544,9 @@ class testSlaReport extends CWebTest {
 		}
 	}
 
-	public function openSlaReport($filter_data) {
-		$this->page->login()->open('zabbix.php?action=slareport.list');
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
-
-		// TODO: Remove the below workaround with changing multiselect fill modes after ZBX-21264 is fixed.
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-		$filter_form->query('button:Reset')->one()->click();
-		$filter_form->fill($filter_data);
-		$filter_form->submit();
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
-	}
-
 	public function getPeriodDataWithCustomDates($data) {
 		foreach (self::$reporting_periods[$data['reporting_period']] as $period) {
-			if ($period['end'] >= strtotime($data['filter']['From'])) {
+			if ($period['end'] >= strtotime($data['fields']['From'])) {
 				$expected_periods[] = $period['value'];
 			}
 			else {
@@ -342,7 +554,7 @@ class testSlaReport extends CWebTest {
 			}
 		}
 
-		if (!array_key_exists('Service', $data['filter'])) {
+		if (!array_key_exists('Service', $data['fields'])) {
 
 			$expected_periods = array_reverse($expected_periods);
 		}
@@ -358,7 +570,7 @@ class testSlaReport extends CWebTest {
 		}
 		$table = $this->query('class:list-table')->asTable()->one();
 
-		if (array_key_exists('Service', $data['filter'])) {
+		if (array_key_exists('Service', $data['fields'])) {
 			$this->assertTableDataColumn($data['expected_periods'], self::$period_headers[$data['reporting_period']]);
 		}
 		else {
@@ -367,7 +579,6 @@ class testSlaReport extends CWebTest {
 			unset($headers[0], $headers[1]);
 			$this->assertEquals($data['expected_periods'], array_values($headers));
 		}
-
 	}
 
 	private function checkDowntimePresent($row, $downtime_values) {
@@ -382,5 +593,50 @@ class testSlaReport extends CWebTest {
 			}
 			$this->assertTrue($match_found);
 		}
+	}
+
+	public function checkDialogContents($dialog_data, $widget = false) {
+		$form_selector = ($widget) ? 'name:widget_dialogue_form' : 'name:zbx_filter';
+		$form = $this->query($form_selector)->one()->asForm();
+		$form->getField($dialog_data['field'])->query('button:Select')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+
+		$this->assertEquals($dialog_data['field'], $dialog->getTitle());
+
+		if ($dialog_data['field'] === 'Service') {
+			// Check filter form.
+			$filter_form = $dialog->query('name:services_filter_form')->one();
+			$this->assertEquals('Name', $filter_form->query('xpath:.//label')->one()->getText());
+			$filter_input = $filter_form->query('name:filter_name')->one();
+			$this->assertEquals(255, $filter_input->getAttribute('maxlength'));
+
+			// Filter out all unwanted services befoce checking table content.
+			$filter_input->fill($dialog_data['check_row']['Name']);
+			$dialog->query('button:Filter')->one()->click();
+			$dialog->waitUntilReady();
+
+			// Check the content of the services list.
+			$this->assertTableData([$dialog_data['check_row']], $dialog_data['table_selector']);
+
+			$filter_form->query('button:Reset')->one()->click();
+			$dialog->waitUntilReady();
+		}
+
+		$this->assertEquals($dialog_data['headers'], $dialog->query('class:list-table')->asTable()->one()->getHeadersText());
+
+		if (array_key_exists('column_data', $dialog_data)) {
+			foreach ($dialog_data['column_data'] as $column => $values) {
+				$this->assertTableDataColumn($values, $column, $dialog_data['table_selector']);
+			}
+		}
+		else {
+			$table = $dialog->query('class:list-table')->asTable()->one();
+			$this->assertEquals($dialog_data['rows_count'], $table->getRows()->count());
+		}
+
+		foreach ($dialog_data['buttons'] as $button) {
+			$this->assertTrue($dialog->query('button', $button)->one()->isClickable());
+		}
+		$dialog->query('button:Cancel')->one()->click();
 	}
 }

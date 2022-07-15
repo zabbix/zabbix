@@ -830,19 +830,18 @@ class testFormServicesSla extends CWebTest {
 		$this->checkAction($data, true);
 	}
 
-	// TODO: Uncomment the below test case after ZBX-21264 is fixed.
-//	public function testFormServicesSla_SimpleUpdate() {
-//		$old_hash = CDBHelper::getHash(self::$sla_sql);
+	public function testFormServicesSla_SimpleUpdate() {
+		$old_hash = CDBHelper::getHash(self::$sla_sql);
 
-//		$this->page->login()->open('zabbix.php?action=sla.list');
-//		$this->query('link', self::$sla_with_downtimes)->waitUntilClickable()->one()->click();
+		$this->page->login()->open('zabbix.php?action=sla.list');
+		$this->query('link', self::$sla_with_downtimes)->waitUntilClickable()->one()->click();
 
-//		$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
-//		$form->submit();
+		$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
+		$form->submit();
 
-//		$this->assertMessage(TEST_GOOD, 'SLA updated');
-//		$this->assertEquals($old_hash, CDBHelper::getHash(self::$sla_sql));
-//	}
+		$this->assertMessage(TEST_GOOD, 'SLA updated');
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::$sla_sql));
+	}
 
 	public function testFormServicesSla_Delete() {
 		// Get ID of the SLA to be deleted.
