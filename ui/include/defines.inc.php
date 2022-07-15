@@ -155,6 +155,15 @@ define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 
 define('ZBX_DB_EXTENSION_TIMESCALEDB', 'timescaledb');
 
+define('ZBX_EXT_ERR_UNDEFINED',							0);
+define('ZBX_EXT_SUCCEED',								1);
+define('ZBX_TIMESCALEDB_POSTGRES_TOO_OLD',				2);
+define('ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE',	3);
+define('ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM',	4);
+define('ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED',			5);
+define('ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM',	6);
+define('ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY',			7);
+
 define('ZBX_DB_MAX_ID', '9223372036854775807');
 
 // maximum number of records for create() or update() API calls
@@ -2090,6 +2099,7 @@ define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
 define('ZBX_STYLE_ICON_HELP_HINT', 'icon-help-hint');
 
 // Host interface styles.
+define('ZBX_STYLE_HOST_INTERFACES', 'interfaces');
 define('ZBX_STYLE_HOST_INTERFACE_CONTAINER', 'interface-container');
 define('ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER', 'interface-container-header');
 define('ZBX_STYLE_HOST_INTERFACE_ROW', 'interface-row');

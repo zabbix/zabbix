@@ -253,7 +253,8 @@ $host_tab->addRow(
 			->setModern(true)
 			->setReadonly($host_prototype['templateid'] != 0),
 		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
-			->setId('interfaces-table'),
+			->setId('interfaces-table')
+			->addClass(ZBX_STYLE_HOST_INTERFACES),
 		new CDiv(
 			(new CButton('interface-add', _('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)

@@ -1005,7 +1005,7 @@ if (!empty($data['itemid'])) {
 }
 else {
 	$cancel_button = $data['backurl'] !== null
-		? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+		? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
 		: new CButtonCancel(url_param('context'));
 
 	$form_actions = new CFormActions(

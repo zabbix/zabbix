@@ -251,7 +251,7 @@ void	hk_history_compression_init(void)
 	compression_status_cache = cfg.db.history_compression_status;
 	compress_older_cache = cfg.db.history_compress_older;
 
-	if (0 == zbx_strcmp_null(cfg.db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+	if (0 == zbx_strcmp_null(cfg.db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
 		/* suppress notice logs during DB initialization */
 		result = DBselect("show client_min_messages");
@@ -263,7 +263,7 @@ void	hk_history_compression_init(void)
 		}
 		DBfree_result(result);
 
-		if (ON == cfg.db.history_compression_status)
+		if (ON == zbx_tsdb_get_compression_availability() && ON == cfg.db.history_compression_status)
 		{
 			if (0 == cfg.db.history_compress_older)
 			{
@@ -315,7 +315,7 @@ void	hk_history_compression_update(zbx_config_db_t *cfg)
 #if defined(HAVE_POSTGRESQL)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (ON == cfg->history_compression_status)
+	if (ON == zbx_tsdb_get_compression_availability() && ON == cfg->history_compression_status)
 	{
 		if (cfg->history_compression_status != compression_status_cache ||
 				cfg->history_compress_older != compress_older_cache)
