@@ -406,7 +406,8 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
 
 			$hosts = API::Host()->get([
 				'output' => ['host'],
-				'hostids' => [$destinationHostId]
+				'hostids' => [$destinationHostId],
+				'templated_hosts' => true
 			]);
 
 			error(_s('Missing key "%1$s" for host "%2$s".', $items[0]['key_'], $hosts[0]['host']));
