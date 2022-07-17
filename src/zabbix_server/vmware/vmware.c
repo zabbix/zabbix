@@ -5394,7 +5394,7 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		char	*error;
+		char	*error = NULL;
 
 		if (NULL == (id = zbx_xml_node_read_value(doc, nodeset->nodeTab[i], ZBX_XPATH_NN("obj"))))
 		{
