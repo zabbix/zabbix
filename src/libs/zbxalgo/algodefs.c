@@ -124,6 +124,11 @@ int	zbx_default_str_compare_func(const void *d1, const void *d2)
 	return strcmp(*(const char * const *)d1, *(const char * const *)d2);
 }
 
+int	zbx_default_str_ptr_compare_func(const void *d1, const void *d2)
+{
+	return strcmp(**(const char * const * const *)d1, **(const char * const * const *)d2);
+}
+
 int	zbx_natural_str_compare_func(const void *d1, const void *d2)
 {
 	return zbx_strcmp_natural(*(const char * const *)d1, *(const char * const *)d2);

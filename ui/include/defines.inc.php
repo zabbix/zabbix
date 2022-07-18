@@ -2189,6 +2189,7 @@ define('ZBX_STYLE_ICON_HELP_HINT', 'icon-help-hint');
 define('ZBX_STYLE_ICON_DOC_LINK', 'icon-doc-link');
 
 // Host interface styles.
+define('ZBX_STYLE_HOST_INTERFACES', 'interfaces');
 define('ZBX_STYLE_HOST_INTERFACE_CONTAINER', 'interface-container');
 define('ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER', 'interface-container-header');
 define('ZBX_STYLE_HOST_INTERFACE_ROW', 'interface-row');
