@@ -596,7 +596,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	 * @dataProvider getUpdateValueData
 	 **/
 	public function testFormAdministrationGeneralAuditLog_UpdateParameters($data) {
-		if($data['expected'] === TEST_BAD) {
+		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash('SELECT * FROM config');
 		}
 
@@ -605,7 +605,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 		$form->fill($data['fields']);
 		$form->submit()->waitUntilReloaded();
 
-		if($data['expected'] === TEST_GOOD) {
+		if ($data['expected'] === TEST_GOOD) {
 			$this->assertMessage(TEST_GOOD, 'Configuration updated');
 			$form->checkValue($data['fields']);
 
