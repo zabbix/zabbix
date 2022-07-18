@@ -32,7 +32,6 @@ void	zbx_lrtrim(char *str, const char *charlist);
 void	zbx_remove_chars(char *str, const char *charlist);
 char	*zbx_str_printable_dyn(const char *text);
 #define ZBX_WHITESPACE			" \t\r\n"
-#define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	del_zeros(char *s);
 
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
@@ -74,7 +73,6 @@ char	*zbx_strcasestr(const char *haystack, const char *needle);
 int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 char	*zbx_unicode_to_utf8(const wchar_t *wide_string);
 char	*zbx_unicode_to_utf8_static(const wchar_t *wide_string, char *utf8_string, int utf8_size);
 #endif
