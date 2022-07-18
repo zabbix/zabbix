@@ -720,7 +720,7 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 		}
 		else if (NULL != tkn && NULL != fn_parent)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s() SOAP response have next unprocessed page: %s", fn_parent,
+			zabbix_log(LOG_LEVEL_WARNING, "%s() SOAP response has next unprocessed page: %s", fn_parent,
 					tkn);
 		}
 
