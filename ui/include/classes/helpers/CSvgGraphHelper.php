@@ -59,7 +59,7 @@ class CSvgGraphHelper {
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $width);
 		// Load aggregated Data for each dataset.
-		self::getMetricsAggregatedData($metrics);
+		self::getMetricsAggregatedData($metrics, $width);
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
@@ -527,7 +527,7 @@ class CSvgGraphHelper {
 	/**
 	 * Select aggregated data to show in graph for each metric.
 	 */
-	private static function getMetricsAggregatedData(array &$metrics): void {
+	private static function getMetricsAggregatedData(array &$metrics, int $width): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -585,13 +585,30 @@ class CSvgGraphHelper {
 
 			if ($result) {
 				$metric_points = [];
+
+				$period = $metric['time_period']['time_to'] - $metric['time_period']['time_from'];
+				$approximation_tick_delta = ($period / $metric['options']['aggregate_interval']) > $width
+					? ceil($period / $width)
+					: 0;
+
 				foreach ($result as $points) {
+					$tick = 0;
+
+					usort($points['data'],
+						static function (array $point_a, array $point_b): int {
+							return $point_a['clock'] <=> $point_b['clock'];
+						}
+					);
+
 					foreach ($points['data'] as $point) {
+						if ($point['tick'] > ($tick + $approximation_tick_delta)) {
+							$tick = $point['tick'];
+						}
 						if (array_key_exists('count', $point)) {
-							$metric_points[$point['tick']]['value'][] = $point['count'];
+							$metric_points[$tick]['value'][] = $point['count'];
 						}
 						if (array_key_exists('value', $point)) {
-							$metric_points[$point['tick']]['value'][] = $point['value'];
+							$metric_points[$tick]['value'][] = $point['value'];
 						}
 					}
 				}
