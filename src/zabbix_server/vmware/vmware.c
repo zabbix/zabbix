@@ -711,7 +711,7 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 	{
 		char	*tkn;
 
-		tkn = zbx_xml_read_doc_value(*xdoc, ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN);
+		tkn = zbx_xml_doc_read_value(*xdoc, ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN);
 
 		if (NULL != token)
 		{
@@ -3394,7 +3394,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		zbx_free(hvid_esc);
 		zbx_free(scsi_req);
 
-		ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, error);
+		ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, NULL, error);
 		zbx_free(tmp);
 	}
 	else
@@ -3483,7 +3483,7 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() for DS:%s", __func__, ds_id);
 
-	if (NULL != (value = zbx_xml_read_node_value(xdoc, ds_node, ZBX_XPATH_PROP_SUFFIX("mounted"))))
+	if (NULL != (value = zbx_xml_node_read_value(xdoc, ds_node, ZBX_XPATH_PROP_SUFFIX("mounted"))))
 	{
 		if (0 == strcmp(value, "true"))
 			mi_access |= ZBX_VMWARE_DS_MOUNTED;
@@ -3493,7 +3493,7 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, cons
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find item 'mounted' in mountinfo for DS:%s", ds_id);
 
-	if (NULL != (value = zbx_xml_read_node_value(xdoc, ds_node, ZBX_XPATH_PROP_SUFFIX("accessible"))))
+	if (NULL != (value = zbx_xml_node_read_value(xdoc, ds_node, ZBX_XPATH_PROP_SUFFIX("accessible"))))
 	{
 		if (0 == strcmp(value, "true"))
 			mi_access |= ZBX_VMWARE_DS_ACCESSIBLE;
@@ -3503,7 +3503,7 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, cons
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find item 'accessible' in accessible for DS:%s", ds_id);
 
-	if (NULL != (value = zbx_xml_read_node_value(xdoc, ds_node, ZBX_XPATH_PROP_SUFFIX("accessMode"))))
+	if (NULL != (value = zbx_xml_node_read_value(xdoc, ds_node, ZBX_XPATH_PROP_SUFFIX("accessMode"))))
 	{
 		if (0 == strcmp(value, "readWrite"))
 			mi_access |= ZBX_VMWARE_DS_READWRITE;
@@ -3772,7 +3772,7 @@ static int	vmware_hv_ds_access_parse(xmlDoc *xdoc, const zbx_vector_str_t *hv_ds
 		zbx_vmware_datastore_t		*ds, ds_cmp;
 		zbx_str_uint64_pair_t		hv_ds_access;
 
-		if (NULL == (value = zbx_xml_read_node_value(xdoc, nodeset->nodeTab[i], ZBX_XPATH_NN("obj"))))
+		if (NULL == (value = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XPATH_NN("obj"))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "skipping DS record without ID, xml number '%d'", i);
 			continue;
@@ -3886,6 +3886,7 @@ static int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyh
 		updated += vmware_hv_ds_access_parse(doc, hv_dss, hv_uuid, hv_id, dss);
 	}
 
+	ret = SUCCEED;
 out:
 	zbx_property_collection_free(iter);
 	zbx_xml_free_doc(doc);
