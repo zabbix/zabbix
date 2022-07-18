@@ -89,10 +89,6 @@ else {
 	];
 }
 
-if ($data['warning']) {
-	$data['warning'] = makeMessageBox(ZBX_STYLE_MSG_WARNING, [['message' => $data['warning']]]);
-}
-
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_EDIT),
@@ -103,7 +99,8 @@ $output = [
 			'popup_url' => $popup_url->getUrl(),
 			'form_name' => $data['form_name'],
 			'host_interfaces' => $data['host']['interfaces'],
-			'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+			'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
+			'warning' => $data['warning']
 		]).');',
 	'buttons' => $buttons
 ];

@@ -1591,9 +1591,7 @@ class CSvgGraph extends CSvg {
 				$gap_interval = floor(($clock - $prev_clock) / $threshold);
 
 				if ($missingdatafunc == SVG_GRAPH_MISSING_DATA_NONE) {
-					$value = ['min' => null, 'avg' => null, 'max' => null];
-
-					$missing_points[$prev_clock + $gap_interval] = $value;
+					$missing_points[$prev_clock + $gap_interval] = null;
 				}
 				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
 					$value = ['min' => 0, 'avg' => 0, 'max' => 0];

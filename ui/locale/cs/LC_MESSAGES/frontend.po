@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-29 08:09+0000\n"
+"PO-Revision-Date: 2022-06-29 12:11+0000\n"
 "Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -541,6 +541,11 @@ msgstr "Přístup ke službám"
 msgid "Ack"
 msgstr "Potvrzeno"
 
+#: app/views/monitoring.widget.problems.view.php:81
+msgctxt "compact table header"
+msgid "Ack"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "Přijmout"
@@ -634,6 +639,11 @@ msgstr "Potvrzené VYŘEŠENÉ události"
 msgid "Action"
 msgstr "Akce"
 
+#: app/views/monitoring.widget.actionlog.view.php:37
+msgctxt "compact table header"
+msgid "Action"
+msgstr ""
+
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
@@ -704,6 +714,11 @@ msgstr "Akce byla aktualizována"
 #: jsLoader.php:352 tr_events.php:183
 msgid "Actions"
 msgstr "Akce"
+
+#: app/views/monitoring.widget.problems.view.php:82
+msgctxt "compact table header"
+msgid "Actions"
+msgstr ""
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -1654,6 +1669,11 @@ msgstr "Protokol dostupnosti"
 #: include/classes/html/CHostAvailability.php:80
 msgid "Available"
 msgstr "Dostupný"
+
+#: app/views/monitoring.widget.hostavail.view.php:37
+msgctxt "compact table header"
+msgid "Available"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -4031,6 +4051,13 @@ msgstr "Komprimujte záznamy starší než"
 msgid "Compression"
 msgstr "Komprimace"
 
+#: app/views/administration.housekeeping.edit.php:164
+#: app/views/administration.housekeeping.edit.php:169
+#: app/views/administration.housekeeping.edit.php:174
+#: app/views/administration.housekeeping.edit.php:184
+msgid "Compression is not supported."
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
 msgstr "Souběžné relace"
@@ -5177,6 +5204,11 @@ msgstr "Funkce data a času"
 msgid "Day"
 msgstr "Den"
 
+#: include/classes/helpers/CSlaHelper.php:68
+msgctxt "compact table header"
+msgid "Day"
+msgstr ""
+
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
 msgstr "Předevčírem"
@@ -5776,6 +5808,10 @@ msgstr "Detaily"
 msgid "Details of web scenario"
 msgstr "Detaily web scénáře"
 
+#: app/views/administration.housekeeping.edit.php:195
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr "Období detekce"
@@ -6097,6 +6133,11 @@ msgstr ""
 msgid "Discovery rule"
 msgstr "Pravidlo pro průzkum"
 
+#: app/views/monitoring.widget.discovery.view.php:33
+msgctxt "compact table header"
+msgid "Discovery rule"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -6324,6 +6365,11 @@ msgstr "Stáhnout konfigurační soubor"
 msgid "Downtime"
 msgstr "Prostoj"
 
+#: app/views/monitoring.widget.slareport.view.php:100
+msgctxt "compact table header"
+msgid "Downtime"
+msgstr ""
+
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
 #: include/classes/widgets/CWidgetHelper.php:969
@@ -6387,6 +6433,11 @@ msgstr "Duplicitní userid \"%1$s\" u uživatele mapy \"%2$s\"."
 #: include/views/configuration.action.edit.php:174
 msgid "Duration"
 msgstr "Trvání"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
+msgid "Duration"
+msgstr ""
 
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
@@ -6816,6 +6867,11 @@ msgstr "Chyba"
 msgid "Error budget"
 msgstr "Rozpočet chyb"
 
+#: app/views/monitoring.widget.slareport.view.php:101
+msgctxt "compact table header"
+msgid "Error budget"
+msgstr ""
+
 #: include/db.inc.php:518
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
@@ -6829,6 +6885,13 @@ msgstr "Chybná zpráva"
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr "Chyba! Nelze spustit server Zabbix kvůli nepodporované verzi databázového serveru %1$s. Musí být alespoň (%2$s)"
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
+msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -6956,6 +7019,11 @@ msgstr ""
 #: app/views/slareport.list.php:168
 msgid "Excluded downtimes"
 msgstr "Vyloučené prostoje"
+
+#: app/views/monitoring.widget.slareport.view.php:102
+msgctxt "compact table header"
+msgid "Excluded downtimes"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:197 jsLoader.php:219
 msgid "Execute"
@@ -7160,6 +7228,11 @@ msgstr ""
 #: include/views/administration.auditacts.list.php:90
 msgid "Failed"
 msgstr "Selhalo"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
+msgid "Failed"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
@@ -8222,6 +8295,12 @@ msgstr[0] "Hostitel"
 msgstr[1] "Hostitelé"
 msgstr[2] "Hostitelé"
 
+#: app/views/monitoring.widget.problems.view.php:66
+#: app/views/monitoring.widget.problems.view.php:67
+msgctxt "compact table header"
+msgid "Host"
+msgstr ""
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8313,6 +8392,13 @@ msgstr "Hostitelské grafy"
 #: report2.php:400
 msgid "Host group"
 msgstr "Skupina hostitele"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+#: app/views/monitoring.widget.problemsbysv.view.php:41
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Host group"
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:760
 #, c-format
@@ -9905,6 +9991,12 @@ msgstr "Nekonečno"
 #: include/views/configuration.triggers.list.php:200
 msgid "Info"
 msgstr "Info"
+
+#: app/views/monitoring.widget.actionlog.view.php:48
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Info"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -11624,7 +11716,7 @@ msgstr ""
 #: app/views/administration.script.list.php:53
 #: app/views/administration.script.list.php:131
 msgid "Manual host action"
-msgstr ""
+msgstr "Ruční akce zařízení"
 
 #: app/views/popup.acknowledge.edit.php:83
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
@@ -12002,6 +12094,11 @@ msgstr "Cesta v menu"
 msgid "Message"
 msgstr "Zpráva"
 
+#: app/views/monitoring.widget.actionlog.view.php:44
+msgctxt "compact table header"
+msgid "Message"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
 msgstr "Formát zprávy"
@@ -12084,6 +12181,11 @@ msgstr ""
 #, c-format
 msgid "Minimum required PHP version is %1$s."
 msgstr "Minimální požadovaná verze PHP je %1$s."
+
+#: app/views/administration.housekeeping.edit.php:175
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -12269,6 +12371,11 @@ msgstr "Monospace"
 #: include/classes/helpers/CSlaHelper.php:60 report4.php:165
 msgid "Month"
 msgstr "Měsíc"
+
+#: include/classes/helpers/CSlaHelper.php:70
+msgctxt "compact table header"
+msgid "Month"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
@@ -12530,6 +12637,11 @@ msgstr "NTLM"
 #: report2.php:509 sysmaps.php:38 trigger_prototypes.php:37 triggers.php:45
 msgid "Name"
 msgstr "Jméno"
+
+#: app/views/monitoring.widget.plaintext.view.php:49
+msgctxt "compact table header"
+msgid "Name"
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
@@ -12892,7 +13004,7 @@ msgstr "Nenalezené žádné rozhraní."
 
 #: jsLoader.php:321
 msgid "No interfaces are defined."
-msgstr ""
+msgstr "Nejsou definována žádná rozhraní."
 
 #: app/controllers/CControllerActionOperationValidate.php:169
 msgid "No inventory mode specified for action operation."
@@ -12905,7 +13017,7 @@ msgstr "Nebyla vybrána žádná položka."
 #: include/items.inc.php:742
 #, c-format
 msgid "No item with item ID \"%1$s\"."
-msgstr ""
+msgstr "Žádná položka s ID \"%1$s\"."
 
 #: chart3.php:145 chart7.php:56
 msgid "No items defined."
@@ -13327,6 +13439,11 @@ msgstr "Neautorizovaný."
 msgid "Not available"
 msgstr "Nedostupný"
 
+#: app/views/monitoring.widget.hostavail.view.php:38
+msgctxt "compact table header"
+msgid "Not available"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
 msgstr "Neurčeno"
@@ -13398,7 +13515,7 @@ msgstr "Počet povolených položek na hostitele."
 
 #: app/partials/administration.system.info.php:40
 msgid "Number of hosts (enabled/disabled)"
-msgstr ""
+msgstr "Počet zařízení (povolených/zakázáných)"
 
 #: app/partials/administration.system.info.php:55
 msgid "Number of items (enabled/disabled/not supported)"
@@ -13615,6 +13732,11 @@ msgstr "Vypnuté"
 msgid "Ok"
 msgstr "Ok"
 
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
+msgid "Ok"
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13705,7 +13827,7 @@ msgstr "Pouze super administrátoři mohou ustanovit vlastníka dashboardu."
 
 #: include/classes/api/services/CReport.php:334
 msgid "Only super admins can set report owner."
-msgstr ""
+msgstr "Vlastníka přehledu mohou nastavit pouze super administrátoři."
 
 #: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
@@ -13760,6 +13882,11 @@ msgstr "Operace nemá šablonu na vykonání."
 msgid "Operational data"
 msgstr "Provozní údaje"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Operational data"
+msgstr ""
+
 #: app/views/configuration.correlation.edit.php:145
 #: app/views/configuration.correlation.list.php:78
 #: app/views/popup.lldoverride.php:210
@@ -13801,7 +13928,7 @@ msgstr "Operátor"
 
 #: app/views/popup.triggerexpr.php:114
 msgid "Operator functions"
-msgstr ""
+msgstr "Funkce operátorů"
 
 #: app/views/administration.mediatype.edit.php:347
 msgid "Options"
@@ -14234,7 +14361,7 @@ msgstr "Parametr \"%1$s\" je zastaralý."
 #: include/classes/api/services/CTemplateGroup.php:1226
 #, c-format
 msgid "Parameter \"%1$s\" must be enabled."
-msgstr ""
+msgstr "Parametr \"%1$s\" musí být povolen."
 
 #: app/views/administration.mediatype.edit.php:213
 #: app/views/administration.script.edit.php:181
@@ -14572,6 +14699,10 @@ msgstr "Portugalsky (pt_PT)"
 msgid "Position"
 msgstr "Pozice"
 
+#: include/classes/widgets/views/widget.item.form.view.php:143
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "Pole zpráv"
@@ -14579,6 +14710,10 @@ msgstr "Pole zpráv"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "Typ zprávy"
+
+#: app/views/administration.housekeeping.edit.php:165
+msgid "PostgreSQL database server version is too old."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -14740,6 +14875,12 @@ msgstr "Úroveň oprávnění"
 msgid "Problem"
 msgstr "Problém"
 
+#: app/views/monitoring.widget.problems.view.php:70
+#: app/views/monitoring.widget.problems.view.php:71
+msgctxt "compact table header"
+msgid "Problem"
+msgstr ""
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "Problém vytvořen"
@@ -14775,7 +14916,7 @@ msgstr "Problém na"
 #: app/views/popup.mediatype.message.php:52
 #: include/classes/helpers/CMediatypeHelper.php:64
 msgid "Problem recovery"
-msgstr ""
+msgstr "Vyřešení problému"
 
 #: include/actions.inc.php:2062
 msgid "Problem resolved"
@@ -14783,7 +14924,7 @@ msgstr "Problém vyřešen"
 
 #: app/views/administration.usergroup.edit.php:275
 msgid "Problem tag filter"
-msgstr ""
+msgstr "Filtr problémových tagů"
 
 #: app/views/popup.service.edit.php:59 app/views/popup.service.edit.php:269
 #: app/views/popup.services.php:62
@@ -14968,6 +15109,11 @@ msgstr "Soubor s veřejným klíčem"
 msgid "Quarter"
 msgstr "Čtvrtletí"
 
+#: include/classes/helpers/CSlaHelper.php:71
+msgctxt "compact table header"
+msgid "Quarter"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
 msgstr "Čtvrtletní"
@@ -15113,6 +15259,12 @@ msgstr "Aktuální problémy"
 msgid "Recipient"
 msgstr "Příjemce"
 
+#: app/views/monitoring.widget.actionlog.view.php:42
+#: app/views/monitoring.widget.actionlog.view.php:43
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr "Příjemce již existuje."
@@ -15159,6 +15311,11 @@ msgstr "Obnovení operací"
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
 msgid "Recovery time"
 msgstr "Doba obnovy"
+
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Recovery time"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:371
 #: include/views/js/monitoring.sysmaps.js.php:531
@@ -15235,11 +15392,11 @@ msgstr "Regulární výrazy"
 
 #: app/controllers/CControllerPopupScheduledReportList.php:52
 msgid "Related reports"
-msgstr ""
+msgstr "Související reporty"
 
 #: jsLoader.php:151
 msgid "Release to create a widget."
-msgstr ""
+msgstr "Uvolněním vytvoříte widget."
 
 #: include/views/general.login.php:77
 msgid "Remember me for 30 days"
@@ -15618,7 +15775,7 @@ msgstr "Obnovit původní hodnoty"
 
 #: jsLoader.php:174
 msgid "Reset to initial view"
-msgstr ""
+msgstr "Obnovit výchozí zobrazení"
 
 #: jsLoader.php:293
 msgid "Resolved"
@@ -15915,7 +16072,7 @@ msgstr ""
 
 #: app/controllers/CControllerSlaReportList.php:229
 msgid "SLA Report"
-msgstr ""
+msgstr "Report SLA"
 
 #: app/controllers/CControllerSlaCreate.php:114
 msgid "SLA created"
@@ -15968,6 +16125,11 @@ msgstr ""
 msgid "SLI"
 msgstr "SLI"
 
+#: app/views/monitoring.widget.slareport.view.php:98
+msgctxt "compact table header"
+msgid "SLI"
+msgstr ""
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
@@ -15975,6 +16137,12 @@ msgstr "SLI"
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
 msgid "SLO"
 msgstr "SLO"
+
+#: app/views/monitoring.widget.slareport.view.php:38
+#: app/views/monitoring.widget.slareport.view.php:97
+msgctxt "compact table header"
+msgid "SLO"
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
@@ -16605,6 +16773,11 @@ msgstr "Servery"
 msgid "Service"
 msgstr "Služba"
 
+#: app/views/monitoring.widget.slareport.view.php:37
+msgctxt "compact table header"
+msgid "Service"
+msgstr ""
+
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
 #, c-format
@@ -16635,7 +16808,7 @@ msgstr[2] "Služby byly smazány"
 #: app/views/administration.userrole.edit.php:146
 #: app/views/administration.userrole.edit.php:187
 msgid "Service list"
-msgstr ""
+msgstr "Seznam služeb"
 
 #: include/actions.inc.php:68
 msgid "Service name"
@@ -16804,6 +16977,12 @@ msgstr "Nastavení"
 #: include/views/reports.toptriggers.php:86
 msgid "Severity"
 msgstr "Závažnost"
+
+#: app/views/monitoring.widget.problems.view.php:74
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
+msgid "Severity"
+msgstr ""
 
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
@@ -17354,6 +17533,13 @@ msgstr ""
 msgid "Status"
 msgstr "Stav"
 
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.actionlog.view.php:47
+#: app/views/monitoring.widget.problems.view.php:62
+msgctxt "compact table header"
+msgid "Status"
+msgstr ""
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr ""
@@ -17558,11 +17744,11 @@ msgstr "Podpora"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
-msgstr ""
+msgstr "Podporované formáty:"
 
 #: include/classes/widgets/views/widget.item.form.view.php:59
 msgid "Supported macros:"
-msgstr ""
+msgstr "Podporovaná makra:"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:101
 #: app/views/popup.acknowledge.edit.php:82
@@ -17571,11 +17757,11 @@ msgstr "Potlačit"
 
 #: include/classes/helpers/CRoleHelper.php:471
 msgid "Suppress problems"
-msgstr ""
+msgstr "Potlačit problémy"
 
 #: include/actions.inc.php:1761
 msgid "Suppress until"
-msgstr ""
+msgstr "Potlačit do"
 
 #: include/actions.inc.php:1771 include/classes/screens/CScreenProblem.php:1259
 msgid "Suppressed"
@@ -17796,6 +17982,11 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:235
 msgid "Tags"
 msgstr "Značky"
+
+#: app/views/monitoring.widget.problems.view.php:83
+msgctxt "compact table header"
+msgid "Tags"
+msgstr ""
 
 #: include/views/configuration.copy.elements.php:69
 #: include/views/configuration.trigger.prototype.edit.php:202
@@ -18076,7 +18267,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:79
 msgid "Test report generating"
-msgstr ""
+msgstr "Vygenerování zkušebního reportu"
 
 #: app/views/administration.regex.edit.php:120
 msgid "Test string"
@@ -18140,7 +18331,7 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
-msgstr ""
+msgstr "Jsou podporovány následující zástupné symboly:"
 
 #: include/html.inc.php:691
 #, c-format
@@ -18339,6 +18530,14 @@ msgstr "Do"
 msgid "Time"
 msgstr "Čas"
 
+#: app/views/monitoring.widget.actionlog.view.php:35
+#: app/views/monitoring.widget.actionlog.view.php:36
+#: app/views/monitoring.widget.problems.view.php:40
+#: app/views/monitoring.widget.problems.view.php:41
+msgctxt "compact table header"
+msgid "Time"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Podíl doby konkrétního procesu či skupiny procesů Zabbixu (identifikovaná pomocí <type> a <mode>) čerpaný v <state> v procentech."
@@ -18402,6 +18601,11 @@ msgstr "Časový limit"
 msgid "Timestamp"
 msgstr "Časové razítko"
 
+#: app/views/monitoring.widget.plaintext.view.php:33
+msgctxt "compact table header"
+msgid "Timestamp"
+msgstr ""
+
 #: app/views/sla.list.php:91
 msgid "Timezone"
 msgstr "Časové pásmo"
@@ -18458,6 +18662,12 @@ msgstr ""
 #: app/views/monitoring.widget.problemhosts.view.php:34
 msgid "Total"
 msgstr "Celkem"
+
+#: app/views/monitoring.widget.hostavail.view.php:40
+#: app/views/monitoring.widget.problemhosts.view.php:35
+msgctxt "compact table header"
+msgid "Total"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -18969,6 +19179,12 @@ msgstr ""
 msgid "Type"
 msgstr "Typ"
 
+#: app/views/monitoring.widget.actionlog.view.php:39
+#: app/views/monitoring.widget.actionlog.view.php:40
+msgctxt "compact table header"
+msgid "Type"
+msgstr ""
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "Typ (Podrobně)"
@@ -19115,6 +19331,14 @@ msgstr ""
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Nelze přepsat existující konfigurační soubor."
 
+#: app/views/administration.housekeeping.edit.php:160
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:170
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr ""
@@ -19225,6 +19449,12 @@ msgstr "Jednotky"
 msgid "Unknown"
 msgstr "Neznámý"
 
+#: app/views/monitoring.widget.hostavail.view.php:39
+#: app/views/monitoring.widget.web.view.php:35
+msgctxt "compact table header"
+msgid "Unknown"
+msgstr ""
+
 #: app/views/reports.auditlog.list.php:119
 msgid "Unknown action"
 msgstr "Neznámá akce"
@@ -19294,6 +19524,26 @@ msgstr "Odpojit od šablon"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Povolit zvuky"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:179
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:189
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -19481,6 +19731,11 @@ msgstr "Mapa nejvyšší úrovně"
 #: include/classes/screens/CScreenDiscovery.php:120
 msgid "Uptime"
 msgstr "Doba provozu"
+
+#: app/views/monitoring.widget.slareport.view.php:99
+msgctxt "compact table header"
+msgid "Uptime"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1686
 msgid "Uptime of Zabbix server process in seconds."
@@ -19882,6 +20137,10 @@ msgstr ""
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware statistiky cache. Platné módy jsou: total, free, pfree, used a pused."
 
+#: include/classes/data/CItemData.php:1252
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
@@ -19890,12 +20149,28 @@ msgstr ""
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware stav klastru, <url> - URL VMware služby, <name> - VMware jméno klastru"
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1296
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1304
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1268
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1242
@@ -19909,6 +20184,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1246
@@ -19925,6 +20204,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1324
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1350
@@ -20007,6 +20290,10 @@ msgstr ""
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware status, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware celková velikost paměti, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
@@ -20034,6 +20321,14 @@ msgstr "VMware plné jméno služby, <url> - URL VMware služby"
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware verze, <url> - URL VMware služby"
+
+#: include/classes/data/CItemData.php:1244
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1500
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20131,6 +20426,10 @@ msgstr ""
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost swapovací paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
+#: include/classes/data/CItemData.php:1664
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
 msgstr ""
@@ -20227,6 +20526,11 @@ msgstr "Validace"
 #, c-format
 msgid "Value"
 msgstr "Hodnota"
+
+#: app/views/monitoring.widget.plaintext.view.php:51
+msgctxt "compact table header"
+msgid "Value"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
@@ -20487,9 +20791,23 @@ msgstr "Varování"
 msgid "Warning message"
 msgstr "Varovná zpráva"
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
 msgstr ""
 
 #: jsLoader.php:301
@@ -20588,6 +20906,11 @@ msgstr "Středa"
 msgid "Week"
 msgstr "Týden"
 
+#: include/classes/helpers/CSlaHelper.php:69
+msgctxt "compact table header"
+msgid "Week"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/popup.maintenance.period.php:77 app/views/popup.sla.edit.php:75
@@ -20682,6 +21005,11 @@ msgstr "S názvem problému"
 msgid "With problems"
 msgstr "S problémy"
 
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
+msgid "With problems"
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr ""
@@ -20697,6 +21025,11 @@ msgstr "Bez dat"
 #: app/views/monitoring.widget.problemhosts.view.php:32
 msgid "Without problems"
 msgstr "Bez problémů"
+
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "Without problems"
+msgstr ""
 
 #: include/forms.inc.php:343
 msgid "Without triggers"
@@ -20888,6 +21221,11 @@ msgstr "YYYY-MM-DDThh:mm:ssZ"
 #: include/classes/helpers/CSlaHelper.php:62 report4.php:118 report4.php:154
 msgid "Year"
 msgstr "Rok"
+
+#: include/classes/helpers/CSlaHelper.php:72
+msgctxt "compact table header"
+msgid "Year"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93

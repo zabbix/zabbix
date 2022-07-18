@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $table = new CTableInfo();
@@ -29,7 +30,7 @@ if ($data['error'] != null) {
 	$table->setNoDataMessage($data['error']);
 }
 else {
-	$table_header = [(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH)];
+	$table_header = [(new CColHeader(_x('Timestamp', 'compact table header')))->addClass(ZBX_STYLE_CELL_WIDTH)];
 	$names_at_top = ($data['style'] == STYLE_TOP && count($data['items']) > 1);
 
 	if ($names_at_top) {
@@ -45,9 +46,9 @@ else {
 	}
 	else {
 		if ($data['style'] == STYLE_LEFT) {
-			$table_header[] = _('Name');
+			$table_header[] = _x('Name', 'compact table header');
 		}
-		$table_header[] = _('Value');
+		$table_header[] = _x('Value', 'compact table header');
 	}
 	$table->setHeader($table_header);
 

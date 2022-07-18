@@ -202,7 +202,7 @@ function zbx_date2str($format, $time = null, string $timezone = null) {
 	}
 	else {
 		$prefix = '';
-		$datetime = new DateTime('@'.$time);
+		$datetime = new DateTime('@'.(int) $time);
 	}
 
 	$datetime->setTimezone(new DateTimeZone($timezone ?? date_default_timezone_get()));

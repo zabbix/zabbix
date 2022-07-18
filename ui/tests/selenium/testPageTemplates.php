@@ -392,7 +392,7 @@ class testPageTemplates extends CLegacyWebTest {
 
 		// Check that correct result displayed.
 		if (array_key_exists('absent_templates', $data)) {
-			$filtering = $this->getTableResult('Name');
+			$filtering = $this->getTableColumnData('Name');
 			foreach ($data['absent_templates'] as $absence) {
 				if (($key = array_search($absence, $filtering))) {
 					unset($filtering[$key]);
