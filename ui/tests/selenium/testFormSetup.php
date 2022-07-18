@@ -134,7 +134,7 @@ class testFormSetup extends CWebTest {
 		$this->checkPageTextElements('Configure DB connection', $text);
 		$form = $this->query('xpath://form')->asForm()->one();
 
-		// Check input fieldsin Configure DB connection section for each DB type.
+		// Check input fields in Configure DB connection section for each DB type.
 		$db_types = $form->getField('Database type')->getOptions()->asText();
 		foreach ($db_types as $db_type) {
 			$form->getField('Database type')->select($db_type);
@@ -336,7 +336,8 @@ class testFormSetup extends CWebTest {
 		else {
 			$summary_fields['Database type'] = 'MySQL';
 			$this->assertFalse($this->query('xpath://span[text()="Database schema"]')->one(false)->isValid());
-			$summary_fields['Database TLS encryption'] = ($db_parameters['Database host'] === 'localhost') ? 'false' : 'true';
+			// TODO: change variable value, if TLS is enabled for MariaDB on Jenkins. ($db_parameters['Database host'] === 'localhost') ? 'false' : 'true'
+			$summary_fields['Database TLS encryption'] = 'false';
 		}
 		$summary_fields['Database port'] = ($db_parameters['Database port'] === '0') ? 'default' : $db_parameters['Database port'];
 		foreach ($summary_fields as $field_name => $value) {
@@ -592,6 +593,11 @@ class testFormSetup extends CWebTest {
 
 			return;
 		}
+		// TODO: remove condition, if TLS is enabled for MariaDB on Jenkins. Skip the cases with enabled TLS for MariaDB.
+		if (CTestArrayHelper::get($data, 'tls_encryption', false) && $db_parameters['Database type'] === 'MySQL') {
+
+			return;
+		}
 		// Open "Configure DB connection" section.
 		$this->openSpecifiedSection('Configure DB connection');
 
@@ -620,6 +626,10 @@ class testFormSetup extends CWebTest {
 		}
 
 		$form->fill($db_parameters);
+		// TODO: remove condition, if TLS is enabled for MariaDB on Jenkins.
+		if ($db_parameters['Database type'] === 'MySQL' && $db_parameters['Database host'] !== 'localhost') {
+			$form->fill(['Database TLS encryption' => false]);
+		}
 
 		// Check that port number was trimmed after removing focus, starting with 1st non-numeric symbol.
 		if ($data['field']['name'] === 'Database port') {
@@ -942,6 +952,10 @@ class testFormSetup extends CWebTest {
 		$db_parameters = $this->getDbParameters();
 		$form = $this->query('xpath://form')->asForm()->one();
 		$form->fill($db_parameters);
+		// TODO: remove condition, if TLS is enabled for MariaDB on Jenkins.
+		if ($db_parameters['Database type'] === 'MySQL' && $db_parameters['Database host'] !== 'localhost') {
+			$form->fill(['Database TLS encryption' => false]);
+		}
 		for ($i = 0; $i < $skip_sections[$section]; $i++) {
 			$this->query('button:Next step')->one()->click();
 		}
