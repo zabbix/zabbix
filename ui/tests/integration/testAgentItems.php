@@ -491,25 +491,45 @@ class testAgentItems extends CIntegrationTest {
 			'result' => 2
 		],
 		[
-			'key' => 'proc.get[,,zabbix_agentd.*]',
+			'key' => 'proc.get[,,systemd-logind.*]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid', 'threads'],
 			'result' => [
 				[
-					'pid' => 'pgrep zabbix_agentd',
-					'ppid' => self::formatPsCmd('ppid', 'zabbix_agentd'),
-					'name' => self::formatProcfsCmd('Name'),
-					'cmdline' => self::formatPsCmd('cmd', 'zabbix_agentd'),
-					'user' => self::formatPsCmd('euser', 'zabbix_agentd'),
-					'group' => self::formatPsCmd('rgroup', 'zabbix_agentd'),
-					'uid' => self::formatPsCmd('euid', 'zabbix_agentd'),
-					'gid' => self::formatPsCmd('rgid', 'zabbix_agentd'),
-					'threads' => self::formatPsCmd('nlwp', 'zabbix_agentd')
+					'pid' => 'pgrep systemd-logind',
+					'ppid' => 'ps --no-headers -o ppid:1 -C systemd-logind',
+					'cmdline' => 'ps --no-headers -o cmd:1 -C systemd-logind',
+					'user' => 'ps --no-headers -o euser:1 -C systemd-logind',
+					'group' => 'ps --no-headers -o rgroup:1 -C systemd-logind',
+					'uid' => 'ps --no-headers -o euid:1 -C systemd-logind',
+					'gid' => 'ps --no-headers -o rgid:1 -C systemd-logind',
+					'threads' => 'ps --no-headers -o nlwp:1 -C systemd-logind'
 				]
 			]
-		]
+		],
+		[
+			'key' => 'proc.get[,,systemd-logind.*]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid', 'threads'],
+			'result' => [
+				[
+					'pid' => 'pgrep systemd-logind',
+					'ppid' => 'ps --no-headers -o ppid:1 -C systemd-logind',
+					'cmdline' => 'ps --no-headers -o cmd:1 -C systemd-logind',
+					'user' => 'ps --no-headers -o euser:1 -C systemd-logind',
+					'group' => 'ps --no-headers -o rgroup:1 -C systemd-logind',
+					'uid' => 'ps --no-headers -o euid:1 -C systemd-logind',
+					'gid' => 'ps --no-headers -o rgid:1 -C systemd-logind',
+					'threads' => 'ps --no-headers -o nlwp:1 -C systemd-logind'
+				]
+			]
+		],
 	];
 
 	/**
@@ -890,8 +910,5 @@ class testAgentItems extends CIntegrationTest {
 		return "ps --no-headers -o $column:1 -C $component";
 	}
 
-	private static function formatProcfsCmd(string $param) {
-		return "grep $param /proc/`pgrep zabbix_agent`/status | awk \'BEGIN { FS="[\t]" } ; { print $2 }\'";
-	}
 }
 
