@@ -98,8 +98,6 @@ void	zbx_replace_invalid_utf8(char *text);
 
 void	dos2unix(char *str);
 
-int	zbx_check_hostname(const char *hostname, char **error);
-
 int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_t offset, size_t sz_to,
 		const char *from, size_t sz_from);
 

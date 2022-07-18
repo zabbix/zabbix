@@ -786,6 +786,51 @@ void	make_hostname(char *host)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check a byte stream for a valid hostname                          *
+ *                                                                            *
+ * Parameters: hostname - pointer to the first char of hostname               *
+ *             error - pointer to the error message (can be NULL)             *
+ *                                                                            *
+ * Return value: return SUCCEED if hostname is valid                          *
+ *               or FAIL if hostname contains invalid chars, is empty         *
+ *               or is longer than ZBX_MAX_HOSTNAME_LEN                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_hostname(const char *hostname, char **error)
+{
+	int	len = 0;
+
+	while ('\0' != hostname[len])
+	{
+		if (FAIL == is_hostname_char(hostname[len]))
+		{
+			if (NULL != error)
+				*error = zbx_dsprintf(NULL, "name contains invalid character '%c'", hostname[len]);
+			return FAIL;
+		}
+
+		len++;
+	}
+
+	if (0 == len)
+	{
+		if (NULL != error)
+			*error = zbx_strdup(NULL, "name is empty");
+		return FAIL;
+	}
+
+	if (ZBX_MAX_HOSTNAME_LEN < len)
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", ZBX_MAX_HOSTNAME_LEN);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Return value: Interface type                                               *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *

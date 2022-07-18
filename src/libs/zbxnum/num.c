@@ -141,7 +141,22 @@ int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint
 	return SUCCEED;
 }
 
-double	ZBX_DOUBLE_EPSILON = 2.22e-16;
+static double	ZBX_DOUBLE_EPSILON = 2.22e-16;
+
+double	zbx_get_double_epsilon(void)
+{
+	return ZBX_DOUBLE_EPSILON;
+}
+
+void	zbx_update_epsilon_to_not_use_double_precision(void)
+{
+	ZBX_DOUBLE_EPSILON = 0.000001;
+}
+
+void	zbx_update_epsilon_to_python_compatible_precision(void)
+{
+	ZBX_DOUBLE_EPSILON = 0.0001;
+}
 
 int	zbx_double_compare(double a, double b)
 {
@@ -363,21 +378,6 @@ int	zbx_number_parse(const char *number, int *len)
 
 		return SUCCEED;
 	}
-}
-
-double	zbx_get_double_epsilon(void)
-{
-	return ZBX_DOUBLE_EPSILON;
-}
-
-void	zbx_update_epsilon_to_not_use_double_precision(void)
-{
-	ZBX_DOUBLE_EPSILON = 0.000001;
-}
-
-void	zbx_update_epsilon_to_python_compatible_precision(void)
-{
-	ZBX_DOUBLE_EPSILON = 0.0001;
 }
 
 /******************************************************************************

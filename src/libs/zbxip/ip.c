@@ -206,7 +206,7 @@ int	ip_in_list(const char *list, const char *ip)
 			ptr = list + strlen(list);
 
 		address_offset = 0;
-		zbx_strncpy_alloc(&address, &address_alloc, &address_offset, list, ptr - list);
+		zbx_strncpy_alloc(&address, &address_alloc, &address_offset, list, (size_t)(ptr - list));
 
 		if (SUCCEED != iprange_parse(&iprange, address))
 			continue;

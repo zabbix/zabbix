@@ -1155,6 +1155,7 @@ int	is_discovery_macro(const char *name);
 int	parse_key(const char **exp);
 int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
+int	zbx_check_hostname(const char *hostname, char **error);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
@@ -1260,9 +1261,6 @@ typedef struct
 	char	*value;
 }
 zbx_tag_t;
-
-#define ZBX_OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
-#define ZBX_HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
 
 void	zbx_free_tag(zbx_tag_t *tag);
 

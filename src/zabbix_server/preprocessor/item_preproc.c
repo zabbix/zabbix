@@ -710,6 +710,9 @@ static int	is_uhex(const char *str)
  ******************************************************************************/
 static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char **errmsg)
 {
+#define OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
+#define HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
+
 	zbx_uint64_t	value_ui64;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
@@ -733,7 +736,7 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 				*errmsg = zbx_strdup(NULL, "invalid value format");
 				return FAIL;
 			}
-			ZBX_OCT2UINT64(value_ui64, value->data.str);
+			OCT2UINT64(value_ui64, value->data.str);
 			break;
 		case ZBX_PREPROC_HEX2DEC:
 			if (SUCCEED != is_uhex(value->data.str))
@@ -746,7 +749,7 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 
 				zbx_remove_chars(value->data.str, " \n");
 			}
-			ZBX_HEX2UINT64(value_ui64, value->data.str);
+			HEX2UINT64(value_ui64, value->data.str);
 			break;
 		default:
 			*errmsg = zbx_strdup(NULL, "unknown operation type");
@@ -757,6 +760,8 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 	zbx_variant_set_ui64(value, value_ui64);
 
 	return SUCCEED;
+#undef OCT2UINT64
+#undef HEX2UINT64
 }
 
 /******************************************************************************
