@@ -7462,7 +7462,7 @@ static void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() %s id:%s key:%s response length:%d node type:%d", fn_parent,
 			ZBX_VMWARE_CQV_ERROR == cqv->status ? "FAIL" : "SUCCEED", cqv->instance->id,
 			cqv->instance->key, NULL == cqv->response ? -1 : (int)strlen(cqv->response),
-			NULL != node && NULL != node->xmlChildrenNode ? node->xmlChildrenNode->type : -1);
+			NULL != node && NULL != node->xmlChildrenNode ? (int)node->xmlChildrenNode->type : -1);
 }
 
 /******************************************************************************
