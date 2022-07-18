@@ -5457,7 +5457,7 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		char	*error;
+		char	*error = NULL;
 
 		if (NULL == (id = zbx_xml_node_read_value(doc, nodeset->nodeTab[i], ZBX_XPATH_NN("obj"))))
 		{
@@ -7467,7 +7467,7 @@ static void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() %s id:%s key:%s response length:%d node type:%d", fn_parent,
 			ZBX_VMWARE_CQV_ERROR == cqv->status ? "FAIL" : "SUCCEED", cqv->instance->id,
 			cqv->instance->key, NULL == cqv->response ? -1 : (int)strlen(cqv->response),
-			NULL != node && NULL != node->xmlChildrenNode ? node->xmlChildrenNode->type : -1);
+			NULL != node && NULL != node->xmlChildrenNode ? (int)node->xmlChildrenNode->type : -1);
 }
 
 /******************************************************************************
