@@ -1,10 +1,34 @@
 Changes for 6.0.7rc1
 
 New features:
+.......PS. [ZBXNEXT-7814] updated max supported mariadb version to 10.8 (yurii)
+.........T [ZBXNEXT-7633] added HPE Synergy template (vkhaliev)
 .........T [ZBXNEXT-7802] added namespaces in templates HashiCorp Consul by HTTP (ychukina)
 .........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
+..F....... [ZBX-21290] fixed displaying extra reporting periods in SLA reports when filtered by date (averza)
+..F....... [ZBX-21269] fixed missing custom time period icon in graph widgets when editing dashboards (averza)
+..F....... [ZBX-21110] fixed time string parsing in graphs with items without data (averza)
+..F....... [ZBX-19731] fixed problems page and problems widget table layout issues when long names are used (acikuns)
+...G...... [ZBX-20523] fixed symlink names expansion in vfs.dir.get and vfs.file.get (akozlovs)
+...G...... [ZBX-20448] improved error message when failed to accept incoming connection (vso)
+...G...... [ZBX-20860] fixed Zabbix agent 2 build on mipsle and mipsle64 linux (esneiders)
+........S. [ZBX-21218] fixed deadlocks between server and frontend when discovering items with LLD (wiper)
+........S. [ZBX-20936] improved performance of configuration syncer when reading trigger dependencies (vso)
+........S. [ZBX-21021] fixed services actions not executing scripts (vso)
+...G...... [ZBX-20586] free tls C resources when closing tls connection on agent2 (wiper)
+.......PS. [ZBX-21301] fixed ambiguity and inability to set character set for MariaDB connection by setting utf8mb3 character instead of utf8 (vso)
+........S. [ZBX-17450] added check for minimal amount of data with forecast/timeleft functions and polynomial fit (wiper)
+...G...... [ZBX-19001] fixed wmi.getall[] and wmi.get[] to report invalid queries (vso)
+..F....... [ZBX-20908] fixed interface type labels in host edit form (ashubin)
+..F....... [ZBX-21157] fixed warning message overlaying error message when cloning a host (agriscenko)
+...G...... [ZBX-20667] fixed timeout issue for Agent 2 checks in test run mode (ssimonenko)
+..F....... [ZBX-20467] fixed z-select options with long labels (rlataria)
+........S. [ZBX-21159] improved logging in the case of permission errors during HA startup (wiper)
+........S. [ZBX-20962] improved error message when trying to use foreach function with single item query (wiper)
+........S. [ZBX-20880] changed HA cluster node discovery to return empty array in standalone mode (wiper)
+...G...... [ZBX-20203] fixed agent2 log* item large file support on windows (wiper)
 ..F....... [ZBX-21125] fixed incorrect filter results with empty multiselect fields in Monitoring Problems (dpetra)
 ..F....... [ZBX-18957] fixed not displaying years on X axis of classic graphs (averza)
 ..F....... [ZBX-20978] fixed trigger popover layout error in high-contrast themes (dpetra)
@@ -1996,11 +2020,23 @@ New features:
 .........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
+A.F....... [ZBX-7706] removed permission checks for ymin_itemid and ymax_itemid (acikuns, rlataria)
+...G...... [ZBX-20448] improved error message when failed to accept incoming connection (vso)
+........S. [ZBX-21218] fixed deadlocks between server and frontend when discovering items with LLD (wiper)
+...G...... [ZBX-20586] free tls C resources when closing tls connection on agent2 (wiper)
+.......PS. [ZBX-21301] fixed ambiguity and inability to set character set for MariaDB connection by setting utf8mb3 character instead of utf8 (vso)
+........S. [ZBX-17450] added check for minimal amount of data with forecast/timeleft functions and polynomial fit (wiper)
+...G...... [ZBX-19001] fixed wmi.getall[] and wmi.get[] to report invalid queries (vso)
+........S. [ZBX-20868] fixed count function pattern to support whole numeric unsigned number in decimal and scientific notation (vso)
+...G...... [ZBX-20667] fixed timeout issue for Agent 2 checks in test run mode (ssimonenko)
+...G...... [ZBX-20203] fixed agent2 log* item large file support on windows (wiper)
 ..F....... [ZBX-18957] fixed not displaying years on X axis of classic graphs (averza)
 .D........ [ZBX-21020] improved "ServerActive" configuration option description (vso)
 .........T [ZBX-20473] fixed evaluation period macro in disk space triggers for NetApp FAS3220 template (drasihov)
 ....I....T [ZBX-19205] fixed item preprocessing in PostgreSQL by Zabbix agent 2 template, removed duplicate PostgreSQL templates from templates.tmpl (drasihov)
 ........S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (mprihodko)
+..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
+..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.25
@@ -4527,9 +4563,9 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.43rc1
 
-New features:
-
 Bug fixes:
+..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
+..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.42

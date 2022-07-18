@@ -509,10 +509,7 @@ if (hasRequest('preprocessing')) {
  */
 $result = false;
 if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
-	$result = false;
-	if ($item = get_item_by_itemid($_REQUEST['itemid'])) {
-		$result = API::Item()->delete([getRequest('itemid')]);
-	}
+	$result = API::Item()->delete([getRequest('itemid')]);
 
 	if ($result) {
 		uncheckTableRows(getRequest('checkbox_hash'));
