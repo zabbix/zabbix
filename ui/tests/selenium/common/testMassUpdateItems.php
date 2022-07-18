@@ -1702,9 +1702,8 @@ class testMassUpdateItems extends CWebTest{
 
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
-				$this->page->waitUntilReady();
 				$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one()->waitUntilReady();
-				$table->query('link', $name)->one()->waitUntilClickable()->click();
+				$table->query('xpath://a[text()='.CXPathHelper::escapeQuotes($name).']')->one()->waitUntilClickable()->click();
 				$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 				$form->selectTab('Preprocessing');
 				$this->assertPreprocessingSteps($data['Preprocessing steps']);
