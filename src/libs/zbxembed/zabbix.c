@@ -141,7 +141,7 @@ static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 	/* use duk_to_number() instead of duk_to_uint() to distinguish between zero value and error */
 	sleep_dbl = duk_to_number(ctx, 0);
 
-	if (0 != DUK_ISNAN((float)sleep_dbl) || 0.0 > sleep_dbl)
+	if (FP_NAN == fpclassify((float)sleep_dbl) || 0.0 > sleep_dbl)
 		return duk_error(ctx, DUK_ERR_EVAL_ERROR, "invalid Zabbix.sleep() duration");
 
 	if (DUK_UINT_MAX < sleep_dbl)

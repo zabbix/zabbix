@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-01-10T14:11:35Z</date>
+   <date>2022-03-03T15:01:42Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -671,7 +671,7 @@ return valueArr.reduce(function(acc,obj){
                <key>etcd.leader.changes</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>The the number of leader changes the member has seen since its start.</description>
+               <description>The number of leader changes the member has seen since its start.</description>
                <applications>
                   <application>
                      <name>Etcd</name>
@@ -1520,7 +1520,7 @@ return JSON.stringify(result);</params>
             <macro>
                <macro>{$ETCD.GRPC_CODE.TRIGGER.MATCHES}</macro>
                <value>Aborted|Unavailable</value>
-               <description>Filter of discoverable gRPC codes which will be create triggers</description>
+               <description>Filter of discoverable gRPC codes which will create triggers</description>
             </macro>
             <macro>
                <macro>{$ETCD.GRPC.ERRORS.MAX.WARN}</macro>

@@ -111,6 +111,7 @@ static zbx_vmware_t	*vmware = NULL;
 
 ZBX_PTR_VECTOR_IMPL(str_uint64_pair, zbx_str_uint64_pair_t)
 ZBX_PTR_VECTOR_IMPL(vmware_datastore, zbx_vmware_datastore_t *)
+ZBX_PTR_VECTOR_IMPL(ds_name_uuid, zbx_vmware_ds_name_uuid_t)
 ZBX_PTR_VECTOR_IMPL(vmware_datacenter, zbx_vmware_datacenter_t *)
 
 /* VMware service object name mapping for vcenter and vsphere installations */
@@ -229,10 +230,6 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_COUNTERINFO()										\
 	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
 
-#define ZBX_XPATH_DATASTORE_MOUNT()									\
-	"/*/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='DatastoreHostMount']"			\
-	"/*[local-name()='mountInfo']/*[local-name()='path']"
-
 #define ZBX_XPATH_HV_DATASTORES()									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
 	"/*[local-name()='val']/*[@type='Datastore']"
@@ -267,10 +264,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
 		"/*[local-name()='val']"
 
-#define ZBX_XPATH_HV_SENSOR_STATUS(sensor)								\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"					\
-		"[text()='runtime.healthSystemRuntime.systemHealthInfo']]"				\
-		"/*[local-name()='val']/*[local-name()='numericSensorInfo']"				\
+#define ZBX_XPATH_HV_SENSOR_STATUS(node, sensor)							\
+	ZBX_XPATH_PROP_NAME(node) "/*[local-name()='HostNumericSensorInfo']"				\
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
 
@@ -328,14 +323,14 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_PROPMAP("summary.hardware.uuid"), 			/* ZBX_VMWARE_HVPROP_HW_UUID */
 	ZBX_PROPMAP("summary.hardware.vendor"), 		/* ZBX_VMWARE_HVPROP_HW_VENDOR */
 	ZBX_PROPMAP("summary.quickStats.overallMemoryUsage"),	/* ZBX_VMWARE_HVPROP_MEMORY_USED */
-	{"runtime.healthSystemRuntime.systemHealthInfo", 	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
-			ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"), NULL},
+	{NULL, ZBX_XPATH_HV_SENSOR_STATUS("runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
+			"VMware Rollup Health State"), NULL},	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
 	ZBX_PROPMAP("summary.quickStats.uptime"),		/* ZBX_VMWARE_HVPROP_UPTIME */
 	ZBX_PROPMAP("summary.config.product.version"),		/* ZBX_VMWARE_HVPROP_VERSION */
 	ZBX_PROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
 	ZBX_PROPMAP("overallStatus"),				/* ZBX_VMWARE_HVPROP_STATUS */
 	ZBX_PROPMAP("runtime.inMaintenanceMode"),		/* ZBX_VMWARE_HVPROP_MAINTENANCE */
-	ZBX_PROPMAP_EXT("summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
+	ZBX_PROPMAP_EXT("runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
 			zbx_xmlnode_to_json),			/* ZBX_VMWARE_HVPROP_SENSOR */
 	{"config.network.dnsConfig", "concat("			/* ZBX_VMWARE_HVPROP_NET_NAME */
 			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='hostName']" ",'.',"
@@ -937,9 +932,7 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 {
 	vmware_shared_strfree(datastore->name);
 	vmware_shared_strfree(datastore->id);
-
-	if (NULL != datastore->uuid)
-		vmware_shared_strfree(datastore->uuid);
+	vmware_shared_strfree(datastore->uuid);
 
 	vmware_vector_str_uint64_pair_shared_clean(&datastore->hv_uuids_access);
 	zbx_vector_str_uint64_pair_destroy(&datastore->hv_uuids_access);
@@ -1057,6 +1050,19 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_ds_shared_name_uuid_free                                  *
+ *                                                                            *
+ * Purpose: free zbx_vmware_ds_name_uuid_t shared memory                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_ds_shared_name_uuid_free(const zbx_vmware_ds_name_uuid_t ds)
+{
+	vmware_shared_strfree(ds.name);
+	vmware_shared_strfree(ds.uuid);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_hv_shared_clean                                           *
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware hypervisor       *
@@ -1066,8 +1072,8 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
  ******************************************************************************/
 static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_str_clear_ext(&hv->ds_names, vmware_shared_strfree);
-	zbx_vector_str_destroy(&hv->ds_names);
+	zbx_vector_ds_name_uuid_clear_ext(&hv->ds_names, vmware_ds_shared_name_uuid_free);
+	zbx_vector_ds_name_uuid_destroy(&hv->ds_names);
 
 	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_shared_free);
 	zbx_vector_ptr_destroy(&hv->vms);
@@ -1486,9 +1492,9 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 {
 	int	i;
 
-	VMWARE_VECTOR_CREATE(&dst->ds_names, str);
+	VMWARE_VECTOR_CREATE(&dst->ds_names, ds_name_uuid);
 	VMWARE_VECTOR_CREATE(&dst->vms, ptr);
-	zbx_vector_str_reserve(&dst->ds_names, src->ds_names.values_num);
+	zbx_vector_ds_name_uuid_reserve(&dst->ds_names, src->ds_names.values_num);
 	zbx_vector_ptr_reserve(&dst->vms, src->vms.values_num);
 
 	dst->uuid = vmware_shared_strdup(src->uuid);
@@ -1501,7 +1507,13 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 	dst->parent_type= vmware_shared_strdup(src->parent_type);
 
 	for (i = 0; i < src->ds_names.values_num; i++)
-		zbx_vector_str_append(&dst->ds_names, vmware_shared_strdup(src->ds_names.values[i]));
+	{
+		zbx_vmware_ds_name_uuid_t	ds;
+
+		ds.name = vmware_shared_strdup(src->ds_names.values[i].name);
+		ds.uuid = vmware_shared_strdup(src->ds_names.values[i].uuid);
+		zbx_vector_ds_name_uuid_append(&dst->ds_names, ds);
+	}
 
 	for (i = 0; i < src->vms.values_num; i++)
 		zbx_vector_ptr_append(&dst->vms, vmware_vm_shared_dup((zbx_vmware_vm_t *)src->vms.values[i]));
@@ -1698,6 +1710,19 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_ds_name_uuid_free                                         *
+ *                                                                            *
+ * Purpose: free memory of zbx_vmware_ds_name_uuid_t                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_ds_name_uuid_free(zbx_vmware_ds_name_uuid_t ds)
+{
+	zbx_free(ds.name);
+	zbx_free(ds.uuid);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_hv_clean                                                  *
  *                                                                            *
  * Purpose: frees resources allocated to store vmware hypervisor              *
@@ -1707,8 +1732,8 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
  ******************************************************************************/
 static void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_str_clear_ext(&hv->ds_names, zbx_str_free);
-	zbx_vector_str_destroy(&hv->ds_names);
+	zbx_vector_ds_name_uuid_clear_ext(&hv->ds_names, vmware_ds_name_uuid_free);
+	zbx_vector_ds_name_uuid_destroy(&hv->ds_names);
 
 	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_free);
 	zbx_vector_ptr_destroy(&hv->vms);
@@ -2724,7 +2749,6 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 				"<ns0:propSet>"							\
 					"<ns0:type>Datastore</ns0:type>"			\
 					"<ns0:pathSet>summary</ns0:pathSet>"			\
-					"<ns0:pathSet>host</ns0:pathSet>"			\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
 					"<ns0:obj type=\"Datastore\">%s</ns0:obj>"		\
@@ -2761,7 +2785,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	name = zbx_xml_read_doc_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("name"));
 
-	if (NULL != (path = zbx_xml_read_doc_value(doc, ZBX_XPATH_DATASTORE_MOUNT())))
+	if (NULL != (path = zbx_xml_read_doc_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("url"))))
 	{
 		if ('\0' != *path)
 		{
@@ -2779,6 +2803,12 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 			uuid = zbx_strdup(NULL, ptr + 1);
 		}
 		zbx_free(path);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() datastore uuid not present for id:'%s'", __func__, id);
+		zbx_free(name);
+		goto out;
 	}
 
 	if (ZBX_VMWARE_TYPE_VSPHERE == service->type)
@@ -2886,6 +2916,9 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	for (i = 0; i < props_num; i++)
 	{
+		if (NULL == propmap[i].name)
+			continue;
+
 		zbx_strlcat(props, "<ns0:pathSet>", sizeof(props));
 		zbx_strlcat(props, propmap[i].name, sizeof(props));
 		zbx_strlcat(props, "</ns0:pathSet>", sizeof(props));
@@ -3049,6 +3082,36 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_hvds_name_compare                                         *
+ *                                                                            *
+ * Purpose: sorting function to sort zbx_vmware_ds_name_uuid_t vector by name *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_hvds_name_compare(const void *d1, const void *d2)
+{
+	const zbx_vmware_ds_name_uuid_t	ds1 = *(const zbx_vmware_ds_name_uuid_t *)d1;
+	const zbx_vmware_ds_name_uuid_t	ds2 = *(const zbx_vmware_ds_name_uuid_t *)d2;
+
+	return strcmp(ds1.name, ds2.name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_ds_uuid_compare                                           *
+ *                                                                            *
+ * Purpose: sorting function to sort Datastore vector by uuid                 *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_ds_uuid_compare(const void *d1, const void *d2)
+{
+	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
+	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
+
+	return strcmp(ds1->uuid, ds2->uuid);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_ds_name_compare                                           *
  *                                                                            *
  * Purpose: sorting function to sort Datastore vector by name                 *
@@ -3203,7 +3266,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	memset(hv, 0, sizeof(zbx_vmware_hv_t));
 
-	zbx_vector_str_create(&hv->ds_names);
+	zbx_vector_ds_name_uuid_create(&hv->ds_names);
 	zbx_vector_ptr_create(&hv->vms);
 
 	zbx_vector_str_create(&datastores);
@@ -3231,12 +3294,13 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		goto out;
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
-	zbx_vector_str_reserve(&hv->ds_names, datastores.values_num);
+	zbx_vector_ds_name_uuid_reserve(&hv->ds_names, datastores.values_num);
 
 	for (i = 0; i < datastores.values_num; i++)
 	{
-		zbx_vmware_datastore_t	*ds, ds_cmp;
-		zbx_str_uint64_pair_t	hv_ds_access;
+		zbx_vmware_datastore_t		*ds, ds_cmp;
+		zbx_str_uint64_pair_t		hv_ds_access;
+		zbx_vmware_ds_name_uuid_t	ds_name;
 
 		ds_cmp.id = datastores.values[i];
 
@@ -3251,10 +3315,12 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		hv_ds_access.name = zbx_strdup(NULL, hv->uuid);
 		hv_ds_access.value = vmware_hv_get_ds_access(details, ds->id);
 		zbx_vector_str_uint64_pair_append_ptr(&ds->hv_uuids_access, &hv_ds_access);
-		zbx_vector_str_append(&hv->ds_names, zbx_strdup(NULL, ds->name));
+		ds_name.name = zbx_strdup(NULL, ds->name);
+		ds_name.uuid = zbx_strdup(NULL, ds->uuid);
+		zbx_vector_ds_name_uuid_append(&hv->ds_names, ds_name);
 	}
 
-	zbx_vector_str_sort(&hv->ds_names, ZBX_DEFAULT_STR_COMPARE_FUNC);
+	zbx_vector_ds_name_uuid_sort(&hv->ds_names, vmware_hvds_name_compare);
 	zbx_xml_read_values(details, ZBX_XPATH_HV_VMS(), &vms);
 	zbx_vector_ptr_reserve(&hv->vms, vms.values_num + hv->vms.values_alloc);
 
@@ -4726,7 +4792,7 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 	if (SUCCEED != vmware_service_get_contents(easyhandle, &version, &fullname, error))
 		goto out;
 
-	if (0 == (service->state & ZBX_VMWARE_STATE_NEW) && 0 == strcmp(service->version, version))
+	if (0 != (service->state & ZBX_VMWARE_STATE_READY) && 0 == strcmp(service->version, version))
 	{
 		ret = SUCCEED;
 		goto out;
@@ -5054,7 +5120,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 				zbx_str_uint64_pair_name_compare);
 	}
 
-	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_name_compare);
+	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_uuid_compare);
 
 	if (0 == service->eventlog.req_sz && 0 == evt_pause)
 	{

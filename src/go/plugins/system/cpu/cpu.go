@@ -23,6 +23,8 @@ import (
 	"encoding/json"
 	"errors"
 	"strconv"
+
+	"zabbix.com/pkg/zbxerr"
 )
 
 const pluginName = "Cpu"
@@ -101,29 +103,21 @@ func (p *Plugin) getCpuDiscovery(params []string) (result interface{}, err error
 }
 
 func (p *Plugin) getCpuNum(params []string) (result interface{}, err error) {
-	mask := cpuStatusOnline
 	switch len(params) {
 	case 1:
 		switch params[0] {
 		case "", "online":
-			// default value, already initialized
+			return numCPUOnline(), nil
 		case "max":
-			mask = cpuStatusOnline | cpuStatusOffline
+			return numCPUConf(), nil
 		default:
 			return nil, errors.New("Invalid first parameter.")
 		}
 	case 0:
+		return numCPUOnline(), nil
 	default:
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorTooManyParameters
 	}
-
-	var num int
-	for i := 1; i < len(p.cpus); i++ {
-		if p.cpus[i].status&mask != 0 {
-			num++
-		}
-	}
-	return num, nil
 }
 
 func periodByMode(mode string) (period historyIndex) {

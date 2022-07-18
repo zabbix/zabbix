@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-21T18:00:04Z</date>
+   <date>2022-02-10T15:43:34Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -604,7 +604,7 @@ This is the actual amount of free disk space the selected Elasticsearch nodes ca
             <item>
                <name>ES: Cluster uptime</name>
                <type>DEPENDENT</type>
-               <key>es.nodes.jvm.max_uptime[{#ES.NODE}]</key>
+               <key>es.nodes.jvm.max_uptime</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>

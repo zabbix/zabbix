@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-21T18:57:38Z</date>
+   <date>2022-03-03T14:37:04Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -1193,7 +1193,7 @@ For domain mode: The name given to this domain</description>
                      <value_type>FLOAT</value_type>
                      <username>{$WILDFLY.USER}</username>
                      <password>{$WILDFLY.PASSWORD}</password>
-                     <description>The number of XAResource recover invocationsper second.</description>
+                     <description>The number of XAResource recover invocations per second.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>WildFly datasource [{#JMX_DATA_SOURCE}]</name>

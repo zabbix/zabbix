@@ -1172,9 +1172,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		ZBX_DOUBLE_EPSILON = 0.000001;
 		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
 	}
-
-	DBcheck_capabilities();
-
+#ifdef HAVE_POSTGRESQL
+	zbx_db_check_tsdb_capabilities();
+#endif
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);
 

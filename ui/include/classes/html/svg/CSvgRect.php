@@ -22,7 +22,7 @@
 class CSvgRect extends CSvgTag {
 
 	public function __construct($x, $y, $width, $height) {
-		parent::__construct('rect', true);
+		parent::__construct('rect');
 
 		$this->setAttribute('x', $x);
 		$this->setAttribute('y', $y);

@@ -274,7 +274,6 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleXpath("//input[@name='description']");
 		$this->zbxTestAssertAttribute("//input[@name='description']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@name='description']", 'size', 20);
 
 		if (!(isset($data['constructor'])) || $data['constructor'] == 'open_close') {
 			$this->zbxTestTextPresent(['Expression', 'Expression constructor']);
@@ -343,7 +342,6 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('URL');
 		$this->zbxTestAssertVisibleId('url');
 		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='url']", 'size', 20);
 
 		$this->zbxTestAssertElementPresentId('priority_0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_0'));
@@ -850,10 +848,10 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 						}
 					}
 					if (isset($constructor['elementError'])) {
-						$this->zbxTestAssertElementPresentXpath('//span[@class="icon-info status-red"]');
+						$this->zbxTestAssertElementPresentXpath('//a[@class="icon-info status-red"]');
 					}
 					else {
-						$this->zbxTestAssertElementNotPresentXpath('//span[@class="icon-info status-red"]');
+						$this->zbxTestAssertElementNotPresentXpath('//a[@class="icon-info status-red"]');
 					}
 
 					if (isset($constructor['text'])) {

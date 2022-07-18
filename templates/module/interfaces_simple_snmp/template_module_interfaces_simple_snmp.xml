@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T09:19:00Z</date>
+   <date>2022-03-03T14:16:51Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -155,7 +155,7 @@ For packet-oriented interfaces, the number of inbound packets that contained err
                      <history>7d</history>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
-The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occurat re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.</description>
+The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFDESCR}</name>
@@ -227,7 +227,7 @@ For packet-oriented interfaces, the number of outbound packets that contained er
                      <history>7d</history>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
-The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occurat re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
+The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFDESCR}</name>
@@ -258,7 +258,7 @@ An estimate of the interface's current bandwidth in bits per second.&#13;
 For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made,&#13;
 this object should contain the nominal bandwidth.&#13;
 If the bandwidth of the interface is greater than the maximum value reportable by this object then&#13;
-this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interace's speed.&#13;
+this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the Internet Assigned Numbers Authority's speed.&#13;
 For a sub-layer which has no concept of bandwidth, this object should be zero.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -317,7 +317,7 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <trends>0d</trends>
                      <description>MIB: IF-MIB&#13;
 The type of interface.&#13;
-Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),&#13;
+Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),&#13;
 through updating the syntax of the IANAifType textual convention.</description>
                      <application_prototypes>
                         <application_prototype>

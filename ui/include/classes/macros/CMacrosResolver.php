@@ -1625,7 +1625,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Replace macros to value.
 		foreach ($macro_values as $key => $macros) {
-			$items[$key]['key_expanded'] = $this->resolveItemKeyMacros($items[$key]['key_expanded'], $macros, $types);
+			$items[$key]['key_expanded'] = self::resolveItemKeyMacros($items[$key]['key_expanded'], $macros, $types);
 		}
 
 		return $items;

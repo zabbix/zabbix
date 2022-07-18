@@ -51,7 +51,7 @@ var impl Plugin
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (interface{}, error) {
 	var result []byte
 
-	params, err := metrics[key].EvalParams(rawParams, nil)
+	params, _, err := metrics[key].EvalParams(rawParams, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -27,7 +27,6 @@ class CNavigationTree extends CDiv {
 		parent::__construct();
 
 		$this->data = $data;
-		$this->error = null;
 
 		$this->setId(uniqid());
 		$this->addClass(ZBX_STYLE_NAVIGATIONTREE);

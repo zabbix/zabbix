@@ -105,7 +105,7 @@ if (!CWebUser::$data) {
 }
 
 // page title
-(new CPageHeader(_('Installation')))
+(new CPageHeader(_('Installation'), CWebUser::getLang()))
 	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('js/vendors/jquery.js'))->getUrl())
@@ -134,8 +134,6 @@ $sub_footer = (new CDiv(['Licensed under ', $link]))->addClass(ZBX_STYLE_SIGNIN_
 	(new CDiv([
 		(new CTag('main', true, [$ZBX_SETUP_WIZARD, $sub_footer])), makePageFooter()])
 	)->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
-))
-	->setAttribute('lang', CWebUser::getLang())
-	->show();
+))->show();
 ?>
 </html>

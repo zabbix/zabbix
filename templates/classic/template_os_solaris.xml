@@ -75,7 +75,7 @@
                     <publickey/>
                     <privatekey/>
                     <port/>
-                    <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
+                    <description>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</description>
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>

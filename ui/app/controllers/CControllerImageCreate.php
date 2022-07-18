@@ -106,7 +106,8 @@ class CControllerImageCreate extends CController {
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add image'));
 
-			return $this->setResponse($response);
+			$this->setResponse($response);
+			return;
 		}
 
 		$result = API::Image()->create([

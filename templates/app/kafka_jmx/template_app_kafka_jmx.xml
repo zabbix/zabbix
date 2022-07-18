@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-01-10T14:11:38Z</date>
+   <date>2022-03-03T14:56:42Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -202,7 +202,7 @@ Template tooling version used: 0.39</description>
                      <expression>{last()} &gt; 0</expression>
                      <name>Kafka: There are offline log directories</name>
                      <priority>WARNING</priority>
-                     <description>The offline log directory count metric indicate the number of log directories which are offline (due to an hardware failure for example) so that the broker cannot store incoming messages anymore.</description>
+                     <description>The offline log directory count metric indicate the number of log directories which are offline (due to a hardware failure for example) so that the broker cannot store incoming messages anymore.</description>
                   </trigger>
                </triggers>
             </item>

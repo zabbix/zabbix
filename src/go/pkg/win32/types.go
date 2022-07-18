@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 /*
@@ -227,4 +228,11 @@ type IO_COUNTERS struct {
 	ReadTransferCount   uint64
 	WriteTransferCount  uint64
 	OtherTransferCount  uint64
+}
+
+type CLUSTER struct {
+	LpSectorsPerCluster     uint32
+	LpBytesPerSector        uint32
+	LpNumberOfFreeClusters  uint32
+	LpTotalNumberOfClusters uint32
 }

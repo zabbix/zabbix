@@ -202,7 +202,7 @@ class CAPIHelper {
 	 *
 	 * @return string
 	 */
-	public function getDebugInfoAsString($clear = false) {
+	public static function getDebugInfoAsString($clear = false) {
 		$steps = [];
 		foreach (static::getDebugInfo($clear) as $call) {
 			$step = "  Request: ".$call['request'];

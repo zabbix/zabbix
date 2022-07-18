@@ -22,7 +22,7 @@
 class CSvgLine extends CSvgTag {
 
 	public function __construct($x1, $y1, $x2, $y2) {
-		parent::__construct('line', true);
+		parent::__construct('line');
 
 		$this->setAttribute('x1', $x1);
 		$this->setAttribute('y1', $y1);

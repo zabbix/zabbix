@@ -41,6 +41,12 @@ var metricSet = MetricSet{
 		[]*Param{paramURI, paramUsername, paramPassword,
 			NewParam("Param1", "Description.").WithDefault("60").WithValidator(SetValidator{Set: []string{"15", "60"}}),
 		}, false),
+	"metric.bar": New("bar description.",
+		[]*Param{paramURI, paramUsername, NewSessionOnlyParam("Password", "Description.")}, true),
+	"metric.bar.strict": New("bar description.",
+		[]*Param{paramURI, paramUsername, paramPassword,
+			NewSessionOnlyParam("Param1", "Description.").SetRequired(),
+		}, false),
 	"metric.query": New("Query description.",
 		[]*Param{paramURI, paramUsername, paramPassword,
 			NewParam("QueryName", "Description.").SetRequired(),
@@ -63,6 +69,7 @@ func TestMetric_EvalParams(t *testing.T) {
 		m         *Metric
 		args      args
 		want      map[string]string
+		wantExtra []string
 		wantErr   bool
 		wantPanic bool
 	}{
@@ -85,7 +92,99 @@ func TestMetric_EvalParams(t *testing.T) {
 				sessions:  map[string]conf.Session{},
 			},
 			want:      map[string]string{"Password": "password", "QueryName": "queryName", "URI": "localhost", "User": "user"},
+			wantExtra: []string{"queryParam1", "queryParam2"},
 			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "Must not fail if passed more parameters than described, " +
+				"but the metric has the varParam enabled (with session)",
+			m: metricSet["metric.query"],
+			args: args{
+				rawParams: []string{"Session1", "", "", "queryName", "queryParam1", "queryParam2"},
+				sessions: map[string]conf.Session{
+					"Session1": {URI: "localhost", User: "user", Password: "password"},
+				},
+			},
+			want: map[string]string{
+				"Password": "password", "QueryName": "queryName", "URI": "localhost", "User": "user", "sessionName": "Session1",
+			},
+			wantExtra: []string{"queryParam1", "queryParam2"},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "Must not fail if passed session only parameters none strict",
+			m:    metricSet["metric.bar"],
+			args: args{
+				rawParams: []string{"Session1", "", "queryParam1"},
+				sessions: map[string]conf.Session{
+					"Session1": {URI: "localhost", User: "user", Password: "password"},
+				},
+			},
+			want: map[string]string{
+				"Password": "password", "URI": "localhost", "User": "user", "sessionName": "Session1",
+			},
+			wantExtra: []string{"queryParam1"},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "Must not fail if missing session only parameters none strict",
+			m:    metricSet["metric.bar"],
+			args: args{
+				rawParams: []string{"Session1", "", "queryParam1"},
+				sessions: map[string]conf.Session{
+					"Session1": {URI: "localhost", User: "user"},
+				},
+			},
+			want: map[string]string{
+				"Password": "", "URI": "localhost", "User": "user", "sessionName": "Session1",
+			},
+			wantExtra: []string{"queryParam1"},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "Must not fail if passed session only parameters none strict",
+			m:    metricSet["metric.bar"],
+			args: args{
+				rawParams: []string{"Session1", "", "queryParam1"},
+				sessions: map[string]conf.Session{
+					"Session1": {URI: "localhost", User: "user", Password: "password"},
+				},
+			},
+			want: map[string]string{
+				"Password": "password", "URI": "localhost", "User": "user", "sessionName": "Session1",
+			},
+			wantExtra: []string{"queryParam1"},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "Must fail if missing session only parameters with strict required",
+			m:    metricSet["metric.bar.strict"],
+			args: args{
+				rawParams: []string{"Session1", "", "queryParam1"},
+				sessions: map[string]conf.Session{
+					"Session1": {URI: "localhost", User: "user"},
+				},
+			},
+			want:      nil,
+			wantExtra: nil,
+			wantErr:   true,
+			wantPanic: false,
+		},
+		{
+			name: "Must fail if session only parameter passed in key",
+			m:    metricSet["metric.bar.strict"],
+			args: args{
+				rawParams: []string{"localhost", "user", "password", "param1"},
+				sessions:  map[string]conf.Session{},
+			},
+			want:      nil,
+			wantExtra: nil,
+			wantErr:   true,
 			wantPanic: false,
 		},
 		{
@@ -199,13 +298,16 @@ func TestMetric_EvalParams(t *testing.T) {
 				}()
 			}
 
-			gotParams, err := tt.m.EvalParams(tt.args.rawParams, tt.args.sessions)
+			gotParams, gotExtraParams, err := tt.m.EvalParams(tt.args.rawParams, tt.args.sessions)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("EvalParams() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotParams, tt.want) {
 				t.Errorf("EvalParams() got = %v, want %v", gotParams, tt.want)
+			}
+			if !reflect.DeepEqual(gotExtraParams, tt.wantExtra) {
+				t.Errorf("EvalParams() got extraParams = %v, want %v", gotExtraParams, tt.wantExtra)
 			}
 		})
 	}
@@ -261,9 +363,9 @@ func TestNew(t *testing.T) {
 				false,
 			},
 			want: &Metric{
-				description: "Metric description.",
-				params:      []*Param{paramURI, paramUsername, paramPassword, paramGeneral},
-				varParam:    false,
+				"Metric description.",
+				[]*Param{paramURI, paramUsername, paramPassword, paramGeneral},
+				false,
 			},
 			wantPanic: false,
 		},

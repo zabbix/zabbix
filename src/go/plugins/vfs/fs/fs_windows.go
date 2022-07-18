@@ -33,7 +33,7 @@ func getMountPaths() (paths []string, err error) {
 	if h, err = windows.FindFirstVolume(&volume[0], uint32(len(volume))); err != nil {
 		return
 	}
-	defer windows.FindClose(h)
+	defer windows.FindVolumeClose(h)
 
 	var result []string
 	var size uint32

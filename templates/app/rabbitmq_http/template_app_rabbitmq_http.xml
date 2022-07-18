@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-01-10T14:11:41Z</date>
+   <date>2022-03-03T14:24:25Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -669,7 +669,7 @@ Template tooling version used: 0.39</description>
                <description>Individual exchange metrics</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages acknowledged per second</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages acknowledged per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.ack.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -694,7 +694,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages acknowledged</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages acknowledged</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.ack["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -718,7 +718,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages confirmed per second</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages confirmed per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.confirm.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -743,7 +743,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages confirmed</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages confirmed</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.confirm["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -767,7 +767,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages delivered per second</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages delivered per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.deliver_get.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -792,7 +792,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages delivered</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages delivered</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.deliver_get["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -816,7 +816,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_in per second</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_in per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.publish_in.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -841,7 +841,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_in</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_in</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.publish_in["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -865,7 +865,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_out per second</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_out per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.publish_out.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -890,7 +890,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_out</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_out</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.publish_out["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -914,7 +914,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages published per second</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages published per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.publish.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -939,7 +939,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages published</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages published</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.publish["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -963,7 +963,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages redelivered per second</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages redelivered per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.redeliver.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -988,7 +988,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages redelivered</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages redelivered</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.redeliver["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -1012,7 +1012,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages returned unroutable per second</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages returned unroutable per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.return_unroutable.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -1037,7 +1037,7 @@ Template tooling version used: 0.39</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages returned unroutable</name>
+                     <name>RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages returned unroutable</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.exchange.messages.return_unroutable["{#VHOST}/{#EXCHANGE}/{#TYPE}"]</key>
                      <delay>0</delay>
@@ -1328,7 +1328,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>RabbitMQ: Service response time</name>
                <type>SIMPLE</type>
-               <key>net.tcp.service.perf[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"]</key>
+               <key>net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
@@ -1346,7 +1346,7 @@ Template tooling version used: 0.39</description>
                      <dependencies>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by HTTP:net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1355,7 +1355,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>RabbitMQ: Service ping</name>
                <type>SIMPLE</type>
-               <key>net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"]</key>
+               <key>net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"]</key>
                <history>7d</history>
                <applications>
                   <application>
@@ -1425,7 +1425,7 @@ Template tooling version used: 0.39</description>
                      <dependencies>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by HTTP:net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1799,7 +1799,7 @@ Template tooling version used: 0.39</description>
                      <dependencies>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by HTTP:net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1944,7 +1944,7 @@ default: 2}</params>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Healthcheck: local alarms in effect on the this node{#SINGLETON}</name>
+                     <name>RabbitMQ: Healthcheck: local alarms in effect on this node{#SINGLETON}</name>
                      <type>HTTP_AGENT</type>
                      <key>rabbitmq.healthcheck.local_alarms[{#SINGLETON}]</key>
                      <history>7d</history>
@@ -2032,7 +2032,7 @@ default: 2}</params>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>RabbitMQ: There are queues that could potentially lose data if the this node goes offline.</name>
+                           <name>RabbitMQ: There are queues that could potentially lose data if this node goes offline.</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</description>
@@ -2080,7 +2080,7 @@ default: 2}</params>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down.</name>
+                           <name>RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</description>
@@ -2088,7 +2088,7 @@ default: 2}</params>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Healthcheck: virtual hosts on the this node{#SINGLETON}</name>
+                     <name>RabbitMQ: Healthcheck: virtual hosts on this node{#SINGLETON}</name>
                      <type>HTTP_AGENT</type>
                      <key>rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}]</key>
                      <history>7d</history>
@@ -2247,7 +2247,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                <description>Individual queue metrics</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Consumers</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Consumers</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.consumers["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2269,7 +2269,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Memory</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Memory</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.memory["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2292,7 +2292,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages ready per second</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages ready per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages_ready.rate["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2315,7 +2315,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages ready</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages ready</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages_ready["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2337,7 +2337,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages unacknowledged per second</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages unacknowledged per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages_unacknowledged.rate["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2360,7 +2360,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages unacknowledged</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages unacknowledged</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages_unacknowledged["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2382,7 +2382,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages acknowledged per second</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages acknowledged per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages.ack.rate["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2407,7 +2407,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages acknowledged</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages acknowledged</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages.ack["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2431,7 +2431,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered per second</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Sum of messages delivered per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages.deliver_get.rate["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2456,7 +2456,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Sum of messages delivered</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages.deliver_get["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2480,7 +2480,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered per second</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages delivered per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages.deliver.rate["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2505,7 +2505,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages delivered</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages.deliver["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2529,7 +2529,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages published per second</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages published per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages.publish.rate["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2554,7 +2554,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages published</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages published</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages.publish["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2578,7 +2578,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages per second</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages.rate["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2601,7 +2601,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages redelivered per second</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages redelivered per second</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages.redeliver.rate["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2626,7 +2626,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages redelivered</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages redelivered</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages.redeliver["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2650,7 +2650,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages</name>
                      <type>DEPENDENT</type>
                      <key>rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]</key>
                      <delay>0</delay>
@@ -2673,7 +2673,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}</expression>
-                           <name>RabbitMQ: Too many messages in queue (over {$RABBITMQ.MESSAGES.MAX.WARN} for 5m)</name>
+                           <name>RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}] (over {$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"} for 5m)</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                         </trigger_prototype>
@@ -2682,7 +2682,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                </item_prototypes>
                <graph_prototypes>
                   <graph_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages per second</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages per second</name>
                      <graph_items>
                         <graph_item>
                            <color>1A7C11</color>
@@ -2750,7 +2750,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                      </graph_items>
                   </graph_prototype>
                   <graph_prototype>
-                     <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages status</name>
+                     <name>RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages status</name>
                      <graph_items>
                         <graph_item>
                            <color>1A7C11</color>

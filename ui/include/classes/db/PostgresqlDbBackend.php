@@ -239,7 +239,7 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public function init() {
-		$schema_set = DBexecute('SET search_path='.zbx_dbstr($this->schema), true);
+		$schema_set = DBexecute('SET search_path='.zbx_dbstr($this->schema));
 
 		if(!$schema_set) {
 			$this->setError(pg_last_error());

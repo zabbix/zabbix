@@ -212,7 +212,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
 			if(isset($data['templatedHost'])) {
 				$this->zbxTestAssertAttribute("//input[@id='name']", 'readonly');
@@ -245,7 +244,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		else {
 			$this->zbxTestAssertVisibleId('typename');
 			$this->zbxTestAssertAttribute("//input[@id='typename']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='typename']", 'size', 20);
 			$this->zbxTestAssertAttribute("//input[@id='typename']", 'readonly');
 
 			$type = $this->zbxTestGetValue("//input[@id='typename']");
@@ -254,7 +252,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Key');
 		$this->zbxTestAssertVisibleId('key');
 		$this->zbxTestAssertAttribute("//input[@id='key']", 'maxlength', 2048);
-		$this->zbxTestAssertAttribute("//input[@id='key']", 'size', 20);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='key']", 'readonly');
 		}
@@ -334,7 +331,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestTextPresent('IPMI sensor');
 			$this->zbxTestAssertVisibleId('ipmi_sensor');
 			$this->zbxTestAssertAttribute("//input[@id='ipmi_sensor']", 'maxlength', 128);
-			$this->zbxTestAssertAttribute("//input[@id='ipmi_sensor']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('IPMI sensor');
@@ -355,7 +351,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestTextPresent('User name');
 			$this->zbxTestAssertVisibleId('username');
 			$this->zbxTestAssertAttribute("//input[@id='username']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='username']", 'size', 20);
 
 			if (isset($authtype) && $authtype == 'Public key') {
 				$this->zbxTestTextPresent('Key passphrase');
@@ -365,7 +360,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			}
 			$this->zbxTestAssertVisibleId('password');
 			$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='password']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible(['User name', 'Password', 'Key passphrase']);
@@ -377,12 +371,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Public key file');
 			$this->zbxTestAssertVisibleId('publickey');
 			$this->zbxTestAssertAttribute("//input[@id='publickey']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='publickey']", 'size', 20);
 
 			$this->zbxTestTextPresent('Private key file');
 			$this->zbxTestAssertVisibleId('privatekey');
 			$this->zbxTestAssertAttribute("//input[@id='privatekey']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='privatekey']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('Public key file');
@@ -396,7 +388,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestTextPresent('SNMP OID');
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
-			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
 		}
 		else {
@@ -418,7 +409,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Update interval');
 				$this->zbxTestAssertVisibleId('delay');
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
-				$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
 				if (!isset($data['form'])) {
 					$this->zbxTestAssertElementValue('delay', '1m');
 				}
@@ -431,7 +421,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Keep lost resources period');
 		$this->zbxTestAssertVisibleId('lifetime');
 		$this->zbxTestAssertAttribute("//input[@id='lifetime']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='lifetime']", 'size', 20);
 		$this->zbxTestAssertElementValue('lifetime', '30d');
 
 		// Custom intervals isn't visible for type 'SNMP trap' and 'Zabbix trapper'
@@ -451,12 +440,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestTextPresent(['Flexible', 'Scheduling']);
 			$this->zbxTestAssertVisibleId('delay_flex_0_delay');
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'size', 20);
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'placeholder', '50s');
 
 			$this->zbxTestAssertVisibleId('delay_flex_0_period');
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'size', 20);
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'placeholder', '1-7,00:00-24:00');
 			$this->zbxTestAssertVisibleId('interval_add');
 		}
@@ -465,7 +452,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Allowed hosts');
 			$this->zbxTestAssertVisibleId('trapper_hosts');
 			$this->zbxTestAssertAttribute("//input[@id='trapper_hosts']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='trapper_hosts']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('Allowed hosts');
@@ -490,12 +476,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Macro');
 		$this->zbxTestAssertVisibleId('conditions_0_macro');
 		$this->zbxTestAssertAttribute("//input[@id='conditions_0_macro']", 'maxlength', 64);
-		$this->zbxTestAssertAttribute("//input[@id='conditions_0_macro']", 'size', 20);
 
 		$this->zbxTestTextPresent('Regular expression');
 		$this->zbxTestAssertVisibleId('conditions_0_value');
 		$this->zbxTestAssertAttribute("//input[@id='conditions_0_value']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='conditions_0_value']", 'size', 20);
 	}
 
 	// Returns update data

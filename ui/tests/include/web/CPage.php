@@ -99,7 +99,8 @@ class CPage {
 			$options->addArguments([
 				'--no-sandbox',
 				'--enable-font-antialiasing=false',
-				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT
+				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT,
+				'--disable-dev-shm-usage'
 			]);
 
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
@@ -621,5 +622,12 @@ class CPage {
 		if ($text !== $header) {
 			throw new \Exception('Header of the page "'.$text.'" is not equal to "'.$header.'".');
 		}
+	}
+
+	/**
+	 * Scroll page to the top position.
+	 */
+	public function scrollToTop() {
+		$this->getDriver()->executeScript('document.getElementsByClassName(\'wrapper\')[0].scrollTo(0, 0)');
 	}
 }

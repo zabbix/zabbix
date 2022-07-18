@@ -6393,7 +6393,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned 
 	if (ZBX_ITEM_GET_INVENTORY & mode)
 	{
 		if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories, &src_host->hostid)))
-			dst_host->inventory_mode = (char)host_inventory->inventory_mode;
+			dst_host->inventory_mode = (signed char)host_inventory->inventory_mode;
 		else
 			dst_host->inventory_mode = HOST_INVENTORY_DISABLED;
 	}
@@ -8636,6 +8636,7 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const unsigned char *s
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 			case CONFIG_ERROR:
+			case SIG_ERROR:
 				dc_item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
 				dc_requeue_item(dc_item, dc_host, states[i], ZBX_ITEM_COLLECTED, lastclocks[i]);
 				break;
@@ -12482,8 +12483,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 				ps_win->period_end = ds_win->period_end;
 			}
 
-			if (ps_win->flags != ds_win->flags)
-				ps_win->flags = ds_win->flags;
+			ps_win->flags = ds_win->flags;
 
 			if (0 > ps_win->values_num)	/* some new values was processed faster than old */
 				ps_win->values_num = 0;	/* we will suppress more                         */

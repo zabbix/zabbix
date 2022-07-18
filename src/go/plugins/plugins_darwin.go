@@ -38,5 +38,4 @@ import (
 	_ "zabbix.com/plugins/web/page"
 	_ "zabbix.com/plugins/zabbix/async"
 	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
 )

@@ -58,6 +58,7 @@ type PGConn struct {
 	lastTimeAccess time.Time
 	version        int
 	queryStorage   *yarn.Yarn
+	address        string
 }
 
 var errorQueryNotFound = "query %q not found"
@@ -127,7 +128,7 @@ func (conn *PGConn) updateAccessTime() {
 type ConnManager struct {
 	sync.Mutex
 	connMutex      sync.Mutex
-	connections    map[uri.URI]*PGConn
+	connections    map[string]*PGConn
 	keepAlive      time.Duration
 	connectTimeout time.Duration
 	callTimeout    time.Duration
@@ -141,7 +142,7 @@ func NewConnManager(keepAlive, connectTimeout, callTimeout,
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections:    make(map[uri.URI]*PGConn),
+		connections:    make(map[string]*PGConn),
 		keepAlive:      keepAlive,
 		connectTimeout: connectTimeout,
 		callTimeout:    callTimeout,
@@ -163,7 +164,7 @@ func (c *ConnManager) closeUnused() {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
 			conn.client.Close()
 			delete(c.connections, uri)
-			log.Debugf("[%s] Closed unused connection: %s", pluginName, uri.Addr())
+			log.Debugf("[%s] Closed unused connection: %s", pluginName, conn.address)
 		}
 	}
 }
@@ -200,7 +201,7 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*PGConn, e
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if _, ok := c.connections[uri]; ok {
+	if _, ok := c.connections[uri.NoQueryString()]; ok {
 		// Should never happen.
 		panic("connection already exists")
 	}
@@ -248,18 +249,19 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*PGConn, e
 		return nil, fmt.Errorf("postgres version %d is not supported", serverVersion)
 	}
 
-	c.connections[uri] = &PGConn{
+	c.connections[uri.NoQueryString()] = &PGConn{
 		client:         client,
 		callTimeout:    c.callTimeout,
 		version:        serverVersion,
 		lastTimeAccess: time.Now(),
 		ctx:            ctx,
 		queryStorage:   &c.queryStorage,
+		address:        uri.Addr(),
 	}
 
 	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())
 
-	return c.connections[uri], nil
+	return c.connections[uri.NoQueryString()], nil
 }
 
 func createTLSClient(dsn string, timeout time.Duration, details tlsconfig.Details) (*sql.DB, error) {
@@ -304,7 +306,7 @@ func (c *ConnManager) get(uri uri.URI) *PGConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if conn, ok := c.connections[uri]; ok {
+	if conn, ok := c.connections[uri.NoQueryString()]; ok {
 		conn.updateAccessTime()
 		return conn
 	}

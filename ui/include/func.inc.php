@@ -1340,7 +1340,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  *
  * @param string   $number     Valid number in decimal or scientific notation.
  * @param int|null $precision  Max number of significant digits to take into account. Default: ZBX_FLOAT_DIG.
- * @param int|null $decimals   Max number of first non-zero decimals decimals to display. Default: 0.
+ * @param int|null $decimals   Max number of first non-zero decimals to display. Default: 0.
  * @param bool     $exact      Display exactly this number of decimals instead of first non-zeros.
  *
  * Note: $decimals must be less than $precision.
@@ -2315,10 +2315,10 @@ function uncheckTableRows($parentid = null, $keepids = []) {
 		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		$keepids = array_combine($keepids, $keepids);
 
-		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.json_encode($keepids).'))');
+		insert_js('sessionStorage.setItem('.json_encode($key).', JSON.stringify('.json_encode($keepids).'));');
 	}
 	else {
-		insert_js('sessionStorage.removeItem("'.$key.'")');
+		insert_js('sessionStorage.removeItem('.json_encode($key).');');
 	}
 }
 
