@@ -63,8 +63,6 @@ zabbix_agentd_LDADD = \
 	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
-	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxgetopt/libzbxgetopt.a \
 	$(top_builddir)/src/libs/zbxhash/libzbxhash.a \
@@ -75,6 +73,7 @@ zabbix_agentd_LDADD = \
 	$(top_builddir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_builddir)/src/libs/zbxip/libzbxip.a \
 	$(top_builddir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_builddir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
