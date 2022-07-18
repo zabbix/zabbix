@@ -31,6 +31,8 @@ int	check_vcenter_cluster_alarms_get(AGENT_REQUEST *request, const char *usernam
 		AGENT_RESULT *result);
 int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_cluster_property(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_cluster_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
@@ -49,6 +51,8 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 int	check_vcenter_datastore_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_datastore_property(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -119,6 +123,8 @@ int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_property(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT * result);
@@ -204,6 +210,8 @@ int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, const char *use
 int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_net_if_usage(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_vm_property(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
