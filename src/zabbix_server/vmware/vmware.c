@@ -3390,6 +3390,7 @@ static int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyh
 		updated += vmware_hv_ds_access_parse(doc, hv_dss, hv_uuid, hv_id, dss);
 	}
 
+	ret = SUCCEED;
 out:
 	zbx_property_collection_free(iter);
 	zbx_xml_free_doc(doc);
