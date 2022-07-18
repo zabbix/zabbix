@@ -54,7 +54,6 @@ typedef int	(*replace_key_param_f)(const char *data, int key_type, int level, in
 #define ZBX_KEY_TYPE_OID	1
 int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
 		size_t maxerrlen);
-void	remove_param(char *param, int num);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 #endif /* ZABBIX_PARAM_H */

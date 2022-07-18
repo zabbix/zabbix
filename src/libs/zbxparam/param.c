@@ -642,51 +642,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: remove parameter by index (num) from parameter list (param)       *
- *                                                                            *
- * Parameters:                                                                *
- *      param  - parameter list                                               *
- *      num    - requested parameter index                                    *
- *                                                                            *
- * Comments: delimiter for parameters is ','                                  *
- *                                                                            *
- ******************************************************************************/
-void	remove_param(char *param, int num)
-{
-	int	state = 0;	/* 0 - unquoted parameter, 1 - quoted parameter */
-	int	idx = 1, skip_char = 0;
-	char	*p;
-
-	for (p = param; '\0' != *p; p++)
-	{
-		switch (state)
-		{
-			case 0:			/* in unquoted parameter */
-				if (',' == *p)
-				{
-					if (1 == idx && 1 == num)
-						skip_char = 1;
-					idx++;
-				}
-				else if ('"' == *p)
-					state = 1;
-				break;
-			case 1:			/* in quoted parameter */
-				if ('"' == *p && '\\' != *(p - 1))
-					state = 0;
-				break;
-		}
-		if (idx != num && 0 == skip_char)
-			*param++ = *p;
-
-		skip_char = 0;
-	}
-
-	*param = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *          to be used for keys: key[param1,param2]                           *
  *                                                                            *
