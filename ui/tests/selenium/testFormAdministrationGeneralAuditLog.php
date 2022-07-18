@@ -43,7 +43,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
-	 **/
+	 */
 	public function getBehaviors() {
 		return ['class' => CMessageBehavior::class];
 	}
@@ -51,7 +51,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	/**
 	 * The function's main purpose is to check if the layout of the page is not broken and fields are in their place,
 	 * Additional checkups are made and committed within the function.
-	 **/
+	 */
 	public function testFormAdministrationGeneralAuditLog_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=audit.settings.edit')->waitUntilReady();
 		$form = $this->query('id:audit-settings')->waitUntilPresent()->asForm()->one();
@@ -83,14 +83,14 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 
 	/**
 	 * Test for checking 'Reset defaults' button.
-	 **/
+	 */
 	public function totestFormAdministrationGeneralAuditLog_ResetButton() {
 		$this->executeResetButtonTest();
 	}
 
 	/**
 	 * Test for checking form update without changing any data.
-	 **/
+	 */
 	public function testFormAdministrationGeneralAuditLog_SimpleUpdate() {
 		$this->executeSimpleUpdate();
 	}
@@ -594,7 +594,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	 * After each data set values are reset, for which a private function is used.
 	 *
 	 * @dataProvider getUpdateValueData
-	 **/
+	 */
 	public function testFormAdministrationGeneralAuditLog_UpdateParameters($data) {
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash('SELECT * FROM config');
