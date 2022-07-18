@@ -68,7 +68,7 @@ window.widget_svggraph_form = new class {
 	}
 
 	onGraphConfigChange() {
-		this._updatedForm();
+		this._updateForm();
 		this._updatePreview();
 	}
 
@@ -212,7 +212,7 @@ window.widget_svggraph_form = new class {
 			widget_svggraph_form._updateSingleItemsLinks();
 			widget_svggraph_form._initSingleItemSortable(widget_svggraph_form._getOpenedDataset());
 
-			widget_svggraph_form.onGraphConfigChange();
+			widget_svggraph_form._updatePreview();
 		}
 
 		this._updateSingleItemsLinks();
@@ -340,8 +340,8 @@ window.widget_svggraph_form = new class {
 			this._form.scrollHeight - this._$overlay_body.height()
 		));
 
-		this.onGraphConfigChange();
 		this._initDataSetSortable();
+		this._updateForm();
 	}
 
 	_cloneDataset() {
@@ -393,7 +393,7 @@ window.widget_svggraph_form = new class {
 			}
 		}
 
-		this.onGraphConfigChange();
+		this._updatePreview();
 	}
 
 	_removeDataSet(obj) {
@@ -589,7 +589,7 @@ window.widget_svggraph_form = new class {
 		}
 	}
 
-	_updatedForm() {
+	_updateForm() {
 		const axes_used = {<?= GRAPH_YAXIS_SIDE_LEFT ?>: 0, <?= GRAPH_YAXIS_SIDE_RIGHT ?>: 0};
 
 		for (const element of this._form.querySelectorAll('[type=radio], [type=hidden]')) {
