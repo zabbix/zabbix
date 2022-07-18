@@ -594,15 +594,21 @@ class CSvgGraphHelper {
 				foreach ($result as $points) {
 					$tick = 0;
 
+					usort($points['data'],
+						static function (array $point_a, array $point_b): int {
+							return $point_a['clock'] <=> $point_b['clock'];
+						}
+					);
+
 					foreach ($points['data'] as $point) {
 						if ($point['tick'] > ($tick + $approximation_tick_delta)) {
 							$tick = $point['tick'];
 						}
 						if (array_key_exists('count', $point)) {
-							$metric_points[$tick]['value'][$point['tick']] = $point['count'];
+							$metric_points[$tick]['value'][] = $point['count'];
 						}
 						if (array_key_exists('value', $point)) {
-							$metric_points[$tick]['value'][$point['tick']] = $point['value'];
+							$metric_points[$tick]['value'][] = $point['value'];
 						}
 					}
 				}
