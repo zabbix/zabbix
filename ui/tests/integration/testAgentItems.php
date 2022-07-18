@@ -906,9 +906,5 @@ class testAgentItems extends CIntegrationTest {
 		}
 	}
 
-	private static function formatPsCmd(string $column, string $component) {
-		return "ps --no-headers -o $column:1 -C $component";
-	}
-
 }
 
