@@ -39,43 +39,39 @@ static int	DBpatch_6030000(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	result = DBselect("select roleid,type,name,value_int,value_str from role_rule where name in ("
+	result = DBselect("select roleid,type,name,value_int from role_rule where name in ("
 			"'ui.configuration.actions',"
 			"'ui.services.actions')");
 
-	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int", "value_str",
-			"value_moduleid", "value_serviceid", NULL);
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int", NULL);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	roleid, type;
-		char		*name, *value_str;
 		int		value_int;
 
 		ZBX_STR2UINT64(roleid, row[0]);
-		ZBX_STR2UINT64(type, row[1]);
-		name = row[2];
+		type = atoi(row[1]);
 		value_int = atoi(row[3]);
-		value_str = row[4];
 
-		if (0 == strcmp(name, "ui.configuration.actions"))
+		if (0 == strcmp(row[2], "ui.configuration.actions"))
 		{
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
-					"ui.configuration.autoregistration_actions", value_int, value_str, NULL, NULL);
+					"ui.configuration.autoregistration_actions", value_int);
 
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
-					"ui.configuration.discovery_actions", value_int, value_str, NULL, NULL);
+					"ui.configuration.discovery_actions", value_int);
 
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
-					"ui.configuration.internal_actions", value_int, value_str, NULL, NULL);
+					"ui.configuration.internal_actions", value_int);
 
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
-					"ui.configuration.trigger_actions", value_int, value_str, NULL, NULL);
+					"ui.configuration.trigger_actions", value_int);
 		}
 		else
 		{
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
-					"ui.configuration.service_actions", value_int, value_str, NULL, NULL);
+					"ui.configuration.service_actions", value_int);
 		}
 	}
 	DBfree_result(result);
