@@ -176,9 +176,6 @@ zbx_token_t;
 #define ZBX_TOKEN_SEARCH_FUNCTIONID		0x04
 #define ZBX_TOKEN_SEARCH_SIMPLE_MACRO		0x08	/* used by the upgrade patches only */
 
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
-		zbx_token_t *token);
-
 typedef int zbx_token_search_t;
 
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search);

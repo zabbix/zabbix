@@ -52,6 +52,7 @@ double	zbx_get_double_epsilon(void);
 void	zbx_update_epsilon_to_not_use_double_precision(void);
 void	zbx_update_epsilon_to_python_compatible_precision(void);
 int	zbx_double_compare(double a, double b);
+int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 int	int_in_list(char *list, int value);
 

@@ -122,6 +122,7 @@ static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *f
 
 		flex_intervals = flex_intervals->next;
 	}
+
 	return -1 == current_delay ? default_delay : current_delay;
 }
 
@@ -1153,6 +1154,7 @@ static int	scheduler_get_wday_nextcheck(const zbx_scheduler_interval_t *interval
 		return SUCCEED;
 
 	value_now = value_next = calculate_dayofweek(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
+
 	/* get the nearest week day from the current week day*/
 	if (SUCCEED != scheduler_get_nearest_filter_value(interval->wdays, &value_next))
 	{
