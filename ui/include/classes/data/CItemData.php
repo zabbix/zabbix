@@ -234,11 +234,13 @@ final class CItemData {
 			'vmware.cl.perfcounter[<url>,<id>,<path>,<instance>]',
 			'vmware.cluster.alarms.get[<url>,<id>]',
 			'vmware.cluster.discovery[<url>]',
+			'vmware.cluster.property[<url>,<id>,<prop>]',
 			'vmware.cluster.status[<url>,<name>]',
 			'vmware.cluster.tags.get[<url>,<id>]',
 			'vmware.datastore.alarms.get[<url>,<uuid>]',
 			'vmware.datastore.discovery[<url>]',
 			'vmware.datastore.hv.list[<url>,<datastore>]',
+			'vmware.datastore.property[<url>,<uuid>,<prop>]',
 			'vmware.datastore.read[<url>,<datastore>,<mode>]',
 			'vmware.datastore.size[<url>,<datastore>,<mode>]',
 			'vmware.datastore.tags.get[<url>,<uuid>]',
@@ -284,6 +286,7 @@ final class CItemData {
 			'vmware.hv.network.out[<url>,<uuid>,<mode>]',
 			'vmware.hv.perfcounter[<url>,<uuid>,<path>,<instance>]',
 			'vmware.hv.power[<url>,<uuid>,<max>]',
+			'vmware.hv.property[<url>,<uuid>,<prop>]',
 			'vmware.hv.sensor.health.state[<url>,<uuid>]',
 			'vmware.hv.sensors.get[<url>,<uuid>]',
 			'vmware.hv.status[<url>,<uuid>]',
@@ -326,6 +329,7 @@ final class CItemData {
 			'vmware.vm.net.if.usage[<url>,<uuid>,<instance>]',
 			'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
 			'vmware.vm.powerstate[<url>,<uuid>]',
+			'vmware.vm.property[<url>,<uuid>,<prop>]',
 			'vmware.vm.snapshot.get[<url>,<uuid>]',
 			'vmware.vm.state[<url>,<uuid>]',
 			'vmware.vm.storage.committed[<url>,<uuid>]',
@@ -1256,6 +1260,10 @@ final class CItemData {
 				'description' => _('Discovery of VMware clusters, <url> - VMware service URL. Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
+			'vmware.cluster.property[<url>,<id>,<prop>]' => [
+				'description' => _('VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'vmware.cluster.status[<url>,<name>]' => [
 				'description' => _('VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
@@ -1274,6 +1282,10 @@ final class CItemData {
 			],
 			'vmware.datastore.hv.list[<url>,<datastore>]' => [
 				'description' => _('VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'vmware.datastore.property[<url>,<uuid>,<prop>]' => [
+				'description' => _('VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.datastore.read[<url>,<datastore>,<mode>]' => [
@@ -1456,6 +1468,10 @@ final class CItemData {
 				'description' => _('Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
+			'vmware.hv.property[<url>,<uuid>,<prop>]' => [
+				'description' => _('VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'vmware.hv.sensor.health.state[<url>,<uuid>]' => [
 				'description' => _('VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
@@ -1623,6 +1639,10 @@ final class CItemData {
 			'vmware.vm.powerstate[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vmware.vm.property[<url>,<uuid>,<prop>]' => [
+				'description' => _('VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.vm.snapshot.get[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON'),

@@ -1376,23 +1376,25 @@ static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs)
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)))
 		{
+			(void)zbx_tcp_recv(&s);	/* allow Zabbix server or Zabbix proxy to close connection */
+
 			if (last_ret == FAIL)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Successfully sent heartbeat message to [%s]:%d [%s]",
+				zabbix_log(LOG_LEVEL_WARNING, "Successfully sent heartbeat message to [%s]:%d",
 						((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror());
+						((zbx_addr_t *)addrs->values[0])->port);
 			}
 		}
-		else
-		{
-			zabbix_log(level, "Unable to send heartbeat message to [%s]:%d [%s]",
-					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
-					zbx_socket_strerror());
-		}
-
-		zbx_tcp_close(&s);
 	}
 
+	if (SUCCEED != ret)
+	{
+		zabbix_log(level, "Unable to send heartbeat message to [%s]:%d [%s]",
+				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+				zbx_socket_strerror());
+	}
+
+	zbx_tcp_close(&s);
 	last_ret = ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Out %s()", __func__);
