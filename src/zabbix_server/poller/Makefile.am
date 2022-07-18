@@ -45,6 +45,7 @@ libzbxpoller_a_CFLAGS = \
 	-I$(top_srcdir)/src/libs/zbxdbcache \
 	$(SNMP_CFLAGS) \
 	$(SSH2_CFLAGS) \
-	$(SSH_CFLAGS)
+	$(SSH_CFLAGS) \
+	$(LIBXML2_CFLAGS)
 
 libzbxpoller_server_a_CFLAGS = -I$(top_srcdir)/src/libs/zbxdbcache
