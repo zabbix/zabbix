@@ -7,6 +7,8 @@ New features:
 .........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
+A.F....... [ZBX-7706] improved performance of graph.get and graphprototype.get methods (acikuns, rlataria)
+..F....... [ZBX-20429] fixed error when deleting services (rdetlavs)
 ..F....... [ZBX-21290] fixed displaying extra reporting periods in SLA reports when filtered by date (averza)
 ..F....... [ZBX-21269] fixed missing custom time period icon in graph widgets when editing dashboards (averza)
 ..F....... [ZBX-21110] fixed time string parsing in graphs with items without data (averza)
