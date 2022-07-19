@@ -353,7 +353,7 @@ class CDBHelper {
 
 			$port = '';
 			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
-				$port .= ' -port='.$DB['PORT'];
+				$port .= ' --port='.$DB['PORT'];
 			}
 			$cmd .= $port;
 
