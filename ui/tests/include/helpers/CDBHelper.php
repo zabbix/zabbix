@@ -262,8 +262,6 @@ class CDBHelper {
 		$suffix = '_tmp'.count(self::$backups);
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-			$cmd = '';
-
 			if (self::$db_extension == null) {
 				$res = DBfetch(DBselect('SELECT db_extension FROM config'));
 
@@ -275,18 +273,20 @@ class CDBHelper {
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
-			$server = ($DB['SERVER'] !== '') ? ' -h'.$DB['SERVER'] : '';
 
-			$cmd .= ' pg_dump'.$server;
+			$cmd = 'pg_dump';
 
-			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
-				$cmd .= ' -p'.$DB['PORT'];
+			if ($DB['SERVER'] !== 'v') {
+				$cmd .= ' --host='.$DB['SERVER'];
 			}
 
-			$db_name = $DB['DATABASE'];
-			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' --port='.$DB['PORT'];
+			}
 
-			$cmd .= ' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' -d'.$db_name.' -f'.$file;
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
+			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --dbname='.$DB['DATABASE'];
+			$cmd .= ' --table='.implode(' --table=', $tables).' --file='.$file;
 
 			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
 				$cmd .= ' 2>/dev/null';
@@ -299,9 +299,28 @@ class CDBHelper {
 			}
 		}
 		else {
-			foreach ($tables as $table) {
-				DBexecute('DROP TABLE IF EXISTS '.$table.$suffix);
-				DBexecute('CREATE TABLE '.$table.$suffix.' AS SELECT * FROM '.$table);
+			if ($DB['PASSWORD'] !== '') {
+				putenv('MYSQL_PWD='.$DB['PASSWORD']);
+			}
+
+			$cmd = 'mysqldump';
+
+			if ($DB['SERVER'] !== 'v') {
+				$cmd .= ' --host='.$DB['SERVER'];
+			}
+
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' --port='.$DB['PORT'];
+			}
+
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump.gz';
+			$cmd .= ' --user='.$DB['USER'].' --add-drop-table '.$DB['DATABASE'];
+			$cmd .= ' '.implode(' ', $tables).' | gzip -c > '.$file;
+
+			exec($cmd, $output, $result_code);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to backup "'.implode('", "', $top_tables).'".');
 			}
 		}
 	}
@@ -321,29 +340,29 @@ class CDBHelper {
 		$tables = array_pop(self::$backups);
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-			$cmd = '';
-			$cmd_tdb = '';
-
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
-			$server = ($DB['SERVER'] !== '') ? ' -h'.$DB['SERVER'] : '';
 
-			$cmd .= 'pg_restore'.$server;
+			$cmd = 'pg_restore';
+
+			if ($DB['SERVER'] !== 'v') {
+				$server = ' --host='.$DB['SERVER'];
+			}
+			$cmd .= $server;
 
 			$port = '';
 			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
-				$port .= ' -p'.$DB['PORT'];
+				$port .= ' -port='.$DB['PORT'];
 			}
 			$cmd .= $port;
 
-			$db_name = $DB['DATABASE'];
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
-
-			$cmd .= ' -U'.$DB['USER'].' -Fd -j5 --clean -d'.$db_name.' '.$file;
+			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --clean --dbname='.$DB['DATABASE'];
+			$cmd .= ' '.$file;
 
 			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
-				$cmd_tdb .= 'psql -U '.$DB['USER'].$server.$port.' -d'.$db_name.' -c "SELECT timescaledb_pre_restore();"; ';
+				$cmd_tdb = 'psql -U '.$DB['USER'].$server.$port.' -d'.$db_name.' -c "SELECT timescaledb_pre_restore();"; ';
 				$cmd_tdb .= $cmd .' 2>/dev/null; ';
 				$cmd_tdb .= 'psql -U '.$DB['USER'].$server.$port.' -d'.$db_name.' -c "SELECT timescaledb_post_restore();" ';
 				exec($cmd_tdb, $output, $result_code);
@@ -361,7 +380,7 @@ class CDBHelper {
 				exec('rd '.$file.' /q /s');
 			}
 			else {
-				exec('rm -rf '.$file);
+				exec('rm -rf '.$file, $output, $result_code);
 			}
 
 			if ($result_code != 0) {
@@ -369,20 +388,41 @@ class CDBHelper {
 			}
 		}
 		else {
-			$result = DBselect('SELECT @@unique_checks,@@foreign_key_checks');
-			$row = DBfetch($result);
-			DBexecute('SET unique_checks=0,foreign_key_checks=0');
-
-			foreach (array_reverse($tables) as $table) {
-				DBexecute('DELETE FROM '.$table);
+			if ($DB['PASSWORD'] !== '') {
+				putenv('MYSQL_PWD='.$DB['PASSWORD']);
 			}
 
-			foreach ($tables as $table) {
-				DBexecute('INSERT INTO '.$table.' SELECT * FROM '.$table.$suffix);
-				DBexecute('DROP TABLE '.$table.$suffix);
+			$cmd = 'mysql';
+
+			if ($DB['SERVER'] !== 'v') {
+				$cmd .= ' --host='.$DB['SERVER'];
 			}
 
-			DBexecute('SET foreign_key_checks='.$row['@@foreign_key_checks'].',unique_checks='.$row['@@unique_checks']);
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' --port='.$DB['PORT'];
+			}
+
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump.gz';
+			$cmd .= ' --user='.$DB['USER'].' '.$DB['DATABASE'];
+			$cmd = 'gzip -cd '.$file.' | '.$cmd;
+
+			exec($cmd, $output, $result_code);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to restore "'.$file.'".');
+			}
+
+			if (strstr(strtolower(PHP_OS), 'win') !== false) {
+				$file = str_replace('/', '\\', $file);
+				exec('del '.$file);
+			}
+			else {
+				exec('rm -rf '.$file, $output, $result_code);
+			}
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to remove "'.$file.'".');
+			}
 		}
 	}
 

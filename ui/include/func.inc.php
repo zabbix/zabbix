@@ -202,7 +202,7 @@ function zbx_date2str($format, $time = null, string $timezone = null) {
 	}
 	else {
 		$prefix = '';
-		$datetime = new DateTime('@'.$time);
+		$datetime = new DateTime('@'.(int) $time);
 	}
 
 	$datetime->setTimezone(new DateTimeZone($timezone ?? date_default_timezone_get()));
@@ -1491,6 +1491,10 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 * @return float
 */
 function truncateFloat(float $number): float {
+	if ($number == INF) {
+		return INF;
+	}
+
 	return (float) sprintf('%.'.(ZBX_FLOAT_DIG - 1).'E', $number);
 }
 
@@ -2238,19 +2242,14 @@ function splitPath($path) {
  * @param string   $color  a hexadecimal color identifier like "1F2C33"
  * @param int      $alpha
  *
- * @return int|false
+ * @return int
  */
 function get_color($image, $color, $alpha = 0) {
 	$red = hexdec('0x'.substr($color, 0, 2));
 	$green = hexdec('0x'.substr($color, 2, 2));
 	$blue = hexdec('0x'.substr($color, 4, 2));
 
-	if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
-			&& @imagecreatetruecolor(1, 1)) {
-		return imagecolorexactalpha($image, $red, $green, $blue, $alpha);
-	}
-
-	return imagecolorallocate($image, $red, $green, $blue);
+	return imagecolorexactalpha($image, $red, $green, $blue, $alpha);
 }
 
 /**

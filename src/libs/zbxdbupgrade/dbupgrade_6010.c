@@ -451,6 +451,7 @@ static int	DBpatch_6010025(void)
 						"Response code for step \"%s\" of scenario \"%s\".", row[2], row[3]);
 				break;
 		}
+
 		esc = DBdyn_escape_field("items", "name", out);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
 				ZBX_FS_UI64 ";\n", esc, itemid);
@@ -473,6 +474,12 @@ static int	DBpatch_6010025(void)
 
 	return ret;
 }
+
+#undef HTTPSTEP_ITEM_TYPE_RSPCODE
+#undef HTTPSTEP_ITEM_TYPE_TIME
+#undef HTTPSTEP_ITEM_TYPE_IN
+#undef HTTPSTEP_ITEM_TYPE_LASTSTEP
+#undef HTTPSTEP_ITEM_TYPE_LASTERROR
 
 static int	DBpatch_6010026(void)
 {
@@ -753,6 +760,16 @@ static int	DBpatch_6010033_split_groups(void)
 
 	/* 0 - CONDITION_TYPE_HOST_GROUP */
 	result = DBselect("select distinct value from conditions where conditiontype=0");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(groupid, row[0]);
+		zbx_vector_uint64_append(&host_groupids, groupid);
+	}
+	DBfree_result(result);
+
+	/* 3 - SYSMAP_ELEMENT_TYPE_HOST_GROUP */
+	result = DBselect("select distinct elementid from sysmaps_elements where elementtype=3");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1283,6 +1300,7 @@ static int	DBpatch_6010097(void)
 {
 	return DBdrop_field("hosts", "lastaccess");
 }
+
 #endif
 
 DBPATCH_START(6010)

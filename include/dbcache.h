@@ -402,9 +402,6 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE		__UINT64_C(0x0000000000000100)
 #define ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED		__UINT64_C(0x0000000000000200)
 
-/* possible values for database extensions (if flag ZBX_CONFIG_FLAGS_DB_EXTENSION set) */
-#define ZBX_CONFIG_DB_EXTENSION_TIMESCALE		"timescaledb"
-
 typedef struct
 {
 	zbx_uint64_t	hostid;
@@ -567,9 +564,13 @@ typedef struct
 	unsigned char	type;
 	unsigned char	error_handler;
 	char		*params;
+	char		*params_orig;
 	char		*error_handler_params;
 }
 zbx_preproc_op_t;
+
+#define ZBX_PREPROC_MACRO_UPDATE_TRUE	1
+#define ZBX_PREPROC_MACRO_UPDATE_FALSE	0
 
 typedef struct
 {
@@ -581,6 +582,7 @@ typedef struct
 	int			dep_itemids_num;
 	int			preproc_ops_num;
 	int			update_time;
+	int			macro_update;
 
 	zbx_uint64_pair_t	*dep_itemids;
 	zbx_preproc_op_t	*preproc_ops;

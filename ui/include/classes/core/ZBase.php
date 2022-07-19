@@ -559,6 +559,10 @@ class ZBase {
 		$action_class = $router->getController();
 
 		try {
+			if ($action_class === null) {
+				throw new Exception(_('Class not found.'));
+			}
+
 			if (!class_exists($action_class)) {
 				throw new Exception(_s('Class %1$s not found for action %2$s.', $action_class, $action_name));
 			}

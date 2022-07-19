@@ -139,7 +139,9 @@ $form_list
 				->addClass('form-field')
 				->addClass('field-fluid'),
 
-			CWidgetHelper::getLabel($fields['units_pos']),
+			CWidgetHelper::getLabel($fields['units_pos'], null,
+				_('Position is ignored for s, uptime and unixtime units.')
+			),
 			(new CDiv(CWidgetHelper::getSelect($fields['units_pos'])))->addClass('form-field'),
 
 			CWidgetHelper::getLabel($fields['units_size']),
@@ -216,11 +218,9 @@ if ($data['templateid'] === null) {
 
 $form->addItem($form_list);
 
-$form->addItem(
-	(new CScriptTag('
-		widget_item_form.init();
-	'))->setOnDocumentReady()
-);
+$scripts[] = '
+	widget_item_form.init();
+';
 
 return [
 	'form' => $form,
