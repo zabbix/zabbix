@@ -2483,6 +2483,14 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		zbx_vector_uint64_append(&trigger_protoids, trigger_prototype->triggerid);
 	}
 
+	if (0 != new_functions)
+	{
+		functionid = DBget_maxid_num("functions", new_functions);
+
+		zbx_db_insert_prepare(&db_insert_tfunctions, "functions", "functionid", "itemid", "triggerid",
+				"name", "parameter", NULL);
+	}
+
 	if (0 != new_triggers)
 	{
 		triggerid = DBget_maxid_num("triggers", new_triggers);
@@ -2496,12 +2504,12 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				NULL);
 	}
 
-	if (0 != new_functions)
+	if (0 != new_tags)
 	{
-		functionid = DBget_maxid_num("functions", new_functions);
+		triggertagid = DBget_maxid_num("trigger_tag", new_tags);
 
-		zbx_db_insert_prepare(&db_insert_tfunctions, "functions", "functionid", "itemid", "triggerid",
-				"name", "parameter", NULL);
+		zbx_db_insert_prepare(&db_insert_ttags, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
+				NULL);
 	}
 
 	if (0 != new_dependencies)
@@ -2510,14 +2518,6 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 
 		zbx_db_insert_prepare(&db_insert_tdepends, "trigger_depends", "triggerdepid", "triggerid_down",
 				"triggerid_up", NULL);
-	}
-
-	if (0 != new_tags)
-	{
-		triggertagid = DBget_maxid_num("trigger_tag", new_tags);
-
-		zbx_db_insert_prepare(&db_insert_ttags, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
-				NULL);
 	}
 
 	if (SUCCEED != DBlock_hostid(hostid) || SUCCEED != DBlock_triggerids(&trigger_protoids))
