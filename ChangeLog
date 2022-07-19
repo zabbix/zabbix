@@ -19,8 +19,6 @@ A.F....... [ZBX-7706] improved performance of graph.get and graphprototype.get m
 .........T [ZBX-20473] fixed evaluation period macro in disk space triggers for NetApp FAS3220 template (drasihov)
 ....I....T [ZBX-19205] fixed item preprocessing in PostgreSQL by Zabbix agent 2 template, removed duplicate PostgreSQL templates from templates.tmpl (drasihov)
 ........S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (mprihodko)
-..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
-..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.25
@@ -43,6 +41,8 @@ Bug fixes:
 .........T [ZBX-20628] removed system metrics from PFSense template (vkhaliev)
 .........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
 ..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
+..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.24
