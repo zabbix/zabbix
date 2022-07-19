@@ -24,6 +24,8 @@
  * @var array $data
  */
 
+require_once dirname(__FILE__).'/js/configuration.action.list.js.php';
+
 if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
 	$title = _('Service actions');
 	$submenu = null;
@@ -42,7 +44,8 @@ else {
 	$doc_url = CDocHelper::CONFIGURATION_ACTION_LIST;
 
 	foreach ($submenu_source as $value => $label) {
-		$url = (new CUrl('actionconf.php'))
+		$url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'action.list')
 			->setArgument('eventsource', $value)
 			->getUrl();
 
@@ -50,7 +53,9 @@ else {
 	}
 }
 
-$current_url = (new CUrl('actionconf.php'))->setArgument('eventsource', $data['eventsource']);
+$current_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'action.list')
+	->setArgument('eventsource', $data['eventsource']);
 
 $widget = (new CWidget())
 	->setTitle($title)
@@ -60,8 +65,9 @@ $widget = (new CWidget())
 		(new CForm('get'))
 			->cleanItems()
 			->addItem(new CInput('hidden', 'eventsource', $data['eventsource']))
-			->addItem((new CList())
-				->addItem(new CSubmit('form', _('Create action')))
+			->addItem(
+				(new CSimpleButton(_('Create action')))
+					->addClass('js-action-create')
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
@@ -72,18 +78,19 @@ $widget = (new CWidget())
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Name'),
+			(new CFormGrid())->addItem([
+				new CLabel(_('Name'), 'filter_name'),
 				(new CTextBox('filter_name', $data['filter']['name']))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
-			),
-			(new CFormList())->addRow(_('Status'),
+			]),
+			(new CFormGrid())->addItem([_('Status'),
 				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
 					->addValue(_('Any'), -1)
 					->addValue(_('Enabled'), ACTION_STATUS_ENABLED)
 					->addValue(_('Disabled'), ACTION_STATUS_DISABLED)
 					->setModern(true)
-			)
+			])
 		])
 	);
 
@@ -135,7 +142,7 @@ if ($this->data['actions']) {
 		if ($action['status'] == ACTION_STATUS_DISABLED) {
 			$status = (new CLink(_('Disabled'),
 				'actionconf.php?action=action.massenable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
-			)
+				)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
 				->addSID();
@@ -167,7 +174,7 @@ $actionForm->addItem([
 	$actionTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'g_actionid', [
-		'action.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected actions?')],
+		'action.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected actions?')],
 		'action.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected actions?')],
 		'action.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected actions?')]
 	], $data['eventsource'])
@@ -177,3 +184,11 @@ $actionForm->addItem([
 $widget->addItem($actionForm);
 
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'eventsource' => $data['eventsource'],
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

@@ -55,6 +55,8 @@ class CRouter {
 	 */
 	private $routes = [
 		// action									controller												layout					view
+		'action.enable'								=> ['CControllerActionEnable',							null,					null],
+		'action.list'								=> ['CControllerActionList',							'layout.htmlpage',		'configuration.action.list'],
 		'action.operation.get'						=> ['CControllerActionOperationGet',					'layout.json',			null],
 		'action.operation.validate'					=> ['CControllerActionOperationValidate',				'layout.json',			null],
 		'audit.settings.edit'						=> ['CControllerAuditSettingsEdit',						'layout.htmlpage',		'administration.audit.settings.edit'],
@@ -166,6 +168,7 @@ class CRouter {
 		'popup'										=> ['CControllerPopup',									'layout.htmlpage',		'popup.view'],
 		'popup.acknowledge.create'					=> ['CControllerPopupAcknowledgeCreate',				'layout.json',			null],
 		'popup.acknowledge.edit'					=> ['CControllerPopupAcknowledgeEdit',					'layout.json',			'popup.acknowledge.edit'],
+		'popup.action.edit'							=> ['CControllerPopupActionEdit',						'layout.json',			'popup.action.edit'],
 		'popup.condition.actions'					=> ['CControllerPopupConditionActions',					'layout.json',			'popup.condition.common'],
 		'popup.condition.event.corr'				=> ['CControllerPopupConditionEventCorr',				'layout.json',			'popup.condition.common'],
 		'popup.condition.operations'				=> ['CControllerPopupConditionOperations',				'layout.json',			'popup.condition.common'],

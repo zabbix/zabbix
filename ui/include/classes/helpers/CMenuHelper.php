@@ -203,23 +203,25 @@ class CMenuHelper {
 					->setSubMenu(new CMenu([
 						(new CMenuItem(_('Trigger actions')))
 							->setUrl(
-								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_TRIGGERS),
-								'actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS
+								(new CUrl('zabbix.php'))
+									->setArgument('action', 'action.list')
+									->setArgument('eventsource', EVENT_SOURCE_TRIGGERS),
+								'action.list',
 							),
 						(new CMenuItem(_('Discovery actions')))
-							->setUrl(
-								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_DISCOVERY),
-								'actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY
+							->setUrl((new CUrl('zabbix.php'))
+								->setArgument('action', 'action.list')
+								->setArgument('eventsource', EVENT_SOURCE_DISCOVERY),
 							),
 						(new CMenuItem(_('Autoregistration actions')))
-							->setUrl(
-								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_AUTOREGISTRATION),
-								'actionconf.php?eventsource='.EVENT_SOURCE_AUTOREGISTRATION
+							->setUrl((new CUrl('zabbix.php'))
+								->setArgument('action', 'action.list')
+								->setArgument('eventsource', EVENT_SOURCE_AUTOREGISTRATION),
 							),
 						(new CMenuItem(_('Internal actions')))
-							->setUrl(
-								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_INTERNAL),
-								'actionconf.php?eventsource='.EVENT_SOURCE_INTERNAL
+							->setUrl((new CUrl('zabbix.php'))
+								->setArgument('action', 'action.list')
+								->setArgument('eventsource', EVENT_SOURCE_INTERNAL),
 							)
 					]))
 				: null,
