@@ -2351,7 +2351,7 @@ New features:
 .........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
-A.F....... [ZBX-7706] removed permission checks for ymin_itemid and ymax_itemid (acikuns, rlataria)
+A.F....... [ZBX-7706] improved performance of graph.get and graphprototype.get methods (acikuns, rlataria)
 ...G...... [ZBX-20448] improved error message when failed to accept incoming connection (vso)
 ........S. [ZBX-21218] fixed deadlocks between server and frontend when discovering items with LLD (wiper)
 ...G...... [ZBX-20586] free tls C resources when closing tls connection on agent2 (wiper)
