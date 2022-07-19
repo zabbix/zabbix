@@ -158,8 +158,6 @@ A.F....... [ZBX-20233] fixed handling of empty configuration parameters $ZBX_SER
 ..F....... [ZBX-20496] fixed delete missing import option for templated dashboards (rlataria)
 ..F....... [ZBX-20591] fixed draggable block position in preprocessing (rlataria)
 ...G...PS. [ZBX-21086] fixed regexp matching not to check for UTF-8 validity (vso)
-..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
-..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0
@@ -225,6 +223,8 @@ Bug fixes:
 .........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
 ..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
 ........S. [ZBX-21111] fixed HA manager stopping (kprutkovs)
+..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
+..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0beta3
@@ -393,8 +393,6 @@ A.F....... [ZBX-7706] improved performance of graph.get and graphprototype.get m
 .........T [ZBX-20473] fixed evaluation period macro in disk space triggers for NetApp FAS3220 template (drasihov)
 .........T [ZBX-19205] fixed item preprocessing in PostgreSQL by Zabbix agent 2 template (drasihov)
 A.F.....S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (agriscenko, mprihodko)
-..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
-..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.6
@@ -493,6 +491,8 @@ A.F....... [ZBX-20613] returned the ability to edit the dependencies of inherite
 .........T [ZBX-20982] fixed API request by coordinates in the OpenWeatherMap template (vkhaliev)
 ........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)
 ..F....... [ZBX-20548] fixed broken host link not opening in Inventory (rdetlavs)
+..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
+..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.4
@@ -2378,8 +2378,6 @@ A.F....... [ZBX-7706] improved performance of graph.get and graphprototype.get m
 .........T [ZBX-20473] fixed evaluation period macro in disk space triggers for NetApp FAS3220 template (drasihov)
 ....I....T [ZBX-19205] fixed item preprocessing in PostgreSQL by Zabbix agent 2 template, removed duplicate PostgreSQL templates from templates.tmpl (drasihov)
 ........S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (mprihodko)
-..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
-..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.25
@@ -2402,6 +2400,8 @@ Bug fixes:
 .........T [ZBX-20628] removed system metrics from PFSense template (vkhaliev)
 .........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
 ..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
+..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.24
