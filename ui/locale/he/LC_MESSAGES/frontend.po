@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-03 11:18+0000\n"
+"PO-Revision-Date: 2022-07-10 09:03+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -3081,7 +3081,7 @@ msgstr "לא ניתן לקרוא את התגובה, יש לבדוק את החי�
 #: app/controllers/CControllerPopupMassupdateHost.php:362
 #, c-format
 msgid "Cannot remove the tag with name \"%1$s\" and value \"%2$s\", defined in a host prototype, from host \"%3$s\"."
-msgstr ""
+msgstr "לא ניתן להסיר את התגית בשם „%1$s” עם הערך „%2$s”, שמוגדר באבטיפוס מארח מהמארח „%3$s”."
 
 #: include/classes/api/services/CUser.php:556
 msgid "Cannot rename guest user."
@@ -3975,7 +3975,7 @@ msgstr "דחיסה"
 #: app/views/administration.housekeeping.edit.php:174
 #: app/views/administration.housekeeping.edit.php:184
 msgid "Compression is not supported."
-msgstr ""
+msgstr "אין תמיכה בדחיסה."
 
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
@@ -4207,7 +4207,7 @@ msgstr "טקסט אימות"
 
 #: app/views/popup.acknowledge.edit.php:114
 msgid "Confirms the problem is noticed (acknowledging user will be recorded). Status change triggers action update operation."
-msgstr ""
+msgstr "מאשר שהוקדשה תשומת לב לבעיה (המשתמש שהכיר בבעיה יתועד). שינוי המצב מקפיץ פעולת עדכון פעילות."
 
 #: include/classes/setup/CSetupWizard.php:907
 msgid "Congratulations! You have successfully installed Zabbix frontend."
@@ -5672,7 +5672,7 @@ msgstr "השימוש הופסק"
 #: include/classes/validators/CApiInputValidator.php:1302
 #, c-format
 msgid "Deprecated parameter \"%1$s\" cannot be used with \"%2$s\"."
-msgstr ""
+msgstr "אי אפשר להשתמש במשתנה „%1$s” שהשימוש בו הופסק עם „%2$s”."
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -5725,7 +5725,7 @@ msgstr "פרטי תרחיש רשת"
 
 #: app/views/administration.housekeeping.edit.php:195
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "רישיון ה־TimescaleDB שהתגלה לא תומך בדחיסה. דחיסה נתמכת במהדורה הקהילתית של TimescaleDB."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -6803,7 +6803,7 @@ msgstr "שגיאה! לא ניתן להפעיל את שרת ה־Zabbix עקב ג�
 #: app/partials/administration.system.info.php:159
 #: app/partials/administration.system.info.php:172
 msgid "Error! Unable to start Zabbix server."
-msgstr ""
+msgstr "שגיאה! לא ניתן להפעיל את שרת ה־Zabbix."
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -8319,7 +8319,7 @@ msgstr "לא ניתן למחוק את קבוצת המארחים „%1$s”, כי
 #: include/classes/api/services/CHostGroup.php:631
 #, c-format
 msgid "Host group \"%1$s\" is group for discovered hosts and cannot be deleted."
-msgstr ""
+msgstr "קבוצת המארחים \"%1$s\" היא קבוצה של מארחים שהתגלו ולא ניתן למחוק אותה."
 
 #: include/classes/api/services/CHostGroup.php:642
 #, c-format
@@ -9855,7 +9855,7 @@ msgstr "הגדלה בשיעור"
 #: app/views/popup.acknowledge.edit.php:90 include/actions.inc.php:1774
 #: include/actions.inc.php:2216 include/html.inc.php:978
 msgid "Indefinitely"
-msgstr ""
+msgstr "בלתי מוגבל"
 
 #: app/views/popup.tophosts.column.edit.php:152
 msgid "Indicators"
@@ -11612,12 +11612,12 @@ msgstr "פעולת מארח ידנית"
 
 #: app/views/popup.acknowledge.edit.php:83
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
-msgstr ""
+msgstr "הדחקת בעיות ידניות. קלט תאריך-שעה מקבל תצורת זמן יחסית ומוחלטת."
 
 #: include/html.inc.php:1009
 #, c-format
 msgid "Manually by: %1$s"
-msgstr ""
+msgstr "ידנית על ידי: %1$s"
 
 #: include/actions.inc.php:2070
 msgid "Manually closed"
@@ -12073,7 +12073,7 @@ msgstr "גרסת ה־PHP הנמוכה ביותר הנדרשת היא %1$s."
 #: app/views/administration.housekeeping.edit.php:175
 #, c-format
 msgid "Minimum required TimescaleDB version is %1$s."
-msgstr ""
+msgstr "גרסת ה־TimeScaleDB הנמוכה ביותר הנדרשת היא %1$s."
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -13295,7 +13295,7 @@ msgstr "לא כל התבנויות מקושרות אל „%1$s”."
 #: include/classes/api/services/CUserMacro.php:569
 #, c-format
 msgid "Not allowed to modify automatic user macro \"%1$s\"."
-msgstr ""
+msgstr "אין אישור לערוך מאקרו משתמש אוטומטי „%1$s”."
 
 #: include/classes/api/services/CUser.php:577
 msgid "Not allowed to set language for user \"guest\"."
@@ -14583,7 +14583,7 @@ msgstr "מיקום"
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
-msgstr ""
+msgstr "המיקום זוכה להתעלמות ביחידות שנ׳, זמן פעילות ושעון יוניקס."
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -14595,7 +14595,7 @@ msgstr "סוג Post"
 
 #: app/views/administration.housekeeping.edit.php:165
 msgid "PostgreSQL database server version is too old."
-msgstr ""
+msgstr "גרסת שרת מסד הנתונים מסוג PostgreSQL ישנה מדי."
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -17625,19 +17625,19 @@ msgstr "מאקרואים נתמכים:"
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:101
 #: app/views/popup.acknowledge.edit.php:82
 msgid "Suppress"
-msgstr ""
+msgstr "הדחקה"
 
 #: include/classes/helpers/CRoleHelper.php:471
 msgid "Suppress problems"
-msgstr ""
+msgstr "הדחקת בעיות"
 
 #: include/actions.inc.php:1761
 msgid "Suppress until"
-msgstr ""
+msgstr "הדחקה עד"
 
 #: include/actions.inc.php:1771 include/classes/screens/CScreenProblem.php:1259
 msgid "Suppressed"
-msgstr ""
+msgstr "הודחק"
 
 #: include/html.inc.php:973
 #, c-format
@@ -19195,11 +19195,11 @@ msgstr "לא ניתן לשכתב על קובץ התצורה הקיים."
 
 #: app/views/administration.housekeeping.edit.php:160
 msgid "Unable to retrieve TimescaleDB compression support status."
-msgstr ""
+msgstr "לא ניתן למשוך את מצב התמיכה של TimescaleDB בדחיסה."
 
 #: app/views/administration.housekeeping.edit.php:170
 msgid "Unable to retrieve TimescaleDB version."
-msgstr ""
+msgstr "לא ניתן לקבל את גרסת TimescaleDB."
 
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
@@ -19249,7 +19249,7 @@ msgstr "לשחרר את המשתמשים הנבחרים?"
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
-msgstr ""
+msgstr "ביטול הכרת בעיה."
 
 #: include/classes/core/ZBase.php:574
 #, c-format
@@ -19389,22 +19389,22 @@ msgstr "ביטול השתקה"
 #: app/partials/administration.system.info.php:160
 #, c-format
 msgid "Unsupported %1$s database server version. Must be at least %2$s."
-msgstr ""
+msgstr "גרסת שרת מסד נתונים %1$s אינה נתמכת. אמורה להיות %2$s לפחות."
 
 #: app/partials/administration.system.info.php:173
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
-msgstr ""
+msgstr "גרסת שרת מסד נתונים %1$s אינה נתמכת. אמורה להיות לא גדולה מ־%2$s."
 
 #: app/views/administration.housekeeping.edit.php:179
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
-msgstr ""
+msgstr "גרסת TimescaleDB לא נתמכת. אמורה להיות %1$s לפחות."
 
 #: app/views/administration.housekeeping.edit.php:189
 #, c-format
 msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
-msgstr ""
+msgstr "גרסת TimescaleDB לא נתמכת. אמורה להיות מעל %1$s."
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -19440,18 +19440,18 @@ msgstr "משתנה לא נתמך „%2$s” למסנן של כלל הגילוי 
 
 #: app/views/popup.acknowledge.edit.php:102
 msgid "Unsuppress"
-msgstr ""
+msgstr "ביטול הדחקה"
 
 #: include/actions.inc.php:1785 include/actions.inc.php:2235
 #: include/classes/screens/CScreenProblem.php:1262
 msgid "Unsuppressed"
-msgstr ""
+msgstr "לא מודחק"
 
 #: app/views/monitoring.widget.problems.view.php:174 include/blocks.inc.php:668
 #: include/classes/screens/CScreenProblem.php:1026
 #, c-format
 msgid "Unsuppressed by: %1$s"
-msgstr ""
+msgstr "הדחקה בוטלה על ידי: %1$s"
 
 #: app/views/popup.acknowledge.edit.php:91
 msgid "Until"
@@ -19992,13 +19992,33 @@ msgstr "מעטפת FetchDVPorts ב־VMware,‏ <url> - כתובת שירות VMw
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "סטטיסטיקת זיכרון מטמון של VMware. המצבים האפשריים הם: total,‏ free,‏ pfree,‏ used ו־pused."
 
+#: include/classes/data/CItemData.php:1256
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "מודד ביצועי קלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה קלאסטר VMware,‏ <path> - נתיב מודד ביצועים, <instance> - מופע של מודד ביצועים"
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "מצב קלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ <name> - שם קלאסטר VMware"
+
+#: include/classes/data/CItemData.php:1272
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1308
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1316
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -20007,6 +20027,10 @@ msgstr "חוות שרתי VMware ומספרי הזיהוי שלהם,‏ <url>‏
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr "חוות (datacenters) של VMware והמזהים שלהם. מחזירה JSON"
+
+#: include/classes/data/CItemData.php:1276
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
@@ -20017,9 +20041,17 @@ msgstr "סטטיסטיקת נפח מאגר הנתונים של VMWare בבתים
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "רשימת מאגרי הנתונים של ה־Hypervisors של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <datastore> - שם מאגר הנתונים"
 
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "סטטיסטיקת קריאה ממאגרי נתונים של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <datastore> - שם מאגר הנתונים, <mode>‏ - latency/maxlatency - ממוצע או מקסימום"
+
+#: include/classes/data/CItemData.php:1300
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20036,6 +20068,10 @@ msgstr "המזהה הייחודי של ה־BIOS של ה־hypervisor של VMware�
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "חיישני מצב יצרן חומרה של VMware hypervisor,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־VMware hypervisor. מחזירה JSON"
+
+#: include/classes/data/CItemData.php:1336
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20105,6 +20141,10 @@ msgstr "דגם מעבד של ה־hypervisor מבית VMware,‏ <url> כתובת
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "ניצול תהליך hypervisor של VMware בהרץ,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "ערך חיישנים ב־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware. מחזירה JSON"
@@ -20116,6 +20156,10 @@ msgstr "המספר הסידורי של ה־hypervisor של VMware,‏ <url> כת
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "מצב ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
+
+#: include/classes/data/CItemData.php:1488
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20144,6 +20188,14 @@ msgstr "שם מלא של שירות ה־VMware,‏ <url> - כתובת שירות
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "גרסת שירות ה־VMware,‏ <url> - כתובת שירות ה־VMware"
+
+#: include/classes/data/CItemData.php:1248
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1516
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20225,6 +20277,10 @@ msgstr "זמן במילישניות של זמן המתנת מעבד במכונה
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "ניצולת מעבד במכונה וירטואלית של VMWare בהרץ (Hz), <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "גודל זיכרון שיתופי במכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
@@ -20240,6 +20296,10 @@ msgstr "מצב מכונה וירטואלית ב־VMware,‏ <url> - כתובת �
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "גודל זיכרון החלפה במכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
+
+#: include/classes/data/CItemData.php:1684
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
@@ -20604,12 +20664,12 @@ msgstr "הודעת אזהרה"
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
-msgstr ""
+msgstr "אזהרה! לא ניתן לקבל את גרסת מסד הנתונים."
 
 #: app/partials/administration.system.info.php:166
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
-msgstr ""
+msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת. עליה להיות %2$s לפחות."
 
 #: app/partials/administration.system.info.php:167
 #, c-format
@@ -20619,7 +20679,7 @@ msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת
 #: app/partials/administration.system.info.php:179
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
-msgstr ""
+msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת. עליה להיות גדולה מ־%2$s."
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -22608,7 +22668,7 @@ msgstr "אין הרשאות ליצור ולערוך מפות"
 
 #: include/classes/api/services/CEvent.php:863
 msgid "no permissions to suppress problems"
-msgstr ""
+msgstr "אין הרשאה להדחיק בעיות"
 
 #: include/classes/api/services/CEvent.php:774
 msgid "no permissions to unacknowledge problems"
@@ -22616,7 +22676,7 @@ msgstr "אין הרשאות לבטל הכרה בתקלות"
 
 #: include/classes/api/services/CEvent.php:864
 msgid "no permissions to unsuppress problems"
-msgstr ""
+msgstr "אין הרשאה לבטל הדחקת בעיות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:836
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
