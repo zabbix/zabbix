@@ -286,7 +286,15 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	}
 
 	if (NULL == (tmp = get_rparam(&request, 0)) || '\0' == *tmp)
+	{
+		if ('\0' == *host_addr)
+		{
+			zbx_snprintf(error, max_error_len,
+					"Ping item has to have target or host interface specified.");
+			goto out;
+		}
 		*addr = strdup(host_addr);
+	}
 	else
 		*addr = strdup(tmp);
 

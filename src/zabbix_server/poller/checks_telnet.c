@@ -27,7 +27,7 @@
 /*
  * Example: telnet.run["ls /"]
  */
-static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+__attribute__((weak)) int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
 	zbx_socket_t	s;
 	int		ret = NOTSUPPORTED, flags;
@@ -101,6 +101,12 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		strscpy(item->interface.dns_orig, dns);
 		item->interface.addr = item->interface.dns_orig;
+	}
+
+	if ('\0' == *(item->interface.addr))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Telnet checks must have ip parameter or the host interface to be specified."));
+		goto out;
 	}
 
 	if (NULL != (port = get_rparam(&request, 2)) && '\0' != *port)

@@ -319,7 +319,14 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	}
 
 	if (NULL == ip_str || '\0' == *ip_str)
+	{
+		if (NULL == default_addr || '\0' == *default_addr)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Check service item has to have IP parameter or host interface specified."));
+			return SYSINFO_RET_FAIL;
+		}
 		strscpy(ip, default_addr);
+	}
 	else
 		strscpy(ip, ip_str);
 
