@@ -114,7 +114,7 @@ class testUserRolesPermissions extends CWebTest {
 	}
 
 	public function prepareServiceData() {
-		// Remove all unnecessary services befoce rest execution.
+		// Remove all unnecessary services before proceeding with execution.
 		$serviceids = CDBHelper::getColumn('SELECT * from services', 'serviceid');
 
 		if ($serviceids !== []) {

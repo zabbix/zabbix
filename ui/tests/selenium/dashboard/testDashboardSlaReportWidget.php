@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  * @dataSource Services, Sla
  *
  * @onBefore prepareDashboardData
+ * @onBefore getDateTimeData
  */
 class testDashboardSlaReportWidget extends testSlaReport {
 
@@ -34,7 +35,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	private static $slaid;
 	private static $monthly_sla = 'SLA Monthly';
 	private static $create_page = 'Page for creating widgets';
-	private static $update_widget = 'Page for creating widgets';
+	private static $update_widget = 'Update widgets';
 	private static $delete_widget = 'Widget for delete';
 
 	/*
@@ -50,7 +51,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			' wf.value_itemid, wf.value_graphid';
 
 	/**
-	 * Function creates dashboards with widgets for test and defines the corresponding dashboard IDs.
+	 * Create dashboards with widgets for test and define the corresponding dashboard ID.
 	 */
 	public static function prepareDashboardData() {
 		self::$slaid = CDBHelper::getValue('SELECT slaid FROM sla WHERE name='.zbx_dbstr(self::$monthly_sla));
@@ -139,11 +140,11 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'value' => 20
 			],
 			'id:date_from' => [
-				'maxlength' => 255,				// TODO: change the value after ZBX-21264 is fixed.
+				'maxlength' => 255,
 				'placeholder' => 'YYYY-MM-DD'
 			],
 			'id:date_to' => [
-				'maxlength' => 255,				// TODO: change the value after ZBX-21264 is fixed.
+				'maxlength' => 255,
 				'placeholder' => 'YYYY-MM-DD'
 			]
 		];
@@ -195,7 +196,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$service_data = [
 			'field' => 'Service',
 			'headers' => ['Name', 'Tags', 'Problem tags'],
-			'rows_count' => 26,
 			'table_selector' => 'xpath://form[@name="services_form"]/table',
 			'buttons' => ['Filter', 'Reset', 'Cancel'],
 			'check_row' => [
@@ -384,8 +384,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	 * @dataProvider getSlaReportConfigurationFormData
 	 * @dataProvider getSlaDataWithService
 	 * @dataProvider getSlaDataWithoutService
-	 *
-	 * @onBefore getDateTimeData
 	 */
 	public function testDashboardSlaReportWidget_Create($data) {
 		$this->executeAction($data);
@@ -395,8 +393,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	 * @dataProvider getSlaReportConfigurationFormData
 	 * @dataProvider getSlaDataWithService
 	 * @dataProvider getSlaDataWithoutService
-	 *
-	 * @onBefore getDateTimeData
 	 */
 	public function testDashboardSlaReportWidget_Update($data) {
 		$this->executeAction($data, 'update');
@@ -529,6 +525,12 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
 	}
 
+	/**
+	 * Perform SLA report widget creation or update and verify the result.
+	 *
+	 * @param array		$data		widget relate data from data provider.
+	 * @param string	$action		string that specifies whether create or update action should be performed.
+	 */
 	private function executeAction($data, $action = 'create') {
 		$data['fields']['Name'] = 'SLA report '.microtime();
 
@@ -536,6 +538,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 
+		// Open SLA report widget configuration form.
 		if ($action === 'create') {
 			$dashboard->selectPage(self::$create_page);
 
@@ -547,6 +550,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		}
 		else {
 			$form = $dashboard->getWidget(self::$update_widget)->edit();
+			// Clean-up values in fields after previous cases before filling in the form.
 			$data['fields'] = $this->cleanupFormBeforeFill($data['fields'], $form);
 		}
 
@@ -597,6 +601,14 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		}
 	}
 
+	/**
+	 * Clear multiselects and add default data to data provider before filling in new data inthe form.
+	 * This is needed in update scenarios to overwrite the data left from previous test case.
+	 *
+	 * @param	array			$fields		Array containing tall the fields to be filled in the form.
+	 * @param	CFormElement	$form		Form that should be filled in.
+	 * @return	array
+	 */
 	private function cleanupFormBeforeFill($fields, $form) {
 		foreach (['SLA', 'Service', 'Show periods', 'From', 'To'] as $field) {
 			if (!array_key_exists($field, $fields)) {
@@ -2280,7 +2292,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'expected_periods' => []
 				]
-			],
+			]
 		];
 	}
 
@@ -2289,11 +2301,10 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	 */
 	public function testDashboardSlaReportWidget_UpdateWithCustomPeriods($data) {
 		// Construct the expected result array if such is not present in the data provider.
-		if (CTestArrayHelper ::get($data, 'expected_periods') === []) {
+		if (CTestArrayHelper::get($data, 'expected_periods') === []) {
 
 			// If dynamic format is used in From and To fields, equivalent values are used for building the reference array.
 			$data_for_period = $data;
-
 			if (array_key_exists('equivalent_timestamps', $data)) {
 				foreach ($data_for_period['equivalent_timestamps'] as $field => $value) {
 					$data_for_period['fields'][$field] = $value;
@@ -2317,7 +2328,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$data['fields'] = $this->cleanupFormBeforeFill($data['fields'], $form);
 
 		// Convert From and To field values to date if it is populated as string and not as a dynamic date.
-		if (CTestArrayHelper ::get($data, 'expected_periods') === [] && !array_key_exists('equivalent_timestamps', $data)) {
+		if (CTestArrayHelper::get($data, 'expected_periods') === [] && !array_key_exists('equivalent_timestamps', $data)) {
 			foreach (['From', 'To'] as $field) {
 				if (CTestArrayHelper::get($data['fields'], $field)) {
 					$data['fields'][$field] = date('Y-m-d', strtotime($data['fields'][$field]));
@@ -2331,7 +2342,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 		$form->submit();
 
-		$dashboard->getWidget(self::$update_widget)->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+		$dashboard->getWidget(self::$update_widget)->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$dashboard->save();
 
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -2349,7 +2360,16 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		}
 	}
 
+	/**
+	 * Build reference array with reporting periods based on report parameters and reporting period type.
+	 * At first the last date that should be included in the report is obtained, and then $show_periods number of
+	 * periods (from this date) is written into the reference array.
+	 *
+	 * @param	array	$data	data provider
+	 * @return	array
+	 */
 	private function getWidgetDateTimeData($data) {
+		// By default the last 20 periods are displayed.
 		$show_periods = (array_key_exists('Show periods', $data['fields'])) ? $data['fields']['Show periods'] : 20;
 
 		switch ($data['reporting_period']) {
@@ -2364,7 +2384,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					$to_date = 'today';
 				}
 
-				// By default the last 20 periods are displayed.
 				for ($i = 0; $i < $show_periods; $i++) {
 					$period_values[] = date('Y-m-d', strtotime($to_date.' '.-$i.' days'));
 				}
@@ -2430,7 +2449,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				$i = 0;
 				for ($year = $to_year; $year >= $from_year; $year--) {
 					foreach (array_reverse($quarters) as $quarter) {
-						// Get the last and the fisrt month of the quarter under attention.
+						// Get the last and the first month of the quarter under attention.
 						$period_end = ltrim(stristr($quarter, '– '), '– ');
 						$period_start = substr($quarter, 0, strpos($quarter, " –"));
 
@@ -2439,7 +2458,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 							continue;
 						}
 
-						// Write periods into reference array if period end is not later than current month.
+						// Write periods into reference array if period start is not later than the reports' last month.
 						if ($year < $to_year || ($year == $to_year && $period_start <= $to_month)) {
 							$period_values[] = $year.'-'.$quarter;
 

@@ -43,7 +43,6 @@ class testFormServicesServices extends CWebTest {
 	private static $childid;
 	private static $parentid_2;
 	private static $childid_2;
-
 	private static $service_count;
 
 	/**
@@ -862,7 +861,7 @@ class testFormServicesServices extends CWebTest {
 			}
 
 			// Open just created or updated Service and check that all fields present correctly in form.
-			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
 
 			// If it is child service, we need to open parent firstly.
 			if (array_key_exists('Parent services', $data['fields'])) {
@@ -883,6 +882,8 @@ class testFormServicesServices extends CWebTest {
 				$this->assertTableData([$data['children']['Child services']], 'id:children');
 			}
 			else {
+				// There are 3 tables with class list-table, so it is specifified that is should be in the service list.
+				$table = $this->query('xpath://form[@name="service_list"]//table')->asTable()->one()->waitUntilPresent();
 				$table->findRow('Name', $data['fields']['Name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
 						->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
@@ -992,6 +993,12 @@ class testFormServicesServices extends CWebTest {
 		$table->findRow('Name', $name, true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		$form->invalidate();
 		$original_values['Name'] = $name;
+
+		// If the date changed since the data source was executed, "Created at" for clone will differ from the original.
+		if ($original_values['Created at'] !== date('Y-m-d', strtotime('today'))) {
+			$original_values['Created at'] = date('Y-m-d', strtotime('today'));
+		}
+
 		$this->assertEquals($original_values, $form->getFields()->asValues());
 
 		// Check Child services were not cloned.

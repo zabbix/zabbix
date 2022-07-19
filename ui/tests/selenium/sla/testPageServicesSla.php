@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup sla, profiles
  *
- * @dataSource Sla
+ * @dataSource Services, Sla
  */
 class testPageServicesSla extends CWebTest {
 
@@ -120,7 +120,7 @@ class testPageServicesSla extends CWebTest {
 			[
 				'Name' => 'SLA with schedule and downtime',
 				'SLO' => '12.3456%',
-				'Effective date' => '2022-04-30',
+				'Effective date' => '2022-05-01',
 				'Reporting period' => 'Weekly',
 				'Timezone' => 'Europe/Riga',
 				'Schedule' => 'Custom',
@@ -801,7 +801,7 @@ class testPageServicesSla extends CWebTest {
 						'2021-05-01',
 						'2021-05-01',
 						'2022-04-30',
-						'2022-04-30',
+						'2022-05-01',
 						'2030-12-31'
 					]
 				]

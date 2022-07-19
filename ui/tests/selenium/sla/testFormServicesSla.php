@@ -771,7 +771,7 @@ class testFormServicesSla extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => '   Check triming trailing and leading spaces   ',
+						'Name' => '   Check trimming trailing and leading spaces   ',
 						'SLO' => '  7.77  ',
 						'Reporting period' => 'Quarterly',
 						'Time zone' => '(UTC-02:00) America/Nuuk',

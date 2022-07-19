@@ -180,9 +180,9 @@ class testPageServicesServices extends CWebTest {
 	 */
 	private function checkParentChildLayout($table, $parent, $child, $edit = false) {
 		$this->checkSeviceInfoLayout($table, $parent, $edit);
-		$this->assertTableDataColumn([$child.' 1'], 'Name');
+		$this->assertTableDataColumn([$child.' 1'], 'Name', 'xpath://form[@name="service_list"]//table');
 		$this->checkSeviceInfoLayout($table, $child, $edit);
-		$this->assertTableDataColumn([self::LAYOUT_CHILD2], 'Name');
+		$this->assertTableDataColumn([self::LAYOUT_CHILD2], 'Name', 'xpath://form[@name="service_list"]//table');
 
 		$breadcrumbs = $this->query(self::BREADCRUMB_SELECTOR)->one();
 		// Check breadcrumbs on last child page.
@@ -849,7 +849,7 @@ class testPageServicesServices extends CWebTest {
 	}
 
 	/**
-	 * @depends testPageMonitoringServices_SimpleServiceDeleteFromRow
+	 * @depends testPageServicesServices_SimpleServiceDeleteFromRow
 	 */
 	public function testPageServicesServices_SimpleServicesMassDelete() {
 		$names = [

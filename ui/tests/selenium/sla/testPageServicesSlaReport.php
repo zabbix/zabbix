@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/../common/testSlaReport.php';
  * @backup profiles
  *
  * @dataSource Services, Sla
+ *
+ * @onBefore getDateTimeData
  */
 class testPageServicesSlaReport extends testSlaReport {
 
@@ -70,7 +72,6 @@ class testPageServicesSlaReport extends testSlaReport {
 		$service_data = [
 			'field' => 'Service',
 			'headers' => ['Name', 'Tags', 'Problem tags'],
-			'rows_count' => 26,
 			'table_selector' => 'xpath://form[@name="services_form"]/table',
 			'buttons' => ['Filter', 'Reset', 'Cancel'],
 			'check_row' => [
@@ -95,8 +96,6 @@ class testPageServicesSlaReport extends testSlaReport {
 
 	/**
 	 * @dataProvider getSlaDataWithService
-	 *
-	 * @onBefore getDateTimeData
 	 */
 	public function testPageServicesSlaReport_LayoutWithService($data) {
 		$this->openSlaReport($data['fields']);
@@ -105,8 +104,6 @@ class testPageServicesSlaReport extends testSlaReport {
 
 	/**
 	 * @dataProvider getSlaDataWithoutService
-	 *
-	 * @onBefore getDateTimeData
 	 */
 	public function testPageServicesSlaReport_LayoutWithoutService($data) {
 		$this->openSlaReport($data['fields']);
@@ -1448,8 +1445,6 @@ class testPageServicesSlaReport extends testSlaReport {
 
 	/**
 	 * @dataProvider getSlaDataWithCustomDates
-	 *
-	 * @onBefore getDateTimeData
 	 */
 	public function testPageServicesSlaReport_CheckCustomPeriods ($data) {
 		// Construct the expected result array if such is not present in the data provider.
@@ -1463,6 +1458,11 @@ class testPageServicesSlaReport extends testSlaReport {
 		$this->checkCustomPeriods($data);
 	}
 
+	/**
+	 * Open the SLA report with configuration specified in the data provider.
+	 *
+	 * @param array $filter_data	SLA report parameters.
+	 */
 	public function openSlaReport($filter_data) {
 		$this->page->login()->open('zabbix.php?action=slareport.list');
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
@@ -1473,5 +1473,55 @@ class testPageServicesSlaReport extends testSlaReport {
 		$filter_form->fill($filter_data);
 		$filter_form->submit();
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
+	}
+
+	/**
+	 * Retrieve array with reference reporting periods modified according to From field (all cases with To field
+	 * are covered by data provider).
+	 *
+	 * @param	array	$data	data provider
+	 * @return	array
+	 */
+	public function getPeriodDataWithCustomDates($data) {
+		foreach (self::$reporting_periods[$data['reporting_period']] as $period) {
+			// Write all periods tat end after the value in From field into the reference array.
+			if ($period['end'] >= strtotime($data['fields']['From'])) {
+				$expected_periods[] = $period['value'];
+			}
+			else {
+				break;
+			}
+		}
+
+		if (!array_key_exists('Service', $data['fields'])) {
+			// If SLA report is shouwn without selecting a service, then periods are displayed in reverse order.
+			$expected_periods = array_reverse($expected_periods);
+		}
+
+		return $expected_periods;
+	}
+
+	/**
+	 * Check reporting periods values in SLA report with custom dates.
+	 *
+	 * @param	array	$data	data provider
+	 */
+	public function checkCustomPeriods($data) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, null, $data['error']);
+
+			return;
+		}
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		if (array_key_exists('Service', $data['fields'])) {
+			$this->assertTableDataColumn($data['expected_periods'], self::$period_headers[$data['reporting_period']]);
+		}
+		else {
+			$headers = $table->getHeadersText();
+
+			unset($headers[0], $headers[1]);
+			$this->assertEquals($data['expected_periods'], array_values($headers));
+		}
 	}
 }

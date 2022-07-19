@@ -46,10 +46,10 @@ class testSlaReport extends CWebTest {
 		'Annually' => 'Year'
 	];
 
-	private static $creation_time;
-	private static $creation_day;
+	private static $actual_creation_time;	// Actual timestamp when data source was executed.
+	private static $service_creation_time;	// Service "Service with problem" creation time, needed for downtime calculation.
 
-	const SLA_CREATION_TIME = 1619827200;
+	const SLA_CREATION_TIME = 1619827200; // SLA creation timestamp as per scenario - 01.05.2021
 
 	public function getSlaDataWithService() {
 		return [
@@ -243,10 +243,18 @@ class testSlaReport extends CWebTest {
 		];
 	}
 
+	/**
+	 * Create the reference array with reporting periods based on the SLA creation time and current date.
+	 */
 	public function getDateTimeData() {
-		self::$creation_time = CDataHelper::get('Sla.creation_time');
-		self::$creation_day = date('Y-m-d', self::$creation_time);
+		self::$actual_creation_time = CDataHelper::get('Sla.creation_time');
+		self::$service_creation_time = CDBHelper::getValue(
+				'SELECT created_at FROM services WHERE name='.zbx_dbstr('Service with problem')
+		);
 
+		$creation_day = date('Y-m-d', self::$actual_creation_time);
+
+		// Construct the reference reporting period array based on the period type.
 		foreach (['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Annually'] as $reporting_period) {
 			$period_values = [];
 
@@ -273,7 +281,7 @@ class testSlaReport extends CWebTest {
 					break;
 
 				case 'Monthly':
-					// Get the number of Months to be displayed.
+					// Get the number of Months to be displayed as difference between today and SLA creation day in months.
 					$months = ((date('Y', time()) - date('Y', self::SLA_CREATION_TIME)) * 12) + ((date('m', time()) -
 							date('m', self::SLA_CREATION_TIME))
 					);
@@ -295,16 +303,16 @@ class testSlaReport extends CWebTest {
 					$i = 0;
 					for ($year = date('Y', self::SLA_CREATION_TIME); $year <= date('Y', time()); $year++) {
 						foreach ($quarters as $quarter) {
-							// Get the last month of the quarter under attention.
+							// Get the last and the first month of the quarter under attention.
 							$period_end = ltrim(stristr($quarter, '– '), '– ');
 							$period_start = substr($quarter, 0, strpos($quarter, " –"));
 
-							// Skip the quarters before SQL creation in SLA creation year.
+							// Skip the quarters before SLA creation quarter in SLA creation year.
 							if ($year === date('Y', self::SLA_CREATION_TIME) && $period_end < date("m", self::SLA_CREATION_TIME)) {
 								continue;
 							}
 
-							// Write periods into reference array if period end is not later than current month.
+							// Write periods into reference array if period start is not later than current month.
 							if ($year < $current_year || ($year == $current_year && $period_start <= $current_month)) {
 								$period_values[$i]['value'] = $year.'-'.$quarter;
 								$period_values[$i]['start'] = strtotime($year.'-'.$period_start);
@@ -318,7 +326,7 @@ class testSlaReport extends CWebTest {
 					break;
 
 				case 'Annually':
-					// Get the number of Years to be displayed.
+					// Get the number of Years to be displayed as difference between this year and SLA creation year.
 					$years = (date('Y', time()) - date('Y', self::SLA_CREATION_TIME));
 
 					for ($i = 0; $i <= $years; $i++) {
@@ -334,7 +342,15 @@ class testSlaReport extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check SLA report when SLA is specified together with the corresponding Service.
+	 *
+	 * @param array		$data		test case related data from data provider.
+	 * @param boolean	$widget		flag that specifies whether the check is made in the SLA report or SLA report widget.
+	 */
 	public function checkLayoutWithService($data, $widget = false) {
+		$creation_day = date('Y-m-d', self::$actual_creation_time);
+
 		if ($widget) {
 			$table = CDashboardElement::find()->one()->getWidget($data['fields']['Name'])->query('class:list-table')->asTable()->one();
 		}
@@ -342,12 +358,13 @@ class testSlaReport extends CWebTest {
 			$table = $this->query('class:list-table')->asTable()->one();
 		}
 
+		// If data should be displayed get the timestamp when screen was loaded and the reference reporting periods.
 		if (!CTestArrayHelper::get($data, 'no_data')) {
 			$load_time = time();
 			$reference_periods = self::$reporting_periods[$data['reporting_period']];
 		}
 		else {
-			// Check empty result in case of selecting not related SLA and Service and proceed with next test.
+			// Check empty result if non-related SLA + Service or disabled SLA (in widget) is selected and proceed with next test.
 			if ($widget && !array_key_exists('expected', $data)) {
 				// TODO: remove this if condition and the statement under it when ZBX-21264 is fixed.
 				$this->assertEquals(['No permissions to referred object or it does not exist!'], $table->getRows()->asText());
@@ -379,16 +396,16 @@ class testSlaReport extends CWebTest {
 			 * If the date has changed since data source was executed, then downtimes will be divided into 2 days.
 			 * Such case is covered in the else statement.
 			 */
-			if (date('Y-m-d', time()) === self::$creation_day) {
+			if (date('Y-m-d', time()) === $creation_day) {
 				foreach ($data['downtimes']['names'] as $downtime_name) {
 					/**
 					 * A second or two can pass from Downtime duration calculation till report is loaded.
-					 * So an array of expected results is created.
+					 * So an array of expected results is created and the presence of actual value in array is checked.
 					 */
 					$single_downtime = [];
 					for ($i = 0; $i <= 2; $i++) {
-						$single_downtime[] = date('Y-m-d H:i', self::$creation_time).' '.$downtime_name.': '
-								.convertUnitsS($load_time - self::$creation_time + $i);
+						$single_downtime[] = date('Y-m-d H:i', self::$actual_creation_time).' '.$downtime_name.': '
+								.convertUnitsS($load_time - self::$actual_creation_time + $i);
 					}
 
 					$downtime_values[$downtime_name] = $single_downtime;
@@ -396,17 +413,22 @@ class testSlaReport extends CWebTest {
 					unset($single_downtime);
 				}
 				// Check that each of the obtained downtimes is present in the created reference arrays.
-				$row = $table->findRow(self::$period_headers[$data['reporting_period']], self::$creation_day);
+				$row = $table->findRow(self::$period_headers[$data['reporting_period']], $creation_day);
 				$this->checkDowntimePresent($row, $downtime_values);
 			}
 			else {
-				foreach ([date('Y-m-d', time()), self::$creation_day] as $day) {
-					if ($day === self::$creation_day) {
+				foreach ([date('Y-m-d', time()), $creation_day] as $day) {
+					if ($day === $creation_day) {
 						foreach ($data['downtimes']['names'] as $downtime_name) {
-							// The time is not dependent on view load time, so no nee for "for" cycle.
+							/**
+							 * Time is counted from max(SLA creation timestamp, Service creation timestamp till the start
+							 * of next period. This time difference is not dependent on view load time, so no need for "for" cycle.
+							 */
+							$downtime_start = max(self::$actual_creation_time, self::$service_creation_time);
+
 							$single_downtime = [];
-							$single_downtime[] = date('Y-m-d H:i', self::$creation_time).' '.$downtime_name.': '
-									.convertUnitsS(strtotime('today') - self::$creation_time);
+							$single_downtime[] = date('Y-m-d H:i', $downtime_start).' '.$downtime_name.': '
+									.convertUnitsS(strtotime('today') - $downtime_start);
 							$downtime_values[] = $single_downtime;
 
 							unset($single_downtime);
@@ -414,6 +436,7 @@ class testSlaReport extends CWebTest {
 					}
 					else {
 						foreach ($data['downtimes']['names'] as $downtime_name) {
+							// Time is counted from  period start till page load time.
 							$single_downtime = [];
 							for ($i = 0; $i <= 2; $i++) {
 								$single_downtime[] = date('Y-m-d H:i', strtotime('today')).' '.$downtime_name.': '
@@ -432,26 +455,34 @@ class testSlaReport extends CWebTest {
 		}
 		else {
 			foreach ($reference_periods as $period) {
+				// If no downtime is expected, then check that the Downtime column is empty.
 				$row = $table->findRow(self::$period_headers[$data['reporting_period']], $period['value']);
 				$this->assertEquals('', $row->getColumn('Excluded downtimes')->getText());
 			}
 		}
 
+		// Check other columns of the displayed report.
 		foreach ($reference_periods as $period) {
 			$row = $table->findRow(self::$period_headers[$data['reporting_period']], $period['value']);
 			$this->assertEquals($data['expected']['SLO'].'%', $row->getColumn('SLO')->getText());
 
-			if (array_key_exists('SLI', $data['expected']) && $period['end'] > self::$creation_time) {
+			/**
+			 * SLI is displayed for periods from SLA actual creation time to page load time.
+			 * If SLI is expected, then Uptime and Error budget should be calculated and checked.
+			 */
+			if (array_key_exists('SLI', $data['expected']) && $period['end'] > self::$actual_creation_time) {
 				$this->assertEquals($data['expected']['SLI'], $row->getColumn('SLI')->getText());
 
-				// Check Uptime and Error budget values
+				// Check Uptime and Error budget values. These values are calcullated only from the actual SLA creation time.
 				$uptime = $row->getColumn('Uptime')->getText();
 				if ($period['end'] > $load_time) {
 					$reference_uptime = [];
-					$start_date = ($period['start'] < self::$creation_time) ? self::$creation_time : $period['start'];
+					// If SLA created in current period, calculation starts from creation timestamp, else from period start.
+					$start_time = max($period['start'], self::$actual_creation_time, self::$service_creation_time);
 
-					for ($i = 0; $i <= 2; $i++) {
-						$reference_uptime[] = convertUnitsS($load_time - $start_date + $i);
+					// Get array of Utime possible values and check that the correct one is there.
+					for ($i = 0; $i <= 3; $i++) {
+						$reference_uptime[] = convertUnitsS($load_time - $start_time + $i);
 					}
 
 					$this->assertTrue(in_array($uptime, $reference_uptime));
@@ -462,22 +493,21 @@ class testSlaReport extends CWebTest {
 						$uptime_seconds = $uptime_seconds + timeUnitToSeconds($time_unit);
 					}
 
-					foreach ([0, 60, 120] as $buffer_seconds) {
-						$error_budget[] = convertUnitsS(intval($uptime_seconds / floatval($data['expected']['SLO']) * 100)
-							- $uptime_seconds + $buffer_seconds
-						);
-					}
+					$error_budget[] = convertUnitsS(intval($uptime_seconds / floatval($data['expected']['SLO']) * 100)
+						- $uptime_seconds
+					);
 
 					$this->assertTrue(in_array($row->getColumn('Error budget')->getText(), $error_budget));
-
 				}
 				else {
 					$reference_uptime = [];
 					for ($i = 0; $i <= 3; $i++) {
-						$reference_uptime[] = convertUnitsS($period['end'] - self::$creation_time + $i);
+						$uptime_start = max(self::$actual_creation_time, self::$service_creation_time);
+						$reference_uptime[] = convertUnitsS($period['end'] - $uptime_start + $i);
 					}
 					$this->assertTrue(in_array($uptime, $reference_uptime));
 
+					// Error budget is always 0 for periods that have already passed.
 					$this->assertEquals('0', $row->getColumn('Error budget')->getText());
 				}
 			}
@@ -491,6 +521,12 @@ class testSlaReport extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check the SLA report in case if only SLA is specified (without Service).
+	 *
+	 * @param array		$data		test case related data from data provider
+	 * @param boolean	$widget		flag that specifies whether the check is made in the SLA report or SLA report widget.
+	 */
 	public function checkLayoutWithoutService($data, $widget = false) {
 		// This if condition is here specifically to check case when displaying disabled SLA on SLA report widget.
 		if (array_key_exists('no_data', $data)) {
@@ -533,8 +569,9 @@ class testSlaReport extends CWebTest {
 
 			$this->assertEquals($data['expected']['SLO'].'%', $row->getColumn('SLO')->getText());
 
+			// For SLA without service periods are shown in ascending order, so reference array should be reversed.
 			foreach (array_reverse($reference_periods) as $period) {
-				if (array_key_exists('SLI', $data['expected']) && $period['end'] > self::$creation_time) {
+				if (array_key_exists('SLI', $data['expected']) && $period['end'] > self::$actual_creation_time) {
 					$this->assertEquals($data['expected']['SLI'], $row->getColumn($period['value'])->getText());
 				}
 				else {
@@ -544,43 +581,12 @@ class testSlaReport extends CWebTest {
 		}
 	}
 
-	public function getPeriodDataWithCustomDates($data) {
-		foreach (self::$reporting_periods[$data['reporting_period']] as $period) {
-			if ($period['end'] >= strtotime($data['fields']['From'])) {
-				$expected_periods[] = $period['value'];
-			}
-			else {
-				break;
-			}
-		}
-
-		if (!array_key_exists('Service', $data['fields'])) {
-
-			$expected_periods = array_reverse($expected_periods);
-		}
-
-		return $expected_periods;
-	}
-
-	public function checkCustomPeriods($data) {
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, null, $data['error']);
-
-			return;
-		}
-		$table = $this->query('class:list-table')->asTable()->one();
-
-		if (array_key_exists('Service', $data['fields'])) {
-			$this->assertTableDataColumn($data['expected_periods'], self::$period_headers[$data['reporting_period']]);
-		}
-		else {
-			$headers = $table->getHeadersText();
-
-			unset($headers[0], $headers[1]);
-			$this->assertEquals($data['expected_periods'], array_values($headers));
-		}
-	}
-
+	/**
+	 * Split cell into active downtimes and check that it is present in the reference array.
+	 *
+	 * @param CTableRowElement	$row				row that contains the downtime values to be checked
+	 * @param array				$downtime_values	reference array that should contain the downtime to be checked
+	 */
 	private function checkDowntimePresent($row, $downtime_values) {
 		// Split column value into downtimes.
 		foreach (explode("\n", $row->getColumn('Excluded downtimes')->getText()) as $downtime) {
@@ -591,10 +597,17 @@ class testSlaReport extends CWebTest {
 					$match_found = true;
 				}
 			}
+
 			$this->assertTrue($match_found);
 		}
 	}
 
+	/**
+	 * Check the layout and the contents on the dialogs in SLA and Service multiselect elements.
+	 *
+	 * @param array		$dialog_data	array that contains all of the reference data needed to check dialog layout
+	 * @param boolean	$widget			flag that specified whether the check is made in the SLA report or SLA report widget
+	 */
 	public function checkDialogContents($dialog_data, $widget = false) {
 		$form_selector = ($widget) ? 'name:widget_dialogue_form' : 'name:zbx_filter';
 		$form = $this->query($form_selector)->one()->asForm();
@@ -631,7 +644,7 @@ class testSlaReport extends CWebTest {
 		}
 		else {
 			$table = $dialog->query('class:list-table')->asTable()->one();
-			$this->assertEquals($dialog_data['rows_count'], $table->getRows()->count());
+			$this->assertEquals(CDBHelper::getCount('SELECT serviceid FROM services'), $table->getRows()->count());
 		}
 
 		foreach ($dialog_data['buttons'] as $button) {

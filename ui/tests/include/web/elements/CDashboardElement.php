@@ -272,7 +272,7 @@ class CDashboardElement extends CElement {
 	 * Select dashboard page by name.
 	 *
 	 * @param string	$page_name		page name to be selected
-	 * @param integer	$index			expected number of page with the provided name
+	 * @param integer	$index			expected number of pages with the provided name
 	 */
 	public function selectPage($page_name, $index = 1) {
 		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
