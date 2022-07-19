@@ -47,8 +47,8 @@ static int	DBpatch_6030000(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	roleid, type;
-		int		value_int;
+		zbx_uint64_t	roleid;
+		int		value_int, type;
 
 		ZBX_STR2UINT64(roleid, row[0]);
 		type = atoi(row[1]);
