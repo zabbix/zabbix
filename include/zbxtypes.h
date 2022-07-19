@@ -52,9 +52,6 @@
 #if defined(_WINDOWS)
 #	include <strsafe.h>
 
-#	define zbx_stat(path, buf)		__zbx_stat(path, buf)
-#	define zbx_fstat(fd, buf)		_fstat64(fd, buf)
-
 #	ifndef __UINT64_C
 #		define __UINT64_C(x)	x
 #	endif
@@ -85,9 +82,6 @@ typedef uint32_t		zbx_uint32_t;
 
 #	define strcasecmp	lstrcmpiA
 
-typedef __int64	zbx_offset_t;
-#	define zbx_lseek(fd, offset, whence)	_lseeki64(fd, (zbx_offset_t)(offset), whence)
-
 #	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
 typedef int	ssize_t;
 #	else
@@ -95,9 +89,6 @@ typedef long	ssize_t;
 #	endif
 
 #else	/* _WINDOWS */
-#	define zbx_stat(path, buf)		stat(path, buf)
-#	define zbx_fstat(fd, buf)		fstat(fd, buf)
-
 #	ifndef __UINT64_C
 #		ifdef UINT64_C
 #			define __UINT64_C(c)	(UINT64_C(c))
@@ -162,10 +153,30 @@ typedef long	ssize_t;
 
 typedef uint32_t	zbx_uint32_t;
 
+#endif	/* _WINDOWS */
+
+#if defined(_WINDOWS)
+#	define zbx_stat(path, buf)		__zbx_stat(path, buf)
+#	define zbx_fstat(fd, buf)		_fstat64(fd, buf)
+
+typedef __int64	zbx_offset_t;
+#	define zbx_lseek(fd, offset, whence)	_lseeki64(fd, (zbx_offset_t)(offset), whence)
+
+#elif defined(__MINGW32__)
+#	define zbx_stat(path, buf)		_stat64(path, buf)
+#	define zbx_fstat(fd, buf)		_fstat64(fd, buf)
+
+typedef off64_t	zbx_offset_t;
+#	define zbx_lseek(fd, offset, whence)	lseek64(fd, (zbx_offset_t)(offset), whence)
+
+#else
+#	define zbx_stat(path, buf)		stat(path, buf)
+#	define zbx_fstat(fd, buf)		fstat(fd, buf)
+
 typedef off_t	zbx_offset_t;
 #	define zbx_lseek(fd, offset, whence)	lseek(fd, (zbx_offset_t)(offset), whence)
 
-#endif	/* _WINDOWS */
+#endif
 
 #define ZBX_FS_DBL		"%lf"
 #define ZBX_FS_DBL_EXT(p)	"%." #p "lf"
