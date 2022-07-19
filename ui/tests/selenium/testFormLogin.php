@@ -1,29 +1,27 @@
 <?php
 /*
- ** Zabbix
- ** Copyright (C) 2001-2022 Zabbix SIA
- **
- ** This program is free software; you can redistribute it and/or modify
- ** it under the terms of the GNU General Public License as published by
- ** the Free Software Foundation; either version 2 of the License, or
- ** (at your option) any later version.
- **
- ** This program is distributed in the hope that it will be useful,
- ** but WITHOUT ANY WARRANTY; without even the implied warranty of
- ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- ** GNU General Public License for more details.
- **
- ** You should have received a copy of the GNU General Public License
- ** along with this program; if not, write to the Free Software
- ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- **/
+** Zabbix
+** Copyright (C) 2001-2022 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
- * @backup users, users_groups
- *
  * @onBefore prepareLdapUserData
  **/
 class testFormLogin extends CWebTest {
@@ -181,7 +179,7 @@ class testFormLogin extends CWebTest {
 	}
 
 	/**
-	 * Function makes two authentifications with different data to different Zabbix views, separately clicking on
+	 * Function makes two authentications with different data to different Zabbix views, separately clicking on
 	 * sign in button and checking by views header, if correct url is opened.
 	 **/
 	public function testFormLogin_LoginWithRequest() {
@@ -196,29 +194,25 @@ class testFormLogin extends CWebTest {
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 **/
 	public function removeGuestFromDisabledGroup() {
-		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
-
-//		CDataHelper::call('user.update', [
-//			[
-//				'userid' => '2',
-//				'usrgrps' => [
-//					['usrgrpid' => '8']
-//				]
-//			]
-//		]);
+		CDataHelper::call('user.update', [
+			[
+				'userid' => '2',
+				'usrgrps' => [
+					['usrgrpid' => '8']
+				]
+			]
+		]);
 	}
 
 	public static function addGuestToDisabledGroup() {
-		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
-
-//		CDataHelper::call('user.update', [
-//			[
-//				'userid' => '2',
-//				'usrgrps' => [
-//					['usrgrpid' => '8'],
-//					['usrgrpid' => '9']
-//				]
-//			]
-//		]);
+		CDataHelper::call('user.update', [
+			[
+				'userid' => '2',
+				'usrgrps' => [
+					['usrgrpid' => '8'],
+					['usrgrpid' => '9']
+				]
+			]
+		]);
 	}
 }
