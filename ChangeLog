@@ -1,6 +1,7 @@
 Changes for 6.2.1rc1
 
 New features:
+.......PS. [ZBXNEXT-2878] added new vmware.*.property items (MVekslers)
 .......PS. [ZBXNEXT-7814] updated max supported mariadb version to 10.8 (yurii)
 .......PS. [ZBXNEXT-5229] added support vmware tags for hv, vm, ds, cl and dc (MVekslers)
 .......PS. [ZBXNEXT-2043] added new vmware keys *.alarms.get (MVekslers, ssimonenko)
@@ -9,6 +10,8 @@ New features:
 .........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
+A.F....... [ZBX-7706] improved performance of graph.get and graphprototype.get methods (acikuns, rlataria)
+..F....... [ZBX-21291] fixed aggregation by sum for the graph widget; fixed approximation function for aggregate values (ashubin)
 ..F....... [ZBX-21290] fixed displaying extra reporting periods in SLA reports when filtered by date (averza)
 .......PS. [ZBX-21294] fixed macros not being updated in javascript preprocessing step (vso)
 ...G...... [ZBX-21310] fixed SSL_shutdown() error in zabbix_server.log when receiving active check heartbeat (vso)
