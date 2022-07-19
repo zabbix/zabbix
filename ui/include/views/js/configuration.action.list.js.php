@@ -45,7 +45,6 @@
 			});
 		},
 
-
 		openActionPopup() {
 			const parameters = {
 				eventsource: this.eventsource

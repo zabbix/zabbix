@@ -55,7 +55,7 @@ class CControllerActionList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS);
 
 		//		$eventsource = getRequest('eventsource', EVENT_SOURCE_TRIGGERS);
 //		$check_actionids = false;

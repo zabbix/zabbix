@@ -84,12 +84,15 @@ $widget = (new CWidget())
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
 			]),
-			(new CFormGrid())->addItem([_('Status'),
-				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-					->addValue(_('Any'), -1)
-					->addValue(_('Enabled'), ACTION_STATUS_ENABLED)
-					->addValue(_('Disabled'), ACTION_STATUS_DISABLED)
-					->setModern(true)
+			(new CFormGrid())->addItem([
+				new CLabel(_('Status')),
+				new CFormField(
+					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+						->addValue(_('Any'), -1)
+						->addValue(_('Enabled'), ACTION_STATUS_ENABLED)
+						->addValue(_('Disabled'), ACTION_STATUS_DISABLED)
+						->setModern(true)
+				)
 			])
 		])
 	);
@@ -175,8 +178,8 @@ $actionForm->addItem([
 	$this->data['paging'],
 	new CActionButtonList('action', 'g_actionid', [
 		'action.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected actions?')],
-		'action.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected actions?')],
-		'action.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected actions?')]
+		'action.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected actions?')],
+		'action.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected actions?')]
 	], $data['eventsource'])
 ]);
 

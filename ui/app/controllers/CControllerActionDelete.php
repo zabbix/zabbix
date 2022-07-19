@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerActionEnable extends CController {
+class CControllerActionDelete extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
@@ -59,19 +59,14 @@ class CControllerActionEnable extends CController {
 		if (hasRequest('g_actionid')) {
 			$actionids = getRequest('g_actionid', []);
 			$actions_count = count($actionids);
-			$actions = [];
 
-			foreach ($actionids as $actionid) {
-				$actions[] = ['actionid' => $actionid, 'status' => ACTION_STATUS_ENABLED];
-			}
+			$result = API::Action()->delete($actionids);
 
-			$result = API::Action()->update($actions);
-
-			if ($result && array_key_exists('actionids', $result)) {
-				CMessageHelper::setSuccessTitle(_n('Action enabled', 'Actions enabled', $actions_count));
+			if ($result) {
+				CMessageHelper::setSuccessTitle(_n('Selected action deleted', 'Selected actions deleted', $actions_count));
 			}
 			else {
-				CMessageHelper::setErrorTitle(_n('Cannot enable action ', 'Cannot enable actions', $actions_count));
+				CMessageHelper::setErrorTitle(_n('Cannot delete selected action', 'Cannot delete selected actions', $actions_count));
 			}
 
 			uncheckTableRows($eventsource);

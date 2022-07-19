@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerActionEnable extends CController {
+class CControllerActionDisable extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
@@ -62,16 +62,16 @@ class CControllerActionEnable extends CController {
 			$actions = [];
 
 			foreach ($actionids as $actionid) {
-				$actions[] = ['actionid' => $actionid, 'status' => ACTION_STATUS_ENABLED];
+				$actions[] = ['actionid' => $actionid, 'status' => ACTION_STATUS_DISABLED];
 			}
 
 			$result = API::Action()->update($actions);
 
 			if ($result && array_key_exists('actionids', $result)) {
-				CMessageHelper::setSuccessTitle(_n('Action enabled', 'Actions enabled', $actions_count));
+				CMessageHelper::setSuccessTitle(_n('Action disabled', 'Actions disabled', $actions_count));
 			}
 			else {
-				CMessageHelper::setErrorTitle(_n('Cannot enable action ', 'Cannot enable actions', $actions_count));
+				CMessageHelper::setErrorTitle(_n('Cannot disable action', 'Cannot disable actions', $actions_count));
 			}
 
 			uncheckTableRows($eventsource);
