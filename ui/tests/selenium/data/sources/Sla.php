@@ -206,8 +206,8 @@ class Sla {
 					],
 					[
 						'name' => 'Downtime in the past',
-						'period_from' => time() - 3600,
-						'period_to' => time() - 1
+						'period_from' => time() - 7200,
+						'period_to' => time() - 3600
 					],
 					[
 						'name' => 'Downtime in the future',

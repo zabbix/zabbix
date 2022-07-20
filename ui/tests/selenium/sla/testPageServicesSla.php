@@ -375,7 +375,7 @@ class testPageServicesSla extends CWebTest {
 
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, $message_title );
+		$this->assertMessage(TEST_GOOD, $message_title);
 		$this->assertEquals($column_status, $row->getColumn('Status')->getText());
 		$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM sla WHERE name='.zbx_dbstr($sla)));
 	}

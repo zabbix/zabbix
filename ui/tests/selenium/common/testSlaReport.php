@@ -403,7 +403,7 @@ class testSlaReport extends CWebTest {
 					 * So an array of expected results is created and the presence of actual value in array is checked.
 					 */
 					$single_downtime = [];
-					for ($i = 0; $i <= 2; $i++) {
+					for ($i = 0; $i <= 5; $i++) {
 						$single_downtime[] = date('Y-m-d H:i', self::$actual_creation_time).' '.$downtime_name.': '
 								.convertUnitsS($load_time - self::$actual_creation_time + $i);
 					}
@@ -438,7 +438,7 @@ class testSlaReport extends CWebTest {
 						foreach ($data['downtimes']['names'] as $downtime_name) {
 							// Time is counted from  period start till page load time.
 							$single_downtime = [];
-							for ($i = 0; $i <= 2; $i++) {
+							for ($i = 0; $i <= 5; $i++) {
 								$single_downtime[] = date('Y-m-d H:i', strtotime('today')).' '.$downtime_name.': '
 										.convertUnitsS($load_time - strtotime('today') + $i);
 							}
@@ -481,7 +481,7 @@ class testSlaReport extends CWebTest {
 					$start_time = max($period['start'], self::$actual_creation_time, self::$service_creation_time);
 
 					// Get array of Utime possible values and check that the correct one is there.
-					for ($i = 0; $i <= 3; $i++) {
+					for ($i = 0; $i <= 5; $i++) {
 						$reference_uptime[] = convertUnitsS($load_time - $start_time + $i);
 					}
 
@@ -501,7 +501,7 @@ class testSlaReport extends CWebTest {
 				}
 				else {
 					$reference_uptime = [];
-					for ($i = 0; $i <= 3; $i++) {
+					for ($i = 0; $i <= 5; $i++) {
 						$uptime_start = max(self::$actual_creation_time, self::$service_creation_time);
 						$reference_uptime[] = convertUnitsS($period['end'] - $uptime_start + $i);
 					}

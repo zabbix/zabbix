@@ -144,7 +144,6 @@ class testPageServicesSlaReport extends testSlaReport {
 					],
 					'reporting_period' => 'Daily',
 					'expected_periods' => [
-						'2020-03-03',		// TODO: remove line this when ZBX-21290 will be fixed.
 						'2020-03-02',
 						'2020-03-01',
 						'2020-02-29',
@@ -193,7 +192,6 @@ class testPageServicesSlaReport extends testSlaReport {
 					],
 					'reporting_period' => 'Daily',
 					'expected_periods' => [
-						'2021-06-30',		// TODO: remove line this when ZBX-21290 will be fixed.
 						'2021-06-29',
 						'2021-06-28',
 						'2021-06-27',
@@ -212,7 +210,8 @@ class testPageServicesSlaReport extends testSlaReport {
 						'2021-06-14',
 						'2021-06-13',
 						'2021-06-12',
-						'2021-06-11'
+						'2021-06-11',
+						'2021-06-10'
 					]
 				]
 			],
@@ -225,7 +224,6 @@ class testPageServicesSlaReport extends testSlaReport {
 					],
 					'reporting_period' => 'Daily',
 					'expected_periods' => [
-						'2021-05-07',		// TODO: remove line this when ZBX-21290 will be fixed.
 						'2021-05-06',
 						'2021-05-05',
 						'2021-05-04',
@@ -261,8 +259,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'2021-07-02',
 						'2021-07-03',
 						'2021-07-04',
-						'2021-07-05',
-						'2021-07-06'		// TODO: remove line this when ZBX-21290 will be fixed.
+						'2021-07-05'
 					]
 				]
 			],
@@ -305,6 +302,7 @@ class testPageServicesSlaReport extends testSlaReport {
 					],
 					'reporting_period' => 'Daily',
 					'expected_periods' => [
+						'2021-12-20',
 						'2021-12-21',
 						'2021-12-22',
 						'2021-12-23',
@@ -323,8 +321,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'2022-01-05',
 						'2022-01-06',
 						'2022-01-07',
-						'2022-01-08',
-						'2022-01-09'		// TODO: remove line this when ZBX-21290 will be fixed.
+						'2022-01-08'
 					]
 				]
 			],
@@ -341,8 +338,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'2021-05-03',
 						'2021-05-04',
 						'2021-05-05',
-						'2021-05-06',
-						'2021-05-07'		// TODO: remove line this when ZBX-21290 will be fixed.
+						'2021-05-06'
 					]
 				]
 			],
@@ -580,7 +576,6 @@ class testPageServicesSlaReport extends testSlaReport {
 					],
 					'reporting_period' => 'Monthly',
 					'expected_periods' => [
-						'2020-03',		// TODO: remove line this when ZBX-21290 will be fixed.
 						'2020-02',
 						'2020-01'
 					]
@@ -689,8 +684,7 @@ class testPageServicesSlaReport extends testSlaReport {
 					'reporting_period' => 'Monthly',
 					'expected_periods' => [
 						'2020-01',
-						'2020-02',
-						'2020-03'		// TODO: remove line this when ZBX-21290 will be fixed.
+						'2020-02'
 
 					]
 				]
@@ -1000,7 +994,6 @@ class testPageServicesSlaReport extends testSlaReport {
 					],
 					'reporting_period' => 'Annually',
 					'expected_periods' => [
-						'2026',
 						'2025',
 						'2024',
 						'2023',
@@ -1191,8 +1184,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'2021-09',
 						'2021-10',
 						'2021-11',
-						'2021-12',
-						'2022-01'		// TODO: remove line this when ZBX-21290 will be fixed.
+						'2021-12'
 					]
 				]
 			],
