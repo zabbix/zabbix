@@ -215,7 +215,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE(description, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(expression, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
 
-#undef PREPARE_AUDIT_ITEM_UPDATE
+#undef PREPARE_AUDIT_TRIGGER_UPDATE
 #undef TR_OR_TRP
 
 /******************************************************************************
@@ -404,3 +404,4 @@ void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(zbx_uint64_t 
 
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_UPDATE, audit_key_);
 }
+#undef TRIGGER_RESOURCE_KEY_RESOLVE_TAG
