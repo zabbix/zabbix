@@ -154,11 +154,11 @@ class CConfigFile {
 			$this->config['DB']['VAULT_TOKEN'] = $DB['VAULT_TOKEN'];
 		}
 
-		if (isset($ZBX_SERVER)) {
+		if (isset($ZBX_SERVER) && $ZBX_SERVER !== '') {
 			$this->config['ZBX_SERVER'] = $ZBX_SERVER;
 		}
 
-		if (isset($ZBX_SERVER_PORT)) {
+		if (isset($ZBX_SERVER_PORT) && $ZBX_SERVER_PORT !== '') {
 			$this->config['ZBX_SERVER_PORT'] = $ZBX_SERVER_PORT;
 		}
 

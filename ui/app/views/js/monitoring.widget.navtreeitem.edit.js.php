@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,19 +18,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package mongodb
 
-const (
-	pingFailed = 0
-	pingOk     = 1
-)
+/**
+ * @var CView $this
+ */
+?>
 
-// pingHandler executes 'ping' command and returns pingOk if a connection is alive or pingFailed otherwise.
-// https://docs.mongodb.com/manual/reference/command/ping/index.html
-func pingHandler(s Session, _ map[string]string) (interface{}, error) {
-	if err := s.Ping(); err != nil {
-		return pingFailed, nil
+window.navtreeitem_edit_popup = new class {
+	init() {
+		jQuery('#sysmapname').on('change', (e) => {
+			const name_input = document.getElementById('name');
+
+			if (name_input.value === '') {
+				name_input.value = e.target.value;
+			}
+		});
+
+		document.getElementById('select').addEventListener('click', () => {
+			return PopUp('popup.generic', {
+				srctbl: 'sysmaps',
+				srcfld1: 'sysmapid',
+				srcfld2: 'name',
+				dstfrm: 'widget_dialogue_form',
+				dstfld1: 'sysmapid',
+				dstfld2: 'sysmapname'
+			}, {dialogue_class: 'modal-popup-generic'});
+		});
 	}
-
-	return pingOk, nil
-}
+};

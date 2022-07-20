@@ -351,6 +351,9 @@ class testDashboardPages extends CWebTest {
 			CPopupMenuElement::find()->waitUntilVisible()->one()->select('Paste page');
 			$dashboard->waitUntilReady();
 
+			// Wait until the second page appears.
+			$this->query('xpath://li[@class="sortable-item"][2]')->waitUntilVisible()->one();
+
 			// Copied page added.
 			$titles_before[] = 'first_page_copy';
 

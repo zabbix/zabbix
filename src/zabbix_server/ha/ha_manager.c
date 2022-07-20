@@ -1125,6 +1125,14 @@ static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **e
 	if (ZBX_DB_OK > info->db_status)
 		goto out;
 
+	if (0 == ZBX_HA_IS_CLUSTER())
+	{
+		/* return empty json array in standalone mode */
+		*nodes_json = zbx_strdup(NULL, "[]");
+		ret = SUCCEED;
+		goto out;
+	}
+
 	if (SUCCEED != ha_db_get_time(info, &db_time))
 		goto out;
 
@@ -1570,7 +1578,7 @@ out:
  ******************************************************************************/
 int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 {
-	int			ret = FAIL;
+	int			ret = FAIL, status;
 	zbx_uint32_t		code = 0;
 	zbx_thread_args_t	args;
 	zbx_ipc_client_t	*client;
@@ -1591,7 +1599,9 @@ int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 
 	start = now = time(NULL);
 
-	while (start + ZBX_HA_SERVICE_TIMEOUT > now)
+	/* Add few seconds to allow HA manager to terminate by its own in the case of RTC timeout. */
+	/* Otherwise it will get killed before logging timeout error.                              */
+	while (start + ZBX_HA_SERVICE_TIMEOUT + 5 > now)
 	{
 		(void)zbx_ipc_service_recv(&rtc->service, &rtc_timeout, &client, &message);
 
@@ -1607,6 +1617,13 @@ int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 				break;
 		}
 
+		if (0 < waitpid(ha_pid, &status, WNOHANG))
+		{
+			ha_pid = ZBX_THREAD_ERROR;
+			*error = zbx_strdup(NULL, "HA manager has stopped during startup registration");
+			goto out;
+		}
+
 		now = time(NULL);
 	}
 
@@ -1618,7 +1635,7 @@ int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 
 	ret = SUCCEED;
 out:
-	if (SUCCEED != ret && ZBX_THREAD_ERROR != ha_pid)
+	if (SUCCEED != ret)
 	{
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 		zbx_locks_disable();
@@ -1668,7 +1685,7 @@ int	zbx_ha_stop(char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (ZBX_THREAD_ERROR == ha_pid)
+	if (ZBX_THREAD_ERROR == ha_pid || 0 != kill(ha_pid, 0))
 	{
 		ret = SUCCEED;
 		goto out;
@@ -1688,7 +1705,8 @@ int	zbx_ha_stop(char **error)
 		ret = SUCCEED;
 	}
 out:
-	ha_pid = ZBX_THREAD_ERROR;
+	if (SUCCEED == ret)
+		ha_pid = ZBX_THREAD_ERROR;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1702,9 +1720,12 @@ out:
  ******************************************************************************/
 void	zbx_ha_kill(void)
 {
-	kill(ha_pid, SIGKILL);
-	zbx_thread_wait(ha_pid);
-	ha_pid = ZBX_THREAD_ERROR;
+	if (ZBX_THREAD_ERROR != ha_pid)
+	{
+		kill(ha_pid, SIGKILL);
+		zbx_thread_wait(ha_pid);
+		ha_pid = ZBX_THREAD_ERROR;
+	}
 }
 
 /******************************************************************************

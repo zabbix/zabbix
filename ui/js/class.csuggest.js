@@ -101,7 +101,7 @@ CSuggest.prototype = {
 	// search
 	searchServer: function(needle) {
 		if (needle !== this.userNeedle.toLowerCase()) {
-			return true;
+			return;
 		}
 
 		var rpcRequest = {
@@ -116,8 +116,6 @@ CSuggest.prototype = {
 		};
 
 		new RPC.Call(rpcRequest);
-
-		return true;
 	},
 
 	serverRespond: function(needle, respond) {

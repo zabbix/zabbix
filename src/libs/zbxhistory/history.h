@@ -57,7 +57,7 @@ int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, ch
 
 /* elastic hist */
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
-void	zbx_elastic_version_extract(struct zbx_json *json);
+void	zbx_elastic_version_extract(struct zbx_json *json, int *result);
 zbx_uint32_t	zbx_elastic_version_get(void);
 
 #endif

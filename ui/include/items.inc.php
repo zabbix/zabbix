@@ -761,15 +761,6 @@ function copyItems($srcHostId, $dstHostId, $assign_opt_interface = false) {
 	return true;
 }
 
-function get_item_by_itemid($itemid) {
-	$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.zbx_dbstr($itemid)));
-	if ($db_items) {
-		return $db_items;
-	}
-	error(_s('No item with item ID "%1$s".', $itemid));
-	return false;
-}
-
 /**
  * Description:
  * Replace items for specified host
@@ -1135,17 +1126,21 @@ function getDataOverviewCellData(array $db_items, array $data, int $show_suppres
  * @return array
  */
 function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, int $evaltype): array {
-
 	if ($hostids === null) {
-		$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1;
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$db_hosts = API::Host()->get([
-			'output' => [],
+			'output' => ['name'],
 			'groupids' => $groupids,
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
-			'preservekeys' => true,
-			'limit' => $limit
+			'sortfield' => ['name'],
+			'limit' => $limit,
+			'preservekeys' => true
 		]);
+
+		CArrayHelper::sort($db_hosts, ['name']);
+		$db_hosts = array_slice($db_hosts, 0, CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1, true);
+
 		$hostids = array_keys($db_hosts);
 	}
 
@@ -1167,7 +1162,7 @@ function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, i
 		['field' => 'itemid', 'order' => ZBX_SORT_UP]
 	]);
 
-	return [$db_items, $hostids];
+	return $db_items;
 }
 
 /**
@@ -1184,7 +1179,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	$tags = (array_key_exists('tags', $filter) && $filter['tags']) ? $filter['tags'] : null;
 	$evaltype = array_key_exists('evaltype', $filter) ? $filter['evaltype'] : TAG_EVAL_TYPE_AND_OR;
 
-	[$db_items, $hostids] = getDataOverviewItems($groupids, $hostids, $tags, $evaltype);
+	$db_items = getDataOverviewItems($groupids, $hostids, $tags, $evaltype);
 
 	$data = [];
 	$item_counter = [];
@@ -1237,35 +1232,51 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	]);
 
 	$data_display_limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
-	$has_hidden_hosts = (count($db_hosts) > $data_display_limit);
+	$has_hidden_data = count($data) > $data_display_limit || count($db_hosts) > $data_display_limit;
 	$db_hosts = array_slice($db_hosts, 0, $data_display_limit, true);
+	$host_names = array_column($db_hosts, 'name', 'name');
 
-	$data = array_slice($data, 0, $data_display_limit, true);
-	$items_left = $data_display_limit;
 	$itemids = [];
-	array_walk($data, function (array &$item_columns) use ($data_display_limit, &$itemids, &$items_left) {
+	$items_left = $data_display_limit;
+
+	foreach ($data as &$item_columns) {
 		if ($items_left != 0) {
 			$item_columns = array_slice($item_columns, 0, min($data_display_limit, $items_left));
 			$items_left -= count($item_columns);
 		}
 		else {
 			$item_columns = null;
-			return;
+			break;
 		}
 
-		array_walk($item_columns, function (array &$item_column) use ($data_display_limit, &$itemids) {
+		foreach ($item_columns as &$item_column) {
+			CArrayHelper::ksort($item_column);
 			$item_column = array_slice($item_column, 0, $data_display_limit, true);
-			$itemids += array_column($item_column, 'itemid', 'itemid');
-		});
-	});
-	$data = array_filter($data);
 
-	$has_hidden_items = (count($db_items) != count($itemids));
+			foreach ($item_column as $host_name => $item) {
+				if (array_key_exists($host_name, $host_names)) {
+					$itemids[$item['itemid']] = true;
+				}
+				else {
+					unset($item_column[$host_name]);
+				}
+			}
+		}
+		unset($item_column);
+
+		$item_columns = array_filter($item_columns);
+	}
+	unset($item_columns);
+
+	$data = array_filter($data);
+	$data = array_slice($data, 0, $data_display_limit, true);
+
+	$has_hidden_data = $has_hidden_data || count($db_items) != count($itemids);
 
 	$db_items = array_intersect_key($db_items, $itemids);
 	$data = getDataOverviewCellData($db_items, $data, $filter['show_suppressed']);
 
-	return [$data, $db_hosts, ($has_hidden_items || $has_hidden_hosts)];
+	return [$data, $db_hosts, $has_hidden_data];
 }
 
 /**
