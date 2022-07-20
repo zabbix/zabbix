@@ -24,10 +24,12 @@ require_once dirname(__FILE__).'/testAuditUserGroups.php';
 require_once dirname(__FILE__).'/testAuditEventCorrelation.php';
 require_once dirname(__FILE__).'/testAuditDashboard.php';
 require_once dirname(__FILE__).'/testAuditScheduledReport.php';
-//require_once dirname(__FILE__).'/testAuditSettings.php';
-//require_once dirname(__FILE__).'/testAuditAutoregistration.php';
+require_once dirname(__FILE__).'/testAuditSettings.php';
+require_once dirname(__FILE__).'/testAuditAutoregistration.php';
 require_once dirname(__FILE__).'/testAuditProxy.php';
 require_once dirname(__FILE__).'/testAuditUser.php';
+require_once dirname(__FILE__).'/testAuditMediaType.php';
+require_once dirname(__FILE__).'/testAuditIconMap.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -41,10 +43,12 @@ class AuditLogTests {
 		$suite->addTestSuite('testAuditEventCorrelation');
 		$suite->addTestSuite('testAuditDashboard');
 		$suite->addTestSuite('testAuditScheduledReport');
-//		$suite->addTestSuite('testAuditSettings');
-//		$suite->addTestSuite('testAuditAutoregistration');
+		$suite->addTestSuite('testAuditSettings');
+		$suite->addTestSuite('testAuditAutoregistration');
 		$suite->addTestSuite('testAuditProxy');
 		$suite->addTestSuite('testAuditUser');
+		$suite->addTestSuite('testAuditMediaType');
+		$suite->addTestSuite('testAuditIconMap');
 
 		return $suite;
 	}

@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/testPageReportsAuditValues.php';
 
 /**
- * @backup config_autoreg_tls, ids
+ * @backup config_autoreg_tls, config, ids
  */
 class testAuditAutoregistration extends testPageReportsAuditValues {
 
@@ -32,22 +32,9 @@ class testAuditAutoregistration extends testPageReportsAuditValues {
 	 */
 	protected static $ids = 1;
 
-	public $updated = "dashboard.auto_start: 1 => 0".
-			"\ndashboard.display_period: 30 => 60".
-			"\ndashboard.name: Audit dashboard => Updated dashboard name".
-			"\ndashboard.pages[1468]: Deleted".
-			"\ndashboard.pages[1469]: Added".
-			"\ndashboard.pages[1469].dashboard_pageid: 1469".
-			"\ndashboard.pages[1469].widgets[3906]: Added".
-			"\ndashboard.pages[1469].widgets[3906].height: 3".
-			"\ndashboard.pages[1469].widgets[3906].type: clock".
-			"\ndashboard.pages[1469].widgets[3906].widgetid: 3906".
-			"\ndashboard.pages[1469].widgets[3906].width: 4".
-			"\ndashboard.pages[1470]: Added".
-			"\ndashboard.pages[1470].dashboard_pageid: 1470".
-			"\ndashboard.pages[1470].display_period: 60".
-			"\ndashboard.userGroups[2]: Updated".
-			"\ndashboard.userGroups[2].permission: 2 => 3";
+	public $updated = "autoregistration.tls_accept: 1 => 3".
+			"\nautoregistration.tls_psk: ****** => ******".
+			"\nautoregistration.tls_psk_identity: ****** => ******";
 
 	public $resource_name = 'Autoregistration';
 
@@ -56,11 +43,9 @@ class testAuditAutoregistration extends testPageReportsAuditValues {
 	 */
 	public function testAuditAutoregistration_Update() {
 		CDataHelper::call('autoregistration.update', [
-			[
-				'tls_accept' => '3',
-				'tls_psk_identity' => 'PSK 001',
-				'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
-			]
+			'tls_accept' => '3',
+			'tls_psk_identity' => 'PSK 001',
+			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
 		]);
 
 		$this->checkAuditValues(self::$ids, 'Update');
