@@ -1226,6 +1226,8 @@ abstract class CHostBase extends CApiService {
 			return;
 		}
 
+		$this->checkLinkedItemKeys(array_flip($templateIds));
+
 		// check if someone passed duplicate templates in the same query
 		$templateIdDuplicates = zbx_arrayFindDuplicates($templateIds);
 		if ($templateIdDuplicates) {

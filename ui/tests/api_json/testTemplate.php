@@ -169,6 +169,19 @@ class testTemplate extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix']
+			],
+			[
+				'request' => [
+					[
+						'host' => 'test-template-15',
+						'groups' => ['groupid' => 1],
+						'templates' => [
+							['templateid' => 10050],
+							['templateid' => 10081]
+						]
+					]
+				],
+				'expected_error' => 'Item "agent.hostname" on "Windows by Zabbix agent" already exists on "Zabbix agent".'
 			]
 		];
 	}
