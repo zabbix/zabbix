@@ -41,7 +41,8 @@ static int	DBpatch_6030000(void)
 
 	result = DBselect("select roleid,type,name,value_int from role_rule where name in ("
 			"'ui.configuration.actions',"
-			"'ui.services.actions')");
+			"'ui.services.actions',"
+			"'ui.administration.general')");
 
 	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int", NULL);
 
@@ -67,6 +68,14 @@ static int	DBpatch_6030000(void)
 
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
 					"ui.configuration.trigger_actions", value_int);
+		}
+		else if (0 == strcmp(row[2], "ui.administration.general"))
+		{
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.administration.housekeeping", value_int);
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.administration.macros", value_int);
 		}
 		else
 		{
