@@ -90,10 +90,12 @@ class CControllerPopupCopy extends CController {
 				$data['itemids'] = $this->getInput('itemids');
 				$data['element_type'] = 'itemids';
 				break;
+
 			case 'triggers':
 				$data['triggerids'] = $this->getInput('triggerids');
 				$data['element_type'] = 'triggerids';
 				break;
+
 			case 'graphs':
 				$data['graphids'] = $this->getInput('graphids');
 				$data['element_type'] = 'graphids';

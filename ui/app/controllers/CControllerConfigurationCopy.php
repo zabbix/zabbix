@@ -80,6 +80,7 @@ class CControllerConfigurationCopy extends CController {
 				]);
 
 				return $items_count == count($this->getInput('itemids'));
+
 			case 'triggers':
 				$triggers_count = API::Trigger()->get([
 					'countOutput' => true,
@@ -87,6 +88,7 @@ class CControllerConfigurationCopy extends CController {
 				]);
 
 				return $triggers_count == count($this->getInput('triggerids'));
+
 			case 'graphs':
 				$graphs_count = API::Graph()->get([
 					'countOutput' => true,
@@ -164,6 +166,7 @@ class CControllerConfigurationCopy extends CController {
 					];
 				}
 				break;
+
 			case 'triggers':
 				$triggers_count = count($this->getInput('triggerids'));
 
@@ -181,6 +184,7 @@ class CControllerConfigurationCopy extends CController {
 					];
 				}
 				break;
+
 			case 'graphs':
 				$graphs_count = count($this->getInput('graphids'));
 
@@ -197,7 +201,8 @@ class CControllerConfigurationCopy extends CController {
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					];
 				}
-		};
+				break;
+		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
