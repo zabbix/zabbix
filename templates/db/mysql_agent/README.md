@@ -10,7 +10,7 @@ This template was tested on:
 
 - MySQL, version 5.7, 8.0
 - Percona, version 8.0
-- MariaDB, version 10.4
+- MariaDB, version 10.4, 10.6.8
 
 ## Setup
 
@@ -18,6 +18,9 @@ This template was tested on:
 
 1. Install Zabbix agent and MySQL client. If necessary, add the path to the `mysql` and `mysqladmin` utilities to the global environment variable PATH.
 2. Copy `template_db_mysql.conf` into the folder with Zabbix agent configuration (`/etc/zabbix/zabbix_agentd.d/` by default). Don't forget to restart Zabbix agent.
+
+*NOTE.* If you use this template with MariaDB 10.6.1 and higher, it's necessary to add `--protocol` parameter to `mysql` and `mysqladmin` commands in `template_db_mysql.conf` (https://mariadb.com/kb/en/mysql-command-line-client/#how-to-specify-which-protocol-to-use-when-connecting-to-the-mysqld-server).
+
 3. Create a MySQL user for monitoring (`<password>` at your discretion):
 
 ```text
