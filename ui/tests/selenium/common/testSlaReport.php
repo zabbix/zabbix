@@ -487,7 +487,9 @@ class testSlaReport extends CWebTest {
 var_dump('^^^^^^^^^^^^^^^^^');
 var_dump('From table: '.$uptime);
 var_dump('---------------------------------');
-var_dump('Reference array: '.$reference_uptime);
+var_dump('Reference array :');
+var_dump($reference_uptime);
+var_dump('vvvvvvvvvvvvvvvvv');
 					$this->assertTrue(in_array($uptime, $reference_uptime));
 
 					// Calculate the error budet based on the actual uptime and compare with actual error budget.
