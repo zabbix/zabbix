@@ -99,7 +99,7 @@ class CControllerCopy extends CController {
 		return false;
 	}
 
-	private function checkTargetPermissions(int $copy_type): bool {
+	private function checkTargetPermissions(int $copy_type) {
 		$copy_targetids = $this->getInput('copy_targetids');
 
 		switch ($copy_type) {
@@ -124,8 +124,7 @@ class CControllerCopy extends CController {
 			case COPY_TYPE_TO_HOST_GROUP:
 				$copy_targets = API::HostGroup()->get([
 					'countOutput' => true,
-					'groupids' => $copy_targetids,
-					'editable' => true
+					'groupids' => $copy_targetids
 				]);
 
 				return $copy_targets == count($copy_targetids);
@@ -133,8 +132,7 @@ class CControllerCopy extends CController {
 			case COPY_TYPE_TO_TEMPLATE_GROUP:
 				$copy_targets = API::TemplateGroup()->get([
 					'countOutput' => true,
-					'groupids' => $copy_targetids,
-					'editable' => true
+					'groupids' => $copy_targetids
 				]);
 
 				return $copy_targets == count($copy_targetids);
