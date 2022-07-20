@@ -219,7 +219,6 @@ class CItemManager {
 		}
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-
 			if ($config['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 				if ($config['hk_history_mode'] != 0 && $config['hk_history_global'] == 1) {
 					$table_names = array_diff($table_names,
