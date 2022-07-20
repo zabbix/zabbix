@@ -478,7 +478,7 @@ class testSlaReport extends CWebTest {
 				if ($period['end'] > $load_time) {
 					$reference_uptime = [];
 					// If SLA created in current period, calculation starts from creation timestamp, else from period start.
-					$start_time = max($period['start'], self::$actual_creation_time, self::$service_creation_time);
+					$start_time = max($period['start'], min(self::$actual_creation_time, self::$service_creation_time));
 
 					// Get array of Utime possible values and check that the correct one is there.
 					for ($i = 0; $i <= 5; $i++) {
