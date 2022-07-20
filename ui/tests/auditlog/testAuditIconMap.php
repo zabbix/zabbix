@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/testPageReportsAuditValues.php';
  * @onBefore prepareCreateData
  */
 class testAuditIconMap extends testPageReportsAuditValues {
-	
+
 	/**
 	 * Id of icon map.
 	 *
@@ -73,14 +73,14 @@ class testAuditIconMap extends testPageReportsAuditValues {
 		$this->assertArrayHasKey('iconmapids', $ids);
 		self::$ids = $ids['iconmapids'][0];
 	}
-	
+
 	/**
 	 * Check audit of created icon mapping.
 	 */
 	public function testAuditIconMap_Create() {
 		$this->checkAuditValues(self::$ids, 'Add');
 	}
-	
+
 	/**
 	 * Check audit of updated icon mapping.
 	 */
@@ -102,7 +102,7 @@ class testAuditIconMap extends testPageReportsAuditValues {
 
 		$this->checkAuditValues(self::$ids, 'Update');
 	}
-	
+
 	/**
 	 * Check audit of deleted icon mapping.
 	 */
