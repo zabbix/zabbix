@@ -72,29 +72,28 @@ class CControllerConfigurationCopy extends CController {
 			return false;
 		}
 
-		if ($source === 'items') {
-			$items_count = API::Item()->get([
-				'countOutput' => true,
-				'itemids' => $this->getInput('itemids')
-			]);
+		switch ($source) {
+			case 'items':
+				$items_count = API::Item()->get([
+					'countOutput' => true,
+					'itemids' => $this->getInput('itemids')
+				]);
 
-			return $items_count == count($this->getInput('itemids'));
-		}
-		elseif ($source === 'triggers') {
-			$triggers_count = API::Trigger()->get([
-				'countOutput' => true,
-				'triggerids' => $this->getInput('triggerids')
-			]);
+				return $items_count == count($this->getInput('itemids'));
+			case 'triggers':
+				$triggers_count = API::Trigger()->get([
+					'countOutput' => true,
+					'triggerids' => $this->getInput('triggerids')
+				]);
 
-			return $triggers_count == count($this->getInput('triggerids'));
-		}
-		elseif ($source === 'graphs') {
-			$graphs_count = API::Graph()->get([
-				'countOutput' => true,
-				'graphids' => $this->getInput('graphids')
-			]);
+				return $triggers_count == count($this->getInput('triggerids'));
+			case 'graphs':
+				$graphs_count = API::Graph()->get([
+					'countOutput' => true,
+					'graphids' => $this->getInput('graphids')
+				]);
 
-			return $graphs_count == count($this->getInput('graphids'));
+				return $graphs_count == count($this->getInput('graphids'));
 		}
 
 		return false;
