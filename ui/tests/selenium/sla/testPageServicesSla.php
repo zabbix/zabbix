@@ -341,6 +341,7 @@ class testPageServicesSla extends CWebTest {
 		$this->checkSlaStatus($row, 'disabled', self::$update_sla);
 
 		// Enable SLA.
+		CMessageElement::find()->one()->close();
 		$status->click();
 
 		// Check SLA enabled.
