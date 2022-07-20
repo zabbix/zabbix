@@ -107,7 +107,7 @@ class testFormHostStandalone extends testFormHost {
 	}
 
 	/**
-	 * Test for checking templated items linked to discovered host and unlinking them.
+	 * Test for checking templated objects that are linked to a discovered host and for checking their unlinkage.
 	 * This test is implemented only for Standalone scenario.
 	 */
 	public function testFormHostStandalone_DiscoveredHostLinkedTemplates() {
@@ -127,7 +127,6 @@ class testFormHostStandalone extends testFormHost {
 					// This template was unlinked but not cleared.
 					['Name' => 'Template1 item1'],
 					['Name' => 'Template1 item2'],
-
 					// This template was not unlinked.
 					['Name' => 'Test of discovered host Template: Template item'],
 					['Name' => 'Test of discovered host Template: Template item with tag']
@@ -144,7 +143,6 @@ class testFormHostStandalone extends testFormHost {
 				'objects_after_unlink' =>  [
 					// This template was unlinked but not cleared.
 					['Name' => 'Template1 trigger'],
-
 					// This template was not unlinked.
 					['Name' => 'Test of discovered host Template: Template trigger']
 				]
@@ -160,7 +158,6 @@ class testFormHostStandalone extends testFormHost {
 				'objects_after_unlink' =>  [
 					// This template was unlinked but not cleared.
 					['Name' => 'Template1 graph'],
-
 					// This template was not unlinked.
 					['Name' => 'Test of discovered host Template: Template graph']
 				]
@@ -176,7 +173,6 @@ class testFormHostStandalone extends testFormHost {
 				'objects_after_unlink' =>  [
 					// This template was unlinked but not cleared.
 					['Name' => 'Template1 discovery rule'],
-
 					// This template was not unlinked.
 					['Name' => 'Test of discovered host Template: Template discovery rule']
 				]
@@ -192,7 +188,6 @@ class testFormHostStandalone extends testFormHost {
 				'objects_after_unlink' =>  [
 					// This template was not unlinked.
 					['Name' => 'Test of discovered host Template: Template web scenario'],
-
 					// This template was unlinked but not cleared.
 					['Name' => 'Template web scenario 1']
 				]
@@ -231,7 +226,7 @@ class testFormHostStandalone extends testFormHost {
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		foreach ($filtered_results as $result) {
-			// Open hosts objects and check items on Discovered host after unlinking some templates.
+			// Open hosts objects and check objects on Discovered host after unlinking some templates.
 			$this->page->open($result['objects'].'.php?filter_set=1&filter_hostids%5B0%5D='.
 					$discovered_hostid.'&context=host')->waitUntilReady();
 			$this->assertTableData($result['objects_after_unlink'], 'xpath://form[@name='.

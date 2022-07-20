@@ -1979,7 +1979,7 @@ class testFormHost extends CWebTest {
 
 					$this->assertEquals('LLD for Discovered host tests', $form->getField('Discovered by')->getText());
 
-					// Check fields' editability and default values.
+					// Check fields' editability, maxlength and default values.
 					$host_fields = [
 						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'maxlength' => 128, 'enabled' => false],
 						['name' => 'Visible name', 'value' => '', 'maxlength' => 128, 'enabled' => false],
@@ -2103,7 +2103,8 @@ class testFormHost extends CWebTest {
 		}
 
 		$this->assertEquals(5, $form_type->query('button', ['Update', 'Clone', 'Full clone', 'Delete', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+		);
 
 		if (!$this->standalone) {
 			$form_type->close();

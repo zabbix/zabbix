@@ -57,9 +57,7 @@ class DiscoveredHosts {
 		]);
 
 		self::$hostid = $hosts['hostids'][0];
-		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface'.
-				' WHERE hostid='.zbx_dbstr(self::$hostid)
-		);
+		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.zbx_dbstr(self::$hostid));
 
 		// Create discovery rule.
 		$llds = CDataHelper::call('discoveryrule.create', [
