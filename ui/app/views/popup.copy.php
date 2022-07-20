@@ -68,7 +68,7 @@ $form_grid = (new CFormGrid())
 	->addItem(
 		(new CScriptTag('
 			copy_popup.init('.json_encode([
-				'action' => 'copy'
+				'action' => 'configuration.copy'
 			]).');
 		'))->setOnDocumentReady()
 	);

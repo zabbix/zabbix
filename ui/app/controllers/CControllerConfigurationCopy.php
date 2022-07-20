@@ -23,7 +23,7 @@
  * @var array
  */
 
-class CControllerCopy extends CController {
+class CControllerConfigurationCopy extends CController {
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
