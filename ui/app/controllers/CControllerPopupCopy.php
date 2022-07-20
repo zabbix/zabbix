@@ -85,14 +85,19 @@ class CControllerPopupCopy extends CController {
 			'source' => $this->getInput('source')
 		];
 
-		if ($data['source'] === 'items') {
-			$data['itemids'] = $this->getInput('itemids');
-		}
-		elseif ($data['source'] === 'triggers') {
-			$data['triggerids'] = $this->getInput('triggerids');
-		}
-		elseif ($data['source'] === 'graphs') {
-			$data['graphids'] = $this->getInput('graphids');
+		switch ($data['source']) {
+			case 'items':
+				$data['itemids'] = $this->getInput('itemids');
+				$data['element_type'] = 'itemids';
+				break;
+			case 'triggers':
+				$data['triggerids'] = $this->getInput('triggerids');
+				$data['element_type'] = 'triggerids';
+				break;
+			case 'graphs':
+				$data['graphids'] = $this->getInput('graphids');
+				$data['element_type'] = 'graphids';
+				break;
 		}
 
 		$this->setResponse(new CControllerResponseData($data));

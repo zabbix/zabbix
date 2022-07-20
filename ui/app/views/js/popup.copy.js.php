@@ -33,7 +33,6 @@ window.copy_popup = new class {
 		this.curl.setArgument('action', action);
 
 		$('[name="copy_type"]').on('change', this.changeTargetType);
-
 		this.changeTargetType();
 	}
 
@@ -97,7 +96,6 @@ window.copy_popup = new class {
 		const fields = getFormFields(this.form);
 
 		this.overlay.setLoading();
-
 		this._post(this.curl.getUrl(), fields);
 	}
 

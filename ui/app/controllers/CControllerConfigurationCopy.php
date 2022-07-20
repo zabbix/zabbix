@@ -147,57 +147,58 @@ class CControllerConfigurationCopy extends CController {
 		$source = $this->getInput('source');
 		$output = [];
 
-		if ($source === 'items') {
-			$items_count = count($this->getInput('itemids'));
+		switch ($source) {
+			case 'items':
+				$items_count = count($this->getInput('itemids'));
 
-			if ($this->copyItems($copy_targetids)) {
-				$output['success']['title'] = _n('Item copied', 'Items copied', $items_count);
+				if ($this->copyItems($copy_targetids)) {
+					$output['success']['title'] = _n('Item copied', 'Items copied', $items_count);
 
-				if ($messages = get_and_clear_messages()) {
-					$output['success']['messages'] = array_column($messages, 'message');
+					if ($messages = get_and_clear_messages()) {
+						$output['success']['messages'] = array_column($messages, 'message');
+					}
 				}
-			}
-			else {
-				$output['error'] = [
-					'title' => _n('Cannot copy item', 'Cannot copy items', $items_count),
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				];
-			}
-		}
-		elseif ($source === 'triggers') {
-			$triggers_count = count($this->getInput('triggerids'));
-
-			if ($this->copyTriggers($copy_targetids)) {
-				$output['success']['title'] = _n('Trigger copied', 'Triggers copied', $triggers_count);
-
-				if ($messages = get_and_clear_messages()) {
-					$output['success']['messages'] = array_column($messages, 'message');
+				else {
+					$output['error'] = [
+						'title' => _n('Cannot copy item', 'Cannot copy items', $items_count),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					];
 				}
-			}
-			else {
-				$output['error'] = [
-					'title' => _n('Cannot copy trigger', 'Cannot copy triggers', $triggers_count),
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				];
-			}
-		}
-		elseif ($source === 'graphs') {
-			$graphs_count = count($this->getInput('graphids'));
+				break;
+			case 'triggers':
+				$triggers_count = count($this->getInput('triggerids'));
 
-			if ($this->copyGraphs($copy_targetids)) {
-				$output['success']['title'] = _n('Graph copied', 'Graphs copied', $graphs_count);
+				if ($this->copyTriggers($copy_targetids)) {
+					$output['success']['title'] = _n('Trigger copied', 'Triggers copied', $triggers_count);
 
-				if ($messages = get_and_clear_messages()) {
-					$output['success']['messages'] = array_column($messages, 'message');
+					if ($messages = get_and_clear_messages()) {
+						$output['success']['messages'] = array_column($messages, 'message');
+					}
 				}
-			}
-			else {
-				$output['error'] = [
-					'title' => _n('Cannot copy graph', 'Cannot copy graphs', $graphs_count),
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				];
-			}
-		}
+				else {
+					$output['error'] = [
+						'title' => _n('Cannot copy trigger', 'Cannot copy triggers', $triggers_count),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					];
+				}
+				break;
+			case 'graphs':
+				$graphs_count = count($this->getInput('graphids'));
+
+				if ($this->copyGraphs($copy_targetids)) {
+					$output['success']['title'] = _n('Graph copied', 'Graphs copied', $graphs_count);
+
+					if ($messages = get_and_clear_messages()) {
+						$output['success']['messages'] = array_column($messages, 'message');
+					}
+				}
+				else {
+					$output['error'] = [
+						'title' => _n('Cannot copy graph', 'Cannot copy graphs', $graphs_count),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					];
+				}
+		};
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}

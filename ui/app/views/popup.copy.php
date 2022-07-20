@@ -29,23 +29,25 @@ $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-if (array_key_exists('itemids', $data)) {
-	$form
-		->addVar('itemids', $data['itemids'])
-		->addVar('source', 'items');
-	$header = _n('Copy %1$s item', 'Copy %1$s items', count($data['itemids']));
-}
-elseif (array_key_exists('triggerids', $data)) {
-	$form
-		->addVar('triggerids', $data['triggerids'])
-		->addVar('source', 'triggers');
-	$header = _n('Copy %1$s trigger', 'Copy %1$s triggers', count($data['triggerids']));
-}
-elseif (array_key_exists('graphids', $data)) {
-	$form
-		->addVar('graphids', $data['graphids'])
-		->addVar('source', 'graphs');
-	$header = _n('Copy %1$s graph', 'Copy %1$s graphs', count($data['graphids']));
+switch($data['element_type']) {
+	case 'itemids':
+		$form
+			->addVar('itemids', $data['itemids'])
+			->addVar('source', 'items');
+		$header = _n('Copy %1$s item', 'Copy %1$s items', count($data['itemids']));
+		break;
+	case 'triggerids':
+		$form
+			->addVar('triggerids', $data['triggerids'])
+			->addVar('source', 'triggers');
+		$header = _n('Copy %1$s trigger', 'Copy %1$s triggers', count($data['triggerids']));
+		break;
+	case 'graphids':
+		$form
+			->addVar('graphids', $data['graphids'])
+			->addVar('source', 'graphs');
+		$header = _n('Copy %1$s graph', 'Copy %1$s graphs', count($data['graphids']));
+		break;
 }
 
 $form_grid = (new CFormGrid())
