@@ -100,10 +100,11 @@
 
 		openCopyPopup() {
 			const parameters = {
-				itemids: Object.keys(chkbxRange.getSelectedIds())
+				itemids: Object.keys(chkbxRange.getSelectedIds()),
+				source: 'items'
 			};
 
-			return PopUp('popup.copy.items', parameters, {
+			return PopUp('popup.copy', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});

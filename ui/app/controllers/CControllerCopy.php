@@ -36,7 +36,8 @@ class CControllerCopy extends CController {
 			'graphids' => 'array_id',
 			'copy_type' => 'required|in '.implode(',', [
 				COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP
-			])
+			]),
+			'source' => 'required|in '.implode(',', ['items', 'triggers', 'graphs'])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -55,7 +56,7 @@ class CControllerCopy extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$action = $this->getAction();
+		$source = $this->getInput('source');
 		$copy_type = $this->getInput('copy_type');
 
 		if (($copy_type == COPY_TYPE_TO_HOST || $copy_type == COPY_TYPE_TO_HOST_GROUP)
@@ -71,7 +72,7 @@ class CControllerCopy extends CController {
 			return false;
 		}
 
-		if ($action === 'copy.items' && $this->hasInput('itemids')) {
+		if ($source === 'items') {
 			$items_count = API::Item()->get([
 				'countOutput' => true,
 				'itemids' => $this->getInput('itemids')
@@ -79,7 +80,7 @@ class CControllerCopy extends CController {
 
 			return $items_count == count($this->getInput('itemids'));
 		}
-		elseif ($action === 'copy.triggers' && $this->hasInput('triggerids')) {
+		elseif ($source === 'triggers') {
 			$triggers_count = API::Trigger()->get([
 				'countOutput' => true,
 				'triggerids' => $this->getInput('triggerids')
@@ -87,7 +88,7 @@ class CControllerCopy extends CController {
 
 			return $triggers_count == count($this->getInput('triggerids'));
 		}
-		elseif ($action === 'copy.graphs' && $this->hasInput('graphids')) {
+		elseif ($source === 'graphs') {
 			$graphs_count = API::Graph()->get([
 				'countOutput' => true,
 				'graphids' => $this->getInput('graphids')
@@ -141,9 +142,10 @@ class CControllerCopy extends CController {
 
 	protected function doAction() {
 		$copy_targetids = $this->getTargetIds();
+		$source = $this->getInput('source');
 		$output = [];
 
-		if ($this->getAction() === 'copy.items') {
+		if ($source === 'items') {
 			$items_count = count($this->getInput('itemids'));
 
 			if ($this->copyItems($copy_targetids)) {
@@ -160,7 +162,7 @@ class CControllerCopy extends CController {
 				];
 			}
 		}
-		elseif ($this->getAction() === 'copy.triggers') {
+		elseif ($source === 'triggers') {
 			$triggers_count = count($this->getInput('triggerids'));
 
 			if ($this->copyTriggers($copy_targetids)) {
@@ -177,7 +179,7 @@ class CControllerCopy extends CController {
 				];
 			}
 		}
-		elseif ($this->getAction() === 'copy.graphs') {
+		elseif ($source === 'graphs') {
 			$graphs_count = count($this->getInput('graphids'));
 
 			if ($this->copyGraphs($copy_targetids)) {
@@ -207,7 +209,7 @@ class CControllerCopy extends CController {
 	private function copyTriggers(array $copy_targetids): bool {
 		$triggerids = $this->getInput('triggerids');
 
-		return copyTriggersToHosts($hostids, getRequest('hostid'), $triggerids);
+		return copyTriggersToHosts($copy_targetids, getRequest('hostid'), $triggerids);
 	}
 
 	private function copyGraphs(array $copy_targetids): bool {

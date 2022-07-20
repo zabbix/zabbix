@@ -25,7 +25,8 @@ class CControllerPopupCopy extends CController {
 		$fields = [
 			'itemids' => 'array_id',
 			'triggerids' => 'array_id',
-			'graphids' => 'array_id'
+			'graphids' => 'array_id',
+			'source' => 'required|in '.implode(',', ['items', 'triggers', 'graphs'])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -49,9 +50,9 @@ class CControllerPopupCopy extends CController {
 			return false;
 		}
 
-		$action = $this->getAction();
+		$source = $this->getInput('source');
 
-		if ($action === 'popup.copy.items' && $this->hasInput('itemids')) {
+		if ($source === 'items' && $this->hasInput('itemids')) {
 			$items_count = API::Item()->get([
 				'countOutput' => true,
 				'itemids' => $this->getInput('itemids')
@@ -59,7 +60,7 @@ class CControllerPopupCopy extends CController {
 
 			return $items_count == count($this->getInput('itemids'));
 		}
-		elseif ($action === 'popup.copy.triggers' && $this->hasInput('triggerids')) {
+		elseif ($source === 'triggers' && $this->hasInput('triggerids')) {
 			$triggers_count = API::Trigger()->get([
 				'countOutput' => true,
 				'triggerids' => $this->getInput('triggerids')
@@ -67,7 +68,7 @@ class CControllerPopupCopy extends CController {
 
 			return $triggers_count == count($this->getInput('triggerids'));
 		}
-		elseif ($action === 'popup.copy.graphs' && $this->hasInput('graphids')) {
+		elseif ($source === 'graphs' && $this->hasInput('graphids')) {
 			$graphs_count = API::Graph()->get([
 				'countOutput' => true,
 				'graphids' => $this->getInput('graphids')
@@ -81,16 +82,16 @@ class CControllerPopupCopy extends CController {
 
 	protected function doAction() {
 		$data = [
-			'action' => $this->getAction()
+			'source' => $this->getInput('source')
 		];
 
-		if ($data['action'] === 'popup.copy.items') {
+		if ($data['source'] === 'items') {
 			$data['itemids'] = $this->getInput('itemids');
 		}
-		elseif ($data['action'] === 'popup.copy.triggers') {
+		elseif ($data['source'] === 'triggers') {
 			$data['triggerids'] = $this->getInput('triggerids');
 		}
-		elseif ($data['action'] === 'popup.copy.graphs') {
+		elseif ($data['source'] === 'graphs') {
 			$data['graphids'] = $this->getInput('graphids');
 		}
 

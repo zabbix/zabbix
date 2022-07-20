@@ -64,10 +64,11 @@
 
 		openCopyPopup() {
 			const parameters = {
-				graphids: Object.keys(chkbxRange.getSelectedIds())
+				graphids: Object.keys(chkbxRange.getSelectedIds()),
+				source: 'graphs'
 			};
 
-			return PopUp('popup.copy.graphs', parameters, {
+			return PopUp('popup.copy', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});

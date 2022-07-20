@@ -90,10 +90,11 @@
 
 		openCopyPopup() {
 			const parameters = {
-				triggerids: Object.keys(chkbxRange.getSelectedIds())
+				triggerids: Object.keys(chkbxRange.getSelectedIds()),
+				source: 'triggers'
 			};
 
-			return PopUp('popup.copy.triggers', parameters, {
+			return PopUp('popup.copy', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});

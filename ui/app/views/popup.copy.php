@@ -30,19 +30,22 @@ $form = (new CForm())
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 if (array_key_exists('itemids', $data)) {
-	$form->addVar('itemids', $data['itemids']);
+	$form
+		->addVar('itemids', $data['itemids'])
+		->addVar('source', 'items');
 	$header = _n('Copy %1$s item', 'Copy %1$s items', count($data['itemids']));
-	$action = 'copy.items';
 }
 elseif (array_key_exists('triggerids', $data)) {
-	$form->addVar('triggerids', $data['triggerids']);
+	$form
+		->addVar('triggerids', $data['triggerids'])
+		->addVar('source', 'triggers');
 	$header = _n('Copy %1$s trigger', 'Copy %1$s triggers', count($data['triggerids']));
-	$action = 'copy.triggers';
 }
 elseif (array_key_exists('graphids', $data)) {
-	$form->addVar('graphids', $data['graphids']);
+	$form
+		->addVar('graphids', $data['graphids'])
+		->addVar('source', 'graphs');
 	$header = _n('Copy %1$s graph', 'Copy %1$s graphs', count($data['graphids']));
-	$action = 'copy.graphs';
 }
 
 $form_grid = (new CFormGrid())
@@ -65,7 +68,7 @@ $form_grid = (new CFormGrid())
 	->addItem(
 		(new CScriptTag('
 			copy_popup.init('.json_encode([
-				'action' => $action
+				'action' => 'copy'
 			]).');
 		'))->setOnDocumentReady()
 	);
