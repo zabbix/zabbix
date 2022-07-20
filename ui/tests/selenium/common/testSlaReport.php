@@ -484,7 +484,10 @@ class testSlaReport extends CWebTest {
 					for ($i = 0; $i <= 5; $i++) {
 						$reference_uptime[] = convertUnitsS($load_time - $start_time + $i);
 					}
-
+var_dump('^^^^^^^^^^^^^^^^^');
+var_dump('From table: '.$uptime);
+var_dump('---------------------------------');
+var_dump('Reference array: '.$reference_uptime);
 					$this->assertTrue(in_array($uptime, $reference_uptime));
 
 					// Calculate the error budet based on the actual uptime and compare with actual error budget.
