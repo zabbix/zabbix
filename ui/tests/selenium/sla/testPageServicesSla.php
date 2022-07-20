@@ -341,7 +341,6 @@ class testPageServicesSla extends CWebTest {
 		$this->checkSlaStatus($row, 'disabled', self::$update_sla);
 
 		// Enable SLA.
-		CMessageElement::find()->one()->close();
 		$status->click();
 
 		// Check SLA enabled.
@@ -377,6 +376,7 @@ class testPageServicesSla extends CWebTest {
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $message_title);
+		CMessageElement::find()->one()->close();
 		$this->assertEquals($column_status, $row->getColumn('Status')->getText());
 		$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM sla WHERE name='.zbx_dbstr($sla)));
 	}
