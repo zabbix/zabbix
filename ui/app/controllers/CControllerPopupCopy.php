@@ -21,7 +21,7 @@
 
 class CControllerPopupCopy extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'itemids' => 'array_id',
 			'triggerids' => 'array_id',
@@ -44,7 +44,7 @@ class CControllerPopupCopy extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 				&& !$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
 			return false;
@@ -80,7 +80,7 @@ class CControllerPopupCopy extends CController {
 		return false;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'source' => $this->getInput('source')
 		];

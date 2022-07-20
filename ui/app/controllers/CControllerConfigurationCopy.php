@@ -100,7 +100,7 @@ class CControllerConfigurationCopy extends CController {
 		return false;
 	}
 
-	private function checkTargetPermissions(int $copy_type) {
+	private function checkTargetPermissions(int $copy_type): bool {
 		$copy_targetids = $this->getInput('copy_targetids');
 
 		switch ($copy_type) {
@@ -138,9 +138,11 @@ class CControllerConfigurationCopy extends CController {
 
 				return $copy_targets == count($copy_targetids);
 		}
+
+		return false;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$copy_targetids = $this->getTargetIds();
 		$source = $this->getInput('source');
 		$output = [];
