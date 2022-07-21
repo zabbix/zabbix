@@ -36,7 +36,9 @@ POLLER_LIBS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a
 
 zbx_poller_test_SOURCES = \
 	../../../src/zabbix_server/poller/checks_ssh.c \
@@ -52,8 +54,8 @@ zbx_poller_test_SOURCES = \
 zbx_poller_test_LDADD = $(POLLER_LIBS)
 zbx_poller_test_LDADD += @SERVER_LIBS@ 
 zbx_poller_test_LDFLAGS = @SERVER_LDFLAGS@\
-	-U _ssh_run \
-	-U _telnet_run
+	-Wl,--wrap=ssh_run \
+	-Wl,--wrap=telnet_run
 
 zbx_poller_test_CFLAGS = \
 	-I@top_srcdir@/tests @LIBXML2_CFLAGS@

@@ -17,23 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "test_get_value_telnet.h"
+#ifndef ZABBIX_TELNET_RUN_H
+#define ZABBIX_TELNET_RUN_H
 
-#include "../../../src/zabbix_server/poller/checks_telnet.h"
+#include "dbcache.h"
 
-int	__wrap_telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
-{
-	return SYSINFO_RET_OK;
-}
+#define TELNET_RUN_KEY	"telnet.run"
 
-int	zbx_get_value_telnet_test_run(DC_ITEM *item, char **error)
-{
-	AGENT_RESULT	result;
-	int		ret;
+extern char	*CONFIG_SOURCE_IP;
 
-	ret = get_value_telnet(item, &result);
-	*error = zbx_malloc(NULL, sizeof(char) * strlen(result.msg));
-	zbx_strlcpy(*error, result.msg, strlen(result.msg) * sizeof(char));
+int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
 
-	return ret;
-}
+#endif

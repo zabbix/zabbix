@@ -21,6 +21,12 @@
 
 #include "../../../src/zabbix_server/poller/checks_ssh.h"
 
+int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+{
+	return SYSINFO_RET_OK;
+}
+
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
 {
 	AGENT_RESULT	result;
@@ -32,3 +38,4 @@ int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
 
 	return ret;
 }
+#endif /*POLLER_GET_VALUE_SSH_TEST_H*/

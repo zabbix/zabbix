@@ -19,57 +19,7 @@
 
 #include "checks_telnet.h"
 
-#include "zbxcomms.h"
-#include "log.h"
-
-#define TELNET_RUN_KEY	"telnet.run"
-
-/*
- * Example: telnet.run["ls /"]
- */
-__attribute__((weak)) int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
-{
-	zbx_socket_t	s;
-	int		ret = NOTSUPPORTED, flags;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to TELNET server: %s",
-				zbx_socket_strerror()));
-		goto close;
-	}
-
-	flags = fcntl(s.socket, F_GETFL);
-
-	if (-1 == flags)
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, " error in getting the status flag: %s",
-				zbx_strerror(errno)));
-	}
-
-	if (0 == (flags & O_NONBLOCK) && (-1 == fcntl(s.socket, F_SETFL, flags | O_NONBLOCK)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, " error in setting the status flag: %s",
-				zbx_strerror(errno)));
-	}
-
-	if (FAIL == zbx_telnet_login(s.socket, item->username, item->password, result))
-		goto tcp_close;
-
-	if (FAIL == zbx_telnet_execute(s.socket, item->params, result, encoding))
-		goto tcp_close;
-
-	ret = SUCCEED;
-tcp_close:
-	zbx_tcp_close(&s);
-close:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
+#include "telnet_run.h"
 
 int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 {

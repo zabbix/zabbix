@@ -28,16 +28,6 @@
 #include "test_get_value_telnet.h"
 #include "../../../src/zabbix_server/poller/checks_telnet.h"
 
-int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
-{
-	return SYSINFO_RET_OK;
-}
-
-int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
-{
-	return SYSINFO_RET_OK;
-}
-
 void	zbx_mock_test_entry(void **state)
 {
 	DC_ITEM	item;
