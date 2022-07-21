@@ -79,31 +79,6 @@ abstract class CHostBase extends CApiService {
 			}
 		}
 
-		// Check if templates linked have the same item keys.
-		$linked_item_keys = [];
-
-		foreach ($templateIds as $templateId) {
-			$linked_template = API::Template()->get([
-				'templateids' => $templateId,
-				'output' => ['host']
-			]);
-
-			$linked_template_items = API::Item()->get([
-				'templateids' => $templateId,
-				'output' => ['key_']
-			]);
-
-			foreach ($linked_template_items as $template_item) {
-				if (!array_key_exists($template_item['key_'], $linked_item_keys)) {
-					$linked_item_keys[$template_item['key_']] = $linked_template[0]['host'];
-				}
-				else {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Item "%1$s" on "%2$s" already exists on "%3$s".', $template_item['key_'], $linked_template[0]['host'], $linked_item_keys[$template_item['key_']]));
-				}
-			}
-		}
-
 		// check if there are any template with triggers which depends on triggers in templates which will be not linked
 		$commonTemplateIds = array_unique(array_merge($commonDBTemplateIds, $templateIds));
 		foreach ($templateIds as $templateid) {
