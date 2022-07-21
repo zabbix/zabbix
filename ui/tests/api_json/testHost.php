@@ -140,7 +140,7 @@ class testHost extends CAPITest {
 						['templateid' => 10081]
 					]
 				],
-				'expected_error' => 'Item "agent.hostname" on "Windows by Zabbix agent" already exists on "Zabbix agent".'
+				'expected_error' => 'Item "agent.hostname" already exists on "new host 7", inherited from another template.'
 			]
 		];
 	}
