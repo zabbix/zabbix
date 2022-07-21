@@ -213,7 +213,6 @@ abstract class CHostBase extends CApiService {
 				$this->checkDoubleLinkageNew($ins_templates, $del_links);
 			}
 
-			$this->checkLinkedItemKeys($ins_templates);
 			$this->checkTriggerDependenciesOfInsTemplates($ins_templates);
 			$this->checkTriggerExpressionsOfInsTemplates($ins_templates);
 		}
@@ -648,39 +647,6 @@ abstract class CHostBase extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$ins_templateid]['host'],
 					$objects[$hostid]['host'], $objects[$parent_templateid]['host']
 				));
-			}
-		}
-	}
-
-	/**
-	 * Check if templates linked have the same item keys.
-	 *
-	 * @param array $ins_links[<templateid>][<hostid>]
-	 *
-	 * @throws APIException
-	 */
-	protected function checkLinkedItemKeys(array $ins_links): void {
-		$linked_item_keys = [];
-
-		foreach ($ins_links as $templateid => $ins_link) {
-			$linked_template = API::Template()->get([
-				'templateids' => $templateid,
-				'output' => ['host']
-			]);
-
-			$linked_template_items = API::Item()->get([
-				'templateids' => $templateid,
-				'output' => ['key_']
-			]);
-
-			foreach ($linked_template_items as $template_item) {
-				if (!array_key_exists($template_item['key_'], $linked_item_keys)) {
-					$linked_item_keys[$template_item['key_']] = $linked_template[0]['host'];
-				}
-				else {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Item "%1$s" on "%2$s" already exists on "%3$s".', $template_item['key_'], $linked_template[0]['host'], $linked_item_keys[$template_item['key_']]));
-				}
 			}
 		}
 	}
@@ -1225,8 +1191,6 @@ abstract class CHostBase extends CApiService {
 		if (empty($templateIds)) {
 			return;
 		}
-
-		$this->checkLinkedItemKeys(array_flip($templateIds));
 
 		// check if someone passed duplicate templates in the same query
 		$templateIdDuplicates = zbx_arrayFindDuplicates($templateIds);
