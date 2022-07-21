@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-06-21T16:32:14Z'
+  date: '2022-07-21T13:12:07Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1707,7 +1707,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
-              description: 'Endpoint age (number of secods since creation).'
+              description: 'Endpoint age (number of seconds since creation).'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
