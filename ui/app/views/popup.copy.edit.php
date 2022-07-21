@@ -70,7 +70,7 @@ $form_grid = (new CFormGrid())
 	->addItem(
 		(new CScriptTag('
 			copy_popup.init('.json_encode([
-				'action' => 'configuration.copy'
+				'action' => 'popup.copy.create'
 			]).');
 		'))->setOnDocumentReady()
 	);
@@ -91,7 +91,7 @@ $output = [
 	'header' => $header,
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('popup.copy.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('popup.copy.edit.js.php')
 ];
 
 echo json_encode($output);

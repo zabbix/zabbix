@@ -68,7 +68,7 @@
 				source: 'graphs'
 			};
 
-			return PopUp('popup.copy', parameters, {
+			return PopUp('popup.copy.edit', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});

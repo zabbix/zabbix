@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupCopy extends CController {
+class CControllerPopupCopyEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
