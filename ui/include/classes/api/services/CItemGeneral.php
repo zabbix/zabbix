@@ -925,6 +925,16 @@ abstract class CItemGeneral extends CApiService {
 			return [];
 		}
 
+		// Check if duplicates do not exist among inherited template item keys.
+		$duplicate_item = CArrayHelper::findDuplicate($tpl_items, 'key_');
+		if ($duplicate_item !== null) {
+			$host = reset($chd_hosts);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, _params(
+				$this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), [$duplicate_item['key_'], $host['host']]
+			));
+		}
+
 		$chd_items_tpl = [];
 		$chd_items_key = [];
 
