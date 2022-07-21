@@ -66,7 +66,7 @@ class testAuditSettings extends testPageReportsAuditValues {
 			"\nsettings.severity_color_3: FFA059 => FFA058".
 			"\nsettings.severity_color_4: E97659 => E97658".
 			"\nsettings.severity_color_5: E45959 => E45958".
-			"\nsettings.severity_name_0: Not classified => Updated Not slassified".
+			"\nsettings.severity_name_0: Not classified => Updated Not classified".
 			"\nsettings.severity_name_1: Information => Updated Information".
 			"\nsettings.severity_name_2: Warning => Updated Warning".
 			"\nsettings.severity_name_3: Average => Updated Average".
@@ -98,7 +98,7 @@ class testAuditSettings extends testPageReportsAuditValues {
 			'severity_color_3' => 'FFA058',
 			'severity_color_4' => 'E97658',
 			'severity_color_5' => 'E45958',
-			'severity_name_0' => 'Updated Not slassified',
+			'severity_name_0' => 'Updated Not classified',
 			'severity_name_1' => 'Updated Information',
 			'severity_name_2' => 'Updated Warning',
 			'severity_name_3' => 'Updated Average',
