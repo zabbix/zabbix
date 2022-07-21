@@ -256,18 +256,15 @@ class CSelect extends CTag {
 	}
 
 	protected function startToString() {
-		$res = '<'.$this->tagname;
+		$attributes = '';
+
 		foreach ($this->attributes as $key => $value) {
-			if ($value === null) {
-				continue;
+			if ($value !== null) {
+				$attributes .= ' '.$key.'="'.$this->encode($value, $this->attrEncStrategy).'"';
 			}
-
-			$value = $this->encode($value, $this->attrEncStrategy);
-			$res .= ' '.$key.'="'.$value.'"';
 		}
-		$res .= '>';
 
-		return $res;
+		return '<'.$this->tagname.$attributes.'>';
 	}
 
 	public function toString($destroy = true) {
