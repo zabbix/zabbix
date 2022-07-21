@@ -19,7 +19,7 @@ This template was tested on:
 
 This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to [AdminServer](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver).  
 By default AdminServer is enabled and listens on port 8080.  
-You can еnable or configure AdminServer parameters according [official documentations](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).  
+You can enable or configure AdminServer parameters according [official documentations](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).  
 Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.
 
 
@@ -106,7 +106,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Zookeeper: Server mode has changed (new mode: {ITEM.VALUE}) |<p>Zookeeper node state has changed. Ack to close.</p> |`{TEMPLATE_NAME:zookeeper.server_state.diff()}=1 and {TEMPLATE_NAME:zookeeper.server_state.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Zookeeper: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:zookeeper.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
+|Zookeeper: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:zookeeper.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Zookeeper: Failed to fetch info data (or no data for 10m) |<p>Zabbix has not received data for items for the last 10 minutes</p> |`{TEMPLATE_NAME:zookeeper.uptime.nodata(10m)}=1` |WARNING |<p>Manual close: YES</p> |
 |Zookeeper: Version has changed (new version: {ITEM.VALUE}) |<p>Zookeeper version has changed. Ack to close.</p> |`{TEMPLATE_NAME:zookeeper.version.diff()}=1 and {TEMPLATE_NAME:zookeeper.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Zookeeper: Too many file descriptors used (over {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% for 5 min) |<p>Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.</p> |`{TEMPLATE_NAME:zookeeper.open_file_descriptor_count.min(5m)} * 100 / {TEMPLATE_NAME:zookeeper.max_file_descriptor_count.last()} > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}` |WARNING | |

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-21T18:00:09Z</date>
+   <date>2022-07-21T11:20:07Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -857,7 +857,7 @@ return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
                      <expression>{last()}&lt;10m</expression>
                      <name>Zookeeper: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>

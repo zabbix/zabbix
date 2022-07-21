@@ -329,7 +329,7 @@ try {&#13;
 &#13;
     // Create an issue.&#13;
     // Numeric value of the event that triggered an action (1 for problem, 0 for recovering).&#13;
-    // Numeric value of of the problem update status. Possible values:&#13;
+    // Numeric value of the problem update status. Possible values:&#13;
     // 0 - Webhook was called because of problem/recovery event, 1 - Update operation.&#13;
     if ((params.event_source == 0 &amp;&amp; params.event_value == 1 &amp;&amp; params.event_update_status == 0)&#13;
             || (params.event_source == 3 &amp;&amp; params.event_value == 1)&#13;
