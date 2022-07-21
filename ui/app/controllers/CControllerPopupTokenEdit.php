@@ -51,12 +51,6 @@ class CControllerPopupTokenEdit extends CController {
 			return false;
 		}
 
-		if ($this->getInput('admin_mode') === '1') {
-			return ($this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
-				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
-			);
-		}
-
 		return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS);
 	}
 
