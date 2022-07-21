@@ -61,9 +61,7 @@ class testSlaReport extends CWebTest {
 						'Service' => 'Service with problem'
 					],
 					'reporting_period' => 'Daily',
-					'downtimes' => [
-						'names' => ['EXCLUDED DOWNTIME', 'Second downtime']
-					],
+					'downtimes' => ['EXCLUDED DOWNTIME', 'Second downtime'],
 					'check_sorting' => true,
 					'expected' => [
 						'SLO' => '11.111'
@@ -391,21 +389,24 @@ class testSlaReport extends CWebTest {
 
 		// This test is written taking into account that only SLA with daily reporting period has ongoing downtimes.
 		if (array_key_exists('downtimes', $data)) {
+			// Downtime starts from min(SLA creation timestamp, Service creation timestamp).
+			$downtime_start = min(self::$actual_creation_time, self::$service_creation_time);
 			$downtime_values = [];
 			/**
 			 * If the date has changed since data source was executed, then downtimes will be divided into 2 days.
 			 * Such case is covered in the else statement.
 			 */
 			if (date('Y-m-d', time()) === $creation_day) {
-				foreach ($data['downtimes']['names'] as $downtime_name) {
+				foreach ($data['downtimes'] as $downtime_name) {
 					/**
 					 * A second or two can pass from Downtime duration calculation till report is loaded.
 					 * So an array of expected results is created and the presence of actual value in array is checked.
 					 */
 					$single_downtime = [];
-					for ($i = 0; $i <= 5; $i++) {
-						$single_downtime[] = date('Y-m-d H:i', self::$actual_creation_time).' '.$downtime_name.': '
-								.convertUnitsS($load_time - self::$actual_creation_time + $i);
+
+					for ($i = 0; $i <= 3; $i++) {
+						$single_downtime[] = date('Y-m-d H:i', $downtime_start).' '.$downtime_name.': '
+								.convertUnitsS($load_time - $downtime_start + $i);
 					}
 
 					$downtime_values[$downtime_name] = $single_downtime;
@@ -419,13 +420,11 @@ class testSlaReport extends CWebTest {
 			else {
 				foreach ([date('Y-m-d', time()), $creation_day] as $day) {
 					if ($day === $creation_day) {
-						foreach ($data['downtimes']['names'] as $downtime_name) {
+						foreach ($data['downtimes'] as $downtime_name) {
 							/**
-							 * Time is counted from max(SLA creation timestamp, Service creation timestamp till the start
+							 * Time is counted from min(SLA creation timestamp, Service creation timestamp) till the start
 							 * of next period. This time difference is not dependent on view load time, so no need for "for" cycle.
 							 */
-							$downtime_start = max(self::$actual_creation_time, self::$service_creation_time);
-
 							$single_downtime = [];
 							$single_downtime[] = date('Y-m-d H:i', $downtime_start).' '.$downtime_name.': '
 									.convertUnitsS(strtotime('today') - $downtime_start);
@@ -435,10 +434,10 @@ class testSlaReport extends CWebTest {
 						}
 					}
 					else {
-						foreach ($data['downtimes']['names'] as $downtime_name) {
+						foreach ($data['downtimes'] as $downtime_name) {
 							// Time is counted from  period start till page load time.
 							$single_downtime = [];
-							for ($i = 0; $i <= 5; $i++) {
+							for ($i = 0; $i <= 3; $i++) {
 								$single_downtime[] = date('Y-m-d H:i', strtotime('today')).' '.$downtime_name.': '
 										.convertUnitsS($load_time - strtotime('today') + $i);
 							}
@@ -481,15 +480,10 @@ class testSlaReport extends CWebTest {
 					$start_time = max($period['start'], min(self::$actual_creation_time, self::$service_creation_time));
 
 					// Get array of Utime possible values and check that the correct one is there.
-					for ($i = 0; $i <= 5; $i++) {
+					for ($i = 0; $i <= 3; $i++) {
 						$reference_uptime[] = convertUnitsS($load_time - $start_time + $i);
 					}
-var_dump('^^^^^^^^^^^^^^^^^');
-var_dump('From table: '.$uptime);
-var_dump('---------------------------------');
-var_dump('Reference array :');
-var_dump($reference_uptime);
-var_dump('vvvvvvvvvvvvvvvvv');
+
 					$this->assertTrue(in_array($uptime, $reference_uptime));
 
 					// Calculate the error budet based on the actual uptime and compare with actual error budget.
@@ -506,8 +500,8 @@ var_dump('vvvvvvvvvvvvvvvvv');
 				}
 				else {
 					$reference_uptime = [];
-					for ($i = 0; $i <= 5; $i++) {
-						$uptime_start = max(self::$actual_creation_time, self::$service_creation_time);
+					$uptime_start = min(self::$actual_creation_time, self::$service_creation_time);
+					for ($i = 0; $i <= 3; $i++) {
 						$reference_uptime[] = convertUnitsS($period['end'] - $uptime_start + $i);
 					}
 					$this->assertTrue(in_array($uptime, $reference_uptime));

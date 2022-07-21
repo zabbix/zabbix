@@ -196,12 +196,12 @@ class Sla {
 				'excluded_downtimes' => [
 					[
 						'name' => 'EXCLUDED DOWNTIME',
-						'period_from' => time(),
+						'period_from' => time() - 3600,
 						'period_to' => time() + 86400
 					],
 					[
 						'name' => 'Second downtime',
-						'period_from' => time(),
+						'period_from' => time() - 3600,
 						'period_to' => time() + 31536000
 					],
 					[
