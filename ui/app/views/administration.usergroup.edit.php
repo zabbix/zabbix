@@ -38,7 +38,7 @@ if ($data['usrgrpid'] != 0) {
 	$form->addVar('usrgrpid', $data['usrgrpid']);
 }
 
-$form_list = (new CFormGrid())
+$form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
 		new CFormField(
@@ -87,7 +87,7 @@ if ($data['can_update_group']) {
 		->addOptions(CSelect::createOptionsFromArray($data['userdirectories']))
 		->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-	$form_list
+	$form_grid
 		->addItem([
 			(new CLabel(_('Frontend access'), $select_gui_access->getFocusableElementId())),
 			new CFormField($select_gui_access)
@@ -106,7 +106,7 @@ if ($data['can_update_group']) {
 		]);
 }
 else {
-	$form_list
+	$form_grid
 		->addItem([
 			new CLabel(_('Frontend access')),
 			new CFormField(
@@ -124,7 +124,7 @@ else {
 			)
 		]);
 }
-$form_list
+$form_grid
 	->addItem([
 		new CLabel(_('Debug mode')),
 		new CFormField(
@@ -298,7 +298,7 @@ $tag_filter_form_list->addItem([
 ]);
 
 $tabs = (new CTabView())
-	->addTab('user_group_tab', _('User group'), $form_list)
+	->addTab('user_group_tab', _('User group'), $form_grid)
 	->addTab('template_permissions_tab', _('Template permissions'), $template_permissions_form_grid, TAB_INDICATOR_TEMPLATE_PERMISSIONS)
 	->addTab('permissions_tab', _('Host permissions'), $host_permissions_form_grid, TAB_INDICATOR_HOST_PERMISSIONS)
 	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_list, TAB_INDICATOR_TAG_FILTER);
