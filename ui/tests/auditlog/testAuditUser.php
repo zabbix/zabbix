@@ -38,28 +38,47 @@ class testAuditUser extends testPageReportsAuditValues {
 			"\nuser.medias[1].mediaid: 1".
 			"\nuser.medias[1].mediatypeid: 1".
 			"\nuser.medias[1].sendto: audit@audit.com".
+			"\nuser.name: Audit_name".
 			"\nuser.passwd: ******".
-			"\nuser.roleid: 3\nuser.userid: 3".
+			"\nuser.roleid: 3".
+			"\nuser.surname: Audit_surname".
+			"\nuser.userid: 3".
 			"\nuser.username: Audit".
 			"\nuser.usrgrps[5]: Added".
 			"\nuser.usrgrps[5].id: 5".
 			"\nuser.usrgrps[5].usrgrpid: 7";
 
-	public $updated = "usergroup.debug_mode: 0 => 1".
-			"\nusergroup.name: Audit user groups => Updated user group name".
-			"\nusergroup.users_status: 0 => 1";
+	public $updated = "user.medias[1]: Deleted".
+			"\nuser.medias[2]: Added".
+			"\nuser.medias[2].mediaid: 2".
+			"\nuser.medias[2].mediatypeid: 1".
+			"\nuser.medias[2].sendto: update_audit@audit.com".
+			"\nuser.name: Audit_name => Updated_Audit_name".
+			"\nuser.passwd: ****** => ******".
+			"\nuser.surname: Audit_surname => Updated_Audit_surname".
+			"\nuser.username: Audit => updated_Audit".
+			"\nuser.usrgrps[5]: Deleted".
+			"\nuser.usrgrps[6]: Added".
+			"\nuser.usrgrps[6].id: 6".
+			"\nuser.usrgrps[6].usrgrpid: 11";
 
-	public $deleted = 'Description: Updated user group name';
+	public $deleted = 'Description: updated_Audit';
 
 	public $resource_name = 'User';
 
 	public $login = '';
+
+	public $logout = '';
+
+	public $failed_login = '';
 
 	public function prepareCreateData() {
 		$ids = CDataHelper::call('user.create', [
 			[
 				'username' => 'Audit',
 				'passwd' => 'zabbixzabbix',
+				'name' => 'Audit_name',
+				'surname' => 'Audit_surname',
 				'roleid' => '3',
 				'usrgrps' => [
 					[
@@ -100,27 +119,63 @@ class testAuditUser extends testPageReportsAuditValues {
 	}
 
 	/**
-	 * Check audit of User group.
+	 * Check audit of User logout.
 	 */
-//	public function testAuditUser_Update() {
-//		CDataHelper::call('usergroup.update', [
-//			[
-//				'usrgrpid' => self::$ids,
-//				'users_status' => 1,
-//				'debug_mode' => 1,
-//				'name' => 'Updated user group name'
-//			]
-//		]);
+	public function testAuditUser_Logout() {
+		CDataHelper::call('user.logout', []);
 
-//		$this->checkAuditValues(self::$ids, 'Update');
-//	}
+		$this->checkAuditValues(self::$ids, 'Logout');
+	}
 
-//	/**
-//	 * Check audit of deleted User group.
-//	 */
-//	public function testAuditUser_Delete() {
-//		CDataHelper::call('usergroup.delete', [self::$ids]);
+	/**
+	 * Check audit of User failed login.
+	 */
+	public function testAuditUser_FailedLogin() {
+		CAPIHelper::authorize('Audit', 'incorrect_pas');
 
-//		$this->checkAuditValues(self::$ids, 'Delete');
-//	}
+		$this->checkAuditValues(self::$ids, 'Failed login');
+	}
+
+	/**
+	 * Check audit of User update.
+	 */
+	public function testAuditUser_Update() {
+		CAPIHelper::authorize('Admin', 'zabbix');
+		CDataHelper::call('user.update', [
+			[
+				'userid' => self::$ids,
+				'username' => 'updated_Audit',
+				'passwd' => 'updatezabbix',
+				'name' => 'Updated_Audit_name',
+				'surname' => 'Updated_Audit_surname',
+				'usrgrps' => [
+					[
+						'usrgrpid' => '11'
+					]
+				],
+				'medias' => [
+					[
+						'mediatypeid' => '1',
+						'sendto' => [
+							'update_audit@audit.com'
+						],
+						'active' => 0,
+						'severity' => 63,
+						'period' => '1-7,00:00-24:00'
+					]
+				]
+			]
+		]);
+
+		$this->checkAuditValues(self::$ids, 'Update');
+	}
+
+	/**
+	 * Check audit of User delete.
+	 */
+	public function testAuditUser_Delete() {
+		CDataHelper::call('user.delete', [self::$ids]);
+
+		$this->checkAuditValues(self::$ids, 'Delete');
+	}
 }

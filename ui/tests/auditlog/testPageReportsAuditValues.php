@@ -31,6 +31,8 @@ class testPageReportsAuditValues extends CWebTest {
 	public $deleted;
 	public $config_refresh;
 	public $login;
+	public $logout;
+	public $failed_login;
 
 	public $resource_name;
 
@@ -86,6 +88,14 @@ class testPageReportsAuditValues extends CWebTest {
 
 			case 'Login':
 				$audit = $this->login;
+				break;
+
+			case 'Logout':
+				$audit = $this->logout;
+				break;
+
+			case 'Failed login':
+				$audit = $this->failed_login;
 				break;
 		}
 
