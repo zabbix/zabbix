@@ -758,7 +758,33 @@ ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
 zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value);
 void		zbx_db_tag_free(zbx_db_tag_t *tag);
 
+typedef struct _zbx_template_item_param_t zbx_template_item_param_t;
+struct _zbx_template_item_param_t
+{
+	zbx_uint64_t	item_parameterid;
+#define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_RESET_FLAG	__UINT64_C(0x000000000000)
+#define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME	__UINT64_C(0x000000000001)
+#define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE	__UINT64_C(0x000000000002)
+#define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE			\
+		(ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME |	\
+		ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE	\
+		)
+
+#define ZBX_FLAG_TEMPLATE_ITEM_PARAM_DELETE		__UINT64_C(0x000000010000)
+
+	zbx_uint64_t	upd_flags;
+	char		*name_orig;
+	char		*name;
+	char		*value_orig;
+	char		*value;
+};
+
+ZBX_PTR_VECTOR_DECL(item_param_ptr, zbx_template_item_param_t *)
+
+void	zbx_item_params_free(zbx_template_item_param_t *param);
+
 int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, const char *owner, char **error);
+int	zbx_merge_item_param(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_param_ptr_t *src, const char *owner, char **error);
 
 typedef enum
 {

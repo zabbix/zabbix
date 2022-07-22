@@ -56,25 +56,6 @@ struct _zbx_template_item_preproc_t
 
 ZBX_PTR_VECTOR_IMPL(item_preproc_ptr, zbx_template_item_preproc_t *)
 
-struct _zbx_template_item_param_t
-{
-	zbx_uint64_t	item_parameterid;
-#define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_RESET_FLAG	__UINT64_C(0x000000000000)
-#define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME	__UINT64_C(0x000000000001)
-#define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE	__UINT64_C(0x000000000002)
-#define ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE			\
-		(ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME |	\
-		ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE	\
-		)
-
-#define ZBX_FLAG_TEMPLATE_ITEM_PARAM_DELETE		__UINT64_C(0x000000010000)
-
-	zbx_uint64_t	upd_flags;
-	char		*name_orig;
-	char		*name;
-	char		*value_orig;
-	char		*value;
-};
 
 ZBX_PTR_VECTOR_IMPL(item_param_ptr, zbx_template_item_param_t *)
 
@@ -1358,7 +1339,7 @@ static void	zbx_item_preproc_free(zbx_template_item_preproc_t *preproc)
 	zbx_free(preproc);
 }
 
-static void	zbx_item_params_free(zbx_template_item_param_t *param)
+void	zbx_item_params_free(zbx_template_item_param_t *param)
 {
 	if (0 != (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME))
 		zbx_free(param->name_orig);
