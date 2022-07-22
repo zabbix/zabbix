@@ -88,17 +88,17 @@ class CControllerPopupCopyEdit extends CController {
 		switch ($data['source']) {
 			case 'items':
 				$data['itemids'] = $this->getInput('itemids');
-				$data['element_type'] = 'itemids';
+				$data['element_type'] = 'items';
 				break;
 
 			case 'triggers':
 				$data['triggerids'] = $this->getInput('triggerids');
-				$data['element_type'] = 'triggerids';
+				$data['element_type'] = 'triggers';
 				break;
 
 			case 'graphs':
 				$data['graphids'] = $this->getInput('graphids');
-				$data['element_type'] = 'graphids';
+				$data['element_type'] = 'graphs';
 				break;
 		}
 

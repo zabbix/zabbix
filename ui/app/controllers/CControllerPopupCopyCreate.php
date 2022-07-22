@@ -72,30 +72,29 @@ class CControllerPopupCopyCreate extends CController {
 			return false;
 		}
 
-		switch ($source) {
-			case 'items':
-				$items_count = API::Item()->get([
-					'countOutput' => true,
-					'itemids' => $this->getInput('itemids')
-				]);
+		if ($source === 'items' && $this->hasInput('itemids')) {
+			$items_count = API::Item()->get([
+				'countOutput' => true,
+				'itemids' => $this->getInput('itemids')
+			]);
 
-				return $items_count == count($this->getInput('itemids'));
+			return $items_count == count($this->getInput('itemids'));
+		}
+		elseif ($source === 'triggers' && $this->hasInput('triggerids')) {
+			$triggers_count = API::Trigger()->get([
+				'countOutput' => true,
+				'triggerids' => $this->getInput('triggerids')
+			]);
 
-			case 'triggers':
-				$triggers_count = API::Trigger()->get([
-					'countOutput' => true,
-					'triggerids' => $this->getInput('triggerids')
-				]);
+			return $triggers_count == count($this->getInput('triggerids'));
+		}
+		elseif ($source === 'graphs' && $this->hasInput('graphids')) {
+			$graphs_count = API::Graph()->get([
+				'countOutput' => true,
+				'graphids' => $this->getInput('graphids')
+			]);
 
-				return $triggers_count == count($this->getInput('triggerids'));
-
-			case 'graphs':
-				$graphs_count = API::Graph()->get([
-					'countOutput' => true,
-					'graphids' => $this->getInput('graphids')
-				]);
-
-				return $graphs_count == count($this->getInput('graphids'));
+			return $graphs_count == count($this->getInput('graphids'));
 		}
 
 		return false;

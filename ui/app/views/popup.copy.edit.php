@@ -29,20 +29,22 @@ $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-switch($data['element_type']) {
-	case 'itemids':
+switch ($data['element_type']) {
+	case 'items':
 		$form
 			->addVar('itemids', $data['itemids'])
 			->addVar('source', 'items');
 		$header = _n('Copy %1$s item', 'Copy %1$s items', count($data['itemids']));
 		break;
-	case 'triggerids':
+
+	case 'triggers':
 		$form
 			->addVar('triggerids', $data['triggerids'])
 			->addVar('source', 'triggers');
 		$header = _n('Copy %1$s trigger', 'Copy %1$s triggers', count($data['triggerids']));
 		break;
-	case 'graphids':
+
+	case 'graphs':
 		$form
 			->addVar('graphids', $data['graphids'])
 			->addVar('source', 'graphs');
