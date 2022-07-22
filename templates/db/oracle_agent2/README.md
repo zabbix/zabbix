@@ -165,8 +165,8 @@ There are no template links in this template.
 |Zabbix raw items |Oracle: Get FRA stats |<p>Get FRA statistics.</p> |ZABBIX_PASSIVE |oracle.fra.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get SGA stats |<p>Get SGA statistics.</p> |ZABBIX_PASSIVE |oracle.sga.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get tablespaces stats |<p>Get tablespaces stats.</p> |ZABBIX_PASSIVE |oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
-|Zabbix raw items |Oracle: Get CDB and No-CDB info |<p>Get info about CDB and  No-CDB databases on instansce.</p> |ZABBIX_PASSIVE |oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
-|Zabbix raw items |Oracle: Get PDB info |<p>Get info about PDB databases on instansce.</p> |ZABBIX_PASSIVE |oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
+|Zabbix raw items |Oracle: Get CDB and No-CDB info |<p>Get info about CDB and  No-CDB databases on instance.</p> |ZABBIX_PASSIVE |oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
+|Zabbix raw items |Oracle: Get PDB info |<p>Get info about PDB databases on instance.</p> |ZABBIX_PASSIVE |oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get archive log info | |ZABBIX_PASSIVE |oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get ASM stats |<p>Get ASM disk groups stats.</p> |ZABBIX_PASSIVE |oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 
