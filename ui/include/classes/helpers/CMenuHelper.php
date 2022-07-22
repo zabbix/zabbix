@@ -40,7 +40,6 @@ class CMenuHelper {
 				: null
 		);
 
-
 		$submenu_monitoring = [
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
 				? (new CMenuItem(_('Problems')))
@@ -483,7 +482,10 @@ class CMenuHelper {
 
 		foreach (CRoleHelper::getUiSectionsLabels(CWebUser::$data['type']) as $section_label) {
 			$section_submenu = $menu->find($section_label);
-			if ($section_submenu instanceof CMenuItem && $section_label != 'Dashboards') {
+			if ($section_submenu instanceof CMenuItem  && !$section_submenu->hasSubMenu()) {
+				return $menu->getMenuItems()[0];
+			}
+			elseif ($section_submenu instanceof CMenuItem) {
 				$menu = $section_submenu
 					->getSubMenu()
 					->getMenuItems();

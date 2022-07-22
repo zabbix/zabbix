@@ -96,7 +96,7 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 					&& $data['rules']['ui'][$rule_key]
 				)
 				->setReadonly($data['readonly'])
-				->setLabel($rule_label != 'Dashboards' ? $rule_label : '')
+				->setLabel(count($data['labels']['rules'][$section_key])===1 ? '' : $rule_label)
 				->setUncheckedValue(0)
 		);
 	}
