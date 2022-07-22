@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-30 13:38+0000\n"
+"PO-Revision-Date: 2022-07-21 12:03+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -11963,7 +11963,7 @@ msgstr "最低限必要なPHPのバージョンは%1$sです。"
 #: app/views/administration.housekeeping.edit.php:175
 #, c-format
 msgid "Minimum required TimescaleDB version is %1$s."
-msgstr ""
+msgstr "最低限必要なTimescaleDBのバージョンは%1$sです。"
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -14467,7 +14467,7 @@ msgstr "位置"
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
-msgstr ""
+msgstr "位置は、単位がs、uptime、unixtimeの時は無視されます。"
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -14479,7 +14479,7 @@ msgstr "POSTデータの形式"
 
 #: app/views/administration.housekeeping.edit.php:165
 msgid "PostgreSQL database server version is too old."
-msgstr ""
+msgstr "PostgreSQLデータベースサーバーのバージョンが古すぎます。"
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -18674,62 +18674,62 @@ msgstr "トリガーのプロトタイプ\"%1$s\"はリンクされている他�
 #: include/classes/api/services/CDiscoveryRule.php:916
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "トリガーのプロトタイプ\"%1$s\"は、ホスト\"%3$s\"に存在しないトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:915
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
-msgstr ""
+msgstr "トリガーのプロトタイプ\"%1$s\"は、テンプレート\"%3$s\"に存在しないトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2684
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "子テンプレートまたはホストからの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、ホスト\"%3$s\"からのトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2683
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "子テンプレートまたはホストからの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、テンプレート\"%3$s\"からのトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2573
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "親テンプレートからの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、テンプレート\"%3$s\"からトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2424
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "テンプレートトリガーのホストトリガーへの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、トリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2813
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%3$s\"はホスト\"%4$s\"にリンクされていないため、トリガーのプロトタイプ\"%1$s\"はトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2812
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%3$s\"はテンプレート\"%4$s\"にリンクされていないため、トリガーのプロトタイプ\"%1$s\"はトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2306
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "ホスト\"%4$s\"に対して循環リンク(%3$s)が発生してしまうため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2301
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%4$s\"に対して循環リンク(%3$s)が発生してしまうため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2317
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "循環リンク(%3$s)が発生してしまうため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:1325
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
-msgstr ""
+msgstr "別のLLDルールからトリガーのプロトタイプへの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:1715
 #, c-format
@@ -19065,11 +19065,11 @@ msgstr "設定ファイルが上書きできません。"
 
 #: app/views/administration.housekeeping.edit.php:160
 msgid "Unable to retrieve TimescaleDB compression support status."
-msgstr ""
+msgstr "TimescaleDBの圧縮サポートステータスを取得できません。"
 
 #: app/views/administration.housekeeping.edit.php:170
 msgid "Unable to retrieve TimescaleDB version."
-msgstr ""
+msgstr "TimescaleDBのバージョンを取得できません。"
 
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
@@ -19260,22 +19260,22 @@ msgstr "ミュートを解除"
 #: app/partials/administration.system.info.php:160
 #, c-format
 msgid "Unsupported %1$s database server version. Must be at least %2$s."
-msgstr ""
+msgstr "データベースサーバーのバージョン%1$sはサポートされていません。%2$s以上が必要です。"
 
 #: app/partials/administration.system.info.php:173
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
-msgstr ""
+msgstr "データベースサーバーのバージョン%1$sはサポートされていません。%2$sより高いバージョンは使用できません。"
 
 #: app/views/administration.housekeeping.edit.php:179
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
-msgstr ""
+msgstr "サポートされていないTimescaleDBのバージョンです。 %1$s以上が必要です。"
 
 #: app/views/administration.housekeeping.edit.php:189
 #, c-format
 msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
-msgstr ""
+msgstr "サポートされていないTimescaleDBのバージョンです。%1$sより高いバージョンは使用できません。"
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -19865,6 +19865,10 @@ msgstr ""
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMwareクラスターのパフォーマンスカウンター、 <url> - VMwareサービスURL、<id> - VMwareクラスターid、<path> - パフォーマンスカウンターのパス、<instance> - パフォーマンスカウンターのインスタンス"
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMwareクラスターの状態、<url> - VMwareサービスURL、<name> - VMwareクラスター名"
@@ -19901,6 +19905,10 @@ msgstr "VMwareデータストアのバイト単位かトータルからのパー
 #: include/classes/data/CItemData.php:1234
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "VMwareデータストアのハイパーバイザーのリスト、<url> - VMwareサービスURL>、<datastore> - データストア名"
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -19997,6 +20005,10 @@ msgstr "VMwareハイパーバイザーのプロセッサーモデル、<url> - V
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのプロセッサー利用量(Hz)、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
+
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20129,6 +20141,10 @@ msgstr "VMware仮想マシンのプロセッサ有効時間(ms)、<url> - VMware
 #: include/classes/data/CItemData.php:1430
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのプロセッサ利用量(Hz)、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
+
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20513,12 +20529,12 @@ msgstr "警告メッセージ"
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
-msgstr ""
+msgstr "警告！データベースのバージョンを取得できません。"
 
 #: app/partials/administration.system.info.php:166
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
-msgstr ""
+msgstr "警告！データベースサーバーのバージョン%1$sはサポートされていません。%2$s以上が必要です。"
 
 #: app/partials/administration.system.info.php:167
 #, c-format
@@ -20528,7 +20544,7 @@ msgstr "警告！データベースサーバーのバージョン%1$sはサポ�
 #: app/partials/administration.system.info.php:179
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
-msgstr ""
+msgstr "警告！データベースサーバーのバージョン%1$sはサポートされていません。%2$sより高いバージョンは使用できません。"
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-06 20:35+0000\n"
+"PO-Revision-Date: 2022-07-18 08:27+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -621,7 +621,7 @@ msgstr "Acção"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Ação"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -695,7 +695,7 @@ msgstr "Acções"
 #: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Ações"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -1303,7 +1303,7 @@ msgstr "Aplicar permissões e filtros de tags a todos os subgrupos"
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "Aplicar permissões a todos os subgrupos"
 
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.maintenance.list.php:105
@@ -1648,7 +1648,7 @@ msgstr "Disponível"
 #: app/views/monitoring.widget.hostavail.view.php:37
 msgctxt "compact table header"
 msgid "Available"
-msgstr ""
+msgstr "Disponível"
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -19995,6 +19995,10 @@ msgstr ""
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Status do cluster VMware, <url> URL de serviço do VMware, <name> nome do cluster VMware"
@@ -20030,6 +20034,10 @@ msgstr "Estatísticas de capacidade do datastore em bytes ou em percentagem do t
 
 #: include/classes/data/CItemData.php:1234
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1238
@@ -20127,6 +20135,10 @@ msgstr "Modelo do processador do hypervisor VMware, <url> - url de serviço do V
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Utilização do processador do hypervisor VMware em Hz, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
+
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20259,6 +20271,10 @@ msgstr "Tempo em prontidão do processador da máquina virtual em milisegundos, 
 #: include/classes/data/CItemData.php:1430
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Utilização de processador pela máquina virtual VMware em Hz, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
+
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
