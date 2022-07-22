@@ -48,7 +48,7 @@ class IntegrationTests {
 		$suite = new TestSuite('Integration');
 		$suite->addTestSuite('testTimescaleDb');
 		$suite->addTestSuite('testDataCollection');
-		$suite->addTestSuite('testDiagnosticDataTask');
+		/*$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
 		$suite->addTestSuite('testItemState');
@@ -67,7 +67,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHighAvailability');
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
-		$suite->addTestSuite('testActiveAvailability');
+		$suite->addTestSuite('testActiveAvailability');*/
 
 		return $suite;
 	}
