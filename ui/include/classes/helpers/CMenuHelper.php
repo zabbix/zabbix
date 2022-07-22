@@ -31,10 +31,10 @@ class CMenuHelper {
 		$menu = new CMenu();
 
 		$menu->add(
-			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
+			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
 				? (new CMenuItem(_('Dashboards')))
 					->setId('dashboard')
-					->setIcon('icon-dashboards')// TODO new icon needs to be added
+					->setIcon('icon-dashboards')
 					->setAction('dashboard.view')
 					->setAliases(['dashboard.list'])
 				: null
@@ -215,7 +215,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Data collection')))
 					->setId('config')
-					->setIcon('icon-datacollection')// TODO new icon needs to be added
+					->setIcon('icon-data-collection')
 					->setSubMenu(new CMenu($submenu_data_collection))
 			);
 		}
@@ -252,8 +252,9 @@ class CMenuHelper {
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS)
 							? (new CMenuItem(_('Autoregistration actions')))
 								->setUrl(
-									(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_AUTOREGISTRATION),
-									'actionconf.php?eventsource='.EVENT_SOURCE_AUTOREGISTRATION
+									(new CUrl('actionconf.php'))
+										->setArgument('eventsource', EVENT_SOURCE_AUTOREGISTRATION),
+										'actionconf.php?eventsource='.EVENT_SOURCE_AUTOREGISTRATION
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS)
