@@ -30,15 +30,15 @@ class CMenuHelper {
 	public static function getMainMenu(): CMenu {
 		$menu = new CMenu();
 
-		$menu->add(
-			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
-				? (new CMenuItem(_('Dashboards')))
+		if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)) {
+			$menu->add(
+				(new CMenuItem(_('Dashboards')))
 					->setId('dashboard')
 					->setIcon('icon-dashboards')
 					->setAction('dashboard.view')
 					->setAliases(['dashboard.list'])
-				: null
-		);
+			);
+		}
 
 		$submenu_monitoring = [
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
