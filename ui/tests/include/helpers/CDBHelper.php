@@ -362,9 +362,9 @@ class CDBHelper {
 			$cmd .= ' '.$file;
 
 			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
-				$cmd_tdb = 'psql -U '.$DB['USER'].$server.$port.' -d'.$db_name.' -c "SELECT timescaledb_pre_restore();"; ';
+				$cmd_tdb = 'psql --username='.$DB['USER'].$server.$port.' --dbname='.$DB['DATABASE'].' --command="SELECT timescaledb_pre_restore();"; ';
 				$cmd_tdb .= $cmd .' 2>/dev/null; ';
-				$cmd_tdb .= 'psql -U '.$DB['USER'].$server.$port.' -d'.$db_name.' -c "SELECT timescaledb_post_restore();" ';
+				$cmd_tdb .= 'psql --username='.$DB['USER'].$server.$port.' --dbname='.$DB['DATABASE'].' --command="SELECT timescaledb_post_restore();" ';
 				exec($cmd_tdb, $output, $result_code);
 			}
 			else {
