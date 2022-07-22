@@ -188,7 +188,7 @@ class testDataCollection extends CIntegrationTest {
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @hosts agent
 	 */
-	/*public function testDataCollection_checkAgentData() {
+	public function testDataCollection_checkAgentData() {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "agent": interface became available',
 			'resuming Zabbix agent checks on host "agent": connection restored'
@@ -212,7 +212,7 @@ class testDataCollection extends CIntegrationTest {
 		foreach ($active_data['result'] as $item) {
 			$this->assertEquals('agent', $item['value']);
 		}
-	}*/
+	}
 
 	/**
 	 * Test if custom active checks are processed.
@@ -220,7 +220,7 @@ class testDataCollection extends CIntegrationTest {
 	 * @required-components server
 	 * @hosts custom_agent
 	 */
-	/*public function testDataCollection_checkCustomActiveChecks() {
+	public function testDataCollection_checkCustomActiveChecks() {
 		$host = 'custom_agent';
 		$items = [];
 
@@ -275,7 +275,7 @@ class testDataCollection extends CIntegrationTest {
 				$this->assertEquals($value[$field], $item[$field]);
 			}
 		}
-	}*/
+	}
 
 	/**
 	 * Component configuration provider for proxy related tests.
@@ -312,7 +312,7 @@ class testDataCollection extends CIntegrationTest {
 	 * @configurationDataProvider proxyConfigurationProvider
 	 * @hosts proxy_agent
 	 */
-	/*public function testDataCollection_checkProxyData() {
+	public function testDataCollection_checkProxyData() {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "proxy"');
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server');
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, [
@@ -338,5 +338,5 @@ class testDataCollection extends CIntegrationTest {
 		foreach ($active_data['result'] as $item) {
 			$this->assertEquals('proxy_agent', $item['value']);
 		}
-	}*/
+	}
 }
