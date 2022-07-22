@@ -451,21 +451,18 @@ class CRoleHelper {
 			case self::UI_SECTION_ALERTS:
 				$labels = [];
 
-				if ($user_type === USER_TYPE_SUPER_ADMIN) {
+				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels += [
 						self::UI_CONFIGURATION_TRIGGER_ACTIONS => _('Trigger actions'),
-					];
+						self::UI_CONFIGURATION_SERVICE_ACTIONS => _('Service actions'),
+						self::UI_CONFIGURATION_DISCOVERY_ACTIONS => _('Discovery actions'),
+						self::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS  => _('Autoregistration actions'),
+						self::UI_CONFIGURATION_INTERNAL_ACTIONS  => _('Internal actions')
+						];
 				}
-
-				$labels += [
-					self::UI_CONFIGURATION_SERVICE_ACTIONS => _('Service actions')
-				];
 
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels += [
-						self::UI_CONFIGURATION_DISCOVERY_ACTIONS => _('Discovery actions'),
-						self::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS  => _('Autoregistration actions'),
-						self::UI_CONFIGURATION_INTERNAL_ACTIONS  => _('Internal actions'),
 						self::UI_ADMINISTRATION_MEDIA_TYPES => _('Media types'),
 						self::UI_ADMINISTRATION_SCRIPTS => _('Scripts')
 					];
