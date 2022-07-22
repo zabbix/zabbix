@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-23T13:48:16Z</date>
+   <date>2022-07-22T07:43:19Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -174,7 +174,7 @@ The value of sgiKbMemoryAvailable indicates the amount of free memory, in kiloby
                <history>7d</history>
                <units>B</units>
                <params>last("vm.memory.available[sgiKbMemoryAvailable.0]")+last("vm.memory.used[sgiKbMemoryUsed.0]")</params>
-               <description>Total memory in Bytes</description>
+               <description>Total memory in Bytes.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -210,7 +210,7 @@ The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in k
                <value_type>FLOAT</value_type>
                <units>%</units>
                <params>last("vm.memory.used[sgiKbMemoryUsed.0]")/(last("vm.memory.available[sgiKbMemoryAvailable.0]")+last("vm.memory.used[sgiKbMemoryUsed.0]"))*100</params>
-               <description>Memory utilization in %</description>
+               <description>Memory utilization in %.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -341,7 +341,7 @@ Current status of the Fan tray.</description>
                      <trends>0d</trends>
                      <description>MIB: TIMETRA-SYSTEM-MIB&#13;
 The overall status of an equipped power supply. &#13;
-For AC multiple powersupplies, this represents the overall status of the first power supplyin the tray (or shelf).&#13;
+For AC multiple power supplies, this represents the overall status of the first power supply in the tray (or shelf).&#13;
 For any other type, this represents the overall status of the power supply.&#13;
 If tmnxChassisPowerSupply1Status is'deviceStateOk', then all monitored statuses are 'deviceStateOk'.&#13;
 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.</description>
@@ -373,7 +373,7 @@ A value of 'deviceStateFailed' represents a condition where at least one monitor
                      <trends>0d</trends>
                      <description>MIB: TIMETRA-SYSTEM-MIB&#13;
 The overall status of an equipped power supply.&#13;
-For AC multiple powersupplies, this represents the overall status of the second power supplyin the tray (or shelf).&#13;
+For AC multiple power supplies, this represents the overall status of the second power supply in the tray (or shelf).&#13;
 For any other type, this field is unused and set to 'deviceNotEquipped'.&#13;
 If tmnxChassisPowerSupply2Status is 'deviceStateOk', then all monitored statuses are 'deviceStateOk'.&#13;
 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.</description>
