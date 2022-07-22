@@ -38,6 +38,7 @@ class testFormServicesServices extends CWebTest {
 
 	private static $service_sql = 'SELECT * FROM services ORDER BY serviceid';
 	private static $update_service = 'Update service';
+	private static $delete_service = 'Service for delete';
 
 	private static $parentid;
 	private static $childid;
@@ -1268,24 +1269,22 @@ class testFormServicesServices extends CWebTest {
 		);
 	}
 
-	// TODO: Complete this scenario once ZBX-20429 is fixed and merged.
-//	public function testFormMonitoringServices_DeleteService() {
-//		$this->page->login()->open('zabbix.php?action=service.list.edit');
-//		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
-//		$table->findRow('Name', 'Service for delete')->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
-//		$this->page->waitUntilReady();
+	public function testFormServicesServices_DeleteService() {
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+		$table->findRow('Name', 'Service for delete')->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 
-//		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-//		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
-//		$this->page->acceptAlert();
-//		$dialog->ensureNotPresent();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->page->acceptAlert();
+		$dialog->ensureNotPresent();
 
-//		$this->page->waitUntilReady();
-//		$this->assertMessage(TEST_GOOD, 'Service deleted');
-//		$this->assertFalse($this->query('link:Service for delete')->one(false)->isValid());
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Service deleted');
+		$this->assertFalse($this->query('link:Service for delete')->one(false)->isValid());
 
-//		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name="Service for delete"'));
-//	}
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr(self::$delete_service)));
+	}
 
 	/**
 	 * Check all possible options and the default option for the provided dropdown element.

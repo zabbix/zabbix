@@ -981,7 +981,8 @@ class testFormServicesSla extends CWebTest {
 			$form->selectTab('Excluded downtimes');
 
 			foreach ($data['excluded_downtimes'] as $downtime) {
-				$form->query('id:excluded-downtimes')->waitUntilVisible()->one()->query('button:Add')->one()->click();
+				$form->query('id:excluded-downtimes')->waitUntilVisible()->one()->query('button:Add')
+						->waitUntilCLickable()->one()->click();
 				$downtimes_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
 				$downtimes_form->fill($downtime);
 
