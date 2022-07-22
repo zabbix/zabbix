@@ -36,11 +36,11 @@ void	zbx_mock_test_entry(void **state)
 {
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
-	char			*returned_addr = NULL, *expected_addr = NULL;
+	const char		*expected_addr = NULL, *interface = NULL, *key = NULL;
 	char			error[MAX_ERR_LEN];
 	int			ret;
 	int			count, interval, size, timeout;
-	char			*interface = NULL, *key = NULL;
+	char			*returned_addr = NULL;
 
 	ZBX_UNUSED(state);
 	expected_addr = zbx_mock_get_parameter_string("out.address");

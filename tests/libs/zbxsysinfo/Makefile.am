@@ -26,6 +26,7 @@ check_service_test_SOURCES = \
 	../../../src/libs/zbxsysinfo/simple/simple.c \
 	check_service_test.c \
 	../../zbxmocktest.h \
+	../../zbxmockutil.c \
 	../../zbxmockexit.c \
 	../../zbxmockfile.c \
 	../../zbxmocklog.c \

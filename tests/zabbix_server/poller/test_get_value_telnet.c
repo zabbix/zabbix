@@ -23,6 +23,10 @@
 
 int	__wrap_telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
+	ZBX_UNUSED(item);
+	ZBX_UNUSED(result);
+	ZBX_UNUSED(encoding);
+
 	return SYSINFO_RET_OK;
 }
 
@@ -34,7 +38,7 @@ int	zbx_get_value_telnet_test_run(DC_ITEM *item, char **error)
 	init_result(&result);
 	ret = get_value_telnet(item, &result);
 
-	if (NULL != result.msg && '\0' != result.msg)
+	if (NULL != result.msg && '\0' != *(result.msg))
 	{
 		*error = zbx_malloc(NULL, sizeof(char) * strlen(result.msg));
 		zbx_strlcpy(*error, result.msg, strlen(result.msg) * sizeof(char));
