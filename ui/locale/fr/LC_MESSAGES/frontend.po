@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-07-10 16:51+0000\n"
+"PO-Revision-Date: 2022-07-22 13:16+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3453,7 +3453,7 @@ msgstr "Changer"
 #: app/views/administration.proxy.edit.php:126
 #: include/views/configuration.host.prototype.edit.php:398
 msgid "Change PSK"
-msgstr "Change PSK"
+msgstr "Changer PSK"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:354
 #: include/classes/widgets/forms/CWidgetFormItem.php:364
@@ -3480,7 +3480,7 @@ msgstr "Changement de gravité"
 
 #: include/classes/html/CMacroValue.php:162
 msgid "Change type"
-msgstr "Type changé"
+msgstr "Changer le type"
 
 #: app/partials/configuration.filter.items.php:139
 #: app/views/popup.massupdate.item.php:157 include/items.inc.php:127
@@ -3815,7 +3815,7 @@ msgstr "Compression"
 #: app/views/administration.housekeeping.edit.php:173
 #: app/views/administration.housekeeping.edit.php:183
 msgid "Compression is not supported."
-msgstr ""
+msgstr "La compression n'est pas prise en charge."
 
 #: app/views/administration.mediatype.edit.php:319
 msgid "Concurrent sessions"
@@ -5499,7 +5499,7 @@ msgstr "Détails du scénario web"
 
 #: app/views/administration.housekeeping.edit.php:194
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "La licence TimescaleDB détectée ne prend pas en charge la compression. La compression est prise en charge dans TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -5523,7 +5523,7 @@ msgstr "Critère d'unicité de l'équipement"
 
 #: include/httptest.inc.php:31
 msgid "Digest"
-msgstr ""
+msgstr "Digest"
 
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
@@ -6446,7 +6446,7 @@ msgstr "Activé"
 
 #: app/views/administration.authentication.edit.php:299
 msgid "Encrypt"
-msgstr "Chiffrer"
+msgstr "Chiffrement"
 
 #: app/partials/configuration.host.edit.html.php:527
 #: app/views/administration.proxy.edit.php:143
@@ -8461,7 +8461,7 @@ msgstr "Icônes"
 
 #: app/views/administration.authentication.edit.php:222
 msgid "IdP entity ID"
-msgstr ""
+msgstr "ID d'entité de l'IdP"
 
 #: include/classes/core/CModuleManager.php:155
 #, c-format
@@ -10486,7 +10486,7 @@ msgstr "Une chaîne JSON est attendue"
 #: include/classes/core/CJsonRpc.php:146
 #, c-format
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "La génération de l'erreur JSON-RPC a échoué. Aucune erreur de type \"%1$s\"."
 
 #: include/items.inc.php:1825
 #: include/views/configuration.host.discovery.edit.php:865
@@ -10972,7 +10972,7 @@ msgstr "Local"
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
 #: include/views/monitoring.history.php:292
 msgid "Local time"
-msgstr "Temps local"
+msgstr "Heure locale"
 
 #: include/hosts.inc.php:214
 msgid "Location"
@@ -11040,7 +11040,7 @@ msgstr "Requêtes Logout"
 
 #: app/views/administration.authentication.edit.php:293
 msgid "Logout responses"
-msgstr "Réponses de déconnexion"
+msgstr "Réponses Logout"
 
 #: include/discovery.inc.php:139
 msgid "Lost"
@@ -11662,7 +11662,7 @@ msgstr "La version PHP minimale requise est %1$s."
 #: app/views/administration.housekeeping.edit.php:174
 #, c-format
 msgid "Minimum required TimescaleDB version is %1$s."
-msgstr ""
+msgstr "La version minimale requise de TimescaleDB est %1$s."
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -12117,7 +12117,7 @@ msgstr "Prénom"
 
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
-msgstr ""
+msgstr "ID du nom"
 
 #: include/views/js/configuration.httpconf.edit.js.php:176
 msgid "Name of the form field should not exceed 255 characters."
@@ -12758,7 +12758,7 @@ msgstr "Aucune cible sélectionnée."
 #: app/controllers/CControllerActionOperationValidate.php:142
 #: include/classes/api/services/CAction.php:2847
 msgid "No targets specified for action operation global script."
-msgstr ""
+msgstr "Aucune cible spécifiée pour le script global de l'opération d'action."
 
 #: include/triggers.inc.php:91
 #, c-format
@@ -14137,7 +14137,7 @@ msgstr "Position"
 
 #: include/classes/widgets/views/widget.item.form.view.php:142
 msgid "Position is ignored for s, uptime and unixtime units."
-msgstr ""
+msgstr "La position est ignorée pour les unités de types : s, uptime et unixtime."
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -14149,7 +14149,7 @@ msgstr "Type POST"
 
 #: app/views/administration.housekeeping.edit.php:164
 msgid "PostgreSQL database server version is too old."
-msgstr ""
+msgstr "La version du serveur de base de données PostgreSQL est trop ancienne."
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -15594,11 +15594,11 @@ msgstr "agent SNMPv3"
 
 #: app/views/administration.authentication.edit.php:249
 msgid "SP entity ID"
-msgstr ""
+msgstr "ID d'entité du SP"
 
 #: app/views/administration.authentication.edit.php:257
 msgid "SP name ID format"
-msgstr ""
+msgstr "Format d'ID du nom du SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -16696,7 +16696,7 @@ msgstr "Éléments standards"
 
 #: app/partials/administration.ha.nodes.php:45
 msgid "Standby"
-msgstr ""
+msgstr "Veille"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:668
 #: app/controllers/CControllerPopupTriggerExpr.php:787
@@ -17038,7 +17038,7 @@ msgstr "Macros supportées :"
 #: include/html.inc.php:975
 #, c-format
 msgid "Suppressed till: %1$s"
-msgstr "Supprimé jusqu'à: %1$s"
+msgstr "Supprimé jusqu'à : %1$s"
 
 #: include/classes/data/CItemData.php:1109
 msgid "Swap in (from device into memory) statistics. Returns integer"
@@ -18519,7 +18519,7 @@ msgstr "Impossible de charger les paramètres de l'API de maintenance."
 
 #: include/classes/helpers/CSettingsHelper.php:113
 msgid "Unable to load settings API parameters."
-msgstr ""
+msgstr "Impossible de charger les paramètres de l'API de configuration."
 
 #: include/classes/core/CConfigFile.php:257
 msgid "Unable to overwrite the existing configuration file."
@@ -18527,11 +18527,11 @@ msgstr "Impossible d'écrire par-dessus le fichier de configuration existant."
 
 #: app/views/administration.housekeeping.edit.php:159
 msgid "Unable to retrieve TimescaleDB compression support status."
-msgstr ""
+msgstr "Impossible de récupérer l'état de prise en charge de la compression de TimescaleDB."
 
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unable to retrieve TimescaleDB version."
-msgstr ""
+msgstr "Impossible de récupérer la version de TimescaleDB."
 
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
@@ -18719,12 +18719,12 @@ msgstr "Version du serveur de base de données %1$s non supportée. Ne doit pas 
 #: app/views/administration.housekeeping.edit.php:178
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
-msgstr ""
+msgstr "Version de TimescaleDB non prise en charge. Doit être au moins %1$s."
 
 #: app/views/administration.housekeeping.edit.php:188
 #, c-format
 msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
-msgstr ""
+msgstr "Version de TimescaleDB non prise en charge. Ne doit pas être supérieur à %1$s."
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -19246,7 +19246,7 @@ msgstr "Le nom d'utilisateur et le mot de passe doivent être stockés dans les 
 
 #: app/views/administration.authentication.edit.php:241
 msgid "Username attribute"
-msgstr "Attribut nom d'utilisateur"
+msgstr "Attribut du nom d'utilisateur"
 
 #: app/controllers/CControllerPopupGeneric.php:209
 #: app/views/administration.token.list.php:44
@@ -19789,7 +19789,7 @@ msgstr "Le nom visible ne peut pas être vide si le nom d'hôte est manquant."
 #: include/classes/helpers/CServiceHelper.php:57
 #: include/classes/helpers/CServiceHelper.php:67
 msgid "W"
-msgstr ""
+msgstr "P"
 
 #: jsLoader.php:254
 msgctxt "Wednesday short"
@@ -20167,7 +20167,7 @@ msgstr "d/m/Y H:i:s"
 
 #: include/translateDefines.inc.php:43
 msgid "Y-n-d"
-msgstr ""
+msgstr "d/n/Y"
 
 #: include/views/js/monitoring.sysmaps.js.php:445
 msgid "Y1"
@@ -21721,11 +21721,11 @@ msgstr "ne doit pas contenir le nom, le prénom ou le nom de famille de l'utilis
 
 #: include/translateDefines.inc.php:44
 msgid "n-d"
-msgstr ""
+msgstr "d/n"
 
 #: include/translateDefines.inc.php:42
 msgid "n-d H:i"
-msgstr ""
+msgstr "d/n H:i"
 
 #: include/views/configuration.host.discovery.edit.php:204
 #: include/views/configuration.host.discovery.edit.php:361

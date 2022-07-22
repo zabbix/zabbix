@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-06-30 13:36+0000\n"
+"PO-Revision-Date: 2022-07-21 11:03+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -3737,7 +3737,7 @@ msgstr "圧縮"
 #: app/views/administration.housekeeping.edit.php:173
 #: app/views/administration.housekeeping.edit.php:183
 msgid "Compression is not supported."
-msgstr ""
+msgstr "圧縮はサポートされていません。"
 
 #: app/views/administration.mediatype.edit.php:319
 msgid "Concurrent sessions"
@@ -5417,7 +5417,7 @@ msgstr "Webシナリオの詳細"
 
 #: app/views/administration.housekeeping.edit.php:194
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "検出されたTimescaleDBライセンスは、圧縮をサポートしていません。 圧縮はTimescaleDB Community Editionでサポートされています。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -11554,7 +11554,7 @@ msgstr "最低限必要なPHPのバージョンは%1$sです。"
 #: app/views/administration.housekeeping.edit.php:174
 #, c-format
 msgid "Minimum required TimescaleDB version is %1$s."
-msgstr ""
+msgstr "最低限必要なTimescaleDBのバージョンは%1$sです。"
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -14023,7 +14023,7 @@ msgstr "位置"
 
 #: include/classes/widgets/views/widget.item.form.view.php:142
 msgid "Position is ignored for s, uptime and unixtime units."
-msgstr ""
+msgstr "位置は、単位がs、uptime、unixtimeの時は無視されます。"
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -14035,7 +14035,7 @@ msgstr "POSTデータの形式"
 
 #: app/views/administration.housekeeping.edit.php:164
 msgid "PostgreSQL database server version is too old."
-msgstr ""
+msgstr "PostgreSQLデータベースサーバーのバージョンが古すぎます。"
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -18016,62 +18016,62 @@ msgstr "トリガーのプロトタイプ\"%1$s\"はリンクされている他�
 #: include/classes/api/services/CDiscoveryRule.php:916
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "トリガーのプロトタイプ\"%1$s\"は、ホスト\"%3$s\"に存在しないトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:915
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
-msgstr ""
+msgstr "トリガーのプロトタイプ\"%1$s\"は、テンプレート\"%3$s\"に存在しないトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2733
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "子テンプレートまたはホストからの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、ホスト\"%3$s\"からのトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2732
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "子テンプレートまたはホストからの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、テンプレート\"%3$s\"からのトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2622
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "親テンプレートからの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、テンプレート\"%3$s\"からトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2473
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "テンプレートトリガーのホストトリガーへの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、トリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2862
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%3$s\"はホスト\"%4$s\"にリンクされていないため、トリガーのプロトタイプ\"%1$s\"はトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2861
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%3$s\"はテンプレート\"%4$s\"にリンクされていないため、トリガーのプロトタイプ\"%1$s\"はトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2355
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "ホスト\"%4$s\"に対して循環リンク(%3$s)が発生してしまうため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2350
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%4$s\"に対して循環リンク(%3$s)が発生してしまうため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2366
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "循環リンク(%3$s)が発生してしまうため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:1325
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
-msgstr ""
+msgstr "別のLLDルールからトリガーのプロトタイプへの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:1716
 #, c-format
@@ -18397,11 +18397,11 @@ msgstr "設定ファイルが上書きできません。"
 
 #: app/views/administration.housekeeping.edit.php:159
 msgid "Unable to retrieve TimescaleDB compression support status."
-msgstr ""
+msgstr "TimescaleDBの圧縮サポートステータスを取得できません。"
 
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unable to retrieve TimescaleDB version."
-msgstr ""
+msgstr "TimescaleDBのバージョンを取得できません。"
 
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
@@ -18589,12 +18589,12 @@ msgstr "データベースサーバーのバージョン%1$sはサポートさ�
 #: app/views/administration.housekeeping.edit.php:178
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
-msgstr ""
+msgstr "サポートされていないTimescaleDBのバージョンです。 %1$s以上が必要です。"
 
 #: app/views/administration.housekeeping.edit.php:188
 #, c-format
 msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
-msgstr ""
+msgstr "サポートされていないTimescaleDBのバージョンです。%1$sより高いバージョンは使用できません。"
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
