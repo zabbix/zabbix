@@ -31,9 +31,9 @@
 void	zbx_mock_test_entry(void **state)
 {
 	DC_ITEM	item;
-	char		*error = NULL;
-	int		returned_code, expected_code;
-	char		*test_type = NULL;
+	char	*error = NULL;
+	int	returned_code, expected_code;
+	char	*test_type = NULL;
 
 	ZBX_UNUSED(state);
 	test_type =  zbx_mock_get_parameter_string("in.type");
@@ -49,7 +49,7 @@ void	zbx_mock_test_entry(void **state)
 		item.key =  zbx_mock_get_parameter_string("in.item.key");
 
 		returned_code = zbx_get_value_ssh_test_run(&item, &error);
-		if (SUCCEED != returned_code)
+		if (SUCCEED != returned_code && NULL != error)
 			printf("zbx_get_value_ssh_test_run error: %s\n", error);
 
 		zbx_mock_assert_result_eq("Return value", expected_code, returned_code);
@@ -64,7 +64,7 @@ void	zbx_mock_test_entry(void **state)
 		item.key =  zbx_mock_get_parameter_string("in.item.key");
 
 		returned_code = zbx_get_value_telnet_test_run(&item, &error);
-		if (SUCCEED != returned_code)
+		if (SUCCEED != returned_code && NULL != error)
 			printf("zbx_get_value_telnet_test_run error: %s\n", error);
 
 		zbx_mock_assert_result_eq("Return value", expected_code, returned_code);

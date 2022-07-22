@@ -22,8 +22,6 @@
 
 #include "config.h"
 
-#define SSH_RUN_KEY	"ssh.run"
-
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "dbcache.h"
 

@@ -34,20 +34,21 @@ int	CONFIG_REPORTWRITER_FORKS	= 0;
 
 void	zbx_mock_test_entry(void **state)
 {
-	icmpping_t	icmpping;
-	icmppingsec_type_t type;
-	char		*returned_addr = NULL, *expected_addr = NULL;
-	char		error[MAX_ERR_LEN];
-	int		ret;
-	int		count, interval, size, timeout;
-	char		*interface = NULL, *key = NULL;
+	icmpping_t		icmpping;
+	icmppingsec_type_t	type;
+	char			*returned_addr = NULL, *expected_addr = NULL;
+	char			error[MAX_ERR_LEN];
+	int			ret;
+	int			count, interval, size, timeout;
+	char			*interface = NULL, *key = NULL;
 
 	ZBX_UNUSED(state);
-	expected_addr =zbx_mock_get_parameter_string("out.address");
+	expected_addr = zbx_mock_get_parameter_string("out.address");
 	interface = zbx_mock_get_parameter_string("in.interface");
 	key =  zbx_mock_get_parameter_string("in.key");
 
-	ret = parse_key_params(key, interface, &icmpping, &returned_addr, &count, &interval, &size, &timeout, &type, error, MAX_ERR_LEN);
+	ret = parse_key_params(key, interface, &icmpping, &returned_addr, &count,
+			&interval, &size, &timeout, &type, error, MAX_ERR_LEN);
 	if (SUCCEED != ret)
 		printf("zbx_pinger_test error: %s\n", error);
 
@@ -62,5 +63,7 @@ void	zbx_mock_test_entry(void **state)
 		printf("zbx_pinger_test debug: address is [%s]\n", returned_addr);
 		zbx_mock_assert_str_eq("Returned address", expected_addr, returned_addr);
 	}
+
+	zbx_free(returned_addr);
 }
 

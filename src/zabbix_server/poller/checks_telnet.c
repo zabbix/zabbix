@@ -53,9 +53,10 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 		item->interface.addr = item->interface.dns_orig;
 	}
 
-	if ('\0' == *(item->interface.addr))
+	if (NULL == item->interface.addr ||'\0' == *(item->interface.addr))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Telnet checks must have ip parameter or the host interface to be specified."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL,
+				"Telnet checks must have ip parameter or the host interface to be specified."));
 		goto out;
 	}
 

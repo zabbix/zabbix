@@ -34,6 +34,7 @@ void	zbx_mock_test_entry(void **state)
 	AGENT_RESULT	result;
 	char		*default_addr = NULL, *ip = NULL;
 	int		returned_code, expected_code;
+	char		key[1024];
 
 	ZBX_UNUSED(state);
 
@@ -41,11 +42,18 @@ void	zbx_mock_test_entry(void **state)
 	default_addr = zbx_mock_get_parameter_string("in.interface");
 	ip = zbx_mock_get_parameter_string("in.ip");
 
-	request.nparam = 2;
-	request.params = zbx_malloc(NULL, sizeof(char *) * request.nparam);
-	request.params[0] = "smtp";
-	request.params[1] = ip;
-	request.key = "net.tcp.service[smtp]";
+	init_request(&request);
+	*key = '\0';
+	strcat(key, "net.tcp.service[smtp");
+
+	if (NULL != ip && '\0' != *ip)
+	{
+		strcat(key, ",");
+		strcat(key, ip);
+	}
+
+	strcat(key, "]");
+	parse_item_key(key, &request);
 
 	returned_code = check_service(&request, default_addr, &result, 0);
 	if (SUCCEED != returned_code)
@@ -53,5 +61,6 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_result_eq("Return value", expected_code, returned_code);
 
+	free_request(&request);
 	zbx_free(request.params);
 }
