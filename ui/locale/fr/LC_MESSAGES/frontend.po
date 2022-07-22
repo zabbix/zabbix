@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-07-10 16:53+0000\n"
+"PO-Revision-Date: 2022-07-22 13:18+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3096,7 +3096,7 @@ msgstr "Changer"
 
 #: app/views/administration.autoreg.edit.php:80
 msgid "Change PSK"
-msgstr "Change PSK"
+msgstr "Changer PSK"
 
 #: app/views/administration.authentication.edit.php:80
 #: app/views/administration.mediatype.edit.php:137
@@ -3114,7 +3114,7 @@ msgstr "Changement de gravité"
 
 #: include/classes/html/CMacroValue.php:143
 msgid "Change type"
-msgstr ""
+msgstr "Changer le type"
 
 #: include/forms.inc.php:192 include/items.inc.php:127
 #: include/views/configuration.item.edit.php:568
@@ -5959,7 +5959,7 @@ msgstr "Activé"
 
 #: app/views/administration.authentication.edit.php:230
 msgid "Encrypt"
-msgstr "Chiffrer"
+msgstr "Chiffrement"
 
 #: app/views/administration.proxy.edit.php:124
 #: app/views/administration.proxy.list.php:74
@@ -7879,7 +7879,7 @@ msgstr "Icônes"
 
 #: app/views/administration.authentication.edit.php:153
 msgid "IdP entity ID"
-msgstr ""
+msgstr "ID d'entité de l'IdP"
 
 #: include/classes/core/CModuleManager.php:155
 #, c-format
@@ -10139,7 +10139,7 @@ msgstr "Une chaîne JSON est attendue"
 #: include/classes/core/CJsonRpc.php:150
 #, c-format
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "La génération de l'erreur JSON-RPC a échoué. Aucune erreur de type \"%1$s\"."
 
 #: include/items.inc.php:1792
 #: include/views/configuration.host.discovery.edit.php:669
@@ -10707,11 +10707,11 @@ msgstr "Déconnexion"
 
 #: app/views/administration.authentication.edit.php:218
 msgid "Logout requests"
-msgstr "Demandes de déconnexion"
+msgstr "Requêtes Logout"
 
 #: app/views/administration.authentication.edit.php:224
 msgid "Logout responses"
-msgstr "Réponses de déconnexion"
+msgstr "Réponses Logout"
 
 #: include/discovery.inc.php:139
 msgid "Lost"
@@ -11687,7 +11687,7 @@ msgstr "Prénom"
 
 #: app/views/administration.authentication.edit.php:234
 msgid "Name ID"
-msgstr ""
+msgstr "ID du nom"
 
 #: include/views/js/configuration.httpconf.edit.js.php:100
 msgid "Name of the form field should not exceed 255 characters."
@@ -14983,11 +14983,11 @@ msgstr "agent SNMPv3"
 
 #: app/views/administration.authentication.edit.php:180
 msgid "SP entity ID"
-msgstr ""
+msgstr "ID d'entité du SP"
 
 #: app/views/administration.authentication.edit.php:188
 msgid "SP name ID format"
-msgstr ""
+msgstr "Format d'ID du nom du SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -16373,7 +16373,7 @@ msgstr "Support"
 #: include/html.inc.php:980
 #, c-format
 msgid "Suppressed till: %1$s"
-msgstr "Supprimé jusqu'à: %1$s"
+msgstr "Supprimé jusqu'à : %1$s"
 
 #: app/controllers/CControllerPopupGeneric.php:250
 #: app/views/administration.user.edit.php:74
@@ -18298,7 +18298,7 @@ msgstr "Nom d'utilisateur et mot de passe"
 
 #: app/views/administration.authentication.edit.php:172
 msgid "Username attribute"
-msgstr "Attribut nom d'utilisateur"
+msgstr "Attribut du nom d'utilisateur"
 
 #: app/controllers/CControllerPopupGeneric.php:240
 #: app/views/administration.user.edit.php:34
@@ -19130,7 +19130,7 @@ msgstr "d/m/Y H:i:s"
 
 #: include/translateDefines.inc.php:37
 msgid "Y-n-d"
-msgstr ""
+msgstr "d/n/Y"
 
 #: include/views/js/monitoring.sysmaps.js.php:430
 msgid "Y1"
@@ -19992,7 +19992,7 @@ msgstr "paramètres de nettoyage globaux"
 
 #: app/views/monitoring.charts.view.php:140
 msgid "graph pattern"
-msgstr ""
+msgstr "motif graphique"
 
 #: include/func.inc.php:599 jsLoader.php:146
 msgctxt "hour short"
@@ -20331,11 +20331,11 @@ msgstr "doit contenir au moins une macro de découverte de bas niveau"
 
 #: include/translateDefines.inc.php:38
 msgid "n-d"
-msgstr ""
+msgstr "d/n"
 
 #: include/translateDefines.inc.php:36
 msgid "n-d H:i"
-msgstr ""
+msgstr "d/n H:i"
 
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:221
