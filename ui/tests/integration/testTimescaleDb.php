@@ -56,9 +56,6 @@ class testTimescaleDb extends CIntegrationTest {
 	 * Test TimescaleDb extension.
 	 */
 	public function setExtension() {
-
-		/// getenv('DB')
-
 		self::$db_extension = '';
 
 		$sql = 'SELECT db_extension'.
@@ -87,12 +84,9 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkServerUp() {
-		if (self::$db_extension  === ZBX_DB_EXTENSION_TIMESCALEDB) {
-			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'TimescaleDB version:');
-		}
-		else {
-			$this->assertNotEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
-		}
+		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
+		
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'TimescaleDB version:');
 	}
 
 	/**
@@ -190,37 +184,34 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkHistoryRecords() {
-		if (self::$db_extension  === ZBX_DB_EXTENSION_TIMESCALEDB) {
-			$this->reloadConfigurationCache();
+		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
+		
+		$this->reloadConfigurationCache();
 
-			$count_start = $this->getHistoryCount();
-			$this->assertNotEquals(-1, $count_start);
+		$count_start = $this->getHistoryCount();
+		$this->assertNotEquals(-1, $count_start);
 
-			$c = time() - self::COMPRESSION_OLDER_THAN;
-			$n = 1;
-			for ($i = 0; $i < self::HIST_COUNT; $i++) {
-				$sender_data[$i] = ['value' => $c, 'clock' => $c, 'ns' => $n, 'host' => self::HOSTNAME, 'key' => self::TRAPNAME];
-				$n += 10;
-			}
-			$this->sendDataValues('sender', $sender_data , self::COMPONENT_SERVER);
-
-			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
-
-			$count_end = $this->getHistoryCount();
-			$this->assertNotEquals(-1, $count_end);
-			$this->assertEquals($count_end - $count_start, self::HIST_COUNT);
-
-			$response = $this->call('housekeeping.update',
-				['compression_status' => 1]
-			);
-			$this->assertArrayHasKey(0, $response['result']);
-			$this->assertEquals('compression_status', $response['result'][0]);
-			$this->reloadConfigurationCache();
-			$this->executeHousekeeper();
+		$c = time() - self::COMPRESSION_OLDER_THAN;
+		$n = 1;
+		for ($i = 0; $i < self::HIST_COUNT; $i++) {
+			$sender_data[$i] = ['value' => $c, 'clock' => $c, 'ns' => $n, 'host' => self::HOSTNAME, 'key' => self::TRAPNAME];
+			$n += 10;
 		}
-		else {
-			$this->assertNotEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
-		}
+		$this->sendDataValues('sender', $sender_data , self::COMPONENT_SERVER);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
+
+		$count_end = $this->getHistoryCount();
+		$this->assertNotEquals(-1, $count_end);
+		$this->assertEquals($count_end - $count_start, self::HIST_COUNT);
+
+		$response = $this->call('housekeeping.update',
+			['compression_status' => 1]
+		);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertEquals('compression_status', $response['result'][0]);
+		$this->reloadConfigurationCache();
+		$this->executeHousekeeper();
 	}
 
 /**
@@ -230,13 +221,10 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkCompression() {
-		if (self::$db_extension  === ZBX_DB_EXTENSION_TIMESCALEDB) {
-			$this->executeHousekeeper();
+		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
 
-			$this->getCheckCompression();
-		}
-		else {
-			$this->assertNotEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
-		}
+		$this->executeHousekeeper();
+
+		$this->getCheckCompression();
 	}
 }

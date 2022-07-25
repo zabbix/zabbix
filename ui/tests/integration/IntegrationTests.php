@@ -46,11 +46,11 @@ use PHPUnit\Framework\TestSuite;
 class IntegrationTests {
 	public static function suite() {
 		$suite = new TestSuite('Integration');
-		print("DB = ");
-		print_r(getenv('DB'));
-		print("\n");
-		$suite->addTestSuite('testTimescaleDb');
-		/*$suite->addTestSuite('testDataCollection');
+
+		if  (substr(getenv('DB'), 0, 4) === "tsdb" ) {
+			$suite->addTestSuite('testTimescaleDb');
+		}
+		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
@@ -70,7 +70,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHighAvailability');
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
-		$suite->addTestSuite('testActiveAvailability');*/
+		$suite->addTestSuite('testActiveAvailability');
 
 		return $suite;
 	}
