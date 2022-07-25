@@ -26,7 +26,11 @@ window.action_edit_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
+		this.curl = new Curl('zabbix.php');
+		this.curl.setArgument('action', 'action.list');
+		this.curl.setArgument('eventsource', 0);
 
 		document.getElementById('action-form').style.display = '';
 	}
-};
+
+}

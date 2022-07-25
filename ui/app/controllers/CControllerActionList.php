@@ -33,12 +33,12 @@ class CControllerActionList extends CController {
 					EVENT_SOURCE_SERVICE
 				]),
 			'g_actionid' => 'array_id',
-			'filter_set' => 'string',
-			'filter_rst' =>	'string',
+			'filter_set' => 'in 1',
+			'filter_rst' =>	'in 1',
 			'filter_name' =>'string',
 			'filter_status' =>'in '.implode(',', [-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])
 		];
-
+		// todo: check error messaging for input field validation
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
@@ -55,56 +55,39 @@ class CControllerActionList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS);
-
-		//		$eventsource = getRequest('eventsource', EVENT_SOURCE_TRIGGERS);
-//		$check_actionids = false;
-
-//		if (hasRequest('actionid')) {
-//			$check_actionids[getRequest('actionid')] = true;
-//		}
-
-//		if ($check_actionids) {
-//			$actions = API::Action()->get([
-//				'output' => [],
-//				'actionids' => array_keys($check_actionids),
-//				'filter' => [
-//					'eventsource' => $eventsource
-//				],
-//				'editable' => true
-//			]);
-
-//			if (count($actions) != count($check_actionids)) {
-//				access_deny();
-//			}
-
-//			unset($check_actionids, $actions);
-//		}
 	}
 
 	protected function doAction(): void {
-		$page['file'] = 'zabbix.php';
 		$eventsource = getRequest('eventsource');
+		$sort_field = $this->getInput('sort', CProfile::get('web.action.list.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.action.list.sortorder', ZBX_SORT_UP));
+
+		CProfile::update('web.action.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.action.list.sortorder', $sort_order, PROFILE_TYPE_STR);
+
+		if ($this->hasInput('filter_set')) {
+			CProfile::update('web.action.list.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.action.list.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
+		}
+		elseif ($this->hasInput('filter_rst')) {
+			CProfile::delete('web.action.list.filter_name');
+			CProfile::delete('web.action.list.filter_status');
+		}
 
 		$filter = [
-			'name' => CProfile::get('web.actionconf.filter_name', ''),
-			'status' => CProfile::get('web.actionconf.filter_status', -1)
+			'name' => CProfile::get('web.action.list.filter_name', ''),
+			'status' => CProfile::get('web.action.list.filter_status', -1)
 		];
 
-		$active_tab = 'web.service_actions.filter.active';
-		$profile = 'web.actionconf.filter';
-
-		$sortField = getRequest('sort', CProfile::get('web.actionconf.php.sort', 'name'));
-		$sortOrder = getRequest('sortorder', CProfile::get('web.actionconf.php.sortorder', ZBX_SORT_UP));
-
 		$data = [
-			'action' => $this->getAction(),
 			'eventsource' => $eventsource,
-			'active_tab' => CProfile::get($active_tab, 1),
-			'profileIdx' => $profile,
+			'sort' => $sort_field,
+			'sortorder' => $sort_order,
 			'filter' => $filter,
-			'sort' => $sortField,
-			'sortorder' => $sortOrder
+			'profileIdx' => 'web.action.list.filter',
+			'active_tab' => CProfile::get('web.action.list.filter.active', 1),
 		];
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
@@ -120,10 +103,10 @@ class CControllerActionList extends CController {
 			'selectFilter' => ['formula', 'conditions', 'evaltype'],
 			'selectOperations' => API_OUTPUT_EXTEND,
 			'editable' => true,
-			'sortfield' => $sortField,
+			'sortfield' => $sort_field,
 			'limit' => $limit
 		]);
-		order_result($data['actions'], $sortField, $sortOrder);
+	//	order_result($data['actions'], $sort_field, $sort_order);
 
 		// pager
 		if (hasRequest('page')) {
@@ -133,12 +116,11 @@ class CControllerActionList extends CController {
 			$page_num = 1;
 		}
 		else {
-			$page_num = CPagerHelper::loadPage($page['file']);
+			$page_num = $this->getInput('page', 1);
 		}
 
-		CPagerHelper::savePage($page['file'], $page_num);
-
-		$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sortOrder, (new CUrl('zabbix.php'))
+//		CPagerHelper::savePage($page['file'], $page_num);
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sort_order, (new CUrl('zabbix.php'))
 			->setArgument('action', 'action.list')
 			->setArgument('eventsource', $eventsource)
 		);

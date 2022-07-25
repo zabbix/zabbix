@@ -26,6 +26,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.action.list.js.php';
 
+
 if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
 	$title = _('Service actions');
 	$submenu = null;
@@ -43,19 +44,14 @@ else {
 	$submenu = [];
 	$doc_url = CDocHelper::CONFIGURATION_ACTION_LIST;
 
-	foreach ($submenu_source as $value => $label) {
-		$url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'action.list')
-			->setArgument('eventsource', $value)
-			->getUrl();
-
-		$submenu[$url] = $label;
-	}
+//	foreach ($submenu_source as $value => $label) {
+//		$url = (new CUrl('zabbix.php'))
+//			->setArgument('action', 'action.list')
+//			->setArgument('eventsource', $value)
+//			->getUrl();
+//		$submenu[$url] = $label;
+//	}
 }
-
-$current_url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'action.list')
-	->setArgument('eventsource', $data['eventsource']);
 
 $widget = (new CWidget())
 	->setTitle($title)
@@ -71,13 +67,19 @@ $widget = (new CWidget())
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
-	)
-	->addItem((new CFilter())
-		->setResetUrl($current_url)
-		->addVar('eventsource', $data['eventsource'])
-		->setProfile($data['profileIdx'])
-		->setActiveTab($data['active_tab'])
-		->addFilterTab(_('Filter'), [
+	);
+
+$current_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'action.list')
+	->setArgument('eventsource', $data['eventsource']);
+
+$filter = (new CFilter())
+	->setResetUrl($current_url)
+	//->addVar('action', 'action.list')
+	->addVar('eventsource', $data['eventsource'])
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
 			(new CFormGrid())->addItem([
 				new CLabel(_('Name'), 'filter_name'),
 				(new CTextBox('filter_name', $data['filter']['name']))
@@ -94,9 +96,15 @@ $widget = (new CWidget())
 						->setModern(true)
 				)
 			])
-		])
+		]
 	);
 
+if (in_array($data['eventsource'], [0,1,2,3])) {
+	$filter->addVar('action', 'action.list');
+}
+
+
+$widget->addItem($filter);
 $current_url->removeArgument('filter_rst');
 
 // create form
@@ -161,10 +169,9 @@ if ($this->data['actions']) {
 
 		$actionTable->addRow([
 			new CCheckBox('g_actionid['.$action['actionid'].']', $action['actionid']),
-			(new CLink($action['name'], $current_url
-				->setArgument('form', 'update')
-				->setArgument('actionid', $action['actionid'])
-			)),
+			(new CLink($action['name']))
+				->addClass('js-action-edit')
+				->setAttribute('actionid', $action['actionid']),
 			$conditions,
 			$operations,
 			$status

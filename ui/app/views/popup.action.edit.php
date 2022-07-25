@@ -48,7 +48,7 @@ $condition_table->setFooter(
 		->onClick('
 			PopUp("popup.condition.actions", {
 				type: '.ZBX_POPUP_CONDITION_TYPE_ACTION.',
-				source: '.$data['eventsource'].',
+				source: this.dataset.eventsource,
 			}, {dialogue_class: "modal-popup-medium"});
 		')
 		->addClass(ZBX_STYLE_BTN_LINK)
@@ -107,11 +107,11 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 
 $operations_table->setFooter(
 	(new CSimpleButton(_('Add')))
-		//->setAttribute('data-actionid', $data['actionid'])
-		//->setAttribute('data-eventsource', $data['eventsource'])
-//		->onClick('
-//			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource, '.ACTION_OPERATION.');
-//		')
+		->setAttribute('data-actionid', 0)
+		->setAttribute('data-eventsource', $data['eventsource'])
+		->onClick('
+			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource, '.ACTION_OPERATION.');
+		')
 		->addClass(ZBX_STYLE_BTN_LINK)
 );
 

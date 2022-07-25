@@ -55,6 +55,7 @@ class CRouter {
 	 */
 	private $routes = [
 		// action									controller												layout					view
+		'action.create'								=> ['CControllerActionCreate',							null,					null],
 		'action.enable'								=> ['CControllerActionEnable',							null,					null],
 		'action.delete'								=> ['CControllerActionDelete',							null,					null],
 		'action.disable'							=> ['CControllerActionDisable',							null,					null],

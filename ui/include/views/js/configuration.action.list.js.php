@@ -42,6 +42,9 @@
 				if (e.target.classList.contains('js-action-create')) {
 					this.openActionPopup();
 				}
+				else if (e.target.classList.contains('js-action-edit')) {
+					this.openActionPopup({actionid: e.target.dataset.actionid});		// pass the action id for edit not create functionality.
+				}
 			});
 		},
 

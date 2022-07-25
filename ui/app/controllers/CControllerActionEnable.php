@@ -31,16 +31,16 @@ class CControllerActionEnable extends CController {
 		];
 		// something else?
 
+	// TODO: fix error messaging here
 		$ret = $this->validateInput($fields);
 
-		// todo: FIX wrong error messaging
 		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
+				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])]))->disableView()
+				])])
 			);
 		}
 
@@ -48,9 +48,24 @@ class CControllerActionEnable extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		// check permission to actions -> are they writable?
-		// check permissions to actions ???
-		return true;
+		$eventsource = $this->getInput('eventsource');
+		$check_actionids = [];
+		$check_actionids += array_fill_keys(getRequest('g_actionid'), true);
+
+		if ($check_actionids) {
+			$actions = API::Action()->get([
+				'output' => [],
+				'actionids' => array_keys($check_actionids),
+				'filter' => [
+					'eventsource' => $eventsource
+				],
+				'editable' => true
+			]);
+
+			return (count($actions) == count($check_actionids));
+		}
+
+		return false;
 	}
 
 	protected function doAction(): void {
