@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-16 12:46+0000\n"
+"PO-Revision-Date: 2022-07-22 13:16+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3583,7 +3583,7 @@ msgstr "Reçoit tous les traps SNMP qui n'ont été reçus par aucun élément s
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
 #: include/views/js/monitoring.sysmaps.js.php:35
 msgid "Center"
-msgstr ""
+msgstr "Centre"
 
 #: app/partials/configuration.host.edit.html.php:433
 #: app/partials/configuration.host.edit.html.php:452
@@ -3615,7 +3615,7 @@ msgstr "Changer"
 #: app/views/administration.proxy.edit.php:128
 #: include/views/configuration.host.prototype.edit.php:399
 msgid "Change PSK"
-msgstr ""
+msgstr "Changer PSK"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:354
 #: include/classes/widgets/forms/CWidgetFormItem.php:364
@@ -3642,7 +3642,7 @@ msgstr "Changement de gravité"
 
 #: include/classes/html/CMacroValue.php:162
 msgid "Change type"
-msgstr ""
+msgstr "Changer le type"
 
 #: app/partials/configuration.filter.items.php:139
 #: app/views/popup.massupdate.item.php:157 include/items.inc.php:127
@@ -5754,7 +5754,7 @@ msgstr "Critère d'unicité de l'équipement"
 
 #: include/httptest.inc.php:31
 msgid "Digest"
-msgstr ""
+msgstr "Digest"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:74
 msgid "Digital"
@@ -6710,7 +6710,7 @@ msgstr "Activé"
 
 #: app/views/administration.authentication.edit.php:299
 msgid "Encrypt"
-msgstr "Chiffrer"
+msgstr "Chiffrement"
 
 #: app/partials/configuration.host.edit.html.php:527
 #: app/views/administration.proxy.edit.php:145
@@ -8790,7 +8790,7 @@ msgstr "Icônes"
 
 #: app/views/administration.authentication.edit.php:222
 msgid "IdP entity ID"
-msgstr ""
+msgstr "ID d'entité de l'IdP"
 
 #: include/classes/core/CModuleManager.php:155
 #, c-format
@@ -10846,7 +10846,7 @@ msgstr "Une chaîne JSON est attendue"
 #: include/classes/core/CJsonRpc.php:146
 #, c-format
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "La génération de l'erreur JSON-RPC a échoué. Aucune erreur de type \"%1$s\"."
 
 #: include/items.inc.php:1824
 #: include/views/configuration.host.discovery.edit.php:866
@@ -11436,11 +11436,11 @@ msgstr "Déconnexion"
 
 #: app/views/administration.authentication.edit.php:287
 msgid "Logout requests"
-msgstr "Demandes de déconnexion"
+msgstr "Requêtes Logout"
 
 #: app/views/administration.authentication.edit.php:293
 msgid "Logout responses"
-msgstr "Réponses de déconnexion"
+msgstr "Réponses Logout"
 
 #: include/discovery.inc.php:139
 msgid "Lost"
@@ -11623,7 +11623,7 @@ msgstr "Suppression manuelle des problèmes. L'entrée date-heure accepte le for
 #: include/html.inc.php:1009
 #, c-format
 msgid "Manually by: %1$s"
-msgstr ""
+msgstr "Manuellement par : %1$s"
 
 #: include/actions.inc.php:2070
 msgid "Manually closed"
@@ -12326,7 +12326,7 @@ msgstr "A moi"
 #: include/classes/helpers/CServiceHelper.php:37
 #: include/classes/helpers/CServiceHelper.php:47
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: jsLoader.php:188
 msgctxt "abbreviation of severity level"
@@ -12541,7 +12541,7 @@ msgstr "Prénom"
 
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
-msgstr ""
+msgstr "ID du nom"
 
 #: include/views/js/configuration.httpconf.edit.js.php:176
 msgid "Name of the form field should not exceed 255 characters."
@@ -13208,7 +13208,7 @@ msgstr "Aucune cible sélectionnée."
 #: app/controllers/CControllerActionOperationValidate.php:142
 #: include/classes/api/services/CAction.php:2847
 msgid "No targets specified for action operation global script."
-msgstr ""
+msgstr "Aucune cible spécifiée pour le script global de l'opération d'action."
 
 #: include/triggers.inc.php:91
 #, c-format
@@ -14589,7 +14589,7 @@ msgstr "Position"
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
-msgstr ""
+msgstr "La position est ignorée pour les unités de types : s, uptime et unixtime."
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -16137,11 +16137,11 @@ msgstr "agent SNMPv3"
 
 #: app/views/administration.authentication.edit.php:249
 msgid "SP entity ID"
-msgstr ""
+msgstr "ID d'entité du SP"
 
 #: app/views/administration.authentication.edit.php:257
 msgid "SP name ID format"
-msgstr ""
+msgstr "Format d'ID du nom du SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -16909,7 +16909,7 @@ msgstr "La valeur est manquante pour l'option de partage \"%1$s\" de la carte \"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:243
 msgid "Short"
-msgstr ""
+msgstr "Court"
 
 #: app/partials/monitoring.latest.filter.php:154
 #: app/partials/monitoring.problem.filter.php:222
@@ -17270,7 +17270,7 @@ msgstr "Éléments standards"
 
 #: app/partials/administration.ha.nodes.php:45
 msgid "Standby"
-msgstr ""
+msgstr "Veille"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:668
 #: app/controllers/CControllerPopupTriggerExpr.php:787
@@ -17649,7 +17649,7 @@ msgstr "Supprimé"
 #: include/html.inc.php:973
 #, c-format
 msgid "Suppressed till: %1$s"
-msgstr "Supprimé jusqu'à: %1$s"
+msgstr "Supprimé jusqu'à : %1$s"
 
 #: include/classes/data/CItemData.php:1102
 msgid "Swap in (from device into memory) statistics. Returns integer"
@@ -19194,7 +19194,7 @@ msgstr "Impossible de charger les paramètres de l'API de maintenance."
 
 #: include/classes/helpers/CSettingsHelper.php:113
 msgid "Unable to load settings API parameters."
-msgstr ""
+msgstr "Impossible de charger les paramètres de l'API de configuration."
 
 #: include/classes/core/CConfigFile.php:257
 msgid "Unable to overwrite the existing configuration file."
@@ -19967,7 +19967,7 @@ msgstr "Le nom d'utilisateur et le mot de passe doivent être stockés dans les 
 
 #: app/views/administration.authentication.edit.php:241
 msgid "Username attribute"
-msgstr "Attribut nom d'utilisateur"
+msgstr "Attribut du nom d'utilisateur"
 
 #: app/controllers/CControllerPopupGeneric.php:209
 #: app/views/administration.token.list.php:42
@@ -20001,7 +20001,7 @@ msgstr "statistiques du cache VMware. Les modes valides sont : total, free, pfre
 
 #: include/classes/data/CItemData.php:1256
 msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "Données d'alarmes du cluster VMware, retourne un JSON, <url> - URL du service VMware, <id> - ID du cluster VMware"
 
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
@@ -20009,7 +20009,7 @@ msgstr "Compteur de performances du cluster VMware, <url> - URL du service VMwar
 
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
-msgstr ""
+msgstr "Propriété du cluster VMware, <url> - URL du service VMware, <id> - ID du cluster VMware, <prop> - chemin de la propriété"
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -20017,15 +20017,15 @@ msgstr "État du cluster VMware, <url> - URL du service VMware, <name> - Nom du 
 
 #: include/classes/data/CItemData.php:1272
 msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "Tableau des tags du cluster VMware, <url> - URL du service VMware, <id> - ID de cluster VMware"
 
 #: include/classes/data/CItemData.php:1308
 msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
-msgstr ""
+msgstr "Données d'alarmes du datacenter VMware, retourne un JSON, <url> - URL du service VMware, <id> - ID du datacenter VMware"
 
 #: include/classes/data/CItemData.php:1316
 msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
-msgstr ""
+msgstr "Tableau de tags du datacenter VMware, <url> - URL du service VMware, <id> - ID du datacenter VMware. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -20037,7 +20037,7 @@ msgstr "Datacenters VMware et leurs identifiants. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1276
 msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
-msgstr ""
+msgstr "Données d'alarmes du datacenter VMware, retourne un JSON, <url> - URL du service VMware, <uuid> - Nom du datacenter VMware"
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
@@ -20050,7 +20050,7 @@ msgstr "Liste des hyperviseurs du datastore VMware, <url> - URL du service VMwar
 
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
-msgstr ""
+msgstr "Propriété du datastore VMware, <url> - URL du service VMware, <uuid> - nom du datastore, <prop> - chemin de la propriété"
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20058,7 +20058,7 @@ msgstr "Statistiques de lecture du datastore VMware, <url> - URL du service VMwa
 
 #: include/classes/data/CItemData.php:1300
 msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
-msgstr ""
+msgstr "Tableau des tags du datastore VMware, <url> - URL du service VMware, <uuid> - uuid du datastore VMware. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20078,7 +20078,7 @@ msgstr "Capteurs d'état du fournisseur du matériel de l'hyperviseur VMware, <u
 
 #: include/classes/data/CItemData.php:1336
 msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Données d'alarmes de l'hyperviseur VMware, retourne un JSON, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20150,7 +20150,7 @@ msgstr "Utilisation du processeur de l'hyperviseur VMware en Hz, <url> - URL du 
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
-msgstr ""
+msgstr "Propriété de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - nom d'hôte de l'hyperviseur VMware, <prop> - chemin de la propriété"
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20166,7 +20166,7 @@ msgstr "État de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - N
 
 #: include/classes/data/CItemData.php:1488
 msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Tableau des tags de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20198,11 +20198,11 @@ msgstr "Version du service VMware, <url> - URL du service VMware"
 
 #: include/classes/data/CItemData.php:1248
 msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
-msgstr ""
+msgstr "Données d'alarmes du vCenter VMware alerte les données, retourne un JSON, <url> - URL du service VMware"
 
 #: include/classes/data/CItemData.php:1516
 msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
-msgstr ""
+msgstr "Données d'alarme de la machine virtuelle VMware, retourne un JSON, <url> - URL du service VMware, <uuid> - Nom de la machine virtuelle VMware"
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20286,7 +20286,7 @@ msgstr "Utilisation du processeur d'une machine virtuelle VMware en Hz, <url> - 
 
 #: include/classes/data/CItemData.php:1644
 msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
-msgstr ""
+msgstr "Propriété de la machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware, <prop> - chemin de la propriété"
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20306,7 +20306,7 @@ msgstr "Taille de la mémoire swappée d'une machine virtuelle VMware, <url> - U
 
 #: include/classes/data/CItemData.php:1684
 msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "Tableau des tags de machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
@@ -20641,7 +20641,7 @@ msgstr "Le nom visible ne peut pas être vide si le nom d'hôte est manquant."
 #: include/classes/helpers/CServiceHelper.php:57
 #: include/classes/helpers/CServiceHelper.php:67
 msgid "W"
-msgstr ""
+msgstr "P"
 
 #: jsLoader.php:254
 msgctxt "Wednesday short"
@@ -21041,7 +21041,7 @@ msgstr "d/m/Y H:i:s"
 
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
-msgstr ""
+msgstr "d/n/Y"
 
 #: include/views/js/monitoring.sysmaps.js.php:457
 msgid "Y1"
@@ -22614,11 +22614,11 @@ msgstr "ne doit pas contenir le nom, le prénom ou le nom de famille de l'utilis
 
 #: include/translateDefines.inc.php:41
 msgid "n-d"
-msgstr ""
+msgstr "d/n"
 
 #: include/translateDefines.inc.php:39
 msgid "n-d H:i"
-msgstr ""
+msgstr "d/n H:i"
 
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:362
