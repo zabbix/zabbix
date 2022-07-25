@@ -1,0 +1,296 @@
+zabbix_export:
+  version: '6.2'
+  date: '2022-07-25T16:55:38Z'
+  template_groups:
+    -
+      uuid: c2c162144c2d4c5491c8801193af4945
+      name: Templates/Cloud
+  host_groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Applications
+  templates:
+    -
+      uuid: fa58228fee8a4e34a7c6503950d1c615
+      template: 'Azure by HTTP'
+      name: 'Azure by HTTP'
+      description: |
+        The template to monitor Microsoft Azure by HTTP.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create an Azure service principal via Azure CLI for your subscription.
+            `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+            https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fazure%2Fazure-resource-manager%2Ftoc.json&view=azure-cli-latest
+          2. Link template to the host.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.42
+      groups:
+        -
+          name: Templates/Cloud
+      items:
+        -
+          uuid: 7b2fe9a7ee164718933eb456b0068fea
+          name: 'Azure: Get errors'
+          type: DEPENDENT
+          key: azure.get.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.errors
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.get.resources
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: 502cb582546046a29267715763c46bff
+              expression: 'length(last(/Azure by HTTP/azure.get.errors))>0'
+              name: 'Azure: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in requests to API.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: fb6abf3631b240b08357ea9ce9ba89a4
+          name: 'Azure: Get resources'
+          type: SCRIPT
+          key: azure.get.resources
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Azure = {
+                params: {},
+                token: null,
+            
+                setParams: function (params) {
+                    ['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    Azure.params = params;
+                },
+            
+                requestToken: function () {
+                    if (Azure.token !== null) {
+                        return;
+                    }
+            
+                    var response, request = new HttpRequest();
+                    request.addHeader('Content-Type: application/x-www-form-urlencoded');
+                    response = request.post('https://login.microsoftonline.com/' + Azure.params.tenant_id +'/oauth2/token', 'grant_type=client_credentials&client_id=' + Azure.params.app_id +'&client_secret=' + Azure.params.password + '&resource=https%3A%2F%2Fmanagement.azure.com%2F');
+            
+                    if (request.getStatus() !== 200) {
+                        throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    if (response !== null) {
+                        try {
+                            auth_data = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse auth response received from API.';
+                        }
+                    }
+                    else {
+                        throw 'No data received by auth request.';
+                    }
+            
+                    if ('access_token' in auth_data) {
+                        Azure.token = auth_data['access_token'];
+                    } else {
+                        throw 'Auth response does not contain access token.';
+                    }
+                },
+            
+                requestResources: function () {
+                    if (Azure.token === null) {
+                        return;
+                    }
+            
+                    request = new HttpRequest();
+                    request.addHeader('Accept=application/json');
+                    request.addHeader('Authorization: Bearer ' + Azure.token);
+            
+                    r_data = request.get('https://management.azure.com/subscriptions/' + Azure.params.subscription_id + '/resources?api-version=2022-05-01');
+            
+                    if (request.getStatus() !== 200) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + r_data;
+                    }
+            
+                    if (r_data !== null) {
+                        try {
+                            return JSON.parse(r_data);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from API.';
+                        }
+                    }
+                    else {
+                        throw 'No data received by resources request.';
+                    }
+                }
+            };
+            
+            var data = {};
+                data['errors'] = {};
+            
+            try {
+                Azure.setParams(JSON.parse(value));
+            
+                try {
+                    Azure.requestToken();
+                }
+                catch (error) {
+                    data.errors.auth = error.toString();
+                }
+            
+                if (!('auth' in data.errors)) {
+                    try {
+                        data.resources = Azure.requestResources();
+                    }
+                    catch (error) {
+                        data.errors.resources = error.toString();
+                    }
+                }
+            }
+            catch (error) {
+                data.errors.params = error.toString();
+            }
+            
+            if (Object.keys(data.errors).length !== 0) {
+                errors = 'Failed to receive data:';
+                for (var error in data.errors) {
+                    errors += '\n' + error + ' : ' + data.errors[error];
+                }
+                data.errors = errors;
+            }
+            else {
+                data.errors = '';
+            }
+            
+            return JSON.stringify(data);
+          description: 'The JSON with result of API requests.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: app_id
+              value: '{$AZURE.APP_ID}'
+            -
+              name: password
+              value: '{$AZURE.PASSWORD}'
+            -
+              name: tenant_id
+              value: '{$AZURE.TENANT_ID}'
+            -
+              name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION_ID}'
+          tags:
+            -
+              tag: component
+              value: raw
+      discovery_rules:
+        -
+          uuid: f9386233186648ce828f406c52972ce5
+          name: 'Virtual machines discovery'
+          type: DEPENDENT
+          key: azure.vm.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: ^Microsoft.Compute/virtualMachines$
+                formulaid: A
+          description: 'A list of the virtual machines in the subscription.'
+          host_prototypes:
+            -
+              uuid: d08c0ee33c924b28bf1fed571da6c7f4
+              host: 'Azure virtual machine {#NAME}'
+              name: 'Azure virtual machine {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Applications
+              templates:
+                -
+                  name: 'Azure virtual machine by HTTP'
+              macros:
+                -
+                  macro: '{$AZURE.RESOURCE_ID}'
+                  value: '{#ID}'
+              tags:
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+          master_item:
+            key: azure.get.resources
+          lld_macro_paths:
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#LOCATION}'
+              path: $.location
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.resources.value
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: azure
+      macros:
+        -
+          macro: '{$AZURE.APP_ID}'
+          description: 'Microsoft Azure app ID.'
+        -
+          macro: '{$AZURE.DATA.TIMEOUT}'
+          value: 15s
+          description: 'Response timeout for API.'
+        -
+          macro: '{$AZURE.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Microsoft Azure password.'
+        -
+          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          description: 'Microsoft Azure subscription ID.'
+        -
+          macro: '{$AZURE.TENANT_ID}'
+          description: 'Microsoft Azure tenant ID.'
