@@ -85,7 +85,7 @@ class testTimescaleDb extends CIntegrationTest {
 	 */
 	public function testTimescaleDb_checkServerUp() {
 		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
-		
+
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'TimescaleDB version:');
 	}
 
@@ -185,7 +185,7 @@ class testTimescaleDb extends CIntegrationTest {
 	 */
 	public function testTimescaleDb_checkHistoryRecords() {
 		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
-		
+
 		$this->reloadConfigurationCache();
 
 		$count_start = $this->getHistoryCount();
