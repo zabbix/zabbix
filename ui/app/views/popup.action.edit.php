@@ -28,12 +28,14 @@
 
 //require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
+
 $form = (new CForm())
 //	->setName('action_form')
 //	->addItem(getMessages())
 	->setId('action-form')
+	->addVar('actionid', $data['actionid'])
 	->addStyle('display: none;')
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addItem((new CInput('submit'))->addStyle('display: none;'));
 // check if I need the 'null'??
 
 // Create condition table.
@@ -48,7 +50,7 @@ $condition_table->setFooter(
 		->onClick('
 			PopUp("popup.condition.actions", {
 				type: '.ZBX_POPUP_CONDITION_TYPE_ACTION.',
-				source: this.dataset.eventsource,
+				source: '.$data['eventsource'].',
 			}, {dialogue_class: "modal-popup-medium"});
 		')
 		->addClass(ZBX_STYLE_BTN_LINK)

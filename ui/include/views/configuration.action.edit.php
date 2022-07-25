@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
@@ -45,14 +46,15 @@ if ($data['actionid']) {
 }
 
 // Action tab.
-$action_tab = (new CFormList())
-	->addRow(
+$action_tab = (new CFormGrid())
+	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['action']['name']))
+		new CFormField((new CTextBox('name', $data['action']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
-	);
+		)
+	]);
 
 // Create condition table.
 $condition_table = (new CTable(_('No conditions defined.')))
@@ -89,22 +91,23 @@ if ($data['action']['filter']['conditions']) {
 			->setAttribute('data-conditiontype', $condition['conditiontype'])
 			->setAttribute('data-formulaid', $label);
 
-		$condition_table->addRow(
-			[
-				$labelSpan,
-				(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
-					$actionConditionStringValues[0][$cIdx], $condition['value2']
-				)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
-				(new CCol([
-					(new CButton('remove', _('Remove')))
-						->onClick('removeCondition('.$i.');')
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->removeId(),
-					new CVar('conditions['.$i.']', $condition)
-				]))->addClass(ZBX_STYLE_NOWRAP)
-			],
-			null, 'conditions_'.$i
-		);
+		$condition_table
+			->addItem([
+				[
+					$labelSpan,
+					(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
+						$actionConditionStringValues[0][$cIdx], $condition['value2']
+					)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
+					(new CCol([
+						(new CButton('remove', _('Remove')))
+							->onClick('removeCondition('.$i.');')
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->removeId(),
+						new CVar('conditions['.$i.']', $condition)
+					]))->addClass(ZBX_STYLE_NOWRAP)
+				],
+				null, 'conditions_'.$i
+			]);
 
 		$i++;
 	}
@@ -117,23 +120,27 @@ $formula = (new CTextBox('formula', $data['action']['filter']['formula'], false,
 	->setId('formula')
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');
 
-$action_tab->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
-	(new CSelect('evaltype'))
-		->setId('evaltype')
-		->setFocusableElementId('label-evaltype')
-		->setValue($data['action']['filter']['evaltype'])
-		->addOptions(CSelect::createOptionsFromArray([
-			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-			CONDITION_EVAL_TYPE_AND => _('And'),
-			CONDITION_EVAL_TYPE_OR => _('Or'),
-			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-		])),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CSpan())->setId('conditionLabel'),
-	$formula
+$action_tab
+	->addItem([
+		new CLabel(_('Type of calculation'), 'label-evaltype'),
+		[
+			new CFormField(
+				(new CSelect('evaltype'))
+					->setId('evaltype')
+					->setFocusableElementId('label-evaltype')
+					->setValue($data['action']['filter']['evaltype'])
+					->addOptions(CSelect::createOptionsFromArray([
+						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+						CONDITION_EVAL_TYPE_AND => _('And'),
+						CONDITION_EVAL_TYPE_OR => _('Or'),
+						CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+					])),
+			),
+			new CFormField((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)),
+			new CFormField((new CSpan())->setId('conditionLabel'))
+		]
 ]);
-
-$condition_table->addRow([
+$condition_table->addItem([
 	(new CSimpleButton(_('Add')))
 		->setAttribute('data-eventsource', $data['eventsource'])
 		->onClick('
@@ -145,25 +152,33 @@ $condition_table->addRow([
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]);
 
-$action_tab->addRow(_('Conditions'),
-	(new CDiv($condition_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
+$action_tab->addItem([
+	new CLabel(_('Conditions')),
+	new CFormField(
+		(new CDiv($condition_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	)
+]);
 
-$action_tab->addRow(_('Enabled'),
-	(new CCheckBox('status', ACTION_STATUS_ENABLED))->setChecked($data['action']['status'] == ACTION_STATUS_ENABLED)
-);
+$action_tab->addItem([
+	new CLabel(_('Enabled')),
+	new CFormField(
+		(new CCheckBox('status', ACTION_STATUS_ENABLED))
+			->setChecked($data['action']['status'] == ACTION_STATUS_ENABLED)
+	)
+]);
 
 // Operations tab.
-$operation_tab = new CFormList();
+$operation_tab = new CFormGrid();
 
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-	$operation_tab->addRow((new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
-		(new CTextBox('esc_period', $data['action']['esc_period']))
+	$operation_tab->addItem([
+		(new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
+		new CFormField((new CTextBox('esc_period', $data['action']['esc_period']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	);
+			->setAriaRequired())
+	]);
 }
 
 // create operation table
@@ -294,11 +309,14 @@ if ($data['action']['operations']) {
 				))->addClass(ZBX_STYLE_NOWRAP)
 			];
 		}
-		$operations_table->addRow($operation_row, null, 'operations_'.$operationid);
+		$operations_table->addItem([
+			$operation_row,
+			null,
+			'operations_'.$operationid
+		]);
 	}
 }
-
-$operations_table->addRow(
+$operations_table->addItem([
 	(new CSimpleButton(_('Add')))
 		->setAttribute('data-actionid', $data['actionid'])
 		->setAttribute('data-eventsource', $data['eventsource'])
@@ -306,13 +324,14 @@ $operations_table->addRow(
 			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource, '.ACTION_OPERATION.');
 		')
 		->addClass(ZBX_STYLE_BTN_LINK)
-);
+]);
 
-$operation_tab->addRow(_('Operations'),
-	(new CDiv($operations_table))
+$operation_tab->addItem([
+	new CLabel(_('Operations')),
+	new CFormField((new CDiv($operations_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'))
+]);
 
 // Recovery operations.
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
@@ -355,37 +374,39 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 				}
 			}
 
-			$operations_table->addRow([
-				$details,
-				(new CCol(
-					new CHorList([
-						(new CSimpleButton(_('Edit')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('js-edit-button')
-							->setAttribute('data-operation', json_encode([
-								'operationid' => $operationid,
-								'actionid' => $data['actionid'],
-								'eventsource' => $data['eventsource'],
-								'operationtype' => ACTION_RECOVERY_OPERATION
-							])),
-						[
-							(new CButton('remove', _('Remove')))
-								->setAttribute('data-operationid', $operationid)
-								->onClick('removeOperation(this.dataset.operationid, '.ACTION_RECOVERY_OPERATION.');')
+			$operations_table->addItem([
+
+					$details,
+					(new CCol(
+						new CHorList([
+							(new CSimpleButton(_('Edit')))
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId(),
-							new CVar('recovery_operations['.$operationid.']', $operation),
-							new CVar('operations_for_popup['.ACTION_RECOVERY_OPERATION.']['.$operationid.']',
-								json_encode($operation_for_popup)
-							)
-						]
-					])
-				))->addClass(ZBX_STYLE_NOWRAP)
-			], null, 'recovery_operations_'.$operationid);
+								->addClass('js-edit-button')
+								->setAttribute('data-operation', json_encode([
+									'operationid' => $operationid,
+									'actionid' => $data['actionid'],
+									'eventsource' => $data['eventsource'],
+									'operationtype' => ACTION_RECOVERY_OPERATION
+								])),
+							[
+								(new CButton('remove', _('Remove')))
+									->setAttribute('data-operationid', $operationid)
+									->onClick('removeOperation(this.dataset.operationid, '.ACTION_RECOVERY_OPERATION.');')
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->removeId(),
+								new CVar('recovery_operations['.$operationid.']', $operation),
+								new CVar('operations_for_popup['.ACTION_RECOVERY_OPERATION.']['.$operationid.']',
+									json_encode($operation_for_popup)
+								)
+							]
+						])
+					))->addClass(ZBX_STYLE_NOWRAP)
+				, null, 'recovery_operations_'.$operationid
+			]);
 		}
 	}
 
-	$operations_table->addRow(
+	$operations_table->addItem([
 		(new CSimpleButton(_('Add')))
 			->setAttribute('data-actionid', $data['actionid'])
 			->setAttribute('data-eventsource', $data['eventsource'])
@@ -395,13 +416,14 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 				);
 			')
 			->addClass(ZBX_STYLE_BTN_LINK)
-	);
+	]);
 
-	$operation_tab->addRow(_('Recovery operations'),
-		(new CDiv($operations_table))
+	$operation_tab->addItem([
+		new CLabel(_('Recovery operations')),
+		new CFormField($operations_table
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'))
+	]);
 }
 
 // Update operations.
@@ -436,7 +458,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				}
 			}
 
-			$operations_table->addRow([
+			$operations_table->addItem([
 				$details,
 				(new CCol(
 					new CHorList([
@@ -461,40 +483,44 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							)
 						]
 					])
-				))->addClass(ZBX_STYLE_NOWRAP)
-			], null, 'update_operations_'.$operationid);
+				))->addClass(ZBX_STYLE_NOWRAP),
+				null, 'update_operations_'.$operationid
+			]);
 		}
 	}
-
-	$operations_table->addRow(
-		(new CSimpleButton(_('Add')))
-			->setAttribute('data-actionid', $data['actionid'])
-			->setAttribute('data-eventsource', $data['eventsource'])
-			->onClick('
+$operations_table->addItem([
+	(new CSimpleButton(_('Add')))
+		->setAttribute('data-actionid', $data['actionid'])
+		->setAttribute('data-eventsource', $data['eventsource'])
+		->onClick('
 				operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
 					'.ACTION_UPDATE_OPERATION.'
 				);
 			')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	);
+		->addClass(ZBX_STYLE_BTN_LINK)
+]);
 
-	$operation_tab->addRow(_('Update operations'),
-		(new CDiv($operations_table))
+	$operation_tab->addItem([
+		new CLabel(_('Update operations')),
+		new CFormField((new CDiv($operations_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
+			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'))
+	]);
 }
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$operation_tab
-		->addRow(_('Pause operations for suppressed problems'),
-			(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
-				->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
-		)
-		->addRow(_('Notify about canceled escalations'),
-			(new CCheckBox('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_TRUE))
-				->setChecked($data['action']['notify_if_canceled'] == ACTION_NOTIFY_IF_CANCELED_TRUE)
-		);
+		->addItem([
+			new CLabel(_('Pause operations for suppressed problems')),
+			new CFormField((new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
+				->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE))
+		])
+		->addItem([
+			new CLabel(_('Notify about canceled escalations'),
+			new CFormField((new CCheckBox('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_TRUE))
+				->setChecked($data['action']['notify_if_canceled'] == ACTION_NOTIFY_IF_CANCELED_TRUE))
+			)
+		]);
 }
 
 // Append tabs to form.
