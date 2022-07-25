@@ -26,7 +26,6 @@
 
 require_once dirname(__FILE__).'/js/configuration.action.list.js.php';
 
-
 if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
 	$title = _('Service actions');
 	$submenu = null;
@@ -75,7 +74,6 @@ $current_url = (new CUrl('zabbix.php'))
 
 $filter = (new CFilter())
 	->setResetUrl($current_url)
-	//->addVar('action', 'action.list')
 	->addVar('eventsource', $data['eventsource'])
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
@@ -102,7 +100,6 @@ $filter = (new CFilter())
 if (in_array($data['eventsource'], [0,1,2,3])) {
 	$filter->addVar('action', 'action.list');
 }
-
 
 $widget->addItem($filter);
 $current_url->removeArgument('filter_rst');
@@ -179,7 +176,6 @@ if ($this->data['actions']) {
 	}
 }
 
-// append table to form
 $actionForm->addItem([
 	$actionTable,
 	$this->data['paging'],
@@ -190,9 +186,7 @@ $actionForm->addItem([
 	], $data['eventsource'])
 ]);
 
-// append form to widget
 $widget->addItem($actionForm);
-
 $widget->show();
 
 (new CScriptTag('

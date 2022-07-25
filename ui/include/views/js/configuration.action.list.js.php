@@ -57,22 +57,6 @@
 				dialogueid: 'action',
 				dialogue_class: 'modal-popup-large'
 			});
-		},
-
-		events: {
-			hostSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = location.href;
-				},
 		}
 	};
 </script>
