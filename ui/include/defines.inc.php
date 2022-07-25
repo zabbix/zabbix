@@ -50,6 +50,8 @@ define('ZBX_MIN_PERIOD',		60); // 1 minute
 
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
+define('ZBX_MIN_INT64',			'-9223372036854775808');
+define('ZBX_MAX_INT64',			'9223372036854775807');
 define('ZBX_MAX_UINT64',		'18446744073709551615');
 
 // Double precision 64-bit float.
