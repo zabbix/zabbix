@@ -1364,6 +1364,7 @@ define('API_BOOLEAN',				4);
 define('API_FLAG',					5);
 define('API_FLOAT',					6);
 define('API_UINT64',				7);
+define('API_FILTER_VALUE',			58);
 // arrays
 define('API_OBJECT',				8);
 define('API_IDS',					9);
@@ -1374,6 +1375,7 @@ define('API_FLOATS',				13);
 define('API_UINTS64',				14);
 define('API_CUIDS',					44);
 define('API_USER_MACROS',			52);
+define('API_FILTER_VALUES',			57);
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
@@ -1413,6 +1415,7 @@ define('API_UNEXPECTED',			51);
 define('API_INT32_RANGES',			53);
 define('API_LAT_LNG_ZOOM',			54);
 define('API_TIMESTAMP',				55);
+define('API_FILTER',				56);
 
 // flags
 define('API_REQUIRED',					0x00001);
