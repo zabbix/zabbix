@@ -152,7 +152,7 @@ if ($this->data['actions']) {
 
 		if ($action['status'] == ACTION_STATUS_DISABLED) {
 			$status = (new CLink(_('Disabled'),
-				'actionconf.php?action=action.massenable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
+				'zabbix.php?action=action.enable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
 				)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
@@ -160,7 +160,7 @@ if ($this->data['actions']) {
 		}
 		else {
 			$status = (new CLink(_('Enabled'),
-				'actionconf.php?action=action.massdisable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
+				'zabbix.php?action=action.disable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
 			)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
