@@ -21,6 +21,7 @@
 #define ZABBIX_SSH_RUN_H
 
 #include "config.h"
+#include "module.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "dbcache.h"

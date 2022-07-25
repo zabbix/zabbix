@@ -20,8 +20,6 @@
 #include "checks_ssh.h"
 #include "ssh_run.h"
 
-#define SSH_RUN_KEY	"ssh.run"
-
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 {
@@ -37,11 +35,13 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
+#define SSH_RUN_KEY	"ssh.run"
 	if (0 != strcmp(SSH_RUN_KEY, get_rkey(&request)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
 		goto out;
 	}
+#undef SSH_RUN_KEY
 
 	if (4 < get_rparams_num(&request))
 	{
