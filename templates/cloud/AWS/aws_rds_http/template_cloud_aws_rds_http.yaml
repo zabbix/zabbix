@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-11T10:45:54Z'
+  date: '2022-07-25T10:23:38Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -11,7 +11,7 @@ zabbix_export:
       template: 'AWS RDS instance by HTTP'
       name: 'AWS RDS instance by HTTP'
       description: |
-        Get AWS RDS instance metrics and uses the script item to make HTTP requests to the CloudWatch API.
+        The template gets AWS RDS instance metrics and uses the script item to make HTTP requests to the CloudWatch API.
         Don't forget to read the README.md for the correct setup of the template.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -593,151 +593,151 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AwsRds = {
-            params: {},
+                params: {},
             
-            setParams: function (params) {
-                ['access_key', 'secret_key', 'region', 'db_instance_id'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: "' + field + '".';
-                    }
-                });
-            
-                AwsRds.params = params;
-            },
-            
-            sign: function (key, message) {
-                var hex = hmac('sha256', key, message);
-            
-                if ((hex.length % 2) === 1) {
-                    throw 'Invalid length of a hex string!';
-                }
-            
-                var result = new Int8Array(hex.length / 2);
-                for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
-                    result[b] = parseInt(hex.substring(i, i + 2), 16);
-                }
-            
-                return result;
-            },
-            
-            prepareParams: function (params) {
-                var result = [];
-            
-                Object.keys(params).sort().forEach(function (key) {
-                    if (typeof params[key] !== 'object') {
-                        result.push(key + '=' + encodeURIComponent(params[key]));
-                    }
-                    else {
-                        result.push(prepareObject(key, params[key]));
-                    }
-                });
-            
-                return result.join('&');
-            },
-            
-            request: function (method, region, service, params, data) {
-                if (typeof data === 'undefined' || data === null) {
-                    data = '';
-                }
-            
-                var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
-                    date = amzdate.replace(/T\d+Z/, ''),
-                    host = service + '.' + region + '.amazonaws.com',
-                    canonical_uri = '/',
-                    canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
-                    signed_headers = 'content-encoding;host;x-amz-date',
-                    canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-                    credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
-                    request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-                    key = AwsRds.sign('AWS4' + AwsRds.params.secret_key, date);
-            
-                key = AwsRds.sign(key, region);
-                key = AwsRds.sign(key, service);
-                key = AwsRds.sign(key, 'aws4_request');
-            
-                var request = new HttpRequest(),
-                    url = 'https://' + host + canonical_uri + '?' + params;
-            
-                request.addHeader('x-amz-date: ' + amzdate);
-                request.addHeader('Accept: application/json');
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('Content-Encoding: amz-1.0');
-                request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsRds.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            
-                Zabbix.log(4, '[ AWC RDS  ] Sending request: ' + url);
-            
-                response = request.get(url);
-            
-                Zabbix.log(4, '[ AWC RDS ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
-                if (request.getStatus() !== 200) {
-                    throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                }
-            
-                if (response[0] === '<') {
-                    try {
-                        response = XML.toJson(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-                    }
-                }
-            
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-                    }
-                }
-            
-                return response;
-            },
-            
-            getAlarms: function () {
-                var payload = {},
-                    result = [];
-            
-                payload['Action'] = 'DescribeAlarms';
-                payload['MaxRecords'] = 100;
-                payload['Version'] = '2010-08-01';
-            
-                while (payload.NextToken !== '') {
-                    var alarms = AwsRds.request('GET', AwsRds.params.region, 'monitoring', AwsRds.prepareParams(payload));
-            
-                    if (typeof alarms !== 'object'
-                        || typeof alarms.DescribeAlarmsResponse !== 'object'
-                        || typeof alarms.DescribeAlarmsResponse.DescribeAlarmsResult !== 'object'
-                        || typeof alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms !== 'object') {
-                        throw 'Cannot get alarms from AWS CloudWatch API. Check debug log for more information.';
-                    }
-            
-                    payload.NextToken = alarms.DescribeAlarmsResponse.DescribeAlarmsResult.NextToken || '';
-            
-                    alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms.forEach(function (alarm) {
-                        var dimensions = alarm.Dimensions;
-            
-                        if (Array.isArray(alarm.Metrics)) {
-                            alarm.Metrics.forEach(function (metric) {
-                                if (typeof metric.MetricStat === 'object' && metric.MetricStat !== null
-                                    && typeof metric.MetricStat.Metric === 'object' && metric.MetricStat.Metric !== null
-                                    && Array.isArray(metric.MetricStat.Metric.Dimensions)) {
-                                    dimensions = dimensions.concat(metric.MetricStat.Metric.Dimensions);
-                                }
-                            });
-                        }
-                        for (var i in dimensions) {
-                            if (dimensions[i].Name === 'DBInstanceIdentifier' && dimensions[i].Value === AwsRds.params.db_instance_id) {
-                                result.push(alarm);
-                                break;
-                            }
+                setParams: function (params) {
+                    ['access_key', 'secret_key', 'region', 'db_instance_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: "' + field + '".';
                         }
                     });
-                }
             
-                return result;
-            }
+                    AwsRds.params = params;
+                },
+            
+                sign: function (key, message) {
+                    var hex = hmac('sha256', key, message);
+            
+                    if ((hex.length % 2) === 1) {
+                        throw 'Invalid length of a hex string!';
+                    }
+            
+                    var result = new Int8Array(hex.length / 2);
+                    for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
+                        result[b] = parseInt(hex.substring(i, i + 2), 16);
+                    }
+            
+                    return result;
+                },
+            
+                prepareParams: function (params) {
+                    var result = [];
+            
+                    Object.keys(params).sort().forEach(function (key) {
+                        if (typeof params[key] !== 'object') {
+                            result.push(key + '=' + encodeURIComponent(params[key]));
+                        }
+                        else {
+                            result.push(prepareObject(key, params[key]));
+                        }
+                    });
+            
+                    return result.join('&');
+                },
+            
+                request: function (method, region, service, params, data) {
+                    if (typeof data === 'undefined' || data === null) {
+                        data = '';
+                    }
+            
+                    var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
+                        date = amzdate.replace(/T\d+Z/, ''),
+                        host = service + '.' + region + '.amazonaws.com',
+                        canonical_uri = '/',
+                        canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
+                        signed_headers = 'content-encoding;host;x-amz-date',
+                        canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+                        credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
+                        request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
+                        key = AwsRds.sign('AWS4' + AwsRds.params.secret_key, date);
+            
+                    key = AwsRds.sign(key, region);
+                    key = AwsRds.sign(key, service);
+                    key = AwsRds.sign(key, 'aws4_request');
+            
+                    var request = new HttpRequest(),
+                        url = 'https://' + host + canonical_uri + '?' + params;
+            
+                    request.addHeader('x-amz-date: ' + amzdate);
+                    request.addHeader('Accept: application/json');
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Content-Encoding: amz-1.0');
+                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsRds.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+            
+                    Zabbix.log(4, '[ AWS RDS ] Sending request: ' + url);
+            
+                    response = request.get(url);
+            
+                    Zabbix.log(4, '[ AWS RDS ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() !== 200) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    if (response[0] === '<') {
+                        try {
+                            response = XML.toJson(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+                        }
+                    }
+            
+                    if (response !== null) {
+                        try {
+                            response = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+                        }
+                    }
+            
+                    return response;
+                },
+            
+                getAlarms: function () {
+                    var payload = {},
+                        result = [];
+            
+                    payload['Action'] = 'DescribeAlarms';
+                    payload['MaxRecords'] = 100;
+                    payload['Version'] = '2010-08-01';
+            
+                    while (payload.NextToken !== '') {
+                        var alarms = AwsRds.request('GET', AwsRds.params.region, 'monitoring', AwsRds.prepareParams(payload));
+            
+                        if (typeof alarms !== 'object'
+                            || typeof alarms.DescribeAlarmsResponse !== 'object'
+                            || typeof alarms.DescribeAlarmsResponse.DescribeAlarmsResult !== 'object'
+                            || typeof alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms !== 'object') {
+                            throw 'Cannot get alarms from AWS CloudWatch API. Check debug log for more information.';
+                        }
+            
+                        payload.NextToken = alarms.DescribeAlarmsResponse.DescribeAlarmsResult.NextToken || '';
+            
+                        alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms.forEach(function (alarm) {
+                            var dimensions = alarm.Dimensions;
+            
+                            if (Array.isArray(alarm.Metrics)) {
+                                alarm.Metrics.forEach(function (metric) {
+                                    if (typeof metric.MetricStat === 'object' && metric.MetricStat !== null
+                                        && typeof metric.MetricStat.Metric === 'object' && metric.MetricStat.Metric !== null
+                                        && Array.isArray(metric.MetricStat.Metric.Dimensions)) {
+                                        dimensions = dimensions.concat(metric.MetricStat.Metric.Dimensions);
+                                    }
+                                });
+                            }
+                            for (var i in dimensions) {
+                                if (dimensions[i].Name === 'DBInstanceIdentifier' && dimensions[i].Value === AwsRds.params.db_instance_id) {
+                                    result.push(alarm);
+                                    break;
+                                }
+                            }
+                        });
+                    }
+            
+                    return result;
+                }
             }
             
             try {
@@ -857,11 +857,11 @@ zabbix_export:
                     request.addHeader('Content-Encoding: amz-1.0');
                     request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsRds.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
             
-                    Zabbix.log(4, '[ AWC RDS  ] Sending request: ' + url);
+                    Zabbix.log(4, '[ AWS RDS ] Sending request: ' + url);
             
                     response = request.get(url);
             
-                    Zabbix.log(4, '[ AWC RDS ] Received response with status code ' + request.getStatus() + ': ' + response);
+                    Zabbix.log(4, '[ AWS RDS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                     if (request.getStatus() !== 200) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -888,7 +888,7 @@ zabbix_export:
                     return response;
                 },
             
-                getAlarms: function () {
+                getEvents: function () {
                     var payload = {},
                         result = [];
             
@@ -906,12 +906,11 @@ zabbix_export:
                             || typeof events.DescribeEventsResponse !== 'object'
                             || typeof events.DescribeEventsResponse.DescribeEventsResult !== 'object'
                             || typeof events.DescribeEventsResponse.DescribeEventsResult.Events !== 'object') {
-                            throw 'Cannot get alarms from AWS RDS API. Check debug log for more information.';
+                            throw 'Cannot get events from AWS RDS API. Check debug log for more information.';
                         }
                         events.DescribeEventsResponse.DescribeEventsResult.Events.forEach(function (event) {
                             event.EventCategories = event.EventCategories.toString()
                             result.push(event)
-            
                         });
                         payload.NextToken = events.DescribeEventsResponse.DescribeEventsResult.NextToken || '';
             
@@ -924,7 +923,7 @@ zabbix_export:
                 try {
                     AwsRds.setParams(JSON.parse(value));
             
-                    return JSON.stringify(AwsRds.getAlarms());
+                    return JSON.stringify(AwsRds.getEvents());
                   }
                 catch (error) {
                     error += (String(error).endsWith('.')) ? '' : '.';
@@ -1054,7 +1053,7 @@ zabbix_export:
                             response = JSON.parse(response);
                         }
                         catch (error) {
-                            throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+                            throw 'Failed to parse response received from AWS RDS API. Check debug log for more information.';
                         }
                     }
                     return response;
@@ -1331,10 +1330,9 @@ zabbix_export:
                     payload['StartTime'] = start_time;
                     payload['EndTime'] = end_time;
                     payload['ScanBy'] = 'TimestampDescending';
-                    payload["MetricDataQueries"] = AwsRds.renderMetricQuery(AwsRds.request_period, AwsRds.params.db_instance_id);
+                    payload['MetricDataQueries'] = AwsRds.renderMetricQuery(AwsRds.request_period, AwsRds.params.db_instance_id);
                     result = AwsRds.request('POST', AwsRds.params.region, 'monitoring', payload);
-                    if (typeof result !== 'object'
-                            || typeof result.MetricDataResults !== 'object') {
+                    if (typeof result !== 'object' || typeof result.MetricDataResults !== 'object') {
                         throw 'Cannot get metrics data from AWS CloudWatch API. Check debug log for more information.';
                     }
             
