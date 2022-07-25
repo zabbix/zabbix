@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.usergroup.edit.js.php');
@@ -124,6 +125,7 @@ else {
 			)
 		]);
 }
+
 $form_grid
 	->addItem([
 		new CLabel(_('Debug mode')),
