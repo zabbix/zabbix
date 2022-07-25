@@ -130,7 +130,7 @@ $form_grid
 	->addItem([
 		new CLabel(_('Debug mode')),
 		new CFormField(
-			(new CCheckBox('debug_mode', GROUP_DEBUG_MODE_ENABLED))
+			(new CCheckBox('debug_mode'))
 				->setUncheckedValue(GROUP_DEBUG_MODE_DISABLED)
 				->setChecked($data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 		)
