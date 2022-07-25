@@ -34,7 +34,7 @@ class testTimescaleDb extends CIntegrationTest {
 	const TRAPNAME = 'trap_timescale';
 	const TABLENAME = 'history_uint';
 	const HIST_COUNT = 3000;
-	 /* storing old data deep in the past - 20 days, which is way longer that the minimum 7days, and must be guaranteed to be compressed */
+	/* storing old data deep in the past - 20 days, which is way longer that the minimum 7days, and must be guaranteed to be compressed */
 	const COMPRESSION_OLDER_THAN = 20 * 24 * 3600;
 	static $db_extension = '';
 
@@ -57,7 +57,7 @@ class testTimescaleDb extends CIntegrationTest {
 	 */
 	public function setExtension() {
 
-		///getenv('DB')
+		/// getenv('DB')
 
 		self::$db_extension = '';
 
