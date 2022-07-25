@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-25T10:22:26Z'
+  date: '2022-07-25T11:00:58Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -75,6 +75,43 @@ zabbix_export:
             -
               tag: component
               value: requests
+        -
+          uuid: 7ca108eafb0d4b65a304815ee637174e
+          name: 'AWS S3: Get alarms check'
+          type: DEPENDENT
+          key: aws.s3.alarms.check
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Data collection check.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: aws.s3.get_alarms
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: a8f8a7518aad4e32b23a8611afc8f48c
+              expression: 'length(last(/AWS S3 bucket by HTTP/aws.s3.alarms.check))>0'
+              name: 'AWS S3: Failed to get alarms data'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 7530d7ebe61942f4abc29a8ccb3b5516
           name: 'AWS S3: Requests: All'
@@ -269,6 +306,201 @@ zabbix_export:
             -
               tag: component
               value: requests
+        -
+          uuid: 6da0ea7130e64a7fb8ae32ee02290cbf
+          name: 'AWS S3: Get alarms data'
+          type: SCRIPT
+          key: aws.s3.get_alarms
+          delay: 0s;m/1
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var AwsS3 = {
+                params: {},
+            
+                setParams: function (params) {
+                    ['access_key', 'secret_key', 'region', 'bucket_name'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: "' + field + '".';
+                        }
+                    });
+            
+                    AwsS3.params = params;
+                },
+            
+                sign: function (key, message) {
+                    var hex = hmac('sha256', key, message);
+            
+                    if ((hex.length % 2) === 1) {
+                        throw 'Invalid length of a hex string!';
+                    }
+            
+                    var result = new Int8Array(hex.length / 2);
+                    for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
+                        result[b] = parseInt(hex.substring(i, i + 2), 16);
+                    }
+            
+                    return result;
+                },
+            
+                prepareParams: function (params) {
+                    var result = [];
+            
+                    Object.keys(params).sort().forEach(function (key) {
+                        if (typeof params[key] !== 'object') {
+                            result.push(key + '=' + encodeURIComponent(params[key]));
+                        }
+                        else {
+                            result.push(prepareObject(key, params[key]));
+                        }
+                    });
+            
+                    return result.join('&');
+                },
+            
+                request: function (method, region, service, params, data) {
+                    if (typeof data === 'undefined' || data === null) {
+                        data = '';
+                    }
+            
+                    var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
+                        date = amzdate.replace(/T\d+Z/, ''),
+                        host = service + '.' + region + '.amazonaws.com',
+                        canonical_uri = '/',
+                        canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
+                        signed_headers = 'content-encoding;host;x-amz-date',
+                        canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+                        credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
+                        request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
+                        key = AwsS3.sign('AWS4' + AwsS3.params.secret_key, date);
+            
+                    key = AwsS3.sign(key, region);
+                    key = AwsS3.sign(key, service);
+                    key = AwsS3.sign(key, 'aws4_request');
+            
+                    var request = new HttpRequest(),
+                        url = 'https://' + host + canonical_uri + '?' + params;
+            
+                    request.addHeader('x-amz-date: ' + amzdate);
+                    request.addHeader('Accept: application/json');
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Content-Encoding: amz-1.0');
+                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsS3.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+            
+                    Zabbix.log(4, '[ AWS S3 ] Sending request: ' + url);
+            
+                    response = request.get(url);
+            
+                    Zabbix.log(4, '[ AWS S3 ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() !== 200) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    if (response[0] === '<') {
+                        try {
+                            response = XML.toJson(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+                        }
+                    }
+            
+                    if (response !== null) {
+                        try {
+                            response = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+                        }
+                    }
+            
+                    return response;
+                },
+            
+                getAlarms: function () {
+                    var payload = {},
+                        result = [];
+            
+                    payload['Action'] = 'DescribeAlarms';
+                    payload['MaxRecords'] = 100;
+                    payload['Version'] = '2010-08-01';
+            
+                    while (payload.NextToken !== '') {
+                        var alarms = AwsS3.request('GET', AwsS3.params.region, 'monitoring', AwsS3.prepareParams(payload));
+            
+                        if (typeof alarms !== 'object'
+                            || typeof alarms.DescribeAlarmsResponse !== 'object'
+                            || typeof alarms.DescribeAlarmsResponse.DescribeAlarmsResult !== 'object'
+                            || typeof alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms !== 'object') {
+                            throw 'Cannot get alarms from AWS CloudWatch API. Check debug log for more information.';
+                        }
+            
+                        payload.NextToken = alarms.DescribeAlarmsResponse.DescribeAlarmsResult.NextToken || '';
+            
+                        alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms.forEach(function (alarm) {
+                            var dimensions = alarm.Dimensions;
+            
+                            if (Array.isArray(alarm.Metrics)) {
+                                alarm.Metrics.forEach(function (metric) {
+                                    if (typeof metric.MetricStat === 'object' && metric.MetricStat !== null
+                                        && typeof metric.MetricStat.Metric === 'object' && metric.MetricStat.Metric !== null
+                                        && Array.isArray(metric.MetricStat.Metric.Dimensions)) {
+                                        dimensions = dimensions.concat(metric.MetricStat.Metric.Dimensions);
+                                    }
+                                });
+                            }
+                            for (var i in dimensions) {
+                                if (dimensions[i].Name === 'BucketName' && dimensions[i].Value === AwsS3.params.bucket_name) {
+                                    result.push(alarm);
+                                    break;
+                                }
+                            }
+                        });
+                    }
+            
+                    return result;
+                }
+            }
+            
+            try {
+                AwsS3.setParams(JSON.parse(value));
+            
+                return JSON.stringify(AwsS3.getAlarms());
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ AWS S3 ] ERROR: ' + error);
+            
+                return JSON.stringify({ 'error': error });
+            }
+          description: |
+            Get alarms data.
+            DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          timeout: 15s
+          parameters:
+            -
+              name: access_key
+              value: '{$AWS.ACCESS.KEY.ID}'
+            -
+              name: secret_key
+              value: '{$AWS.SECRET.ACCESS.KEY}'
+            -
+              name: region
+              value: '{$AWS.REGION}'
+            -
+              name: bucket_name
+              value: '{$AWS.S3.BUCKET.NAME}'
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: 598e9dc563334ad6b1d72245a6f8679f
           name: 'AWS S3: Get metrics data'
@@ -831,6 +1063,137 @@ zabbix_export:
             -
               tag: component
               value: requests
+      discovery_rules:
+        -
+          uuid: 26c424a60a7a4975996ccc44601c4ee3
+          name: 'Bucket Alarms discovery'
+          type: DEPENDENT
+          key: aws.s3.alarms.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ALARM_NAME}'
+                value: '{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ALARM_NAME}'
+                value: '{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery bucket alarms.'
+          item_prototypes:
+            -
+              uuid: b38bd6e4566445acb52e8ecce4014f0f
+              name: 'AWS S3 Alarms: ["{#ALARM_NAME}"]: State'
+              type: DEPENDENT
+              key: 'aws.s3.alarm.state["{#ALARM_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
+                Alarm description:
+                {#ALARM_DESCRIPTION}
+              valuemap:
+                name: 'Alarm state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.AlarmName == "{#ALARM_NAME}")].StateValue.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '3'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var state = ['OK', 'INSUFFICIENT_DATA', 'ALARM'];
+                      
+                      return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
+              master_item:
+                key: aws.s3.get_alarms
+              tags:
+                -
+                  tag: component
+                  value: alarms
+              trigger_prototypes:
+                -
+                  uuid: 7f0ba96047784510b734c0064d434edc
+                  expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1'
+                  name: 'AWS S3 Alarms: "{#ALARM_NAME}" has ''Insufficient data'' state'
+                  priority: INFO
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: 7e536a43faf742058d303ffe21cd9a8c
+              name: 'AWS S3 Alarms: ["{#ALARM_NAME}"]: State reason'
+              type: DEPENDENT
+              key: 'aws.s3.alarm.state_reason["{#ALARM_NAME}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: |
+                An explanation for the alarm state, in text format.
+                Alarm description:
+                {#ALARM_DESCRIPTION}
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.AlarmName == "{#ALARM_NAME}")].StateReason.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: aws.s3.get_alarms
+              tags:
+                -
+                  tag: component
+                  value: alarms
+          trigger_prototypes:
+            -
+              uuid: c1b94199b7ac4cc9889ff0e724f7057d
+              expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0'
+              name: 'AWS S3 Alarms: "{#ALARM_NAME}" has ''Alarm'' state'
+              priority: AVERAGE
+              description: |
+                Alarm "{#ALARM_NAME}" has 'Alarm' state. 
+                Reason: {ITEM.LASTVALUE2}
+              tags:
+                -
+                  tag: scope
+                  value: availability
+          master_item:
+            key: aws.s3.get_alarms
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  var alarms = JSON.parse(value);
+                  
+                  alarms.forEach(function(alarm) {
+                  
+                   result.push({
+                  '{#ALARM_DESCRIPTION}': alarm.AlarmDescription !== null ? alarm.AlarmDescription : 'None' ,
+                  '{#ALARM_NAME}': alarm.AlarmName,
+                  '{#ALARM_PERIOD}': alarm.Period,
+                  '{#METRIC_NAME}': alarm.MetricName
+                    });
+                  });
+                  
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
       tags:
         -
           tag: class
@@ -856,6 +1219,31 @@ zabbix_export:
           macro: '{$AWS.S3.FILTER.ID}'
           description: 'S3 bucket requests filter identifier.'
         -
+          macro: '{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable alarms by name.'
+        -
+          macro: '{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered alarms by name.'
+        -
           macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'
+      valuemaps:
+        -
+          uuid: 5f232f40f02246ab843c9aacdcf8d5c5
+          name: 'Alarm state'
+          mappings:
+            -
+              value: '0'
+              newvalue: OK
+            -
+              value: '1'
+              newvalue: 'Insufficient data'
+            -
+              value: '2'
+              newvalue: Alarm
+            -
+              value: '255'
+              newvalue: Unknown
