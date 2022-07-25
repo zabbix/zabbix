@@ -866,6 +866,7 @@ class testFormSetup extends CWebTest {
 		$db_parameters = $this->getDbParameters();
 		$form = $this->query('xpath://form')->asForm()->one();
 		$form->fill($db_parameters);
+
 		for ($i = 0; $i < $skip_sections[$section]; $i++) {
 			$this->query('button:Next step')->one()->click();
 		}
