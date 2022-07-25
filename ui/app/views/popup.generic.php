@@ -392,7 +392,7 @@ switch ($data['popup_type']) {
 				$host = reset($item['hosts']);
 				$item['hostname'] = $host['name'];
 
-				$description = new CLink($item['name'], 'javascript:void(0);');
+				$description = (new CLink($item['name'], 'javascript:void(0);'))->addClass(ZBX_STYLE_WORDBREAK);
 				$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
 
 				$checkbox_key = is_numeric($item[$options['srcfld1']])
@@ -452,17 +452,19 @@ switch ($data['popup_type']) {
 		else {
 			foreach ($data['table_records'] as &$item) {
 				$host = reset($item['hosts']);
+				$item_pattern = array_key_exists('pattern', $item) ? $item['pattern'] : $item['itemid'];
 
 				$table->addRow([
 					$data['multiselect']
-						? new CCheckBox('item['.$item['itemid'].']', $item['pattern'])
+						? new CCheckBox('item['.$item['itemid'].']', $item_pattern)
 						: null,
 					(new CLink($item['name'], 'javascript:void(0);'))
 						->onClick('javascript: addValue('.
 							json_encode($options['reference']).', '.
-							json_encode($item['pattern']).', '.
+							json_encode($item_pattern).', '.
 							$options['parentid'].
-						');'.$js_action_onclick),
+						');'.$js_action_onclick)
+						->addClass(ZBX_STYLE_WORDBREAK),
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
@@ -473,7 +475,7 @@ switch ($data['popup_type']) {
 				]);
 
 				$item = [
-					'id' => $item['pattern'],
+					'id' => $item_pattern,
 					'itemid' => $item['itemid'],
 					'name' => $options['patternselect']
 						? $item['name']
