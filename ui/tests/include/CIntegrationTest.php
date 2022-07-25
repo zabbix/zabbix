@@ -35,6 +35,7 @@ class CIntegrationTest extends CAPITest {
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY		= 1; // Wait iteration delay.
 	const CACHE_RELOAD_DELAY		= 5; // Configuration cache reload delay.
+	const HOUSEKEEPER_EXEC_DELAY	= 5; // Housekeeper execution delay.
 	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
 
 	// Zabbix component constants.
@@ -825,7 +826,7 @@ class CIntegrationTest extends CAPITest {
 
 		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'housekeeper_execute']);
 
-		sleep(self::CACHE_RELOAD_DELAY);
+		sleep(self::HOUSEKEEPER_EXEC_DELAY);
 	}
 
 	/**

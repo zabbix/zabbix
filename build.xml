@@ -202,7 +202,7 @@
 	</target>
 
 	<target name="create-db-tsdb" depends="create-db-postgresql">
-		<!-- Create PostgreSQL database -->
+		<!-- Create PostgreSQL database with TimescaleDB extension-->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>

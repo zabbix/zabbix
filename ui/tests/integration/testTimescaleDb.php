@@ -34,7 +34,8 @@ class testTimescaleDb extends CIntegrationTest {
 	const TRAPNAME = 'trap_timescale';
 	const TABLENAME = 'history_uint';
 	const HIST_COUNT = 3000;
-	const COMPRESSION_OLDER_THAN = 20 * 24 * 3600; /* more than 7d */
+	 /* storing old data deep in the past - 20 days, which is way longer that the minimum 7days, and must be guaranteed to be compressed */
+	const COMPRESSION_OLDER_THAN = 20 * 24 * 3600;
 	static $db_extension = '';
 
 	/**
@@ -52,24 +53,12 @@ class testTimescaleDb extends CIntegrationTest {
 	}
 
 	/**
-	 * Component configuration provider.
-	 *
-	 * @return array
-	 */
-	public function serverConfigurationProvider2() {
-		return [
-			self::COMPONENT_SERVER => [
-				'DebugLevel' => 3,
-				'LogFileSize' => 0,
-			]
-		];
-	}
-
-	/**
 	 * Test TimescaleDb extension.
 	 */
 	public function setExtension() {
-		global $DB;
+
+		///getenv('DB')
+
 		self::$db_extension = '';
 
 		$sql = 'SELECT db_extension'.
@@ -86,8 +75,6 @@ class testTimescaleDb extends CIntegrationTest {
 	 * Test TimescaleDb extension.
 	 */
 	public function clearChunks() {
-		global $DB;
-
 		$sql = 'SELECT drop_chunks(\''.self::TABLENAME.'\', older_than => '.time().')';
 
 		$res = DBfetch(DBselect($sql));
@@ -100,8 +87,8 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkServerUp() {
-		if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
-			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'commit;');
+		if (self::$db_extension  === ZBX_DB_EXTENSION_TIMESCALEDB) {
+			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'TimescaleDB version:');
 		}
 		else {
 			$this->assertNotEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
@@ -131,7 +118,7 @@ class testTimescaleDb extends CIntegrationTest {
 					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
 				],
 				'groups' => [['groupid' => 4]],
-				'status' => HOST_STATUS_MONITORED
+				'status' => HOST_STATUS_NOT_MONITORED
 			]
 		]);
 
@@ -179,11 +166,9 @@ class testTimescaleDb extends CIntegrationTest {
 	 * Check compression of the chunk.
 	 */
 	public function getCheckCompression() {
-		global $DB;
-
-		$compres = DBfetch(DBselect('SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')'));
-		$this->assertArrayHasKey('number_compressed_chunks', $compres);
-		if ($compres['number_compressed_chunks'] == 0) {
+		$compress = DBfetch(DBselect('SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')'));
+		$this->assertArrayHasKey('number_compressed_chunks', $compress);
+		if ($compress['number_compressed_chunks'] == 0) {
 
 			$res = DBfetch(DBselect('SELECT show_chunks(\''.self::TABLENAME.'\')'));
 			$this->assertArrayHasKey('show_chunks', $res);
@@ -198,14 +183,14 @@ class testTimescaleDb extends CIntegrationTest {
 		}
 	}
 
-/**
+	/**
 	 * Test history table TimescaleDb.
 	 *
 	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkHistoryRecords() {
-		if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+		if (self::$db_extension  === ZBX_DB_EXTENSION_TIMESCALEDB) {
 			$this->reloadConfigurationCache();
 
 			$count_start = $this->getHistoryCount();
@@ -222,12 +207,14 @@ class testTimescaleDb extends CIntegrationTest {
 			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
 
 			$count_end = $this->getHistoryCount();
+			$this->assertNotEquals(-1, $count_end);
 			$this->assertEquals($count_end - $count_start, self::HIST_COUNT);
 
 			$response = $this->call('housekeeping.update',
 				['compression_status' => 1]
 			);
 			$this->assertArrayHasKey(0, $response['result']);
+			$this->assertEquals('compression_status', $response['result'][0]);
 			$this->reloadConfigurationCache();
 			$this->executeHousekeeper();
 		}
@@ -240,10 +227,10 @@ class testTimescaleDb extends CIntegrationTest {
 	 * Test compression TimescaleDb.
 	 *
 	 * @required-components server
-	 * @configurationDataProvider serverConfigurationProvider2
+	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkCompression() {
-		if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+		if (self::$db_extension  === ZBX_DB_EXTENSION_TIMESCALEDB) {
 			$this->executeHousekeeper();
 
 			$this->getCheckCompression();
