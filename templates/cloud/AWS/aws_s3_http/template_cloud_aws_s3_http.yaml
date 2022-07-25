@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-21T15:19:11Z'
+  date: '2022-07-25T10:22:26Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -442,10 +442,9 @@ zabbix_export:
                     payload['StartTime'] = start_time;
                     payload['EndTime'] = end_time;
                     payload['ScanBy'] = 'TimestampDescending';
-                    payload["MetricDataQueries"] = AwsS3.renderMetricQuery(AwsS3.request_period, AwsS3.params.bucket_name, AwsS3.params.filter_id);
+                    payload['MetricDataQueries'] = AwsS3.renderMetricQuery(AwsS3.request_period, AwsS3.params.bucket_name, AwsS3.params.filter_id);
                     result = AwsS3.request('POST', AwsS3.params.region, 'monitoring', payload);
-                    if (typeof result !== 'object'
-                        || typeof result.MetricDataResults !== 'object') {
+                    if (typeof result !== 'object' || typeof result.MetricDataResults !== 'object') {
                         throw 'Cannot get metrics data from AWS CloudWatch API. Check debug log for more information.';
                     }
             
