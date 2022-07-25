@@ -175,19 +175,24 @@ $new_templategroup_right_table = (new CTable())
 				->setModern(true)
 		))->setAttribute('style', 'vertical-align: top')
 	])
-	->addRow((new CCheckBox('new_templategroup_right[include_subgroups]'))
-		->setChecked((bool) $data['new_templategroup_right']['include_subgroups'])
-		->setLabel(_('Include subgroups'))
+	->addRow(
+		(new CCheckBox('new_templategroup_right[include_subgroups]'))
+			->setChecked((bool) $data['new_templategroup_right']['include_subgroups'])
+			->setLabel(_('Include subgroups'))
 	)
-	->addRow((new CSimpleButton(_('Add')))
-		->onClick('javascript: usergroups.submitNewTemplateGroupRight("usergroup.templategroupright.add");')
-		->addClass(ZBX_STYLE_BTN_LINK)
+	->addRow(
+		(new CSimpleButton(_('Add')))
+			->onClick('javascript: usergroups.submitNewTemplateGroupRight("usergroup.templategroupright.add");')
+			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
 $template_permissions_form_grid
-	->addItem(new CFormField((new CDiv($new_templategroup_right_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'))
+	->addItem(
+		new CFormField(
+			(new CDiv($new_templategroup_right_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
 	);
 
 $host_permissions_form_grid = (new CFormGrid())
@@ -225,19 +230,24 @@ $new_group_right_table = (new CTable())
 				->setModern(true)
 		))->setAttribute('style', 'vertical-align: top')
 	])
-	->addRow((new CCheckBox('new_group_right[include_subgroups]'))
-		->setChecked((bool) $data['new_group_right']['include_subgroups'])
-		->setLabel(_('Include subgroups'))
+	->addRow(
+		(new CCheckBox('new_group_right[include_subgroups]'))
+			->setChecked((bool) $data['new_group_right']['include_subgroups'])
+			->setLabel(_('Include subgroups'))
 	)
-	->addRow((new CSimpleButton(_('Add')))
-		->onClick('javascript: usergroups.submitNewGroupRight("usergroup.groupright.add");')
-		->addClass(ZBX_STYLE_BTN_LINK)
+	->addRow(
+		(new CSimpleButton(_('Add')))
+			->onClick('javascript: usergroups.submitNewGroupRight("usergroup.groupright.add");')
+			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
 $host_permissions_form_grid
-	->addItem(new CFormField((new CDiv($new_group_right_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'))
+	->addItem(
+		new CFormField(
+			(new CDiv($new_group_right_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
 	);
 
 $tag_filter_form_grid = (new CFormGrid())
@@ -279,21 +289,25 @@ $new_tag_filter_table = (new CTable())
 				->setAttribute('placeholder', _('value'))
 		))->addStyle('vertical-align: top;')
 	])
-	->addRow((new CCheckBox('new_tag_filter[include_subgroups]'))
-		->setChecked((bool) $data['new_tag_filter']['include_subgroups'])
-		->setLabel(_('Include subgroups'))
+	->addRow(
+		(new CCheckBox('new_tag_filter[include_subgroups]'))
+			->setChecked((bool) $data['new_tag_filter']['include_subgroups'])
+			->setLabel(_('Include subgroups'))
 	)
-	->addRow((new CSimpleButton(_('Add')))
-		->onClick('javascript: usergroups.submitNewTagFilter("usergroup.tagfilter.add");')
-		->addClass(ZBX_STYLE_BTN_LINK)
+	->addRow(
+		(new CSimpleButton(_('Add')))
+			->onClick('javascript: usergroups.submitNewTagFilter("usergroup.tagfilter.add");')
+			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
 $tag_filter_form_grid
-	->addItem(new CFormField(
-		(new CDiv($new_tag_filter_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-));
+	->addItem(
+		new CFormField(
+			(new CDiv($new_tag_filter_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+	);
 
 $tabs = (new CTabView())
 	->addTab('user_group_tab', _('User group'), $form_grid)
