@@ -38,11 +38,20 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 
 $scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.item.form.view.js.php')];
 
+$jq_templates['thresholds-row-tmpl'] = CWidgetHelper::getThresholdsTemplate();
+
 $field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
 	$form->getName()
 );
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
+
 $scripts[] = $field_itemid->getPostJS();
+$scripts[] = $fields['thresholds']->getJavascript();
+
+$numeric_only_warning = new CSpan([
+	'&nbsp;',
+	makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
+]);
 
 $form_list
 	->addRow(
@@ -209,6 +218,11 @@ $form_list
 		CWidgetHelper::getLabel($fields['bg_color']),
 		(new CDiv(CWidgetHelper::getColor($fields['bg_color'], true)))->addClass('form-field'),
 		'bg-color-row'
+	)
+	->addRow(
+		CWidgetHelper::getLabel($fields['thresholds'])->addItem($numeric_only_warning),
+		(new CDiv(CWidgetHelper::getThresholds($fields['thresholds'])))->addClass('form-field'),
+		'thresholds-row'
 	);
 
 // Dynamic item.
@@ -219,10 +233,13 @@ if ($data['templateid'] === null) {
 $form->addItem($form_list);
 
 $scripts[] = '
-	widget_item_form.init();
+	widget_item_form.init('.json_encode([
+		'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE
+	]).');
 ';
 
 return [
 	'form' => $form,
-	'scripts' => $scripts
+	'scripts' => $scripts,
+	'jq_templates' => $jq_templates
 ];

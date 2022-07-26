@@ -101,8 +101,20 @@ else {
 		new CLink($rows, $data['url'])
 	))->addClass('dashboard-grid-widget-item');
 
-	if ($data['bg_color'] !== '') {
-		$body->addStyle('background-color: #'.$data['bg_color']);
+	$color = $data['bg_color'];
+
+	if (array_key_exists('thresholds', $data) && $data['raw_value'] !== null) {
+		foreach ($data['thresholds'] as $threshold) {
+			if ($data['raw_value'] < $threshold['threshold']) {
+				break;
+			}
+
+			$color = $threshold['color'];
+		}
+	}
+
+	if ($color !== '') {
+		$body->addStyle('background-color: #'.$color);
 	}
 }
 

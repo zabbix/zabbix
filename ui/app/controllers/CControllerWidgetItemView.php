@@ -49,6 +49,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 		$time = '';
 		$units = '';
 		$decimals = null;
+		$raw_units = null;
 		$is_dynamic = ($this->hasInput('dynamic_hostid')
 				&& ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
 					|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM)
@@ -326,6 +327,8 @@ class CControllerWidgetItemView extends CControllerWidget {
 			'cells' => $cells,
 			'url' => $url,
 			'bg_color' => $fields['bg_color'],
+			'thresholds' => $fields['thresholds'],
+			'raw_value' => $raw_units ? $raw_units['value'] : null,
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

@@ -22,7 +22,7 @@
 
 window.widget_item_form = new class {
 
-	init() {
+	init({thresholds_colors}) {
 		this.show_description = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_DESCRIPTION ?>}`);
 		this.show_value = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_VALUE ?>}`);
 		this.show_time = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_TIME ?>}`);
@@ -35,6 +35,7 @@ window.widget_item_form = new class {
 		this.time_row = document.getElementById('time-row');
 		this.change_indicator_row = document.getElementById('change-indicator-row');
 		this.bg_color_row = document.getElementById('bg-color-row');
+		this.thresholds_row = document.getElementById('thresholds-row');
 
 		const show = [this.show_description, this.show_value, this.show_time, this.show_change_indicator];
 
@@ -66,6 +67,8 @@ window.widget_item_form = new class {
 				});
 			});
 
+		colorPalette.setThemeColors(thresholds_colors);
+
 		this.updateForm();
 	}
 
@@ -96,6 +99,11 @@ window.widget_item_form = new class {
 
 		this.bg_color_row.style.display = this.advance_configuration.checked ? '' : 'none';
 		this.bg_color_row.querySelectorAll('input').forEach((element) => {
+			element.disabled = !this.advance_configuration.checked;
+		});
+
+		this.thresholds_row.style.display = this.advance_configuration.checked ? '' : 'none';
+		this.thresholds_row.querySelectorAll('input').forEach((element) => {
 			element.disabled = !this.advance_configuration.checked;
 		});
 
