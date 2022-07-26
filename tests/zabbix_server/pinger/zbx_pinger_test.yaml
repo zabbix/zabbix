@@ -1,3 +1,4 @@
+---
 test case: Both interface and key parameter are present
 in:
   interface: "127.0.0.1:10051"
@@ -25,3 +26,4 @@ in:
   key: icmpping[]
 out:
   address: ""
+...

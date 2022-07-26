@@ -1,3 +1,4 @@
+---
 test case: (SSH) Both interface and key parameter are present
 in:
   type: ZBX_TEST_GET_VALUE_SSH
@@ -69,3 +70,4 @@ in:
     key: telnet.run[clear]
 out:
   return: NOTSUPPORTED
+...

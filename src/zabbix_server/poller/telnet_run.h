@@ -22,10 +22,6 @@
 
 #include "dbcache.h"
 
-#define TELNET_RUN_KEY	"telnet.run"
-
-extern char	*CONFIG_SOURCE_IP;
-
 int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
 
 #endif

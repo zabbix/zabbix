@@ -35,11 +35,13 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
+#define TELNET_RUN_KEY	"telnet.run"
 	if (0 != strcmp(TELNET_RUN_KEY, get_rkey(&request)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
 		goto out;
 	}
+#undef TELNET_RUN_KEY
 
 	if (4 < get_rparams_num(&request))
 	{
@@ -79,5 +81,3 @@ out:
 
 	return ret;
 }
-
-#undef TELNET_RUN_KEY

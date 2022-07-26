@@ -35,6 +35,9 @@
 #include "log.h"
 #endif
 
+extern char	*CONFIG_SOURCE_IP;
+extern char	*CONFIG_SSH_KEY_LOCATION;
+
 #if defined(HAVE_SSH2)
 static const char	*password;
 

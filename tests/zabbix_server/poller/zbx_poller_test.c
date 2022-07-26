@@ -57,8 +57,7 @@ void	zbx_mock_test_entry(void **state)
 		zbx_free(error);
 #endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH) */
 	}
-
-	if (0 == zbx_strcmp_null("ZBX_TEST_GET_VALUE_TELNET", test_type))
+	else if (0 == zbx_strcmp_null("ZBX_TEST_GET_VALUE_TELNET", test_type))
 	{
 		item.interface.addr = (char *)zbx_mock_get_parameter_string("in.item.interface");
 		item.key = (char *)zbx_mock_get_parameter_string("in.item.key");
