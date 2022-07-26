@@ -145,8 +145,6 @@ class testTimescaleDb extends CIntegrationTest {
 	 * Get number of records in history_uint table.
 	 */
 	public function getHistoryCount() {
-		global $DB;
-
 		$res = DBfetch(DBselect('SELECT count(*) FROM '.self::TABLENAME));
 
 		if ($res) {
