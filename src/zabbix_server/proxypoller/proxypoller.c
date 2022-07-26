@@ -432,7 +432,7 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 	/* handle pre 3.4 proxies that did not support proxy data request */
 	if ('\0' == *answer)
 	{
-		proxy->version = ZBX_COMPONENT_VERSION(3, 2);
+		proxy->version = ZBX_COMPONENT_VERSION(3, 2, 0);
 		zbx_free(answer);
 		ret = FAIL;
 		goto out;
@@ -471,7 +471,7 @@ static int	proxy_get_tasks(DC_PROXY *proxy)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (ZBX_COMPONENT_VERSION(3, 2) >= proxy->version)
+	if (ZBX_COMPONENT_VERSION(3, 2, 0) >= ZBX_COMPONENT_VERSION_IGNORE_PATCH(proxy->version))
 		goto out;
 
 	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_TASKS, &answer, &ts)))

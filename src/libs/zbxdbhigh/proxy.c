@@ -3855,12 +3855,12 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp), NULL) ||
-				FAIL == (version = zbx_get_component_version(tmp)))
+				FAIL == (version = zbx_get_component_version_ignore_patch(tmp)))
 	{
-		version = ZBX_COMPONENT_VERSION(4, 2);
+		version = ZBX_COMPONENT_VERSION(4, 2, 0);
 	}
 
-	if (ZBX_COMPONENT_VERSION(4, 4) <= version &&
+	if (ZBX_COMPONENT_VERSION(4, 4, 0) <= version &&
 			SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, tmp, sizeof(tmp), NULL))
 	{
 		zbx_data_session_t	*session;
@@ -4519,12 +4519,12 @@ int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp)
 	int	version;
 
 	if (NULL != jp && SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value), NULL) &&
-			-1 != (version = zbx_get_component_version(value)))
+			FAIL != (version = zbx_get_component_version(value)))
 	{
 		return version;
 	}
 	else
-		return ZBX_COMPONENT_VERSION(3, 2);
+		return ZBX_COMPONENT_VERSION(3, 2, 0);
 }
 
 /******************************************************************************
@@ -4893,6 +4893,43 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: gets proxy version status, which is compatibility between server  *
+ *          and proxy                                                         *
+ *                                                                            *
+ * Parameters: proxy_version - [IN] proxy_version                             *
+ *                                                                            *
+ * Return value: proxy version status                                         *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_proxy_version_status_t	zbx_get_proxy_version_status(int proxy_version)
+{
+#define SERVER_VERION	ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR, 0)
+
+	proxy_version = ZBX_COMPONENT_VERSION_IGNORE_PATCH(proxy_version);
+
+	if (0 == proxy_version)
+		return ZBX_PROXY_VERSION_STATUS_UNDEFINED;
+
+	if (SERVER_VERION == proxy_version)
+		return ZBX_PROXY_VERSION_STATUS_CURRENT;
+
+	if (SERVER_VERION < proxy_version)
+		return ZBX_PROXY_VERSION_STATUS_UNSUPPORTED;
+
+#if (ZABBIX_VERSION_MINOR == 0)
+	if (ZABBIX_VERSION_MAJOR == 1 + ZBX_COMPONENT_VERSION_MAJOR(proxy_version))
+		return ZBX_PROXY_VERSION_STATUS_OUTDATED;
+#else
+	if (ZABBIX_VERSION_MAJOR == ZBX_COMPONENT_VERSION_MAJOR(proxy_version))
+		return ZBX_PROXY_VERSION_STATUS_OUTDATED;
+#endif
+
+	return ZBX_PROXY_VERSION_STATUS_UNSUPPORTED;
+#undef SERVER_VERION
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: updates proxy runtime properties in cache and database.           *
  *                                                                            *
  * Parameters: proxy      - [IN/OUT] the proxy                                *
@@ -4908,10 +4945,12 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress, zbx_uint64_t flags_add)
 {
 	zbx_proxy_diff_t	diff;
+	zbx_proxy_version_status_t	version_status;
 
 	diff.hostid = proxy->hostid;
 	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE | flags_add;
 	diff.version = version;
+	diff.version_status = zbx_get_proxy_version_status(version);
 	diff.lastaccess = lastaccess;
 	diff.compress = compress;
 
@@ -4972,8 +5011,10 @@ int	zbx_check_protocol_version(DC_PROXY *proxy, int version)
 	int	now;
 	int	print_log = 0;
 
+	version = ZBX_COMPONENT_VERSION_IGNORE_PATCH(version);
+
 	/* warn if another proxy version is used and proceed with compatibility rules*/
-	if ((server_version = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR)) != version)
+	if ((server_version = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR, 0)) != version)
 	{
 		now = (int)time(NULL);
 
@@ -4985,7 +5026,7 @@ int	zbx_check_protocol_version(DC_PROXY *proxy, int version)
 		}
 
 		/* don't accept pre 4.2 data */
-		if (ZBX_COMPONENT_VERSION(4, 2) > version)
+		if (ZBX_COMPONENT_VERSION(4, 2, 0) > version)
 		{
 			if (1 == print_log)
 			{

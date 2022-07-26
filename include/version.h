@@ -42,5 +42,16 @@
 #define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
 
 int	zbx_get_component_version(char *value);
+int	zbx_get_component_version_ignore_patch(char *value);
+
+/* these values are shared with the UI*/
+typedef enum
+{
+	ZBX_PROXY_VERSION_STATUS_UNDEFINED = 0,
+	ZBX_PROXY_VERSION_STATUS_CURRENT,
+	ZBX_PROXY_VERSION_STATUS_OUTDATED,
+	ZBX_PROXY_VERSION_STATUS_UNSUPPORTED
+}
+zbx_proxy_version_status_t;
 
 #endif

@@ -1631,9 +1631,13 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc);
 char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);
 
-#define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
-#define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
-#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFFFF)
+#define ZBX_COMPONENT_VERSION_RIGHT2(x)			((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)((x)/100))*100))
+#define ZBX_COMPONENT_VERSION(major, minor, patch)	((major*10000) + (minor*100) + patch)
+#define ZBX_COMPONENT_VERSION_MAJOR(version)		ZBX_COMPONENT_VERSION_RIGHT2(version/10000)
+#define ZBX_COMPONENT_VERSION_MINOR(version)		ZBX_COMPONENT_VERSION_RIGHT2(version/100)
+#define ZBX_COMPONENT_VERSION_PATCH(version)		ZBX_COMPONENT_VERSION_RIGHT2(version)
+#define ZBX_COMPONENT_VERSION_IGNORE_PATCH(version)	ZBX_COMPONENT_VERSION(ZBX_COMPONENT_VERSION_MAJOR(version), \
+							ZBX_COMPONENT_VERSION_MINOR(version), 0)
 
 #define ZBX_PREPROC_MULTIPLIER			1
 #define ZBX_PREPROC_RTRIM			2

@@ -603,9 +603,9 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp), NULL) ||
-			FAIL == (version = zbx_get_component_version(tmp)))
+			FAIL == (version = zbx_get_component_version_ignore_patch(tmp)))
 	{
-		version = ZBX_COMPONENT_VERSION(4, 2);
+		version = ZBX_COMPONENT_VERSION(4, 2, 0);
 	}
 
 	zbx_vector_uint64_create(&itemids);
@@ -657,7 +657,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, dc_items[i].key, ZBX_JSON_TYPE_STRING);
 
-			if (ZBX_COMPONENT_VERSION(4,4) > version)
+			if (ZBX_COMPONENT_VERSION(4, 4, 0) > version)
 			{
 				if (0 != strcmp(dc_items[i].key, dc_items[i].key_orig))
 				{
@@ -699,7 +699,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	zbx_json_close(&json);
 
-	if (ZBX_COMPONENT_VERSION(4,4) == version || ZBX_COMPONENT_VERSION(5,0) == version)
+	if (ZBX_COMPONENT_VERSION(4, 4, 0) == version || ZBX_COMPONENT_VERSION(5, 0, 0) == version)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, 600);
 
 	zbx_vector_uint64_destroy(&itemids);

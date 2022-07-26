@@ -683,14 +683,15 @@ void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
 
 typedef struct
 {
-	zbx_uint64_t		hostid;
-	unsigned char		compress;
-	int			version;
-	int			lastaccess;
-	int			last_version_error_time;
-	int			proxy_delay;
-	int			more_data;
-	zbx_proxy_suppress_t	nodata_win;
+	zbx_uint64_t			hostid;
+	unsigned char			compress;
+	int				version;
+	zbx_proxy_version_status_t	version_status;
+	int				lastaccess;
+	int				last_version_error_time;
+	int				proxy_delay;
+	int				more_data;
+	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)

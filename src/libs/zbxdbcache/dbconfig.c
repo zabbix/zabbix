@@ -1307,6 +1307,7 @@ done:
 			{
 				proxy->location = ZBX_LOC_NOWHERE;
 				proxy->version = 0;
+				proxy->version_status = ZBX_PROXY_VERSION_STATUS_UNDEFINED;
 				proxy->lastaccess = atoi(row[12]);
 				proxy->last_cfg_error_time = 0;
 				proxy->proxy_delay = 0;
@@ -11022,7 +11023,8 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
 		zbx_vector_ptr_t *items_active_normal, zbx_vector_ptr_t *items_active_notsupported,
 		zbx_vector_ptr_t *items_disabled, zbx_uint64_t *triggers_enabled_ok,
 		zbx_uint64_t *triggers_enabled_problem, zbx_uint64_t *triggers_disabled,
-		zbx_vector_ptr_t *required_performance)
+		zbx_vector_ptr_t *required_performance, zbx_vector_ptr_t *proxy_version,
+		zbx_vector_ptr_t *proxy_version_status)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_PROXY	*dc_proxy;
@@ -11048,6 +11050,8 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
 	{
 		proxy_counter_ui64_push(hosts_monitored, dc_proxy->hostid, dc_proxy->hosts_monitored);
 		proxy_counter_ui64_push(hosts_not_monitored, dc_proxy->hostid, dc_proxy->hosts_not_monitored);
+		proxy_counter_ui64_push(proxy_version, dc_proxy->hostid, (zbx_uint64_t)dc_proxy->version);
+		proxy_counter_ui64_push(proxy_version_status, dc_proxy->hostid, (zbx_uint64_t)dc_proxy->version_status);
 
 		if (NULL != (dc_proxy_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_proxy->hostid)))
 		{
@@ -12808,9 +12812,14 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION))
 		{
 			if (proxy->version != diff->version)
+			{
 				proxy->version = diff->version;
+				proxy->version_status = diff->version_status;
+			}
 			else
+			{
 				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION);
+			}
 		}
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))

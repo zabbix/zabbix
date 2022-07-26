@@ -516,7 +516,7 @@ out:
 
 static zbx_entry_info_t	templates, hosts_monitored, hosts_not_monitored, items_active_normal, items_active_notsupported,
 			items_disabled, triggers_enabled_ok, triggers_enabled_problem, triggers_disabled, users_online,
-			users_offline, required_performance;
+			users_offline, required_performance, proxy_version, proxy_version_status, server_version;
 static int		templates_res, users_res;
 
 static void	zbx_status_counters_init(void)
@@ -527,6 +527,8 @@ static void	zbx_status_counters_init(void)
 	zbx_vector_ptr_create(&items_active_notsupported.counters);
 	zbx_vector_ptr_create(&items_disabled.counters);
 	zbx_vector_ptr_create(&required_performance.counters);
+	zbx_vector_ptr_create(&proxy_version.counters);
+	zbx_vector_ptr_create(&proxy_version_status.counters);
 }
 
 static void	zbx_status_counters_free(void)
@@ -537,6 +539,8 @@ static void	zbx_status_counters_free(void)
 	zbx_vector_ptr_clear_ext(&items_active_notsupported.counters, zbx_default_mem_free_func);
 	zbx_vector_ptr_clear_ext(&items_disabled.counters, zbx_default_mem_free_func);
 	zbx_vector_ptr_clear_ext(&required_performance.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&proxy_version.counters, zbx_default_mem_free_func);
+	zbx_vector_ptr_clear_ext(&proxy_version_status.counters, zbx_default_mem_free_func);
 
 	zbx_vector_ptr_destroy(&hosts_monitored.counters);
 	zbx_vector_ptr_destroy(&hosts_not_monitored.counters);
@@ -544,6 +548,8 @@ static void	zbx_status_counters_free(void)
 	zbx_vector_ptr_destroy(&items_active_notsupported.counters);
 	zbx_vector_ptr_destroy(&items_disabled.counters);
 	zbx_vector_ptr_destroy(&required_performance.counters);
+	zbx_vector_ptr_destroy(&proxy_version.counters);
+	zbx_vector_ptr_destroy(&proxy_version_status.counters);
 }
 
 const zbx_status_section_t	status_sections[] = {
@@ -663,6 +669,36 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
+	{"proxy version",	ZBX_SECTION_ENTRY_PER_PROXY, USER_TYPE_SUPER_ADMIN,	NULL,
+		{
+		{&proxy_version,	ZBX_COUNTER_TYPE_UI64,
+			{
+			{NULL}
+			}
+		},
+		{NULL}
+		}
+	},
+	{"proxy version status",	ZBX_SECTION_ENTRY_PER_PROXY, USER_TYPE_SUPER_ADMIN,	NULL,
+		{
+		{&proxy_version_status,	ZBX_COUNTER_TYPE_UI64,
+			{
+			{NULL}
+			}
+		},
+		{NULL}
+		}
+	},
+	{"server version",	ZBX_SECTION_ENTRY_THE_ONLY, USER_TYPE_SUPER_ADMIN,	NULL,
+		{
+		{&server_version,	ZBX_COUNTER_TYPE_UI64,
+			{
+			{NULL}
+			}
+		},
+		{NULL}
+		}
+	},
 	{NULL}
 };
 
@@ -717,10 +753,13 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 
 	templates_res = DBget_template_count(&templates.counter.ui64);
 	users_res = DBget_user_count(&users_online.counter.ui64, &users_offline.counter.ui64);
+	server_version.counter.ui64 = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR, \
+			ZABBIX_VERSION_PATCH);
 	DCget_status(&hosts_monitored.counters, &hosts_not_monitored.counters, &items_active_normal.counters,
 			&items_active_notsupported.counters, &items_disabled.counters,
 			&triggers_enabled_ok.counter.ui64, &triggers_enabled_problem.counter.ui64,
-			&triggers_disabled.counter.ui64, &required_performance.counters);
+			&triggers_disabled.counter.ui64, &required_performance.counters, &proxy_version.counters,
+			&proxy_version_status.counters);
 
 	/* add status information to JSON */
 	for (section = status_sections; NULL != section->name; section++)

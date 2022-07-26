@@ -5462,10 +5462,12 @@ void	zbx_trim_float(char *str)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: extracts protocol version from value                              *
+ * Purpose: Extracts protocol version from string. All three groups of digits *
+ *          are extracted. Alphanumeric release candidate part is gnored.     *
  *                                                                            *
  * Parameters:                                                                *
  *     value      - [IN] textual representation of version                    *
+ *                  Example: "6.4.0alpha1"                                    *
  *                                                                            *
  * Return value: The protocol version if it was successfully extracted,       *
  *               otherwise -1                                                 *
@@ -5473,17 +5475,42 @@ void	zbx_trim_float(char *str)
  ******************************************************************************/
 int	zbx_get_component_version(char *value)
 {
-	char	*pminor, *ptr;
+	char *pmid, *plow;
 
-	if (NULL == (pminor = strchr(value, '.')))
+	if (NULL == (pmid = strchr(value, '.')))
 		return FAIL;
 
-	*pminor++ = '\0';
+	*pmid++ = '\0';
 
-	if (NULL != (ptr = strchr(pminor, '.')))
-		*ptr = '\0';
+	if (NULL == (plow = strchr(pmid, '.')))
+		return FAIL;
 
-	return ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
+	*plow++ = '\0';
+
+	return ZBX_COMPONENT_VERSION(atoi(value), atoi(pmid), atoi(plow));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Extracts protocol version from string. Only the two most          *
+ *          significant groups of digits are extracted.                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     value      - [IN] textual representation of version                    *
+ *                  Example: "6.4.0alpha1"                                    *
+ *                                                                            *
+ * Return value: The protocol version if it was successfully extracted,       *
+ *               otherwise -1                                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_get_component_version_ignore_patch(char *value)
+{
+	int ver;
+
+	if (FAIL == (ver = zbx_get_component_version(value)))
+		return FAIL;
+
+	return ZBX_COMPONENT_VERSION_IGNORE_PATCH(ver);
 }
 
 /******************************************************************************
