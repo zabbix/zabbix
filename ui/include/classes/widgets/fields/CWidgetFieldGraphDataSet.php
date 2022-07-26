@@ -59,8 +59,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'aggregate_interval'	=> ['type' => API_MULTIPLE, 'rules' => [
 				['if' => ['field' => 'aggregate_function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 					'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
-				['else' => true,
-					'type' => API_STRING_UTF8]
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => GRAPH_AGGREGATE_DEFAULT_INTERVAL]
 			]],
 			'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])],
 			'approximation'			=> ['type' => API_INT32, 'in' => implode(',', [APPROXIMATION_MIN, APPROXIMATION_AVG, APPROXIMATION_MAX, APPROXIMATION_ALL])]
