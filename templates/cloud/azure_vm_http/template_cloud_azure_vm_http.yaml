@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-25T16:55:42Z'
+  date: '2022-07-26T08:41:29Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -716,7 +716,7 @@ zabbix_export:
                         try {
                             metrics_data = AzureVM.requestMetrics(metrics[i]);
                             for (j in metrics_data.value) {
-                                data.metrics[metrics_data.value[j].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[j].timeseries[0].data[metrics_data.value[j].timeseries[0].data.length - 3];
+                                data.metrics[metrics_data.value[j].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[j].timeseries[0].data[metrics_data.value[j].timeseries[0].data.length - 2];
                             }
                         }
                         catch (error) {

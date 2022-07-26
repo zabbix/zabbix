@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-25T16:55:38Z'
+  date: '2022-07-26T08:41:25Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -74,6 +74,7 @@ zabbix_export:
           name: 'Azure: Get resources'
           type: SCRIPT
           key: azure.get.resources
+          delay: 10m
           history: 0d
           trends: '0'
           value_type: TEXT
