@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-06-26 14:19+0000\n"
+"PO-Revision-Date: 2022-07-22 13:16+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1018,11 +1018,11 @@ msgstr "Chiffrement"
 
 #: include/classes/data/CItemData.php:817
 msgid "Agent host metadata. Returns string"
-msgstr "Métadonnées de l'hôte de l'agent. Renvoie un chaîne"
+msgstr "Métadonnées de l'hôte de l'agent. Retourne un chaîne de caractères"
 
 #: include/classes/data/CItemData.php:821
 msgid "Agent host name. Returns string"
-msgstr "Nom d'hôte de l'agent. Retourne une chaîne"
+msgstr "Nom d'hôte de l'agent. Retourne une chaîne de caractères"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
@@ -1030,7 +1030,7 @@ msgstr "Interfaces de l'agent"
 
 #: include/classes/data/CItemData.php:829
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr "Vérification de la variante de l'agent. Renvoie 1 - pour agent Zabbix ; 2 - pour agent Zabbix 2"
+msgstr "Vérification de la variante de l'agent. Retourne 1 - pour agent Zabbix ; 2 - pour agent Zabbix 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
@@ -1778,7 +1778,7 @@ msgstr "FERMETURE"
 
 #: include/classes/data/CItemData.php:1073
 msgid "CPU information. Returns string or integer"
-msgstr "Informations du CPU. Retourne une chaîne ou un entier"
+msgstr "Informations du CPU. Retourne une chaîne de caractères ou un entier"
 
 #: include/classes/data/CItemData.php:1049
 msgid "CPU load. Returns float"
@@ -1895,7 +1895,7 @@ msgstr "Impossible d'ajouter la corrélation"
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr "Impossible d'ajouter une page de tableau de bord : le nombre maximal de %1$d pages de tableau de bord a été ajouté."
+msgstr "Impossible d'ajouter une page au tableau de bord : le nombre maximal de %1$d pages de tableau de bord a été ajouté."
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
@@ -2783,7 +2783,7 @@ msgstr "Impossible de lier le modèle"
 #: include/classes/api/services/CHostBase.php:520
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr "Impossible de lier le modèle \"%1$s\" à l'hôte \"%2$s\" car son modèle parent \"%3$s\" sera lié deux fois."
+msgstr "Impossible de lier le modèle \"%1$s\" à l'hôte \"%2$s\" car son modèle parent \"%3$s\" serait lié deux fois."
 
 #: include/classes/api/services/CHostBase.php:678
 #: include/classes/api/services/CHostBase.php:755
@@ -2804,7 +2804,7 @@ msgstr "Impossible de lier le modèle \"%1$s\" à l'hôte \"%2$s\" car son modè
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr "Impossible de lier le modèle \"%1$s\" au prototype hôte \"%2$s\" car son modèle parent \"%3$s\" sera lié deux fois."
+msgstr "Impossible de lier le modèle \"%1$s\" au prototype hôte \"%2$s\" car son modèle parent \"%3$s\" serait lié deux fois."
 
 #: include/classes/api/services/CHostBase.php:675
 #: include/classes/api/services/CHostBase.php:752
@@ -3065,7 +3065,7 @@ msgstr "Impossible de dissocier le modèle \"%1$s\" sans le modèle \"%2$s\" de 
 #: include/classes/api/services/CHostBase.php:255
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from template \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr "Impossible de dissocier le modèle \"%1$s\" sans le modèle \"%2$s\" de l'hôte \"%3$s\" en raison de l'expression du déclencheur \"%4$s\"."
+msgstr "Impossible de dissocier le modèle \"%1$s\" sans le modèle \"%2$s\" du modèle \"%3$s\" en raison de l'expression du déclencheur \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:299
 #, c-format
@@ -3453,7 +3453,7 @@ msgstr "Changer"
 #: app/views/administration.proxy.edit.php:126
 #: include/views/configuration.host.prototype.edit.php:398
 msgid "Change PSK"
-msgstr "Change PSK"
+msgstr "Changer PSK"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:354
 #: include/classes/widgets/forms/CWidgetFormItem.php:364
@@ -3480,7 +3480,7 @@ msgstr "Changement de gravité"
 
 #: include/classes/html/CMacroValue.php:162
 msgid "Change type"
-msgstr "Type changé"
+msgstr "Changer le type"
 
 #: app/partials/configuration.filter.items.php:139
 #: app/views/popup.massupdate.item.php:157 include/items.inc.php:127
@@ -3511,7 +3511,7 @@ msgstr "Châssis"
 
 #: include/classes/data/CItemData.php:1069
 msgid "Chassis information. Returns string"
-msgstr "Informations du chaŝsis. Retourne une chaîne"
+msgstr "Informations du châssis. Retourne une chaîne de caractères"
 
 #: app/views/js/configuration.discovery.edit.js.php:388
 msgid "Check already exists."
@@ -3564,7 +3564,7 @@ msgstr "Vérifie si le service DNS est actif. Retourne 0 - le DNS est inactif (l
 
 #: include/classes/data/CItemData.php:1165
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
-msgstr "Vérifie si le fichier existe. Renvoie 0 - introuvable ; 1 - le fichier du type spécifié existe"
+msgstr "Vérifie si le fichier existe. Retourne 0 - introuvable ; 1 - le fichier du type spécifié existe"
 
 #: include/classes/data/CItemData.php:853
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -3809,6 +3809,13 @@ msgstr "Compresser les enregistrements antérieurs à"
 #: app/views/administration.proxy.list.php:79
 msgid "Compression"
 msgstr "Compression"
+
+#: app/views/administration.housekeeping.edit.php:163
+#: app/views/administration.housekeeping.edit.php:168
+#: app/views/administration.housekeeping.edit.php:173
+#: app/views/administration.housekeeping.edit.php:183
+msgid "Compression is not supported."
+msgstr "La compression n'est pas prise en charge."
 
 #: app/views/administration.mediatype.edit.php:319
 msgid "Concurrent sessions"
@@ -4294,7 +4301,7 @@ msgstr "Nombre de bascules de contexte. Retourne un entier"
 
 #: include/classes/data/CItemData.php:1145
 msgid "Count of directory entries, recursively. Returns integer"
-msgstr "Nombre d'entrées de répertoire, récursif. Renvoie un entier"
+msgstr "Nombre d'entrées de répertoire, récursif. Retourne un entier"
 
 #: include/classes/data/CItemData.php:901
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
@@ -5490,6 +5497,10 @@ msgstr "Détails"
 msgid "Details of web scenario"
 msgstr "Détails du scénario web"
 
+#: app/views/administration.housekeeping.edit.php:194
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr "La licence TimescaleDB détectée ne prend pas en charge la compression. La compression est prise en charge dans TimescaleDB Community Edition."
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr "Période de détection"
@@ -5512,7 +5523,7 @@ msgstr "Critère d'unicité de l'équipement"
 
 #: include/httptest.inc.php:31
 msgid "Digest"
-msgstr ""
+msgstr "Digest"
 
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
@@ -5761,11 +5772,11 @@ msgstr "Objet de découverte"
 
 #: include/classes/data/CItemData.php:1229
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
-msgstr "Découverte des clusters VMware, <url> - URL du service VMware. Renvoie un JSON"
+msgstr "Découverte des clusters VMware, <url> - URL du service VMware. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1237
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
-msgstr "Découverte des datastores VMware, <url> - URL du service VMware. Renvoie un JSON"
+msgstr "Découverte des datastores VMware, <url> - URL du service VMware. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1289
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -5781,7 +5792,7 @@ msgstr "Découverte des périphériques de disque de la machine virtuelle VMware
 
 #: include/classes/data/CItemData.php:1569
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr "Découverte des systèmes de fichiers de la machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware. Renvoie JSON"
+msgstr "Découverte des systèmes de fichiers de la machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1501
 msgid "Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
@@ -5789,7 +5800,7 @@ msgstr "Découverte des périphériques réseau de la machine virtuelle VMware, 
 
 #: include/classes/data/CItemData.php:1445
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
-msgstr "Découverte des machines virtuelles VMware, <url> - URL du service VMware. Renvoie un JSON"
+msgstr "Découverte des machines virtuelles VMware, <url> - URL du service VMware. Retourne un JSON"
 
 #: app/controllers/CControllerAuditLogList.php:215
 #: app/views/configuration.discovery.edit.php:136
@@ -6435,7 +6446,7 @@ msgstr "Activé"
 
 #: app/views/administration.authentication.edit.php:299
 msgid "Encrypt"
-msgstr "Crypter"
+msgstr "Chiffrement"
 
 #: app/partials/configuration.host.edit.html.php:527
 #: app/views/administration.proxy.edit.php:143
@@ -6447,7 +6458,7 @@ msgstr "Chiffrement"
 
 #: app/views/administration.autoreg.edit.php:43
 msgid "Encryption level"
-msgstr "Niveau de cryptage"
+msgstr "Niveau de chiffrement"
 
 #: app/partials/scheduledreport.formgrid.html.php:160
 msgid "End date"
@@ -6667,7 +6678,7 @@ msgstr "Exécuter la requête WMI et renvoyer le document JSON avec tous les obj
 
 #: include/classes/data/CItemData.php:1589
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
-msgstr "Exécute une requête WMI et retourne le premier objet sélectionné. Retourne un entier, un flottant, une chaîne ou du texte (selon la requête)"
+msgstr "Exécute une requête WMI et retourne le premier objet sélectionné. Retourne un entier, un flottant, une chaîne de caractères ou du texte (selon la requête)"
 
 #: include/views/configuration.host.discovery.edit.php:990
 #: include/views/configuration.host.discovery.list.php:329
@@ -6975,7 +6986,7 @@ msgstr "Le champ \"%1$s\" n'est pas un entier."
 #: include/validate.inc.php:202
 #, c-format
 msgid "Field \"%1$s\" is not string."
-msgstr "Le champ \"%1$s\" n'est pas une chaîne."
+msgstr "Le champ \"%1$s\" n'est pas une chaîne de caractères."
 
 #: include/validate.inc.php:298
 #, c-format
@@ -6997,7 +7008,7 @@ msgstr "Fichier trop volumineux, la taille maximale de téléchargement est de %
 
 #: include/classes/data/CItemData.php:1177
 msgid "File owner information. Returns string"
-msgstr "Informations sur le propriétaire du fichier. Renvoie une chaîne"
+msgstr "Informations sur le propriétaire du fichier. Retourne une chaîne de caractères"
 
 #: include/classes/data/CItemData.php:1193
 msgid "File size in bytes (default) or in newlines. Returns integer"
@@ -7086,15 +7097,15 @@ msgstr "Filtres"
 
 #: include/classes/data/CItemData.php:1189
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
-msgstr "Trouver une chaîne dans un fichier. Retourne 0 - correspondance non trouvée ; 1 - trouvée"
+msgstr "Trouver une chaîne de caractères dans un fichier. Retourne 0 - correspondance non trouvée ; 1 - trouvée"
 
 #: include/classes/data/CItemData.php:1185
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
-msgstr "Trouver une chaîne dans un fichier. Retourne la ligne contenant la chaîne correspondance, ou selon ce qui est spécifié dans le paramètre optionnel output"
+msgstr "Trouver une chaîne de caractères dans un fichier. Retourne la ligne contenant la chaîne correspondance, ou selon ce qui est spécifié dans le paramètre optionnel output"
 
 #: include/classes/data/CItemData.php:1585
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
-msgstr "Trouver une chaîne sur une page web. Retourne la chaîne correspondante, ou selon ce qui est spécifié dans le paramètre optionnel output"
+msgstr "Trouver une chaîne de caractères sur une page web. Retourne la chaîne correspondante, ou selon ce qui est spécifié dans le paramètre optionnel output"
 
 #: include/classes/setup/CSetupWizard.php:346
 msgid "Finish"
@@ -7974,7 +7985,7 @@ msgstr[1] "Hôtes désactivés"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "Host graphs"
-msgstr "Graphiques d'hôtes"
+msgstr "Graphiques de l'hôtes"
 
 #: app/controllers/CControllerAuditLogList.php:220
 #: app/partials/administration.usergroup.grouprights.html.php:29
@@ -8182,7 +8193,7 @@ msgstr "Tags d'hôte"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:34
 msgid "Host time"
-msgstr "Temps de l'hôte"
+msgstr "Heure de l'hôte"
 
 #: include/classes/api/services/CHost.php:821
 msgid "Host update failed."
@@ -8450,7 +8461,7 @@ msgstr "Icônes"
 
 #: app/views/administration.authentication.edit.php:222
 msgid "IdP entity ID"
-msgstr ""
+msgstr "ID d'entité de l'IdP"
 
 #: include/classes/core/CModuleManager.php:155
 #, c-format
@@ -9568,11 +9579,11 @@ msgstr "Information"
 
 #: include/classes/data/CItemData.php:1169
 msgid "Information about a file. Returns JSON"
-msgstr "Informations sur un fichier. Renvoie un JSON"
+msgstr "Informations sur un fichier. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1021
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
-msgstr "Informations à propos d'un service. Retourne un entier avec param state, startup ; une chaîne avec param displayname, path, user ; du texte avec param description ; Pour state : 0 - en fonctionnement, 1 - en pause, 2 - démarrage en attente, 3 - pause en attente, 4 - continue en attente, 5 - arrêt en attente, 6 - arrêté, 7 - inconnu, 255 - service introuvable ; Pour startup : 0 - automatique, 1 - automatique avec délai, 2 - manuel, 3 - désactivé, 4 - inconnu"
+msgstr "Informations à propos d'un service. Retourne un entier avec param state, startup ; une chaîne de caractères avec param displayname, path, user ; du texte avec param description ; Pour state : 0 - en fonctionnement, 1 - en pause, 2 - démarrage en attente, 3 - pause en attente, 4 - continue en attente, 5 - arrêt en attente, 6 - arrêté, 7 - inconnu, 255 - service introuvable ; Pour startup : 0 - automatique, 1 - automatique avec délai, 2 - manuel, 3 - désactivé, 4 - inconnu"
 
 #: include/views/configuration.host.prototype.edit.php:251
 msgid "Inherit"
@@ -10475,7 +10486,7 @@ msgstr "Une chaîne JSON est attendue"
 #: include/classes/core/CJsonRpc.php:146
 #, c-format
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "La génération de l'erreur JSON-RPC a échoué. Aucune erreur de type \"%1$s\"."
 
 #: include/items.inc.php:1825
 #: include/views/configuration.host.discovery.edit.php:865
@@ -10885,35 +10896,35 @@ msgstr "La liste est vide"
 
 #: include/classes/data/CItemData.php:1133
 msgid "List of block devices and their type. Returns JSON"
-msgstr "Liste les périphériques de bloc et leur type. Renvoie un JSON"
+msgstr "Liste les périphériques de bloc et leur type. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1041
 msgid "List of detected CPUs/CPU cores. Returns JSON"
-msgstr "Liste les processeurs/cœurs de processeur détectés. Renvoie un JSON"
+msgstr "Liste les processeurs/cœurs de processeur détectés. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1149
 msgid "List of directory entries, recursively. Returns JSON"
-msgstr "Liste les entrées du répertoire, récursif. Renvoie un JSON"
+msgstr "Liste les entrées du répertoire, récursif. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1201
 msgid "List of mounted filesystems and their types. Returns JSON"
-msgstr "Liste les systèmes de fichiers montés et leurs types. Renvoie un JSON"
+msgstr "Liste les systèmes de fichiers montés et leurs types. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1205
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
-msgstr "Liste les systèmes de fichiers montés, leurs types, l'espace disque et les statistiques d'inode. Renvoie un JSON"
+msgstr "Liste les systèmes de fichiers montés, leurs types, l'espace disque et les statistiques d'inode. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:929
 msgid "List of network interfaces. Returns JSON"
-msgstr "Liste les interfaces réseau. Renvoie un JSON"
+msgstr "Liste les interfaces réseau. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:997
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
-msgstr "Liste les instances d'objets des compteurs de performances Windows, découvertes à l'aide de noms d'objets en anglais. Renvoie un JSON"
+msgstr "Liste les instances d'objets des compteurs de performances Windows, découvertes à l'aide de noms d'objets en anglais. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:993
 msgid "List of object instances of Windows performance counters. Returns JSON"
-msgstr "Liste les instances d'objet des compteurs de performances Windows. Renvoie un JSON"
+msgstr "Liste les instances d'objet des compteurs de performances Windows. Retourne un JSON"
 
 #: app/views/popup.dashboard.share.edit.php:129
 #: include/views/monitoring.sysmap.edit.php:402
@@ -10927,7 +10938,7 @@ msgstr "Liste de partages pour les utilisateurs"
 
 #: include/classes/data/CItemData.php:1081
 msgid "Listing of MAC addresses. Returns string"
-msgstr "Liste des adresses MAC. Retourne une chaîne"
+msgstr "Liste des adresses MAC. Retourne une chaîne de caractères"
 
 #: include/classes/data/CItemData.php:1077
 msgid "Listing of PCI or USB devices. Returns text"
@@ -10961,7 +10972,7 @@ msgstr "Local"
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
 #: include/views/monitoring.history.php:292
 msgid "Local time"
-msgstr "Temps local"
+msgstr "Heure locale"
 
 #: include/hosts.inc.php:214
 msgid "Location"
@@ -11025,11 +11036,11 @@ msgstr "Déconnexion"
 
 #: app/views/administration.authentication.edit.php:287
 msgid "Logout requests"
-msgstr ""
+msgstr "Requêtes Logout"
 
 #: app/views/administration.authentication.edit.php:293
 msgid "Logout responses"
-msgstr "Réponses de déconnexion"
+msgstr "Réponses Logout"
 
 #: include/discovery.inc.php:139
 msgid "Lost"
@@ -11648,6 +11659,11 @@ msgstr "La valeur minimale requise pour la taille des téléversements à PHP es
 msgid "Minimum required PHP version is %1$s."
 msgstr "La version PHP minimale requise est %1$s."
 
+#: app/views/administration.housekeeping.edit.php:174
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
+msgstr "La version minimale requise de TimescaleDB est %1$s."
+
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %1$s (configuration option \"max_execution_time\")."
@@ -11858,11 +11874,11 @@ msgstr "Plus d'un graphique nommé \"%1$s\" dans l'hôte."
 
 #: include/classes/helpers/CServiceHelper.php:27
 msgid "Most critical if all children have problems"
-msgstr "Plus critique si tous les enfants ont des problèmes"
+msgstr "Le plus critique si tous les enfants ont des problèmes"
 
 #: include/classes/helpers/CServiceHelper.php:26
 msgid "Most critical of child services"
-msgstr "Les plus critiques des services enfants"
+msgstr "Le plus critiques des services enfants"
 
 #: include/httptest.inc.php:409
 msgid "Mozilla Firefox"
@@ -11900,7 +11916,7 @@ msgstr "N"
 #: include/classes/helpers/CServiceHelper.php:62
 #: include/classes/helpers/CServiceHelper.php:72
 msgid "N%"
-msgstr "N%"
+msgstr "N %"
 
 #: include/classes/helpers/CSlaHelper.php:183
 msgid "N/A"
@@ -12101,7 +12117,7 @@ msgstr "Prénom"
 
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
-msgstr ""
+msgstr "ID du nom"
 
 #: include/views/js/configuration.httpconf.edit.js.php:176
 msgid "Name of the form field should not exceed 255 characters."
@@ -12742,7 +12758,7 @@ msgstr "Aucune cible sélectionnée."
 #: app/controllers/CControllerActionOperationValidate.php:142
 #: include/classes/api/services/CAction.php:2847
 msgid "No targets specified for action operation global script."
-msgstr ""
+msgstr "Aucune cible spécifiée pour le script global de l'opération d'action."
 
 #: include/triggers.inc.php:91
 #, c-format
@@ -12915,7 +12931,7 @@ msgstr "Nombre de chemins du datastore disponibles, <url> - URL du service VMwar
 
 #: include/classes/data/CItemData.php:889
 msgid "Number of currently open file descriptors. Returns integer"
-msgstr "Nombre de descripteurs de fichiers actuellement ouverts. Renvoie un entier"
+msgstr "Nombre de descripteurs de fichiers actuellement ouverts. Retourne un entier"
 
 #: include/classes/data/CItemData.php:1629
 msgid "Number of enabled items on the host."
@@ -13249,7 +13265,7 @@ msgstr "Seuls les services sans enfants"
 
 #: app/views/service.list.edit.php:94
 msgid "Only services without problem tags"
-msgstr "Seuls les services sans tags de problème"
+msgstr "Uniquement les services sans tags de problème"
 
 #: include/classes/api/services/CDashboard.php:414
 msgid "Only super admins can set dashboard owner."
@@ -13269,7 +13285,7 @@ msgstr "Opera"
 
 #: include/classes/data/CItemData.php:1101
 msgid "Operating system information. Returns string"
-msgstr "Informations du système d'exploitation. Retourne une chaîne"
+msgstr "Informations du système d'exploitation. Retourne une chaîne de caractères"
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -14121,7 +14137,7 @@ msgstr "Position"
 
 #: include/classes/widgets/views/widget.item.form.view.php:142
 msgid "Position is ignored for s, uptime and unixtime units."
-msgstr ""
+msgstr "La position est ignorée pour les unités de types : s, uptime et unixtime."
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -14130,6 +14146,10 @@ msgstr "Champs POST"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "Type POST"
+
+#: app/views/administration.housekeeping.edit.php:164
+msgid "PostgreSQL database server version is too old."
+msgstr "La version du serveur de base de données PostgreSQL est trop ancienne."
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -14612,7 +14632,7 @@ msgstr "Accès en lecture-écriture aux services avec tag"
 
 #: include/classes/data/CItemData.php:909
 msgid "Reads modbus data. Returns various types"
-msgstr "Lit les données modbus. Renvoie différents types"
+msgstr "Lit les données modbus. Retourne différents types"
 
 #: include/actions.inc.php:60
 msgid "Received value"
@@ -14735,7 +14755,7 @@ msgstr[1] "Expressions régulière supprimées"
 
 #: app/controllers/CControllerRegExTest.php:72
 msgid "Regular expression must be a string"
-msgstr "L'expression régulière doit être une chaîne"
+msgstr "L'expression régulière doit être une chaîne de caractères"
 
 #: app/controllers/CControllerRegExUpdate.php:80
 msgid "Regular expression updated"
@@ -15179,7 +15199,7 @@ msgstr "Type de réponse : JSON"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:162
 msgid "Response type: String"
-msgstr "Type de réponse : chaîne"
+msgstr "Type de réponse : chaîne de caractères"
 
 #: app/views/administration.regex.edit.php:123
 #: app/views/administration.regex.edit.php:128
@@ -15235,7 +15255,7 @@ msgstr "Retourne un tableau JSON avec les macros LDD décrivant les objets MBean
 
 #: include/classes/data/CItemData.php:873
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
-msgstr "Renvoie un tableau JSON avec des objets MBean ou leurs attributs. Comparé à jmx.discovery, il ne définit pas les macros LLD. Peut être utilisé pour la découverte bas niveau."
+msgstr "Retourne un tableau JSON avec des objets MBean ou leurs attributs. Comparé à jmx.discovery, il ne définit pas les macros LLD. Peut être utilisé pour la découverte bas niveau."
 
 #: include/classes/data/CItemData.php:845
 msgid "Return first column of the first row of the SQL query result."
@@ -15247,7 +15267,7 @@ msgstr "Retourne la valeur d'un attribut d'un objet MBean."
 
 #: include/classes/data/CItemData.php:1181
 msgid "Returns 4-digit string containing octal number with Unix permissions"
-msgstr "Renvoie une chaîne de 4 chiffres contenant un nombre octal avec les autorisations Unix"
+msgstr "Retourne une chaîne de 4 chiffres contenant un nombre octal avec les autorisations Unix"
 
 #: include/classes/data/CItemData.php:861
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
@@ -15574,11 +15594,11 @@ msgstr "agent SNMPv3"
 
 #: app/views/administration.authentication.edit.php:249
 msgid "SP entity ID"
-msgstr ""
+msgstr "ID d'entité du SP"
 
 #: app/views/administration.authentication.edit.php:257
 msgid "SP name ID format"
-msgstr ""
+msgstr "Format d'ID du nom du SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -16061,7 +16081,7 @@ msgstr "Serveur (proxy)"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
 msgid "Server time"
-msgstr "Temps serveur"
+msgstr "Heure du serveur"
 
 #: app/controllers/CControllerAuditLogList.php:225
 #: app/views/js/slareport.list.js.php:39
@@ -16218,7 +16238,7 @@ msgstr "Positionner le statut à"
 
 #: include/classes/helpers/CServiceHelper.php:28
 msgid "Set status to OK"
-msgstr "Définir l'état sur OK"
+msgstr "Définir l'état à OK"
 
 #: jsLoader.php:173
 msgid "Set this view as default"
@@ -16475,7 +16495,7 @@ msgstr "Connectez-vous avec HTTP"
 
 #: include/views/general.login.php:50
 msgid "Sign in with Single Sign-On (SAML)"
-msgstr ""
+msgstr "Authentification avec Single Sign-On (SAML)"
 
 #: include/classes/helpers/CMenuHelper.php:413
 #: include/classes/helpers/CMenuHelper.php:416
@@ -16605,7 +16625,7 @@ msgstr "Application logicielle E"
 
 #: include/classes/data/CItemData.php:1097
 msgid "Software architecture information. Returns string"
-msgstr "Information sur l'architecture logicielle. Retourne une chaîne"
+msgstr "Information sur l'architecture logicielle. Retourne une chaîne de caractères"
 
 #: include/classes/api/managers/CHistoryManager.php:1272
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -16676,7 +16696,7 @@ msgstr "Éléments standards"
 
 #: app/partials/administration.ha.nodes.php:45
 msgid "Standby"
-msgstr ""
+msgstr "Veille"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:668
 #: app/controllers/CControllerPopupTriggerExpr.php:787
@@ -17018,7 +17038,7 @@ msgstr "Macros supportées :"
 #: include/html.inc.php:975
 #, c-format
 msgid "Suppressed till: %1$s"
-msgstr "Supprimé jusqu'à: %1$s"
+msgstr "Supprimé jusqu'à : %1$s"
 
 #: include/classes/data/CItemData.php:1109
 msgid "Swap in (from device into memory) statistics. Returns integer"
@@ -17066,7 +17086,7 @@ msgstr "Erreur système."
 
 #: include/classes/data/CItemData.php:1065
 msgid "System host name. Returns string"
-msgstr "Nom d'hôte du système. Retourne une chaîne"
+msgstr "Nom d'hôte du système. Retourne une chaîne de caractères"
 
 #: app/controllers/CControllerReportStatus.php:42
 #: app/views/report.status.php:30 include/classes/helpers/CMenuHelper.php:132
@@ -17085,7 +17105,7 @@ msgstr "Statistiques système"
 
 #: include/classes/data/CItemData.php:1085
 msgid "System time. Returns integer with type as UTC; string - with type as local"
-msgstr "Horloge système. Retourne un entier avec le type UTC; une chaîne avec le type local"
+msgstr "Horloge système. Retourne un entier de type UTC; une chaîne de caractères avec le type local"
 
 #: include/classes/data/CItemData.php:1125
 msgid "System uptime in seconds. Returns integer"
@@ -17462,7 +17482,7 @@ msgstr "Génération d'un rapport de test"
 
 #: app/views/administration.regex.edit.php:119
 msgid "Test string"
-msgstr "Chaîne de test"
+msgstr "Chaîne de caractères de test"
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:81
 msgid "Test subject"
@@ -17773,7 +17793,7 @@ msgstr "Décalage temporel"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:31
 msgid "Time type"
-msgstr "Type temps"
+msgstr "Type d'heure"
 
 #: app/views/administration.user.edit.php:250 app/views/popup.sla.edit.php:83
 msgid "Time zone"
@@ -18495,15 +18515,23 @@ msgstr "Impossible de charger les informations d'identification de la base de do
 
 #: include/classes/helpers/CHousekeepingHelper.php:66
 msgid "Unable to load housekeeping API parameters."
-msgstr ""
+msgstr "Impossible de charger les paramètres de l'API de maintenance."
 
 #: include/classes/helpers/CSettingsHelper.php:113
 msgid "Unable to load settings API parameters."
-msgstr ""
+msgstr "Impossible de charger les paramètres de l'API de configuration."
 
 #: include/classes/core/CConfigFile.php:257
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Impossible d'écrire par-dessus le fichier de configuration existant."
+
+#: app/views/administration.housekeeping.edit.php:159
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr "Impossible de récupérer l'état de prise en charge de la compression de TimescaleDB."
+
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unable to retrieve TimescaleDB version."
+msgstr "Impossible de récupérer la version de TimescaleDB."
 
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
@@ -18687,6 +18715,16 @@ msgstr "Version du serveur de base de données %1$s non supportée. Doit être d
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "Version du serveur de base de données %1$s non supportée. Ne doit pas être supérieur à %2$s."
+
+#: app/views/administration.housekeeping.edit.php:178
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr "Version de TimescaleDB non prise en charge. Doit être au moins %1$s."
+
+#: app/views/administration.housekeeping.edit.php:188
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr "Version de TimescaleDB non prise en charge. Ne doit pas être supérieur à %1$s."
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -18958,7 +18996,7 @@ msgstr "Utilisateur ajouté"
 
 #: include/views/configuration.httpconf.edit.php:98
 msgid "User agent string"
-msgstr "Chaîne du \"user agent\""
+msgstr "Chaîne de caractères du \"user agent\""
 
 #: include/classes/api/services/CUserGroup.php:534
 #: include/classes/api/services/CUser.php:979
@@ -19208,7 +19246,7 @@ msgstr "Le nom d'utilisateur et le mot de passe doivent être stockés dans les 
 
 #: app/views/administration.authentication.edit.php:241
 msgid "Username attribute"
-msgstr "Attribut nom d'utilisateur"
+msgstr "Attribut du nom d'utilisateur"
 
 #: app/controllers/CControllerPopupGeneric.php:209
 #: app/views/administration.token.list.php:44
@@ -19234,7 +19272,7 @@ msgstr "statistiques du cache VMware. Les modes valides sont : total, free, pfre
 
 #: include/classes/data/CItemData.php:1225
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
-msgstr "Compteur de performances du cluster VMware, <url> - URL du service VMware, <id> - ID du cluster VMware, <chemin> - chemin du compteur de performances, <instance> - instance du compteur de performances"
+msgstr "Compteur de performances du cluster VMware, <url> - URL du service VMware, <id> - ID du cluster VMware, <path> - chemin du compteur de performances, <instance> - instance du compteur de performances"
 
 #: include/classes/data/CItemData.php:1233
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -19242,7 +19280,7 @@ msgstr "État du cluster VMware, <url> - URL du service VMware, <name> - Nom du 
 
 #: include/classes/data/CItemData.php:1257
 msgid "VMware datacenters and their IDs. Returns JSON"
-msgstr "Datacenters VMware et leurs identifiants. Retourne JSON"
+msgstr "Datacenters VMware et leurs identifiants. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1249
 #: include/classes/data/CItemData.php:1305
@@ -19604,15 +19642,15 @@ msgstr "Tables de correspondance"
 
 #: include/classes/data/CItemData.php:913
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
-msgstr "Valeur du sujet MQTT. Le format des données renvoyées dépend du contenu du sujet. Si des caractères génériques sont utilisés, renvoie les valeurs du sujet au format JSON"
+msgstr "Valeur du sujet MQTT. Le format des données renvoyées dépend du contenu du sujet. Si des caractères génériques sont utilisés, retourne les valeurs du sujet au format JSON"
 
 #: include/classes/data/CItemData.php:989
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
-msgstr "Valeur de n'importe quel compteur de performances Windows en Anglais. Retourne un entier, un flottant une chaîne ou un texte (selon la requête)"
+msgstr "Valeur de n'importe quel compteur de performances Windows en Anglais. Retourne un entier, un flottant, une chaîne de caractères ou un texte (selon la requête)"
 
 #: include/classes/data/CItemData.php:985
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
-msgstr "Valeur de n'importe quel compteur de performances Windows. Retourne un entier, un flottant une chaîne ou un texte (selon la requête)"
+msgstr "Valeur de n'importe quel compteur de performances Windows. Retourne un entier, un flottant, une chaîne de caractères ou un texte (selon la requête)"
 
 #: include/classes/helpers/CCorrelationHelper.php:153
 msgid "Value of new event tag"
@@ -19697,7 +19735,7 @@ msgstr "Version"
 
 #: include/classes/data/CItemData.php:833
 msgid "Version of Zabbix agent. Returns string"
-msgstr "Version de l'agent Zabbix. Retourne une chaîne"
+msgstr "Version de l'agent Zabbix. Retourne une chaîne de caractères"
 
 #: include/classes/data/CItemData.php:1733
 msgid "Version of Zabbix server or proxy"
@@ -19751,7 +19789,7 @@ msgstr "Le nom visible ne peut pas être vide si le nom d'hôte est manquant."
 #: include/classes/helpers/CServiceHelper.php:57
 #: include/classes/helpers/CServiceHelper.php:67
 msgid "W"
-msgstr ""
+msgstr "P"
 
 #: jsLoader.php:254
 msgctxt "Wednesday short"
@@ -20129,7 +20167,7 @@ msgstr "d/m/Y H:i:s"
 
 #: include/translateDefines.inc.php:43
 msgid "Y-n-d"
-msgstr ""
+msgstr "d/n/Y"
 
 #: include/views/js/monitoring.sysmaps.js.php:445
 msgid "Y1"
@@ -20460,7 +20498,7 @@ msgstr "un caractère spécial"
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"
-msgstr "une chaîne, un nombre ou une valeur nulle est attendu"
+msgstr "une chaîne de caractères, un nombre ou une valeur nulle est attendu"
 
 #: app/controllers/CControllerSlaExcludedDowntimeValidate.php:58
 #: include/classes/validators/CNewValidator.php:238
@@ -20587,7 +20625,7 @@ msgstr "un tableau ou un objet est attendu"
 #: include/classes/import/validators/C10XmlValidator.php:360
 #: include/classes/import/validators/C10XmlValidator.php:382
 msgid "an empty string is expected"
-msgstr "une chaîne vie est attendue"
+msgstr "une chaîne de caractères vide est attendue"
 
 #: include/classes/api/services/CHost.php:1816
 #: include/classes/validators/CApiInputValidator.php:1336
@@ -20645,7 +20683,7 @@ msgstr "croissant"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:346
 msgid "ascii() - Returns the ASCII code of the leftmost character of the value"
-msgstr "ascii() - Renvoie le code ASCII du caractère le plus à gauche de la valeur"
+msgstr "ascii() - Retourne le code ASCII du caractère le plus à gauche de la valeur"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:353
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
@@ -20694,7 +20732,7 @@ msgstr "avg() - Valeur moyenne d'une période T"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1053
 msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
-msgstr "baselinedev() - Renvoie le nombre d'écarts entre les périodes de données dans les cycles et la dernière période de données"
+msgstr "baselinedev() - Retourne le nombre d'écarts entre les périodes de données dans les cycles et la dernière période de données"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1060
 msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
@@ -20710,7 +20748,7 @@ msgstr "bitand() - ET binaire"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:418
 msgid "bitlength() - Returns the length in bits"
-msgstr "bitlength() - Renvoie la longueur en bits"
+msgstr "bitlength() - Retourne la longueur en bits"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:425
 msgid "bitlshift() - Bitwise shift left"
@@ -20745,7 +20783,7 @@ msgstr "le nom d'utilisateur et le mot de passe doivent être présents ou vides
 
 #: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
-msgstr "bytelength() - Renvoie la longueur en octets"
+msgstr "bytelength() - Retourne la longueur en octets"
 
 #: app/views/popup.tophosts.column.edit.php:180
 #: app/views/popup.tophosts.column.edit.php:190
@@ -20923,7 +20961,7 @@ msgstr "changecount() - Nombre de changements entre des valeurs adjacentes, Mode
 
 #: app/controllers/CControllerPopupTriggerExpr.php:518
 msgid "char() - Returns the character which represents the given ASCII code"
-msgstr "char() - Renvoie le caractère qui représente le code ASCII donné"
+msgstr "char() - Retourne le caractère qui représente le code ASCII donné"
 
 #: include/classes/parsers/CConditionFormula.php:219
 #, c-format
@@ -20955,7 +20993,7 @@ msgstr "liste séparée par des virgules"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:525
 msgid "concat() - Returns a string that is the result of concatenating value to string"
-msgstr "concat() - Retourne une chaîne de caractères, résultat de la concaténation de chaînes"
+msgstr "concat() - Retourne une chaîne de caractères, résultat de la concaténation des chaînes"
 
 #: app/partials/hostmacros.inherited.list.html.php:39
 msgid "configure"
@@ -21106,7 +21144,7 @@ msgstr "ne correspond pas"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
-msgstr "e() - Renvoie le nombre d'Euler"
+msgstr "e() - Retourne le nombre d'Euler"
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
@@ -21463,7 +21501,7 @@ msgstr "gauche"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:702
 msgid "left() - Returns the leftmost count characters"
-msgstr "left() - Renvoie le nombre de caractères les plus à gauche"
+msgstr "left() - Retourne le nombre de caractères les plus à gauche"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:715
 msgid "length() - Length of last (most recent) T value in characters"
@@ -21499,7 +21537,7 @@ msgstr "règle de découverte bas niveau"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:757
 msgid "ltrim() - Remove specified characters from the beginning of a string"
-msgstr "ltrim() - Supprime les caractères spécifiés du début d'une chaîne"
+msgstr "ltrim() - Supprime les caractères spécifiés du début d'une chaîne de caractères"
 
 #: include/func.inc.php:595 jsLoader.php:126 jsLoader.php:225 jsLoader.php:406
 msgctxt "minute short"
@@ -21587,7 +21625,7 @@ msgstr "nombre maximal de niveaux de dépendance atteint"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:784
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
-msgstr "mid() - Renvoie une sous-chaîne commençant à la position de caractère spécifiée par start et contenant N caractères"
+msgstr "mid() - Retourne une sous-chaîne commençant à la position de caractère spécifiée par start et contenant N caractères"
 
 #: app/views/popup.tophosts.column.edit.php:126
 #: include/classes/api/services/CItemGeneral.php:1399
@@ -21683,11 +21721,11 @@ msgstr "ne doit pas contenir le nom, le prénom ou le nom de famille de l'utilis
 
 #: include/translateDefines.inc.php:44
 msgid "n-d"
-msgstr ""
+msgstr "d/n"
 
 #: include/translateDefines.inc.php:42
 msgid "n-d H:i"
-msgstr ""
+msgstr "d/n H:i"
 
 #: include/views/configuration.host.discovery.edit.php:204
 #: include/views/configuration.host.discovery.edit.php:361
@@ -21858,7 +21896,7 @@ msgstr "percentile () - Pourcentage P d'une période T"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:856
 msgid "pi() - Returns the Pi constant"
-msgstr "pi() - Renvoie la constante Pi"
+msgstr "pi() - Retourne la constante Pi"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:861
 msgid "power() - The power of a base value to a power value"
@@ -21878,7 +21916,7 @@ msgstr "rand() - Une valeur entière aléatoire"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:886
 msgid "rate() - Returns per-second average rate for monotonically increasing counters"
-msgstr "rate() - Renvoie le taux moyen par seconde pour les compteurs croissants de manière monotone"
+msgstr "rate() - Retourne le taux moyen par seconde pour les compteurs croissants de manière monotone"
 
 #: include/classes/api/services/CService.php:2392
 #, c-format
@@ -21927,7 +21965,7 @@ msgstr "expression régulière"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:893
 msgid "repeat() - Returns a string composed of value repeated count times"
-msgstr "repeat() - Retourne une chaîne composée de valeurs répétées N fois"
+msgstr "repeat() - Retourne une chaîne de caractères composée de valeurs répétées N fois"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:906
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
@@ -21955,7 +21993,7 @@ msgstr "droite"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
-msgstr "right() - Renvoie le nombre de caractères le plus à droite"
+msgstr "right() - Retourne le nombre de caractères le plus à droite"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"
@@ -21963,7 +22001,7 @@ msgstr "round() - Arrondit une valeur aux décimales"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:950
 msgid "rtrim() - Removes specified characters from the end of a string"
-msgstr "rtrim() - Supprime les caractères spécifiés à la fin d'une chaîne"
+msgstr "rtrim() - Supprime les caractères spécifiés à la fin d'une chaîne de caractères"
 
 #: include/func.inc.php:596
 msgctxt "second short"
@@ -21981,7 +22019,7 @@ msgstr "script"
 
 #: include/forms.inc.php:1441 include/views/js/item.preprocessing.js.php:246
 msgid "search string"
-msgstr "chaîne de recherche"
+msgstr "chaîne de caractères de recherche"
 
 #: app/views/popup.maintenance.period.php:125 include/maintenances.inc.php:106
 msgctxt "adjective"
@@ -22052,7 +22090,7 @@ msgstr "se connecter en tant qu'invité"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:963
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
-msgstr "signum() - Renvoie -1 si une valeur est négative, 0 si une valeur est nulle, 1 si une valeur est positive"
+msgstr "signum() - Retourne -1 si une valeur est négative, 0 si une valeur est nulle, 1 si une valeur est positive"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:970
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
@@ -22253,7 +22291,7 @@ msgstr "un déclencheur avec liens ne peut pas être déplacé vers un autre mod
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
-msgstr "trim() - Supprime les caractères spécifiés du début et de la fin d'une chaîne"
+msgstr "trim() - Supprime les caractères spécifiés du début et de la fin d'une chaîne de caractères"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1151
 msgid "truncate() - Truncates a value to decimal places"

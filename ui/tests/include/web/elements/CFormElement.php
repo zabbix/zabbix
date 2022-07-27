@@ -441,6 +441,12 @@ class CFormElement extends CElement {
 	public function checkValue($expected, $raise_exception = true) {
 		if ($expected && is_array($expected)) {
 			foreach ($expected as $field => $value) {
+				if ($value instanceof \Closure) {
+					$function = new ReflectionFunction($value);
+					$variables = $function->getStaticVariables();
+					$value = $variables['value'];
+				}
+
 				if ($this->checkFieldValue($field, $value, $raise_exception) === false) {
 					return false;
 				}
