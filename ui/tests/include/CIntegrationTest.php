@@ -597,10 +597,15 @@ class CIntegrationTest extends CAPITest {
 	protected static function stopComponent($component) {
 		self::validateComponent($component);
 
-		$pid = @file_get_contents(self::getPidPath($component));
 		$child_pids = [];
-		if ($pid && is_numeric($pid)) {
-			$child_pids = explode("\n", shell_exec('pgrep -P '.$pid));
+		$pid = @file_get_contents(self::getPidPath($component));
+
+		if ($pid !== false && is_numeric($pid)) {
+			$output = shell_exec('pgrep -P '.$pid);
+			if ($output !== false && $output !== null) {
+				$child_pids = explode("\n", $output);
+			}
+
 			posix_kill($pid, SIGTERM);
 		}
 		self::waitForShutdown($component, $child_pids);
