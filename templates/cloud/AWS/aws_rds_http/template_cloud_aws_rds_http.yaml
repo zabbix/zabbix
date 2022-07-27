@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-25T10:23:38Z'
+  date: '2022-07-27T14:14:38Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -2727,7 +2727,7 @@ zabbix_export:
               uuid: 3842a935bedf446d8b8b9a7fd58fc24b
               name: 'AWS RDS: Connections: Aborted'
               type: DEPENDENT
-              key: 'aws.rds.aurora_lients_aborted[{#SINGLETON}]'
+              key: 'aws.rds.aurora_clients_aborted[{#SINGLETON}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
