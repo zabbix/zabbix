@@ -592,6 +592,7 @@ FIELD		|geomaps_max_zoom	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_attribution|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|vault_provider	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_userdirectoryid	|t_id	|NULL |NULL	|0		|3|userdirectory	|userdirectoryid|RESTRICT
+FIELD		|server_status		|t_shorttext	|''	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 INDEX		|3		|ldap_userdirectoryid
@@ -1947,6 +1948,8 @@ TABLE|host_rtdata|hostid|ZBX_TEMPLATE
 FIELD		|hostid			|t_id		|	|NOT NULL	|0	|1|hosts|hostid
 FIELD		|active_available	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastaccess		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|version		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|compatibility		|t_integer	|'0'	|NOT NULL	|0
 
 
 TABLE|userdirectory|userdirectoryid|0
@@ -1974,4 +1977,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6020000	|6020000
+ROW		|1		|6030002	|6030002
