@@ -80,7 +80,16 @@ class CWidgetFieldThresholds extends CWidgetField {
 						.colorpicker({
 							appendTo: ".overlay-dialogue-body"
 						});
-				});
+					document.getElementById("tophosts-column-thresholds-warning").style.display =
+					document.querySelector("#thresholds_table_thresholds")
+						.querySelectorAll(".form_row")
+						.length > 0 ? "" : "none";
+				}).on("afterremove.dynamicRows", () => {
+					document.getElementById("tophosts-column-thresholds-warning").style.display =
+					document.querySelector("#thresholds_table_thresholds")
+						.querySelectorAll(".form_row")
+						.length > 0 ? "" : "none";
+					});;
 				';
 	}
 	/**

@@ -48,10 +48,10 @@ $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field
 $scripts[] = $field_itemid->getPostJS();
 $scripts[] = $fields['thresholds']->getJavascript();
 
-$numeric_only_warning = new CSpan([
+$numeric_only_warning = (new CSpan([
 	'&nbsp;',
 	makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
-]);
+]))->addStyle('display: none;');
 
 $form_list
 	->addRow(
@@ -220,7 +220,9 @@ $form_list
 		'bg-color-row'
 	)
 	->addRow(
-		CWidgetHelper::getLabel($fields['thresholds'])->addItem($numeric_only_warning),
+		CWidgetHelper::getLabel($fields['thresholds'])
+			->addItem($numeric_only_warning->setId('tophosts-column-thresholds-warning')
+		),
 		(new CDiv(CWidgetHelper::getThresholds($fields['thresholds'])))->addClass('form-field'),
 		'thresholds-row'
 	);
