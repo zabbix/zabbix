@@ -460,7 +460,7 @@ static int	check_duplicate_resource(zbx_vector_resource_ptr_t *resources, const 
  *               FAIL - resources were merged with errors                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_merge_resource(zbx_vector_resource_ptr_t *dst, zbx_vector_resource_ptr_t *src, const char *owner,
+static int	zbx_merge_resource(zbx_vector_resource_ptr_t *dst, zbx_vector_resource_ptr_t *src, const char *owner,
 		char **error)
 {
 	int	i, j, ret;
