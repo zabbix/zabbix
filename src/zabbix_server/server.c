@@ -1252,6 +1252,27 @@ static void	zbx_check_db(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: save Zabbix server status to database                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_db_save_server_status()
+{
+	struct zbx_json	json;
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addstring(&json, "server_version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+
+	zbx_json_close(&json);
+
+	if (ZBX_DB_OK > DBexecute("update config set server_status='%s'", json.buffer))
+		zabbix_log(LOG_LEVEL_WARNING, "Failed to save server status to database");
+
+	zbx_json_free(&json);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: initialize shared resources and start processes                   *
  *                                                                            *
  ******************************************************************************/
@@ -1767,6 +1788,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	DBcheck_character_set();
 	zbx_check_db();
+	zbx_db_save_server_status();
 
 	if (SUCCEED != DBcheck_double_type())
 	{

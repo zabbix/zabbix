@@ -4893,6 +4893,41 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: updates proxy version and compatibility with server in database   *
+ *                                                                            *
+ * Parameters: proxy - [IN] the proxy                                         *
+ *             diff  - [IN] indicates changes to proxy                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_db_update_proxy_version(DC_PROXY *proxy, zbx_proxy_diff_t *diff)
+{
+	if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION))
+	{
+		if (0 != proxy->version)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "proxy \"%s\" protocol version updated from %d.%d to %d.%d",
+					proxy->host,
+					ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
+					ZBX_COMPONENT_VERSION_MINOR(proxy->version),
+					ZBX_COMPONENT_VERSION_MAJOR(diff->version),
+					ZBX_COMPONENT_VERSION_MINOR(diff->version));
+		}
+
+		if (ZBX_DB_OK > DBexecute(
+				"update host_rtdata"
+				" set version=%d, compatibility=%d"
+				" where hostid=" ZBX_FS_UI64,
+				ZBX_COMPONENT_VERSION_TO_DB_FORMAT(diff->version), diff->proxy_compatibility,
+				diff->hostid))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to update proxy version and compatibility with server for"
+					" proxy '%s'.", proxy->host);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: gets proxy version compatibility with server version              *
  *                                                                            *
  * Parameters: proxy_version - [IN] proxy_version                             *
@@ -4942,7 +4977,6 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
 void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress, zbx_uint64_t flags_add)
 {
 	zbx_proxy_diff_t	diff;
-	zbx_proxy_compatibility_t	proxy_compatibility;
 
 	diff.hostid = proxy->hostid;
 	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE | flags_add;
@@ -4953,14 +4987,7 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int com
 
 	zbx_dc_update_proxy(&diff);
 
-	if (0 != (diff.flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION) && 0 != proxy->version)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "proxy \"%s\" protocol version updated from %d.%d to %d.%d", proxy->host,
-				ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
-				ZBX_COMPONENT_VERSION_MINOR(proxy->version),
-				ZBX_COMPONENT_VERSION_MAJOR(diff.version),
-				ZBX_COMPONENT_VERSION_MINOR(diff.version));
-	}
+	zbx_db_update_proxy_version(proxy, &diff);
 
 	proxy->version = version;
 	proxy->auto_compress = compress;
