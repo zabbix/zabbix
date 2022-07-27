@@ -255,12 +255,7 @@ class CIntegrationTest extends CAPITest {
 		$components = array_merge(self::$suite_components, $this->case_components);
 
 		foreach ($components as $component) {
-			try {
-				self::stopComponent($component);
-			}
-			catch (Exception $e) {
-				self::zbxAddWarning($e->getMessage());
-			}
+			self::stopComponent($component);
 		}
 
 		self::setHostStatus($this->case_hosts, HOST_STATUS_NOT_MONITORED);
@@ -277,12 +272,7 @@ class CIntegrationTest extends CAPITest {
 	 */
 	public static function onAfterTestSuite() {
 		foreach (self::$suite_components as $component) {
-			try {
-				self::stopComponent($component);
-			}
-			catch (Exception $e) {
-				self::zbxAddWarning($e->getMessage());
-			}
+			self::stopComponent($component);
 		}
 
 		if (self::$suite_hosts) {
