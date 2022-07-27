@@ -686,7 +686,7 @@ typedef struct
 	zbx_uint64_t			hostid;
 	unsigned char			compress;
 	int				version;
-	zbx_proxy_version_status_t	version_status;
+	zbx_proxy_compatibility_t	proxy_compatibility;
 	int				lastaccess;
 	int				last_version_error_time;
 	int				proxy_delay;

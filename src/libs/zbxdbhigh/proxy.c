@@ -4893,38 +4893,35 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets proxy version status, which is compatibility between server  *
- *          and proxy                                                         *
+ * Purpose: gets proxy version compatibility with server version              *
  *                                                                            *
  * Parameters: proxy_version - [IN] proxy_version                             *
  *                                                                            *
- * Return value: proxy version status                                         *
+ * Return value: proxy version compatibility with server version              *
  *                                                                            *
  ******************************************************************************/
-static zbx_proxy_version_status_t	zbx_get_proxy_version_status(int proxy_version)
+static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
 {
 #define SERVER_VERION	ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR, 0)
 
 	proxy_version = ZBX_COMPONENT_VERSION_IGNORE_PATCH(proxy_version);
 
 	if (0 == proxy_version)
-		return ZBX_PROXY_VERSION_STATUS_UNDEFINED;
+		return ZBX_PROXY_VERSION_UNDEFINED;
 
 	if (SERVER_VERION == proxy_version)
-		return ZBX_PROXY_VERSION_STATUS_CURRENT;
+		return ZBX_PROXY_VERSION_CURRENT;
 
 	if (SERVER_VERION < proxy_version)
-		return ZBX_PROXY_VERSION_STATUS_UNSUPPORTED;
-
+		return ZBX_PROXY_VERSION_UNSUPPORTED;
 #if (ZABBIX_VERSION_MINOR == 0)
 	if (ZABBIX_VERSION_MAJOR == 1 + ZBX_COMPONENT_VERSION_MAJOR(proxy_version))
 		return ZBX_PROXY_VERSION_STATUS_OUTDATED;
-#else
+#elif (ZABBIX_VERSION_MINOR > 0)
 	if (ZABBIX_VERSION_MAJOR == ZBX_COMPONENT_VERSION_MAJOR(proxy_version))
-		return ZBX_PROXY_VERSION_STATUS_OUTDATED;
+		return ZBX_PROXY_VERSION_OUTDATED;
 #endif
-
-	return ZBX_PROXY_VERSION_STATUS_UNSUPPORTED;
+	return ZBX_PROXY_VERSION_UNSUPPORTED;
 #undef SERVER_VERION
 }
 
@@ -4945,12 +4942,12 @@ static zbx_proxy_version_status_t	zbx_get_proxy_version_status(int proxy_version
 void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress, zbx_uint64_t flags_add)
 {
 	zbx_proxy_diff_t	diff;
-	zbx_proxy_version_status_t	version_status;
+	zbx_proxy_compatibility_t	proxy_compatibility;
 
 	diff.hostid = proxy->hostid;
 	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE | flags_add;
 	diff.version = version;
-	diff.version_status = zbx_get_proxy_version_status(version);
+	diff.proxy_compatibility = zbx_get_proxy_compatibility(version);
 	diff.lastaccess = lastaccess;
 	diff.compress = compress;
 

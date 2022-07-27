@@ -837,8 +837,7 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
 		zbx_vector_ptr_t *items_active_normal, zbx_vector_ptr_t *items_active_notsupported,
 		zbx_vector_ptr_t *items_disabled, zbx_uint64_t *triggers_enabled_ok,
 		zbx_uint64_t *triggers_enabled_problem, zbx_uint64_t *triggers_disabled,
-		zbx_vector_ptr_t *required_performance, zbx_vector_ptr_t *proxy_version,
-		zbx_vector_ptr_t *proxy_version_status);
+		zbx_vector_ptr_t *required_performance);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);

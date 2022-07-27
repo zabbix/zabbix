@@ -384,7 +384,7 @@ typedef struct
 	int				last_cfg_error_time;	/* time when passive proxy misconfiguration error was */
 								/* seen or 0 if no error */
 	int				version;
-	zbx_proxy_version_status_t	version_status;
+	zbx_proxy_compatibility_t	proxy_compatibility;
 	unsigned char			location;
 	unsigned char			auto_compress;
 	const char			*proxy_address;

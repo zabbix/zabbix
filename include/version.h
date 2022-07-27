@@ -47,11 +47,11 @@ int	zbx_get_component_version_ignore_patch(char *value);
 /* these values are shared with the UI*/
 typedef enum
 {
-	ZBX_PROXY_VERSION_STATUS_UNDEFINED = 0,
-	ZBX_PROXY_VERSION_STATUS_CURRENT,
-	ZBX_PROXY_VERSION_STATUS_OUTDATED,
-	ZBX_PROXY_VERSION_STATUS_UNSUPPORTED
+	ZBX_PROXY_VERSION_UNDEFINED = 0,
+	ZBX_PROXY_VERSION_CURRENT,
+	ZBX_PROXY_VERSION_OUTDATED,
+	ZBX_PROXY_VERSION_UNSUPPORTED
 }
-zbx_proxy_version_status_t;
+zbx_proxy_compatibility_t;
 
 #endif
