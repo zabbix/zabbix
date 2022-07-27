@@ -719,7 +719,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		$selement['triggers'] = array_map(function ($trigger) use ($problems_by_trigger, $selement) {
 			$filtered_problems = $problems_by_trigger[$trigger['triggerid']];
 
-			// Check if $filtered_problems tags matches $selement filter tags.
+			// Check if $filtered_problems tags match $selement filter tags.
 			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
 					|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
 				$filtered_problems = getProblemsMatchingTags($filtered_problems, $selement['tags'],
