@@ -303,7 +303,8 @@ class CMenuHelper {
 					->setAction('user.list')
 					->setAliases(['user.edit'])
 				: null,
-			(!CWebUser::isGuest() && CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS))
+			(!CWebUser::isGuest() && CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL) &&
+				CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS))
 				? (new CMenuItem(_('API tokens')))
 					->setAction('token.list')
 				: null,

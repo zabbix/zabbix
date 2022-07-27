@@ -845,10 +845,6 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'autoreg.edit')
 		->getUrl();
 
-	$housekeeping_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'housekeeping.edit')
-		->getUrl();
-
 	$audit_settings_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'audit.settings.edit')
 		->getUrl();
@@ -865,10 +861,6 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'regex.list')
 		->getUrl();
 
-	$macros_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'macros.edit')
-		->getUrl();
-
 	$trigdisplay_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'trigdisplay.edit')
 		->getUrl();
@@ -881,31 +873,22 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'module.list')
 		->getUrl();
 
-	$tokens_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'token.list')
-		->getUrl();
-
 	$miscconfig_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
-
-	$can_access_tokens = (!CWebUser::isGuest() && CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS));
 
 	return [
 		'main_section' => [
 			'items' => array_filter([
 				$gui_url            => _('GUI'),
 				$autoreg_url        => _('Autoregistration'),
-				$housekeeping_url   => _('Housekeeping'),
 				$audit_settings_url => _('Audit log'),
 				$image_url          => _('Images'),
 				$iconmap_url        => _('Icon mapping'),
 				$regex_url          => _('Regular expressions'),
-				$macros_url         => _('Macros'),
 				$trigdisplay_url    => _('Trigger displaying options'),
 				$geomap_url			=> _('Geographical maps'),
 				$modules_url        => _('Modules'),
-				$tokens_url         => $can_access_tokens ? _('API tokens') : null,
 				$miscconfig_url     => _('Other')
 			])
 		]
