@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:36:04Z'
+  date: '2022-07-27T07:30:22Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -12,7 +12,7 @@ zabbix_export:
       name: 'Zookeeper by HTTP'
       description: |
         Get Apache Zookeeper metrics by HTTP agent.
-          This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to AdminServer.
+          This template works with standalone and cluster instances. Metrics are collected from each Zookeeper node by requests to AdminServer.
           Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -745,7 +745,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: s
-          description: 'Uptime of Zookeeper server.'
+          description: 'Uptime that a peer has been in a table leading/following/observing state.'
           preprocessing:
             -
               type: JSONPATH
@@ -774,18 +774,6 @@ zabbix_export:
                 -
                   tag: scope
                   value: availability
-            -
-              uuid: d023c72f35e441d2bf5bbc3c1f9d0dad
-              expression: 'last(/Zookeeper by HTTP/zookeeper.uptime)<10m'
-              name: 'Zookeeper: has been restarted'
-              event_name: 'Zookeeper: has been restarted (uptime < 10m)'
-              priority: INFO
-              description: 'Uptime is less than 10 minutes'
-              manual_close: 'YES'
-              tags:
-                -
-                  tag: scope
-                  value: notice
         -
           uuid: 86a65edd19e14fa9aea1ff40220f895c
           name: 'Zookeeper: Version'
@@ -1289,7 +1277,7 @@ zabbix_export:
           value: application
         -
           tag: target
-          value: zookeper
+          value: zookeeper
       macros:
         -
           macro: '{$ZOOKEEPER.COMMAND_URL}'
