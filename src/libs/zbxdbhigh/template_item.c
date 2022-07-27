@@ -56,9 +56,6 @@ struct _zbx_template_item_preproc_t
 
 ZBX_PTR_VECTOR_IMPL(item_preproc_ptr, zbx_template_item_preproc_t *)
 
-
-ZBX_PTR_VECTOR_IMPL(item_param_ptr, zbx_template_item_param_t *)
-
 struct _zbx_template_lld_macro_t
 {
 	zbx_uint64_t	lld_macro_pathid;
@@ -1339,19 +1336,6 @@ static void	zbx_item_preproc_free(zbx_template_item_preproc_t *preproc)
 	zbx_free(preproc);
 }
 
-void	zbx_item_params_free(zbx_template_item_param_t *param)
-{
-	if (0 != (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME))
-		zbx_free(param->name_orig);
-	zbx_free(param->name);
-
-	if (0 != (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE))
-		zbx_free(param->value_orig);
-	zbx_free(param->value);
-
-	zbx_free(param);
-}
-
 static void	zbx_lld_macros_free(zbx_template_lld_macro_t *macro)
 {
 	if (0 != (macro->upd_flags & ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_LLD_MACRO))
@@ -1830,7 +1814,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			item_parameter_id = 0;
 	zbx_template_item_t		*item;
-	zbx_template_item_param_t	*param;
+	zbx_item_param_t		*param;
 	zbx_vector_uint64_t		deleteids;
 	zbx_db_insert_t			db_insert;
 
@@ -1844,9 +1828,9 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 
 		for (j = 0; j < item->item_params.values_num; j++)
 		{
-			param = (zbx_template_item_param_t *)item->item_params.values[j];
+			param = (zbx_item_param_t *)item->item_params.values[j];
 
-			if (0 != (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_DELETE))
+			if (0 != (param->upd_flags & ZBX_FLAG_ITEM_PARAM_DELETE))
 			{
 				zbx_vector_uint64_append(&deleteids, param->item_parameterid);
 				zbx_audit_item_delete_params(item->itemid, item->flags, param->item_parameterid);
@@ -1859,7 +1843,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 				continue;
 			}
 
-			if (0 == (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE))
+			if (0 == (param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE))
 				continue;
 
 			update_param_num++;
@@ -1884,7 +1868,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 		{
 			const char	*d = "";
 
-			param = (zbx_template_item_param_t *)item->item_params.values[j];
+			param = (zbx_item_param_t *)item->item_params.values[j];
 			if (0 == param->item_parameterid)
 			{
 				zbx_db_insert_add_values(&db_insert, item_parameter_id, item->itemid, param->name,
@@ -1895,7 +1879,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 				continue;
 			}
 
-			if (0 == (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE))
+			if (0 == (param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE))
 				continue;
 
 			zbx_audit_item_update_json_update_params_create_entry(item->itemid, item->flags,
@@ -1903,7 +1887,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_parameter set ");
 
-			if (0 != (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME))
+			if (0 != (param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE_NAME))
 			{
 				char	*name_esc;
 
@@ -1917,7 +1901,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 						param->item_parameterid, param->name_orig, param->name);
 			}
 
-			if (0 != (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE))
+			if (0 != (param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
 			{
 				char	*value_esc;
 
@@ -2651,10 +2635,10 @@ static int	template_item_preproc_sort_by_step(const void *d1, const void *d2)
 	return 0;
 }
 
-static int	template_item_param_sort_by_name(const void *d1, const void *d2)
+int	zbx_item_param_sort_by_name(const zbx_item_param_t *d1, const zbx_item_param_t *d2)
 {
-	zbx_template_item_param_t	*ip1 = *(zbx_template_item_param_t * const *)d1;
-	zbx_template_item_param_t	*ip2 = *(zbx_template_item_param_t * const *)d2;
+	zbx_item_param_t	*ip1 = *(zbx_item_param_t * const *)d1;
+	zbx_item_param_t	*ip2 = *(zbx_item_param_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(ip1->name, ip2->name);
 
@@ -2969,7 +2953,8 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			itemid;
-	zbx_template_item_param_t	*ppsrc, *ppdst;
+	//zbx_template_item_param_t	*ppsrc, *ppdst;
+	zbx_item_param_t		*db_item_param;
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
@@ -3014,14 +2999,9 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 
 			item = (zbx_template_item_t *)items->values[index];
 
-			ppdst = (zbx_template_item_param_t *)zbx_malloc(NULL, sizeof(zbx_template_item_param_t));
-
-			ppdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_RESET_FLAG;
-			ZBX_STR2UINT64(ppdst->item_parameterid, row[0]);
-			ppdst->name = zbx_strdup(NULL, row[2]);
-			ppdst->value = zbx_strdup(NULL, row[3]);
-
-			zbx_vector_item_param_ptr_append(&item->item_params, ppdst);
+			db_item_param = zbx_item_param_create(row[2], row[3]);
+			ZBX_STR2UINT64(db_item_param->item_parameterid, row[0]);
+			zbx_vector_item_param_ptr_append(&item->item_params, db_item_param);
 		}
 		DBfree_result(result);
 		zbx_free(sql);
@@ -3030,7 +3010,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ip.item_parameterid,ip.itemid,ip.name,ip.value"
+			"select ip.itemid,ip.name,ip.value"
 			" from item_parameter ip,items ti"
 			" where ip.itemid=ti.itemid"
 			" and");
@@ -3040,22 +3020,17 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	result = DBselect("%s", sql);
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_template_item_t		item_local, *pitem_local = &item_local, **pitem;
+		zbx_template_item_t	item_local, *pitem_local = &item_local, **pitem;
 
-		ZBX_STR2UINT64(item_local.templateid, row[1]);
+		ZBX_STR2UINT64(item_local.templateid, row[0]);
 		if (NULL == (pitem = (zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
-		ppdst = (zbx_template_item_param_t *)zbx_malloc(NULL, sizeof(zbx_template_item_param_t));
 
-		ppdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_RESET_FLAG;
-		ZBX_STR2UINT64(ppdst->item_parameterid, row[0]);
-		ppdst->name = zbx_strdup(NULL, row[2]);
-		ppdst->value = zbx_strdup(NULL, row[3]);
-
-		zbx_vector_item_param_ptr_append(&(*pitem)->template_params, ppdst);
+		db_item_param = zbx_item_param_create(row[1], row[2]);
+		zbx_vector_item_param_ptr_append(&(*pitem)->template_params, db_item_param);
 	}
 
 	DBfree_result(result);
@@ -3063,67 +3038,8 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 
 	for (i = 0; i < items->values_num; i++)
 	{
-		int	j, param_num;
-		char	*buffer = NULL;
-
 		item = (zbx_template_item_t *)items->values[i];
-
-		zbx_vector_item_param_ptr_sort(&item->item_params, template_item_param_sort_by_name);
-		zbx_vector_item_param_ptr_sort(&item->template_params, template_item_param_sort_by_name);
-
-		param_num = MAX(item->item_params.values_num, item->template_params.values_num);
-
-		for (j = 0; j < param_num; j++)
-		{
-			if (j >= item->item_params.values_num)
-			{
-				ppsrc = (zbx_template_item_param_t *)item->template_params.values[j];
-				ppdst = (zbx_template_item_param_t *)zbx_malloc(NULL,
-						sizeof(zbx_template_item_param_t));
-				ppdst->item_parameterid = 0;
-				ppdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_RESET_FLAG;
-				ppdst->name = zbx_strdup(NULL, ppsrc->name);
-				ppdst->value = zbx_strdup(NULL, ppsrc->value);
-				zbx_vector_item_param_ptr_append(&item->item_params, ppdst);
-				continue;
-			}
-
-			ppdst = (zbx_template_item_param_t *)item->item_params.values[j];
-
-			if (j >= item->template_params.values_num)
-			{
-				ppdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_PARAM_DELETE;
-				continue;
-			}
-
-			ppsrc = (zbx_template_item_param_t *)item->template_params.values[j];
-
-			buffer = zbx_strdup(buffer, ppsrc->name);
-
-			if (0 != strcmp(ppdst->name, buffer))
-			{
-				ppdst->name_orig = zbx_strdup(NULL, ppdst->name);
-				zbx_free(ppdst->name);
-
-				ppdst->name = buffer;
-				buffer = NULL;
-				ppdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME;
-			}
-
-			buffer = zbx_strdup(buffer, ppsrc->value);
-
-			if (0 != strcmp(ppdst->value, buffer))
-			{
-				ppdst->value_orig = zbx_strdup(NULL, ppdst->value);
-				zbx_free(ppdst->value);
-
-				ppdst->value = buffer;
-				buffer = NULL;
-				ppdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE;
-			}
-			else
-				zbx_free(buffer);
-		}
+		zbx_merge_item_param(&item->item_params, &item->template_params, NULL, NULL);
 	}
 	zbx_hashset_destroy(&items_t);
 	zbx_vector_uint64_destroy(&itemids);
@@ -3205,7 +3121,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 	result = DBselect("%s", sql);
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_template_item_t		item_local, *pitem_local = &item_local, **pitem;
+		zbx_template_item_t	item_local, *pitem_local = &item_local, **pitem;
 
 		ZBX_STR2UINT64(item_local.templateid, row[1]);
 		if (NULL == (pitem = (zbx_template_item_t **)zbx_hashset_search(lld_items, &pitem_local)))

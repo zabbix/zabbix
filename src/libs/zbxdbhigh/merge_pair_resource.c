@@ -21,8 +21,8 @@
 
 typedef union
 {
-	zbx_db_tag_t			*tag;
-	zbx_template_item_param_t	*item_param;
+	zbx_db_tag_t		*tag;
+	zbx_item_param_t	*item_param;
 }
 resouce_u;
 
@@ -33,7 +33,7 @@ typedef struct
 {
 	unsigned char	type;
 	char		*name;
-	resouce_u	*resource;
+	resouce_u	resource;
 } resource_t;
 
 #define GET_RESOURCE(func_name, struct_member_tag, struct_member_item_param, ret_type)	\
@@ -41,11 +41,11 @@ static ret_type	get_resource_##func_name(const resource_t* in)				\
 {											\
 	if (0 != (in->type & RESOURCE_TAG))						\
 	{										\
-		return in->resource->tag->struct_member_tag;				\
+		return in->resource.tag->struct_member_tag;				\
 	}										\
 	else if (0 != (in->type & RESOURCE_ITEM_PARAM))					\
 	{										\
-		return in->resource->item_param->struct_member_item_param;		\
+		return in->resource.item_param->struct_member_item_param;		\
 	}										\
 	else										\
 	{										\
@@ -60,16 +60,18 @@ GET_RESOURCE(second,		value,		value,			char*)
 GET_RESOURCE(second_orig,	value_orig,	value_orig,		char*)
 GET_RESOURCE(id,		tagid,		item_parameterid,	uint64_t)
 
+#undef GET_RESOURCE
+
 #define SET_RESOURCE(func_name, struct_member_tag, struct_member_item_param, set_type)	\
 static void	set_resource_##func_name(resource_t* in, set_type value_in)		\
 {											\
 	if (0 != (in->type & RESOURCE_TAG))						\
 	{										\
-		in->resource->tag->struct_member_tag = value_in;			\
+		in->resource.tag->struct_member_tag = value_in;				\
 	}										\
 	else if (0 != (in->type & RESOURCE_ITEM_PARAM))					\
 	{										\
-		in->resource->item_param->struct_member_item_param = value_in;		\
+		in->resource.item_param->struct_member_item_param = value_in;		\
 	}										\
 	else										\
 	{										\
@@ -78,59 +80,56 @@ static void	set_resource_##func_name(resource_t* in, set_type value_in)		\
 	}										\
 }											\
 
-SET_RESOURCE(first,		tag,		name,		char*)
-SET_RESOURCE(first_orig,	tag_orig,	name_orig,	char*)
-SET_RESOURCE(second,		value,		value,		char*)
-SET_RESOURCE(second_orig,	value_orig,	value_orig,	char*)
+SET_RESOURCE(first,		tag,		name,			char*)
+SET_RESOURCE(first_orig,	tag_orig,	name_orig,		char*)
+SET_RESOURCE(second,		value,		value,			char*)
+SET_RESOURCE(second_orig,	value_orig,	value_orig,		char*)
+
+#undef SET_RESOURCE
 
 #define RESOURCE_FREE(func_name, struct_member_tag, struct_member_item_param)		\
 static void	resource_free_##func_name(resource_t* in)				\
 {											\
 	if (0 != (in->type & RESOURCE_TAG))						\
 	{										\
-		zbx_free(in->resource->tag->struct_member_tag);				\
+		zbx_free(in->resource.tag->struct_member_tag);				\
 	}										\
 	else if (0 != (in->type & RESOURCE_ITEM_PARAM))					\
 	{										\
-		zbx_free(in->resource->item_param->struct_member_item_param);		\
-	}										\
-	else										\
-	{										\
-		THIS_SHOULD_NEVER_HAPPEN;						\
-		exit(EXIT_FAILURE);							\
+		zbx_free(in->resource.item_param->struct_member_item_param);		\
 	}										\
 }											\
 
 RESOURCE_FREE(first,	tag,	name)
 RESOURCE_FREE(second,	value,	value)
 
-void	resource_free(resource_t* in)
+#undef RESOURCE_FREE
+
+static void	resource_free(resource_t* in)
 {
-	if (0 == (in->type & RESOURCE_TAG))
+	if (0 != (in->type & RESOURCE_TAG))
 	{
-		zbx_db_tag_free(in->resource->tag);
+		zbx_db_tag_free(in->resource.tag);
 	}
-	else if (0 == (in->type & RESOURCE_TAG))
+	else if (0 != (in->type & RESOURCE_ITEM_PARAM))
 	{
-		zbx_item_params_free(in->resource->item_param);
+		zbx_item_params_free(in->resource.item_param);
 	}
-	else
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
+
+	zbx_free(in->name);
+	zbx_free(in);
 }
 
 #define RESOURCE_FLAG_IS(func_name, tag_flag, item_param_flag, struct_member_tag, struct_member_item_param)	\
-int	resource_flag_is_##func_name(resource_t* in)								\
+static int	resource_flag_is_##func_name(resource_t* in)							\
 {														\
 	if (0 != (in->type & RESOURCE_TAG))									\
 	{													\
-		return tag_flag == in->resource->struct_member_tag->flags;					\
+		return 0 != (tag_flag & in->resource.struct_member_tag->flags);					\
 	}													\
 	else if (0 != (in->type & RESOURCE_ITEM_PARAM))								\
 	{													\
-		return item_param_flag == in->resource->struct_member_item_param->upd_flags;			\
+		return 0 != (item_param_flag & in->resource.struct_member_item_param->upd_flags);		\
 	}													\
 	else													\
 	{													\
@@ -139,20 +138,22 @@ int	resource_flag_is_##func_name(resource_t* in)								\
 	}													\
 }														\
 
-RESOURCE_FLAG_IS(delete, ZBX_FLAG_DB_TAG_REMOVE, ZBX_FLAG_TEMPLATE_ITEM_PARAM_DELETE, tag, item_param)
-RESOURCE_FLAG_IS(update_first, ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME, tag, item_param)
-RESOURCE_FLAG_IS(update_second, ZBX_FLAG_DB_TAG_UPDATE_VALUE, ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE, tag, item_param)
+RESOURCE_FLAG_IS(delete, ZBX_FLAG_DB_TAG_REMOVE, ZBX_FLAG_ITEM_PARAM_DELETE, tag, item_param)
+RESOURCE_FLAG_IS(update_first, ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_ITEM_PARAM_UPDATE_NAME, tag, item_param)
+RESOURCE_FLAG_IS(update_second, ZBX_FLAG_DB_TAG_UPDATE_VALUE, ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE, tag, item_param)
 
-#define RESOURCE_FLAG(func_name, tag_flag, item_param_flag, struct_member_tag, struct_member_item_param)	\
-void	resource_flag_##func_name(resource_t* in)								\
+#undef RESOURCE_FLAG_IS
+
+#define RESOURCE_FLAG(func_name, operator, tag_flag, item_param_flag)						\
+static void	resource_flag_##func_name(resource_t* in)							\
 {														\
 	if (0 != (in->type & RESOURCE_TAG))									\
 	{													\
-		in->resource->struct_member_tag->flags &= tag_flag;						\
+		in->resource.tag->flags operator tag_flag;							\
 	}													\
 	else if (0 != (in->type & RESOURCE_ITEM_PARAM))								\
 	{													\
-		in->resource->struct_member_item_param->upd_flags &= item_param_flag;				\
+		in->resource.item_param->upd_flags operator item_param_flag;					\
 	}													\
 	else													\
 	{													\
@@ -161,10 +162,13 @@ void	resource_flag_##func_name(resource_t* in)								\
 	}													\
 }														\
 
-RESOURCE_FLAG(reset_first, (~ZBX_FLAG_DB_TAG_UPDATE_TAG), (~ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME), tag, item_param)
-RESOURCE_FLAG(reset_second, (~ZBX_FLAG_DB_TAG_UPDATE_VALUE), (~ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE), tag, item_param)
-RESOURCE_FLAG(set_first, (ZBX_FLAG_DB_TAG_UPDATE_TAG), (ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME), tag, item_param)
-RESOURCE_FLAG(set_second, (ZBX_FLAG_DB_TAG_UPDATE_VALUE), (ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE), tag, item_param)
+RESOURCE_FLAG(reset_update_first, &=, (~ZBX_FLAG_DB_TAG_UPDATE_TAG), (~ZBX_FLAG_ITEM_PARAM_UPDATE_NAME))
+RESOURCE_FLAG(reset_update_second, &=, (~ZBX_FLAG_DB_TAG_UPDATE_VALUE), (~ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
+RESOURCE_FLAG(set_update_second, =, ZBX_FLAG_DB_TAG_UPDATE_VALUE, ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE)
+RESOURCE_FLAG(set_update_both, =, (ZBX_FLAG_DB_TAG_UPDATE_TAG | ZBX_FLAG_DB_TAG_UPDATE_VALUE), \
+		(ZBX_FLAG_ITEM_PARAM_UPDATE_NAME | ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
+RESOURCE_FLAG(set_remove, =, ZBX_FLAG_DB_TAG_REMOVE, ZBX_FLAG_ITEM_PARAM_DELETE)
+#undef RESOURCE_FLAG
 
 ZBX_PTR_VECTOR_DECL(resource_ptr, resource_t *)
 ZBX_PTR_VECTOR_IMPL(resource_ptr, resource_t *)
@@ -181,12 +185,12 @@ static void	db_tag_merge_automatic(zbx_db_tag_t *dst, zbx_db_tag_t *src)
 
 static void	resource_update_automatic(resource_t *in)
 {
-	if (0 == (in->type & RESOURCE_TAG))
+	if (0 != (in->type & RESOURCE_TAG))
 	{
-		if (0 != (in->resource->tag->flags & ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC))
+		if (0 != (in->resource.tag->flags & ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC))
 		{
-			in->resource->tag->automatic = in->resource->tag->automatic_orig;
-			in->resource->tag->flags &= (~ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC);
+			in->resource.tag->automatic = in->resource.tag->automatic_orig;
+			in->resource.tag->flags &= (~ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC);
 		}
 	}
 }
@@ -209,7 +213,7 @@ static int	db_resource_rollback(resource_t *in)
 		resource_free_first(in);
 		set_resource_first(in, get_resource_first_orig(in));
 		set_resource_first_orig(in, NULL);
-		resource_flag_reset_first(in);
+		resource_flag_reset_update_first(in);
 	}
 
 	if (resource_flag_is_update_second(in))
@@ -217,7 +221,7 @@ static int	db_resource_rollback(resource_t *in)
 		resource_free_second(in);
 		set_resource_second(in, get_resource_second_orig(in));
 		set_resource_second_orig(in, NULL);
-		resource_flag_reset_second(in);
+		resource_flag_reset_update_second(in);
 	}
 
 	resource_update_automatic(in);
@@ -236,10 +240,9 @@ resource_field_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check validness of a single tag/item_param field                  *
- *          (tag+value/name+value)                                            *
+ * Purpose: check validness of a single resource field                        *
  *                                                                            *
- * Return value: SUCCEED - tag/item_param field is valid                      *
+ * Return value: SUCCEED - resource field is valid                            *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -254,13 +257,13 @@ static int	db_resource_check_field(resource_t *in, resource_field_t type, const 
 			if (0 != (in->type & RESOURCE_TAG))
 			{
 				field = "tag";
-				str = in->resource->tag->tag;
+				str = in->resource.tag->tag;
 				field_len = ZBX_DB_TAG_NAME_LEN;
 			}
 			else if (0 != (in->type & RESOURCE_ITEM_PARAM))
 			{
 				field = "name";
-				str = in->resource->item_param->name;
+				str = in->resource.item_param->name;
 				field_len = ZBX_ITEM_PARAMETER_NAME_LEN;
 			}
 			else
@@ -273,13 +276,13 @@ static int	db_resource_check_field(resource_t *in, resource_field_t type, const 
 			if (0 != (in->type & RESOURCE_TAG))
 			{
 				field = "value";
-				str = in->resource->tag->value;
+				str = in->resource.tag->value;
 				field_len = ZBX_DB_TAG_VALUE_LEN;
 			}
 			else if (0 != (in->type & RESOURCE_ITEM_PARAM))
 			{
 				field = "value";
-				str = in->resource->item_param->value;
+				str = in->resource.item_param->value;
 				field_len = ZBX_ITEM_PARAMETER_VALUE_LEN;
 			}
 			else
@@ -332,9 +335,9 @@ static int	db_resource_check_field(resource_t *in, resource_field_t type, const 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check validness of all fields for a list of tags/item_params      *
+ * Purpose: check validness of all fields for a list of resources             *
  *                                                                            *
- * Return value: SUCCEED - tags/item_params have valid fields                 *
+ * Return value: SUCCEED - resources have valid fields                        *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -344,16 +347,16 @@ static int	check_resource_fields(zbx_vector_resource_ptr_t *resources_in, const 
 
 	for (i = 0; i < resources_in->values_num; i++)
 	{
-		int		errors = 0;
+		int	errors = 0;
 
-		if (resource_flag_is_delete(resources_in->values[i]))
+		if (0 != resource_flag_is_delete(resources_in->values[i]))
 			continue;
 
 		if ('\0' == *get_resource_first(resources_in->values[i]))
 		{
 			if (NULL != error)
 			{
-				*error = zbx_strdcatf(*error, "Cannot %s %s %s: empty tag name.\n",
+				*error = zbx_strdcatf(*error, "Cannot %s %s: empty %s name.\n",
 						RESOURCE_OP(resources_in->values[i]), owner,
 						resources_in->values[i]->name);
 			}
@@ -380,18 +383,18 @@ static int	check_resource_fields(zbx_vector_resource_ptr_t *resources_in, const 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check new tags/parameters for duplicate tag+value/name+value      *
+ * Purpose: check new resources for duplicate first_member+second_member      *
  *          combinations                                                      *
  *                                                                            *
- * Parameters: resources  - [IN/OUT] tags/parameters to check                 *
- *             owner - [IN] the owned object (host, item, trigger)            *
- *             error - [OUT] the error message                                *
+ * Parameters: resources  - [IN/OUT] resources to check                       *
+ *             owner      - [IN] the owned object (host, item, trigger)       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
- * Return value: SUCCEED - tags/parameters have no duplicates                 *
+ * Return value: SUCCEED - resources have no duplicates                       *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: Existing tags/parameters are rolled back to their original       *
- *           values, while new tags/parameters are removed.                   *
+ * Comments: Existing resources are rolled back to their original             *
+ *           values, while new resources are removed.                         *
  *                                                                            *
  ******************************************************************************/
 static int	check_duplicate_resource(zbx_vector_resource_ptr_t *resources, const char *owner, char **error)
@@ -428,28 +431,33 @@ static int	check_duplicate_resource(zbx_vector_resource_ptr_t *resources, const 
 	return ret;
 }
 
+#undef RESOURCE_OP
+
 /******************************************************************************
  *                                                                            *
- * Purpose: merge new tags into existing                                      *
+ * Purpose: merge new resources into existing                                 *
  *                                                                            *
- * Parameters: dst - [IN/OUT] vector of existing tags                         *
- *             src - [IN/OUT] vector or new tags                              *
- *             owner  - [IN] the tag owner (host, item, trigger),             *
+ * Parameters: dst    - [IN/OUT] vector of existing resources                 *
+ *             src    - [IN/OUT] vector or new resources                      *
+ *             owner  - [IN] the resource owner (host, item, trigger),        *
  *                           optional - must be specified if error parameter  *
  *                           is not null                                      *
  *             error  - [IN,OUT] the error message (appended to existing),    *
  *                           optional                                         *
  *                                                                            *
- * Comments: The tags are merged using the following logic:                   *
- *           1) tags with matching name+value are left as it is               *
- *           2) tags with matching names will have their values updated       *
- *           3) tags without matches will have:                               *
- *              a) their name and value updated if there are new tags left    *
+ * Comments: The resources are merged using the following logic:              *
+ *           1) resources with matching first+second members are left as it   *
+ *              is                                                            *
+ *           2) resources with matching first members will have their second  *
+ *              members updated                                               *
+ *           3) resources without matches will have:                          *
+ *              a) their first and second memevers updated if there are new   *
+ *                 resources left                                             *
  *              b) flagged to be removed otherwise                            *
- *           4) all leftover new tags will be created                         *
+ *           4) all leftover new resources will be created                    *
  *                                                                            *
- * Return value: SUCCEED - tags were merged without issues                    *
- *               FAIL - tags were merged with errors                          *
+ * Return value: SUCCEED - resources were merged without issues               *
+ *               FAIL - resources were merged with errors                     *
  *                                                                            *
  ******************************************************************************/
 int	zbx_merge_resource(zbx_vector_resource_ptr_t *dst, zbx_vector_resource_ptr_t *src, const char *owner,
@@ -462,7 +470,7 @@ int	zbx_merge_resource(zbx_vector_resource_ptr_t *dst, zbx_vector_resource_ptr_t
 
 	ret = check_duplicate_resource(src, owner, error);
 
-	/* perform exact tag+value/name+value match */
+	/* perform exact first_member+second_member match */
 	for (i = 0; i < dst->values_num; i++)
 	{
 		for (j = 0; j < src->values_num; j++)
@@ -477,28 +485,29 @@ int	zbx_merge_resource(zbx_vector_resource_ptr_t *dst, zbx_vector_resource_ptr_t
 
 		if (j != src->values_num)
 		{
-			if (0 == (dst->values[i]->type & RESOURCE_TAG))
-				db_tag_merge_automatic(dst->values[i]->resource->tag, src->values[j]->resource->tag);
+			if (0 != (dst->values[i]->type & RESOURCE_TAG))
+				db_tag_merge_automatic(dst->values[i]->resource.tag, src->values[j]->resource.tag);
 
 			resource_free(src->values[j]);
 			zbx_vector_resource_ptr_remove_noorder(src, j);
 			continue;
 		}
 
-		if (0 == (dst->values[i]->type & RESOURCE_TAG) && ZBX_DB_TAG_AUTOMATIC ==
-				dst->values[i]->resource->tag->automatic)
+		if ((0 != (dst->values[i]->type & RESOURCE_TAG) && ZBX_DB_TAG_AUTOMATIC ==
+				dst->values[i]->resource.tag->automatic) || (0 != (dst->values[i]->type &
+				RESOURCE_ITEM_PARAM)))
 		{
-			dst->values[i]->resource->tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
+			resource_flag_set_remove(dst->values[i]);
 		}
 	}
 
 	if (0 == src->values_num)
 		goto out;
 
-	/* perform tag match */
+	/* perform resource match */
 	for (i = 0; i < dst->values_num; i++)
 	{
-		if (resource_flag_is_delete(dst->values[i]))
+		if (0 == resource_flag_is_delete(dst->values[i]))
 			continue;
 
 		for (j = 0; j < src->values_num; j++)
@@ -511,7 +520,7 @@ int	zbx_merge_resource(zbx_vector_resource_ptr_t *dst, zbx_vector_resource_ptr_t
 		{
 			set_resource_second_orig(dst->values[i], get_resource_second(dst->values[i]));
 			set_resource_second(dst->values[i], get_resource_second(src->values[j]));
-			resource_flag_set_second(dst->values[i]);
+			resource_flag_set_update_second(dst->values[i]);
 			set_resource_second(src->values[j], NULL);
 			resource_free(src->values[j]);
 
@@ -523,10 +532,10 @@ int	zbx_merge_resource(zbx_vector_resource_ptr_t *dst, zbx_vector_resource_ptr_t
 	if (0 == src->values_num)
 		goto out;
 
-	/* update rest of the tags */
+	/* update rest of resources */
 	for (i = 0; i < dst->values_num && 0 < src->values_num; i++)
 	{
-		if(resource_flag_is_delete(dst->values[i]))
+		if (0 == resource_flag_is_delete(dst->values[i]))
 		{
 			continue;
 		}
@@ -535,9 +544,8 @@ int	zbx_merge_resource(zbx_vector_resource_ptr_t *dst, zbx_vector_resource_ptr_t
 		set_resource_second_orig(dst->values[i], get_resource_second(dst->values[i]));
 		set_resource_first(dst->values[i], get_resource_first(src->values[0]));
 		set_resource_second(dst->values[i], get_resource_second(src->values[0]));
+		resource_flag_set_update_both(dst->values[i]);
 
-		resource_flag_set_first(dst->values[i]);
-		resource_flag_set_second(dst->values[i]);
 		set_resource_first(src->values[0], NULL);
 		set_resource_second(src->values[0], NULL);
 		resource_free(src->values[0]);
@@ -546,7 +554,7 @@ int	zbx_merge_resource(zbx_vector_resource_ptr_t *dst, zbx_vector_resource_ptr_t
 		continue;
 	}
 
-	/* add leftover new tags */
+	/* add leftover new resources */
 	zbx_vector_resource_ptr_append_array(dst, src->values, src->values_num);
 
 	zbx_vector_resource_ptr_clear(src);
@@ -554,73 +562,78 @@ out:
 	if (SUCCEED != check_resource_fields(dst, owner, error))
 		ret = FAIL;
 
-	zbx_vector_resource_ptr_sort(dst, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() resources :%d", __func__, dst->values_num);
 
 	return ret;
 }
 
-#define ZBX_MERGE(func_name, vector_type, merge_type, merge_name, merge_struct)					\
-int	zbx_merge_##func_name(zbx_vector_##vector_type##_ptr_t *dst, zbx_vector_##vector_type##_ptr_t *src,	\
-		const char *owner, char **error)								\
-{														\
-	int	i, res;								\
-	zbx_vector_resource_ptr_t	res_dst, res_src;							\
-														\
-	zbx_vector_resource_ptr_create(&res_dst);								\
-	zbx_vector_resource_ptr_create(&res_src);								\
-														\
-	for (i = 0; i < dst->values_num; i++)									\
-	{													\
-		resource_t	*r; \
-\
-		r = (resource_t *)zbx_malloc(NULL, sizeof(resource_t));\
-		r->type = merge_type;\
-		r->name = zbx_strdup(NULL, merge_name);\
-		r->resource->merge_struct = dst->values[i];\
-		zbx_vector_resource_ptr_append(&res_dst, r);\
-	}\
-\
-	for (i = 0; i < src->values_num; i++)\
-	{\
-		resource_t	*r;\
-\
-		r = (resource_t *)zbx_malloc(NULL, sizeof(resource_t));\
-		r->type = merge_type;\
-		r->name = zbx_strdup(NULL, merge_name);\
-		r->resource->merge_struct = src->values[i];\
-		zbx_vector_resource_ptr_append(&res_src, r);\
-	}\
-\
-	zbx_vector_##vector_type##_ptr_destroy(dst);\
-	zbx_vector_##vector_type##_ptr_destroy(src);\
-	\
-	\
-	res = zbx_merge_resource(&res_dst, &res_src, owner, error);\
-\
-	zbx_vector_##vector_type##_ptr_create(dst);\
-	zbx_vector_##vector_type##_ptr_create(src);\
-\
-	for (i = 0; i < res_dst.values_num; i++)\
-	{\
-		zbx_vector_##vector_type##_ptr_append(dst, res_dst.values[i]->resource->merge_struct);\
-		zbx_free(res_dst.values[i]->name);\
-		zbx_free(res_dst.values[i]);\
-	}\
-\
-	for (i = 0; i < res_src.values_num; i++)\
-	{\
-		zbx_vector_##vector_type##_ptr_append(src, res_src.values[i]->resource->merge_struct);\
-		zbx_free(res_src.values[i]->name);\
-		zbx_free(res_src.values[i]);	  \
-	}\
-\
-	zbx_vector_resource_ptr_destroy(&res_dst);\
-	zbx_vector_resource_ptr_destroy(&res_src);\
-\
-	return res; \
-}						\
+#define ZBX_MERGE(func_name, vector_type, merge_type, merge_name, merge_struct)		\
+int	zbx_merge_##func_name(zbx_vector_##vector_type##_ptr_t *dst,			\
+		zbx_vector_##vector_type##_ptr_t *src, const char *owner,		\
+		char **error)								\
+{											\
+	int				i, res;						\
+	zbx_vector_resource_ptr_t	res_dst, res_src;				\
+											\
+	zbx_vector_resource_ptr_create(&res_dst);					\
+	zbx_vector_resource_ptr_create(&res_src);					\
+											\
+	for (i = 0; i < dst->values_num; i++)						\
+	{										\
+		resource_t	*r;							\
+											\
+		r = (resource_t *)zbx_malloc(NULL, sizeof(resource_t));			\
+		r->type = merge_type;							\
+		r->name = zbx_strdup(NULL, merge_name);					\
+		r->resource.merge_struct = dst->values[i];				\
+		zbx_vector_resource_ptr_append(&res_dst, r);				\
+	}										\
+											\
+	for (i = 0; i < src->values_num; i++)						\
+	{										\
+		resource_t	*r;							\
+											\
+		r = (resource_t *)zbx_malloc(NULL, sizeof(resource_t));			\
+		r->type = merge_type;							\
+		r->name = zbx_strdup(NULL, merge_name);					\
+		r->resource.merge_struct = src->values[i];				\
+		zbx_vector_resource_ptr_append(&res_src, r);				\
+	}										\
+											\
+	zbx_vector_##vector_type##_ptr_destroy(dst);					\
+	zbx_vector_##vector_type##_ptr_destroy(src);					\
+											\
+											\
+	res = zbx_merge_resource(&res_dst, &res_src, owner, error);			\
+											\
+	zbx_vector_##vector_type##_ptr_create(dst);					\
+	zbx_vector_##vector_type##_ptr_create(src);					\
+											\
+	for (i = 0; i < res_dst.values_num; i++)					\
+	{										\
+		zbx_vector_##vector_type##_ptr_append(dst,				\
+				res_dst.values[i]->resource.merge_struct);		\
+		zbx_free(res_dst.values[i]->name);					\
+		zbx_free(res_dst.values[i]);						\
+	}										\
+											\
+	for (i = 0; i < res_src.values_num; i++)					\
+	{										\
+		zbx_vector_##vector_type##_ptr_append(src,				\
+				res_src.values[i]->resource.merge_struct);		\
+		zbx_free(res_src.values[i]->name);					\
+		zbx_free(res_src.values[i]);						\
+	}										\
+											\
+	zbx_vector_resource_ptr_destroy(&res_dst);					\
+	zbx_vector_resource_ptr_destroy(&res_src);					\
+											\
+	return res;									\
+}											\
 
-ZBX_MERGE(tags, db_tag, RESOURCE_TAG, "tag", tag)
-ZBX_MERGE(item_param, item_param, RESOURCE_ITEM_PARAM, "item_param", item_param)
+ZBX_MERGE(tags,		db_tag,		RESOURCE_TAG,		"tag",		tag)
+ZBX_MERGE(item_param,	item_param,	RESOURCE_ITEM_PARAM,	"item_param",	item_param)
+#undef ZBX_MERGE
+
+#undef RESOURCE_TAG
+#undef RESOURCE_ITEM_PARAM
