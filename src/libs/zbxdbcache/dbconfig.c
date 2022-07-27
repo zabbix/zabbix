@@ -514,6 +514,15 @@ static ZBX_DC_HOST	*DCfind_host(const char *host)
 		return host_h->host_ptr;
 }
 
+static ZBX_DC_AUTOREG_HOST	*DCfind_autoreg_host(const char *host)
+{
+	ZBX_DC_AUTOREG_HOST	autoreg_host_local;
+
+	autoreg_host_local.host = (char *)host;
+
+	return (ZBX_DC_AUTOREG_HOST *)zbx_hashset_search(&config->autoreg_hosts, &autoreg_host_local);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Find a record with proxy details in configuration cache using the *
@@ -6311,6 +6320,21 @@ static int	__config_host_h_compare(const void *d1, const void *d2)
 	return host_h_1->host == host_h_2->host ? 0 : strcmp(host_h_1->host, host_h_2->host);
 }
 
+static zbx_hash_t	__config_autoreg_host_h_hash(const void *data)
+{
+	const ZBX_DC_AUTOREG_HOST	*autoreg_host = (const ZBX_DC_AUTOREG_HOST *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(autoreg_host->host, strlen(autoreg_host->host), ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	__config_autoreg_host_h_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_AUTOREG_HOST	*autoreg_host_1 = (const ZBX_DC_AUTOREG_HOST *)d1;
+	const ZBX_DC_AUTOREG_HOST	*autoreg_host_2 = (const ZBX_DC_AUTOREG_HOST *)d2;
+
+	return strcmp(autoreg_host_1->host, autoreg_host_2->host);
+}
+
 static zbx_hash_t	__config_interface_ht_hash(const void *data)
 {
 	const ZBX_DC_INTERFACE_HT	*interface_ht = (const ZBX_DC_INTERFACE_HT *)data;
@@ -6629,7 +6653,9 @@ int	init_configuration_cache(char **error)
 
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
+
 	CREATE_HASHSET_EXT(config->hosts_p, 0, __config_host_h_hash, __config_host_h_compare);
+	CREATE_HASHSET_EXT(config->autoreg_hosts, 10, __config_autoreg_host_h_hash, __config_autoreg_host_h_compare);
 	CREATE_HASHSET_EXT(config->interfaces_ht, 10, __config_interface_ht_hash, __config_interface_ht_compare);
 	CREATE_HASHSET_EXT(config->interface_snmpaddrs, 0, __config_interface_addr_hash, __config_interface_addr_compare);
 	CREATE_HASHSET_EXT(config->regexps, 0, __config_regexp_hash, __config_regexp_compare);
@@ -6877,6 +6903,83 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 	return ret;
 }
 
+static int	tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char **error)
+{
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_cert(sock, attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_psk(sock, attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+#endif
+	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
+	{
+		*error = zbx_strdup(*error, "internal error: invalid connection type");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+#endif
+	return SUCCEED;
+}
+
+static int	tls_validate_attr(const zbx_socket_t *sock, const zbx_tls_conn_attr_t *attr, const char *tls_issuer,
+		const char *tls_subject, const ZBX_DC_PSK *tls_dc_psk, const char **msg)
+{
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	{
+		/* simplified match, not compliant with RFC 4517, 4518 */
+		if ('\0' != *tls_issuer && 0 != strcmp(tls_issuer, attr->issuer))
+		{
+			*msg = "certificate issuer does not match";
+			return FAIL;
+		}
+
+		/* simplified match, not compliant with RFC 4517, 4518 */
+		if ('\0' != *tls_subject && 0 != strcmp(tls_subject, attr->subject))
+		{
+			*msg = "certificate subject does not match";
+			return FAIL;
+		}
+	}
+#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (NULL != tls_dc_psk)
+		{
+			if (strlen(tls_dc_psk->tls_psk_identity) != attr->psk_identity_len ||
+					0 != memcmp(tls_dc_psk->tls_psk_identity, attr->psk_identity,
+					attr->psk_identity_len))
+			{
+				*msg = "false PSK identity";
+				return FAIL;
+			}
+		}
+		else
+		{
+			*msg = "missing PSK";
+			return FAIL;
+		}
+	}
+#endif
+#endif
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose:                                                                   *
@@ -6899,36 +7002,12 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
+	const char		*msg;
 
-	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
-	{
-		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
-		{
-			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-		}
-	}
-#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
-	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
-	{
-		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
-		{
-			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-		}
-	}
-#endif
-	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
-	{
-		*error = zbx_strdup(*error, "internal error: invalid connection type");
-		THIS_SHOULD_NEVER_HAPPEN;
+	if (FAIL == tls_get_attr(sock, &attr, error))
 		return FAIL;
-	}
-#endif
+
 	RDLOCK_CACHE;
 
 	if (NULL == (dc_host = DCfind_proxy(host)))
@@ -6953,54 +7032,105 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 		return FAIL;
 	}
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	if (FAIL == tls_validate_attr(sock, &attr, dc_host->tls_issuer, dc_host->tls_subject, dc_host->tls_dc_psk,
+			&msg))
 	{
-		/* simplified match, not compliant with RFC 4517, 4518 */
-		if ('\0' != *dc_host->tls_issuer && 0 != strcmp(dc_host->tls_issuer, attr.issuer))
-		{
-			UNLOCK_CACHE;
-			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate issuer does not match", host);
-			return FAIL;
-		}
+		UNLOCK_CACHE;
+		*error = zbx_dsprintf(NULL, "proxy \"%s\": %s", host, msg);
+		return FAIL;
+	}
 
-		/* simplified match, not compliant with RFC 4517, 4518 */
-		if ('\0' != *dc_host->tls_subject && 0 != strcmp(dc_host->tls_subject, attr.subject))
-		{
-			UNLOCK_CACHE;
-			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate subject does not match", host);
-			return FAIL;
-		}
-	}
-#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
-	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
-	{
-		if (NULL != dc_host->tls_dc_psk)
-		{
-			if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr.psk_identity_len ||
-					0 != memcmp(dc_host->tls_dc_psk->tls_psk_identity, attr.psk_identity,
-					attr.psk_identity_len))
-			{
-				UNLOCK_CACHE;
-				*error = zbx_dsprintf(*error, "proxy \"%s\" is using false PSK identity", host);
-				return FAIL;
-			}
-		}
-		else
-		{
-			UNLOCK_CACHE;
-			*error = zbx_dsprintf(*error, "active proxy \"%s\" is connecting with PSK but there is no PSK"
-					" in the database for this proxy", host);
-			return FAIL;
-		}
-	}
-#endif
-#endif
 	*hostid = dc_host->hostid;
 
 	UNLOCK_CACHE;
 
 	return SUCCEED;
+}
+
+int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error)
+{
+	const ZBX_DC_HOST	*dc_host;
+	zbx_tls_conn_attr_t	attr;
+	const char		*msg;
+
+	if (FAIL == tls_get_attr(sock, &attr, error))
+		return FAIL;
+
+	RDLOCK_CACHE;
+
+	if (NULL == (dc_host = DCfind_host(host)))
+	{
+		UNLOCK_CACHE;
+		*hostid = 0;
+		return SUCCEED;
+	}
+
+	if (HOST_STATUS_MONITORED != dc_host->status)
+	{
+		UNLOCK_CACHE;
+		*error = zbx_dsprintf(*error, "host \"%s\" not monitored", host);
+		return FAIL;
+	}
+
+	if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
+	{
+		UNLOCK_CACHE;
+		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for host \"%s\"",
+				zbx_tcp_connection_type_name(sock->connection_type), host);
+		return FAIL;
+	}
+
+	if (FAIL == tls_validate_attr(sock, &attr, dc_host->tls_issuer, dc_host->tls_subject, dc_host->tls_dc_psk,
+			&msg))
+	{
+		UNLOCK_CACHE;
+		*error = zbx_dsprintf(NULL, "host \"%s\": %s", host, msg);
+		return FAIL;
+	}
+
+	*hostid = dc_host->hostid;
+
+	UNLOCK_CACHE;
+
+	return SUCCEED;
+}
+
+int	DCis_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
+		zbx_conn_flags_t flag, const char *interface)
+{
+	const ZBX_DC_AUTOREG_HOST	*dc_autoreg_host;
+	int				ret;
+
+	RDLOCK_CACHE;
+
+	if (NULL == (dc_autoreg_host = DCfind_autoreg_host(host)))
+	{
+		ret = SUCCEED;
+	}
+	else if (0 != strcmp(dc_autoreg_host->host_metadata, host_metadata))
+	{
+		ret = SUCCEED;
+	}
+	else if (dc_autoreg_host->flags != (int)flag)
+	{
+		ret = SUCCEED;
+	}
+	else if (ZBX_CONN_IP == flag && (0 != strcmp(dc_autoreg_host->listen_ip, interface) ||
+			dc_autoreg_host->listen_port != port))
+	{
+		ret = SUCCEED;
+	}
+	else if (ZBX_CONN_DNS == flag && (0 != strcmp(dc_autoreg_host->listen_dns, interface) ||
+			dc_autoreg_host->listen_port != port))
+	{
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
 }
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

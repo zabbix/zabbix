@@ -798,6 +798,9 @@ int	DCconfig_get_proxypoller_nextcheck(void);
 #define ZBX_PROXY_TASKS_NEXTCHECK	0x04
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int proxy_conn_err);
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
+int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
+int	DCis_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
+		zbx_conn_flags_t flag, const char *interface);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage);

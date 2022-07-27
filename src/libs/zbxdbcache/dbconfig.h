@@ -305,7 +305,6 @@ typedef struct
 }
 ZBX_DC_SCRIPTITEM;
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 typedef struct
 {
 	const char	*tls_psk_identity;	/* pre-shared key identity           */
@@ -313,7 +312,6 @@ typedef struct
 	unsigned int	refcount;		/* reference count                   */
 }
 ZBX_DC_PSK;
-#endif
 
 typedef struct
 {
@@ -342,16 +340,25 @@ typedef struct
 	/* 'tls_connect' and 'tls_accept' must be respected even if encryption support is not compiled in */
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*tls_issuer;
 	const char	*tls_subject;
 	ZBX_DC_PSK	*tls_dc_psk;
-#endif
 
 	zbx_vector_ptr_t	interfaces_v;	/* for quick finding of all host interfaces in */
 						/* 'config->interfaces' hashset */
 }
 ZBX_DC_HOST;
+
+typedef struct
+{
+	char		*host;
+	char		*host_metadata;
+	char		*listen_ip;
+	char		*listen_dns;
+	int		flags;
+	unsigned short	listen_port;
+}
+ZBX_DC_AUTOREG_HOST;
 
 typedef struct
 {
@@ -798,6 +805,7 @@ typedef struct
 	zbx_hashset_t		hosts_h;		/* for searching hosts by 'host' name */
 	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
 	zbx_hashset_t		proxies;
+	zbx_hashset_t		autoreg_hosts;
 	zbx_hashset_t		host_inventories;
 	zbx_hashset_t		host_inventories_auto;	/* For caching of automatically populated host inventories. */
 	 	 	 	 	 	 	/* Configuration syncer will read host_inventories without  */

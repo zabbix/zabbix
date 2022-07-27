@@ -87,9 +87,10 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 		DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag);
 
 	DBcommit();
+	// add to cache on success
 }
 
-static int	zbx_autoreg_check_permissions(const char *host, const char *ip, unsigned short port,
+static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, unsigned short port,
 		const zbx_socket_t *sock)
 {
 	zbx_config_t	cfg;
@@ -159,12 +160,8 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
 		char *error)
 {
-	char			*host_esc, *ch_error, *old_metadata, *old_ip, *old_dns, *old_flag, *old_port;
-	DB_RESULT		result;
-	DB_ROW			row;
-	unsigned short		old_port_v;
-	int			tls_offset = 0, ret = FAIL;
-	zbx_conn_flags_t	old_flag_v;
+	char	*ch_error;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
 
@@ -175,133 +172,32 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		goto out;
 	}
 
-	host_esc = DBdyn_escape_string(host);
-
-	result =
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		DBselect(
-			"select h.hostid,h.status,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,"
-			"a.host_metadata,a.listen_ip,a.listen_dns,a.listen_port,a.flags"
-			" from hosts h"
-				" left join autoreg_host a"
-					" on a.proxy_hostid is null and a.host=h.host"
-			" where h.host='%s'"
-				" and h.status in (%d,%d)"
-				" and h.flags<>%d"
-				" and h.proxy_hostid is null",
-			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
-#else
-		DBselect(
-			"select h.hostid,h.status,h.tls_accept,a.host_metadata,a.listen_ip,a.listen_dns,a.listen_port,"
-			"a.flags"
-			" from hosts h"
-				" left join autoreg_host a"
-					" on a.proxy_hostid is null and a.host=h.host"
-			" where h.host='%s'"
-				" and h.status in (%d,%d)"
-				" and h.flags<>%d"
-				" and h.proxy_hostid is null",
-			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
-#endif
-	if (NULL != (row = DBfetch(result)))
+	/* if host exists then check host connection permissions */
+	if (FAIL == DCcheck_host_permissions(host, sock, hostid, &ch_error))
 	{
-		if (0 == ((unsigned int)atoi(row[2]) & sock->connection_type))
-		{
-			zbx_snprintf(error, MAX_STRING_LEN, "connection of type \"%s\" is not allowed for host"
-					" \"%s\"", zbx_tcp_connection_type_name(sock->connection_type), host);
-			goto done;
-		}
-
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
-		{
-			zbx_tls_conn_attr_t	attr;
-
-			if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-
-				zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
-						" \"%s\"", host);
-				goto done;
-			}
-
-			/* simplified match, not compliant with RFC 4517, 4518 */
-			if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
-			{
-				zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for"
-						" host \"%s\"", host);
-				goto done;
-			}
-
-			/* simplified match, not compliant with RFC 4517, 4518 */
-			if ('\0' != *row[4] && 0 != strcmp(row[4], attr.subject))
-			{
-				zbx_snprintf(error, MAX_STRING_LEN, "certificate subject does not match for"
-						" host \"%s\"", host);
-				goto done;
-			}
-		}
-#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
-		else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
-		{
-			zbx_tls_conn_attr_t	attr;
-
-			if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-
-				zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
-						" \"%s\"", host);
-				goto done;
-			}
-
-			if (strlen(row[5]) != attr.psk_identity_len ||
-					0 != memcmp(row[5], attr.psk_identity, attr.psk_identity_len))
-			{
-				zbx_snprintf(error, MAX_STRING_LEN, "false PSK identity for host \"%s\"", host);
-				goto done;
-			}
-		}
-#endif
-		tls_offset = 3;
-#endif
-		old_metadata = row[3 + tls_offset];
-		old_ip = row[4 + tls_offset];
-		old_dns = row[5 + tls_offset];
-		old_port = row[6 + tls_offset];
-		old_flag = row[7 + tls_offset];
-		old_port_v = (unsigned short)(SUCCEED == DBis_null(old_port)) ? 0 : atoi(old_port);
-		old_flag_v = (zbx_conn_flags_t)(SUCCEED == DBis_null(old_flag)) ? ZBX_CONN_DEFAULT : atoi(old_flag);
-		/* metadata is available only on Zabbix server */
-		if (SUCCEED == DBis_null(old_flag) || 0 != strcmp(old_metadata, host_metadata) ||
-				(ZBX_CONN_IP  == flag && ( 0 != strcmp(old_ip, interface)  || old_port_v != port)) ||
-				(ZBX_CONN_DNS == flag && ( 0 != strcmp(old_dns, interface) || old_port_v != port)) ||
-				(old_flag_v != flag))
-		{
-			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
-		}
-
-		if (HOST_STATUS_MONITORED != atoi(row[1]))
-		{
-			zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not monitored", host);
-			goto done;
-		}
-
-		ZBX_STR2UINT64(*hostid, row[0]);
-		ret = SUCCEED;
+		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
+		zbx_free(ch_error);
+		goto out;
 	}
-	else
+
+	/* if host does not exist then check autoregistration connection permissions */
+	if (0 == *hostid)
 	{
+		if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
+		{
+			if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface))
+				db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+		}
+
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
 
-		if (SUCCEED == zbx_autoreg_check_permissions(host, ip, port, sock))
-			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+		goto out;
 	}
-done:
-	DBfree_result(result);
 
-	zbx_free(host_esc);
+	if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface))
+		db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+
+	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
