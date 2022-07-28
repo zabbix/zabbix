@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-07-27T06:05:59Z</date>
+   <date>2022-07-28T08:48:05Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -356,7 +356,7 @@ return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Rate ofconnection revalidations.</description>
+               <description>Rate of connection revalidations.</description>
                <applications>
                   <application>
                      <name>Zookeeper</name>
