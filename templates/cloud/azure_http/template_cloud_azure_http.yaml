@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-26T08:41:25Z'
+  date: '2022-07-27T16:53:02Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -125,7 +125,7 @@ zabbix_export:
                     }
                 },
             
-                requestResources: function () {
+                requestVMs: function () {
                     if (Azure.token === null) {
                         return;
                     }
@@ -134,7 +134,7 @@ zabbix_export:
                     request.addHeader('Accept=application/json');
                     request.addHeader('Authorization: Bearer ' + Azure.token);
             
-                    r_data = request.get('https://management.azure.com/subscriptions/' + Azure.params.subscription_id + '/resources?api-version=2022-05-01');
+                    r_data = request.get('https://management.azure.com/subscriptions/' + Azure.params.subscription_id + '/providers/Microsoft.Compute/virtualMachines?api-version=2022-03-01');
             
                     if (request.getStatus() !== 200) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + r_data;
@@ -150,6 +150,30 @@ zabbix_export:
                     }
                     else {
                         throw 'No data received by resources request.';
+                    }
+                },
+            
+                nextLink: function (url) {
+                    request = new HttpRequest();
+                    request.addHeader('Accept=application/json');
+                    request.addHeader('Authorization: Bearer ' + Azure.token);
+            
+                    link_data = request.get(url);
+            
+                    if (request.getStatus() !== 200) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + link_data;
+                    }
+            
+                    if (link_data !== null) {
+                        try {
+                            return JSON.parse(link_data);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from API.';
+                        }
+                    }
+                    else {
+                        throw 'No data received by next link request.';
                     }
                 }
             };
@@ -169,7 +193,27 @@ zabbix_export:
             
                 if (!('auth' in data.errors)) {
                     try {
-                        data.resources = Azure.requestResources();
+                        raw_data = Azure.requestVMs();
+                        
+                        if ('nextLink' in raw_data) {
+                            try {
+                                next_data = Azure.nextLink(raw_data.nextLink);
+                                next_data.value.forEach(function (value) {
+                                    raw_data.value.push(value);
+                                });
+                                
+                                while ('nextLink' in next_data) {
+                                    next_data = Azure.nextLink(next_data.nextLink);
+                                    next_data.value.forEach(function (value) {
+                                        raw_data.value.push(value);
+                                    });
+                                }
+                            }
+                            catch (error) {
+                                data.errors.next_link = error.toString();
+                            }
+                        }
+                        data.resources = raw_data;
                     }
                     catch (error) {
                         data.errors.resources = error.toString();
@@ -246,6 +290,12 @@ zabbix_export:
                 -
                   tag: location
                   value: '{#LOCATION}'
+                -
+                  tag: os
+                  value: '{#OS}'
+                -
+                  tag: size
+                  value: '{#SIZE}'
           master_item:
             key: azure.get.resources
           lld_macro_paths:
@@ -258,6 +308,12 @@ zabbix_export:
             -
               lld_macro: '{#NAME}'
               path: $.name
+            -
+              lld_macro: '{#OS}'
+              path: $.properties.storageProfile.osDisk.osType
+            -
+              lld_macro: '{#SIZE}'
+              path: $.properties.hardwareProfile.vmSize
             -
               lld_macro: '{#TYPE}'
               path: $.type

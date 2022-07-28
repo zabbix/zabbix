@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-26T08:41:29Z'
+  date: '2022-07-27T16:53:06Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -136,16 +136,16 @@ zabbix_export:
               name: 'Azure: Virtual machine is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'The resource state is unavialable.'
+              description: 'The resource state is unavailable.'
               tags:
                 -
                   tag: scope
                   value: availability
         -
           uuid: a93308573303437487d151de340fcaed
-          name: 'Azure: VM cached bandwith consumed percentage'
+          name: 'Azure: VM cached bandwidth consumed percentage'
           type: DEPENDENT
-          key: azure.vm.cached.bandwith.consumed.percentage
+          key: azure.vm.cached.bandwidth.consumed.percentage
           delay: '0'
           history: 7d
           units: '%'
@@ -258,9 +258,9 @@ zabbix_export:
                   value: performance
         -
           uuid: 47cda13c203e4f1e9918eb73fd8afa20
-          name: 'Azure: Data disk bandwith consumed percentage'
+          name: 'Azure: Data disk bandwidth consumed percentage'
           type: DEPENDENT
-          key: azure.vm.data.disk.bandwith.consumed.percentage
+          key: azure.vm.data.disk.bandwidth.consumed.percentage
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -270,7 +270,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.metrics.DataDiskBandwithConsumedPercentage.average
+                - $.metrics.DataDiskBandwidthConsumedPercentage.average
               error_handler: DISCARD_VALUE
           master_item:
             key: azure.vm.data.get
@@ -302,9 +302,9 @@ zabbix_export:
               value: storage
         -
           uuid: d0fb23206d564e1da746bff3369056c1
-          name: 'Azure: Data disk max burst bandwith'
+          name: 'Azure: Data disk max burst bandwidth'
           type: DEPENDENT
-          key: azure.vm.data.disk.max.bandwith
+          key: azure.vm.data.disk.max.bandwidth
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -314,7 +314,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.metrics.DataDiskMaxBurstBandwith.average
+                - $.metrics.DataDiskMaxBurstBandwidth.average
               error_handler: DISCARD_VALUE
           master_item:
             key: azure.vm.data.get
@@ -411,9 +411,9 @@ zabbix_export:
               value: storage
         -
           uuid: c61ad4af97c243cca75bbece40eea795
-          name: 'Azure: Data disk target bandwith'
+          name: 'Azure: Data disk target bandwidth'
           type: DEPENDENT
-          key: azure.vm.data.disk.target.bandwith
+          key: azure.vm.data.disk.target.bandwidth
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -423,7 +423,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.metrics.DataDiskTargetBandwith.average
+                - $.metrics.DataDiskTargetBandwidth.average
               error_handler: DISCARD_VALUE
           master_item:
             key: azure.vm.data.get
@@ -457,7 +457,7 @@ zabbix_export:
           uuid: 68c730e4904f402cb12fb71b45fede02
           name: 'Azure: Data disk used burst BPS credits percentage'
           type: DEPENDENT
-          key: azure.vm.data.disk.used.burst.bandwith
+          key: azure.vm.data.disk.used.burst.bandwidth
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -665,11 +665,14 @@ zabbix_export:
                     if (AzureVM.token === null) {
                         return;
                     }
+                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+            
                     request = new HttpRequest();
                     request.addHeader('Accept=application/json');
                     request.addHeader('Authorization: Bearer ' + AzureVM.token);
             
-                    metrics_data = request.get('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + metrics + '&api-version=2021-05-01');
+                    metrics_data = request.get('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + metrics + '&timespan=' + start_date + '/' + end_date + '&api-version=2021-05-01');
             
                     if (request.getStatus() !== 200) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + metrics_data;
@@ -716,7 +719,7 @@ zabbix_export:
                         try {
                             metrics_data = AzureVM.requestMetrics(metrics[i]);
                             for (j in metrics_data.value) {
-                                data.metrics[metrics_data.value[j].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[j].timeseries[0].data[metrics_data.value[j].timeseries[0].data.length - 2];
+                                data.metrics[metrics_data.value[j].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[j].timeseries[0].data[metrics_data.value[j].timeseries[0].data.length - 3];
                             }
                         }
                         catch (error) {
@@ -1011,9 +1014,9 @@ zabbix_export:
               value: network
         -
           uuid: 24c58e473c5c4b8388a0e78ae38378fc
-          name: 'Azure: OS disk bandwith consumed percentage'
+          name: 'Azure: OS disk bandwidth consumed percentage'
           type: DEPENDENT
-          key: azure.vm.os.disk.bandwith.consumed.percentage
+          key: azure.vm.os.disk.bandwidth.consumed.percentage
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1023,7 +1026,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.metrics.OSDiskBandwithConsumedPercentage.average
+                - $.metrics.OSDiskBandwidthConsumedPercentage.average
               error_handler: DISCARD_VALUE
           master_item:
             key: azure.vm.data.get
@@ -1055,9 +1058,9 @@ zabbix_export:
               value: storage
         -
           uuid: 7d0ca132bc264ac08e3c55809bdc40d1
-          name: 'Azure: OS disk max burst bandwith'
+          name: 'Azure: OS disk max burst bandwidth'
           type: DEPENDENT
-          key: azure.vm.os.disk.max.bandwith
+          key: azure.vm.os.disk.max.bandwidth
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1067,7 +1070,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.metrics.OSDiskMaxBurstBandwith.average
+                - $.metrics.OSDiskMaxBurstBandwidth.average
               error_handler: DISCARD_VALUE
           master_item:
             key: azure.vm.data.get
@@ -1164,9 +1167,9 @@ zabbix_export:
               value: storage
         -
           uuid: 5cc422b7da3145fa885a88bb6165e3b9
-          name: 'Azure: OS disk target bandwith'
+          name: 'Azure: OS disk target bandwidth'
           type: DEPENDENT
-          key: azure.vm.os.disk.target.bandwith
+          key: azure.vm.os.disk.target.bandwidth
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1176,7 +1179,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.metrics.OSDiskTargetBandwith.average
+                - $.metrics.OSDiskTargetBandwidth.average
               error_handler: DISCARD_VALUE
           master_item:
             key: azure.vm.data.get
@@ -1210,7 +1213,7 @@ zabbix_export:
           uuid: 9d42609950864c899a0d63b94f1d2235
           name: 'Azure: OS disk used burst BPS credits percentage'
           type: DEPENDENT
-          key: azure.vm.os.disk.used.burst.bandwith
+          key: azure.vm.os.disk.used.burst.bandwidth
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1380,9 +1383,9 @@ zabbix_export:
               value: storage
         -
           uuid: d6e85395e34b4288988a5287d287f182
-          name: 'Azure: VM uncached bandwith consumed percentage'
+          name: 'Azure: VM uncached bandwidth consumed percentage'
           type: DEPENDENT
-          key: azure.vm.uncached.bandwith.consumed.percentage
+          key: azure.vm.uncached.bandwidth.consumed.percentage
           delay: '0'
           history: 7d
           units: '%'
