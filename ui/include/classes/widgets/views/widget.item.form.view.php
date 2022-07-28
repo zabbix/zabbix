@@ -51,7 +51,7 @@ $scripts[] = $fields['thresholds']->getJavascript();
 $numeric_only_warning = (new CSpan([
 	'&nbsp;',
 	makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
-]))->addStyle('display: none;');
+]));
 
 $form_list
 	->addRow(
@@ -221,7 +221,7 @@ $form_list
 	)
 	->addRow(
 		CWidgetHelper::getLabel($fields['thresholds'])
-			->addItem($numeric_only_warning->setId('tophosts-column-thresholds-warning')
+			->addItem($numeric_only_warning->setId('item-value-thresholds-warning')
 		),
 		(new CDiv(CWidgetHelper::getThresholds($fields['thresholds'])))->addClass('form-field'),
 		'thresholds-row'

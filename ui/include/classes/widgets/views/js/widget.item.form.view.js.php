@@ -37,6 +37,8 @@ window.widget_item_form = new class {
 		this.bg_color_row = document.getElementById('bg-color-row');
 		this.thresholds_row = document.getElementById('thresholds-row');
 
+		jQuery('#itemid').on('change', this.updateWarningIcon);
+
 		const show = [this.show_description, this.show_value, this.show_time, this.show_change_indicator];
 
 		for (const checkbox of show) {
@@ -70,6 +72,7 @@ window.widget_item_form = new class {
 		colorPalette.setThemeColors(thresholds_colors);
 
 		this.updateForm();
+		this.updateWarningIcon();
 	}
 
 	updateForm() {
@@ -121,5 +124,33 @@ window.widget_item_form = new class {
 
 		document.getElementById(indicator_ids[name])
 			.querySelector("polygon").style.fill = (color !== '') ? `#${color}` : '';
+	}
+
+	updateWarningIcon() {
+		const ms_item_data = $('#itemid').multiSelect('getData');
+
+		if (ms_item_data.length) {
+			const curl = new Curl('jsrpc.php', false);
+			curl.setArgument('method', 'item_value_type.get');
+			curl.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
+			curl.setArgument('itemid', ms_item_data[0].id);
+
+			return fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({itemid: ms_item_data[0].id})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					switch (response.result) {
+						case '0':
+						case '3':
+							document.getElementById('item-value-thresholds-warning').style.display = 'none';
+							break;
+						default:
+							document.getElementById('item-value-thresholds-warning').style.display = '';
+					}
+				});
+		}
 	}
 };

@@ -70,11 +70,6 @@ class CWidgetFieldThresholds extends CWidgetField {
 		return '
 			var thresholds_table = jQuery("#thresholds_table_'.$this->getName().'");
 
-			document.getElementById("tophosts-column-thresholds-warning").style.display =
-			document.querySelector("#thresholds_table_thresholds")
-				.querySelectorAll(".form_row")
-				.length > 0 ? "" : "none";
-
 			thresholds_table
 				.dynamicRows({template: "#thresholds-row-tmpl"})
 				.on("afteradd.dynamicRows", function(opt) {
@@ -84,16 +79,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 						.colorpicker({
 							appendTo: ".overlay-dialogue-body"
 						});
-					document.getElementById("tophosts-column-thresholds-warning").style.display =
-					document.querySelector("#thresholds_table_thresholds")
-						.querySelectorAll(".form_row")
-						.length > 0 ? "" : "none";
-				}).on("afterremove.dynamicRows", () => {
-					document.getElementById("tophosts-column-thresholds-warning").style.display =
-					document.querySelector("#thresholds_table_thresholds")
-						.querySelectorAll(".form_row")
-						.length > 0 ? "" : "none";
-					});;
+				});
 				';
 	}
 	/**
