@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+
+use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup profiles
- *
- * @onBefore prepareDashboardData
  */
-class testDashboardViewMode extends CWebTest {
+class testDashboardViewMode extends CLegacyWebTest {
 
 	/**
 	 * @onBefore removeGuestFromDisabledGroup
@@ -55,23 +55,18 @@ class testDashboardViewMode extends CWebTest {
 			}
 			$this->zbxTestCheckTitle('Dashboard');
 			$this->zbxTestCheckHeader('Global view');
-			if ($user !== 'super-admin') {
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//tr[@class='nothing-to-show']/td",
-						'No data found.');
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[3]//tr[@class='nothing-to-show']/td",
-						'No permissions to referred object or it does not exist!');
+			if ($user != 'super-admin') {
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[9]//tr[@class='nothing-to-show']/td", 'No graphs added.');
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[8]//tr[@class='nothing-to-show']/td", 'No maps added.');
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[7]//tr[@class='nothing-to-show']/td", 'No data found.');
 			}
-			else {
-				$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Performance']");
-			}
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'Top hosts by CPU utilization');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[4]//h4", 'System information');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Host availability');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Problems by severity');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[9]//h4", 'Geomap');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[10]//h4", 'Current problems');
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Local time']");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[6]//h4[text()='Graph']");
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[9]//h4", 'Favourite graphs');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[8]//h4", 'Favourite maps');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[7]//h4", 'Problems');
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashbrd-grid-container']/div[6]//h4[text()='Problems by severity']");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashbrd-grid-container']/div[5]//h4[text()='Local']");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashbrd-grid-container']/div[4]//h4[text()='Host availability']");
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[3]//h4", 'System information');
 
 			// Logout.
 			$this->zbxTestLogout();
@@ -81,7 +76,7 @@ class testDashboardViewMode extends CWebTest {
 	}
 
 	public function testDashboardViewMode_KioskMode() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view&dashboardid=1', false);
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view', false);
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
 
@@ -99,7 +94,7 @@ class testDashboardViewMode extends CWebTest {
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
 		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//header[@class='header-title']");
-		$this->zbxTestAssertElementPresentXpath('//ul[@class="breadcrumbs"]');
+		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 	}
 
 	public function testDashboardViewMode_KioskModeUrlParameter() {
