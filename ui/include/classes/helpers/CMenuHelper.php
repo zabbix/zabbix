@@ -318,7 +318,7 @@ class CMenuHelper {
 		if ($submenu_users) {
 			$menu->add(
 				(new CMenuItem(_('Users')))
-					->setId('users')
+					->setId('users-menu')
 					->setIcon('icon-users')
 					->setSubMenu(new CMenu($submenu_users))
 			);
