@@ -30,71 +30,7 @@ class testRole extends CAPITest {
 
 	public static function role_create() {
 		return [
-			[
-				'role' => [
-					'name' => 'non existent parameter',
-					'type' => '4'
-				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of 1, 2, 3.'
-			],
-			// Check role name.
-			[
-				'role' => [
-					'name' => '',
-					'type' => '1'
-				],
-				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
-			],
-			[
-				'role' => [
-					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
-					'type' => '1'
-				],
-				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
-			],
-			// Check for duplicated host groups names.
-			[
-				'role' => [
-					'name' => 'Super admin role',
-					'type' => '1'
-				],
-				'expected_error' => 'User role "Super admin role" already exists.'
-			],
-			// Check for removed ui elements
-			[
-				'role' => [
-					'name' => 'role-with-all-ui-elements',
-					'type' => '3',
-					'rules' => [
-						'ui' => [
-							[
-								'name' => 'services.actions',
-								'status' => '1'
-							]
-						],
-					'ui.default_access' => '0',
-					]
-				],
-				'expected_error' =>
-					'UI element "services.actions" is not available for user role "role-with-all-ui-elements".'
-			],
-			[
-				'role' => [
-					'name' => 'role-with-all-ui-elements',
-					'type' => '3',
-					'rules' => [
-						'ui' => [
-							[
-								'name' => 'configuration.actions',
-								'status' => '1'
-							]
-						],
-					'ui.default_access' => '0',
-					]
-				],
-				'expected_error' => 'UI element "configuration.actions" is not available for user role "role-with-all-ui-elements".'
-			],
-			// Check successfully create.
+			// Check successful create.
 			[
 				'role' => [
 					'name' => 'role-with-all-ui-elements',
@@ -377,6 +313,72 @@ class testRole extends CAPITest {
 					'type' => '1'
 				],
 				'expected_error' => null
+			],
+			// Check invalid role type.
+			[
+				'role' => [
+					'name' => 'non existent parameter',
+					'type' => '4'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 1, 2, 3.'
+			],
+			// Check role name.
+			[
+				'role' => [
+					'name' => '',
+					'type' => '1'
+				],
+				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
+			],
+			[
+				'role' => [
+					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
+					'type' => '1'
+				],
+				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
+			],
+			// Check for duplicated role names.
+			[
+				'role' => [
+					'name' => 'Super admin role',
+					'type' => '1'
+				],
+				'expected_error' => 'User role "Super admin role" already exists.'
+			],
+			// Check for removed ui elements
+			[
+				'role' => [
+					'name' => 'role-with-invalid-ui-elements',
+					'type' => '3',
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'services.actions',
+								'status' => '1'
+							]
+						],
+					'ui.default_access' => '0',
+					]
+				],
+				'expected_error' =>
+					'UI element "services.actions" is not available for user role "role-with-invalid-ui-elements".'
+			],
+			[
+				'role' => [
+					'name' => 'role-with-invalid-ui-elements',
+					'type' => '3',
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'configuration.actions',
+								'status' => '1'
+							]
+						],
+					'ui.default_access' => '0',
+					]
+				],
+				'expected_error' =>
+					'UI element "configuration.actions" is not available for user role "role-with-invalid-ui-elements".'
 			]
 		];
 	}
@@ -413,6 +415,12 @@ class testRole extends CAPITest {
 		return [
 			[
 				'role' => [
+					'roleid_2'
+				],
+				'expected_error' => null
+			],
+			[
+				'role' => [
 					''
 				],
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
@@ -440,12 +448,6 @@ class testRole extends CAPITest {
 					'roleid_1'
 				],
 				'expected_error' => 'Cannot delete assigned user role "used-role".'
-			],
-			[
-				'role' => [
-					'roleid_2'
-				],
-				'expected_error' => null
 			]
 		];
 	}
@@ -470,6 +472,36 @@ class testRole extends CAPITest {
 
 	public static function role_update() {
 		return [
+			// Check successful update.
+			[
+				'role' => [
+					'roleid' => 'roleid_4',
+					'name' => 'Successfully updated role',
+					'type' => '2'
+				],
+				'expected_error' => null
+			],
+			[
+				'role' => [
+					'roleid' => 'roleid_4',
+					'name' => 'Successfully updated role',
+					'type' => '3',
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'administration.macros',
+								'status' => '1'
+							],
+							[
+								'name' => 'administration.housekeeping',
+								'status' => '1'
+							]
+						],
+					'ui.default_access' => '0',
+					]
+				],
+				'expected_error' => null
+			],
 			[
 				'role' => [
 					'roleid' => 'roleid_3',
@@ -564,37 +596,7 @@ class testRole extends CAPITest {
 				],
 				'expected_error' =>
 					'UI element "services.actions" is not available for user role "first-role-for-update".'
-			],
-			// Check successfully update.
-			[
-				'role' => [
-					'roleid' => 'roleid_4',
-					'name' => 'Successfully updated role',
-					'type' => '2'
-				],
-				'expected_error' => null
-			],
-			[
-				'role' => [
-					'roleid' => 'roleid_4',
-					'name' => 'Successfully updated role',
-					'type' => '3',
-					'rules' => [
-						'ui' => [
-							[
-								'name' => 'administration.macros',
-								'status' => '1'
-							],
-							[
-								'name' => 'administration.housekeeping',
-								'status' => '1'
-							]
-						],
-					'ui.default_access' => '0',
-					]
-				],
-				'expected_error' => null
-			],
+			]
 		];
 	}
 
@@ -602,11 +604,12 @@ class testRole extends CAPITest {
 	* @dataProvider role_update
 	*/
 	public function testRole_Update($role, $expected_error) {
-		if (isset($role['roleid'])) {
-			if ($role['roleid'] === 'roleid_3' || $role['roleid'] === 'roleid_4') {
+//		if (isset($role['roleid'])) {
+			if (isset($role['roleid']) && $role['roleid'] === 'roleid_3' ||
+				isset($role['roleid']) && $role['roleid'] === 'roleid_4') {
 				$role['roleid'] = (int) self::$data['roleids'][$role['roleid']];
 			}
-		}
+//		}
 
 		$result = $this->call('role.update', $role, $expected_error);
 
@@ -636,40 +639,7 @@ class testRole extends CAPITest {
 
 	public static function role_get() {
 		return [
-			[
-				'params' => [
-					'output' => ['roleid', 'name', 'type'],
-					'roleids' => 'abc'
-				],
-				'expected_result' => false,
-				'expected_error' => 'Invalid parameter "/roleids": an array is expected.'
-			],
-			[
-				'params' => [
-					'output' => ['roleid', 'name', 'type'],
-					'roleids' => ['abc']
-				],
-				'expected_result' => false,
-				'expected_error' => 'Invalid parameter "/roleids/1": a number is expected.'
-			],
-			[
-				'params' => [
-					'output' => ['roleid', 'name', 'type'],
-					'roleids' => ['']
-				],
-				'expected_result' => false,
-				'expected_error' => 'Invalid parameter "/roleids/1": a number is expected.'
-			],
-			[
-				'params' => [
-					'output' => ['flag'],
-					'roleids' => ['3']
-				],
-				'expected_result' => false,
-				'expected_error' =>
-					'Invalid parameter "/output/1": value must be one of "roleid", "name", "type", "readonly".'
-			],
-			// Check successfully get.
+			// Check successful get.
 			[
 				'params' => [
 					'output' => ['roleid', 'name', 'type'],
@@ -871,6 +841,39 @@ class testRole extends CAPITest {
 					'id' => 3
 				],
 				'expected_error' => null
+			],
+			[
+				'params' => [
+					'output' => ['roleid', 'name', 'type'],
+					'roleids' => 'abc'
+				],
+				'expected_result' => false,
+				'expected_error' => 'Invalid parameter "/roleids": an array is expected.'
+			],
+			[
+				'params' => [
+					'output' => ['roleid', 'name', 'type'],
+					'roleids' => ['abc']
+				],
+				'expected_result' => false,
+				'expected_error' => 'Invalid parameter "/roleids/1": a number is expected.'
+			],
+			[
+				'params' => [
+					'output' => ['roleid', 'name', 'type'],
+					'roleids' => ['']
+				],
+				'expected_result' => false,
+				'expected_error' => 'Invalid parameter "/roleids/1": a number is expected.'
+			],
+			[
+				'params' => [
+					'output' => ['flag'],
+					'roleids' => ['3']
+				],
+				'expected_result' => false,
+				'expected_error' =>
+					'Invalid parameter "/output/1": value must be one of "roleid", "name", "type", "readonly".'
 			]
 		];
 	}
@@ -981,7 +984,5 @@ class testRole extends CAPITest {
 					]
 			]
 		]);
-
-
 	}
 }
