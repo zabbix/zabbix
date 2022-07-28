@@ -1,1 +1,1 @@
-..F....... [ZBX-20889] fixed special characters in item-tags break the subfilter in the latest data and graphs (acikuns)
+..F....... [ZBX-20889] fixed special characters in item-tags breaking the subfilter in the latest data and graphs (acikuns)
