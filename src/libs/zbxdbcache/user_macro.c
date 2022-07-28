@@ -1040,18 +1040,27 @@ static void	um_cache_get_macro(const zbx_um_cache_t *cache, const zbx_uint64_t *
  *             hostids     - [IN] the host identifiers                           *
  *             hostids_num - [IN] the number of host identifiers                 *
  *             macro       - [IN] the macro with optional context                *
+ *             env         - [IN] the environment flag:                          *
+ *                                  0 - secure                                   *
+ *                                  1 - non-secure (secure macros are resolved   *
+ *                                                  to ***** )                   *
  *             value       - [OUT] macro value, must be freed by the caller      *
  *                                                                               *
  *********************************************************************************/
 void	um_cache_resolve_const(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
-		const char *macro, const char **value)
+		const char *macro, int env, const char **value)
 {
 	const zbx_um_macro_t	*um_macro = NULL;
 
 	um_cache_get_macro(cache, hostids, hostids_num, macro, &um_macro);
 
 	if (NULL != um_macro)
-		*value = (NULL != um_macro->value ? um_macro->value : ZBX_MACRO_NO_KVS_VALUE);
+	{
+		if (ZBX_MACRO_ENV_NONSECURE == env && ZBX_MACRO_VALUE_TEXT != um_macro->type)
+			*value = ZBX_MACRO_SECRET_MASK;
+		else
+			*value = (NULL != um_macro->value ? um_macro->value : ZBX_MACRO_NO_KVS_VALUE);
+	}
 }
 
 /*********************************************************************************
