@@ -208,8 +208,8 @@ There are no template links in this template.
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Completion succeeded |<p>Number of job has completed its execution.</p> |DEPENDENT |kube.job.completion.succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_job_complete{namespace="{#NAMESPACE}", job_name="{#NAME}", condition="true"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Completion failed |<p>Number of job has failed its execution.</p> |DEPENDENT |kube.job.completion.failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_job_failed{namespace="{#NAMESPACE}", job_name="{#NAME}", condition="true"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Component [{#NAME}]: Healthy |<p>Cluster component healthy.</p> |DEPENDENT |kube.componentstatuses.healthy[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items.[?(@.metadata.name == "{#NAME}")].conditions[?(@.type == "Healthy")].status.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Readyz [{#NAME}]: Healthcheck |<p>Result of readyz helthcheck for component.</p> |DEPENDENT |kube.readyz.helthcheck[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name == "{#NAME}")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Livez [{#NAME}]: Healthcheck |<p>Result of livez helthcheck for component.</p> |DEPENDENT |kube.livez.helthcheck[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name == "{#NAME}")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: Readyz [{#NAME}]: Healthcheck |<p>Result of readyz healthcheck for component.</p> |DEPENDENT |kube.readyz.healthcheck[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name == "{#NAME}")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: Livez [{#NAME}]: Healthcheck |<p>Result of livez healthcheck for component.</p> |DEPENDENT |kube.livez.healthcheck[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name == "{#NAME}")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ## Triggers
 
@@ -223,8 +223,8 @@ There are no template links in this template.
 |Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatfulSet is down |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1` |HIGH | |
 |Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: Statefulset replicas mismatch |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]))<>0` |WARNING | |
 |Kubernetes: Component [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#3,,"True")<2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0` |WARNING | |
-|Kubernetes: Readyz [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}]))>0` |WARNING | |
-|Kubernetes: Livez [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}]))>0` |WARNING | |
+|Kubernetes: Readyz [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0` |WARNING | |
+|Kubernetes: Livez [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0` |WARNING | |
 
 ## Feedback
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-07-21T13:12:07Z'
+  date: '2022-07-28T07:46:54Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1974,12 +1974,12 @@ zabbix_export:
               uuid: 93548d985c1542a891bfc74f2d42d59a
               name: 'Kubernetes: Livez [{#NAME}]: Healthcheck'
               type: DEPENDENT
-              key: 'kube.livez.helthcheck[{#NAME}]'
+              key: 'kube.livez.healthcheck[{#NAME}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Result of livez helthcheck for component.'
+              description: 'Result of livez healthcheck for component.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1998,7 +1998,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9fcb23d29ac3481a8613515cc2cccfcf
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}]))>0'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0'
                   name: 'Kubernetes: Livez [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:
@@ -3438,12 +3438,12 @@ zabbix_export:
               uuid: c0693fb2709e4b01a35ca433edb84db7
               name: 'Kubernetes: Readyz [{#NAME}]: Healthcheck'
               type: DEPENDENT
-              key: 'kube.readyz.helthcheck[{#NAME}]'
+              key: 'kube.readyz.healthcheck[{#NAME}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Result of readyz helthcheck for component.'
+              description: 'Result of readyz healthcheck for component.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3462,7 +3462,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1a88c2cf94d3444c9e5320776b323ce6
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}]))>0'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0'
                   name: 'Kubernetes: Readyz [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:
