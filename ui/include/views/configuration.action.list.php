@@ -24,13 +24,27 @@
  * @var array $data
  */
 
-$submenu_source = [
-	EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
-	EVENT_SOURCE_SERVICE => _('Service actions'),
-	EVENT_SOURCE_DISCOVERY => _('Discovery actions'),
-	EVENT_SOURCE_AUTOREGISTRATION => _('Autoregistration actions'),
-	EVENT_SOURCE_INTERNAL => _('Internal actions')
-];
+$submenu_source = [];
+
+if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS)) {
+	$submenu_source[EVENT_SOURCE_TRIGGERS] = _('Trigger actions');
+}
+
+if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS)) {
+	$submenu_source[EVENT_SOURCE_SERVICE] = _('Service actions');
+}
+
+if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS)) {
+	$submenu_source[EVENT_SOURCE_DISCOVERY] = _('Discovery actions');
+}
+
+if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS)) {
+	$submenu_source[EVENT_SOURCE_AUTOREGISTRATION] = _('Autoregistration actions');
+}
+
+if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS)) {
+	$submenu_source[EVENT_SOURCE_INTERNAL] = _('Internal actions');
+}
 
 $title = $submenu_source[$data['eventsource']];
 $submenu = [];
