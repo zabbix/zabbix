@@ -187,19 +187,28 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	/* if host does not exist then check autoregistration connection permissions */
 	if (0 == *hostid)
 	{
-		if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
-		{
-			if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface))
-				db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
-		}
-
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
+
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != DCget_auto_registration_action_count())
+		{
+			if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
+			{
+				if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface))
+				{
+					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
+							interface);
+				}
+			}
+		}
 
 		goto out;
 	}
 
-	if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface))
-		db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != DCget_auto_registration_action_count())
+	{
+		if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface))
+			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+	}
 
 	ret = SUCCEED;
 out:

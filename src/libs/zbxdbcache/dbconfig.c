@@ -3890,6 +3890,9 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 			if (EVENT_SOURCE_INTERNAL == action->eventsource)
 				config->internal_actions++;
 
+			if (EVENT_SOURCE_AUTOREGISTRATION == action->eventsource)
+				config->auto_registration_actions++;
+
 			zbx_vector_ptr_create_ext(&action->conditions, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
 
@@ -3907,6 +3910,9 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 
 		if (EVENT_SOURCE_INTERNAL == action->eventsource)
 			config->internal_actions--;
+
+		if (EVENT_SOURCE_AUTOREGISTRATION == action->eventsource)
+			config->auto_registration_actions--;
 
 		dc_strpool_release(action->formula);
 		zbx_vector_ptr_destroy(&action->conditions);
@@ -6724,6 +6730,7 @@ int	init_configuration_cache(char **error)
 	config->sync_start_ts = 0;
 
 	config->internal_actions = 0;
+	config->auto_registration_actions = 0;
 
 	config->um_cache = um_cache_create();
 
@@ -11461,6 +11468,19 @@ unsigned int	DCget_internal_action_count(void)
 	RDLOCK_CACHE;
 
 	count = config->internal_actions;
+
+	UNLOCK_CACHE;
+
+	return count;
+}
+
+unsigned int	DCget_auto_registration_action_count(void)
+{
+	unsigned int count;
+
+	RDLOCK_CACHE;
+
+	count = config->auto_registration_actions;
 
 	UNLOCK_CACHE;
 

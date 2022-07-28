@@ -1580,31 +1580,6 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	zbx_vector_ptr_destroy(&autoreg_hosts);
 }
 
-static int	DBregister_host_active(void)
-{
-	DB_RESULT	result;
-	int		ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	result = DBselect(
-			"select null"
-			" from actions"
-			" where eventsource=%d"
-				" and status=%d",
-			EVENT_SOURCE_AUTOREGISTRATION,
-			ACTION_STATUS_ACTIVE);
-
-	if (NULL == DBfetch(result))
-		ret = FAIL;
-
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 static void	autoreg_host_free(zbx_autoreg_host_t *autoreg_host)
 {
 	zbx_free(autoreg_host->host);
@@ -1797,9 +1772,6 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != DBregister_host_active())
-		goto exit;
-
 	process_autoreg_hosts(autoreg_hosts, proxy_hostid);
 
 	for (i = 0; i < autoreg_hosts->values_num; i++)
@@ -1890,7 +1862,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 	zbx_process_events(NULL, NULL);
 	zbx_clean_events();
-exit:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

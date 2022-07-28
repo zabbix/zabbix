@@ -858,6 +858,7 @@ int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error);
 int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **error);
 
 unsigned int	DCget_internal_action_count(void);
+unsigned int	DCget_auto_registration_action_count(void);
 
 /* global configuration support */
 #define ZBX_DISCOVERY_GROUPID_UNDEFINED	0
