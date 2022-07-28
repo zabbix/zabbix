@@ -1265,8 +1265,12 @@ static void	zbx_db_save_server_status()
 
 	zbx_json_close(&json);
 
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
 	if (ZBX_DB_OK > DBexecute("update config set server_status='%s'", json.buffer))
 		zabbix_log(LOG_LEVEL_WARNING, "Failed to save server status to database");
+
+	DBclose();
 
 	zbx_json_free(&json);
 }
