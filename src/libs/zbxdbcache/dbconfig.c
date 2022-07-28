@@ -5612,7 +5612,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	sec = zbx_time();
 	DCsync_autoreg_config(&autoreg_config_sync);	/* must be done in the same cache locking with config sync */
 	autoreg_csec2 = zbx_time() - sec;
-//todo
+
 	DCsync_autoreg_host(&autoreg_host_sync);
 	FINISH_SYNC;
 
