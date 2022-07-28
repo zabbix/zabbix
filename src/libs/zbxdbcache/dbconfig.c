@@ -898,6 +898,42 @@ static void	DCsync_autoreg_config(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
+{
+	char		**row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED == zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		ZBX_DC_AUTOREG_HOST	*autoreg_host, autoreg_host_local;
+		int			found;
+
+		autoreg_host_local.host = row[0];
+
+		autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_search(&config->autoreg_hosts, &autoreg_host_local);
+		if (NULL == autoreg_host)
+		{
+			found = 0;
+			autoreg_host = zbx_hashset_insert(&config->autoreg_hosts, &autoreg_host_local,
+					sizeof(ZBX_DC_AUTOREG_HOST));
+		}
+		else
+			found = 1;
+
+		dc_strpool_replace(found, &autoreg_host->host, row[0]);
+		dc_strpool_replace(found, &autoreg_host->listen_ip, row[1]);
+		dc_strpool_replace(found, &autoreg_host->listen_dns, row[2]);
+		dc_strpool_replace(found, &autoreg_host->host_metadata, row[3]);
+		autoreg_host->flags = atoi(row[4]);
+		autoreg_host->listen_port = atoi(row[5]);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 {
 	if (ZBX_LOC_QUEUE == proxy->location)
@@ -5474,7 +5510,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 			func_sync, expr_sync, action_sync, action_op_sync, action_condition_sync, trigger_tag_sync,
 			item_tag_sync, host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync,
 			hgroups_sync, itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync,
-			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync;
+			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
+			autoreg_host_sync;
 
 	double		autoreg_csec, autoreg_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
@@ -5503,6 +5540,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	/* global configuration must be synchronized directly with database */
 	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
 	zbx_dbsync_init(&autoreg_config_sync, mode);
+	zbx_dbsync_init(&autoreg_host_sync, mode);
 	zbx_dbsync_init(&hosts_sync, changelog_sync_mode);
 	zbx_dbsync_init(&hi_sync, mode);
 	zbx_dbsync_init(&htmpl_sync, mode);
@@ -5560,6 +5598,11 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		goto out;
 	autoreg_csec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_autoreg_host(&autoreg_host_sync))
+		goto out;
+	autoreg_csec = zbx_time() - sec;
+
 	/* sync global configuration settings */
 	START_SYNC;
 	sec = zbx_time();
@@ -5569,6 +5612,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	sec = zbx_time();
 	DCsync_autoreg_config(&autoreg_config_sync);	/* must be done in the same cache locking with config sync */
 	autoreg_csec2 = zbx_time() - sec;
+//todo
+	DCsync_autoreg_host(&autoreg_host_sync);
 	FINISH_SYNC;
 
 	/* sync macro related data, to support macro resolving during configuration sync */
@@ -6234,6 +6279,7 @@ out:
 
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&autoreg_config_sync);
+	zbx_dbsync_clear(&autoreg_host_sync);
 	zbx_dbsync_clear(&hosts_sync);
 	zbx_dbsync_clear(&hi_sync);
 	zbx_dbsync_clear(&htmpl_sync);
