@@ -59,8 +59,8 @@ abstract class CBaseElement extends RemoteWebElement {
 
 			$this->reload();
 			return call_user_func_array(['parent', $method], $params);
-			}
 		}
+	}
 
 	/**
 	 * Check if element is in stalled state.
