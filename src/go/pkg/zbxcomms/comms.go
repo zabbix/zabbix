@@ -295,7 +295,7 @@ func Listen(address string, args ...interface{}) (c *Listener, err error) {
 		Control: func(network, address string, conn syscall.RawConn) error {
 			var operr error
 			if err := conn.Control(func(fd uintptr) {
-				operr = syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, ^syscall.SO_REUSEADDR, 1)
+				operr = syscall.SetsockoptInt(syscall.Handle(fd), syscall.SOL_SOCKET, ^syscall.SO_REUSEADDR, 1)
 			}); err != nil {
 				return err
 			}
