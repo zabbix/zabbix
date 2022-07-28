@@ -49,10 +49,11 @@ trait TableTrait {
 	/**
 	 * Check if values in table rows match data from data provider.
 	 *
-	 * @param array   $data     data array to be match with result in table
-	 * @param string $selector	table selector
+	 * @param array   $data        data array to be match with result in table
+	 * @param string  $selector    table selector
+	 * @param boolean $count_rows  check rows count with results count in data provider
 	 */
-	public function assertTableData($data = [], $selector = 'class:list-table') {
+	public function assertTableData($data = [], $selector = 'class:list-table', $count_rows = true) {
 		$rows = $this->query($selector)->asTable()->one()->getRows();
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
@@ -61,10 +62,12 @@ trait TableTrait {
 			return;
 		}
 
-		$this->assertEquals(count($data), $rows->count(), 'Rows count does not match results count in data provider.');
-		$this->assertEquals(array_keys($data), array_keys($rows->asArray()),
-				'Row indices don\'t not match indices in data provider.'
-		);
+		if ($count_rows) {
+			$this->assertEquals(count($data), $rows->count(), 'Rows count does not match results count in data provider.');
+			$this->assertEquals(array_keys($data), array_keys($rows->asArray()),
+					'Row indices don\'t not match indices in data provider.'
+			);
+		}
 
 		foreach ($this->normalizeData($data) as $i => $values) {
 			$row = $rows->get($i);
@@ -84,14 +87,15 @@ trait TableTrait {
 	 *
 	 * @param array   $rows        data array to be match with result in table
 	 * @param string  $field       table column name
+	 * @param boolean $count_rows  check rows count with results count in data provider
 	 */
-	public function assertTableDataColumn($rows = [], $field = 'Name', $selector = 'class:list-table') {
+	public function assertTableDataColumn($rows = [], $field = 'Name', $selector = 'class:list-table', $count_rows = true) {
 		$data = [];
 		foreach ($rows as $row) {
 			$data[] = [$field => $row];
 		}
 
-		$this->assertTableData($data, $selector);
+		$this->assertTableData($data, $selector, $count_rows);
 	}
 
 	/**
@@ -134,8 +138,8 @@ trait TableTrait {
 	 *
 	 * @param string $column		Column name, where value should be checked
 	 */
-	private function getTableResult($column) {
-		$table = $this->query('class:list-table')->asTable()->one();
+	private function getTableResult($column, $selector = 'class:list-table') {
+		$table = $this->query($selector)->asTable()->one();
 		$result = [];
 		foreach ($table->getRows() as $row) {
 			$result[] = $row->getColumn($column)->getText();
