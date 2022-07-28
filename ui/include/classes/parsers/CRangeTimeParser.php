@@ -84,21 +84,20 @@ class CRangeTimeParser extends CParser {
 	}
 
 	/**
-	 * Timestamp is returned as initialized DateTime object. Returns null when timestamp is not valid.
+	 * Get DateTime object with its value set to either start or end of the period derived from the date/time specified.
 	 *
-	 * @param bool   $is_start  If set to true date will be modified to lowest value, example (now/w) will be returned
-	 *                          as Monday of this week. When set to false precisiion will modify date to highest value,
-	 *                          same example will return Sunday of this week.
+	 * @param                   $is_start
+	 * @param DateTimeZone|null $timezone
 	 *
 	 * @return DateTime|null
 	 */
-	public function getDateTime($is_start) {
+	public function getDateTime($is_start, DateTimeZone $timezone = null): ?DateTime {
 		switch ($this->time_type) {
 			case self::ZBX_TIME_ABSOLUTE:
-				return $this->absolute_time_parser->getDateTime($is_start);
+				return $this->absolute_time_parser->getDateTime($is_start, $timezone);
 
 			case self::ZBX_TIME_RELATIVE:
-				return $this->relative_time_parser->getDateTime($is_start);
+				return $this->relative_time_parser->getDateTime($is_start, $timezone);
 
 			default:
 				return null;

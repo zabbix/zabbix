@@ -24,6 +24,7 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include"../vmware/vmware.h"
+#include "zbxxml.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
 #define ZBX_VMWARE_DATASTORE_SIZE_FREE		1
@@ -634,6 +635,31 @@ out:
 	return ret;
 }
 
+static int	custquery_read_result(zbx_vmware_cust_query_t *custom_query, AGENT_RESULT *result)
+{
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_ERROR))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Custom query error: %s", custom_query->error));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_READY))
+		SET_STR_RESULT(result, zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(custom_query->value)));
+
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_PAUSED))
+		custom_query->state &= (unsigned char)~ZBX_VMWARE_CQ_PAUSED;
+
+	if (NULL != custom_query->value && '\0' != *custom_query->value &&
+			0 != (custom_query->state & ZBX_VMWARE_CQ_SEPARATE))
+	{
+		custom_query->state &= (unsigned char)~ZBX_VMWARE_CQ_SEPARATE;
+	}
+
+	custom_query->last_pooled = time(NULL);
+
+	return SYSINFO_RET_OK;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: update json document with tags info                               *
@@ -777,6 +803,72 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 unlock:
 	zbx_vmware_unlock();
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_cluster_property(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	const char			*url, *id, *key, *type = ZBX_VMWARE_SOAP_CLUSTER, *mode = "";
+	int				ret = SYSINFO_RET_FAIL;
+	char				*key_esc = NULL;
+	zbx_vmware_service_t		*service;
+	zbx_vmware_cluster_t		*cl;
+	zbx_vmware_cust_query_t		*custom_query;
+	zbx_vmware_custom_query_type_t	query_type = VMWARE_OBJECT_PROPERTY;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	id = get_rparam(request, 1);
+	key = get_rparam(request, 2);
+
+	if (NULL == key || '\0' == *key)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto out;
+	}
+
+	key_esc = zbx_xml_escape_dyn(key);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (cl = cluster_get(&service->data->clusters, id)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown cluster id."));
+		goto unlock;
+	}
+
+	/* FAIL is returned if custom query exists */
+	if (NULL == (custom_query = zbx_vmware_service_get_cust_query(service, type, cl->id, key_esc, query_type, mode))
+			&& NULL != (custom_query = zbx_vmware_service_add_cust_query(service, type, cl->id, key_esc,
+			query_type, mode, NULL)))
+	{
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+	else if (NULL == custom_query)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown vmware property query."));
+		goto unlock;
+	}
+
+	ret = custquery_read_result(custom_query, result);
+unlock:
+	zbx_vmware_unlock();
+out:
+	zbx_str_free(key_esc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
@@ -1622,6 +1714,72 @@ int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, c
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_hv_property(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	const char			*url, *uuid, *key, *type = ZBX_VMWARE_SOAP_HV, *mode = "";
+	int				ret = SYSINFO_RET_FAIL;
+	char				*key_esc = NULL;
+	zbx_vmware_service_t		*service;
+	zbx_vmware_hv_t			*hv;
+	zbx_vmware_cust_query_t		*custom_query;
+	zbx_vmware_custom_query_type_t	query_type = VMWARE_OBJECT_PROPERTY;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	key = get_rparam(request, 2);
+
+	if (NULL == key || '\0' == *key)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto out;
+	}
+
+	key_esc = zbx_xml_escape_dyn(key);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	/* FAIL is returned if custom query exists */
+	if (NULL == (custom_query = zbx_vmware_service_get_cust_query(service, type, hv->id, key_esc, query_type, mode))
+			&& NULL != (custom_query = zbx_vmware_service_add_cust_query(service, type, hv->id, key_esc,
+			query_type, mode, NULL)))
+	{
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+	else if (NULL == custom_query)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown vmware property query."));
+		goto unlock;
+	}
+
+	ret = custquery_read_result(custom_query, result);
+unlock:
+	zbx_vmware_unlock();
+out:
+	zbx_str_free(key_esc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
@@ -3118,6 +3276,81 @@ out:
 	return ret;
 }
 
+int	check_vcenter_datastore_property(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	const char			*url, *uuid, *key, *type = ZBX_VMWARE_SOAP_DS, *mode = "";
+	int				ret = SYSINFO_RET_FAIL;
+	char				*key_esc = NULL;
+	zbx_vmware_service_t		*service;
+	zbx_vmware_datastore_t		*ds;
+	zbx_vmware_cust_query_t		*custom_query;
+	zbx_vmware_custom_query_type_t	query_type = VMWARE_OBJECT_PROPERTY;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	key = get_rparam(request, 2);
+
+	if (NULL == key || '\0' == *key)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto out;
+	}
+
+	key_esc = zbx_xml_escape_dyn(key);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
+	{
+		int			i;
+		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)uuid};
+
+		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+				vmware_ds_name_compare)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+			goto unlock;
+		}
+
+		ds = service->data->datastores.values[i];
+	}
+
+	/* FAIL is returned if custom query exists */
+	if (NULL == (custom_query = zbx_vmware_service_get_cust_query(service, type, ds->id, key_esc, query_type, mode))
+			&& NULL != (custom_query = zbx_vmware_service_add_cust_query(service, type, ds->id, key_esc,
+			query_type, mode, NULL)))
+	{
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+	else if (NULL == custom_query)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown vmware property query."));
+		goto unlock;
+	}
+
+	ret = custquery_read_result(custom_query, result);
+unlock:
+	zbx_vmware_unlock();
+out:
+	zbx_str_free(key_esc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -3410,6 +3643,7 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 {
 	const char			*mode, *url, *uuid, *key, *type = ZBX_VMWARE_SOAP_DVS;
 	int				ret = SYSINFO_RET_FAIL;
+	char				*key_esc = NULL;
 	zbx_vmware_service_t		*service;
 	zbx_vmware_dvswitch_t		*dvs;
 	zbx_vmware_cust_query_t		*custom_query;
@@ -3444,6 +3678,8 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 	if (NULL == key)
 		key = "";
 
+	key_esc = zbx_xml_escape_dyn(key);
+
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
@@ -3455,8 +3691,9 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 		goto unlock;
 	}
 
-	if (NULL == (custom_query = zbx_vmware_service_get_cust_query(service, type, dvs->id, key, query_type, mode))
-			&& (SUCCEED != custquery_param_create(key, &query_params)
+	if (NULL == (custom_query =
+			zbx_vmware_service_get_cust_query(service, type, dvs->id, key_esc, query_type, mode))
+			&& (SUCCEED != custquery_param_create(key_esc, &query_params)
 			|| SUCCEED != dvs_param_validate(&query_params,
 			service->major_version * 10 + service->minor_version)))
 	{
@@ -3466,8 +3703,8 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 	}
 
 	/* FAIL is returned if custom query exists */
-	if (NULL == custom_query && SUCCEED == zbx_vmware_service_add_cust_query(service, type, dvs->id, key,
-			query_type, mode, &query_params))
+	if (NULL == custom_query && NULL != (custom_query = zbx_vmware_service_add_cust_query(service, type, dvs->id,
+			key_esc, query_type, mode, &query_params)))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
@@ -3480,7 +3717,7 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 
 	if (0 != (custom_query->state & ZBX_VMWARE_CQ_ERROR))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, custom_query->error));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Custom query error: %s", custom_query->error));
 		goto unlock;
 	}
 
@@ -3495,6 +3732,7 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 unlock:
 	zbx_vmware_unlock();
 out:
+	zbx_str_free(key_esc);
 	zbx_vector_custquery_param_clear_ext(&query_params, zbx_vmware_cq_param_free);
 	zbx_vector_custquery_param_destroy(&query_params);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -4084,6 +4322,72 @@ int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *user
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_vm_property(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	const char			*url, *uuid, *key, *type = ZBX_VMWARE_SOAP_VM, *mode = "";
+	int				ret = SYSINFO_RET_FAIL;
+	char				*key_esc = NULL;
+	zbx_vmware_service_t		*service;
+	zbx_vmware_vm_t			*vm;
+	zbx_vmware_cust_query_t		*custom_query;
+	zbx_vmware_custom_query_type_t	query_type = VMWARE_OBJECT_PROPERTY;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	key = get_rparam(request, 2);
+
+	if (NULL == key || '\0' == *key)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto out;
+	}
+
+	key_esc = zbx_xml_escape_dyn(key);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
+	}
+
+	/* FAIL is returned if custom query exists */
+	if (NULL == (custom_query = zbx_vmware_service_get_cust_query(service, type, vm->id, key_esc, query_type, mode))
+			&& NULL != (custom_query = zbx_vmware_service_add_cust_query(service, type, vm->id, key_esc,
+			query_type, mode, NULL)))
+	{
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+	else if (NULL == custom_query)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown vmware property query."));
+		goto unlock;
+	}
+
+	ret = custquery_read_result(custom_query, result);
+unlock:
+	zbx_vmware_unlock();
+out:
+	zbx_str_free(key_esc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
