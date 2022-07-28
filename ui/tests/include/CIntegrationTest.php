@@ -256,12 +256,7 @@ class CIntegrationTest extends CAPITest {
 		$components = array_merge(self::$suite_components, $this->case_components);
 
 		foreach ($components as $component) {
-			try {
-				self::stopComponent($component);
-			}
-			catch (Exception $e) {
-				self::zbxAddWarning($e->getMessage());
-			}
+			self::stopComponent($component);
 		}
 
 		self::setHostStatus($this->case_hosts, HOST_STATUS_NOT_MONITORED);
@@ -278,12 +273,7 @@ class CIntegrationTest extends CAPITest {
 	 */
 	public static function onAfterTestSuite() {
 		foreach (self::$suite_components as $component) {
-			try {
-				self::stopComponent($component);
-			}
-			catch (Exception $e) {
-				self::zbxAddWarning($e->getMessage());
-			}
+			self::stopComponent($component);
 		}
 
 		if (self::$suite_hosts) {
@@ -368,7 +358,6 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 */
 	private static function checkPidKilled($component) {
-
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 			if (!file_exists(self::getPidPath($component))) {
 				return true;
@@ -383,54 +372,34 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Wait for component to stop.
 	 *
-	 * @param string $component    component name
+	 * @param string $component
+	 * @param array  $child_pids
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
-	protected static function waitForShutdown($component) {
-		self::validateComponent($component);
+	protected static function waitForShutdown($component, array $child_pids) {
+		if (!self::checkPidKilled($component)) {
+			throw new Exception('Failed to wait for component "'.$component.'" to stop.');
+		}
 
-		if (self::checkPidKilled($component)) {
+		$failed_pids = [];
+
+		foreach ($child_pids as $child_pid) {
+			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
+				posix_kill($child_pid, SIGKILL);
+				$failed_pids[] = $child_pid;
+			}
+		}
+
+		if (!$failed_pids) {
 			return;
 		}
 
-		$pid = @file_get_contents(self::getPidPath($component));
+		$log = CLogHelper::readLog(self::getLogPath($component), false);
 
-		$pids = explode("\n", shell_exec('pgrep -P '.$pid));
-		$pids_count = count($pids);
-		$iterations = 0;
-
-		do {
-			for ($i = count($pids) -1; $i >= 0; $i--) {
-				$child_pid = $pids[$i];
-
-				if  (is_numeric($child_pid) && posix_kill($child_pid, 0)) {
-					posix_kill($child_pid, SIGKILL);
-					sleep(10 * self::WAIT_ITERATION_DELAY);
-
-					if (!posix_kill($child_pid, 0)) {
-						break;
-					}
-				}
-			}
-
-			if (self::checkPidKilled($component)) {
-				return;
-			}
-
-			$pids = explode("\n", shell_exec('pgrep -P '.$pid));
-			$iterations++;
-		} while (count($pids) > 0 && $iterations < $pids_count );
-
-		if  (is_numeric($pid) && posix_kill($pid, 0)) {
-			posix_kill($pid, SIGKILL);
-
-			if (self::checkPidKilled($component)) {
-				return;
-			}
-		}
-
-		throw new Exception('Failed to wait for component "'.$component.'" to stop.');
+		throw new Exception('Multiple child processes for component "'.$component.'" did not stop gracefully:'."\n".
+			implode(', ', $failed_pids)."\n".
+			'Log file contents: '."\n".$log."\n");
 	}
 
 	/**
@@ -591,19 +560,9 @@ class CIntegrationTest extends CAPITest {
 
 		$background = ($component === self::COMPONENT_AGENT2);
 
-		$bin_path = '';
-
-		if ($component === self::COMPONENT_SERVER_HANODE1) {
-			$bin_path = "/tmp/zabbix_".self::COMPONENT_SERVER_HANODE1;
-			if (file_exists($bin_path)) {
-				unlink($bin_path);
-			}
-			copy(PHPUNIT_BINARY_DIR.'zabbix_'.self::COMPONENT_SERVER, $bin_path);
-			chmod($bin_path, 0755);
-		}
-		else {
-			$bin_path = PHPUNIT_BINARY_DIR.'zabbix_'.$component;
-		}
+		$bin_path = $component === self::COMPONENT_SERVER_HANODE1
+			? PHPUNIT_BINARY_DIR.'zabbix_'.self::COMPONENT_SERVER
+			: PHPUNIT_BINARY_DIR.'zabbix_'.$component;
 
 		self::executeCommand($bin_path, ['-c', $config], $background);
 		self::waitForStartup($component, $waitLogLineOverride, $skip_pid );
@@ -619,11 +578,49 @@ class CIntegrationTest extends CAPITest {
 	protected static function stopComponent($component) {
 		self::validateComponent($component);
 
+		$child_pids = [];
 		$pid = @file_get_contents(self::getPidPath($component));
-		if ($pid && is_numeric($pid)) {
+
+		if ($pid !== false && is_numeric($pid)) {
+			$output = shell_exec('pgrep -P '.$pid);
+			if ($output !== false && $output !== null) {
+				$child_pids = explode("\n", $output);
+			}
+
 			posix_kill($pid, SIGTERM);
 		}
-		self::waitForShutdown($component);
+		self::waitForShutdown($component, $child_pids);
+	}
+
+	/**
+	 * Stop component by using SIGKILL signal.
+	 *
+	 * @param string $component    component name
+	 *
+	 * @throws Exception    on missing configuration or failed stop
+	 */
+	protected static function killComponent($component) {
+		self::validateComponent($component);
+
+		$child_pids = [];
+		$pid_path = self::getPidPath($component);
+		$pid = @file_get_contents($pid_path);
+
+		if ($pid !== false && is_numeric($pid)) {
+			$output = shell_exec('pgrep -P '.$pid);
+			if ($output !== false && $output !== null) {
+				$child_pids = explode("\n", $output);
+				foreach ($child_pids as $child_pid) {
+					if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
+						posix_kill($child_pid, SIGKILL);
+					}
+				}
+			}
+
+			posix_kill($pid, SIGKILL);
+		}
+
+		unlink($pid_path);
 	}
 
 	/**
