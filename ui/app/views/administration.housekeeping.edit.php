@@ -27,7 +27,6 @@ $this->includeJsFile('administration.housekeeping.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Housekeeping'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_HOUSEKEEPING_EDIT));
 
 $form = (new CForm())
