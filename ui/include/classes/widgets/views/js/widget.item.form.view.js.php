@@ -143,8 +143,8 @@ window.widget_item_form = new class {
 				.then((response) => response.json())
 				.then((response) => {
 					switch (response.result) {
-						case '0':
-						case '3':
+						case <?= ITEM_VALUE_TYPE_FLOAT ?>:
+						case <?= ITEM_VALUE_TYPE_UINT64 ?>:
 							document.getElementById('item-value-thresholds-warning').style.display = 'none';
 							break;
 						default:
