@@ -25,13 +25,13 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  *
  * @onBefore prepareDashboardData
  */
-class testDashboardDefault extends CWebTest {
+class testDashboardViewMode extends CWebTest {
 
 	/**
 	 * @onBefore removeGuestFromDisabledGroup
 	 * @onAfter addGuestToDisabledGroup
 	 */
-	public function testDashboardDefault_CheckLayoutForDifferentUsers() {
+	public function testDashboardViewMode_CheckLayoutForDifferentUsers() {
 		$users = ['super-admin', 'admin', 'user', 'guest'];
 		foreach ($users as $user) {
 			switch ($user) {
@@ -80,7 +80,7 @@ class testDashboardDefault extends CWebTest {
 		}
 	}
 
-	public function testDashboardForm_KioskMode() {
+	public function testDashboardViewMode_KioskMode() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view&dashboardid=1', false);
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
@@ -102,7 +102,7 @@ class testDashboardDefault extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath('//ul[@class="breadcrumbs"]');
 	}
 
-	public function testDashboardForm_KioskModeUrlParameter() {
+	public function testDashboardViewMode_KioskModeUrlParameter() {
 		// Set layout mode to kiosk view.
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view&kiosk=1', false);
 		$this->zbxTestWaitForPageToLoad();
