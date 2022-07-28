@@ -20145,6 +20145,10 @@ msgstr ""
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Licznik wydajności klastra VMware, <url> - URL usługi VMware, <id> - identyfikator klastra VMware, <path> - ścieżka licznika wydajności, <instance> - instancja licznika wydajności"
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Stan klastra VMware, <url> - URL usługi VMware, <uuid> - nazwa klastra VMware"
@@ -20181,6 +20185,10 @@ msgstr "Statystyki pojemności magazynu danych VMware w bajtach lub procentach o
 #: include/classes/data/CItemData.php:1234
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Lista hipernadzorców magazynu danych VMware, <url> - URL usługi VMware, <datastore> - nazwa magazynu danych"
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20277,6 +20285,10 @@ msgstr "Model procesora hipernadzorcy VMware, <url> - URL usługi VMware, <uuid>
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Użycie procesora hipernadzorcy VMware w Hz, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
+
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20409,6 +20421,10 @@ msgstr "Czas gotowości procesora maszyny wirtualnej VMware w ms, <url> - URL us
 #: include/classes/data/CItemData.php:1430
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Użycie procesora maszyny wirtualnej VMware w Hz, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
+
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
