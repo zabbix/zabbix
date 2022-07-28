@@ -1120,6 +1120,15 @@ static void	vmware_entities_shared_clean_stats(zbx_hashset_t *entities)
 static void	vmware_diskextent_shared_free(zbx_vmware_diskextent_t *diskextent)
 {
 	vmware_shared_strfree(diskextent->diskname);
+	vmware_shared_strfree(diskextent->operational_state);
+	vmware_shared_strfree(diskextent->ssd);
+	vmware_shared_strfree(diskextent->local_disk);
+	vmware_shared_strfree(diskextent->lun_type);
+	vmware_shared_strfree(diskextent->scsi_disk_type);
+	vmware_shared_strfree(diskextent->model);
+	vmware_shared_strfree(diskextent->vendor);
+	vmware_shared_strfree(diskextent->revision);
+	vmware_shared_strfree(diskextent->serial_number);
 
 	__vm_shmem_free_func(diskextent);
 }
@@ -1685,8 +1694,18 @@ static zbx_vmware_diskextent_t	*vmware_diskextent_shared_dup(const zbx_vmware_di
 	zbx_vmware_diskextent_t	*diskextent;
 
 	diskextent = (zbx_vmware_diskextent_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_diskextent_t));
-	diskextent->diskname = vmware_shared_strdup(src->diskname);
 	diskextent->partitionid = src->partitionid;
+	diskextent->diskname = vmware_shared_strdup(src->diskname);
+	diskextent->operational_state = vmware_shared_strdup(src->operational_state);
+	diskextent->ssd = vmware_shared_strdup(src->ssd);
+	diskextent->local_disk = vmware_shared_strdup(src->local_disk);
+	diskextent->lun_type = vmware_shared_strdup(src->lun_type);
+	diskextent->scsi_disk_type = vmware_shared_strdup(src->scsi_disk_type);
+	diskextent->queue_depth = src->queue_depth;
+	diskextent->model = vmware_shared_strdup(src->model);
+	diskextent->vendor = vmware_shared_strdup(src->vendor);
+	diskextent->revision = vmware_shared_strdup(src->revision);
+	diskextent->serial_number = vmware_shared_strdup(src->serial_number);
 
 	return diskextent;
 }
@@ -2185,6 +2204,15 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 static void	vmware_diskextent_free(zbx_vmware_diskextent_t *diskextent)
 {
 	zbx_free(diskextent->diskname);
+	zbx_free(diskextent->operational_state);
+	zbx_free(diskextent->ssd);
+	zbx_free(diskextent->local_disk);
+	zbx_free(diskextent->lun_type);
+	zbx_free(diskextent->scsi_disk_type);
+	zbx_free(diskextent->model);
+	zbx_free(diskextent->vendor);
+	zbx_free(diskextent->revision);
+	zbx_free(diskextent->serial_number);
 	zbx_free(diskextent);
 }
 
@@ -4254,8 +4282,6 @@ static int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_di
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
 	xmlNodeSetPtr		nodeset;
-	char			*name, *partition;
-	zbx_vmware_diskextent_t	*diskextent;
 	int			i, ret = FAIL;
 
 	if (NULL == doc)
@@ -4273,23 +4299,45 @@ static int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_di
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		if (NULL == (name = zbx_xml_node_read_value(doc, nodeset->nodeTab[i], ZBX_XPATH_NN("diskName"))))
+		char			*value;
+		zbx_vmware_diskextent_t	*diskextent;
+		xmlNode			*xn = nodeset->nodeTab[i];
+
+		if (NULL == (value= zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("diskName"))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get diskName.", __func__);
 			continue;
 		}
 
 		diskextent = (zbx_vmware_diskextent_t *)zbx_malloc(NULL, sizeof(zbx_vmware_diskextent_t));
-		diskextent->diskname = name;
+		diskextent->diskname = value;
 
-		if (NULL != (partition = zbx_xml_node_read_value(doc, nodeset->nodeTab[i], ZBX_XPATH_NN("partition"))))
+		if (NULL != (value = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("partition"))))
 		{
-			diskextent->partitionid = (unsigned int) atoi(partition);
-			zbx_free(partition);
+			diskextent->partitionid = (unsigned int) atoi(value);
+			zbx_free(value);
 		}
 		else
 			diskextent->partitionid = 0;
 
+		diskextent->operational_state = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("operationalState"));
+		diskextent->ssd = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("ssd"));
+		diskextent->local_disk = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("localDisk"));
+		diskextent->lun_type = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("lunType"));
+		diskextent->scsi_disk_type = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("scsiDiskType"));
+
+		if (NULL != (value = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("queueDepth"))))
+		{
+			diskextent->queue_depth = atoi(value);
+			zbx_free(value);
+		}
+		else
+			diskextent->queue_depth = 0;
+
+		diskextent->model = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("model"));
+		diskextent->vendor = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("vendor"));
+		diskextent->revision = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("revision"));
+		diskextent->serial_number = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("serialNumber"));
 		zbx_vector_vmware_diskextent_append(diskextents, diskextent);
 	}
 

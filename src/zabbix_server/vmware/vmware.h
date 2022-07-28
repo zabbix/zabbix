@@ -94,6 +94,16 @@ typedef struct
 {
 	zbx_uint64_t	partitionid;
 	char		*diskname;
+	char		*operational_state;
+	char		*ssd;
+	char		*local_disk;
+	char		*lun_type;
+	char		*scsi_disk_type;
+	int		queue_depth;
+	char		*model;
+	char		*vendor;
+	char		*revision;
+	char		*serial_number;
 }
 zbx_vmware_diskextent_t;
 
@@ -546,7 +556,7 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
 		const char *id);
 
-zbx_vmware_cust_query_t *zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *type,
+zbx_vmware_cust_query_t *zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *soap_type,
 		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
 		zbx_vector_custquery_param_t *query_params);
 zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t *service, const char *type,
