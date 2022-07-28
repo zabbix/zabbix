@@ -22,7 +22,7 @@
 class CWidgetFieldThresholds extends CWidgetField {
 
 	/**
-	 * Create widget field for Tags selection.
+	 * Create widget field for Thresholds selection.
 	 *
 	 * @param string $name   Field name in form.
 	 * @param string $label  Label for the field in form.
@@ -61,7 +61,6 @@ class CWidgetFieldThresholds extends CWidgetField {
 		return $value;
 	}
 
-	// TODO change the comment bellow
 	/**
 	 * Add dynamic row script.
 	 *
