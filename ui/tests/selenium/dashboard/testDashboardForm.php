@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__) . '/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup dashboard
@@ -41,10 +41,9 @@ class testDashboardForm extends CWebTest {
 	 * Get all dashboard related tables hash values.
 	 */
 	public static function getHash() {
-		return CDBHelper::getHash('SELECT * FROM dashboard') .
-				CDBHelper::getHash('SELECT * FROM dashboard_user ORDER by dashboard_userid') .
-				CDBHelper::getHash('SELECT * FROM dashboard_usrgrp ORDER by dashboard_usrgrpid') .
-				CDBHelper::getHash('SELECT * FROM dashboard_page ORDER by dashboard_pageid') .
+		return CDBHelper::getHash('SELECT * FROM dashboard').
+				CDBHelper::getHash('SELECT * FROM dashboard_user ORDER by dashboard_userid').
+				CDBHelper::getHash('SELECT * FROM dashboard_usrgrp ORDER by dashboard_usrgrpid').
 				CDBHelper::getHash('SELECT * FROM widget ORDER by widgetid');
 	}
 
@@ -53,9 +52,7 @@ class testDashboardForm extends CWebTest {
 	 */
 	private $default_values = [
 		'Owner' => 'Admin (Zabbix Administrator)',
-		'Name' => 'New dashboard',
-		'Default page display period' => '30 seconds',
-		'Start slideshow automatically' => true
+		'Name' => 'New dashboard'
 	];
 
 	/**
@@ -63,9 +60,7 @@ class testDashboardForm extends CWebTest {
 	 */
 	private $update_values = [
 		'Owner' => 'guest',
-		'Name' => 'Dashboard to test poperties changes',
-		'Default page display period' => '1 hour',
-		'Start slideshow automatically' => false
+		'Name' => 'Dashboard to test poperties changes'
 	];
 
 	/**
@@ -79,86 +74,74 @@ class testDashboardForm extends CWebTest {
 
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for update',
+				'userid' => 2,
+				'private' => 1
+			],
+			[
+				'name' => 'Dashboard for clone and delete',
+				'userid' => 2,
+				'private' => 0,
+				'widgets' => [
 					[
-						'name' => 'Dashboard for update',
-						'userid' => 2,
-						'display_period' => 60,
-						'auto_start' => 0,
-						'private' => 1,
-						'pages' => [[]]
-					],
-					[
-						'name' => 'Dashboard for clone and delete',
-						'userid' => 2,
-						'display_period' => 3600,
-						'auto_start' => 0,
-						'private' => 0,
-						'pages' => [
+						'type' => 'clock',
+						'name' => 'Custom clock name',
+						'x' => 0,
+						'y' => 0,
+						'width' => 12,
+						'height' => 4,
+						'fields' => [
 							[
-								'name' => 'Page name',
-								'display_period' => 1800,
-								'widgets' => [
-									[
-										'type' => 'clock',
-										'name' => 'Custom clock name',
-										'x' => 0,
-										'y' => 0,
-										'width' => 12,
-										'height' => 4,
-										'fields' => [
-											[
-												'type' => 0,
-												'name' => 'rf_rate',
-												'value' => 0
-											],
-											[
-												'type' => 0,
-												'name' => 'time_type',
-												'value' => 1
-											]
-										]
-									]
-								]
-							]
-						],
-						'users' => [
-							[
-								'userid' => 1,
-								'permission' => 3
-							]
-						],
-						'userGroups' => [
-							[
-								'usrgrpid' => 7,
-								'permission' => 2
-							]
-						]
-					],
-					[
-						'name' => 'Dashboard for share',
-						'userid' => 1,
-						'pages' => [[]],
-						'users' => [
-							[
-								'userid' => 4,
-								'permission' => 3
+								'type' => 0,
+								'name' => 'rf_rate',
+								'value' => 0
 							],
 							[
-								'userid' => 7,
-								'permission' => 2
-							]
-						],
-						'userGroups' => [
-							[
-								'usrgrpid' => 11,
-								'permission' => 2
-							],
-							[
-								'usrgrpid' => 12,
-								'permission' => 3
+								'type' => 0,
+								'name' => 'time_type',
+								'value' => 1
 							]
 						]
 					]
+				],
+				'users' => [
+					[
+						'userid' => 1,
+						'permission' => 3
+					]
+				],
+				'userGroups' => [
+					[
+						'usrgrpid' => 7,
+						'permission' => 2
+					]
+				]
+			],
+			[
+				'name' => 'Dashboard for share',
+				'userid' => 1,
+				'users' => [
+					[
+						'userid' => 4,
+						'permission' => 3
+					],
+					[
+						'userid' => 7,
+						'permission' => 2
+					]
+				],
+				'userGroups' => [
+					[
+						'usrgrpid' => 11,
+						'permission' => 2
+					],
+					[
+						'usrgrpid' => 12,
+						'permission' => 3
+					]
+				]
+			]
 		]);
 		$this->assertArrayHasKey('dashboardids', $response);
 		self::$ids = CDataHelper::getIds('name');
@@ -176,10 +159,6 @@ class testDashboardForm extends CWebTest {
 		// Check default values.
 		$form->checkValue($this->default_values);
 		$this->assertEquals('255', $form->query('id:name')->one()->getAttribute('maxlength'));
-		// Check available display periods.
-		$this->assertEquals(['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'],
-				$form->getField('Default page display period')->getOptions()->asText()
-		);
 
 		// Close the dialog.
 		$dialog->query('button:Cancel')->one()->click();
@@ -209,7 +188,8 @@ class testDashboardForm extends CWebTest {
 					'dashboard_properties' => [
 						'Name' => '   '
 					],
-					'error_message' => 'Incorrect value for field "name": cannot be empty.'
+					'error_message' => 'Incorrect value for field "name": cannot be empty.',
+					'trim' => true
 				]
 			],
 			[
@@ -250,8 +230,7 @@ class testDashboardForm extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'dashboard_properties' => [
-						'Name' => '!@#$%^&*()_+=-09[]{};:\'"',
-						'Default page display period' => '10 seconds'
+						'Name' => '!@#$%^&*()_+=-09[]{};:\'"'
 					]
 				]
 			],
@@ -260,8 +239,7 @@ class testDashboardForm extends CWebTest {
 					'expected' => TEST_GOOD,
 					'dashboard_properties' => [
 						'Owner' => 'guest',
-						'Name' => 'кириллица',
-						'Start slideshow automatically' => false
+						'Name' => 'кириллица'
 					]
 				]
 			],
@@ -270,9 +248,7 @@ class testDashboardForm extends CWebTest {
 					'expected' => TEST_GOOD,
 					'dashboard_properties' => [
 						'Owner' => 'guest',
-						'Name' => '☺æų☺',
-						'Default page display period' => '1 minute',
-						'Start slideshow automatically' => false
+						'Name' => '☺æų☺'
 					]
 				]
 			],
@@ -280,8 +256,7 @@ class testDashboardForm extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'dashboard_properties' => [
-						'Name' => '    Trailing & leading spaces    ',
-						'Start slideshow automatically' => false
+						'Name' => '    Trailing & leading spaces    '
 					],
 					'trim' => true
 				]
@@ -311,9 +286,9 @@ class testDashboardForm extends CWebTest {
 		$old_hash = ($data['expected'] === TEST_BAD || empty($data['dashboard_properties'])) ? $this->getHash() : null;
 
 		if (CTestArrayHelper::get($data, 'dashboard_properties.Name', false) && $data['expected'] === TEST_GOOD) {
-			$data['dashboard_properties']['Name'] = $data['dashboard_properties']['Name'] . microtime();
+			$data['dashboard_properties']['Name'] = $data['dashboard_properties']['Name'].microtime();
 		}
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' . self::$ids['Dashboard for update']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for update']);
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 		$dialog = $dashboard->editProperties();
@@ -341,7 +316,7 @@ class testDashboardForm extends CWebTest {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'save_dashboard')) {
 				$this->query('button:Save changes')->one()->click();
-				$this->assertMessage(TEST_BAD, 'Failed to ' . $action . ' dashboard', $data['error_message']);
+				$this->assertMessage(TEST_BAD, null, $data['error_message']);
 			}
 			else {
 				$this->assertMessage(TEST_BAD, null, $data['error_message']);
@@ -357,7 +332,7 @@ class testDashboardForm extends CWebTest {
 			COverlayDialogElement::ensureNotPresent();
 			$dashboard->save();
 			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Dashboard ' . $action . 'd');
+			$this->assertMessage(TEST_GOOD, 'Dashboard '.$action.'d');
 			$default_name = ($action === 'create') ? $this->default_values['Name'] : 'Dashboard for update';
 			if (CTestArrayHelper::get($data, 'trim', false)) {
 				$title = trim(preg_replace('/\s\s+/', ' ', str_replace("\n", " ", $data['dashboard_properties']['Name'])));
@@ -420,7 +395,7 @@ class testDashboardForm extends CWebTest {
 			$this->query('link', $data['opened_dashboard'])->one()->click();
 			$this->page->assertHeader($data['opened_dashboard']);
 			$this->page->assertTitle('Dashboard');
-			$this->query('id:dashboard-actions')->one()->click();
+			$this->query('id:dashbrd-actions')->one()->click();
 			CPopupMenuElement::find()->waitUntilVisible()->one()->select('Create new');
 		}
 		else {
@@ -491,7 +466,7 @@ class testDashboardForm extends CWebTest {
 	public function testDashboardForm_Cancel($data) {
 		$old_hash = $this->getHash();
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' . self::$ids['Dashboard for update']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for update']);
 		$dashboard = CDashboardElement::find()->one();
 
 		// Open dashboard properties overlay dialog for update and clone action.
@@ -500,7 +475,7 @@ class testDashboardForm extends CWebTest {
 			$dialog = $dashboard->editProperties();
 		}
 		else {
-			$this->query('id:dashboard-actions')->one()->click();
+			$this->query('id:dashbrd-actions')->one()->click();
 			CPopupMenuElement::find()->waitUntilVisible()->one()->select($data['action']);
 
 			if ($data['action'] === 'Delete') {
@@ -534,17 +509,15 @@ class testDashboardForm extends CWebTest {
 	public function testDashboardForm_Clone() {
 		$original_values = [
 			'Name' => 'Dashboard for clone and delete',
-			'Owner' => 'guest',
-			'Default page display period' => '1 hour',
-			'Start slideshow automatically' => false
+			'Owner' => 'guest'
 		];
 		$cloned_name = 'Cloned dashboard';
 		$original_hashes = $this->getDashboardHashes($original_values['Name']);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' . self::$ids['Dashboard for clone and delete'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for clone and delete'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		// Clone dashboard.
-		$this->query('id:dashboard-actions')->one()->click();
+		$this->query('id:dashbrd-actions')->one()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->select('Clone');
 		$this->assertEquals($original_values['Name'], $dashboard->getTitle());
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -583,29 +556,17 @@ class testDashboardForm extends CWebTest {
 	 * @return array
 	 */
 	private function getDashboardHashes($name) {
-		$ids = [];
-		$query_value = $name;
-		$query_id = [
-			'dashboardid' => 'SELECT dashboardid FROM dashboard WHERE name=',
-			'pageid' => 'SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=',
-			'widgetid' => 'SELECT widgetid FROM widget WHERE dashboard_pageid=',
-		];
-
-		foreach ($query_id as $id => $hash) {
-			$ids[$id] = CDBHelper::getValue($hash . zbx_dbstr($query_value));
-			// Save previous id value for next query.
-			$query_value = $ids[$id];
-		}
-
 		$result = [];
+		$dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name='.zbx_dbstr($name));
+		$widgetid = CDBHelper::getValue('SELECT widgetid FROM widget WHERE dashboardid='.$dashboardid);
 		$query_hash = [
-			'dashboard' => 'SELECT private, templateid, display_period, auto_start, uuid FROM dashboard WHERE dashboardid=' . $ids['dashboardid'],
-			'dashboard_user' => 'SELECT userid, permission  FROM dashboard_user WHERE dashboardid=' . $ids['dashboardid'],
-			'dashboard_usrgrp' => 'SELECT usrgrpid, permission  FROM dashboard_usrgrp WHERE dashboardid=' . $ids['dashboardid'],
-			'dashboard_page' => 'SELECT name, display_period, sortorder FROM dashboard_page WHERE dashboard_pageid=' . $ids['pageid'],
-			'widget' => 'SELECT type, name, x, y, width, height, view_mode FROM widget WHERE dashboard_pageid=' . $ids['pageid'],
-			'widget_field' => 'SELECT type, name, value_int, value_str, value_groupid FROM widget_field WHERE widgetid=' . $ids['widgetid']
+			'dashboard' => 'SELECT private FROM dashboard WHERE dashboardid='.$dashboardid,
+			'dashboard_user' => 'SELECT userid, permission FROM dashboard_user WHERE dashboardid='.$dashboardid,
+			'dashboard_usrgrp' => 'SELECT usrgrpid, permission FROM dashboard_usrgrp WHERE dashboardid='.$dashboardid,
+			'widget' => 'SELECT type, name, x, y, width, height, view_mode FROM widget WHERE dashboardid='.$dashboardid,
+			'widget_field' => 'SELECT type, name, value_int, value_str, value_groupid FROM widget_field WHERE widgetid='.$widgetid
 		];
+
 		foreach ($query_hash as $table => $hash) {
 			$result[$table] = CDBHelper::getHash($hash);
 		}
@@ -729,9 +690,9 @@ class testDashboardForm extends CWebTest {
 	 * @dataProvider getShareData
 	 */
 	public function testDashboardForm_SharingPopup($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' . self::$ids[$data['dashboard']]);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids[$data['dashboard']]);
 		CDashboardElement::find()->one()->waitUntilReady();
-		$this->query('id:dashboard-actions')->one()->click();
+		$this->query('id:dashbrd-actions')->one()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->select('Sharing');
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Dashboard sharing', $dialog->getTitle());
@@ -747,7 +708,7 @@ class testDashboardForm extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Сheck sharing popup form.
-		$this->query('id:dashboard-actions')->one()->click();
+		$this->query('id:dashbrd-actions')->one()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->select('Sharing');
 		$form->invalidate();
 		$form->checkValue(['Type' => $type]);
@@ -790,7 +751,7 @@ class testDashboardForm extends CWebTest {
 						}
 
 						// Wait until new table row appears.
-						$table->query('xpath://tbody/tr[' . ($rows + $add_rows) . ']')->waitUntilPresent();
+						$table->query('xpath://tbody/tr['.($rows + $add_rows).']')->waitUntilPresent();
 
 						if (CTestArrayHelper::get($share, 'permissions', false)) {
 							$row = $table->findRow($list, $share['name']);
@@ -828,8 +789,8 @@ class testDashboardForm extends CWebTest {
 
 			if ($data[0] === 'all') {
 				if ($list === 'Users') {
-					$query = 'SELECT username FROM users';
-					$key = 'username';
+					$query = 'SELECT alias FROM users';
+					$key = 'alias';
 					$selector = 'xpath://label[text()="List of user shares"]/ancestor::li//table';
 				}
 				else {
@@ -867,31 +828,28 @@ class testDashboardForm extends CWebTest {
 				}
 				else {
 					$this->assertFalse($table->query('xpath://tbody/tr/td[text()=' .
-									CXPathHelper::escapeQuotes($share['name']) . ']')->one(false)->isValid());
+									CXPathHelper::escapeQuotes($share['name']).']')->one(false)->isValid());
 				}
 			}
 		}
 	}
 
 	public function testDashboardForm_Delete() {
-		$pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=' .
-						zbx_dbstr(self::$ids['Dashboard for clone and delete']));
-		$widgetid = CDBHelper::getValue('SELECT widgetid FROM widget WHERE dashboard_pageid=' . zbx_dbstr($pageid));
+		$widgetid = CDBHelper::getValue('SELECT widgetid FROM widget WHERE dashboardid='.zbx_dbstr(self::$ids['Dashboard for clone and delete']));
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' . self::$ids['Dashboard for clone and delete']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for clone and delete']);
 		CDashboardElement::find()->one()->waitUntilReady();
-		$this->query('id:dashboard-actions')->one()->click();
+		$this->query('id:dashbrd-actions')->one()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->select('Delete');
 		$this->page->acceptAlert();
 		$this->assertMessage(TEST_GOOD, 'Dashboard deleted');
 
 		// Check related dashboard tables.
 		$tables = [
-			'SELECT NULL FROM dashboard_page dp INNER JOIN dashboard d' .
-			' ON d.dashboardid=dp.dashboardid WHERE d.dashboardid=' . zbx_dbstr(self::$ids['Dashboard for clone and delete']),
-			'SELECT NULL FROM dashboard_user WHERE dashboardid=' . zbx_dbstr(self::$ids['Dashboard for clone and delete']),
-			'SELECT NULL FROM dashboard_usrgrp WHERE dashboardid=' . zbx_dbstr(self::$ids['Dashboard for clone and delete']),
-			'SELECT NULL FROM widget_field wf INNER JOIN widget w ON w.widgetid=wf.widgetid WHERE w.widgetid=' . $widgetid
+			'SELECT NULL FROM dashboard WHERE dashboardid='.zbx_dbstr(self::$ids['Dashboard for clone and delete']),
+			'SELECT NULL FROM dashboard_user WHERE dashboardid='.zbx_dbstr(self::$ids['Dashboard for clone and delete']),
+			'SELECT NULL FROM dashboard_usrgrp WHERE dashboardid='.zbx_dbstr(self::$ids['Dashboard for clone and delete']),
+			'SELECT NULL FROM widget_field wf INNER JOIN widget w ON w.widgetid=wf.widgetid WHERE w.widgetid='.$widgetid
 		];
 		foreach ($tables as $query) {
 			$this->assertEquals(0, CDBHelper::getCount($query));

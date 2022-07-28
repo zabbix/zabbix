@@ -119,7 +119,7 @@ class CDashboardElement extends CElement {
 	 */
 	public function editProperties() {
 		$this->checkIfEditable();
-		$this->getControls()->query('id:dashboard-config')->one()->click();
+		$this->getControls()->query('id:dashbrd-config')->one()->click();
 
 		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="dashboard_properties"]')
 				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
