@@ -283,7 +283,6 @@ class CWidgetHelper {
 		if ($use_default) {
 			$color_picker->enableUseDefault();
 		}
-
 		return $color_picker;
 	}
 
