@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  *
  * @onBefore prepareDashboardData
  */
-class testDashboardDefault extends CWebTest {
+class testDashboardViewMode extends CWebTest {
 
 	/**
 	 * @onBefore removeGuestFromDisabledGroup
