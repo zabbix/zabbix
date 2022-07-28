@@ -351,12 +351,12 @@ ZBX_DC_HOST;
 
 typedef struct
 {
-	char		*host;
-	char		*host_metadata;
-	char		*listen_ip;
-	char		*listen_dns;
-	int		flags;
-	unsigned short	listen_port;
+	const char		*host;
+	const char		*host_metadata;
+	const char		*listen_ip;
+	const char		*listen_dns;
+	int			flags;
+	unsigned short		listen_port;
 }
 ZBX_DC_AUTOREG_HOST;
 

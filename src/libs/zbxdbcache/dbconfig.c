@@ -7133,6 +7133,48 @@ int	DCis_autoreg_host_changed(const char *host, unsigned short port, const char 
 	return ret;
 }
 
+void	DCconfig_update_autoreg_host(const char *host, unsigned short port, const char *host_metadata,
+		zbx_conn_flags_t flag, const char *interface)
+{
+	ZBX_DC_AUTOREG_HOST	*dc_autoreg_host, dc_autoreg_host_local;
+	int			found;
+
+	dc_autoreg_host_local.host = host;
+
+	WRLOCK_CACHE;
+
+	dc_autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_search(&config->autoreg_hosts, &dc_autoreg_host_local);
+	if (NULL == dc_autoreg_host)
+	{
+		found = 0;
+		dc_autoreg_host = zbx_hashset_insert(&config->autoreg_hosts, &dc_autoreg_host_local,
+				sizeof(ZBX_DC_AUTOREG_HOST));
+	}
+	else
+
+		found = 1;
+
+	dc_strpool_replace(found, &dc_autoreg_host->host, host);
+	dc_autoreg_host->listen_port = port;
+	dc_strpool_replace(found, &dc_autoreg_host->host_metadata, host_metadata);
+	dc_autoreg_host->flags = flag;
+
+	switch(flag)
+	{
+		case ZBX_CONN_IP:
+			dc_strpool_replace(found, &dc_autoreg_host->listen_ip, interface);
+			break;
+		case ZBX_CONN_DNS:
+			dc_strpool_replace(found, &dc_autoreg_host->listen_dns, interface);
+			break;
+		default:
+			dc_strpool_replace(found, &dc_autoreg_host->listen_ip, "");
+			dc_strpool_replace(found, &dc_autoreg_host->listen_dns, "");
+	}
+
+	UNLOCK_CACHE;
+}
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *

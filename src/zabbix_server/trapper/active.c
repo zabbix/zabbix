@@ -52,12 +52,15 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	const char	*p;
 	const char	*p_ip, *p_dns;
 
+	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
+	DCconfig_update_autoreg_host(host, port, host_metadata, flag, interface);
+
 	p_ip = ip;
 	p_dns = dns;
 
 	if (ZBX_CONN_DEFAULT == flag)
 		p = ip;
-	else if (ZBX_CONN_IP  == flag)
+	else if (ZBX_CONN_IP == flag)
 		p_ip = p = interface;
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
@@ -76,18 +79,19 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	}
 	zbx_alarm_off();
 
-	DBbegin();
-
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	do
 	{
-		DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
-				(int)time(NULL));
-	}
-	else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
-		DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag);
+		DBbegin();
 
-	DBcommit();
-	// add to cache on success
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		{
+			DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
+					(int)time(NULL));
+		}
+		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+			DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag);
+	}
+	while (ZBX_DB_DOWN == DBcommit());
 }
 
 static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, unsigned short port,
