@@ -21,6 +21,7 @@ package zbxcomms
 
 import (
 	"bytes"
+	"context"
 	"compress/zlib"
 	"encoding/binary"
 	"errors"
@@ -308,7 +309,7 @@ func Listen(address string, args ...interface{}) (c *Listener, err error) {
 			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
 		}
 	}
-	l, tmperr := lc.Listen("tcp", address)
+	l, tmperr := lc.Listen(context.Background(), "tcp", address)
 	if tmperr != nil {
 		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
 	}
