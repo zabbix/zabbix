@@ -218,8 +218,7 @@ class testDashboardForm extends CWebTest {
 					'dashboard_properties' => [
 						'Owner' => ''
 					],
-					'error_message' => 'Field "userid" is mandatory.',
-					'trim' => true
+					'error_message' => 'Field "userid" is mandatory.'
 				]
 			],
 			[
