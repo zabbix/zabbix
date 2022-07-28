@@ -28,7 +28,12 @@ Template need to use Authorization via API token.
 
 Don't forget to change macros {$CONSUL.NODE.API.URL}, {$CONSUL.TOKEN}.  
 Also, see the Macros section for a list of macros used to set trigger values.  
+
+This template support [Consul namespaces](https://www.consul.io/docs/enterprise/namespaces). You can set macros {$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}, {$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES} if you want to filter discovered services by namespace.  
+In case of Open Source version service namespace will be set to 'None'.
+
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
+*NOTE.* You maybe are interested in Envoy Proxy by HTTP [template](../../envoy_proxy_http).
 
 
 ## Zabbix configuration
@@ -41,8 +46,8 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES} |<p>Filter of discoverable discovered services on local node.</p> |`.*` |
 |{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES} |<p>Filter to exclude discovered services on local node.</p> |`CHANGE IF NEEDED` |
-|{$CONSUL.LLD.FILTER.SERVICE_CHECK_NAME.MATCHES} |<p>Filter of discoverable discovered service checks on local node.</p> |`.*` |
-|{$CONSUL.LLD.FILTER.SERVICE_CHECK_NAME.NOT_MATCHES} |<p>Filter to exclude discovered service checks on local node.</p> |`CHANGE IF NEEDED` |
+|{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES} |<p>Filter of discoverable discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to 'None'.</p> |`.*` |
+|{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES} |<p>Filter to exclude discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to 'None'.</p> |`CHANGE IF NEEDED` |
 |{$CONSUL.NODE.API.URL} |<p>Consul instance URL.</p> |`http://localhost:8500` |
 |{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH} |<p>Maximum acceptable value of node's health score for AVERAGE trigger expression.</p> |`4` |
 |{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN} |<p>Maximum acceptable value of node's health score for WARNING trigger expression.</p> |`2` |
@@ -58,7 +63,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |HTTP API methods discovery |<p>Discovery HTTP API methods specific metrics.</p> |DEPENDENT |consul.http_api_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `consul_api_http{method =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Local node services discovery |<p>Discover metrics for services that are registered with the local agent.</p> |DEPENDENT |consul.node_services_lld<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Filter**:</p> <p>- {#SERVICE_NAME} MATCHES_REGEX `{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES}`</p><p>- {#SERVICE_NAME} NOT_MATCHES_REGEX `{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES}`</p><p>**Overrides:**</p><p>aggregated status<br> - {#TYPE} MATCHES_REGEX `aggregated_status`<br>  - ITEM_PROTOTYPE LIKE `Aggregated status` - DISCOVER</p><br>  - ITEM_PROTOTYPE LIKE `State` - DISCOVER</p><p>checks<br> - {#TYPE} MATCHES_REGEX `service_check`<br>  - ITEM_PROTOTYPE LIKE `Check` - DISCOVER</p> |
+|Local node services discovery |<p>Discover metrics for services that are registered with the local agent.</p> |DEPENDENT |consul.node_services_lld<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Filter**:</p> <p>- {#SERVICE_NAME} MATCHES_REGEX `{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES}`</p><p>- {#SERVICE_NAME} NOT_MATCHES_REGEX `{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES}`</p><p>- {#SERVICE_NAMESPACE} MATCHES_REGEX `{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}`</p><p>- {#SERVICE_NAMESPACE} NOT_MATCHES_REGEX `{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES}`</p><p>**Overrides:**</p><p>aggregated status<br> - {#TYPE} MATCHES_REGEX `aggregated_status`<br>  - ITEM_PROTOTYPE LIKE `Aggregated status` - DISCOVER</p><br>  - ITEM_PROTOTYPE LIKE `State` - DISCOVER</p><p>checks<br> - {#TYPE} MATCHES_REGEX `service_check`<br>  - ITEM_PROTOTYPE LIKE `Check` - DISCOVER</p> |
 |Raft leader metrics discovery |<p>Discover raft metrics for leader nodes.</p> |DEPENDENT |consul.raft.leader.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Raft server metrics discovery |<p>Discover raft metrics for server nodes.</p> |DEPENDENT |consul.raft.server.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 

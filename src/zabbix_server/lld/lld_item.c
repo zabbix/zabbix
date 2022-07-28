@@ -4448,8 +4448,8 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 	DBbegin();
 
 	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked) &&
-			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
+			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_tags_save(hostid, &items, &host_record_is_locked))
 	{
 		if (ZBX_DB_OK != DBcommit())
@@ -4460,7 +4460,6 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 	}
 	else
 	{
-		ret = FAIL;
 		DBrollback();
 		goto clean;
 	}
