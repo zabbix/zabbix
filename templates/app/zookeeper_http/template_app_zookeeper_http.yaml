@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-07-22T09:06:30Z'
+  date: '2022-07-28T07:29:39Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -317,7 +317,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Rate ofconnection revalidations.'
+          description: 'Rate of connection revalidations.'
           preprocessing:
             -
               type: JSONPATH
