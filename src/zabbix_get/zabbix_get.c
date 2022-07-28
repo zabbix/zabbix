@@ -319,7 +319,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	zbx_config_tls = zbx_config_tls_init();
+	zbx_config_tls = zbx_config_tls_new();
 
 	progname = get_program_name(argv[0]);
 
@@ -536,7 +536,7 @@ out:
 #endif
 	}
 #endif
-	zbx_config_tls_clean(zbx_config_tls);
+	zbx_config_tls_free(zbx_config_tls);
 #if defined(_WINDOWS)
 	while (0 == WSACleanup())
 		;

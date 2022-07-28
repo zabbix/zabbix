@@ -54,7 +54,7 @@ extern ZBX_THREAD_LOCAL char	info_buf[256];
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
-zbx_config_tls_t	*zbx_config_tls_init(void)
+zbx_config_tls_t	*zbx_config_tls_new(void)
 {
 	zbx_config_tls_t	*zbx_config_tls;
 
@@ -85,7 +85,7 @@ zbx_config_tls_t	*zbx_config_tls_init(void)
 	return zbx_config_tls;
 }
 
-void	zbx_config_tls_clean(zbx_config_tls_t *zbx_config_tls)
+void	zbx_config_tls_free(zbx_config_tls_t *zbx_config_tls)
 {
 	zbx_free(zbx_config_tls->connect);
 	zbx_free(zbx_config_tls->accept);

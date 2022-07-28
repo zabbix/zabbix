@@ -1056,7 +1056,7 @@ static void	zbx_on_exit(int ret)
 	setproctitle_free_env();
 #endif
 
-	zbx_config_tls_clean(zbx_config_tls);
+	zbx_config_tls_free(zbx_config_tls);
 
 	exit(EXIT_SUCCESS);
 }
@@ -1078,7 +1078,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
 
-	zbx_config_tls = zbx_config_tls_init();
+	zbx_config_tls = zbx_config_tls_new();
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
@@ -1253,7 +1253,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, get_program_type};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
-							zbx_config_tls->key_file};
+							zbx_config_tls->key_file, get_program_type};
 
 	if (SUCCEED != init_database_cache(&error))
 	{

@@ -984,7 +984,7 @@ static void	zbx_on_exit(int ret)
 	setproctitle_free_env();
 #endif
 
-	zbx_config_tls_clean(zbx_config_tls);
+	zbx_config_tls_free(zbx_config_tls);
 
 	exit(EXIT_SUCCESS);
 }
@@ -1006,7 +1006,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
 
-	zbx_config_tls = zbx_config_tls_init();
+	zbx_config_tls = zbx_config_tls_new();
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);

@@ -1061,7 +1061,7 @@ static void	zbx_on_exit(int ret)
 	zbx_tls_free();
 	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
 #endif
-	zbx_config_tls_clean(zbx_config_tls);
+	zbx_config_tls_free(zbx_config_tls);
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();
 #endif
@@ -1341,7 +1341,7 @@ int	main(int argc, char **argv)
 	/* Instead, the system sends the error to the calling process.*/
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
-	zbx_config_tls = zbx_config_tls_init();
+	zbx_config_tls = zbx_config_tls_new();
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif

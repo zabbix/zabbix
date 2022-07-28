@@ -83,8 +83,8 @@ typedef struct
 	char		*cipher_cmd;	/* not used in agent, server, proxy, config file parameter 'tls-cipher' */
 } zbx_config_tls_t;
 
-zbx_config_tls_t	*zbx_config_tls_init(void);
-void	zbx_config_tls_clean(zbx_config_tls_t *zbx_config_tls);
+zbx_config_tls_t	*zbx_config_tls_new(void);
+void	zbx_config_tls_free(zbx_config_tls_t *zbx_config_tls);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
