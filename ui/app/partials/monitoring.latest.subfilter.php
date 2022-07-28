@@ -115,9 +115,8 @@ if (count($subfilters['tags']) > 0) {
 						->addStyle($element_style)
 						->setAttribute('data-key', $tag)
 						->setAttribute('data-value', $element['name'])
-						->onClick(
-							'view.unsetSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,
-							this.dataset.value]);'
+						->onClick('view.unsetSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+							'this.dataset.value]);'
 						),
 					' ',
 					new CSup($element['count'])
@@ -131,8 +130,8 @@ if (count($subfilters['tags']) > 0) {
 						->addStyle($element_style)
 						->setAttribute('data-key', $tag)
 						->setAttribute('data-value', $element['name'])
-						->onClick('view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,
-						this.dataset.value]);'),
+						->onClick('view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+							'this.dataset.value]);'),
 					' ',
 					new CSup(($subfilter_used ? '+' : '').$element['count'])
 				]))->addClass(ZBX_STYLE_SUBFILTER);

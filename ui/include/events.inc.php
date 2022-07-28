@@ -560,8 +560,8 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 						$tags[$element[$key]][] = (new CSimpleButton($value))
 							->setAttribute('data-key', $tag['tag'])
 							->setAttribute('data-value', $tag['value'])
-							->onClick('view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,
-							this.dataset.value]);')
+							->onClick('view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+								'this.dataset.value]);')
 							->addClass(ZBX_STYLE_BTN_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
@@ -593,8 +593,8 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 						$hint_content[$element[$key]][] = (new CSimpleButton($value))
 							->setAttribute('data-key', $tag['tag'])
 							->setAttribute('data-value', $tag['value'])
-							->onClick('view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,
-							this.dataset.value]);')
+							->onClick('view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+								'this.dataset.value]);')
 							->addClass(ZBX_STYLE_BTN_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
