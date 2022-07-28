@@ -1577,8 +1577,7 @@ class CWidgetHelper {
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->addClass('element-table-add')
 					))
-				))
-			->addClass('table-forms-separator');
+				));
 
 		$i = 0;
 
@@ -1597,7 +1596,9 @@ class CWidgetHelper {
 
 			$i++;
 		}
-		return $thresholds;
+		return (new CDiv($thresholds))
+			->addClass('table-forms-separator')
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
 	public static function getThresholdsTemplate() {

@@ -3858,6 +3858,8 @@ form.is-loading {
   display: inline-block;
   padding: 5px;
   position: relative; }
+  .table-forms-separator #thresholds_table_thresholds td {
+    padding: 5px 5px 5px 0; }
 
 .border-left {
   border-left: 1px solid #383838; }
