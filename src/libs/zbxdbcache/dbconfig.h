@@ -39,7 +39,7 @@ typedef struct
 	const unsigned char	*recovery_expression_bin;
 	int			lastchange;
 	zbx_uint32_t		revision;
-	int			timer_revision;
+	zbx_uint32_t		timer_revision;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -82,7 +82,7 @@ typedef struct
 	const char	*function;
 	const char	*parameter;
 	zbx_uint32_t	revision;
-	int		timer_revision;
+	zbx_uint32_t	timer_revision;
 	unsigned char	type;
 }
 ZBX_DC_FUNCTION;
