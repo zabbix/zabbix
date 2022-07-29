@@ -49,6 +49,7 @@ class testAgentItems extends CIntegrationTest {
 
 	private static $hostids = [];
 	private static $itemids = [];
+	private static $results = [];
 
 	// List of items to check.
 	private static $items = [
@@ -491,45 +492,131 @@ class testAgentItems extends CIntegrationTest {
 			'result' => 2
 		],
 		[
-			'key' => 'proc.get[,,systemd-logind.*]',
+			'key' => 'proc.get[zabbix_agentd]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'json' => JSON_COMPARE_LEFT,
-			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid', 'threads'],
+			'fields_exec' => ['user', 'group', 'uid', 'gid', 'threads'],
 			'result' => [
 				[
-					'pid' => 'pgrep systemd-logind',
-					'ppid' => 'ps --no-headers -o ppid:1 -C systemd-logind',
-					'cmdline' => 'ps --no-headers -o cmd:1 -C systemd-logind',
-					'user' => 'ps --no-headers -o euser:1 -C systemd-logind',
-					'group' => 'ps --no-headers -o rgroup:1 -C systemd-logind',
-					'uid' => 'ps --no-headers -o euid:1 -C systemd-logind',
-					'gid' => 'ps --no-headers -o rgid:1 -C systemd-logind',
-					'threads' => 'ps --no-headers -o nlwp:1 -C systemd-logind'
+					'user' => 'ps --no-headers -o euser:1 -C zabbix_agentd',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agentd',
+					'uid' => 'ps --no-headers -o euid:1 -C zabbix_agentd',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agentd',
+					'threads' => 'ps --no-headers -o nlwp:1 -C zabbix_agentd'
 				]
 			]
 		],
 		[
-			'key' => 'proc.get[,,systemd-logind.*]',
+			'key' => 'proc.get[zabbix_agent2]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid'],
+			'result' => [
+				[
+					'pid' => 'pgrep zabbix_agent2',
+					'ppid' => 'ps --no-headers -o ppid:1 -C zabbix_agent2',
+					'cmdline' => 'ps --no-headers -o cmd:1 -C zabbix_agent2',
+					'user' => 'ps --no-headers -o euser:1 -C zabbix_agent2',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agent2',
+					'uid' => 'ps --no-headers -o euid:1 -C zabbix_agent2',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2,,,thread]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'result' => [
+				[
+					'name' => 'zabbix_agent2',
+					'tname' => 'zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd,,,summary]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'result' => [
+				[
+					'name' => 'zabbix_agentd',
+					'processes' => 6,
+					'threads' => 6
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'json' => JSON_COMPARE_LEFT,
-			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid', 'threads'],
+			'fields_exec' => ['user', 'group', 'uid', 'gid', 'threads'],
 			'result' => [
 				[
-					'pid' => 'pgrep systemd-logind',
-					'ppid' => 'ps --no-headers -o ppid:1 -C systemd-logind',
-					'cmdline' => 'ps --no-headers -o cmd:1 -C systemd-logind',
-					'user' => 'ps --no-headers -o euser:1 -C systemd-logind',
-					'group' => 'ps --no-headers -o rgroup:1 -C systemd-logind',
-					'uid' => 'ps --no-headers -o euid:1 -C systemd-logind',
-					'gid' => 'ps --no-headers -o rgid:1 -C systemd-logind',
-					'threads' => 'ps --no-headers -o nlwp:1 -C systemd-logind'
+					'user' => 'ps --no-headers -o euser:1 -C zabbix_agentd',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agentd',
+					'uid' => 'ps --no-headers -o euid:1 -C zabbix_agentd',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agentd',
+					'threads' => 'ps --no-headers -o nlwp:1 -C zabbix_agentd'
 				]
 			]
 		],
+		[
+			'key' => 'proc.get[zabbix_agent2]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid'],
+			'result' => [
+				[
+					'pid' => 'pgrep zabbix_agent2',
+					'ppid' => 'ps --no-headers -o ppid:1 -C zabbix_agent2',
+					'cmdline' => 'ps --no-headers -o cmd:1 -C zabbix_agent2',
+					'user' => 'ps --no-headers -o euser:1 -C zabbix_agent2',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agent2',
+					'uid' => 'ps --no-headers -o euid:1 -C zabbix_agent2',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2,,,thread]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'result' => [
+				[
+					'name' => 'zabbix_agent2',
+					'tname' => 'zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd,,,summary]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'result' => [
+				[
+					'name' => 'zabbix_agentd',
+					'processes' => 6,
+					'threads' => 6
+				]
+			]
+		]
 	];
 
 	/**
@@ -678,6 +765,7 @@ class testAgentItems extends CIntegrationTest {
 			);
 		}
 
+		$this->updateExpectedResults();
 		$this->getItemData();
 	}
 
@@ -742,6 +830,30 @@ class testAgentItems extends CIntegrationTest {
 	}
 
 	/**
+	 * Update expected result values.
+	 *
+	 * @return array
+	 */
+	public function updateExpectedResults() {
+		foreach(self::$items as $k => $item) {
+
+			if (array_key_exists('json', $item) && array_key_exists('fields_exec', $item)) {
+				self::$results[$item['component'].':'.$item['key']] = self::$items[$k]['result'];
+				foreach ($item['fields_exec'] as $dyn) {
+					$this->dynupdate(self::$results[$item['component'].':'.$item['key']], $dyn);
+				}
+
+			}
+			elseif (array_key_exists('result_exec', $item)) {
+				self::$results[$item['component'].':'.$item['key']] = exec($item['result_exec']);
+			}
+			else {
+				self::$results[$item['component'].':'.$item['key']] = $item['result'];
+			}
+		}
+	}
+
+	/**
 	 * Test if both active and passive go agent checks are processed.
 	 *
 	 * @depends testAgentItems_checkDataCollection
@@ -755,15 +867,7 @@ class testAgentItems extends CIntegrationTest {
 		}
 
 		$value = $data[$item['component'].':'.$item['key']];
-
-		if (array_key_exists('json', $item) && array_key_exists('fields_exec', $item)) {
-			foreach ($item['fields_exec'] as $dyn) {
-				$this->dynupdate($item, $dyn);
-			}
-		}
-		elseif (array_key_exists('result_exec', $item)) {
-			$item['result'] = exec($item['result_exec']);
-		}
+		$result = self::$results[$item['component'].':'.$item['key']];
 
 		switch ($item['valueType']) {
 			case ITEM_VALUE_TYPE_TEXT:
@@ -771,13 +875,13 @@ class testAgentItems extends CIntegrationTest {
 					$jsonval = json_decode($value, true);
 
 					if ($item['json'] === JSON_COMPARE_LEFT) {
-						$this->arrcmpr($item['result'], $jsonval, $item['key']);
+						$this->arrcmpr($result, $jsonval, $item['key']);
 					}
 					elseif ($item['json'] === JSON_COMPARE_RIGHT) {
-						$this->arrcmpr($jsonval, $item['result'], $item['key']);
+						$this->arrcmpr($jsonval, $result, $item['key']);
 					}
 					elseif ($item['json'] === JSON_ARRAY_COMPARE_LEFT) {
-						foreach ($item['result'] as $result_key => $result_value) {
+						foreach ($result as $result_key => $result_value) {
 							$found = false;
 							foreach ($jsonval as $jsonval_key => $jsonval_value) {
 								$found = $found || $this->arrfind($result_value, $jsonval_value);
@@ -788,8 +892,7 @@ class testAgentItems extends CIntegrationTest {
 					elseif ($item['json'] === JSON_ARRAY_COMPARE_RIGHT) {
 						foreach ($jsonval as $jsonval_key => $jsonval_value) {
 							$found = false;
-
-							foreach ($item['result'] as $result_key => $result_value) {
+							foreach ($result as $result_key => $result_value) {
 								$found = $found || $this->arrfind($jsonval_value, $result_value);
 							}
 							self::assertEquals($found, true, 'Value (jsonval_key: '.$jsonval_key.') is not found for '.$item['key']);
@@ -799,26 +902,25 @@ class testAgentItems extends CIntegrationTest {
 				else {
 					if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
 						$value = substr($value, 0, $item['threshold']);
-						$expected = substr($item['result'], 0, $item['threshold']);
+						$expected = substr($result, 0, $item['threshold']);
 					}
 					else {
-						$expected = $item['result'];
+						$expected = $result;
 					}
 
 					$this->assertEquals($expected, $value, 'Received value is not expected for '.$item['key']);
 				}
 				break;
-
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
 				if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
-					$diff = abs(abs($value) - abs($item['result']));
+					$diff = abs(abs($value) - abs($result));
 					$this->assertTrue($diff <= $item['threshold'], 'Received value ('.$value.') for '.$item['key'].
 						' differs more than defined threshold '.$diff.' > '.$item['threshold']
 					);
 				}
 				else {
-					$this->assertEquals($item['result'], $value, 'Received value is not expected for '.$item['key']);
+					$this->assertEquals($result, $value, 'Received value is not expected for '.$item['key']);
 				}
 
 				break;
@@ -905,6 +1007,5 @@ class testAgentItems extends CIntegrationTest {
 			}
 		}
 	}
-
 }
 
