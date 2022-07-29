@@ -5513,7 +5513,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
 			autoreg_host_sync;
 
-	double		autoreg_csec, autoreg_csec2;
+	double		autoreg_csec, autoreg_csec2, autoreg_host_csec, autoreg_host_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
 	zbx_uint64_t	update_flags = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
@@ -5601,7 +5601,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_autoreg_host(&autoreg_host_sync))
 		goto out;
-	autoreg_csec = zbx_time() - sec;
+	autoreg_host_csec = zbx_time() - sec;
 
 	/* sync global configuration settings */
 	START_SYNC;
@@ -5613,7 +5613,9 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	DCsync_autoreg_config(&autoreg_config_sync);	/* must be done in the same cache locking with config sync */
 	autoreg_csec2 = zbx_time() - sec;
 
+	sec = zbx_time();
 	DCsync_autoreg_host(&autoreg_host_sync);
+	autoreg_host_csec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
 	/* sync macro related data, to support macro resolving during configuration sync */
@@ -5985,12 +5987,17 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 				__func__, csec, csec2, config_sync.add_num, config_sync.update_num,
 				config_sync.remove_num);
 
-		total += autoreg_csec;
-		total2 += autoreg_csec2;
+		total += autoreg_csec + autoreg_host_csec;
+		total2 += autoreg_csec2 + autoreg_host_csec2;
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() autoreg    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, autoreg_csec, autoreg_csec2, autoreg_config_sync.add_num,
 				autoreg_config_sync.update_num, autoreg_config_sync.remove_num);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() autoreg host    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, autoreg_host_csec, autoreg_host_csec2, autoreg_host_sync.add_num,
+				autoreg_host_sync.update_num, autoreg_host_sync.remove_num);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
