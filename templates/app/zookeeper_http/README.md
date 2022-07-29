@@ -56,7 +56,7 @@ There are no template links in this template.
 |Zabbix_raw_items |Zookeeper: Get server metrics |<p>-</p> |HTTP_AGENT |zookeeper.get_metrics |
 |Zabbix_raw_items |Zookeeper: Get connections stats |<p>Get information on client connections to server. Note, depending on the number of client connections this operation may be expensive (i.e. impact server performance).</p> |HTTP_AGENT |zookeeper.get_connections_stats |
 |Zookeeper |Zookeeper: Server mode |<p>Mode of the server. In an ensemble, this may either be leader or follower. Otherwise, it is standalone</p> |DEPENDENT |zookeeper.server_state<p>**Preprocessing**:</p><p>- JSONPATH: `$.server_state`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zookeeper |Zookeeper: Uptime |<p>Uptime of Zookeeper server.</p> |DEPENDENT |zookeeper.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.uptime`</p><p>- MULTIPLIER: `0.001`</p> |
+|Zookeeper |Zookeeper: Uptime |<p>Uptime that a peer has been in a table leading/following/observing state.</p> |DEPENDENT |zookeeper.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.uptime`</p><p>- MULTIPLIER: `0.001`</p> |
 |Zookeeper |Zookeeper: Version |<p>Version of Zookeeper server.</p> |DEPENDENT |zookeeper.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version`</p><p>- REGEX: `([^,]+)--(.+) \1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Zookeeper |Zookeeper: Approximate data size |<p>Data tree size in bytes.The size includes the znode path and its value.</p> |DEPENDENT |zookeeper.approximate_data_size<p>**Preprocessing**:</p><p>- JSONPATH: `$.approximate_data_size`</p> |
 |Zookeeper |Zookeeper: File descriptors, max |<p>Maximum number of file descriptors that a zookeeper server can open.</p> |DEPENDENT |zookeeper.max_file_descriptor_count<p>**Preprocessing**:</p><p>- JSONPATH: `$.max_file_descriptor_count`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
@@ -106,7 +106,6 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Zookeeper: Server mode has changed (new mode: {ITEM.VALUE}) |<p>Zookeeper node state has changed. Ack to close.</p> |`{TEMPLATE_NAME:zookeeper.server_state.diff()}=1 and {TEMPLATE_NAME:zookeeper.server_state.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Zookeeper: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:zookeeper.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Zookeeper: Failed to fetch info data (or no data for 10m) |<p>Zabbix has not received data for items for the last 10 minutes</p> |`{TEMPLATE_NAME:zookeeper.uptime.nodata(10m)}=1` |WARNING |<p>Manual close: YES</p> |
 |Zookeeper: Version has changed (new version: {ITEM.VALUE}) |<p>Zookeeper version has changed. Ack to close.</p> |`{TEMPLATE_NAME:zookeeper.version.diff()}=1 and {TEMPLATE_NAME:zookeeper.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Zookeeper: Too many file descriptors used (over {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% for 5 min) |<p>Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.</p> |`{TEMPLATE_NAME:zookeeper.open_file_descriptor_count.min(5m)} * 100 / {TEMPLATE_NAME:zookeeper.max_file_descriptor_count.last()} > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}` |WARNING | |
