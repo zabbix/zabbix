@@ -1300,7 +1300,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts, const 
 ZBX_THREAD_ENTRY(trapper_thread, args)
 {
 	zbx_thread_trapper_args	*trapper_args_in = (zbx_thread_trapper_args *)
-			(((zbx_thread_args_t *)args)->args);
+					(((zbx_thread_args_t *)args)->args);
 	double			sec = 0.0;
 	zbx_socket_t		s;
 	int			ret;

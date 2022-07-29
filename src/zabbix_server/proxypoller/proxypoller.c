@@ -32,7 +32,7 @@
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
 
-static zbx_get_program_type_f           zbx_get_program_type_cb = NULL;
+static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 

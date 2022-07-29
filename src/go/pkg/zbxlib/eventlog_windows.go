@@ -28,7 +28,7 @@ package zbxlib
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 
-void	zbx_config_tls_init_g_version(zbx_config_tls_t *zbx_config_tls, unsigned int accept, unsigned int connect,
+void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *zbx_config_tls, unsigned int accept, unsigned int connect,
 		char *PSKIdentity, char *PSKKey, char *CAFile, char *CRLFile, char *CertFile, char *KeyFile,
 		char *ServerCertIssuer, char *ServerCertSubject);
 
@@ -194,7 +194,7 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 		return
 	}
 	if (nil != tlsConfig) {
-		C.zbx_config_tls_init_g_version(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
+		C.zbx_config_tls_init_for_agent2(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
 			(C.CString)(tlsConfig.PSKIdentity), (C.CString)(tlsConfig.PSKKey),
 			(C.CString)(tlsConfig.CAFile), (C.CString)(tlsConfig.CRLFile), (C.CString)(tlsConfig.CertFile),
 			(C.CString)(tlsConfig.KeyFile), (C.CString)(tlsConfig.ServerCertIssuer),

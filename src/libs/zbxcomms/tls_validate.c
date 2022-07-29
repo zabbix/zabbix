@@ -34,7 +34,7 @@ static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
  *                                                                            *
  * Parameters:                                                                *
  *     type           - [IN] type of parameter (file or command line)         *
- *     param          - [IN] address of the global parameter variable         *
+ *     param          - [IN] address of the parameter variable                *
  *     zbx_config_tls - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
@@ -123,7 +123,7 @@ static const char	*zbx_tls_parameter_name(int type, char * const *param, const z
  *     not be empty. Otherwise log error and exit.                            *
  *                                                                            *
  * Parameters:                                                                *
- *     param          - [IN] address of the global parameter variable         *
+ *     param          - [IN] address of the parameter variable                *
  *     zbx_config_tls - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
