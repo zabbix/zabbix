@@ -4346,6 +4346,12 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (0 == DCget_auto_registration_action_count())
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot process auto registration contents, all autoregistration actions are disabled");
+		goto out;
+	}
+
 	zbx_vector_ptr_create(&autoreg_hosts);
 	host_metadata = (char *)zbx_malloc(host_metadata, host_metadata_alloc);
 
@@ -4462,7 +4468,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, zbx_json_strerror());
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
