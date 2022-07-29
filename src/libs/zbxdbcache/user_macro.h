@@ -44,6 +44,7 @@ typedef struct
 	zbx_vector_uint64_t	templateids;
 	zbx_vector_um_macro_t	macros;
 	zbx_uint32_t		refcount;
+	zbx_uint32_t		revision;
 }
 zbx_um_host_t;
 
@@ -53,6 +54,7 @@ typedef struct
 {
 	zbx_hashset_t	hosts;
 	zbx_uint32_t	refcount;
+	zbx_uint32_t	revision;
 }
 zbx_um_cache_t;
 
