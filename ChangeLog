@@ -3,6 +3,16 @@ Changes for 6.2.2rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
+.........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
+.......PS. [ZBX-20770] fixed secret macro being resolved in wrong locations (vso)
+...G...... [ZBX-21300] fixed high cpu usage when using net.tcp.socket.count key (vso)
+........S. [ZBX-20419] fixed database deadlocks and MySQL error number calculation to be consistent between logging and recoverability detection logic (akozlovs)
+..F....... [ZBX-21043] fixed z-select error when labels have specials chars (rlataria)
+........S. [ZBX-20656] updated active proxy throttling to allow task transfer (wiper)
+.......PS. [ZBX-21153] fixed info collection about access to vmware DS for HV with large number of connected DS (MVekslers)
+........S. [ZBX-19821] fixed host prototype interface update when linking templates (wiper)
+..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.1
