@@ -1537,26 +1537,23 @@ class CWidgetHelper {
 	}
 
 	public static function getThresholds($field) {
-		$header_row = [
-			'',
-			(new CColHeader(_('Threshold')))->setWidth('100%'),
-			_('Action')
-		];
-
 		$thresholds = (new CTable())
-			->setHeader($header_row)
+			->setHeader([
+				'',
+				(new CColHeader(_('Threshold')))->setWidth('100%'),
+				_('Action')
+			])
 			->setId('thresholds_table_'.$field->getName())
-				->addClass(ZBX_STYLE_TABLE_FORMS)
-				->setFooter(new CRow(
-					(new CCol(
-						(new CButton(null, _('Add')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('element-table-add')
-					))
-				));
+			->addClass(ZBX_STYLE_TABLE_FORMS)
+			->setFooter(new CRow(
+				new CCol(
+					(new CButton(null, _('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-add')
+				)
+			));
 
 		$i = 0;
-
 		foreach ($field->getValue() as $threshold) {
 			$thresholds->addRow([
 				(new CColor('thresholds['.$i.'][color]', $threshold['color']))->appendColorPickerJs(false),
@@ -1572,6 +1569,7 @@ class CWidgetHelper {
 
 			$i++;
 		}
+
 		return (new CDiv($thresholds))
 			->addClass('table-forms-separator')
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);

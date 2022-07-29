@@ -42,7 +42,8 @@ class CWidgetFormItem extends CWidgetForm {
 		parent::__construct($data, $templateid, WIDGET_ITEM);
 
 		$this->data = self::convertDottedKeys($this->data);
-		// item field
+
+		// Item field.
 		$field_item = (new CWidgetFieldMsItem('itemid', _('Item'), $templateid))
 			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			->setMultiple(false);
@@ -53,7 +54,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_item->getName()] = $field_item;
 
-		// show checkboxes
+		// Show checkboxes.
 		$field_show = (new CWidgetFieldCheckBoxList('show', _('Show')))
 			->setDefault([WIDGET_ITEM_SHOW_DESCRIPTION, WIDGET_ITEM_SHOW_VALUE, WIDGET_ITEM_SHOW_TIME,
 				WIDGET_ITEM_SHOW_CHANGE_INDICATOR
@@ -66,7 +67,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_show->getName()] = $field_show;
 
-		// advanced configuration
+		// Advanced configuration.
 		$field_adv_conf = (new CWidgetFieldCheckBox('adv_conf', _('Advanced configuration')))->setDefault(0);
 
 		if (array_key_exists('adv_conf', $this->data)) {
@@ -75,7 +76,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_adv_conf->getName()] = $field_adv_conf;
 
-		// description textarea field
+		// Description textarea field.
 		$field_desc = (new CWidgetFieldTextArea('description', _('Description')))
 			->setDefault('{ITEM.NAME}')
 			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
@@ -87,7 +88,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_desc->getName()] = $field_desc;
 
-		// description horizontal position
+		// Description horizontal position.
 		$field_desc_h_pos = (new CWidgetFieldRadioButtonList('desc_h_pos', _('Horizontal position'), [
 			WIDGET_ITEM_POS_LEFT => _('Left'),
 			WIDGET_ITEM_POS_CENTER => _('Center'),
@@ -102,7 +103,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_desc_h_pos->getName()] = $field_desc_h_pos;
 
-		// description vertical position
+		// Description vertical position.
 		$field_desc_v_pos = (new CWidgetFieldRadioButtonList('desc_v_pos', _('Vertical position'), [
 			WIDGET_ITEM_POS_TOP => _('Top'),
 			WIDGET_ITEM_POS_MIDDLE => _('Middle'),
@@ -117,7 +118,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_desc_v_pos->getName()] = $field_desc_v_pos;
 
-		// description size
+		// Description size.
 		$field_desc_size = (new CWidgetFieldIntegerBox('desc_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
 			self::WIDGET_ITEM_PERCENT_MAX
 		))->setDefault(15);
@@ -128,7 +129,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_desc_size->getName()] = $field_desc_size;
 
-		// description bold
+		// Description bold.
 		$field_desc_bold = (new CWidgetFieldCheckBox('desc_bold', _('Bold')))->setDefault(0);
 
 		if (array_key_exists('desc_bold', $this->data)) {
@@ -137,7 +138,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_desc_bold->getName()] = $field_desc_bold;
 
-		// description color
+		// Description color.
 		$field_desc_color = (new CWidgetFieldColor('desc_color', _('Color')))
 			->setDefault('');
 
@@ -147,7 +148,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_desc_color->getName()] = $field_desc_color;
 
-		// value decimal places
+		// Value decimal places.
 		$field_decimal_places = (new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'), 0, 10))
 			->setDefault(2);
 
@@ -157,7 +158,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_decimal_places->getName()] = $field_decimal_places;
 
-		// value decimal size
+		// Value decimal size.
 		$field_decimal_size = (new CWidgetFieldIntegerBox('decimal_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
 			self::WIDGET_ITEM_PERCENT_MAX
 		))->setDefault(35);
@@ -168,7 +169,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_decimal_size->getName()] = $field_decimal_size;
 
-		// value horizontal position
+		// Value horizontal position.
 		$field_value_h_pos = (new CWidgetFieldRadioButtonList('value_h_pos', _('Horizontal position'), [
 			WIDGET_ITEM_POS_LEFT => _('Left'),
 			WIDGET_ITEM_POS_CENTER => _('Center'),
@@ -183,7 +184,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_value_h_pos->getName()] = $field_value_h_pos;
 
-		// value vertical position
+		// Value vertical position.
 		$field_value_v_pos = (new CWidgetFieldRadioButtonList('value_v_pos', _('Vertical position'), [
 			WIDGET_ITEM_POS_TOP => _('Top'),
 			WIDGET_ITEM_POS_MIDDLE => _('Middle'),
@@ -198,7 +199,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_value_v_pos->getName()] = $field_value_v_pos;
 
-		// value size
+		// Value size.
 		$field_value_size = (new CWidgetFieldIntegerBox('value_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
 			self::WIDGET_ITEM_PERCENT_MAX
 		))->setDefault(45);
@@ -209,7 +210,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_value_size->getName()] = $field_value_size;
 
-		// value bold
+		// Value bold.
 		$field_value_bold = (new CWidgetFieldCheckBox('value_bold', _('Bold')))->setDefault(1);
 
 		if (array_key_exists('value_bold', $this->data)) {
@@ -218,7 +219,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_value_bold->getName()] = $field_value_bold;
 
-		// value color
+		// Value color.
 		$field_value_color = (new CWidgetFieldColor('value_color', _('Color')))
 			->setDefault('');
 
@@ -228,7 +229,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_value_color->getName()] = $field_value_color;
 
-		// units show
+		// Units show.
 		$field_units_show = (new CWidgetFieldCheckBox('units_show', _('Units')))->setDefault(1);
 
 		if (array_key_exists('units_show', $this->data)) {
@@ -237,7 +238,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_units_show->getName()] = $field_units_show;
 
-		// units input field
+		// Units input field.
 		$field_units = new CWidgetFieldTextBox('units', _('Units'));
 
 		if (array_key_exists('units', $this->data)) {
@@ -246,7 +247,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_units->getName()] = $field_units;
 
-		// units position
+		// Units position.
 		$field_units_pos = (new CWidgetFieldSelect('units_pos', _('Position'), [
 			WIDGET_ITEM_POS_BEFORE => _('Before value'),
 			WIDGET_ITEM_POS_ABOVE => _('Above value'),
@@ -261,7 +262,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_units_pos->getName()] = $field_units_pos;
 
-		// units size
+		// Units size.
 		$field_units_size = (new CWidgetFieldIntegerBox('units_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
 			self::WIDGET_ITEM_PERCENT_MAX
 		))->setDefault(35);
@@ -272,7 +273,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_units_size->getName()] = $field_units_size;
 
-		// units bold
+		// Units bold.
 		$field_units_bold = (new CWidgetFieldCheckBox('units_bold', _('Bold')))->setDefault(1);
 
 		if (array_key_exists('units_bold', $this->data)) {
@@ -281,7 +282,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_units_bold->getName()] = $field_units_bold;
 
-		// units color
+		// Units color.
 		$field_units_color = (new CWidgetFieldColor('units_color', _('Color')))
 			->setDefault('');
 
@@ -291,7 +292,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_units_color->getName()] = $field_units_color;
 
-		// time horizontal position
+		// Time horizontal position.
 		$field_time_h_pos = (new CWidgetFieldRadioButtonList('time_h_pos', _('Horizontal position'), [
 			WIDGET_ITEM_POS_LEFT => _('Left'),
 			WIDGET_ITEM_POS_CENTER => _('Center'),
@@ -306,7 +307,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_time_h_pos->getName()] = $field_time_h_pos;
 
-		// time vertical position
+		// Time vertical position.
 		$field_time_v_pos = (new CWidgetFieldRadioButtonList('time_v_pos', _('Vertical position'), [
 			WIDGET_ITEM_POS_TOP => _('Top'),
 			WIDGET_ITEM_POS_MIDDLE => _('Middle'),
@@ -321,7 +322,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_time_v_pos->getName()] = $field_time_v_pos;
 
-		// time size
+		// Time size.
 		$field_time_size = (new CWidgetFieldIntegerBox('time_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
 			self::WIDGET_ITEM_PERCENT_MAX
 		))->setDefault(15);
@@ -332,7 +333,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_time_size->getName()] = $field_time_size;
 
-		// time bold
+		// Time bold.
 		$field_time_bold = (new CWidgetFieldCheckBox('time_bold', _('Bold')))->setDefault(0);
 
 		if (array_key_exists('time_bold', $this->data)) {
@@ -341,7 +342,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_time_bold->getName()] = $field_time_bold;
 
-		// time color
+		// Time color.
 		$field_time_color = (new CWidgetFieldColor('time_color', _('Color')))
 			->setDefault('');
 
@@ -351,7 +352,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_time_color->getName()] = $field_time_color;
 
-		// change indicator up arrow color
+		// Change indicator up arrow color.
 		$field_up_color = (new CWidgetFieldColor('up_color', _('Change indicator')))
 			->setDefault('');
 
@@ -361,7 +362,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_up_color->getName()] = $field_up_color;
 
-		// change indicator down arrow color
+		// Change indicator down arrow color.
 		$field_down_color = (new CWidgetFieldColor('down_color', _('Change indicator')))
 			->setDefault('');
 
@@ -371,7 +372,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_down_color->getName()] = $field_down_color;
 
-		// change indicator up/down arrow color
+		// Change indicator up/down arrow color.
 		$field_updown_color = (new CWidgetFieldColor('updown_color', _('Change indicator')))
 			->setDefault('');
 
@@ -381,7 +382,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_updown_color->getName()] = $field_updown_color;
 
-		// background color
+		// Background color.
 		$field_bg_color = (new CWidgetFieldColor('bg_color', _('Background color')))
 			->setDefault('');
 
@@ -391,6 +392,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		$this->fields[$field_bg_color->getName()] = $field_bg_color;
 
+		// Thresholds.
 		$field_thresholds = (new CWidgetFieldThresholds('thresholds', _('Thresholds')))
 			->setDefault([]);
 

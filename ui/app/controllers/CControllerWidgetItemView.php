@@ -328,7 +328,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 			'url' => $url,
 			'bg_color' => $fields['bg_color'],
 			'thresholds' => $fields['thresholds'],
-			'raw_value' => $raw_units ? $raw_units['value'] : null,
+			'raw_value' => $raw_units !== null ? $raw_units['value'] : null,
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

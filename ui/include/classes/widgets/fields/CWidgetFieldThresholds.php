@@ -73,15 +73,16 @@ class CWidgetFieldThresholds extends CWidgetField {
 			thresholds_table
 				.dynamicRows({template: "#thresholds-row-tmpl"})
 				.on("afteradd.dynamicRows", function(opt) {
-					var rows = this.querySelectorAll(".form_row");
+					const rows = this.querySelectorAll(".form_row");
 					jQuery(".color-picker input", rows[rows.length - 1])
 						.val(colorPalette.getNextColor())
 						.colorpicker({
 							appendTo: ".overlay-dialogue-body"
 						});
 				});
-				';
+		';
 	}
+
 	/**
 	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
 	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget

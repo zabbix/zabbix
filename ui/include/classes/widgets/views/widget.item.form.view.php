@@ -46,14 +46,6 @@ $form_grid->addItem([
 	new CFormField($field_itemid)
 ]);
 $scripts[] = $field_itemid->getPostJS();
-$scripts[] = $fields['thresholds']->getJavascript();
-
-$jq_templates['thresholds-row-tmpl'] = CWidgetHelper::getThresholdsTemplate();
-
-$numeric_only_warning = (new CSpan([
-	'&nbsp;',
-	makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
-]));
 
 // Show.
 $form_grid->addItem([
@@ -230,12 +222,19 @@ $form_grid->addItem([
 	(new CFormField(CWidgetHelper::getColor($fields['bg_color'], true)))->addClass('js-row-bg-color')
 ]);
 
-// Thresholds
+// Thresholds.
 $form_grid->addItem([
 	CWidgetHelper::getLabel($fields['thresholds'])
-		->addItem($numeric_only_warning->setId('item-value-thresholds-warning')),
-	(new CFormField(CWidgetHelper::getThresholds($fields['thresholds'])))
+		->addItem(
+			(new CSpan([
+				'&nbsp;',
+				makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
+			]))->setId('item-value-thresholds-warning'))
+		->addClass('js-row-thresholds'),
+	(new CFormField(CWidgetHelper::getThresholds($fields['thresholds'])))->addClass('js-row-thresholds')
 ]);
+$scripts[] = $fields['thresholds']->getJavascript();
+$jq_templates['thresholds-row-tmpl'] = CWidgetHelper::getThresholdsTemplate();
 
 // Dynamic item.
 if ($data['templateid'] === null) {
