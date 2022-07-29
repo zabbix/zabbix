@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-27T16:53:06Z'
+  date: '2022-07-29T06:56:16Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -17,7 +17,7 @@ zabbix_export:
         Setup:
           1. Create an Azure service principal via Azure CLI for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
-            https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fazure%2Fazure-resource-manager%2Ftoc.json&view=azure-cli-latest
+            https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli
           2. Link template to the host.
           3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
         
@@ -782,9 +782,9 @@ zabbix_export:
               parameters:
                 - $.metrics.DiskReadBytes.total
             -
-              type: CHANGE_PER_SECOND
+              type: MULTIPLIER
               parameters:
-                - ''
+                - '0.0167'
           master_item:
             key: azure.vm.data.get
           tags:
@@ -828,9 +828,9 @@ zabbix_export:
               parameters:
                 - $.metrics.DiskWriteBytes.total
             -
-              type: CHANGE_PER_SECOND
+              type: MULTIPLIER
               parameters:
-                - ''
+                - '0.0167'
           master_item:
             key: azure.vm.data.get
           tags:
@@ -953,7 +953,7 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: network
+              value: memory
         -
           uuid: 411c5f6fcb374c4c90e2951a546c0c08
           name: 'Azure: Network in total'
@@ -972,11 +972,7 @@ zabbix_export:
             -
               type: MULTIPLIER
               parameters:
-                - '8'
-            -
-              type: CHANGE_PER_SECOND
-              parameters:
-                - ''
+                - '0.1333'
           master_item:
             key: azure.vm.data.get
           tags:
@@ -1001,11 +997,7 @@ zabbix_export:
             -
               type: MULTIPLIER
               parameters:
-                - '8'
-            -
-              type: CHANGE_PER_SECOND
-              parameters:
-                - ''
+                - '0.1333'
           master_item:
             key: azure.vm.data.get
           tags:

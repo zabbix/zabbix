@@ -13,7 +13,7 @@ It works without any external scripts and uses the script item.
 
 1. Create an Azure service principal via Azure CLI for your subscription.
   `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
-  https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fazure%2Fazure-resource-manager%2Ftoc.json&view=azure-cli-latest
+  https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli
 2. Link template to the host.
 3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
 
@@ -49,8 +49,8 @@ There are no template links in this template.
 |Azure |Azure: Availability state |<p>Availability status of the resource.</p> |DEPENDENT |azure.vm.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure: Availability status detailed |<p>Summary description of the availability status.</p> |DEPENDENT |azure.vm.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure: Percentage CPU |<p>The percentage of allocated compute units that are currently in use by the Virtual Machine(s).</p> |DEPENDENT |azure.vm.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.PercentageCPU.average`</p> |
-|Azure |Azure: Disk read rate |<p>Bytes read from disk during monitoring period (1 minute).</p> |DEPENDENT |azure.vm.disk.read.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DiskReadBytes.total`</p><p>- CHANGE_PER_SECOND</p> |
-|Azure |Azure: Disk write rate |<p>Bytes written to disk during monitoring period (1 minute).</p> |DEPENDENT |azure.vm.disk.write.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DiskWriteBytes.total`</p><p>- CHANGE_PER_SECOND</p> |
+|Azure |Azure: Disk read rate |<p>Bytes read from disk during monitoring period (1 minute).</p> |DEPENDENT |azure.vm.disk.read.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DiskReadBytes.total`</p><p>- MULTIPLIER: `0.0167`</p> |
+|Azure |Azure: Disk write rate |<p>Bytes written to disk during monitoring period (1 minute).</p> |DEPENDENT |azure.vm.disk.write.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DiskWriteBytes.total`</p><p>- MULTIPLIER: `0.0167`</p> |
 |Azure |Azure: Disk read Operations/Sec |<p>Disk read IOPS.</p> |DEPENDENT |azure.vm.disk.read.ops<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DiskReadOperationsSec.average`</p> |
 |Azure |Azure: Disk write Operations/Sec |<p>Disk write IOPS.</p> |DEPENDENT |azure.vm.disk.write.ops<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DiskWriteOperationsSec.average`</p> |
 |Azure |Azure: CPU credits remaining |<p>Total number of credits available to burst. Only available on B-series burstable VMs.</p> |DEPENDENT |azure.vm.cpu.credits.remaining<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.CPUCreditsRemaining.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
@@ -93,8 +93,8 @@ There are no template links in this template.
 |Azure |Azure: VM cached IOPS consumed percentage |<p>Percentage of cached disk IOPS consumed by the VM.</p> |DEPENDENT |azure.vm.cached.iops.consumed.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.VMCachedIOPSConsumedPercentage.average`</p> |
 |Azure |Azure: VM uncached bandwidth consumed percentage |<p>Percentage of uncached disk bandwidth consumed by the VM.</p> |DEPENDENT |azure.vm.uncached.bandwidth.consumed.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.VMUncachedBandwidthConsumedPercentage.average`</p> |
 |Azure |Azure: VM uncached IOPS consumed percentage |<p>Percentage of uncached disk IOPS consumed by the VM.</p> |DEPENDENT |azure.vm.uncached.iops.consumed.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.VMUncachedIOPSConsumedPercentage.average`</p> |
-|Azure |Azure: Network in total |<p>The number of bytes received on all network interfaces by the Virtual Machine(s) (Incoming Traffic).</p> |DEPENDENT |azure.vm.network.in.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.NetworkInTotal.total`</p><p>- MULTIPLIER: `8`</p><p>- CHANGE_PER_SECOND</p> |
-|Azure |Azure: Network out total |<p>The number of bytes out on all network interfaces by the Virtual Machine(s) (Outgoing Traffic).</p> |DEPENDENT |azure.vm.network.out.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.NetworkOutTotal.total`</p><p>- MULTIPLIER: `8`</p><p>- CHANGE_PER_SECOND</p> |
+|Azure |Azure: Network in total |<p>The number of bytes received on all network interfaces by the Virtual Machine(s) (Incoming Traffic).</p> |DEPENDENT |azure.vm.network.in.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.NetworkInTotal.total`</p><p>- MULTIPLIER: `0.1333`</p> |
+|Azure |Azure: Network out total |<p>The number of bytes out on all network interfaces by the Virtual Machine(s) (Outgoing Traffic).</p> |DEPENDENT |azure.vm.network.out.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.NetworkOutTotal.total`</p><p>- MULTIPLIER: `0.1333`</p> |
 |Azure |Azure: Available memory |<p>Amount of physical memory, in bytes, immediately available for allocation to a process or for system use in the Virtual Machine.</p> |DEPENDENT |azure.vm.memory.available<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.AvailableMemoryBytes.average`</p> |
 
 ## Triggers
