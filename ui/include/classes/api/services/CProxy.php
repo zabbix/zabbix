@@ -83,6 +83,8 @@ class CProxy extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
+		$this->validateGet($options);
+
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -108,6 +110,23 @@ class CProxy extends CApiService {
 					$sqlParts
 				);
 			}
+
+			$rt_filter = array_intersect_key($options['filter'], ['version' => '']);
+
+			if ($rt_filter && $rt_filter['version'] !== null) {
+				$this->dbFilter('host_rtdata hv', ['filter' => $rt_filter] + $options,
+					$sqlParts
+				);
+			}
+
+			$rt_filter = array_intersect_key($options['filter'], ['compatibility' => '']);
+
+			if ($rt_filter && $rt_filter['compatibility'] !== null) {
+				$this->dbFilter('host_rtdata hc', ['filter' => $rt_filter] + $options,
+					$sqlParts
+				);
+			}
+
 		}
 
 		// search
@@ -118,7 +137,7 @@ class CProxy extends CApiService {
 		// output
 		$fields = [
 			'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
-			'tls_subject', 'proxy_address', 'auto_compress'
+			'tls_subject', 'proxy_address', 'auto_compress', 'version', 'compatibility'
 		];
 		$options['output'] = ($options['output'] === API_OUTPUT_EXTEND) ? $fields : (array) $options['output'];
 
@@ -497,6 +516,26 @@ class CProxy extends CApiService {
 			$sqlParts = $this->addQuerySelect('hr.lastaccess', $sqlParts);
 		}
 
+		if ((!$options['countOutput'] && $this->outputIsRequested('version', $options['output']))
+				|| (is_array($options['filter']) && array_key_exists('version', $options['filter']))) {
+			$sqlParts['left_join'][] = ['alias' => 'hv', 'table' => 'host_rtdata', 'using' => 'hostid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
+		if (!$options['countOutput'] && $this->outputIsRequested('version', $options['output'])) {
+			$sqlParts = $this->addQuerySelect('hv.version', $sqlParts);
+		}
+
+		if ((!$options['countOutput'] && $this->outputIsRequested('compatibility', $options['output']))
+			|| (is_array($options['filter']) && array_key_exists('compatibility', $options['filter']))) {
+			$sqlParts['left_join'][] = ['alias' => 'hc', 'table' => 'host_rtdata', 'using' => 'hostid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
+		if (!$options['countOutput'] && $this->outputIsRequested('compatibility', $options['output'])) {
+			$sqlParts = $this->addQuerySelect('hc.compatibility', $sqlParts);
+		}
+
 		return $sqlParts;
 	}
 
@@ -539,6 +578,28 @@ class CProxy extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	protected function validateGet(array $options) {
+		// Validate input parameters.
+		// todo: pass the correct data, rewrite the input rules!
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'version' => 		['type' => API_INTS32],
+			'compatibility' => 	['type' => API_INTS32, 'in' => implode(',', [0, 1, 2, 3])]
+		]];
+
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
