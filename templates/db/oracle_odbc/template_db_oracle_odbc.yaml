@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:35Z'
+  date: '2022-07-22T09:19:44Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -22,7 +22,7 @@ zabbix_export:
         The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.
         
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Databases
@@ -94,7 +94,7 @@ zabbix_export:
             FROM v$database
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'Get info about CDB and  No-CDB databases on instansce.'
+          description: 'Get info about CDB and  No-CDB databases on instance.'
           tags:
             -
               tag: component
@@ -142,7 +142,7 @@ zabbix_export:
             FROM v$pdbs;
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'Get info about PDB databases on instansce.'
+          description: 'Get info about PDB databases on instance.'
           tags:
             -
               tag: component

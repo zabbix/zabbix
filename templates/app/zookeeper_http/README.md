@@ -17,7 +17,7 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to [AdminServer](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver).
+This template works with standalone and cluster instances. Metrics are collected from each Zookeeper node by requests to [AdminServer](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver).
 By default AdminServer is enabled and listens on port 8080.
 You can enable or configure AdminServer parameters according [official documentations](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).
 Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.
@@ -71,7 +71,7 @@ There are no template links in this template.
 |Zookeeper |Zookeeper: Local sessions |<p>Number of local sessions.</p> |DEPENDENT |zookeeper.local_sessions<p>**Preprocessing**:</p><p>- JSONPATH: `$.local_sessions`</p> |
 |Zookeeper |Zookeeper: Drop connections per sec |<p>Rate of connection drops.</p> |DEPENDENT |zookeeper.connection_drop_count.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.connection_drop_count`</p><p>- CHANGE_PER_SECOND</p> |
 |Zookeeper |Zookeeper: Rejected connections per sec |<p>Rate of connection rejected.</p> |DEPENDENT |zookeeper.connection_rejected.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.connection_rejected`</p><p>- CHANGE_PER_SECOND</p> |
-|Zookeeper |Zookeeper: Revalidate connections per sec |<p>Rate ofconnection revalidations.</p> |DEPENDENT |zookeeper.connection_revalidate_count.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.connection_revalidate_count`</p><p>- CHANGE_PER_SECOND</p> |
+|Zookeeper |Zookeeper: Revalidate connections per sec |<p>Rate of connection revalidations.</p> |DEPENDENT |zookeeper.connection_revalidate_count.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.connection_revalidate_count`</p><p>- CHANGE_PER_SECOND</p> |
 |Zookeeper |Zookeeper: Revalidate per sec |<p>Rate of revalidations.</p> |DEPENDENT |zookeeper.revalidate_count.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.revalidate_count`</p><p>- CHANGE_PER_SECOND</p> |
 |Zookeeper |Zookeeper: Latency, max |<p>The maximum amount of time it takes for the server to respond to a client request.</p> |DEPENDENT |zookeeper.max_latency<p>**Preprocessing**:</p><p>- JSONPATH: `$.max_latency`</p> |
 |Zookeeper |Zookeeper: Latency, min |<p>The minimum amount of time it takes for the server to respond to a client request.</p> |DEPENDENT |zookeeper.min_latency<p>**Preprocessing**:</p><p>- JSONPATH: `$.min_latency`</p> |

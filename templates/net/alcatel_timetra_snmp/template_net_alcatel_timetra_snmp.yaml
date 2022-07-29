@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:57Z'
+  date: '2022-07-22T09:13:30Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -20,7 +20,7 @@ zabbix_export:
         TIMETRA-CHASSIS-MIB
         IF-MIB
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -1215,7 +1215,7 @@ zabbix_export:
               description: |
                 MIB: TIMETRA-SYSTEM-MIB
                 The overall status of an equipped power supply.
-                For AC multiple powersupplies, this represents the overall status of the first power supplyin the tray (or shelf).
+                For AC multiple power supplies, this represents the overall status of the first power supply in the tray (or shelf).
                 For any other type, this represents the overall status of the power supply.
                 If tmnxChassisPowerSupply1Status is'deviceStateOk', then all monitored statuses are 'deviceStateOk'.
                 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.
@@ -1252,7 +1252,7 @@ zabbix_export:
               description: |
                 MIB: TIMETRA-SYSTEM-MIB
                 The overall status of an equipped power supply.
-                For AC multiple powersupplies, this represents the overall status of the second power supplyin the tray (or shelf).
+                For AC multiple power supplies, this represents the overall status of the second power supply in the tray (or shelf).
                 For any other type, this field is unused and set to 'deviceNotEquipped'.
                 If tmnxChassisPowerSupply2Status is 'deviceStateOk', then all monitored statuses are 'deviceStateOk'.
                 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.
