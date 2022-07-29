@@ -65,7 +65,7 @@ static void	mock_step_validate(zbx_mock_step_t *step)
 		const char	*value = NULL;
 
 		um_cache_resolve_const(step->cache, step->hostids.values, step->hostids.values_num,
-			step->macros.values[i].key, &value);
+			step->macros.values[i].key, ZBX_MACRO_ENV_NONSECURE, &value);
 
 		if (NULL == step->macros.values[i].value)
 		{

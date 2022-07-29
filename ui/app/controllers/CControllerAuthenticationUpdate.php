@@ -222,6 +222,9 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		if (!$auth_valid) {
+			if (CMessageHelper::getTitle() === null) {
+				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
+			}
 			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
 

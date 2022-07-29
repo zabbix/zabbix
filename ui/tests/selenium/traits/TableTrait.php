@@ -137,8 +137,9 @@ trait TableTrait {
 	 * Get data from chosen column.
 	 *
 	 * @param string $column		Column name, where value should be checked
+	 * @param string $selector		Table selector
 	 */
-	private function getTableResult($column, $selector = 'class:list-table') {
+	private function getTableColumnData($column, $selector = 'class:list-table') {
 		$table = $this->query($selector)->asTable()->one();
 		$result = [];
 		foreach ($table->getRows() as $row) {
