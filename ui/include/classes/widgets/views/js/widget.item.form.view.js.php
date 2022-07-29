@@ -167,7 +167,9 @@ window.widget_item_form = new class {
 						default:
 							document.getElementById('item-value-thresholds-warning').style.display = '';
 					}
-				});
+				}).catch((exception) => {
+				console.log('Could not get value data type of the item:', exception);
+			});
 		}
 	}
 };
