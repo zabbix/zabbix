@@ -7121,7 +7121,8 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 	return SUCCEED;
 }
 
-int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error)
+int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
+		zbx_uint32_t *revision, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
 	zbx_tls_conn_attr_t	attr;
@@ -7131,7 +7132,7 @@ int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uin
 		return FAIL;
 
 	RDLOCK_CACHE;
-
+// check revision and attempt to retrieve host with items here
 	if (NULL == (dc_host = DCfind_host(host)))
 	{
 		UNLOCK_CACHE;
@@ -7163,6 +7164,7 @@ int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uin
 	}
 
 	*hostid = dc_host->hostid;
+	*revision = dc_host->revision;
 
 	UNLOCK_CACHE;
 

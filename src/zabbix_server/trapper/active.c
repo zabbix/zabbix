@@ -170,7 +170,7 @@ out:
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
-		char *error)
+		zbx_uint32_t *revision, char *error)
 {
 	char	*ch_error;
 	int	ret = FAIL, heartbeat;
@@ -185,7 +185,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	}
 
 	/* if host exists then check host connection permissions */
-	if (FAIL == DCcheck_host_permissions(host, sock, hostid, &ch_error))
+	if (FAIL == DCcheck_host_permissions(host, sock, hostid, revision, &ch_error))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
 		zbx_free(ch_error);
@@ -277,6 +277,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 	int			ret = FAIL, i;
 	zbx_uint64_t		hostid;
 	zbx_vector_uint64_t	itemids;
+	zbx_uint32_t		revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -293,8 +294,11 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 	}
 
 	/* no host metadata in older versions of agent */
-	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",  &hostid, error))
+	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",  &hostid, &revision,
+			error))
+	{
 		goto out;
+	}
 
 	zbx_vector_uint64_create(&itemids);
 
@@ -457,6 +461,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	struct zbx_json		json;
 	int			ret = FAIL, i, version;
 	zbx_uint64_t		hostid;
+	zbx_uint32_t		revision, agent_config_revision;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminated string */
 	size_t			interface_alloc = 1;		/* for at least NUL-terminated string */
 	size_t			buffer_size, reserved = 0;
@@ -525,7 +530,17 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 	}
 
-	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, &hostid, error))
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CONFIG_REVISION, tmp, sizeof(tmp), NULL))
+	{
+		agent_config_revision = 0;
+	}
+	else if (FAIL == is_uint32(tmp, &agent_config_revision))
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "\"%s\" is not a valid revision", tmp);
+		goto error;
+	}
+
+	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, &hostid, &revision, error))
 		goto error;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp), NULL) ||
@@ -534,13 +549,17 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		version = ZBX_COMPONENT_VERSION(4, 2);
 	}
 
-	zbx_vector_uint64_create(&itemids);
-
-	get_list_of_active_checks(hostid, &itemids);
-
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)revision);
+
+	zbx_vector_uint64_create(&itemids);
+
+	if (agent_config_revision != revision)
+	{
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+		get_list_of_active_checks(hostid, &itemids);
+	}
 
 	if (0 != itemids.values_num)
 	{

@@ -39,7 +39,7 @@ int	CONFIG_ENABLE_REMOTE_COMMANDS	= 1;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
-int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
+int	CONFIG_REFRESH_ACTIVE_CHECKS	= 5;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
@@ -822,6 +822,7 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
  ******************************************************************************/
 static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 {
+#define MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY	5
 	static char			*active_hosts;
 	zbx_vector_str_t		hostnames;
 	cfg_custom_parameter_parser_t	parser_load_enable_remove_commands, parser_load_key_access_rule;
@@ -873,7 +874,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"StartAgents",			&CONFIG_PASSIVE_FORKS,			TYPE_INT,
 			PARM_OPT,	0,			100},
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,
-			PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
+			PARM_OPT,	MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY,		SEC_PER_HOUR},
 		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
 			PARM_OPT,	1,			1000},
 		{"EnableRemoteCommands",	&parser_load_enable_remove_commands,	TYPE_CUSTOM,
