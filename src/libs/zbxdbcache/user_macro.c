@@ -131,6 +131,7 @@ zbx_um_cache_t	*um_cache_create(void)
 
 	cache = (zbx_um_cache_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_um_cache_t));
 	cache->refcount = 1;
+	cache->revision = 0;
 	zbx_hashset_create_ext(&cache->hosts, 10, um_host_hash, um_host_compare,NULL,
 			__config_shmem_malloc_func, __config_shmem_realloc_func, __config_shmem_free_func);
 
@@ -292,6 +293,7 @@ static zbx_um_host_t	*um_cache_create_host(zbx_um_cache_t *cache, zbx_uint64_t h
 	host = (zbx_um_host_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_um_host_t));
 	host->hostid = hostid;
 	host->refcount = 1;
+	host->revision = cache->revision;
 	zbx_vector_uint64_create_ext(&host->templateids, __config_shmem_malloc_func, __config_shmem_realloc_func,
 			__config_shmem_free_func);
 	zbx_vector_um_macro_create_ext(&host->macros, __config_shmem_malloc_func, __config_shmem_realloc_func,
@@ -320,8 +322,11 @@ static zbx_um_host_t	*um_cache_acquire_host(zbx_um_cache_t *cache, zbx_uint64_t 
 		{
 			um_host_release(*phost);
 			*phost = um_host_dup(*phost);
-			(*phost)->revision = cache->revision;
 		}
+
+		/* hosts are acquired when there are changes to be made, */
+		/* meaning host revision must be updated                 */
+		(*phost)->revision = cache->revision;
 
 		return *phost;
 	}
@@ -851,8 +856,9 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint32_t revision, zbx_
 	{
 		um_cache_release(cache);
 		cache = um_cache_dup(cache);
-		cache->revision = revision;
 	}
+
+	cache->revision = revision;
 
 	um_cache_sync_macros(cache, gmacros, 1);
 	um_cache_sync_macros(cache, hmacros, 2);
@@ -1114,8 +1120,8 @@ void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, 
  *             value          - [IN] the new value (stored in string pool)       *
  *                                                                               *
  *********************************************************************************/
-zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, const zbx_vector_uint64_pair_t *host_macro_ids,
-		const char *value)
+zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, zbx_uint32_t revision,
+		const zbx_vector_uint64_pair_t *host_macro_ids, const char *value)
 {
 	int			i;
 	zbx_vector_um_host_t	hosts;
@@ -1127,6 +1133,8 @@ zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, const zbx_ve
 		um_cache_release(cache);
 		cache = um_cache_dup(cache);
 	}
+
+	cache->revision = revision;
 
 	for (i = 0; i < host_macro_ids->values_num; i++)
 	{
@@ -1178,14 +1186,16 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 	zbx_vector_uint64_t	ids;
 	int			i;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() hosts:%d refcount:%u", __func__, cache->hosts.num_data, cache->refcount);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() hosts:%d refcount:%u revision:%u", __func__, cache->hosts.num_data,
+			cache->refcount, cache->revision);
 
 	zbx_vector_uint64_create(&ids);
 
 	zbx_hashset_iter_reset(&cache->hosts, &iter);
 	while (NULL != (phost = (zbx_um_host_t **)zbx_hashset_iter_next(&iter)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " refcount:%u", (*phost)->hostid, (*phost)->refcount);
+		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " refcount:%u revision:%u", (*phost)->hostid,
+				(*phost)->refcount, (*phost)->revision);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  macros:");
 

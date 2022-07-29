@@ -1631,8 +1631,8 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 					dc_kv->value = NULL;
 				}
 
-				config->um_cache = um_cache_set_value_to_macros(config->um_cache, &dc_kv->macros,
-						dc_kv->value);
+				config->um_cache = um_cache_set_value_to_macros(config->um_cache, config->revision,
+						&dc_kv->macros, dc_kv->value);
 
 				dc_kv->update = 0;
 			}

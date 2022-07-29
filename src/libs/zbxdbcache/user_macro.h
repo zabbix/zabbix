@@ -65,8 +65,8 @@ zbx_um_cache_t	*um_cache_create(void);
 void	um_cache_release(zbx_um_cache_t *cache);
 void	um_macro_release(zbx_um_macro_t *macro);
 
-zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, const zbx_vector_uint64_pair_t *host_macro_ids,
-		const char *value);
+zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, zbx_uint32_t revision,
+		const zbx_vector_uint64_pair_t *host_macro_ids, const char *value);
 
 int	um_macro_check_vault_location(const zbx_um_macro_t *macro, const char *location);
 
