@@ -714,9 +714,10 @@ switch ($data['method']) {
 				'output' => ['value_type'],
 				'itemids' => [$data['itemid'] ?: null]
 			]);
-			$result = $item[0]['value_type'];
+			if ($item) {
+				$result = $item[0]['value_type'];
+			}
 		}
-
 		break;
 
 	default:
