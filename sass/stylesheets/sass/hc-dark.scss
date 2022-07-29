@@ -1201,6 +1201,7 @@ td.inactive-bg {
 }
 
 // Multiline input control.
+
 .multilineinput-control {
 	button {
 		&::after {
@@ -1226,6 +1227,7 @@ td.inactive-bg {
 }
 
 // Time selection.
+
 .ui-tabs-nav {
 	.btn-info {
 		&::after {
@@ -1476,6 +1478,7 @@ td.inactive-bg {
 }
 
 // Overrides.
+
 .overrides-options-list {
 	> li > div {
 		border: 1px solid $ui-tab-bg-selected-color;
@@ -1506,6 +1509,7 @@ td.inactive-bg {
 }
 
 // Widget "Host availability".
+
 .host-avail-widget {
 	td:not(:first-child) {
 		border-left: 1px solid $ui-border-color;
@@ -1519,7 +1523,8 @@ td.inactive-bg {
 	}
 }
 
-// Widget "Navigation tree"
+// Widget "Navigation tree".
+
 .navtree {
 	.tree .tree-item > .tree-row {
 		min-width: 410px;
@@ -1527,6 +1532,7 @@ td.inactive-bg {
 }
 
 // Widget "Problems by severity".
+
 .by-severity-widget {
 	> div {
 		min-width: 65px;
@@ -1539,13 +1545,13 @@ td.inactive-bg {
 	}
 }
 
-// InputSecret and ButtonDropdown
+// InputSecret and ButtonDropdown.
 
 .btn-undo.is-focused {
 	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
 }
 
-// Tabfilter
+// Tabfilter.
 
 .filter-container.tabfilter-container {
 	.icon-filter::before {
@@ -1569,7 +1575,7 @@ td.inactive-bg {
 	}
 }
 
-// HOST INTERFACES
+// Host interfaces.
 
 .interfaces {
 	.interface-row {
@@ -1583,6 +1589,20 @@ td.inactive-bg {
 					background-position: -318px -655px;
 				}
 			}
+		}
+	}
+}
+
+// Section (components/_section.scss).
+
+section {
+	.section-toggle {
+		background-position: -318px -654px;
+	}
+
+	&.section-collapsed {
+		.section-toggle {
+			background-position: -318px -690px;
 		}
 	}
 }

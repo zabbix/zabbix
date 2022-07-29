@@ -1646,16 +1646,17 @@ define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
 // max depth of navigation tree
 define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
 
-// event details widgets
-define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
-define('WIDGET_HAT_EVENTDETAILS',		'hat_eventdetails');
-define('WIDGET_HAT_EVENTACTIONS',		'hat_eventactions');
-define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
-// search widget
-define('WIDGET_SEARCH_HOSTS',			'search_hosts');
-define('WIDGET_SEARCH_HOSTGROUP',		'search_hostgroup');
-define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
-define('WIDGET_SEARCH_TEMPLATEGROUP',	'search_templategroup');
+// event details sections
+define('SECTION_HAT_TRIGGERDETAILS',	'hat_triggerdetails');
+define('SECTION_HAT_EVENTDETAILS',		'hat_eventdetails');
+define('SECTION_HAT_EVENTACTIONS',		'hat_eventactions');
+define('SECTION_HAT_EVENTLIST',			'hat_eventlist');
+
+// search sections
+define('SECTION_SEARCH_HOSTS',			'search_hosts');
+define('SECTION_SEARCH_HOSTGROUP',		'search_hostgroup');
+define('SECTION_SEARCH_TEMPLATES',		'search_templates');
+define('SECTION_SEARCH_TEMPLATEGROUP',	'search_templategroup');
 
 // dashboard widget dynamic state
 define('WIDGET_SIMPLE_ITEM',	0);
@@ -1891,7 +1892,6 @@ define('ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE', 'dashboard-previous-page');
 define('ZBX_STYLE_DASHBOARD_NEXT_PAGE', 'dashboard-next-page');
 define('ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW', 'dashboard-toggle-slideshow');
 define('ZBX_STYLE_DASHBOARD_WIDGET', 'dashboard-widget');
-define('ZBX_STYLE_DASHBOARD_WIDGET_FLUID', 'dashboard-widget-fluid');
 define('ZBX_STYLE_DASHBOARD_WIDGET_HEAD', 'dashboard-widget-head');
 define('ZBX_STYLE_DASHBOARD_WIDGET_FOOT', 'dashboard-widget-foot');
 define('ZBX_STYLE_DASHBOARD_EDIT', 'dashboard-edit');

@@ -63,9 +63,9 @@ class CControllerProfileUpdate extends CController {
 				case 'web.proxies.filter.active':
 				case 'web.scheduledreport.filter.active':
 				case 'web.scripts.filter.active':
-				case 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state':
-				case 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state':
-				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
+				case 'web.search.hats.'.SECTION_SEARCH_HOSTS.'.state':
+				case 'web.search.hats.'.SECTION_SEARCH_TEMPLATES.'.state':
+				case 'web.search.hats.'.SECTION_SEARCH_HOSTGROUP.'.state':
 				case 'web.service.filter.active':
 				case 'web.service_actions.filter.active':
 				case 'web.sidebar.mode':
@@ -81,8 +81,8 @@ class CControllerProfileUpdate extends CController {
 				case 'web.templates.triggers.filter.active':
 				case 'web.token.filter.active':
 				case 'web.toptriggers.filter.active':
-				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state':
-				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state':
+				case 'web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state':
+				case 'web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state':
 				case 'web.user.filter.active':
 				case 'web.user.token.filter.active':
 				case 'web.usergroup.filter.active':

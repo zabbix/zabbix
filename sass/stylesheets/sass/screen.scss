@@ -30,6 +30,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20220519';
 
 @import "components/buttons";
 @import "components/color-picker";
+@import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
 @import "components/dashboard/widget-clock";
 @import "components/dashboard/widget-item";
@@ -45,6 +46,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20220519';
 @import "components/message-box";
 @import "components/radio-list-control";
 @import "components/range-control";
+@import "components/section";
 @import "components/service/info";
 @import "components/subfilter";
 @import "components/svg-graph";
@@ -4868,75 +4870,6 @@ svg {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		line-height: 24px;
-	}
-}
-
-.columns-wrapper {
-	$column-count: (2, 3);
-	$column-size: (
-		5: 5%,
-		10: 10%,
-		15: 15%,
-		20: 20%,
-		33: 33.33333%,
-		35: 35%,
-		40: 40%,
-		50: 50%,
-		75: 75%,
-		90: 90%,
-		95: 95%
-	);
-
-	display: flex;
-	flex-wrap: wrap;
-	align-items: start;
-
-	&.columns-nowrap {
-		flex-wrap: nowrap;
-	}
-
-	// Dynamically generated classes for the columns count:
-	//  .columns-2
-	//  .columns-3
-	@each $count in $column-count {
-		&.columns-#{$count} > {
-			div,
-			li {
-				display: block;
-				flex: 0 0 (100% / $count);
-				max-width: (100% / $count);
-			}
-		}
-	}
-
-	// Dynamically generated classes for the column width:
-	//  .column-5
-	//  .column-10
-	//  .column-15
-	//  .column-20
-	//  .column-33
-	//  .column-35
-	//  .column-40
-	//  .column-50
-	//  .column-75
-	//  .column-90
-	//  .column-95
-	@each $class, $width in $column-size {
-		.column-#{$class} {
-			flex: 0 0 $width;
-			max-width: $width;
-		}
-	}
-
-	.column-center {
-		display: flex;
-		justify-content: center;
-		text-align: center;
-	}
-
-	.column-middle {
-		display: flex;
-		align-items: center;
 	}
 }
 

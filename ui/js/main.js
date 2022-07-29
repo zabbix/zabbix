@@ -688,25 +688,23 @@ function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {
 	});
 }
 
-function changeWidgetState(obj, widgetId, idx) {
-	var widgetObj = jQuery('#' + widgetId + '_widget'),
-		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
-		state = 0;
+/**
+ * Section collapse toggle.
+ *
+ * @param {string}      id
+ * @param {string|null} profile_idx  If not null, stores state in profile.
+ */
+function toggleSection(id, profile_idx) {
+	const section = document.getElementById(id);
+	const toggle = section.querySelector('.section-toggle');
 
-	if (css === 'btn-widget-expand') {
-		jQuery('.body', widgetObj).slideUp(50);
-		jQuery('.dashboard-widget-foot', widgetObj).slideUp(50);
-	}
-	else {
-		jQuery('.body', widgetObj).slideDown(50);
-		jQuery('.dashboard-widget-foot', widgetObj).slideDown(50);
+	let is_collapsed = section.classList.contains('section-collapsed');
 
-		state = 1;
-	}
+	section.classList.toggle('section-collapsed', !is_collapsed);
+	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 
-	obj.title = (state == 1) ? t('S_COLLAPSE') : t('S_EXPAND');
-	if (idx !== '' && typeof idx !== 'undefined') {
-		updateUserProfile(idx, state, []);
+	if (profile_idx !== null) {
+		updateUserProfile(profile_idx, is_collapsed ? '1' : '0', []);
 	}
 }
 
