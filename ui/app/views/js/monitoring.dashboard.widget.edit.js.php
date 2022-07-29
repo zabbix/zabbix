@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -16,24 +17,21 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+?>
 
-#ifndef ZABBIX_PROXYDATA_H
-#define ZABBIX_PROXYDATA_H
 
-#include "zbxjson.h"
-#include "dbcache.h"
+window.widget_form = new class {
+	init() {
+		document.getElementById('type').addEventListener('change', () => ZABBIX.Dashboard.reloadWidgetProperties());
 
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_TRAPPER_TIMEOUT;
+		document.getElementById('widget-dialogue-form').addEventListener('change', (e) => {
+			const is_trimmable = e.target.matches(
+				'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])'
+			);
 
-void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts);
-void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts);
-void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts);
-
-int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info, int status,
-		int upload_status);
-
-int	init_proxy_history_lock(char **error);
-void	free_proxy_history_lock(void);
-
-#endif
+			if (is_trimmable) {
+				e.target.value = e.target.value.trim();
+			}
+		}, {capture: true});
+	}
+};
