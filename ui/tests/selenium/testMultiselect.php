@@ -66,6 +66,8 @@ class testMultiselect extends CWebTest {
 		$element = $field->query('tag:input')->one();
 		$element->type('Zabbix server');
 		$this->query('class:multiselect-matches')->waitUntilVisible();
+		// Tags table change elements layout when not fully loaded..
+		$this->query('xpath://table[@id="filter-tags"]//tr[@class="form_row"]')->waitUntilVisible();
 		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(),
 			[$element]
 		);
