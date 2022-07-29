@@ -21,14 +21,12 @@ package zbxcomms
 
 import (
 	"bytes"
-	"context"
 	"compress/zlib"
 	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
 	"net"
-	"syscall"
 	"time"
 
 	"zabbix.com/pkg/log"
