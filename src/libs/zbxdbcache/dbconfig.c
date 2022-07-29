@@ -921,7 +921,10 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 					sizeof(ZBX_DC_AUTOREG_HOST));
 		}
 		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process duplicate host '%s' in autoreg_host table", row[0]);
 			found = 1;
+		}
 
 		dc_strpool_replace(found, &autoreg_host->host, row[0]);
 		dc_strpool_replace(found, &autoreg_host->listen_ip, row[1]);
