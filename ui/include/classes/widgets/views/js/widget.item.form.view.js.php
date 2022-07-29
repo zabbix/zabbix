@@ -149,10 +149,10 @@ window.widget_item_form = new class {
 		if (ms_item_data.length) {
 			const curl = new Curl('jsrpc.php', false);
 			curl.setArgument('method', 'item_value_type.get');
-			curl.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
+			curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 			curl.setArgument('itemid', ms_item_data[0].id);
 
-			return fetch(curl.getUrl(), {
+			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({itemid: ms_item_data[0].id})
