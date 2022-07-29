@@ -1220,6 +1220,14 @@ int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlD
 
 	ret = SUCCEED;
 
+	if (XPATH_STRING == xpathObj->type)
+	{
+		if ('\0' != *xpathObj->stringval)
+			*value = zbx_strdup(NULL, (const char *)xpathObj->stringval);
+
+		goto clean;
+	}
+
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 		goto clean;
 
