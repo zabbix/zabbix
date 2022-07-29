@@ -38,7 +38,7 @@ typedef struct
 	const unsigned char	*expression_bin;
 	const unsigned char	*recovery_expression_bin;
 	int			lastchange;
-	int			revision;
+	zbx_uint32_t		revision;
 	int			timer_revision;
 	unsigned char		topoindex;
 	unsigned char		priority;
@@ -81,7 +81,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*function;
 	const char	*parameter;
-	int		revision;
+	zbx_uint32_t	revision;
 	int		timer_revision;
 	unsigned char	type;
 }
@@ -104,6 +104,7 @@ typedef struct
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
+	zbx_uint32_t		revision;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
@@ -329,6 +330,7 @@ typedef struct
 	const char	*name;
 	int		maintenance_from;
 	int		data_expected_from;
+	zbx_uint32_t	revision;
 
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
@@ -766,10 +768,13 @@ typedef struct
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
 	int			item_sync_ts;
-	int			sync_start_ts;
 
 	unsigned int		internal_actions;		/* number of enabled internal actions */
 	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */
+
+	zbx_uint32_t		revision;
+	zbx_uint32_t		expression_revision;
+
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */
 	zbx_uint64_t		*maintenance_update_flags;	/* Array of flags to manage timer maintenance updates.*/
@@ -915,7 +920,7 @@ char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int h
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
 
 
-zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_dbsync_t *hmacros,
-		zbx_dbsync_t *htmpls);
+zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache,  zbx_uint32_t revision, zbx_dbsync_t *gmacros,
+		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls);
 
 #endif

@@ -320,6 +320,7 @@ static zbx_um_host_t	*um_cache_acquire_host(zbx_um_cache_t *cache, zbx_uint64_t 
 		{
 			um_host_release(*phost);
 			*phost = um_host_dup(*phost);
+			(*phost)->revision = cache->revision;
 		}
 
 		return *phost;
@@ -837,8 +838,8 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
  * Purpose: sync user macro cache                                                *
  *                                                                               *
  *********************************************************************************/
-zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_dbsync_t *hmacros,
-		zbx_dbsync_t *htmpls)
+zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint32_t revision, zbx_dbsync_t *gmacros,
+		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls)
 {
 	if (ZBX_DBSYNC_INIT != gmacros->mode && ZBX_DBSYNC_INIT != hmacros->mode && ZBX_DBSYNC_INIT != htmpls->mode &&
 			0 == gmacros->rows.values_num && 0 == hmacros->rows.values_num && 0 == htmpls->rows.values_num)
@@ -850,6 +851,7 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_
 	{
 		um_cache_release(cache);
 		cache = um_cache_dup(cache);
+		cache->revision = revision;
 	}
 
 	um_cache_sync_macros(cache, gmacros, 1);
