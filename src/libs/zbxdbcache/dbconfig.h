@@ -356,6 +356,7 @@ typedef struct
 	const char	*listen_dns;
 	const char	*host_metadata;
 	int		flags;
+	int		timestamp;
 	unsigned short	listen_port;
 }
 ZBX_DC_AUTOREG_HOST;

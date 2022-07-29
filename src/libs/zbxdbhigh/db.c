@@ -1864,7 +1864,7 @@ void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts)
  *                                                                            *
  ******************************************************************************/
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		unsigned int connection_type, const char *host_metadata, unsigned short flag)
+		unsigned int connection_type, const char *host_metadata, unsigned short flag, int now)
 {
 	char	*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 
@@ -1877,7 +1877,7 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
 			" (clock,host,listen_ip,listen_dns,listen_port,tls_accepted,host_metadata,flags)"
 			" values"
 			" (%d,'%s','%s','%s',%d,%u,'%s',%d)",
-			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port, connection_type, host_metadata_esc,
+			now, host_esc, ip_esc, dns_esc, (int)port, connection_type, host_metadata_esc,
 			(int)flag);
 
 	zbx_free(host_metadata_esc);

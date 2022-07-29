@@ -7159,7 +7159,7 @@ int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uin
 }
 
 int	DCis_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface)
+		zbx_conn_flags_t flag, const char *interface, int now, int heartbeat)
 {
 	const ZBX_DC_AUTOREG_HOST	*dc_autoreg_host;
 	int				ret;
@@ -7188,6 +7188,10 @@ int	DCis_autoreg_host_changed(const char *host, unsigned short port, const char 
 	{
 		ret = SUCCEED;
 	}
+	else if (0 != heartbeat && heartbeat < now - dc_autoreg_host->timestamp)
+	{
+		ret = SUCCEED;
+	}
 	else
 		ret = FAIL;
 
@@ -7197,7 +7201,7 @@ int	DCis_autoreg_host_changed(const char *host, unsigned short port, const char 
 }
 
 void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
-		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags)
+		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now)
 {
 	ZBX_DC_AUTOREG_HOST	*dc_autoreg_host, dc_autoreg_host_local;
 	int			found;
@@ -7222,6 +7226,7 @@ void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const
 	dc_strpool_replace(found, &dc_autoreg_host->listen_dns, listen_dns);
 	dc_strpool_replace(found, &dc_autoreg_host->host_metadata, host_metadata);
 	dc_autoreg_host->flags = flags;
+	dc_autoreg_host->timestamp = now;
 	dc_autoreg_host->listen_port = listen_port;
 
 	UNLOCK_CACHE;

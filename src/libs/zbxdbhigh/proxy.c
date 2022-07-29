@@ -4453,7 +4453,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 		DBbegin();
 		DBregister_host_flush(&autoreg_hosts, proxy_hostid);
 		DBcommit();
-
 		DCconfig_delete_autoreg_host(&autoreg_hosts);
 	}
 

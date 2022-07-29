@@ -28,6 +28,8 @@
 
 extern unsigned char	program_type;
 
+#define PROXY_AUTO_REGISTRATION_HEARTBEAT	120
+
 /******************************************************************************
  *                                                                            *
  * Purpose: perform active agent auto registration                            *
@@ -51,6 +53,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
 	const char	*p;
 	const char	*p_ip, *p_dns;
+	int		now;
 
 	p_ip = ip;
 	p_dns = dns;
@@ -76,8 +79,10 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	}
 	zbx_alarm_off();
 
+	now = time(NULL);
+
 	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
-	DCconfig_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag);
+	DCconfig_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now);
 
 	do
 	{
@@ -85,11 +90,14 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
-					(int)time(NULL));
+			DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
+					(unsigned short)flag, now);
 		}
-		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
-			DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag);
+		else
+		{
+			DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata,
+					(unsigned short)flag, now);
+		}
 	}
 	while (ZBX_DB_DOWN == DBcommit());
 }
@@ -165,7 +173,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		char *error)
 {
 	char	*ch_error;
-	int	ret = FAIL;
+	int	ret = FAIL, heartbeat;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
 
@@ -184,6 +192,11 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		goto out;
 	}
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		heartbeat = PROXY_AUTO_REGISTRATION_HEARTBEAT;
+	else
+		heartbeat = 0;
+
 	/* if host does not exist then check autoregistration connection permissions */
 	if (0 == *hostid)
 	{
@@ -193,7 +206,8 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		{
 			if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
 			{
-				if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface))
+				if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface,
+						(int)time(NULL), heartbeat))
 				{
 					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
 							interface);
@@ -206,8 +220,11 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != DCget_auto_registration_action_count())
 	{
-		if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface))
+		if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL),
+				heartbeat))
+		{
 			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+		}
 	}
 
 	ret = SUCCEED;

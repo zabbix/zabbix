@@ -769,7 +769,7 @@ int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **inte
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
 
 void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
-		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags);
+		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now);
 void	DCconfig_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
 
 #define ZBX_HK_OPTION_DISABLED		0
@@ -819,7 +819,7 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
 int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
 int	DCis_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface);
+		zbx_conn_flags_t flag, const char *interface, int now, int heartbeat);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage);
