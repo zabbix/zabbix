@@ -17,7 +17,7 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to [AdminServer](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver).
+This template works with standalone and cluster instances. Metrics are collected from each Zookeeper node by requests to [AdminServer](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver).
 By default AdminServer is enabled and listens on port 8080.
 You can enable or configure AdminServer parameters according [official documentations](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).
 Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.
@@ -71,7 +71,7 @@ There are no template links in this template.
 |Zookeeper |Zookeeper: Local sessions |<p>Number of local sessions.</p> |DEPENDENT |zookeeper.local_sessions<p>**Preprocessing**:</p><p>- JSONPATH: `$.local_sessions`</p> |
 |Zookeeper |Zookeeper: Drop connections per sec |<p>Rate of connection drops.</p> |DEPENDENT |zookeeper.connection_drop_count.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.connection_drop_count`</p><p>- CHANGE_PER_SECOND</p> |
 |Zookeeper |Zookeeper: Rejected connections per sec |<p>Rate of connection rejected.</p> |DEPENDENT |zookeeper.connection_rejected.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.connection_rejected`</p><p>- CHANGE_PER_SECOND</p> |
-|Zookeeper |Zookeeper: Revalidate connections per sec |<p>Rate ofconnection revalidations.</p> |DEPENDENT |zookeeper.connection_revalidate_count.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.connection_revalidate_count`</p><p>- CHANGE_PER_SECOND</p> |
+|Zookeeper |Zookeeper: Revalidate connections per sec |<p>Rate of connection revalidations.</p> |DEPENDENT |zookeeper.connection_revalidate_count.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.connection_revalidate_count`</p><p>- CHANGE_PER_SECOND</p> |
 |Zookeeper |Zookeeper: Revalidate per sec |<p>Rate of revalidations.</p> |DEPENDENT |zookeeper.revalidate_count.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.revalidate_count`</p><p>- CHANGE_PER_SECOND</p> |
 |Zookeeper |Zookeeper: Latency, max |<p>The maximum amount of time it takes for the server to respond to a client request.</p> |DEPENDENT |zookeeper.max_latency<p>**Preprocessing**:</p><p>- JSONPATH: `$.max_latency`</p> |
 |Zookeeper |Zookeeper: Latency, min |<p>The minimum amount of time it takes for the server to respond to a client request.</p> |DEPENDENT |zookeeper.min_latency<p>**Preprocessing**:</p><p>- JSONPATH: `$.min_latency`</p> |
@@ -106,7 +106,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Zookeeper: Server mode has changed |<p>Zookeeper node state has changed. Ack to close.</p> |`last(/Zookeeper by HTTP/zookeeper.server_state,#1)<>last(/Zookeeper by HTTP/zookeeper.server_state,#2) and length(last(/Zookeeper by HTTP/zookeeper.server_state))>0` |INFO |<p>Manual close: YES</p> |
-|Zookeeper: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Zookeeper by HTTP/zookeeper.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Zookeeper: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Zookeeper by HTTP/zookeeper.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |Zookeeper: Failed to fetch info data |<p>Zabbix has not received data for items for the last 10 minutes</p> |`nodata(/Zookeeper by HTTP/zookeeper.uptime,10m)=1` |WARNING |<p>Manual close: YES</p> |
 |Zookeeper: Version has changed |<p>Zookeeper version has changed. Ack to close.</p> |`last(/Zookeeper by HTTP/zookeeper.version,#1)<>last(/Zookeeper by HTTP/zookeeper.version,#2) and length(last(/Zookeeper by HTTP/zookeeper.version))>0` |INFO |<p>Manual close: YES</p> |
 |Zookeeper: Too many file descriptors used |<p>Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.</p> |`min(/Zookeeper by HTTP/zookeeper.open_file_descriptor_count,5m) * 100 / last(/Zookeeper by HTTP/zookeeper.max_file_descriptor_count) > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}` |WARNING | |

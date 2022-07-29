@@ -165,8 +165,8 @@ There are no template links in this template.
 |Zabbix raw items |Oracle: Get FRA stats |<p>Get FRA statistics.</p> |ZABBIX_PASSIVE |oracle.fra.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get SGA stats |<p>Get SGA statistics.</p> |ZABBIX_PASSIVE |oracle.sga.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get tablespaces stats |<p>Get tablespaces stats.</p> |ZABBIX_PASSIVE |oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
-|Zabbix raw items |Oracle: Get CDB and No-CDB info |<p>Get info about CDB and  No-CDB databases on instansce.</p> |ZABBIX_PASSIVE |oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
-|Zabbix raw items |Oracle: Get PDB info |<p>Get info about PDB databases on instansce.</p> |ZABBIX_PASSIVE |oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
+|Zabbix raw items |Oracle: Get CDB and No-CDB info |<p>Get info about CDB and  No-CDB databases on instance.</p> |ZABBIX_PASSIVE |oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
+|Zabbix raw items |Oracle: Get PDB info |<p>Get info about PDB databases on instance.</p> |ZABBIX_PASSIVE |oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get archive log info | |ZABBIX_PASSIVE |oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get ASM stats |<p>Get ASM disk groups stats.</p> |ZABBIX_PASSIVE |oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 
@@ -177,7 +177,7 @@ There are no template links in this template.
 |Oracle: Connection to database is unavailable |<p>Connection to Oracle Database is currently unavailable.</p> |`last(/Oracle by Zabbix agent 2/oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"])=0` |DISASTER | |
 |Oracle: Version has changed |<p>Oracle DB version has changed. Ack to close.</p> |`last(/Oracle by Zabbix agent 2/oracle.version,#1)<>last(/Oracle by Zabbix agent 2/oracle.version,#2) and length(last(/Oracle by Zabbix agent 2/oracle.version))>0` |INFO |<p>Manual close: YES</p> |
 |Oracle: Failed to fetch info data |<p>Zabbix has not received data for items for the last 5 minutes. The database might be unavailable for connecting.</p> |`nodata(/Oracle by Zabbix agent 2/oracle.uptime,30m)=1` |INFO | |
-|Oracle: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Oracle by Zabbix agent 2/oracle.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Oracle: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Oracle by Zabbix agent 2/oracle.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |Oracle: Instance name has changed |<p>Oracle DB Instance name has changed. Ack to close.</p> |`last(/Oracle by Zabbix agent 2/oracle.instance_name,#1)<>last(/Oracle by Zabbix agent 2/oracle.instance_name,#2) and length(last(/Oracle by Zabbix agent 2/oracle.instance_name))>0` |INFO |<p>Manual close: YES</p> |
 |Oracle: Instance hostname has changed |<p>Oracle DB Instance hostname has changed. Ack to close.</p> |`last(/Oracle by Zabbix agent 2/oracle.instance_hostname,#1)<>last(/Oracle by Zabbix agent 2/oracle.instance_hostname,#2) and length(last(/Oracle by Zabbix agent 2/oracle.instance_hostname))>0` |INFO |<p>Manual close: YES</p> |
 |Oracle: Shared pool free is too low |<p>The shared pool free memory percent has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% in the last 5 minutes.</p> |`max(/Oracle by Zabbix agent 2/oracle.shared_pool_free,5m)<{$ORACLE.SHARED.FREE.MIN.WARN}` |WARNING | |
