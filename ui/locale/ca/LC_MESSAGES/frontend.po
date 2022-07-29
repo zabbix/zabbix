@@ -11439,6 +11439,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr ""
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr ""
