@@ -500,57 +500,11 @@ class testAgentItems extends CIntegrationTest {
 			'fields_exec' => ['user', 'group', 'uid', 'gid', 'threads'],
 			'result' => [
 				[
-					'user' => 'ps --no-headers -o euser:1 -C zabbix_agentd',
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agentd',
 					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agentd',
-					'uid' => 'ps --no-headers -o euid:1 -C zabbix_agentd',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agentd',
 					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agentd',
 					'threads' => 'ps --no-headers -o nlwp:1 -C zabbix_agentd'
-				]
-			]
-		],
-		[
-			'key' => 'proc.get[zabbix_agent2]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT,
-			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'json' => JSON_COMPARE_LEFT,
-			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid'],
-			'result' => [
-				[
-					'pid' => 'pgrep zabbix_agent2',
-					'ppid' => 'ps --no-headers -o ppid:1 -C zabbix_agent2',
-					'cmdline' => 'ps --no-headers -o cmd:1 -C zabbix_agent2',
-					'user' => 'ps --no-headers -o euser:1 -C zabbix_agent2',
-					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agent2',
-					'uid' => 'ps --no-headers -o euid:1 -C zabbix_agent2',
-					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agent2'
-				]
-			]
-		],
-		[
-			'key' => 'proc.get[zabbix_agent2,,,thread]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT,
-			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'json' => JSON_COMPARE_LEFT,
-			'result' => [
-				[
-					'name' => 'zabbix_agent2',
-					'tname' => 'zabbix_agent2'
-				]
-			]
-		],
-		[
-			'key' => 'proc.get[zabbix_agentd,,,summary]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT,
-			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'json' => JSON_COMPARE_LEFT,
-			'result' => [
-				[
-					'name' => 'zabbix_agentd',
-					'processes' => 6,
-					'threads' => 6
 				]
 			]
 		],
@@ -563,11 +517,30 @@ class testAgentItems extends CIntegrationTest {
 			'fields_exec' => ['user', 'group', 'uid', 'gid', 'threads'],
 			'result' => [
 				[
-					'user' => 'ps --no-headers -o euser:1 -C zabbix_agentd',
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agentd',
 					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agentd',
-					'uid' => 'ps --no-headers -o euid:1 -C zabbix_agentd',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agentd',
 					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agentd',
 					'threads' => 'ps --no-headers -o nlwp:1 -C zabbix_agentd'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid'],
+			'result' => [
+				[
+					'pid' => 'pgrep zabbix_agent2',
+					'ppid' => 'ps --no-headers -o ppid:1 -C zabbix_agent2',
+					'cmdline' => 'ps --no-headers -o cmd:1 -C zabbix_agent2',
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agent2',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agent2',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agent2',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agent2'
 				]
 			]
 		],
@@ -583,10 +556,25 @@ class testAgentItems extends CIntegrationTest {
 					'pid' => 'pgrep zabbix_agent2',
 					'ppid' => 'ps --no-headers -o ppid:1 -C zabbix_agent2',
 					'cmdline' => 'ps --no-headers -o cmd:1 -C zabbix_agent2',
-					'user' => 'ps --no-headers -o euser:1 -C zabbix_agent2',
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agent2',
 					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agent2',
-					'uid' => 'ps --no-headers -o euid:1 -C zabbix_agent2',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agent2',
 					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2,,,thread]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['tid'],
+			'result' => [
+				[
+					'name' => 'zabbix_agent2',
+					'tname' => 'zabbix_agent2',
+					'tid' => 'ps --no-headers -o tid:1 -C zabbix_agent2'
 				]
 			]
 		],
@@ -596,10 +584,27 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['tid'],
 			'result' => [
 				[
 					'name' => 'zabbix_agent2',
-					'tname' => 'zabbix_agent2'
+					'tname' => 'zabbix_agent2',
+					'tid' => 'ps --no-headers -o tid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd,,,summary]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['processes', 'threads'],
+			'result' => [
+				[
+					'name' => 'zabbix_agentd',
+					'processes' => 'ps --no-headers -C zabbix_agentd | wc -l',
+					'threads' => 'ps --no-headers -T -C zabbix_agentd | wc -l'
 				]
 			]
 		],
@@ -609,11 +614,12 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['processes', 'threads'],
 			'result' => [
 				[
 					'name' => 'zabbix_agentd',
-					'processes' => 6,
-					'threads' => 6
+					'processes' => 'ps --no-headers -C zabbix_agentd | wc -l',
+					'threads' => 'ps --no-headers -T -C zabbix_agentd | wc -l'
 				]
 			]
 		]
