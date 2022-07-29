@@ -7227,6 +7227,51 @@ void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const
 	UNLOCK_CACHE;
 }
 
+void	DCconfig_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts)
+{
+	ZBX_DC_AUTOREG_HOST	*autoreg_host, autoreg_host_local;
+	int			cached = 0, i;
+
+	/* hosts monitored by Zabbix proxy shouldn't be changed too frequently */
+	if (0 == autoreg_hosts->values_num)
+		return;
+
+	/* hosts monitored by Zabbix proxy shouldn't be in cache */
+	RDLOCK_CACHE;
+	for (i = 0; i < autoreg_hosts->values_num; i++)
+	{
+		autoreg_host_local.host = ((const zbx_autoreg_host_t *)autoreg_hosts->values[i])->host;
+		if (NULL != zbx_hashset_search(&config->autoreg_hosts, &autoreg_host_local))
+			cached++;
+	}
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "moved:%d hosts from Zabbix server to Zabbix proxy", cached);
+
+	if (0 == cached)
+		return;
+
+	WRLOCK_CACHE;
+
+	for (i = 0; i < autoreg_hosts->values_num; i++)
+	{
+		autoreg_host_local.host = ((const zbx_autoreg_host_t *)autoreg_hosts->values[i])->host;
+		autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_search(&config->autoreg_hosts, &autoreg_host_local);
+
+		if (NULL != autoreg_host)
+		{
+			dc_strpool_release(autoreg_host->host);
+			dc_strpool_release(autoreg_host->listen_ip);
+			dc_strpool_release(autoreg_host->listen_dns);
+			dc_strpool_release(autoreg_host->host_metadata);
+
+			zbx_hashset_remove_direct(&config->autoreg_hosts, autoreg_host);
+		}
+	}
+
+	UNLOCK_CACHE;
+}
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *

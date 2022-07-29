@@ -49,21 +49,6 @@
 #	define	ZBX_SQL_EXEC_FROM	0
 #endif
 
-typedef struct
-{
-	zbx_uint64_t	autoreg_hostid;
-	zbx_uint64_t	hostid;
-	char		*host;
-	char		*ip;
-	char		*dns;
-	char		*host_metadata;
-	int		now;
-	unsigned short	port;
-	unsigned short	flag;
-	unsigned int	connection_type;
-}
-zbx_autoreg_host_t;
-
 #if defined(HAVE_POSTGRESQL)
 extern char	ZBX_PG_ESCAPE_BACKSLASH;
 #endif
