@@ -52,9 +52,6 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	const char	*p;
 	const char	*p_ip, *p_dns;
 
-	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
-	DCconfig_update_autoreg_host(host, port, host_metadata, flag, interface);
-
 	p_ip = ip;
 	p_dns = dns;
 
@@ -78,6 +75,9 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 		p_dns = interface;
 	}
 	zbx_alarm_off();
+
+	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
+	DCconfig_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag);
 
 	do
 	{

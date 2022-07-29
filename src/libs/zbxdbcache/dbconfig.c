@@ -518,7 +518,7 @@ static ZBX_DC_AUTOREG_HOST	*DCfind_autoreg_host(const char *host)
 {
 	ZBX_DC_AUTOREG_HOST	autoreg_host_local;
 
-	autoreg_host_local.host = (char *)host;
+	autoreg_host_local.host = host;
 
 	return (ZBX_DC_AUTOREG_HOST *)zbx_hashset_search(&config->autoreg_hosts, &autoreg_host_local);
 }
@@ -7196,8 +7196,8 @@ int	DCis_autoreg_host_changed(const char *host, unsigned short port, const char 
 	return ret;
 }
 
-void	DCconfig_update_autoreg_host(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface)
+void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
+		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags)
 {
 	ZBX_DC_AUTOREG_HOST	*dc_autoreg_host, dc_autoreg_host_local;
 	int			found;
@@ -7218,22 +7218,11 @@ void	DCconfig_update_autoreg_host(const char *host, unsigned short port, const c
 		found = 1;
 
 	dc_strpool_replace(found, &dc_autoreg_host->host, host);
-	dc_autoreg_host->listen_port = port;
+	dc_strpool_replace(found, &dc_autoreg_host->listen_ip, listen_ip);
+	dc_strpool_replace(found, &dc_autoreg_host->listen_dns, listen_dns);
 	dc_strpool_replace(found, &dc_autoreg_host->host_metadata, host_metadata);
-	dc_autoreg_host->flags = flag;
-
-	switch(flag)
-	{
-		case ZBX_CONN_IP:
-			dc_strpool_replace(found, &dc_autoreg_host->listen_ip, interface);
-			break;
-		case ZBX_CONN_DNS:
-			dc_strpool_replace(found, &dc_autoreg_host->listen_dns, interface);
-			break;
-		default:
-			dc_strpool_replace(found, &dc_autoreg_host->listen_ip, "");
-			dc_strpool_replace(found, &dc_autoreg_host->listen_dns, "");
-	}
+	dc_autoreg_host->flags = flags;
+	dc_autoreg_host->listen_port = listen_port;
 
 	UNLOCK_CACHE;
 }

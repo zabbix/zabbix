@@ -753,8 +753,8 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
 
-void	DCconfig_update_autoreg_host(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface);
+void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
+		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags);
 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
