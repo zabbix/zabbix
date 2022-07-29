@@ -58,7 +58,7 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 	if (NULL == item->interface.addr || '\0' == *(item->interface.addr))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL,
-				"SSH checks must have ip parameter or the host interface to be specified."));
+				"SSH checks must have IP parameter or the host interface to be specified."));
 		goto out;
 	}
 
