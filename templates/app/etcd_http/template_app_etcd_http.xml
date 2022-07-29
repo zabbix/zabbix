@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-03-03T15:01:42Z</date>
+   <date>2022-07-21T11:05:07Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -1145,7 +1145,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <expression>{last()}&lt;10m</expression>
                      <name>Etcd: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -1427,7 +1427,7 @@ return JSON.stringify(result);</params>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Etcd: Etcd peer {#ETCD.PEER}: Receive failures failures</name>
+                     <name>Etcd: Etcd peer {#ETCD.PEER}: Receive failures</name>
                      <type>DEPENDENT</type>
                      <key>etcd.received.fail.rate[{#ETCD.PEER}]</key>
                      <delay>0</delay>
