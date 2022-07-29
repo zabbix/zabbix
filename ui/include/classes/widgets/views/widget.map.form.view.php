@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,37 +21,32 @@
 
 /**
  * Map widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
-);
-
 $scripts = [];
 
-// Map widget reference.
-$field = $fields[CWidgetFieldReference::FIELD_NAME];
-$form->addVar($field->getName(), $field->getValue());
-
-// Source.
-$form_list->addRow(
-	CWidgetHelper::getLabel($fields['source_type']),
-	CWidgetHelper::getRadioButtonList($fields['source_type'])
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
 );
 
-// Filter.
-if (array_key_exists('filter_widget_reference', $fields)) {
-	$form_list->addRow(
-		CWidgetHelper::getLabel($fields['filter_widget_reference']),
-		CWidgetHelper::getEmptySelect($fields['filter_widget_reference'])
-	);
-	$scripts[] = $fields['filter_widget_reference']->getJavascript();
-}
+// Map widget reference.
+$form->addVar($fields[CWidgetFieldReference::FIELD_NAME]->getName(),
+	$fields[CWidgetFieldReference::FIELD_NAME]->getValue()
+);
+
+// Source type.
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['source_type']),
+	new CFormField(CWidgetHelper::getRadioButtonList($fields['source_type']))
+]);
 
 // Map.
 if (array_key_exists('sysmapid', $fields)) {
@@ -59,14 +54,30 @@ if (array_key_exists('sysmapid', $fields)) {
 
 	$form->addVar($field->getName(), $field->getValue());
 
-	$field_sysmapid = CWidgetHelper::getSelectResource($field,
-		($field->getValue() != 0) ? $data['captions']['simple'][$field->getResourceType()][$field->getValue()] : '',
-		$form->getName()
-	);
-	$form_list->addRow(CWidgetHelper::getLabel($field), $field_sysmapid);
+	$form_grid->addItem([
+		CWidgetHelper::getLabel($field),
+		new CFormField(
+			CWidgetHelper::getSelectResource(
+				$field,
+				$field->getValue() != 0
+					? $data['captions']['simple'][$field->getResourceType()][$field->getValue()]
+					: '',
+				$form->getName()
+			)
+		)
+	]);
 }
 
-$form->addItem($form_list);
+// Filter.
+if (array_key_exists('filter_widget_reference', $fields)) {
+	$form_grid->addItem([
+		CWidgetHelper::getLabel($fields['filter_widget_reference']),
+		new CFormField(CWidgetHelper::getEmptySelect($fields['filter_widget_reference']))
+	]);
+	$scripts[] = $fields['filter_widget_reference']->getJavascript();
+}
+
+$form->addItem($form_grid);
 
 return [
 	'form' => $form,
