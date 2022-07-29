@@ -1186,7 +1186,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_free_config();
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_parent();
+	zbx_tls_init_parent(get_program_type);
 #endif
 	/* --- START THREADS ---*/
 

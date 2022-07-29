@@ -506,9 +506,9 @@ int	main(int argc, char **argv)
 		if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 		{
 #if defined(_WINDOWS)
-			zbx_tls_init_parent();
+			zbx_tls_init_parent(get_program_type);
 #endif
-			zbx_tls_init_child(zbx_config_tls);
+			zbx_tls_init_child(zbx_config_tls, get_program_type);
 		}
 #else
 		ZBX_UNUSED(get_program_type);

@@ -1352,7 +1352,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_parent();
+	zbx_tls_init_parent(get_program_type);
 #endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
