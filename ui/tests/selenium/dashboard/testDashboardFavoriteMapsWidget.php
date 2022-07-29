@@ -18,15 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+
+use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup profiles
  *
  * @onBefore prepareDashboardData
  */
-class testDashboardFavoriteMapsWidget extends CWebTest {
+class testDashboardFavoriteMapsWidget extends CLegacyWebTest {
 
+	protected static $dashboardid;
 	public $mapTest = 'Test map 1';
 	public $mapTestId = 3;
 

@@ -388,7 +388,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardGeomapWidget');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
-		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
+		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
 		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
 		$suite->addTestSuite('testDashboardForm');
 		$suite->addTestSuite('testDashboardGraphWidget');

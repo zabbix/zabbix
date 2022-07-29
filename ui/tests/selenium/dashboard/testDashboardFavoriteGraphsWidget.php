@@ -18,15 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+
+use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup profiles
  *
  * @onBefore prepareDashboardData
  */
-class testDashboardFavoriteGraphsWidget extends CWebTest {
+class testDashboardFavoriteGraphsWidget extends CLegacyWebTest {
 
+	protected static $dashboardid;
 	public $graphCpu = 'CPU utilization';
 	public $hostName = 'ЗАББИКС Сервер';
 	public $graphMemory = 'Available memory in %';

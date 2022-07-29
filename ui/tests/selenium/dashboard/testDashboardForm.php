@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
- * @backup dashboard
+ * @backup dashboard, profiles
  *
  * @onBefore prepareDashboardData
  */
