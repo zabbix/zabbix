@@ -1261,7 +1261,7 @@ static void	zbx_db_save_server_status()
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_json_addstring(&json, "server_version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_close(&json);
 

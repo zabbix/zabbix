@@ -4917,7 +4917,7 @@ static void	zbx_db_update_proxy_version(DC_PROXY *proxy, zbx_proxy_diff_t *diff)
 				"update host_rtdata"
 				" set version=%d, compatibility=%d"
 				" where hostid=" ZBX_FS_UI64,
-				ZBX_COMPONENT_VERSION_TO_DB_FORMAT(diff->version), diff->proxy_compatibility,
+				ZBX_COMPONENT_VERSION_TO_DEC_FORMAT(diff->version), diff->proxy_compatibility,
 				diff->hostid))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Failed to update proxy version and compatibility with server for"

@@ -1631,13 +1631,13 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc);
 char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);
 
-#define ZBX_COMPONENT_VERSION(major, minor, patch)	((major << 20) | (minor << 10) | patch)
-#define ZBX_COMPONENT_VERSION_MAJOR(version)		(((zbx_uint32_t)(version) >> 20) & 0x3ff)
-#define ZBX_COMPONENT_VERSION_MINOR(version)		(((zbx_uint32_t)(version) >> 10) & 0x3ff)
-#define ZBX_COMPONENT_VERSION_PATCH(version)		((zbx_uint32_t)(version) & 0x3ff)
-#define ZBX_COMPONENT_VERSION_IGNORE_PATCH(version)	((zbx_uint32_t)(version) & ((0x3ff << 20) | (0x3ff << 10)))
-#define ZBX_COMPONENT_VERSION_TO_DB_FORMAT(version)	(ZBX_COMPONENT_VERSION_MAJOR(version)*1000000 + \
-		ZBX_COMPONENT_VERSION_MINOR(version)*1000 + ZBX_COMPONENT_VERSION_PATCH(version))
+#define ZBX_COMPONENT_VERSION(major, minor, patch)	((major << 16) | (minor << 8) | patch)
+#define ZBX_COMPONENT_VERSION_MAJOR(version)		(((zbx_uint32_t)(version) >> 16) & 0xff)
+#define ZBX_COMPONENT_VERSION_MINOR(version)		(((zbx_uint32_t)(version) >> 8) & 0xff)
+#define ZBX_COMPONENT_VERSION_PATCH(version)		((zbx_uint32_t)(version) & 0xff)
+#define ZBX_COMPONENT_VERSION_IGNORE_PATCH(version)	((zbx_uint32_t)(version) & ((0xff << 16) | (0xff << 8)))
+#define ZBX_COMPONENT_VERSION_TO_DEC_FORMAT(version)	(ZBX_COMPONENT_VERSION_MAJOR(version)*10000 + \
+		ZBX_COMPONENT_VERSION_MINOR(version)*100 + ZBX_COMPONENT_VERSION_PATCH(version))
 
 #define ZBX_PREPROC_MULTIPLIER			1
 #define ZBX_PREPROC_RTRIM			2
