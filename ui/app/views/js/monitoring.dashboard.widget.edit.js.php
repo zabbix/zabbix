@@ -15,28 +15,23 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+?>
 
 
-/**
- * Favorite maps widget form view.
- *
- * @var CView $this
- * @var array $data
- */
+window.widget_form = new class {
+	init() {
+		document.getElementById('type').addEventListener('change', () => ZABBIX.Dashboard.reloadWidgetProperties());
 
-$fields = $data['dialogue']['fields'];
+		document.getElementById('widget-dialogue-form').addEventListener('change', (e) => {
+			const is_trimmable = e.target.matches(
+				'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])'
+			);
 
-$form = CWidgetHelper::createForm();
-
-$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'],
-	$data['templateid'] === null ? $fields['rf_rate'] : null
-);
-
-$form->addItem($form_grid);
-
-return [
-	'form' => $form
-];
+			if (is_trimmable) {
+				e.target.value = e.target.value.trim();
+			}
+		}, {capture: true});
+	}
+};
