@@ -39,6 +39,8 @@ class CUser extends CApiService {
 	protected $tableAlias = 'u';
 	protected $sortColumns = ['userid', 'username', 'alias']; // Field "alias" is deprecated in favor for "username".
 
+	protected const PROVISIONED_FIELDS = ['username', 'name', 'surname', 'usrgrps', 'medias', 'roleid', 'passwd'];
+
 	/**
 	 * Get users data.
 	 *
@@ -510,11 +512,14 @@ class CUser extends CApiService {
 		// 'passwd' can't be received by the user.get method
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'username', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
-				'refresh', 'theme', 'rows_per_page', 'timezone', 'roleid'
+				'refresh', 'theme', 'rows_per_page', 'timezone', 'roleid', 'userdirectoryid'
 			],
 			'userids' => array_keys($db_users),
 			'preservekeys' => true
 		]);
+
+		$userdirectoryids = array_filter(array_column($db_users, 'userdirectoryid'));
+		$user_directory_provisioning_state = self::getUserDirectoryProvisioningState($userdirectoryids);
 
 		// Get readonly super admin role ID and name.
 		$db_roles = DBfetchArray(DBselect(
@@ -550,6 +555,17 @@ class CUser extends CApiService {
 			}
 
 			$db_user = $db_users[$user['userid']];
+
+			if ($db_user['userdirectoryid'] != 0
+					&& $user_directory_provisioning_state[$db_user['userdirectoryid']] == JIT_PROVISIONING_ENABLED) {
+				$provisioned_fields = array_key_first(array_intersect_key(array_flip(self::PROVISIONED_FIELDS), $user));
+
+				if ($provisioned_fields) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Not allowed to update field "%1$s" for provisioned user.', $provisioned_fields)
+					);
+				}
+			}
 
 			if (array_key_exists('username', $user) && $user['username'] !== $db_user['username']) {
 				if ($db_user['username'] === ZBX_GUEST_USER) {
@@ -629,6 +645,61 @@ class CUser extends CApiService {
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
 		$this->checkHimself($users);
+	}
+
+	/**
+	 * Find each given user directory provisioning state.
+	 * Returns an array with user directory IDs as key and corresponding state as value.
+	 *
+	 * @param array $userdirectoryids    Array of userdirectory IDs.
+	 *
+	 * @return array
+	 */
+	private static function getUserDirectoryProvisioningState(array $userdirectoryids): array {
+		if (!$userdirectoryids) {
+			return [];
+		}
+
+		$response = array_fill_keys($userdirectoryids, JIT_PROVISIONING_DISABLED);
+		$configured_id_providers = array_filter([
+			CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CONFIGURED) == ZBX_AUTH_LDAP_ENABLED
+				? IDP_TYPE_LDAP
+				: null,
+			CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_ENABLED
+				? IDP_TYPE_SAML
+				: null
+		]);
+		if (!$configured_id_providers) {
+			return $response;
+		}
+
+		$user_directories = API::UserDirectory()->get([
+			'output' => ['userdirectoryid', 'idp_type'],
+			'userdirectoryids' => $userdirectoryids,
+			'filter' => [
+				'provision_status' => JIT_PROVISIONING_ENABLED,
+				'idp_type' => $configured_id_providers
+			],
+			'preservekeys' => true
+		]);
+
+		$default_ldap_userdirectory = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
+
+		foreach ($user_directories as $user_directory) {
+			switch ($user_directory['idp_type']) {
+				case IDP_TYPE_SAML:
+					$response[$user_directory['userdirectoryid']] = JIT_PROVISIONING_ENABLED;
+					break;
+
+				case IDP_TYPE_LDAP:
+					if ($default_ldap_userdirectory == $user_directory['userdirectoryid']) {
+						$response[$user_directory['userdirectoryid']] = JIT_PROVISIONING_ENABLED;
+					}
+					break;
+			}
+		}
+
+		return $response;
 	}
 
 	/**
