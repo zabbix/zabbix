@@ -29,10 +29,126 @@ extern unsigned char	program_type;
 
 #ifndef HAVE_SQLITE3
 
-/*static int	DBpatch_6030000(void)
+static int	DBpatch_6030000(void)
 {
-	*** first upgrade patch ***
-}*/
+	return DBcreate_changelog_insert_trigger("drules", "druleid");
+}
+
+static int	DBpatch_6030001(void)
+{
+	return DBcreate_changelog_update_trigger("drules", "druleid");
+}
+
+static int	DBpatch_6030002(void)
+{
+	return DBcreate_changelog_delete_trigger("drules", "druleid");
+}
+
+static int	DBpatch_6030003(void)
+{
+	return DBcreate_changelog_insert_trigger("dchecks", "dcheckid");
+}
+
+static int	DBpatch_6030004(void)
+{
+	return DBcreate_changelog_update_trigger("dchecks", "dcheckid");
+}
+
+static int	DBpatch_6030005(void)
+{
+	return DBcreate_changelog_delete_trigger("dchecks", "dcheckid");
+}
+
+static int	DBpatch_6030006(void)
+{
+	return DBcreate_changelog_insert_trigger("httptest", "httptestid");
+}
+
+static int	DBpatch_6030007(void)
+{
+	return DBcreate_changelog_update_trigger("httptest", "httptestid");
+}
+
+static int	DBpatch_6030008(void)
+{
+	return DBcreate_changelog_delete_trigger("httptest", "httptestid");
+}
+
+static int	DBpatch_6030009(void)
+{
+	return DBcreate_changelog_insert_trigger("httptest_field", "httptest_fieldid");
+}
+
+static int	DBpatch_6030010(void)
+{
+	return DBcreate_changelog_update_trigger("httptest_field", "httptest_fieldid");
+}
+
+static int	DBpatch_6030011(void)
+{
+	return DBcreate_changelog_delete_trigger("httptest_field", "httptest_fieldid");
+}
+
+static int	DBpatch_6030012(void)
+{
+	return DBcreate_changelog_insert_trigger("httptestitem", "httptestitemid");
+}
+
+static int	DBpatch_6030013(void)
+{
+	return DBcreate_changelog_update_trigger("httptestitem", "httptestitemid");
+}
+
+static int	DBpatch_6030014(void)
+{
+	return DBcreate_changelog_delete_trigger("httptestitem", "httptestitemid");
+}
+
+static int	DBpatch_6030015(void)
+{
+	return DBcreate_changelog_insert_trigger("httpstep", "httpstepid");
+}
+
+static int	DBpatch_6030016(void)
+{
+	return DBcreate_changelog_update_trigger("httpstep", "httpstepid");
+}
+
+static int	DBpatch_6030017(void)
+{
+	return DBcreate_changelog_delete_trigger("httpstep", "httpstepid");
+}
+
+static int	DBpatch_6030018(void)
+{
+	return DBcreate_changelog_insert_trigger("httpstep_field", "httpstep_fieldid");
+}
+
+static int	DBpatch_6030019(void)
+{
+	return DBcreate_changelog_update_trigger("httpstep_field", "httpstep_fieldid");
+}
+
+static int	DBpatch_6030020(void)
+{
+	return DBcreate_changelog_delete_trigger("httpstep_field", "httpstep_fieldid");
+}
+
+static int	DBpatch_6030021(void)
+{
+	return DBcreate_changelog_insert_trigger("httpstepitem", "httpstepitemid");
+}
+
+static int	DBpatch_6030022(void)
+{
+	return DBcreate_changelog_update_trigger("httpstepitem", "httpstepitemid");
+}
+
+static int	DBpatch_6030023(void)
+{
+	return DBcreate_changelog_delete_trigger("httpstepitem", "httpstepitemid");
+}
+
 
 #endif
 
@@ -40,6 +156,29 @@ DBPATCH_START(6030)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(6030000, 0, 1)*/
+DBPATCH_ADD(6030000, 0, 1)
+DBPATCH_ADD(6030001, 0, 1)
+DBPATCH_ADD(6030002, 0, 1)
+DBPATCH_ADD(6030003, 0, 1)
+DBPATCH_ADD(6030004, 0, 1)
+DBPATCH_ADD(6030005, 0, 1)
+DBPATCH_ADD(6030006, 0, 1)
+DBPATCH_ADD(6030007, 0, 1)
+DBPATCH_ADD(6030008, 0, 1)
+DBPATCH_ADD(6030009, 0, 1)
+DBPATCH_ADD(6030010, 0, 1)
+DBPATCH_ADD(6030011, 0, 1)
+DBPATCH_ADD(6030012, 0, 1)
+DBPATCH_ADD(6030013, 0, 1)
+DBPATCH_ADD(6030014, 0, 1)
+DBPATCH_ADD(6030015, 0, 1)
+DBPATCH_ADD(6030016, 0, 1)
+DBPATCH_ADD(6030017, 0, 1)
+DBPATCH_ADD(6030018, 0, 1)
+DBPATCH_ADD(6030019, 0, 1)
+DBPATCH_ADD(6030020, 0, 1)
+DBPATCH_ADD(6030021, 0, 1)
+DBPATCH_ADD(6030022, 0, 1)
+DBPATCH_ADD(6030023, 0, 1)
 
 DBPATCH_END()

@@ -390,6 +390,7 @@ typedef struct
 	unsigned char		auto_compress;
 	const char		*proxy_address;
 	int			last_version_error_time;
+	zbx_uint32_t		revision;
 }
 ZBX_DC_PROXY;
 
@@ -755,6 +756,21 @@ zbx_dc_macro_kv_t;
 
 typedef struct
 {
+	zbx_uint64_t	druleid;
+	zbx_uint64_t	proxy_hostid;
+	zbx_uint32_t	revision;
+}
+zbx_dc_drule_t;
+
+typedef struct
+{
+	zbx_uint64_t	dcheckid;
+	zbx_uint64_t	druleid;
+}
+zbx_dc_dcheck_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
@@ -841,6 +857,8 @@ typedef struct
 							/* by PSK identity */
 #endif
 	zbx_hashset_t		data_sessions;
+	zbx_hashset_t		drules;
+	zbx_hashset_t		dchecks;
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	zbx_binary_heap_t	trigger_queue;

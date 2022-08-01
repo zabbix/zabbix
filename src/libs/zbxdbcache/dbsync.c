@@ -33,9 +33,16 @@
 #define ZBX_DBSYNC_OBJ_TRIGGER_TAG	6
 #define ZBX_DBSYNC_OBJ_FUNCTION		7
 #define ZBX_DBSYNC_OBJ_ITEM_PREPROC	8
-
+#define ZBX_DBSYNC_OBJ_DRULE		9
+#define ZBX_DBSYNC_OBJ_DCHECK		10
+#define ZBX_DBSYNC_OBJ_HTTPTEST		11
+#define ZBX_DBSYNC_OBJ_HTTPTEST_FIELD	12
+#define ZBX_DBSYNC_OBJ_HTTPTESTITEM	13
+#define ZBX_DBSYNC_OBJ_HTTPSTEP		14
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD	15
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM	16
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		8
+#define ZBX_DBSYNC_OBJ_COUNT		16
 
 #define ZBX_DBSYNC_JOURNAL(X)		(X - 1)
 
@@ -3744,4 +3751,74 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 	zbx_hashset_destroy(&groups);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare dbsync object for drules table                            *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_prepare_drules(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select druleid,proxy_hostid from drules");
+
+	dbsync_prepare(sync, 2, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "druleid", "where",
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_DRULE)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare dbsync object for dchecks tabkle                          *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_prepare_dchecks(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select dcheckid,druleid from dchecks");
+
+	dbsync_prepare(sync, 2, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "dcheckid", "where",
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_DCHECK)]);
+out:
+	zbx_free(sql);
+
+	return ret;
 }

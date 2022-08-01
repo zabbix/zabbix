@@ -1308,6 +1308,7 @@ done:
 			{
 				proxy->location = ZBX_LOC_NOWHERE;
 				proxy->version = 0;
+				proxy->revision = 0;
 				proxy->lastaccess = atoi(row[12]);
 				proxy->last_cfg_error_time = 0;
 				proxy->proxy_delay = 0;
@@ -5115,6 +5116,119 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	dc_sync_drules(zbx_dbsync_t *sync)
+{
+	char		**row;
+	zbx_uint64_t	rowid, druleid, proxy_hostid;
+	unsigned char	tag;
+	int 		found, ret;
+	ZBX_DC_PROXY	*proxy;
+	zbx_dc_drule_t	*drule;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(druleid, row[0]);
+		ZBX_DBROW2UINT64(proxy_hostid, row[1]);
+
+		drule = (zbx_dc_drule_t *)DCfind_id(&config->drules, druleid, sizeof(zbx_dc_drule_t), &found);
+
+		if (1 == found && proxy_hostid != drule->proxy_hostid)
+		{
+			if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxy_hostid)))
+				proxy->revision = config->revision;
+		}
+
+		drule->proxy_hostid = proxy_hostid;
+		if (0 != drule->proxy_hostid)
+		{
+			if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxy_hostid)))
+				proxy->revision = config->revision;
+		}
+
+		drule->revision = config->revision;
+	}
+
+	/* remove deleted discovery rules from cache and update proxy revision */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &rowid)))
+			continue;
+
+		if (0 != drule->proxy_hostid)
+		{
+			if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxy_hostid)))
+				proxy->revision = config->revision;
+		}
+
+		zbx_hashset_remove_direct(&config->drules, &drule);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	dc_sync_dchecks(zbx_dbsync_t *sync)
+{
+	char		**row;
+	zbx_uint64_t	rowid, druleid, dcheckid;
+	unsigned char	tag;
+	int 		found, ret;
+	ZBX_DC_PROXY	*proxy;
+	zbx_dc_drule_t	*drule;
+	zbx_dc_dcheck_t	*dcheck;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(dcheckid, row[0]);
+		ZBX_STR2UINT64(druleid, row[1]);
+
+		if (NULL == (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &druleid)))
+			continue;
+
+		dcheck = (zbx_dc_dcheck_t *)DCfind_id(&config->dchecks, dcheckid, sizeof(zbx_dc_dcheck_t), &found);
+		dcheck->druleid = druleid;
+
+		if (drule->revision == config->revision)
+			continue;
+
+		drule->revision = config->revision;
+
+		if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxy_hostid)))
+			proxy->revision = config->revision;
+	}
+
+	/* remove deleted discovery rules from cache and update proxy revision */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_search(&config->dchecks, &rowid)))
+			continue;
+
+		if (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &druleid)) &&
+				0 != drule->proxy_hostid && drule->revision != config->revision)
+		{
+			if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxy_hostid)))
+				proxy->revision = config->revision;
+
+			drule->revision = config->revision;
+		}
+
+		zbx_hashset_remove_direct(&config->dchecks, dcheck);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: updates trigger topology after trigger dependency changes         *
@@ -5462,14 +5576,15 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
 			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, itemscrp_sec,
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
-			item_tag_sec2, um_cache_sec, queues_sec, changelog_sec;
+			item_tag_sec2, um_cache_sec, queues_sec, changelog_sec, drules_sec, drules_sec2;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
 			func_sync, expr_sync, action_sync, action_op_sync, action_condition_sync, trigger_tag_sync,
 			item_tag_sync, host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync,
 			hgroups_sync, itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync,
-			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync;
+			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
+			drules_sync, dchecks_sync;
 
 	double		autoreg_csec, autoreg_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
@@ -5536,6 +5651,9 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	zbx_dbsync_init(&maintenance_tag_sync, mode);
 	zbx_dbsync_init(&maintenance_group_sync, mode);
 	zbx_dbsync_init(&maintenance_host_sync, mode);
+
+	zbx_dbsync_init(&drules_sync, mode);
+	zbx_dbsync_init(&dchecks_sync, mode);
 
 #ifdef HAVE_ORACLE
 	/* With Oracle fetch statements can fail before all data has been fetched. */
@@ -5637,6 +5755,13 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	if (FAIL == zbx_dbsync_compare_maintenance_hosts(&maintenance_host_sync))
 		goto out;
 	maintenance_sec = zbx_time() - sec;
+
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_prepare_drules(&drules_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_prepare_dchecks(&dchecks_sync))
+		goto out;
+	drules_sec = zbx_time() - sec;
 
 	START_SYNC;
 	sec = zbx_time();
@@ -5877,6 +6002,11 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	corr_operation_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
+	dc_sync_drules(&drules_sync);
+	dc_sync_dchecks(&dchecks_sync);
+	drules_sec2 = zbx_time() - sec;
+
+	sec = zbx_time();
 
 	if (0 != hosts_sync.add_num + hosts_sync.update_num + hosts_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_HOSTS;
@@ -5921,11 +6051,12 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec +  tisec + pisec + tsec + dsec + fsec + expr_sec +
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
 				corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec + maintenance_sec +
-				item_tag_sec;
+				item_tag_sec + drules_sec;
 		total2 = csec2 + hsec2 + hisec2 + ifsec2 + idsec2 + isec2 + tisec2 + pisec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
-				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec;
+				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec +
+				drules_sec2;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
 				__func__, changelog_sec, changelog_num);
@@ -6051,6 +6182,12 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, maintenance_sec, maintenance_sec2, maintenance_sync.add_num,
 				maintenance_sync.update_num, maintenance_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() drules     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, drules_sec, drules_sec2, drules_sync.add_num, drules_sync.update_num,
+				drules_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() dchecks    : (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, dchecks_sync.add_num, dchecks_sync.update_num, dchecks_sync.remove_num);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() macro cache: " ZBX_FS_DBL " sec.", __func__, um_cache_sec);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __func__, update_sec);
@@ -6161,6 +6298,11 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint time : %d (%d slots)", __func__,
 				config->maintenance_periods.num_data, config->maintenance_periods.num_slots);
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() drules     : %d (%d slots)", __func__,
+				config->drules.num_data, config->drules.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() dchecks    : %d (%d slots)", __func__,
+				config->dchecks.num_data, config->dchecks.num_slots);
+
 		for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __func__,
@@ -6261,6 +6403,8 @@ out:
 	zbx_dbsync_clear(&maintenance_group_sync);
 	zbx_dbsync_clear(&maintenance_host_sync);
 	zbx_dbsync_clear(&hgroup_host_sync);
+	zbx_dbsync_clear(&drules_sync);
+	zbx_dbsync_clear(&dchecks_sync);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
@@ -6696,6 +6840,8 @@ int	init_configuration_cache(char **error)
 					__config_shmem_free_func);
 
 	CREATE_HASHSET_EXT(config->data_sessions, 0, __config_data_session_hash, __config_data_session_compare);
+	CREATE_HASHSET(config->drules, 0);
+	CREATE_HASHSET(config->dchecks, 0);
 
 	config->config = NULL;
 
