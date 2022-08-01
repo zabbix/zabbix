@@ -18,9 +18,6 @@ This template was tested on:
 
 1. Install Zabbix agent and MySQL client. If necessary, add the path to the `mysql` and `mysqladmin` utilities to the global environment variable PATH.
 2. Copy `template_db_mysql.conf` into the folder with Zabbix agent configuration (`/etc/zabbix/zabbix_agentd.d/` by default). Don't forget to restart Zabbix agent.
-
-*NOTE.* If you use this template with MariaDB 10.6.1 and higher, it's necessary to add `--protocol` parameter to `mysql` and `mysqladmin` commands in `template_db_mysql.conf` (https://mariadb.com/kb/en/mysql-command-line-client/#how-to-specify-which-protocol-to-use-when-connecting-to-the-mysqld-server).
-
 3. Create a MySQL user for monitoring (`<password>` at your discretion):
 
 ```text
@@ -84,7 +81,7 @@ No specific Zabbix configuration is required.
 |{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} |<p>The maximum number of created tmp tables on a disk per second for trigger expressions.</p> |`10` |
 |{$MYSQL.CREATED_TMP_FILES.MAX.WARN} |<p>The maximum number of created tmp files on a disk per second for trigger expressions.</p> |`10` |
 |{$MYSQL.CREATED_TMP_TABLES.MAX.WARN} |<p>The maximum number of created tmp tables in memory per second for trigger expressions.</p> |`30` |
-|{$MYSQL.HOST} |<p>Hostname or IP of MySQL host or container.</p> |`localhost` |
+|{$MYSQL.HOST} |<p>Hostname or IP of MySQL host or container.</p> |`127.0.0.1` |
 |{$MYSQL.INNODB_LOG_FILES} |<p>Number of physical files in the InnoDB redo log for calculating innodb_log_file_size.</p> |`2` |
 |{$MYSQL.PORT} |<p>MySQL service port.</p> |`3306` |
 |{$MYSQL.REPL_LAG.MAX.WARN} |<p>The lag of slave from master for trigger expression.</p> |`30m` |
