@@ -50,7 +50,7 @@ $form_tabs = (new CTabView())
 		TAB_INDICATOR_GRAPH_DISPLAY_OPTIONS
 	)
 	->addTab('time_period', _('Time period'), getTimePeriodTab($fields), TAB_INDICATOR_GRAPH_TIME)
-	->addTab('axes', _('Axes'), getAxesTab($fields))
+	->addTab('axes', _('Axes'), getAxesTab($fields), TAB_INDICATOR_GRAPH_AXES)
 	->addTab('legend_tab', _('Legend'), getLegendTab($fields, $scripts), TAB_INDICATOR_GRAPH_LEGEND)
 	->addTab('problems', _('Problems'), getProblemsTab($fields, $scripts, $jq_templates, $form->getName()),
 		TAB_INDICATOR_GRAPH_PROBLEMS
