@@ -1559,12 +1559,6 @@ void	zbx_tls_init_child(const zbx_config_tls_t *zbx_config_tls, zbx_get_program_
 
 	zbx_get_program_type_cb = zbx_get_program_type_cb_arg;
 
-	if (NULL == zbx_get_program_type_cb)
-	{
-		/* validation of zbx_config_tls was not called and program_type was not set */
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
 #ifndef _WINDOWS
 	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
