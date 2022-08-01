@@ -30,10 +30,13 @@ class CHtmlPage {
 	private const ZBX_STYLE_HEADER_KIOSKMODE_CONTROLS = 'header-kioskmode-controls';
 
 	private string $title = '';
-	private array $title_submenu = [];
-	private string $doc_url = '';
+	private ?array $title_submenu = null;
+
 	private ?CTag $controls = null;
 	private ?CList $kiosk_mode_controls = null;
+
+	private string $doc_url = '';
+
 	private array $items = [];
 
 	/**
@@ -52,7 +55,7 @@ class CHtmlPage {
 		return $this;
 	}
 
-	public function setTitleSubmenu(array $title_submenu): self {
+	public function setTitleSubmenu(?array $title_submenu): self {
 		$this->title_submenu = $title_submenu;
 
 		return $this;
@@ -151,7 +154,7 @@ class CHtmlPage {
 		if ($this->title !== '') {
 			$title_tag = (new CTag('h1', true, $this->title))->setId(self::PAGE_TITLE_ID);
 
-			if ($this->title_submenu) {
+			if ($this->title_submenu !== null) {
 				$title_tag = (new CLinkAction($title_tag))
 					->setMenuPopup([
 						'type' => 'submenu',
