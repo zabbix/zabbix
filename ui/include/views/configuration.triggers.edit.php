@@ -689,7 +689,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
 $cancelButton = $data['backurl'] !== null
-	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+	? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
 	: new CButtonCancel(url_param('context'));
 
 // Append buttons to form list.

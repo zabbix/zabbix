@@ -289,27 +289,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			$url = 'zabbix.php?action=dashboard.view&dashboardid=';
 		}
 
-		// Mapping for tags in problem widgets.
-		$mapping = [
-			'tag',
-			[
-				'name' => 'match',
-				'class' => CSegmentedRadioElement::class
-			],
-			'value'
-		];
 		$this->page->login()->open($url.$dashboard_id);
 		$dashboard = CDashboardElement::find()->one();
 
 		// Get fields from widget form to compare them with new widget after copying.
-		$fields = $dashboard->getWidget($name)->edit()->getFields();
+		$widget = $dashboard->getWidget($name)->edit();
+		$original_form = $widget->getFields()->asValues();
 
-		// Add tag fields mapping to form for problem widgets.
+		// Get tags of original widget.
 		if (stristr($name, 'Problem')) {
-			$fields->set('', $fields->get('')->asMultifieldTable(['mapping' => $mapping]));
+			$tags = $widget->query('id:tags_table_tags')->asMultifieldTable()->one()->getValue();
 		}
 
-		$original_form = $fields->asValues();
 		$original_widget_size = $replace
 			? self::$replaced_widget_size
 			: CDBHelper::getRow('SELECT w.width, w.height'.
@@ -360,14 +351,15 @@ class testDashboardCopyWidgets extends CWebTest {
 		}
 
 		$this->assertEquals($name, $copied_widget->getHeaderText());
-		$copied_fields = $copied_widget->edit()->getFields();
+		$copied_form = $copied_widget->edit()->getFields()->asValues();
 
-		// Add tag fields mapping to form for newly copied problem widgets.
+		// Check tags of original and copied widget.
 		if (stristr($name, 'Problem')) {
-			$copied_fields->set('', $copied_fields->get('')->asMultifieldTable(['mapping' => $mapping]));
+			$copied_tags = COverlayDialogElement::find()->waitUntilReady()->one()->query('id:tags_table_tags')
+					->asMultifieldTable()->one()->getValue();
+			$this->assertEquals($tags, $copied_tags);
 		}
 
-		$copied_form = $copied_fields->asValues();
 		$this->assertEquals($original_form, $copied_form);
 
 		// Close overlay and save dashboard to get new widget size from DB.
