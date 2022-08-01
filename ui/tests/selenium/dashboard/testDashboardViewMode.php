@@ -37,22 +37,18 @@ class testDashboardViewMode extends CLegacyWebTest {
 			switch ($user) {
 				case 'super-admin' :
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55b', 1);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-					$this->zbxTestCheckNoRealHostnames();
 					break;
 				case 'admin' :
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 4);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					break;
 				case 'user';
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 5);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					break;
 				case 'guest';
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55e', 2);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					break;
 			}
+			$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
 			$this->zbxTestCheckTitle('Dashboard');
 			$this->zbxTestCheckHeader('Global view');
 			if ($user !== 'super-admin') {
@@ -62,6 +58,7 @@ class testDashboardViewMode extends CLegacyWebTest {
 						'No permissions to referred object or it does not exist!');
 			}
 			else {
+				$this->zbxTestCheckNoRealHostnames();
 				$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Performance']");
 			}
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'Top hosts by CPU utilization');
