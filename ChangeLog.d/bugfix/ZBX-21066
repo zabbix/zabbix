@@ -1,1 +1,0 @@
-....I..... [ZBX-21066] fixed libopenssl.m4 when dealing with lib/64 in openssl 3 (yurii)

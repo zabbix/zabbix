@@ -133,7 +133,8 @@ class CControllerHostEdit extends CController {
 			if ($this->hasInput('full_clone') || $this->hasInput('clone')) {
 				$clone_hostid = $this->getInput('hostid');
 				$this->host = ['hostid' => null];
-			} else {
+			}
+			else {
 				$hosts = API::Host()->get([
 					'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
 						'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
@@ -352,7 +353,7 @@ class CControllerHostEdit extends CController {
 	 */
 	protected function extendDiscoveryRule(?array &$editable_discovery_rule): void {
 		$editable_discovery_rule = $this->host['discoveryRule']
-			? API::DiscoveryRule([
+			? API::DiscoveryRule()->get([
 				'output' => [],
 				'itemids' => array_column($this->host['discoveryRule'], 'itemid'),
 				'editable' => true,
