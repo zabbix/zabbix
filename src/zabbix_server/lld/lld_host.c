@@ -4005,7 +4005,7 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_ptr_t *host
 
 		for (i = 0; i < updates.values_num;)
 		{
-			if (update->ifnew == updates.values[i]->ifnew && update->ifold == updates.values[i]->ifold)
+			if (update->ifnew == updates.values[i]->ifnew || update->ifold == updates.values[i]->ifold)
 			{
 				zbx_free(updates.values[i]);
 				zbx_vector_if_update_remove(&updates, i);
