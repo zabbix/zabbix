@@ -436,7 +436,7 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	protected function validateItemsCreate(array $graphs) {
 		$itemIds = [];
-		$itemid_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
+		$itemid_rules = ['type' => API_ID];
 
 		foreach ($graphs as $graph) {
 			// validate graph name

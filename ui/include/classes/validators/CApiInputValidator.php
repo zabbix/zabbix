@@ -798,17 +798,8 @@ class CApiInputValidator {
 	private static function validateId($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (($flags & API_ALLOW_NULL) && $data === null) {
-			return true;
-		}
-
 		if (!is_scalar($data) || is_bool($data) || is_double($data) || !ctype_digit(strval($data))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
-			return false;
-		}
-
-		if (($flags & API_NOT_EMPTY) && $data == 0) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
 			return false;
 		}
 
