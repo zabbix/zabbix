@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-07-20T14:47:41Z</date>
+   <date>2022-08-01T13:34:57Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -13,7 +13,7 @@
          <name>Template DB MySQL by Zabbix agent</name>
          <description>Requirements for template operation:&#13;
 1.Install Zabbix agent and MySQL client.&#13;
-2.Copy template_db_mysql.conf into folder with Zabbix agent configuration (/etc/zabbix/zabbix_agentd.d/ by default). If you use this template with MariaDB 10.6.1 and higher, it's necessary to add "--protocol" parameter to "mysql" and "mysqladmin" commands in template_db_mysql.conf. Don't forget to restart zabbix-agent. &#13;
+2.Copy template_db_mysql.conf into folder with Zabbix agent configuration (/etc/zabbix/zabbix_agentd.d/ by default). Don't forget to restart zabbix-agent. &#13;
 3.Create MySQL user for monitoring. For example:&#13;
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '&lt;password&gt;';&#13;
 GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';&#13;
@@ -1781,7 +1781,7 @@ return '[]';</params>
             </macro>
             <macro>
                <macro>{$MYSQL.HOST}</macro>
-               <value>localhost</value>
+               <value>127.0.0.1</value>
                <description>Hostname or IP of MySQL host or container.</description>
             </macro>
             <macro>
