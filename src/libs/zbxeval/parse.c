@@ -652,23 +652,28 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
 	end = ++key;
 
 	if ('*' == *key)
-		end++;
-	else if (0 == strncmp(key, MVAR_ITEM_KEY, ZBX_CONST_STRLEN(MVAR_ITEM_KEY)))
 	{
-		int	offset = 0;
-
-		if ('}' == key[ZBX_CONST_STRLEN(MVAR_ITEM_KEY)])
+		end++;
+	}
+	else if ('{' == *key)
+	{
+		if (0 == strncmp(key, MVAR_ITEM_KEY, ZBX_CONST_STRLEN(MVAR_ITEM_KEY)))
 		{
-			offset = 1;
-		}
-		else if (0 != isdigit((unsigned char)key[ZBX_CONST_STRLEN(MVAR_ITEM_KEY)]) &&
-				'}' == key[ZBX_CONST_STRLEN(MVAR_ITEM_KEY) + 1])
-		{
-			offset = 2;
-		}
+			int	offset = 0;
 
-		if (0 != offset)
-			end += ZBX_CONST_STRLEN(MVAR_ITEM_KEY) + offset;
+			if ('}' == key[ZBX_CONST_STRLEN(MVAR_ITEM_KEY)])
+			{
+				offset = 1;
+			}
+			else if (0 != isdigit((unsigned char)key[ZBX_CONST_STRLEN(MVAR_ITEM_KEY)]) &&
+					'}' == key[ZBX_CONST_STRLEN(MVAR_ITEM_KEY) + 1])
+			{
+				offset = 2;
+			}
+
+			if (0 != offset)
+				end += ZBX_CONST_STRLEN(MVAR_ITEM_KEY) + offset;
+		}
 	}
 	else if (SUCCEED != parse_key(&end))
 		return 0;
