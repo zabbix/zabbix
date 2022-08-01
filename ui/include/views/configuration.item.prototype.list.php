@@ -25,7 +25,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.item.prototype.list.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Item prototypes'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
 		? CDocHelper::CONFIGURATION_HOST_ITEM_PROTOTYPE_LIST
@@ -226,7 +226,6 @@ $itemForm->addItem([
 	)
 ]);
 
-// append form to widget
-$widget->addItem($itemForm);
-
-$widget->show();
+$html_page
+	->addItem($itemForm)
+	->show();

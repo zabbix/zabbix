@@ -25,13 +25,13 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Triggers'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_TRIGGERS_EDIT));
 
 // Append host summary to widget header.
 if ($data['hostid'] != 0) {
-	$widget->setNavigation(getHostNavigation('triggers', $data['hostid']));
+	$html_page->setNavigation(getHostNavigation('triggers', $data['hostid']));
 }
 
 $url = (new CUrl('triggers.php'))
@@ -42,7 +42,7 @@ $url = (new CUrl('triggers.php'))
 $triggersForm = (new CForm('post', $url))
 	->setid('triggers-form')
 	->setName('triggersForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('expression_constructor', $data['expression_constructor'])
@@ -716,9 +716,9 @@ else {
 // Append tabs to form.
 $triggersForm->addItem($triggersTab);
 
-$widget->addItem($triggersForm);
-
-$widget->show();
+$html_page
+	->addItem($triggersForm)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

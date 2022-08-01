@@ -184,14 +184,13 @@ $event_tab = (new CDiv([
 	->addClass(ZBX_STYLE_COLUMNS)
 	->addClass(ZBX_STYLE_COLUMNS_2);
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Event details'))
 	->setWebLayoutMode($page['web_layout_mode'])
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::TR_EVENTS))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())
-				->addItem(get_icon('kioskmode', ['mode' => $page['web_layout_mode']]))
+			(new CList())->addItem(get_icon('kioskmode', ['mode' => $page['web_layout_mode']]))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($event_tab)

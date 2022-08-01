@@ -22,10 +22,10 @@
 class CSectionCollapsible extends CSection {
 
 	private const ZBX_STYLE_COLLAPSED = 'section-collapsed';
-	private const ZBX_STYLE_TOGGLE    = 'section-toggle';
+	private const ZBX_STYLE_TOGGLE = 'section-toggle';
 
 	private bool $is_expanded = true;
-	private string $profile_key;
+	private string $profile_key = '';
 
 	public function setExpanded(bool $is_expanded): self {
 		$this->is_expanded = $is_expanded;

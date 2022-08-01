@@ -23,13 +23,13 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Web monitoring'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HTTPCONF_EDIT));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$widget->setNavigation(getHostNavigation('web', $this->data['hostid']));
+	$html_page->setNavigation(getHostNavigation('web', $this->data['hostid']));
 }
 
 $url = (new CUrl('httpconf.php'))
@@ -40,7 +40,7 @@ $url = (new CUrl('httpconf.php'))
 $http_form = (new CForm('post', $url))
 	->setId('http-form')
 	->setName('httpForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('templated', $this->data['templated']);
@@ -280,7 +280,7 @@ else {
 }
 
 $http_form->addItem($http_tab);
-$widget->addItem($http_form);
+$html_page->addItem($http_form);
 
 $this->data['scenario_tab_data'] = [
 	'agent_visibility' => [],
@@ -299,7 +299,7 @@ zbx_subarray_push($this->data['scenario_tab_data']['agent_visibility'], ZBX_AGEN
 
 require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

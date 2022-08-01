@@ -25,7 +25,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Actions'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ACTION_EDIT));
 
@@ -37,7 +37,7 @@ $actionForm = (new CForm())
 		->setArgument('eventsource', $data['eventsource'])
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form']);
 
 if ($data['actionid']) {
@@ -539,7 +539,6 @@ $action_tabs->setFooter([
 ]);
 $actionForm->addItem($action_tabs);
 
-// Append form to widget.
-$widget->addItem($actionForm);
-
-$widget->show();
+$html_page
+	->addItem($actionForm)
+	->show();

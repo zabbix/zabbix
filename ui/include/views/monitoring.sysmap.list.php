@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Maps'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_SYSMAP_LIST))
 	->setControls(
@@ -123,7 +123,6 @@ $sysmapForm->addItem([
 	])
 ]);
 
-// append form to widget
-$widget->addItem($sysmapForm);
-
-$widget->show();
+$html_page
+	->addItem($sysmapForm)
+	->show();

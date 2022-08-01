@@ -100,7 +100,7 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 		]);
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle($data['dashboard']['name'])
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_DASHBOARD_VIEW))
@@ -197,7 +197,7 @@ $widget = (new CWidget())
 	])));
 
 if ($data['has_time_selector']) {
-	$widget->addItem(
+	$html_page->addItem(
 		(new CFilter())
 			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
@@ -252,7 +252,7 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 
 $dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
 
-$widget
+$html_page
 	->addItem($dashboard)
 	->show();
 

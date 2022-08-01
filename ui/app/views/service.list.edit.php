@@ -119,7 +119,7 @@ $filter->addFilterTab(_('Filter'), [
 		])
 ]);
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Services'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICE_LIST_EDIT))
 	->setControls(

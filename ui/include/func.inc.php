@@ -1559,7 +1559,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		show_error_message(_('No permissions to referred object or it does not exist!'));
 
 		require_once dirname(__FILE__).'/page_header.php';
-		(new CWidget())->show();
+		(new CHtmlPage())->show();
 		require_once dirname(__FILE__).'/page_footer.php';
 	}
 	// deny access to a page

@@ -62,7 +62,7 @@ if ($data['warning']) {
 	$data['warning'] = null;
 }
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(($data['hostid'] == 0) ? _('New host') : _('Host'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_EDIT))
 	->addItem(new CPartial('configuration.host.edit.html', $data))

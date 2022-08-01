@@ -46,7 +46,7 @@ $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('configuration.dashboard.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Dashboards'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DASHBOARD_EDIT))
 	->setControls(
@@ -105,7 +105,7 @@ $dashboard->addItem(
 
 $dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
 
-$widget
+$html_page
 	->addItem($dashboard)
 	->show();
 

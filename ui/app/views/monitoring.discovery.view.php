@@ -30,7 +30,7 @@ $this->addJsFile('layout.mode.js');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Status of discovery'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_DISCOVERY_VIEW))
@@ -77,4 +77,4 @@ $discovery_table = CScreenBuilder::getScreen([
 	]
 ])->get();
 
-$widget->addItem($discovery_table)->show();
+$html_page->addItem($discovery_table)->show();

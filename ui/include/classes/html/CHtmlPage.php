@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,7 +19,9 @@
 **/
 
 
-class CWidget {
+class CHtmlPage {
+
+	public const PAGE_TITLE_ID = 'page-title-general';
 
 	private const ZBX_STYLE_HEADER_TITLE = 'header-title';
 	private const ZBX_STYLE_HEADER_DOC_LINK = 'header-doc-link';
@@ -27,104 +29,80 @@ class CWidget {
 	private const ZBX_STYLE_HEADER_CONTROLS = 'header-controls';
 	private const ZBX_STYLE_HEADER_KIOSKMODE_CONTROLS = 'header-kioskmode-controls';
 
-	private $title;
-	private $title_submenu;
-	private $doc_url;
-	private $controls;
-	private $kiosk_mode_controls;
+	private string $title = '';
+	private array $title_submenu = [];
+	private string $doc_url = '';
+	private ?CTag $controls = null;
+	private ?CList $kiosk_mode_controls = null;
+	private array $items = [];
 
 	/**
 	 * Navigation, displayed exclusively in ZBX_LAYOUT_NORMAL mode.
-	 *
-	 * @var mixed
 	 */
-	private $navigation;
-
-	/**
-	 * The contents of the body of the widget.
-	 *
-	 * @var array
-	 */
-	protected $body = [];
+	private ?CList $navigation = null;
 
 	/**
 	 * Layout mode (ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_KIOSKMODE).
-	 *
-	 * @var integer
 	 */
-	protected $web_layout_mode = ZBX_LAYOUT_NORMAL;
+	private int $web_layout_mode = ZBX_LAYOUT_NORMAL;
 
-	public function setTitle($title) {
+	public function setTitle(string $title): self {
 		$this->title = $title;
 
 		return $this;
 	}
 
-	public function setTitleSubmenu($title_submenu) {
+	public function setTitleSubmenu(array $title_submenu): self {
 		$this->title_submenu = $title_submenu;
 
 		return $this;
 	}
 
-	public function setDocUrl($doc_url) {
+	public function setDocUrl(string $doc_url): self {
 		$this->doc_url = $doc_url;
 
 		return $this;
 	}
 
-	public function setControls($controls) {
+	public function setControls(CTag $controls): self {
 		$this->controls = $controls;
 
 		return $this;
 	}
 
-	public function setKioskModeControls($kiosk_mode_controls) {
+	public function setKioskModeControls(?CList $kiosk_mode_controls): self {
 		$this->kiosk_mode_controls = $kiosk_mode_controls;
 
 		return $this;
 	}
 
-	/**
-	 * Set layout mode.
-	 *
-	 * @param integer $web_layout_mode
-	 *
-	 * @return CWidget
-	 */
-	public function setWebLayoutMode($web_layout_mode) {
+	public function setWebLayoutMode(int $web_layout_mode): self {
 		$this->web_layout_mode = $web_layout_mode;
 
 		return $this;
 	}
 
-	/**
-	 * Set navigation for displaying exclusively in ZBX_LAYOUT_NORMAL mode.
-	 *
-	 * @param mixed $navigation
-	 *
-	 * @return CWidget
-	 */
-	public function setNavigation($navigation) {
+	public function setNavigation(?CList $navigation): self {
 		$this->navigation = $navigation;
 
 		return $this;
 	}
 
-	public function addItem($items = null) {
-		if (!is_null($items)) {
-			$this->body[] = $items;
+	public function addItem($value): self {
+		if ($value !== null) {
+			$this->items[] = $value;
 		}
 
 		return $this;
 	}
 
-	public function show() {
+	public function show(): self {
 		echo $this->toString();
 
 		return $this;
 	}
 
-	public function toString() {
+	private function toString() {
 		$items = [];
 
 		if ($this->web_layout_mode == ZBX_LAYOUT_KIOSKMODE) {
@@ -138,7 +116,7 @@ class CWidget {
 					)
 			);
 		}
-		elseif ($this->title !== null || $this->controls !== null || $this->doc_url !== null) {
+		elseif ($this->title !== '' || $this->doc_url !== '' || $this->controls !== null) {
 			$items[] = $this->createTopHeader();
 		}
 
@@ -152,25 +130,26 @@ class CWidget {
 			? (new CDiv($this->navigation))->addClass(self::ZBX_STYLE_HEADER_NAVIGATION)
 			: null;
 
-		$items[] = new CTag('main', true, [$navigation, $this->body]);
+		$items[] = new CTag('main', true, [$navigation, $this->items]);
 
 		return unpack_object($items);
 	}
 
 	private function createTopHeader(): CTag {
 		$divs = [
-			(new CTag('nav', true, (new CButton(null, _('Show sidebar')))
-				->setId('sidebar-button-toggle')
-				->addClass('button-toggle')
-				->setAttribute('title', _('Show sidebar'))
+			(new CTag('nav', true,
+				(new CButton(null, _('Show sidebar')))
+					->setId('sidebar-button-toggle')
+					->addClass('button-toggle')
+					->setAttribute('title', _('Show sidebar'))
 			))
 				->addClass('sidebar-nav-toggle')
 				->setAttribute('role', 'navigation')
 				->setAttribute('aria-label', _('Sidebar control'))
 		];
 
-		if ($this->title !== null) {
-			$title_tag = (new CTag('h1', true, $this->title))->setId(ZBX_STYLE_PAGE_TITLE);
+		if ($this->title !== '') {
+			$title_tag = (new CTag('h1', true, $this->title))->setId(self::PAGE_TITLE_ID);
 
 			if ($this->title_submenu) {
 				$title_tag = (new CLinkAction($title_tag))
@@ -189,7 +168,7 @@ class CWidget {
 			$divs[] = new CDiv($title_tag);
 		}
 
-		if ($this->doc_url !== null) {
+		if ($this->doc_url !== '') {
 			$divs[] = (new CDiv(
 				(new CLink(null, $this->doc_url))
 					->setTitle(_('Help'))

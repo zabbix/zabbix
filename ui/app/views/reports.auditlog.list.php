@@ -82,7 +82,7 @@ $filter_form = (new CFormList())
 	)
 	->addRow(_('Actions'), $filter_actions);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Audit log'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_AUDITLOG_LIST))
 	->addItem($filter
@@ -154,7 +154,7 @@ $obj = [
 	'timeControl.processObjects();')
 )->show();
 
-$widget
+$html_page
 	->addItem(
 		(new CForm('get'))
 			->setName('auditForm')

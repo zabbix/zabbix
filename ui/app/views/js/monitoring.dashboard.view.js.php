@@ -380,7 +380,7 @@
 			applyProperties() {
 				const dashboard_data = ZABBIX.Dashboard.getData();
 
-				document.getElementById('<?= ZBX_STYLE_PAGE_TITLE ?>').textContent = dashboard_data.name;
+				document.getElementById('<?= CHtmlPage::PAGE_TITLE_ID ?>').textContent = dashboard_data.name;
 				document.getElementById('dashboard-direct-link').textContent = dashboard_data.name;
 			},
 

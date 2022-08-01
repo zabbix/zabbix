@@ -806,7 +806,7 @@ function makePageFooter($with_version = true) {
 /**
  * Get drop-down submenu item list for the User settings section.
  *
- * @return array|null  Menu definition for CWidget::setTitleSubmenu.
+ * @return array|null  Menu definition for CHtmlPage::setTitleSubmenu.
  */
 function getUserSettingsSubmenu(): ?array {
 	if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
@@ -834,7 +834,7 @@ function getUserSettingsSubmenu(): ?array {
 /**
  * Get drop-down submenu item list for the Administration->General section.
  *
- * @return array  Menu definition for CWidget::setTitleSubmenu.
+ * @return array  Menu definition for CHtmlPage::setTitleSubmenu.
  */
 function getAdministrationGeneralSubmenu() {
 	$gui_url = (new CUrl('zabbix.php'))

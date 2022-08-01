@@ -63,7 +63,7 @@ $this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
 $this->enableLayoutModes();
 $this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 
-(new CWidget())
+(new CHtmlPage())
 	->addItem(
 		(new CDiv())
 			->addClass(ZBX_STYLE_DASHBOARD)

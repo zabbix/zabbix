@@ -333,14 +333,14 @@ $saml_tab = (new CFormGrid())
 		)
 	]);
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Authentication'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTHENTICATION_EDIT))
 	->addItem((new CForm())
 		->addVar('action', $data['action_submit'])
 		->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
 		->setId('authentication-form')
-		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+		->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 		->disablePasswordAutofill()
 		->addItem((new CTabView())
 			->setSelected($data['form_refresh'] ? null : 0)
@@ -356,7 +356,7 @@ $saml_tab = (new CFormGrid())
 	->show();
 
 (new CScriptTag(
-	'view.init('. json_encode([
+	'view.init('.json_encode([
 		'ldap_servers' => $data['ldap_servers'],
 		'ldap_default_row_index' => $data['ldap_default_row_index'],
 		'db_authentication_type' => $data['db_authentication_type']

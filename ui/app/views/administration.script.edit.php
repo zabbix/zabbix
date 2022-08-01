@@ -27,7 +27,7 @@ $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('administration.script.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Scripts'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_SCRIPT_EDIT));
 
@@ -50,12 +50,12 @@ $row_template = (new CTag('script', true))
 		]))->addClass('form_row')
 	);
 
-$widget->addItem($row_template);
+$html_page->addItem($row_template);
 
 $form = (new CForm())
 	->setId('script-form')
 	->setName('scripts')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 
@@ -303,4 +303,4 @@ else {
 
 $form->addItem($scriptView);
 
-$widget->addItem($form)->show();
+$html_page->addItem($form)->show();

@@ -160,7 +160,7 @@ $form_list = (new CFormList())
 
 $form = (new CForm('post', null, 'multipart/form-data'))
 	->setId('import-form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('import', 1)
 	->addVar('rules_preset', $data['rules_preset'])
 	->addItem($form_list);

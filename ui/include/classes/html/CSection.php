@@ -33,10 +33,8 @@ class CSection extends CTag {
 	}
 
 	public function addItem($value): self {
-		$items = is_array($value) ? $value : [$value];
-
-		foreach ($items as $item) {
-			$this->items[] = $item;
+		if ($value !== null) {
+			$this->items[] = $value;
 		}
 
 		return $this;

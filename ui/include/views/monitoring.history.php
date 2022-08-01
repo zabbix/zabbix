@@ -26,7 +26,7 @@ $this->includeJsFile('monitoring.history.js.php');
 
 $web_layout_mode = CViewHelper::loadLayoutMode();
 
-$historyWidget = (new CWidget())->setWebLayoutMode($web_layout_mode);
+$html_page = (new CHtmlPage())->setWebLayoutMode($web_layout_mode);
 
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
@@ -222,7 +222,7 @@ if ($data['itemids']) {
 // append plaintext to widget
 if ($data['plaintext']) {
 	foreach ($header_row as $text) {
-		$historyWidget->addItem([new CSpan($text), BR()]);
+		$html_page->addItem([new CSpan($text), BR()]);
 	}
 
 	if ($data['itemids']) {
@@ -231,11 +231,11 @@ if ($data['plaintext']) {
 		foreach ($screen as $text) {
 			$pre->addItem([$text, BR()]);
 		}
-		$historyWidget->addItem($pre);
+		$html_page->addItem($pre);
 	}
 }
 else {
-	$historyWidget
+	$html_page
 		->setTitle($header['left'])
 		->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HISTORY))
 		->setControls((new CTag('nav', true, $header['right']))->setAttribute('aria-label', _('Content controls')));
@@ -272,10 +272,10 @@ else {
 
 	if ($data['itemids']) {
 		if ($data['action'] !== HISTORY_LATEST) {
-			$historyWidget->addItem($filter_form);
+			$html_page->addItem($filter_form);
 		}
 
-		$historyWidget->addItem($screen->get());
+		$html_page->addItem($screen->get());
 
 		if ($data['action'] !== HISTORY_LATEST) {
 			CScreenBuilder::insertScreenStandardJs($screen->timeline);
@@ -283,10 +283,10 @@ else {
 	}
 	else {
 		if ($filter_tab) {
-			$historyWidget->addItem($filter_form);
+			$html_page->addItem($filter_form);
 		}
 
-		$historyWidget->addItem(
+		$html_page->addItem(
 			(new CTableInfo())
 				->setHeader([
 					(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH),
@@ -298,4 +298,4 @@ else {
 	}
 }
 
-$historyWidget->show();
+$html_page->show();

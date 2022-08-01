@@ -26,7 +26,7 @@
 
 $this->includeJsFile('configuration.templategroup.list.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Template groups'))
 	->setControls((new CTag('nav', true, (new CList())
 		->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
@@ -148,7 +148,7 @@ $form->addItem([
 	], 'templategroup')
 ]);
 
-$widget
+$html_page
 	->addItem($filter)
 	->addItem($form)
 	->show();

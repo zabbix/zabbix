@@ -29,7 +29,7 @@ $this->includeJsFile(($data['action'] === 'user.edit')
 	: 'administration.userprofile.edit.js.php'
 );
 
-$widget = new CWidget();
+$html_page = new CHtmlPage();
 
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
@@ -40,13 +40,14 @@ else {
 	$widget_name .= ($data['name'] !== '' || $data['surname'] !== '')
 		? $data['name'].' '.$data['surname']
 		: $data['username'];
-	$widget->setTitleSubmenu(getUserSettingsSubmenu());
+	$html_page->setTitleSubmenu(getUserSettingsSubmenu());
 	$doc_url = CDocHelper::ADMINISTRATION_USERPROFILE_EDIT;
 }
 
-$widget
+$html_page
 	->setTitle($widget_name)
 	->setDocUrl(CDocHelper::getUrl($doc_url));
+
 $tabs = new CTabView();
 
 if ($data['form_refresh'] == 0) {
@@ -57,7 +58,7 @@ if ($data['form_refresh'] == 0) {
 $user_form = (new CForm())
 	->setId('user-form')
 	->setName('user_form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);
 
@@ -805,6 +806,6 @@ else {
 
 // Append tab to form.
 $user_form->addItem($tabs);
-$widget
+$html_page
 	->addItem($user_form)
 	->show();

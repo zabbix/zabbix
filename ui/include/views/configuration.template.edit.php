@@ -25,12 +25,12 @@
 
 require_once __DIR__.'/js/common.template.edit.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Templates'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_TEMPLATES_EDIT));
 
 if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
-	$widget->setNavigation(getHostNavigation('', $data['templateid']));
+	$html_page->setNavigation(getHostNavigation('', $data['templateid']));
 }
 
 $tabs = new CTabView();
@@ -42,7 +42,7 @@ if (!hasRequest('form_refresh')) {
 $form = (new CForm())
 	->setId('templates-form')
 	->setName('templatesForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form']);
 
 if ($data['templateid'] != 0) {
@@ -235,6 +235,7 @@ else {
 }
 
 $form->addItem($tabs);
-$widget->addItem($form);
 
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

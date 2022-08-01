@@ -27,7 +27,7 @@ $this->addJsFile('colorpicker.js');
 
 $this->includeJsFile('administration.trigdisplay.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Trigger displaying options'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_TRIGDISPLAY_EDIT));
@@ -156,7 +156,7 @@ $form_list = (new CFormList())
 	->addInfo(_('Custom severity names affect all locales and require manual translation!'));
 
 $form = (new CForm())
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'trigdisplay.update')
 		->getUrl()
@@ -170,4 +170,4 @@ $form = (new CForm())
 			))
 	);
 
-$widget->addItem($form)->show();
+$html_page->addItem($form)->show();

@@ -33,7 +33,7 @@ $this->includeJsFile('monitoring.web.view.js.php');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Web monitoring'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_WEB_VIEW))

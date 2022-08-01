@@ -25,7 +25,7 @@
 
 $this->includeJsFile('administration.housekeeping.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Housekeeping'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_HOUSEKEEPING_EDIT));
@@ -36,7 +36,7 @@ $form = (new CForm())
 		->setArgument('action', 'housekeeping.update')
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID);
 
 $house_keeper_tab = (new CFormList())
 	->addRow((new CTag('h4', true, _('Events and alerts')))->addClass('input-section-header'))
@@ -240,6 +240,6 @@ $form->addItem(
 		))
 );
 
-$widget
+$html_page
 	->addItem($form)
 	->show();

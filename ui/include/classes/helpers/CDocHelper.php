@@ -154,15 +154,15 @@ class CDocHelper {
 	const SLAREPORT_LIST =									'web_interface/frontend_sections/services/sla_report#overview';
 	const TR_EVENTS =										'web_interface/frontend_sections/monitoring/problems#viewing-details';
 
-	public static function getUrl($path): ?string {
+	public static function getUrl($path): string {
 		if (CBrandHelper::isRebranded()) {
-			return null;
+			return '';
 		}
 
 		if (preg_match('/^\d+\.\d+/', ZABBIX_VERSION, $version)) {
 			return ZBX_DOCUMENTATION_URL.'/'.$version[0].'/en/manual/'.$path;
 		}
 
-		return null;
+		return '';
 	}
 }

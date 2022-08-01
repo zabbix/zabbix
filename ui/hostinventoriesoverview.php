@@ -142,7 +142,7 @@ $select_groupby = (new CSelect('filter_groupby'))
 	->addOption(new CSelectOption('', _('not selected')))
 	->addOptions(CSelect::createOptionsFromArray($inventories));
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Host inventory overview'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::INVENTORY_HOST_OVERVIEW))
 	->addItem(

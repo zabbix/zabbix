@@ -52,7 +52,7 @@ else {
 
 $current_url = (new CUrl('actionconf.php'))->setArgument('eventsource', $data['eventsource']);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle($title)
 	->setTitleSubmenu($submenu ? ['main_section' => ['items' => $submenu]] : null)
 	->setDocUrl(CDocHelper::getUrl($doc_url))
@@ -173,7 +173,6 @@ $actionForm->addItem([
 	], $data['eventsource'])
 ]);
 
-// append form to widget
-$widget->addItem($actionForm);
-
-$widget->show();
+$html_page
+	->addItem($actionForm)
+	->show();

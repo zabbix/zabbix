@@ -25,7 +25,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Discovery rules'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DISCOVERY_EDIT));
 
@@ -33,7 +33,7 @@ $widget = (new CWidget())
 $discoveryForm = (new CForm())
 	->setId('discoveryForm')
 	->setName('discoveryForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID);
 
 if (!empty($this->data['druleid'])) {
 	$discoveryForm->addVar('druleid', $this->data['druleid']);
@@ -174,6 +174,6 @@ else {
 
 $discoveryForm->addItem($discoveryTabs);
 
-$widget->addItem($discoveryForm);
-
-$widget->show();
+$html_page
+	->addItem($discoveryForm)
+	->show();

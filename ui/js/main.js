@@ -703,7 +703,7 @@ function toggleSection(id, profile_idx) {
 	section.classList.toggle('section-collapsed', !is_collapsed);
 	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 
-	if (profile_idx !== null) {
+	if (profile_idx !== '') {
 		updateUserProfile(profile_idx, is_collapsed ? '1' : '0', []);
 	}
 }
