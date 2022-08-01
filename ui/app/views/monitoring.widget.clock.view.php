@@ -84,7 +84,7 @@ else {
 		}
 
 		$body = (new CDiv($rows))
-			->addClass('dashboard-grid-widget-clock')
+			->addClass('dashboard-widget-clock')
 			->addClass('clock-digital');
 
 		if ($clock_data['bg_color'] !== '') {

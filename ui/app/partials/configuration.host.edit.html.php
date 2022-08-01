@@ -188,7 +188,7 @@ $host_tab
 					]))
 				])
 				: null
-		]),
+		], 'add_templates__ms'),
 		(new CFormField(
 			(count($templates_field_items) > 1)
 				? (new CDiv($templates_field_items))->addClass('linked-templates')
@@ -222,7 +222,13 @@ $host_tab
 	->addItem([
 		new CLabel(_('Interfaces')),
 		new CFormField([
-			new CDiv([renderInterfaceHeaders(), $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]),
+			(new CDiv([
+				renderInterfaceHeaders(),
+				$agent_interfaces,
+				$snmp_interfaces,
+				$jmx_interfaces,
+				$ipmi_interfaces
+			]))->addClass(ZBX_STYLE_HOST_INTERFACES),
 			$host_is_discovered
 				? null
 				: new CDiv(
@@ -396,7 +402,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 	}
 
 	$inventory_tab->addItem([
-		new CLabel($inventory_field['title']),
+		new CLabel($inventory_field['title'], 'host_inventory['.$field_name.']'),
 		new CFormField([$input_field, $inventory_item])
 	]);
 }
@@ -522,6 +528,5 @@ if (array_key_exists('buttons', $data)) {
 }
 
 $host_form
-	->addItem($data['warning'])
 	->addItem($tabs)
 	->show();

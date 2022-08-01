@@ -4060,7 +4060,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 						interface->interfaceid, interface->main, interface->type,
 						interface->useip, interface->ip, interface->dns, atoi(interface->port));
 			}
-			else if (0 != (interface->flags & ZBX_FLAG_HPMACRO_UPDATE))
+			else if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE))
 			{
 				const char	*d = "";
 
