@@ -31,6 +31,10 @@ import (
 func Listen(address string, args ...interface{}) (c *Listener, err error) {
 	var tlsconfig *tls.Config
 
+	// prevent other processes from binding to the same port
+	// SO_EXCLUSIVEADDRUSE is mutually exclusive with SO_REUSEADDR
+	// on Windows SO_REUSEADDR has different semantics than on Unix
+	// https://msdn.microsoft.com/en-us/library/windows/desktop/ms740621(v=vs.85).aspx
 	lc := net.ListenConfig{
 		Control: func(network, address string, conn syscall.RawConn) error {
 			var operr error
