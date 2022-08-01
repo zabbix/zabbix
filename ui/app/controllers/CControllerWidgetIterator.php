@@ -22,7 +22,7 @@
 /**
  * Class containing methods for operations with widget iterators.
  */
-abstract class CControllerWidgetIterator extends CControllerWidget {
+abstract class CControllerWidgetIterator extends CControllerDashboardWidgetView {
 
 	/**
 	 * @var array $iterator_validation_rules  Validation rules for input parameters of the iterator.

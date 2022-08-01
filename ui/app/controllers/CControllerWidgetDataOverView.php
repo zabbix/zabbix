@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerWidgetDataOverView extends CControllerWidget {
+class CControllerWidgetDataOverView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();

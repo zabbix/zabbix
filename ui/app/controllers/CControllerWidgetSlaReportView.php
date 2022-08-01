@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerWidgetSlaReportView extends CControllerWidget {
+class CControllerWidgetSlaReportView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();

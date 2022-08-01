@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerWidgetClockView extends CControllerWidget {
+class CControllerWidgetClockView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();

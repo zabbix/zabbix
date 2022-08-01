@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerWidgetGeoMapView extends CControllerWidget {
+class CControllerWidgetGeoMapView extends CControllerDashboardWidgetView {
 
 	const NO_PROBLEMS_MARKER_COLOR = '#009900';
 

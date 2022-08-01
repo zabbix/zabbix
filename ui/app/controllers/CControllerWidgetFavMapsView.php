@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetFavMapsView extends CControllerWidget {
+class CControllerWidgetFavMapsView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();

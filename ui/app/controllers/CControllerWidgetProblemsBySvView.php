@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetProblemsBySvView extends CControllerWidget {
+class CControllerWidgetProblemsBySvView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();

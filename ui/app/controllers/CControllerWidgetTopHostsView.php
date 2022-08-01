@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerWidgetTopHostsView extends CControllerWidget {
+class CControllerWidgetTopHostsView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();

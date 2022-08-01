@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetNavTreeView extends CControllerWidget {
+class CControllerWidgetNavTreeView extends CControllerDashboardWidgetView {
 
 	private $problems_per_severity_tpl;
 

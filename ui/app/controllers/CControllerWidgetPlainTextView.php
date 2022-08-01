@@ -22,7 +22,7 @@
 /**
  * Class for Dashboard Plain-text widget view.
  */
-class CControllerWidgetPlainTextView extends CControllerWidget {
+class CControllerWidgetPlainTextView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();

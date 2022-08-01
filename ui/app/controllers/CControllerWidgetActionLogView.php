@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerWidgetActionLogView extends CControllerWidget {
+class CControllerWidgetActionLogView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();

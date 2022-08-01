@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerWidgetItemView extends CControllerWidget {
+class CControllerWidgetItemView extends CControllerDashboardWidgetView {
 
 	public const CHANGE_INDICATOR_UP = 1;
 	public const CHANGE_INDICATOR_DOWN = 2;

@@ -21,7 +21,7 @@
 
 require_once __DIR__.'/../../include/blocks.inc.php';
 
-class CControllerWidgetSystemInfoView extends CControllerWidget {
+class CControllerWidgetSystemInfoView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();

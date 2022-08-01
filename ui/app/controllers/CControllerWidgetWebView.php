@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerWidgetWebView extends CControllerWidget {
+class CControllerWidgetWebView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();

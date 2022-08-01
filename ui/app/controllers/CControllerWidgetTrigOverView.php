@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerWidgetTrigOverView extends CControllerWidget {
+class CControllerWidgetTrigOverView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();

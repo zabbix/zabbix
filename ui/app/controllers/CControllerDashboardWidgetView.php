@@ -22,7 +22,7 @@
 /**
  * Class containing methods for operations with widgets.
  */
-abstract class CControllerWidget extends CController {
+abstract class CControllerDashboardWidgetView extends CController {
 
 	/**
 	 * @var int $type  Widget type WIDGET_*.

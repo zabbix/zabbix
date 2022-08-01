@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-class CControllerWidgetSvgGraphView extends CControllerWidget {
+class CControllerWidgetSvgGraphView extends CControllerDashboardWidgetView {
 
 	const GRAPH_WIDTH_MIN = 1;
 	const GRAPH_WIDTH_MAX = 65535;

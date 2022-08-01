@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerWidgetHostAvailView extends CControllerWidget {
+class CControllerWidgetHostAvailView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();
