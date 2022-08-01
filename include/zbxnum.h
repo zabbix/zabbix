@@ -49,7 +49,7 @@ int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint
 int	is_hex_string(const char *str);
 
 double	zbx_get_double_epsilon(void);
-void	zbx_update_epsilon_to_not_use_double_precision(void);
+void	zbx_update_epsilon_to_float_precision(void);
 void	zbx_update_epsilon_to_python_compatible_precision(void);
 int	zbx_double_compare(double a, double b);
 int	zbx_validate_value_dbl(double value, int dbl_precision);

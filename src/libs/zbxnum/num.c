@@ -148,7 +148,7 @@ double	zbx_get_double_epsilon(void)
 	return ZBX_DOUBLE_EPSILON;
 }
 
-void	zbx_update_epsilon_to_not_use_double_precision(void)
+void	zbx_update_epsilon_to_float_precision(void)
 {
 	ZBX_DOUBLE_EPSILON = 0.000001;
 }

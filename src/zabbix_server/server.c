@@ -1773,7 +1773,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != DBcheck_double_type())
 	{
 		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_DISABLED;
-		zbx_update_epsilon_to_not_use_double_precision();
+		zbx_update_epsilon_to_float_precision();
 		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
 	}
 

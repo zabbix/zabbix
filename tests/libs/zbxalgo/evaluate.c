@@ -36,7 +36,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_update_epsilon_to_not_use_double_precision();
+	zbx_update_epsilon_to_float_precision();
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("expression", &param_handle)) ||
 			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &expression)))

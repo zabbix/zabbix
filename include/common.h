@@ -914,6 +914,11 @@ do														\
 }														\
 while (0)
 
+/* to avoid dependency on libzbxnix.a */
+#define	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE									\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
+			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
+
 extern const char	*progname;
 extern const char	title_message[];
 extern const char	syslog_app_name[];

@@ -1930,7 +1930,7 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 						*ptr++ = '"';
 						break;
 					case '\0':
-						exit(EXIT_FAILURE);
+						THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE;
 						*ptr = '\0';
 						return str;
 				}
@@ -2112,7 +2112,7 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 	{
 		if (0 == *alloc_len)
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
+			THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE;
 			exit(EXIT_FAILURE);
 		}
 
