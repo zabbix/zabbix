@@ -1,40 +1,65 @@
+Changes for 6.2.2rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
+.........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
+.......PS. [ZBX-20770] fixed secret macro being resolved in wrong locations (vso)
+...G...... [ZBX-21300] fixed high cpu usage when using net.tcp.socket.count key (vso)
+........S. [ZBX-20419] fixed database deadlocks and MySQL error number calculation to be consistent between logging and recoverability detection logic (akozlovs)
+..F....... [ZBX-21043] fixed z-select error when labels have specials chars (rlataria)
+........S. [ZBX-20656] updated active proxy throttling to allow task transfer (wiper)
+.......PS. [ZBX-21153] fixed info collection about access to vmware DS for HV with large number of connected DS (MVekslers)
+........S. [ZBX-19821] fixed host prototype interface update when linking templates (wiper)
+..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 6.2.1
+
+6.2.1rc1 was released as 6.2.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.2.1rc1
 
 New features:
-.......PS. [ZBXNEXT-7814] updated max supported mariadb version to 10.8 (yurii)
-.......PS. [ZBXNEXT-5229] added support vmware tags for hv, vm, ds, cl and dc (MVekslers)
-.......PS. [ZBXNEXT-2043] added new vmware keys *.alarms.get (MVekslers, ssimonenko)
+.......PS. [ZBXNEXT-2878] added new vmware.*.property items (MVekslers)
+.......PS. [ZBXNEXT-7814] updated max supported MariaDB version to 10.8 (yurii)
+.......PS. [ZBXNEXT-5229] added support for VMware tags for hv, vm, ds, cl and dc (MVekslers)
+.......PS. [ZBXNEXT-2043] added new VMware keys *.alarms.get (MVekslers, ssimonenko)
 .........T [ZBXNEXT-7633] added HPE Synergy template (vkhaliev)
 .........T [ZBXNEXT-7802] added namespaces in templates HashiCorp Consul by HTTP (ychukina)
 .........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
+A.F....... [ZBX-7706] improved performance of graph.get and graphprototype.get methods (acikuns, rlataria)
+..F....... [ZBX-21291] fixed aggregation by sum for the graph widget; fixed approximation function for aggregate values (ashubin)
 ..F....... [ZBX-21290] fixed displaying extra reporting periods in SLA reports when filtered by date (averza)
-.......PS. [ZBX-21294] fixed macros not being updated in javascript preprocessing step (vso)
+.......PS. [ZBX-21294] fixed macros not being updated in JavaScript preprocessing step (vso)
 ...G...... [ZBX-21310] fixed SSL_shutdown() error in zabbix_server.log when receiving active check heartbeat (vso)
 ..F....... [ZBX-21269] fixed missing custom time period icon in graph widgets when editing dashboards (averza)
 ..F....... [ZBX-21110] fixed time string parsing in graphs with items without data (averza)
 ..F....... [ZBX-19731] fixed problems page and problems widget table layout issues when long names are used (acikuns)
-..F....... [ZBX-21314] fixed locale for digital clock widget (rlataria)
+..F....... [ZBX-21314] fixed locale for Digital clock widget (rlataria)
 ...G...... [ZBX-20523] fixed symlink names expansion in vfs.dir.get and vfs.file.get (akozlovs)
 ...G...... [ZBX-20448] improved error message when failed to accept incoming connection (vso)
-...G...... [ZBX-20860] fixed Zabbix agent 2 build on mipsle and mipsle64 linux (esneiders)
+...G...... [ZBX-20860] fixed Zabbix agent 2 build on mipsle and mipsle64 Linux (esneiders)
 ........S. [ZBX-21218] fixed deadlocks between server and frontend when discovering items with LLD (wiper)
 ........S. [ZBX-21021] fixed services actions not executing scripts (vso)
-...G...... [ZBX-20586] free tls C resources when closing tls connection on agent2 (wiper)
+...G...... [ZBX-20586] free TLS C resources when closing TLS connection on agent 2 (wiper)
 .......PS. [ZBX-21301] fixed ambiguity and inability to set character set for MariaDB connection by setting utf8mb3 character instead of utf8 (vso)
 ........S. [ZBX-17450] added check for minimal amount of data with forecast/timeleft functions and polynomial fit (wiper)
 ...G...... [ZBX-19001] fixed wmi.getall[] and wmi.get[] to report invalid queries (vso)
 ..F....... [ZBX-21282] fixed graph widget missing data option (ashubin)
 ..F....... [ZBX-20908] fixed interface type labels in host edit form (ashubin)
 ..F....... [ZBX-21157] fixed warning message overlaying error message when cloning a host (agriscenko)
-...G...... [ZBX-20667] fixed timeout issue for Agent 2 checks in test run mode (ssimonenko)
+...G...... [ZBX-20667] fixed timeout issue for agent 2 checks in test run mode (ssimonenko)
 ..F....... [ZBX-20467] fixed z-select options with long labels (rlataria)
 ........S. [ZBX-21159] improved logging in the case of permission errors during HA startup (wiper)
 ........S. [ZBX-20962] improved error message when trying to use foreach function with single item query (wiper)
 ........S. [ZBX-20880] changed HA cluster node discovery to return empty array in standalone mode (wiper)
-...G...... [ZBX-20203] fixed agent2 log* item large file support on windows (wiper)
-........S. [ZBX-21044] fixed javascript preprocessing output conversion to utf-8 (kprutkovs)
+...G...... [ZBX-20203] fixed agent 2 log* item large file support on windows (wiper)
+........S. [ZBX-21044] fixed JavaScript preprocessing output conversion to utf-8 (kprutkovs)
 ..F....... [ZBX-21125] fixed incorrect filter results with empty multiselect fields in Monitoring Problems (dpetra)
 ..F....... [ZBX-18957] fixed not displaying years on X axis of classic graphs (averza)
 ..F....... [ZBX-21061] fixed incorrect error message position on Authentication page (kkuzmina)
@@ -50,7 +75,7 @@ Bug fixes:
 ..F....... [ZBX-20887] added missing documentation link in Dashboard sharing popup form (dpetra)
 A.F.....S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (agriscenko, mprihodko)
 ..F....... [ZBX-20629] fixed auto refreshing for graphs on Monitoring -> Hosts page (rdetlavs)
-.........T [ZBX-19955] fixed script item in cloudflare template (vkhaliev)
+.........T [ZBX-19955] fixed script item in Cloudflare template (vkhaliev)
 ..F....... [ZBX-18534] fixed name autocomplete when select element has been selected in map navigation tree (dpetra)
 ..F....... [ZBX-20781] fixed overlapping of subfilter options (miks)
 ..F....... [ZBX-10615] fixed missing translations context for strings used as headers in small tables (dpetra)
@@ -67,13 +92,14 @@ A.F....... [ZBX-20233] fixed handling of empty configuration parameters $ZBX_SER
 .......PS. [ZBX-20888] improved out of memory error message readability (vso)
 .D........ [ZBX-21020] improved "ServerActive" configuration option description (vso)
 .......PS. [ZBX-20855] fixed preprocessing not to discard event log specific data (vso)
-..F....PS. [ZBX-20638] fixed handling of db version higher than supported (agriscenko, dgoloscapov)
+..F....PS. [ZBX-20638] fixed handling of DB version higher than supported (agriscenko, dgoloscapov)
 ..F....... [ZBX-21015] fixed web scenario tags disappearing from Monitoring -> Hosts -> Web scenario on page auto refresh (agriscenko)
 ..F....... [ZBX-20847] fixed inability to attach any host groups after removing already attached ones (agriscenko)
 ..F....... [ZBX-20534] fixed popup layout for importing when horizontal scroll was not visible (rlataria)
 ..F....... [ZBX-20496] fixed delete missing import option for templated dashboards (rlataria)
 ..F....... [ZBX-20591] fixed draggable block position in preprocessing (rlataria)
 ...G...PS. [ZBX-21086] fixed regexp matching not to check for UTF-8 validity (vso)
+..F....... [ZBX-21350] fixed cross-site scripting vulnerability in backurl parameter (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0
@@ -139,6 +165,8 @@ Bug fixes:
 .........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
 ..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
 ........S. [ZBX-21111] fixed HA manager stopping (kprutkovs)
+..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
+..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0beta3
@@ -251,37 +279,60 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.8rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
+.........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
+...G...... [ZBX-21300] fixed high cpu usage when using net.tcp.socket.count key (vso)
+........S. [ZBX-20419] fixed database deadlocks and MySQL error number calculation to be consistent between logging and recoverability detection logic (akozlovs)
+..F....... [ZBX-21043] fixed z-select error when labels have specials chars (rlataria)
+........S. [ZBX-20656] updated active proxy throttling to allow task transfer (wiper)
+.......PS. [ZBX-21153] fixed info collection about access to vmware DS for HV with large number of connected DS (MVekslers)
+........S. [ZBX-19821] fixed host prototype interface update when linking templates (wiper)
+..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.7
+
+6.0.7rc1 was released as 6.0.7 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.7rc1
 
 New features:
-.......PS. [ZBXNEXT-7814] updated max supported mariadb version to 10.8 (yurii)
+.......PS. [ZBXNEXT-7814] updated max supported MariaDB version to 10.8 (yurii)
 .........T [ZBXNEXT-7633] added HPE Synergy template (vkhaliev)
 .........T [ZBXNEXT-7802] added namespaces in templates HashiCorp Consul by HTTP (ychukina)
 .........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
+A.F....... [ZBX-7706] improved performance of graph.get and graphprototype.get methods (acikuns, rlataria)
+..F....... [ZBX-20429] fixed error when deleting services (rdetlavs)
 ..F....... [ZBX-21290] fixed displaying extra reporting periods in SLA reports when filtered by date (averza)
 ..F....... [ZBX-21269] fixed missing custom time period icon in graph widgets when editing dashboards (averza)
 ..F....... [ZBX-21110] fixed time string parsing in graphs with items without data (averza)
-..F....... [ZBX-19731] fixed problems page and problems widget table layout issues when long names are used (acikuns)
+..F....... [ZBX-19731] fixed Problems page and Problems widget table layout issues when long names are used (acikuns)
 ...G...... [ZBX-20523] fixed symlink names expansion in vfs.dir.get and vfs.file.get (akozlovs)
 ...G...... [ZBX-20448] improved error message when failed to accept incoming connection (vso)
-...G...... [ZBX-20860] fixed Zabbix agent 2 build on mipsle and mipsle64 linux (esneiders)
+...G...... [ZBX-20860] fixed Zabbix agent 2 build on mipsle and mipsle64 Linux (esneiders)
 ........S. [ZBX-21218] fixed deadlocks between server and frontend when discovering items with LLD (wiper)
 ........S. [ZBX-20936] improved performance of configuration syncer when reading trigger dependencies (vso)
 ........S. [ZBX-21021] fixed services actions not executing scripts (vso)
-...G...... [ZBX-20586] free tls C resources when closing tls connection on agent2 (wiper)
+...G...... [ZBX-20586] free TLS C resources when closing TLS connection on agent 2 (wiper)
 .......PS. [ZBX-21301] fixed ambiguity and inability to set character set for MariaDB connection by setting utf8mb3 character instead of utf8 (vso)
 ........S. [ZBX-17450] added check for minimal amount of data with forecast/timeleft functions and polynomial fit (wiper)
 ...G...... [ZBX-19001] fixed wmi.getall[] and wmi.get[] to report invalid queries (vso)
 ..F....... [ZBX-20908] fixed interface type labels in host edit form (ashubin)
 ..F....... [ZBX-21157] fixed warning message overlaying error message when cloning a host (agriscenko)
-...G...... [ZBX-20667] fixed timeout issue for Agent 2 checks in test run mode (ssimonenko)
+...G...... [ZBX-20667] fixed timeout issue for agent 2 checks in test run mode (ssimonenko)
 ..F....... [ZBX-20467] fixed z-select options with long labels (rlataria)
 ........S. [ZBX-21159] improved logging in the case of permission errors during HA startup (wiper)
 ........S. [ZBX-20962] improved error message when trying to use foreach function with single item query (wiper)
 ........S. [ZBX-20880] changed HA cluster node discovery to return empty array in standalone mode (wiper)
-...G...... [ZBX-20203] fixed agent2 log* item large file support on windows (wiper)
+...G...... [ZBX-20203] fixed agent 2 log* item large file support on Windows (wiper)
 ..F....... [ZBX-21125] fixed incorrect filter results with empty multiselect fields in Monitoring Problems (dpetra)
 ..F....... [ZBX-18957] fixed not displaying years on X axis of classic graphs (averza)
 ..F....... [ZBX-20978] fixed trigger popover layout error in high-contrast themes (dpetra)
@@ -290,9 +341,9 @@ Bug fixes:
 ..F....... [ZBX-20854] fixed missing headers in Columns field in Top hosts widget configuration form (dpetra)
 .........T [ZBX-21172] fixed host group names and added IPv6 support in Templates Kubernetes by HTTP (ychukina)
 ..F....... [ZBX-20965] fixed positioning of change indicator in Item value widget (dpetra)
-..F....... [ZBX-21259] fixed API token expiration date field is always visible in User Settings->API tokens (esekace)
+..F....... [ZBX-21259] fixed API token expiration date field being always visible in User Settings->API tokens (esekace)
 ..F....... [ZBX-20629] fixed auto refreshing for graphs on Monitoring -> Hosts page (rdetlavs)
-.........T [ZBX-19955] fixed script item in cloudflare template (vkhaliev)
+.........T [ZBX-19955] fixed script item in Cloudflare template (vkhaliev)
 ..F....... [ZBX-18534] fixed name autocomplete when select element has been selected in map navigation tree (dpetra)
 ..F....... [ZBX-20584] fixed possibility to open graph in a full screen from graph widget (Sasha)
 .......PS. [ZBX-20888] improved out of memory error message readability (vso)
@@ -305,6 +356,7 @@ Bug fixes:
 .........T [ZBX-20473] fixed evaluation period macro in disk space triggers for NetApp FAS3220 template (drasihov)
 .........T [ZBX-19205] fixed item preprocessing in PostgreSQL by Zabbix agent 2 template (drasihov)
 A.F.....S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (agriscenko, mprihodko)
+..F....... [ZBX-21350] fixed cross-site scripting vulnerability in backurl parameter (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.6
@@ -403,6 +455,8 @@ A.F....... [ZBX-20613] returned the ability to edit the dependencies of inherite
 .........T [ZBX-20982] fixed API request by coordinates in the OpenWeatherMap template (vkhaliev)
 ........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)
 ..F....... [ZBX-20548] fixed broken host link not opening in Inventory (rdetlavs)
+..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
+..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.4
@@ -2267,13 +2321,31 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.27rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
+.........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
+........S. [ZBX-20419] fixed database deadlocks and MySQL error number calculation to be consistent between logging and recoverability detection logic (akozlovs)
+........S. [ZBX-20656] updated active proxy throttling to allow task transfer (wiper)
+.......PS. [ZBX-21153] fixed info collection about access to vmware DS for HV with large number of connected DS (MVekslers)
+..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.26
+
+5.0.26rc1 was released as 5.0.26 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.26rc1
 
 New features:
 .........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
-A.F....... [ZBX-7706] removed permission checks for ymin_itemid and ymax_itemid (acikuns, rlataria)
+A.F....... [ZBX-7706] improved performance of graph.get and graphprototype.get methods (acikuns, rlataria)
 ...G...... [ZBX-20448] improved error message when failed to accept incoming connection (vso)
 ........S. [ZBX-21218] fixed deadlocks between server and frontend when discovering items with LLD (wiper)
 ...G...... [ZBX-20586] free tls C resources when closing tls connection on agent2 (wiper)
@@ -2288,8 +2360,6 @@ A.F....... [ZBX-7706] removed permission checks for ymin_itemid and ymax_itemid 
 .........T [ZBX-20473] fixed evaluation period macro in disk space triggers for NetApp FAS3220 template (drasihov)
 ....I....T [ZBX-19205] fixed item preprocessing in PostgreSQL by Zabbix agent 2 template, removed duplicate PostgreSQL templates from templates.tmpl (drasihov)
 ........S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (mprihodko)
-..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
-..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.25
@@ -2312,6 +2382,8 @@ Bug fixes:
 .........T [ZBX-20628] removed system metrics from PFSense template (vkhaliev)
 .........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
 ..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+..F....... [ZBX-21306] fixed xss in discovery rules (rlataria)
+..F....... [ZBX-21305] fixed xss in graph (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.24
@@ -4812,6 +4884,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.44rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.43
+
+4.0.43rc1 was released as 4.0.43 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.43rc1

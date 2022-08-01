@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -30,14 +30,13 @@ $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
-);
-
 $scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.svggraph.form.view.js.php')];
 $jq_templates = [];
+
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
+);
 
 $graph_preview = (new CDiv())
 	->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)
@@ -61,11 +60,10 @@ $form_tabs = (new CTabView())
 	)
 	->addClass('graph-widget-config-tabs')
 	->setSelected(0);
-
 $scripts[] = $form_tabs->makeJavascript();
 
 $form
-	->addItem($form_list)
+	->addItem($form_grid)
 	->addItem($graph_preview)
 	->addItem($form_tabs);
 

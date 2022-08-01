@@ -589,7 +589,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 
 	$units = [
 		'years' => _x('y', 'year short'),
-		'months' => _x('m', 'month short'),
+		'months' => _x('M', 'month short'),
 		'days' => _x('d', 'day short'),
 		'hours' => _x('h', 'hour short'),
 		'minutes' => _x('m', 'minute short'),

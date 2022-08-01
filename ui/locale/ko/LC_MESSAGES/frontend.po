@@ -11341,6 +11341,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "MAC주소A"
@@ -19848,13 +19853,33 @@ msgstr ""
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware 캐쉬통계. 이용가능한 모드：total, free, pfree, used, pused."
 
+#: include/classes/data/CItemData.php:1256
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware 클래스터의 상태, <url> - VMware서비스URL, <name> - VMware클래스터 이름"
+
+#: include/classes/data/CItemData.php:1272
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1308
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1316
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -19862,6 +19887,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1276
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1242
@@ -19873,8 +19902,16 @@ msgstr "VMware datastore의 바이트 단위 혹은 전체에서 퍼센트 용�
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1300
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1246
@@ -19891,6 +19928,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1336
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1350
@@ -19961,6 +20002,10 @@ msgstr "VMware 하이퍼바이저 프로세서 모델, <url> - VMware 서비스 
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 프로세서 사용량(Hz), <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
@@ -19972,6 +20017,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 상태, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
+
+#: include/classes/data/CItemData.php:1488
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20000,6 +20049,14 @@ msgstr "VMware서비스 풀네임, <url> - VMware서비스URL"
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware서비스버전, <url> - VMware서비스URL"
+
+#: include/classes/data/CItemData.php:1248
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1516
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20081,6 +20138,10 @@ msgstr "VMware가상머신의 프로세서 유효시간(ms)、<url> - VMware 서
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신의 프로세서사용량(Hz), <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
 
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 공유메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
@@ -20096,6 +20157,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 스왑된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
+
+#: include/classes/data/CItemData.php:1684
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"

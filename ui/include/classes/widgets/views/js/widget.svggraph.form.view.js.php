@@ -68,7 +68,7 @@ window.widget_svggraph_form = new class {
 	}
 
 	onGraphConfigChange() {
-		this._updatedForm();
+		this._updateForm();
 		this._updatePreview();
 	}
 
@@ -341,6 +341,7 @@ window.widget_svggraph_form = new class {
 		));
 
 		this._initDataSetSortable();
+		this._updateForm();
 	}
 
 	_cloneDataset() {
@@ -392,7 +393,7 @@ window.widget_svggraph_form = new class {
 			}
 		}
 
-		this.onGraphConfigChange();
+		this._updatePreview();
 	}
 
 	_removeDataSet(obj) {
@@ -588,7 +589,7 @@ window.widget_svggraph_form = new class {
 		}
 	}
 
-	_updatedForm() {
+	_updateForm() {
 		const axes_used = {<?= GRAPH_YAXIS_SIDE_LEFT ?>: 0, <?= GRAPH_YAXIS_SIDE_RIGHT ?>: 0};
 
 		for (const element of this._form.querySelectorAll('[type=radio], [type=hidden]')) {

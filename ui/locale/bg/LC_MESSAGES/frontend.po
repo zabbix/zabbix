@@ -1,32 +1,33 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2013-01-12 23:52+0300\n"
-"Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
+"PO-Revision-Date: 2022-07-25 06:55+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: \n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1358027539.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "Дата \"%1$s\" трябва да е в по-ранен времеви период от  дата\"%2$s\" ."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" вместо \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:323
 #: include/classes/import/validators/C10XmlValidator.php:341
@@ -44,69 +45,69 @@ msgstr ""
 #: include/classes/import/validators/C62XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" е очаквано"
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" трябва да е празен стринг (текст) или по-голям от \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "\"%1$s\" стойност трябва да е по-малка или равна на \"%2$s\" стойност"
 
 #: include/classes/import/validators/C10XmlValidator.php:360
 #: include/classes/import/validators/C10XmlValidator.php:383
 #: include/classes/import/validators/C10XmlValidator.php:405
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "\"host:key\" двойка се очаква"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"hostid\" на зависимия елемент и главния елемент трябва да съвпадат"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"ruleid\" на зависимия елемент и главния елемент трябва да съвпадат"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:901
 #: include/views/js/configuration.host.discovery.edit.js.php:86
 #: include/views/js/item.preprocessing.js.php:171
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.path.to.node"
 
 #: include/classes/api/services/CDRule.php:556
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr ""
+msgstr "%1$d знака надвишава максималната дължина от %2$d знака"
 
 #: include/func.inc.php:488
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d ден"
+msgstr[1] "%1$d дни"
 
 #: jsLoader.php:347
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "Намерени са %1$d съвпадения за %2$s"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d от %3$d%2$s проблем е показан"
+msgstr[1] "%1$d от %3$d%2$s проблеми са показани"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d проблема са избрани."
 
 #: chart4.php:94
 #, c-format
@@ -116,53 +117,53 @@ msgstr "%1$s (година %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - хвърлено от модул, намиращ се на %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Ред: %2$s | Колона: %3$s]"
 
 #: include/actions.inc.php:1893
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s действие"
+msgstr[1] "%1$s действия"
 
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s знака"
 
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "Остават %1$s знака"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s събитие"
+msgstr[1] "%1$s събития"
 
 #: include/maps.inc.php:410
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s хост е в профилактика"
+msgstr[1] "%1$s хоста са в профилактика"
 
 #: include/func.inc.php:2549
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s час"
+msgstr[1] "%1$s часа"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:126
 #: app/controllers/CControllerWidgetPlainTextView.php:127
@@ -170,16 +171,16 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s елемент"
+msgstr[1] "%1$s елементи"
 
 #: include/actions.inc.php:1731
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s съобщение"
+msgstr[1] "%1$s съобщения"
 
 #: include/classes/widgets/CWidgetConfig.php:308
 #: include/classes/widgets/CWidgetConfig.php:309
@@ -189,36 +190,36 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s минута"
+msgstr[1] "%1$s минути"
 
 #: include/classes/helpers/CMapHelper.php:316
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s от %2$s елемент в проблемно състояние"
+msgstr[1] "%1$s от %2$s елементи са в проблемно състояние"
 
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s предварително избрано, използвайте клавишите със стрелки надолу, нагоре и enter за избор"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s проблем"
+msgstr[1] "%1$s проблеми"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Общо %1$s проблем"
+msgstr[1] "Общо %1$s проблеми"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2172
@@ -226,8 +227,8 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Остава %1$s повторен опит"
+msgstr[1] "Остават %1$s повторени опити"
 
 #: app/views/administration.user.edit.php:671
 #: include/classes/widgets/CWidgetConfig.php:306
@@ -236,47 +237,47 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s секунда"
+msgstr[1] "%1$s секунди"
 
 #: include/maps.inc.php:368 include/maps.inc.php:371 include/maps.inc.php:378
 #: include/maps.inc.php:383
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s непотвърден проблем"
+msgstr[1] "%1$s непотвърдени проблеми"
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, сериозност, %2$s"
 
 #: jsLoader.php:342
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, само за четене"
 
 #: jsLoader.php:388
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, избрано"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$s-ти процентил: %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Регистриран е %4$s неуспешен опит за влизане. Последният неуспешен опит беше от %1$s на %2$s в %3$s."
+msgstr[1] "Регистрирани са %4$s неуспешни опити за влизане. Последният неуспешен опит беше от %1$s на %2$s в %3$s."
 
 #: include/classes/screens/CScreenDiscovery.php:213
 #, c-format
@@ -289,29 +290,29 @@ msgstr[1] "%d устройства"
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: app/partials/popup.operations.php:56
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - безкрайно)"
 
 #: app/partials/popup.operations.php:67
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 - използване на действие по подразбиране)"
 
 #: include/views/configuration.hostgroups.list.php:37
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Само супер администратори могат да създават групи)"
 
 #: app/partials/configuration.tags.tab.php:84
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(създадено от откриване на хостове)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
-msgstr ""
+msgstr "(свързан чрез откриване на хостове)"
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
@@ -322,7 +323,7 @@ msgstr "(без прокси)"
 
 #: include/classes/setup/CSetupWizard.php:494
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - използване на порт по подразбиране"
 
 #: include/triggers.inc.php:1594
 msgid "0 or 1"
@@ -340,19 +341,19 @@ msgstr "10 секунди"
 
 #: include/views/reports.toptriggers.php:118 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "100 най-натоварени задействания"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:184
 msgid "12-hour"
-msgstr ""
+msgstr "12-часов"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:183
 msgid "24-hour"
-msgstr ""
+msgstr "24-часов"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
-msgstr ""
+msgstr "24x7"
 
 #: app/views/administration.queue.overview.php:49
 #: app/views/administration.queue.overview.proxy.php:49
@@ -380,11 +381,11 @@ msgstr "500 последни стойности"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<празен низ>"
 
 #: include/forms.inc.php:1406 include/views/js/item.preprocessing.js.php:220
 msgid "<label name>"
-msgstr ""
+msgstr "<име на етикет>"
 
 #: include/views/monitoring.sysmap.edit.php:129
 msgid "<manual>"
@@ -394,70 +395,70 @@ msgstr "<ръчно>"
 #: include/views/js/item.preprocessing.js.php:218
 #: include/views/js/item.preprocessing.js.php:227
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr ""
+msgstr "<име на показател>{<име на етикет>=\"<стойност на етикет>\", ...} == <стойност>"
 
 #: app/views/administration.script.edit.php:111
 msgid "<sub-menu/sub-menu/...>"
-msgstr ""
+msgstr "<подменю/подменю/...>"
 
 #: jsLoader.php:185
 msgctxt "abbreviation of severity level"
 msgid "A"
-msgstr ""
+msgstr "А"
 
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
-msgstr ""
+msgstr "ДОБАВЯНЕ НА ЗАМЕНЯНЕ"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
-msgstr ""
+msgstr "API достъп"
 
 #: app/controllers/CControllerPopupGeneric.php:333
 #: app/views/administration.userrole.edit.php:287
 msgid "API methods"
-msgstr ""
+msgstr "API методи"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "API token"
-msgstr ""
+msgstr "API токен"
 
 #: include/classes/api/services/CToken.php:299
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "API токен „%1$s“ вече съществува за потребителски идентификатор „%2$s“."
 
 #: app/controllers/CControllerTokenCreate.php:109
 #: app/controllers/CControllerTokenCreate.php:131
 msgid "API token added"
-msgstr ""
+msgstr "Добавен API токен"
 
 #: app/controllers/CControllerTokenDelete.php:67
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "API токенът е изтрит"
+msgstr[1] "API токените са изтрити"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "API токенът е деактивиран"
+msgstr[1] "API токенът е деактивиран"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "API токенът е активиран"
+msgstr[1] "API токените са активирани"
 
 #: include/classes/api/clients/CLocalApiClient.php:198
 msgid "API token expired."
-msgstr ""
+msgstr "API токенът е изтекъл."
 
 #: app/controllers/CControllerTokenUpdate.php:107
 #: app/controllers/CControllerTokenUpdate.php:138
 msgid "API token updated"
-msgstr ""
+msgstr "API токенът е актуализиран"
 
 #: app/controllers/CControllerPopupTokenEdit.php:114
 #: app/controllers/CControllerPopupTokenView.php:74
@@ -469,19 +470,19 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:396 include/html.inc.php:820
 #: include/html.inc.php:900
 msgid "API tokens"
-msgstr ""
+msgstr "API токени"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "Над стойността"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "Абциса"
 
 #: include/func.inc.php:1578
 msgid "Access denied"
-msgstr ""
+msgstr "Достъпът отказан!"
 
 #: sysmap.php:81
 msgid "Access denied!"
@@ -490,27 +491,27 @@ msgstr "Достъпът отказан!"
 #: app/views/administration.user.edit.php:603
 #: app/views/administration.userrole.edit.php:273
 msgid "Access to API"
-msgstr ""
+msgstr "Достъп до API"
 
 #: app/views/administration.user.edit.php:456
 #: app/views/administration.userrole.edit.php:83
 msgid "Access to UI elements"
-msgstr ""
+msgstr "Достъп до UI елементи"
 
 #: app/views/administration.user.edit.php:632
 #: app/views/administration.userrole.edit.php:322
 msgid "Access to actions"
-msgstr ""
+msgstr "Достъп до действия"
 
 #: app/views/administration.user.edit.php:574
 #: app/views/administration.userrole.edit.php:224
 msgid "Access to modules"
-msgstr ""
+msgstr "Достъп до модули"
 
 #: app/views/administration.user.edit.php:478
 #: app/views/administration.userrole.edit.php:136
 msgid "Access to services"
-msgstr ""
+msgstr "Достъп до услуги"
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66 include/actions.inc.php:161
@@ -531,7 +532,7 @@ msgstr "Потвърждавам"
 
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "Потвърди проблемите"
 
 #: app/views/popup.condition.common.php:684 include/actions.inc.php:2075
 #: include/events.inc.php:196
@@ -544,7 +545,7 @@ msgstr "Потвърдени събития ПРОБЛЕМ"
 
 #: app/views/administration.trigdisplay.edit.php:77
 msgid "Acknowledged RESOLVED events"
-msgstr ""
+msgstr "Потвърдени РАЗРЕШЕНИ събития"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -626,12 +627,12 @@ msgstr "Действие"
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "Действието „%1$s“ вече съществува."
 
 #: include/classes/api/services/CRole.php:761
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "Действието „%2$s“ не е налично за потребителска роля „%1$s“."
 
 #: actionconf.php:301
 msgid "Action added"
@@ -640,7 +641,7 @@ msgstr "Действие добавено"
 #: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "Класът на действие %1$s трябва да разшири класа %2$s."
 
 #: actionconf.php:323
 msgid "Action deleted"
@@ -649,27 +650,27 @@ msgstr "Действие изтрито"
 #: actionconf.php:491
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Действието е деактивирано"
+msgstr[1] "Действието е деактивирано"
 
 #: actionconf.php:490
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Действията са деактивирани"
+msgstr[1] "Действието е активирано"
 
 #: auditacts.php:27 include/classes/helpers/CMenuHelper.php:151
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/classes/widgets/CWidgetConfig.php:52
 #: include/views/administration.auditacts.list.php:27
 msgid "Action log"
-msgstr ""
+msgstr "Дневник на действията"
 
 #: app/views/administration.script.edit.php:102
 #: app/views/administration.script.list.php:52
 #: app/views/administration.script.list.php:91
 msgid "Action operation"
-msgstr ""
+msgstr "Действие операция"
 
 #: actionconf.php:293
 msgid "Action updated"
@@ -712,7 +713,7 @@ msgstr "Активно"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Активни проверки"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -877,27 +878,27 @@ msgstr "Добави"
 
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "Добавяне (достигнат е лимитът за тип съобщение)"
 
 #: jsLoader.php:149
 msgid "Add a new widget"
-msgstr ""
+msgstr "Добавете нова джаджа"
 
 #: jsLoader.php:204
 msgid "Add child element"
-msgstr ""
+msgstr "Добавяне на дъщерен елемент"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
-msgstr ""
+msgstr "Добавяне на дъщерна услуга"
 
 #: app/views/js/popup.service.edit.js.php:401
 msgid "Add child services"
-msgstr ""
+msgstr "Добавяне на дъщерни услуги"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "Добавяне от"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -907,46 +908,46 @@ msgstr "Добави хост"
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
 msgid "Add host trigger"
-msgstr ""
+msgstr "Добавяне на хост тригер"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Добавете колона за елемент"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
 msgid "Add missing"
-msgstr ""
+msgstr "Добавете липсващо"
 
 #: jsLoader.php:205
 msgid "Add multiple maps"
-msgstr ""
+msgstr "Добавете няколко карти"
 
 #: include/classes/widgets/CWidgetHelper.php:1378
 msgid "Add new data set"
-msgstr ""
+msgstr "Добавете нов набор от данни"
 
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:267
 msgid "Add new interface"
-msgstr ""
+msgstr "Добавете нов интерфейс"
 
 #: include/classes/widgets/CWidgetHelper.php:906
 msgid "Add new override"
-msgstr ""
+msgstr "Добавете нова замяна"
 
 #: app/views/js/configuration.dashboard.edit.js.php:202
 #: app/views/js/monitoring.dashboard.view.js.php:290
 msgid "Add page"
-msgstr ""
+msgstr "Добавяне на страница"
 
 #: app/views/js/popup.service.edit.js.php:431
 msgid "Add parent services"
-msgstr ""
+msgstr "Добавяне на родителски услуги"
 
 #: include/classes/helpers/CRoleHelper.php:461
 msgid "Add problem comments"
-msgstr ""
+msgstr "Добавяне на коментари за проблема"
 
 #: app/views/popup.massupdate.trigger.php:101
 #: include/views/configuration.graph.edit.php:410
@@ -956,19 +957,19 @@ msgstr "Добави прототип"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:127
 msgid "Add scheduled report"
-msgstr ""
+msgstr "Добавяне на планиран отчет"
 
 #: app/views/js/administration.userrole.edit.js.php:210
 msgid "Add services"
-msgstr ""
+msgstr "Добавяне на услуги"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:68
 msgid "Add submaps"
-msgstr ""
+msgstr "Добавете подкарти"
 
 #: app/controllers/CControllerFavouriteDelete.php:69 include/html.inc.php:153
 msgid "Add to favorites"
-msgstr ""
+msgstr "Добави към любими"
 
 #: include/actions.inc.php:1033
 msgid "Add to host group"
@@ -980,40 +981,40 @@ msgstr "Добави към хост групи"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "Добавете потребител"
 
 #: app/partials/scheduledreport.subscription.php:46
 msgid "Add user group"
-msgstr ""
+msgstr "Добавяне на потребителска група"
 
 #: app/views/js/configuration.dashboard.edit.js.php:198
 #: app/views/js/monitoring.dashboard.view.js.php:286
 #: app/views/monitoring.dashboard.widget.edit.php:35
 msgid "Add widget"
-msgstr ""
+msgstr "Добавете джаджа"
 
 #: app/controllers/CControllerAuditLogList.php:356
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
-msgstr ""
+msgstr "Добавено"
 
 #: jsLoader.php:340
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
-msgstr ""
+msgstr "Добавено, %1$s"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "Допълнително правило"
 
 #: app/views/popup.service.edit.php:182
 msgid "Additional rules"
-msgstr ""
+msgstr "Допълнителни правила"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "Адрес"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1027,7 +1028,7 @@ msgstr "Администрация"
 #: app/views/popup.service.edit.php:158
 #: include/classes/widgets/forms/CWidgetFormItem.php:69
 msgid "Advanced configuration"
-msgstr ""
+msgstr "Разширена конфигурация"
 
 #: include/views/monitoring.sysmap.edit.php:160
 msgid "Advanced labels"
@@ -1035,7 +1036,7 @@ msgstr "Разширени етикети"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
-msgstr ""
+msgstr "След стойност"
 
 #: include/events.inc.php:288
 msgid "Age"
@@ -1053,19 +1054,19 @@ msgstr "Агент"
 
 #: include/classes/data/CItemData.php:818
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "Проверка на наличността на агента. Не връща нищо - недостъпен; 1 - наличен"
 
 #: app/views/configuration.host.list.php:197
 msgid "Agent encryption"
-msgstr ""
+msgstr "Агентно криптиране"
 
 #: include/classes/data/CItemData.php:810
 msgid "Agent host metadata. Returns string"
-msgstr ""
+msgstr "Метаданни на хоста на агента. Връща низ"
 
 #: include/classes/data/CItemData.php:814
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "Име на хост на агент. Връща низ"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
@@ -1073,33 +1074,33 @@ msgstr "Интерфейси на агента"
 
 #: include/classes/data/CItemData.php:822
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Проверка на вариант на агент. Връща 1 - за Zabbix агент; 2 - за Zabbix агент 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
-msgstr ""
+msgstr "Агрегат"
 
 #: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
-msgstr ""
+msgstr "Агрегатни функции"
 
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
 msgid "Aggregation function"
-msgstr ""
+msgstr "Агрегираща функция"
 
 #: app/views/popup.tophosts.column.edit.php:139
 #: include/classes/widgets/CWidgetHelper.php:1308
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Интервал на агрегиране"
 
 #: include/actions.inc.php:2106
 msgid "Alert message"
-msgstr ""
+msgstr "Предупредително съобщение"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
-msgstr ""
+msgstr "Алгоритъм"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1107,7 +1108,7 @@ msgstr "Псевдоним"
 
 #: include/views/monitoring.sysmap.constructor.php:75
 msgid "Align map elements"
-msgstr ""
+msgstr "Подравнете елементите на картата"
 
 #: app/controllers/CControllerAuditLogList.php:172
 #: app/controllers/CControllerAuditLogList.php:173
@@ -1130,21 +1131,21 @@ msgstr "Всички"
 
 #: app/views/monitoring.dashboard.view.php:186
 msgid "All dashboards"
-msgstr ""
+msgstr "Всички табла"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "All graphs"
-msgstr ""
+msgstr "Всички графики"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:429
 #: app/views/administration.user.edit.php:435
 msgid "All groups"
-msgstr ""
+msgstr "Всички групи"
 
 #: app/views/monitoring.host.dashboard.view.php:120 include/html.inc.php:305
 msgid "All hosts"
-msgstr ""
+msgstr "Всички хостове"
 
 #: jsLoader.php:284
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -1152,39 +1153,39 @@ msgstr "Във всички връзки трябва да са уточнени
 
 #: include/html.inc.php:516
 msgid "All maps"
-msgstr ""
+msgstr "Всички карти"
 
 #: include/views/configuration.trigger.prototype.edit.php:514
 #: include/views/configuration.triggers.edit.php:543
 msgid "All problems"
-msgstr ""
+msgstr "Всички проблеми"
 
 #: include/views/configuration.trigger.prototype.edit.php:515
 #: include/views/configuration.triggers.edit.php:544
 msgid "All problems if tag values match"
-msgstr ""
+msgstr "Всички проблеми, ако стойностите на етикета съвпадат"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
-msgstr ""
+msgstr "Всички услуги"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
-msgstr ""
+msgstr "Всички етикети"
 
 #: include/html.inc.php:267
 msgid "All templates"
-msgstr ""
+msgstr "Всички шаблони"
 
 #: app/views/administration.userrole.edit.php:291
 msgid "Allow list"
-msgstr ""
+msgstr "Списък с разрешени"
 
 #: app/views/popup.massupdate.trigger.php:60 include/triggers.inc.php:991
 #: include/views/configuration.trigger.prototype.edit.php:527
 #: include/views/configuration.triggers.edit.php:556
 msgid "Allow manual close"
-msgstr ""
+msgstr "Разрешете ръчно затваряне"
 
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
@@ -1195,23 +1196,23 @@ msgstr "Позволени хостове"
 
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
-msgstr ""
+msgstr "Разрешени методи"
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "Като алтернатива можете да го инсталирате ръчно:"
 
 #: include/classes/data/CItemData.php:1442
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Количество физическа памет на госта, което е преместено в пространството за SWAP, <url> - URL адрес на услугата на VMware, <uuid> - име на хост на виртуална машина VMware"
 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Количество физическа памет на хоста, използвано за архивиране на страници с физическа памет на гост, <url> - URL адрес на услугата на VMware, <uuid> - име на хост на виртуална машина VMware"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
-msgstr ""
+msgstr "Аналогов"
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
@@ -1223,7 +1224,7 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:183
 #: include/views/configuration.triggers.edit.php:383
 msgid "And"
-msgstr ""
+msgstr "И"
 
 #: app/partials/monitoring.host.filter.php:32
 #: app/partials/monitoring.latest.filter.php:93
@@ -1246,11 +1247,11 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:143
 #: include/views/js/monitoring.sysmaps.js.php:242
 msgid "And/Or"
-msgstr ""
+msgstr "И/Или"
 
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
-msgstr ""
+msgstr "Ежегодно"
 
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
@@ -1299,11 +1300,11 @@ msgstr "Прилагане"
 
 #: include/views/configuration.hostgroups.edit.php:48
 msgid "Apply permissions and tag filters to all subgroups"
-msgstr ""
+msgstr "Прилагане на разрешения и филтри за етикети към всички подгрупи"
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "Прилагане на разрешения за всички подгрупи"
 
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.maintenance.list.php:105
@@ -1313,7 +1314,7 @@ msgstr "Приближаване"
 
 #: include/classes/widgets/CWidgetHelper.php:1443
 msgid "Approximation"
-msgstr ""
+msgstr "Приближение"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1325,15 +1326,15 @@ msgstr "Април"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
-msgstr ""
+msgstr "Сигурни ли сте, че искате да изтриете този филтър?"
 
 #: app/views/js/administration.macros.edit.js.php:86
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "Сигурен ли си, че искаш да изтриеш?"
 
 #: include/classes/html/CButtonQMessage.php:52
 msgid "Are you sure you want to perform this action?"
-msgstr ""
+msgstr "Сигурни ли сте, че искате да извършите това действие?"
 
 #: include/views/js/monitoring.sysmaps.js.php:122
 msgid "Area size"
@@ -1345,12 +1346,12 @@ msgstr "Тип област"
 
 #: include/items.inc.php:1835
 msgid "Arithmetic"
-msgstr ""
+msgstr "Аритметика"
 
 #: app/views/popup.tophosts.column.edit.php:150
 #: include/classes/helpers/CServiceHelper.php:148
 msgid "As is"
-msgstr ""
+msgstr "Както е"
 
 #: include/views/monitoring.history.php:102
 msgid "As plain text"
@@ -1359,7 +1360,7 @@ msgstr "Като обикновен текст"
 #: app/views/administration.authentication.edit.php:275
 #: app/views/administration.authentication.edit.php:309
 msgid "Assertions"
-msgstr ""
+msgstr "Твърдения"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1369,23 +1370,25 @@ msgstr "Собсвеник етикет "
 #, c-format
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
-msgstr[0] ""
+msgstr[0] "В %1$s:%2$s %3$s всяка седмица"
+msgstr[1] "В %1$s:%2$s %3$s на всеки  %4$s седмици"
 
 #: include/maintenances.inc.php:50
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
-msgstr[0] ""
+msgstr[0] "В %1$s:%2$s всеки ден"
+msgstr[1] "В %1$s:%2$s на всеки %3$s дни"
 
 #: include/maintenances.inc.php:112
 #, c-format
 msgid "At %1$s:%2$s on %3$s %4$s of every %5$s"
-msgstr ""
+msgstr "В %1$s:%2$s на %3$s %4$s на всеки %5$s"
 
 #: include/maintenances.inc.php:121
 #, c-format
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
-msgstr ""
+msgstr "В %1$s:%2$s в ден %3$s на всеки %4$s"
 
 #: app/views/popup.maintenance.period.php:154
 msgid "At (hour:minute)"
@@ -1393,88 +1396,88 @@ msgstr "В (час:минута)"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:125
 msgid "At least one LDAP server must exist."
-msgstr ""
+msgstr "Трябва да съществува поне един LDAP сървър."
 
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
-msgstr ""
+msgstr "Поне един UI елемент трябва да бъде маркиран."
 
 #: include/classes/api/services/CRole.php:487
 #, c-format
 msgid "At least one UI element must be enabled for user role \"%1$s\"."
-msgstr ""
+msgstr "Поне един UI елемент трябва да бъде активиран за потребителска роля „%1$s“."
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "Поне едно действие е задължително."
 
 #: include/classes/api/services/CUser.php:614
 #: include/classes/api/services/CUser.php:1286
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr ""
+msgstr "Трябва да съществува поне един активен потребител с роля „%1$s“."
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "Трябва да се посочи поне един ден от седмицата или ден от месеца."
 
 #: include/classes/api/services/CMaintenance.php:382
 #: include/classes/api/services/CMaintenance.php:574
 #: include/views/configuration.maintenance.edit.php:247
 msgid "At least one host group or host must be selected."
-msgstr ""
+msgstr "Трябва да бъде избрана поне една хост група или хост."
 
 #: include/classes/api/services/CHostGroup.php:1111
 #: include/classes/api/services/CHostGroup.php:1268
 msgid "At least one host or template must be specified."
-msgstr ""
+msgstr "Трябва да се посочи поне един хост или шаблон."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "Трябва да се поддържа поне един от MySQL, PostgreSQL или Oracle."
 
 #: app/views/configuration.correlation.edit.php:161
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "Трябва да бъде избрана поне една операция."
 
 #: include/views/configuration.action.edit.php:522
 msgid "At least one operation must exist."
-msgstr ""
+msgstr "Трябва да съществува поне една операция."
 
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "Поне един параметър „%1$s“ или „%2$s“ трябва да бъде разрешен."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "Поне една операция или съобщение за актуализиране е задължително"
 
 #: app/views/popup.acknowledge.edit.php:105
 msgid "At least one update operation or message must exist."
-msgstr ""
+msgstr "Трябва да съществува поне една операция или съобщение за актуализиране."
 
 #: app/partials/popup.operations.php:75
 msgid "At least one user or user group must be selected."
-msgstr ""
+msgstr "Трябва да бъде избран поне един потребител или потребителска група."
 
 #: include/classes/api/services/CReport.php:343
 msgid "At least one user or user group must be specified."
-msgstr ""
+msgstr "Трябва да се посочи поне един потребител или потребителска група."
 
 #: app/views/administration.mediatype.edit.php:342
 msgid "Attempt interval"
-msgstr ""
+msgstr "Интервал на опитите"
 
 #: app/views/administration.mediatype.edit.php:337 httpconf.php:43
 #: include/views/configuration.httpconf.edit.php:78
 #: include/views/configuration.httpconf.list.php:141
 msgid "Attempts"
-msgstr ""
+msgstr "Опити"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "Приписване"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1488,11 +1491,11 @@ msgstr "Одит"
 #: app/views/reports.auditlog.list.php:78
 #: include/classes/helpers/CMenuHelper.php:253 include/html.inc.php:892
 msgid "Audit log"
-msgstr ""
+msgstr "Одитен дневник"
 
 #: app/views/administration.housekeeping.edit.php:180
 msgid "Audit settings"
-msgstr ""
+msgstr "Настройки за одит"
 
 #: include/func.inc.php:243
 msgid "Aug"
@@ -1504,11 +1507,11 @@ msgstr "Август"
 
 #: app/views/popup.token.view.php:46
 msgid "Auth token"
-msgstr ""
+msgstr "Токен за удостоверяване"
 
 #: app/views/administration.authentication.edit.php:281
 msgid "AuthN requests"
-msgstr ""
+msgstr "AuthN заявки"
 
 #: app/controllers/CControllerAuditLogList.php:211
 #: app/views/administration.authentication.edit.php:323
@@ -1530,7 +1533,7 @@ msgstr "Алгоритъм за автентификация"
 #: include/classes/api/services/CUser.php:2022
 #, c-format
 msgid "Authentication failed: %1$s."
-msgstr ""
+msgstr "Неуспешно удостоверяване: %1$s."
 
 #: app/views/administration.script.edit.php:131
 #: app/views/popup.massupdate.item.php:169
@@ -1555,27 +1558,27 @@ msgstr "Протокол за автентификация"
 #: app/controllers/CControllerAuthenticationUpdate.php:395
 #: app/controllers/CControllerAuthenticationUpdate.php:403
 msgid "Authentication settings updated"
-msgstr ""
+msgstr "Настройките за удостоверяване са актуализирани"
 
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:77
 msgid "Author"
-msgstr ""
+msgstr "Автор"
 
 #: app/views/administration.miscconfig.edit.php:87
 msgid "Authorization"
-msgstr ""
+msgstr "Упълномощаване"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
-msgstr ""
+msgstr "Автоматичен"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:154
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:226
 msgctxt "history source selection method"
 msgid "Auto"
-msgstr ""
+msgstr "Автоматичен"
 
 #: app/views/administration.user.edit.php:261
 msgid "Auto-login"
@@ -1583,11 +1586,11 @@ msgstr "Автоматичен вход"
 
 #: include/classes/api/services/CUser.php:1012
 msgid "Auto-login and auto-logout options cannot be enabled together."
-msgstr ""
+msgstr "Опциите за автоматично влизане и автоматично излизане не могат да бъдат активирани заедно."
 
 #: app/views/administration.user.edit.php:266
 msgid "Auto-logout"
-msgstr ""
+msgstr "Автоматично излизане"
 
 #: app/partials/configuration.host.edit.html.php:360
 #: app/partials/popup.operations.php:228
@@ -1616,16 +1619,16 @@ msgstr "Автоматичен избор на икона"
 #: include/classes/helpers/CMediatypeHelper.php:189
 #: include/classes/helpers/CMenuHelper.php:249 include/html.inc.php:890
 msgid "Autoregistration"
-msgstr ""
+msgstr "Автоматично регистриране"
 
 #: include/classes/helpers/CMenuHelper.php:209
 #: include/views/configuration.action.list.php:36
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "Действия за автоматична регистрация"
 
 #: app/views/administration.housekeeping.edit.php:87
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "Период на съхранение на данните за автоматична регистрация"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:196
@@ -1655,24 +1658,24 @@ msgstr "Среден"
 
 #: include/classes/data/CItemData.php:1522
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Среден брой неуредени заявки за четене към виртуалния диск по време на интервала на събиране, <url> - URL адрес на услугата на VMware, <uuid> - име на хост на виртуална машина VMware, <instance> - екземпляр на дисково устройство"
 
 #: include/classes/data/CItemData.php:1542
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Среден брой неуредени заявки за четене към виртуалния диск по време на интервала на събиране, <url> - URL адрес на услугата на VMware, <uuid> - име на хост на виртуална машина VMware, <instance> - екземпляр на дисково устройство"
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
-msgstr ""
+msgstr "Избягвайте лесните за отгатване пароли"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
-msgstr ""
+msgstr "Оси"
 
 #: include/classes/setup/CSetupWizard.php:334
 #: include/classes/setup/CSetupWizard.php:755
 msgid "Back"
-msgstr ""
+msgstr "обратно"
 
 #: app/views/administration.image.edit.php:74
 #: app/views/administration.image.list.php:52
@@ -1683,7 +1686,7 @@ msgstr "Фон"
 #: include/classes/widgets/forms/CWidgetFormItem.php:384
 #: include/views/js/monitoring.sysmaps.js.php:582
 msgid "Background color"
-msgstr ""
+msgstr "Цвят на фона"
 
 #: include/views/monitoring.sysmap.edit.php:123
 msgid "Background image"
@@ -1694,7 +1697,7 @@ msgstr "Фоново изображение"
 #: include/classes/widgets/CWidgetHelper.php:971
 #: include/classes/widgets/CWidgetHelper.php:1219
 msgid "Bar"
-msgstr ""
+msgstr "Бар"
 
 #: app/views/administration.authentication.edit.php:175
 msgid "Base DN"
@@ -1704,19 +1707,19 @@ msgstr "База данни за търсене (Base DN)"
 #: include/classes/widgets/CWidgetHelper.php:954
 #: include/classes/widgets/CWidgetHelper.php:1210
 msgid "Base color"
-msgstr ""
+msgstr "Основен цвят"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
-msgstr ""
+msgstr "Основен"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
-msgstr ""
+msgstr "Преди стойност"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "Под стойност"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1729,11 +1732,11 @@ msgstr " Парола за връзката (Bind password)"
 #: app/controllers/CControllerPopupTriggerExpr.php:428
 #: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
-msgstr ""
+msgstr "Битове за разместване"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
-msgstr ""
+msgstr "Побитови функции"
 
 #: app/views/administration.user.list.php:144
 msgid "Blocked"
@@ -1741,28 +1744,28 @@ msgstr "Блокиран"
 
 #: include/classes/core/ZBase.php:358
 msgid "Blue"
-msgstr ""
+msgstr "Син"
 
 #: app/views/popup.httpstep.php:160
 #: include/views/configuration.host.discovery.edit.php:400
 #: include/views/configuration.item.edit.php:458
 #: include/views/configuration.item.prototype.edit.php:436
 msgid "Body"
-msgstr ""
+msgstr "Тяло"
 
 #: app/views/popup.httpstep.php:162
 #: include/views/configuration.host.discovery.edit.php:402
 #: include/views/configuration.item.edit.php:460
 #: include/views/configuration.item.prototype.edit.php:438
 msgid "Body and headers"
-msgstr ""
+msgstr "Тяло и заглавки"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:131
 #: include/classes/widgets/forms/CWidgetFormItem.php:212
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "Удебелен"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:804
 #: include/views/js/monitoring.sysmaps.js.php:894
@@ -1771,27 +1774,27 @@ msgstr "Дебела линия"
 
 #: include/items.inc.php:1848
 msgid "Boolean to decimal"
-msgstr ""
+msgstr "Булева към десетична"
 
 #: include/views/js/monitoring.sysmaps.js.php:421
 msgid "Border"
-msgstr ""
+msgstr "Граница"
 
 #: include/views/js/monitoring.sysmaps.js.php:613
 msgid "Border color"
-msgstr ""
+msgstr "Цвят на границата"
 
 #: include/views/js/monitoring.sysmaps.js.php:591
 msgid "Border type"
-msgstr ""
+msgstr "Тип граница"
 
 #: include/views/js/monitoring.sysmaps.js.php:603
 msgid "Border width"
-msgstr ""
+msgstr "Ширина на границата"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "И двете пароли трябва да са еднакви."
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:108
 #: include/classes/widgets/forms/CWidgetFormItem.php:189
@@ -1805,15 +1808,15 @@ msgstr "Долен"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr ""
+msgstr "Долен Н"
 
 #: jsLoader.php:276
 msgid "Bring forward"
-msgstr ""
+msgstr "Изведи напред"
 
 #: jsLoader.php:275
 msgid "Bring to front"
-msgstr ""
+msgstr "Изведете отпред"
 
 #: include/locales.inc.php:34
 msgid "Bulgarian (bg_BG)"
@@ -1833,7 +1836,7 @@ msgstr "По тригер шаблон "
 #: app/views/configuration.host.list.php:405
 #: app/views/configuration.host.list.php:408
 msgid "CERT"
-msgstr ""
+msgstr "CERT"
 
 #: app/views/hintbox.eventlist.php:116
 #: app/views/monitoring.widget.problems.view.php:109
@@ -1841,52 +1844,52 @@ msgstr ""
 #: include/classes/screens/CScreenProblem.php:969
 #: include/classes/screens/CScreenProblem.php:1180 include/events.inc.php:376
 msgid "CLOSING"
-msgstr ""
+msgstr "ЗАТВАРЯНЕ"
 
 #: include/classes/data/CItemData.php:1066
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "Информация за процесора. Връща низ или цяло число"
 
 #: include/classes/data/CItemData.php:1042
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "натоварване на процесора. Връща float"
 
 #: include/classes/data/CItemData.php:1422
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "Време на процесора, прекарано в изчакване за смяна, <url> - URL адрес на услугата на VMware, <uuid> - име на хост на виртуална машина VMware, <instance> - екземпляр на CPU"
 
 #: include/classes/data/CItemData.php:1274
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Използването на процесора като процент по време на интервала зависи от управлението на захранването или HT, <url> - URL адрес на услугата на VMware, <uuid> - име на хост на VMware хипервизор"
 
 #: include/classes/data/CItemData.php:1266
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Използване на процесора като процент през интервала, <url> - URL адрес на услугата на VMware, <uuid> - име на хост на VMware хипервизор"
 
 #: include/classes/data/CItemData.php:1426
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Използване на процесора като процент през интервала, <url> - URL адрес на услугата на VMware, <uuid> - име на хост на виртуална машина VMware"
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
-msgstr ""
+msgstr "Използване на процесора в херци по време на интервала на VMware Resource Pool, <url> - URL на VMware услуга, <rpid> - VMware Resource Pool id"
 
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "Процент на използване на процесора. Връща float"
 
 #: app/views/popup.itemtestedit.view.php:300
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: include/items.inc.php:1828
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV към JSON"
 
 #: include/classes/validators/CApiInputValidator.php:2717
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
-msgstr ""
+msgstr "Очаква се CUID"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:179
 #: include/views/configuration.graph.edit.php:254
@@ -1895,7 +1898,7 @@ msgstr "Изчислено"
 
 #: jsLoader.php:232
 msgid "Calendar"
-msgstr ""
+msgstr "Календар"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
@@ -1938,20 +1941,20 @@ msgstr "Отказ"
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:140
 msgid "Cannot add API token"
-msgstr ""
+msgstr "Не може да се добави API токен"
 
 #: include/classes/api/services/CGraph.php:517
 #: include/classes/api/services/CGraph.php:531
 #: include/classes/api/services/CGraph.php:545
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "Не може да се добави нечислов елемент „%1$s“ към графиката „%2$s“."
 
 #: include/classes/api/services/CGraphPrototype.php:471
 #: include/classes/api/services/CGraphPrototype.php:535
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "Не може да се добави нечислов елемент „%1$s“ към графичен прототип „%2$s“."
 
 #: actionconf.php:302
 msgid "Cannot add action"
@@ -1959,12 +1962,12 @@ msgstr "Не може да се добави действие"
 
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot add correlation"
-msgstr ""
+msgstr "Не може да се добави корелация"
 
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "Не може да се добави страница на таблото за управление: добавени са максимален брой от %1$d страници на таблото."
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
@@ -1987,7 +1990,7 @@ msgstr "Не може да се добави графика"
 
 #: graphs.php:227
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "Не може да се добави графичен прототип"
 
 #: hostgroups.php:114
 msgid "Cannot add group"
@@ -2001,11 +2004,11 @@ msgstr "Не може да се добави потребител"
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "Не може да се добави хост група"
 
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "Не може да се добави прототип на хост"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:101
@@ -2015,11 +2018,11 @@ msgstr "Не може да се добави изображение"
 
 #: items.php:876
 msgid "Cannot add item"
-msgstr "Не може да се добави елемент на данните"
+msgstr "Не може да се добави елемент"
 
 #: disc_prototypes.php:553
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "Не може да се добави прототип на елемент"
 
 #: maintenance.php:123
 msgid "Cannot add maintenance"
@@ -2028,7 +2031,7 @@ msgstr "Не може да се добави поддръжка"
 #: include/classes/api/services/CMap.php:1559
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "Не може да се добави елемент от картата „%1$s“ поради кръгова препратка."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
@@ -2039,8 +2042,8 @@ msgstr "Не може да се добави метод на уведомлен�
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не може да се добави модул: %1$s."
+msgstr[1] "Не могат да се добавят модули: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -2050,7 +2053,7 @@ msgstr "Не може да се добави повече от един елем
 #: include/classes/api/services/CGraphPrototype.php:40
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Не може да се добави повече от един елемент с тип „Сума на графика“ към прототип на графика „%1$s“."
 
 #: sysmaps.php:214
 msgid "Cannot add network map"
@@ -2068,7 +2071,7 @@ msgstr "Не може да се добави регулярен израз"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "Не може да се добави планиран отчет"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -2077,7 +2080,7 @@ msgstr "Не може да се добави скрипт"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:63
 msgid "Cannot add submaps. Max depth reached."
-msgstr ""
+msgstr "Не могат да се добавят подкарти. Достигната максимална дълбочина."
 
 #: templates.php:205
 msgid "Cannot add template"
@@ -2086,7 +2089,7 @@ msgstr "Не може да се добави шаблон"
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "Не може да се добави шаблонна група"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2094,7 +2097,7 @@ msgstr "Не може да се добави тригер"
 
 #: trigger_prototypes.php:257
 msgid "Cannot add trigger prototype"
-msgstr ""
+msgstr "Не може да се добави прототип на тригер"
 
 #: app/controllers/CControllerUserCreate.php:63
 #: app/controllers/CControllerUserCreate.php:119
@@ -2104,7 +2107,7 @@ msgstr "Не може да се добави потребител"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Не може да се добави потребителска група"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
@@ -2112,31 +2115,31 @@ msgstr "Не може да се добави уеб сценарий"
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "Не може да се добави джаджа: няма достатъчно свободно място на таблото."
 
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Не може да се премахне"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "Не може да се свърже анонимно към LDAP сървъра."
 
 #: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "Не може да се свърже с LDAP сървър."
 
 #: include/forms.inc.php:1932 include/forms.inc.php:1939
 #: include/forms.inc.php:1949 include/forms.inc.php:1983
 #: include/forms.inc.php:1990 include/forms.inc.php:2000
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "Не може да се изгради дърво на изрази: %1$s."
 
 #: include/classes/api/services/CRole.php:792
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "Не може да промени потребителския тип на собствената роля."
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
@@ -2159,42 +2162,42 @@ msgstr "Не може да се клонират тригер прототипи
 #: include/classes/api/services/CEvent.php:848
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr ""
+msgstr "Проблемът с неуспешно затваряне: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "Не може да се свърже с LDAP сървър."
 
 #: include/classes/setup/CSetupWizard.php:593
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "Не може да се свърже с базата данни."
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "Не могат да се конвертират POST данни:"
 
 #: graphs.php:390
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Графиката не може да се копира"
+msgstr[1] "Графиките не могат да се копират"
 
 #: items.php:965
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не може да се копира елемент"
+msgstr[1] "Не може да се копират елементите"
 
 #: triggers.php:538
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не може да се копира тригер"
+msgstr[1] "Не могат да се копират тригерите"
 
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Не може да се копира тригер „%1$s“, защото има множество хостове в израза."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2204,12 +2207,12 @@ msgstr "Не може да се копира тригер \"%1$s:%2$s\", защ�
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
 msgid "Cannot create SLA"
-msgstr ""
+msgstr "Не може да се създаде SLA"
 
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Не може да се създаде прототип на хост на открит хост \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -2226,7 +2229,7 @@ msgstr "Не може да се създаде зависимост на три�
 
 #: include/classes/api/services/CTriggerPrototype.php:758
 msgid "Cannot create dependency on trigger prototype itself."
-msgstr ""
+msgstr "Не може да се създаде зависимост от самия прототип на тригера."
 
 #: app/controllers/CControllerDiscoveryCreate.php:47
 #: app/controllers/CControllerDiscoveryCreate.php:92
@@ -2240,43 +2243,43 @@ msgstr "Не може да се създаде съответствие на и�
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "Не може да се създаде заявка"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "Не може да се създаде планиран отчет"
 
 #: app/controllers/CControllerServiceCreate.php:96
 #: app/controllers/CControllerServiceCreate.php:184
 msgid "Cannot create service"
-msgstr ""
+msgstr "Не може да се създаде услуга"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Не може да се създаде услуга „%1$s“: %2$s."
 
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Cannot create the configuration file."
-msgstr ""
+msgstr "Не може да се създаде конфигурационният файл."
 
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
-msgstr ""
+msgstr "Не може да се създаде потребителска роля"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не може да се изтрие API токен"
+msgstr[1] "Не може да се изтрият API токените"
 
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не може да изтрие SLA"
+msgstr[1] "Не може да изтрият SLA"
 
 #: include/classes/api/services/CUser.php:1257
 #, c-format
@@ -2290,24 +2293,24 @@ msgstr "Не може да се изтрие действието"
 #: include/classes/api/services/CRole.php:375
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "Не може да се изтрие присвоената потребителска роля „%1$s“."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Корелацията не може да се изтрие"
+msgstr[1] "Корелациите не могат да се изтрият"
 
 #: app/controllers/CControllerDashboardDelete.php:63
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Таблото за управление не може да се изтрие"
+msgstr[1] "Таблата за управление не могат да се изтрият"
 
 #: include/classes/api/services/CUserDirectory.php:383
 msgid "Cannot delete default user directory."
-msgstr ""
+msgstr "Не може да изтрие потребителската директория по подразбиране."
 
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
@@ -2335,7 +2338,7 @@ msgstr "Не може да се изтрие графичния прототип
 
 #: graphs.php:312
 msgid "Cannot delete graph prototypes"
-msgstr ""
+msgstr "Не могат да се изтрият прототипи на графики"
 
 #: graphs.php:329
 msgid "Cannot delete graphs"
@@ -2356,30 +2359,30 @@ msgstr "Не може да се изтрие хоста"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не може да се изтрие хост %1$s, защото поддръжката \"%2$s\" трябва да съдържа поне един хост или група хостове."
+msgstr[1] "Не може да се изтрие хост %1$s, защото поддръжката \"%2$s\" трябва да съдържа поне един хост или група хостове."
 
 #: app/controllers/CControllerHostGroupDelete.php:75
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не може да изтрие хост група"
+msgstr[1] "Не могат да се изтрият хост групите"
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не може да се изтрие хост група %1$s, защото поддръжката „%2$s“ трябва да съдържа поне един хост или хост група."
+msgstr[1] "Не може да се изтрият хост групите %1$s, защото поддръжката „%2$s“ трябва да съдържа поне един хост или хост група."
 
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
-msgstr ""
+msgstr "Не могат да се изтрият хост групи"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
-msgstr ""
+msgstr "Не може да изтрие прототипи на хост"
 
 #: app/controllers/CControllerIconMapDelete.php:65
 #, fuzzy
@@ -2393,7 +2396,7 @@ msgstr "Не може да се изтрие изображението"
 #: include/classes/api/services/CHostInterface.php:636
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Не може да се изтрие интерфейс за открит хост \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1142
 msgid "Cannot delete inventory."
@@ -2405,11 +2408,11 @@ msgstr "Не може да се изтрие елемент на данните"
 
 #: disc_prototypes.php:310
 msgid "Cannot delete item prototype"
-msgstr ""
+msgstr "Не може да се изтрие прототипа на елемента"
 
 #: disc_prototypes.php:596
 msgid "Cannot delete item prototypes"
-msgstr ""
+msgstr "Не може да се изтрият прототипите на елемента"
 
 #: items.php:991
 msgid "Cannot delete items"
@@ -2429,8 +2432,8 @@ msgstr[1] "Не може да се изтрие метод на уведомле
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не може да се изтрие модул: %1$s."
+msgstr[1] "Не може да се изтрият модули: %1$s."
 
 #: sysmaps.php:261
 msgid "Cannot delete network map"
@@ -2438,7 +2441,7 @@ msgstr "Не може да се изтрие картата на мрежата"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
-msgstr ""
+msgstr "Не може да изтрият прокситата"
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
@@ -2449,7 +2452,7 @@ msgstr[1] "Не може да се изтрие проксито"
 #: include/classes/api/services/CRole.php:369
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
-msgstr ""
+msgstr "Не може да се изтрие потребителска роля само за четене „%1$s“."
 
 #: app/controllers/CControllerRegExDelete.php:55
 msgid "Cannot delete regular expression"
@@ -2460,8 +2463,8 @@ msgstr[1] "Не може да се изтрият регулярните изр�
 #: app/controllers/CControllerScheduledReportDelete.php:71
 msgid "Cannot delete scheduled report"
 msgid_plural "Cannot delete scheduled reports"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не може да се изтрие насрочен отчет"
+msgstr[1] "Не може да се изтрият насрочени отчети"
 
 #: app/controllers/CControllerScriptDelete.php:69
 msgid "Cannot delete script"
@@ -2489,7 +2492,7 @@ msgstr[1] "Не може да се изтрие услугата"
 #: include/classes/api/services/CService.php:470
 #, c-format
 msgid "Cannot delete service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Не може да се изтрие услугата „%1$s“: %2$s."
 
 #: templates.php:462 templates.php:476 templates.php:542
 msgid "Cannot delete template"
@@ -2498,8 +2501,8 @@ msgstr "Не може да се изтрие шаблона"
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Не може да се изтрие шаблонна група"
+msgstr[1] "Не може да се изтрият шаблонните групи"
 
 #: include/classes/api/services/CGraphPrototype.php:374
 msgid "Cannot delete templated graph prototype."
@@ -2511,7 +2514,7 @@ msgstr ""
 
 #: include/classes/api/services/CItemPrototype.php:663
 msgid "Cannot delete templated item prototype."
-msgstr ""
+msgstr "Не може да се изтрие шаблонния елемент на данните."
 
 #: include/classes/api/services/CItem.php:778
 msgid "Cannot delete templated item."
@@ -2705,8 +2708,8 @@ msgstr[1] ""
 #: items.php:924
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Елементът не може да се активира"
+msgstr[1] "Елементите не могат да се активират"
 
 #: app/controllers/CControllerMediatypeEnable.php:75
 #, fuzzy
@@ -2813,7 +2816,7 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:719
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Не може да се намери интерфейс „%1$s“, използван за елемент „%2$s“ на „%3$s“."
 
 #: include/classes/import/CConfigurationImport.php:1105
 #, c-format
@@ -11461,6 +11464,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "Пн"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "MAC адрес A"
@@ -20006,12 +20014,32 @@ msgstr ""
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1256
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1272
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1308
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1316
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1251
@@ -20020,6 +20048,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1276
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1242
@@ -20031,8 +20063,16 @@ msgstr ""
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1300
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1246
@@ -20049,6 +20089,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1336
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1350
@@ -20119,6 +20163,10 @@ msgstr ""
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
@@ -20129,6 +20177,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1488
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1330
@@ -20157,6 +20209,14 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1248
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1516
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1454
@@ -20239,6 +20299,10 @@ msgstr ""
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
@@ -20253,6 +20317,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1684
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1591

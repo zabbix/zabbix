@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:34Z'
+  date: '2022-07-22T09:19:41Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: d670c32f007d438c9dcd32db57d2b691
       template: 'Oracle by Zabbix agent 2'
       name: 'Oracle by Zabbix agent 2'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Databases
@@ -179,7 +179,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get info about CDB and  No-CDB databases on instansce.'
+          description: 'Get info about CDB and  No-CDB databases on instance.'
           tags:
             -
               tag: component
@@ -705,7 +705,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get info about PDB databases on instansce.'
+          description: 'Get info about PDB databases on instance.'
           tags:
             -
               tag: component
