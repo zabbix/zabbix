@@ -31,6 +31,13 @@ import (
 func Listen(address string, args ...interface{}) (c *Listener, err error) {
 	var tlsconfig *tls.Config
 
+	if len(args) > 0 {
+		var ok bool
+		if tlsconfig, ok = args[0].(*tls.Config); !ok {
+			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
+		}
+	}
+
 	// prevent other processes from binding to the same port
 	// SO_EXCLUSIVEADDRUSE is mutually exclusive with SO_REUSEADDR
 	// on Windows SO_REUSEADDR has different semantics than on Unix
@@ -47,12 +54,6 @@ func Listen(address string, args ...interface{}) (c *Listener, err error) {
 		},
 	}
 
-	if len(args) > 0 {
-		var ok bool
-		if tlsconfig, ok = args[0].(*tls.Config); !ok {
-			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
-		}
-	}
 	l, tmperr := lc.Listen(context.Background(), "tcp", address)
 	if tmperr != nil {
 		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
