@@ -124,7 +124,6 @@ class CProxy extends CApiService {
 					$sqlParts
 				);
 			}
-
 		}
 
 		// search
@@ -139,8 +138,6 @@ class CProxy extends CApiService {
 		];
 
 		$options['output'] = ($options['output'] === API_OUTPUT_EXTEND) ?  $fields : (array) $options['output'];
-		$options['output'][] = 'version';
-		$options['output'][] = 'compatibility';
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $fields), 'default' => API_OUTPUT_EXTEND]
@@ -186,6 +183,19 @@ class CProxy extends CApiService {
 				unset($proxy['hostid']);
 
 				$result[$proxy['proxyid']] = $proxy;
+				if (isset($result[$proxy['proxyid']]['version'])) {
+					if ($proxy['version'] === '0') {
+						$result[$proxy['proxyid']]['version'] = '';
+					}
+					else {
+						// convert proxy version to readable format
+						// todo: rewrite this!!!
+						$mayor_version = number_format($proxy['version']/10000);
+						$minor_version = number_format(($proxy['version'] - ($mayor_version * 10000))/100);
+						$patch_version = ($proxy['version'] - ($mayor_version * 10000) - ($minor_version * 100));
+						$result[$proxy['proxyid']]['version'] = $mayor_version.'.'.$minor_version.'.'.$patch_version;
+					}
+				}
 			}
 		}
 

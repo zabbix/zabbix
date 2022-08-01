@@ -33,7 +33,8 @@ class CControllerProxyList extends CController {
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
-			'filter_status' =>	'in -1,'.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE
+			'filter_status' =>	'in -1,'.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'filter_version' =>	'in -1,1,2'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -60,16 +61,20 @@ class CControllerProxyList extends CController {
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.proxies.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.proxies.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.proxies.filter_version', $this->getInput('filter_version', -1), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.proxies.filter_name');
 			CProfile::delete('web.proxies.filter_status');
+			CProfile::delete('web.proxies.filter_version');
 		}
 
 		$filter = [
 			'name' => CProfile::get('web.proxies.filter_name', ''),
-			'status' => CProfile::get('web.proxies.filter_status', -1)
+			'status' => CProfile::get('web.proxies.filter_status', -1),
+			'version' => CProfile::get('web.proxies.filter_version', -1)
 		];
+		// todo: add compatibility 2 and 3 to filter value 2
 
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
@@ -87,7 +92,8 @@ class CControllerProxyList extends CController {
 				'host' => ($filter['name'] === '') ? null : $filter['name']
 			],
 			'filter' => [
-				'status' => ($filter['status'] == -1) ? null : $filter['status']
+				'status' => ($filter['status'] == -1) ? null : $filter['status'],
+				'compatibility' => ($filter['version'] == -1) ? null : $filter['version']
 			],
 			'sortfield' => $sortField,
 			'limit' => $limit,
@@ -105,12 +111,25 @@ class CControllerProxyList extends CController {
 		);
 
 		$data['proxies'] = API::Proxy()->get([
-			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'auto_compress'],
+			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'version'],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'proxyids' => array_keys($data['proxies']),
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		$data['filter']['compatibility'] = API::Proxy()->get([
+			'output' => ['compatibility'],
+			'proxyids' => array_keys($data['proxies']),
+			'preservekeys' => true
+		]);
+
+		$data['version'] = API::Proxy()->get([
+			'output' => ['version'],
+			'proxyids' => array_keys($data['proxies']),
+			'preservekeys' => true
+		]);
+
 		order_result($data['proxies'], $sortField, $sortOrder);
 
 		foreach ($data['proxies'] as &$proxy) {
@@ -169,7 +188,6 @@ class CControllerProxyList extends CController {
 				}
 			}
 		}
-
 		$data['config'] = ['max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)];
 
 		$response = new CControllerResponseData($data);

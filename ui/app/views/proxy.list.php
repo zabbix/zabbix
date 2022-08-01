@@ -55,6 +55,18 @@ $filter = (new CFilter())
 						->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
 						->setModern(true)
 				)
+			]),
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Version')),
+				new CFormField(
+					(new CRadioButtonList('filter_version', (int) $data['filter']['version']))
+						->addValue(_('Any'), -1)
+						->addValue(_('Current'), ZBX_PROXY_VERSION_CURRENT)
+						->addValue(_('Outdated'), 2)
+						->setModern(true)
+				)
 			])
 	]);
 
@@ -74,7 +86,7 @@ $proxy_list = (new CTableInfo())
 		),
 		_('Mode'),
 		_('Encryption'),
-		_('Compression'),
+		_('Version'),
 		_('Last seen (age)'),
 		_('Host count'),
 		_('Item count'),
@@ -84,6 +96,7 @@ $proxy_list = (new CTableInfo())
 
 foreach ($data['proxies'] as $proxyid => $proxy) {
 	$hosts = [];
+	$version = $proxy['version'];
 
 	foreach ($proxy['hosts'] as $host_index => $host) {
 		if ($host_index >= $data['config']['max_in_table']) {
@@ -147,7 +160,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			$encryption->addItem((new CSpan(_('CERT')))->addClass(ZBX_STYLE_STATUS_GREEN));
 		}
 	}
-
+	$compatibility = $data['filter']['compatibility'];
 	$proxy_list->addRow([
 		new CCheckBox('proxyids['.$proxyid.']', $proxyid),
 		(new CCol(
@@ -157,9 +170,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$encryption,
-		($proxy['auto_compress'] == HOST_COMPRESSION_ON)
-			? (new CSpan(_('On')))->addClass(ZBX_STYLE_STATUS_GREEN)
-			: (new CSpan(_('Off')))->addClass(ZBX_STYLE_STATUS_GREY),
+		$version,
 		($proxy['lastaccess'] == 0)
 			? (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED)
 			: zbx_date2age($proxy['lastaccess']),
