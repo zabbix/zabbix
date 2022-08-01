@@ -83,8 +83,6 @@ class CProxy extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		$this->validateGet($options);
-
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -139,7 +137,20 @@ class CProxy extends CApiService {
 			'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
 			'tls_subject', 'proxy_address', 'auto_compress', 'version', 'compatibility'
 		];
-		$options['output'] = ($options['output'] === API_OUTPUT_EXTEND) ? $fields : (array) $options['output'];
+
+		$options['output'] = ($options['output'] === API_OUTPUT_EXTEND) ?  $fields : (array) $options['output'];
+		$options['output'][] = 'version';
+		$options['output'][] = 'compatibility';
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $fields), 'default' => API_OUTPUT_EXTEND]
+		]];
+
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		/*
 		 * For internal calls of API method, is possible to get the write-only fields if they were specified in output.
@@ -578,28 +589,6 @@ class CProxy extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Validates the input parameters for the get() method.
-	 *
-	 * @param array $options
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	protected function validateGet(array $options) {
-		// Validate input parameters.
-		// todo: pass the correct data, rewrite the input rules!
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'version' => 		['type' => API_INTS32],
-			'compatibility' => 	['type' => API_INTS32, 'in' => implode(',', [0, 1, 2, 3])]
-		]];
-
-		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
-
-		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
 	}
 
 	/**
