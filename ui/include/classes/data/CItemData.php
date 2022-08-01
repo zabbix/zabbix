@@ -1798,7 +1798,7 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'zabbix[proxy,discovery]' => [
-				'description' => _('List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and version status (current/outdated/unsupported). Returns JSON.'),
+				'description' => _('List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON.'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'zabbix[proxy_history]' => [
