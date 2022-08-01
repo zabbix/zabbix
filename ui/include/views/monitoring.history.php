@@ -52,12 +52,8 @@ if ($data['items']) {
 }
 
 if ((count($data['items']) == 1 || $same_host) && $data['itemids']) {
-	$header['left'] = [
-		$host_name,
-		NAME_DELIMITER,
-		count($data['items']) == 1 ? $item['name'] : $header['left']
-	];
-	$header_row[] = implode('', $header['left']);
+	$header['left'] = $host_name.NAME_DELIMITER.(count($data['items']) == 1 ? $item['name'] : $header['left']);
+	$header_row[] = $header['left'];
 }
 else {
 	$header_row[] = $header['left'];
