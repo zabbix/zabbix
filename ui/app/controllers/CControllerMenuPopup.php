@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_configuration,item_prototype_configuration,map_element,refresh,trigger,trigger_macro',
+			'type' => 'required|in history,host,item,item_configuration,item_prototype_configuration,map_element,trigger,trigger_macro',
 			'data' => 'array'
 		];
 
