@@ -4020,6 +4020,7 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_ptr_t *host
 			{
 				lld_interface_free(interfaces->values[i]);
 				zbx_vector_lld_interface_remove_noorder(interfaces, i);
+				break;
 			}
 			else
 				i++;
