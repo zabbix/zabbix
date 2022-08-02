@@ -1323,6 +1323,74 @@ static void	DCdump_dchecks(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
+static void	DCdump_httptests(void)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_dc_httptest_t		*httptest;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&config->httptests, &iter);
+	while (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "httptestid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " revision:%u",
+				httptest->httptestid, httptest->hostid, httptest->revision);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
+static void	DCdump_httptest_fields(void)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_dc_httptest_field_t	*httptest_field;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&config->httptest_fields, &iter);
+	while (NULL != (httptest_field = (zbx_dc_httptest_field_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "httptest_fieldid:" ZBX_FS_UI64 " httptestid:" ZBX_FS_UI64,
+				httptest_field->httptest_fieldid, httptest_field->httptestid);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
+static void	DCdump_httpsteps(void)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_dc_httpstep_t	*httpstep;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&config->httpsteps, &iter);
+	while (NULL != (httpstep = (zbx_dc_httpstep_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "httpstepid:" ZBX_FS_UI64 " httptestid:" ZBX_FS_UI64,
+				httpstep->httpstepid, httpstep->httptestid);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
+static void	DCdump_httpstep_fields(void)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_dc_httpstep_field_t	*httpstep_field;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&config->httpstep_fields, &iter);
+	while (NULL != (httpstep_field = (zbx_dc_httpstep_field_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "httpstep_fieldid:" ZBX_FS_UI64 " httpstepid:" ZBX_FS_UI64,
+				httpstep_field->httpstep_fieldid, httpstep_field->httpstepid);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
 void	DCdump_configuration(void)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:%u) ===", config->revision);
@@ -1353,4 +1421,8 @@ void	DCdump_configuration(void)
 	DCdump_maintenances();
 	DCdump_drules();
 	DCdump_dchecks();
+	DCdump_httptests();
+	DCdump_httptest_fields();
+	DCdump_httpsteps();
+	DCdump_httpstep_fields();
 }

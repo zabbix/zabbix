@@ -821,31 +821,6 @@ static int	process_discovery(time_t *nextcheck)
 	return rule_count;	/* performance metric */
 }
 
-static int	get_minnextcheck(void)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		res = FAIL;
-
-	result = DBselect(
-			"select count(*),min(nextcheck)"
-			" from drules"
-			" where status=%d"
-				" and " ZBX_SQL_MOD(druleid,%d) "=%d",
-			DRULE_STATUS_MONITORED, CONFIG_DISCOVERER_FORKS, process_num - 1);
-
-	row = DBfetch(result);
-
-	if (NULL == row || DBis_null(row[0]) == SUCCEED || DBis_null(row[1]) == SUCCEED)
-		zabbix_log(LOG_LEVEL_DEBUG, "get_minnextcheck(): no items to update");
-	else if (0 != atoi(row[0]))
-		res = atoi(row[1]);
-
-	DBfree_result(result);
-
-	return res;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically try to find new hosts and services                   *

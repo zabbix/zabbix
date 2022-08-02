@@ -774,6 +774,36 @@ zbx_dc_dcheck_t;
 
 typedef struct
 {
+	zbx_uint64_t	httptestid;
+	zbx_uint64_t	hostid;
+	zbx_uint32_t	revision;
+}
+zbx_dc_httptest_t;
+
+typedef struct
+{
+	zbx_uint64_t	httptest_fieldid;
+	zbx_uint64_t	httptestid;
+}
+zbx_dc_httptest_field_t;
+
+typedef struct
+{
+	zbx_uint64_t	httpstepid;
+	zbx_uint64_t	httptestid;
+	zbx_uint32_t	revision;
+}
+zbx_dc_httpstep_t;
+
+typedef struct
+{
+	zbx_uint64_t	httpstep_fieldid;
+	zbx_uint64_t	httpstepid;
+}
+zbx_dc_httpstep_field_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
@@ -862,6 +892,10 @@ typedef struct
 	zbx_hashset_t		data_sessions;
 	zbx_hashset_t		drules;
 	zbx_hashset_t		dchecks;
+	zbx_hashset_t		httptests;
+	zbx_hashset_t		httptest_fields;
+	zbx_hashset_t		httpsteps;
+	zbx_hashset_t		httpstep_fields;
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	zbx_binary_heap_t	trigger_queue;

@@ -1308,7 +1308,7 @@ done:
 			{
 				proxy->location = ZBX_LOC_NOWHERE;
 				proxy->version = 0;
-				proxy->revision = 0;
+				proxy->revision = config->revision;
 				proxy->lastaccess = atoi(row[12]);
 				proxy->last_cfg_error_time = 0;
 				proxy->proxy_delay = 0;
@@ -5275,7 +5275,7 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync)
 			proxy->revision = config->revision;
 	}
 
-	/* remove deleted discovery rules from cache and update proxy revision */
+	/* remove deleted discovery checks from cache and update proxy revision */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
 		if (NULL == (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_search(&config->dchecks, &rowid)))
@@ -5291,6 +5291,291 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync)
 		}
 
 		zbx_hashset_remove_direct(&config->dchecks, dcheck);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update host and its proxy revision                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_host_update_revision(ZBX_DC_HOST *host)
+{
+	ZBX_DC_PROXY	*proxy;
+
+	if (host->revision == config->revision)
+		return SUCCEED;
+
+	host->revision = config->revision;
+
+	if (0 == host->proxy_hostid)
+		return SUCCEED;
+
+	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
+		return FAIL;
+
+	proxy->revision = config->revision;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update httptest and its parent object revision                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_httptest_update_revision(zbx_dc_httptest_t *httptest)
+{
+	ZBX_DC_HOST	*host;
+
+	if (httptest->revision == config->revision)
+		return SUCCEED;
+
+	httptest->revision = config->revision;
+
+	if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &httptest->hostid)))
+		return FAIL;
+
+	dc_host_update_revision(host);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update httptest step and its parent object revision               *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_httpstep_update_revision(zbx_dc_httpstep_t *httpstep)
+{
+	zbx_dc_httptest_t	*httptest;
+
+	if (httpstep->revision == config->revision)
+		return SUCCEED;
+
+	httpstep->revision = config->revision;
+
+	if (NULL == (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httpstep->httptestid)))
+		return FAIL;
+
+	return dc_httptest_update_revision(httptest);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update httpstep and its parent object revision                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_sync_httptests(zbx_dbsync_t *sync)
+{
+	char			**row;
+	zbx_uint64_t		rowid, httptestid, hostid;
+	unsigned char		tag;
+	int 			found, ret;
+	ZBX_DC_HOST		*host;
+	zbx_dc_httptest_t	*httptest;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(hostid, row[1]);
+
+		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+			continue;
+
+		dc_host_update_revision(host);
+
+		ZBX_STR2UINT64(httptestid, row[0]);
+
+		httptest = (zbx_dc_httptest_t *)DCfind_id(&config->httptests, httptestid, sizeof(zbx_dc_httptest_t),
+				&found);
+
+		httptest->hostid = hostid;
+		httptest->revision = config->revision;
+
+	}
+
+	/* remove deleted httptest rules from cache and update host revision */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &rowid)))
+			continue;
+
+		if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &httptest->hostid)))
+			dc_host_update_revision(host);
+
+		zbx_hashset_remove_direct(&config->httptests, httptest);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	dc_sync_httptest_fields(zbx_dbsync_t *sync)
+{
+	char			**row;
+	zbx_uint64_t		rowid, httptestid, httptest_fieldid;
+	unsigned char		tag;
+	int 			found, ret;
+	zbx_dc_httptest_t	*httptest;
+	zbx_dc_httptest_field_t	*httptest_field;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(httptestid, row[1]);
+
+		if (NULL == (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
+			continue;
+
+		dc_httptest_update_revision(httptest);
+
+		ZBX_STR2UINT64(httptest_fieldid, row[0]);
+
+		httptest_field = (zbx_dc_httptest_field_t *)DCfind_id(&config->httptest_fields, httptest_fieldid,
+				sizeof(zbx_dc_httptest_field_t), &found);
+
+		httptest_field->httptestid = httptestid;
+
+	}
+
+	/* remove deleted httptest fields from cache and update host revision */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (httptest_field = (zbx_dc_httptest_field_t *)zbx_hashset_search(&config->httptest_fields,
+				&rowid)))
+		{
+			continue;
+		}
+
+		if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests,
+				&httptest_field->httptestid)))
+		{
+			dc_httptest_update_revision(httptest);
+		}
+
+		zbx_hashset_remove_direct(&config->httptest_fields, httptest_field);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	dc_sync_httpsteps(zbx_dbsync_t *sync)
+{
+	char			**row;
+	zbx_uint64_t		rowid, httptestid, httpstepid;
+	unsigned char		tag;
+	int 			found, ret;
+	zbx_dc_httptest_t	*httptest;
+	zbx_dc_httpstep_t	*httpstep;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(httptestid, row[1]);
+
+		if (NULL == (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
+			continue;
+
+		dc_httptest_update_revision(httptest);
+
+		httptest->revision = config->revision;
+
+		ZBX_STR2UINT64(httpstepid, row[0]);
+
+		httpstep = (zbx_dc_httpstep_t *)DCfind_id(&config->httpsteps, httpstepid,
+				sizeof(zbx_dc_httpstep_t), &found);
+
+		httpstep->httptestid = httptestid;
+		httpstep->revision = config->revision;
+	}
+
+	/* remove deleted httptest fields from cache and update host revision */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (httpstep = (zbx_dc_httpstep_t *)zbx_hashset_search(&config->httpsteps,
+				&rowid)))
+		{
+			continue;
+		}
+
+		if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests,
+				&httpstep->httptestid)))
+		{
+			dc_httptest_update_revision(httptest);
+		}
+
+		zbx_hashset_remove_direct(&config->httpsteps, httpstep);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	dc_sync_httpstep_fields(zbx_dbsync_t *sync)
+{
+	char			**row;
+	zbx_uint64_t		rowid, httpstep_fieldid, httpstepid;
+	unsigned char		tag;
+	int 			found, ret;
+	zbx_dc_httpstep_t	*httpstep;
+	zbx_dc_httpstep_field_t	*httpstep_field;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(httpstepid, row[1]);
+
+		if (NULL == (httpstep = (zbx_dc_httpstep_t *)zbx_hashset_search(&config->httpsteps, &httpstepid)))
+			continue;
+
+		dc_httpstep_update_revision(httpstep);
+
+		ZBX_STR2UINT64(httpstep_fieldid, row[0]);
+
+		httpstep_field = (zbx_dc_httpstep_field_t *)DCfind_id(&config->httpstep_fields, httpstep_fieldid,
+				sizeof(zbx_dc_httpstep_field_t), &found);
+
+		httpstep_field->httpstepid = httpstep_fieldid;
+
+	}
+
+	/* remove deleted httpstep fields from cache and update host revision */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (httpstep_field = (zbx_dc_httpstep_field_t *)zbx_hashset_search(&config->httpstep_fields,
+				&rowid)))
+		{
+			continue;
+		}
+
+		if (NULL != (httpstep = (zbx_dc_httpstep_t *)zbx_hashset_search(&config->httpsteps,
+				&httpstep_field->httpstepid)))
+		{
+			dc_httpstep_update_revision(httpstep);
+		}
+
+		zbx_hashset_remove_direct(&config->httpstep_fields, httpstep_field);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -5643,7 +5928,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
 			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, itemscrp_sec,
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
-			item_tag_sec2, um_cache_sec, queues_sec, changelog_sec, drules_sec, drules_sec2;
+			item_tag_sec2, um_cache_sec, queues_sec, changelog_sec, drules_sec, drules_sec2, httptest_sec,
+			httptest_sec2;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
@@ -5651,7 +5937,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 			item_tag_sync, host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync,
 			hgroups_sync, itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync,
 			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
-			drules_sync, dchecks_sync;
+			drules_sync, dchecks_sync, httptest_sync, httptest_field_sync, httpstep_sync,
+			httpstep_field_sync;
 
 	double		autoreg_csec, autoreg_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
@@ -5721,6 +6008,12 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	zbx_dbsync_init(&drules_sync, mode);
 	zbx_dbsync_init(&dchecks_sync, mode);
+
+	zbx_dbsync_init(&httptest_sync, mode);
+	zbx_dbsync_init(&httptest_field_sync, mode);
+	zbx_dbsync_init(&httpstep_sync, mode);
+	zbx_dbsync_init(&httpstep_field_sync, mode);
+
 
 #ifdef HAVE_ORACLE
 	/* With Oracle fetch statements can fail before all data has been fetched. */
@@ -5829,6 +6122,17 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	if (FAIL == zbx_dbsync_prepare_dchecks(&dchecks_sync))
 		goto out;
 	drules_sec = zbx_time() - sec;
+
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_prepare_httptests(&httptest_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_prepare_httptest_fields(&httptest_field_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_prepare_httpsteps(&httpstep_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_prepare_httpstep_fields(&httpstep_field_sync))
+		goto out;
+	httptest_sec = zbx_time() - sec;
 
 	START_SYNC;
 	sec = zbx_time();
@@ -6074,6 +6378,13 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	drules_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
+	dc_sync_httptests(&httptest_sync);
+	dc_sync_httptest_fields(&httptest_field_sync);
+	dc_sync_httpsteps(&httpstep_sync);
+	dc_sync_httpstep_fields(&httpstep_field_sync);
+	httptest_sec2 = zbx_time() - sec;
+
+	sec = zbx_time();
 
 	if (0 != hosts_sync.add_num + hosts_sync.update_num + hosts_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_HOSTS;
@@ -6118,12 +6429,12 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec +  tisec + pisec + tsec + dsec + fsec + expr_sec +
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
 				corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec + maintenance_sec +
-				item_tag_sec + drules_sec;
+				item_tag_sec + drules_sec + httptest_sec;
 		total2 = csec2 + hsec2 + hisec2 + ifsec2 + idsec2 + isec2 + tisec2 + pisec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec +
-				drules_sec2;
+				drules_sec2 + httptest_sec2;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
 				__func__, changelog_sec, changelog_num);
@@ -6256,6 +6567,19 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() dchecks    : (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, dchecks_sync.add_num, dchecks_sync.update_num, dchecks_sync.remove_num);
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httptests  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, httptest_sec, httptest_sec2, httptest_sync.add_num, httptest_sync.update_num,
+				httptest_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httptestfld : (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, httptest_field_sync.add_num, httptest_field_sync.update_num,
+				httptest_field_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpsteps   : (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, httpstep_sync.add_num, httpstep_sync.update_num, httpstep_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpstepfld : (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, httpstep_field_sync.add_num, httpstep_field_sync.update_num,
+				httpstep_field_sync.remove_num);
+
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() macro cache: " ZBX_FS_DBL " sec.", __func__, um_cache_sec);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __func__, update_sec);
 
@@ -6370,6 +6694,15 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() dchecks    : %d (%d slots)", __func__,
 				config->dchecks.num_data, config->dchecks.num_slots);
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httptests  : %d (%d slots)", __func__,
+				config->httptests.num_data, config->httptests.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httptestfld: %d (%d slots)", __func__,
+				config->httptest_fields.num_data, config->httptest_fields.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpsteps  : %d (%d slots)", __func__,
+				config->httpsteps.num_data, config->httpsteps.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpstepfld: %d (%d slots)", __func__,
+				config->httpstep_fields.num_data, config->httpstep_fields.num_slots);
+
 		for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __func__,
@@ -6472,6 +6805,10 @@ out:
 	zbx_dbsync_clear(&hgroup_host_sync);
 	zbx_dbsync_clear(&drules_sync);
 	zbx_dbsync_clear(&dchecks_sync);
+	zbx_dbsync_clear(&httptest_sync);
+	zbx_dbsync_clear(&httptest_field_sync);
+	zbx_dbsync_clear(&httpstep_sync);
+	zbx_dbsync_clear(&httpstep_field_sync);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
@@ -6927,6 +7264,11 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET_EXT(config->data_sessions, 0, __config_data_session_hash, __config_data_session_compare);
 	CREATE_HASHSET(config->drules, 0);
 	CREATE_HASHSET(config->dchecks, 0);
+
+	CREATE_HASHSET(config->httptests, 0);
+	CREATE_HASHSET(config->httptest_fields, 0);
+	CREATE_HASHSET(config->httpsteps, 0);
+	CREATE_HASHSET(config->httpstep_fields, 0);
 
 	config->config = NULL;
 
