@@ -12307,6 +12307,12 @@ void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies)
 	UNLOCK_CACHE;
 }
 
+void	zbx_cached_proxy_free(zbx_cached_proxy_t *proxy)
+{
+	zbx_free(proxy->name);
+	zbx_free(proxy);
+}
+
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name)
 {
 	int		ret = SUCCEED;
@@ -13239,6 +13245,166 @@ int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **err
 	}
 
 	UNLOCK_CACHE;
+
+	return ret;
+}
+
+int	DCget_proxy_discovery(struct zbx_json *json, char **error)
+{
+	int	i;
+	zbx_vector_cached_proxy_t	proxies;
+	int ret = SUCCEED;
+
+	WRLOCK_CACHE;
+
+	dc_status_update();
+
+	UNLOCK_CACHE;
+
+	zbx_vector_cached_proxy_create(&proxies);
+	zbx_dc_get_all_proxies(&proxies);
+
+	zbx_json_initarray(json, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < proxies.values_num; i++)
+	{
+		zbx_cached_proxy_t	*proxy;
+		const ZBX_DC_HOST	*dc_host;
+		const ZBX_DC_PROXY	*dc_proxy;
+
+		proxy = proxies.values[i];
+
+		zbx_json_addobject(json, NULL);
+
+		zbx_json_addstring(json, "name", proxy->name, ZBX_JSON_TYPE_STRING);
+
+		if (HOST_STATUS_PROXY_PASSIVE == proxy->status)
+		{
+			zbx_json_addstring(json, "passive", "true", ZBX_JSON_TYPE_INT);
+		}
+		else
+		{
+			zbx_json_addstring(json, "passive", "false", ZBX_JSON_TYPE_INT);
+		}
+
+		RDLOCK_CACHE;
+
+		dc_host = DCfind_proxy(proxy->name);
+
+		if (NULL == dc_host)
+		{
+			*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", proxy->name);
+			ret = FAIL;
+		}
+		else
+		{
+			unsigned int	encryption;
+#if 1 // TODO: choose one format of encryption
+			if (HOST_STATUS_PROXY_PASSIVE == proxy->status)
+			{
+				zbx_json_addint64(json, "encryption", dc_host->tls_connect);
+			}
+			else
+			{
+				zbx_json_addint64(json, "encryption", dc_host->tls_accept);
+			}
+#endif
+
+#if 1
+			if (HOST_STATUS_PROXY_PASSIVE == proxy->status)
+			{
+				encryption = dc_host->tls_connect;
+			}
+			else
+			{
+				encryption = dc_host->tls_accept;
+			}
+
+			if (0 < (encryption & ZBX_TCP_SEC_UNENCRYPTED))
+			{
+				zbx_json_addstring(json, "unencrypted", "true", ZBX_JSON_TYPE_INT);
+			}
+			else
+			{
+				zbx_json_addstring(json, "unencrypted", "false", ZBX_JSON_TYPE_INT);
+			}
+
+			if (0 < (encryption & ZBX_TCP_SEC_TLS_PSK))
+			{
+				zbx_json_addstring(json, "psk", "true", ZBX_JSON_TYPE_INT);
+			}
+			else
+			{
+				zbx_json_addstring(json, "psk", "false", ZBX_JSON_TYPE_INT);
+			}
+
+			if (0 < (encryption & ZBX_TCP_SEC_TLS_CERT))
+			{
+				zbx_json_addstring(json, "certificate", "true", ZBX_JSON_TYPE_INT);
+			}
+			else
+			{
+				zbx_json_addstring(json, "certificate", "false", ZBX_JSON_TYPE_INT);
+			}
+
+			zbx_json_adduint64(json, "item_count", dc_host->items_active_normal +
+					dc_host->items_active_notsupported + dc_host->items_disabled);
+#endif
+
+			if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->hostid)))
+			{
+				if (1 == dc_proxy->auto_compress)
+				{
+					zbx_json_addstring(json, "compression", "true", ZBX_JSON_TYPE_INT);
+				}
+				else
+				{
+					zbx_json_addstring(json, "compression", "false", ZBX_JSON_TYPE_INT);
+				}
+
+				if (FAIL != dc_proxy->version)
+				{
+					zbx_json_addint64(json, "version", ZBX_COMPONENT_VERSION_TO_DEC_FORMAT(dc_proxy->version));
+				}
+				else
+				{
+					zbx_json_addint64(json, "version", FAIL);
+				}
+
+				zbx_json_adduint64(json, "compatibility", dc_proxy->proxy_compatibility);
+
+				zbx_json_addint64(json, "lastaccess", dc_proxy->lastaccess);
+
+				if (0 < dc_proxy->lastaccess)
+				{
+					zbx_json_addint64(json, "last_seen", time(NULL) - dc_proxy->lastaccess);
+				}
+				else
+				{
+					zbx_json_addint64(json, "last_seen", -1);
+				}
+
+				zbx_json_adduint64(json, "host_count", dc_proxy->hosts_monitored + dc_proxy->hosts_not_monitored);
+
+				zbx_json_addfloat(json, "required_performance_vps", dc_proxy->required_performance);
+
+			}
+			else
+			{
+				*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", proxy->name);
+				ret = FAIL;
+			}
+		}
+
+		UNLOCK_CACHE;
+
+		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
+
+	zbx_vector_cached_proxy_clear_ext(&proxies, zbx_cached_proxy_free);
+	zbx_vector_cached_proxy_destroy(&proxies);
 
 	return ret;
 }

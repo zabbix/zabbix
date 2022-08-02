@@ -850,6 +850,7 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
 int	DCget_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
 int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error);
 int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **error);
+int	DCget_proxy_discovery(struct zbx_json *json, char **error);
 
 unsigned int	DCget_internal_action_count(void);
 
@@ -1111,6 +1112,7 @@ zbx_cached_proxy_t;
 ZBX_PTR_VECTOR_DECL(cached_proxy, zbx_cached_proxy_t *)
 
 void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies);
+void	zbx_cached_proxy_free(zbx_cached_proxy_t *proxy);
 
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
 

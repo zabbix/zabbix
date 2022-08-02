@@ -59,48 +59,79 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		SET_UI64_RESULT(result, DCget_trigger_count());
 	}
 	else if (0 == strcmp(param1, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess" OR "delay"] */
-	{
+	{							/* zabbix["proxy","discovery"]                        */
 		int	value, res;
 		char	*error = NULL;
 
 		/* this item is always processed by server */
 
-		if (3 != nparams)
+		if (2 > nparams || 3 < nparams)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			goto out;
 		}
 
-		param2 = get_rparam(request, 2);
-
-		if (0 == strcmp(param2, "lastaccess"))
+		if (2 == nparams)
 		{
-			res = DCget_proxy_lastaccess_by_name(get_rparam(request, 1), &value, &error);
-		}
-		else if (0 == strcmp(param2, "delay"))
-		{
-			int	lastaccess;
+			param2 = get_rparam(request, 1);
 
-			if (SUCCEED == (res = DCget_proxy_delay_by_name(get_rparam(request, 1), &value, &error)) &&
-					SUCCEED == (res = DCget_proxy_lastaccess_by_name(get_rparam(request, 1),
-					&lastaccess, &error)))
+			if (0 == strcmp(param2, "discovery"))
 			{
-				value += (int)time(NULL) - lastaccess;
+				struct zbx_json	json;
+
+				if (SUCCEED == (res = DCget_proxy_discovery(&json, &error)))
+				{
+					SET_STR_RESULT(result, zbx_strdup(NULL, json.buffer));
+				}
+				else
+				{
+					SET_MSG_RESULT(result, error);
+				}
+
+				zbx_json_free(&json);
+
+				if (SUCCEED != res)
+					goto out;
+			}
+			else
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				goto out;
 			}
 		}
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-			goto out;
-		}
+			const char *param3 = get_rparam(request, 2);
 
-		if (SUCCEED != res)
-		{
-			SET_MSG_RESULT(result, error);
-			goto out;
-		}
+			if (0 == strcmp(param3, "lastaccess"))
+			{
+				res = DCget_proxy_lastaccess_by_name(get_rparam(request, 1), &value, &error);
+			}
+			else if (0 == strcmp(param3, "delay"))
+			{
+				int	lastaccess;
 
-		SET_UI64_RESULT(result, value);
+				if (SUCCEED == (res = DCget_proxy_delay_by_name(get_rparam(request, 1), &value, &error)) &&
+						SUCCEED == (res = DCget_proxy_lastaccess_by_name(get_rparam(request, 1),
+						&lastaccess, &error)))
+				{
+					value += (int)time(NULL) - lastaccess;
+				}
+			}
+			else
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+				goto out;
+			}
+
+			if (SUCCEED != res)
+			{
+				SET_MSG_RESULT(result, error);
+				goto out;
+			}
+
+			SET_UI64_RESULT(result, value);
+		}
 	}
 	else if (0 == strcmp(param1, "vcache"))
 	{

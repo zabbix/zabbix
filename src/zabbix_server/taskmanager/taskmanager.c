@@ -1109,12 +1109,6 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 	return processed_num + expired_num;
 }
 
-static void	zbx_cached_proxy_free(zbx_cached_proxy_t *proxy)
-{
-	zbx_free(proxy->name);
-	zbx_free(proxy);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: remove old done/expired tasks                                     *
