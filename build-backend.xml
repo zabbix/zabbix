@@ -195,7 +195,7 @@
 		<sequential>
 			<!-- clean, configure and build -->
 			<exec executable="./configure" failonerror="on">
-				<arg line="${COMP_FLAGS}"/>
+				<arg line="CFLAGS='${COMP_FLAGS}'"/>
 				<arg line="@{conf}"/>
 			</exec>
 			<trycatch>
