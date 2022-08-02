@@ -54,7 +54,7 @@ $current_url = (new CUrl('actionconf.php'))->setArgument('eventsource', $data['e
 
 $html_page = (new CHtmlPage())
 	->setTitle($title)
-	->setTitleSubmenu($submenu ? ['main_section' => ['items' => $submenu]] : null)
+	->setTitleSubmenu($submenu ? ['main_section' => ['items' => $submenu]] : [])
 	->setDocUrl(CDocHelper::getUrl($doc_url))
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
