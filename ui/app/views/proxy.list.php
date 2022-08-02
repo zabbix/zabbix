@@ -101,16 +101,16 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 	$compatibility = $proxy['compatibility'];
 
 	// Info icons.
-	// TODO: add server version to hintbox text
-
 	$info_icon = '';
 	if ($compatibility == 2) {
-		$info_icon = (makeInformationIcon(_('Proxy version is outdated, only data collection and remote execution is available with server version 6.4.0')))
+		$version = (new CSpan($version))->addClass(ZBX_STYLE_RED);
+		$info_icon = (makeInformationIcon(_s('Proxy version is outdated, only data collection and remote execution is available with server version %1$s', $data['server_version'])))
 			->addClass(ZBX_STYLE_STATUS_YELLOW)
 			->addStyle('margin-left: 5px;');
 	}
 	elseif ($compatibility == 3) {
-		$info_icon = (makeInformationIcon(_('Proxy version is not supported by server version 6.4.0.')))
+		$version = (new CSpan($version))->addClass(ZBX_STYLE_RED);
+		$info_icon = (makeInformationIcon(_s('Proxy version is not supported by server version %1$s.', $data['server_version'])))
 			->addClass(ZBX_STYLE_STATUS_RED)
 			->addStyle('margin-left: 5px;');
 	}

@@ -178,6 +178,12 @@ class CControllerProxyList extends CController {
 		}
 		$data['config'] = ['max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)];
 
+		$server_version = CSettingsHelper::getGlobal(CSettingsHelper::SERVER_STATUS);
+		if ($server_version !== '' && $server_version !== null) {
+			preg_match('/(\d+)\.(\d+).(\d+)/', json_decode($server_version, true)['version'], $mayor_version);
+			$data['server_version'] = $mayor_version[0];
+		}
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of proxies'));
 		$this->setResponse($response);
