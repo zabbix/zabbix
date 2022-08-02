@@ -4,7 +4,7 @@
 	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 
 	<!-- oracle oci library has functions declarations without arguments: f() instead of f(void), so it triggers -Wstrict-prototypes warning -->
-	<property name="COMP_FLAGS_ORACLE" value="-g -std=gnu99 -pedantic -Wall -Wextra -Wunused -Wshadow -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wunreachable-code -Wformat-extra-args -Wno-missing-field-initializers -Wno-missing-field-initializers -Wincompatible-pointer-types -Wconversion -Wold-style-definition -Wmissing-declarations -Wunused-parameter -Winit-self -Wnested-externs -Wjump-misses-init -Wdangling-else -Wformat-signedness"/>
+	<property name="COMP_FLAGS_ORACLE" value="-g -std=gnu99 -pedantic -Wall -Wextra -Wunused -Wshadow -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wunreachable-code -Wformat-extra-args -Wno-missing-field-initializers -Wno-missing-field-initializers -Wincompatible-pointer-types -Wfloat-conversion -Wold-style-definition -Wmissing-declarations -Wunused-parameter -Winit-self -Wnested-externs -Wjump-misses-init -Wdangling-else -Wformat-signedness"/>
 	<property name="COMP_FLAGS" value="-Wstrict-prototypes ${COMP_FLAGS_ORACLE}"/>
 	<property name="ZBX_BASE_FLAGS" value="--enable-server --enable-agent --enable-proxy --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent  --with-ldap  --with-libcurl"/>
 
@@ -193,8 +193,24 @@
 		<attribute name="conf"/>
 		<attribute name="conf-name"/>
 		<sequential>
+			<!-- initialize cflags depending on used compiler -->
+			<local name="common.cflags"/>
+			<local name="cc.cflags"/>
+			<property name="common.cflags" value="-O2 -g"/>
+			<switch value="@{cc}">
+				<case value="gcc">
+					<property name="cc.cflags" value="${COMP_FLAGS_ORACLE}"/>
+				</case>
+				<case value="clang">
+					<property name="cc.cflags" value=""/>
+				</case>
+				<default>
+					<fail>Unknown compiler type: @{cc}</fail>
+				</default>
+			</switch>
 			<!-- clean, configure and build -->
 			<exec executable="./configure" failonerror="on">
+				<arg line="CFLAGS=&quot;${common.cflags} ${cc.cflags}&quot;"/>
 				<arg line="CFLAGS='${COMP_FLAGS}'"/>
 				<arg line="@{conf}"/>
 			</exec>
