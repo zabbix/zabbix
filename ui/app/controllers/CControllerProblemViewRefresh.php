@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,12 +24,11 @@
  */
 class CControllerProblemViewRefresh extends CControllerProblem {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
-
+	protected function checkInput(): bool {
 		$fields = [
 			'action' =>					'string',
 			'sort' =>					'in clock,host,severity,name',
@@ -61,8 +60,8 @@ class CControllerProblemViewRefresh extends CControllerProblem {
 			'to' =>						'range_time'
 		];
 
-		$ret = ($this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventar()
-				&& $this->validateTags());
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventory()
+			&& $this->validateTags();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -71,12 +70,11 @@ class CControllerProblemViewRefresh extends CControllerProblem {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+	protected function checkPermissions(): bool {
+		return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
 	}
 
-	protected function doAction() {
-
+	protected function doAction(): void {
 		$data = [
 			'page' => $this->getInput('page', 1),
 			'action' => $this->getInput('action'),
@@ -106,7 +104,7 @@ class CControllerProblemViewRefresh extends CControllerProblem {
 				'show_timeline' => $this->getInput('filter_show_timeline', 0),
 				'details' => $this->getInput('filter_details', 0),
 				'highlight_row' => $this->getInput('filter_highlight_row', 0),
-				'show_opdata' => $this->getInput('filter_show_opdata', 0),
+				'show_opdata' => $this->getInput('filter_show_opdata', OPERATIONAL_DATA_SHOW_NONE),
 				'age_state' => $this->getInput('filter_age_state', 0),
 				'age' => $this->getInput('filter_age', 14)
 			],

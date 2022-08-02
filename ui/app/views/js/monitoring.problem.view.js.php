@@ -94,10 +94,10 @@
 
 		$.subscribe('timeselector.rangeupdate', function(event, response) {
 			let refresh_url = new Curl(window.problems_page.refresh_url);
+
 			refresh_url.setArgument('from', response.from);
 			refresh_url.setArgument('to', response.to);
 			window.problems_page.refresh_url = refresh_url.getUrl();
-
 			window.problems_page.refreshNow();
 		});
 
@@ -151,7 +151,7 @@
 	problemsPage.prototype.refresh = function() {
 		this.setLoading();
 
-		var deferred = $.getJSON(this.refresh_url);
+		const deferred = $.getJSON(this.refresh_url);
 
 		return this.bindDataEvents(deferred);
 	};
@@ -184,7 +184,7 @@
 	};
 
 	problemsPage.prototype.bindDataEvents = function(deferred) {
-		var that = this;
+		const that = this;
 
 		deferred
 			.done(function(response) {
@@ -214,10 +214,11 @@
 		$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
 
 		$('#filter_show').change(function() {
-			var	filter_show = jQuery('input[name=filter_show]:checked').val();
+			const filter_show = $('input[name=filter_show]:checked').val();
 
 			$('#filter_age').closest('li').toggle(filter_show == <?= TRIGGERS_OPTION_RECENT_PROBLEM ?>
-				|| filter_show == <?= TRIGGERS_OPTION_IN_PROBLEM ?>);
+				|| filter_show == <?= TRIGGERS_OPTION_IN_PROBLEM ?>
+			);
 		});
 
 		$('#filter_show').trigger('change');
@@ -236,7 +237,8 @@
 		});
 
 		$('#filter_show_tags').change(function() {
-			var disabled = $(this).find('[value = "<?= PROBLEMS_SHOW_TAGS_NONE ?>"]').is(':checked');
+			const disabled = $(this).find('[value = "<?= PROBLEMS_SHOW_TAGS_NONE ?>"]').is(':checked');
+
 			$('#filter_tag_priority').prop('disabled', disabled);
 			$('#filter_tag_name_format input').prop('disabled', disabled);
 		});

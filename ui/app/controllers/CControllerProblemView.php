@@ -20,7 +20,7 @@
 
 
 /**
- * Controller for the "Problem" page and Problems' CSV export.
+ * Controller for the "Problems" page and Problems CSV export.
  */
 class CControllerProblemView extends CControllerProblem {
 
@@ -63,8 +63,8 @@ class CControllerProblemView extends CControllerProblem {
 			'to' =>						'range_time'
 		];
 
-		$ret = ($this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventar()
-				&& $this->validateTags());
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventory()
+			&& $this->validateTags();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
