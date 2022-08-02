@@ -1351,9 +1351,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_parent(get_program_type);
-#endif
+	/* not running zbx_tls_init_parent() since proxy is only run on Unix*/
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
 	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext);
