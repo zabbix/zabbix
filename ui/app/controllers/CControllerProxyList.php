@@ -74,7 +74,6 @@ class CControllerProxyList extends CController {
 			'status' => CProfile::get('web.proxies.filter_status', -1),
 			'version' => CProfile::get('web.proxies.filter_version', -1)
 		];
-		// todo: add compatibility 2 and 3 to filter value 2
 
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
@@ -105,22 +104,10 @@ class CControllerProxyList extends CController {
 		]);
 
 		$data['proxies'] = API::Proxy()->get([
-			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'version'],
+			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'version', 'compatibility'],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'proxyids' => array_keys($data['proxies']),
 			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		$data['filter']['compatibility'] = API::Proxy()->get([
-			'output' => ['compatibility'],
-			'proxyids' => array_keys($data['proxies']),
-			'preservekeys' => true
-		]);
-
-		$data['version'] = API::Proxy()->get([
-			'output' => ['version'],
-			'proxyids' => array_keys($data['proxies']),
 			'preservekeys' => true
 		]);
 

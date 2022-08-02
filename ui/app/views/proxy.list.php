@@ -94,9 +94,26 @@ $proxy_list = (new CTableInfo())
 		_('Hosts')
 	]);
 
+
 foreach ($data['proxies'] as $proxyid => $proxy) {
 	$hosts = [];
 	$version = $proxy['version'];
+	$compatibility = $proxy['compatibility'];
+
+	// Info icons.
+	// TODO: add server version to hintbox text
+
+	$info_icon = '';
+	if ($compatibility == 2) {
+		$info_icon = (makeInformationIcon(_('Proxy version is outdated, only data collection and remote execution is available with server version 6.4.0')))
+			->addClass(ZBX_STYLE_STATUS_YELLOW)
+			->addStyle('margin-left: 5px;');
+	}
+	elseif ($compatibility == 3) {
+		$info_icon = (makeInformationIcon(_('Proxy version is not supported by server version 6.4.0.')))
+			->addClass(ZBX_STYLE_STATUS_RED)
+			->addStyle('margin-left: 5px;');
+	}
 
 	foreach ($proxy['hosts'] as $host_index => $host) {
 		if ($host_index >= $data['config']['max_in_table']) {
@@ -160,7 +177,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			$encryption->addItem((new CSpan(_('CERT')))->addClass(ZBX_STYLE_STATUS_GREEN));
 		}
 	}
-	$compatibility = $data['filter']['compatibility'];
+
 	$proxy_list->addRow([
 		new CCheckBox('proxyids['.$proxyid.']', $proxyid),
 		(new CCol(
@@ -170,7 +187,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$encryption,
-		$version,
+		[$version, $info_icon],
 		($proxy['lastaccess'] == 0)
 			? (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED)
 			: zbx_date2age($proxy['lastaccess']),
