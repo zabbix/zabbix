@@ -758,6 +758,9 @@ typedef struct
 {
 	zbx_uint64_t	druleid;
 	zbx_uint64_t	proxy_hostid;
+	time_t		nextcheck;
+	int		delay;
+	unsigned char	status;
 	zbx_uint32_t	revision;
 }
 zbx_dc_drule_t;
@@ -862,6 +865,7 @@ typedef struct
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	zbx_binary_heap_t	trigger_queue;
+	zbx_binary_heap_t	drule_queue;
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;

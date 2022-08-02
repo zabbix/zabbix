@@ -1114,4 +1114,7 @@ void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies);
 
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
 
+int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck);
+void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
+
 #endif

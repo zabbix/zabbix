@@ -5116,16 +5116,46 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: calculate nextcheck timestamp for passive proxy                   *
+ *                                                                            *
+ * Parameters: hostid - [IN] host identifier from database                    *
+ *             delay  - [IN] default delay value, can be overridden           *
+ *             now    - [IN] current timestamp                                *
+ *                                                                            *
+ * Return value: nextcheck value                                              *
+ *                                                                            *
+ ******************************************************************************/
+time_t	dc_calculate_nextcheck(zbx_uint64_t seed, unsigned int delay, time_t now)
+{
+	time_t	nextcheck;
+
+	if (0 == delay)
+		return ZBX_JAN_2038;
+
+	nextcheck = delay * (now / delay) + (unsigned int)(seed % delay);
+
+	while (nextcheck <= now)
+		nextcheck += delay;
+
+	return nextcheck;
+}
+
 static void	dc_sync_drules(zbx_dbsync_t *sync)
 {
-	char		**row;
-	zbx_uint64_t	rowid, druleid, proxy_hostid;
-	unsigned char	tag;
-	int 		found, ret;
-	ZBX_DC_PROXY	*proxy;
-	zbx_dc_drule_t	*drule;
+	char			**row, *delay_str;
+	zbx_uint64_t		rowid, druleid, proxy_hostid;
+	unsigned char		tag, status;
+	int 			found, ret, delay = 0;
+	ZBX_DC_PROXY		*proxy;
+	zbx_dc_drule_t		*drule;
+	time_t			now;
+	zbx_binary_heap_elem_t	elem;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	now = time(NULL);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -5135,13 +5165,30 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(druleid, row[0]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[1]);
+		ZBX_STR2UCHAR(status, row[3]);
 
 		drule = (zbx_dc_drule_t *)DCfind_id(&config->drules, druleid, sizeof(zbx_dc_drule_t), &found);
 
-		if (1 == found && proxy_hostid != drule->proxy_hostid)
+		if (0 == found)
 		{
-			if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxy_hostid)))
+			drule->delay = INT32_MAX;
+		}
+		else
+		{
+			if (status != drule->status)
+			{
+				if (DRULE_STATUS_MONITORED != status)
+					zbx_binary_heap_remove_direct(&config->drule_queue, drule->druleid);
+				else
+					drule->delay = INT32_MAX;	/* force rescheduling */
+			}
+
+			if (proxy_hostid != drule->proxy_hostid &&
+				NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
+						&drule->proxy_hostid)))
+			{
 				proxy->revision = config->revision;
+			}
 		}
 
 		drule->proxy_hostid = proxy_hostid;
@@ -5151,6 +5198,25 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 				proxy->revision = config->revision;
 		}
 
+		delay_str = dc_expand_user_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
+		(void)is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED);
+		zbx_free(delay_str);
+
+		drule->nextcheck = dc_calculate_nextcheck(drule->druleid, (0 == found ? SEC_PER_MIN : delay), now);
+
+		if (DRULE_STATUS_MONITORED == status && delay != drule->delay)
+		{
+			elem.key = drule->druleid;
+			elem.data = (const void *)drule;
+
+			if (0 == found || DRULE_STATUS_MONITORED != drule->status)
+				zbx_binary_heap_insert(&config->drule_queue, &elem);
+			else
+				zbx_binary_heap_update_direct(&config->drule_queue, &elem);
+		}
+
+		drule->status = status;
+		drule->delay = delay;
 		drule->revision = config->revision;
 	}
 
@@ -5166,6 +5232,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 				proxy->revision = config->revision;
 		}
 
+		zbx_binary_heap_remove_direct(&config->drule_queue, drule->druleid);
 		zbx_hashset_remove_direct(&config->drules, &drule);
 	}
 
@@ -6670,6 +6737,17 @@ static int	__config_timer_compare(const void *d1, const void *d2)
 	return 0;
 }
 
+static int	__config_drule_compare(const void *d1, const void *d2)
+{
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
+
+	const zbx_dc_drule_t	*r1 = (const zbx_dc_drule_t *)e1->data;
+	const zbx_dc_drule_t	*r2 = (const zbx_dc_drule_t *)e2->data;
+
+	return r1->nextcheck - r2->nextcheck;
+}
+
 static zbx_hash_t	__config_data_session_hash(const void *data)
 {
 	const zbx_data_session_t	*session = (const zbx_data_session_t *)data;
@@ -6835,6 +6913,13 @@ int	init_configuration_cache(char **error)
 	zbx_binary_heap_create_ext(&config->trigger_queue,
 					__config_timer_compare,
 					ZBX_BINARY_HEAP_OPTION_EMPTY,
+					__config_shmem_malloc_func,
+					__config_shmem_realloc_func,
+					__config_shmem_free_func);
+
+	zbx_binary_heap_create_ext(&config->drule_queue,
+					__config_drule_compare,
+					ZBX_BINARY_HEAP_OPTION_DIRECT,
 					__config_shmem_malloc_func,
 					__config_shmem_realloc_func,
 					__config_shmem_free_func);
@@ -13829,6 +13914,81 @@ static void	dc_reschedule_items(void)
 
 	zbx_vector_item_delay_clear_ext(&items, zbx_item_delay_free);
 	zbx_vector_item_delay_destroy(&items);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get next drule to be processed                                    *
+ *                                                                            *
+ * Parameter: now       - [IN] the current timestamp                          *
+ *            druleid   - [OUT] the id of drule to be processed               *
+ *            nextcheck - [OUT] the timestamp of next drule to be processed,  *
+ *                              if there is no rule to be processed now and   *
+ *                              the queue is not empty. 0 otherwise           *
+ *                                                                            *
+ * Return value: SUCCEED - the drule id was returned successfully             *
+ *               FAIL    - no drules are scheduled at current time            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck)
+{
+	zbx_binary_heap_elem_t	*elem;
+	zbx_dc_drule_t		*drule;
+	int			ret = FAIL;
+
+	*nextcheck = 0;
+
+	RDLOCK_CACHE;
+
+	*nextcheck = now + 1;
+
+	if (FAIL == zbx_binary_heap_empty(&config->drule_queue))
+	{
+		elem = zbx_binary_heap_find_min(&config->drule_queue);
+		drule = (zbx_dc_drule_t *)elem->data;
+
+		if (drule->nextcheck <= now)
+		{
+			zbx_binary_heap_remove_min(&config->drule_queue);
+			*druleid = drule->druleid;
+			ret = SUCCEED;
+		}
+		else
+			*nextcheck = drule->nextcheck;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: queue drule to be processed according to the delay                *
+ *                                                                            *
+ * Parameter: now      - [IN] the current timestamp                           *
+ *            druleid  - [IN] the id of drule to be queued                    *
+ *            delay    - [IN] the number of seconds between drule processing  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay)
+{
+	zbx_binary_heap_elem_t	elem;
+	zbx_dc_drule_t		*drule;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &druleid)))
+	{
+		drule->delay = delay;
+		drule->nextcheck = dc_calculate_nextcheck(drule->druleid, drule->delay, now);
+		elem.key = drule->druleid;
+		elem.data = (const void *)drule;
+
+		zbx_binary_heap_insert(&config->drule_queue, &elem);
+	}
+
+	UNLOCK_CACHE;
 }
 
 #ifdef HAVE_TESTS
