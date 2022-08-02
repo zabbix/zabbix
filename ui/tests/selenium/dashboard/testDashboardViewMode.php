@@ -37,28 +37,27 @@ class testDashboardViewMode extends CLegacyWebTest {
 			switch ($user) {
 				case 'super-admin' :
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55b', 1);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-					$this->zbxTestCheckNoRealHostnames();
 					break;
 				case 'admin' :
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 4);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					break;
 				case 'user';
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 5);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					break;
 				case 'guest';
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55e', 2);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					break;
 			}
+			$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
 			$this->zbxTestCheckTitle('Dashboard');
 			$this->zbxTestCheckHeader('Global view');
-			if ($user != 'super-admin') {
+			if ($user !== 'super-admin') {
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[9]//tr[@class='nothing-to-show']/td", 'No graphs added.');
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[8]//tr[@class='nothing-to-show']/td", 'No maps added.');
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[7]//tr[@class='nothing-to-show']/td", 'No data found.');
+			}
+			else {
+				$this->zbxTestCheckNoRealHostnames();
 			}
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[9]//h4", 'Favourite graphs');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[8]//h4", 'Favourite maps');

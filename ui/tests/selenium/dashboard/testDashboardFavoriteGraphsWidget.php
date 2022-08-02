@@ -37,7 +37,7 @@ class testDashboardFavoriteGraphsWidget extends CLegacyWebTest {
 	public function testDashboardFavoriteGraphsWidget_AddFavouriteGraphs() {
 		$this->zbxTestLogin('zabbix.php?action=charts.view');
 		$this->zbxTestCheckHeader('Graphs');
-		$this->query('xpath://a[text()="Filter"]')->one()->click();
+		$this->zbxTestExpandFilterTab();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->fill([
 			'Host' => [
@@ -63,7 +63,7 @@ class testDashboardFavoriteGraphsWidget extends CLegacyWebTest {
 		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favourites']);
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
-		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
+		$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[9]//a[@href='zabbix.php?action=charts.view&view_as=showgraph&filter_search_type=0&filter_graphids%5B0%5D=$this->graphCpuId&filter_set=1']", 'ЗАББИКС Сервер: '.$this->graphCpu);
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[9]//a[@href='zabbix.php?action=charts.view&view_as=showgraph&filter_search_type=0&filter_graphids%5B0%5D=$this->graphMemoryId&filter_set=1']", 'ЗАББИКС Сервер: '.$this->graphMemory);
 		$this->assertEquals(1, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphCpuId"));
@@ -74,7 +74,7 @@ class testDashboardFavoriteGraphsWidget extends CLegacyWebTest {
 		$exception = null;
 
 		try {
-			$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+			$this->zbxTestLogin('zabbix.php?action=dashboard.view&dashboardid=1');
 			$FavouriteGraphs = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.graphids'"));
 			foreach ($FavouriteGraphs as $FavouriteGraph) {
 				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-container']/div[9]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));

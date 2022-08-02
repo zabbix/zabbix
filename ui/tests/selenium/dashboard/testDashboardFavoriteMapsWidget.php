@@ -31,7 +31,7 @@ class testDashboardFavoriteMapsWidget extends CLegacyWebTest {
 	public $mapTestId = 3;
 
 	public function testDashboardFavoriteMapsWidget_AddFavouriteMap() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view&dashboardid=1');
 		$FavouriteScreens = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.sysmapids'"));
 		foreach ($FavouriteScreens as $FavouriteScreen) {
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-container']/div[8]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
@@ -43,7 +43,7 @@ class testDashboardFavoriteMapsWidget extends CLegacyWebTest {
 	}
 
 	public function testDashboardFavoriteMapsWidget_RemoveFavouriteMaps() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view&dashboardid=1');
 		$FavouriteScreens = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.sysmapids'"));
 		foreach ($FavouriteScreens as $FavouriteScreen) {
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-container']/div[8]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
