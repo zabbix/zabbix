@@ -471,4 +471,22 @@ class testFormGraph extends testFormGraphs {
 		$this->update = true;
 		$this->checkGraphForm($data);
 	}
+
+	/**
+	 * @dataProvider getCloneData
+	 */
+	public function testFormGraph_Clone($data) {
+		$this->checkClone($data);
+	}
+
+	/**
+	 * @dataProvider getNoChangesData
+	 */
+	public function testFormGraph_NoChanges($data) {
+		$this->checkNoChanges($data);
+	}
+
+	public function testFormGraph_Delete() {
+		$this->checkDelete();
+	}
 }

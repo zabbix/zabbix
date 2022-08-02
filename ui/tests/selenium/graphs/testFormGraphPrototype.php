@@ -591,4 +591,22 @@ class testFormGraphPrototype extends testFormGraphs {
 		$this->update = true;
 		$this->checkGraphForm($data);
 	}
+
+	/**
+	 * @dataProvider getCloneData
+	 */
+	public function testFormGraphPrototype_Clone($data) {
+		$this->checkClone($data);
+	}
+
+	/**
+	 * @dataProvider getNoChangesData
+	 */
+	public function testFormGraphPrototype_NoChanges($data) {
+		$this->checkNoChanges($data);
+	}
+
+	public function testFormGraphPrototype_Delete() {
+		$this->checkDelete();
+	}
 }

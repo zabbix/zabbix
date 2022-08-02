@@ -24,9 +24,10 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 class testFormGraphs extends CWebTest {
 
-	const HOST = 'Simple form test host'; // Item id = 40001.
-	const HOSTID = 40001;                 // Simple form test host.
-	const LLDID = 133800;                 // testFormDiscoveryRule on Simple form test host.
+	const HOST = 'Simple form test host';					// Host id = 40001.
+	const HOSTID = 40001;									// Simple form test host.
+	const LLDID = 133800;									// testFormDiscoveryRule on Simple form test host.
+	CONST SQL = 'SELECT * FROM graphs ORDER BY graphid';
 
 	/**
 	 * Flag for graph prototype.
@@ -55,6 +56,8 @@ class testFormGraphs extends CWebTest {
 	 * @var integer
 	 */
 	protected static $itemid;
+
+
 
 	/**
 	 * Ids of items for creating graphs.
@@ -271,6 +274,7 @@ class testFormGraphs extends CWebTest {
 		$this->page->login()->open($this->url)->waitUntilReady();
 		$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
 				->one()->click();
+		$this->page->assertTitle('Configuration of graphs');
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 
 		// Check default fields only for first case.
@@ -554,8 +558,7 @@ class testFormGraphs extends CWebTest {
 
 	public function checkGraphForm($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$sql = 'SELECT * FROM graphs ORDER BY graphid';
-			$old_hash = CDBHelper::getHash($sql);
+			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
 		$this->page->login()->open($this->url)->waitUntilReady();
@@ -637,7 +640,7 @@ class testFormGraphs extends CWebTest {
 					: ($this->prototype ? 'Cannot add graph prototype' : 'Cannot add graph');
 			}
 			$this->assertMessage(TEST_BAD, $error, $data['details']);
-			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
 			// Write new name to update graph for next case, but if it's last case return to initial name 'Graph for update'.
@@ -700,6 +703,232 @@ class testFormGraphs extends CWebTest {
 				}
 			}
 		}
+	}
+
+	public static function getCloneData() {
+		return [
+			[
+				[
+					'fields' => [
+						'Name' => 'New Cloned graph name with no changes'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'New Cloned graph name with Items in Y axis',
+						'Width' => 205,
+						'Height' => 399,
+						'Graph type' => CFormElement::RELOADABLE_FILL('Stacked'),
+						'Show legend' => false,
+						'Show working time' => false,
+						'Show triggers' => false,
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+					],
+					'yaxis_items' => [
+						'min' => 'Failed step of scenario "testFormWeb3".',
+						'max' => 'Download speed for scenario "testFormWeb4".'
+					],
+					'items' =>[
+						[
+							'color'=> 'B39DDB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'yaxisside' => 'Right'
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'New Cloned graph name with Fixed Y axis',
+						'id:visible_percent_left' => true,
+						'id:visible_percent_right' => true,
+						'id:percent_left' => 3,
+						'id:percent_right' => 20,
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:yaxismin' => 1,
+						'id:yaxismax' => 99,
+					],
+					'items' =>[
+						[
+							'color'=> '1B5E20',
+							'functions' => [
+								'calc_fnc' => 'max',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
+	public function checkClone($data) {
+		$this->page->login()->open($this->url)->waitUntilReady();
+		$name = $this->prototype ? 'Graph prototype for clone' : 'Graph for clone';
+		$this->query('link', $name)->waitUntilClickable()->one()->click();
+		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
+		$form->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->invalidate();
+
+		foreach (['Update', 'Clone', 'Delete'] as $button) {
+			$this->assertFalse($form->query('button', $button)->exists());
+		}
+
+		$form->fill($data['fields']);
+
+		// Fill Y axis Item values separately because field is not real multiselect.
+		if (array_key_exists('yaxis_items', $data)) {
+			foreach ($data['yaxis_items'] as $y => $yaxis_item) {
+				$form->query('xpath:.//div[@id="y'.$y.'_itemid"]/..')->asMultiselect()->one()
+						->setFillMode(CMultiselectElement::MODE_TYPE)->fill($yaxis_item);
+			}
+		}
+
+		$items_container = $form->getFieldContainer('Items');
+
+		// Add items or item prototypes to graph.
+		if (array_key_exists('items', $data)) {
+			// Check that added item link appeared.
+			$item_row = $items_container->query('xpath:.//tr[@id="items_0"]')->one()->waitUntilPresent();
+
+			// Add line styling functions.
+			foreach ($data['items'][0]['functions'] as $function => $value) {
+				$item_row->query('xpath:.//z-select[@name="items[0]['.$function.']"]')->asDropdown()
+						->one()->fill($value);
+			}
+
+			// Add line color.
+			$item_row->query('xpath:.//button[@id="lbl_items_0_color"]')->waitUntilClickable()->one()->click();
+			$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($data['items'][0]['color']);
+
+		}
+
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, ($this->prototype ? 'Graph prototype added' : 'Graph added'));
+
+		// Check that both original graph and clone exist in DB.
+		foreach ([$name, $data['fields']['Name']] as $graph_name) {
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.zbx_dbstr($graph_name)));
+		}
+
+		$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilReady()
+				->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
+
+		$form->invalidate();
+		$form->checkValue($data['fields']);
+
+		// Check Y axis Item values fake multiselects.
+		if (array_key_exists('yaxis_items', $data)) {
+			foreach ($data['yaxis_items'] as $y => $yaxis_item) {
+				$this->assertEquals([self::HOST.': '.$yaxis_item], $form->query('xpath:.//div[@id="y'.$y.'_itemid"]/..')
+						->asMultiselect()->one()->getValue()
+				);
+			}
+		}
+
+		if (array_key_exists('items', $data)) {
+
+			$item_row = $form->getFieldContainer('Items')->query('xpath:.//tr[@id="items_0"]')->one()->waitUntilPresent();
+
+			// Check lines styling functions.
+			foreach ($data['items'][0]['functions'] as $function => $value) {
+				$this->assertEquals($value, $item_row->query('xpath:.//z-select[@name="items[0]['.$function.']"]')
+						->asDropdown()->one()->getValue()
+				);
+			}
+
+			// Check lines color.
+			$item_row->query('xpath:.//button[@id="lbl_items_0_color"]')->waitUntilClickable()->one()->click();
+			$this->assertEquals($data['items'][0]['color'],
+					$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->getValue()
+			);
+		}
+	}
+
+	public static function getNoChangesData() {
+		return [
+			[
+				[
+					'case' => 'simple_update'
+				]
+			],
+			[
+				[
+					'case' => 'Create'
+				]
+			],
+			[
+				[
+					'case' => 'Update'
+				]
+			],
+			[
+				[
+					'case' => 'Clone'
+				]
+			],
+			[
+				[
+					'case' => 'Delete'
+				]
+			]
+		];
+	}
+
+	public function checkNoChanges($data) {
+		$old_hash = CDBHelper::getHash(self::SQL);
+		$this->page->login()->open($this->url)->waitUntilReady();
+
+		if ($data['case'] === 'Create') {
+			$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
+					->one()->click();
+		}
+		else {
+			$this->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
+		}
+
+		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
+
+		if ($data['case'] === 'Clone' || $data['case'] === 'Delete') {
+			$form>query('button', $data['case'])->waitUntilClickable()->one()->click();
+		}
+
+		if ($data['case'] === 'Delete') {
+			$this->page->dismissAlert();
+		}
+
+		if ($data['case'] === 'simple_update') {
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, ($this->prototype ? 'Graph prototype updated' : 'Graph updated'));
+		}
+		else {
+			$form->query('button:Cancel')->waitUntilClickable()->one()->click();
+		}
+
+		$this->assertTrue($this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->exists());
+
+		// Check that DB hash is not changed.
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	public function checkDelete() {
+		$this->page->login()->open($this->url)->waitUntilReady();
+		$name = $this->prototype ? 'Graph prototype for delete' : 'Graph for delete';
+		$this->query('link', $name)->waitUntilClickable()->one()->click();
+		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
+		$form->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->assertEquals(($this->prototype ? 'Delete graph prototype?' : 'Delete graph?'), $this->page->getAlertText());
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, ($this->prototype ? 'Graph prototype deleted' : 'Graph deleted'));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.zbx_dbstr($name)));
 	}
 
 	public function clearData() {
