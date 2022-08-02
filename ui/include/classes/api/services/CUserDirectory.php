@@ -443,7 +443,7 @@ class CUserDirectory extends CApiService {
 	 */
 	protected static function validateTest(array &$userdirectory): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-			'userdirectoryid' =>	['type' => API_ID, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'userdirectoryid' =>	['type' => API_ID, 'default' => 0],
 			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
 			'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'base_dn')],

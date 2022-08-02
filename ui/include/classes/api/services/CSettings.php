@@ -199,7 +199,7 @@ class CSettings extends CApiService {
 			'ok_ack_style' =>					['type' => API_INT32, 'in' => '0,1'],
 			'discovery_groupid' =>				['type' => API_ID],
 			'default_inventory_mode' =>			['type' => API_INT32, 'in' => HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC],
-			'alert_usrgrpid' =>					['type' => API_ID, 'flags' => API_ALLOW_NULL],
+			'alert_usrgrpid' =>					['type' => API_ID],
 			'snmptrap_logging' =>				['type' => API_INT32, 'in' => '0,1'],
 			'default_lang' =>					['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(getLocales()))],
 			'default_timezone' =>				['type' => API_STRING_UTF8, 'in' => ZBX_DEFAULT_TIMEZONE.','.implode(',', array_keys(CTimezoneHelper::getList()))],
