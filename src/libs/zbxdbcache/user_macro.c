@@ -1240,3 +1240,21 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
+
+int	um_cache_get_host_revision(const zbx_um_cache_t *cache, zbx_uint64_t hostid, zbx_uint32_t *revision)
+{
+	const zbx_um_host_t	* const *phost;
+	int			i;
+	zbx_uint64_t		*phostid = &hostid;
+
+	if (NULL == (phost = (const zbx_um_host_t * const *)zbx_hashset_search(&cache->hosts, &phostid)))
+		return FAIL;
+
+	if ((*phost)->revision > *revision)
+		*revision = (*phost)->revision;
+
+	for (i = 0; i < (*phost)->templateids.values_num; i++)
+		um_cache_get_host_revision(cache, (*phost)->templateids.values[i], revision);
+
+	return SUCCEED;
+}

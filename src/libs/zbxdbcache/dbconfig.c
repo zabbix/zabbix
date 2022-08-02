@@ -7122,24 +7122,6 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 	return SUCCEED;
 }
 
-static int	dc_get_max_host_revision(const zbx_um_cache_t *cache, zbx_uint64_t hostid, zbx_uint32_t *revision)
-{
-	const zbx_um_host_t	* const *phost;
-	int			i;
-	zbx_uint64_t		*phostid = &hostid;
-
-	if (NULL == (phost = (const zbx_um_host_t * const *)zbx_hashset_search(&cache->hosts, &phostid)))
-		return FAIL;
-
-	if ((*phost)->revision > *revision)
-		*revision = (*phost)->revision;
-
-	for (i = 0; i < (*phost)->templateids.values_num; i++)
-		dc_get_max_host_revision(cache, (*phost)->templateids.values[i], revision);
-
-	return SUCCEED;
-}
-
 int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		zbx_uint32_t *revision, char **error)
 {
@@ -7185,7 +7167,7 @@ int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uin
 	*hostid = dc_host->hostid;
 	*revision = MAX(dc_host->revision, config->expression_revision);
 
-	dc_get_max_host_revision(config->um_cache, *hostid, revision);
+	um_cache_get_host_revision(config->um_cache, *hostid, revision);
 
 	UNLOCK_CACHE;
 
