@@ -13249,6 +13249,22 @@ int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **err
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get data of all proxies from configuration cache and pack into    *
+ *          JSON for LLD                                                      *
+ *                                                                            *
+ * Parameter: j      - [OUT] JSON with proxy data                             *
+ *            error  - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - interface data in JSON                             *
+ *               FAIL    - proxy not found, 'error' message allocated         *
+ *                                                                            *
+ * Comments: if there are no proxies, an empty JSON {"data":[]} is returned;  *
+ *           if some data were not found in cache, they are missing in the    *
+ *           output                                                           *
+ *                                                                            *
+ ******************************************************************************/
 int	DCget_proxy_discovery(struct zbx_json *json, char **error)
 {
 	int	i;
@@ -13372,8 +13388,6 @@ int	DCget_proxy_discovery(struct zbx_json *json, char **error)
 				}
 
 				zbx_json_adduint64(json, "compatibility", dc_proxy->proxy_compatibility);
-
-				zbx_json_addint64(json, "lastaccess", dc_proxy->lastaccess);
 
 				if (0 < dc_proxy->lastaccess)
 				{
