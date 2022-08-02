@@ -37,6 +37,8 @@
 /* separator for multipart mixed messages */
 #define ZBX_MULTIPART_MIXED_BOUNDARY	"MULTIPART-MIXED-BOUNDARY"
 
+extern char	*CONFIG_SSL_CA_LOCATION;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Encode a string into a base64 string as required by rfc2047.      *
@@ -662,8 +664,6 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 
 	if (SMTP_SECURITY_NONE != smtp_security)
 	{
-		extern char	*CONFIG_SSL_CA_LOCATION;
-
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER,
 						0 == smtp_verify_peer ? 0L : 1L)) ||
 				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST,

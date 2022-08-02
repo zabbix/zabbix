@@ -2737,12 +2737,12 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 
 	if (10 > major)
 	{
-		version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d", major,
+		version_info->friendly_current_version = zbx_dsprintf(NULL, "%u.%d.%d", major,
 				RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
 	}
 	else
 	{
-		version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d", major, RIGHT2(ZBX_PG_SVERSION));
+		version_info->friendly_current_version = zbx_dsprintf(NULL, "%u.%d", major, RIGHT2(ZBX_PG_SVERSION));
 	}
 
 	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY;
