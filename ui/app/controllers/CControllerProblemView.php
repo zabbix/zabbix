@@ -326,11 +326,11 @@ class CControllerProblemView extends CControllerProblem {
 			'hostids' => 'filter_hostids',
 			'application' => 'filter_application',
 			'triggerids' => 'filter_triggerids',
+			'name' => 'filter_name',
 			'severities' => 'filter_severities',
-			'age_state' => 'filter_age_state',
-			'age' => 'filter_age',
 			'inventory' => 'filter_inventory',
 			'evaltype' => 'filter_evaltype',
+			'tags' => 'filter_tags',
 			'show_tags' => 'filter_show_tags',
 			'show_suppressed' => 'filter_show_suppressed',
 			'unacknowledged' => 'filter_unacknowledged',
@@ -344,6 +344,12 @@ class CControllerProblemView extends CControllerProblem {
 		];
 		foreach (array_filter(array_intersect_key($data['filter'], $refresh_url_arguments)) as $key => $value) {
 			$refresh_curl->setArgument($refresh_url_arguments[$key], $value);
+		}
+
+		if ($data['filter']['age_state'] == 1) {
+			$refresh_curl
+				->setArgument('filter_age_state', $data['filter']['age_state'])
+				->setArgument('filter_age', $data['filter']['age']);
 		}
 
 		$refresh_curl
