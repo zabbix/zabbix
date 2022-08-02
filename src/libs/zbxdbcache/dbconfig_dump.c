@@ -176,7 +176,7 @@ static void	DCdump_proxies(void)
 	ZBX_DC_PROXY		*proxy;
 	zbx_hashset_iter_t	iter;
 	zbx_vector_ptr_t	index;
-	int			i, j;
+	int			i;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
@@ -1306,6 +1306,23 @@ static void	DCdump_drules(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
+static void	DCdump_dchecks(void)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_dc_dcheck_t		*dcheck;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&config->dchecks, &iter);
+	while (NULL != (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "dcheckid:" ZBX_FS_UI64 " druleid:" ZBX_FS_UI64,
+				dcheck->dcheckid, dcheck->druleid);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
 void	DCdump_configuration(void)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:%u) ===", config->revision);
@@ -1335,4 +1352,5 @@ void	DCdump_configuration(void)
 	DCdump_host_group_index();
 	DCdump_maintenances();
 	DCdump_drules();
+	DCdump_dchecks();
 }
