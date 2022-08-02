@@ -392,7 +392,7 @@ switch ($data['popup_type']) {
 				$host = reset($item['hosts']);
 				$item['hostname'] = $host['name'];
 
-				$description = new CLink($item['name'], 'javascript:void(0);');
+				$description = (new CLink($item['name'], 'javascript:void(0);'))->addClass(ZBX_STYLE_WORDBREAK);
 				$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
 
 				$checkbox_key = is_numeric($item[$options['srcfld1']])
@@ -463,7 +463,8 @@ switch ($data['popup_type']) {
 							json_encode($options['reference']).', '.
 							json_encode($item_pattern).', '.
 							$options['parentid'].
-						');'.$js_action_onclick),
+						');'.$js_action_onclick)
+						->addClass(ZBX_STYLE_WORDBREAK),
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
