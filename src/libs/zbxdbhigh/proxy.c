@@ -3750,7 +3750,10 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 				last_hostid = items[i].host.hostid;
 
 				if (NULL != token)
-					session = zbx_dc_get_or_create_data_session(last_hostid, token);
+				{
+					session = zbx_dc_get_or_create_data_session(last_hostid, token,
+							ZBX_SESSION_TYPE_DATA);
+				}
 			}
 
 			/* check and discard if duplicate data */
@@ -3876,7 +3879,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 		if (NULL == token)
 			session = NULL;
 		else
-			session = zbx_dc_get_or_create_data_session(hostid, token);
+			session = zbx_dc_get_or_create_data_session(hostid, token, ZBX_SESSION_TYPE_DATA);
 
 		if (SUCCEED != (ret = process_history_data_by_itemids(sock, validator_func, validator_args, &jp_data,
 				session, NULL, info, ZBX_ITEM_GET_DEFAULT)))
@@ -4723,7 +4726,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 				goto out;
 			}
 
-			session = zbx_dc_get_or_create_data_session(proxy->hostid, value);
+			session = zbx_dc_get_or_create_data_session(proxy->hostid, value, ZBX_SESSION_TYPE_DATA);
 		}
 
 		if (SUCCEED != (ret = process_history_data_by_itemids(NULL, proxy_item_validator,

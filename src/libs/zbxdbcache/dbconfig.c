@@ -6783,7 +6783,8 @@ int	init_configuration_cache(char **error)
 					__config_shmem_realloc_func,
 					__config_shmem_free_func);
 
-	CREATE_HASHSET_EXT(config->data_sessions, 0, __config_data_session_hash, __config_data_session_compare);
+	for (i = 0; i < ZBX_SESSION_TYPE_COUNT; i++)
+		CREATE_HASHSET_EXT(config->sessions[i], 0, __config_data_session_hash, __config_data_session_compare);
 
 	config->config = NULL;
 
@@ -13224,7 +13225,7 @@ const char	*zbx_dc_get_session_token(void)
  *           session object will not be deleted for 24 hours.                 *
  *                                                                            *
  ******************************************************************************/
-zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token)
+zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token, int session_type)
 {
 	zbx_data_session_t	*session, session_local;
 	time_t			now;
@@ -13234,18 +13235,17 @@ zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const
 	session_local.token = token;
 
 	RDLOCK_CACHE;
-	session = (zbx_data_session_t *)zbx_hashset_search(&config->data_sessions, &session_local);
+	session = (zbx_data_session_t *)zbx_hashset_search(&config->sessions[session_type], &session_local);
 	UNLOCK_CACHE;
 
 	if (NULL == session)
 	{
 		session_local.last_valueid = 0;
 		session_local.lastaccess = now;
-		session_local.token = dc_strdup(token);
 
 		WRLOCK_CACHE;
-
-		session = (zbx_data_session_t *)zbx_hashset_insert(&config->data_sessions, &session_local,
+		session_local.token = dc_strdup(token);
+		session = (zbx_data_session_t *)zbx_hashset_insert(&config->sessions[session_type], &session_local,
 				sizeof(session_local));
 		UNLOCK_CACHE;
 	}
@@ -13265,18 +13265,22 @@ void	zbx_dc_cleanup_data_sessions(void)
 	zbx_data_session_t	*session;
 	zbx_hashset_iter_t	iter;
 	time_t			now;
+	int			i;
 
 	now = time(NULL);
 
 	WRLOCK_CACHE;
 
-	zbx_hashset_iter_reset(&config->data_sessions, &iter);
-	while (NULL != (session = (zbx_data_session_t *)zbx_hashset_iter_next(&iter)))
+	for (i = 0; i < ZBX_SESSION_TYPE_COUNT; i++)
 	{
-		if (session->lastaccess + SEC_PER_DAY <= now)
+		zbx_hashset_iter_reset(&config->sessions[i], &iter);
+		while (NULL != (session = (zbx_data_session_t *)zbx_hashset_iter_next(&iter)))
 		{
-			__config_shmem_free_func((char *)session->token);
-			zbx_hashset_iter_remove(&iter);
+			if (session->lastaccess + SEC_PER_DAY <= now)
+			{
+				__config_shmem_free_func((char *)session->token);
+				zbx_hashset_iter_remove(&iter);
+			}
 		}
 	}
 

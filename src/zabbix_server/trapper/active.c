@@ -23,6 +23,7 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
+#include "zbxcrypto.h"
 
 #include "zbxcomms.h"
 
@@ -468,7 +469,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;
 	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
-
+	zbx_data_session_t	*session = NULL;
 	zbx_vector_ptr_t	regexps;
 	zbx_vector_str_t	names;
 
@@ -549,14 +550,27 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		version = ZBX_COMPONENT_VERSION(4, 2);
 	}
 
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SESSION, tmp, sizeof(tmp), NULL))
+	{
+		size_t	token_len;
+
+		if (zbx_get_token_len() != (token_len = strlen(tmp)))
+		{
+			zbx_snprintf(error, MAX_STRING_LEN, "invalid session token length %d", (int)token_len);
+			ret = FAIL;
+			goto error;
+		}
+
+		session = zbx_dc_get_or_create_data_session(hostid, tmp, ZBX_SESSION_TYPE_CONFIG);
+	}
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)revision);
-
 	zbx_vector_uint64_create(&itemids);
 
-	if (agent_config_revision != revision)
+	if (NULL == session || 0 == session->last_valueid || agent_config_revision != revision)
 	{
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)revision);
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 		get_list_of_active_checks(hostid, &itemids);
 	}
@@ -709,6 +723,13 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	zbx_json_free(&json);
+
+	if (SUCCEED == ret)
+	{
+		/* remember if configuration was successfully sent for new session */
+		if (NULL != session)
+			session->last_valueid = (zbx_uint64_t)revision;
+	}
 
 	goto out;
 error:

@@ -40,6 +40,10 @@
 #define	ZBX_POLLER_TYPE_ODBC		6
 #define	ZBX_POLLER_TYPE_COUNT		7	/* number of poller types */
 
+#define	ZBX_SESSION_TYPE_DATA		0
+#define	ZBX_SESSION_TYPE_CONFIG		1
+#define	ZBX_SESSION_TYPE_COUNT		2
+
 #define MAX_JAVA_ITEMS		32
 #define MAX_SNMP_ITEMS		128
 #define MAX_POLLER_ITEMS	128	/* MAX(MAX_JAVA_ITEMS, MAX_SNMP_ITEMS) */
@@ -990,7 +994,7 @@ typedef struct
 zbx_data_session_t;
 
 const char	*zbx_dc_get_session_token(void);
-zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token);
+zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token, int session_type);
 void	zbx_dc_cleanup_data_sessions(void);
 
 /* maintenance support */

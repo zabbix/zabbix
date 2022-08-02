@@ -653,6 +653,7 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs, zbx_uint32_t *config_r
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, (zbx_uint64_t)CONFIG_LISTEN_PORT);
 
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)*config_revision_local);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_SESSION, session_token, ZBX_JSON_TYPE_STRING);
 
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
@@ -680,6 +681,8 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs, zbx_uint32_t *config_r
 			}
 			else
 			{
+				/* server is unaware if configuration is actually delivered and saves session */
+				*config_revision_local = 0;
 				zabbix_log(level, "Unable to receive from [%s]:%d [%s]",
 						((zbx_addr_t *)addrs->values[0])->ip,
 						((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror());
