@@ -261,7 +261,7 @@ static void	vc_cache_item_update(zbx_uint64_t itemid, zbx_vc_item_update_type_t 
 	zbx_vc_item_update_t	*update;
 
 	if (vc_itemupdates.values_num == vc_itemupdates.values_alloc)
-		zbx_vector_vc_itemupdate_reserve(&vc_itemupdates, vc_itemupdates.values_alloc * 1.5);
+		zbx_vector_vc_itemupdate_reserve(&vc_itemupdates, (size_t)(vc_itemupdates.values_alloc * 1.5));
 
 	update = &vc_itemupdates.values[vc_itemupdates.values_num++];
 	update->itemid = itemid;

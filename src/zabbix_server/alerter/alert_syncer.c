@@ -910,8 +910,8 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 
 ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 {
-	double		sec1, sec2;
-	int		alerts_num, sleeptime, nextcheck, freq_watchdog, time_watchdog = 0, time_cleanup = 0,
+	double		sec1, sec2, time_cleanup = 0;
+	int		alerts_num, sleeptime, nextcheck, freq_watchdog, time_watchdog = 0,
 			results_num;
 	zbx_am_db_t	amdb;
 	char		*error = NULL;

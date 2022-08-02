@@ -2268,9 +2268,9 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
-		now = time_now;
+		now = (int)time_now;
 
-		if (time_ping + ZBX_DB_PING_FREQUENCY < now)
+		if ((time_ping + ZBX_DB_PING_FREQUENCY) < now)
 		{
 			manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE);
 			DBclose();
