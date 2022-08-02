@@ -74,20 +74,20 @@ $form = (new CForm())
 	->setId('proxy-list')
 	->setName('proxy_list');
 
+$view_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'proxy.list')
+	->getUrl();
+
 $proxy_list = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'proxyids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder'],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'proxy.list')
-				->getUrl()
-		),
-		_('Mode'),
-		_('Encryption'),
-		_('Version'),
-		_('Last seen (age)'),
+		make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Mode'), 'status', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Encryption'), 'tls_accept', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Version'), 'version', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Last seen (age)'), 'lastaccess', $data['sort'], $data['sortorder'], $view_url),
 		_('Host count'),
 		_('Item count'),
 		_('Required performance (vps)'),

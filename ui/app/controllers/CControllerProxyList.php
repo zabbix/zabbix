@@ -27,14 +27,14 @@ class CControllerProxyList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'sort' =>			'in host',
-			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>		'in 1',
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
-			'filter_status' =>	'in -1,'.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'filter_version' =>	'in -1,1,2'
+			'sort' =>			'in '.implode(',', ['host', 'status', 'tls_accept', 'version', 'lastaccess']),
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'filter_status' =>	'in '.implode(',', ['-1', HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]),
+			'filter_version' =>	'in '.implode(',', ['-1', ZBX_PROXY_VERSION_CURRENT, ZBX_PROXY_VERSION_OUTDATED]),
 		];
 
 		$ret = $this->validateInput($fields);
@@ -95,20 +95,10 @@ class CControllerProxyList extends CController {
 				'status' => ($filter['status'] == -1) ? null : $filter['status'],
 				'compatibility' => ($filter['version'] == -1) ? null : $filter['version']
 			],
-			'sortfield' => $sortField,
 			'limit' => $limit,
 			'editable' => true,
 			'preservekeys' => true
 		]);
-
-		// data sort and pager
-		order_result($data['proxies'], $sortField, $sortOrder);
-
-		$page_num = getRequest('page', 1);
-		CPagerHelper::savePage('proxy.list', $page_num);
-		$data['paging'] = CPagerHelper::paginate($page_num, $data['proxies'], $sortOrder,
-			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
-		);
 
 		$data['proxies'] = API::Proxy()->get([
 			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'version'],
@@ -130,10 +120,17 @@ class CControllerProxyList extends CController {
 			'preservekeys' => true
 		]);
 
+		// data sort and pager
 		order_result($data['proxies'], $sortField, $sortOrder);
 
+		$page_num = getRequest('page', 1);
+		CPagerHelper::savePage('proxy.list', $page_num);
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['proxies'], $sortOrder,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+		);
+
 		foreach ($data['proxies'] as &$proxy) {
-			order_result($proxy['hosts'], 'name');
+			order_result($proxy['hosts'],  $sortField);
 			$proxy['hosts'] = array_slice($proxy['hosts'], 0, CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1);
 		}
 		unset($proxy);
