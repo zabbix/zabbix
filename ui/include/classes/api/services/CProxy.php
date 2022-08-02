@@ -181,10 +181,9 @@ class CProxy extends CApiService {
 					else {
 						// convert proxy version to readable format
 						// todo: rewrite this!!!
-						$mayor_version = number_format($proxy['version']/10000);
-						$minor_version = number_format(($proxy['version'] - ($mayor_version * 10000))/100);
-						$patch_version = ($proxy['version'] - ($mayor_version * 10000) - ($minor_version * 100));
-						$result[$proxy['proxyid']]['version'] = $mayor_version.'.'.$minor_version.'.'.$patch_version;
+						$version =$proxy['version'];
+						$result[$proxy['proxyid']]['version'] = (intdiv($version, 10000) % 100).'.'.
+							(intdiv($version, 100) % 100).'.'.($version % 100);;
 					}
 				}
 			}
