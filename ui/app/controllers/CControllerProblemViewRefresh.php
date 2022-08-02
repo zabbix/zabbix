@@ -89,11 +89,11 @@ class CControllerProblemViewRefresh extends CControllerProblem {
 				'name' => $this->getInput('filter_name', ''),
 				'severities' => $this->getInput('filter_severities', []),
 				'inventory' => array_filter($this->getInput('filter_inventory', []), function ($filter_inventory) {
-					return ($filter_inventory['field'] !== '' && $filter_inventory['value'] !== '');
+					return $filter_inventory['field'] !== '' && $filter_inventory['value'] !== '';
 				}),
 				'evaltype' => $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
 				'tags' => array_filter($this->getInput('filter_tags', []), function ($filter_tag) {
-					return ($filter_tag['tag'] !== '');
+					return $filter_tag['tag'] !== '';
 				}),
 				'show_tags' => $this->getInput('filter_show_tags', PROBLEMS_SHOW_TAGS_3),
 				'tag_name_format' => $this->getInput('filter_tag_name_format', PROBLEMS_TAG_NAME_FULL),
