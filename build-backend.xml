@@ -192,6 +192,7 @@
 		<!-- Build Zabbix cmocka tests with the specified command line arguments -->
 		<attribute name="conf"/>
 		<attribute name="conf-name"/>
+		<attribute name="cc" default="gcc"/>
 		<sequential>
 			<!-- initialize cflags depending on used compiler -->
 			<local name="common.cflags"/>
