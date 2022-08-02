@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -265,7 +265,6 @@ static int	check_user_permissions(zbx_uint64_t userid, const DC_HOST *host, zbx_
 {
 	int		ret = SUCCEED;
 	DB_RESULT	result;
-	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " scriptid:" ZBX_FS_UI64,
 			__func__, userid, host->hostid, script->scriptid);
@@ -285,7 +284,7 @@ static int	check_user_permissions(zbx_uint64_t userid, const DC_HOST *host, zbx_
 		PERM_DENY,
 		script->host_access);
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == DBfetch(result))
 		ret = FAIL;
 
 	DBfree_result(result);
@@ -467,8 +466,11 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
-					ret = zbx_execute(script->command, result, error, max_error_len,
-							CONFIG_TRAPPER_TIMEOUT, ZBX_EXIT_CODE_CHECKS_ENABLED);
+					if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
+							CONFIG_TRAPPER_TIMEOUT, ZBX_EXIT_CODE_CHECKS_ENABLED)))
+					{
+						ret = FAIL;
+					}
 					break;
 				default:
 					zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option \"%d\".",

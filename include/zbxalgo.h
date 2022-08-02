@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -456,6 +456,7 @@ void	zbx_list_iterator_clear(zbx_list_iterator_t *iterator);
 int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list_iterator_t *iterator2);
 int	zbx_list_iterator_isset(const zbx_list_iterator_t *iterator);
 void	zbx_list_iterator_update(zbx_list_iterator_t *iterator);
+void	*zbx_list_iterator_remove_next(zbx_list_iterator_t *iterator);
 
 
 #endif

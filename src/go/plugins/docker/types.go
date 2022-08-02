@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -296,6 +296,7 @@ type ThrottlingData struct {
 type CPUUsage struct {
 	TotalUsage        uint64   `json:"total_usage"`
 	PercpuUsage       []uint64 `json:"percpu_usage"`
+	PercentUsage      float64  `json:"percent_usage"`
 	UsageInKernelmode uint64   `json:"usage_in_kernelmode"`
 	UsageInUsermode   uint64   `json:"usage_in_usermode"`
 }

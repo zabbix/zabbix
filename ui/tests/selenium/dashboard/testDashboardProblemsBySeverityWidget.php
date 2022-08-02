@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,13 +41,12 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
 	 */
-	// TODO: add wf.name in select and order by after fix ZBX-18271
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid';
 
 	public function getCreateWidgetData() {
@@ -1665,7 +1664,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 		foreach ($expected_popup['Tags'] as $tag) {
 			$tag_array = $row->getColumn('Tags')->getText();
-			$this->assertContains($tag, $tag_array);
+			$this->assertStringContainsString($tag, $tag_array);
 		}
 		if (CTestArrayHelper::get($data['fields'], 'Show operational data', 'None') === 'Separately') {
 			$this->assertEquals('*UNKNOWN*', $row->getColumn('Operational data')->getText());

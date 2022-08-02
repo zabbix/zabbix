@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -702,7 +702,7 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): arra
 	}
 
 	$exceeded_trigs = (count($triggers_by_name) > ZBX_MAX_TABLE_COLUMNS);
-	$triggers_by_name = array_slice($triggers_by_name, 0, ZBX_MAX_TABLE_COLUMNS);
+	$triggers_by_name = array_slice($triggers_by_name, 0, ZBX_MAX_TABLE_COLUMNS, true);
 	foreach ($triggers_by_name as $name => $triggers) {
 		$triggers_by_name[$name] = array_slice($triggers, 0, ZBX_MAX_TABLE_COLUMNS, true);
 	}
@@ -2562,7 +2562,7 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 				$table->addRow($description);
 			}
 
-			$result[] = (new CSpan())
+			$result[] = (new CLink())
 				->addClass($class)
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint($table, '', $freeze_on_click);

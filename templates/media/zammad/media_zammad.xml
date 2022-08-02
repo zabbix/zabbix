@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-20T00:00:00Z</date>
+    <date>2021-12-13T19:54:37Z</date>
     <media_types>
         <media_type>
             <name>Zammad</name>
@@ -164,18 +164,27 @@
         };&#13;
     },&#13;
 &#13;
-    setTicketTags: function(tags, ticket_id) {&#13;
+    setTicketTags: function (tags, ticket_id) {&#13;
+        var data = {&#13;
+            item: '',&#13;
+            object: 'Ticket',&#13;
+            o_id: ticket_id&#13;
+        };&#13;
+&#13;
         try {&#13;
             var tags_json = JSON.parse(tags),&#13;
                 result;&#13;
 &#13;
             for (var i in tags_json) {&#13;
-                result = Zammad.request('get',&#13;
-                    '/api/v1/tags/add?object=Ticket&amp;o_id=' + ticket_id +&#13;
-                    '&amp;item=' + tags_json[i].tag);&#13;
 &#13;
-                if (typeof result.response !== 'object'&#13;
-                    || result.status != 200) {&#13;
+                if (tags_json[i].value) {&#13;
+                    data.item = tags_json[i].tag + &quot;: &quot; + tags_json[i].value;&#13;
+                } else {&#13;
+                    data.item = tags_json[i].tag;&#13;
+                }&#13;
+                result = Zammad.request('post', 'api/v1/tags/add', data);&#13;
+&#13;
+                if (typeof result.response !== 'object' || result.status != 200) {&#13;
                     Zabbix.Log(4, '[ Zammad Webhook ] Cannot add ticket tag:' + tags_json[i].tag);&#13;
                 }&#13;
             }&#13;

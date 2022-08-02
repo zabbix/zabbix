@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,13 +26,13 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 class testMultiselect extends CWebTest {
 
 	public function testMultiselect_SuggestExisting() {
-		$this->checkSuggest('zabbix.php?action=problem.view', 'zbx_filter',
+		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1', 'zbx_filter',
 			'Host groups', 'z', 'multiselect-suggest'
 		);
 	}
 
 	public function testMultiselect_SuggestNoMatches() {
-		$this->checkSuggest('zabbix.php?action=problem.view','zbx_filter',
+		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1','zbx_filter',
 			'Host groups', 'QQQ', 'multiselect-matches'
 		);
 	}
@@ -58,7 +58,7 @@ class testMultiselect extends CWebTest {
 	}
 
 	public function testMultiselect_NotSuggestAlreadySelected() {
-		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->updateViewport();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$field = $form->getField('Host groups');
@@ -66,6 +66,8 @@ class testMultiselect extends CWebTest {
 		$element = $field->query('tag:input')->one();
 		$element->type('Zabbix server');
 		$this->query('class:multiselect-matches')->waitUntilVisible();
+		// Tags table change elements layout when not fully loaded..
+		$this->query('xpath://table[@id="filter-tags"]//tr[@class="form_row"]')->waitUntilVisible();
 		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(),
 			[$element]
 		);
@@ -82,9 +84,9 @@ class testMultiselect extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
-		$widget_type = $form->getField('Type')->asZDropdown()->getText();
+		$widget_type = $form->getField('Type')->asDropdown()->getText();
 		if ($widget_type !== $widget) {
-			$form->getField('Type')->asZDropdown()->select($widget);
+			$form->getField('Type')->asDropdown()->select($widget);
 			$form->waitUntilReloaded();
 			/* After selecting "type" focus remains in the suggested list,
 			 * need to click on another field to change the position of the mouse.

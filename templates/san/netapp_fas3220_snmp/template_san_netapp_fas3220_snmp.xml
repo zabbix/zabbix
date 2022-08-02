@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-31T16:03:02Z</date>
+   <date>2022-06-17T09:29:01Z</date>
    <groups>
       <group>
          <name>Templates/SAN</name>
@@ -14,11 +14,11 @@
          <description>The template to monitor SAN NetApp FAS3220 cluster by Zabbix SNMP agent.&#13;
 &#13;
 MIBs used:&#13;
-NETAPP-MIB&#13;
+IF-MIB&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/416694-discussion-thread-for-official-zabbix-template-netapp-fas3220&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -153,7 +153,7 @@ Template tooling version used: 0.38</description>
                      </preprocessing>
                   </item_prototype>
                   <item_prototype>
-                     <name>Node {#NODE.NAME}: Failed FAN messgae</name>
+                     <name>Node {#NODE.NAME}: Failed FAN message</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.20.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"]</key>
@@ -398,13 +398,12 @@ fullyCharged(9).</description>
                            <expression>{last()}&lt;10m</expression>
                            <name>Node {#NODE.NAME}: has been restarted (uptime &lt; 10m)</name>
                            <priority>INFO</priority>
-                           <description>Uptime is less than 10 minutes</description>
+                           <description>Uptime is less than 10 minutes.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}={Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}</expression>
@@ -453,7 +452,6 @@ fullyCharged(9).</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Node {#NODE.NAME}: CPU utilization</name>
@@ -626,7 +624,6 @@ fullyCharged(9).</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#VSERVER}{#FSNAME}: Free space</name>
@@ -776,21 +773,20 @@ Possible states:&#13;
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}=5</expression>
-                           <name>Node {#NODE.NAME}: Node has been taken over</name>
-                           <priority>HIGH</priority>
-                           <description>The thisNodeDead(5) setting indicates that this node has been takenover.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()}=1</expression>
                            <name>Node {#NODE.NAME}: HA is not licensed</name>
                            <priority>AVERAGE</priority>
                            <description>The value notConfigured(1) indicates that the HA is not licensed.</description>
                         </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=5</expression>
+                           <name>Node {#NODE.NAME}: Node has been taken over</name>
+                           <priority>HIGH</priority>
+                           <description>The thisNodeDead(5) setting indicates that this node has been takenover.</description>
+                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Network ports discovery</name>
@@ -845,7 +841,8 @@ Possible states:&#13;
                      <key>fas3220.net.if[if64InDiscards, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>The number of inbound packets that were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.</description>
+                     <description>MIB: IF-MIB&#13;
+The number of inbound packets that were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -865,7 +862,8 @@ Possible states:&#13;
                      <key>fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.</description>
+                     <description>MIB: IF-MIB&#13;
+The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -909,7 +907,8 @@ Possible states:&#13;
                      <key>fas3220.net.if[if64OutDiscards, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>The number of outbound packets that were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.</description>
+                     <description>MIB: IF-MIB&#13;
+The number of outbound packets that were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -929,7 +928,8 @@ Possible states:&#13;
                      <key>fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>The number of outbound packets that could not be transmitted because of errors.</description>
+                     <description>MIB: IF-MIB&#13;
+The number of outbound packets that could not be transmitted because of errors.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -1060,7 +1060,7 @@ Possible states:&#13;
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.11.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.net.port[netportSpeedOper, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
-                     <description>The speed that appears on the port. It can be either undef(0), auto(1), ten Mb/s(2), hundred Mb/s(3), one Gb/s(4), or ten Gb/s(5).</description>
+                     <description>The speed appears on the port. It can be either undef(0), auto(1), ten Mb/s(2), hundred Mb/s(3), one Gb/s(4), or ten Gb/s(5).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -1099,7 +1099,6 @@ Possible states:&#13;
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template SAN NetApp FAS3220 SNMP:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
@@ -1107,7 +1106,7 @@ or {Template SAN NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template SAN NetApp FAS3220 SNMP:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template SAN NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (&gt;{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
@@ -1265,7 +1264,7 @@ return JSON.stringify(out);</params>
             </macro>
             <macro>
                <macro>{$FAS3220.FS.TIME}</macro>
-               <value>10G</value>
+               <value>10m</value>
                <description>The time during which disk usage may exceed the threshold. Can be used with {#FSNAME} as context.</description>
             </macro>
             <macro>
@@ -1365,73 +1364,6 @@ Can be used with {#FSNAME} as context.</description>
       </trigger>
    </triggers>
    <value_maps>
-      <value_map>
-         <name>Service state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>FAS3220 Over-temperature</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>No</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Yes</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>FAS3220 NVRAM battery status</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>OK</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Partially discharged</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Fully discharged</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Not present</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>Near end of life</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>At end of life</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>8</value>
-               <newvalue>Overcharged</newvalue>
-            </mapping>
-            <mapping>
-               <value>9</value>
-               <newvalue>Fully charged</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
       <value_map>
          <name>FAS3220 HA cannot takeover cause</name>
          <mappings>
@@ -1539,23 +1471,56 @@ Can be used with {#FSNAME} as context.</description>
          </mappings>
       </value_map>
       <value_map>
-         <name>FAS3220 Port link state</name>
+         <name>FAS3220 NVRAM battery status</name>
          <mappings>
             <mapping>
-               <value>0</value>
-               <newvalue>Undef</newvalue>
-            </mapping>
-            <mapping>
                <value>1</value>
-               <newvalue>Off</newvalue>
+               <newvalue>OK</newvalue>
             </mapping>
             <mapping>
                <value>2</value>
-               <newvalue>UP</newvalue>
+               <newvalue>Partially discharged</newvalue>
             </mapping>
             <mapping>
                <value>3</value>
-               <newvalue>DOWN</newvalue>
+               <newvalue>Fully discharged</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Not present</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Near end of life</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>At end of life</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>Overcharged</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>Fully charged</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>FAS3220 Over-temperature</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>No</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Yes</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -1573,15 +1538,23 @@ Can be used with {#FSNAME} as context.</description>
          </mappings>
       </value_map>
       <value_map>
-         <name>FAS3220 Port UP by administrator</name>
+         <name>FAS3220 Port link state</name>
          <mappings>
             <mapping>
                <value>0</value>
-               <newvalue>False</newvalue>
+               <newvalue>Undef</newvalue>
             </mapping>
             <mapping>
                <value>1</value>
-               <newvalue>True</newvalue>
+               <newvalue>Off</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>UP</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>DOWN</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -1615,27 +1588,6 @@ Can be used with {#FSNAME} as context.</description>
          </mappings>
       </value_map>
       <value_map>
-         <name>FAS3220 Port type</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Physical</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>IF-group</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>VLAN</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Undef</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>FAS3220 Port speed</name>
          <mappings>
             <mapping>
@@ -1661,6 +1613,53 @@ Can be used with {#FSNAME} as context.</description>
             <mapping>
                <value>5</value>
                <newvalue>100 Gb/s</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>FAS3220 Port type</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Physical</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>IF-group</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>VLAN</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Undef</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>FAS3220 Port UP by administrator</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>False</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>True</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -590,7 +590,7 @@ class CControllerPopupGeneric extends CController {
 			$host_options['templated_hosts'] = 1;
 			$group_options['templated_hosts'] = 1;
 		}
-		elseif ($this->source_table !== 'templates') {
+		elseif ($this->source_table !== 'templates' && $this->source_table !== 'host_templates') {
 			$group_options['with_hosts_and_templates'] = 1;
 		}
 
@@ -620,7 +620,7 @@ class CControllerPopupGeneric extends CController {
 				? API::HostGroup()->get([
 					'output' => ['name', 'groupid'],
 					'groupids' => $this->groupids
-				] + $group_options)
+				])
 				: [];
 
 			$filter['groups'] = [
@@ -1197,11 +1197,13 @@ class CControllerPopupGeneric extends CController {
 			case 'graph_prototypes':
 				$options += [
 					'output' => API_OUTPUT_EXTEND,
-					'selectHosts' => ['name'],
+					'selectHosts' => ['hostid', 'name'],
 					'hostids' => $this->hostids ? $this->hostids : null
 				];
 
 				if ($this->source_table === 'graph_prototypes') {
+					$options['selectDiscoveryRule'] = ['hostid'];
+
 					$records = (!$this->host_preselect_required || $this->hostids)
 						? API::GraphPrototype()->get($options)
 						: [];

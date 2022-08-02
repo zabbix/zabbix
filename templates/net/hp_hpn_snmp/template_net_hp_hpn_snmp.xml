@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:20Z</date>
+   <date>2021-12-23T14:12:43Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -21,7 +21,7 @@ ENTITY-SENSORS-MIB&#13;
 ENTITY-MIB&#13;
 STATISTICS-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -511,6 +511,15 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      </applications>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
@@ -525,15 +534,6 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                                  <recovery_expression>{Template Net HP Enterprise Switch SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>

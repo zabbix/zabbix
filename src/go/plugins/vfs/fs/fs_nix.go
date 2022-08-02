@@ -1,8 +1,9 @@
+//go:build !windows
 // +build !windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,16 +39,19 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 	}
 
 	fsmap := make(map[string]*FsInfoNew)
+	fsStatCaller := p.newFSCaller(getFsStats, len(allData))
+	fsInodeCaller := p.newFSCaller(getFsInode, len(allData))
+
 	for _, info := range allData {
-		bytes, err := getFsStats(*info.FsName)
+		bytes, err := fsStatCaller.run(*info.FsName)
 		if err != nil {
-			p.Debugf(`cannot discern stats for the mount: %s`, *info.FsName)
+			p.Debugf(`cannot discern stats for the mount %s: %s`, *info.FsName, err.Error())
 			continue
 		}
 
-		inodes, err := getFsInode(*info.FsName)
+		inodes, err := fsInodeCaller.run(*info.FsName)
 		if err != nil {
-			p.Debugf(`cannot discern inode for the mount: %s`, *info.FsName)
+			p.Debugf(`cannot discern inode for the mount %s: %s`, *info.FsName, err.Error())
 			continue
 		}
 
@@ -55,6 +59,9 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 			fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, bytes, inodes}
 		}
 	}
+
+	fsStatCaller.close()
+	fsInodeCaller.close()
 
 	allData, err = p.getFsInfo()
 	if err != nil {

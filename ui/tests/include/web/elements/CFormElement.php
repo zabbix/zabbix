@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -142,7 +142,7 @@ class CFormElement extends CElement {
 			}
 
 			if ($labels->count() > 1) {
-				CTest::addWarning('Form label "'.$name.'" is not unique.');
+				CTest::zbxAddWarning('Form label "'.$name.'" is not unique.');
 			}
 		}
 
@@ -295,12 +295,16 @@ class CFormElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function submit() {
-		$buttons = $this->query('xpath:.//button[@type="submit"]')->all()
-				->filter(new CElementFilter(CElementFilter::VISIBLE));
+		$buttons = $this->query('xpath:.//button[@type="submit"]|.//input[@type="submit"]')->all();
+
+		if ($buttons->count() > 1) {
+			$buttons = $buttons->filter(new CElementFilter(CElementFilter::VISIBLE));
+		}
+
 		$submit = ($buttons->count() === 0) ? (new CNullElement()) : $buttons->first();
 
 		if ($submit->isValid()) {
-			$submit->click();
+			$submit->click(true);
 		}
 		else {
 			parent::submit();
@@ -317,7 +321,7 @@ class CFormElement extends CElement {
 	 *
 	 * @return $this
 	 */
-	private function setFieldValue($field, $values) {
+	protected function setFieldValue($field, $values) {
 		$classes = [CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class];
 		$element = $this->getField($field);
 
@@ -333,6 +337,11 @@ class CFormElement extends CElement {
 					$container->query('xpath', $xpath)->one()->detect()->fill($value);
 				}
 			}
+
+			return $this;
+		}
+		elseif ($values instanceof \Closure) {
+			$values($this, $field, $element);
 
 			return $this;
 		}
@@ -401,7 +410,7 @@ class CFormElement extends CElement {
 	 *
 	 * @throws Exception
 	 */
-	private function checkFieldValue($field, $values, $raise_exception = true) {
+	protected function checkFieldValue($field, $values, $raise_exception = true) {
 		$classes = [CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class];
 		$element = $this->getField($field);
 
@@ -436,5 +445,21 @@ class CFormElement extends CElement {
 		}
 
 		return $element->checkValue($values, $raise_exception);
+	}
+
+	/**
+	 * Wait for form reload after form element select.
+	 *
+	 * @param string $value		text to be written into the field
+	 *
+	 * @return Closure
+	 */
+	public static function RELOADABLE_FILL($value) {
+		return function ($form, $field, $element) use ($value) {
+			if (!($element instanceof CDropdownElement) || $element->getText() !== $value) {
+				$element->fill($value);
+				$form->waitUntilReloaded();
+			}
+		};
 	}
 }

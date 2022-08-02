@@ -1,5 +1,5 @@
 
-# ICMP Ping
+# Template Module ICMP Ping
 
 ## Overview
 

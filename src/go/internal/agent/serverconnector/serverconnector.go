@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -271,7 +271,7 @@ func (c *Connector) refreshActiveChecks() {
 			return
 		}
 
-		if len(*response.Expressions[i].Delimiter) != 1 {
+		if len(*response.Expressions[i].Delimiter) > 1 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: invalid tag "exp_delimiter" value "%s"`,
 				c.clientID, c.address, *response.Expressions[i].Delimiter)
 			return

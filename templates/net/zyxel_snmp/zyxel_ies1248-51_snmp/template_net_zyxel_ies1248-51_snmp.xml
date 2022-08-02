@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-10T18:31:47Z</date>
+   <date>2021-12-23T18:32:16Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template ZYXEL IES1248-51 SNMP</template>
-         <name>Template ZYXEL IES1248-51 SNMP</name>
+         <template>Template Net ZYXEL IES1248-51 SNMP</template>
+         <name>Template Net ZYXEL IES1248-51 SNMP</name>
          <description>ZYXEL IES1248-51&#13;
 &#13;
 MIBs used:&#13;
@@ -27,7 +27,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Network devices</name>
@@ -59,7 +59,6 @@ Template tooling version used: 0.38</description>
                <type>INTERNAL</type>
                <key>zabbix[host,snmp,available]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Status</name>
@@ -90,9 +89,8 @@ Template tooling version used: 0.38</description>
                <snmp_oid>.1.3.6.1.2.1.1.4.0</snmp_oid>
                <key>zyxel.ies1248.contact</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: RFC1213-MIB&#13;
 The textual identification of the contact person&#13;
@@ -117,9 +115,8 @@ on how to contact this person.</description>
                <snmp_oid>.1.3.6.1.4.1.890.1.5.13.1.1.3.1.4.0.0</snmp_oid>
                <key>zyxel.ies1248.fwversion</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: ZYXEL-IESCOMMON-MIB</description>
                <inventory_link>SOFTWARE_FULL</inventory_link>
@@ -151,9 +148,8 @@ on how to contact this person.</description>
                <snmp_oid>.1.3.6.1.2.1.1.6.0</snmp_oid>
                <key>zyxel.ies1248.location</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: RFC1213-MIB&#13;
 The physical location of this node (e.g.,&#13;
@@ -177,9 +173,8 @@ The physical location of this node (e.g.,&#13;
                <snmp_oid>.1.3.6.1.2.1.2.2.1.6.1</snmp_oid>
                <key>zyxel.ies1248.mac</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: IF-MIB&#13;
 The interface's address at the protocol layer&#13;
@@ -206,9 +201,8 @@ should contain an octet string of zero length.</description>
                <snmp_oid>.1.3.6.1.2.1.1.1.0</snmp_oid>
                <key>zyxel.ies1248.model</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: RFC1213-MIB&#13;
 A textual description of the entity.  This value&#13;
@@ -244,9 +238,8 @@ printable ASCII characters.</description>
                <snmp_oid>.1.3.6.1.2.1.1.5.0</snmp_oid>
                <key>zyxel.ies1248.name</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: RFC1213-MIB&#13;
 An administratively-assigned name for this&#13;
@@ -271,9 +264,8 @@ fully-qualified domain name.</description>
                <snmp_oid>.1.3.6.1.4.1.890.1.5.13.1.1.2.1.3.0</snmp_oid>
                <key>zyxel.ies1248.serialnumber</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: ZYXEL-IESCOMMON-MIB&#13;
 Serial number</description>
@@ -306,7 +298,6 @@ Serial number</description>
                <key>zyxel.ies1248.slot.alarm</key>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: ZYXEL-IESCOMMON-MIB&#13;
 This variable indicates the alarm status of the module.&#13;
@@ -384,7 +375,6 @@ return outArray.join();
                <delay>30s</delay>
                <history>2w</history>
                <trends>0d</trends>
-               <status>ENABLED</status>
                <units>uptime</units>
                <description>MIB: RFC1213-MIB&#13;
 The time (in hundredths of a second) since the&#13;
@@ -427,7 +417,6 @@ re-initialized.</description>
                      <snmp_oid>.1.3.6.1.4.1.890.1.5.13.1.2.1.1.2.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.fan[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!rpm</units>
                      <description>MIB: ZYXEL-IESCOMMON-MIB&#13;
 Current speed in Revolutions Per Minute (RPM) on the fan.</description>
@@ -453,7 +442,6 @@ Current speed in Revolutions Per Minute (RPM) on the fan.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ZYXEL IES1248-51: Fan #{#SNMPINDEX}</name>
@@ -461,7 +449,7 @@ Current speed in Revolutions Per Minute (RPM) on the fan.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.fan[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -503,7 +491,6 @@ Current speed in Revolutions Per Minute (RPM) on the fan.</description>
                      <snmp_oid>.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.adsl.adminstatus[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The desired state of the interface.  The&#13;
 testing(3) state indicates that no operational&#13;
@@ -529,7 +516,6 @@ packets can be passed.</description>
                      <snmp_oid>.1.3.6.1.2.1.10.94.1.1.2.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.adsl.atuc.atn[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>dB</units>
                      <description>MIB: ADSL-LINE-MIB&#13;
@@ -566,7 +552,6 @@ The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit –
                      <snmp_oid>.1.3.6.1.2.1.10.94.1.1.2.1.7.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.adsl.atuc.outpwr[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>dB</units>
                      <description>MIB: ADSL-LINE-MIB&#13;
@@ -594,7 +579,6 @@ The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit –
                      <snmp_oid>.1.3.6.1.2.1.10.94.1.1.2.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.adsl.atuc.snrmgn[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>dB</units>
                      <description>MIB: ADSL-LINE-MIB&#13;
@@ -631,13 +615,12 @@ The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit –
                      <snmp_oid>.1.3.6.1.2.1.10.94.1.1.3.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.adsl.atur.atn[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>dB</units>
                      <description>MIB: ADSL-LINE-MIB&#13;
 Measured difference in the total power transmitted by&#13;
 the peer ATU and the total power received by this ATU. &#13;
-The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.</description>
+The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber's ADSL modem or router, during negotiation/provisioning message interchanges.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Port {#SNMPINDEX}</name>
@@ -668,12 +651,11 @@ The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit –
                      <snmp_oid>.1.3.6.1.2.1.10.94.1.1.3.1.7.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.adsl.atur.outpwr[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>dB</units>
                      <description>MIB: ADSL-LINE-MIB&#13;
 Measured total output power transmitted by this ATU. &#13;
-The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.</description>
+The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber's ADSL modem or router, during negotiation/provisioning message interchanges.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Port {#SNMPINDEX}</name>
@@ -696,13 +678,12 @@ The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit –
                      <snmp_oid>.1.3.6.1.2.1.10.94.1.1.3.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.adsl.atur.snrmgn[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>dB</units>
                      <description>MIB: ADSL-LINE-MIB&#13;
 Noise Margin as seen by this ATU with respect to its&#13;
 received signal in tenth dB. &#13;
-The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.</description>
+The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber's ADSL modem or router, during negotiation/provisioning message interchanges.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Port {#SNMPINDEX}</name>
@@ -733,7 +714,6 @@ The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit –
                      <snmp_oid>.1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.adsl.in.traffic[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
 The total number of octets received on the interface,&#13;
@@ -761,7 +741,6 @@ including framing characters.</description>
                      <key>zyxel.ies1248.net.adsl.name[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: IF-MIB&#13;
 A textual string containing information about the interface</description>
@@ -783,7 +762,6 @@ A textual string containing information about the interface</description>
                      <snmp_oid>.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The current operational state of the interface.&#13;
 The testing(3) state indicates that no operational&#13;
@@ -825,7 +803,6 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <snmp_oid>.1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.adsl.out.traffic[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
 The total number of octets transmitted out of the&#13;
@@ -848,7 +825,6 @@ interface, including framing characters.  This object is a&#13;
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ZYXEL IES1248-51: ADSL port {#SNMPINDEX}: Traffic</name>
@@ -856,7 +832,7 @@ interface, including framing characters.  This object is a&#13;
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.net.adsl.in.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -864,7 +840,7 @@ interface, including framing characters.  This object is a&#13;
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.net.adsl.out.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -873,15 +849,15 @@ interface, including framing characters.  This object is a&#13;
                </graph_prototypes>
                <overrides>
                   <override>
-                     <name>Trigger disabled</name>
+                     <name>Don't create triggers for matching interface</name>
                      <step>1</step>
                      <filter>
                         <conditions>
                            <condition>
                               <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>.*</value>
+                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
+                              <operator>NOT_MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -892,29 +868,6 @@ interface, including framing characters.  This object is a&#13;
                            <value>.*</value>
                            <status>ENABLED</status>
                            <discover>NO_DISCOVER</discover>
-                        </operation>
-                     </operations>
-                  </override>
-                  <override>
-                     <name>Trigger enabled</name>
-                     <step>2</step>
-                     <filter>
-                        <conditions>
-                           <condition>
-                              <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
-                              <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
-                           </condition>
-                        </conditions>
-                     </filter>
-                     <operations>
-                        <operation>
-                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
-                           <operator>REGEXP</operator>
-                           <value>.*</value>
-                           <status>ENABLED</status>
-                           <discover>DISCOVER</discover>
                         </operation>
                      </operations>
                   </override>
@@ -954,7 +907,6 @@ interface, including framing characters.  This object is a&#13;
                      <snmp_oid>.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.if.adminstatus[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The desired state of the interface.  The&#13;
 testing(3) state indicates that no operational&#13;
@@ -980,7 +932,6 @@ packets can be passed.</description>
                      <snmp_oid>.1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.if.in.traffic[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
 The total number of octets received on the interface,&#13;
@@ -1008,7 +959,6 @@ including framing characters.</description>
                      <key>zyxel.ies1248.net.if.name[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: IF-MIB&#13;
 A textual string containing information about the interface</description>
@@ -1030,7 +980,6 @@ A textual string containing information about the interface</description>
                      <snmp_oid>.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The current operational state of the interface.&#13;
 The testing(3) state indicates that no operational&#13;
@@ -1072,7 +1021,6 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <snmp_oid>.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.net.if.out.traffic[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
 The total number of octets transmitted out of the&#13;
@@ -1095,7 +1043,6 @@ interface, including framing characters.  This object is a&#13;
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ZYXEL IES1248-51: Ethernet port {#SNMPINDEX}: Traffic</name>
@@ -1103,7 +1050,7 @@ interface, including framing characters.  This object is a&#13;
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.net.if.in.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1111,7 +1058,7 @@ interface, including framing characters.  This object is a&#13;
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.net.if.out.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1128,7 +1075,6 @@ interface, including framing characters.  This object is a&#13;
                               <macro>{#ZYXEL.IF.NAME}</macro>
                               <value>.*</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -1151,7 +1097,6 @@ interface, including framing characters.  This object is a&#13;
                               <macro>{#ZYXEL.IF.NAME}</macro>
                               <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -1181,7 +1126,6 @@ interface, including framing characters.  This object is a&#13;
                      <snmp_oid>.1.3.6.1.4.1.890.1.5.13.1.2.3.1.2.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.temp[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>°C</units>
                      <description>MIB: ZYXEL-IESCOMMON-MIB&#13;
 The current temperature measured at this sensor</description>
@@ -1207,7 +1151,6 @@ The current temperature measured at this sensor</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ZYXEL IES1248-51: "Temperature {#ZYXEL.TEMP.ID}</name>
@@ -1215,7 +1158,7 @@ The current temperature measured at this sensor</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.temp[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1237,7 +1180,6 @@ The current temperature measured at this sensor</description>
                      <snmp_oid>.1.3.6.1.4.1.890.1.5.13.1.2.2.1.2.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.ies1248.volt[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>V</units>
                      <description>MIB: ZYXEL-IESCOMMON-MIB&#13;
@@ -1268,7 +1210,6 @@ The current voltage reading.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ZYXEL IES1248-51: Nominal "{#ZYXEL.VOLT.NOMINAL}"</name>
@@ -1276,7 +1217,7 @@ The current voltage reading.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.volt[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1320,7 +1261,7 @@ return JSON.stringify(outArr);
             </macro>
             <macro>
                <macro>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</macro>
-               <value>NEED TRIGGERS</value>
+               <value>CHANGE_IF_NEEDED</value>
                <description>Triggers will be created only for interfaces whose description contains the value of this macro</description>
             </macro>
             <macro>
@@ -1380,6 +1321,23 @@ return JSON.stringify(outArr);
          </mappings>
       </value_map>
       <value_map>
+         <name>ZYXEL IES1248-51 operational mode port link up type</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Cooper</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Fiber</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>ZYXEL IES1248-51 operational mode port speed duplex</name>
          <mappings>
             <mapping>
@@ -1405,23 +1363,6 @@ return JSON.stringify(outArr);
             <mapping>
                <value>5</value>
                <newvalue>1G full</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>ZYXEL IES1248-51 operational mode port link up type</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Cooper</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Fiber</newvalue>
             </mapping>
          </mappings>
       </value_map>

@@ -10,7 +10,7 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #elif _AIX
 /* Nothing to do in AIX */
 #else
-	#if defined(DUK_F_OLD_SOLARIS)
+	#if defined(ZBX_OLD_SOLARIS)
 		#include <sys/isa_defs.h>
 	#else
 		#include <machine/endian.h>

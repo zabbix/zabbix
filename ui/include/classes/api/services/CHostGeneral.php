@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -684,6 +684,7 @@ abstract class CHostGeneral extends CHostBase {
 					$templates = API::Template()->get([
 						'output' => $options['selectParentTemplates'],
 						'templateids' => $related_ids,
+						'nopermissions' => $options['nopermissions'],
 						'preservekeys' => true
 					]);
 					if (!is_null($options['limitSelects'])) {
@@ -967,18 +968,18 @@ abstract class CHostGeneral extends CHostBase {
 				'output' => $this->outputExtend($options['selectTags'], ['hostid']),
 				'filter' => ['hostid' => $hostids]
 			];
-			$tags = DBselect(DB::makeSql('host_tag', $tags_options));
 
 			foreach ($result as &$host) {
 				$host['tags'] = [];
 			}
 			unset($host);
 
+			$tags = DBselect(DB::makeSql('host_tag', $tags_options));
+
 			while ($tag = DBfetch($tags)) {
-				$result[$tag['hostid']]['tags'][] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value']
-				];
+				$hostid = $tag['hostid'];
+				unset($tag['hosttagid'], $tag['hostid']);
+				$result[$hostid]['tags'][] = $tag;
 			}
 		}
 

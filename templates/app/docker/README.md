@@ -1,5 +1,5 @@
 
-# Docker
+# Template App Docker
 
 ## Overview
 
@@ -7,7 +7,7 @@ For Zabbix version: 5.0 and higher
 The template to monitor Docker engine by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `Docker` — collects metrics by polling zabbix-agent2.
+Template `Docker` — collects metrics by polling zabbix-agent2.
 
 
 
@@ -96,6 +96,7 @@ There are no template links in this template.
 |Docker |Image {#NAME}: Size |<p>-</p> |DEPENDENT |docker.image.size["{#ID}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Id == "{#ID}")].Size.first()`</p> |
 |Docker |Container {#NAME}: Get stats |<p>Get container stats based on resource usage</p> |ZABBIX_PASSIVE |docker.container_stats["{#NAME}"] |
 |Docker |Container {#NAME}: CPU total usage per second |<p>-</p> |DEPENDENT |docker.container_stats.cpu_usage.total.rate["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.cpu_stats.cpu_usage.total_usage`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `1.0E-9`</p> |
+|Docker |Container {#NAME}: CPU percent usage |<p>-</p> |DEPENDENT |docker.container_stats.cpu_pct_usage["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.cpu_stats.cpu_usage.percent_usage`</p> |
 |Docker |Container {#NAME}: CPU kernelmode usage per second |<p>-</p> |DEPENDENT |docker.container_stats.cpu_usage.kernel.rate["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.cpu_stats.cpu_usage.usage_in_kernelmode`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `1.0E-9`</p> |
 |Docker |Container {#NAME}: CPU usermode usage per second |<p>-</p> |DEPENDENT |docker.container_stats.cpu_usage.user.rate["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.cpu_stats.cpu_usage.usage_in_usermode`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `1.0E-9`</p> |
 |Docker |Container {#NAME}: Online CPUs |<p>-</p> |DEPENDENT |docker.container_stats.online_cpus["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.cpu_stats.online_cpus`</p> |
@@ -142,7 +143,7 @@ There are no template links in this template.
 |Docker: Service is down |<p>-</p> |`{TEMPLATE_NAME:docker.ping.last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |Docker: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:docker.name.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Docker: Service is down</p> |
 |Docker: Version has changed (new version: {ITEM.VALUE}) |<p>Docker version has changed. Ack to close.</p> |`{TEMPLATE_NAME:docker.server_version.diff()}=1 and {TEMPLATE_NAME:docker.server_version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Container {#NAME}: Container has been stopped with error code |<p>-</p> |`{TEMPLATE_NAME:docker.container_info.state.exitcode["{#NAME}"].last()}>0 and {Docker:docker.container_info.state.running["{#NAME}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
+|Container {#NAME}: Container has been stopped with error code |<p>-</p> |`{TEMPLATE_NAME:docker.container_info.state.exitcode["{#NAME}"].last()}>0 and {TEMPLATE_NAME:docker.container_info.state.running["{#NAME}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |Container {#NAME}: An error has occurred in the container |<p>Container {#NAME} has an error. Ack to close.</p> |`{TEMPLATE_NAME:docker.container_info.state.error["{#NAME}"].diff()}=1 and {TEMPLATE_NAME:docker.container_info.state.error["{#NAME}"].strlen()}>0` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback

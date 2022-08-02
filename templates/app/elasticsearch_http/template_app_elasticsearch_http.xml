@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-23T10:28:36Z</date>
+   <date>2022-02-10T15:43:34Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -21,7 +21,7 @@ If you use an atypical location ES API, don't forget to change the macros {$ELAS
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/399473-discussion-thread-for-official-zabbix-template-for-elasticsearch&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -308,13 +308,6 @@ return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{last()}=1</expression>
-                     <name>ES: Health is YELLOW</name>
-                     <priority>AVERAGE</priority>
-                     <description>All primary shards are assigned, but one or more replica shards are unassigned. &#13;
-If a node in the cluster fails, some data could be unavailable until that node is repaired.</description>
-                  </trigger>
-                  <trigger>
                      <expression>{last()}=2</expression>
                      <name>ES: Health is RED</name>
                      <priority>HIGH</priority>
@@ -326,6 +319,13 @@ This can occur briefly during cluster startup as primary shards are assigned.</d
                      <name>ES: Health is UNKNOWN</name>
                      <priority>HIGH</priority>
                      <description>The health status of the cluster is unknown or cannot be obtained.</description>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=1</expression>
+                     <name>ES: Health is YELLOW</name>
+                     <priority>AVERAGE</priority>
+                     <description>All primary shards are assigned, but one or more replica shards are unassigned. &#13;
+If a node in the cluster fails, some data could be unavailable until that node is repaired.</description>
                   </trigger>
                </triggers>
             </item>
@@ -604,7 +604,7 @@ This is the actual amount of free disk space the selected Elasticsearch nodes ca
             <item>
                <name>ES: Cluster uptime</name>
                <type>DEPENDENT</type>
-               <key>es.nodes.jvm.max_uptime[{#ES.NODE}]</key>
+               <key>es.nodes.jvm.max_uptime</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -943,7 +943,7 @@ and eventually prevent you from being able to add new information to your index.
                            <expression>{min(5m)}&gt;{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}</expression>
                            <name>ES {#ES.NODE}: Indexing latency is too high (over {$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}ms for 5m)</name>
                            <priority>WARNING</priority>
-                           <description>If the latency is increasing, it may indicate that you are indexing too many documents at the same time (Elasticsearch’s documentation &#13;
+                           <description>If the latency is increasing, it may indicate that you are indexing too many documents at the same time (Elasticsearch's documentation &#13;
 recommends starting with a bulk indexing size of 5 to 15 megabytes and increasing slowly from there).</description>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -1586,10 +1586,18 @@ or requesting too many results.</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{min(1h)}&gt;{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}</expression>
+                           <name>ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)</name>
+                           <priority>HIGH</priority>
+                           <description>This indicates that the rate of garbage collection isn't keeping up with the rate of garbage creation. &#13;
+To address this problem, you can either increase your heap size (as long as it remains below the recommended &#13;
+guidelines stated above), or scale out the cluster by adding more nodes.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{min(1h)}&gt;{$ELASTICSEARCH.HEAP_USED.MAX.WARN}</expression>
                            <name>ES {#ES.NODE}: Percent of JVM heap in use is high (over {$ELASTICSEARCH.HEAP_USED.MAX.WARN}% for 1h)</name>
                            <priority>WARNING</priority>
-                           <description>This indicates that the rate of garbage collection isn’t keeping up with the rate of garbage creation. &#13;
+                           <description>This indicates that the rate of garbage collection isn't keeping up with the rate of garbage creation. &#13;
 To address this problem, you can either increase your heap size (as long as it remains below the recommended &#13;
 guidelines stated above), or scale out the cluster by adding more nodes.</description>
                            <dependencies>
@@ -1598,14 +1606,6 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                                  <expression>{Template App Elasticsearch Cluster by HTTP:es.node.jvm.mem.heap_used_percent[{#ES.NODE}].min(1h)}&gt;{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}</expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{min(1h)}&gt;{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}</expression>
-                           <name>ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)</name>
-                           <priority>HIGH</priority>
-                           <description>This indicates that the rate of garbage collection isn’t keeping up with the rate of garbage creation. &#13;
-To address this problem, you can either increase your heap size (as long as it remains below the recommended &#13;
-guidelines stated above), or scale out the cluster by adding more nodes.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1971,7 +1971,6 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ES {#ES.NODE}: Latency</name>

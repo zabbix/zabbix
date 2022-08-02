@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,7 +107,7 @@ function removeObjectById(id) {
  * Converts all HTML symbols into HTML entities.
  */
 jQuery.escapeHtml = function(html) {
-	return jQuery('<div />').text(html).html();
+	return jQuery('<div>').text(html).html();
 }
 
 function validateNumericBox(obj, allowempty, allownegative) {

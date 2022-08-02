@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -944,7 +944,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 			if (0 == values.values_num)
 			{
 				/* no new tag found, substitute condition with failure expression */
-				filter = zbx_strdup(NULL, "0");
+				filter = zbx_strdup(NULL, "1=0");
 			}
 			else
 			{

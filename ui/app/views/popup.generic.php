@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -550,12 +550,25 @@ switch ($data['popup_type']) {
 				$graphtype
 			]);
 
+			if ($options['patternselect']) {
+				$graph_name = $graph['name'];
+			}
+			else {
+				if ($data['popup_type'] === 'graphs') {
+					$host_name = $graph['hosts'][0]['name'];
+				}
+				else {
+					$host_names = array_column($graph['hosts'], 'name', 'hostid');
+					$host_name = $host_names[$graph['discoveryRule']['hostid']];
+				}
+
+				$graph_name = $host_name.NAME_DELIMITER.$graph['name'];
+			}
+
 			// For returned data array.
 			$graph = [
 				'id' => $graph['graphid'],
-				'name' => $options['patternselect']
-					? $graph['name']
-					: reset($graph['hosts'])['name'].NAME_DELIMITER.$graph['name']
+				'name' => $graph_name
 			];
 		}
 		unset($graph);

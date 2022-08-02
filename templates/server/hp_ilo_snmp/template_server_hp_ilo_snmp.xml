@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-02-04T07:33:55Z</date>
+   <date>2021-12-23T06:23:21Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -18,7 +18,7 @@ CPQSINFO-MIB&#13;
 CPQHLTH-MIB&#13;
 CPQIDA-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -269,36 +269,24 @@ Capacitor Failed (7)  The flash backed cache module capacitor is below the suffi
                      <history>7d</history>
                      <trends>0d</trends>
                      <description>MIB: CPQIDA-MIB&#13;
-Cache Module/Operations Status. This describes the status of the cache module and/or cache operations.&#13;
-Note that for some controller models, a cache module board that physically attaches to the controller or chipset may not be an available option.&#13;
-&#13;
-The status can be:&#13;
 Other (1)&#13;
- Indicates that the instrument agent does not recognize the status of the cache module. You may need to upgrade the instrument agent.&#13;
-&#13;
+ Indicates that the instrument agent does not recognize the status of the cache module.&#13;
 Invalid (2)&#13;
  Indicates that a cache module board has not been installed in this system or is present but not configured.&#13;
-&#13;
 Enabled (3)&#13;
  Indicates that cache operations are currently configured and enabled for at least one logical drive.&#13;
-&#13;
 Temporarily Disabled (4)&#13;
- Indicates that cache operations have been temporarily disabled. View the cache module board error code object to determine why the write cache operations have been temporarily disabled.&#13;
-&#13;
+ Indicates that cache operations have been temporarily disabled.&#13;
 Permanently Disabled (5)&#13;
- Indicates that cache operations have been permanently disabled. View the cache module board error code object to determine why the write cache operations have been disabled.&#13;
-&#13;
+ Indicates that cache operations have been permanently disabled.&#13;
 Cache Module Flash Memory Not Attached (6)&#13;
- Indicates that the flash memory component of the flash backed cache module is not attached. This status will be set when the flash memory is not attached and the Supercap is attached. This value is only used on flash backed cache modules that support removable flash memory.&#13;
-&#13;
+ Indicates that the flash memory component of the flash backed cache module is not attached.&#13;
 Cache Module Degraded Failsafe Speed (7)&#13;
- Indicates that the cache module board is currently degraded and operating at a failsafe speed. View variables cpqDaCacheMemoryDataWidth and cpqDaCacheMemoryTransferRate to obtain the cache module board`s current memory data width and memory transfer rate.&#13;
-&#13;
+ Indicates that the cache module board is currently degraded and operating at a failsafe speed.&#13;
 Cache Module Critical Failure (8)&#13;
  Indicates that the cache module board has encountered a critical failure. The controller is currently operating in Zero Memory Raid mode.&#13;
-&#13;
 Read Cache Could Not Be Mapped (9)&#13;
- Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available. This status may be caused by virtual space limitations in certain operating systems and is only applicable to B-Series controllers.</description>
+ Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available.</description>
                      <applications>
                         <application>
                            <name>Disk arrays</name>
@@ -354,7 +342,6 @@ Read Cache Could Not Be Mapped (9)&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -442,7 +429,6 @@ and any associated logical drives,physical drives, and array accelerators.</desc
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -510,7 +496,6 @@ failed(4)  A non-redundant fan is not operating properly.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -535,7 +520,7 @@ failed(4)  A non-redundant fan is not operating properly.</description>
                      <trends>0d</trends>
                      <description>MIB: CPQIDA-MIB&#13;
 Drive Array Physical Drive Media Type.The following values are defined:&#13;
-other(1)  The instrument agent is unable to determine the physical drive’s media type.&#13;
+other(1)  The instrument agent is unable to determine the physical drive's media type.&#13;
 rotatingPlatters(2)  The physical drive media is composed of rotating platters.&#13;
 solidState(3)  The physical drive media is composed of solid state electronics.</description>
                      <applications>
@@ -738,7 +723,6 @@ predictiveFailure(4)  Indicates that the drive has a predictive failure error an
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -805,7 +789,6 @@ failed(4)  A power supply component detects a condition that could  permanently 
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -873,16 +856,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -933,7 +916,6 @@ Temperature readings of testpoint: {#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1006,16 +988,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>Ambient: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>Ambient: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>Ambient: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1042,7 +1024,6 @@ Temperature readings of testpoint: Ambient</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1110,16 +1091,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1146,7 +1127,6 @@ Temperature readings of testpoint: CPU-{#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1214,16 +1194,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1250,7 +1230,6 @@ Temperature readings of testpoint: I/O-{#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1318,16 +1297,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1354,7 +1333,6 @@ Temperature readings of testpoint: Memory-{#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1422,16 +1400,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1458,7 +1436,6 @@ Temperature readings of testpoint: PSU-{#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1526,16 +1503,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1562,7 +1539,6 @@ Temperature readings of testpoint: System-{#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1676,7 +1652,6 @@ differ from the advertised size of a drive.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1775,6 +1750,18 @@ differ from the advertised size of a drive.</description>
                <value>3</value>
             </macro>
             <macro>
+               <macro>{$TEMP_CRIT_LOW}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>50</value>
+            </macro>
+            <macro>
                <macro>{$VDISK_CRIT_STATUS}</macro>
                <value>3</value>
             </macro>
@@ -1787,7 +1774,7 @@ differ from the advertised size of a drive.</description>
    </templates>
    <value_maps>
       <value_map>
-         <name>CPQSINFO-MIB::status</name>
+         <name>CPQHLTH-MIB::cpqHeTemperatureCondition</name>
          <mappings>
             <mapping>
                <value>1</value>
@@ -1865,7 +1852,40 @@ differ from the advertised size of a drive.</description>
          </mappings>
       </value_map>
       <value_map>
-         <name>CPQHLTH-MIB::cpqHeTemperatureCondition</name>
+         <name>CPQIDA-MIB::cpqDaAccelBattery</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Recharging</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Degraded</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>Not Present</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Capacitor failed</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaAccelStatus</name>
          <mappings>
             <mapping>
                <value>1</value>
@@ -1873,15 +1893,35 @@ differ from the advertised size of a drive.</description>
             </mapping>
             <mapping>
                <value>2</value>
-               <newvalue>ok</newvalue>
+               <newvalue>invalid</newvalue>
             </mapping>
             <mapping>
                <value>3</value>
-               <newvalue>degraded</newvalue>
+               <newvalue>enabled</newvalue>
             </mapping>
             <mapping>
                <value>4</value>
-               <newvalue>failed</newvalue>
+               <newvalue>tmpDisabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>permDisabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>cacheModFlashMemNotAttached</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>cacheModDegradedFailsafeSpeed</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>cacheModCriticalFailure</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>cacheReadCacheNotMapped</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -2231,139 +2271,6 @@ differ from the advertised size of a drive.</description>
          </mappings>
       </value_map>
       <value_map>
-         <name>CPQIDA-MIB::cpqDaPhyDrvStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>failed</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>predictiveFailure</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CPQIDA-MIB::cpqDaPhyDrvSmartStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>replaceDrive</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>replaceDriveSSDWearOut</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CPQIDA-MIB::cpqDaAccelStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>invalid</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>enabled</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>tmpDisabled</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>permDisabled</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>cacheModFlashMemNotAttached</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>cacheModDegradedFailsafeSpeed</newvalue>
-            </mapping>
-            <mapping>
-               <value>8</value>
-               <newvalue>cacheModCriticalFailure</newvalue>
-            </mapping>
-            <mapping>
-               <value>9</value>
-               <newvalue>cacheReadCacheNotMapped</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CPQIDA-MIB::cpqDaAccelBattery</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Recharging</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Failed</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>Degraded</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>Not Present</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>Capacitor failed</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CPQIDA-MIB::cpqDaPhyDrvMediaType</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>rotatingPlatters</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>solidState</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>CPQIDA-MIB::cpqDaLogDrvFaultTol</name>
          <mappings>
             <mapping>
@@ -2510,6 +2417,86 @@ differ from the advertised size of a drive.</description>
             <mapping>
                <value>25</value>
                <newvalue>newLogDrvKeyRekeyRequestReceived</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaPhyDrvMediaType</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>rotatingPlatters</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>solidState</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaPhyDrvSmartStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>replaceDrive</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>replaceDriveSSDWearOut</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaPhyDrvStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>predictiveFailure</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQSINFO-MIB::status</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>degraded</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>failed</newvalue>
             </mapping>
          </mappings>
       </value_map>

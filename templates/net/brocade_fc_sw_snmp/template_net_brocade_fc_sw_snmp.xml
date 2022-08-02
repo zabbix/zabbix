@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:23Z</date>
+   <date>2021-12-23T13:48:16Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -22,7 +22,7 @@ Known Issues:&#13;
   Version: v6.3.1c, v7.0.0c,  v7.4.1c&#13;
   Device: all&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -538,6 +538,27 @@ or&#13;
    </graphs>
    <value_maps>
       <value_map>
+         <name>SW-MIB::swOperStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>online</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>offline</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>testing</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>faulty</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>SW-MIB::swSensorStatus</name>
          <mappings>
             <mapping>
@@ -563,27 +584,6 @@ or&#13;
             <mapping>
                <value>6</value>
                <newvalue>absent</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>SW-MIB::swOperStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>online</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>offline</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>testing</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>faulty</newvalue>
             </mapping>
          </mappings>
       </value_map>

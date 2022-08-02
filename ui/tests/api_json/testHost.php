@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,6 +72,58 @@ class testHost extends CAPITest {
 		if ($expected_error === null) {
 			foreach ($result['result']['hostids'] as $id) {
 				$this->assertEquals(0, CDBHelper::getCount('select * from hosts where hostid='.zbx_dbstr($id)));
+			}
+		}
+	}
+
+	public static function host_select_tags() {
+		return [
+			'Get test host tag as extend' => [
+				'params' => [
+					'hostids' => [50032],
+					'selectTags' => 'extend'
+				],
+				'expected_result' => [
+					'tags' => [
+						['tag' => 'b', 'value' => 'b']
+					]
+				]
+			],
+			'Get test host tag excluding value' => [
+				'params' => [
+					'hostids' => [50032],
+					'selectTags' => ['tag']
+				],
+				'expected_result' => [
+					'tags' => [
+						['tag' => 'b']
+					]
+				]
+			],
+			'Get test host tag excluding name' => [
+				'params' => [
+					'hostids' => [50032],
+					'selectTags' => ['value']
+				],
+				'expected_result' => [
+					'tags' => [
+						['value' => 'b']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	* @dataProvider host_select_tags
+	*/
+	public function testHost_SelectTags($params, $expected_result) {
+		$result = $this->call('host.get', $params);
+
+		foreach($result['result'] as $host) {
+			foreach($expected_result as $field => $expected_value){
+				$this->assertArrayHasKey($field, $host, 'Field should be present.');
+				$this->assertEquals($host[$field], $expected_value, 'Returned value should match.');
 			}
 		}
 	}

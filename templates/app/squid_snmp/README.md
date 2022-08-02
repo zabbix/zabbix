@@ -1,5 +1,5 @@
 
-# Squid SNMP
+# Template App Squid SNMP
 
 ## Overview
 
@@ -13,7 +13,7 @@ This template was tested on:
 
 ### Setup Squid
 Enable SNMP support following [official documentation](https://wiki.squid-cache.org/Features/Snmp).
-Required parameters in squid.conf: 
+Required parameters in squid.conf:
 ```
 snmp_port <port_number>
 acl <zbx_acl_name> snmp_community <community_name>
@@ -65,7 +65,7 @@ There are no template links in this template.
 |Squid |Squid: Cache swap low water mark |<p>Cache Swap Low Water Mark</p> |SNMP |squid[cacheSwapLowWM] |
 |Squid |Squid: Cache swap high water mark |<p>Cache Swap High Water Mark</p> |SNMP |squid[cacheSwapHighWM] |
 |Squid |Squid: Cache swap directory size |<p>The total of the cache_dir space allocated</p> |SNMP |squid[cacheSwapMaxSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
-|Squid |Squid: Cache swap current size |<p>Storage Swap Size</p> |SNMP |squid[cacheCurrentSwapSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
+|Squid |Squid: Cache swap current size |<p>Storage Swap Size</p> |SNMP |squid[cacheCurrentSwapSize] |
 |Squid |Squid: File descriptor count - current used |<p>Number of file descriptors in use</p> |SNMP |squid[cacheCurrentFileDescrCnt] |
 |Squid |Squid: File descriptor count - current maximum |<p>Highest number of file descriptors in use</p> |SNMP |squid[cacheCurrentFileDescrMax] |
 |Squid |Squid: File descriptor count - current reserved |<p>Reserved number of file descriptors</p> |SNMP |squid[cacheCurrentResFileDescrCnt] |
@@ -117,10 +117,10 @@ There are no template links in this template.
 |Squid: Port {$SQUID.HTTP.PORT} is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[tcp,,{$SQUID.HTTP.PORT}].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |Squid: Squid has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:squid[cacheUptime].last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Squid: Squid version has been changed |<p>Squid version has changed. Ack to close.</p> |`{TEMPLATE_NAME:squid[cacheVersionId].diff()}=1 and {TEMPLATE_NAME:squid[cacheVersionId].strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapLowWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |WARNING | |
-|Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapHighWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |HIGH | |
+|Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{TEMPLATE_NAME:squid[cacheSwapLowWM].last()}*{TEMPLATE_NAME:squid[cacheSwapMaxSize].last()}/100` |WARNING | |
+|Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{TEMPLATE_NAME:squid[cacheSwapHighWM].last()}*{TEMPLATE_NAME:squid[cacheSwapMaxSize].last()}/100` |HIGH | |
 |Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN}) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentUnusedFDescrCnt].last()}<{$SQUID.FILE.DESC.WARN.MIN}` |WARNING | |
-|Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheSysPageFaults].avg(5m)}>{Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}` |WARNING | |
+|Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheSysPageFaults].avg(5m)}>{TEMPLATE_NAME:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}` |WARNING | |
 
 ## Feedback
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-16T11:20:02Z</date>
+   <date>2022-01-10T14:11:34Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -19,7 +19,7 @@ You can set {$CASSANDRA.USER} and {$CASSANDRA.PASSWORD} macros in the template f
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410057-discussion-thread-for-official-zabbix-template-apache-cassandra&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -106,7 +106,7 @@ Template tooling version used: 0.38</description>
                <history>7d</history>
                <username>{$CASSANDRA.USER}</username>
                <password>{$CASSANDRA.PASSWORD}</password>
-               <description>Number of commit log messages written but yet to be fsync’d.</description>
+               <description>Number of commit log messages written but yet to be fsync'd.</description>
                <applications>
                   <application>
                      <name>Cassandra</name>
@@ -957,7 +957,7 @@ MigrationStage:	Runs schema migrations.</description>
                <username>{$CASSANDRA.USER}</username>
                <password>{$CASSANDRA.PASSWORD}</password>
                <description>Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.&#13;
-MiscStage:	Misceleneous tasks run here.</description>
+MiscStage:	Miscellaneous tasks run here.</description>
                <applications>
                   <application>
                      <name>Cassandra</name>
@@ -973,7 +973,7 @@ MiscStage:	Misceleneous tasks run here.</description>
                <username>{$CASSANDRA.USER}</username>
                <password>{$CASSANDRA.PASSWORD}</password>
                <description>Number of queued tasks queued up on this pool.&#13;
-MiscStage:	Misceleneous tasks run here.</description>
+MiscStage:	Miscellaneous tasks run here.</description>
                <applications>
                   <application>
                      <name>Cassandra</name>
@@ -989,7 +989,7 @@ MiscStage:	Misceleneous tasks run here.</description>
                <username>{$CASSANDRA.USER}</username>
                <password>{$CASSANDRA.PASSWORD}</password>
                <description>Number of tasks that were blocked due to queue saturation.&#13;
-MiscStage:	Misceleneous tasks run here.</description>
+MiscStage:	Miscellaneous tasks run here.</description>
                <applications>
                   <application>
                      <name>Cassandra</name>
@@ -1858,7 +1858,6 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Read\Write latency</name>

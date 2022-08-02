@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-02T14:50:01Z</date>
+   <date>2022-01-10T14:11:41Z</date>
    <groups>
       <group>
-         <name>Templates/Modules</name>
+         <name>Templates/Applications</name>
       </group>
    </groups>
    <templates>
@@ -15,10 +15,10 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/409339-discussion-thread-for-official-zabbix-template-squid&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
-               <name>Templates/Modules</name>
+               <name>Templates/Applications</name>
             </group>
          </groups>
          <applications>
@@ -147,12 +147,6 @@ Template tooling version used: 0.38</description>
                      <name>Squid</name>
                   </application>
                </applications>
-               <preprocessing>
-                  <step>
-                     <type>MULTIPLIER</type>
-                     <params>1048576</params>
-                  </step>
-               </preprocessing>
             </item>
             <item>
                <name>Squid: Objects unlinkd requests</name>
@@ -1164,7 +1158,7 @@ Template tooling version used: 0.38</description>
          </graph_items>
       </graph>
       <graph>
-         <name>Squid: Domain name (FQDN) cache ctatistics</name>
+         <name>Squid: Domain name (FQDN) cache statistics</name>
          <graph_items>
             <graph_item>
                <color>1A7C11</color>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1625,7 +1625,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Replace macros to value.
 		foreach ($macro_values as $key => $macros) {
-			$items[$key]['key_expanded'] = $this->resolveItemKeyMacros($items[$key]['key_expanded'], $macros, $types);
+			$items[$key]['key_expanded'] = self::resolveItemKeyMacros($items[$key]['key_expanded'], $macros, $types);
 		}
 
 		return $items;

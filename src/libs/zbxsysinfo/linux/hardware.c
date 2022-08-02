@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,7 +123,14 @@ static size_t	get_chassis_type(char *buf, int bufsize, int type)
 		"Compact PCI",
 		"Advanced TCA",
 		"Blade",
-		"Blade Enclosure",	/* 0x1d (MAX_CHASSIS_TYPE) */
+		"Blade Enclosure",
+		"Tablet",
+		"Convertible",
+		"Detachable",
+		"IoT Gateway",
+		"Embedded PC",
+		"Mini PC",
+		"Stick PC"		/* 0x24 (MAX_CHASSIS_TYPE) */
 	};
 
 	type = CHASSIS_TYPE_BITS & type;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,7 +241,6 @@ class testFormGraph extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='name']", 'readonly');
@@ -253,7 +252,6 @@ class testFormGraph extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Width');
 		$this->zbxTestAssertVisibleId('width');
 		$this->zbxTestAssertAttribute("//input[@id='width']", 'maxlength', 5);
-		$this->zbxTestAssertAttribute("//input[@id='width']", 'size', 20);
 		$this->zbxTestAssertElementValue('width', 900);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='width']", 'readonly');
@@ -265,7 +263,6 @@ class testFormGraph extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Height');
 		$this->zbxTestAssertVisibleId('height');
 		$this->zbxTestAssertAttribute("//input[@id='height']", 'maxlength', 5);
-		$this->zbxTestAssertAttribute("//input[@id='height']", 'size', 20);
 		$this->zbxTestAssertElementValue('height', 200);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='height']", 'readonly');
@@ -470,29 +467,23 @@ class testFormGraph extends CLegacyWebTest {
 			switch($ymin_type) {
 				case 'Fixed':
 					$this->zbxTestAssertVisibleId('yaxismin');
-					$this->zbxTestAssertAttribute("//input[@id='yaxismin']", 'maxlength', 255);
-					$this->zbxTestAssertAttribute("//input[@id='yaxismin']", 'size', 20);
 					$this->zbxTestAssertElementValue('yaxismin', 0);
 
-					$this->zbxTestAssertElementNotPresentId('ymin_name');
-					$this->zbxTestAssertElementNotPresentId('yaxis_min');
+					$this->zbxTestAssertElementNotPresentId('ymin_itemid');
 					break;
 				case 'Calculated':
-					$this->zbxTestAssertElementNotPresentId('ymin_name');
-					$this->zbxTestAssertElementNotPresentId('yaxis_min');
+					$this->zbxTestAssertElementNotPresentId('ymin_itemid');
 					$this->zbxTestAssertNotVisibleId('yaxismin');
 					break;
 				case 'Item':
-					$this->zbxTestAssertElementPresentId('ymin_name');
-					$this->zbxTestAssertElementPresentId('yaxis_min');
-					$this->zbxTestAssertElementText("//button[@id='yaxis_min']", 'Select');
+					$this->zbxTestAssertElementPresentId('ymin_itemid');
+					$this->zbxTestAssertElementText("//div[@id='ymin_itemid']//following-sibling::div/button", 'Select');
 
 					$this->zbxTestAssertNotVisibleId('yaxismin');
 					break;
 				default:
 					$this->zbxTestTextNotPresent('Add graph items first');
-					$this->zbxTestAssertElementNotPresentId('ymin_name');
-					$this->zbxTestAssertElementNotPresentId('yaxis_min');
+					$this->zbxTestAssertElementNotPresentId('ymin_itemid');
 					$this->zbxTestAssertElementNotPresentId('yaxismin');
 					break;
 			}
@@ -500,31 +491,25 @@ class testFormGraph extends CLegacyWebTest {
 			switch($ymax_type) {
 				case 'Fixed':
 					$this->zbxTestAssertVisibleId('yaxismax');
-					$this->zbxTestAssertAttribute("//input[@id='yaxismax']", 'maxlength', 255);
-					$this->zbxTestAssertAttribute("//input[@id='yaxismax']", 'size', 20);
 					$this->zbxTestAssertElementValue('yaxismax', 100);
 
-					$this->zbxTestAssertElementNotPresentId('ymax_name');
-					$this->zbxTestAssertElementNotPresentId('yaxis_max');
+					$this->zbxTestAssertElementNotPresentId('ymax_itemid');
 					break;
 				case 'Calculated':
-					$this->zbxTestAssertElementNotPresentId('ymax_name');
-					$this->zbxTestAssertElementNotPresentId('yaxis_max');
+					$this->zbxTestAssertElementNotPresentId('ymax_itemid');
 					$this->zbxTestAssertNotVisibleId('yaxismax');
 					break;
 				case 'Item':
 					$this->zbxTestDropdownSelectWait('ymax_type', 'Calculated');
 					$this->zbxTestDropdownSelectWait('ymax_type', 'Item');
-					$this->zbxTestAssertElementPresentId('ymax_name');
-					$this->zbxTestAssertElementPresentId('yaxis_max');
-					$this->zbxTestAssertElementText("//button[@id='yaxis_max']", 'Select');
+					$this->zbxTestAssertElementPresentId('ymax_itemid');
+					$this->zbxTestAssertElementText("//div[@id='ymax_itemid']//following-sibling::div/button", 'Select');
 
 					$this->zbxTestAssertNotVisibleId('yaxismax');
 					break;
 				default:
 					$this->zbxTestTextNotPresent('Add graph items first');
-					$this->zbxTestAssertElementNotPresentId('ymax_name');
-					$this->zbxTestAssertElementNotPresentId('yaxis_max');
+					$this->zbxTestAssertElementNotPresentId('ymax_itemid');
 					$this->zbxTestAssertElementNotPresentId('yaxismax');
 					break;
 			}
@@ -759,9 +744,9 @@ class testFormGraph extends CLegacyWebTest {
 					'addItems' => [
 						['itemName' => 'testFormItem']
 					],
-					'error-msg' => 'Cannot add graph',
+					'error-msg' => 'Page received incorrect data',
 					'errors' => [
-						'Invalid parameter "ymin_itemid": cannot be empty.'
+						'Field "ymin_itemid" is mandatory.'
 					]
 				]
 			],
@@ -846,7 +831,6 @@ class testFormGraph extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraph_SimpleCreate($data) {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
@@ -934,7 +918,7 @@ class testFormGraph extends CLegacyWebTest {
 		}
 
 		if (isset($data['ymin_name'])) {
-			$this->zbxTestClick('yaxis_min');
+			$this->zbxTestClickXpath('//div[@id="ymin_itemid"]//following-sibling::div/button');
 			$this->zbxTestLaunchOverlayDialog('Items');
 			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
 			$host->fill([
@@ -944,12 +928,12 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymin_name = $data['ymin_name'];
-			$ymin_nameValue = $this->zbxTestGetValue("//input[@id='ymin_name']");
+			$ymin_nameValue = $this->zbxTestGetText('//div[@id="ymin_itemid"]');
 			$this->assertEquals($ymin_nameValue, $this->host.": $ymin_name");
 		}
 
 		if (isset($data['ymax_name'])) {
-			$this->zbxTestClick('yaxis_max');
+			$this->zbxTestClickXpath('//div[@id="ymax_itemid"]//following-sibling::div/button');
 			$this->zbxTestLaunchOverlayDialog('Items');
 			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
 			$host->fill([
@@ -959,7 +943,7 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymax_name = $data['ymax_name'];
-			$ymax_nameValue = $this->zbxTestGetValue("//input[@id='ymax_name']");
+			$ymax_nameValue = $this->zbxTestGetText('//div[@id="ymax_itemid"]');
 			$this->assertEquals($this->host.": $ymax_name", $ymax_nameValue);
 		}
 

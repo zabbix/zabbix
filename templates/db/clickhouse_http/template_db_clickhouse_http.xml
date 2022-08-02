@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-08T07:25:12Z</date>
+   <date>2022-07-22T07:50:31Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -13,7 +13,7 @@
          <name>Template DB ClickHouse by HTTP</name>
          <description>Get node metrics from ClickHouse HTTP interface using HTTP agent.&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -1296,13 +1296,6 @@ or due to startup without ZooKeeper configured."</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{last()}&lt;10m</expression>
-                     <name>ClickHouse: has been restarted (uptime &lt; 10m)</name>
-                     <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
-                     <manual_close>YES</manual_close>
-                  </trigger>
-                  <trigger>
                      <expression>{nodata(30m)}=1</expression>
                      <name>ClickHouse: Failed to fetch info data (or no data for 30m)</name>
                      <priority>WARNING</priority>
@@ -1314,6 +1307,13 @@ or due to startup without ZooKeeper configured."</description>
                            <expression>{Template DB ClickHouse by HTTP:clickhouse.ping.last()}=0 or {Template DB ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0</expression>
                         </dependency>
                      </dependencies>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>ClickHouse: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes.</description>
+                     <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
             </item>
@@ -1388,7 +1388,7 @@ or due to startup without ZooKeeper configured."</description>
             <item>
                <name>ClickHouse: ZooKeeper exceptions per second</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.exeptions.rate</key>
+               <key>clickhouse.zookeeper.exceptions.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -1417,7 +1417,7 @@ or due to startup without ZooKeeper configured."</description>
             <item>
                <name>ClickHouse: ZooKeeper hardware exceptions per second</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.hw_exeptions.rate</key>
+               <key>clickhouse.zookeeper.hw_exceptions.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -1446,7 +1446,7 @@ or due to startup without ZooKeeper configured."</description>
             <item>
                <name>ClickHouse: ZooKeeper requests</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.request</key>
+               <key>clickhouse.zookeeper.request</key>
                <delay>0</delay>
                <history>7d</history>
                <description>Number of requests to ZooKeeper in progress.</description>
@@ -1468,7 +1468,7 @@ or due to startup without ZooKeeper configured."</description>
             <item>
                <name>ClickHouse: ZooKeeper sessions</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.session</key>
+               <key>clickhouse.zookeeper.session</key>
                <delay>0</delay>
                <history>7d</history>
                <description>Number of sessions (connections) to ZooKeeper. Should be no more than one.</description>
@@ -1499,7 +1499,7 @@ Should be no more than one, because using more than one connection to ZooKeeper 
             <item>
                <name>ClickHouse: ZooKeeper user exceptions per second</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.user_exeptions.rate</key>
+               <key>clickhouse.zookeeper.user_exceptions.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -1528,7 +1528,7 @@ Should be no more than one, because using more than one connection to ZooKeeper 
             <item>
                <name>ClickHouse: ZooKeeper wait time</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.wait.time</key>
+               <key>clickhouse.zookeeper.wait.time</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -1562,7 +1562,7 @@ Should be no more than one, because using more than one connection to ZooKeeper 
             <item>
                <name>ClickHouse: ZooKeeper watches</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.watch</key>
+               <key>clickhouse.zookeeper.watch</key>
                <delay>0</delay>
                <history>7d</history>
                <description>Number of watches (e.g., event subscriptions) in ZooKeeperr.</description>
@@ -1603,7 +1603,7 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                <triggers>
                   <trigger>
                      <expression>{last()}=0</expression>
-                     <name>ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable</name>
+                     <name>ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable</name>
                      <priority>AVERAGE</priority>
                      <manual_close>YES</manual_close>
                   </trigger>
@@ -1768,7 +1768,7 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                      <key>clickhouse.replica.future_parts["{#DB}.{#TABLE}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>Number of data parts that will appear as the result of INSERTs or merges that haven’t been done yet.</description>
+                     <description>Number of data parts that will appear as the result of INSERTs or merges that haven't been done yet.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>ClickHouse: "{#DB}.{#TABLE}" replica status</name>
@@ -1813,7 +1813,7 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Whether the replica is in read-only mode.&#13;
-This mode is turned on if the config doesn’t have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.</description>
+This mode is turned on if the config doesn't have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>ClickHouse: "{#DB}.{#TABLE}" replica status</name>
@@ -1836,7 +1836,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                            <expression>{min(5m)}=1</expression>
                            <name>ClickHouse: {#DB}.{#TABLE} Replica is readonly</name>
                            <priority>WARNING</priority>
-                           <description>This mode is turned on if the config doesn’t have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.</description>
+                           <description>This mode is turned on if the config doesn't have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1869,7 +1869,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                            <expression>{min(5m)}=1</expression>
                            <name>ClickHouse: {#DB}.{#TABLE} Replica session is expired</name>
                            <priority>WARNING</priority>
-                           <description>This mode is turned on if the config doesn’t have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.</description>
+                           <description>This mode is turned on if the config doesn't have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -2349,7 +2349,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
          <manual_close>YES</manual_close>
          <dependencies>
             <dependency>
-               <name>ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable</name>
+               <name>ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable</name>
                <expression>{Template DB ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()}=0</expression>
             </dependency>
          </dependencies>
@@ -2648,7 +2648,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <color>1A7C11</color>
                <item>
                   <host>Template DB ClickHouse by HTTP</host>
-                  <key>clickhouse.zookeper.exeptions.rate</key>
+                  <key>clickhouse.zookeeper.exceptions.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2656,7 +2656,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <color>2774A4</color>
                <item>
                   <host>Template DB ClickHouse by HTTP</host>
-                  <key>clickhouse.zookeper.hw_exeptions.rate</key>
+                  <key>clickhouse.zookeeper.hw_exceptions.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2664,7 +2664,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <color>F63100</color>
                <item>
                   <host>Template DB ClickHouse by HTTP</host>
-                  <key>clickhouse.zookeper.user_exeptions.rate</key>
+                  <key>clickhouse.zookeeper.user_exceptions.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2674,26 +2674,13 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <yaxisside>RIGHT</yaxisside>
                <item>
                   <host>Template DB ClickHouse by HTTP</host>
-                  <key>clickhouse.zookeper.watch</key>
+                  <key>clickhouse.zookeeper.watch</key>
                </item>
             </graph_item>
          </graph_items>
       </graph>
    </graphs>
    <value_maps>
-      <value_map>
-         <name>Service state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
       <value_map>
          <name>Replicas state</name>
          <mappings>
@@ -2704,6 +2691,19 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
             <mapping>
                <value>1</value>
                <newvalue>True</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

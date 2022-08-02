@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -145,8 +145,6 @@ class testPageProblems extends CLegacyWebTest {
 	 * Search by all options in filter
 	 */
 	public function testPageProblems_FilterByAllOptions() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
@@ -384,8 +382,6 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	public function testPageProblems_SuppressedProblems() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
@@ -408,7 +404,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 
 		// Click on suppression icon and check text in hintbox.
-		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/span[contains(@class, "icon-invisible")]');
+		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/a[contains(@class, "icon-invisible")]');
 		$this->zbxTestAssertElementText('//div[@data-hintboxid]', 'Suppressed till: 12:17 Maintenance: Maintenance for suppression test');
 	}
 }

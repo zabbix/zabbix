@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,16 @@ class CDiscoveryRule extends CItemGeneral {
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
 		ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_XPATH, ZBX_PREPROC_ERROR_FIELD_XML,
 		ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE
+	];
+
+	/**
+	 * Define a set of supported item types.
+	 *
+	 * @var array
+	 */
+	const SUPPORTED_ITEM_TYPES = [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
+		ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+		ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
 	];
 
 	public function __construct() {
@@ -1315,7 +1325,7 @@ class CDiscoveryRule extends CItemGeneral {
 							// If same "lld_macro" is found in DB, update only "path" if necessary.
 
 							if (array_key_exists('path', $lld_macro_path)
-									&& $lld_macro_path['path'] !== $lld_macro_path['path']) {
+									&& $lld_macro_path['path'] !== $db_lld_macro_path['path']) {
 								$fields_to_update['path'] = $lld_macro_path['path'];
 							}
 						}
@@ -2377,10 +2387,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// fetch source items
 		$items = API::Item()->get([
-			'itemids' => $srcItemIds,
 			'output' => ['itemid', 'key_'],
-			'preservekeys' => true,
-			'filter' => ['flags' => null]
+			'webitems' => true,
+			'itemids' => $srcItemIds,
+			'filter' => ['flags' => null],
+			'preservekeys' => true
 		]);
 
 		$srcItems = [];
@@ -2392,12 +2403,13 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// fetch newly cloned items
 		$newItems = API::Item()->get([
+			'output' => ['itemid', 'key_'],
+			'webitems' => true,
 			'hostids' => $dstDiscovery['hostid'],
 			'filter' => [
 				'key_' => $itemKeys,
 				'flags' => null
 			],
-			'output' => ['itemid', 'key_'],
 			'preservekeys' => true
 		]);
 

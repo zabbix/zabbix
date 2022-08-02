@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T07:24:02Z</date>
+   <date>2022-04-10T22:48:48Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -24,7 +24,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Operating systems</name>
@@ -118,7 +118,7 @@ version</params>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
+               <description>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -207,7 +207,7 @@ version</params>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)</description>
+               <description>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).</description>
                <applications>
                   <application>
                      <name>CPU</name>
@@ -247,7 +247,7 @@ return valueArr.reduce(function(acc,obj){
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)</description>
+               <description>Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system).</description>
                <applications>
                   <application>
                      <name>CPU</name>
@@ -757,7 +757,7 @@ return valueArr.reduce(function(acc,obj){
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>CPU utilization in %</description>
+               <description>CPU utilization in %.</description>
                <applications>
                   <application>
                      <name>CPU</name>
@@ -862,7 +862,7 @@ and {Template OS Linux by Prom:system.cpu.load.avg15[node_exporter].last()}&gt;0
                <name>System name</name>
                <type>DEPENDENT</type>
                <key>system.name[node_exporter]</key>
-               <delay>1h</delay>
+               <delay>0</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -901,7 +901,7 @@ nodename</params>
                <name>Operating system architecture</name>
                <type>DEPENDENT</type>
                <key>system.sw.arch[node_exporter]</key>
-               <delay>1h</delay>
+               <delay>0</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -930,7 +930,7 @@ machine</params>
                <name>Operating system</name>
                <type>DEPENDENT</type>
                <key>system.sw.os[node_exporter]</key>
-               <delay>1h</delay>
+               <delay>0</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -1077,7 +1077,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>B</units>
-               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
+               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1102,7 +1102,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>B</units>
-               <description>Total memory in Bytes</description>
+               <description>Total memory in Bytes.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1141,7 +1141,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <description>The system is running out of free memory.</description>
                      <dependencies>
                         <dependency>
-                           <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+                           <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                            <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
                         </dependency>
                      </dependencies>
@@ -1405,16 +1405,14 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <description>Indicates the interface RFC2863 operational state as a string.&#13;
-Possible values are:"unknown", "notpresent", "down", "lowerlayerdown", "testing","dormant", "up".&#13;
-Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</description>
+                     <description>Reference: https://www.kernel.org/doc/Documentation/networking/operstates.txt</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
-                        <name>IF-MIB::ifOperStatus</name>
+                        <name>ifOperStatus</name>
                      </valuemap>
                      <preprocessing>
                         <step>
@@ -1426,25 +1424,27 @@ operstate</params>
                            <type>JAVASCRIPT</type>
                            <params>var newvalue;
 switch(value) {
-  case "up":
+  case "unknown":
+    newvalue = 0;
+    break;
+  case "notpresent":
     newvalue = 1;
     break;
   case "down":
     newvalue = 2;
     break;
+  case "lowerlayerdown":
+    newvalue = 3;
+    break;
   case "testing":
     newvalue = 4;
     break;
-  case "unknown":
+  case "dormant":
     newvalue = 5;
     break;
-  case "dormant":
+  case "up":
     newvalue = 6;
-    break;
-  case "notPresent":
-    newvalue = 7;
-    break;
-  default:
+    break;  default:
     newvalue = "Problem parsing interface operstate in JS";
 }
 return newvalue;</params>
@@ -1499,7 +1499,6 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template OS Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].change()}&lt;0 and {Template OS Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()}&gt;0&#13;
@@ -1559,7 +1558,7 @@ and&#13;
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template OS Linux by Prom:net.if.in[node_exporter,"{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template OS Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()} and&#13;
 {Template OS Linux by Prom:net.if.out[node_exporter,"{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template OS Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()}</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt;{$IF.UTIL.MAX:"{#IFNAME}"}%)</name>
                      <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>The network interface utilization is close to its estimated maximum bandwidth.</description>
@@ -1578,7 +1577,7 @@ or {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].min(5m
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template OS Linux by Prom:net.if.in.errors[node_exporter,"{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt;{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
@@ -1908,7 +1907,6 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template OS Linux by Prom:vfs.dev.read.await[node_exporter,"{#DEVNAME}"].min(15m)} &gt; {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or {Template OS Linux by Prom:vfs.dev.write.await[node_exporter,"{#DEVNAME}"].min(15m)} &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}</expression>
@@ -2190,36 +2188,35 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template OS Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template OS Linux by Prom:vfs.fs.total[node_exporter,"{#FSNAME}"].last()}-{Template OS Linux by Prom:vfs.fs.used[node_exporter,"{#FSNAME}"].last()})&lt;5G or {Template OS Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template OS Linux by Prom:vfs.fs.total[node_exporter,"{#FSNAME}"].last()}-{Template OS Linux by Prom:vfs.fs.used[node_exporter,"{#FSNAME}"].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template OS Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 5G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template OS Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
-(({Template OS Linux by Prom:vfs.fs.total[node_exporter,"{#FSNAME}"].last()}-{Template OS Linux by Prom:vfs.fs.used[node_exporter,"{#FSNAME}"].last()})&lt;10G or {Template OS Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template OS Linux by Prom:vfs.fs.total[node_exporter,"{#FSNAME}"].last()}-{Template OS Linux by Prom:vfs.fs.used[node_exporter,"{#FSNAME}"].last()})&lt;{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or {Template OS Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 10G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
                            <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                            <expression>{Template OS Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template OS Linux by Prom:vfs.fs.total[node_exporter,"{#FSNAME}"].last()}-{Template OS Linux by Prom:vfs.fs.used[node_exporter,"{#FSNAME}"].last()})&lt;5G or {Template OS Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template OS Linux by Prom:vfs.fs.total[node_exporter,"{#FSNAME}"].last()}-{Template OS Linux by Prom:vfs.fs.used[node_exporter,"{#FSNAME}"].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template OS Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].timeleft(1h,,100)}&lt;1d)</expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -2330,7 +2327,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
             </macro>
             <macro>
                <macro>{$NET.IF.IFNAME.NOT_MATCHES}</macro>
-               <value>(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})</value>
+               <value>(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})</value>
                <description>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</description>
             </macro>
             <macro>
@@ -2374,6 +2371,16 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <macro>{$VFS.DEV.WRITE.AWAIT.WARN}</macro>
                <value>20</value>
                <description>Disk write average response time (in ms) before the trigger would fire</description>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.FREE.MIN.CRIT}</macro>
+               <value>5G</value>
+               <description>The critical threshold of the filesystem utilization.</description>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.FREE.MIN.WARN}</macro>
+               <value>10G</value>
+               <description>The warning threshold of the filesystem utilization.</description>
             </macro>
             <macro>
                <macro>{$VFS.FS.FSDEVICE.MATCHES}</macro>
@@ -2565,7 +2572,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -2587,7 +2594,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -2609,7 +2616,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -2631,7 +2638,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -2653,7 +2660,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                </screen_items>
             </screen>
@@ -2666,21 +2673,21 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
          <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
-         <description>This trigger is ignored, if there is no swap configured</description>
+         <description>This trigger is ignored, if there is no swap configured.</description>
          <dependencies>
             <dependency>
                <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                <expression>{Template OS Linux by Prom:vm.memory.util[node_exporter].min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
             </dependency>
             <dependency>
-               <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+               <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
             </dependency>
          </dependencies>
       </trigger>
       <trigger>
          <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
-         <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+         <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
          <opdata>Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
       </trigger>
@@ -2914,19 +2921,27 @@ and {Template OS Linux by Prom:system.cpu.load.avg15[node_exporter].last()}&gt;0
    </graphs>
    <value_maps>
       <value_map>
-         <name>IF-MIB::ifOperStatus</name>
+         <name>ifOperStatus</name>
          <mappings>
             <mapping>
+               <value>0</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
                <value>1</value>
-               <newvalue>up</newvalue>
+               <newvalue>notpresent</newvalue>
             </mapping>
             <mapping>
                <value>2</value>
                <newvalue>down</newvalue>
             </mapping>
             <mapping>
+               <value>3</value>
+               <newvalue>lowerlayerdown</newvalue>
+            </mapping>
+            <mapping>
                <value>4</value>
-               <newvalue>unknown</newvalue>
+               <newvalue>testing</newvalue>
             </mapping>
             <mapping>
                <value>5</value>
@@ -2934,11 +2949,7 @@ and {Template OS Linux by Prom:system.cpu.load.avg15[node_exporter].last()}&gt;0
             </mapping>
             <mapping>
                <value>6</value>
-               <newvalue>notPresent</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>lowerLayerDown</newvalue>
+               <newvalue>up</newvalue>
             </mapping>
          </mappings>
       </value_map>

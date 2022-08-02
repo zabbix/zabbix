@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,7 +120,7 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 		}
 	}
 
-	if f, err = os.Stat(params[0]); err == nil {
+	if f, err = stdOs.Stat(params[0]); err == nil {
 		if f.Mode().IsRegular() {
 			types.addType(zbxFtFile)
 		} else if f.Mode().IsDir() {

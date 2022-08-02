@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,6 +108,8 @@ void	zbx_mock_test_entry(void **state)
 	const char	*returned_result;
 
 	ZBX_UNUSED(state);
+
+	ZBX_DOUBLE_EPSILON = 0.000001;
 
 	mock_read_variant("in.value1", &value1);
 	mock_read_variant("in.value2", &value2);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,6 +88,8 @@ char	*CONFIG_TLS_CIPHER_ALL13	= NULL;
 char	*CONFIG_TLS_CIPHER_ALL		= NULL;
 char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/* not used in agent, defined for linking with tls.c */
 char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/* not used in agent, defined for linking with tls.c */
+
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 #ifndef _WINDOWS
 #	include "../libs/zbxnix/control.h"
@@ -881,6 +883,8 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DenyKey",			load_key_access_rule,			TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
+		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
+			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
 

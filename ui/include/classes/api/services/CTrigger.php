@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -505,6 +505,14 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		$result = $this->unsetExtraFields($result, ['state', 'expression'], $options['output']);
+
+		// Triggers share table with trigger prototypes. Therefore remove trigger unrelated fields.
+		if ($this->outputIsRequested('discover', $options['output'])) {
+			foreach ($result as &$row) {
+				unset($row['discover']);
+			}
+			unset($row);
+		}
 
 		return $result;
 	}

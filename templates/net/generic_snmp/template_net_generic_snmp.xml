@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:07Z</date>
+   <date>2021-12-23T14:12:43Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -13,7 +13,7 @@
          <name>Template Net Network Generic Device SNMP</name>
          <description>Template Net Network Generic Device&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>

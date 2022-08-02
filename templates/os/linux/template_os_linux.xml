@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T07:24:02Z</date>
+   <date>2022-04-10T22:48:48Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Linux block devices by Zabbix agent</template>
          <name>Template Module Linux block devices by Zabbix agent</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -28,7 +28,6 @@
          <discovery_rules>
             <discovery_rule>
                <name>Block devices discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>vfs.dev.discovery</key>
                <delay>1h</delay>
                <filter>
@@ -284,7 +283,6 @@
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Linux block devices by Zabbix agent:vfs.dev.read.await[{#DEVNAME}].min(15m)} &gt; {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or {Template Module Linux block devices by Zabbix agent:vfs.dev.write.await[{#DEVNAME}].min(15m)} &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}</expression>
@@ -394,7 +392,7 @@
       <template>
          <template>Template Module Linux CPU by Zabbix agent</template>
          <name>Template Module Linux CPU by Zabbix agent</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -497,7 +495,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>CPU utilization in %</description>
+               <description>CPU utilization in %.</description>
                <applications>
                   <application>
                      <name>CPU</name>
@@ -537,7 +535,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)</description>
+               <description>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).</description>
                <applications>
                   <application>
                      <name>CPU</name>
@@ -550,7 +548,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)</description>
+               <description>Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system).</description>
                <applications>
                   <application>
                      <name>CPU</name>
@@ -677,7 +675,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
       <template>
          <template>Template Module Linux filesystems by Zabbix agent</template>
          <name>Template Module Linux filesystems by Zabbix agent</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -691,7 +689,6 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
          <discovery_rules>
             <discovery_rule>
                <name>Mounted filesystem discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>vfs.fs.discovery</key>
                <delay>1h</delay>
                <filter>
@@ -797,36 +794,35 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 5G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
-(({Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;10G or {Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or {Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 10G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
                            <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                            <expression>{Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -863,6 +859,16 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
             </discovery_rule>
          </discovery_rules>
          <macros>
+            <macro>
+               <macro>{$VFS.FS.FREE.MIN.CRIT}</macro>
+               <value>5G</value>
+               <description>The critical threshold of the filesystem utilization.</description>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.FREE.MIN.WARN}</macro>
+               <value>10G</value>
+               <description>The warning threshold of the filesystem utilization.</description>
+            </macro>
             <macro>
                <macro>{$VFS.FS.FSNAME.MATCHES}</macro>
                <value>.+</value>
@@ -904,7 +910,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
       <template>
          <template>Template Module Linux generic by Zabbix agent</template>
          <name>Template Module Linux generic by Zabbix agent</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -930,7 +936,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>kernel.maxfiles</key>
                <delay>1h</delay>
                <history>7d</history>
-               <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
+               <description>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -955,7 +961,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>kernel.maxproc</key>
                <delay>1h</delay>
                <history>7d</history>
-               <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
+               <description>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -1036,7 +1042,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
                <triggers>
@@ -1147,7 +1153,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
             <item>
                <name>System description</name>
                <key>system.uname</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -1160,7 +1166,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -1254,7 +1260,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
       <template>
          <template>Template Module Linux memory by Zabbix agent</template>
          <name>Template Module Linux memory by Zabbix agent</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1308,7 +1314,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>vm.memory.size[available]</key>
                <history>7d</history>
                <units>B</units>
-               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
+               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1321,7 +1327,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Available memory as percentage of total. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
+               <description>Available memory as percentage of total. See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1333,7 +1339,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>vm.memory.size[total]</key>
                <history>7d</history>
                <units>B</units>
-               <description>Total memory in Bytes</description>
+               <description>Total memory in Bytes.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1371,7 +1377,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <description>The system is running out of free memory.</description>
                      <dependencies>
                         <dependency>
-                           <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+                           <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                            <expression>{Template Module Linux memory by Zabbix agent:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent:vm.memory.size[total].last()}&gt;0</expression>
                         </dependency>
                      </dependencies>
@@ -1399,11 +1405,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
       <template>
          <template>Template Module Linux network interfaces by Zabbix agent</template>
          <name>Template Module Linux network interfaces by Zabbix agent</name>
-         <description>Known Issues:&#13;
-&#13;
-  Description: High interface utilization trigger is removed since currently it is not possible to retrieve interface speed to determine the max bandwidth.&#13;
-&#13;
-Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1417,7 +1419,6 @@ Template tooling version used: 0.38</description>
          <discovery_rules>
             <discovery_rule>
                <name>Network interface discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>net.if.discovery</key>
                <delay>1h</delay>
                <filter>
@@ -1555,41 +1556,41 @@ Template tooling version used: 0.38</description>
                      <key>vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <description>Indicates the interface RFC2863 operational state as a string.&#13;
-Possible values are:"unknown", "notpresent", "down", "lowerlayerdown", "testing","dormant", "up".&#13;
-Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</description>
+                     <description>Reference: https://www.kernel.org/doc/Documentation/networking/operstates.txt</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
-                        <name>IF-MIB::ifOperStatus</name>
+                        <name>ifOperStatus</name>
                      </valuemap>
                      <preprocessing>
                         <step>
                            <type>JAVASCRIPT</type>
                            <params>var newvalue;
 switch(value) {
-  case "up":
+  case "unknown":
+    newvalue = 0;
+    break;
+  case "notpresent":
     newvalue = 1;
     break;
   case "down":
     newvalue = 2;
     break;
+  case "lowerlayerdown":
+    newvalue = 3;
+    break;
   case "testing":
     newvalue = 4;
     break;
-  case "unknown":
+  case "dormant":
     newvalue = 5;
     break;
-  case "dormant":
+  case "up":
     newvalue = 6;
-    break;
-  case "notPresent":
-    newvalue = 7;
-    break;
-  default:
+    break;  default:
     newvalue = "Problem parsing interface operstate in JS";
 }
 return newvalue;</params>
@@ -1612,6 +1613,32 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}: Speed</name>
+                     <key>vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]</key>
+                     <delay>5m</delay>
+                     <history>7d</history>
+                     <trends>0d</trends>
+                     <units>bps</units>
+                     <description>Indicates the interface latest or current speed value. Value is an integer representing the link speed in bits/sec.&#13;
+This attribute is only valid for interfaces that implement the ethtool get_link_ksettings method (mostly Ethernet).&#13;
+Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1000000</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
                   </item_prototype>
                   <item_prototype>
                      <name>Interface {#IFNAME}: Interface type</name>
@@ -1638,17 +1665,16 @@ Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net<
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}&lt;0 and {Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}&gt;0&#13;
+                     <expression>{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].change()}&lt;0 and {Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()}&gt;0&#13;
 and&#13;
 ({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=6&#13;
 or {Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=1)&#13;
 and&#13;
 ({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2)</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}&gt;0 and {Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].prev()}&gt;0) or&#13;
+                     <recovery_expression>({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].change()}&gt;0 and {Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].prev()}&gt;0) or&#13;
 ({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2)</recovery_expression>
                      <name>Interface {#IFNAME}: Ethernet has changed to lower speed than it was before</name>
                      <opdata>Current reported speed: {ITEM.LASTVALUE1}</opdata>
@@ -1664,12 +1690,32 @@ and&#13;
                      </dependencies>
                   </trigger_prototype>
                   <trigger_prototype>
+                     <expression>({Template Module Linux network interfaces by Zabbix agent:net.if.in["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()} or&#13;
+{Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()}) and&#13;
+{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()}&gt;0</expression>
+                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                     <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:net.if.in["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()} and&#13;
+{Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/speed"].last()}</recovery_expression>
+                     <name>Interface {#IFNAME}: High bandwidth usage (&gt;{$IF.UTIL.MAX:"{#IFNAME}"}%)</name>
+                     <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
+                     <priority>WARNING</priority>
+                     <description>The network interface utilization is close to its estimated maximum bandwidth.</description>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Interface {#IFNAME}: Link down</name>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger_prototype>
+                  <trigger_prototype>
                      <expression>{Template Module Linux network interfaces by Zabbix agent:net.if.in["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
 or {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}: High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <name>Interface {#IFNAME}: High error rate (&gt;{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
@@ -1751,6 +1797,11 @@ and {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNA
                <value>2</value>
             </macro>
             <macro>
+               <macro>{$IF.UTIL.MAX}</macro>
+               <value>90</value>
+               <description>This macro is used as a threshold in interface utilization trigger.</description>
+            </macro>
+            <macro>
                <macro>{$IFCONTROL}</macro>
                <value>1</value>
             </macro>
@@ -1760,7 +1811,7 @@ and {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNA
             </macro>
             <macro>
                <macro>{$NET.IF.IFNAME.NOT_MATCHES}</macro>
-               <value>(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})</value>
+               <value>(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})</value>
                <description>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</description>
             </macro>
          </macros>
@@ -1807,7 +1858,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Linux block devices by Zabbix agent</name>
@@ -1950,7 +2001,7 @@ Template tooling version used: 0.38</description>
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -1972,7 +2023,7 @@ Template tooling version used: 0.38</description>
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -1994,7 +2045,7 @@ Template tooling version used: 0.38</description>
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -2016,7 +2067,7 @@ Template tooling version used: 0.38</description>
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -2038,7 +2089,7 @@ Template tooling version used: 0.38</description>
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                </screen_items>
             </screen>
@@ -2057,21 +2108,21 @@ Template tooling version used: 0.38</description>
          <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
-         <description>This trigger is ignored, if there is no swap configured</description>
+         <description>This trigger is ignored, if there is no swap configured.</description>
          <dependencies>
             <dependency>
                <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                <expression>{Template Module Linux memory by Zabbix agent:vm.memory.utilization.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
             </dependency>
             <dependency>
-               <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+               <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                <expression>{Template Module Linux memory by Zabbix agent:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent:vm.memory.size[total].last()}&gt;0</expression>
             </dependency>
          </dependencies>
       </trigger>
       <trigger>
          <expression>{Template Module Linux memory by Zabbix agent:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent:vm.memory.size[total].last()}&gt;0</expression>
-         <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+         <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
          <opdata>Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
       </trigger>
@@ -2327,19 +2378,27 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
    </graphs>
    <value_maps>
       <value_map>
-         <name>IF-MIB::ifOperStatus</name>
+         <name>ifOperStatus</name>
          <mappings>
             <mapping>
+               <value>0</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
                <value>1</value>
-               <newvalue>up</newvalue>
+               <newvalue>notpresent</newvalue>
             </mapping>
             <mapping>
                <value>2</value>
                <newvalue>down</newvalue>
             </mapping>
             <mapping>
+               <value>3</value>
+               <newvalue>lowerlayerdown</newvalue>
+            </mapping>
+            <mapping>
                <value>4</value>
-               <newvalue>unknown</newvalue>
+               <newvalue>testing</newvalue>
             </mapping>
             <mapping>
                <value>5</value>
@@ -2347,11 +2406,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
             </mapping>
             <mapping>
                <value>6</value>
-               <newvalue>notPresent</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>lowerLayerDown</newvalue>
+               <newvalue>up</newvalue>
             </mapping>
          </mappings>
       </value_map>

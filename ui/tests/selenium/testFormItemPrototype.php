@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -577,7 +577,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
 
 		$this->zbxTestTextPresent('Type');
@@ -617,7 +616,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Key');
 		$this->zbxTestAssertVisibleId('key');
 		$this->zbxTestAssertAttribute("//input[@id='key']", 'maxlength', 2048);
-		$this->zbxTestAssertAttribute("//input[@id='key']", 'size', 20);
 		if (!isset($templateid)) {
 			$this->zbxTestAssertElementPresentId('keyButton');
 		}
@@ -738,7 +736,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestTextPresent('IPMI sensor');
 			$this->zbxTestAssertVisibleId('ipmi_sensor');
 			$this->zbxTestAssertAttribute("//input[@id='ipmi_sensor']", 'maxlength', 128);
-			$this->zbxTestAssertAttribute("//input[@id='ipmi_sensor']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('IPMI sensor');
@@ -760,7 +757,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestTextPresent('User name');
 			$this->zbxTestAssertVisibleId('username');
 			$this->zbxTestAssertAttribute("//input[@id='username']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='username']", 'size', 20);
 
 			if ($authtype == 'Public key') {
 				$this->zbxTestTextPresent('Key passphrase');
@@ -770,7 +766,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 			$this->zbxTestAssertVisibleId('password');
 			$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='password']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible(['User name', 'Password', 'Key passphrase']);
@@ -782,12 +777,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Public key file');
 			$this->zbxTestAssertVisibleId('publickey');
 			$this->zbxTestAssertAttribute("//input[@id='publickey']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='publickey']", 'size', 20);
 
 			$this->zbxTestTextPresent('Private key file');
 			$this->zbxTestAssertVisibleId('privatekey');
 			$this->zbxTestAssertAttribute("//input[@id='privatekey']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='privatekey']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('Public key file');
@@ -801,7 +794,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestTextPresent('SNMP OID');
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
-			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
 			if (!isset($itemid)) {
 				$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
 			}
@@ -828,7 +820,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Update interval');
 				$this->zbxTestAssertVisibleId('delay');
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
-				$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
 				if (!isset($itemid)) {
 					$this->zbxTestAssertElementValue('delay', '1m');
 				}
@@ -871,7 +862,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Units');
 			$this->zbxTestAssertVisibleId('units');
 			$this->zbxTestAssertAttribute("//input[@id='units']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='units']", 'size', 20);
 			if(isset($templateid)) {
 				$this->zbxTestAssertAttribute("//input[@id='units']", 'readonly');
 			}
@@ -898,12 +888,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestTextPresent(['Flexible', 'Scheduling', 'Update interval']);
 			$this->zbxTestAssertVisibleId('delay_flex_0_delay');
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'size', 20);
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'placeholder', '50s');
 
 			$this->zbxTestAssertVisibleId('delay_flex_0_period');
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'size', 20);
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'placeholder', '1-7,00:00-24:00');
 			$this->zbxTestAssertVisibleId('interval_add');
 		}
@@ -911,7 +899,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('History storage period');
 		$this->zbxTestAssertVisibleId('history');
 		$this->zbxTestAssertAttribute("//input[@id='history']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='history']", 'size', 20);
 		$this->zbxTestAssertElementValue('history', '90d');
 		if (!isset($itemid)) {
 			$this->zbxTestAssertElementValue('history', '90d');
@@ -924,7 +911,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			if (!isset($itemid)) {
 				$this->zbxTestAssertElementValue('trends', '365d');
 			}
-			$this->zbxTestAssertAttribute("//input[@id='trends']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('Trend storage period');
@@ -956,7 +942,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Allowed hosts');
 			$this->zbxTestAssertVisibleId('trapper_hosts');
 			$this->zbxTestAssertAttribute("//input[@id='trapper_hosts']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='trapper_hosts']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('Allowed hosts');
@@ -967,7 +952,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Log time format');
 			$this->zbxTestAssertVisibleId('logtimefmt');
 			$this->zbxTestAssertAttribute("//input[@id='logtimefmt']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='logtimefmt']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('Log time format');
@@ -977,7 +961,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('New application');
 		$this->zbxTestAssertVisibleId('new_application');
 		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'size', 20);
 
 		$this->zbxTestTextPresent('Applications');
 		$this->zbxTestAssertVisibleId('applications_');

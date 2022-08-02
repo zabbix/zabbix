@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team')))
+$pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team'), CWebUser::getLang()))
 	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
 	->display();
 
@@ -32,7 +32,7 @@ $buttons = [
 		->onClick('javascript: document.location = "zabbix.php?action=dashboard.view"'
 )];
 
-echo '<body lang="'.CWebUser::getLang().'">';
+echo '<body';
 
 (new CDiv((new CTag('main', true,
 	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons)

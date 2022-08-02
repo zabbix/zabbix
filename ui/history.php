@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,6 +107,7 @@ $data = [
 	'profileIdx' => 'web.item.graph.filter',
 	'profileIdx2' => 0,
 	'filter_task' => getRequest('filter_rst') ? FILTER_TASK_SHOW : getRequest('filter_task', FILTER_TASK_SHOW),
+	'mark_color' => getRequest('mark_color', MARK_COLOR_RED),
 	'filter' => getRequest('filter_rst') ? '' : getRequest('filter', ''),
 	'active_tab' => CProfile::get('web.item.graph.filter.active', 1)
 ];

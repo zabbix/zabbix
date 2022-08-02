@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -163,6 +163,20 @@ int	zbx_get_file_time(const char *path, zbx_file_time_t *time)
 	time->change_time = (zbx_fs_time_t)buf.st_ctime;
 
 	return SUCCEED;
+}
+
+char	*zbx_fgets(char *buffer, int size, FILE *fp)
+{
+	char	*s;
+
+	do
+	{
+		errno = 0;
+		s = fgets(buffer, size, fp);
+	}
+	while (EINTR == errno && NULL == s);
+
+	return s;
 }
 #else	/* _WINDOWS */
 static	int	get_file_time_stat(const char *path, zbx_file_time_t *time)

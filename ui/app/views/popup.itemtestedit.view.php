@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -295,13 +295,10 @@ $templates = [
 		)
 ];
 
-$warning_message = [[
-	'message' => _('Item contains user defined macros with type "Secret text". Values of these macros should be entered manually.')
-]];
 $warning_box = $data['show_warning']
-	? makeMessageBox(false, $warning_message, null, true, false)
-		->removeAttribute('class')
-		->addClass(ZBX_STYLE_MSG_WARNING)
+	? makeMessageBox(ZBX_STYLE_MSG_WARNING, [[
+		'message' => _('Item contains user defined macros with type "Secret text". Values of these macros should be entered manually.')
+	]])
 	: null;
 
 $output = [

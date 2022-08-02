@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 
 #include "proxyconfig.h"
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
+#include "zbxcompress.h"
+#include "zbxipcservice.h"
 
 /******************************************************************************
  *                                                                            *
@@ -37,10 +39,11 @@
  ******************************************************************************/
 void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	char		*error = NULL;
+	char		*error = NULL, *buffer = NULL;
 	struct zbx_json	j;
 	DC_PROXY	proxy;
-	int		flags = ZBX_TCP_PROTOCOL;
+	int		ret, flags = ZBX_TCP_PROTOCOL;
+	size_t		buffer_size, reserved = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -74,11 +77,36 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto clean;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen " ZBX_FS_SIZE_T,
-			proxy.host, sock->peer, (zbx_fs_size_t)j.buffer_size);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", j.buffer);
 
-	if (SUCCEED != zbx_tcp_send_ext(sock, j.buffer, strlen(j.buffer), flags, CONFIG_TRAPPER_TIMEOUT))
+	if (0 != proxy.auto_compress)
+	{
+		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+		{
+			zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+			goto clean;
+		}
+
+		reserved = j.buffer_size;
+
+		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+
+		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+				ZBX_FS_SIZE_T ", bytes " ZBX_FS_SIZE_T " with compression ratio %.1f", proxy.host,
+				sock->peer, (zbx_fs_size_t)reserved, (zbx_fs_size_t)buffer_size,
+				(double)reserved / buffer_size);
+
+		ret = zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, flags, CONFIG_TRAPPER_TIMEOUT);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+				ZBX_FS_SIZE_T, proxy.host, sock->peer, (zbx_fs_size_t)j.buffer_size);
+
+		ret = zbx_tcp_send_ext(sock, j.buffer, strlen(j.buffer), 0, flags, CONFIG_TRAPPER_TIMEOUT);
+	}
+
+	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, zbx_socket_strerror());
@@ -87,6 +115,7 @@ clean:
 	zbx_json_free(&j);
 out:
 	zbx_free(error);
+	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -118,7 +147,23 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update"))
 		goto out;
 
-	process_proxyconfig(&jp_data);
+	if (SUCCEED == process_proxyconfig(&jp_data))
+	{
+		unsigned char	*result;
+		char		*error = NULL;
+
+		if (SUCCEED == zbx_ipc_async_exchange(ZBX_IPC_SERVICE_CONFIG, ZBX_IPC_CONFIG_RELOAD_REQUEST,
+				ZBX_IPC_WAIT_FOREVER, NULL, 0, &result, &error))
+		{
+			zbx_free(result);
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send message to configuration syncer: %s", error);
+			zbx_free(error);
+		}
+	}
 	zbx_send_proxy_response(sock, ret, NULL, CONFIG_TIMEOUT);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

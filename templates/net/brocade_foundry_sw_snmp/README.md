@@ -1,5 +1,5 @@
 
-# Brocade_Foundry Performance SNMP
+# Template Module Brocade_Foundry Performance SNMP
 
 ## Overview
 
@@ -45,7 +45,7 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Brocade_Foundry Nonstackable SNMP
+# Template Net Brocade_Foundry Nonstackable SNMP
 
 ## Overview
 
@@ -54,7 +54,7 @@ For devices(old Foundry devices, MLXe and so on) that doesn't support Stackable 
 FOUNDRY-SN-AGENT-MIB::snChasFanTable, snChasPwrSupplyTable,snAgentTempTable are used instead.
 For example:
 The objects in table snChasPwrSupply2Table is not supported on the NetIron and the FastIron SX devices.
-snChasFan2Table is not supported on  on the NetIron devices.
+snChasFan2Table is not supported on the NetIron devices.
 snAgentTemp2Table is not supported on old versions of MLXe
 
 This template was tested on:
@@ -132,7 +132,7 @@ No specific Zabbix configuration is required.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Brocade_Foundry Stackable SNMP
+# Template Net Brocade_Foundry Stackable SNMP
 
 ## Overview
 

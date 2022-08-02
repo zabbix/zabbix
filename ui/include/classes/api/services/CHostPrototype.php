@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -714,21 +714,26 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * Each host prototype must have the "ruleid" parameter set.
 	 *
-	 * @param array     $hostPrototypes
+	 * @param array     $host_prototypes
 	 * @param array		$hostIds
 	 *
 	 * @return array 	an array of unsaved child host prototypes
 	 */
-	protected function prepareInheritedObjects(array $hostPrototypes, array $hostIds = null) {
+	protected function prepareInheritedObjects(array $host_prototypes, array $hostIds = null) {
 		// fetch the related discovery rules with their hosts
 		$discoveryRules = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'hostid'],
 			'selectHosts' => ['hostid'],
-			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid'),
+			'itemids' => array_column($host_prototypes, 'ruleid'),
 			'templated' => true,
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
+
+		// Remove host prototypes which don't belong to templates, so they cannot be inherited.
+		$host_prototypes = array_filter($host_prototypes, function ($host_prototype) use ($discoveryRules) {
+			return array_key_exists($host_prototype['ruleid'], $discoveryRules);
+		});
 
 		// fetch all child hosts to inherit to
 		// do not inherit host prototypes on discovered hosts
@@ -748,10 +753,11 @@ class CHostPrototype extends CHostBase {
 		// fetch the child discovery rules
 		$childDiscoveryRules = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'templateid', 'hostid'],
-			'preservekeys' => true,
 			'filter' => [
 				'templateid' => array_keys($discoveryRules)
-			]
+			],
+			'nopermissions' => true,
+			'preservekeys' => true
 		]);
 
 		// fetch child host prototypes and group them by discovery rule
@@ -760,7 +766,8 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => ['itemid'],
-			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid')
+			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid'),
+			'nopermissions' => true
 		]);
 		foreach ($childDiscoveryRules as &$childDiscoveryRule) {
 			$childDiscoveryRule['hostPrototypes'] = [];
@@ -786,7 +793,7 @@ class CHostPrototype extends CHostBase {
 			// skip items not from parent templates of current host
 			$templateIds = zbx_toHash($host['parentTemplates'], 'templateid');
 			$parentHostPrototypes = [];
-			foreach ($hostPrototypes as $inum => $parentHostPrototype) {
+			foreach ($host_prototypes as $inum => $parentHostPrototype) {
 				$parentTemplateId = $discoveryRules[$parentHostPrototype['ruleid']]['hostid'];
 
 				if (isset($templateIds[$parentTemplateId])) {

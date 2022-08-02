@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-01-11T15:12:53Z</date>
+   <date>2021-12-21T18:00:07Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -13,7 +13,7 @@
          <name>Template App PHP-FPM by Zabbix agent</name>
          <description>Get PHP-FPM metrics using Zabbix agent running on Linux.&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -128,7 +128,7 @@ Template tooling version used: 0.38</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <params>last(php-fpm.listen_queue)/(last(php-fpm.listen_queue_len)+last(php-fpm.listen_queue_len)=0)*100</params>
+               <params>last(php-fpm.listen_queue)/(last(php-fpm.listen_queue_len)+(last(php-fpm.listen_queue_len)=0))*100</params>
                <description>Queue utilization</description>
                <applications>
                   <application>

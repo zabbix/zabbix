@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,7 +88,8 @@ class CRouter {
 		'favourite.delete'				=> ['CControllerFavouriteDelete',					'layout.javascript',	null],
 		'gui.edit'						=> ['CControllerGuiEdit',							'layout.htmlpage',		'administration.gui.edit'],
 		'gui.update'					=> ['CControllerGuiUpdate',							null,					null],
-		'hint.box'						=> ['CControllerHintBox',							'layout.json',			'hint.box'],
+		'hintbox.actionlist'			=> ['CControllerHintboxActionlist',					'layout.json',			'hintbox.actionlist'],
+		'hintbox.eventlist'				=> ['CControllerHintboxEventlist',					'layout.json',			'hintbox.eventlist'],
 		'host.view'						=> ['CControllerHostView',							'layout.htmlpage',		'monitoring.host.view'],
 		'host.view.refresh'				=> ['CControllerHostViewRefresh',					'layout.json',			'monitoring.host.view.refresh'],
 		'hostmacros.list'				=> ['CControllerHostMacrosList',					'layout.json',			'hostmacros.list'],

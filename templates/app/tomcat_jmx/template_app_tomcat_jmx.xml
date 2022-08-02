@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-23T08:33:45Z</date>
+   <date>2022-03-03T14:38:56Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -17,7 +17,7 @@ The metrics are collected by JMX.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/411862-discussion-thread-for-official-zabbix-template-tomcat&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -116,7 +116,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Global request processors discovery</name>
@@ -131,18 +130,18 @@ Template tooling version used: 0.38</description>
                   <conditions>
                      <condition>
                         <macro>{#JMXNAME}</macro>
-                        <value>{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}</value>
+                        <value>{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequestProcessor"}</value>
                         <formulaid>A</formulaid>
                      </condition>
                      <condition>
                         <macro>{#JMXNAME}</macro>
-                        <value>{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}</value>
+                        <value>{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequestProcessor"}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>B</formulaid>
                      </condition>
                   </conditions>
                </filter>
-               <description>Discovery for GlobalRequesProcessor</description>
+               <description>Discovery for GlobalRequestProcessor</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#JMXNAME}: Bytes received per second</name>
@@ -253,7 +252,6 @@ Template tooling version used: 0.38</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#JMXNAME}: Traffic</name>
@@ -394,7 +392,6 @@ Template tooling version used: 0.38</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#JMXHOST}{#JMXCONTEXT}: Sessions</name>
@@ -522,7 +519,6 @@ Template tooling version used: 0.38</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template App Apache Tomcat JMX:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}&gt;{Template App Apache Tomcat JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100</expression>

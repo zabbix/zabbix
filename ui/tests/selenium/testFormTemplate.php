@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -239,6 +239,16 @@ class testFormTemplate extends CLegacyWebTest {
 		$cloned_template_name = 'Cloned template';
 		$this->zbxTestLogin('templates.php?page=1');
 		$this->query('button:Reset')->one()->click();
+
+		// Check if template name present on page, if not, check on next page.
+		for ($i = 0; $i < 3; $i++) {
+			if ($this->query('link', $this->template_clone)->one(false)->isValid() === true) {
+				break;
+			}
+			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
+			$this->zbxTestWaitForPageToLoad();
+		}
+
 		$this->zbxTestAssertElementPresentId('filter_name');
 		$this->zbxTestDoubleClickLinkText($this->template_clone, 'template_name');
 		$this->zbxTestClickWait('clone');
@@ -249,7 +259,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
 
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
-		$this->assertEquals(66, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(67, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(11, CDBHelper::getCount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));
@@ -257,8 +267,9 @@ class testFormTemplate extends CLegacyWebTest {
 
 	public function testFormTemplate_FullCloneTemplate() {
 		$cloned_template_name = 'Full cloned template';
-		$this->zbxTestLogin('templates.php?page=1');
+		$this->zbxTestLogin('templates.php');
 		$this->query('button:Reset')->one()->click();
+		$this->zbxTestOpen('templates.php?page=2');
 		$this->zbxTestClickLinkTextWait($this->template_clone);
 		$this->zbxTestClickWait('full_clone');
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
@@ -268,7 +279,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
 
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
-		$this->assertEquals(66, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(67, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(11, CDBHelper::getCount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));

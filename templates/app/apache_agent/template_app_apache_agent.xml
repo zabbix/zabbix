@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-29T22:48:19Z</date>
+   <date>2022-08-01T08:00:24Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -16,7 +16,7 @@ https://httpd.apache.org/docs/current/mod/mod_status.html&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -169,7 +169,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                      <expression>{last()}&lt;10m</expression>
                      <name>Apache: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -650,7 +650,7 @@ for (var i = 0; i &lt; lines.length; i++) {
 
 // Multiversion metrics
 output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime;
-output.ServerVersion = output.Server || output.ServerVersion;
+output.ServerVersion = output.ServerVersion || output.Server;
 
 // Parse "Scoreboard" to get worker count.
 if (typeof output.Scoreboard === 'string') {
@@ -838,7 +838,6 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Apache: Current async connections{#SINGLETON}</name>
@@ -896,12 +895,13 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                </master_item>
                <preprocessing>
                   <step>
-                     <type>JSONPATH</type>
-                     <params>$.ServerMPM</params>
+                     <type>JAVASCRIPT</type>
+                     <params>return JSON.stringify(JSON.parse(value).ServerMPM === 'event'
+    ? [{'{#SINGLETON}': ''}] : []);</params>
                   </step>
                   <step>
-                     <type>JAVASCRIPT</type>
-                     <params>return JSON.stringify(value === 'event' ? [{'{#SINGLETON}': ''}] : []);</params>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
                   </step>
                </preprocessing>
             </discovery_rule>

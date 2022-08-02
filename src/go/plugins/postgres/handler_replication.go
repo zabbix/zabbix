@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,10 +74,10 @@ func replicationHandler(ctx context.Context, conn PostgresClient,
 
 	case keyReplicationLagSec:
 		query = `SELECT
-  					CASE
-    					WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
-						ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
-  					END as lag`
+					CASE
+		  				WHEN NOT pg_is_in_recovery() OR pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
+		  				ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
+					END AS lag;`
 	case keyReplicationLagB:
 		row, err := conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
 		if err != nil {
@@ -94,8 +94,7 @@ func replicationHandler(ctx context.Context, conn PostgresClient,
 		}
 
 		if inRecovery {
-			query = `SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn())
-						   FROM pg_stat_wal_receiver;`
+			query = `SELECT pg_catalog.pg_wal_lsn_diff (pg_last_wal_receive_lsn(), pg_last_wal_replay_lsn());`
 			row, err = conn.QueryRow(ctx, query)
 
 			if err != nil {
@@ -120,16 +119,16 @@ func replicationHandler(ctx context.Context, conn PostgresClient,
 		query = `SELECT pg_is_in_recovery()::int`
 
 	case keyReplicationCount:
-		query = `SELECT count(*) FROM pg_stat_replication`
+		query = `SELECT COUNT(DISTINCT client_addr) + COALESCE(SUM(CASE WHEN client_addr IS NULL THEN 1 ELSE 0 END), 0) FROM pg_stat_replication;`
 
 	case keyReplicationProcessInfo:
 		query = `SELECT json_object_agg(application_name, row_to_json(T))
 				   FROM (
 						SELECT
-						    CONCAT(application_name, ' ', pid) AS application_name,
-							EXTRACT(epoch FROM COALESCE(flush_lag,'0'::interval)) as flush_lag, 
-							EXTRACT(epoch FROM COALESCE(replay_lag,'0'::interval)) as replay_lag,
-							EXTRACT(epoch FROM COALESCE(write_lag, '0'::interval)) as write_lag
+						    application_name,
+							EXTRACT(epoch FROM COALESCE(flush_lag,'0'::interval)) AS flush_lag, 
+							EXTRACT(epoch FROM COALESCE(replay_lag,'0'::interval)) AS replay_lag,
+							EXTRACT(epoch FROM COALESCE(write_lag, '0'::interval)) AS write_lag
 						FROM pg_stat_replication
 					) T; `
 		row, err := conn.QueryRow(ctx, query)

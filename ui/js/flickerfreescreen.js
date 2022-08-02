@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2021 Zabbix SIA
+ ** Copyright (C) 2001-2022 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -116,17 +116,22 @@
 						'screenitemid'
 					]
 				},
-				params_index = type_params[screen.resourcetype] ? screen.resourcetype : 'default';
-				ajax_url = new Curl('jsrpc.php'),
+				params_index = type_params[screen.resourcetype] ? screen.resourcetype : 'default',
 				self = this;
 
-			ajax_url.setArgument('type', 9); // PAGE_TYPE_TEXT
-			ajax_url.setArgument('method', 'screen.get');
-			// TODO: remove, do not use timestamp passing to server and back to ensure newest content will be shown.
-			ajax_url.setArgument('timestamp', screen.timestampActual);
+			const ajax_url = new Curl('jsrpc.php');
+			const post_data = {
+				type: 9, // PAGE_TYPE_TEXT
+				method: 'screen.get',
+
+				// TODO: remove, do not use timestamp passing to server and back to ensure newest content will be shown.
+				timestamp: screen.timestampActual
+			};
 
 			$.each(type_params[params_index], function (i, name) {
-				ajax_url.setArgument(name, empty(screen[name]) ? null : screen[name]);
+				if (!empty(screen[name])) {
+					post_data[name] = screen[name];
+				}
 			});
 
 			// set actual timestamp
@@ -135,8 +140,8 @@
 			// timeline params
 			// SCREEN_RESOURCE_HTTPTEST_DETAILS, SCREEN_RESOURCE_DISCOVERY, SCREEN_RESOURCE_HTTPTEST
 			if ($.inArray(screen.resourcetype, [21, 22, 23]) === -1) {
-				ajax_url.setArgument('from', screen.timeline.from);
-				ajax_url.setArgument('to', screen.timeline.to);
+				post_data.from = screen.timeline.from;
+				post_data.to = screen.timeline.to;
 			}
 
 			switch (parseInt(screen.resourcetype, 10)) {
@@ -164,7 +169,7 @@
 
 				// SCREEN_RESOURCE_PLAIN_TEXT
 				case 3:
-					self.refreshHtml(id, ajax_url);
+					self.refreshHtml(id, ajax_url, post_data);
 					break;
 
 				// SCREEN_RESOURCE_CLOCK
@@ -181,12 +186,12 @@
 						if ('itemids' in screen.data) {
 							$.each(screen.data.itemids, function (i, value) {
 								if (!empty(value)) {
-									ajax_url.setArgument('itemids[' + value + ']', value);
+									post_data['itemids[' + value + ']'] = value;
 								}
 							});
 						}
 						else {
-							ajax_url.setArgument('graphid', screen.data.graphid);
+							post_data['graphid'] = screen.data.graphid;
 						}
 
 						$.each({
@@ -196,11 +201,11 @@
 							'action': screen.data.action
 						}, function (ajax_key, value) {
 							if (!empty(value)) {
-								ajax_url.setArgument(ajax_key, value);
+								post_data[ajax_key] = value;
 							}
 						});
 
-						self.refreshHtml(id, ajax_url);
+						self.refreshHtml(id, ajax_url, post_data);
 					}
 					break;
 
@@ -208,11 +213,11 @@
 				// SCREEN_RESOURCE_LLD_GRAPH
 				case 20:
 				case 19:
-					self.refreshProfile(id, ajax_url);
+					self.refreshProfile(id, ajax_url, post_data);
 					break;
 
 				default:
-					self.refreshHtml(id, ajax_url);
+					self.refreshHtml(id, ajax_url, post_data);
 					break;
 			}
 
@@ -247,7 +252,7 @@
 			}
 		},
 
-		refreshHtml: function(id, ajaxUrl) {
+		refreshHtml: function(id, ajaxUrl, post_data = {}) {
 			var screen = this.screens[id],
 				request_start = new CDate().getTime();
 
@@ -263,7 +268,7 @@
 					url: ajaxUrl.getUrl(),
 					type: 'post',
 					cache: false,
-					data: {},
+					data: post_data,
 					dataType: 'html',
 					success: function(html) {
 						var html = $(html);
@@ -365,9 +370,9 @@
 					url.setArgument('_', request_start.toString(34));
 
 					// Create temp image in buffer.
-					var	img = $('<img/>', {
-							'class': domImg.attr('class'),
+					var	img = $('<img>', {
 							id: domImg.attr('id'),
+							class: domImg.attr('class'),
 							name: domImg.attr('name'),
 							border: domImg.attr('border'),
 							usemap: domImg.attr('usemap'),
@@ -450,7 +455,7 @@
 			return null;
 		},
 
-		refreshProfile: function(id, ajaxUrl) {
+		refreshProfile: function(id, ajaxUrl, post_data) {
 			var screen = this.screens[id];
 
 			if (screen.isRefreshing) {
@@ -463,7 +468,7 @@
 				var ajaxRequest = $.ajax({
 					url: ajaxUrl.getUrl(),
 					type: 'post',
-					data: {},
+					data: post_data,
 					success: function(data) {
 						screen.timestamp = new CDate().getTime();
 						screen.isRefreshing = false;

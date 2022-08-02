@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -309,15 +309,10 @@ function make_small_eventlist(array $startEvent) {
 		'severity_name_4' => $config['severity_name_4'],
 		'severity_name_5' => $config['severity_name_5']
 	];
-	$actions = getEventsActionsIconsData($events, $triggers, $r_events);
+	$actions = getEventsActionsIconsData($events, $triggers);
 	$users = API::User()->get([
 		'output' => ['alias', 'name', 'surname'],
 		'userids' => array_keys($actions['userids']),
-		'preservekeys' => true
-	]);
-	$mediatypes = API::Mediatype()->get([
-		'output' => ['name', 'maxattempts'],
-		'mediatypeids' => array_keys($actions['mediatypeids']),
 		'preservekeys' => true
 	]);
 
@@ -374,7 +369,7 @@ function make_small_eventlist(array $startEvent) {
 			zbx_date2age($event['clock']),
 			$duration,
 			$problem_update_link,
-			makeEventActionsIcons($event['eventid'], $actions['data'], $mediatypes, $users, $severity_config)
+			makeEventActionsIcons($event['eventid'], $actions['data'], $users, $severity_config)
 		]);
 	}
 

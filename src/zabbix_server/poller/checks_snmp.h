@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ extern int	CONFIG_TIMEOUT;
 #define ZBX_SNMP_STR_ASCII	5
 #define ZBX_SNMP_STR_UNDEFINED	255
 
-void	zbx_init_snmp(void);
 int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type);
 void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type);
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);

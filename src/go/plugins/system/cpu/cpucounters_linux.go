@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ func counterByType(name string) (counter cpuCounter) {
 	}
 }
 
-func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex) (result interface{}) {
+func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex, _ int) (result interface{}) {
 	if c.head == c.tail {
 		return
 	}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,9 +75,12 @@ static int	DBpatch_5000002(void)
 
 static int	DBpatch_5000003(void)
 {
-	DB_RESULT	result;
-	int		ret;
-	const char	*fields[] = {"subject", "message"};
+	DB_RESULT		result;
+	int			ret;
+	zbx_field_len_t		fields[] = {
+			{"subject", 255},
+			{"message", 65535}
+	};
 
 	result = DBselect("select om.operationid,om.subject,om.message"
 			" from opmessage om,operations o,actions a"
@@ -93,12 +96,14 @@ static int	DBpatch_5000003(void)
 	return ret;
 }
 
-
 static int	DBpatch_5000004(void)
 {
-	DB_RESULT	result;
-	int		ret;
-	const char	*fields[] = {"subject", "message"};
+	DB_RESULT		result;
+	int			ret;
+	zbx_field_len_t		fields[] = {
+			{"subject", 255},
+			{"message", 65535}
+	};
 
 	result = DBselect("select mediatype_messageid,subject,message from media_type_message where recovery=1");
 
@@ -108,6 +113,11 @@ static int	DBpatch_5000004(void)
 	DBfree_result(result);
 
 	return ret;
+}
+
+static int	DBpatch_5000005(void)
+{
+	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
 }
 
 #endif
@@ -121,5 +131,6 @@ DBPATCH_ADD(5000001, 0, 0)
 DBPATCH_ADD(5000002, 0, 0)
 DBPATCH_ADD(5000003, 0, 0)
 DBPATCH_ADD(5000004, 0, 0)
+DBPATCH_ADD(5000005, 0, 0)
 
 DBPATCH_END()

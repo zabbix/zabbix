@@ -30,6 +30,7 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a \
+	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 CACHE_LIBS = \
@@ -39,7 +40,10 @@ CACHE_LIBS = \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
+	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
@@ -77,6 +81,7 @@ COMMON_WRAP_FUNCS = \
 	-Wl,--wrap=time
 
 zbx_vc_get_values_SOURCES = \
+	zbx_vc_common.c \
 	zbx_vc_get_values.c \
 	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
@@ -93,6 +98,7 @@ zbx_vc_get_values_CFLAGS = \
 	-I@top_srcdir@/tests
 
 zbx_vc_add_values_SOURCES = \
+	zbx_vc_common.c \
 	zbx_vc_add_values.c \
 	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
@@ -109,6 +115,7 @@ zbx_vc_add_values_CFLAGS = \
 	-I@top_srcdir@/tests
 
 zbx_vc_get_value_SOURCES = \
+	zbx_vc_common.c \
 	zbx_vc_get_value.c \
 	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \

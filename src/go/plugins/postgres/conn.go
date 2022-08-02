@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"crypto/tls"
 	"database/sql"
 	"fmt"
 	"net"
@@ -29,12 +30,13 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"zabbix.com/pkg/uri"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/jackc/pgx/v4/stdlib"
 	"github.com/omeid/go-yarn"
 	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/tlsconfig"
+	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -56,6 +58,7 @@ type PGConn struct {
 	lastTimeAccess time.Time
 	version        int
 	queryStorage   *yarn.Yarn
+	address        string
 }
 
 var errorQueryNotFound = "query %q not found"
@@ -125,7 +128,7 @@ func (conn *PGConn) updateAccessTime() {
 type ConnManager struct {
 	sync.Mutex
 	connMutex      sync.Mutex
-	connections    map[uri.URI]*PGConn
+	connections    map[string]*PGConn
 	keepAlive      time.Duration
 	connectTimeout time.Duration
 	callTimeout    time.Duration
@@ -139,7 +142,7 @@ func NewConnManager(keepAlive, connectTimeout, callTimeout,
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections:    make(map[uri.URI]*PGConn),
+		connections:    make(map[string]*PGConn),
 		keepAlive:      keepAlive,
 		connectTimeout: connectTimeout,
 		callTimeout:    callTimeout,
@@ -161,7 +164,7 @@ func (c *ConnManager) closeUnused() {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
 			conn.client.Close()
 			delete(c.connections, uri)
-			log.Debugf("[%s] Closed unused connection: %s", pluginName, uri.Addr())
+			log.Debugf("[%s] Closed unused connection: %s", pluginName, conn.address)
 		}
 	}
 }
@@ -194,11 +197,11 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI) (*PGConn, error) {
+func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*PGConn, error) {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if _, ok := c.connections[uri]; ok {
+	if _, ok := c.connections[uri.NoQueryString()]; ok {
 		// Should never happen.
 		panic("connection already exists")
 	}
@@ -232,22 +235,10 @@ func (c *ConnManager) create(uri uri.URI) (*PGConn, error) {
 		dsn += " password=" + uri.Password()
 	}
 
-	config, err := pgxpool.ParseConfig(dsn)
+	client, err := createTLSClient(dsn, c.connectTimeout, details)
 	if err != nil {
 		return nil, err
 	}
-
-	config.ConnConfig.DialFunc = func(ctx context.Context, network, addr string) (net.Conn, error) {
-		d := net.Dialer{}
-		ctxTimeout, cancel := context.WithTimeout(context.Background(), c.connectTimeout)
-		defer cancel()
-
-		conn, err := d.DialContext(ctxTimeout, network, addr)
-
-		return conn, err
-	}
-
-	client := stdlib.OpenDB(*config.ConnConfig)
 
 	serverVersion, err := getPostgresVersion(ctx, client)
 	if err != nil {
@@ -258,18 +249,56 @@ func (c *ConnManager) create(uri uri.URI) (*PGConn, error) {
 		return nil, fmt.Errorf("postgres version %d is not supported", serverVersion)
 	}
 
-	c.connections[uri] = &PGConn{
+	c.connections[uri.NoQueryString()] = &PGConn{
 		client:         client,
 		callTimeout:    c.callTimeout,
 		version:        serverVersion,
 		lastTimeAccess: time.Now(),
 		ctx:            ctx,
 		queryStorage:   &c.queryStorage,
+		address:        uri.Addr(),
 	}
 
 	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())
 
-	return c.connections[uri], nil
+	return c.connections[uri.NoQueryString()], nil
+}
+
+func createTLSClient(dsn string, timeout time.Duration, details tlsconfig.Details) (*sql.DB, error) {
+	config, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	config.ConnConfig.DialFunc = func(ctx context.Context, network, addr string) (net.Conn, error) {
+		d := net.Dialer{}
+		ctxTimeout, cancel := context.WithTimeout(context.Background(), timeout)
+		defer cancel()
+
+		conn, err := d.DialContext(ctxTimeout, network, addr)
+
+		return conn, err
+	}
+
+	config.ConnConfig.TLSConfig, err = getTLSConfig(details)
+	if err != nil {
+		return nil, err
+	}
+
+	return stdlib.OpenDB(*config.ConnConfig), nil
+}
+
+func getTLSConfig(details tlsconfig.Details) (*tls.Config, error) {
+	switch details.TlsConnect {
+	case "required":
+		return &tls.Config{InsecureSkipVerify: true}, nil
+	case "verify_ca":
+		return tlsconfig.CreateConfig(details, true)
+	case "verify_full":
+		return tlsconfig.CreateConfig(details, false)
+	}
+
+	return nil, nil
 }
 
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
@@ -277,7 +306,7 @@ func (c *ConnManager) get(uri uri.URI) *PGConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if conn, ok := c.connections[uri]; ok {
+	if conn, ok := c.connections[uri.NoQueryString()]; ok {
 		conn.updateAccessTime()
 		return conn
 	}
@@ -286,14 +315,14 @@ func (c *ConnManager) get(uri uri.URI) *PGConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI) (conn *PGConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI, details tlsconfig.Details) (conn *PGConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 
 	conn = c.get(uri)
 
 	if conn == nil {
-		conn, err = c.create(uri)
+		conn, err = c.create(uri, details)
 	}
 
 	if err != nil {

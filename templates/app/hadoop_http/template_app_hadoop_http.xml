@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-19T14:30:08Z</date>
+   <date>2021-12-21T18:00:05Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -15,7 +15,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/413459-discussion-thread-for-official-zabbix-template-hadoop&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -492,13 +492,6 @@ catch (error) {
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{last()}&lt;10m</expression>
-                     <name>NameNode: Service has been restarted (uptime &lt; 10m)</name>
-                     <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
-                     <manual_close>YES</manual_close>
-                  </trigger>
-                  <trigger>
                      <expression>{nodata(30m)}=1</expression>
                      <name>NameNode: Failed to fetch NameNode API page (or no data for 30m)</name>
                      <priority>WARNING</priority>
@@ -510,6 +503,13 @@ catch (error) {
                            <expression>{Template App Hadoop by HTTP:net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>NameNode: Service has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
             </item>
@@ -811,13 +811,6 @@ catch (error) {
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{last()}&lt;10m</expression>
-                     <name>ResourceManager: Service has been restarted (uptime &lt; 10m)</name>
-                     <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
-                     <manual_close>YES</manual_close>
-                  </trigger>
-                  <trigger>
                      <expression>{nodata(30m)}=1</expression>
                      <name>ResourceManager: Failed to fetch ResourceManager API page (or no data for 30m)</name>
                      <priority>WARNING</priority>
@@ -829,6 +822,13 @@ catch (error) {
                            <expression>{Template App Hadoop by HTTP:net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>ResourceManager: Service has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
             </item>
@@ -1198,13 +1198,6 @@ catch (error) {
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}&lt;10m</expression>
-                           <name>{#HOSTNAME}: Service has been restarted (uptime &lt; 10m)</name>
-                           <priority>INFO</priority>
-                           <description>Uptime is less than 10 minutes</description>
-                           <manual_close>YES</manual_close>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{nodata(30m)}=1</expression>
                            <name>{#HOSTNAME}: Failed to fetch DataNode API page (or no data for 30m)</name>
                            <priority>WARNING</priority>
@@ -1216,6 +1209,13 @@ catch (error) {
                                  <expression>{Template App Hadoop by HTTP:hadoop.datanode.oper_state[{#HOSTNAME}].last()}&lt;&gt;"Live"</expression>
                               </dependency>
                            </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;10m</expression>
+                           <name>{#HOSTNAME}: Service has been restarted (uptime &lt; 10m)</name>
+                           <priority>INFO</priority>
+                           <description>Uptime is less than 10 minutes</description>
+                           <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1248,7 +1248,6 @@ catch (error) {
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#HOSTNAME}: DataNode {#HOSTNAME} DFS size</name>
@@ -1548,13 +1547,6 @@ catch (error) {
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}&lt;10m</expression>
-                           <name>{#HOSTNAME}: Service has been restarted (uptime &lt; 10m)</name>
-                           <priority>INFO</priority>
-                           <description>Uptime is less than 10 minutes</description>
-                           <manual_close>YES</manual_close>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{nodata(30m)}=1</expression>
                            <name>{#HOSTNAME}: Failed to fetch NodeManager API page (or no data for 30m)</name>
                            <priority>WARNING</priority>
@@ -1566,6 +1558,13 @@ catch (error) {
                                  <expression>{Template App Hadoop by HTTP:hadoop.nodemanager.state[{#HOSTNAME}].last()}&lt;&gt;"RUNNING"</expression>
                               </dependency>
                            </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;10m</expression>
+                           <name>{#HOSTNAME}: Service has been restarted (uptime &lt; 10m)</name>
+                           <priority>INFO</priority>
+                           <description>Uptime is less than 10 minutes</description>
+                           <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1619,7 +1618,6 @@ catch (error) {
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>

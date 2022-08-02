@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,6 +106,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 					(new CCheckBox('filter_show_without_data'))
 						->setChecked($data['filter']['show_without_data'] == 1)
 						->setAttribute('disabled', $data['filter']['hostids'] ? null : 'disabled')
+						->setUncheckedValue(0)
 				)
 				->addRow(_('Show details'),
 					(new CCheckBox('filter_show_details'))->setChecked($data['filter']['show_details'] == 1)

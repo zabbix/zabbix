@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1028,9 +1028,7 @@ class testUrlParameters extends CLegacyWebTest {
 					],
 					[
 						'url' => 'hostinventoriesoverview.php?filter_groups%5B%5D=9999999&filter_groupby=&filter_set=1',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
+						'text_present' => 'Host inventory overview'
 					],
 					[
 						'url' => 'hostinventoriesoverview.php',

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,11 +104,7 @@
 		$(document).on('submit', '#problem_form', function(e) {
 			e.preventDefault();
 
-			var eventids = $('[id^="eventids_"]:checked', $(this)).map(function() {
-					return $(this).val();
-				}).get();
-
-			acknowledgePopUp({eventids: eventids}, this);
+			acknowledgePopUp({eventids: chkbxRange.selectedIds}, this);
 		});
 	});
 

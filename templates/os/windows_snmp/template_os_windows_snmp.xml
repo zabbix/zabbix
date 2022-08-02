@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:30:23Z</date>
+   <date>2021-12-24T12:45:11Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -17,7 +17,7 @@
 Known Issues:&#13;
 &#13;
   Description: Doesn't support In/Out 64 bit counters even though IfxTable is present:&#13;
-Currently, Windows gets it’s interface status from MIB-2. Since these 64bit SNMP counters (ifHCInOctets, ifHCOutOctets, etc.) are defined as an extension to IF-MIB, Microsoft has not implemented it.&#13;
+Currently, Windows gets it's interface status from MIB-2. Since these 64bit SNMP counters (ifHCInOctets, ifHCOutOctets, etc.) are defined as an extension to IF-MIB, Microsoft has not implemented it.&#13;
 https://social.technet.microsoft.com/Forums/windowsserver/en-US/07b62ff0-94f6-40ca-a99d-d129c1b33d70/windows-2008-r2-snmp-64bit-counters-support?forum=winservergen&#13;
 &#13;
   Version: Win2008, Win2012R2.&#13;
@@ -29,7 +29,7 @@ https://social.technet.microsoft.com/Forums/windowsserver/en-US/07b62ff0-94f6-40
   Version: *&#13;
   Device: *&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>

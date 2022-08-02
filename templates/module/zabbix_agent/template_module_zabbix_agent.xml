@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.0</version>
+   <date>2021-12-24T09:16:30Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -13,7 +13,7 @@
          <name>Template Module Zabbix agent</name>
          <description>Use this template for agents reachable from Zabbix server/proxy (passive mode).&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -137,7 +137,7 @@ Template tooling version used: 0.34</description>
          <name>Template Module Zabbix agent active</name>
          <description>Use this template instead of 'Template Module Zabbix agent' for agents running in active mode only.&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -248,15 +248,6 @@ Template tooling version used: 0.34</description>
    </templates>
    <value_maps>
       <value_map>
-         <name>Zabbix agent ping status</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>zabbix.host.available</name>
          <mappings>
             <mapping>
@@ -270,6 +261,15 @@ Template tooling version used: 0.34</description>
             <mapping>
                <value>2</value>
                <newvalue>unknown</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Zabbix agent ping status</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

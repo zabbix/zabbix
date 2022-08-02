@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-09T12:44:51Z</date>
+   <date>2021-12-23T20:31:10Z</date>
    <groups>
       <group>
-         <name>Templates/Modules</name>
+         <name>Templates/Network devices</name>
       </group>
    </groups>
    <templates>
@@ -14,10 +14,10 @@
          <description>MIBs used:&#13;
 SURESINE&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
-               <name>Templates/Modules</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>
@@ -131,6 +131,12 @@ Modbus address:0x000B&#13;
                </preprocessing>
                <triggers>
                   <trigger>
+                     <expression>{last()}={$LOAD.STATE.CRIT:"lvd"} or {last()}={$LOAD.STATE.CRIT:"fault"}</expression>
+                     <name>Load: Device load in critical state</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
                      <expression>{last()}={$LOAD.STATE.WARN:"lvdWarning"}  or {last()}={$LOAD.STATE.WARN:"override"}</expression>
                      <name>Load: Device load in warning state</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
@@ -141,12 +147,6 @@ Modbus address:0x000B&#13;
                            <expression>{Template Net Morningstar SureSine SNMP:load.state[loadState.0].last()}={$LOAD.STATE.CRIT:"lvd"} or {Template Net Morningstar SureSine SNMP:load.state[loadState.0].last()}={$LOAD.STATE.CRIT:"fault"}</expression>
                         </dependency>
                      </dependencies>
-                  </trigger>
-                  <trigger>
-                     <expression>{last()}={$LOAD.STATE.CRIT:"lvd"} or {last()}={$LOAD.STATE.CRIT:"fault"}</expression>
-                     <name>Load: Device load in critical state</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
                   </trigger>
                </triggers>
             </item>
@@ -207,14 +207,14 @@ return result.length ? result.join('\n') : 'No alarms';
                      <priority>WARNING</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"unknownAlarm","like")}=2</expression>
-                     <name>Status: Device has "unknownAlarm" alarm flag</name>
+                     <expression>{count(#3,"suresineHot","like")}=2</expression>
+                     <name>Status: Device has "suresineHot" alarm flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"suresineHot","like")}=2</expression>
-                     <name>Status: Device has "suresineHot" alarm flag</name>
+                     <expression>{count(#3,"unknownAlarm","like")}=2</expression>
+                     <name>Status: Device has "unknownAlarm" alarm flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                   </trigger>
@@ -269,38 +269,8 @@ return result.length ? result.join('\n') : 'No faults';
                </preprocessing>
                <triggers>
                   <trigger>
-                     <expression>{count(#3,"reset","like")}=2</expression>
-                     <name>Status: Device has "reset" faults flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"overcurrent","like")}=2</expression>
-                     <name>Status: Device has "overcurrent" faults flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"unknownFault","like")}=2</expression>
-                     <name>Status: Device has "unknownFault" faults flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"software","like")}=2</expression>
-                     <name>Status: Device has "software" faults flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"highVoltageDisconnect","like")}=2</expression>
-                     <name>Status: Device has "highVoltageDisconnect" faults flag</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                  </trigger>
-                  <trigger>
-                     <expression>{count(#3,"suresineHot","like")}=2</expression>
-                     <name>Status: Device has "suresineHot" faults flag</name>
+                     <expression>{count(#3,"customSettingsEdit","like")}=2</expression>
+                     <name>Status: Device has "customSettingsEdit" faults flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                   </trigger>
@@ -311,8 +281,38 @@ return result.length ? result.join('\n') : 'No faults';
                      <priority>HIGH</priority>
                   </trigger>
                   <trigger>
-                     <expression>{count(#3,"customSettingsEdit","like")}=2</expression>
-                     <name>Status: Device has "customSettingsEdit" faults flag</name>
+                     <expression>{count(#3,"highVoltageDisconnect","like")}=2</expression>
+                     <name>Status: Device has "highVoltageDisconnect" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"overcurrent","like")}=2</expression>
+                     <name>Status: Device has "overcurrent" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"reset","like")}=2</expression>
+                     <name>Status: Device has "reset" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"software","like")}=2</expression>
+                     <name>Status: Device has "software" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"suresineHot","like")}=2</expression>
+                     <name>Status: Device has "suresineHot" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"unknownFault","like")}=2</expression>
+                     <name>Status: Device has "unknownFault" faults flag</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                   </trigger>
@@ -415,16 +415,10 @@ Modbus address:0x0004</description>
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{max(5m)}&lt;{#VOLTAGE.MIN.WARN}</expression>
-                           <name>Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)</name>
+                           <expression>{min(5m)}&gt;{#VOLTAGE.MAX.CRIT}</expression>
+                           <name>Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>WARNING</priority>
-                           <dependencies>
-                              <dependency>
-                                 <name>Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)</name>
-                                 <expression>{Template Net Morningstar SureSine SNMP:battery.voltage[batteryVoltageSlow.0{#SINGLETON}].max(5m)}&lt;{#VOLTAGE.MIN.CRIT}</expression>
-                              </dependency>
-                           </dependencies>
+                           <priority>HIGH</priority>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{max(5m)}&lt;{#VOLTAGE.MIN.CRIT}</expression>
@@ -445,15 +439,20 @@ Modbus address:0x0004</description>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{min(5m)}&gt;{#VOLTAGE.MAX.CRIT}</expression>
-                           <name>Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)</name>
+                           <expression>{max(5m)}&lt;{#VOLTAGE.MIN.WARN}</expression>
+                           <name>Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)</name>
+                                 <expression>{Template Net Morningstar SureSine SNMP:battery.voltage[batteryVoltageSlow.0{#SINGLETON}].max(5m)}&lt;{#VOLTAGE.MIN.CRIT}</expression>
+                              </dependency>
+                           </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Voltage: Battery{#SINGLETON}</name>

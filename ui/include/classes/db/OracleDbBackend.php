@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class OracleDbBackend extends DbBackend {
 	 * @return boolean
 	 */
 	protected function checkDbVersionTable() {
-		$table_exists = DBfetch(DBselect("SELECT table_name FROM user_tables WHERE table_name='DBVERSION'"));
+		$table_exists = DBfetch(DBselect("SELECT table_name FROM all_tables WHERE table_name='DBVERSION'"));
 
 		if (!$table_exists) {
 			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 				'message' => _('No permissions to referred object or it does not exist!')
 			]];
 
-			return $this->getOutput(makeMessageBox(false, $messages, null, false, false));
+			return $this->getOutput(makeMessageBox(ZBX_STYLE_MSG_BAD, $messages, null, false));
 		}
 
 		$httptest['lastfailedstep'] = 0;

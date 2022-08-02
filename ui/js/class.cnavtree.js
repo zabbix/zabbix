@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -523,9 +523,9 @@ jQuery(function($) {
 					$('[data-problems' + sev + ']', $obj).each(function() {
 						var obj = $(this);
 
-						$('>.tree-row>.problem-icon-list', this).append($('<span/>', {
-								'class': 'problem-icon-list-item ' + conf.style_class,
-								'title': conf.name
+						$('>.tree-row>.problem-icon-list', this).append($('<span>', {
+								class: 'problem-icon-list-item ' + conf.style_class,
+								title: conf.name
 							})
 							.html(obj.attr('data-problems' + sev))
 						);
@@ -628,7 +628,7 @@ jQuery(function($) {
 														$('> .tree-row > .content > .item-name', $row)
 															.empty()
 															.attr('title', resp['name'])
-															.append($('<span/>').text(resp['name']));
+															.append($('<span>').text(resp['name']));
 														$row.toggleClass('no-map', +resp['sysmapid'] == 0);
 													}
 													else {

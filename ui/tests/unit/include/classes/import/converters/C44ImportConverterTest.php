@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-use PHPUnit\Framework\TestCase;
 
 class C44ImportConverterTest extends CImportConverterTest {
 
@@ -269,6 +267,186 @@ class C44ImportConverterTest extends CImportConverterTest {
 											'key' => 'test3',
 											'type' => 'SNMP_AGENT',
 											'snmp_oid' => 'test'
+										]
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'interfaces' => [
+								[
+									'interface_ref' => 'if1'
+								],
+								[
+									'interface_ref' => 'if2',
+									'type' => 'SNMP',
+									'port' => '161'
+								]
+							],
+							'items' => [
+								[
+									'interface_ref' => 'if2',
+									'key' => 'snmptrap.fallback',
+									'type' => 'SNMP_TRAP',
+									'name' => 'SNMp trap',
+									'delay' => 0
+								],
+								[
+									'interface_ref' => 'if2',
+									'key' => 'snmptrap[asd]',
+									'type' => 'SNMP_TRAP',
+									'name' => 'Snmp trap item',
+									'delay' => 0
+								]
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'interfaces' => [
+								0 => [
+									'interface_ref' => 'if1'
+								],
+								2 => [
+									'interface_ref' => 'if3',
+									'type' => 'SNMP',
+									'port' => '161',
+									'details' => [
+										'bulk' => 'YES',
+										'version' => 'SNMPV1',
+										'community' => 'public'
+									],
+									'default' => 'YES',
+									'useip' => 'YES',
+									'ip' => '127.0.0.1',
+									'dns' => ''
+								]
+							],
+							'items' => [
+								[
+									'interface_ref' => 'if3',
+									'key' => 'snmptrap.fallback',
+									'type' => 'SNMP_TRAP',
+									'name' => 'SNMp trap',
+									'delay' => 0
+								],
+								[
+									'interface_ref' => 'if3',
+									'key' => 'snmptrap[asd]',
+									'type' => 'SNMP_TRAP',
+									'name' => 'Snmp trap item',
+									'delay' => 0
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'interfaces' => [
+								[
+									'interface_ref' => 'if1'
+								],
+								[
+									'interface_ref' => 'if2',
+									'type' => 'SNMP',
+									'port' => '161'
+								]
+							],
+							'items' => [
+								[
+									'interface_ref' => 'if2',
+									'key' => 'snmptrap.fallback',
+									'type' => 'SNMP_TRAP',
+									'name' => 'SNMp trap',
+									'delay' => 0
+								],
+								[
+									'interface_ref' => 'if2',
+									'key' => 'snmptrap[asd]',
+									'type' => 'SNMP_TRAP',
+									'name' => 'Snmp trap item',
+									'delay' => 0
+								]
+							],
+							'discovery_rules' => [
+								[
+									'interface_ref' => 'if1',
+									'name' => 'test',
+									'type' => 0,
+									'key' => 'vfs.file.contents[/tmp/discovery2.txt]</',
+									'item_prototypes' => [
+										[
+											'name' => 'snmp empty port',
+											'interface_ref' => 'if2',
+											'key' => 'test9'
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'interfaces' => [
+								0 => [
+									'interface_ref' => 'if1'
+								],
+								2 => [
+									'interface_ref' => 'if3',
+									'type' => 'SNMP',
+									'port' => '161',
+									'details' => [
+										'bulk' => 'YES',
+										'version' => 'SNMPV1',
+										'community' => 'public'
+									],
+									'default' => 'YES',
+									'useip' => 'YES',
+									'ip' => '127.0.0.1',
+									'dns' => ''
+								]
+							],
+							'items' => [
+								[
+									'interface_ref' => 'if3',
+									'key' => 'snmptrap.fallback',
+									'type' => 'SNMP_TRAP',
+									'name' => 'SNMp trap',
+									'delay' => 0
+								],
+								[
+									'interface_ref' => 'if3',
+									'key' => 'snmptrap[asd]',
+									'type' => 'SNMP_TRAP',
+									'name' => 'Snmp trap item',
+									'delay' => 0
+								]
+							],
+							'discovery_rules' => [
+								[
+									'interface_ref' => 'if1',
+									'name' => 'test',
+									'type' => 'SNMP_AGENT',
+									'key' => 'vfs.file.contents[/tmp/discovery2.txt]</',
+									'item_prototypes' => [
+										[
+											'name' => 'snmp empty port',
+											'interface_ref' => 'if2',
+											'key' => 'test9'
 										]
 									]
 								]

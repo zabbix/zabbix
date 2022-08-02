@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -270,11 +270,6 @@ function getSystemStatusData(array $filter) {
 			'users' => API::User()->get([
 				'output' => ['alias', 'name', 'surname'],
 				'userids' => array_keys($actions['userids']),
-				'preservekeys' => true
-			]),
-			'mediatypes' => API::MediaType()->get([
-				'output' => ['name', 'maxattempts'],
-				'mediatypeids' => array_keys($actions['mediatypeids']),
 				'preservekeys' => true
 			])
 		];
@@ -883,9 +878,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 			zbx_date2age($problem['clock']),
 			$problem_update_link,
-			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['mediatypes'],
-				$actions['users'], $config
-			),
+			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['users'], $config),
 			$tags[$problem['eventid']]
 		]));
 	}

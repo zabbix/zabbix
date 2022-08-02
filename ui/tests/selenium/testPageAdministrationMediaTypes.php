@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -199,9 +199,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// Select one.
 			[
 				[
-					'rows' => [
-						'Name' => 'Email'
-					],
+					'rows' => ['Email'],
 					'db_name' => 'Email',
 					'used_by_action' => 'Trigger action 3'
 				]
@@ -209,9 +207,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// Select several.
 			[
 				[
-					'rows' => [
-						['Name' => 'SMS']
-					],
+					'rows' => ['SMS'],
 					'db_name' => ['SMS']
 				]
 			],

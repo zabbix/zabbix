@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,22 @@ class CPieGraphDraw extends CGraphDraw {
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
-		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($itemid)]);
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid', 'history', 'trends'],
+			'itemids' => [$itemid],
+			'webitems' => true
+		]);
+
+		if (!$items) {
+			$items = API::ItemPrototype()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid', 'history',
+					'trends'
+				],
+				'itemids' => [$itemid]
+			]);
+		}
+
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		$this->items[$this->num] = reset($items);
 
@@ -136,7 +151,8 @@ class CPieGraphDraw extends CGraphDraw {
 		$items = [];
 
 		for ($i = 0; $i < $this->num; $i++) {
-			$item = get_item_by_itemid($this->items[$i]['itemid']);
+			$item = $this->items[$i];
+
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 
@@ -216,7 +232,7 @@ class CPieGraphDraw extends CGraphDraw {
 				$this->dataFrom = $item['source'];
 			}
 
-			switch ($this->items[$i]['calc_fnc']) {
+			switch ($item['calc_fnc']) {
 				case CALC_FNC_MIN:
 					$fncName = 'min';
 					break;
@@ -235,7 +251,7 @@ class CPieGraphDraw extends CGraphDraw {
 				? 0
 				: abs($this->data[$item['itemid']][$fncName]);
 
-			if ($this->items[$i]['calc_type'] == GRAPH_ITEM_SUM) {
+			if ($item['calc_type'] == GRAPH_ITEM_SUM) {
 				$this->background = $i;
 				$graph_sum = $item_value;
 			}

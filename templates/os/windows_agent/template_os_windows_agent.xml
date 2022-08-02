@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-22T08:28:49Z</date>
+   <date>2022-06-01T13:46:30Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Windows CPU by Zabbix agent</template>
          <name>Template Module Windows CPU by Zabbix agent</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -158,7 +158,7 @@ and are waiting to be executed.</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>CPU utilization in %</description>
+               <description>CPU utilization in %.</description>
                <applications>
                   <application>
                      <name>CPU</name>
@@ -212,7 +212,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows filesystems by Zabbix agent</template>
          <name>Template Module Windows filesystems by Zabbix agent</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -226,7 +226,6 @@ and are waiting to be executed.</description>
          <discovery_rules>
             <discovery_rule>
                <name>Mounted filesystem discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>vfs.fs.discovery</key>
                <delay>1h</delay>
                <filter>
@@ -307,36 +306,35 @@ and are waiting to be executed.</description>
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 5G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
-(({Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;10G or {Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or {Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 10G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
                            <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                            <expression>{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -374,6 +372,16 @@ and are waiting to be executed.</description>
          </discovery_rules>
          <macros>
             <macro>
+               <macro>{$VFS.FS.FREE.MIN.CRIT}</macro>
+               <value>5G</value>
+               <description>The critical threshold of the filesystem utilization.</description>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.FREE.MIN.WARN}</macro>
+               <value>10G</value>
+               <description>The warning threshold of the filesystem utilization.</description>
+            </macro>
+            <macro>
                <macro>{$VFS.FS.FSDRIVETYPE.MATCHES}</macro>
                <value>fixed</value>
                <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</description>
@@ -390,7 +398,7 @@ and are waiting to be executed.</description>
             </macro>
             <macro>
                <macro>{$VFS.FS.FSNAME.NOT_MATCHES}</macro>
-               <value>^(/dev|/sys|/run|/proc|.+/shm$)</value>
+               <value>^(?:/dev|/sys|/run|/proc|.+/shm$)</value>
                <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
@@ -418,7 +426,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows generic by Zabbix agent</template>
          <name>Template Module Windows generic by Zabbix agent</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -532,7 +540,7 @@ and are waiting to be executed.</description>
             <item>
                <name>System description</name>
                <key>system.uname</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -584,7 +592,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows memory by Zabbix agent</template>
          <name>Template Module Windows memory by Zabbix agent</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -763,7 +771,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                <key>vm.memory.size[total]</key>
                <history>7d</history>
                <units>B</units>
-               <description>Total memory in Bytes</description>
+               <description>Total memory in Bytes.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -775,7 +783,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                <key>vm.memory.size[used]</key>
                <history>7d</history>
                <units>B</units>
-               <description>Used memory in Bytes</description>
+               <description>Used memory in Bytes.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -790,7 +798,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <params>last("vm.memory.size[used]") / last("vm.memory.size[total]") * 100</params>
-               <description>Memory utilization in %</description>
+               <description>Memory utilization in %.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -832,7 +840,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
       <template>
          <template>Template Module Windows network by Zabbix agent</template>
          <name>Template Module Windows network by Zabbix agent</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -849,7 +857,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
          <items>
             <item>
                <name>Network interfaces WMI get</name>
-               <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
+               <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -859,6 +867,12 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                      <name>Zabbix raw items</name>
                   </application>
                </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
             </item>
          </items>
          <discovery_rules>
@@ -909,7 +923,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded</name>
-                     <key>net.if.in["{#IFNAME}",dropped]</key>
+                     <key>net.if.in["{#IFGUID}",dropped]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>The number of incoming packets dropped on the network interface.</description>
@@ -927,7 +941,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   </item_prototype>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors</name>
-                     <key>net.if.in["{#IFNAME}",errors]</key>
+                     <key>net.if.in["{#IFGUID}",errors]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>The number of incoming packets with errors on the network interface.</description>
@@ -945,7 +959,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   </item_prototype>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Bits received</name>
-                     <key>net.if.in["{#IFNAME}"]</key>
+                     <key>net.if.in["{#IFGUID}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <units>bps</units>
@@ -968,7 +982,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   </item_prototype>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded</name>
-                     <key>net.if.out["{#IFNAME}",dropped]</key>
+                     <key>net.if.out["{#IFGUID}",dropped]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>The number of outgoing packets dropped on the network interface.</description>
@@ -986,7 +1000,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   </item_prototype>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors</name>
-                     <key>net.if.out["{#IFNAME}",errors]</key>
+                     <key>net.if.out["{#IFGUID}",errors]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>The number of outgoing packets with errors on the network interface.</description>
@@ -1004,7 +1018,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   </item_prototype>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Bits sent</name>
-                     <key>net.if.out["{#IFNAME}"]</key>
+                     <key>net.if.out["{#IFGUID}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <units>bps</units>
@@ -1028,7 +1042,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Speed</name>
                      <type>DEPENDENT</type>
-                     <key>net.if.speed["{#IFNAME}"]</key>
+                     <key>net.if.speed["{#IFGUID}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0d</trends>
@@ -1042,7 +1056,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.Name == "{#IFNAME}")].Speed.first()</params>
+                           <params>$[?(@.GUID == "{#IFGUID}")].Speed.first()</params>
                            <error_handler>CUSTOM_VALUE</error_handler>
                            <error_handler_params>0</error_handler_params>
                         </step>
@@ -1057,13 +1071,13 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
+                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Operational status</name>
                      <type>DEPENDENT</type>
-                     <key>net.if.status["{#IFNAME}"]</key>
+                     <key>net.if.status["{#IFGUID}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1079,7 +1093,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.Name == "{#IFNAME}")].NetConnectionStatus.first()</params>
+                           <params>$[?(@.GUID == "{#IFGUID}")].NetConnectionStatus.first()</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1087,7 +1101,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
+                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1111,7 +1125,7 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Interface type</name>
                      <type>DEPENDENT</type>
-                     <key>net.if.type["{#IFNAME}"]</key>
+                     <key>net.if.type["{#IFGUID}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0d</trends>
@@ -1127,7 +1141,7 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.Name == "{#IFNAME}")].AdapterTypeId.first()</params>
+                           <params>$[?(@.GUID == "{#IFGUID}")].AdapterTypeId.first()</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1135,16 +1149,15 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
+                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].change()}&lt;0 and&#13;
-{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}&gt;0 and&#13;
-{Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2</expression>
+                     <expression>{Template Module Windows network by Zabbix agent:net.if.speed["{#IFGUID}"].change()}&lt;0 and&#13;
+{Template Module Windows network by Zabbix agent:net.if.speed["{#IFGUID}"].last()}&gt;0 and&#13;
+{Template Module Windows network by Zabbix agent:net.if.status["{#IFGUID}"].last()}=2</expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before</name>
                      <opdata>Current reported speed: {ITEM.LASTVALUE1}</opdata>
                      <priority>INFO</priority>
@@ -1153,19 +1166,19 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFGUID}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFGUID}"].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFGUID}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>({Template Module Windows network by Zabbix agent:net.if.in["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()} or&#13;
-{Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}) and&#13;
-{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}&gt;0</expression>
+                     <expression>({Template Module Windows network by Zabbix agent:net.if.in["{#IFGUID}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFGUID}"].last()} or&#13;
+{Template Module Windows network by Zabbix agent:net.if.out["{#IFGUID}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFGUID}"].last()}) and&#13;
+{Template Module Windows network by Zabbix agent:net.if.speed["{#IFGUID}"].last()}&gt;0</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.in["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()} and&#13;
-{Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
+                     <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.in["{#IFGUID}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFGUID}"].last()} and&#13;
+{Template Module Windows network by Zabbix agent:net.if.out["{#IFGUID}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFGUID}"].last()}</recovery_expression>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt;{$IF.UTIL.MAX:"{#IFNAME}"}%)</name>
                      <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>The network interface utilization is close to its estimated maximum bandwidth.</description>
@@ -1173,18 +1186,18 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFGUID}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFGUID}"].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFGUID}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Module Windows network by Zabbix agent:net.if.in["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
-or {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
+                     <expression>{Template Module Windows network by Zabbix agent:net.if.in["{#IFGUID}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
+or {Template Module Windows network by Zabbix agent:net.if.out["{#IFGUID}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
-and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.in["{#IFGUID}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
+and {Template Module Windows network by Zabbix agent:net.if.out["{#IFGUID}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt;{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
@@ -1192,8 +1205,8 @@ and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",erro
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFGUID}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFGUID}"].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFGUID}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1207,7 +1220,7 @@ and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",erro
                            <color>1A7C11</color>
                            <item>
                               <host>Template Module Windows network by Zabbix agent</host>
-                              <key>net.if.in["{#IFNAME}"]</key>
+                              <key>net.if.in["{#IFGUID}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1216,7 +1229,7 @@ and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",erro
                            <color>2774A4</color>
                            <item>
                               <host>Template Module Windows network by Zabbix agent</host>
-                              <key>net.if.out["{#IFNAME}"]</key>
+                              <key>net.if.out["{#IFGUID}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1225,7 +1238,7 @@ and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",erro
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Windows network by Zabbix agent</host>
-                              <key>net.if.out["{#IFNAME}",errors]</key>
+                              <key>net.if.out["{#IFGUID}",errors]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1234,7 +1247,7 @@ and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",erro
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Windows network by Zabbix agent</host>
-                              <key>net.if.in["{#IFNAME}",errors]</key>
+                              <key>net.if.in["{#IFGUID}",errors]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1243,7 +1256,7 @@ and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",erro
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Windows network by Zabbix agent</host>
-                              <key>net.if.out["{#IFNAME}",dropped]</key>
+                              <key>net.if.out["{#IFGUID}",dropped]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1252,14 +1265,14 @@ and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",erro
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Windows network by Zabbix agent</host>
-                              <key>net.if.in["{#IFNAME}",dropped]</key>
+                              <key>net.if.in["{#IFGUID}",dropped]</key>
                            </item>
                         </graph_item>
                      </graph_items>
                   </graph_prototype>
                </graph_prototypes>
                <master_item>
-                  <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
+                  <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                </master_item>
                <preprocessing>
                   <step>
@@ -1268,7 +1281,8 @@ and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",erro
     return {
         "{#IFNAME}": net.Name,
         "{#IFDESCR}": net.Description,
-        "{#IFALIAS}" : net.NetConnectionID
+        "{#IFALIAS}": net.NetConnectionID,
+        "{#IFGUID}": net.GUID
     }})
 return JSON.stringify({"data": output})</params>
                   </step>
@@ -1325,7 +1339,7 @@ return JSON.stringify({"data": output})</params>
          </macros>
          <screens>
             <screen>
-               <name>Netowrk interfaces</name>
+               <name>Network interfaces</name>
                <hsize>1</hsize>
                <vsize>1</vsize>
                <screen_items>
@@ -1358,7 +1372,7 @@ return JSON.stringify({"data": output})</params>
       <template>
          <template>Template Module Windows physical disks by Zabbix agent</template>
          <name>Template Module Windows physical disks by Zabbix agent</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1372,7 +1386,6 @@ return JSON.stringify({"data": output})</params>
          <discovery_rules>
             <discovery_rule>
                <name>Physical disks discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>perf_instance_en.discovery[PhysicalDisk]</key>
                <delay>1h</delay>
                <filter>
@@ -1394,17 +1407,23 @@ return JSON.stringify({"data": output})</params>
                <description>Discovery of installed physical disks.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>{#DEVNAME}: Disk utilization</name>
-                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60]</key>
+                     <name>{#DEVNAME}: Disk utilization by idle time</name>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <description>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.</description>
+                     <description>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests based on idle time</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Disk {#DEVNAME}</name>
                         </application_prototype>
                      </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JAVASCRIPT</type>
+                           <params>return 100 - value</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(15m)}&gt;{$VFS.DEV.UTIL.MAX.WARN}</expression>
@@ -1523,7 +1542,6 @@ return JSON.stringify({"data": output})</params>
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Windows physical disks by Zabbix agent:perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60].min(15m)} &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}</expression>
@@ -1613,7 +1631,7 @@ return JSON.stringify({"data": output})</params>
                            <color>2774A4</color>
                            <item>
                               <host>Template Module Windows physical disks by Zabbix agent</host>
-                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60]</key>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1661,7 +1679,7 @@ return JSON.stringify({"data": output})</params>
          <name>Template Module Windows services by Zabbix agent</name>
          <description>Template Services OS Windows&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1675,7 +1693,6 @@ Template tooling version used: 0.38</description>
          <discovery_rules>
             <discovery_rule>
                <name>Windows services discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>service.discovery</key>
                <delay>1h</delay>
                <filter>
@@ -1693,15 +1710,21 @@ Template tooling version used: 0.38</description>
                         <formulaid>B</formulaid>
                      </condition>
                      <condition>
+                        <macro>{#SERVICE.NAME}</macro>
+                        <value>{$SERVICE.NAME.NOT_MATCHES.EXTENDED}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>C</formulaid>
+                     </condition>
+                     <condition>
                         <macro>{#SERVICE.STARTUPNAME}</macro>
                         <value>{$SERVICE.STARTUPNAME.MATCHES}</value>
-                        <formulaid>C</formulaid>
+                        <formulaid>D</formulaid>
                      </condition>
                      <condition>
                         <macro>{#SERVICE.STARTUPNAME}</macro>
                         <value>{$SERVICE.STARTUPNAME.NOT_MATCHES}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
-                        <formulaid>D</formulaid>
+                        <formulaid>E</formulaid>
                      </condition>
                   </conditions>
                </filter>
@@ -1729,7 +1752,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -1739,18 +1761,23 @@ Template tooling version used: 0.38</description>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
+               <macro>{$SERVICE.NAME.NOT_MATCHES.EXTENDED}</macro>
+               <value>^(CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv)$</value>
+               <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
                <macro>{$SERVICE.NAME.NOT_MATCHES}</macro>
-               <value>^RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc$</value>
+               <value>^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc)$</value>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
                <macro>{$SERVICE.STARTUPNAME.MATCHES}</macro>
-               <value>^automatic|automatic delayed$</value>
+               <value>^(?:automatic|automatic delayed)$</value>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
                <macro>{$SERVICE.STARTUPNAME.NOT_MATCHES}</macro>
-               <value>^manual|disabled$</value>
+               <value>^(?:manual|disabled)$</value>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
          </macros>
@@ -1763,7 +1790,7 @@ Template tooling version used: 0.38</description>
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387224-discussion-thread-for-official-zabbix-template-for-windows&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Windows CPU by Zabbix agent</name>
@@ -2000,7 +2027,7 @@ Template tooling version used: 0.38</description>
          <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
-         <description>This trigger is ignored, if there is no swap configured</description>
+         <description>This trigger is ignored, if there is no swap configured.</description>
          <dependencies>
             <dependency>
                <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
@@ -2163,95 +2190,6 @@ Template tooling version used: 0.38</description>
             <mapping>
                <value>13</value>
                <newvalue>1394</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CIM_LogicalDevice::Availability</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Running/Full Power</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Warning</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>In Test</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>Not Applicable</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>Power Off</newvalue>
-            </mapping>
-            <mapping>
-               <value>8</value>
-               <newvalue>Off Line</newvalue>
-            </mapping>
-            <mapping>
-               <value>9</value>
-               <newvalue>Off Duty</newvalue>
-            </mapping>
-            <mapping>
-               <value>10</value>
-               <newvalue>Degraded</newvalue>
-            </mapping>
-            <mapping>
-               <value>11</value>
-               <newvalue>Not Installed</newvalue>
-            </mapping>
-            <mapping>
-               <value>12</value>
-               <newvalue>Install Error</newvalue>
-            </mapping>
-            <mapping>
-               <value>13</value>
-               <newvalue>Power Save - Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>14</value>
-               <newvalue>Power Save - Low Power Mode</newvalue>
-            </mapping>
-            <mapping>
-               <value>15</value>
-               <newvalue>Power Save - Standby</newvalue>
-            </mapping>
-            <mapping>
-               <value>16</value>
-               <newvalue>Power Cycle</newvalue>
-            </mapping>
-            <mapping>
-               <value>17</value>
-               <newvalue>Power Save - Warning</newvalue>
-            </mapping>
-            <mapping>
-               <value>18</value>
-               <newvalue>Paused</newvalue>
-            </mapping>
-            <mapping>
-               <value>19</value>
-               <newvalue>Not Ready</newvalue>
-            </mapping>
-            <mapping>
-               <value>20</value>
-               <newvalue>Not Configured</newvalue>
-            </mapping>
-            <mapping>
-               <value>21</value>
-               <newvalue>Quiesced</newvalue>
             </mapping>
          </mappings>
       </value_map>

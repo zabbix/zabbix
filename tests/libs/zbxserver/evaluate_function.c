@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,6 +66,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vcmock_ds_item_t	*ds_item;
 	zbx_timespec_t		ts;
 	zbx_mock_handle_t	handle;
+
+	ZBX_DOUBLE_EPSILON = 0.000001;
 
 	err = zbx_vc_init(&error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);

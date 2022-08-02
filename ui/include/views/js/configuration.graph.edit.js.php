@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -566,8 +566,23 @@
 					src.setArgument('ymax_type', $('#ymax_type').val());
 					src.setArgument('yaxismin', $('#yaxismin').val());
 					src.setArgument('yaxismax', $('#yaxismax').val());
-					src.setArgument('ymin_itemid', $('#ymin_itemid').val());
-					src.setArgument('ymax_itemid', $('#ymax_itemid').val());
+
+					if ($('#ymin_type').val() == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
+						var ymin_item_data = $('#ymin_itemid').multiSelect('getData');
+
+						if (ymin_item_data.length) {
+							src.setArgument('ymin_itemid', ymin_item_data[0]['id']);
+						}
+					}
+
+					if ($('#ymax_type').val() == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
+						var ymax_item_data = $('#ymax_itemid').multiSelect('getData');
+
+						if (ymax_item_data.length) {
+							src.setArgument('ymax_itemid', ymax_item_data[0]['id']);
+						}
+					}
+
 					src.setArgument('showworkperiod', $('#show_work_period').is(':checked') ? 1 : 0);
 					src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
 				}
@@ -591,7 +606,7 @@
 				preview_chart.append($('<div>', {css: {'position': 'relative', 'min-height': '50px'}})
 					.addClass('is-loading'));
 
-				$('<img />')
+				$('<img>')
 					.attr('src', src.getUrl())
 					.on('load', function() {
 						preview_chart.html($(this));
@@ -673,7 +688,7 @@
 
 					item.sortorder = i + 1;
 
-					$form.append($('<input />', {
+					$form.append($('<input>', {
 						type: 'hidden',
 						name: 'items[' + i + ']',
 						value: JSON.stringify(item)

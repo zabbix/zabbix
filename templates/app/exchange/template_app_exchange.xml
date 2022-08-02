@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-28T07:03:13Z</date>
+   <date>2021-12-21T18:00:05Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -18,7 +18,7 @@ Recommended to use it with "OS Windows by Zabbix agent" template.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415007-discussion-thread-for-official-zabbix-template-microsoft-exchange&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -156,7 +156,6 @@ Template tooling version used: 0.38</description>
          <discovery_rules>
             <discovery_rule>
                <name>LDAP discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>perf_instance_en.discovery["MSExchange ADAccess Domain Controllers"]</key>
                <delay>1h</delay>
                <description>Discovery of domain controller.</description>
@@ -218,7 +217,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Domain Controller [{#INSTANCE}]: Timings</name>
@@ -244,7 +242,6 @@ Template tooling version used: 0.38</description>
             </discovery_rule>
             <discovery_rule>
                <name>Web services discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>perf_instance_en.discovery["Web Service"]</key>
                <delay>1h</delay>
                <description>Discovery of Exchange web services.</description>
@@ -263,11 +260,9 @@ Template tooling version used: 0.38</description>
                      </applications>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Databases discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>perf_instance.discovery["MSExchange Active Manager"]</key>
                <delay>1h</delay>
                <description>Discovery of Exchange databases.</description>
@@ -580,7 +575,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template App Microsoft Exchange Server 2016 by Zabbix agent:perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Writes (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}&gt;{Template App Microsoft Exchange Server 2016 by Zabbix agent:perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}</expression>
@@ -798,19 +792,6 @@ return JSON.stringify(data);</params>
    </graphs>
    <value_maps>
       <value_map>
-         <name>Service state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>Exchange database copy role</name>
          <mappings>
             <mapping>
@@ -837,6 +818,19 @@ return JSON.stringify(data);</params>
             <mapping>
                <value>2</value>
                <newvalue>Healthy</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

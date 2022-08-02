@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -590,6 +590,15 @@ class CHost extends CHostGeneral {
 		// Return count for post SQL filtered result sets.
 		if ($options['countOutput']) {
 			return (string) count($result);
+		}
+
+		// Hosts share table with host prototypes. Therefore remove host unrelated fields.
+		if ($this->outputIsRequested('discover', $options['output'])) {
+			foreach ($result as &$row) {
+				unset($row['discover']);
+			}
+
+			unset($row);
 		}
 
 		if ($result) {

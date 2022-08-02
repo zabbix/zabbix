@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,21 +45,15 @@ class testDataCollection extends CIntegrationTest {
 
 		// Create host "agent", "custom_agent" and "proxy agent".
 		$interfaces = [
-			[
-				'type' => 1,
-				'main' => 1,
-				'useip' => 1,
-				'ip' => '127.0.0.1',
-				'dns' => '',
-				'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
-			]
+			'type' => 1,
+			'main' => 1,
+			'useip' => 1,
+			'ip' => '127.0.0.1',
+			'dns' => '',
+			'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
 		];
 
-		$groups = [
-			[
-				'groupid' => 4
-			]
-		];
+		$groups = ['groupid' => 4];
 
 		$result = CDataHelper::createHosts([
 			[
@@ -145,13 +139,14 @@ class testDataCollection extends CIntegrationTest {
 	public function agentConfigurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'UnreachablePeriod'	=> 5,
-				'UnavailableDelay'	=> 5,
-				'UnreachableDelay'	=> 1
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay' => 5,
+				'UnreachableDelay' => 1,
+				'DebugLevel' => 4
 			],
 			self::COMPONENT_AGENT => [
-				'Hostname'		=> 'agent',
-				'ServerActive'	=> '127.0.0.1'
+				'Hostname' => 'agent',
+				'ServerActive' => '127.0.0.1'
 			]
 		];
 	}
@@ -164,8 +159,8 @@ class testDataCollection extends CIntegrationTest {
 	 * @hosts agent
 	 */
 	public function testDataCollection_checkHostAvailability() {
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-				'temporarily disabling Zabbix agent checks on host "agent": host unavailable'
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'temporarily disabling Zabbix agent checks on host "agent": host unavailable'
 		);
 
 		$data = $this->call('host.get', [
@@ -186,9 +181,9 @@ class testDataCollection extends CIntegrationTest {
 	 * @hosts agent
 	 */
 	public function testDataCollection_checkAgentData() {
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-				'enabling Zabbix agent checks on host "agent": host became available',
-				'resuming Zabbix agent checks on host "agent": connection restored'
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
+			'enabling Zabbix agent checks on host "agent": host became available',
+			'resuming Zabbix agent checks on host "agent": connection restored'
 		]);
 
 		$passive_data = $this->call('history.get', [
@@ -280,19 +275,25 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function proxyConfigurationProvider() {
-		return array_merge($this->agentConfigurationProvider(), [
-			self::COMPONENT_AGENT => [
-				'Hostname'		=> 'proxy_agent',
-				'ServerActive'	=> '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort')
+		return [
+			self::COMPONENT_SERVER => [
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay' => 5,
+				'UnreachableDelay' => 1,
+				'DebugLevel' => 4
 			],
 			self::COMPONENT_PROXY => [
-				'UnreachablePeriod'	=> 5,
-				'UnavailableDelay'	=> 5,
-				'UnreachableDelay'	=> 1,
-				'Hostname'			=> 'proxy',
-				'ServerPort'		=> self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay' => 5,
+				'UnreachableDelay' => 1,
+				'Hostname' => 'proxy',
+				'ServerPort' => self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
+			],
+			self::COMPONENT_AGENT => [
+				'Hostname' => 'proxy_agent',
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort')
 			]
-		]);
+		];
 	}
 
 	/**
@@ -303,9 +304,9 @@ class testDataCollection extends CIntegrationTest {
 	 * @hosts proxy_agent
 	 */
 	public function testDataCollection_checkProxyData() {
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "proxy"');
-		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server');
-		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, [
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "proxy"');
+		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server');
+		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, [
 				'enabling Zabbix agent checks on host "proxy_agent": host became available',
 				'resuming Zabbix agent checks on host "proxy_agent": connection restored'
 		]);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,9 +138,13 @@ class CLogHelper {
 	 */
 	public static function getLineOffset($content, $line) {
 		$matches = [];
-		$regex = '/^ *[0-9]+:[0-9]+:[0-9]+\.[0-9]+ .*'.preg_quote($line, '/').'.*$/m';
+		// "  563:20220112:232318.543 ..."
+		$log_pattern = ' *[0-9]+:[0-9]+:[0-9]+\.[0-9]+';
+		// "2022/01/12 23:23:19.550415 ..."
+		$log2_pattern = '[0-9]+\/[0-9]+\/[0-9]+ [0-9]+:[0-9]+:[0-9]+\.[0-9]+';
+		$pattern = '/^('.$log_pattern.'|'.$log2_pattern.') .*'.preg_quote($line, '/').'.*$/m';
 
-		if (preg_match($regex, $content, $matches, PREG_OFFSET_CAPTURE) === 1) {
+		if (preg_match($pattern, $content, $matches, PREG_OFFSET_CAPTURE) === 1) {
 			return $matches[0][1];
 		}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,6 +86,7 @@ char *CONFIG_TLS_CIPHER_CMD = NULL;
 
 int	CONFIG_PASSIVE_FORKS = 0;
 int	CONFIG_ACTIVE_FORKS = 0;
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 const char	*progname = NULL;
 const char	title_message[] = "agent";

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -629,6 +629,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					$form = $this->query('id:mediatype_message_form')->waitUntilVisible()->asForm()->one();
 					$form->fill($template);
 					$form->submit();
+					COverlayDialogElement::ensureNotPresent();
 					break;
 				case 'Add':
 					$templates_list->query('button:Add')->one()->click();
@@ -636,6 +637,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					unset($template['action']);
 					$form->fill($template);
 					$form->submit();
+					COverlayDialogElement::ensureNotPresent();
 					break;
 				case 'Remove':
 				case 'Remove temporary':

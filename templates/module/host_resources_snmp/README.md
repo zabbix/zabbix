@@ -1,5 +1,5 @@
 
-# HOST-RESOURCES-MIB storage SNMP
+# Template Module HOST-RESOURCES-MIB storage SNMP
 
 ## Overview
 
@@ -17,6 +17,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$VFS.FS.FREE.MIN.CRIT} |<p>The critical threshold of the filesystem utilization.</p> |`5G` |
+|{$VFS.FS.FREE.MIN.WARN} |<p>The warning threshold of the filesystem utilization.</p> |`10G` |
 |{$VFS.FS.FSNAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.+` |
 |{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`^(/dev|/sys|/run|/proc|.+/shm$)` |
 |{$VFS.FS.FSTYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$` |
@@ -46,14 +48,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 5G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and (({HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})<5G or {TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}<1d)` |AVERAGE |<p>Manual close: YES</p> |
-|{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 10G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and (({HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})<10G or {TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}<1d)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</p> |
+|{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and (({TEMPLATE_NAME:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{TEMPLATE_NAME:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}<1d)` |AVERAGE |<p>Manual close: YES</p> |
+|{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and (({TEMPLATE_NAME:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{TEMPLATE_NAME:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or {TEMPLATE_NAME:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}<1d)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-# HOST-RESOURCES-MIB memory SNMP
+# Template Module HOST-RESOURCES-MIB memory SNMP
 
 ## Overview
 
@@ -93,7 +95,7 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Memory |{#MEMNAME}: Used memory |<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</p> |SNMP |vm.memory.used[hrStorageUsed.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#ALLOC_UNITS}`</p> |
 |Memory |{#MEMNAME}: Total memory |<p>MIB: HOST-RESOURCES-MIB</p><p>The size of the storage represented by this entry, in units of hrStorageAllocationUnits.</p><p>This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.</p><p>For example, the amount of main memory allocated to a buffer pool might be modified or the amount of disk space allocated to virtual memory might be modified.</p> |SNMP |vm.memory.total[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#ALLOC_UNITS}`</p> |
-|Memory |{#MEMNAME}: Memory utilization |<p>Memory utilization in %</p> |CALCULATED |vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]<p>**Expression**:</p>`last("vm.memory.used[hrStorageUsed.{#SNMPINDEX}]")/last("vm.memory.total[hrStorageSize.{#SNMPINDEX}]")*100` |
+|Memory |{#MEMNAME}: Memory utilization |<p>Memory utilization in %.</p> |CALCULATED |vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]<p>**Expression**:</p>`last("vm.memory.used[hrStorageUsed.{#SNMPINDEX}]")/last("vm.memory.total[hrStorageSize.{#SNMPINDEX}]")*100` |
 
 ## Triggers
 
@@ -105,7 +107,7 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# HOST-RESOURCES-MIB CPU SNMP
+# Template Module HOST-RESOURCES-MIB CPU SNMP
 
 ## Overview
 
@@ -148,7 +150,7 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# HOST-RESOURCES-MIB SNMP
+# Template Module HOST-RESOURCES-MIB SNMP
 
 ## Overview
 
