@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-06-16T07:46:11Z'
+  date: '2022-07-22T09:17:07Z'
   template_groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -1304,7 +1304,7 @@ zabbix_export:
               history: 7d
               discover: NO_DISCOVER
               units: '%'
-              description: 'The percantage of disk life remaining.'
+              description: 'The percentage of disk life remaining.'
               preprocessing:
                 -
                   type: JSONPATH

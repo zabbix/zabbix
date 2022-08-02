@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 The template to monitor Etcd by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -18,7 +18,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Import template into Zabbix
 2. After importing template make sure that etcd allows for metric collection.
@@ -114,7 +114,7 @@ There are no template links in this template.
 |Etcd |Etcd: Etcd peer {#ETCD.PEER}: Bytes sent |<p>The number of bytes sent to peer with ID {#ETCD.PEER}.</p> |DEPENDENT |etcd.bytes.sent.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_sent_bytes_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Etcd peer {#ETCD.PEER}: Bytes received |<p>The number of bytes received from peer with ID {#ETCD.PEER}.</p> |DEPENDENT |etcd.bytes.received.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_received_bytes_total{From="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Etcd peer {#ETCD.PEER}: Send failures |<p>The number of send failures from peer with ID {#ETCD.PEER}.</p> |DEPENDENT |etcd.sent.fail.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_sent_failures_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
-|Etcd |Etcd: Etcd peer {#ETCD.PEER}: Receive failures failures |<p>The number of receive failures from the peer with ID {#ETCD.PEER}.</p> |DEPENDENT |etcd.received.fail.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_received_failures_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
+|Etcd |Etcd: Etcd peer {#ETCD.PEER}: Receive failures |<p>The number of receive failures from the peer with ID {#ETCD.PEER}.</p> |DEPENDENT |etcd.received.fail.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_received_failures_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |Zabbix raw items |Etcd: Get node metrics |<p>-</p> |HTTP_AGENT |etcd.get_metrics |
 |Zabbix raw items |Etcd: Get version |<p>-</p> |HTTP_AGENT |etcd.get_version |
 
