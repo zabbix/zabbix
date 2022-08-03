@@ -514,6 +514,11 @@ class CHostPrototype extends CHostBase {
 
 		foreach ($host_prototypes as $index => &$host_prototype) {
 			$host_prototype['hostid'] = $hostids[$index];
+			$link_request = [];
+			$link_request['templates'] = array_column($host_prototype['templates'], 'templateid');
+			$link_request['host'] = $host_prototype['host'];
+
+			$this->checkedLinkedDiscoveryItemKeys($link_request);
 		}
 		unset($host_prototype);
 
@@ -772,6 +777,12 @@ class CHostPrototype extends CHostBase {
 
 		// save the host prototypes
 		foreach ($host_prototypes as $host_prototype) {
+			$link_request = [];
+			$link_request['templates'] = array_column($host_prototype['templates'], 'templateid');
+			$link_request['host'] = $host_prototype['host'];
+
+			$this->checkedLinkedDiscoveryItemKeys($link_request);
+
 			$upd_host_prototype = DB::getUpdatedValues('hosts', $host_prototype,
 				$db_host_prototypes[$host_prototype['hostid']]
 			);
@@ -1206,6 +1217,39 @@ class CHostPrototype extends CHostBase {
 					));
 				}
 			}
+		}
+	}
+
+	/**
+	 * Check if linked template discovery rules do not have the same item keys.
+	 *
+	 * @param array $link_request
+	 *
+	 * @throws APIException if there are matching item keys.
+	 */
+	private function checkedLinkedDiscoveryItemKeys(array $link_request): void {
+		$linked_templates = API::Template()->get([
+			'output' => ['name'],
+			'templateids' => $link_request['templates'],
+			'selectDiscoveries' => ['key_']
+		]);
+
+		$linked_keys = [];
+		foreach ($linked_templates as $linked_template) {
+			if (array_key_exists('discoveries', $linked_template)) {
+				foreach ($linked_template['discoveries'] as $linked_discovery) {
+					$linked_keys[] = $linked_discovery;
+				}
+			}
+		}
+
+		$duplicate_item = CArrayHelper::findDuplicate($linked_keys, 'key_');
+		if ($duplicate_item !== null) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.',
+					$duplicate_item['key_'], $link_request['host']
+				)
+			);
 		}
 	}
 
