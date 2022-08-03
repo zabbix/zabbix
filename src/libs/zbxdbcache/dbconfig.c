@@ -1307,7 +1307,7 @@ done:
 			{
 				proxy->location = ZBX_LOC_NOWHERE;
 				proxy->version = 0;
-				proxy->proxy_compatibility = ZBX_PROXY_VERSION_UNDEFINED;
+				proxy->compatibility = ZBX_PROXY_VERSION_UNDEFINED;
 				proxy->lastaccess = atoi(row[12]);
 				proxy->last_cfg_error_time = 0;
 				proxy->proxy_delay = 0;
@@ -12817,7 +12817,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			if (proxy->version != diff->version)
 			{
 				proxy->version = diff->version;
-				proxy->proxy_compatibility = diff->proxy_compatibility;
+				proxy->compatibility = diff->compatibility;
 			}
 			else
 			{
@@ -13387,7 +13387,7 @@ int	DCget_proxy_discovery(struct zbx_json *json, char **error)
 					zbx_json_addint64(json, "version", FAIL);
 				}
 
-				zbx_json_adduint64(json, "compatibility", dc_proxy->proxy_compatibility);
+				zbx_json_adduint64(json, "compatibility", dc_proxy->compatibility);
 
 				if (0 < dc_proxy->lastaccess)
 				{
