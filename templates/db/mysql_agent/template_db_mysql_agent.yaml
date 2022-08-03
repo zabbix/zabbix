@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:29Z'
+  date: '2022-08-01T14:00:25Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -17,8 +17,8 @@ zabbix_export:
         3.Create MySQL user for monitoring. For example:
         CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
         GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
-        For more information read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please.
-        4.Create .my.cnf in home directory of Zabbix agent for Linux (/var/lib/zabbix by default ) or my.cnf in c:\ for Windows. For example:
+        For more information read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please. 
+        4.Create .my.cnf in home directory of Zabbix agent for Linux (/var/lib/zabbix by default) or my.cnf in c:\ for Windows. For example:
         [client]
         user='zbx_monitor'
         password='<password>'
@@ -26,7 +26,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Databases
@@ -1696,7 +1696,7 @@ zabbix_export:
           description: 'The maximum number of created tmp tables in memory per second for trigger expressions.'
         -
           macro: '{$MYSQL.HOST}'
-          value: localhost
+          value: 127.0.0.1
           description: 'Hostname or IP of MySQL host or container.'
         -
           macro: '{$MYSQL.INNODB_LOG_FILES}'
