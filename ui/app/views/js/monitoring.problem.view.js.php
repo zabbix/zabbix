@@ -97,6 +97,8 @@
 
 			refresh_url.setArgument('from', response.from);
 			refresh_url.setArgument('to', response.to);
+			refresh_url.setArgument('page', 1);
+
 			window.problems_page.refresh_url = refresh_url.getUrl();
 			window.problems_page.refreshNow();
 		});
