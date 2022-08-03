@@ -110,8 +110,6 @@ class CControllerProxyList extends CController {
 			'editable' => true,
 			'preservekeys' => true
 		]);
-
-		// data sort and pager
 		order_result($data['proxies'], $sortField, $sortOrder);
 
 		$page_num = getRequest('page', 1);
@@ -121,7 +119,7 @@ class CControllerProxyList extends CController {
 		);
 
 		foreach ($data['proxies'] as &$proxy) {
-			order_result($proxy['hosts'],  $sortField);
+			order_result($proxy['hosts'],  'name');
 			$proxy['hosts'] = array_slice($proxy['hosts'], 0, CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1);
 		}
 		unset($proxy);
@@ -179,9 +177,8 @@ class CControllerProxyList extends CController {
 		$data['config'] = ['max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)];
 
 		$server_version = CSettingsHelper::getGlobal(CSettingsHelper::SERVER_STATUS);
-		if ($server_version !== '' && $server_version !== null) {
-			preg_match('/(\d+)\.(\d+).(\d+)/', json_decode($server_version, true)['version'], $mayor_version);
-			$data['server_version'] = $mayor_version[0];
+		if ($server_version !== '') {
+			$data['server_version'] = preg_split('/[a-z]/i', json_decode($server_version, true)['version'], 2)[0];
 		}
 
 		$response = new CControllerResponseData($data);

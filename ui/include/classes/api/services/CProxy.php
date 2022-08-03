@@ -179,11 +179,10 @@ class CProxy extends CApiService {
 						$result[$proxy['proxyid']]['version'] = '';
 					}
 					else {
-						// convert proxy version to readable format
-						// todo: rewrite this!!!
-						$version =$proxy['version'];
+						// Converting proxy version to readable format.
+						$version = $proxy['version'];
 						$result[$proxy['proxyid']]['version'] = (intdiv($version, 10000) % 100).'.'.
-							(intdiv($version, 100) % 100).'.'.($version % 100);;
+							(intdiv($version, 100) % 100).'.'.($version % 100);
 					}
 				}
 			}
@@ -420,7 +419,6 @@ class CProxy extends CApiService {
 	 * @throws APIException if the input is invalid
 	 */
 	protected function validateGet(array $options) {
-		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', [
 				'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
