@@ -338,9 +338,6 @@ typedef struct
 	unsigned char	maintenance_type;
 	unsigned char	status;
 
-	/* flag to force update for all items */
-	unsigned char	update_items;
-
 	/* 'tls_connect' and 'tls_accept' must be respected even if encryption support is not compiled in */
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
@@ -761,6 +758,7 @@ typedef struct
 	time_t		nextcheck;
 	int		delay;
 	unsigned char	status;
+	unsigned char	location;
 	zbx_uint32_t	revision;
 }
 zbx_dc_drule_t;
@@ -776,6 +774,10 @@ typedef struct
 {
 	zbx_uint64_t	httptestid;
 	zbx_uint64_t	hostid;
+	time_t		nextcheck;
+	int		delay;
+	unsigned char	status;
+	unsigned char	location;
 	zbx_uint32_t	revision;
 }
 zbx_dc_httptest_t;
@@ -900,6 +902,7 @@ typedef struct
 	zbx_binary_heap_t	pqueue;
 	zbx_binary_heap_t	trigger_queue;
 	zbx_binary_heap_t	drule_queue;
+	zbx_binary_heap_t	httptest_queue;		/* web scenario queue */
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
@@ -965,8 +968,10 @@ char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int h
 #define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
 
-
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache,  zbx_uint32_t revision, zbx_dbsync_t *gmacros,
 		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls);
+
+#define ZBX_LOCATION_NONE	0
+#define ZBX_LOCATION_QUEUE	1
 
 #endif

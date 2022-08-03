@@ -1213,7 +1213,6 @@ done:
 			host->maintenance_type = (unsigned char)atoi(row[8]);
 			host->maintenance_from = atoi(row[9]);
 			host->data_expected_from = now;
-			host->update_items = 0;
 
 			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
@@ -5118,11 +5117,11 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate nextcheck timestamp for passive proxy                   *
+ * Purpose: calculate nextcheck timestamp                                     *
  *                                                                            *
- * Parameters: hostid - [IN] host identifier from database                    *
- *             delay  - [IN] default delay value, can be overridden           *
- *             now    - [IN] current timestamp                                *
+ * Parameters: seend - [IN] the seed                                          *
+ *             delay - [IN] the delay in seconds                              *
+ *             now   - [IN] current timestamp                                 *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
@@ -5142,16 +5141,40 @@ time_t	dc_calculate_nextcheck(zbx_uint64_t seed, unsigned int delay, time_t now)
 	return nextcheck;
 }
 
+static void	dc_drule_queue(zbx_dc_drule_t *drule)
+{
+	zbx_binary_heap_elem_t	elem;
+
+	elem.key = drule->druleid;
+	elem.data = (const void *)drule;
+
+	if (ZBX_LOCATION_QUEUE != drule->location)
+	{
+		zbx_binary_heap_insert(&config->drule_queue, &elem);
+		drule->location = ZBX_LOCATION_QUEUE;
+	}
+	else
+		zbx_binary_heap_update_direct(&config->drule_queue, &elem);
+}
+
+static void	dc_drule_dequeue(zbx_dc_drule_t *drule)
+{
+	if (ZBX_LOCATION_QUEUE == drule->location)
+	{
+		zbx_binary_heap_remove_direct(&config->drule_queue, drule->druleid);
+		drule->location = ZBX_LOCATION_NONE;
+	}
+}
+
 static void	dc_sync_drules(zbx_dbsync_t *sync)
 {
 	char			**row, *delay_str;
 	zbx_uint64_t		rowid, druleid, proxy_hostid;
-	unsigned char		tag, status;
+	unsigned char		tag;
 	int 			found, ret, delay = 0;
 	ZBX_DC_PROXY		*proxy;
 	zbx_dc_drule_t		*drule;
 	time_t			now;
-	zbx_binary_heap_elem_t	elem;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5165,24 +5188,17 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(druleid, row[0]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[1]);
-		ZBX_STR2UCHAR(status, row[3]);
 
 		drule = (zbx_dc_drule_t *)DCfind_id(&config->drules, druleid, sizeof(zbx_dc_drule_t), &found);
 
+		ZBX_STR2UCHAR(drule->status, row[3]);
+
 		if (0 == found)
 		{
-			drule->delay = INT32_MAX;
+			drule->location = ZBX_LOCATION_NONE;
 		}
 		else
 		{
-			if (status != drule->status)
-			{
-				if (DRULE_STATUS_MONITORED != status)
-					zbx_binary_heap_remove_direct(&config->drule_queue, drule->druleid);
-				else
-					drule->delay = INT32_MAX;	/* force rescheduling */
-			}
-
 			if (proxy_hostid != drule->proxy_hostid &&
 				NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
 						&drule->proxy_hostid)))
@@ -5202,20 +5218,24 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 		(void)is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED);
 		zbx_free(delay_str);
 
-		drule->nextcheck = dc_calculate_nextcheck(drule->druleid, (0 == found ? SEC_PER_MIN : delay), now);
-
-		if (DRULE_STATUS_MONITORED == status && delay != drule->delay)
+		if (DRULE_STATUS_MONITORED == drule->status && 0 == drule->proxy_hostid)
 		{
-			elem.key = drule->druleid;
-			elem.data = (const void *)drule;
+			int	delay_new = 0;
 
-			if (0 == found || DRULE_STATUS_MONITORED != drule->status)
-				zbx_binary_heap_insert(&config->drule_queue, &elem);
-			else
-				zbx_binary_heap_update_direct(&config->drule_queue, &elem);
+			if (0 == found)
+				delay_new = delay > SEC_PER_MIN ? SEC_PER_MIN : delay;
+			else if (delay != drule->delay || ZBX_LOCATION_QUEUE != drule->location)
+				delay_new = delay;
+
+			if (0 != delay_new)
+			{
+				drule->nextcheck = dc_calculate_nextcheck(drule->druleid, delay_new, now);
+				dc_drule_queue(drule);
+			}
 		}
+		else
+			dc_drule_dequeue(drule);
 
-		drule->status = status;
 		drule->delay = delay;
 		drule->revision = config->revision;
 	}
@@ -5363,6 +5383,31 @@ static int	dc_httpstep_update_revision(zbx_dc_httpstep_t *httpstep)
 	return dc_httptest_update_revision(httptest);
 }
 
+static void	dc_httptest_queue(zbx_dc_httptest_t *httptest)
+{
+	zbx_binary_heap_elem_t	elem;
+
+	elem.key = httptest->httptestid;
+	elem.data = (const void *)httptest;
+
+	if (ZBX_LOCATION_QUEUE != httptest->location)
+	{
+		zbx_binary_heap_insert(&config->httptest_queue, &elem);
+		httptest->location = ZBX_LOCATION_QUEUE;
+	}
+	else
+		zbx_binary_heap_update_direct(&config->httptest_queue, &elem);
+}
+
+static void	dc_httptest_dequeue(zbx_dc_httptest_t *httptest)
+{
+	if (ZBX_LOCATION_QUEUE == httptest->location)
+	{
+		zbx_binary_heap_remove_direct(&config->httptest_queue, httptest->httptestid);
+		httptest->location = ZBX_LOCATION_NONE;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: update httpstep and its parent object revision                    *
@@ -5370,14 +5415,17 @@ static int	dc_httpstep_update_revision(zbx_dc_httpstep_t *httpstep)
  ******************************************************************************/
 static void	dc_sync_httptests(zbx_dbsync_t *sync)
 {
-	char			**row;
+	char			**row, *delay_str;
 	zbx_uint64_t		rowid, httptestid, hostid;
 	unsigned char		tag;
-	int 			found, ret;
+	int 			found, ret, delay;
 	ZBX_DC_HOST		*host;
 	zbx_dc_httptest_t	*httptest;
+	time_t			now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	now = time(NULL);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -5397,9 +5445,42 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 		httptest = (zbx_dc_httptest_t *)DCfind_id(&config->httptests, httptestid, sizeof(zbx_dc_httptest_t),
 				&found);
 
-		httptest->hostid = hostid;
-		httptest->revision = config->revision;
+		if (0 == found)
+			httptest->location = ZBX_LOCATION_NONE;
 
+		ZBX_STR2UCHAR(httptest->status, row[3]);
+
+		if (0 == found)
+			httptest->location = ZBX_LOCATION_NONE;
+
+		delay_str = dc_expand_user_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
+		(void)is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED);
+		zbx_free(delay_str);
+
+		if (HTTPTEST_STATUS_MONITORED == httptest->status && HOST_STATUS_MONITORED == host->status &&
+				(HOST_MAINTENANCE_STATUS_OFF == host->maintenance_status ||
+				MAINTENANCE_TYPE_NORMAL == host->maintenance_status) &&
+				0 == host->proxy_hostid)
+		{
+			int	delay_new = 0;
+
+			if (0 == found)
+				delay_new = delay > SEC_PER_MIN ? SEC_PER_MIN : delay;
+			else if (delay != httptest->delay || ZBX_LOCATION_QUEUE != httptest->location)
+				delay_new = delay;
+
+			if (0 != delay_new)
+			{
+				httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, delay_new, now);
+				dc_httptest_queue(httptest);
+			}
+		}
+		else
+			dc_httptest_dequeue(httptest);
+
+		httptest->hostid = hostid;
+		httptest->delay = delay;
+		httptest->revision = config->revision;
 	}
 
 	/* remove deleted httptest rules from cache and update host revision */
@@ -5411,6 +5492,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 		if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &httptest->hostid)))
 			dc_host_update_revision(host);
 
+		dc_httptest_dequeue(httptest);
 		zbx_hashset_remove_direct(&config->httptests, httptest);
 	}
 
@@ -7085,6 +7167,17 @@ static int	__config_drule_compare(const void *d1, const void *d2)
 	return r1->nextcheck - r2->nextcheck;
 }
 
+static int	__config_httptest_compare(const void *d1, const void *d2)
+{
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
+
+	const zbx_dc_httptest_t	*ht1 = (const zbx_dc_httptest_t *)e1->data;
+	const zbx_dc_httptest_t	*ht2 = (const zbx_dc_httptest_t *)e2->data;
+
+	return ht1->nextcheck - ht2->nextcheck;
+}
+
 static zbx_hash_t	__config_data_session_hash(const void *data)
 {
 	const zbx_data_session_t	*session = (const zbx_data_session_t *)data;
@@ -7256,6 +7349,13 @@ int	init_configuration_cache(char **error)
 
 	zbx_binary_heap_create_ext(&config->drule_queue,
 					__config_drule_compare,
+					ZBX_BINARY_HEAP_OPTION_DIRECT,
+					__config_shmem_malloc_func,
+					__config_shmem_realloc_func,
+					__config_shmem_free_func);
+
+	zbx_binary_heap_create_ext(&config->httptest_queue,
+					__config_httptest_compare,
 					ZBX_BINARY_HEAP_OPTION_DIRECT,
 					__config_shmem_malloc_func,
 					__config_shmem_realloc_func,
@@ -14280,9 +14380,7 @@ int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck)
 
 	*nextcheck = 0;
 
-	RDLOCK_CACHE;
-
-	*nextcheck = now + 1;
+	WRLOCK_CACHE;
 
 	if (FAIL == zbx_binary_heap_empty(&config->drule_queue))
 	{
@@ -14292,6 +14390,7 @@ int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck)
 		if (drule->nextcheck <= now)
 		{
 			zbx_binary_heap_remove_min(&config->drule_queue);
+			drule->location = ZBX_LOCATION_NONE;
 			*druleid = drule->druleid;
 			ret = SUCCEED;
 		}
@@ -14315,7 +14414,6 @@ int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck)
  ******************************************************************************/
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay)
 {
-	zbx_binary_heap_elem_t	elem;
 	zbx_dc_drule_t		*drule;
 
 	WRLOCK_CACHE;
@@ -14324,14 +14422,84 @@ void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay)
 	{
 		drule->delay = delay;
 		drule->nextcheck = dc_calculate_nextcheck(drule->druleid, drule->delay, now);
-		elem.key = drule->druleid;
-		elem.data = (const void *)drule;
-
-		zbx_binary_heap_insert(&config->drule_queue, &elem);
+		dc_drule_queue(drule);
 	}
 
 	UNLOCK_CACHE;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get next httptest to be processed                                 *
+ *                                                                            *
+ * Parameter: now        - [IN] the current timestamp                         *
+ *            httptestid - [OUT] the id of httptest to be processed           *
+ *            nextcheck  - [OUT] the timestamp of next httptest to be         *
+ *                               processed, if there is no httptest to be     *
+ *                               processed now and the queue is not empty.    *
+ *                               0 - otherwise                                *
+ *                                                                            *
+ * Return value: SUCCEED - the httptest id was returned successfully          *
+ *               FAIL    - no httptests are scheduled at current time         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck)
+{
+	zbx_binary_heap_elem_t	*elem;
+	zbx_dc_httptest_t	*httptest;
+	int			ret = FAIL;
+
+	*nextcheck = 0;
+
+	WRLOCK_CACHE;
+
+	if (FAIL == zbx_binary_heap_empty(&config->httptest_queue))
+	{
+		elem = zbx_binary_heap_find_min(&config->httptest_queue);
+		httptest = (zbx_dc_httptest_t *)elem->data;
+
+		if (httptest->nextcheck <= now)
+		{
+			zbx_binary_heap_remove_min(&config->httptest_queue);
+			httptest->location = ZBX_LOCATION_NONE;
+			*httptestid = httptest->httptestid;
+			ret = SUCCEED;
+		}
+		else
+			*nextcheck = httptest->nextcheck;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: queue httptest to be processed according to the delay             *
+ *                                                                            *
+ * Parameter: now        - [IN] the current timestamp                         *
+ *            httptestid - [IN] the id of httptest to be queued               *
+ *            delay      - [IN] the number of seconds between httptest        *
+ *                              processing                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
+{
+	zbx_dc_httptest_t	*httptest;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
+	{
+		httptest->delay = delay;
+		httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
+		dc_httptest_queue(httptest);
+	}
+
+	UNLOCK_CACHE;
+}
+
 
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"

@@ -1117,4 +1117,7 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck);
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
 
+int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
+void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);
+
 #endif

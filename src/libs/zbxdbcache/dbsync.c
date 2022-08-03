@@ -3839,9 +3839,9 @@ int	zbx_dbsync_prepare_httptests(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select httptestid,hostid from httptest");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select httptestid,hostid,delay,status from httptest");
 
-	dbsync_prepare(sync, 2, NULL);
+	dbsync_prepare(sync, 4, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

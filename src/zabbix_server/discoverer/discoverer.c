@@ -32,7 +32,6 @@
 #include "zbxcomms.h"
 #include "../events.h"
 
-extern int				CONFIG_DISCOVERER_FORKS;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
