@@ -141,6 +141,32 @@ static void	DCdump_hosts(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
+static void	DCdump_autoreg_hosts(void)
+{
+	ZBX_DC_AUTOREG_HOST	*autoreg_host;
+	zbx_hashset_iter_t	iter;
+	zbx_vector_ptr_t	index;
+	int			i;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&index);
+	zbx_hashset_iter_reset(&config->autoreg_hosts, &iter);
+
+	while (NULL != (autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, " host:'%s' listen_ip:'%s' listen_dns:'%s' host_metadata:'%s' flags:%d"
+				" timestamp:%d listen_port:%u",
+				autoreg_host->host, autoreg_host->listen_ip, autoreg_host->listen_dns,
+				autoreg_host->host_metadata, autoreg_host->flags, autoreg_host->timestamp,
+				autoreg_host->listen_port);
+	}
+
+
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
 static void	DCdump_host_tags(void)
 {
 	zbx_dc_host_tag_t	*host_tag;
@@ -1323,4 +1349,5 @@ void	DCdump_configuration(void)
 	DCdump_host_groups();
 	DCdump_host_group_index();
 	DCdump_maintenances();
+	DCdump_autoreg_hosts();
 }

@@ -922,7 +922,8 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot process duplicate host '%s' in autoreg_host table", row[0]);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process duplicate host '%s' in autoreg_host table",
+					row[0]);
 			found = 1;
 		}
 
@@ -932,6 +933,7 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 		dc_strpool_replace(found, &autoreg_host->host_metadata, row[3]);
 		autoreg_host->flags = atoi(row[4]);
 		autoreg_host->listen_port = atoi(row[5]);
+		autoreg_host->timestamp = 0;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
