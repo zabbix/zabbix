@@ -58,7 +58,7 @@ void	zbx_queue_ptr_reserve(zbx_queue_ptr_t *queue, int num)
 	if (values_num + num + 1 <= queue->alloc_num)
 		return;
 
-	alloc_num = MAX(queue->alloc_num + num + 1, zbx_uint_64_t(queue->alloc_num * 1.5));
+	alloc_num = MAX(queue->alloc_num + num + 1, (zbx_uint64_t)(queue->alloc_num * 1.5));
 	queue->values = (void **)zbx_realloc(queue->values, alloc_num * sizeof(*queue->values));
 
 	if (queue->tail_pos > queue->head_pos)
