@@ -348,6 +348,7 @@ typedef struct
 
 	zbx_vector_ptr_t	interfaces_v;	/* for quick finding of all host interfaces in */
 						/* 'config->interfaces' hashset */
+	zbx_vector_ptr_t	items;
 }
 ZBX_DC_HOST;
 

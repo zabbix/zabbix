@@ -1265,6 +1265,8 @@ done:
 
 			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
+			zbx_vector_ptr_create_ext(&host->items, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
 		else
 		{
@@ -1463,6 +1465,7 @@ done:
 		}
 #endif
 		zbx_vector_ptr_destroy(&host->interfaces_v);
+		zbx_vector_ptr_destroy(&host->items);
 		zbx_hashset_remove_direct(&config->hosts, host);
 	}
 
@@ -2255,6 +2258,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 				update_index = 1;
 		}
 
+		if (1 == found)
+		{
+			if (FAIL != (i = zbx_vector_ptr_search(&host->items, item, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+				zbx_vector_ptr_remove(&host->items, i);
+		}
+
+		if (ITEM_TYPE_ZABBIX_ACTIVE == type)
+			zbx_vector_ptr_append(&host->items, item);
+
 		/* store new information in item structure */
 
 		item->hostid = hostid;
@@ -2765,6 +2777,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 
 		if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
 			host->revision = config->revision;
+
+		if (FAIL != (i = zbx_vector_ptr_search(&host->items, item, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+			zbx_vector_ptr_remove(&host->items, i);
 
 		if (ITEM_STATUS_ACTIVE == item->status)
 		{
@@ -8026,6 +8041,51 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, 
 	}
 
 	UNLOCK_CACHE;
+}
+
+int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid)
+{
+	const ZBX_DC_HOST	*dc_host;
+	int			num = 0;
+
+	RDLOCK_CACHE;
+	if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+		num = dc_host->items.values_num;
+	UNLOCK_CACHE;
+
+	return num;
+}
+
+void	DCconfig_get_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, int *errcodes, size_t num)
+{
+	const ZBX_DC_HOST	*dc_host;
+	size_t			i = 0;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)) &&
+			0 != dc_host->items.values_num)
+	{
+		DCget_host(&items[0].host, dc_host, ZBX_ITEM_GET_ALL);
+
+		for (; i < MIN((size_t)dc_host->items.values_num, num); i++)
+		{
+			const ZBX_DC_ITEM	*dc_item;
+
+			dc_item = (const ZBX_DC_ITEM *)dc_host->items.values[i];
+
+			if (0 != i)
+				items[i].host = items[0].host;
+
+			DCget_item(&items[i], dc_item, ZBX_ITEM_GET_DEFAULT);
+			errcodes[i] = SUCCEED;
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	for (; i < num; i++)
+		errcodes[i] = FAIL;
 }
 
 /******************************************************************************
