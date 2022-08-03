@@ -9894,7 +9894,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 
 		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
 
-		if (HOST_STATUS_MONITORED != dc_host->status)
+		if (HOST_STATUS_MONITORED != dc_host->status || 0 != dc_host->proxy_hostid)
 			continue;
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
