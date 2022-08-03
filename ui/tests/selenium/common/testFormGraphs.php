@@ -262,8 +262,8 @@ class testFormGraphs extends CWebTest {
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item'), // Y axis MAX value dropdown.
 					],
 					'visible_fields' => [
-						['field' => 'id:ymin_name', 'value' => '', 'visible' => true], // Y axis MIN item input.
-						['field' => 'id:ymax_name', 'value' => '', 'visible' => true] // Y axis MAX item input.
+						['field' => 'id:ymin_itemid', 'value' => '', 'visible' => true], // Y axis MIN item input.
+						['field' => 'id:ymax_itemid', 'value' => '', 'visible' => true] // Y axis MAX item input.
 					]
 				]
 			]
@@ -274,7 +274,7 @@ class testFormGraphs extends CWebTest {
 		$this->page->login()->open($this->url)->waitUntilReady();
 		$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
 				->one()->click();
-		$this->page->assertTitle('Configuration of graphs');
+		$this->page->assertTitle($this->prototype ? 'Configuration of graph prototypes' : 'Configuration of graphs');
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 
 		// Check default fields only for first case.
@@ -589,13 +589,19 @@ class testFormGraphs extends CWebTest {
 		$form->fill($data['fields']);
 		$items_container = $form->getFieldContainer('Items');
 
-		// Fill Y axis Item values separately because field is not real multiselect.
+		// Fill Y axis Item values separately.
 		if (array_key_exists('yaxis_items', $data)) {
 			foreach ($data['yaxis_items'] as $y => $yaxis_item) {
-				$form->query(($this->prototype) ? 'id:yaxis_'.$y.'_prototype' : 'id:yaxis_'.$y)->waitUntilClickable()->one()->click();
-				$dialog = COverlayDialogElement::find()->one();
-				$dialog->query('link', $yaxis_item)->waitUntilClickable()->one()->click();
-				$dialog->waitUntilNotPresent();
+				if ($this->prototype) {
+					$form->query('xpath:.//button[@id="yaxis_'.$y.'_prototype"]')->waitUntilClickable()->one()->click();
+					$dialog = COverlayDialogElement::find()->one();
+					$dialog->query('link', $yaxis_item)->waitUntilClickable()->one()->click();
+					$dialog->waitUntilNotPresent();
+				}
+				else {
+					$form->query('xpath:.//div[@id="y'.$y.'_itemid"]/..')->asMultiselect()->one()
+							->setFillMode(CMultiselectElement::MODE_TYPE)->fill($yaxis_item);
+				}
 			}
 		}
 
@@ -645,7 +651,7 @@ class testFormGraphs extends CWebTest {
 		else {
 			// Write new name to update graph for next case, but if it's last case return to initial name 'Graph for update'.
 			if ($this->update) {
-				self::$update_graph = CTestArrayHelper::get($data, 'last_case', false)
+				self::$update_graph = (CTestArrayHelper::get($data, 'last_case', false))
 					? 'Graph for update'
 					: $data['fields']['Name'];
 			}
@@ -665,11 +671,11 @@ class testFormGraphs extends CWebTest {
 			$form->invalidate();
 			$form->checkValue($data['fields']);
 
-			// Check Y axis Item values fake multiselects.
+			// Check Y axis Item values multiselects.
 			if (array_key_exists('yaxis_items', $data)) {
 				foreach ($data['yaxis_items'] as $y => $yaxis_item) {
-					$this->assertEquals(self::HOST.': '.$yaxis_item,
-							$form->query('id:y'.$y.'_name')->one()->getAttribute('value')
+					$this->assertEquals([self::HOST.': '.$yaxis_item], $form->query('xpath:.//div[@id="y'.$y.'_itemid"]/..')
+							->asMultiselect()->one()->getValue()
 					);
 				}
 			}
@@ -825,7 +831,7 @@ class testFormGraphs extends CWebTest {
 		$form->invalidate();
 		$form->checkValue($data['fields']);
 
-		// Check Y axis Item values fake multiselects.
+		// Check Y axis Item values multiselects.
 		if (array_key_exists('yaxis_items', $data)) {
 			foreach ($data['yaxis_items'] as $y => $yaxis_item) {
 				$this->assertEquals([self::HOST.': '.$yaxis_item], $form->query('xpath:.//div[@id="y'.$y.'_itemid"]/..')
@@ -898,7 +904,7 @@ class testFormGraphs extends CWebTest {
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 
 		if ($data['case'] === 'Clone' || $data['case'] === 'Delete') {
-			$form>query('button', $data['case'])->waitUntilClickable()->one()->click();
+			$form->query('button', $data['case'])->waitUntilClickable()->one()->click();
 		}
 
 		if ($data['case'] === 'Delete') {

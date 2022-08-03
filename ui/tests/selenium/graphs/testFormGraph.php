@@ -423,6 +423,7 @@ class testFormGraph extends testFormGraphs {
 			],
 			[
 				[
+					'last_case' => true,
 					'fields' => [
 						'Name' => 'Exploded graph 3D false',
 						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded'),
@@ -446,8 +447,7 @@ class testFormGraph extends testFormGraphs {
 								'calc_fnc' => 'last'
 							]
 						]
-					],
-					'last_case' => true
+					]
 				]
 			]
 		];
@@ -464,6 +464,8 @@ class testFormGraph extends testFormGraphs {
 	}
 
 	/**
+	 * @backupOnce graphs
+	 *
 	 * @dataProvider getCommonGraphData
 	 * @dataProvider getGraphData
 	 */
