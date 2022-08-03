@@ -108,8 +108,10 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
     if test "x$enable_static_libs" = "xyes"; then
         test "x$static_linking_support" = "xno" -a -z "$_libopenssl_dir_lib" && AC_MSG_ERROR(["OpenSSL: Compiler not support statically linked libs from default folders"])
         AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-        PKG_PROG_PKG_CONFIG()
+        m4_ifdef([PKG_PROG_PKG_CONFIG], [PKG_PROG_PKG_CONFIG()], [:])
         test -z "$PKG_CONFIG" -a -z "$_libopenssl_dir_lib" && AC_MSG_ERROR([Not found pkg-config library])
+        _libopenssl_dir_lib_64="$_libopenssl_dir_lib/64"
+        test -d "$_libopenssl_dir_lib_64" && _libopenssl_dir_lib="$_libopenssl_dir_lib_64"
         m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
     fi
 
@@ -137,6 +139,8 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
 
          if test -d $_libopenssl_dir/lib64; then
            OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib64
+         elif test -d $_libopenssl_dir/lib/64; then
+           OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib/64
          else
            OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib
          fi
@@ -160,13 +164,16 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
       OPENSSL_LIBS="$_libopenssl_dir_lib/libssl.a $_libopenssl_dir_lib/libcrypto.a"
     elif test "x$enable_static_libs" = "xyes"; then
       if test -z "$_libopenssl_dir_lib"; then
-        PKG_CHECK_EXISTS(openssl,[
-          OPENSSL_LIBS=`$PKG_CONFIG --static --libs openssl`
-        ],[
-          AC_MSG_ERROR([Not found openssl package])
-        ])
+        m4_ifdef([PKG_CHECK_EXISTS], [
+          PKG_CHECK_EXISTS(openssl,[
+            OPENSSL_LIBS=`$PKG_CONFIG --static --libs openssl`
+          ],[
+            AC_MSG_ERROR([Not found openssl package])
+          ])
+        ], [:])
       else
-        AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libopenssl_dir_lib/pkgconfig" $PKG_CONFIG --exists --print-errors openssl]) || AC_MSG_ERROR(["Not found openssl package in $_libopenssl_dir/lib/pkgconfig"])
+        AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libopenssl_dir_lib/pkgconfig" $PKG_CONFIG --exists --print-errors openssl]) ||
+          AC_MSG_ERROR(["Not found openssl package in $_libopenssl_dir_lib/pkgconfig"])
         OPENSSL_LIBS=`PKG_CONFIG_LIBDIR="$_libopenssl_dir_lib/pkgconfig" $PKG_CONFIG --static --libs openssl`
         test -z "$OPENSSL_LIBS" && OPENSSL_LIBS=`PKG_CONFIG_LIBDIR="$_libopenssl_dir_lib/pkgconfig" $PKG_CONFIG --libs openssl`
       fi

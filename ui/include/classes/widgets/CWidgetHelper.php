@@ -135,15 +135,15 @@ class CWidgetHelper {
 	 * @return CLabel
 	 */
 	public static function getLabel($field, $class = null, $hint = null) {
-		if ($field instanceof CWidgetFieldSelect) {
-			return (new CLabel($field->getLabel(), 'label-'.$field->getName()))
-				->setAsteriskMark(self::isAriaRequired($field))
-				->addClass($class);
-		}
-
 		$help_icon = ($hint !== null)
 			? makeHelpIcon($hint)
 			: null;
+
+		if ($field instanceof CWidgetFieldSelect) {
+			return (new CLabel([$field->getLabel(), $help_icon], 'label-'.$field->getName()))
+				->setAsteriskMark(self::isAriaRequired($field))
+				->addClass($class);
+		}
 
 		return (new CLabel([$field->getLabel(), $help_icon], $field->getName()))
 			->setAsteriskMark(self::isAriaRequired($field))

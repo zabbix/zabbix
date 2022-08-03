@@ -2,7 +2,7 @@
 # Mattermost webhook
 ![](images/logoHorizontal.png?raw=true)
 
-This guide describes how to integrate your Zabbix 4.4 installation with Mattermost using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 6.0 installation with Mattermost using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Setting up a Mattermost bot
 
@@ -54,7 +54,7 @@ This guide describes how to integrate your Zabbix 4.4 installation with Mattermo
 
 * You can also choose between two notification modes:
 	- **alarm** (default)
-		- Update messages will be attached as replies to Slack message thread
+		- Update messages will be attached as replies to Mattermost message thread
 		- Recovery message from Zabbix will update initial message
 	- **event**
 		- Recovery and update messages from Zabbix will be posted as new messages
@@ -85,4 +85,4 @@ For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.0/
 
 ## Supported Versions
 
-Zabbix 4.4
+Zabbix 6.0

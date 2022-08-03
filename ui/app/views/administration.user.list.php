@@ -70,7 +70,7 @@ $widget = (new CWidget())
 			(new CFormList())->addRow(_('Last name'),
 				(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			),
-			(new CFormList())->addRow((new CLabel(_('User roles'), 'filter_roles')),
+			(new CFormList())->addRow((new CLabel(_('User roles'), 'filter_roles__ms')),
 				(new CMultiSelect([
 					'name' => 'filter_roles[]',
 					'object_name' => 'roles',
