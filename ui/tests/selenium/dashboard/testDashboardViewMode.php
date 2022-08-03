@@ -75,7 +75,7 @@ class testDashboardViewMode extends CLegacyWebTest {
 	}
 
 	public function testDashboardViewMode_KioskMode() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view', false);
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view&dashboardid=1', false);
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
 
