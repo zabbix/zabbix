@@ -1253,9 +1253,9 @@ done:
 				}
 			}
 
-			/* gather hosts that must restart monitoring either by being enabled or */
-			/* assigned from proxy to server                                        */
-			if (ZBX_DBSYNC_INIT != sync->mode && 0 == proxy_hostid)
+			/* gather hosts that must restart monitoring either by being re-enabled or */
+			/* assigned from proxy to server                                           */
+			if (0 == proxy_hostid)
 			{
 				if ((HOST_STATUS_MONITORED == status && HOST_STATUS_MONITORED != host->status) ||
 						0 != host->proxy_hostid)
