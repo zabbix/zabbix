@@ -127,6 +127,13 @@ static void	DCdump_hosts(void)
 
 			zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64, interface->interfaceid);
 		}
+
+		for (j = 0; j < host->items.values_num; j++)
+		{
+			ZBX_DC_ITEM	*item = (ZBX_DC_ITEM *)host->items.values[j];
+
+			zabbix_log(LOG_LEVEL_TRACE, "  itemid:" ZBX_FS_UI64, item->itemid);
+		}
 	}
 
 	zbx_vector_ptr_destroy(&index);

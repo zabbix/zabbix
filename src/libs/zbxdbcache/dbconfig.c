@@ -2776,10 +2776,12 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			continue;
 
 		if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
+		{
 			host->revision = config->revision;
 
-		if (FAIL != (i = zbx_vector_ptr_search(&host->items, item, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-			zbx_vector_ptr_remove(&host->items, i);
+			if (FAIL != (i = zbx_vector_ptr_search(&host->items, item, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+				zbx_vector_ptr_remove(&host->items, i);
+		}
 
 		if (ITEM_STATUS_ACTIVE == item->status)
 		{
