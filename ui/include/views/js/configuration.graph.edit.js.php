@@ -486,6 +486,8 @@
 				return false;
 			}
 
+			form = document.getElementsByName(this.form_name)[0];
+
 			const itemTpl = new Template($('#tmpl-item-row-' + this.graphs.graphtype).html());
 
 			for (let i = 0; i < list.values.length; i++) {
@@ -500,7 +502,7 @@
 					yaxisside: 0,
 					sortorder: number,
 					flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
-					color: colorPalette.getNextColor(),
+					color: colorPalette.getNextColor(form),
 					name: list.values[i].name
 				};
 				const $row = $(itemTpl.evaluate(item));
