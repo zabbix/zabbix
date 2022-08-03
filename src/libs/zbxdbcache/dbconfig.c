@@ -101,7 +101,7 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_ex
 
 static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num, int env);
 
-static void	dc_reschedule_items(const zbx_vector_uint64_t *activated_hostids);
+static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts);
 
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
@@ -902,7 +902,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 }
 
 static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_uint64_t *active_avail_diff,
-		zbx_vector_uint64_t *activated_hostids)
+		zbx_hashset_t *activated_hosts)
 {
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -1260,7 +1260,7 @@ done:
 				if ((HOST_STATUS_MONITORED == status && HOST_STATUS_MONITORED != host->status) ||
 						0 != host->proxy_hostid)
 				{
-					zbx_vector_uint64_append(activated_hostids, host->hostid);
+					zbx_hashset_insert(activated_hosts, &host->hostid, sizeof(host->hostid));
 				}
 			}
 		}
@@ -5477,14 +5477,15 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	zbx_uint64_t	update_flags = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
 
-	zbx_hashset_t			trend_queue;
-	zbx_vector_uint64_t		active_avail_diff, activated_hostids;
+	zbx_hashset_t		trend_queue;
+	zbx_vector_uint64_t	active_avail_diff;
+	zbx_hashset_t		activated_hosts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	config->sync_start_ts = time(NULL);
 
-	zbx_vector_uint64_create(&activated_hostids);
+	zbx_hashset_create(&activated_hosts, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	sec = zbx_time();
 	changelog_num = zbx_dbsync_env_prepare(mode);
@@ -5644,7 +5645,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	START_SYNC;
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
-	DCsync_hosts(&hosts_sync, &active_avail_diff, &activated_hostids);
+	DCsync_hosts(&hosts_sync, &active_avail_diff, &activated_hosts);
 	hsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6225,8 +6226,7 @@ out:
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_ITEMS | ZBX_DBSYNC_UPDATE_MACROS)))
 	{
 		sec = zbx_time();
-		zbx_vector_uint64_sort(&activated_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		dc_reschedule_items(&activated_hostids);
+		dc_reschedule_items(&activated_hosts);
 		queues_sec = zbx_time() - sec;
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reschedule : " ZBX_FS_DBL " sec.", __func__, queues_sec);
 	}
@@ -6271,7 +6271,7 @@ out:
 
 	zbx_dbsync_env_clear();
 
-	zbx_vector_uint64_destroy(&activated_hostids);
+	zbx_hashset_destroy(&activated_hosts);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
@@ -13563,13 +13563,13 @@ static void	zbx_item_delay_free(zbx_item_delay_t *item_delay)
  *                                                                            *
  * Parameters: item            - [IN] the item to check                       *
  *             host            - [IN] the item's host                         *
- *             hostids         - [IN] the activated host identifiers          *
+ *             activated hosts - [IN] the activated host identifiers          *
  *             activated_items - [OUT] items to be rescheduled because host   *
  *                                     being activated                        *
  *                                                                            *
  ******************************************************************************/
 static void	dc_check_item_activation(ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
-		const zbx_vector_uint64_t *hostids, zbx_vector_ptr_pair_t *activated_items)
+		const zbx_hashset_t *activated_hosts, zbx_vector_ptr_pair_t *activated_items)
 {
 	zbx_ptr_pair_t	pair;
 
@@ -13579,7 +13579,7 @@ static void	dc_check_item_activation(ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
 	if (0 != host->proxy_hostid)
 		return;
 
-	if (FAIL == zbx_vector_uint64_bsearch(hostids, host->hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+	if (NULL == zbx_hashset_search(activated_hosts, &host->hostid))
 		return;
 
 	pair.first = item;
@@ -13591,7 +13591,8 @@ static void	dc_check_item_activation(ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
  *                                                                            *
  * Purpose: get items with changed expanded delay value                       *
  *                                                                            *
- * Parameters: items           - [OUT] items to be rescheduled because of     *
+ * Parameters: activated_hosts - [IN] the activated hosts                     *
+ *             items           - [OUT] items to be rescheduled because of     *
  *                                     delay changes                          *
  *             activated_items - [OUT] items to be rescheduled because host   *
  *                                     being activated                        *
@@ -13601,7 +13602,7 @@ static void	dc_check_item_activation(ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
  *           itself.                                                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_get_items_to_reschedule(const zbx_vector_uint64_t *hostids, zbx_vector_item_delay_t *items,
+static void	dc_get_items_to_reschedule(const zbx_hashset_t *activated_hosts, zbx_vector_item_delay_t *items,
 		zbx_vector_ptr_pair_t *activated_items)
 {
 	zbx_hashset_iter_t	iter;
@@ -13631,7 +13632,7 @@ static void	dc_get_items_to_reschedule(const zbx_vector_uint64_t *hostids, zbx_v
 			/* neither new item revision or the last one had macro in delay */
 			if (NULL == item->delay_ex)
 			{
-				dc_check_item_activation(item, host, hostids, activated_items);
+				dc_check_item_activation(item, host, activated_hosts, activated_items);
 				continue;
 			}
 
@@ -13655,7 +13656,7 @@ static void	dc_get_items_to_reschedule(const zbx_vector_uint64_t *hostids, zbx_v
 		else
 		{
 			zbx_free(delay_ex);
-			dc_check_item_activation(item, host, hostids, activated_items);
+			dc_check_item_activation(item, host, activated_hosts, activated_items);
 		}
 	}
 
@@ -13692,7 +13693,7 @@ static void	dc_reschedule_item(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int n
  *           user macro changes affects item queues.                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_reschedule_items(const zbx_vector_uint64_t *activated_hostids)
+static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts)
 {
 	zbx_vector_item_delay_t		items;
 	zbx_vector_ptr_pair_t	activated_items;
@@ -13700,7 +13701,7 @@ static void	dc_reschedule_items(const zbx_vector_uint64_t *activated_hostids)
 	zbx_vector_item_delay_create(&items);
 	zbx_vector_ptr_pair_create(&activated_items);
 
-	dc_get_items_to_reschedule(activated_hostids, &items, &activated_items);
+	dc_get_items_to_reschedule(activated_hosts, &items, &activated_items);
 
 	if (0 != items.values_num || 0 != activated_items.values_num)
 	{
