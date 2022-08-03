@@ -5458,8 +5458,6 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 		zbx_free(delay_str);
 
 		if (HTTPTEST_STATUS_MONITORED == httptest->status && HOST_STATUS_MONITORED == host->status &&
-				(HOST_MAINTENANCE_STATUS_OFF == host->maintenance_status ||
-				MAINTENANCE_TYPE_NORMAL == host->maintenance_status) &&
 				0 == host->proxy_hostid)
 		{
 			int	delay_new = 0;
@@ -14448,12 +14446,13 @@ int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck
 	zbx_binary_heap_elem_t	*elem;
 	zbx_dc_httptest_t	*httptest;
 	int			ret = FAIL;
+	ZBX_DC_HOST		*dc_host;
 
 	*nextcheck = 0;
 
 	WRLOCK_CACHE;
 
-	if (FAIL == zbx_binary_heap_empty(&config->httptest_queue))
+	while (FAIL == zbx_binary_heap_empty(&config->httptest_queue))
 	{
 		elem = zbx_binary_heap_find_min(&config->httptest_queue);
 		httptest = (zbx_dc_httptest_t *)elem->data;
@@ -14462,11 +14461,25 @@ int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck
 		{
 			zbx_binary_heap_remove_min(&config->httptest_queue);
 			httptest->location = ZBX_LOCATION_NONE;
+
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &httptest->hostid)))
+				continue;
+
+			if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
+					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_status)
+			{
+				httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
+				dc_httptest_queue(httptest);
+				continue;
+			}
+
 			*httptestid = httptest->httptestid;
 			ret = SUCCEED;
 		}
 		else
 			*nextcheck = httptest->nextcheck;
+
+		break;
 	}
 
 	UNLOCK_CACHE;
