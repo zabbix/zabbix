@@ -841,7 +841,6 @@ class testFormGraphs extends CWebTest {
 		}
 
 		if (array_key_exists('items', $data)) {
-
 			$item_row = $form->getFieldContainer('Items')->query('xpath:.//tr[@id="items_0"]')->one()->waitUntilPresent();
 
 			// Check lines styling functions.
@@ -889,6 +888,9 @@ class testFormGraphs extends CWebTest {
 		];
 	}
 
+	/**
+	 * Function for checking Cancel button in all actions, as well as update graph form without any changes.
+	 */
 	public function checkNoChanges($data) {
 		$old_hash = CDBHelper::getHash(self::SQL);
 		$this->page->login()->open($this->url)->waitUntilReady();
@@ -923,6 +925,52 @@ class testFormGraphs extends CWebTest {
 
 		// Check that DB hash is not changed.
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	/**
+	 * Function for checking changes functions and color in existing item only.
+	 */
+	public function changeItemSettings($data) {
+		$this->page->login()->open($this->url)->waitUntilReady();
+		$this->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
+		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
+		$item_number = $this->prototype ? 1 : 0;
+		$item_row = $form->getFieldContainer('Items')->query('xpath:.//tr[@id="items_'.$item_number.'"]')
+				->one()->waitUntilPresent();
+
+		// Change line styling functions.
+		if (array_key_exists('functions', $data['change'])) {
+			foreach ($data['change']['functions'] as $function => $value) {
+				$item_row->query('xpath:.//z-select[@name="items['.$item_number.']['.$function.']"]')
+					->asDropdown()->one()->fill($value);
+			}
+		}
+
+		// Change line color.
+		if (array_key_exists('color', $data['change'])) {
+			$item_row->query('xpath:.//button[@id="lbl_items_'.$item_number.'_color"]')->waitUntilClickable()->one()->click();
+			$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()
+					->fill($data['change']['color']);
+		}
+
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, ($this->prototype ? 'Graph prototype updated' : 'Graph updated'));
+		$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilReady()
+				->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
+		$item_row = $form->getFieldContainer('Items')->query('xpath:.//tr[@id="items_'.$item_number.'"]')
+				->one()->waitUntilPresent();
+
+		// Check lines styling functions.
+		foreach ($data['expected']['functions'] as $function => $value) {
+			$this->assertEquals($value, $item_row->query('xpath:.//z-select[@name="items['.$item_number.']['.$function.']"]')
+					->asDropdown()->one()->getValue()
+			);
+		}
+
+		$item_row->query('xpath:.//button[@id="lbl_items_'.$item_number.'_color"]')->waitUntilClickable()->one()->click();
+		$this->assertEquals($data['expected']['color'],
+				$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->getValue()
+		);
 	}
 
 	public function checkDelete() {

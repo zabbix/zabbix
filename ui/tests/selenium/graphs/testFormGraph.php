@@ -488,6 +488,72 @@ class testFormGraph extends testFormGraphs {
 		$this->checkNoChanges($data);
 	}
 
+	public static function getItemSettingsData() {
+		return [
+			[
+				[
+					'change' => [
+						'functions' => [
+							'calc_fnc' => 'min',
+							'drawtype' => 'Dashed line',
+							'yaxisside' => 'Right'
+						]
+					],
+					'expected' => [
+						'functions' => [
+							'calc_fnc' => 'min',
+							'drawtype' => 'Dashed line',
+							'yaxisside' => 'Right'
+						],
+						'color' => 'FDD835'
+					]
+				]
+			],
+			[
+				[
+					'change' => [
+						'color' => 'BBDEFB'
+					],
+					'expected' => [
+						'functions' => [
+							'calc_fnc' => 'min',
+							'drawtype' => 'Dashed line',
+							'yaxisside' => 'Right'
+						],
+						'color' => 'BBDEFB'
+					]
+				]
+			],
+			[
+				[
+					'change' => [
+						'functions' => [
+							'calc_fnc' => 'all',
+							'drawtype' => 'Dot',
+							'yaxisside' => 'Left'
+						],
+						'color' => '891515'
+					],
+					'expected' => [
+						'functions' => [
+							'calc_fnc' => 'all',
+							'drawtype' => 'Dot',
+							'yaxisside' => 'Left'
+						],
+						'color' => '891515'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getItemSettingsData
+	 */
+	public function testFormGraph_ChangeItemSettings($data) {
+		$this->changeItemSettings($data);
+	}
+
 	public function testFormGraph_Delete() {
 		$this->checkDelete();
 	}

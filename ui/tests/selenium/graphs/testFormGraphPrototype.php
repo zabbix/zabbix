@@ -609,6 +609,72 @@ class testFormGraphPrototype extends testFormGraphs {
 		$this->checkNoChanges($data);
 	}
 
+	public static function getItemPrototypeSettingsData() {
+		return [
+			[
+				[
+					'change' => [
+						'functions' => [
+							'calc_fnc' => 'avg',
+							'drawtype' => 'Gradient line',
+							'yaxisside' => 'Right'
+						]
+					],
+					'expected' => [
+						'functions' => [
+							'calc_fnc' => 'avg',
+							'drawtype' => 'Gradient line',
+							'yaxisside' => 'Right'
+						],
+						'color' => '66BB6A'
+					]
+				]
+			],
+			[
+				[
+					'change' => [
+						'color' => 'FFBF00'
+					],
+					'expected' => [
+						'functions' => [
+							'calc_fnc' => 'avg',
+							'drawtype' => 'Gradient line',
+							'yaxisside' => 'Right'
+						],
+						'color' => 'FFBF00'
+					]
+				]
+			],
+			[
+				[
+					'change' => [
+						'functions' => [
+							'calc_fnc' => 'max',
+							'drawtype' => 'Filled region',
+							'yaxisside' => 'Left'
+						],
+						'color' => 'D7CCC8'
+					],
+					'expected' => [
+						'functions' => [
+							'calc_fnc' => 'max',
+							'drawtype' => 'Filled region',
+							'yaxisside' => 'Left'
+						],
+						'color' => 'D7CCC8'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getItemPrototypeSettingsData
+	 */
+	public function testFormGraphPrototype_ChangeItemSettings($data) {
+		$this->changeItemSettings($data);
+	}
+
 	public function testFormGraphPrototype_Delete() {
 		$this->checkDelete();
 	}
