@@ -8056,7 +8056,7 @@ int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 	return num;
 }
 
-void	DCconfig_get_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, int *errcodes, size_t num)
+void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, int *errcodes, size_t num)
 {
 	const ZBX_DC_HOST	*dc_host;
 	size_t			i = 0;
@@ -13287,7 +13287,8 @@ const char	*zbx_dc_get_session_token(void)
  *           session object will not be deleted for 24 hours.                 *
  *                                                                            *
  ******************************************************************************/
-zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token, int session_type)
+zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token,
+		zbx_session_type_t session_type)
 {
 	zbx_data_session_t	*session, session_local;
 	time_t			now;
