@@ -163,7 +163,6 @@ class testFormFilterProblems extends testFormFilter {
 						'Warning' => true,
 						'Average' => true,
 						'Show tags' => '3',
-//						'Show operational data' => 'Separately',
 						'Compact view' => true
 					]
 				]
