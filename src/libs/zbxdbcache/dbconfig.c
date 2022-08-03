@@ -7163,7 +7163,7 @@ int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uin
 	if (HOST_STATUS_MONITORED != dc_host->status)
 	{
 		UNLOCK_CACHE;
-		*error = zbx_dsprintf(*error, "host \"%s\" not monitored", host);
+		*error = zbx_dsprintf(NULL, "host \"%s\" not monitored", host);
 		return FAIL;
 	}
 
