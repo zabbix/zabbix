@@ -1638,8 +1638,8 @@ class CHostGroup extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$groupIds = array_keys($result);
-		sort($groupIds);
+		$groupids = array_keys($result);
+		sort($groupids);
 
 		// adding hosts
 		if ($options['selectHosts'] !== null) {
@@ -1663,7 +1663,7 @@ class CHostGroup extends CApiService {
 			}
 			else {
 				$hosts = API::Host()->get([
-					'groupids' => $groupIds,
+					'groupids' => $groupids,
 					'countOutput' => true,
 					'groupCount' => true
 				]);
@@ -1698,7 +1698,7 @@ class CHostGroup extends CApiService {
 			}
 			else {
 				$hosts = API::Template()->get([
-					'groupids' => $groupIds,
+					'groupids' => $groupids,
 					'countOutput' => true,
 					'groupCount' => true
 				]);
@@ -1717,7 +1717,7 @@ class CHostGroup extends CApiService {
 			$discoveryRules = DBFetchArray(DBselect(
 				'SELECT gd.groupid,hd.parent_itemid'.
 					' FROM group_discovery gd,group_prototype gp,host_discovery hd'.
-					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' WHERE '.dbConditionInt('gd.groupid', $groupids).
 					' AND gd.parent_group_prototypeid=gp.group_prototypeid'.
 					' AND gp.hostid=hd.hostid'
 			));
@@ -1736,7 +1736,7 @@ class CHostGroup extends CApiService {
 			$db_links = DBFetchArray(DBselect(
 				'SELECT gd.groupid,gp.hostid'.
 					' FROM group_discovery gd,group_prototype gp'.
-					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' WHERE '.dbConditionInt('gd.groupid', $groupids).
 					' AND gd.parent_group_prototypeid=gp.group_prototypeid'
 			));
 
@@ -1751,9 +1751,9 @@ class CHostGroup extends CApiService {
 			}
 			unset($row);
 
-			foreach ($db_links as $row) {
-				if (array_key_exists($row['hostid'], $host_prototypes)) {
-					$result[$row['groupid']]['hostPrototype'] = $host_prototypes[$row['hostid']];
+			foreach ($db_links as $db_link) {
+				if (array_key_exists($db_link['hostid'], $host_prototypes)) {
+					$result[$db_link['groupid']]['hostPrototype'] = $host_prototypes[$db_link['hostid']];
 				}
 			}
 		}
@@ -1762,7 +1762,7 @@ class CHostGroup extends CApiService {
 		if ($options['selectGroupDiscovery'] !== null) {
 			$groupDiscoveries = API::getApiService()->select('group_discovery', [
 				'output' => $this->outputExtend($options['selectGroupDiscovery'], ['groupid']),
-				'filter' => ['groupid' => $groupIds],
+				'filter' => ['groupid' => $groupids],
 				'preservekeys' => true
 			]);
 			$relationMap = $this->createRelationMap($groupDiscoveries, 'groupid', 'groupid');
