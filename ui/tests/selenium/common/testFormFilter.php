@@ -90,6 +90,25 @@ class testFormFilter extends CWebTest {
 		}
 	}
 
+	public function checkRememberedFilters($data, $table_selector) {
+		$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
+		$this->page->open($this->url)->waitUntilReady();
+
+		$table = $this->query($table_selector)->asTable()->waitUntilReady()->one();
+		$rows = $table->getRows();
+		$filtered_rows_count = ($rows->count() === 1 && $rows->asText() === ['No data found.'])
+			? 0
+			: $rows->count();
+
+		// Checking that data exists after saving filter.
+		if (array_key_exists('filter_form', $data)) {
+			$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
+			$this->assertTrue($home_form->checkValue($data['filter_form']));
+			$this->query('name:filter_reset')->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
+		}
+	}
+
 	/**
 	 * Change data in filter form.
 	 *
@@ -228,6 +247,7 @@ class testFormFilter extends CWebTest {
 
 		// Checking if home tab is selected.
 		$xpath = 'xpath://li[@data-target="tabfilter_0"]';
+
 		if ($this->query($xpath)->one()->getAttribute('class') === 'tabfilter-item-label') {
 			$this->query($xpath.'/a')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
@@ -237,17 +257,47 @@ class testFormFilter extends CWebTest {
 			$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
 			$home_form->fill($data['filter_form']);
 		}
-		$result_table = $this->query($table_selector)->one();
 
+		$result_table = $this->query($table_selector)->one();
 		$this->query('button:Save as')->one()->click();
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->fill($data['filter']);
 		$dialog->submit();
+
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			COverlayDialogElement::ensureNotPresent();
 			$result_table->waitUntilReloaded();
 			$this->page->waitUntilReady();
 		}
+	}
+
+	/**
+	 * Create filter.
+	 *
+	 * @param array  $data        given data provider
+	 * @param string $user        test user with saved filters
+	 * @param string $password    password for user with saved filters
+	 */
+	public function rememberFilter($data, $user, $password, $table_selector = 'class:list-table') {
+		$this->page->userLogin($user, $password);
+		$this->page->open($this->url)->waitUntilReady();
+
+		// Checking if home tab is selected.
+		$xpath = 'xpath://li[@data-target="tabfilter_0"]';
+		if ($this->query($xpath)->one()->getAttribute('class') === 'tabfilter-item-label') {
+			$this->query($xpath.'/a')->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
+		}
+
+		if (array_key_exists('filter_form', $data)) {
+			$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
+			$home_form->fill($data['filter_form']);
+		}
+
+		$result_table = $this->query($table_selector)->one();
+		$this->query('name:filter_apply')->waitUntilClickable()->one()->click();
+		$result_table->waitUntilReloaded();
+		$this->page->waitUntilReady();
 	}
 
 	/**

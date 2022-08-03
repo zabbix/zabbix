@@ -143,6 +143,44 @@ class testFormFilterProblems extends testFormFilter {
 		$this->checkFilters($data, $this->table_selector);
 	}
 
+	public static function getCheckRememberedFilterData() {
+		return [
+			[
+				[
+					'filter_form' => [
+						'Hosts' => ['Host for tag permissions'],
+						'Not classified' => true,
+						'Show tags' => '2'
+					]
+				]
+			],
+			[
+				[
+					'filter_form' => [
+						'Host groups' => ['Zabbix servers'],
+						'Hosts' => ['ЗАББИКС Сервер'],
+						'Not classified' => true,
+						'Warning' => true,
+						'Average' => true,
+						'Show tags' => '3',
+//						'Show operational data' => 'Separately',
+						'Compact view' => true
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Create and remember new filters.
+	 *
+	 * @dataProvider getCheckRememberedFilterData
+	 */
+	public function testFormFilterProblems_CheckRememberedFilter($data) {
+		$this->rememberFilter($data, 'filter-create', 'zabbix');
+		$this->checkRememberedFilters($data, $this->table_selector);
+	}
+
 	/**
 	 * Delete filters.
 	 */
