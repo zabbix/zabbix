@@ -228,7 +228,7 @@ $form_grid->addItem([
 		->addItem(
 			(new CSpan([
 				'&nbsp;',
-				makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
+				makeWarningIcon(_('This setting applies only to numeric data.'))
 			]))->setId('item-value-thresholds-warning'))
 		->addClass('js-row-thresholds'),
 	(new CFormField(CWidgetHelper::getThresholds($fields['thresholds'])))->addClass('js-row-thresholds')
