@@ -51,18 +51,18 @@
 						.closest('li')
 						.hide();
 
-						$type
-							.find('[value=' + <?= ZBX_SCRIPT_TYPE_URL ?> + ']')
-							.closest('li')
-							.hide();
-				}
-				else {
 					if ($('input[name=type]:checked').val() == <?= ZBX_SCRIPT_TYPE_URL ?>) {
 						$type
 							.find('[value=' + <?= ZBX_SCRIPT_TYPE_WEBHOOK ?> + ']')
-							.prop('checked', true)
+							.prop('checked', true);
 					}
 
+					$type
+						.find('[value=' + <?= ZBX_SCRIPT_TYPE_URL ?> + ']')
+						.closest('li')
+						.hide();
+				}
+				else {
 					$menu_path
 						.add($user_group)
 						.add($host_access)
