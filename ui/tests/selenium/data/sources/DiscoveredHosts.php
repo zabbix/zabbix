@@ -25,9 +25,6 @@ class DiscoveredHosts {
 	const DISCOVERED_INTERFACEID = 90000080;
 	const DISCOVERED_HOST_GROUPID = 90000081;
 
-	protected static $template_names;
-	protected static $templateids;
-
 	/**
 	 * Parent hostid.
 	 *
@@ -282,15 +279,14 @@ class DiscoveredHosts {
 			]
 		]);
 
-		foreach ($templates['templateids'] as $name => $value) {
-			self::$template_names[] = $name;
-			self::$templateids[] = $value;
-		}
-
 		// Link templates.
 		CDataHelper::call('host.update', [
 			'hostid' => self::DISCOVERED_HOSTID,
-			'templates' => self::$templateids
+			'templates' => [
+				$templates['templateids']['Test of discovered host Template'],
+				$templates['templateids']['Test of discovered host 1 template for unlink'],
+				$templates['templateids']['Test of discovered host 2 template for clear']
+			]
 		]);
 
 		return [
