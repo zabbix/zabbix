@@ -5007,6 +5007,7 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 	ZBX_DC_SCRIPTITEM		*scriptitem;
 	zbx_dc_scriptitem_param_t	*scriptitem_params;
 	zbx_vector_ptr_t		items;
+	ZBX_DC_ITEM			*dc_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5026,6 +5027,9 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 					"cannot find parent item for item parameters (itemid=" ZBX_FS_UI64")", itemid);
 			continue;
 		}
+
+		if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+			dc_item_update_revision(dc_item);
 
 		ZBX_STR2UINT64(item_script_paramid, row[0]);
 		scriptitem_params = (zbx_dc_scriptitem_param_t *)DCfind_id(&config->itemscript_params,
@@ -5062,6 +5066,9 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 				zbx_vector_ptr_remove_noorder(&scriptitem->params, index);
 				zbx_vector_ptr_append(&items, scriptitem);
 			}
+
+			if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &scriptitem->itemid)))
+				dc_item_update_revision(dc_item);
 		}
 
 		dc_strpool_release(scriptitem_params->name);
