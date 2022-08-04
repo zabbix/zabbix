@@ -2262,8 +2262,14 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 
 		if (1 == found)
 		{
-			if (FAIL != (i = zbx_vector_ptr_search(&host->items, item, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-				zbx_vector_ptr_remove(&host->items, i);
+			if (ITEM_TYPE_ZABBIX_ACTIVE == item->type)
+			{
+				if (FAIL != (i = zbx_vector_ptr_search(&host->items, item,
+						ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+				{
+					zbx_vector_ptr_remove(&host->items, i);
+				}
+			}
 		}
 
 		if (ITEM_TYPE_ZABBIX_ACTIVE == type)
@@ -2781,8 +2787,14 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 		{
 			host->revision = config->revision;
 
-			if (FAIL != (i = zbx_vector_ptr_search(&host->items, item, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-				zbx_vector_ptr_remove(&host->items, i);
+			if (ITEM_TYPE_ZABBIX_ACTIVE == item->type)
+			{
+				if (FAIL != (i = zbx_vector_ptr_search(&host->items, item,
+						ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+				{
+					zbx_vector_ptr_remove(&host->items, i);
+				}
+			}
 		}
 
 		if (ITEM_STATUS_ACTIVE == item->status)
