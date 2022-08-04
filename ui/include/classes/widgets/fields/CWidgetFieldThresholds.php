@@ -31,7 +31,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
+		$this->setValidationRules(['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
 			'color'		=> ['type' => API_COLOR],
 			'threshold'	=> ['type' => API_NUMERIC]
 		]]);
@@ -52,9 +52,10 @@ class CWidgetFieldThresholds extends CWidgetField {
 	public function getValue() {
 		$value = parent::getValue();
 
-		foreach ($value as $index => $val) {
-			if ($val['threshold'] === '') {
-				unset($value[$index]);
+		$keys = array_keys($value);
+		foreach ($keys as $key) {
+			if ($value[$key]['threshold'] === '') {
+				unset($value[$key]);
 			}
 		}
 

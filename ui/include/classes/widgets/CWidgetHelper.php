@@ -1537,7 +1537,7 @@ class CWidgetHelper {
 	}
 
 	public static function getThresholds($field) {
-		$thresholds = (new CTable())
+		$thresholds_table = (new CTable())
 			->setHeader([
 				'',
 				(new CColHeader(_('Threshold')))->setWidth('100%'),
@@ -1553,9 +1553,34 @@ class CWidgetHelper {
 				)
 			));
 
-		$i = 0;
-		foreach ($field->getValue() as $threshold) {
-			$thresholds->addRow([
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+
+			$thresholds = [];
+
+			foreach ($field->getValue() as $threshold) {
+				$order_threshold = trim($threshold['threshold']);
+
+				if ($order_threshold !== '' && $number_parser->parse($order_threshold) == CParser::PARSE_SUCCESS) {
+					$thresholds[] = $threshold + ['order_threshold' => $number_parser->calcValue()];
+				}
+			}
+
+			if ($thresholds) {
+				CArrayHelper::sort($thresholds, ['order_threshold']);
+
+				$thresholds_sorted = [];
+
+				foreach ($thresholds as $threshold) {
+					unset($threshold['order_threshold']);
+
+					$thresholds_sorted[] = $threshold;
+				}
+
+				$field->setValue($thresholds_sorted);
+			}
+
+		foreach ($field->getValue() as $i => $threshold) {
+			$thresholds_table->addRow([
 				(new CColor('thresholds['.$i.'][color]', $threshold['color']))->appendColorPickerJs(false),
 				(new CTextBox('thresholds['.$i.'][threshold]', $threshold['threshold'], false))
 					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -1566,11 +1591,9 @@ class CWidgetHelper {
 				],
 				'form_row'
 			);
-
-			$i++;
 		}
 
-		return (new CDiv($thresholds))
+		return (new CDiv($thresholds_table))
 			->addClass('table-forms-separator')
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}

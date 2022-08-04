@@ -393,37 +393,10 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_bg_color->getName()] = $field_bg_color;
 
 		// Thresholds.
-		$field_thresholds = (new CWidgetFieldThresholds('thresholds', _('Thresholds')))
-			->setDefault([]);
+		$field_thresholds = (new CWidgetFieldThresholds('thresholds', _('Thresholds')));
 
 		if (array_key_exists('thresholds', $this->data)) {
-			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
-			$thresholds = [];
-
-			foreach ($this->data['thresholds'] as $threshold) {
-				$order_threshold = trim($threshold['threshold']);
-
-				if ($order_threshold !== '' && $number_parser->parse($order_threshold) == CParser::PARSE_SUCCESS) {
-					$thresholds[] = $threshold + ['order_threshold' => $number_parser->calcValue()];
-				}
-			}
-
-			unset($this->data['thresholds']);
-
-			if ($thresholds) {
-				CArrayHelper::sort($thresholds, ['order_threshold']);
-
-				$this->data['thresholds'] = [];
-
-				foreach ($thresholds as $threshold) {
-					unset($threshold['order_threshold']);
-
-					$this->data['thresholds'][] = $threshold;
-				}
-
-				$field_thresholds->setValue($this->data['thresholds']);
-			}
+			$field_thresholds->setValue($this->data['thresholds']);
 		}
 
 		$this->fields[$field_thresholds->getName()] = $field_thresholds;
