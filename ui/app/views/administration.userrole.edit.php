@@ -86,30 +86,47 @@ $form_grid->addItem(
 );
 
 foreach ($data['labels']['sections'] as $section_key => $section_label) {
-	$ui = [];
-	foreach ($data['labels']['rules'][$section_key] as $rule_key => $rule_label) {
-		$ui[] = new CDiv(
-			(new CCheckBox(str_replace('.', '_', $rule_key), 1))
-				->setId($rule_key)
-				->setChecked(
-					array_key_exists($rule_key, $data['rules']['ui'])
-					&& $data['rules']['ui'][$rule_key]
-				)
-				->setReadonly($data['readonly'])
-				->setLabel(count($data['labels']['rules'][$section_key])===1 ? '' : $rule_label)
-				->setUncheckedValue(0)
-		);
+	if (count($data['labels']['rules'][$section_key]) === 1) {
+		$first_rule_key = array_key_first($data['labels']['rules'][$section_key]);
+		$form_grid->addItem([
+			new CLabel($section_label, $section_key),
+			new CFormField(
+				(new CCheckBox(str_replace('.', '_', $first_rule_key), 1))
+					->setId($first_rule_key)
+					->setChecked(
+						array_key_exists($first_rule_key, $data['rules']['ui'])
+						&& $data['rules']['ui'][$first_rule_key]
+					)
+					->setReadonly($data['readonly'])
+					->setUncheckedValue(0)
+			)
+		]);
+	} else {
+		$ui = [];
+		foreach ($data['labels']['rules'][$section_key] as $rule_key => $rule_label) {
+			$ui[] = new CDiv(
+				(new CCheckBox(str_replace('.', '_', $rule_key), 1))
+					->setId($rule_key)
+					->setChecked(
+						array_key_exists($rule_key, $data['rules']['ui'])
+						&& $data['rules']['ui'][$rule_key]
+					)
+					->setReadonly($data['readonly'])
+					->setLabel($rule_label)
+					->setUncheckedValue(0)
+			);
+		}
+		$form_grid->addItem([
+			new CLabel($section_label, $section_key),
+			new CFormField(
+				(new CDiv(
+					(new CDiv($ui))
+						->addClass(ZBX_STYLE_COLUMNS)
+						->addClass(ZBX_STYLE_COLUMNS_3)
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			)
+		]);
 	}
-	$form_grid->addItem([
-		new CLabel($section_label, $section_key),
-		new CFormField(
-			(new CDiv(
-				(new CDiv($ui))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass(ZBX_STYLE_COLUMNS_3)
-			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-	]);
 }
 
 if (!$data['readonly']) {
