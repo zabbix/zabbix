@@ -79,6 +79,9 @@ static int	DBpatch_6030000(void)
 
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
 					"ui.administration.api_tokens", value_int);
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.administration.audit_log", value_int);
 		}
 		else
 		{
