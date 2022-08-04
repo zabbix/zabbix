@@ -31,6 +31,7 @@
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "zbxcomms.h"
 #include "log.h"
+#include "zbxnum.h"
 
 #define SSH_RUN_KEY	"ssh.run"
 #endif

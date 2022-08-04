@@ -267,7 +267,6 @@ static void	DCdump_host_inventories(void)
 	zabbix_log(LOG_LEVEL_TRACE, "  End of %s()", __func__);
 }
 
-
 static void	DCdump_kvs_paths(void)
 {
 	zbx_dc_kvs_path_t	*kvs_path;

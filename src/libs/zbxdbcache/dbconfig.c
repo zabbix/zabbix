@@ -35,6 +35,10 @@
 #include "zbxserialize.h"
 #include "user_macro.h"
 #include "zbxavailability.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxip.h"
 
 int	sync_in_progress = 0;
 
@@ -203,6 +207,16 @@ clean:
 	}
 
 	return ret;
+}
+
+static int	cmp_key_id(const char *key_1, const char *key_2)
+{
+	const char	*p, *q;
+
+	for (p = key_1, q = key_2; *p == *q && '\0' != *q && '[' != *q; p++, q++)
+		;
+
+	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
 }
 
 static unsigned char	poller_by_item(unsigned char type, const char *key)
@@ -856,6 +870,29 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: calculate nextcheck timestamp for passive proxy                   *
+ *                                                                            *
+ * Parameters: hostid - [IN] host identifier from database                    *
+ *             delay  - [IN] default delay value, can be overridden           *
+ *             now    - [IN] current timestamp                                *
+ *                                                                            *
+ * Return value: nextcheck value                                              *
+ *                                                                            *
+ ******************************************************************************/
+static time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now)
+{
+	time_t	nextcheck;
+
+	nextcheck = delay * (now / delay) + (unsigned int)(hostid % delay);
+
+	while (nextcheck <= now)
+		nextcheck += delay;
+
+	return nextcheck;
 }
 
 static void	DCsync_autoreg_config(zbx_dbsync_t *sync)
@@ -2716,7 +2753,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &item->interfaceid);
 			dc_interface_update_agent_stats(interface, item->type, -1);
 		}
-
 
 		itemid = item->itemid;
 
@@ -5422,7 +5458,6 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
 	zbx_ipc_message_t	message;
 	unsigned char		*data = NULL;
 	zbx_uint32_t		data_len = 0;
-
 
 	if (0 == diff->values_num)
 		return;
@@ -10534,7 +10569,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
-
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 			continue;
