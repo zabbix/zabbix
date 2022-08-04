@@ -106,6 +106,7 @@ static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts);
 static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts);
 
 static int	dc_host_update_revision(ZBX_DC_HOST *host);
+static int	dc_item_update_revision(ZBX_DC_ITEM *item);
 
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
@@ -2298,7 +2299,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 		}
 
 		item->revision = config->revision;
-		host->revision = config->revision;
+		dc_host_update_revision(host);
 
 		if (ITEM_STATUS_ACTIVE == status)
 		{
@@ -2747,8 +2748,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &rowid)))
 			continue;
 
-		if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
-			host->revision = config->revision;
+		dc_item_update_revision(item);
 
 		if (ITEM_STATUS_ACTIVE == item->status)
 		{
@@ -4878,6 +4878,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 	ZBX_DC_PREPROCITEM	*preprocitem = NULL;
 	zbx_dc_preproc_op_t	*op;
 	zbx_vector_ptr_t	items;
+	ZBX_DC_ITEM		*item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4909,6 +4910,9 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 			}
 			else
 				preprocitem->update_time = timestamp;
+
+			if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+				dc_item_update_revision(item);
 		}
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
@@ -4948,6 +4952,9 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 				zbx_vector_ptr_append(&items, preprocitem);
 			}
 		}
+
+		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &op->itemid)))
+			dc_item_update_revision(item);
 
 		dc_strpool_release(op->params);
 		dc_strpool_release(op->error_handler_params);
@@ -5369,6 +5376,28 @@ static int	dc_host_update_revision(ZBX_DC_HOST *host)
 		return FAIL;
 
 	proxy->revision = config->revision;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update item, host and its proxy revision                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_item_update_revision(ZBX_DC_ITEM *item)
+{
+	ZBX_DC_HOST	*host;
+
+	if (item->revision == config->revision)
+		return SUCCEED;
+
+	item->revision = config->revision;
+
+	if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
+		return FAIL;
+
+	dc_host_update_revision(host);
 
 	return SUCCEED;
 }
@@ -8605,7 +8634,7 @@ static int	dc_preproc_item_init(zbx_preproc_item_t *item, zbx_uint64_t itemid)
 	if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 		return FAIL;
 
-	if (HOST_STATUS_MONITORED != dc_host->status)
+	if (HOST_STATUS_MONITORED != dc_host->status || 0 == dc_host->proxy_hostid)
 		return FAIL;
 
 	item->itemid = itemid;

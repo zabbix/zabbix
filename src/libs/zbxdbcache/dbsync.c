@@ -3086,11 +3086,8 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 			" from item_preproc pp,items i,hosts h"
 			" where pp.itemid=i.itemid"
 				" and i.hostid=h.hostid"
-				" and (h.proxy_hostid is null"
-					" or i.type in (%d,%d,%d))"
 				" and h.status in (%d,%d)"
 				" and i.flags<>%d",
-			ITEM_TYPE_INTERNAL, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
