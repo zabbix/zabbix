@@ -3388,7 +3388,7 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 	if (0 == zbx_db_txn_level())
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __func__);
 
-	if (NULL = (t = DBget_table(table)))
+	if (NULL = (t == DBget_table(table)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, table);
 		THIS_SHOULD_NEVER_HAPPEN;
