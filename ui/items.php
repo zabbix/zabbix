@@ -739,12 +739,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
 						$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
 					}
-					if ($db_item['username'] !== getRequest('username', '')) {
-						$item['username'] = getRequest('username', '');
-					}
-					if ($db_item['password'] !== getRequest('password', '')) {
-						$item['password'] = getRequest('password', '');
-					}
 					if ($db_item['publickey'] !== getRequest('publickey', '')) {
 						$item['publickey'] = getRequest('publickey', '');
 					}
@@ -790,6 +784,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['templateid'] == 0 && $type == ITEM_TYPE_HTTPAGENT) {
 					$item = prepareItemHttpAgentFormData($http_item) + $item;
 				}
+			}
+
+			if ($db_item['username'] !== getRequest('username', '')) {
+				$item['username'] = getRequest('username', '');
+			}
+
+			if ($db_item['password'] !== getRequest('password', '')) {
+				$item['password'] = getRequest('password', '');
 			}
 
 			if ($db_item['status'] != getRequest('status', ITEM_STATUS_DISABLED)) {
