@@ -21,6 +21,7 @@
 
 #include "zbxcomms.h"
 #include "log.h"
+#include "zbxnum.h"
 
 #define TELNET_RUN_KEY	"telnet.run"
 

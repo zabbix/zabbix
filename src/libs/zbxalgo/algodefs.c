@@ -20,7 +20,8 @@
 #include "zbxalgo.h"
 #include "algodefs.h"
 
-#include "common.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
 
 typedef unsigned char uchar;
 

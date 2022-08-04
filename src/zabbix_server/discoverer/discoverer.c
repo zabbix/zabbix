@@ -25,12 +25,14 @@
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
-
 #include "zbxnix.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
 #include "zbxcomms.h"
 #include "../events.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxip.h"
 
 extern int				CONFIG_DISCOVERER_FORKS;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

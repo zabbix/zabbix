@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxdbhigh.h"
+
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
@@ -29,8 +30,7 @@
 #include "audit/zbxaudit.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
-
-#include "zbxdbhigh.h"
+#include "zbxnum.h"
 
 typedef struct
 {
@@ -4060,7 +4060,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 						interface->interfaceid, interface->main, interface->type,
 						interface->useip, interface->ip, interface->dns, atoi(interface->port));
 			}
-			else if (0 != (interface->flags & ZBX_FLAG_HPMACRO_UPDATE))
+			else if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE))
 			{
 				const char	*d = "";
 

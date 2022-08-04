@@ -19,12 +19,16 @@
 
 #include "zbxcomms.h"
 #include "comms.h"
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #include "tls.h"
 #endif
-#include "common.h"
 #include "log.h"
 #include "zbxcompress.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxip.h"
+#include "zbxtime.h"
 
 #ifdef _WINDOWS
 #	ifndef _WIN32_WINNT_WIN7
@@ -691,7 +695,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	{
 		server_name = ip;
 	}
-
 
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
 			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))

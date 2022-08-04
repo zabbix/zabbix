@@ -1,11 +1,11 @@
 // Widget configuration.
 
-form.dashboard-grid-widget-clock {
-	.field-group-date,
-	.field-group-time,
-	.field-group-tzone {
+form.dashboard-widget-clock {
+	.fields-group-date,
+	.fields-group-time,
+	.fields-group-tzone {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(60px, max-content) auto);
+		grid-template-columns: 60px 120px repeat(2, minmax(60px, max-content) auto);
 		align-items: center;
 		column-gap: 10px;
 		row-gap: 5px;
@@ -21,13 +21,13 @@ form.dashboard-grid-widget-clock {
 		}
 	}
 
-	.field-group-time {
+	.fields-group-time {
 		.field-format {
 			grid-column: 4 / -1;
 		}
 	}
 
-	.field-group-tzone {
+	.fields-group-tzone {
 		.field-format {
 			grid-column: 2 / -1;
 		}
@@ -40,7 +40,7 @@ form.dashboard-grid-widget-clock {
 
 // Widget view.
 
-div.dashboard-grid-widget-clock {
+div.dashboard-widget-clock {
 	&.clock-digital {
 		$line-height: 1.14;
 

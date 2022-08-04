@@ -19,6 +19,10 @@
 
 #include "taskmanager.h"
 
+#include "../../zabbix_server/scripts/scripts.h"
+#include "../../zabbix_server/trapper/trapper_item_test.h"
+#include "../../zabbix_server/poller/checks_snmp.h"
+
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
@@ -28,10 +32,8 @@
 #include "proxy.h"
 #include "zbxcomms.h"
 #include "dbcache.h"
-
-#include "../../zabbix_server/scripts/scripts.h"
-#include "../../zabbix_server/trapper/trapper_item_test.h"
-#include "../../zabbix_server/poller/checks_snmp.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR

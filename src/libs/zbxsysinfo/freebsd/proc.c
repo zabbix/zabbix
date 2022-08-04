@@ -17,19 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
+
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "zbxstr.h"
+
+#if HAVE_LIBJAIL
+#	include <jail.h>
+#endif
 
 #if (__FreeBSD_version) < 500000
 #	define ZBX_COMMLEN		MAXCOMLEN
 #	define ZBX_PROC_PID		kp_proc.p_pid
 #	define ZBX_PROC_PPID		kp_eproc.e_ppid
-#	define ZBX_PROC_JID		kp_eproc.e_jobc
-#	define ZBX_PROC_TID		kp_proc.p_wakeup
-#	define ZBX_PROC_TNAME		kp_proc.p_nice
 #	define ZBX_PROC_COMM		kp_proc.p_comm
 #	define ZBX_PROC_STAT		kp_proc.p_stat
 #	define ZBX_PROC_TSIZE		kp_eproc.e_vm.vm_tsize
@@ -54,7 +56,7 @@
 #	define ZBX_PROC_PPID		ki_ppid
 #	define ZBX_PROC_JID		ki_jid
 #	define ZBX_PROC_TID		ki_tid
-#	define ZBX_PROC_TNAME		ki_tdname
+#	define ZBX_PROC_TNAME		ki_ocomm
 #	define ZBX_PROC_COMM		ki_comm
 #	define ZBX_PROC_STAT		ki_stat
 #	define ZBX_PROC_TSIZE		ki_tsize
@@ -95,6 +97,7 @@ typedef struct
 	int		jid;
 
 	char		*name;
+	char		*jname;
 	char		*tname;
 	char		*cmdline;
 	char		*state;
@@ -135,6 +138,7 @@ ZBX_PTR_VECTOR_IMPL(proc_data_ptr, proc_data_t *)
 static void	proc_data_free(proc_data_t *proc_data)
 {
 	zbx_free(proc_data->name);
+	zbx_free(proc_data->jname);
 	zbx_free(proc_data->tname);
 	zbx_free(proc_data->cmdline);
 	zbx_free(proc_data->state);
@@ -565,22 +569,30 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (SRUN == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
-			case ZBX_PROC_STAT_SLEEP:
-				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 != (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
+			case ZBX_PROC_STAT_TRACE:
+				if (SSTOP == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_ZOMB:
 				if (SZOMB == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
+#if (__FreeBSD_version) < 700000
+			case ZBX_PROC_STAT_SLEEP:
+			case ZBX_PROC_STAT_DISK:
+				if (SSLEEP == proc[i].ZBX_PROC_STAT)
+					stat_ok = 1;
+				break;
+#else
+			case ZBX_PROC_STAT_SLEEP:
+				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 != (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
+					stat_ok = 1;
+				break;
 			case ZBX_PROC_STAT_DISK:
 				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 == (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
 					stat_ok = 1;
 				break;
-			case ZBX_PROC_STAT_TRACE:
-				if (SSTOP == proc[i].ZBX_PROC_STAT)
-					stat_ok = 1;
-				break;
+#endif
 			}
 		}
 		else
@@ -609,18 +621,31 @@ static char	*get_state(struct kinfo_proc *proc)
 {
 	char	*state;
 
-	if (SRUN == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "running");
-	else if (SSLEEP == proc->ZBX_PROC_STAT && 0 != (proc->ZBX_PROC_TDFLAG & TDF_SINTR))
-		state = zbx_strdup(NULL, "sleeping");
-	else if (SZOMB == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "zombie");
-	else if (SSLEEP == proc->ZBX_PROC_STAT && 0 == (proc->ZBX_PROC_TDFLAG & TDF_SINTR))
-		state = zbx_strdup(NULL, "disk sleep");
-	else if (SSTOP == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "tracing stop");
-	else
-		state = zbx_strdup(NULL, "other");
+	switch (proc->ZBX_PROC_STAT)
+	{
+		case SRUN:
+			state = zbx_strdup(NULL, "running");
+			break;
+		case SZOMB:
+			state = zbx_strdup(NULL, "zombie");
+			break;
+		case SSTOP:
+			state = zbx_strdup(NULL, "tracing stop");
+			break;
+		case SSLEEP:
+#if (__FreeBSD_version) < 700000
+			state = zbx_strdup(NULL, "sleeping");
+#else
+			if (0 != (proc->ZBX_PROC_TDFLAG & TDF_SINTR))
+				state = zbx_strdup(NULL, "sleeping");
+			else
+				state = zbx_strdup(NULL, "disk sleep");
+#endif
+
+			break;
+		default:
+			state = zbx_strdup(NULL, "other");
+	}
 
 	return state;
 }
@@ -794,11 +819,21 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
 
+#if (__FreeBSD_version) < 500000
+				proc_data->tid = proc_data->jid = 0;
+				proc_data->tname = NULL;
+#else
 				proc_data->tid = proc_thread[k].ZBX_PROC_TID;
+				proc_data->jid = proc_thread[k].ZBX_PROC_JID;
 				proc_data->tname = zbx_strdup(NULL, proc_thread[k].ZBX_PROC_TNAME);
+#endif
 				proc_data->pid = proc_thread[k].ZBX_PROC_PID;
 				proc_data->ppid = proc_thread[k].ZBX_PROC_PPID;
-				proc_data->jid = proc_thread[k].ZBX_PROC_JID;
+#if HAVE_LIBJAIL
+				proc_data->jname = jail_getname(proc_data->jid);
+#else
+				proc_data->jname = NULL;
+#endif
 				proc_data->name = zbx_strdup(NULL, proc_thread[k].ZBX_PROC_COMM);
 				proc_data->state = get_state(&proc_thread[k]);
 				proc_data->uid = proc[i].ZBX_PROC_UID;
@@ -855,9 +890,18 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (ZBX_PROC_MODE_PROCESS == zbx_proc_mode)
 			{
+#if (__FreeBSD_version) < 500000
+				proc_data->jid = 0;
+#else
+				proc_data->jid = proc[i].ZBX_PROC_JID;
+#endif
 				proc_data->pid = proc[i].ZBX_PROC_PID;
 				proc_data->ppid = proc[i].ZBX_PROC_PPID;
-				proc_data->jid = proc[i].ZBX_PROC_JID;
+#if HAVE_LIBJAIL
+				proc_data->jname = jail_getname(proc_data->jid);
+#else
+				proc_data->jname = NULL;
+#endif
 				proc_data->cmdline = zbx_strdup(NULL, args);
 				proc_data->state = get_state(&proc[i]);
 				proc_data->uid = proc[i].ZBX_PROC_UID;
@@ -869,6 +913,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 			else
 			{
+				proc_data->jname = NULL;
 				proc_data->cmdline = NULL;
 				proc_data->state = NULL;
 				proc_data->user = NULL;
@@ -939,6 +984,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "jname", pdata->jname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "group", ZBX_NULL2EMPTY_STR(pdata->group), ZBX_JSON_TYPE_STRING);
@@ -967,6 +1013,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "jname", pdata->jname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "group", ZBX_NULL2EMPTY_STR(pdata->group), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "uid", pdata->uid);
