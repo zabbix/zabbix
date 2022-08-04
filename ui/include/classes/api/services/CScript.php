@@ -63,7 +63,7 @@ class CScript extends CApiService {
 	public function get(array $options) {
 		$script_fields = ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
 			'confirmation', 'type', 'execute_on', 'timeout', 'parameters', 'scope', 'port', 'authtype', 'username',
-			'password', 'publickey', 'privatekey', 'menu_path'
+			'password', 'publickey', 'privatekey', 'menu_path', 'url', 'new_window'
 		];
 		$group_fields = ['groupid', 'name', 'flags', 'uuid'];
 		$host_fields = ['hostid', 'host', 'name', 'description', 'status', 'proxy_hostid', 'inventory_mode', 'flags',
@@ -85,7 +85,9 @@ class CScript extends CApiService {
 				'usrgrpid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'groupid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'confirmation' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'type' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK])],
+				'type' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL])],
+				'url' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'new_window' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES])],
 				'execute_on' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY])],
 				'scope' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
 				'menu_path' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
@@ -93,6 +95,7 @@ class CScript extends CApiService {
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'command' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'url' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'description' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'confirmation' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'username' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -283,11 +286,26 @@ class CScript extends CApiService {
 		 */
 		foreach ($scripts as $index => $script) {
 			$type_rules = $this->getTypeValidationRules($script['type'], 'create', $type_fields);
-			$this->getScopeValidationRules($script['scope'], $scope_fields);
+			$scope_rules = $this->getScopeValidationRules($script['scope'], $scope_fields);
 
-			$type_rules['fields'] += $common_fields + $scope_fields;
+			// Temporary remove scope fields from script to validate type fields.
+			$tmp = $script;
+			$tmp_fields = array_intersect_key($scope_rules['fields'], $script);
 
-			if (!CApiInputValidator::validate($type_rules, $script, '/'.($index + 1), $error)) {
+			foreach ($tmp_fields as $field => $rules) {
+				unset($tmp[$field]);
+			}
+
+			$type_rules['fields'] += $common_fields + $type_fields;
+
+			if (!CApiInputValidator::validate($type_rules, $tmp, '/'.($index + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			// Validate all fields together.
+			$scope_rules['fields'] += $type_rules['fields'] + $common_fields + $scope_fields;
+
+			if (!CApiInputValidator::validate($scope_rules, $script, '/'.($index + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
@@ -368,7 +386,7 @@ class CScript extends CApiService {
 		$db_scripts = DB::select('scripts', [
 			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
 				'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username', 'password',
-				'publickey', 'privatekey', 'menu_path'
+				'publickey', 'privatekey', 'menu_path', 'url', 'new_window'
 			],
 			'scriptids' => array_column($scripts, 'scriptid'),
 			'preservekeys' => true
@@ -584,19 +602,16 @@ class CScript extends CApiService {
 
 		$common_fields = [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'name')],
-			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK])],
-			'scope' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
-			'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL])],
+			'scope' =>			['type' => API_INT32],
 			'groupid' =>		['type' => API_ID],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'description')]
 		];
 
 		if ($method === 'create') {
-			$common_fields['scope']['default'] = ZBX_SCRIPT_SCOPE_ACTION;
 			$api_input_rules['uniq'] = [['name']];
 			$common_fields['name']['flags'] |= API_REQUIRED;
 			$common_fields['type']['flags'] = API_REQUIRED;
-			$common_fields['command']['flags'] |= API_REQUIRED;
 		}
 		else {
 			$api_input_rules['uniq'] = [['scriptid'], ['name']];
@@ -608,6 +623,7 @@ class CScript extends CApiService {
 		 * script types. Set only type for now. Unique parameter names, lengths and other flags are set later.
 		 */
 		$api_input_rules['fields'] += $common_fields + [
+			'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
 			'execute_on' =>		['type' => API_INT32],
 			'menu_path' =>		['type' => API_STRING_UTF8],
 			'usrgrpid' =>		['type' => API_ID],
@@ -623,7 +639,9 @@ class CScript extends CApiService {
 			'parameters' =>			['type' => API_OBJECTS, 'fields' => [
 				'name' =>				['type' => API_STRING_UTF8],
 				'value' =>				['type' => API_STRING_UTF8]
-			]]
+			]],
+			'url' =>			['type' => API_URL],
+			'new_window' =>		['type' => API_INT32]
 		];
 
 		return $api_input_rules;
@@ -671,12 +689,33 @@ class CScript extends CApiService {
 		switch ($type) {
 			case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 				$api_input_rules['fields'] += [
+					'scope' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
+					'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
 					'execute_on' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY])]
 				];
+
+				if ($method === 'create') {
+					$api_input_rules['fields']['scope']['flags'] = API_REQUIRED;
+					$api_input_rules['fields']['command']['flags'] |= API_REQUIRED;
+				}
+				break;
+
+			case ZBX_SCRIPT_TYPE_IPMI:
+				$api_input_rules['fields'] += [
+					'scope' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
+					'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
+				];
+
+				if ($method === 'create') {
+					$api_input_rules['fields']['scope']['flags'] = API_REQUIRED;
+					$api_input_rules['fields']['command']['flags'] |= API_REQUIRED;
+				}
 				break;
 
 			case ZBX_SCRIPT_TYPE_SSH:
 				$common_fields = [
+					'scope' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
+					'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
 					'port' =>			['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 					'authtype' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY])],
 					'username' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'username')],
@@ -684,6 +723,8 @@ class CScript extends CApiService {
 				];
 
 				if ($method === 'create') {
+					$common_fields['scope']['flags'] = API_REQUIRED;
+					$common_fields['command']['flags'] |= API_REQUIRED;
 					$common_fields['username']['flags'] |= API_REQUIRED;
 				}
 
@@ -695,24 +736,48 @@ class CScript extends CApiService {
 
 			case ZBX_SCRIPT_TYPE_TELNET:
 				$api_input_rules['fields'] += [
+					'scope' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
+					'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
 					'port' =>			['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 					'username' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'username')],
 					'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'password')]
 				];
 
 				if ($method === 'create') {
+					$api_input_rules['fields']['scope']['flags'] = API_REQUIRED;
+					$api_input_rules['fields']['command']['flags'] |= API_REQUIRED;
 					$api_input_rules['fields']['username']['flags'] |= API_REQUIRED;
 				}
 				break;
 
 			case ZBX_SCRIPT_TYPE_WEBHOOK:
 				$api_input_rules['fields'] += [
-					'timeout' =>		['type' => API_TIME_UNIT, 'in' => '1:'.SEC_PER_MIN],
+					'scope' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
+					'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
+					'timeout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:'.SEC_PER_MIN],
 					'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 						'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('script_param', 'name')],
 						'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('script_param', 'value')]
 					]]
 				];
+
+				if ($method === 'create') {
+					$api_input_rules['fields']['scope']['flags'] = API_REQUIRED;
+					$api_input_rules['fields']['command']['flags'] |= API_REQUIRED;
+				}
+				break;
+
+			case ZBX_SCRIPT_TYPE_URL:
+				$api_input_rules['fields'] += [
+					'scope' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
+					'url' =>			['type' => API_URL, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('scripts', 'url')],
+					'new_window' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]), 'default' => DB::getDefault('scripts', 'new_window')]
+				];
+
+				if ($method === 'create') {
+					$api_input_rules['fields']['scope']['flags'] = API_REQUIRED;
+					$api_input_rules['fields']['url']['flags'] |= API_REQUIRED;
+				}
 				break;
 		}
 
