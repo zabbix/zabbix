@@ -127,6 +127,13 @@ static void	DCdump_hosts(void)
 
 			zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64, interface->interfaceid);
 		}
+
+		zabbix_log(LOG_LEVEL_TRACE, "  httptests:");
+		for (j = 0; j < host->httptests.values_num; j++)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "    httptestid:" ZBX_FS_UI64,
+					host->httptests.values[j]->httptestid);
+		}
 	}
 
 	zbx_vector_ptr_destroy(&index);

@@ -72,6 +72,7 @@ int	sync_in_progress = 0;
 				dc_host->maintenance_type, dc_item->type)
 
 ZBX_PTR_VECTOR_IMPL(cached_proxy, zbx_cached_proxy_t *)
+ZBX_PTR_VECTOR_IMPL(dc_httptest, zbx_dc_httptest_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -1217,6 +1218,9 @@ done:
 
 			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
+
+			zbx_vector_dc_httptest_create_ext(&host->httptests, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
 		else
 		{
@@ -1427,6 +1431,8 @@ done:
 #endif
 		zbx_vector_ptr_destroy(&host->interfaces_v);
 		zbx_hashset_remove_direct(&config->hosts, host);
+
+		zbx_vector_dc_httptest_destroy(&host->httptests);
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -5462,7 +5468,10 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(httptest->status, row[3]);
 
 		if (0 == found)
+		{
 			httptest->location = ZBX_LOCATION_NONE;
+			zbx_vector_dc_httptest_append(&host->httptests, httptest);
+		}
 
 		delay_str = dc_expand_user_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
 		(void)is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED);
@@ -5495,11 +5504,22 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 	/* remove deleted httptest rules from cache and update host revision */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
+		int	index;
+
 		if (NULL == (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &rowid)))
 			continue;
 
 		if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &httptest->hostid)))
+		{
 			dc_host_update_revision(host);
+
+			if (FAIL != (index = zbx_vector_dc_httptest_search(&host->httptests, httptest,
+					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+			{
+				zbx_vector_dc_httptest_remove(&host->httptests, index);
+			}
+
+		}
 
 		dc_httptest_dequeue(httptest);
 		zbx_hashset_remove_direct(&config->httptests, httptest);

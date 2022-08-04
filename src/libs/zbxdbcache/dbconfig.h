@@ -318,6 +318,42 @@ ZBX_DC_PSK;
 
 typedef struct
 {
+	zbx_uint64_t	httptestid;
+	zbx_uint64_t	hostid;
+	time_t		nextcheck;
+	int		delay;
+	unsigned char	status;
+	unsigned char	location;
+	zbx_uint32_t	revision;
+}
+zbx_dc_httptest_t;
+
+typedef struct
+{
+	zbx_uint64_t	httptest_fieldid;
+	zbx_uint64_t	httptestid;
+}
+zbx_dc_httptest_field_t;
+
+typedef struct
+{
+	zbx_uint64_t	httpstepid;
+	zbx_uint64_t	httptestid;
+	zbx_uint32_t	revision;
+}
+zbx_dc_httpstep_t;
+
+typedef struct
+{
+	zbx_uint64_t	httpstep_fieldid;
+	zbx_uint64_t	httpstepid;
+}
+zbx_dc_httpstep_field_t;
+
+ZBX_PTR_VECTOR_DECL(dc_httptest, zbx_dc_httptest_t *)
+
+typedef struct
+{
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
 	zbx_uint64_t	items_active_normal;		/* On enabled hosts these two fields store number of enabled */
@@ -349,6 +385,8 @@ typedef struct
 
 	zbx_vector_ptr_t	interfaces_v;	/* for quick finding of all host interfaces in */
 						/* 'config->interfaces' hashset */
+
+	zbx_vector_dc_httptest_t	httptests;
 }
 ZBX_DC_HOST;
 
@@ -769,40 +807,6 @@ typedef struct
 	zbx_uint64_t	druleid;
 }
 zbx_dc_dcheck_t;
-
-typedef struct
-{
-	zbx_uint64_t	httptestid;
-	zbx_uint64_t	hostid;
-	time_t		nextcheck;
-	int		delay;
-	unsigned char	status;
-	unsigned char	location;
-	zbx_uint32_t	revision;
-}
-zbx_dc_httptest_t;
-
-typedef struct
-{
-	zbx_uint64_t	httptest_fieldid;
-	zbx_uint64_t	httptestid;
-}
-zbx_dc_httptest_field_t;
-
-typedef struct
-{
-	zbx_uint64_t	httpstepid;
-	zbx_uint64_t	httptestid;
-	zbx_uint32_t	revision;
-}
-zbx_dc_httpstep_t;
-
-typedef struct
-{
-	zbx_uint64_t	httpstep_fieldid;
-	zbx_uint64_t	httpstepid;
-}
-zbx_dc_httpstep_field_t;
 
 typedef struct
 {
