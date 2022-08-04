@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-04T05:41:51Z'
+  date: '2022-08-04T11:15:13Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -93,75 +93,60 @@ zabbix_export:
                     Azure.params = params;
                 },
             
-                requestAPI: function (type, http_data) {
-                    if (typeof http_data=== 'undefined' || http_data=== null) {
-                        http_data= '';
+                request: function (url, data) {
+                    if (typeof data === 'undefined' || data === null) {
+                        data = '';
                     }
             
-                    request = new HttpRequest();
-            
-                    switch (type) {
-                        case 'token':
-                            request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                            url = 'https://login.microsoftonline.com/' + Azure.params.tenant_id +'/oauth2/token';
-                            request_data = 'grant_type=client_credentials&client_id=' + Azure.params.app_id +'&client_secret=' + Azure.params.password + '&resource=https%3A%2F%2Fmanagement.azure.com%2F'
-                            response = request.post(url, request_data);
-                            break;
-                        case 'vm':
-                            request.addHeader('Accept=application/json');
-                            request.addHeader('Authorization: Bearer ' + Azure.token);
-                            url = 'https://management.azure.com/subscriptions/' + Azure.params.subscription_id + '/providers/Microsoft.Compute/virtualMachines?api-version=2022-03-01'
-                            response = request.get(url);
-                            break;
-                        case 'next_link':
-                            request.addHeader('Accept=application/json');
-                            request.addHeader('Authorization: Bearer ' + Azure.token);
-                            url = http_data;
-                            request_data = '';
-                            response = request.get(url);
+                    var response, request = new HttpRequest();
+                    if (Azure.token) {
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + Azure.token);
                     }
             
-                    if (request.getStatus() !== 200) {
+                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            
+                    if (data !== '') {
+                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
+                        response = request.post(url, data);
+                    }
+                    else {
+                        response = request.get(url);
+                    }
+            
+                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() !== 200 || response === null) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
             
-                    if (response !== null) {
-                        if (type === 'token') {
-                            try {
-                                auth_data = JSON.parse(response);
-                            }
-                            catch (error) {
-                                throw 'Failed to parse auth response received from API.';
-                            }
-                            if ('access_token' in auth_data) {
-                                Azure.token = auth_data['access_token'];
-                            } else {
-                                throw 'Auth response does not contain access token.';
-                            }
-                        }
-                        else {
-                            try {
-                                return JSON.parse(response);
-                            }
-                            catch (error) {
-                                throw 'Failed to parse response received from API.';
-                            }
-                        }
+                    try {
+                        return JSON.parse(response);
                     }
-                    else {
-                        throw 'No data received by ' + type + ' request.';
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
                     }
                 }
             };
             
-            var data = {};
+            var result,
+                data = {};
                 data['errors'] = {};
             
             try {
                 Azure.setParams(JSON.parse(value));
             
                 try {
-                    Azure.requestAPI('token');
+                    result = Azure.request(
+                            'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) +'/oauth2/token',
+                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
+                    );
+            
+                    if ('access_token' in result) {
+                        Azure.token = result['access_token'];
+                    } else {
+                        throw 'Auth response does not contain access token.';
+                    }
                 }
                 catch (error) {
                     data.errors.auth = error.toString();
@@ -169,12 +154,12 @@ zabbix_export:
             
                 if (!('auth' in data.errors)) {
                     try {
-                        raw_data = Azure.requestAPI('vm');
+                        raw_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.Compute/virtualMachines?api-version=2022-03-01');
                         
                         if ('nextLink' in raw_data) {
                             next_data = raw_data;
                             while ('nextLink' in next_data) {
-                                next_data = Azure.requestAPI('next_link', next_data.nextLink);
+                                next_data = Azure.request(next_data.nextLink);
                                 next_data.value.forEach(function (value) {
                                     raw_data.value.push(value);
                                 });

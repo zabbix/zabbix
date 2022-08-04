@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-04T05:41:51Z'
+  date: '2022-08-04T11:15:14Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -608,7 +608,7 @@ zabbix_export:
             
                     var response, request = new HttpRequest();
                     request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                    response = request.post('https://login.microsoftonline.com/' + AzureVM.params.tenant_id +'/oauth2/token', 'grant_type=client_credentials&client_id=' + AzureVM.params.app_id +'&client_secret=' + AzureVM.params.password + '&resource=https%3A%2F%2Fmanagement.azure.com%2F');
+                    response = request.post('https://login.microsoftonline.com/' + encodeURIComponent(AzureVM.params.tenant_id) +'/oauth2/token', 'grant_type=client_credentials&client_id=' + encodeURIComponent(AzureVM.params.app_id) +'&client_secret=' + encodeURIComponent(AzureVM.params.password) + '&resource=' encodeURIComponent('https://Fmanagement.azure.com'));
             
                     if (request.getStatus() !== 200) {
                         throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
@@ -642,7 +642,7 @@ zabbix_export:
                     request.addHeader('Accept=application/json');
                     request.addHeader('Authorization: Bearer ' + AzureVM.token);
             
-                    health_data = request.get('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+                    health_data = request.get('https://management.azure.com' + encodeURIComponent(AzureVM.params.resource_id) + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
             
                     if (request.getStatus() !== 200) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + health_data;
@@ -672,7 +672,7 @@ zabbix_export:
                     request.addHeader('Accept=application/json');
                     request.addHeader('Authorization: Bearer ' + AzureVM.token);
             
-                    metrics_data = request.get('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + encodeURIComponent(metrics) + '&timespan=' + start_date + '/' + end_date + '&api-version=2021-05-01');
+                    metrics_data = request.get('https://management.azure.com' + encodeURIComponent(AzureVM.params.resource_id) + '/providers/Microsoft.Insights/metrics?metricnames=' + encodeURIComponent(metrics) + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
             
                     if (request.getStatus() !== 200) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + metrics_data;
@@ -865,6 +865,7 @@ zabbix_export:
           key: azure.vm.flows.inbound
           delay: '0'
           history: 7d
+          value_type: FLOAT
           description: 'Inbound Flows are number of current flows in the inbound direction (traffic going into the VM).'
           preprocessing:
             -
@@ -884,6 +885,7 @@ zabbix_export:
           key: azure.vm.flows.inbound.max
           delay: '0'
           history: 7d
+          value_type: FLOAT
           description: 'The maximum creation rate of inbound flows (traffic going into the VM).'
           preprocessing:
             -
@@ -903,6 +905,7 @@ zabbix_export:
           key: azure.vm.flows.outbound
           delay: '0'
           history: 7d
+          value_type: FLOAT
           description: 'Outbound Flows are number of current flows in the outbound direction (traffic going out of the VM).'
           preprocessing:
             -
@@ -922,6 +925,7 @@ zabbix_export:
           key: azure.vm.flows.outbound.max
           delay: '0'
           history: 7d
+          value_type: FLOAT
           description: 'The maximum creation rate of outbound flows (traffic going out of the VM).'
           preprocessing:
             -
