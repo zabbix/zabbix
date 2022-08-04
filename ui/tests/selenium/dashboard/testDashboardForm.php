@@ -845,11 +845,11 @@ class testDashboardForm extends CWebTest {
 					// Database result format should be ['Admin', 'Tag-user'] to compare with table result in UI.
 					$result[] = $array[$key];
 				}
+				natcasesort($result);
 				// Add name and surname to Admin user.
 				if ($list === 'Users' && $result[0] === 'Admin') {
 					$result[0] = 'Admin (Zabbix Administrator)';
 				}
-				natcasesort($result);
 				$this->assertTableDataColumn($result, $list, $selector, false);
 
 				return;
