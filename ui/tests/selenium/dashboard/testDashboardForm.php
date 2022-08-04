@@ -806,6 +806,7 @@ class testDashboardForm extends CWebTest {
 					$result[] = $array[$key];
 				}
 				natcasesort($result);
+				$result = array_values($result);
 				// Add name and surname to Admin user.
 				if ($list === 'Users' && $result[0] === 'Admin') {
 					$result[0] = 'Admin (Zabbix Administrator)';
