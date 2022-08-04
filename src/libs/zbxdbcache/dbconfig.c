@@ -6167,6 +6167,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 				config->hosts_h.num_data, config->hosts_h.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_p    : %d (%d slots)", __func__,
 				config->hosts_p.num_data, config->hosts_p.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() autoreg_hosts: %d (%d slots)", __func__,
+				config->autoreg_hosts.num_data, config->autoreg_hosts.num_slots);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() psks       : %d (%d slots)", __func__,
 				config->psks.num_data, config->psks.num_slots);
