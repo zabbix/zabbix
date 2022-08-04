@@ -6758,7 +6758,6 @@ int	init_configuration_cache(char **error)
 
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
-
 	CREATE_HASHSET_EXT(config->hosts_p, 0, __config_host_h_hash, __config_host_h_compare);
 	CREATE_HASHSET_EXT(config->autoreg_hosts, 10, __config_autoreg_host_h_hash, __config_autoreg_host_h_compare);
 	CREATE_HASHSET_EXT(config->interfaces_ht, 10, __config_interface_ht_hash, __config_interface_ht_compare);
@@ -7011,83 +7010,6 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 	return ret;
 }
 
-static int	tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char **error)
-{
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
-	{
-		if (SUCCEED != zbx_tls_get_attr_cert(sock, attr))
-		{
-			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-		}
-	}
-#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
-	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
-	{
-		if (SUCCEED != zbx_tls_get_attr_psk(sock, attr))
-		{
-			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-		}
-	}
-#endif
-	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
-	{
-		*error = zbx_strdup(*error, "internal error: invalid connection type");
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
-	}
-#endif
-	return SUCCEED;
-}
-
-static int	tls_validate_attr(const zbx_socket_t *sock, const zbx_tls_conn_attr_t *attr, const char *tls_issuer,
-		const char *tls_subject, const ZBX_DC_PSK *tls_dc_psk, const char **msg)
-{
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
-	{
-		/* simplified match, not compliant with RFC 4517, 4518 */
-		if ('\0' != *tls_issuer && 0 != strcmp(tls_issuer, attr->issuer))
-		{
-			*msg = "certificate issuer does not match";
-			return FAIL;
-		}
-
-		/* simplified match, not compliant with RFC 4517, 4518 */
-		if ('\0' != *tls_subject && 0 != strcmp(tls_subject, attr->subject))
-		{
-			*msg = "certificate subject does not match";
-			return FAIL;
-		}
-	}
-#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
-	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
-	{
-		if (NULL != tls_dc_psk)
-		{
-			if (strlen(tls_dc_psk->tls_psk_identity) != attr->psk_identity_len ||
-					0 != memcmp(tls_dc_psk->tls_psk_identity, attr->psk_identity,
-					attr->psk_identity_len))
-			{
-				*msg = "false PSK identity";
-				return FAIL;
-			}
-		}
-		else
-		{
-			*msg = "missing PSK";
-			return FAIL;
-		}
-	}
-#endif
-#endif
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose:                                                                   *
@@ -7110,11 +7032,13 @@ static int	tls_validate_attr(const zbx_socket_t *sock, const zbx_tls_conn_attr_t
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
-	zbx_tls_conn_attr_t	attr;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char		*msg;
+	zbx_tls_conn_attr_t	attr;
 
-	if (FAIL == tls_get_attr(sock, &attr, error))
+	if (FAIL == zbx_tls_get_attr(sock, &attr, error))
 		return FAIL;
+#endif
 
 	RDLOCK_CACHE;
 
@@ -7139,14 +7063,15 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 				zbx_tcp_connection_type_name(sock->connection_type), host);
 		return FAIL;
 	}
-
-	if (FAIL == tls_validate_attr(sock, &attr, dc_host->tls_issuer, dc_host->tls_subject, dc_host->tls_dc_psk,
-			&msg))
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (FAIL == zbx_tls_validate_attr(sock, &attr, dc_host->tls_issuer, dc_host->tls_subject,
+			dc_host->tls_dc_psk->tls_psk_identity, &msg))
 	{
 		UNLOCK_CACHE;
 		*error = zbx_dsprintf(NULL, "proxy \"%s\": %s", host, msg);
 		return FAIL;
 	}
+#endif
 
 	*hostid = dc_host->hostid;
 
@@ -7159,11 +7084,13 @@ int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uin
 		zbx_uint32_t *revision, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
 	const char		*msg;
 
-	if (FAIL == tls_get_attr(sock, &attr, error))
+	if (FAIL == zbx_tls_get_attr(sock, &attr, error))
 		return FAIL;
+#endif
 
 	RDLOCK_CACHE;
 
@@ -7188,14 +7115,15 @@ int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uin
 				zbx_tcp_connection_type_name(sock->connection_type), host);
 		return FAIL;
 	}
-
-	if (FAIL == tls_validate_attr(sock, &attr, dc_host->tls_issuer, dc_host->tls_subject, dc_host->tls_dc_psk,
-			&msg))
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (FAIL == zbx_tls_validate_attr(sock, &attr, dc_host->tls_issuer, dc_host->tls_subject,
+			dc_host->tls_dc_psk->tls_psk_identity, &msg))
 	{
 		UNLOCK_CACHE;
 		*error = zbx_dsprintf(NULL, "host \"%s\": %s", host, msg);
 		return FAIL;
 	}
+#endif
 
 	*hostid = dc_host->hostid;
 	*revision = MAX(dc_host->revision, config->expression_revision);

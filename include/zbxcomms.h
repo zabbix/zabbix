@@ -278,6 +278,9 @@ zbx_tls_conn_attr_t;
 
 int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
+int		zbx_tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char **error);
+int		zbx_tls_validate_attr(const zbx_socket_t *sock, const zbx_tls_conn_attr_t *attr, const char *tls_issuer,
+				const char *tls_subject, const char *tls_psk_identity, const char **msg);
 int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error);
 unsigned int	zbx_tls_get_psk_usage(void);
 
