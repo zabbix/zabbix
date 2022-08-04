@@ -1957,6 +1957,8 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
+
+		dc_host_update_revision(host);
 	}
 
 	/* resolve macros in other interfaces */
@@ -1988,6 +1990,8 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 					break;
 				}
 			}
+
+			dc_host_update_revision(host);
 		}
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
