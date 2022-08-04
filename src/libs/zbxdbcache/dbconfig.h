@@ -975,7 +975,4 @@ char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int h
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache,  zbx_uint32_t revision, zbx_dbsync_t *gmacros,
 		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls);
 
-#define ZBX_LOCATION_NONE	0
-#define ZBX_LOCATION_QUEUE	1
-
 #endif

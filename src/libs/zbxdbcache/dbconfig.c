@@ -103,6 +103,7 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_ex
 static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num, int env);
 
 static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts);
+static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts);
 
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
@@ -5165,10 +5166,10 @@ static void	dc_drule_queue(zbx_dc_drule_t *drule)
 	elem.key = drule->druleid;
 	elem.data = (const void *)drule;
 
-	if (ZBX_LOCATION_QUEUE != drule->location)
+	if (ZBX_LOC_QUEUE != drule->location)
 	{
 		zbx_binary_heap_insert(&config->drule_queue, &elem);
-		drule->location = ZBX_LOCATION_QUEUE;
+		drule->location = ZBX_LOC_QUEUE;
 	}
 	else
 		zbx_binary_heap_update_direct(&config->drule_queue, &elem);
@@ -5176,10 +5177,10 @@ static void	dc_drule_queue(zbx_dc_drule_t *drule)
 
 static void	dc_drule_dequeue(zbx_dc_drule_t *drule)
 {
-	if (ZBX_LOCATION_QUEUE == drule->location)
+	if (ZBX_LOC_QUEUE == drule->location)
 	{
 		zbx_binary_heap_remove_direct(&config->drule_queue, drule->druleid);
-		drule->location = ZBX_LOCATION_NONE;
+		drule->location = ZBX_LOC_NOWHERE;
 	}
 }
 
@@ -5212,7 +5213,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 
 		if (0 == found)
 		{
-			drule->location = ZBX_LOCATION_NONE;
+			drule->location = ZBX_LOC_NOWHERE;
 		}
 		else
 		{
@@ -5241,7 +5242,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 
 			if (0 == found)
 				delay_new = delay > SEC_PER_MIN ? SEC_PER_MIN : delay;
-			else if (delay != drule->delay || ZBX_LOCATION_QUEUE != drule->location)
+			else if (delay != drule->delay || ZBX_LOC_QUEUE != drule->location)
 				delay_new = delay;
 
 			if (0 != delay_new)
@@ -5407,10 +5408,10 @@ static void	dc_httptest_queue(zbx_dc_httptest_t *httptest)
 	elem.key = httptest->httptestid;
 	elem.data = (const void *)httptest;
 
-	if (ZBX_LOCATION_QUEUE != httptest->location)
+	if (ZBX_LOC_QUEUE != httptest->location)
 	{
 		zbx_binary_heap_insert(&config->httptest_queue, &elem);
-		httptest->location = ZBX_LOCATION_QUEUE;
+		httptest->location = ZBX_LOC_QUEUE;
 	}
 	else
 		zbx_binary_heap_update_direct(&config->httptest_queue, &elem);
@@ -5418,10 +5419,10 @@ static void	dc_httptest_queue(zbx_dc_httptest_t *httptest)
 
 static void	dc_httptest_dequeue(zbx_dc_httptest_t *httptest)
 {
-	if (ZBX_LOCATION_QUEUE == httptest->location)
+	if (ZBX_LOC_QUEUE == httptest->location)
 	{
 		zbx_binary_heap_remove_direct(&config->httptest_queue, httptest->httptestid);
-		httptest->location = ZBX_LOCATION_NONE;
+		httptest->location = ZBX_LOC_NOWHERE;
 	}
 }
 
@@ -5463,13 +5464,13 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 				&found);
 
 		if (0 == found)
-			httptest->location = ZBX_LOCATION_NONE;
+			httptest->location = ZBX_LOC_NOWHERE;
 
 		ZBX_STR2UCHAR(httptest->status, row[3]);
 
 		if (0 == found)
 		{
-			httptest->location = ZBX_LOCATION_NONE;
+			httptest->location = ZBX_LOC_NOWHERE;
 			zbx_vector_dc_httptest_append(&host->httptests, httptest);
 		}
 
@@ -5484,7 +5485,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 
 			if (0 == found)
 				delay_new = delay > SEC_PER_MIN ? SEC_PER_MIN : delay;
-			else if (delay != httptest->delay || ZBX_LOCATION_QUEUE != httptest->location)
+			else if (delay != httptest->delay || ZBX_LOC_QUEUE != httptest->location)
 				delay_new = delay;
 
 			if (0 != delay_new)
@@ -5518,7 +5519,6 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 			{
 				zbx_vector_dc_httptest_remove(&host->httptests, index);
 			}
-
 		}
 
 		dc_httptest_dequeue(httptest);
@@ -6878,9 +6878,15 @@ out:
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_ITEMS | ZBX_DBSYNC_UPDATE_MACROS)))
 	{
 		sec = zbx_time();
+
 		dc_reschedule_items(&activated_hosts);
+
+		if (0 != activated_hosts.num_data)
+			dc_reschedule_httptests(&activated_hosts);
+
 		queues_sec = zbx_time() - sec;
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reschedule : " ZBX_FS_DBL " sec.", __func__, queues_sec);
+
 	}
 
 	zbx_dbsync_clear(&config_sync);
@@ -14454,6 +14460,63 @@ static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: reschedule httptests on hosts that were re-enabled or unassigned  *
+ *          from proxy                                                        *
+ *                                                                            *
+ * Comments: Cache is not locked for read access because this function is     *
+ *           called from configuration syncer and nobody else can add/remove  *
+ *           objects or change their configuration.                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
+{
+	zbx_vector_dc_httptest_t	httptests;
+	zbx_hashset_iter_t		iter;
+	int				i;
+	zbx_uint64_t			*phostid;
+	ZBX_DC_HOST			*host;
+	time_t				now;
+
+	zbx_vector_dc_httptest_create(&httptests);
+
+	now = time(NULL);
+
+	zbx_hashset_iter_reset(activated_hosts, &iter);
+	while (NULL != (phostid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, phostid)))
+			continue;
+
+		for (i = 0; i < host->httptests.values_num; i++)
+		{
+			if (ZBX_LOC_NOWHERE != host->httptests.values[i]->location)
+				continue;
+
+			zbx_vector_dc_httptest_append(&httptests, host->httptests.values[i]);
+		}
+	}
+
+	if (0 != httptests.values_num)
+	{
+		WRLOCK_CACHE;
+
+		for (i = 0; i < httptests.values_num; i++)
+		{
+			zbx_dc_httptest_t	*httptest = httptests.values[i];
+
+			httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
+			dc_httptest_queue(httptest);
+		}
+
+		UNLOCK_CACHE;
+	}
+
+	zbx_vector_dc_httptest_destroy(&httptests);
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get next drule to be processed                                    *
  *                                                                            *
  * Parameter: now       - [IN] the current timestamp                          *
@@ -14484,8 +14547,9 @@ int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck)
 		if (drule->nextcheck <= now)
 		{
 			zbx_binary_heap_remove_min(&config->drule_queue);
-			drule->location = ZBX_LOCATION_NONE;
+			drule->location = ZBX_LOC_NOWHERE;
 			*druleid = drule->druleid;
+			drule->location = ZBX_LOC_POLLER;
 			ret = SUCCEED;
 		}
 		else
@@ -14556,20 +14620,24 @@ int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck
 		if (httptest->nextcheck <= now)
 		{
 			zbx_binary_heap_remove_min(&config->httptest_queue);
-			httptest->location = ZBX_LOCATION_NONE;
+			httptest->location = ZBX_LOC_NOWHERE;
 
 			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &httptest->hostid)))
 				continue;
 
-			if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_status)
+			if (HOST_STATUS_MONITORED != dc_host->status ||  0 != dc_host->proxy_hostid ||
+					(HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
+					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_status))
 			{
 				httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
 				dc_httptest_queue(httptest);
+
 				continue;
 			}
 
+			httptest->location = ZBX_LOC_POLLER;
 			*httptestid = httptest->httptestid;
+
 			ret = SUCCEED;
 		}
 		else
