@@ -88,33 +88,37 @@ class testFormGraphs extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
+	private function getGraphSuffix() {
+		return $this->prototype ? ' prototype' : '';
+	}
+
 	public function getLayoutData() {
 		return [
 			[
 				[
 					'check_defaults' => true,
-					'change_fields' => [
+					'set_fields' => [
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
 					],
-					'visible_fields' => [
-						['field' => 'id:name', 'value' => '', 'maxlength' => 255],
-						['field' => 'id:width', 'value' => '900', 'maxlength' => 5],
-						['field' => 'id:height', 'value' => '200', 'maxlength' => 5],
-						['field' => 'id:graphtype', 'value' => 'Normal'],
-						['field' => 'id:show_legend', 'value' => true],
-						['field' => 'id:show_work_period', 'value' => true],
-						['field' => 'id:show_triggers', 'value' => true],
-						['field' => 'id:visible_percent_left', 'value' => false], // Percentile line (left) checkbox.
-						['field' => 'id:visible_percent_right', 'value' => false], // Percentile line (right) checkbox.
-						['field' => 'id:percent_left', 'visible' => false], // Percentile line (left) input.
-						['field' => 'id:percent_right', 'visible' => false], // Percentile line (right) input.
-						['field' => 'id:ymin_type', 'value' => 'Calculated'], // Y axis MIN value dropdown.
-						['field' => 'id:ymax_type', 'value' => 'Calculated'], // Y axis MAX value dropdown.
-						['field' => 'id:yaxismin', 'visible' => false], // Y axis MIN fixed value input.
-						['field' => 'id:yaxismax', 'visible' => false], // Y axis MAX fixed value input.
-						['field' => 'id:ymin_name', 'visible' => false], // Y axis MIN item input.
-						['field' => 'id:ymax_name', 'visible' => false], // Y axis MAX item input.
-						['field' => 'id:itemsTable', 'visible' => true]
+					'check_fields' => [
+						'id:name' =>  ['value' => '', 'maxlength' => 255],
+						'id:width' =>  ['value' => '900', 'maxlength' => 5],
+						'id:height' =>  ['value' => '200', 'maxlength' => 5],
+						'id:graphtype' =>  ['value' => 'Normal'],
+						'id:show_legend' =>  ['value' => true],
+						'id:show_work_period' =>  ['value' => true],
+						'id:show_triggers' =>  ['value' => true],
+						'id:visible_percent_left' =>  ['value' => false], // Percentile line (left) checkbox.
+						'id:visible_percent_right' =>  ['value' => false], // Percentile line (right) checkbox.
+						'id:percent_left' =>  ['visible' => false], // Percentile line (left) input.
+						'id:percent_right' =>  ['visible' => false], // Percentile line (right) input.
+						'id:ymin_type' =>  ['value' => 'Calculated'], // Y axis MIN value dropdown.
+						'id:ymax_type' =>  ['value' => 'Calculated'], // Y axis MAX value dropdown.
+						'id:yaxismin' =>  ['visible' => false], // Y axis MIN fixed value input.
+						'id:yaxismax' =>  ['visible' => false], // Y axis MAX fixed value input.
+						'id:ymin_name' =>  ['visible' => false], // Y axis MIN item input.
+						'id:ymax_name' =>  ['visible' => false], // Y axis MAX item input.
+						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
 						'item_columns' => ['', '', 'Name', 'Function', 'Draw style', 'Y axis side', 'Color', 'Action'],
@@ -128,28 +132,28 @@ class testFormGraphs extends CWebTest {
 			],
 			[
 				[
-					'change_fields' => [
+					'set_fields' => [
 						'Graph type' => CFormElement::RELOADABLE_FILL('Stacked'),
 					],
-					'visible_fields' => [
-						['field' => 'id:name', 'value' => ''],
-						['field' => 'id:width', 'value' => '900'],
-						['field' => 'id:height', 'value' => '200'],
-						['field' => 'id:graphtype', 'value' => 'Stacked'],
-						['field' => 'id:show_legend', 'value' => true],
-						['field' => 'id:show_work_period', 'value' => true],
-						['field' => 'id:show_triggers', 'value' => true],
-						['field' => 'id:visible_percent_left', 'exists' => false], // Percentile line (left) checkbox.
-						['field' => 'id:visible_percent_right', 'exists' => false], // Percentile line (right) checkbox.
-						['field' => 'id:percent_left', 'exists' => false], // Percentile line (left) input.
-						['field' => 'id:percent_right', 'exists' => false], // Percentile line (right) input.
-						['field' => 'id:ymin_type', 'value' => 'Calculated'], // Y axis MIN value dropdown.
-						['field' => 'id:ymax_type', 'value' => 'Calculated'], // Y axis MAX value dropdown.
-						['field' => 'id:yaxismin', 'visible' => false], // Y axis MIN fixed value input.
-						['field' => 'id:yaxismax', 'visible' => false], // Y axis MAX fixed value input.
-						['field' => 'id:ymin_name', 'visible' => false], // Y axis MIN item input.
-						['field' => 'id:ymax_name', 'visible' => false], // Y axis MAX item input.
-						['field' => 'id:itemsTable', 'visible' => true]
+					'check_fields' => [
+						'id:name' =>  ['value' => ''],
+						'id:width' =>  ['value' => '900'],
+						'id:height' =>  ['value' => '200'],
+						'id:graphtype' =>  ['value' => 'Stacked'],
+						'id:show_legend' =>  ['value' => true],
+						'id:show_work_period' =>  ['value' => true],
+						'id:show_triggers' =>  ['value' => true],
+						'id:visible_percent_left' =>  ['exists' => false], // Percentile line (left) checkbox.
+						'id:visible_percent_right' =>  ['exists' => false], // Percentile line (right) checkbox.
+						'id:percent_left' =>  ['exists' => false], // Percentile line (left) input.
+						'id:percent_right' =>  ['exists' => false], // Percentile line (right) input.
+						'id:ymin_type' =>  ['value' => 'Calculated'], // Y axis MIN value dropdown.
+						'id:ymax_type' =>  ['value' => 'Calculated'], // Y axis MAX value dropdown.
+						'id:yaxismin' =>  ['visible' => false], // Y axis MIN fixed value input.
+						'id:yaxismax' =>  ['visible' => false], // Y axis MAX fixed value input.
+						'id:ymin_name' =>  ['visible' => false], // Y axis MIN item input.
+						'id:ymax_name' =>  ['visible' => false], // Y axis MAX item input.
+						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
 						'item_columns' => ['', '', 'Name', 'Function', 'Y axis side', 'Color', 'Action'],
@@ -162,29 +166,29 @@ class testFormGraphs extends CWebTest {
 			],
 			[
 				[
-					'change_fields' => [
+					'set_fields' => [
 						'Graph type' => CFormElement::RELOADABLE_FILL('Pie'),
 					],
-					'visible_fields' => [
-						['field' => 'id:name', 'value' => ''],
-						['field' => 'id:width', 'value' => '900'],
-						['field' => 'id:height', 'value' => '200'],
-						['field' => 'id:graphtype', 'value' => 'Pie'],
-						['field' => 'id:show_legend', 'value' => true],
-						['field' => 'id:show_work_period', 'exists' => false],
-						['field' => 'id:show_triggers', 'exists' => false],
-						['field' => 'id:visible_percent_left', 'exists' => false], // Percentile line (left) checkbox.
-						['field' => 'id:visible_percent_right', 'exists' => false], // Percentile line (right) checkbox.
-						['field' => 'id:percent_left', 'exists' => false], // Percentile line (left) input.
-						['field' => 'id:percent_right', 'exists' => false], // Percentile line (right) input.
-						['field' => 'id:ymin_type', 'exists' => false], // Y axis MIN value dropdown.
-						['field' => 'id:ymax_type', 'exists' => false], // Y axis MAX value dropdown.
-						['field' => 'id:yaxismin', 'exists' => false], // Y axis MIN fixed value input.
-						['field' => 'id:yaxismax', 'exists' => false], // Y axis MAX fixed value input.
-						['field' => 'id:ymin_name', 'exists' => false], // Y axis MIN item input.
-						['field' => 'id:ymax_name', 'exists' => false], // Y axis MAX item input.
-						['field' => 'id:show_3d', 'value' => false],
-						['field' => 'id:itemsTable', 'visible' => true]
+					'check_fields' => [
+						'id:name' =>  ['value' => ''],
+						'id:width' =>  ['value' => '900'],
+						'id:height' =>  ['value' => '200'],
+						'id:graphtype' =>  ['value' => 'Pie'],
+						'id:show_legend' =>  ['value' => true],
+						'id:show_work_period' =>  ['exists' => false],
+						'id:show_triggers' =>  ['exists' => false],
+						'id:visible_percent_left' =>  ['exists' => false], // Percentile line (left) checkbox.
+						'id:visible_percent_right' =>  ['exists' => false], // Percentile line (right) checkbox.
+						'id:percent_left' =>  ['exists' => false], // Percentile line (left) input.
+						'id:percent_right' =>  ['exists' => false], // Percentile line (right) input.
+						'id:ymin_type' =>  ['exists' => false], // Y axis MIN value dropdown.
+						'id:ymax_type' =>  ['exists' => false], // Y axis MAX value dropdown.
+						'id:yaxismin' =>  ['exists' => false], // Y axis MIN fixed value input.
+						'id:yaxismax' =>  ['exists' => false], // Y axis MAX fixed value input.
+						'id:ymin_name' =>  ['exists' => false], // Y axis MIN item input.
+						'id:ymax_name' =>  ['exists' => false], // Y axis MAX item input.
+						'id:show_3d' =>  ['value' => false],
+						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
 						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Color', 'Action'],
@@ -197,29 +201,29 @@ class testFormGraphs extends CWebTest {
 			],
 			[
 				[
-					'change_fields' => [
+					'set_fields' => [
 						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded'),
 					],
-					'visible_fields' => [
-						['field' => 'id:name', 'value' => ''],
-						['field' => 'id:width', 'value' => '900'],
-						['field' => 'id:height', 'value' => '200'],
-						['field' => 'id:graphtype', 'value' => 'Exploded'],
-						['field' => 'id:show_legend', 'value' => true],
-						['field' => 'id:show_work_period', 'exists' => false],
-						['field' => 'id:show_triggers', 'exists' => false],
-						['field' => 'id:visible_percent_left', 'exists' => false], // Percentile line (left) checkbox.
-						['field' => 'id:visible_percent_right', 'exists' => false], // Percentile line (right) checkbox.
-						['field' => 'id:percent_left', 'exists' => false], // Percentile line (left) input.
-						['field' => 'id:percent_right', 'exists' => false], // Percentile line (right) input.
-						['field' => 'id:ymin_type', 'exists' => false], // Y axis MIN value dropdown.
-						['field' => 'id:ymax_type', 'exists' => false], // Y axis MAX value dropdown.
-						['field' => 'id:yaxismin', 'exists' => false], // Y axis MIN fixed value input.
-						['field' => 'id:yaxismax', 'exists' => false], // Y axis MAX fixed value input.
-						['field' => 'id:ymin_name', 'exists' => false], // Y axis MIN item input.
-						['field' => 'id:ymax_name', 'exists' => false], // Y axis MAX item input.
-						['field' => 'id:show_3d', 'value' => false],
-						['field' => 'id:itemsTable', 'visible' => true]
+					'check_fields' => [
+						'id:name' =>  ['value' => ''],
+						'id:width' =>  ['value' => '900'],
+						'id:height' =>  ['value' => '200'],
+						'id:graphtype' =>  ['value' => 'Exploded'],
+						'id:show_legend' =>  ['value' => true],
+						'id:show_work_period' =>  ['exists' => false],
+						'id:show_triggers' =>  ['exists' => false],
+						'id:visible_percent_left' =>  ['exists' => false], // Percentile line (left) checkbox.
+						'id:visible_percent_right' =>  ['exists' => false], // Percentile line (right) checkbox.
+						'id:percent_left' =>  ['exists' => false], // Percentile line (left) input.
+						'id:percent_right' =>  ['exists' => false], // Percentile line (right) input.
+						'id:ymin_type' =>  ['exists' => false], // Y axis MIN value dropdown.
+						'id:ymax_type' =>  ['exists' => false], // Y axis MAX value dropdown.
+						'id:yaxismin' =>  ['exists' => false], // Y axis MIN fixed value input.
+						'id:yaxismax' =>  ['exists' => false], // Y axis MAX fixed value input.
+						'id:ymin_name' =>  ['exists' => false], // Y axis MIN item input.
+						'id:ymax_name' =>  ['exists' => false], // Y axis MAX item input.
+						'id:show_3d' =>  ['value' => false],
+						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
 						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Color', 'Action'],
@@ -232,40 +236,40 @@ class testFormGraphs extends CWebTest {
 			],
 			[
 				[
-					'change_fields' => [
+					'set_fields' => [
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
 						'id:visible_percent_left' => true, // Percentile line (left) checkbox.
 						'id:visible_percent_right' => true, // Percentile line (right) checkbox.
 					],
-					'visible_fields' => [
-						['field' => 'id:percent_left', 'value' => 0, 'visible' => true], // Percentile line (left) input.
-						['field' => 'id:percent_right', 'value' => 0, 'visible' => true] // Percentile line (right) input.
+					'check_fields' => [
+						'id:percent_left' =>  ['value' => 0, 'visible' => true], // Percentile line (left) input.
+						'id:percent_right' =>  ['value' => 0, 'visible' => true] // Percentile line (right) input.
 					]
 				]
 			],
 			[
 				[
-					'change_fields' => [
+					'set_fields' => [
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
 						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'), // Y axis MIN value dropdown.
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'), // Y axis MAX value dropdown.
 					],
-					'visible_fields' => [
-						['field' => 'id:yaxismin', 'value' => 0, 'visible' => true], // Y axis MIN fixed value input.
-						['field' => 'id:yaxismax', 'value' => 100, 'visible' => true] // Y axis MAX fixed value input.
+					'check_fields' => [
+						'id:yaxismin' =>  ['value' => 0, 'visible' => true], // Y axis MIN fixed value input.
+						'id:yaxismax' =>  ['value' => 100, 'visible' => true] // Y axis MAX fixed value input.
 					]
 				]
 			],
 			[
 				[
-					'change_fields' => [
+					'set_fields' => [
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
 						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'), // Y axis MIN value dropdown.
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item'), // Y axis MAX value dropdown.
 					],
-					'visible_fields' => [
-						['field' => 'id:ymin_itemid', 'value' => '', 'visible' => true], // Y axis MIN item input.
-						['field' => 'id:ymax_itemid', 'value' => '', 'visible' => true] // Y axis MAX item input.
+					'check_fields' => [
+						'id:ymin_itemid' =>  ['value' => '', 'visible' => true], // Y axis MIN item input.
+						'id:ymax_itemid' =>  ['value' => '', 'visible' => true] // Y axis MAX item input.
 					]
 				]
 			]
@@ -274,14 +278,14 @@ class testFormGraphs extends CWebTest {
 
 	public function checkGraphFormLayout($data) {
 		$this->page->login()->open($this->url)->waitUntilReady();
-		$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
+		$this->query('button', 'Create graph'.$this->getGraphSuffix())->waitUntilClickable()
 				->one()->click();
-		$this->page->assertTitle($this->prototype ? 'Configuration of graph prototypes' : 'Configuration of graphs');
+		$this->page->assertTitle('Configuration of graph'.$this->getGraphSuffix().'s');
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 
 		// Check default fields only for first case.
 		if (CTestArrayHelper::get($data, 'check_defaults', false)) {
-			$this->assertEquals([($this->prototype ? 'Graph prototype' : 'Graph'),'Preview'], $form->getTabs());
+			$this->assertEquals(['Graph'.$this->getGraphSuffix(), 'Preview'], $form->getTabs());
 			$this->assertFalse($form->query('xpath:.//table[@id="itemsTable"]//div[@class="drag-icon"]')->exists());
 
 			$items_container = $form->getFieldContainer('Items');
@@ -303,28 +307,28 @@ class testFormGraphs extends CWebTest {
 			$this->page->waitUntilReady();
 			$this->assertTrue($this->query('xpath://div[@id="previewChart"]/img')->waitUntilPresent()->one()->isVisible());
 
-			$form->selectTab($this->prototype ? 'Graph prototype' : 'Graph');
+			$form->selectTab('Graph'.$this->getGraphSuffix());
 			$this->page->waitUntilReady();
 			*/
 		}
 
-		$form->fill($data['change_fields']);
+		$form->fill($data['set_fields']);
 
-		foreach ($data['visible_fields'] as $visible_field) {
-			if (array_key_exists('exists', $visible_field)) {
-				$this->assertEquals($visible_field['exists'], $form->query($visible_field['field'])->exists());
+		foreach ($data['check_fields'] as $field => $attribute) {
+			if (array_key_exists('exists', $attribute)) {
+				$this->assertEquals($attribute['exists'], $form->query($field)->exists());
 			}
 
-			if (array_key_exists('visible', $visible_field)) {
-				$this->assertTrue($form->query($visible_field['field'])->one(false)->isVisible($visible_field['visible']));
+			if (array_key_exists('visible', $attribute)) {
+				$this->assertTrue($form->query($field)->one(false)->isVisible($attribute['visible']));
 			}
 
-			if (array_key_exists('value', $visible_field)) {
-				$this->assertEquals($visible_field['value'], $form->getField($visible_field['field'])->getValue());
+			if (array_key_exists('value', $attribute)) {
+				$this->assertEquals($attribute['value'], $form->getField($field)->getValue());
 			}
 
-			if (array_key_exists('maxlength', $visible_field)) {
-				$this->assertEquals($visible_field['maxlength'], $form->getField($visible_field['field'])->getAttribute('maxlength'));
+			if (array_key_exists('maxlength', $attribute)) {
+				$this->assertEquals($attribute['maxlength'], $form->getField($field)->getAttribute('maxlength'));
 			}
 		};
 
@@ -550,7 +554,7 @@ class testFormGraphs extends CWebTest {
 						'Name' => 'Empty item'.($this->prototype ? ' {#KEY}' : NULL)
 					],
 					'details' => [
-						'Missing items for '.($this->prototype ? 'graph prototype' : 'graph').' "Empty item'.
+						'Missing items for graph'.$this->getGraphSuffix().' "Empty item'.
 								($this->prototype ? ' {#KEY}' : NULL).'".'
 					]
 				]
@@ -569,8 +573,7 @@ class testFormGraphs extends CWebTest {
 			$this->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
 		}
 		else {
-			$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
-				->one()->click();
+			$this->query('button', 'Create graph'.$this->getGraphSuffix())->waitUntilClickable()->one()->click();
 		}
 
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
@@ -644,8 +647,8 @@ class testFormGraphs extends CWebTest {
 			}
 			else {
 				$error = $this->update
-					? ($this->prototype ? 'Cannot update graph prototype' : 'Cannot update graph')
-					: ($this->prototype ? 'Cannot add graph prototype' : 'Cannot add graph');
+					? 'Cannot update graph'.$this->getGraphSuffix()
+					: 'Cannot add graph'.$this->getGraphSuffix();
 			}
 			$this->assertMessage(TEST_BAD, $error, $data['details']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
@@ -659,8 +662,8 @@ class testFormGraphs extends CWebTest {
 			}
 
 			$message = $this->update
-				? ($this->prototype ? 'Graph prototype updated' : 'Graph updated')
-				: ($this->prototype ? 'Graph prototype added' : 'Graph added');
+				? 'Graph'.$this->getGraphSuffix().' updated'
+				: 'Graph'.$this->getGraphSuffix().' added';
 
 			$this->assertMessage(TEST_GOOD, $message);
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.
@@ -780,7 +783,7 @@ class testFormGraphs extends CWebTest {
 
 	public function checkClone($data) {
 		$this->page->login()->open($this->url)->waitUntilReady();
-		$name = $this->prototype ? 'Graph prototype for clone' : 'Graph for clone';
+		$name = 'Graph'.$this->getGraphSuffix().' for clone';
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 		$form->query('button:Clone')->waitUntilClickable()->one()->click();
@@ -820,7 +823,7 @@ class testFormGraphs extends CWebTest {
 		}
 
 		$form->submit();
-		$this->assertMessage(TEST_GOOD, ($this->prototype ? 'Graph prototype added' : 'Graph added'));
+		$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' added');
 
 		// Check that both original graph and clone exist in DB.
 		foreach ([$name, $data['fields']['Name']] as $graph_name) {
@@ -898,8 +901,7 @@ class testFormGraphs extends CWebTest {
 		$this->page->login()->open($this->url)->waitUntilReady();
 
 		if ($data['case'] === 'Create') {
-			$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
-					->one()->click();
+			$this->query('button', 'Create graph'.$this->getGraphSuffix())->waitUntilClickable()->one()->click();
 		}
 		else {
 			$this->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
@@ -917,13 +919,13 @@ class testFormGraphs extends CWebTest {
 
 		if ($data['case'] === 'simple_update') {
 			$form->submit();
-			$this->assertMessage(TEST_GOOD, ($this->prototype ? 'Graph prototype updated' : 'Graph updated'));
+			$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' updated');
 		}
 		else {
 			$form->query('button:Cancel')->waitUntilClickable()->one()->click();
 		}
 
-		$this->assertTrue($this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->exists());
+		$this->assertTrue($this->query('button', 'Create graph'.$this->getGraphSuffix())->exists());
 
 		// Check that DB hash is not changed.
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
@@ -956,7 +958,7 @@ class testFormGraphs extends CWebTest {
 		}
 
 		$form->submit();
-		$this->assertMessage(TEST_GOOD, ($this->prototype ? 'Graph prototype updated' : 'Graph updated'));
+		$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' updated');
 		$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilReady()
 				->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
 		$item_row = $form->getFieldContainer('Items')->query('xpath:.//tr[@id="items_'.$item_number.'"]')
@@ -977,13 +979,13 @@ class testFormGraphs extends CWebTest {
 
 	public function checkDelete() {
 		$this->page->login()->open($this->url)->waitUntilReady();
-		$name = $this->prototype ? 'Graph prototype for delete' : 'Graph for delete';
+		$name = 'Graph'.$this->getGraphSuffix().' for delete';
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 		$form->query('button:Delete')->waitUntilClickable()->one()->click();
-		$this->assertEquals(($this->prototype ? 'Delete graph prototype?' : 'Delete graph?'), $this->page->getAlertText());
+		$this->assertEquals('Delete graph'.$this->getGraphSuffix().'?', $this->page->getAlertText());
 		$this->page->acceptAlert();
-		$this->assertMessage(TEST_GOOD, ($this->prototype ? 'Graph prototype deleted' : 'Graph deleted'));
+		$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' deleted');
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.zbx_dbstr($name)));
 	}
 
@@ -992,9 +994,7 @@ class testFormGraphs extends CWebTest {
 	 */
 	public function checkTextItems($data) {
 		$this->page->login()->open($this->url)->waitUntilReady();
-		$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
-				->one()->click();
-
+		$this->query('button', 'Create graph'.$this->getGraphSuffix())->waitUntilClickable()->one()->click();
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 		$form->fill($data['fields']);
 		$items_container = $form->getFieldContainer('Items');
@@ -1015,7 +1015,7 @@ class testFormGraphs extends CWebTest {
 			}
 		}
 
-		$items_container->query('button', ($this->prototype ? 'Add prototype' : 'Add'))->waitUntilClickable()->one()->click();
+		$items_container->query('button', 'Add'.$this->getGraphSuffix())->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one();
 
 		// Assert that text items are not present in dialog.

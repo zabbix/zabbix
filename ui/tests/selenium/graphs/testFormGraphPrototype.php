@@ -49,9 +49,7 @@ class testFormGraphPrototype extends testFormGraphs {
 			'value_type' => ITEM_VALUE_TYPE_FLOAT
 		]);
 		$this->assertArrayHasKey('itemids', $items);
-		$itemids = CDataHelper::getIds('name');
-
-		self::$itemid = $itemids['item_graph_ptototype_test'];
+		self::$itemid = $items['itemids'][0];
 
 		// Create item prototypes on given host with given LLD.
 		foreach (self::$items['item_prototypes'] as $name => $fields) {
