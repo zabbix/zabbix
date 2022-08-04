@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-29T06:56:15Z'
+  date: '2022-08-04T05:41:51Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -93,87 +93,63 @@ zabbix_export:
                     Azure.params = params;
                 },
             
-                requestToken: function () {
-                    if (Azure.token !== null) {
-                        return;
+                requestAPI: function (type, http_data) {
+                    if (typeof http_data=== 'undefined' || http_data=== null) {
+                        http_data= '';
                     }
             
-                    var response, request = new HttpRequest();
-                    request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                    response = request.post('https://login.microsoftonline.com/' + Azure.params.tenant_id +'/oauth2/token', 'grant_type=client_credentials&client_id=' + Azure.params.app_id +'&client_secret=' + Azure.params.password + '&resource=https%3A%2F%2Fmanagement.azure.com%2F');
+                    request = new HttpRequest();
+            
+                    switch (type) {
+                        case 'token':
+                            request.addHeader('Content-Type: application/x-www-form-urlencoded');
+                            url = 'https://login.microsoftonline.com/' + Azure.params.tenant_id +'/oauth2/token';
+                            request_data = 'grant_type=client_credentials&client_id=' + Azure.params.app_id +'&client_secret=' + Azure.params.password + '&resource=https%3A%2F%2Fmanagement.azure.com%2F'
+                            response = request.post(url, request_data);
+                            break;
+                        case 'vm':
+                            request.addHeader('Accept=application/json');
+                            request.addHeader('Authorization: Bearer ' + Azure.token);
+                            url = 'https://management.azure.com/subscriptions/' + Azure.params.subscription_id + '/providers/Microsoft.Compute/virtualMachines?api-version=2022-03-01'
+                            response = request.get(url);
+                            break;
+                        case 'next_link':
+                            request.addHeader('Accept=application/json');
+                            request.addHeader('Authorization: Bearer ' + Azure.token);
+                            url = http_data;
+                            request_data = '';
+                            response = request.get(url);
+                    }
             
                     if (request.getStatus() !== 200) {
-                        throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
             
                     if (response !== null) {
-                        try {
-                            auth_data = JSON.parse(response);
+                        if (type === 'token') {
+                            try {
+                                auth_data = JSON.parse(response);
+                            }
+                            catch (error) {
+                                throw 'Failed to parse auth response received from API.';
+                            }
+                            if ('access_token' in auth_data) {
+                                Azure.token = auth_data['access_token'];
+                            } else {
+                                throw 'Auth response does not contain access token.';
+                            }
                         }
-                        catch (error) {
-                            throw 'Failed to parse auth response received from API.';
-                        }
-                    }
-                    else {
-                        throw 'No data received by auth request.';
-                    }
-            
-                    if ('access_token' in auth_data) {
-                        Azure.token = auth_data['access_token'];
-                    } else {
-                        throw 'Auth response does not contain access token.';
-                    }
-                },
-            
-                requestVMs: function () {
-                    if (Azure.token === null) {
-                        return;
-                    }
-            
-                    request = new HttpRequest();
-                    request.addHeader('Accept=application/json');
-                    request.addHeader('Authorization: Bearer ' + Azure.token);
-            
-                    r_data = request.get('https://management.azure.com/subscriptions/' + Azure.params.subscription_id + '/providers/Microsoft.Compute/virtualMachines?api-version=2022-03-01');
-            
-                    if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + r_data;
-                    }
-            
-                    if (r_data !== null) {
-                        try {
-                            return JSON.parse(r_data);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from API.';
+                        else {
+                            try {
+                                return JSON.parse(response);
+                            }
+                            catch (error) {
+                                throw 'Failed to parse response received from API.';
+                            }
                         }
                     }
                     else {
-                        throw 'No data received by resources request.';
-                    }
-                },
-            
-                nextLink: function (url) {
-                    request = new HttpRequest();
-                    request.addHeader('Accept=application/json');
-                    request.addHeader('Authorization: Bearer ' + Azure.token);
-            
-                    link_data = request.get(url);
-            
-                    if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + link_data;
-                    }
-            
-                    if (link_data !== null) {
-                        try {
-                            return JSON.parse(link_data);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from API.';
-                        }
-                    }
-                    else {
-                        throw 'No data received by next link request.';
+                        throw 'No data received by ' + type + ' request.';
                     }
                 }
             };
@@ -185,7 +161,7 @@ zabbix_export:
                 Azure.setParams(JSON.parse(value));
             
                 try {
-                    Azure.requestToken();
+                    Azure.requestAPI('token');
                 }
                 catch (error) {
                     data.errors.auth = error.toString();
@@ -193,26 +169,18 @@ zabbix_export:
             
                 if (!('auth' in data.errors)) {
                     try {
-                        raw_data = Azure.requestVMs();
+                        raw_data = Azure.requestAPI('vm');
                         
                         if ('nextLink' in raw_data) {
-                            try {
-                                next_data = Azure.nextLink(raw_data.nextLink);
+                            next_data = raw_data;
+                            while ('nextLink' in next_data) {
+                                next_data = Azure.requestAPI('next_link', next_data.nextLink);
                                 next_data.value.forEach(function (value) {
                                     raw_data.value.push(value);
                                 });
-                                
-                                while ('nextLink' in next_data) {
-                                    next_data = Azure.nextLink(next_data.nextLink);
-                                    next_data.value.forEach(function (value) {
-                                        raw_data.value.push(value);
-                                    });
-                                }
-                            }
-                            catch (error) {
-                                data.errors.next_link = error.toString();
                             }
                         }
+                        
                         data.resources = raw_data;
                     }
                     catch (error) {
