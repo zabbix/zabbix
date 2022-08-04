@@ -63,6 +63,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'ui_configuration_event_correlation' => 		'in 0,1',
 			'ui_configuration_discovery' => 				'in 0,1',
 			'ui_administration_general' => 					'in 0,1',
+			'ui_administration_audit_log' => 				'in 0,1',
 			'ui_administration_housekeeping' => 			'in 0,1',
 			'ui_administration_proxies' => 					'in 0,1',
 			'ui_administration_macros' => 					'in 0,1',

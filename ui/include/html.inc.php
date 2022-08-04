@@ -845,10 +845,6 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'autoreg.edit')
 		->getUrl();
 
-	$audit_settings_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'audit.settings.edit')
-		->getUrl();
-
 	$image_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'image.list')
 		->getUrl();
@@ -882,7 +878,6 @@ function getAdministrationGeneralSubmenu() {
 			'items' => array_filter([
 				$gui_url            => _('GUI'),
 				$autoreg_url        => _('Autoregistration'),
-				$audit_settings_url => _('Audit log'),
 				$image_url          => _('Images'),
 				$iconmap_url        => _('Icon mapping'),
 				$regex_url          => _('Regular expressions'),

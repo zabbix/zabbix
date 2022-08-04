@@ -226,7 +226,7 @@ $house_keeper_tab = (new CFormList())
 	}
 
 $house_keeper_tab
-	->addRow((new CTag('h4', true, _('Audit')))->addClass('input-section-header'))
+	->addRow((new CTag('h4', true, _('Audit log')))->addClass('input-section-header'))
 	->addRow(new CLink(_('Audit settings'), (new CUrl('zabbix.php'))->setArgument('action', 'audit.settings.edit'))
 );
 

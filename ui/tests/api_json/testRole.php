@@ -819,6 +819,10 @@ class testRole extends CAPITest {
 									'status' => '1'
 								],
 								[
+									'name' => 'administration.audit_log',
+									'status' => '1'
+								],
+								[
 									'name' => 'administration.housekeeping',
 									'status' => '1'
 								],

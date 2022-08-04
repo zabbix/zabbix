@@ -144,7 +144,7 @@ class CMenuHelper {
 				? (new CMenuItem(_('Triggers top 100')))->setUrl(new CUrl('toptriggers.php'), 'toptriggers.php')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AUDIT)
-				? (new CMenuItem(_('Audit')))->setAction('auditlog.list')
+				? (new CMenuItem(_('Audit log')))->setAction('auditlog.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_ACTION_LOG)
 				? (new CMenuItem(_('Action log')))->setUrl(new CUrl('auditacts.php'), 'auditacts.php')
@@ -332,8 +332,6 @@ class CMenuHelper {
 							->setAction('gui.edit'),
 						(new CMenuItem(_('Autoregistration')))
 							->setAction('autoreg.edit'),
-						(new CMenuItem(_('Audit log')))
-							->setAction('audit.settings.edit'),
 						(new CMenuItem(_('Images')))
 							->setAction('image.list')
 							->setAliases(['image.edit']),
@@ -353,6 +351,10 @@ class CMenuHelper {
 						(new CMenuItem(_('Other')))
 							->setAction('miscconfig.edit')
 					])))
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_AUDIT_LOG)
+				? (new CMenuItem(_('Audit log')))
+					->setAction('audit.settings.edit')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_HOUSEKEEPING)
 				? (new CMenuItem(_('Housekeeping')))
