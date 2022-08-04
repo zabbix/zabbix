@@ -11344,6 +11344,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "Địa chỉ MAC A"
@@ -19863,6 +19868,10 @@ msgstr ""
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Trạng thái VMware cluster, <url> - Dịch vụ VMware URL, <name> - Tên VMware cluster"
@@ -19898,6 +19907,10 @@ msgstr "Thống kê dung lượng kho dữ liệu VMware theo byte hoặc theo t
 
 #: include/classes/data/CItemData.php:1234
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1238
@@ -19995,6 +20008,10 @@ msgstr "Mô hình bộ xử lý VMware hypervisor, <url> - dịch vụ VMwar
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Cách sử dụng bộ xử lý VMware hypervisor đơn vị là Hz, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20127,6 +20144,10 @@ msgstr "Bộ xử lý máy ảo VMware thời gian sẵn sàng ms, <url> - URL d
 #: include/classes/data/CItemData.php:1430
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ xử lý máy ảo VMware đơn vị Hz, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"

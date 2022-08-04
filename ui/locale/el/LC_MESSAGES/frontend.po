@@ -11456,6 +11456,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "Δ"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "MAC διεύθυνση A"
@@ -20013,6 +20018,10 @@ msgstr ""
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Κατάσταση cluster VMware, <url> - URL υπηρεσίας VMware, <name> - όνομα cluster VMware"
@@ -20048,6 +20057,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1234
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1238
@@ -20145,6 +20158,10 @@ msgstr "Τύπος επεξεργαστή VMware hypervisor, <url> - URL υπη�
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Χρήση επεξεργαστή VMware hypervisor σε Hz, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
+
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20277,6 +20294,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1430
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Χρήση επεξεργαστή σε Hz εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
+
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-07-07T21:30:50Z'
+  date: '2022-07-21T14:11:47Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -191,7 +191,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Rps
-          description: 'Number of times per second whenever whenever a Consul agent in client mode makes an RPC request to a Consul server and fails.'
+          description: 'Number of times per second whenever a Consul agent in client mode makes an RPC request to a Consul server and fails.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
