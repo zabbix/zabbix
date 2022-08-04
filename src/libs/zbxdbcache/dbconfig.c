@@ -7065,7 +7065,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 	}
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (FAIL == zbx_tls_validate_attr(sock, &attr, dc_host->tls_issuer, dc_host->tls_subject,
-			dc_host->tls_dc_psk->tls_psk_identity, &msg))
+			NULL == dc_host->tls_dc_psk ? NULL : dc_host->tls_dc_psk->tls_psk_identity, &msg))
 	{
 		UNLOCK_CACHE;
 		*error = zbx_dsprintf(NULL, "proxy \"%s\": %s", host, msg);
@@ -7117,7 +7117,7 @@ int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uin
 	}
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (FAIL == zbx_tls_validate_attr(sock, &attr, dc_host->tls_issuer, dc_host->tls_subject,
-			dc_host->tls_dc_psk->tls_psk_identity, &msg))
+			NULL == dc_host->tls_dc_psk ? NULL : dc_host->tls_dc_psk->tls_psk_identity, &msg))
 	{
 		UNLOCK_CACHE;
 		*error = zbx_dsprintf(NULL, "host \"%s\": %s", host, msg);
