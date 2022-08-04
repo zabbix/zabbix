@@ -170,7 +170,7 @@ $form_list = (new CFormList())
 		(new CTextArea('command', $data['command']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxLength(DB::getFieldLength('scripts', 'command'))
+			->setMaxlength(DB::getFieldLength('scripts', 'command'))
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Command'), 'commandipmi'))->setAsteriskMark(),
