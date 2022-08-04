@@ -118,6 +118,7 @@ abstract class CControllerProblem extends CController {
 				$trigger['prefix'] = $trigger['hosts'][0]['name'].NAME_DELIMITER;
 				unset($trigger['hosts']);
 			}
+			unset($trigger);
 
 			$data['triggers'] = $triggers;
 		}
@@ -165,9 +166,9 @@ abstract class CControllerProblem extends CController {
 	/**
 	 * Validate input of filter inventory fields.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
-	protected function validateInventar() {
+	protected function validateInventory(): bool {
 		if (!$this->hasInput('inventory')) {
 			return true;
 		}
@@ -188,9 +189,9 @@ abstract class CControllerProblem extends CController {
 	/**
 	 * Validate values of filter tags input fields.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
-	protected function validateTags() {
+	protected function validateTags(): bool {
 		if (!$this->hasInput('tags')) {
 			return true;
 		}

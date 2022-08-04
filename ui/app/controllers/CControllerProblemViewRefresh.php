@@ -19,14 +19,16 @@
 **/
 
 
+/**
+ * Controller for the "Problems" asynchronous refresh page.
+ */
 class CControllerProblemViewRefresh extends CControllerProblemView {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
-
+	protected function checkInput(): bool {
 		$fields = [
 			'action' =>				'string',
 			'sort' =>				'in clock,host,severity,name',
@@ -58,8 +60,8 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			'filter_counters' =>	'in 1'
 		];
 
-		$ret = ($this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventar()
-				&& $this->validateTags());
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventory()
+			&& $this->validateTags();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -68,7 +70,11 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 		return $ret;
 	}
 
-	protected function doAction() {
+	protected function checkPermissions(): bool {
+		return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
+	}
+
+	protected function doAction(): void {
 		$data = [];
 
 		if ($this->getInput('filter_counters', 0)) {
@@ -114,11 +120,11 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 					'name' => $this->getInput('name', ''),
 					'severities' => $this->getInput('severities', []),
 					'inventory' => array_filter($this->getInput('inventory', []), function ($filter_inventory) {
-						return ($filter_inventory['field'] !== '' && $filter_inventory['value'] !== '');
+						return $filter_inventory['field'] !== '' && $filter_inventory['value'] !== '';
 					}),
 					'evaltype' => $this->getInput('evaltype', TAG_EVAL_TYPE_AND_OR),
 					'tags' => array_filter($this->getInput('tags', []), function ($filter_tag) {
-						return ($filter_tag['tag'] !== '');
+						return $filter_tag['tag'] !== '';
 					}),
 					'show_tags' => $this->getInput('show_tags', SHOW_TAGS_3),
 					'tag_name_format' => $this->getInput('tag_name_format', TAG_NAME_FULL),
@@ -129,7 +135,7 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 					'show_timeline' => $this->getInput('show_timeline', 0),
 					'details' => $this->getInput('details', 0),
 					'highlight_row' => $this->getInput('highlight_row', 0),
-					'show_opdata' => $this->getInput('show_opdata', 0),
+					'show_opdata' => $this->getInput('show_opdata', OPERATIONAL_DATA_SHOW_NONE),
 					'age_state' => $this->getInput('age_state', 0),
 					'age' => $this->getInput('age_state', 0) ? $this->getInput('age', 14) : null,
 					'from' => $this->hasInput('from') ? $this->getInput('from') : null,

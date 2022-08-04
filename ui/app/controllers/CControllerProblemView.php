@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,13 +19,16 @@
 **/
 
 
+/**
+ * Controller for the "Problems" page and Problems CSV export.
+ */
 class CControllerProblemView extends CControllerProblem {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'show' =>					'in '.TRIGGERS_OPTION_RECENT_PROBLEM.','.TRIGGERS_OPTION_IN_PROBLEM.','.TRIGGERS_OPTION_ALL,
 			'groupids' =>				'array_id',
@@ -62,8 +65,8 @@ class CControllerProblemView extends CControllerProblem {
 			'counter_index' =>			'ge 0'
 		];
 
-		$ret = ($this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventar()
-				&& $this->validateTags());
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventory()
+			&& $this->validateTags();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -72,11 +75,11 @@ class CControllerProblemView extends CControllerProblem {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$filter_tabs = [];
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
 			->read()
