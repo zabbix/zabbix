@@ -2581,11 +2581,17 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_re
 		new_item.itemid = itemid;
 		new_item.value_type = value_type;
 		item = &new_item;
+
+		ret = vch_item_get_values(item, values, seconds, count, ts);
 	}
 	else if (item->value_type != value_type)
+	{
 		goto out;
-
-	ret = vch_item_get_values(item, values, seconds, count, ts);
+	}
+	else
+	{
+		ret = vch_item_get_values(item, values, seconds, count, ts);
+	}
 out:
 	if (FAIL == ret)
 	{
