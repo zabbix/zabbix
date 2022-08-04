@@ -455,10 +455,7 @@ int	init_perf_collector(zbx_threadedness_t threadedness, char **error)
 	}
 
 	if (SUCCEED != set_object_names())
-	{
-		*error = zbx_strdup(*error, "cannot initialize object names");
-		goto out;
-	}
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot initialize object names", __func__);
 
 	ret = SUCCEED;
 out:
