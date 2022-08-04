@@ -99,7 +99,7 @@ class ExecuteNowAction {
 			]
 		]);
 
-		// Get item from web scenrio.
+		// Get item from web scenario.
 		$web_item = CDataHelper::call('item.get', [
 			'hostids' => $hosts['hostids']['Host for execute now permissions'],
 			'webitems' => 'extend',

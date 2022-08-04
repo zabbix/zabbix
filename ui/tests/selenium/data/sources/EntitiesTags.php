@@ -834,7 +834,7 @@ class EntitiesTags {
 			]
 		]);
 
-		// Create servises.
+		// Create services.
 		CDataHelper::call('service.create', [
 			[
 				'name' => 'Service with tags for updating',

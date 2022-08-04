@@ -130,7 +130,7 @@ class testPageTriggerDescription extends CWebTest {
 	}
 
 	private function checkDescriptionUrls($data, $element) {
-		// Take the urls out of description text to process them separatelly.
+		// Take the urls out of description text to process them separately.
 		$urls = [];
 		preg_match_all('/https?:\/\/\S+/', $data['description'], $urls);
 
