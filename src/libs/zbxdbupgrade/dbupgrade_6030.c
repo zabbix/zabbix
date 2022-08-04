@@ -149,6 +149,15 @@ static int	DBpatch_6030023(void)
 	return DBcreate_changelog_delete_trigger("httpstepitem", "httpstepitemid");
 }
 
+static int	DBpatch_6030024(void)
+{
+	return DBdrop_field("drules", "nextcheck");
+}
+
+static int	DBpatch_6030025(void)
+{
+	return DBdrop_field("httptest", "nextcheck");
+}
 
 #endif
 
@@ -180,5 +189,7 @@ DBPATCH_ADD(6030020, 0, 1)
 DBPATCH_ADD(6030021, 0, 1)
 DBPATCH_ADD(6030022, 0, 1)
 DBPATCH_ADD(6030023, 0, 1)
+DBPATCH_ADD(6030024, 0, 1)
+DBPATCH_ADD(6030025, 0, 1)
 
 DBPATCH_END()
