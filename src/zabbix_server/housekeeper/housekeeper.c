@@ -18,15 +18,16 @@
 **/
 
 #include "housekeeper.h"
+
 #include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxserver.h"
 #include "zbxrtc.h"
-
+#include "zbxnum.h"
+#include "zbxtime.h"
 #include "history_compress.h"
 #include "../../libs/zbxdbcache/valuecache.h"
-
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -1203,7 +1204,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER | ZBX_CONFIG_FLAGS_DB_EXTENSION);
 
-		if (0 == strcmp(cfg.db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+		if (0 == strcmp(cfg.db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		{
 			zbx_setproctitle("%s [synchronizing history and trends compression settings]",
 					get_process_type_string(process_type));

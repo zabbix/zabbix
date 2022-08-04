@@ -20,8 +20,8 @@
 #include "zbxcomms.h"
 #include "comms.h"
 
-#include "common.h"
 #include "log.h"
+#include "zbxstr.h"
 
 #define WAIT_READ	0
 #define WAIT_WRITE	1

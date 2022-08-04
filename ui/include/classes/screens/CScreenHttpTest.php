@@ -53,9 +53,6 @@ class CScreenHttpTest extends CScreenBase {
 		$sort_field = $this->data['sort'];
 		$sort_order = $this->data['sortorder'];
 
-		$httptests = [];
-		$paging = [];
-
 		$options = [
 			'output' => ['httptestid', 'name', 'hostid'],
 			'selectHosts' => ['name', 'status'],
@@ -90,9 +87,9 @@ class CScreenHttpTest extends CScreenBase {
 		$httptests = resolveHttpTestMacros($httptests, true, false);
 		order_result($httptests, $sort_field, $sort_order);
 
-		$tags = array_key_exists('tags', $this->data)
-			? makeTags($httptests, true, 'httptestid', ZBX_TAG_COUNT_DEFAULT, $this->data['tags'])
-			: [];
+		$tags = makeTags($httptests, true, 'httptestid', ZBX_TAG_COUNT_DEFAULT,
+			array_key_exists('tags', $this->data) ? $this->data['tags'] : []
+		);
 
 		// Fetch the latest results of the web scenario.
 		$last_httptest_data = Manager::HttpTest()->getLastData(array_keys($httptests));

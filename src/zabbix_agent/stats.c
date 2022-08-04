@@ -20,7 +20,7 @@
 #include "stats.h"
 
 #include "log.h"
-
+#include "zbxtime.h"
 #include "zbxmutexs.h"
 
 #ifdef _WINDOWS

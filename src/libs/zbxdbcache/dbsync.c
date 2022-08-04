@@ -24,6 +24,7 @@
 #include "zbxserialize.h"
 #include "base64.h"
 #include "zbxeval.h"
+#include "zbxnum.h"
 
 #define ZBX_DBSYNC_OBJ_HOST		1
 #define ZBX_DBSYNC_OBJ_HOST_TAG		2
@@ -322,7 +323,7 @@ void	zbx_dbsync_env_init(ZBX_DC_CONFIG *cache)
  *          database time                                                     *
  *                                                                            *
  ******************************************************************************/
-static void	dbsync_prune_changelog()
+static void	dbsync_prune_changelog(void)
 {
 	static int		last_prune_time;
 	int			now;
@@ -446,6 +447,7 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 			ZBX_DBROW2UINT64(changelog_local.changelogid, row[0]);
 			changelog_local.clock = atoi(row[1]);
 			zbx_hashset_insert(&dbsync_env.changelog, &changelog_local, sizeof(changelog_local));
+			changelog_num++;
 		}
 	}
 	else

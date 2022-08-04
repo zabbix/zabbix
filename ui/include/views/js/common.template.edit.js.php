@@ -131,6 +131,7 @@
 			.trigger('input');
 
 		window.macros_manager = new HostMacrosManager(<?= json_encode([
+			'readonly' => $data['readonly'],
 			'parent_hostid' =>  array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null
 		]) ?>);
 

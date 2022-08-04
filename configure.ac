@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.2.0rc1])
+AC_INIT([Zabbix],[6.4.0alpha1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -155,6 +155,9 @@ AC_CHECK_HEADERS(libperfstat.h, [], [], [
 #endif
 ])
 
+dnl Kluge for building wihout pkg-config
+m4_ifdef([PKG_PROG_PKG_CONFIG], [], [ AC_DEFUN([PKG_PROG_PKG_CONFIG], []) ])
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for libraries                      *
@@ -172,8 +175,9 @@ AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1
 AC_SEARCH_LIBS(devstat_getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
 AC_SEARCH_LIBS(getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
 
-dnl on FreeBSD we have to link with -lexecinfo to get backtraces
+dnl on FreeBSD we have to link with -lexecinfo to get backtraces and also check jail_getname() availability (available after __FreeBSD_version >= 800099)
 AC_SEARCH_LIBS(backtrace_symbols, execinfo, [AC_DEFINE([HAVE_LIBEXECINFO], 1, [Define to 1 if you have the 'libexecinfo' library (-lexecinfo)])])
+AC_SEARCH_LIBS(jail_getname, jail, [AC_DEFINE([HAVE_LIBJAIL], 1, [Define to 1 if you have 'libjail' library (-ljail)])])
 
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
@@ -1322,6 +1326,10 @@ AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked bin
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-static-libs]) ;;
 esac])
 
+if test "x#static_linking" = "xyes" && test "x$static_linking_libs" = "xyes"; then
+  AC_MSG_ERROR([cannot use --static and --static-libs at the same time])
+fi
+
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of Zabbix server],
 [case "${enableval}" in
   yes) server=yes ;;
@@ -1545,9 +1553,12 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_libxml2="yes"
 		fi
 	fi
-	
-	LDFLAGS="$LDFLAGS $LIBXML2_LDFLAGS"
-	LIBS="$LIBS $LIBXML2_LIBS"
+
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBXML2_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $LIBXML2_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
 
 	AC_SUBST(LIBXML2_CFLAGS)
 
@@ -1873,19 +1884,41 @@ ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
 
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
-dnl Check for libpcre or libpcre2, used by Zabbix for regular expressions
-dnl Must check for both pcre and pcre2 to check if both were selected by the user and produce an error in that case
-LIBPCRE_CHECK_CONFIG([no])
-if test "x$enable_static_libs" != "xyes" || test "x$found_libpcre" != "xyes"; then
-LIBPCRE2_CHECK_CONFIG([no])
-fi
-if test "x$want_libpcre2" = "xyes"; then
-	if test "x$want_libpcre" = "xyes"; then
-		AC_MSG_ERROR([Cannot use both pcre and pcre2 at the same time!])
+LIBPCRE_CHECK_CONFIG([flags-only])
+LIBPCRE2_CHECK_CONFIG([flags-only])
+
+if test "x$want_libpcre2" = "xno"; then # default to old pcre
+	if test "x$want_libpcre" = "xno"; then
+		AC_MSG_NOTICE([using old pcre library by default])
 	fi
 
+	LIBPCRE_CHECK_CONFIG([mandatory])
+
+	if test "x$found_libpcre" != "xyes"; then
+		AC_MSG_ERROR([unable to use libpcre (libpcre check failed)])
+	fi
+
+	LIBPCRE_CHECK_CONFIG([no])
+
+	CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
+	LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
+	if test "x$ARCH" = "xosx"; then
+		LIBS="$LIBPCRE_LIBS $LIBS"
+	else
+		LIBS="$LIBS $LIBPCRE_LIBS"
+	fi
+
+	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
+	have_pcre=1
+else
+	if test "x$want_libpcre" != "xno"; then
+		AC_MSG_ERROR([cannot use both pcre and pcre2 at the same time])
+	fi
+
+	LIBPCRE2_CHECK_CONFIG([mandatory])
+
 	if test "x$found_libpcre2" != "xyes"; then
-		AC_MSG_ERROR([Unable to use libpcre2 (libpcre2 check failed)])
+	    AC_MSG_ERROR([unable to use libpcre2 (libpcre2 check failed)])
 	fi
 
 	CFLAGS="$CFLAGS $LIBPCRE2_CFLAGS"
@@ -1898,21 +1931,10 @@ if test "x$want_libpcre2" = "xyes"; then
 
 	AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
 	have_pcre2=1
-else
-	if test "x$found_libpcre" != "xyes"; then
-		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
-	fi
+fi
 
-	CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
-	LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
-	if test "x$ARCH" = "xosx"; then
-		LIBS="$LIBPCRE_LIBS $LIBS"
-	else
-		LIBS="$LIBS $LIBPCRE_LIBS"
-	fi
-
-	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
-	have_pcre=1
+if test "x$have_pcre" != "x1" && test "x$have_pcre2" != "x1"; then
+    AC_MSG_ERROR([cannot build with libpcre or libpcre2])
 fi
 fi
 
@@ -1967,29 +1989,35 @@ fi
 if test "x$agent2" = "xyes"; then
 	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
-		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
-		\${abs_top_builddir}/src/libs/zbxhash/libzbxhash.a \
 		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 		\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
 		\${abs_top_builddir}/src/libs/zbxconf/libzbxconf.a \
 		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
 		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
+		\${abs_top_builddir}/src/libs/zbxhash/libzbxhash.a \
 		\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
 		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
-		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
+		\${abs_top_builddir}/src/libs/zbxmutexs/libzbxmutexs.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
-		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
-		\${abs_top_builddir}/src/libs/zbxmutexs/libzbxmutexs.a \
+		\${abs_top_builddir}/src/libs/zbxnum/libzbxnum.a \
+		\${abs_top_builddir}/src/libs/zbxstr/libzbxstr.a \
+		\${abs_top_builddir}/src/libs/zbxparam/libzbxparam.a \
+		\${abs_top_builddir}/src/libs/zbxexpr/libzbxexpr.a \
+		\${abs_top_builddir}/src/libs/zbxtime/libzbxtime.a \
+		\${abs_top_builddir}/src/libs/zbxip/libzbxip.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
+		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
+		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
 		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
+		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
@@ -2073,113 +2101,120 @@ AC_OUTPUT([
 	src/Makefile
 	src/go/Makefile
 	src/libs/Makefile
-	src/libs/zbxlog/Makefile
 	src/libs/zbxalgo/Makefile
-	src/libs/zbxshmem/Makefile
-	src/libs/zbxhash/Makefile
-	src/libs/zbxcrypto/Makefile
-	src/libs/zbxconf/Makefile
-	src/libs/zbxdbcache/Makefile
-	src/libs/zbxdbhigh/Makefile
-	src/libs/zbxgetopt/Makefile
-	src/libs/zbxmedia/Makefile
-	src/libs/zbxsysinfo/Makefile
+	src/libs/zbxaudit/Makefile
+	src/libs/zbxavailability/Makefile
 	src/libs/zbxcommon/Makefile
-	src/libs/zbxsysinfo/agent/Makefile
-	src/libs/zbxsysinfo/alias/Makefile
-	src/libs/zbxsysinfo/common/Makefile
-	src/libs/zbxsysinfo/simple/Makefile
-	src/libs/zbxsysinfo/linux/Makefile
-	src/libs/zbxsysinfo/aix/Makefile
-	src/libs/zbxsysinfo/freebsd/Makefile
-	src/libs/zbxsysinfo/hpux/Makefile
-	src/libs/zbxsysinfo/openbsd/Makefile
-	src/libs/zbxsysinfo/osx/Makefile
-	src/libs/zbxsysinfo/solaris/Makefile
-	src/libs/zbxsysinfo/osf/Makefile
-	src/libs/zbxsysinfo/netbsd/Makefile
-	src/libs/zbxsysinfo/unknown/Makefile
-	src/libs/zbxnix/Makefile
-	src/libs/zbxthreads/Makefile
-	src/libs/zbxmutexs/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
-	src/libs/zbxdiscovery/Makefile
-	src/libs/zbxdb/Makefile
-	src/libs/zbxdbupgrade/Makefile
-	src/libs/zbxdbschema/Makefile
-	src/libs/zbxjson/Makefile
-	src/libs/zbxhttp/Makefile
-	src/libs/zbxserver/Makefile
-	src/libs/zbxicmpping/Makefile
-	src/libs/zbxeval/Makefile
-	src/libs/zbxserialize/Makefile
-	src/libs/zbxexec/Makefile
-	src/libs/zbxself/Makefile
-	src/libs/zbxmodules/Makefile
-	src/libs/zbxregexp/Makefile
-	src/libs/zbxtasks/Makefile
-	src/libs/zbxipcservice/Makefile
-	src/libs/zbxhistory/Makefile
 	src/libs/zbxcompress/Makefile
-	src/libs/zbxembed/Makefile
-	src/libs/zbxexport/Makefile
-	src/libs/zbxprometheus/Makefile
-	src/libs/zbxvault/Makefile
-	src/libs/zbxhashicorp/Makefile
+	src/libs/zbxconf/Makefile
+	src/libs/zbxcrypto/Makefile
 	src/libs/zbxcyberark/Makefile
-	src/libs/zbxkvs/Makefile
+	src/libs/zbxdb/Makefile
+	src/libs/zbxdbcache/Makefile
+	src/libs/zbxdbhigh/Makefile
+	src/libs/zbxdbschema/Makefile
+	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxdiag/Makefile
-	src/libs/zbxtrends/Makefile
-	src/libs/zbxavailability/Makefile
-	src/libs/zbxaudit/Makefile
-	src/libs/zbxservice/Makefile
-	src/libs/zbxxml/Makefile
+	src/libs/zbxdiscovery/Makefile
+	src/libs/zbxembed/Makefile
+	src/libs/zbxeval/Makefile
+	src/libs/zbxexec/Makefile
+	src/libs/zbxexport/Makefile
+	src/libs/zbxexpr/Makefile
+	src/libs/zbxgetopt/Makefile
 	src/libs/zbxha/Makefile
+	src/libs/zbxhash/Makefile
+	src/libs/zbxhashicorp/Makefile
+	src/libs/zbxhistory/Makefile
+	src/libs/zbxhttp/Makefile
+	src/libs/zbxicmpping/Makefile
+	src/libs/zbxip/Makefile
+	src/libs/zbxipcservice/Makefile
+	src/libs/zbxjson/Makefile
+	src/libs/zbxkvs/Makefile
+	src/libs/zbxlog/Makefile
+	src/libs/zbxmedia/Makefile
+	src/libs/zbxmodules/Makefile
+	src/libs/zbxmutexs/Makefile
+	src/libs/zbxnix/Makefile
+	src/libs/zbxnum/Makefile
+	src/libs/zbxparam/Makefile
+	src/libs/zbxprometheus/Makefile
+	src/libs/zbxregexp/Makefile
 	src/libs/zbxrtc/Makefile
+	src/libs/zbxself/Makefile
+	src/libs/zbxserialize/Makefile
+	src/libs/zbxserver/Makefile
+	src/libs/zbxservice/Makefile
+	src/libs/zbxshmem/Makefile
+	src/libs/zbxstr/Makefile
+	src/libs/zbxsysinfo/Makefile
+	src/libs/zbxsysinfo/agent/Makefile
+	src/libs/zbxsysinfo/aix/Makefile
+	src/libs/zbxsysinfo/alias/Makefile
+	src/libs/zbxsysinfo/common/Makefile
+	src/libs/zbxsysinfo/freebsd/Makefile
+	src/libs/zbxsysinfo/hpux/Makefile
+	src/libs/zbxsysinfo/linux/Makefile
+	src/libs/zbxsysinfo/netbsd/Makefile
+	src/libs/zbxsysinfo/openbsd/Makefile
+	src/libs/zbxsysinfo/osf/Makefile
+	src/libs/zbxsysinfo/osx/Makefile
+	src/libs/zbxsysinfo/simple/Makefile
+	src/libs/zbxsysinfo/solaris/Makefile
+	src/libs/zbxsysinfo/unknown/Makefile
+	src/libs/zbxtasks/Makefile
+	src/libs/zbxthreads/Makefile
+	src/libs/zbxtime/Makefile
+	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
+	src/libs/zbxvault/Makefile
+	src/libs/zbxversion/Makefile
+	src/libs/zbxxml/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
+	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile
-	src/zabbix_sender/Makefile
-	src/zabbix_server/Makefile
-	src/zabbix_server/alerter/Makefile
-	src/zabbix_server/dbsyncer/Makefile
-	src/zabbix_server/dbconfig/Makefile
-	src/zabbix_server/diag/Makefile
-	src/zabbix_server/discoverer/Makefile
-	src/zabbix_server/ha/Makefile
-	src/zabbix_server/housekeeper/Makefile
-	src/zabbix_server/httppoller/Makefile
-	src/zabbix_server/pinger/Makefile
-	src/zabbix_server/poller/Makefile
-	src/zabbix_server/snmptrapper/Makefile
-	src/zabbix_server/timer/Makefile
-	src/zabbix_server/trapper/Makefile
-	src/zabbix_server/escalator/Makefile
-	src/zabbix_server/proxypoller/Makefile
-	src/zabbix_server/selfmon/Makefile
-	src/zabbix_server/stats/Makefile
-	src/zabbix_server/vmware/Makefile
-	src/zabbix_server/taskmanager/Makefile
-	src/zabbix_server/ipmi/Makefile
-	src/zabbix_server/odbc/Makefile
-	src/zabbix_server/scripts/Makefile
-	src/zabbix_server/preprocessor/Makefile
-	src/zabbix_server/availability/Makefile
-	src/zabbix_server/service/Makefile
-	src/zabbix_server/lld/Makefile
-	src/zabbix_server/reporter/Makefile
 	src/zabbix_proxy/Makefile
+	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/diag/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
-	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/stats/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
-	src/zabbix_java/Makefile
+	src/zabbix_sender/Makefile
+	src/zabbix_server/Makefile
+	src/zabbix_server/alerter/Makefile
+	src/zabbix_server/availability/Makefile
+	src/zabbix_server/dbconfig/Makefile
+	src/zabbix_server/dbsyncer/Makefile
+	src/zabbix_server/diag/Makefile
+	src/zabbix_server/discoverer/Makefile
+	src/zabbix_server/escalator/Makefile
+	src/zabbix_server/ha/Makefile
+	src/zabbix_server/housekeeper/Makefile
+	src/zabbix_server/httppoller/Makefile
+	src/zabbix_server/ipmi/Makefile
+	src/zabbix_server/lld/Makefile
+	src/zabbix_server/odbc/Makefile
+	src/zabbix_server/pinger/Makefile
+	src/zabbix_server/poller/Makefile
+	src/zabbix_server/preprocessor/Makefile
+	src/zabbix_server/proxypoller/Makefile
+	src/zabbix_server/reporter/Makefile
+	src/zabbix_server/scripts/Makefile
+	src/zabbix_server/selfmon/Makefile
+	src/zabbix_server/service/Makefile
+	src/zabbix_server/snmptrapper/Makefile
+	src/zabbix_server/stats/Makefile
+	src/zabbix_server/taskmanager/Makefile
+	src/zabbix_server/timer/Makefile
+	src/zabbix_server/trapper/Makefile
+	src/zabbix_server/vmware/Makefile
 	man/Makefile
 	])
 
@@ -2241,6 +2276,14 @@ Configuration:
 
 if test "x$DB_CFLAGS" != "x"; then
 	echo "    database:              ${DB_CFLAGS}"
+fi
+
+if test "x$LIBPCRE_CFLAGS" != "x"; then
+	echo "    libpcre:               ${LIBPCRE_CFLAGS}"
+fi
+
+if test "x$LIBPCRE2_CFLAGS" != "x"; then
+	echo "    libpcre2:              ${LIBPCRE2_CFLAGS}"
 fi
 
 if test "x$LIBXML2_CFLAGS" != "x"; then

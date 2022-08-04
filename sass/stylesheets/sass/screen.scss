@@ -450,7 +450,6 @@ form {
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, .1);
 			color: $font-color;
 			height: 22px;
-			line-height: 1;
 			vertical-align: middle;
 			white-space: nowrap;
 
@@ -1599,10 +1598,6 @@ input {
 		@extend %form-input-style;
 	}
 
-	&[type="checkbox"] {
-		@extend %form-check-radio-style;
-	}
-
 	&[type="radio"] {
 		@extend %form-check-radio-style;
 	}
@@ -1618,13 +1613,16 @@ input {
 }
 
 textarea {
+	margin: 0;
+	padding: 4px 5px;
+	overflow: auto;
 	font: {
 		family: $font-stack;
 		size: $font-form-size;
 	}
-	padding: 4px 5px;
-	margin: 0;
-	overflow: auto;
+	line-height: normal;
+	vertical-align: top;
+
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
 
@@ -1666,6 +1664,7 @@ select {
 		padding: 4px 5px;
 		width: 300px;
 		height: 150px;
+		vertical-align: top;
 
 		option {
 			padding: 0;
@@ -1691,10 +1690,39 @@ select {
 
 .form-input-margin {
 	display: inline-block;
-	margin: 0 4px 0 0;
+	margin: 0 3px 0 0;
 }
 
 .checkbox-radio {
+	position: absolute !important;
+	top: auto !important;
+	z-index: 1;
+	width: 16px !important;
+	height: 16px !important;
+	opacity: 0;
+
+	& + label {
+		span {
+			position: relative;
+			display: inline-block;
+			width: 14px;
+			height: 14px;
+			margin-right: 4px;
+			vertical-align: text-bottom;
+			background-color: $form-bg-color;
+			border: 1px solid $form-border-color;
+
+			&:active {
+				border-color: $form-border-color;
+			}
+		}
+
+		&.label-pos-left span {
+			margin-left: 4px;
+			margin-right: 0;
+		}
+	}
+
 	&:checked[readonly] + label span {
 		transition: none;
 
@@ -1705,7 +1733,7 @@ select {
 
 	&[readonly] {
 		&,
-		+ label {
+		& + label {
 			pointer-events: none;
 
 			span {
@@ -1716,7 +1744,7 @@ select {
 	}
 
 	&[type="checkbox"] {
-		+ label span {
+		& + label span {
 			border-radius: 2px;
 		}
 
@@ -1743,7 +1771,7 @@ select {
 	}
 
 	&[type="radio"] {
-		+ label span {
+		& + label span {
 			border-radius: 50%;
 		}
 
@@ -1766,33 +1794,6 @@ select {
 				background-color: $form-border-color !important;
 			}
 		}
-	}
-
-	position: absolute !important;
-	top: auto !important;
-	width: 16px !important;
-	height: 16px !important;
-	opacity: 0;
-	z-index: 1;
-
-	+ label span {
-		position: relative;
-		display: inline-block;
-		width: 14px;
-		height: 14px;
-		margin: -4px 4px 0 0;
-		bottom: -3px;
-		border: 1px solid $form-border-color;
-		background-color: $form-bg-color;
-
-		&:active {
-			border-color: $form-border-color;
-		}
-	}
-
-	+ label.label-pos-left span {
-		margin-left: 6px;
-		margin-right: 1px;
 	}
 
 	&:focus + label span {
@@ -2436,6 +2437,13 @@ $icon-widget-btn: (
 	}
 }
 
+.calendar-control {
+	.icon-cal {
+		position: relative;
+		top: -1px;
+	}
+}
+
 .header-kioskmode-controls {
 	position: fixed;
 	top: 5px;
@@ -2941,8 +2949,8 @@ $form-icon-btn: (
 	min-width: 166px;
 	max-width: 250px;
 	background-color: $ui-bg-color;
-	border: 1px solid $action-border-color;
-	border-bottom-color: darken($action-border-color, 1%);
+	border: 1px solid $overlay-border-color;
+	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
 	&:focus {
@@ -3036,8 +3044,8 @@ $form-icon-btn: (
 		width: 12px;
 		height: 12px;
 		background-color: $ui-bg-color;
-		border-top: 1px solid $action-border-color;
-		border-left: 1px solid $action-border-color;
+		border-top: 1px solid $overlay-border-color;
+		border-left: 1px solid $overlay-border-color;
 		transform: rotate(45deg);
 	}
 }
@@ -3048,8 +3056,8 @@ $form-icon-btn: (
 	z-index: 1000;
 	padding: 13px 10px 10px;
 	background-color: $ui-bg-color;
-	border: 1px solid $action-border-color;
-	border-bottom-color: darken($action-border-color, 1%);
+	border: 1px solid $overlay-border-color;
+	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
 	.dashboard-widget-head {
@@ -3734,9 +3742,7 @@ $form-icon-btn: (
 
 .svg-graph-preview {
 	margin-top: 10px;
-	// min-width: 960px;
-	// max-width: 1080px;
-	width: 1080px;
+	min-width: 1120px;
 	height: 300px;
 	position: relative;
 
@@ -4428,7 +4434,7 @@ span {
 .menu-popup-preloader,
 .hintbox-preloader {
 	background: $preloader-bg-color;
-	border: 1px solid $action-border-color;
+	border: 1px solid $overlay-border-color;
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 	height: 128px;
 	width: 128px;
@@ -4869,12 +4875,7 @@ svg {
 	li {
 		overflow: hidden;
 		text-overflow: ellipsis;
-		line-height: 20px;
-
-		label {
-			line-height: 16px;
-			vertical-align: bottom;
-		}
+		line-height: 24px;
 	}
 }
 
@@ -4955,6 +4956,7 @@ svg {
 	display: block;
 	max-width: 930px;
 	min-width: 800px;
+	position: relative;
 
 	> li {
 		display: block;
@@ -6111,81 +6113,88 @@ button {
 
 // HOST INTERFACES
 
-.interface-container {
-	width: fit-content;
-	width: -moz-fit-content;
-	padding-left: 0;
-
-	&:not(.interface-container-header):not(:empty) {
-		margin-bottom: 5px;
-
-		& ~ .interface-container:not(:empty) {
-			border-top: 1px solid $form-border-color;
-			padding-top: 10px;
-		}
-	}
-
-	&:empty {
-		display: none;
-	}
-
-	.interface-row {
-		display: grid;
-		grid-template-columns: 26px 36px 225px 175px 85px 100px 20px 1fr;
-		grid-template-rows: 24px 1fr;
-		gap: 5px;
-
-		&:not(:first-of-type) {
-			margin-top: 5px;
-		}
-
-		&[data-type] .interface-cell-details {
-			display: none;
-			grid-column: 1/-1;
-		}
-
-		.interface-cell {
-			align-self: center;
-
-			.interface-btn-toggle {
-				display: none;
-				@extend .btn-link;
-			}
-
-			&.interface-cell-header {
-				color: $font-alt-color;
-				text-align: left;
-			}
-
-			.table-forms-td-left,
-			.table-forms-td-right {
-				padding-bottom: 0;
-			}
-		}
+.table-forms-td-right {
+	.interfaces {
+		margin-top: 5px;
 	}
 }
 
-// Host interface accordion for SNMP specific styles.
-.interface-row.list-accordion-item[data-type="2"] {
-	&.list-accordion-item-closed {
-		.interface-btn-toggle {
-			@extend .btn-widget-expand;
+.interfaces {
+	display: grid;
+	grid-template-columns: 26px repeat(7, max-content);
+	margin-bottom: 5px;
+	line-height: 24px;
+
+	.interface-container {
+		display: contents;
+
+		&.interface-container-header {
+			.interface-cell {
+				padding: 0 5px 0 0;
+				color: $font-alt-color;
+			}
+
+			.interface-cell-action {
+				grid-column: span 2;
+			}
+		}
+
+		&:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) {
+			.interface-cell:not(.interface-cell-details) {
+				padding-top: 10px;
+				margin-top: 5px;
+				border-top: 1px solid $form-border-color;
+			}
 		}
 	}
 
-	&.list-accordion-item-opened {
-		.interface-btn-toggle {
-			@extend .btn-widget-collapse;
-		}
+	.interface-row {
+		display: contents;
 
-		.list-accordion-item-body {
-			display: block;
+		&[data-type="2"] {
+			.interface-btn-toggle {
+				@extend %btn-widget-defaults;
+
+				display: inline-block;
+				width: 24px;
+				height: 24px;
+				background: url($sprite-path) no-repeat -6px -690px;
+			}
+
+			.list-accordion-item-body {
+				display: none;
+				padding-top: 0;
+			}
+
+			&.list-accordion-item-opened {
+				.interface-btn-toggle {
+					background: url($sprite-path) no-repeat -6px -655px;
+				}
+
+				.list-accordion-item-body {
+					display: block;
+				}
+			}
+		}
+	}
+
+	.interface-cell {
+		padding: 5px 5px 5px 0;
+
+		&.interface-cell-details {
+			display: none;
+			grid-column: 1 / -1;
 		}
 	}
 
 	.interface-btn-toggle {
-		display: inline-block;
-		@extend %btn-widget;
+		display: none;
+		vertical-align: top;
+	}
+
+	.no-interface {
+		grid-column: 1 / -1;
+		color: $font-alt-color;
 	}
 }
 
@@ -6377,7 +6386,7 @@ z-select,
 
 .import-compare {
 	display: flex;
-	max-height: calc(100vh - 190px);
+	max-height: calc(100vh - 220px);
 
 	.toc {
 		flex: 20%;
@@ -6390,6 +6399,11 @@ z-select,
 		margin-left: 5px;
 		overflow: auto;
 		border: 1px dashed $form-border-color;
+	}
+
+	.toc,
+	.diff {
+		@extend %webkit-scrollbar;
 	}
 }
 
@@ -6468,9 +6482,9 @@ z-select,
 	background-position: -117px -506px !important;
 }
 .geomap-filter {
-	border: 2px solid rgba($ui-border-color, .4);
+	border: 1px solid $overlay-border-color;
 	background-color: $ui-bg-color;
-	padding: 10px 30px 5px 10px;
+	padding: 5px 20px 5px 10px;
 	position: absolute;
 	margin-right: -2px;
 	margin-top: 5px;
@@ -6478,7 +6492,7 @@ z-select,
 	right: 0;
 }
 .geomap-filter.collapsed {
-	display: table;
+	display: block;
 }
 .geomap-filter li {
 	width: calc(100% + 20px);
