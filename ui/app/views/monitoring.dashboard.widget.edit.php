@@ -21,12 +21,12 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $widget_view = include('include/classes/widgets/views/widget.'.$data['dialogue']['type'].'.form.view.php');
 
-$form = $widget_view['form']
-	->addClass('dashboard-grid-widget-'.$data['dialogue']['type']);
+$form = $widget_view['form']->addClass('dashboard-widget-'.$data['dialogue']['type']);
 
 // Submit button is needed to enable submit event on Enter on inputs.
 $form->addItem((new CInput('submit', 'dashboard_widget_config_submit'))->addStyle('display: none;'));
@@ -65,9 +65,16 @@ if (array_key_exists('jq_templates', $widget_view)) {
 	}
 }
 
+$scripts = [
+	$this->readJsFile('monitoring.dashboard.widget.edit.js.php'),
+	'widget_form.init();'
+];
+
 if (array_key_exists('scripts', $widget_view)) {
-	$output['body'] .= get_js(implode("\n", $widget_view['scripts']));
+	$scripts = array_merge($scripts, $widget_view['scripts']);
 }
+
+$output['body'] .= get_js(implode("\n", $scripts));
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
