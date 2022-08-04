@@ -1,3 +1,24 @@
+Changes for 6.0.8rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
+.........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
+...G...... [ZBX-21300] fixed high cpu usage when using net.tcp.socket.count key (vso)
+........S. [ZBX-20419] fixed database deadlocks and MySQL error number calculation to be consistent between logging and recoverability detection logic (akozlovs)
+..F....... [ZBX-21043] fixed z-select error when labels have specials chars (rlataria)
+........S. [ZBX-20656] updated active proxy throttling to allow task transfer (wiper)
+.......PS. [ZBX-21153] fixed info collection about access to vmware DS for HV with large number of connected DS (MVekslers)
+........S. [ZBX-19821] fixed host prototype interface update when linking templates (wiper)
+..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.7
+
+6.0.7rc1 was released as 6.0.7 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.7rc1
 
 New features:
@@ -54,6 +75,7 @@ A.F....... [ZBX-7706] improved performance of graph.get and graphprototype.get m
 .........T [ZBX-20473] fixed evaluation period macro in disk space triggers for NetApp FAS3220 template (drasihov)
 .........T [ZBX-19205] fixed item preprocessing in PostgreSQL by Zabbix agent 2 template (drasihov)
 A.F.....S. [ZBX-20743] fixed error handling in compression with Apache licensed TimescaleDB 2.x (agriscenko, mprihodko)
+..F....... [ZBX-21350] fixed cross-site scripting vulnerability in backurl parameter (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.6
@@ -2016,6 +2038,24 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.27rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
+.........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
+........S. [ZBX-20419] fixed database deadlocks and MySQL error number calculation to be consistent between logging and recoverability detection logic (akozlovs)
+........S. [ZBX-20656] updated active proxy throttling to allow task transfer (wiper)
+.......PS. [ZBX-21153] fixed info collection about access to vmware DS for HV with large number of connected DS (MVekslers)
+..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.26
+
+5.0.26rc1 was released as 5.0.26 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.26rc1
@@ -4563,6 +4603,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.44rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.43
+
+4.0.43rc1 was released as 4.0.43 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.43rc1
