@@ -807,6 +807,10 @@ class testRole extends CAPITest {
 									'status' => '1'
 								],
 								[
+									'name' => 'administration.api_tokens',
+									'status' => '1'
+								],
+								[
 									'name' => 'administration.authentication',
 									'status' => '1'
 								],

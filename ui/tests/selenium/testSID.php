@@ -449,12 +449,13 @@ class testSID extends CWebTest {
 					'ui_configuration_event_correlation=0&ui_configuration_discovery=0&ui_configuration_services=0&'.
 					'ui_administration_general=0&ui_administration_housekeeping=0&ui_administration_proxies=0&'.
 					'ui_administration_macros=0&ui_administration_authentication=0&ui_administration_user_groups=0&'.
-					'ui_administration_user_roles=0&ui_administration_users=0&ui_administration_media_types=0&'.
-					'ui_administration_scripts=0&ui_administration_queue=0&ui_default_access=1&modules_default_access=1&'.
-					'api_access=1&api_mode=0&actions_edit_dashboards=1&actions_edit_maps=1&actions_edit_maintenance=0&'.
-					'actions_add_problem_comments=1&actions_change_severity=1&actions_acknowledge_problems=1&'.
-					'actions_close_problems=1&actions_execute_scripts=1&actions_manage_api_tokens=1&'.
-					'actions_default_access=1&action=userrole.create']],
+					'ui_administration_user_roles=0&ui_administration_users=0&ui_administration_api_tokens=0&'.
+					'ui_administration_media_types=0&ui_administration_scripts=0&ui_administration_queue=0&'.
+					'ui_default_access=1&modules_default_access=1&api_access=1&api_mode=0&actions_edit_dashboards=1&'.
+					'actions_edit_maps=1&actions_edit_maintenance=0&actions_add_problem_comments=1&'.
+					'actions_change_severity=1&actions_acknowledge_problems=1&actions_close_problems=1&'.
+					'actions_execute_scripts=1&actions_manage_api_tokens=1&actions_default_access=1&'.
+					'action=userrole.create']],
 
 			// User role update.
 			[['link' => 'zabbix.php?form_refresh=1&roleid=5&name=sadasda&type=2&ui_monitoring_dashboard=1&'.
@@ -472,12 +473,13 @@ class testSID extends CWebTest {
 					'ui_configuration_event_correlation=0&ui_configuration_discovery=0&ui_configuration_discovery=1&'.
 					'ui_configuration_services=0&ui_configuration_services=1&ui_administration_general=0&'.
 					'ui_administration_proxies=0&ui_administration_authentication=0&ui_administration_user_groups=0&'.
-					'ui_administration_user_roles=0&ui_administration_users=0&ui_administration_media_types=0&'.
-					'ui_administration_scripts=0&ui_administration_queue=0&ui_default_access=1&modules_default_access=1'.
-					'&api_access=1&api_mode=0&actions_edit_dashboards=1&actions_edit_maps=1&actions_edit_maintenance=0'.
-					'&actions_edit_maintenance=1&actions_add_problem_comments=1&actions_change_severity=1&'.
-					'actions_acknowledge_problems=1&actions_close_problems=1&actions_execute_scripts=1&'.
-					'actions_manage_api_tokens=1&actions_default_access=1&action=userrole.update']],
+					'ui_administration_user_roles=0&ui_administration_users=0&ui_administration_api_tokens=0&'.
+					'ui_administration_media_types=0&ui_administration_scripts=0&ui_administration_queue=0&'.
+					'ui_default_access=1&modules_default_access=1&api_access=1&api_mode=0&actions_edit_dashboards=1&'.
+					'actions_edit_maps=1&actions_edit_maintenance=0&actions_edit_maintenance=1&'.
+					'actions_add_problem_comments=1&actions_change_severity=1&actions_acknowledge_problems=1&'.
+					'actions_close_problems=1&actions_execute_scripts=1&actions_manage_api_tokens=1&'.
+					'actions_default_access=1&action=userrole.update']],
 
 			// User role delete.
 			[['link' => 'zabbix.php?action=userrole.delete&roleids%5B0%5D=5']],

@@ -62,6 +62,7 @@ class CRoleHelper {
 	public const UI_ADMINISTRATION_USER_GROUPS = 'ui.administration.user_groups';
 	public const UI_ADMINISTRATION_USER_ROLES = 'ui.administration.user_roles';
 	public const UI_ADMINISTRATION_USERS = 'ui.administration.users';
+	public const UI_ADMINISTRATION_API_TOKENS = 'ui.administration.api_tokens';
 	public const UI_ADMINISTRATION_MEDIA_TYPES = 'ui.administration.media_types';
 	public const UI_ADMINISTRATION_SCRIPTS = 'ui.administration.scripts';
 	public const UI_ADMINISTRATION_QUEUE = 'ui.administration.queue';
@@ -271,6 +272,7 @@ class CRoleHelper {
 				self::UI_ADMINISTRATION_USER_GROUPS,
 				self::UI_ADMINISTRATION_USER_ROLES,
 				self::UI_ADMINISTRATION_USERS,
+				self::UI_ADMINISTRATION_API_TOKENS,
 				self::UI_ADMINISTRATION_AUTHENTICATION,
 				self::UI_ADMINISTRATION_GENERAL,
 				self::UI_ADMINISTRATION_HOUSEKEEPING,
@@ -478,6 +480,7 @@ class CRoleHelper {
 						self::UI_ADMINISTRATION_USER_GROUPS => _('User groups'),
 						self::UI_ADMINISTRATION_USER_ROLES => _('User roles'),
 						self::UI_ADMINISTRATION_USERS => _('Users'),
+						self::UI_ADMINISTRATION_API_TOKENS => _('API tokens'),
 						self::UI_ADMINISTRATION_AUTHENTICATION => _('Authentication')
 					];
 				}

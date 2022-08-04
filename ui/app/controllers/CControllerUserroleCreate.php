@@ -70,6 +70,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'ui_administration_user_groups' => 				'in 0,1',
 			'ui_administration_user_roles' => 				'in 0,1',
 			'ui_administration_users' => 					'in 0,1',
+			'ui_administration_api_tokens' => 				'in 0,1',
 			'ui_administration_media_types' => 				'in 0,1',
 			'ui_administration_scripts' => 					'in 0,1',
 			'ui_administration_queue' => 					'in 0,1',
