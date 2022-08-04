@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-04T11:28:48Z'
+  date: '2022-08-04T11:54:51Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -672,7 +672,7 @@ zabbix_export:
                     request.addHeader('Accept=application/json');
                     request.addHeader('Authorization: Bearer ' + AzureVM.token);
             
-                    metrics_data = request.get('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + encodeURIComponent(metrics) + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+                    metrics_data = request.get('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + metrics + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
             
                     if (request.getStatus() !== 200) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + metrics_data;
@@ -692,7 +692,7 @@ zabbix_export:
                 },
             };
             
-            var metrics = ['Percentage CPU,Network In,Network Out,Disk Read Bytes,Disk Write Bytes,Disk Read Operations/Sec,Disk Write Operations/Sec,CPU Credits Remaining,CPU Credits Consumed,Data Disk Read Bytes/sec,Data Disk Write Bytes/sec,Data Disk Read Operations/Sec,Data Disk Write Operations/Sec,Data Disk Queue Depth,Data Disk Bandwidth Consumed Percentage,Data Disk IOPS Consumed Percentage,Data Disk Target Bandwidth,Data Disk Target IOPS,Data Disk Max Burst Bandwidth,Data Disk Max Burst IOPS', 'Data Disk Used Burst BPS Credits Percentage,Data Disk Used Burst IO Credits Percentage,OS Disk Read Bytes/sec,OS Disk Write Bytes/sec,OS Disk Read Operations/Sec,OS Disk Write Operations/Sec,OS Disk Queue Depth,OS Disk Bandwidth Consumed Percentage,OS Disk IOPS Consumed Percentage,OS Disk Target Bandwidth,OS Disk Target IOPS,OS Disk Max Burst Bandwidth,OS Disk Max Burst IOPS,OS Disk Used Burst BPS Credits Percentage,OS Disk Used Burst IO Credits Percentage,Inbound Flows,Outbound Flows,Inbound Flows Maximum Creation Rate,Outbound Flows Maximum Creation Rate,Premium Data Disk Cache Read Hit', 'Premium Data Disk Cache Read Miss,Premium OS Disk Cache Read Hit,Premium OS Disk Cache Read Miss,VM Cached Bandwidth Consumed Percentage,VM Cached IOPS Consumed Percentage,VM Uncached Bandwidth Consumed Percentage,VM Uncached IOPS Consumed Percentage,Network In Total,Network Out Total,Available Memory Bytes'],
+            var metrics = ['Percentage%20CPU,Network%20In,Network%20Out,Disk%20Read%20Bytes,Disk%20Write%20Bytes,Disk%20Read%20Operations/Sec,Disk%20Write%20Operations/Sec,CPU%20Credits%20Remaining,CPU%20Credits%20Consumed,Data%20Disk%20Read%20Bytes/sec,Data%20Disk%20Write%20Bytes/sec,Data%20Disk%20Read%20Operations/Sec,Data%20Disk%20Write%20Operations/Sec,Data%20Disk%20Queue%20Depth,Data%20Disk%20Bandwidth%20Consumed%20Percentage,Data%20Disk%20IOPS%20Consumed%20Percentage,Data%20Disk%20Target%20Bandwidth,Data%20Disk%20Target%20IOPS,Data%20Disk%20Max%20Burst%20Bandwidth,Data%20Disk%20Max%20Burst%20IOPS', 'Data%20Disk%20Used%20Burst%20BPS%20Credits%20Percentage,Data%20Disk%20Used%20Burst%20IO%20Credits%20Percentage,OS%20Disk%20Read%20Bytes/sec,OS%20Disk%20Write%20Bytes/sec,OS%20Disk%20Read%20Operations/Sec,OS%20Disk%20Write%20Operations/Sec,OS%20Disk%20Queue%20Depth,OS%20Disk%20Bandwidth%20Consumed%20Percentage,OS%20Disk%20IOPS%20Consumed%20Percentage,OS%20Disk%20Target%20Bandwidth,OS%20Disk%20Target%20IOPS,OS%20Disk%20Max%20Burst%20Bandwidth,OS%20Disk%20Max%20Burst%20IOPS,OS%20Disk%20Used%20Burst%20BPS%20Credits%20Percentage,OS%20Disk%20Used%20Burst%20IO%20Credits%20Percentage,Inbound%20Flows,Outbound%20Flows,Inbound%20Flows%20Maximum%20Creation%20Rate,Outbound%20Flows%20Maximum%20Creation%20Rate,Premium%20Data%20Disk%20Cache%20Read%20Hit', 'Premium%20Data%20Disk%20Cache%20Read%20Miss,Premium%20OS%20Disk%20Cache%20Read%20Hit,Premium%20OS%20Disk%20Cache%20Read%20Miss,VM%20Cached%20Bandwidth%20Consumed%20Percentage,VM%20Cached%20IOPS%20Consumed%20Percentage,VM%20Uncached%20Bandwidth%20Consumed%20Percentage,VM%20Uncached%20IOPS%20Consumed%20Percentage,Network%20In%20Total,Network%20Out%20Total,Available%20Memory%20Bytes'],
                 data = {};
                 data['errors'] = {};
                 data['metrics'] = {};
