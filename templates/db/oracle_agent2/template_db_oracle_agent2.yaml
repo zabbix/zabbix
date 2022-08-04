@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:29Z'
+  date: '2022-07-22T08:53:38Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -179,7 +179,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get info about CDB and  No-CDB databases on instansce.'
+          description: 'Get info about CDB and  No-CDB databases on instance.'
           tags:
             -
               tag: component
@@ -705,7 +705,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get info about PDB databases on instansce.'
+          description: 'Get info about PDB databases on instance.'
           tags:
             -
               tag: component
@@ -1579,7 +1579,7 @@ zabbix_export:
               name: 'Oracle: has been restarted'
               event_name: 'Oracle: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -

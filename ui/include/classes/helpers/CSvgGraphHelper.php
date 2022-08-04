@@ -536,8 +536,7 @@ class CSvgGraphHelper {
 
 			if ($hosts) {
 				$items = API::Item()->get([
-					'output' => [
-						'itemid', 'name', 'history', 'trends', 'units', 'value_type'],
+					'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
 					'selectHosts' => ['name'],
 					'hostids' => array_keys($hosts),
 					'webitems' => true,
