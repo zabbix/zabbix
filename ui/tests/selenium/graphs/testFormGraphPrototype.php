@@ -72,6 +72,7 @@ class testFormGraphPrototype extends testFormGraphs {
 		self::$items['graph_prototype_trap_int']['itemid'] = $item_prototype_ids['graph_prototype_trap_int'];
 		self::$items['graph_prototype_trap_float']['itemid'] = $item_prototype_ids['graph_prototype_trap_float'];
 		self::$items['graph_prototype_trap_text']['itemid'] = $item_prototype_ids['graph_prototype_trap_text'];
+		self::$items['graph_prototype_trap_char']['itemid'] = $item_prototype_ids['graph_prototype_trap_char'];
 
 		// Create graphs with previously created items..
 		$prepared_graph_prototypes = [
@@ -227,7 +228,7 @@ class testFormGraphPrototype extends testFormGraphs {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Exploded graph protoype duplicated Graph sum type mixed',
+						'Name' => 'Exploded graph prototype duplicated Graph sum type mixed',
 						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded'),
 					],
 					'items' =>[
@@ -250,7 +251,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						]
 					],
 					'details' => [
-						'Cannot add more than one item with type "Graph sum" on graph prototype "Exploded graph protoype '.
+						'Cannot add more than one item with type "Graph sum" on graph prototype "Exploded graph prototype '.
 								'duplicated Graph sum type mixed".'
 					]
 				]
@@ -677,5 +678,36 @@ class testFormGraphPrototype extends testFormGraphs {
 
 	public function testFormGraphPrototype_Delete() {
 		$this->checkDelete();
+	}
+
+	public static function getTextItemPrototypesData() {
+		return [
+			[
+				[
+					'fields' => [
+						'Name' => 'Graph prototype of text items',
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+					],
+					'yaxis_items' => [
+						'min' => 'graph_prototype_trap_text',
+						'max' => 'graph_prototype_trap_char'
+					],
+					'items' =>[
+						[
+							'item' => 'graph_prototype_trap_text',
+							'item' => 'graph_prototype_trap_char'
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getTextItemPrototypesData
+	 */
+	public function testFormGraphPrototype_TextItems($data) {
+		$this->checkTextItems($data);
 	}
 }

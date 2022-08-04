@@ -51,6 +51,7 @@ class testFormGraph extends testFormGraphs {
 		self::$items['graph_trap_int']['itemid'] = $itemids['graph_trap_int'];
 		self::$items['graph_trap_float']['itemid'] = $itemids['graph_trap_float'];
 		self::$items['graph_trap_text']['itemid'] = $itemids['graph_trap_text'];
+		self::$items['graph_trap_log']['itemid'] = $itemids['graph_trap_log'];
 
 		// Create graphs with previously created items..
 		$prepared_graphs = [
@@ -118,13 +119,18 @@ class testFormGraph extends testFormGraphs {
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Normal graph'
+						'Name' => 'Empty color'
 					],
 					'items' =>[
 						[
-							'item' => 'testFormItem'
+							'item' => 'testFormItem',
+							'color' => ''
 						]
+					],
+					'details' => [
+						'Empty color.'
 					]
 				]
 			],
@@ -556,5 +562,36 @@ class testFormGraph extends testFormGraphs {
 
 	public function testFormGraph_Delete() {
 		$this->checkDelete();
+	}
+
+	public static function getTextItemsData() {
+		return [
+			[
+				[
+					'fields' => [
+						'Name' => 'Graph of text items',
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+					],
+					'yaxis_items' => [
+						'min' => 'graph_trap_text',
+						'max' => 'graph_trap_log'
+					],
+					'items' =>[
+						[
+							'item' => 'graph_trap_text',
+							'item' => 'graph_trap_log'
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getTextItemsData
+	 */
+	public function testFormGraph_TextItems($data) {
+		$this->checkTextItems($data);
 	}
 }

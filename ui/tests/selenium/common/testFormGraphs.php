@@ -68,12 +68,14 @@ class testFormGraphs extends CWebTest {
 		'items' => [
 			'graph_trap_int' => ['value_type' => ITEM_VALUE_TYPE_UINT64, 'itemid' => null],
 			'graph_trap_float' => ['value_type' => ITEM_VALUE_TYPE_FLOAT, 'itemid' => null],
-			'graph_trap_text' => ['value_type' => ITEM_VALUE_TYPE_TEXT, 'itemid' => null]
+			'graph_trap_text' => ['value_type' => ITEM_VALUE_TYPE_TEXT, 'itemid' => null],
+			'graph_trap_log' => ['value_type' => ITEM_VALUE_TYPE_LOG, 'itemid' => null]
 		],
 		'item_prototypes' => [
 			'graph_prototype_trap_int' => ['value_type' => ITEM_VALUE_TYPE_UINT64, 'itemid' => null],
 			'graph_prototype_trap_float' => ['value_type' => ITEM_VALUE_TYPE_FLOAT, 'itemid' => null],
-			'graph_prototype_trap_text' => ['value_type' => ITEM_VALUE_TYPE_TEXT, 'itemid' => null]
+			'graph_prototype_trap_text' => ['value_type' => ITEM_VALUE_TYPE_TEXT, 'itemid' => null],
+			'graph_prototype_trap_char' => ['value_type' => ITEM_VALUE_TYPE_STR, 'itemid' => null]
 		]
 	];
 
@@ -983,6 +985,45 @@ class testFormGraphs extends CWebTest {
 		$this->page->acceptAlert();
 		$this->assertMessage(TEST_GOOD, ($this->prototype ? 'Graph prototype deleted' : 'Graph deleted'));
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.zbx_dbstr($name)));
+	}
+
+	/**
+	 * Function for asserting that text, log and char items are not eligible for graph creating.
+	 */
+	public function checkTextItems($data) {
+		$this->page->login()->open($this->url)->waitUntilReady();
+		$this->query('button', ($this->prototype ? 'Create graph prototype' : 'Create graph'))->waitUntilClickable()
+				->one()->click();
+
+		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
+		$form->fill($data['fields']);
+		$items_container = $form->getFieldContainer('Items');
+
+		// Assert that text items are not suggested in multiselect.
+		foreach ($data['yaxis_items'] as $y => $yaxis_item) {
+			if ($this->prototype) {
+				$form->query('xpath:.//button[@id="yaxis_'.$y.'_prototype"]')->waitUntilClickable()->one()->click();
+				$dialog = COverlayDialogElement::find()->one();
+				$this->assertFalse($dialog->query('link', $yaxis_item)->exists());
+				$dialog->close();
+			}
+			else {
+				$form->query('xpath:.//div[@id="y'.$y.'_itemid"]/..')->asMultiselect()->one()->query('tag:input')
+						->one()->type($yaxis_item);
+				$this->assertTrue($this->query('xpath://div[@class="multiselect-matches" and text()="No matches found"]')
+						->waitUntilVisible()->one()->isVisible());
+			}
+		}
+
+		$items_container->query('button', ($this->prototype ? 'Add prototype' : 'Add'))->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->one();
+
+		// Assert that text items are not present in dialog.
+		foreach ($data['items'] as  $item) {
+			$this->assertFalse($dialog->query('link', $item)->exists());
+		}
+
+		$dialog->close();
 	}
 
 	public function clearData() {
