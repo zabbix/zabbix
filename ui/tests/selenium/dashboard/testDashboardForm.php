@@ -60,7 +60,7 @@ class testDashboardForm extends CWebTest {
 	 */
 	private $update_values = [
 		'Owner' => 'guest',
-		'Name' => 'Dashboard to test poperties changes'
+		'Name' => 'Dashboard to test properties changes'
 	];
 
 	/**
@@ -707,7 +707,7 @@ class testDashboardForm extends CWebTest {
 		COverlayDialogElement::ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-		// Сheck sharing popup form.
+		// Check sharing popup form.
 		$this->query('id:dashbrd-actions')->one()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->select('Sharing');
 		$form->invalidate();
