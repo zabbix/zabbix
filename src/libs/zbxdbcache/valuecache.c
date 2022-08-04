@@ -1956,7 +1956,11 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t **item, int range_start)
 		zbx_vc_item_t	new_item = {.itemid = itemid, .value_type = value_type};
 
 		if (NULL == (*item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(new_item))))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			ret = FAIL;
 			goto out;
+		}
 	}
 
 	/* when updating cache with time based request we can always reset status flags */
@@ -2582,16 +2586,11 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_re
 		new_item.value_type = value_type;
 		item = &new_item;
 
-		ret = vch_item_get_values(item, values, seconds, count, ts);
 	}
 	else if (item->value_type != value_type)
-	{
 		goto out;
-	}
-	else
-	{
-		ret = vch_item_get_values(item, values, seconds, count, ts);
-	}
+
+	ret = vch_item_get_values(item, values, seconds, count, ts);
 out:
 	if (FAIL == ret)
 	{
