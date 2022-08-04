@@ -12,8 +12,6 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 JSON_LIBS = \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
