@@ -29,10 +29,19 @@ extern unsigned char	program_type;
 
 #ifndef HAVE_SQLITE3
 
-/*static int	DBpatch_6030000(void)
+static int	DBpatch_6030000(void)
 {
-	*** first upgrade patch ***
-}*/
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6030001(void)
+{
+	const ZBX_FIELD	field = {"new_window", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
 
 #endif
 
@@ -40,6 +49,7 @@ DBPATCH_START(6030)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(6030000, 0, 1)*/
+DBPATCH_ADD(6030000, 0, 1)
+DBPATCH_ADD(6030001, 0, 1)
 
 DBPATCH_END()
