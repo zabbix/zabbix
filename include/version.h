@@ -20,6 +20,14 @@
 #ifndef ZABBIX_VERSION_H
 #define ZABBIX_VERSION_H
 
+#define ZBX_COMPONENT_VERSION(major, minor, patch)	((major << 16) | (minor << 8) | patch)
+#define ZBX_COMPONENT_VERSION_MAJOR(version)		(((zbx_uint32_t)(version) >> 16) & 0xff)
+#define ZBX_COMPONENT_VERSION_MINOR(version)		(((zbx_uint32_t)(version) >> 8) & 0xff)
+#define ZBX_COMPONENT_VERSION_PATCH(version)		((zbx_uint32_t)(version) & 0xff)
+#define ZBX_COMPONENT_VERSION_IGNORE_PATCH(version)	((zbx_uint32_t)(version) & ((0xff << 16) | (0xff << 8)))
+#define ZBX_COMPONENT_VERSION_TO_DEC_FORMAT(version)	(ZBX_COMPONENT_VERSION_MAJOR(version)*10000 + \
+		ZBX_COMPONENT_VERSION_MINOR(version)*100 + ZBX_COMPONENT_VERSION_PATCH(version))
+
 #define ZBX_STR2(str)	#str
 #define ZBX_STR(str)	ZBX_STR2(str)
 
@@ -54,4 +62,4 @@ typedef enum
 }
 zbx_proxy_compatibility_t;
 
-#endif
+#endif /* ZABBIX_VERSION_H */

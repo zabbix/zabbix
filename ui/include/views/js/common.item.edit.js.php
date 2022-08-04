@@ -61,14 +61,14 @@
 	}
 
 	const item_form = {
-		init({interfaces, key_type_suggestions, testable_item_types, field_switches, interface_types}) {
+		init({interfaces, value_type_by_keys, keys_by_item_type, testable_item_types, field_switches, interface_types}) {
 			this.interfaces = interfaces;
 			this.testable_item_types = testable_item_types;
 			this.field_switches = field_switches;
 			this.interface_types = interface_types;
 
-			if (typeof key_type_suggestions !== 'undefined') {
-				item_type_lookup.init(key_type_suggestions);
+			if (typeof value_type_by_keys !== 'undefined' && typeof keys_by_item_type !== 'undefined') {
+				item_type_lookup.init(value_type_by_keys, keys_by_item_type);
 			}
 		}
 	}
@@ -232,7 +232,9 @@
 	});
 
 	const item_type_lookup = {
-		key_type_suggestions: [],
+		value_type_by_keys: [],
+		key_type_suggestions: {},
+		keys_by_item_type: [],
 		preprocessing_active: false,
 		form: null,
 		key_field: null,
@@ -240,13 +242,18 @@
 		preprocessing_tab_type_field: null,
 		last_lookup: '',
 		inferred_type: null,
+		item_type: null,
 
-		init(key_type_suggestions) {
-			this.key_type_suggestions = key_type_suggestions;
+		init(value_type_by_keys, keys_by_item_type) {
+			this.value_type_by_keys = value_type_by_keys;
+			this.keys_by_item_type = keys_by_item_type;
 			this.form = document.querySelector('#item-form, #item-prototype-form');
 			this.key_field = this.form.querySelector('[name=key]');
 			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
 			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
+			this.item_type = this.form.querySelector('[name=type]');
+
+			this.updateKeyTypeSuggestions();
 
 			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
 				this.item_tab_type_field.value = this.preprocessing_tab_type_field.value;
@@ -258,7 +265,7 @@
 				this.updateHintDisplay();
 
 				// 'Do not keep trends' for Calculated with string-types of information is forced on Item save.
-				if (this.form.querySelector('[name=type]').value == <?=ITEM_TYPE_CALCULATED ?>) {
+				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?>) {
 					if (e.target.value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 							|| e.target.value == <?= ITEM_VALUE_TYPE_UINT64 ?>) {
 						this.form.querySelector('#trends_mode_1').disabled = false;
@@ -284,8 +291,9 @@
 				this.updatePreprocessingState();
 			});
 
-			this.form.querySelector('[name=type]').addEventListener('change', () => {
+			this.item_type.addEventListener('change', () => {
 				this.updateHintDisplay();
+				this.updateKeyTypeSuggestions();
 			});
 
 			this.updatePreprocessingState();
@@ -296,7 +304,7 @@
 		updateHintDisplay() {
 			this.form.querySelector('#js-item-type-hint')
 				.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>, (
-					this.form.querySelector('[name=type]').value == <?=ITEM_TYPE_CALCULATED ?>
+					this.item_type.value == <?=ITEM_TYPE_CALCULATED ?>
 						|| this.preprocessing_active || this.inferred_type === null
 						|| this.item_tab_type_field.value == this.inferred_type
 				));
@@ -318,6 +326,18 @@
 			);
 
 			this.item_tab_type_field.dispatchEvent(change_event);
+		},
+
+		updateKeyTypeSuggestions() {
+			this.key_type_suggestions = {};
+
+			if (this.item_type.value in this.keys_by_item_type) {
+				for (let [key, value] of Object.entries(this.value_type_by_keys)) {
+					if (this.keys_by_item_type[this.item_type.value].includes(key)) {
+						this.key_type_suggestions[key] = value;
+					}
+				}
+			}
 		},
 
 		/**

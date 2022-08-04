@@ -18,13 +18,12 @@
 **/
 
 #include "proxy.h"
-
 #include "zbxdbhigh.h"
+
 #include "log.h"
 #include "sysinfo.h"
 #include "zbxserver.h"
 #include "zbxtasks.h"
-
 #include "zbxdiscovery.h"
 #include "zbxalgo.h"
 #include "preproc.h"
@@ -35,6 +34,9 @@
 #include "../zbxvault/vault.h"
 #include "zbxavailability.h"
 #include "zbxcommshigh.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxip.h"
 
 extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;

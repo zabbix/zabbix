@@ -20,10 +20,10 @@
 #include "zbxdiag.h"
 #include "diag_server.h"
 
-#include "common.h"
 #include "../../libs/zbxdbcache/valuecache.h"
 #include "zbxlld.h"
 #include "zbxalert.h"
+#include "zbxtime.h"
 
 #define ZBX_DIAG_LLD_RULES		0x00000001
 #define ZBX_DIAG_LLD_VALUES		0x00000002

@@ -19,6 +19,8 @@
 
 #include "dbupgrade.h"
 
+#include "zbxnum.h"
+#include "zbxexpr.h"
 #include "zbxdbhigh.h"
 #include "log.h"
 

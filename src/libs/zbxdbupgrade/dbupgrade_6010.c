@@ -17,10 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxdbhigh.h"
 #include "dbupgrade.h"
+
+#include "zbxdbhigh.h"
 #include "zbxalgo.h"
+#include "zbxnum.h"
 
 extern unsigned char	program_type;
 

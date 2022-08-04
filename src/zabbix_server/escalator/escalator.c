@@ -30,6 +30,9 @@
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxservice.h"
 #include "zbxcomms.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxexpr.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 
@@ -144,6 +147,21 @@ static int	get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_
 	return user_type;
 }
 
+static const char	*permission_string(int perm)
+{
+	switch (perm)
+	{
+		case PERM_DENY:
+			return "dn";
+		case PERM_READ:
+			return "r";
+		case PERM_READ_WRITE:
+			return "rw";
+		default:
+			return "unknown";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Return user permissions for access to the host                    *
@@ -182,7 +200,7 @@ static int	get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *h
 	DBfree_result(result);
 	zbx_free(sql);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
 
 	return perm;
 }
@@ -329,7 +347,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, const ZBX_DB_EVENT *event
 
 	zbx_vector_uint64_destroy(&hostgroupids);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
 
 	return perm;
 }
@@ -378,7 +396,7 @@ static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **
 out:
 	zbx_vector_uint64_destroy(&hostgroupids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
 
 	return perm;
 }
@@ -2277,6 +2295,21 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 	return ret;
 }
 
+static const char	*escalation_status_string(unsigned char status)
+{
+	switch (status)
+	{
+		case ESCALATION_STATUS_ACTIVE:
+			return "active";
+		case ESCALATION_STATUS_SLEEP:
+			return "sleep";
+		case ESCALATION_STATUS_COMPLETED:
+			return "completed";
+		default:
+			return "unknown";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: check whether escalation must be cancelled, deleted, skipped or   *
@@ -2306,7 +2339,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	unsigned char	maintenance = HOST_MAINTENANCE_STATUS_OFF, skip = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	if (EVENT_OBJECT_TRIGGER == event->object)
 	{
@@ -2423,7 +2456,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	ZBX_USER_MSG	*user_msg = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	/* the cancellation notification can be sent if no objects are deleted and notification is not disabled */
 	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step &&
@@ -2453,7 +2486,7 @@ static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *actio
 		const ZBX_DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	escalation_execute_operations(escalation, event, action, service, default_timezone, roles);
 
@@ -2475,7 +2508,7 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
 		zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	escalation_execute_recovery_operations(event, r_event, action, service, default_timezone, roles);
 
@@ -2502,7 +2535,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " acknowledgeid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation->acknowledgeid,
-			zbx_escalation_status_string(escalation->status));
+			escalation_status_string(escalation->status));
 
 	result = DBselect(
 			"select message,userid,clock,action,old_severity,new_severity,suppress_until from acknowledges"
@@ -2550,7 +2583,7 @@ static void	escalation_update(DB_ESCALATION *escalation, const DB_ACTION *action
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " servicealarmid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation->servicealarmid,
-			zbx_escalation_status_string(escalation->status));
+			escalation_status_string(escalation->status));
 
 	escalation_execute_update_operations(event, NULL, action, NULL, service_alarm, service, default_timezone, roles);
 

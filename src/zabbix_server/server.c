@@ -19,6 +19,8 @@
 
 #include "config.h"
 
+#include "zbxserver.h"
+
 #ifdef HAVE_SQLITE3
 #	error SQLite is not supported as a main Zabbix database backend.
 #endif
@@ -73,10 +75,10 @@
 #include "ha/ha.h"
 #include "zbxrtc.h"
 #include "zbxha.h"
-#include "zbxserver.h"
 #include "stats/zabbix_stats.h"
 #include "zbxdiag.h"
 #include "diag/diag_server.h"
+#include "zbxip.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -1797,7 +1799,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != DBcheck_double_type())
 	{
 		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_DISABLED;
-		ZBX_DOUBLE_EPSILON = 0.000001;
+		zbx_update_epsilon_to_float_precision();
 		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
 	}
 

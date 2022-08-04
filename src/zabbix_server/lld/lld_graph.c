@@ -18,11 +18,12 @@
 **/
 
 #include "lld.h"
+#include "zbxserver.h"
 
 #include "log.h"
-#include "zbxserver.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_graph.h"
+#include "zbxnum.h"
 
 typedef struct
 {
