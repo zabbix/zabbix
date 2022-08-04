@@ -554,7 +554,7 @@ static int	process_proxy(void)
 			if (proxy.proxy_tasks_nextcheck <= now)
 				check_tasks = 1;
 
-			if (proxy.proxy_data_nextcheck <= now)
+			if (proxy.proxy_data_nextcheck <= now && proxy.compatibility != ZBX_PROXY_VERSION_UNSUPPORTED)
 			{
 				int	more;
 

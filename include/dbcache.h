@@ -286,31 +286,32 @@ zbx_trigger_items_t;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	char		host[ZBX_HOSTNAME_BUF_LEN];
-	int		proxy_config_nextcheck;
-	int		proxy_data_nextcheck;
-	int		proxy_tasks_nextcheck;
-	int		last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
-						/* or 0 if no error */
-	int		version;
-	int		lastaccess;
-	char		addr_orig[ZBX_INTERFACE_ADDR_LEN_MAX];
-	char		port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
-	char		*addr;
-	unsigned short	port;
+char					host[ZBX_HOSTNAME_BUF_LEN];
+int					proxy_config_nextcheck;
+int					proxy_data_nextcheck;
+int					proxy_tasks_nextcheck;
+int					last_cfg_error_time;	/* time when passive proxy misconfiguration error was */
+								/* seen or 0 if no error */
+int					version;
+	zbx_proxy_compatibility_t	compatibility;
+	int				lastaccess;
+	char				addr_orig[ZBX_INTERFACE_ADDR_LEN_MAX];
+	char				port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
+	char				*addr;
+	unsigned short			port;
 
-	unsigned char	auto_compress;
-	unsigned char	tls_connect;
-	unsigned char	tls_accept;
+	unsigned char			auto_compress;
+	unsigned char			tls_connect;
+	unsigned char			tls_accept;
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX];
-	char		tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
-	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
-	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
+	char				tls_issuer[HOST_TLS_ISSUER_LEN_MAX];
+	char				tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
+	char				tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+	char				tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
-	char		proxy_address[HOST_PROXY_ADDRESS_LEN_MAX];
-	int		last_version_error_time;
+	char				proxy_address[HOST_PROXY_ADDRESS_LEN_MAX];
+	int				last_version_error_time;
 }
 DC_PROXY;
 

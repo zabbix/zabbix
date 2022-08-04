@@ -126,7 +126,9 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	if (SUCCEED != zbx_check_protocol_version(&proxy, version))
 	{
-		goto out;
+		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
+		error = zbx_strdup(error, "current proxy version is unsupported by server");
+		goto reply;
 	}
 
 	if (FAIL == (ret = zbx_hc_check_proxy(proxy.hostid)))
@@ -153,10 +155,9 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		ret = FAIL;
 		goto out;
 	}
-
+reply:
 	zbx_send_proxy_data_response(&proxy, sock, error, upload_status);
 	responded = 1;
-
 out:
 	if (SUCCEED == status)	/* moved the unpredictable long operation to the end */
 				/* we are trying to save info about lastaccess to detect communication problem */
