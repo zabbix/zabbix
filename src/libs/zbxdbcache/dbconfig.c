@@ -105,6 +105,8 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts);
 static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts);
 
+static int	dc_host_update_revision(ZBX_DC_HOST *host);
+
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
 /******************************************************************************
@@ -1450,6 +1452,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 	int			found, ret, i;
 	char			**row;
 	unsigned char		tag;
+	ZBX_DC_HOST		*dc_host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1461,7 +1464,8 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(hostid, row[0]);
 
-		host_inventory = (ZBX_DC_HOST_INVENTORY *)DCfind_id(&config->host_inventories, hostid, sizeof(ZBX_DC_HOST_INVENTORY), &found);
+		host_inventory = (ZBX_DC_HOST_INVENTORY *)DCfind_id(&config->host_inventories, hostid,
+				sizeof(ZBX_DC_HOST_INVENTORY), &found);
 
 		ZBX_STR2UCHAR(host_inventory->inventory_mode, row[1]);
 
@@ -1469,8 +1473,8 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		for (i = 0; i < HOST_INVENTORY_FIELD_COUNT; i++)
 			dc_strpool_replace(found, &(host_inventory->values[i]), row[i + 2]);
 
-		host_inventory_auto = (ZBX_DC_HOST_INVENTORY *)DCfind_id(&config->host_inventories_auto, hostid, sizeof(ZBX_DC_HOST_INVENTORY),
-				&found);
+		host_inventory_auto = (ZBX_DC_HOST_INVENTORY *)DCfind_id(&config->host_inventories_auto, hostid,
+				sizeof(ZBX_DC_HOST_INVENTORY), &found);
 
 		host_inventory_auto->inventory_mode = host_inventory->inventory_mode;
 
@@ -1490,6 +1494,9 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 			for (i = 0; i < HOST_INVENTORY_FIELD_COUNT; i++)
 				host_inventory_auto->values[i] = NULL;
 		}
+
+		if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+			dc_host_update_revision(dc_host);
 	}
 
 	/* remove deleted host inventory from cache */
@@ -1497,6 +1504,9 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 	{
 		if (NULL == (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories, &rowid)))
 			continue;
+
+		if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &host_inventory->hostid)))
+			dc_host_update_revision(dc_host);
 
 		for (i = 0; i < HOST_INVENTORY_FIELD_COUNT; i++)
 			dc_strpool_release(host_inventory->values[i]);
