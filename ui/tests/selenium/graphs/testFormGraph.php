@@ -245,7 +245,7 @@ class testFormGraph extends testFormGraphs {
 						'id:percent_left' => 5.5,
 						'id:percent_right' => 99.9,
 						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
 					],
 					'yaxis_items' => [
 						'min' => 'Failed step of scenario "testFormWeb1".',

@@ -185,7 +185,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Exploded graph prototype duplicated Graph sum type',
-						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded'),
+						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
 					],
 					'items' =>[
 						[
@@ -227,7 +227,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Exploded graph prototype duplicated Graph sum type mixed',
-						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded'),
+						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
 					],
 					'items' =>[
 						[
@@ -269,7 +269,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'id:percent_left' => 5.5,
 						'id:percent_right' => 99.9,
 						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
 					],
 					'yaxis_items' => [
 						'min' => 'testFormItemPrototype1',
