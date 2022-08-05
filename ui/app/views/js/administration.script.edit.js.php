@@ -54,7 +54,8 @@
 					if ($('input[name=type]:checked').val() == <?= ZBX_SCRIPT_TYPE_URL ?>) {
 						$type
 							.find('[value=' + <?= ZBX_SCRIPT_TYPE_WEBHOOK ?> + ']')
-							.prop('checked', true);
+							.prop('checked', true)
+							.change();
 					}
 
 					$type
