@@ -30,6 +30,9 @@
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxservice.h"
 #include "zbxcomms.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxexpr.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 
@@ -144,6 +147,21 @@ static int	get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_
 	return user_type;
 }
 
+static const char	*permission_string(int perm)
+{
+	switch (perm)
+	{
+		case PERM_DENY:
+			return "dn";
+		case PERM_READ:
+			return "r";
+		case PERM_READ_WRITE:
+			return "rw";
+		default:
+			return "unknown";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Return user permissions for access to the host                    *
@@ -182,7 +200,7 @@ static int	get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *h
 	DBfree_result(result);
 	zbx_free(sql);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
 
 	return perm;
 }
@@ -329,7 +347,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, const ZBX_DB_EVENT *event
 
 	zbx_vector_uint64_destroy(&hostgroupids);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
 
 	return perm;
 }
@@ -378,7 +396,7 @@ static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **
 out:
 	zbx_vector_uint64_destroy(&hostgroupids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
 
 	return perm;
 }
@@ -1306,10 +1324,12 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 				",null,null,null,null");
 #endif
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o,opcommand_hst oh,scripts s"
-			" where o.operationid=oh.operationid"
-				" and o.scriptid=s.scriptid"
-				" and o.operationid=" ZBX_FS_UI64
+			" from opcommand o"
+			" join scripts s"
+				" on o.scriptid=s.scriptid"
+			" left join opcommand_hst oh"
+				" on o.operationid=oh.operationid"
+			" where  o.operationid=" ZBX_FS_UI64
 				" and oh.hostid is null",
 			operationid);
 
@@ -1387,54 +1407,59 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 			goto fail;
 		}
 
-		/* get host details */
-
-		if (0 == host.hostid)
-		{
-			/* target is "Current host" */
-			if (SUCCEED != (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
-					sizeof(error))))
-			{
-				goto fail;
-			}
-		}
-
-		if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			goto skip;
-
-		zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-
-		if (0 < groupid && SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
-		{
-			zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
-					sizeof(error));
-			rc = FAIL;
-			goto fail;
-		}
-
 		if (EVENT_SOURCE_SERVICE == event->source)
 		{
 			/* service event cannot have target, force execution on Zabbix server */
 			script.execute_on = ZBX_SCRIPT_EXECUTE_ON_SERVER;
+			strscpy(host.host, "Zabbix server");
 		}
-		else if ('\0' == *host.host)
+		else
 		{
-			/* target is from "Host" list or "Host group" list */
+			/* get host details */
 
-			strscpy(host.host, row[2]);
-			host.tls_connect = (unsigned char)atoi(row[17]);
+			if (0 == host.hostid)
+			{
+				/* target is "Current host" */
+				if (SUCCEED != (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
+						sizeof(error))))
+				{
+					goto fail;
+				}
+			}
+
+			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				goto skip;
+
+			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+
+			if (0 < groupid && SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
+			{
+				zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
+						sizeof(error));
+				rc = FAIL;
+				goto fail;
+			}
+
+
+			if ('\0' == *host.host)
+			{
+				/* target is from "Host" list or "Host group" list */
+
+				strscpy(host.host, row[2]);
+				host.tls_connect = (unsigned char)atoi(row[17]);
 #ifdef HAVE_OPENIPMI
-			host.ipmi_authtype = (signed char)atoi(row[18]);
-			host.ipmi_privilege = (unsigned char)atoi(row[19]);
-			strscpy(host.ipmi_username, row[20]);
-			strscpy(host.ipmi_password, row[21]);
+				host.ipmi_authtype = (signed char)atoi(row[18]);
+				host.ipmi_privilege = (unsigned char)atoi(row[19]);
+				strscpy(host.ipmi_username, row[20]);
+				strscpy(host.ipmi_password, row[21]);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
-			strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
-			strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
-			strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
+			}
 		}
 
 		/* substitute macros in script body and webhook parameters */
@@ -2270,6 +2295,21 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 	return ret;
 }
 
+static const char	*escalation_status_string(unsigned char status)
+{
+	switch (status)
+	{
+		case ESCALATION_STATUS_ACTIVE:
+			return "active";
+		case ESCALATION_STATUS_SLEEP:
+			return "sleep";
+		case ESCALATION_STATUS_COMPLETED:
+			return "completed";
+		default:
+			return "unknown";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: check whether escalation must be cancelled, deleted, skipped or   *
@@ -2299,7 +2339,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	unsigned char	maintenance = HOST_MAINTENANCE_STATUS_OFF, skip = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	if (EVENT_OBJECT_TRIGGER == event->object)
 	{
@@ -2416,7 +2456,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	ZBX_USER_MSG	*user_msg = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	/* the cancellation notification can be sent if no objects are deleted and notification is not disabled */
 	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step &&
@@ -2446,7 +2486,7 @@ static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *actio
 		const ZBX_DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	escalation_execute_operations(escalation, event, action, service, default_timezone, roles);
 
@@ -2468,7 +2508,7 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
 		zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
-			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
+			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	escalation_execute_recovery_operations(event, r_event, action, service, default_timezone, roles);
 
@@ -2495,7 +2535,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " acknowledgeid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation->acknowledgeid,
-			zbx_escalation_status_string(escalation->status));
+			escalation_status_string(escalation->status));
 
 	result = DBselect(
 			"select message,userid,clock,action,old_severity,new_severity,suppress_until from acknowledges"
@@ -2543,7 +2583,7 @@ static void	escalation_update(DB_ESCALATION *escalation, const DB_ACTION *action
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " servicealarmid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation->servicealarmid,
-			zbx_escalation_status_string(escalation->status));
+			escalation_status_string(escalation->status));
 
 	escalation_execute_update_operations(event, NULL, action, NULL, service_alarm, service, default_timezone, roles);
 

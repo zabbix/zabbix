@@ -19,12 +19,12 @@
 
 #include "httppoller.h"
 
-#include "common.h"
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "httptest.h"
+#include "zbxtime.h"
 
 extern int		CONFIG_HTTPPOLLER_FORKS;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

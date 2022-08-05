@@ -10,7 +10,7 @@
 		@if $ui-transitions {
 			transition: left .2s, top .2s;
 
-			.sortable-item {
+			.sortable-item:not(.sortable-dragging) {
 				transition: left .2s, top .2s;
 			}
 		}
@@ -19,10 +19,6 @@
 	&.sortable-dragging {
 		.sortable-item {
 			position: absolute;
-
-			&.sortable-dragging {
-				display: none;
-			}
 		}
 	}
 }

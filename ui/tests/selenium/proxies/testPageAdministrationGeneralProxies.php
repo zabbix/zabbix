@@ -244,7 +244,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 		$form->query('button:Reset')->one()->click();
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
 		$rows_count = $table->getRows()->count();
-		$table_contents = $this->getTableResult('Name');
+		$table_contents = $this->getTableColumnData('Name');
 
 		// Fill filter form with data.
 		$form->fill(['Name' => '1']);
@@ -293,7 +293,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 		// Reset filter and assert row count.
 		$form->query('button:Reset')->one()->click();
 		$this->assertEquals($rows_count, $table->getRows()->count());
-		$this->assertEquals($table_contents, $this->getTableResult('Name'));
+		$this->assertEquals($table_contents, $this->getTableColumnData('Name'));
 	}
 
 	public function getFilterProxyData() {

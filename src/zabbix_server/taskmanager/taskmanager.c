@@ -35,6 +35,8 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_proxy.h"
 #include "dbcache.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -736,7 +738,6 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 	if (passive_proxy_count > 0)
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 }
-
 
 /******************************************************************************
  *                                                                            *

@@ -20,6 +20,7 @@
 #ifndef ZABBIX_ACTIVE_H
 #define ZABBIX_ACTIVE_H
 
+#include "zbxtime.h"
 #include "zbxthreads.h"
 #include "zbxalgo.h"
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,24 +21,27 @@
 
 /**
  * System information widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
 );
 
-// Toggle systems stats or HAC node list.
-$form_list->addRow(
+// Show.
+$form_grid->addItem([
 	CWidgetHelper::getLabel($fields['info_type']),
-	CWidgetHelper::getRadioButtonList($fields['info_type'])
-);
+	new CFormField(CWidgetHelper::getRadioButtonList($fields['info_type']))
+]);
 
-$form->addItem($form_list);
+$form->addItem($form_grid);
 
 return [
 	'form' => $form

@@ -24,6 +24,11 @@ package zbxlib
 /*
 #cgo LDFLAGS: -Wl,--start-group
 #cgo LDFLAGS: ${SRCDIR}/../../../zabbix_agent/logfiles/libzbxlogfiles.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxnum/libzbxnum.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxstr/libzbxstr.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxparam/libzbxparam.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxexpr/libzbxexpr.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxip/libzbxip.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcomms/libzbxcomms.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcommon/libzbxcommon.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcrypto/libzbxcrypto.a

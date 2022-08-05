@@ -18,13 +18,12 @@
 **/
 
 #include "proxy.h"
-
 #include "zbxdbhigh.h"
+
 #include "log.h"
 #include "sysinfo.h"
 #include "zbxserver.h"
 #include "zbxtasks.h"
-
 #include "zbxdiscovery.h"
 #include "zbxalgo.h"
 #include "preproc.h"
@@ -35,6 +34,9 @@
 #include "../zbxvault/vault.h"
 #include "zbxavailability.h"
 #include "zbxcommshigh.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxip.h"
 
 extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;
@@ -4519,7 +4521,7 @@ int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp)
 	int	version;
 
 	if (NULL != jp && SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value), NULL) &&
-			-1 != (version = zbx_get_component_version(value)))
+			FAIL != (version = zbx_get_component_version(value)))
 	{
 		return version;
 	}

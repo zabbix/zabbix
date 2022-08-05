@@ -17,12 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <procfs.h>
-#include "common.h"
 #include "sysinfo.h"
+
+#include <procfs.h>
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
 
 #if !defined(HAVE_ZONE_H) && defined(HAVE_SYS_UTSNAME_H)
 #	include <sys/utsname.h>

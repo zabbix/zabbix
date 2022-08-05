@@ -91,10 +91,10 @@ class testPageUserRoles extends CWebTest {
 		}
 
 		// Check roles list sort order.
-		$before_listing = $this->getTableResult('Name');
+		$before_listing = $this->getTableColumnData('Name');
 		$name_header = $this->query('xpath://a[text()="Name"]')->one();
 		$name_header->click();
-		$after_listing = $this->getTableResult('Name');
+		$after_listing = $this->getTableColumnData('Name');
 		$this->assertEquals($after_listing, array_reverse($before_listing));
 		$name_header->click();
 
@@ -360,7 +360,7 @@ class testPageUserRoles extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		$this->query('button:Reset')->one()->click();
-		$before_delete = $this->getTableResult('Name');
+		$before_delete = $this->getTableColumnData('Name');
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		foreach ($data['roles'] as $role) {

@@ -23,6 +23,7 @@
 #include "log.h"
 #include "zbxjson.h"
 #include "dbcache.h"
+#include "zbxnum.h"
 
 #define AUDIT_USERID		__UINT64_C(0)
 #define AUDIT_USERID_SQL	"null"
@@ -333,15 +334,11 @@ void	zbx_audit_flush(void)
 	{
 		if (SUCCEED == zbx_audit_validate_entry(*audit_entry))
 		{
-			char	*details_esc;
-
-			details_esc = DBdyn_escape_string((*audit_entry)->details_json.buffer);
-
 			zbx_db_insert_add_values(&db_insert_audit, (*audit_entry)->audit_cuid, AUDIT_USERID,
 					AUDIT_USERNAME, (int)time(NULL), (*audit_entry)->audit_action, AUDIT_IP,
 					(*audit_entry)->id, (*audit_entry)->name, (*audit_entry)->resource_type,
-					recsetid_cuid, 0 == strcmp(details_esc, "{}") ? "" : details_esc);
-			zbx_free(details_esc);
+					recsetid_cuid, 0 == strcmp((*audit_entry)->details_json.buffer, "{}") ? "" :
+					(*audit_entry)->details_json.buffer);
 		}
 	}
 

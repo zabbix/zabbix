@@ -100,6 +100,7 @@ class CDocHelper {
 	const CONFIGURATION_TRIGGERS_EDIT =						'config/triggers/trigger#configuration';
 	const DASHBOARD_PAGE_PROPERTIES_EDIT =					'web_interface/frontend_sections/monitoring/dashboard#adding-pages';
 	const DASHBOARD_PROPERTIES_EDIT =						'web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard';
+	const DASHBOARD_SHARE_EDIT =							'web_interface/frontend_sections/monitoring/dashboard#sharing';
 	const INVENTORY_HOST_LIST =								'web_interface/frontend_sections/inventory/hosts';
 	const INVENTORY_HOST_OVERVIEW =							'web_interface/frontend_sections/inventory/overview';
 	const MONITORING_CHARTS_VIEW =							'web_interface/frontend_sections/monitoring/hosts/graphs';

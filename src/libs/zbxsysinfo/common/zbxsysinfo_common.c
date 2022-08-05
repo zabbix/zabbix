@@ -18,8 +18,8 @@
 **/
 
 #include "zbxsysinfo_common.h"
-
 #include "sysinfo.h"
+
 #include "log.h"
 #include "file.h"
 #include "dir.h"
@@ -28,6 +28,7 @@
 #include "system.h"
 #include "zabbix_stats.h"
 #include "zbxexec.h"
+#include "zbxstr.h"
 
 #if !defined(_WINDOWS)
 #	define VFS_TEST_FILE "/etc/passwd"

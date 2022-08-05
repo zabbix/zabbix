@@ -33,6 +33,8 @@ void	zbx_xml_free_data_dyn(char **data);
 char	*zbx_xml_escape_dyn(const char *data);
 void	zbx_xml_escape_xpath(char **data);
 
+int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
+
 #ifdef HAVE_LIBXML2
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
