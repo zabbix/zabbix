@@ -25,6 +25,9 @@
 #include "dbcache.h"
 #include "user_macro.h"
 
+#define ZBX_MAINTENANCE_IDLE		0
+#define ZBX_MAINTENANCE_RUNNING		1
+
 typedef struct
 {
 	zbx_uint64_t		triggerid;

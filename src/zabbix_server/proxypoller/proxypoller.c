@@ -18,19 +18,20 @@
 **/
 
 #include "proxypoller.h"
+#include "zbxserver.h"
+#include "proxy.h"
 
-#include "common.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "zbxserver.h"
 #include "zbxdbhigh.h"
 #include "log.h"
-#include "proxy.h"
 #include "zbxcrypto.h"
 #include "../trapper/proxydata.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -218,7 +219,8 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 				}
 				else
 				{
-					ret = zbx_send_proxy_data_response(proxy, &s, NULL, ZBX_PROXY_UPLOAD_UNDEFINED);
+					ret = zbx_send_proxy_data_response(proxy, &s, NULL, SUCCEED,
+							ZBX_PROXY_UPLOAD_UNDEFINED);
 
 					if (SUCCEED == ret)
 						*data = zbx_strdup(*data, s.buffer);

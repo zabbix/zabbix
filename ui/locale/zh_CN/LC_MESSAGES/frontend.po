@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-16 05:05+0000\n"
+"PO-Revision-Date: 2022-07-23 13:00+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -11351,6 +11351,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "Mac 地址 A"
@@ -19871,7 +19876,7 @@ msgstr "VMware 集群性能计数器，<url> - VMware 服务 URL，<id> - VMware
 
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
-msgstr ""
+msgstr "VMware 集群属性，<url> - VMware 服务 URL，<id> - VMware 集群 id，<prop> - 属性路径"
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -19912,7 +19917,7 @@ msgstr "VMware 数据存储管理程序列表，<url> - VMware 服务 URL，<dat
 
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
-msgstr ""
+msgstr "VMware 数据存储属性，<url> - VMware 服务 URL，<uuid> - 数据存储名称，<prop> - 属性路径"
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20012,7 +20017,7 @@ msgstr "VMware hypervisor 处理器使用率单位Hz, <url> - VMware 服务 URL,
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
-msgstr ""
+msgstr "VMware 管理程序属性，<url> - VMware 服务 URL，<uuid> - VMware 管理程序主机名，<prop> - 属性路径"
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20148,7 +20153,7 @@ msgstr "VMware 虚拟机处理器使用率，单位Hz, <url> - VMware 服务 URL
 
 #: include/classes/data/CItemData.php:1644
 msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
-msgstr ""
+msgstr "VMware 虚机属性，<url> - VMware 服务 URL，<uuid> - VMware 虚机主机名，<prop> - 属性路径"
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"

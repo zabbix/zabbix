@@ -19,7 +19,7 @@
 
 #include "perfmon.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "stats.h"
 #include "log.h"
 
