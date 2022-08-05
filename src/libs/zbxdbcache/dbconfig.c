@@ -7870,6 +7870,17 @@ static int	dc_preproc_item_init(zbx_preproc_item_t *item, zbx_uint64_t itemid)
 	if (HOST_STATUS_MONITORED != dc_host->status)
 		return FAIL;
 
+	switch (dc_item->type)
+	{
+		case ITEM_TYPE_INTERNAL:
+		case ITEM_TYPE_CALCULATED:
+		case ITEM_TYPE_DEPENDENT:
+			break;
+		default:
+			if (0 != dc_host->proxy_hostid)
+				return FAIL;
+	}
+
 	item->itemid = itemid;
 	item->hostid = dc_item->hostid;
 	item->type = dc_item->type;
