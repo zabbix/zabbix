@@ -683,14 +683,22 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
  ******************************************************************************/
 static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value_raw)
 {
-	if (SUCCEED != is_time_suffix(value_raw, value, ZBX_LENGTH_UNLIMITED))
+	int	value_int;
+
+	if (SUCCEED != is_time_suffix(value_raw, &value_int, ZBX_LENGTH_UNLIMITED))
 		return FAIL;
 
-	if (0 != non_zero && 0 == *value)
+	if (0 != non_zero && 0 == value_int)
 		return FAIL;
 
-	if (0 != *value && (value_min > *value || ZBX_HK_PERIOD_MAX < *value))
+	if (0 != *value && (value_min > value_int || ZBX_HK_PERIOD_MAX < value_int))
 		return FAIL;
+
+	if (*value != value_int)
+	{
+		*value = value_int;
+		config->config->revision = config->revision;
+	}
 
 	return SUCCEED;
 }
@@ -713,9 +721,10 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
-	int		j, found = 1, ret;
+	int		j, found = 1, ret, value_int;
+	unsigned char	value_uchar;
 	char		**db_row;
-	zbx_uint64_t	rowid;
+	zbx_uint64_t	rowid, value_uint64;
 	unsigned char	tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -726,6 +735,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	{
 		found = 0;
 		config->config = (ZBX_DC_CONFIG_TABLE *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
+		memset(config->config, 0, sizeof(ZBX_DC_CONFIG_TABLE));
 	}
 
 	if (SUCCEED != (ret = zbx_dbsync_next(sync, &rowid, &db_row, &tag)))
@@ -749,24 +759,69 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	/* store the config data */
 
 	if (NULL != row[0])
-		ZBX_STR2UINT64(config->config->discovery_groupid, row[0]);
+		ZBX_STR2UINT64(value_uint64, row[0]);
 	else
-		config->config->discovery_groupid = ZBX_DISCOVERY_GROUPID_UNDEFINED;
+		value_uint64 = ZBX_DISCOVERY_GROUPID_UNDEFINED;
 
-	ZBX_STR2UCHAR(config->config->snmptrap_logging, row[1]);
-	config->config->default_inventory_mode = atoi(row[25]);
-	dc_strpool_replace(found, (const char **)&config->config->db.extension, row[26]);
-	ZBX_STR2UCHAR(config->config->autoreg_tls_accept, row[27]);
-	ZBX_STR2UCHAR(config->config->db.history_compression_status, row[28]);
+	if (config->config->discovery_groupid != value_uint64)
+	{
+		config->config->discovery_groupid = value_uint64;
+		config->config->revision = config->revision;
+	}
 
-	if (SUCCEED != is_time_suffix(row[29], &config->config->db.history_compress_older, ZBX_LENGTH_UNLIMITED))
+	ZBX_STR2UCHAR(value_uchar, row[1]);
+	if (config->config->snmptrap_logging != value_uchar)
+	{
+		config->config->snmptrap_logging = value_uchar;
+		config->config->revision = config->revision;
+	}
+
+	if (config->config->default_inventory_mode != (value_int = atoi(row[25])))
+	{
+		config->config->default_inventory_mode = value_int;
+		config->config->revision = config->revision;
+	}
+
+	if (NULL == config->config->db.extension || 0 != strcmp(config->config->db.extension, row[26]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->db.extension, row[26]);
+		config->config->revision = config->revision;
+	}
+
+	ZBX_STR2UCHAR(value_uchar, row[27]);
+	if (config->config->autoreg_tls_accept != value_uchar)
+	{
+		config->config->autoreg_tls_accept = value_uchar;
+		config->config->revision = config->revision;
+	}
+
+	ZBX_STR2UCHAR(value_uchar, row[28]);
+	if (config->config->db.history_compression_status != value_uchar)
+	{
+		config->config->db.history_compression_status = value_uchar;
+		config->config->revision = config->revision;
+	}
+
+	if (SUCCEED != is_time_suffix(row[29], &value_int, ZBX_LENGTH_UNLIMITED))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid history compression age: %s", row[29]);
-		config->config->db.history_compress_older = 0;
+		value_int = 0;
+	}
+
+	if (config->config->db.history_compress_older != value_int)
+	{
+		config->config->db.history_compress_older = value_int;
+		config->config->revision = config->revision;
 	}
 
 	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
-		dc_strpool_replace(found, &config->config->severity_name[j], row[2 + j]);
+	{
+		if (NULL == config->config->severity_name[j] || 0 != strcmp(config->config->severity_name[j], row[2 + j]))
+		{
+			dc_strpool_replace(found, (const char **)&config->config->severity_name[j], row[2 + j]);
+			config->config->revision = config->revision;
+		}
+	}
 
 	/* instance id cannot be changed - update it only at first sync to avoid read locks later */
 	if (0 == found)
@@ -777,8 +832,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #endif
 
 	/* read housekeeper configuration */
-
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.events_mode = atoi(row[8])) &&
+	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[8])) &&
 			(SUCCEED != set_hk_opt(&config->config->hk.events_trigger, 1, SEC_PER_DAY, row[9]) ||
 			SUCCEED != set_hk_opt(&config->config->hk.events_internal, 1, SEC_PER_DAY, row[10]) ||
 			SUCCEED != set_hk_opt(&config->config->hk.events_discovery, 1, SEC_PER_DAY, row[11]) ||
@@ -787,41 +841,80 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "trigger, internal, network discovery and auto-registration data"
 				" housekeeping will be disabled due to invalid settings");
-		config->config->hk.events_mode = ZBX_HK_OPTION_DISABLED;
+		value_int = ZBX_HK_OPTION_DISABLED;
+	}
+	if (config->config->hk.events_mode != value_int)
+	{
+		config->config->hk.events_mode = value_int;
+		config->config->revision = config->revision;
 	}
 
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.services_mode = atoi(row[13])) &&
+	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[13])) &&
 			SUCCEED != set_hk_opt(&config->config->hk.services, 1, SEC_PER_DAY, row[14]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "IT services data housekeeping will be disabled due to invalid"
 				" settings");
-		config->config->hk.services_mode = ZBX_HK_OPTION_DISABLED;
+		value_int = ZBX_HK_OPTION_DISABLED;
+	}
+	if (config->config->hk.services_mode != value_int)
+	{
+		config->config->hk.services_mode = value_int;
+		config->config->revision = config->revision;
 	}
 
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.audit_mode = atoi(row[15])) &&
+	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[15])) &&
 			SUCCEED != set_hk_opt(&config->config->hk.audit, 1, SEC_PER_DAY, row[16]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "audit data housekeeping will be disabled due to invalid"
 				" settings");
-		config->config->hk.audit_mode = ZBX_HK_OPTION_DISABLED;
+		value_int = ZBX_HK_OPTION_DISABLED;
+	}
+	if (config->config->hk.audit_mode != value_int)
+	{
+		config->config->hk.audit_mode = value_int;
+		config->config->revision = config->revision;
 	}
 
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.sessions_mode = atoi(row[17])) &&
+	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[17])) &&
 			SUCCEED != set_hk_opt(&config->config->hk.sessions, 1, SEC_PER_DAY, row[18]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "user sessions data housekeeping will be disabled due to invalid"
 				" settings");
-		config->config->hk.sessions_mode = ZBX_HK_OPTION_DISABLED;
+		value_int = ZBX_HK_OPTION_DISABLED;
+	}
+	if (config->config->hk.sessions_mode != value_int)
+	{
+		config->config->hk.sessions_mode = value_int;
+		config->config->revision = config->revision;
 	}
 
-	config->config->hk.history_mode = atoi(row[19]);
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.history_global = atoi(row[20])) &&
+	if (config->config->hk.history_mode != (value_int = atoi(row[19])))
+	{
+		config->config->hk.history_mode = value_int;
+		config->config->revision = config->revision;
+	}
+
+	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[20])) &&
 			SUCCEED != set_hk_opt(&config->config->hk.history, 0, ZBX_HK_HISTORY_MIN, row[21]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "history data housekeeping will be disabled and all items will"
 				" store their history due to invalid global override settings");
-		config->config->hk.history_mode = ZBX_HK_MODE_DISABLED;
-		config->config->hk.history = 1;	/* just enough to make 0 == items[i].history condition fail */
+		if (ZBX_HK_MODE_DISABLED != config->config->hk.history_mode)
+		{
+			config->config->hk.history_mode = ZBX_HK_MODE_DISABLED;
+			config->config->revision = config->revision;
+		}
+
+		if (1 != config->config->hk.history)
+		{
+			config->config->hk.history = 1;	/* just enough to make 0 == items[i].history condition fail */
+			config->config->revision = config->revision;
+		}
+	}
+	if (config->config->hk.history_global != value_int)
+	{
+		config->config->hk.history_global = value_int;
+		config->config->revision = config->revision;
 	}
 
 #ifdef HAVE_POSTGRESQL
@@ -829,18 +922,40 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 			ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
 			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
-		config->config->hk.history_mode = ZBX_HK_MODE_PARTITION;
+		if (ZBX_HK_MODE_PARTITION != config->config->hk.history_mode)
+		{
+			config->config->hk.history_mode = ZBX_HK_MODE_PARTITION;
+			config->config->revision = config->revision;
+		}
 	}
 #endif
 
-	config->config->hk.trends_mode = atoi(row[22]);
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.trends_global = atoi(row[23])) &&
+	if (config->config->hk.trends_mode != (value_int = atoi(row[22])))
+	{
+		config->config->hk.trends_mode = value_int;
+		config->config->revision = config->revision;
+	}
+
+	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[23])) &&
 			SUCCEED != set_hk_opt(&config->config->hk.trends, 0, ZBX_HK_TRENDS_MIN, row[24]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "trends data housekeeping will be disabled and all numeric items"
 				" will store their history due to invalid global override settings");
-		config->config->hk.trends_mode = ZBX_HK_MODE_DISABLED;
-		config->config->hk.trends = 1;	/* just enough to make 0 == items[i].trends condition fail */
+		if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode)
+		{
+			config->config->hk.trends_mode = ZBX_HK_MODE_DISABLED;
+			config->config->revision = config->revision;
+		}
+		if (1 != config->config->hk.trends)
+		{
+			config->config->hk.trends = 1;	/* just enough to make 0 == items[i].trends condition fail */
+			config->config->revision = config->revision;
+		}
+	}
+	if (config->config->hk.trends_global != value_int)
+	{
+		config->config->hk.trends_global = value_int;
+		config->config->revision = config->revision;
 	}
 
 #ifdef HAVE_POSTGRESQL
@@ -848,12 +963,25 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 			ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
 			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
-		config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
+		if (ZBX_HK_MODE_PARTITION != onfig->config->hk.trends_mode)
+		{
+			config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
+			config->config->revision = config->revision;
+		}
 	}
 #endif
-	dc_strpool_replace(found, &config->config->default_timezone, row[31]);
 
-	config->config->auditlog_enabled = atoi(row[33]);
+	if (NULL == config->config->default_timezone || 0 != strcmp(config->config->default_timezone, row[31]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->default_timezone, row[31]);
+		config->config->revision = config->revision;
+	}
+
+	if (config->config->auditlog_enabled != (value_int = atoi(row[33])))
+	{
+		config->config->auditlog_enabled = value_int;
+		config->config->revision = config->revision;
+	}
 
 	if (SUCCEED == ret && SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))	/* table must have */
 		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");	/* only one record */
@@ -5242,6 +5370,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 		if (0 == found)
 		{
 			drule->location = ZBX_LOC_NOWHERE;
+			drule->nextcheck = 0;
 		}
 		else
 		{
@@ -5521,6 +5650,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 		if (0 == found)
 		{
 			httptest->location = ZBX_LOC_NOWHERE;
+			httptest->nextcheck = 0;
 			zbx_vector_dc_httptest_append(&host->httptests, httptest);
 		}
 
@@ -7472,6 +7602,7 @@ int	init_configuration_cache(char **error)
 	config->internal_actions = 0;
 	config->revision = 0;
 	config->expression_revision = 0;
+	config->autoreg_tls_revision = 0;
 
 	config->um_cache = um_cache_create();
 

@@ -546,6 +546,7 @@ typedef struct
 	unsigned char	autoreg_tls_accept;
 	const char	*default_timezone;
 	int		auditlog_enabled;
+	zbx_uint32_t	revision;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
@@ -820,6 +821,7 @@ typedef struct
 
 	zbx_uint32_t		revision;
 	zbx_uint32_t		expression_revision;
+	zbx_uint32_t		autoreg_tls_revision;
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */
