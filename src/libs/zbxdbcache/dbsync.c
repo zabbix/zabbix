@@ -517,8 +517,8 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 
 static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 {
-	zbx_vector_uint64_t	objectids;
-	int			i, j, objects_num;
+	zbx_hashset_t	objectids;
+	int		i, j, objects_num;
 
 	if (0 == journal->changelog.values_num)
 		return;
@@ -528,8 +528,8 @@ static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 	for (i = 0; i < journal->syncs.values_num; i++)
 		objects_num += journal->syncs.values[i]->rows.values_num;
 
-	zbx_vector_uint64_create(&objectids);
-	zbx_vector_uint64_reserve(&objectids, (size_t)objects_num);
+	zbx_hashset_create(&objectids, (size_t)objects_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (j = 0; j < journal->syncs.values_num; j++)
 	{
@@ -537,29 +537,26 @@ static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 		{
 			zbx_dbsync_row_t	*row = (zbx_dbsync_row_t *)journal->syncs.values[j]->rows.values[i];
 
-			zbx_vector_uint64_append(&objectids, row->rowid);
+			zbx_hashset_insert(&objectids, &row->rowid, sizeof(row->rowid));
 		}
 	}
 
-	if (0 != journal->inserts.values_num)
-		zbx_vector_uint64_append_array(&objectids, journal->inserts.values, journal->inserts.values_num);
+	for (i = 0; i < journal->inserts.values_num; i++)
+		zbx_hashset_insert(&objectids, &journal->inserts.values[i], sizeof(journal->inserts.values[i]));
 
-	if (0 != journal->updates.values_num)
-		zbx_vector_uint64_append_array(&objectids, journal->updates.values, journal->updates.values_num);
-
-	zbx_vector_uint64_sort(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	for (i = 0; i < journal->updates.values_num; i++)
+		zbx_hashset_insert(&objectids, &journal->updates.values[i], sizeof(journal->updates.values[i]));
 
 	for (i = 0; i < journal->changelog.values_num; i++)
 	{
-		if (FAIL != zbx_vector_uint64_bsearch(&objectids, journal->changelog.values[i].objectid,
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (NULL != zbx_hashset_search(&objectids, &journal->changelog.values[i].objectid))
 		{
 			zbx_hashset_insert(&dbsync_env.changelog, &journal->changelog.values[i].changelog,
 					sizeof(zbx_dbsync_changelog_t));
 		}
 	}
 
-	zbx_vector_uint64_destroy(&objectids);
+	zbx_hashset_destroy(&objectids);
 }
 
 void	zbx_dbsync_env_flush_changelog(void)
