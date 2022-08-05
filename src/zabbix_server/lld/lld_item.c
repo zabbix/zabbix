@@ -210,7 +210,7 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 	zbx_vector_ptr_clear_ext(&item_prototype->preproc_ops, (zbx_clean_func_t)lld_item_preproc_free);
 	zbx_vector_ptr_destroy(&item_prototype->preproc_ops);
 
-	zbx_vector_item_param_ptr_clear_ext(&item_prototype->item_params, zbx_item_params_free);
+	zbx_vector_item_param_ptr_clear_ext(&item_prototype->item_params, zbx_item_param_free);
 	zbx_vector_item_param_ptr_destroy(&item_prototype->item_params);
 
 	zbx_vector_db_tag_ptr_clear_ext(&item_prototype->item_tags, zbx_db_tag_free);
@@ -276,7 +276,7 @@ static void	lld_item_free(zbx_lld_item_t *item)
 
 	zbx_vector_ptr_clear_ext(&item->preproc_ops, (zbx_clean_func_t)lld_item_preproc_free);
 	zbx_vector_ptr_destroy(&item->preproc_ops);
-	zbx_vector_item_param_ptr_clear_ext(&item->item_params, zbx_item_params_free);
+	zbx_vector_item_param_ptr_clear_ext(&item->item_params, zbx_item_param_free);
 	zbx_vector_item_param_ptr_destroy(&item->item_params);
 	zbx_vector_db_tag_ptr_clear_ext(&item->item_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&item->item_tags);
@@ -2596,7 +2596,7 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
 			zbx_vector_item_param_ptr_append(&new_item_params, db_item_param);
 		}
 
-		if (SUCCEED != zbx_merge_item_param(&item->item_params, &new_item_params, "item", error))
+		if (SUCCEED != zbx_merge_item_params(&item->item_params, &new_item_params, "item", error))
 		{
 			if (0 == item->itemid)
 			{

@@ -21,7 +21,6 @@ libzbxdbhigh_a_SOURCES = \
 	graph_linking.h \
 	tag.c \
 	item_param.c \
-	merge_pair_resource.c \
 	lld_override.c \
 	mediatype.c
 

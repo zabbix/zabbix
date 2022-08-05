@@ -784,11 +784,11 @@ int	zbx_item_param_sort_by_name(const zbx_item_param_t *d1, const zbx_item_param
 
 zbx_item_param_t	*zbx_item_param_create(const char *item_param_name,
 		const char *item_param_value);
-void	zbx_item_params_free(zbx_item_param_t *param);
+void	zbx_item_param_free(zbx_item_param_t *param);
 
 
 int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, const char *owner, char **error);
-int	zbx_merge_item_param(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_param_ptr_t *src, const char *owner,
+int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_param_ptr_t *src, const char *owner,
 		char **error);
 
 typedef enum

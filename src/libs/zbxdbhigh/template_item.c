@@ -1363,8 +1363,8 @@ static void	free_template_item(zbx_template_item_t *item)
 	zbx_vector_item_preproc_ptr_clear_ext(&item->template_preprocs, zbx_item_preproc_free);
 	zbx_vector_db_tag_ptr_clear_ext(&item->item_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_clear_ext(&item->template_tags, zbx_db_tag_free);
-	zbx_vector_item_param_ptr_clear_ext(&item->item_params, zbx_item_params_free);
-	zbx_vector_item_param_ptr_clear_ext(&item->template_params, zbx_item_params_free);
+	zbx_vector_item_param_ptr_clear_ext(&item->item_params, zbx_item_param_free);
+	zbx_vector_item_param_ptr_clear_ext(&item->template_params, zbx_item_param_free);
 	zbx_vector_lld_macro_ptr_clear_ext(&item->item_lld_macros, zbx_lld_macros_free);
 	zbx_vector_lld_macro_ptr_clear_ext(&item->template_lld_macros, zbx_lld_macros_free);
 	zbx_vector_item_preproc_ptr_destroy(&item->item_preprocs);
@@ -3039,7 +3039,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_template_item_t *)items->values[i];
-		zbx_merge_item_param(&item->item_params, &item->template_params, NULL, NULL);
+		zbx_merge_item_params(&item->item_params, &item->template_params, NULL, NULL);
 	}
 	zbx_hashset_destroy(&items_t);
 	zbx_vector_uint64_destroy(&itemids);
