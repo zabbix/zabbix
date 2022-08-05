@@ -390,6 +390,8 @@ typedef struct
 }
 ZBX_DC_HOST;
 
+ZBX_PTR_VECTOR_DECL(dc_host, ZBX_DC_HOST *)
+
 typedef struct
 {
 	zbx_uint64_t	hostid;
@@ -426,6 +428,8 @@ typedef struct
 	const char		*proxy_address;
 	int			last_version_error_time;
 	zbx_uint32_t		revision;
+
+	zbx_vector_dc_host_t	hosts;
 }
 ZBX_DC_PROXY;
 

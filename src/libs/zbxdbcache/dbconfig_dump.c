@@ -184,7 +184,7 @@ static void	DCdump_proxies(void)
 	ZBX_DC_PROXY		*proxy;
 	zbx_hashset_iter_t	iter;
 	zbx_vector_ptr_t	index;
-	int			i;
+	int			i, j;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
@@ -204,6 +204,10 @@ static void	DCdump_proxies(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  proxy_address:'%s'", proxy->proxy_address);
 		zabbix_log(LOG_LEVEL_TRACE, "  compress:%d", proxy->auto_compress);
 		zabbix_log(LOG_LEVEL_TRACE, "  lastaccess:%d", proxy->lastaccess);
+
+		zabbix_log(LOG_LEVEL_TRACE, "  hosts:%d", proxy->hosts.values_num);
+		for (j = 0; j < proxy->hosts.values_num; j++)
+			zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64, proxy->hosts.values[j]->hostid);
 	}
 
 	zbx_vector_ptr_destroy(&index);

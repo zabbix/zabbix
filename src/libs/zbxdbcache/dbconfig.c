@@ -73,6 +73,7 @@ int	sync_in_progress = 0;
 
 ZBX_PTR_VECTOR_IMPL(cached_proxy, zbx_cached_proxy_t *)
 ZBX_PTR_VECTOR_IMPL(dc_httptest, zbx_dc_httptest_t *)
+ZBX_PTR_VECTOR_IMPL(dc_host, ZBX_DC_HOST *)
 
 /******************************************************************************
  *                                                                            *
@@ -1033,7 +1034,34 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	}
 
 	dc_strpool_release(proxy->proxy_address);
+	zbx_vector_dc_host_destroy(&proxy->hosts);
+
 	zbx_hashset_remove_direct(&config->proxies, proxy);
+}
+
+static void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid)
+{
+	ZBX_DC_PROXY	*proxy;
+	int		i;
+
+	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_hostid)))
+		return;
+
+	if (FAIL == (i = zbx_vector_dc_host_search(&proxy->hosts, host, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+		return;
+
+	zbx_vector_dc_host_remove_noorder(&proxy->hosts, i);
+}
+
+static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid)
+{
+	ZBX_DC_PROXY	*proxy;
+	int		i;
+
+	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_hostid)))
+		return;
+
+	zbx_vector_dc_host_append(&proxy->hosts, host);
 }
 
 static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_uint64_t *active_avail_diff,
@@ -1403,6 +1431,15 @@ done:
 			}
 		}
 
+		if (HOST_STATUS_MONITORED == status || HOST_STATUS_NOT_MONITORED == status)
+		{
+			if (0 != found && 0 != host->proxy_hostid && host->proxy_hostid != proxy_hostid)
+				dc_host_deregister_proxy(host, host->proxy_hostid);
+
+			if (0 != proxy_hostid && (0 == found || host->proxy_hostid != proxy_hostid))
+				dc_host_register_proxy(host, proxy_hostid);
+		}
+
 		host->proxy_hostid = proxy_hostid;
 
 		/* update 'hosts_h' and 'hosts_p' indexes using new data, if not done already */
@@ -1463,6 +1500,8 @@ done:
 				proxy->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
 				proxy->nodata_win.values_num = 0;
 				proxy->nodata_win.period_end = 0;
+
+				zbx_vector_dc_host_create(&proxy->hosts);
 			}
 
 			proxy->auto_compress = atoi(row[16 + ZBX_HOST_TLS_OFFSET]);
@@ -1529,6 +1568,9 @@ done:
 			}
 
 			zbx_vector_uint64_append(active_avail_diff, host->hostid);
+
+			if (0 != host->proxy_hostid)
+				dc_host_deregister_proxy(host, host->proxy_hostid);
 		}
 		else if (HOST_STATUS_PROXY_ACTIVE == host->status || HOST_STATUS_PROXY_PASSIVE == host->status)
 		{
