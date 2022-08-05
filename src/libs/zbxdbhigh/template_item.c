@@ -2953,7 +2953,6 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			itemid;
-	//zbx_template_item_param_t	*ppsrc, *ppdst;
 	zbx_item_param_t		*db_item_param;
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;

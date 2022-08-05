@@ -1664,6 +1664,7 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
  * Parameters: item_prototype  - [IN] the item prototype                      *
  *             lld_row         - [IN] the lld row                             *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  * Returns: The created item or NULL if cannot create new item from prototype *
  *                                                                            *
@@ -2552,6 +2553,8 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
  * Parameters: item_prototypes - [IN] the item prototypes                     *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
+ *             items           - [IN/OUT] sorted list of items                *
+ *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
@@ -2621,6 +2624,7 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
  * Parameters: item_prototypes - [IN] the item prototypes                     *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
+ *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_macro_paths,
