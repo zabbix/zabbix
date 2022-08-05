@@ -569,9 +569,9 @@ class testFormTabIndicators extends CWebTest {
 							],
 							'field_type' => 'general_field'
 						],
+						// There is no tab indicator if the default values are set.
 						[
 							'name' => 'Legend',
-							'set by default' => true,
 							'entries' => [
 								'selector' => 'id:legend',
 								'value' => false,
@@ -674,13 +674,12 @@ class testFormTabIndicators extends CWebTest {
 			$form->selectTab($tab['name']);
 
 			if (array_key_exists('count', $tab)) {
-				$data_indicator = 'count';
 				$new_value = $tab['count'];
 				$old_value = CTestArrayHelper::get($tab, 'initial_count', 0);
 			}
 			else {
-				$data_indicator = 'mark';
-				$old_value = CTestArrayHelper::get($tab, 'set by default', false);
+				// There is no tab indicator if the default values are set.
+				$old_value = false;
 				$new_value = !$old_value;
 			}
 
