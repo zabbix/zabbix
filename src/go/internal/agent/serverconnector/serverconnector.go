@@ -20,6 +20,9 @@
 package serverconnector
 
 import (
+	"crypto/md5"
+	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -50,6 +53,7 @@ type Connector struct {
 	input                      chan interface{}
 	addresses                  []string
 	hostname                   string
+	session                    string
 	localAddr                  net.Addr
 	lastActiveCheckErrors      []error
 	lastActiveHbErrors         []error
@@ -64,6 +68,7 @@ type activeChecksRequest struct {
 	Request       string `json:"request"`
 	Host          string `json:"host"`
 	Version       string `json:"version"`
+	Session       string `json:"session"`
 	HostMetadata  string `json:"host_metadata,omitempty"`
 	HostInterface string `json:"interface,omitempty"`
 	ListenIP      string `json:"ip,omitempty"`
@@ -147,6 +152,7 @@ func (c *Connector) refreshActiveChecks() {
 		Request: "active checks",
 		Host:    c.hostname,
 		Version: version.Short(),
+		Session: c.session,
 	}
 
 	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.addresses)
@@ -395,6 +401,12 @@ func (c *Connector) updateOptions(options *agent.AgentOptions) {
 	c.localAddr = &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0}
 }
 
+func newToken() string {
+	h := md5.New()
+	_ = binary.Write(h, binary.LittleEndian, time.Now().UnixNano())
+	return hex.EncodeToString(h.Sum(nil))
+}
+
 func New(taskManager scheduler.Scheduler, addresses []string, hostname string,
 	options *agent.AgentOptions) (connector *Connector, err error) {
 	c := &Connector{
@@ -403,6 +415,7 @@ func New(taskManager scheduler.Scheduler, addresses []string, hostname string,
 		hostname:    hostname,
 		input:       make(chan interface{}, 10),
 		clientID:    agent.NewClientID(),
+		session:     newToken(),
 	}
 
 	c.updateOptions(options)
@@ -416,6 +429,7 @@ func New(taskManager scheduler.Scheduler, addresses []string, hostname string,
 		localAddr: c.localAddr,
 		tlsConfig: c.tlsConfig,
 		timeout:   options.Timeout,
+		session:   c.session,
 	}
 	c.resultCache = resultcache.New(&agent.Options, c.clientID, ac)
 

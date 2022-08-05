@@ -36,6 +36,7 @@ type activeConnection struct {
 	localAddr net.Addr
 	tlsConfig *tls.Config
 	timeout   int
+	session   string
 }
 
 func (c *activeConnection) Write(data []byte, timeout time.Duration) []error {
@@ -65,6 +66,10 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) []error {
 
 func (c *activeConnection) Addr() (s string) {
 	return c.addresses[0]
+}
+
+func (c *activeConnection) Session() (s string) {
+	return c.session
 }
 
 func (c *activeConnection) Hostname() (s string) {
