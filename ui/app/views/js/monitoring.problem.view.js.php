@@ -147,6 +147,8 @@
 					chkbxRange.clearSelectedOnFilterChange();
 				}
 
+				view.refreshNow();
+
 				clearMessages();
 				addMessage(makeMessageBox('good', [], response.message, true, false));
 			});
@@ -235,9 +237,13 @@
 
 		onDataDone(response) {
 			this.clearLoading();
-			clearMessages();
 			this.refreshBody(response.body);
-			('messages' in response) && addMessage(makeMessageBox('good', [], response.messages, true, false));
+
+			if ('messages' in response) {
+				clearMessages();
+				addMessage(makeMessageBox('good', [], response.messages, true, false));
+			}
+
 			('debug' in response) && this.refreshDebug(response.debug);
 		},
 
