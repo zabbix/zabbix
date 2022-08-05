@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-05T08:31:10Z'
+  date: '2022-08-05T11:12:08Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -9,6 +9,12 @@ zabbix_export:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Applications
+    -
+      uuid: 748ad4d098d447d492bb935c907f652f
+      name: Databases
+    -
+      uuid: 137f19e6e2dc4219b33553b812627bc2
+      name: 'Virtual machines'
   templates:
     -
       uuid: c60e5929ab474f67bbe67dc6b04e709d
@@ -187,7 +193,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Applications
+                    name: 'Virtual machines'
               templates:
                 -
                   name: 'AWS EC2 by HTTP'
@@ -359,7 +365,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Applications
+                    name: Databases
               templates:
                 -
                   name: 'AWS RDS instance by HTTP'
