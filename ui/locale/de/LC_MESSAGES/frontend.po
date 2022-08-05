@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-04-01 13:55+0000\n"
-"Last-Translator: Joachim <joachim.schwender@web.de>\n"
+"POT-Creation-Date: 2022-04-01 16:26+0300\n"
+"PO-Revision-Date: 2022-07-08 20:03+0000\n"
+"Last-Translator: Stephan Burger <stephan.burger@mail.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -188,10 +188,10 @@ msgstr[0] "%1$s von %2$s Elementen in problematischem Zustand"
 msgstr[1] "%1$s von %2$s Elementen in problematischem Zustand"
 
 #: jsLoader.php:259
-#, fuzzy, c-format
+#, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr "%1$s voreingestellt, verwende zur Auswahl Ab- und Auf Pfeiltasten und Eingabetaste "
+msgstr "%1$s vorausgewählt, verwenden Sie die Pfeiltasten nach unten, nach oben und die Eingabetaste, um auszuwählen"
 
 #: include/maps.inc.php:335 include/maps.inc.php:339 include/maps.inc.php:346
 #: include/maps.inc.php:395
@@ -1170,14 +1170,14 @@ msgid "Asset tag"
 msgstr "Inventarnummer"
 
 #: include/maintenances.inc.php:70
-#, fuzzy, c-format
+#, c-format
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
 msgstr[0] "Um %1$s:%2$s %3$s jede Woche"
 msgstr[1] "Um %1$s:%2$s %3$s alle %4$s Wochen"
 
 #: include/maintenances.inc.php:50
-#, fuzzy, c-format
+#, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
 msgstr[0] "Um %1$s:%2$s jeden Tag"
@@ -2036,7 +2036,7 @@ msgid "Cannot delete host"
 msgstr "Kann Host nicht löschen"
 
 #: include/classes/api/services/CHost.php:1463
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
 msgstr[0] "Kann den Host nicht löschen da die Wartung \"%1$s\" mindestens einen Host oder Host-Gruppe enthalten muss."
@@ -10740,6 +10740,11 @@ msgstr "Mo"
 msgctxt "Monday short"
 msgid "M"
 msgstr "Mo"
+
+#: include/func.inc.php:597 jsLoader.php:144
+msgctxt "month short"
+msgid "M"
+msgstr ""
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:90
 msgid "MAC address A"

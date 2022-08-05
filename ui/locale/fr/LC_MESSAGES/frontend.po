@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-06-04 13:58+0000\n"
+"POT-Creation-Date: 2022-04-01 16:26+0300\n"
+"PO-Revision-Date: 2022-07-22 13:18+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3096,7 +3096,7 @@ msgstr "Changer"
 
 #: app/views/administration.autoreg.edit.php:80
 msgid "Change PSK"
-msgstr "Change PSK"
+msgstr "Changer PSK"
 
 #: app/views/administration.authentication.edit.php:80
 #: app/views/administration.mediatype.edit.php:137
@@ -3114,7 +3114,7 @@ msgstr "Changement de gravité"
 
 #: include/classes/html/CMacroValue.php:143
 msgid "Change type"
-msgstr ""
+msgstr "Changer le type"
 
 #: include/forms.inc.php:192 include/items.inc.php:127
 #: include/views/configuration.item.edit.php:568
@@ -5959,7 +5959,7 @@ msgstr "Activé"
 
 #: app/views/administration.authentication.edit.php:230
 msgid "Encrypt"
-msgstr "Chiffrer"
+msgstr "Chiffrement"
 
 #: app/views/administration.proxy.edit.php:124
 #: app/views/administration.proxy.list.php:74
@@ -7625,7 +7625,7 @@ msgstr "Masque de sous-réseau de l'hôte"
 #: include/classes/widgets/forms/CWidgetFormClock.php:34
 #: include/views/monitoring.screen.constructor.edit.php:722
 msgid "Host time"
-msgstr "Temps de l'hôte"
+msgstr "Heure de l'hôte"
 
 #: include/classes/api/services/CHost.php:929
 msgid "Host update failed."
@@ -7879,7 +7879,7 @@ msgstr "Icônes"
 
 #: app/views/administration.authentication.edit.php:153
 msgid "IdP entity ID"
-msgstr ""
+msgstr "ID d'entité de l'IdP"
 
 #: include/classes/core/CModuleManager.php:155
 #, c-format
@@ -8076,7 +8076,7 @@ msgstr "Inclure"
 
 #: app/views/administration.mediatype.edit.php:240
 msgid "Include event menu entry"
-msgstr ""
+msgstr "Inclure dans le menu de l'événement"
 
 #: app/views/administration.usergroup.edit.php:139
 #: app/views/administration.usergroup.edit.php:190
@@ -10139,7 +10139,7 @@ msgstr "Une chaîne JSON est attendue"
 #: include/classes/core/CJsonRpc.php:150
 #, c-format
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "La génération de l'erreur JSON-RPC a échoué. Aucune erreur de type \"%1$s\"."
 
 #: include/items.inc.php:1792
 #: include/views/configuration.host.discovery.edit.php:669
@@ -10421,7 +10421,7 @@ msgstr "Letton (lv_LV)"
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:48
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:121
 msgid "Layout"
-msgstr ""
+msgstr "Disposition"
 
 #: include/classes/widgets/CWidgetHelper.php:769
 #: include/classes/widgets/CWidgetHelper.php:844
@@ -10645,7 +10645,7 @@ msgstr "Local"
 #: include/views/monitoring.history.php:292
 #: include/views/monitoring.screen.constructor.edit.php:720
 msgid "Local time"
-msgstr "Temps local"
+msgstr "Heure locale"
 
 #: include/hosts.inc.php:214
 msgid "Location"
@@ -10707,11 +10707,11 @@ msgstr "Déconnexion"
 
 #: app/views/administration.authentication.edit.php:218
 msgid "Logout requests"
-msgstr "Demandes de déconnexion"
+msgstr "Requêtes Logout"
 
 #: app/views/administration.authentication.edit.php:224
 msgid "Logout responses"
-msgstr "Réponses de déconnexion"
+msgstr "Réponses Logout"
 
 #: include/discovery.inc.php:139
 msgid "Lost"
@@ -10729,6 +10729,11 @@ msgstr "M"
 msgctxt "Monday short"
 msgid "M"
 msgstr "L"
+
+#: include/func.inc.php:597 jsLoader.php:144
+msgctxt "month short"
+msgid "M"
+msgstr ""
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:90
 msgid "MAC address A"
@@ -11158,7 +11163,7 @@ msgstr "Le test du type de média a échoué."
 
 #: app/views/js/popup.mediatypetest.edit.js.php:109
 msgid "Media type test log"
-msgstr ""
+msgstr "Journal du test du type de média"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:139
 msgid "Media type test successful."
@@ -11206,11 +11211,11 @@ msgstr "Mémoire utilisée par un processeur en octets. Retourne un entier"
 
 #: app/views/administration.mediatype.edit.php:255
 msgid "Menu entry URL"
-msgstr ""
+msgstr "URL de l'entrée de menu"
 
 #: app/views/administration.mediatype.edit.php:246
 msgid "Menu entry name"
-msgstr ""
+msgstr "Nom de l'entrée de menu"
 
 #: app/partials/popup.operations.php:158
 #: app/views/monitoring.widget.actionlog.view.php:37
@@ -11687,7 +11692,7 @@ msgstr "Prénom"
 
 #: app/views/administration.authentication.edit.php:234
 msgid "Name ID"
-msgstr ""
+msgstr "ID du nom"
 
 #: include/views/js/configuration.httpconf.edit.js.php:100
 msgid "Name of the form field should not exceed 255 characters."
@@ -13524,7 +13529,7 @@ msgstr "Coller sans les liens externes"
 
 #: app/views/monitoring.charts.view.php:106
 msgid "Pattern"
-msgstr ""
+msgstr "Motif"
 
 #: actionconf.php:81 include/views/configuration.action.edit.php:160
 msgid "Pause operations for suppressed problems"
@@ -13941,7 +13946,7 @@ msgstr "Pourcentage d'utilisation du processeur pour un processus. Retourne un f
 
 #: app/views/administration.mediatype.edit.php:234
 msgid "Process tags"
-msgstr ""
+msgstr "Traiter les tags"
 
 #: include/items.inc.php:1859 include/items.inc.php:1863
 msgid "Prometheus"
@@ -14983,11 +14988,11 @@ msgstr "agent SNMPv3"
 
 #: app/views/administration.authentication.edit.php:180
 msgid "SP entity ID"
-msgstr ""
+msgstr "ID d'entité du SP"
 
 #: app/views/administration.authentication.edit.php:188
 msgid "SP name ID format"
-msgstr ""
+msgstr "Format d'ID du nom du SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -15506,7 +15511,7 @@ msgstr "Serveur (proxy)"
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
 #: include/views/monitoring.screen.constructor.edit.php:721
 msgid "Server time"
-msgstr "Temps serveur"
+msgstr "Heure du serveur"
 
 #: app/controllers/CControllerAuditLogList.php:203
 #: app/views/popup.services.php:46 include/actions.inc.php:76
@@ -15878,7 +15883,7 @@ msgstr "Connectez-vous avec HTTP"
 
 #: include/views/general.login.php:49
 msgid "Sign in with Single Sign-On (SAML)"
-msgstr ""
+msgstr "Authentification avec Single Sign-On (SAML)"
 
 #: include/menu.inc.php:241 include/menu.inc.php:244
 msgid "Sign out"
@@ -16373,7 +16378,7 @@ msgstr "Support"
 #: include/html.inc.php:980
 #, c-format
 msgid "Suppressed till: %1$s"
-msgstr "Supprimé jusqu'à: %1$s"
+msgstr "Supprimé jusqu'à : %1$s"
 
 #: app/controllers/CControllerPopupGeneric.php:250
 #: app/views/administration.user.edit.php:74
@@ -17022,7 +17027,7 @@ msgstr "Temps écoulé :"
 
 #: include/classes/items/CHelpItems.php:1151
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
-msgstr ""
+msgstr "Moment du dernier accès au proxy. Name - nom du proxy. Les paramètres valides sont : lastaccess - horodatage Unix, delay - secondes."
 
 #: include/actions.inc.php:51
 #: include/classes/widgets/views/widget.svggraph.form.view.php:290
@@ -17044,7 +17049,7 @@ msgstr "Décalage temporel"
 #: include/classes/widgets/forms/CWidgetFormClock.php:31
 #: include/views/monitoring.screen.constructor.edit.php:714
 msgid "Time type"
-msgstr "Type temps"
+msgstr "Type d'heure"
 
 #: include/classes/setup/CFrontendSetup.php:236
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
@@ -17230,7 +17235,7 @@ msgstr "Le déclencheur \"%1$s\" dépend du déclencheur \"%2$s\", qui n'existe 
 
 #: app/controllers/CControllerMenuPopup.php:582
 msgid "Trigger URL"
-msgstr ""
+msgstr "URL du déclencheur"
 
 #: include/views/configuration.action.list.php:27
 msgid "Trigger actions"
@@ -18298,7 +18303,7 @@ msgstr "Nom d'utilisateur et mot de passe"
 
 #: app/views/administration.authentication.edit.php:172
 msgid "Username attribute"
-msgstr "Attribut nom d'utilisateur"
+msgstr "Attribut du nom d'utilisateur"
 
 #: app/controllers/CControllerPopupGeneric.php:240
 #: app/views/administration.user.edit.php:34
@@ -18323,7 +18328,7 @@ msgstr "État du cluster VMware, <url> - URL du service VMware, <name> - Nom du 
 
 #: include/classes/items/CHelpItems.php:815
 msgid "VMware datacenters and their IDs. Returns JSON"
-msgstr ""
+msgstr "Datacenters VMware et leurs identifiants. Retourne un JSON"
 
 #: include/classes/items/CHelpItems.php:807
 #: include/classes/items/CHelpItems.php:851
@@ -18332,7 +18337,7 @@ msgstr "Statistiques de capacité du datastore VMware en octets ou en pourcentag
 
 #: include/classes/items/CHelpItems.php:799
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
-msgstr ""
+msgstr "Liste des hyperviseurs du datastore VMware, <url> - URL du service VMware, <datastore> - nom du datastore"
 
 #: include/classes/items/CHelpItems.php:803
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -18352,7 +18357,7 @@ msgstr "Uuid du BIOS de l'hyperviseur VMware, <url> - URL du service VMware, <uu
 
 #: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Capteurs d'état du fournisseur du matériel de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware. Retourne un JSON"
 
 #: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18364,7 +18369,7 @@ msgstr "Nom du cluster de l'hyperviseur VMware, <url> - URL du service VMware, <
 
 #: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
-msgstr ""
+msgstr "Nom du datacenter de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware. Retourne une chaîne de caractères"
 
 #: include/classes/items/CHelpItems.php:847
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
@@ -18376,15 +18381,15 @@ msgstr "Statistiques d'écriture du datastore de l'hyperviseur VMware, <url> - U
 
 #: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Liste des datastores de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
 #: include/classes/items/CHelpItems.php:927
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
-msgstr ""
+msgstr "Etat cumulatif des capteurs de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware. Retourne 0 - gris ; 1 - vert; 2 - jaune; 3 - rouge"
 
 #: include/classes/items/CHelpItems.php:899
 msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "État de maintenance de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
 #: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18464,7 +18469,7 @@ msgstr "Taille de la mémoire compressée d'une machine virtuelle VMware, <url> 
 
 #: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
-msgstr ""
+msgstr "Nom du datacenter de la machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware. Retourne une chaîne de caractères"
 
 #: include/classes/items/CHelpItems.php:1051
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
@@ -19130,7 +19135,7 @@ msgstr "d/m/Y H:i:s"
 
 #: include/translateDefines.inc.php:37
 msgid "Y-n-d"
-msgstr ""
+msgstr "d/n/Y"
 
 #: include/views/js/monitoring.sysmaps.js.php:430
 msgid "Y1"
@@ -19992,7 +19997,7 @@ msgstr "paramètres de nettoyage globaux"
 
 #: app/views/monitoring.charts.view.php:140
 msgid "graph pattern"
-msgstr ""
+msgstr "motif graphique"
 
 #: include/func.inc.php:599 jsLoader.php:146
 msgctxt "hour short"
@@ -20331,11 +20336,11 @@ msgstr "doit contenir au moins une macro de découverte de bas niveau"
 
 #: include/translateDefines.inc.php:38
 msgid "n-d"
-msgstr ""
+msgstr "d/n"
 
 #: include/translateDefines.inc.php:36
 msgid "n-d H:i"
-msgstr ""
+msgstr "d/n H:i"
 
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:221

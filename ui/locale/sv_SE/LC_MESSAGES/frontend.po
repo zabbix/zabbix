@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 19:52+0200\n"
+"POT-Creation-Date: 2022-04-01 16:26+0300\n"
 "PO-Revision-Date: 2022-05-23 11:11+0000\n"
 "Last-Translator: Johan <johan.lindgren@metricio.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10716,6 +10716,11 @@ msgstr ""
 
 #: jsLoader.php:174
 msgctxt "Monday short"
+msgid "M"
+msgstr ""
+
+#: include/func.inc.php:597 jsLoader.php:144
+msgctxt "month short"
 msgid "M"
 msgstr ""
 

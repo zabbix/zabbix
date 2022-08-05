@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 19:52+0200\n"
+"POT-Creation-Date: 2022-04-01 16:26+0300\n"
 "PO-Revision-Date: 2021-11-08 13:49+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -10640,6 +10640,11 @@ msgstr "M"
 msgctxt "Monday short"
 msgid "M"
 msgstr "M"
+
+#: include/func.inc.php:597 jsLoader.php:144
+msgctxt "month short"
+msgid "M"
+msgstr ""
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:90
 msgid "MAC address A"

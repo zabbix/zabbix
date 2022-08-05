@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-06-07T10:40:25Z</date>
+   <date>2022-07-21T11:16:03Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -2187,7 +2187,7 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <key>mssql.secondary_recovery_health["{#GROUP_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>Indicates the recovery health of a secondary replica replica:&#13;
+                     <description>Indicates the recovery health of a secondary replica:&#13;
 0 = In progress&#13;
 1 = Online&#13;
 2 = Unavailable</description>

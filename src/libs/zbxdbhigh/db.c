@@ -849,51 +849,97 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 	return DBget_nextid(tablename, num);
 }
 
+#ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
- * Function: DBcheck_capabilities                                             *
+ * Function: zbx_db_check_tsdb_capabilities                                        *
  *                                                                            *
- * Purpose: checks DBMS for optional features and adjusting configuration     *
+ * Purpose: checks TimescaleDB for compression availability                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcheck_capabilities(void)
+void	zbx_db_check_tsdb_capabilities(void)
 {
-#ifdef HAVE_POSTGRESQL
-	int	compression_available = OFF;
+#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
+#define ZBX_TIMESCALE_MIN_VERSION				10500
+#define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
+#define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
+	int		major, minor, patch, version;
+	int		compression_available = OFF;
+	char		*tsdb_lic = NULL;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
-	if (100002 <= zbx_dbms_get_version())
+	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 and newer */
+	/* in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition.    */
+	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0.  */
+	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > zbx_dbms_get_version())
+		goto out;
+
+	if (NULL == (result = DBselect("select db_extension from config")))
+		goto out;
+
+	if (NULL == (row = DBfetch(result)))
+		goto clean;
+
+	if (0 != zbx_strcmp_null((const char *)row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+		goto clean;
+
+	DBfree_result(result);
+
+	if (NULL == (result = DBselect("select extversion from pg_extension where extname='timescaledb'")))
+		goto out;
+
+	if (NULL == (row = DBfetch(result)))
+		goto clean;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char *)row[0]);
+
+	sscanf((const char *)row[0], "%d.%d.%d", &major, &minor, &patch);
+	version = major * 10000;
+	version += minor * 100;
+	version += patch;
+
+	if (ZBX_TIMESCALE_MIN_VERSION > version)
+		goto clean;
+
+	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT > version)
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
-		int		major, minor, patch, version;
-
-		if (NULL == (result = DBselect("select extversion from pg_extension where extname = 'timescaledb'")))
-			goto out;
-
-		if (NULL == (row = DBfetch(result)))
-			goto clean;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char*)row[0]);
-
-		sscanf((const char*)row[0], "%d.%d.%d", &major, &minor, &patch);
-		version = major * 10000;
-		version += minor * 100;
-		version += patch;
-
-		if (10500 <= version)
-			compression_available = ON;
-clean:
-		DBfree_result(result);
+		zabbix_log(LOG_LEVEL_WARNING, "Current TimescaleDB version is %d. TimescaleDB license and compression"
+				" availability detection is possible starting from TimescaleDB 2.0.", version);
+		compression_available = ON;
+		goto clean;
 	}
+
+	DBfree_result(result);
+
+	if (NULL != (result = DBselect("show timescaledb.license")) && NULL != (row = DBfetch(result)))
+		tsdb_lic = row[0];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB license: [%s]", ZBX_NULL2EMPTY_STR(tsdb_lic));
+
+	if (0 != zbx_strcmp_null(tsdb_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Detected license [%s] does not support compression. Compression is"
+				" supported in TimescaleDB Community Edition.", ZBX_NULL2EMPTY_STR(tsdb_lic));
+		goto clean;
+	}
+
+	compression_available = ON;
+clean:
+	DBfree_result(result);
 out:
-	DBexecute("update config set compression_availability=%d", compression_available);
+	if (ZBX_DB_OK > DBexecute("update config set compression_availability=%d", compression_available))
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set database compression availability");
 
 	DBclose();
-#endif
+#undef ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB
+#undef ZBX_TIMESCALE_MIN_VERSION
+#undef ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT
+#undef ZBX_TIMESCALE_LICENSE_COMMUNITY
 }
+#endif
 
 #define MAX_EXPRESSIONS	950
 
@@ -2078,9 +2124,8 @@ int	DBtable_exists(const char *table_name)
 #elif defined(HAVE_ORACLE)
 	result = DBselect(
 			"select 1"
-			" from tab"
-			" where tabtype='TABLE'"
-				" and lower(tname)='%s'",
+			" from all_tables"
+			" where lower(table_name)='%s'",
 			table_name_esc);
 #elif defined(HAVE_POSTGRESQL)
 	result = DBselect(

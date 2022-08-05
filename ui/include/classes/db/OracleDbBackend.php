@@ -30,7 +30,7 @@ class OracleDbBackend extends DbBackend {
 	 * @return boolean
 	 */
 	protected function checkDbVersionTable() {
-		$table_exists = DBfetch(DBselect("SELECT table_name FROM user_tables WHERE table_name='DBVERSION'"));
+		$table_exists = DBfetch(DBselect("SELECT table_name FROM all_tables WHERE table_name='DBVERSION'"));
 
 		if (!$table_exists) {
 			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-05-11 06:05+0000\n"
+"POT-Creation-Date: 2022-04-01 16:26+0300\n"
+"PO-Revision-Date: 2022-06-17 05:59+0000\n"
 "Last-Translator: Óscar <oscar.zabbix@linaresdigital.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -10730,6 +10730,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr ""
 
+#: include/func.inc.php:597 jsLoader.php:144
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:90
 msgid "MAC address A"
 msgstr ""
@@ -11960,7 +11965,7 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:54
 #: include/views/configuration.maintenance.list.php:108
 msgid "No data collection"
-msgstr ""
+msgstr "Sin recogida de datos"
 
 #: include/classes/html/CTableInfo.php:30
 msgid "No data found."
@@ -18943,7 +18948,7 @@ msgstr "Anchura"
 #: include/views/configuration.maintenance.edit.php:53
 #: include/views/configuration.maintenance.list.php:108
 msgid "With data collection"
-msgstr ""
+msgstr "Con recogida de datos"
 
 #: include/views/configuration.triggers.list.php:151
 msgid "With dependencies"

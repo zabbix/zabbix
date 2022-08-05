@@ -670,7 +670,7 @@ static int	evaluate_COUNT(char **value, DC_ITEM *item, const char *parameters, c
 			{
 				if (OP_BAND != op)
 				{
-					if (SUCCEED != str2uint64(arg2, ZBX_UNIT_SYMBOLS, &arg2_ui64))
+					if (SUCCEED != str2uint64whole(arg2, &arg2_ui64))
 					{
 						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
 								" value", arg2);
@@ -2860,7 +2860,7 @@ static void	add_value_suffix_s(char *value, size_t max_len)
 
 	if (0 != (n = floor(secs / SEC_PER_MONTH)))
 	{
-		offset += zbx_snprintf(value + offset, max_len - offset, "%dm ", (int)n);
+		offset += zbx_snprintf(value + offset, max_len - offset, "%dM ", (int)n);
 		secs -= n * SEC_PER_MONTH;
 		if (0 == n_unit)
 			n_unit = 3;

@@ -39,7 +39,7 @@ No specific Zabbix configuration is required.
 |{$FAS3220.FS.NAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.*` |
 |{$FAS3220.FS.NAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`snapshot` |
 |{$FAS3220.FS.PUSED.MAX.CRIT} |<p>Maximum percentage of disk used. Can be used with {#FSNAME} as context.</p> |`90` |
-|{$FAS3220.FS.TIME} |<p>The time during which disk usage may exceed the threshold. Can be used with {#FSNAME} as context.</p> |`10G` |
+|{$FAS3220.FS.TIME} |<p>The time during which disk usage may exceed the threshold. Can be used with {#FSNAME} as context.</p> |`10m` |
 |{$FAS3220.FS.TYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p><p>Value should be integer:</p><p>  2 - flexibleVolume,</p><p>  3 - aggregate,</p><p>  4 - stripedAggregate,</p><p>  5 - stripedVolume.</p> |`.*` |
 |{$FAS3220.FS.TYPE.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p><p>Value should be integer:</p><p>  2 - flexibleVolume,</p><p>  3 - aggregate,</p><p>  4 - stripedAggregate,</p><p>  5 - stripedVolume.</p> |`CHANGE_IF_NEEDED` |
 |{$FAS3220.FS.USE.PCT} |<p>Macro define what threshold will be used for disk space trigger:</p><p>  0 - use Bytes ({$FAS3220.FS.AVAIL.MIN.CRIT})</p><p>  1 - use percents ({$FAS3220.FS.PUSED.MAX.CRIT})</p><p>Can be used with {#FSNAME} as context.</p> |`1` |
@@ -115,7 +115,7 @@ No specific Zabbix configuration is required.
 |----|-----------|----|----|----|
 |Node {#NODE.NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`{TEMPLATE_NAME:fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"].min(5m)}>{$CPU.UTIL.CRIT}` |WARNING | |
 |NetApp FAS3220: Number of failed disks has changed |<p>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</p> |`{TEMPLATE_NAME:fas3220.disk[diskFailedCount].last()}>0 and {TEMPLATE_NAME:fas3220.disk[diskFailedMessage].diff()}=1`<p>Recovery expression:</p>`{TEMPLATE_NAME:fas3220.disk[diskFailedCount].last()}=0` |WARNING | |
-|Node {#NODE.NAME}: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeUptime, "{#NODE.NAME}"].last()}<10m` |INFO |<p>Manual close: YES</p> |
+|Node {#NODE.NAME}: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeUptime, "{#NODE.NAME}"].last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Node {#NODE.NAME}: Node can not communicate with the cluster |<p>-</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeHealth, "{#NODE.NAME}"].last()}=0` |HIGH |<p>Manual close: YES</p> |
 |Node {#NODE.NAME}: NVRAM battery status is not OK |<p>-</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeNvramBatteryStatus, "{#NODE.NAME}"].last()}<>1` |AVERAGE |<p>Manual close: YES</p> |
 |Node {#NODE.NAME}: Temperature is over than recommended |<p>The hardware will shutdown if the temperature exceeds critical thresholds.</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeEnvOverTemperature, "{#NODE.NAME}"].last()}=2` |HIGH | |
