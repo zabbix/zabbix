@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,11 +32,11 @@ $subfilter_options = [];
 foreach (['hostids', 'tagnames', 'data'] as $key) {
 	if (!array_key_exists($key, $subfilters) || count($subfilters[$key]) <= 1) {
 		$subfilter_options[$key] = null;
+
 		continue;
 	}
-	else {
-		$subfilter_options[$key] = [];
-	}
+
+	$subfilter_options[$key] = [];
 
 	// Remove non-selected filter fields with 0 occurrences.
 	$subfilters[$key] = array_filter($subfilters[$key], function ($field) {
@@ -115,8 +115,10 @@ if (count($subfilters['tags']) > 0) {
 						->addStyle($element_style)
 						->setAttribute('data-key', $tag)
 						->setAttribute('data-value', $element['name'])
-						->onClick('view.unsetSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
-							'this.dataset.value]);'
+						->onClick(
+							'view.unsetSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+								'this.dataset.value]'.
+							');'
 						),
 					' ',
 					new CSup($element['count'])
@@ -124,18 +126,20 @@ if (count($subfilters['tags']) > 0) {
 					->addClass(ZBX_STYLE_SUBFILTER)
 					->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 			}
-			else {
-				return (new CSpan([
-					(new CLinkAction($element_name))
-						->addStyle($element_style)
-						->setAttribute('data-key', $tag)
-						->setAttribute('data-value', $element['name'])
-						->onClick('view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
-							'this.dataset.value]);'),
-					' ',
-					new CSup(($subfilter_used ? '+' : '').$element['count'])
-				]))->addClass(ZBX_STYLE_SUBFILTER);
-			}
+
+			return (new CSpan([
+				(new CLinkAction($element_name))
+					->addStyle($element_style)
+					->setAttribute('data-key', $tag)
+					->setAttribute('data-value', $element['name'])
+					->onClick(
+						'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+							'this.dataset.value]'.
+						');'
+					),
+				' ',
+				new CSup(($subfilter_used ? '+' : '').$element['count'])
+			]))->addClass(ZBX_STYLE_SUBFILTER);
 		}, $tags_group['values']);
 
 		$tag_values = $tags_group['trimmed'] ? [$tag_values, new CSpan('...')] : $tag_values;
