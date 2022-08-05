@@ -6645,19 +6645,19 @@ static int	__config_timer_compare(const void *d1, const void *d2)
 	return 0;
 }
 
-static zbx_hash_t	__config_data_session_hash(const void *data)
+static zbx_hash_t	__config_session_hash(const void *data)
 {
-	const zbx_data_session_t	*session = (const zbx_data_session_t *)data;
+	const zbx_session_t	*session = (const zbx_session_t *)data;
 	zbx_hash_t			hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&session->hostid);
 	return ZBX_DEFAULT_STRING_HASH_ALGO(session->token, strlen(session->token), hash);
 }
 
-static int	__config_data_session_compare(const void *d1, const void *d2)
+static int	__config_session_compare(const void *d1, const void *d2)
 {
-	const zbx_data_session_t	*s1 = (const zbx_data_session_t *)d1;
-	const zbx_data_session_t	*s2 = (const zbx_data_session_t *)d2;
+	const zbx_session_t	*s1 = (const zbx_session_t *)d1;
+	const zbx_session_t	*s2 = (const zbx_session_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(s1->hostid, s2->hostid);
 	return strcmp(s1->token, s2->token);
@@ -6816,7 +6816,7 @@ int	init_configuration_cache(char **error)
 					__config_shmem_free_func);
 
 	for (i = 0; i < ZBX_SESSION_TYPE_COUNT; i++)
-		CREATE_HASHSET_EXT(config->sessions[i], 0, __config_data_session_hash, __config_data_session_compare);
+		CREATE_HASHSET_EXT(config->sessions[i], 0, __config_session_hash, __config_session_compare);
 
 	config->config = NULL;
 
@@ -13233,10 +13233,10 @@ const char	*zbx_dc_get_session_token(void)
  *           session object will not be deleted for 24 hours.                 *
  *                                                                            *
  ******************************************************************************/
-zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token,
+zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *token,
 		zbx_session_type_t session_type)
 {
-	zbx_data_session_t	*session, session_local;
+	zbx_session_t	*session, session_local;
 	time_t			now;
 
 	now = time(NULL);
@@ -13244,17 +13244,17 @@ zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const
 	session_local.token = token;
 
 	RDLOCK_CACHE;
-	session = (zbx_data_session_t *)zbx_hashset_search(&config->sessions[session_type], &session_local);
+	session = (zbx_session_t *)zbx_hashset_search(&config->sessions[session_type], &session_local);
 	UNLOCK_CACHE;
 
 	if (NULL == session)
 	{
-		session_local.last_valueid = 0;
+		session_local.last_id = 0;
 		session_local.lastaccess = now;
 
 		WRLOCK_CACHE;
 		session_local.token = dc_strdup(token);
-		session = (zbx_data_session_t *)zbx_hashset_insert(&config->sessions[session_type], &session_local,
+		session = (zbx_session_t *)zbx_hashset_insert(&config->sessions[session_type], &session_local,
 				sizeof(session_local));
 		UNLOCK_CACHE;
 	}
@@ -13269,9 +13269,9 @@ zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const
  * Purpose: removes data sessions not accessed for 24 hours                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_cleanup_data_sessions(void)
+void	zbx_dc_cleanup_sessions(void)
 {
-	zbx_data_session_t	*session;
+	zbx_session_t	*session;
 	zbx_hashset_iter_t	iter;
 	time_t			now;
 	int			i;
@@ -13283,7 +13283,7 @@ void	zbx_dc_cleanup_data_sessions(void)
 	for (i = 0; i < ZBX_SESSION_TYPE_COUNT; i++)
 	{
 		zbx_hashset_iter_reset(&config->sessions[i], &iter);
-		while (NULL != (session = (zbx_data_session_t *)zbx_hashset_iter_next(&iter)))
+		while (NULL != (session = (zbx_session_t *)zbx_hashset_iter_next(&iter)))
 		{
 			if (session->lastaccess + SEC_PER_DAY <= now)
 			{

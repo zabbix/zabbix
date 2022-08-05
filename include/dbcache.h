@@ -994,16 +994,16 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	zbx_uint64_t	last_valueid;
+	zbx_uint64_t	last_id;
 	const char	*token;
 	time_t		lastaccess;
 }
-zbx_data_session_t;
+zbx_session_t;
 
 const char	*zbx_dc_get_session_token(void);
-zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token,
+zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *token,
 		zbx_session_type_t session_type);
-void	zbx_dc_cleanup_data_sessions(void);
+void	zbx_dc_cleanup_sessions(void);
 
 /* maintenance support */
 

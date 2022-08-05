@@ -234,7 +234,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		DBclose();
 
-		zbx_dc_cleanup_data_sessions();
+		zbx_dc_cleanup_sessions();
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d records in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), records, sec, sleeptext);

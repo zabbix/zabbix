@@ -1246,7 +1246,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		DBclose();
 
-		zbx_dc_cleanup_data_sessions();
+		zbx_dc_cleanup_sessions();
 		zbx_vc_housekeeping_value_cache();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
