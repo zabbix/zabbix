@@ -46,10 +46,10 @@ $fields = [
 											IN([ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]),
 											null
 										],
-	'g_correlationid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({action})'],
-	'conditions' =>						[null,		O_OPT,	null,	null,		null],
-	'new_condition' =>					[null,		O_OPT,	null,	null,		'isset({add_condition})'],
-	'operations' =>						[null,		O_OPT,	null,	null,		null],
+	'g_correlationid' =>				[T_ZBX_INT, O_OPT,	P_ONLY_ARRAY,	DB_ID,		'isset({action})'],
+	'conditions' =>						[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
+	'new_condition' =>					[null,		O_OPT,	P_ONLY_ARRAY,	null,		'isset({add_condition})'],
+	'operations' =>						[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
 	'edit_operationid' =>				[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
 	// actions
 	'action' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
