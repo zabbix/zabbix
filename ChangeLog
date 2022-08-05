@@ -375,6 +375,11 @@ Changes for 6.0.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21311] fixed runtime error for host and host prototype graph preview tabs (dpetra)
+.........T [ZBX-20901] changed host macro in MySQL by Zabbix agent template to use TCP/IP connection method explicitly (drasihov)
+..F....... [ZBX-20931] fixed automatic type selection in item form (kkuzmina)
+.........T [ZBX-21344] changed JS preprocessing in Apache by HTTP/Zabbix agent templates to use ServerActive field from status page primarily (drasihov)
+...G...... [ZBX-21135] added fix to prevent agent from stopping in case of broken windows performance counters (asestakovs)
 .........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
 .........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
 ...G...... [ZBX-21300] fixed high cpu usage when using net.tcp.socket.count key (vso)
