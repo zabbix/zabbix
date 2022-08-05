@@ -147,8 +147,6 @@
 					chkbxRange.clearSelectedOnFilterChange();
 				}
 
-				this.refreshNow();
-
 				clearMessages();
 				addMessage(makeMessageBox('good', [], response.message, true, false));
 			});
