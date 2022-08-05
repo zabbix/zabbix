@@ -109,10 +109,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
-		$this->page->removeFocus();
 		$element = $overlay->query('id:svg-graph-preview')->one();
-
-		$errors = [];
 
 		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
 		foreach ($tabs as $tab) {
@@ -125,16 +122,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 			$this->page->removeFocus();
 			sleep(1);
-			// Collect all screenshot errors.
-			try {
-				$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
-			} catch (Exception $ex) {
-				$errors[] = $ex->getMessage();
-			}
-		}
-
-		if ($errors) {
-			$this->fail(implode("\n", $errors));
+			$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
 		}
 	}
 
@@ -654,7 +642,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2022-07-04 12:53:00',
+						'From' => '2027-07-04 12:53:00',
 						'To' => 'now'
 					],
 					'error' => 'Minimum time period to display is 1 minute.'

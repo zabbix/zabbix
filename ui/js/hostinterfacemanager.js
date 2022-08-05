@@ -46,7 +46,7 @@ class HostInterfaceManager {
 	static ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER = 'interface-container-header';
 	static ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND = 'interface-input-expand';
 	static ZBX_STYLE_HOST_INTERFACE_ROW = 'interface-row';
-	static ZBX_STYLE_GREY = 'grey';
+	static ZBX_STYLE_HOST_NO_INTERFACE = 'no-interface';
 	static ZBX_STYLE_LIST_ACCORDION_ITEM = 'list-accordion-item';
 	static ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED = 'list-accordion-item-opened';
 
@@ -82,10 +82,7 @@ class HostInterfaceManager {
 
 		this.$noInterfacesMsg = jQuery('<div>', {
 			html: t('No interfaces are defined.'),
-			class: HostInterfaceManager.ZBX_STYLE_GREY,
-			css: {
-				'padding': '5px 0px'
-			}
+			class: HostInterfaceManager.ZBX_STYLE_HOST_NO_INTERFACE
 		})
 			.insertAfter(jQuery('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER));
 
