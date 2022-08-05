@@ -31,15 +31,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'shows' =>			[T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,	null],
+	'shows' =>			[T_ZBX_INT, O_OPT,	P_SYS|P_ONLY_ARRAY,		DB_ID,	null],
 	'slideshowid' =>	[T_ZBX_INT, O_NO,	P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
 	'name' =>			[T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'delay' =>			[T_ZBX_TU,  O_OPT, null, null, 'isset({add}) || isset({update})', _('Default delay')],
-	'slides' =>			[null,		 O_OPT, null,		null,	null],
+	'slides' =>			[null,		 O_OPT, P_ONLY_TD_ARRAY,		null,	null],
 	'userid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'private' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
-	'users' =>			[T_ZBX_INT, O_OPT, null,	null,			null],
-	'userGroups' =>		[T_ZBX_INT, O_OPT, null,	null,			null],
+	'users' =>			[T_ZBX_INT, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
+	'userGroups' =>		[T_ZBX_INT, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"slideshow.massdelete"'),	null],
 	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],

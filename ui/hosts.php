@@ -33,14 +33,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hosts' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'groups' =>					[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'hosts' =>					[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,			DB_ID,		null],
+	'groups' =>					[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,			NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'mass_update_groups' =>		[T_ZBX_INT, O_OPT, null,
 									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 									null
 								],
-	'hostids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'groupids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'hostids' =>				[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,			DB_ID,		null],
+	'groupids' =>				[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,			DB_ID,		null],
 	'applications' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'],
 	'clone_hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,
@@ -55,11 +55,11 @@ $fields = [
 	'status' =>					[T_ZBX_INT, O_OPT, null,
 									IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null
 								],
-	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
+	'interfaces' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,			NOT_EMPTY,
 									'isset({add}) || isset({update})'
 								],
-	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'tags' =>					[T_ZBX_STR, O_OPT, null,			null,		null],
+	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,			DB_ID,		null],
+	'tags' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,			null,		null],
 	'mass_update_tags' =>		[T_ZBX_INT, O_OPT, null,
 									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 									null
@@ -107,8 +107,8 @@ $fields = [
 									null
 								],
 	'host_inventory' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,		null],
-	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
-	'visible' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
+	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,			null,		null],
+	'visible' =>				[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,			null,		null],
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -134,8 +134,8 @@ $fields = [
 	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'filter_host' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
-	'filter_templates' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'filter_groups' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'filter_templates' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,			DB_ID,		null],
+	'filter_groups' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,			DB_ID,		null],
 	'filter_ip' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_dns' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_port' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
@@ -148,7 +148,7 @@ $fields = [
 									IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
 									null
 								],
-	'filter_tags' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+	'filter_tags' =>			[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,			null,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]

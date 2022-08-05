@@ -43,8 +43,8 @@ $fields = [
 	// filter
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_groupids' =>	[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_hostids' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_groupids' =>	[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'filter_hostids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'ack_status' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'show_severity' =>		[T_ZBX_INT, O_OPT, P_SYS,	null,		null],

@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'new_httpstep'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM,	null,				null],
-	'group_httptestid'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,				null],
+	'group_httptestid'	=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,				null],
 	// form
 	'hostid'          => [T_ZBX_INT, O_OPT, P_SYS, DB_ID.NOT_ZERO,          'isset({form}) || isset({add}) || isset({update})'],
 	'applicationid'   => [T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')],
@@ -48,8 +48,8 @@ $fields = [
 	'agent_other'     => [T_ZBX_STR, O_OPT, null, null,
 		'(isset({add}) || isset({update})) && {agent} == '.ZBX_AGENT_OTHER
 	],
-	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    null],
-	'steps'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    'isset({add}) || isset({update})', _('Steps')],
+	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,  null,                    null],
+	'steps'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,  null,                    'isset({add}) || isset({update})', _('Steps')],
 	'authentication'  => [T_ZBX_INT, O_OPT, null,  IN('0,1,2,3'),             'isset({add}) || isset({update})'],
 	'http_user'       => [T_ZBX_STR, O_OPT, null,  null,
 		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
@@ -78,8 +78,8 @@ $fields = [
 	'filter_status' =>		[T_ZBX_INT, O_OPT, null,
 		IN([-1, HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED]), null
 	],
-	'filter_groups'		=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'filter_hostids'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
+	'filter_groups'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
+	'filter_hostids'	=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"httptest.massclearhistory","httptest.massdelete","httptest.massdisable",'.

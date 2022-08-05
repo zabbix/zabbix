@@ -44,7 +44,7 @@ $fields = [
 	'host_source' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
 	'name_source' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
 	'g_druleid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'dchecks' =>		[null, O_OPT, null,		null,		null],
+	'dchecks' =>		[null, O_OPT, P_ONLY_TD_ARRAY,		null,		null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 							IN('"drule.massdelete","drule.massdisable","drule.massenable"'),

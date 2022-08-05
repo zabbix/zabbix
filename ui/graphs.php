@@ -55,12 +55,12 @@ $fields = [
 	'percent_left' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN_DBL(0, 100, 4), null, _('Percentile line (left)')],
 	'percent_right' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN_DBL(0, 100, 4), null, _('Percentile line (right)')],
 	'visible' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null],
-	'items' =>				[T_ZBX_STR, O_OPT, null,		null,			null],
+	'items' =>				[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,		null,			null],
 	'discover' =>			[T_ZBX_INT, O_OPT, null,		IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'show_work_period' =>	[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
-	'group_graphid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
-	'copy_targetids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
+	'group_graphid' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,			null],
+	'copy_targetids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,			null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete","graph.updatediscover"'),	null],
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
@@ -74,8 +74,8 @@ $fields = [
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'filter_groups' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'filter_hostids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
+	'filter_groups' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,	null],
+	'filter_hostids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,	null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name","discover"'),					null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]

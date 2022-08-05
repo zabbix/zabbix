@@ -36,9 +36,9 @@ $fields = [
 	'tpl_triggerid' =>		[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
 	'triggerid' =>			[T_ZBX_INT,			O_OPT,	P_SYS|P_NZERO,	DB_ID,		null],
 	// filter
-	'filter_groups' =>		[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'filter_hostids' =>		[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'filter_templateid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
+	'filter_groups' =>		[T_ZBX_INT,			O_OPT,	P_SYS|P_ONLY_ARRAY,			DB_ID,		null],
+	'filter_hostids' =>		[T_ZBX_INT,			O_OPT,	P_SYS|P_ONLY_ARRAY,			DB_ID,		null],
+	'filter_templateid' =>	[T_ZBX_INT,			O_OPT,	P_SYS|P_ONLY_ARRAY,			DB_ID,		null],
 	'filter_rst'=>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
 	'filter_set' =>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
 	'from' =>				[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],

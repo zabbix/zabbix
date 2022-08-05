@@ -58,7 +58,7 @@ $fields = [
 											' && {type} != '.ITEM_TYPE_DEPENDENT,
 										_('Update interval')
 									],
-	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'delay_flex' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'history_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'history' =>					[T_ZBX_STR, O_OPT, null,	null, '(isset({add}) || isset({update}))'.
 										' && isset({history_mode}) && {history_mode}=='.ITEM_STORAGE_CUSTOM,
@@ -138,12 +138,12 @@ $fields = [
 										'(isset({add}) || isset({update})) && isset({value_type})'.
 											' && {value_type} == '.ITEM_VALUE_TYPE_LOG
 									],
-	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
-	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_targetids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'group_itemid' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'copy_targetids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'visible' =>					[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
+	'applications' =>				[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
 	'massupdate_app_action' =>		[T_ZBX_INT, O_OPT, null,
 										IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 										null
@@ -162,7 +162,7 @@ $fields = [
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
 										_('URL')
 									],
-	'query_fields' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'query_fields' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
@@ -174,7 +174,7 @@ $fields = [
 										null
 									],
 	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'headers' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'headers' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'retrieve_mode' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
 											HTTPTEST_STEP_RETRIEVE_MODE_BOTH
@@ -241,9 +241,9 @@ $fields = [
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_hostids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_application' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_groupids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'filter_hostids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'filter_application' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
 	'filter_name' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_type' =>				[T_ZBX_INT, O_OPT, null,
 										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,

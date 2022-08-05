@@ -59,7 +59,7 @@ $fields = [
 												' && {type} != '.ITEM_TYPE_DEPENDENT,
 										_('Update interval')
 									],
-	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
+	'delay_flex' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	'status' =>						[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]), null],
 	'discover' =>					[T_ZBX_INT, O_OPT, null,	IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'type' =>						[T_ZBX_INT, O_OPT, null,
@@ -131,8 +131,8 @@ $fields = [
 	'new_application_prototype' =>	[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({parent_discoveryid})'
 									],
-	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'application_prototypes' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'applications' =>				[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
+	'application_prototypes' =>		[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
 	'massupdate_app_action' =>		[T_ZBX_INT, O_OPT, null,
 										IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 										null
@@ -168,7 +168,7 @@ $fields = [
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
 										_('URL')
 									],
-	'query_fields' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'query_fields' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
@@ -180,7 +180,7 @@ $fields = [
 										null
 									],
 	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'headers' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'headers' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'retrieve_mode' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
 											HTTPTEST_STEP_RETRIEVE_MODE_BOTH
