@@ -30,6 +30,12 @@ No specific Zabbix configuration is required.
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+|{$AZURE.VM.LOCATION.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
+|{$AZURE.VM.LOCATION.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.VM.NAME.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
+|{$AZURE.VM.NAME.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.VM.RESOURCE_GROUP.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
+|{$AZURE.VM.RESOURCE_GROUP.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
 
 ## Template links
 
@@ -39,7 +45,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Virtual machines discovery |<p>A list of the virtual machines in the subscription.</p> |DEPENDENT |azure.vm.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Compute/virtualMachines$`</p> |
+|Virtual machines discovery |<p>A list of the virtual machines in the subscription.</p> |DEPENDENT |azure.vm.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Compute/virtualMachines$`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.VM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.VM.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.VM.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.VM.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.VM.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.VM.RESOURCE_GROUP.NOT_MATCHES}`</p> |
 
 ## Items collected
 
