@@ -475,13 +475,16 @@ class CScript extends CApiService {
 		}
 
 		// Populate common and mandatory fields.
-		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', ['name', 'type', 'command', 'scope']);
+		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', ['name', 'type', 'scope']);
 
 		foreach ($scripts as $index => &$script) {
 			$db_script = $db_scripts[$script['scriptid']];
 			$method = 'update';
 
-			if (array_key_exists('type', $script) && $script['type'] != $db_script['type']) {
+			if (array_key_exists('type', $script) && $script['type'] != $db_script['type']
+					|| array_key_exists('scope', $script) && $script['scope'] == ZBX_SCRIPT_SCOPE_ACTION
+						&& $db_script['scope'] != ZBX_SCRIPT_SCOPE_ACTION
+						&& $db_script['type'] == ZBX_SCRIPT_TYPE_URL) {
 				// This means that all other fields are now required just like create method.
 				$method = 'create';
 
@@ -495,11 +498,26 @@ class CScript extends CApiService {
 			}
 
 			$type_rules = $this->getTypeValidationRules($script['type'], $method, $type_fields);
-			$this->getScopeValidationRules($script['scope'], $scope_fields);
+			$scope_rules = $this->getScopeValidationRules($script['scope'], $scope_fields);
 
-			$type_rules['fields'] += $common_fields + $scope_fields;
+			// Temporary remove scope fields from script to validate type fields.
+			$tmp = $script;
+			$tmp_fields = array_intersect_key($scope_rules['fields'], $script);
 
-			if (!CApiInputValidator::validate($type_rules, $script, '/'.($index + 1), $error)) {
+			foreach ($tmp_fields as $field => $rules) {
+				unset($tmp[$field]);
+			}
+
+			$type_rules['fields'] += $common_fields + $type_fields;
+
+			if (!CApiInputValidator::validate($type_rules, $tmp, '/'.($index + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			// Validate all fields together.
+			$scope_rules['fields'] += $type_rules['fields'] + $common_fields + $scope_fields;
+
+			if (!CApiInputValidator::validate($scope_rules, $script, '/'.($index + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
@@ -530,6 +548,8 @@ class CScript extends CApiService {
 				switch ($script['type']) {
 					case ZBX_SCRIPT_TYPE_IPMI:
 						$script['execute_on'] = DB::getDefault('scripts', 'execute_on');
+						$script['url'] = '';
+						$script['new_window'] = DB::getDefault('scripts', 'new_window');
 						// break; is not missing here
 
 					case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
@@ -541,12 +561,16 @@ class CScript extends CApiService {
 						$script['privatekey'] = '';
 						$script['parameters'] = [];
 						$script['timeout'] = DB::getDefault('scripts', 'timeout');
+						$script['url'] = '';
+						$script['new_window'] = DB::getDefault('scripts', 'new_window');
 						break;
 
 					case ZBX_SCRIPT_TYPE_SSH:
 						$script['execute_on'] = DB::getDefault('scripts', 'execute_on');
 						$script['parameters'] = [];
 						$script['timeout'] = DB::getDefault('scripts', 'timeout');
+						$script['url'] = '';
+						$script['new_window'] = DB::getDefault('scripts', 'new_window');
 						break;
 
 					case ZBX_SCRIPT_TYPE_TELNET:
@@ -556,9 +580,26 @@ class CScript extends CApiService {
 						$script['execute_on'] = DB::getDefault('scripts', 'execute_on');
 						$script['parameters'] = [];
 						$script['timeout'] = DB::getDefault('scripts', 'timeout');
+						$script['url'] = '';
+						$script['new_window'] = DB::getDefault('scripts', 'new_window');
 						break;
 
 					case ZBX_SCRIPT_TYPE_WEBHOOK:
+						$script['port'] = '';
+						$script['authtype'] = DB::getDefault('scripts', 'authtype');
+						$script['username'] = '';
+						$script['password'] = '';
+						$script['publickey'] = '';
+						$script['privatekey'] = '';
+						$script['execute_on'] = DB::getDefault('scripts', 'execute_on');
+						$script['url'] = '';
+						$script['new_window'] = DB::getDefault('scripts', 'new_window');
+						break;
+
+					case ZBX_SCRIPT_TYPE_URL:
+						$script['command'] = '';
+						$script['parameters'] = [];
+						$script['timeout'] = DB::getDefault('scripts', 'timeout');
 						$script['port'] = '';
 						$script['authtype'] = DB::getDefault('scripts', 'authtype');
 						$script['username'] = '';
