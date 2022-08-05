@@ -1013,6 +1013,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		goto out;
 	}
 
+	/* sort by h.proxy_hostid to ensure that proxies are synced before hosts assigned to them */
 	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "h.hostid", "and", "h.proxy_hostid",
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)]);
 out:

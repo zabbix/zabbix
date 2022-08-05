@@ -1051,17 +1051,18 @@ static void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hosti
 		return;
 
 	zbx_vector_dc_host_remove_noorder(&proxy->hosts, i);
+	proxy->revision = config->revision;
 }
 
 static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid)
 {
 	ZBX_DC_PROXY	*proxy;
-	int		i;
 
 	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_hostid)))
 		return;
 
 	zbx_vector_dc_host_append(&proxy->hosts, host);
+	proxy->revision = config->revision;
 }
 
 static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_uint64_t *active_avail_diff,
@@ -1434,10 +1435,24 @@ done:
 		if (HOST_STATUS_MONITORED == status || HOST_STATUS_NOT_MONITORED == status)
 		{
 			if (0 != found && 0 != host->proxy_hostid && host->proxy_hostid != proxy_hostid)
+			{
 				dc_host_deregister_proxy(host, host->proxy_hostid);
-
-			if (0 != proxy_hostid && (0 == found || host->proxy_hostid != proxy_hostid))
-				dc_host_register_proxy(host, proxy_hostid);
+			}
+			else if (0 != proxy_hostid)
+			{
+				if (0 == found || host->proxy_hostid != proxy_hostid)
+				{
+					dc_host_register_proxy(host, proxy_hostid);
+				}
+				else
+				{
+					if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
+							&proxy_hostid)))
+					{
+						proxy->revision = config->revision;
+					}
+				}
+			}
 		}
 
 		host->proxy_hostid = proxy_hostid;
