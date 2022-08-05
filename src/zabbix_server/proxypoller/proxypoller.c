@@ -547,7 +547,7 @@ static int	process_proxy(void)
 			}
 			zbx_free(port);
 
-			if (proxy.proxy_config_nextcheck <= now)
+			if (proxy.proxy_config_nextcheck <= now && proxy.compatibility == ZBX_PROXY_VERSION_CURRENT)
 			{
 				if (SUCCEED != (ret = proxy_send_configuration(&proxy)))
 					goto error;

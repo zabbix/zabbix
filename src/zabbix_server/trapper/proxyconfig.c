@@ -63,6 +63,15 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (0 != proxy.auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
 
+	if (ZBX_PROXY_VERSION_CURRENT != proxy.compatibility)
+	{
+		error = zbx_strdup(error, "proxy and server major versions do not match");
+		zbx_send_response_ext(sock, NOTSUPPORTED, error, ZABBIX_VERSION, flags, CONFIG_TIMEOUT);
+		zabbix_log(LOG_LEVEL_DEBUG, "configuration update is disabled for this version of proxy \"%s\" at"
+				" \"%s\": %s", proxy.host, sock->peer, error);
+		goto out;
+	}
+
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (SUCCEED != get_proxyconfig_data(proxy.hostid, &j, &error))

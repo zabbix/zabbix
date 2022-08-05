@@ -4977,12 +4977,15 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
  ******************************************************************************/
 void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress, zbx_uint64_t flags_add)
 {
-	zbx_proxy_diff_t	diff;
+	zbx_proxy_diff_t		diff;
+	zbx_proxy_compatibility_t	compatibility;
+
+	compatibility = zbx_get_proxy_compatibility(version);
 
 	diff.hostid = proxy->hostid;
 	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE | flags_add;
 	diff.version = version;
-	diff.compatibility = zbx_get_proxy_compatibility(version);
+	diff.compatibility = compatibility;
 	diff.lastaccess = lastaccess;
 	diff.compress = compress;
 
@@ -4991,6 +4994,7 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int com
 	zbx_db_update_proxy_version(proxy, &diff);
 
 	proxy->version = version;
+	proxy->compatibility = compatibility;
 	proxy->auto_compress = compress;
 	proxy->lastaccess = lastaccess;
 
