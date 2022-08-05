@@ -90,7 +90,7 @@ $proxy_list = (new CTableInfo())
 		make_sorting_header(_('Last seen (age)'), 'lastaccess', $data['sort'], $data['sortorder'], $view_url),
 		_('Host count'),
 		_('Item count'),
-		_('Required performance (vps)'),
+		_('Required vps'),
 		_('Hosts')
 	]);
 
