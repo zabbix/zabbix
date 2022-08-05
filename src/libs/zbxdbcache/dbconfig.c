@@ -13301,8 +13301,6 @@ void	zbx_dc_cleanup_sessions(void)
 	UNLOCK_CACHE;
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: removes autoreg hosts not accessed for 25 hours                   *
