@@ -1017,6 +1017,8 @@ static void	DCsync_autoreg_config(zbx_dbsync_t *sync)
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
+
+		config->autoreg_tls_revision = config->revision;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
