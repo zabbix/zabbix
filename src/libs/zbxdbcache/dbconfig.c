@@ -13285,7 +13285,7 @@ void	zbx_dc_cleanup_sessions(void)
 		zbx_hashset_iter_reset(&config->sessions[i], &iter);
 		while (NULL != (session = (zbx_session_t *)zbx_hashset_iter_next(&iter)))
 		{
-			if (session->lastaccess + SEC_PER_DAY <= now)
+			if (session->lastaccess + SEC_PER_DAY + SEC_PER_HOUR <= now)
 			{
 				__config_shmem_free_func((char *)session->token);
 				zbx_hashset_iter_remove(&iter);

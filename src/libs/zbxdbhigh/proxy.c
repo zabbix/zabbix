@@ -3866,8 +3866,8 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	if (ZBX_COMPONENT_VERSION(4, 4) <= version &&
 			SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, tmp, sizeof(tmp), NULL))
 	{
-		zbx_session_t		*session;
-		zbx_uint64_t		hostid;
+		zbx_session_t	*session;
+		zbx_uint64_t	hostid;
 
 		if (SUCCEED != DCconfig_get_hostid_by_name(tmp, &hostid))
 		{

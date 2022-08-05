@@ -1003,7 +1003,7 @@ zbx_session_t;
 const char	*zbx_dc_get_session_token(void);
 zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *token,
 		zbx_session_type_t session_type);
-void	zbx_dc_cleanup_sessions(void);
+void		zbx_dc_cleanup_sessions(void);
 
 /* maintenance support */
 
