@@ -7209,6 +7209,14 @@ void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const
 	UNLOCK_CACHE;
 }
 
+static void	autoreg_host_free_data(ZBX_DC_AUTOREG_HOST *autoreg_host)
+{
+	dc_strpool_release(autoreg_host->host);
+	dc_strpool_release(autoreg_host->listen_ip);
+	dc_strpool_release(autoreg_host->listen_dns);
+	dc_strpool_release(autoreg_host->host_metadata);
+}
+
 void	DCconfig_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts)
 {
 	ZBX_DC_AUTOREG_HOST	*autoreg_host, autoreg_host_local;
@@ -7242,11 +7250,7 @@ void	DCconfig_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts)
 
 		if (NULL != autoreg_host)
 		{
-			dc_strpool_release(autoreg_host->host);
-			dc_strpool_release(autoreg_host->listen_ip);
-			dc_strpool_release(autoreg_host->listen_dns);
-			dc_strpool_release(autoreg_host->host_metadata);
-
+			autoreg_host_free_data(autoreg_host);
 			zbx_hashset_remove_direct(&config->autoreg_hosts, autoreg_host);
 		}
 	}
@@ -13266,12 +13270,12 @@ zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *tok
 
 /******************************************************************************
  *                                                                            *
- * Purpose: removes data sessions not accessed for 24 hours                   *
+ * Purpose: removes data sessions not accessed for 25 hours                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_cleanup_sessions(void)
 {
-	zbx_session_t	*session;
+	zbx_session_t		*session;
 	zbx_hashset_iter_t	iter;
 	time_t			now;
 	int			i;
@@ -13285,11 +13289,43 @@ void	zbx_dc_cleanup_sessions(void)
 		zbx_hashset_iter_reset(&config->sessions[i], &iter);
 		while (NULL != (session = (zbx_session_t *)zbx_hashset_iter_next(&iter)))
 		{
+			/* should be more than MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY */
 			if (session->lastaccess + SEC_PER_DAY + SEC_PER_HOUR <= now)
 			{
 				__config_shmem_free_func((char *)session->token);
 				zbx_hashset_iter_remove(&iter);
 			}
+		}
+	}
+
+	UNLOCK_CACHE;
+}
+
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: removes autoreg hosts not accessed for 25 hours                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_cleanup_autoreg_host(void)
+{
+	ZBX_DC_AUTOREG_HOST	*autoreg_host;
+	zbx_hashset_iter_t	iter;
+	time_t			now;
+
+	now = time(NULL);
+
+	WRLOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->autoreg_hosts, &iter);
+	while (NULL != (autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_iter_next(&iter)))
+	{
+		/* should be more than MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY */
+		if (autoreg_host->timestamp + SEC_PER_DAY + SEC_PER_HOUR <= now)
+		{
+			autoreg_host_free_data(autoreg_host);
+			zbx_hashset_remove_direct(&config->autoreg_hosts, autoreg_host);
 		}
 	}
 
