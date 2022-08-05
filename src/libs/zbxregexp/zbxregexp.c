@@ -348,6 +348,8 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 	else
 	{
+		flags |= PCRE2_NO_UTF_CHECK;
+
 		if (0 <= (r = pcre2_match(regexp->pcre2_regexp, (PCRE2_SPTR)string, PCRE2_ZERO_TERMINATED, 0, flags,
 			match_data, regexp->match_ctx)))
 		{

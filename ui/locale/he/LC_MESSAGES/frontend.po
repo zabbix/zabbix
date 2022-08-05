@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-06-01 07:48+0000\n"
+"PO-Revision-Date: 2022-07-05 20:03+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -3627,6 +3627,10 @@ msgstr "קישור תבניות מעגלי אסור."
 msgid "Class %1$s not found for action %2$s."
 msgstr "המחלקה %1$s לא נמצאה לפעולה %2$s."
 
+#: include/classes/core/ZBase.php:494
+msgid "Class not found."
+msgstr "המחלקה לא נמצאה."
+
 #: include/views/configuration.httpconf.list.php:217
 #: include/views/configuration.item.list.php:297
 msgid "Clear history"
@@ -3804,6 +3808,13 @@ msgstr "דחיסת רשומות קדומות ל־"
 #: app/views/administration.proxy.list.php:79
 msgid "Compression"
 msgstr "דחיסה"
+
+#: app/views/administration.housekeeping.edit.php:163
+#: app/views/administration.housekeeping.edit.php:168
+#: app/views/administration.housekeeping.edit.php:173
+#: app/views/administration.housekeeping.edit.php:183
+msgid "Compression is not supported."
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:319
 msgid "Concurrent sessions"
@@ -5485,6 +5496,10 @@ msgstr "פרטים"
 msgid "Details of web scenario"
 msgstr "פרטי תרחיש רשת"
 
+#: app/views/administration.housekeeping.edit.php:194
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr "תקופת זיהוי"
@@ -6518,6 +6533,13 @@ msgstr "הודעת שגיאה"
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr "שגיאה! לא ניתן להפעיל את שרת ה־Zabbix עקב גרסת מסד נתונים %1$s שאינה נתמכת. חייבת להיות לפחות (%2$s)"
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
+msgstr "שגיאה! לא ניתן להפעיל את שרת ה־Zabbix."
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -11036,6 +11058,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "ב׳"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "כתובת MAC א׳"
@@ -11635,6 +11662,11 @@ msgstr "גודל הקובץ המזערי להעלאה הנדרש ל־PHP הוא 
 #, c-format
 msgid "Minimum required PHP version is %1$s."
 msgstr "גרסת ה־PHP הנמוכה ביותר הנדרשת היא %1$s."
+
+#: app/views/administration.housekeeping.edit.php:174
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -12927,7 +12959,7 @@ msgstr "מספר הפריטים בהיסטוריה של המתווך שלא נש
 
 #: include/classes/data/CItemData.php:1668
 msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
-msgstr ""
+msgstr "מספר הפריטים בתור שהושהו למשך תקופת שניות מ־ עד, כולל."
 
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -14107,6 +14139,10 @@ msgstr "פורטוגלית (pt_PT)"
 msgid "Position"
 msgstr "מיקום"
 
+#: include/classes/widgets/views/widget.item.form.view.php:142
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr "המיקום זוכה להתעלמות ביחידות שנ׳, זמן פעילות ושעון יוניקס."
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "שדות Post"
@@ -14114,6 +14150,10 @@ msgstr "שדות Post"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "סוג Post"
+
+#: app/views/administration.housekeeping.edit.php:164
+msgid "PostgreSQL database server version is too old."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -17373,6 +17413,10 @@ msgstr "תבניות"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "התבניות „%1$s” נותקו מהמארחים „%2$s”."
 
+#: app/partials/configuration.host.edit.html.php:215
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr "תבניות שמוקשרות על ידי גילוי מארחים אינן ניתנות לניתוק."
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr "תבניות עודכנו"
@@ -17988,7 +18032,7 @@ msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצ
 #: include/classes/api/services/CTriggerGeneral.php:2472
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” כיוון שתלויות של הקפצות מארח בתבניות הקפצה אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2857
 #, c-format
@@ -18130,7 +18174,7 @@ msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי
 #: include/classes/api/services/CTriggerGeneral.php:2473
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי בהקפצה „%2$s” כיוון שתלויות של הקפצות מארח בתבניות הקפצה אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2862
 #, c-format
@@ -18160,7 +18204,7 @@ msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי
 #: include/classes/api/services/CTriggerGeneral.php:1325
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי באבטיפוס ההקפצה „%2$s” כיוון שתלויות באבות טיפוס של הקפצות מכלל LLD (גילוי ברמה נמוכה) אסורים."
 
 #: include/classes/api/services/CTriggerGeneral.php:1716
 #, c-format
@@ -18485,6 +18529,14 @@ msgstr "לא ניתן לטעון את משתני API ההגדרות."
 msgid "Unable to overwrite the existing configuration file."
 msgstr "לא ניתן לשכתב על קובץ התצורה הקיים."
 
+#: app/views/administration.housekeeping.edit.php:159
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr "לא ניתן לקבל את גרסת מסד הנתונים."
@@ -18657,6 +18709,26 @@ msgstr "הפרדה מתבניות"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "ביטול השתקה"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr "גרסת שרת מסד נתונים %1$s אינה נתמכת. אמורה להיות %2$s לפחות."
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr "גרסת שרת מסד נתונים %1$s אינה נתמכת. אמורה להיות לא גדולה מ־%2$s."
+
+#: app/views/administration.housekeeping.edit.php:178
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:188
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -18845,6 +18917,10 @@ msgstr "להשתמש בצבעי אירועים מותאמים אישית"
 #: jsLoader.php:402
 msgid "Use default"
 msgstr "להשתמש בבררת מחדל"
+
+#: app/partials/configuration.host.edit.html.php:216
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
+msgstr "ניתן להשתמש בטופס הגדרת אבטיפוס כדי להסיר תבניות מקושרות אוטומטית על הגילויים הבאים."
 
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
 msgid "Use if severity"
@@ -19745,10 +19821,24 @@ msgstr "אזהרה"
 msgid "Warning message"
 msgstr "הודעת אזהרה"
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr "אזהרה! לא ניתן לקבל את גרסת מסד הנתונים."
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת. עליה להיות %2$s לפחות."
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת. עליה להיות לפחות (%2$s)"
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
+msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת. עליה להיות גדולה מ־%2$s."
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."

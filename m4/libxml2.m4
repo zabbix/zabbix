@@ -50,7 +50,7 @@ AC_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
 
     if test "$want_libxml2" = "yes"; then
         AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-        PKG_PROG_PKG_CONFIG()
+        m4_ifdef([PKG_PROG_PKG_CONFIG], [PKG_PROG_PKG_CONFIG()], [:])
 
         if test -x "$PKG_CONFIG"; then
 
