@@ -2553,7 +2553,6 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
  * Parameters: item_prototypes - [IN] the item prototypes                     *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
- *             items           - [IN/OUT] sorted list of items                *
  *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  ******************************************************************************/
