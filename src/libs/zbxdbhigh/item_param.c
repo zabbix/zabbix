@@ -273,10 +273,10 @@ static int	check_duplicate_item_params(zbx_vector_item_param_ptr_t *item_params,
  * Comments: The item_params are merged using the following logic:            *
  *           1) item_params with matching name+value are left as it is        *
  *           2) item_params with matching names will have their values        *
- *              updated                                                       * 
+ *              updated                                                       *
  *           3) item_params without matches will have:                        *
  *              a) their name and value updated if there are new item_params  *
- *                 left                                                       * 
+ *                 left                                                       *
  *              b) flagged to be removed otherwise                            *
  *           4) all leftover new item_params will be created                  *
  *                                                                            *
