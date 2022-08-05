@@ -240,6 +240,7 @@ class CProxy extends CApiService {
 
 		self::updateInterfaces($proxies, __FUNCTION__, $db_proxies);
 		self::updateHosts($proxies, __FUNCTION__, $db_proxies);
+
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_PROXY, $proxies, $db_proxies);
 
 		return ['proxyids' => array_column($proxies, 'proxyid')];
@@ -851,7 +852,7 @@ class CProxy extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// Load existing values of PSK fields of proxies independently from APP mode.
+		// Load PSK data directly from the DB, since the API won't return secret data.
 		$proxies_psk_fields = DB::select($this->tableName(), [
 			'output' => ['tls_psk_identity', 'tls_psk'],
 			'hostids' => array_keys($db_proxies),
