@@ -74,6 +74,7 @@ int	sync_in_progress = 0;
 ZBX_PTR_VECTOR_IMPL(cached_proxy, zbx_cached_proxy_t *)
 ZBX_PTR_VECTOR_IMPL(dc_httptest, zbx_dc_httptest_t *)
 ZBX_PTR_VECTOR_IMPL(dc_host, ZBX_DC_HOST *)
+ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
 
 /******************************************************************************
  *                                                                            *
@@ -1035,6 +1036,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 
 	dc_strpool_release(proxy->proxy_address);
 	zbx_vector_dc_host_destroy(&proxy->hosts);
+	zbx_vector_host_rev_destroy(&proxy->removed_hosts);
 
 	zbx_hashset_remove_direct(&config->proxies, proxy);
 }
@@ -1043,9 +1045,14 @@ static void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hosti
 {
 	ZBX_DC_PROXY	*proxy;
 	int		i;
+	zbx_host_rev_t	rev;
 
 	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_hostid)))
 		return;
+
+	rev.hostid = host->hostid;
+	rev.revision = config->revision;
+	zbx_vector_host_rev_append(&proxy->removed_hosts, rev);
 
 	if (FAIL == (i = zbx_vector_dc_host_search(&proxy->hosts, host, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 		return;
@@ -1517,6 +1524,7 @@ done:
 				proxy->nodata_win.period_end = 0;
 
 				zbx_vector_dc_host_create(&proxy->hosts);
+				zbx_vector_host_rev_create(&proxy->removed_hosts);
 			}
 
 			proxy->auto_compress = atoi(row[16 + ZBX_HOST_TLS_OFFSET]);
@@ -14928,8 +14936,54 @@ void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get hostids removed from proxy since last proxy configuration     *
+ *          update                                                            *
+ *                                                                            *
+ * Parameter: proxy_hostid - [IN] the proxy hostid                            *
+ *            revision     - [IN] the proxy configuration revision            *
+ *            hostids      - [OUT] the hostsids removed from proxy since last *
+ *                                 proxy configuration sync                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_proxy_get_removed_hostids(zbx_uint64_t proxy_hostid, zbx_uint32_t revision,
+		zbx_vector_uint64_t *hostids)
+{
+	ZBX_DC_PROXY	*proxy;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_hostid)))
+	{
+		int	i;
+
+		for (i = 0; i < proxy->removed_hosts.values_num; )
+		{
+			if (proxy->removed_hosts.values[i].revision > revision)
+			{
+				zbx_vector_uint64_append(hostids, proxy->removed_hosts.values[i].hostid);
+				i++;
+			}
+			else
+			{
+				/* this operation can be done with read lock:                 */
+				/*   - removal from vector does not allocate/free memory      */
+				/*   - to configuration requests for the same proxy cannot be */
+				/*     processed at the same time                             */
+				/*   - configuration syncer uses write lock to update         */
+				/*     removed hosts on proxy                                 */
+				zbx_vector_host_rev_remove_noorder(&proxy->removed_hosts, i);
+			}
+		}
+	}
+
+	UNLOCK_CACHE;
+}
+
 
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
 #	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"
 #endif
+

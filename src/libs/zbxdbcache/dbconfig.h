@@ -409,6 +409,15 @@ ZBX_DC_HOST_H;
 
 typedef struct
 {
+	zbx_uint64_t	hostid;
+	zbx_uint32_t	revision;
+}
+zbx_host_rev_t;
+
+ZBX_VECTOR_DECL(host_rev, zbx_host_rev_t)
+
+typedef struct
+{
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		hosts_monitored;	/* number of enabled hosts assigned to proxy */
 	zbx_uint64_t		hosts_not_monitored;	/* number of disabled hosts assigned to proxy */
@@ -430,6 +439,8 @@ typedef struct
 	zbx_uint32_t		revision;
 
 	zbx_vector_dc_host_t	hosts;
+
+	zbx_vector_host_rev_t	removed_hosts;
 }
 ZBX_DC_PROXY;
 

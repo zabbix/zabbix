@@ -208,6 +208,11 @@ static void	DCdump_proxies(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  hosts:%d", proxy->hosts.values_num);
 		for (j = 0; j < proxy->hosts.values_num; j++)
 			zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64, proxy->hosts.values[j]->hostid);
+
+		zabbix_log(LOG_LEVEL_TRACE, "  removed hosts:%d", proxy->removed_hosts.values_num);
+				for (j = 0; j < proxy->removed_hosts.values_num; j++)
+			zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64 " revision:%u",
+					proxy->removed_hosts.values[j].hostid, proxy->removed_hosts.values[j].revision);
 	}
 
 	zbx_vector_ptr_destroy(&index);
