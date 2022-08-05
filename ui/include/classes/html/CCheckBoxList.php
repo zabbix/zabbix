@@ -58,7 +58,7 @@ class CCheckBoxList extends CList {
 	/**
 	 * @param string $name
 	 */
-	public function __construct($name) {
+	public function __construct($name = '') {
 		parent::__construct();
 
 		$this->addClass(self::ZBX_STYLE_CHECKBOX_LIST);
@@ -167,14 +167,14 @@ class CCheckBoxList extends CList {
 	 * @return string
 	 */
 	public function toString($destroy = true) {
-		$this->addStyle('--columns:'.$this->columns.';');
+		$this->addStyle('--columns: '.$this->columns.';');
 
 		if ($this->vertical) {
 			$values_count = count($this->values);
 			$max_rows = (int) ceil($values_count / $this->columns);
 
 			$this->addClass(self::ZBX_STYLE_VERTICAL);
-			$this->addStyle('--rows:'.$max_rows.';');
+			$this->addStyle('--rows: '.$max_rows.';');
 		}
 
 		foreach ($this->values as $value) {

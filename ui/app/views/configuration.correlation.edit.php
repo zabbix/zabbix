@@ -143,7 +143,7 @@ $form_list
 	)
 	->addRow(
 		_('Operations'),[
-		(new CCheckBoxList(''))
+		(new CCheckBoxList())
 			->setVertical(true)
 			->setOptions([
 				[

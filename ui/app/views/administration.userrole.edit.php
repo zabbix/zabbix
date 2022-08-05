@@ -93,8 +93,7 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 			'name' => str_replace('.', '_', $rule_key),
 			'label' => $rule_label,
 			'value' => 1,
-			'checked' => array_key_exists($rule_key, $data['rules']['ui'])
-				&& $data['rules']['ui'][$rule_key],
+			'checked' => array_key_exists($rule_key, $data['rules']['ui']) && $data['rules']['ui'][$rule_key],
 			'unchecked_value' => 0
 		];
 	}
@@ -102,7 +101,7 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 	$form_grid->addItem([
 		new CLabel($section_label, $section_key),
 		new CFormField(
-			(new CCheckBoxList($section_label))
+			(new CCheckBoxList())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setOptions($ui)
 				->setVertical(true)
