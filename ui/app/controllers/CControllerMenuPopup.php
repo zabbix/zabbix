@@ -120,53 +120,82 @@ class CControllerMenuPopup extends CController {
 				]);
 			}
 
-			$scripts = CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)
+			$all_scripts = CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)
 				? API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']]
 				: [];
 
-			// Filter only host scope scripts, get rid of excess spaces and unify slashes in menu path.
-			if ($scripts) {
-				foreach ($scripts as $num => &$script) {
+			$scripts = [];
+			$urls = [];
+
+			if ($all_scripts) {
+				foreach ($all_scripts as $num => $script) {
+					// Filter only host scope scripts, get rid of excess spaces and unify slashes in menu path.
 					if ($script['scope'] != ZBX_SCRIPT_SCOPE_HOST) {
-						unset($scripts[$num]);
+						unset($all_scripts[$num]);
 						continue;
 					}
 
-					$script['menu_path'] = trimPath($script['menu_path']);
-					$script['sort'] = '';
+					// Split scripts and URLs.
+					if ($script['type'] == ZBX_SCRIPT_TYPE_URL) {
+						$urls[] = $script;
+					}
+					else {
+						$scripts[] = $script;
+					}
+				}
 
-					if (strlen($script['menu_path']) > 0) {
-						// First or only slash from beginning is trimmed.
-						if (substr($script['menu_path'], 0, 1) === '/') {
-							$script['menu_path'] = substr($script['menu_path'], 1);
-						}
+				if (array_key_exists('urls', $data)) {
+					foreach ($data['urls'] as &$url) {
+						$url['new_window'] = ZBX_SCRIPT_URL_NEW_WINDOW_NO;
+						$url['confirmation'] = '';
+						$url['menu_path'] = '';
+					}
+					unset($url);
 
-						$script['sort'] = $script['menu_path'];
+					$urls = array_merge($urls, $data['urls']);
+				}
 
-						// If there is something more, check if last slash is present.
-						if (strlen($script['menu_path']) > 0) {
-							if (substr($script['menu_path'], -1) !== '/'
-									&& substr($script['menu_path'], -2) === '\\/') {
-								$script['sort'] = $script['menu_path'].'/';
+				if ($scripts || $urls) {
+					foreach ([&$scripts, &$urls] as &$entities) {
+						if ($entities) {
+							foreach ($entities as $num => &$entity) {
+								$entity['menu_path'] = trimPath($entity['menu_path']);
+								$entity['sort'] = '';
+
+								if (strlen($entity['menu_path']) > 0) {
+									// First or only slash from beginning is trimmed.
+									if (substr($entity['menu_path'], 0, 1) === '/') {
+										$entity['menu_path'] = substr($entity['menu_path'], 1);
+									}
+
+									$entity['sort'] = $entity['menu_path'];
+
+									// If there is something more, check if last slash is present.
+									if (strlen($entity['menu_path']) > 0) {
+										if (substr($entity['menu_path'], -1) !== '/'
+												&& substr($entity['menu_path'], -2) === '\\/') {
+											$entity['sort'] = $entity['menu_path'].'/';
+										}
+										else {
+											$entity['sort'] = $entity['menu_path'];
+										}
+
+										if (substr($entity['menu_path'], -1) === '/'
+												&& substr($entity['menu_path'], -2) !== '\\/') {
+											$entity['menu_path'] = substr($entity['menu_path'], 0, -1);
+										}
+									}
+								}
+
+								$entity['sort'] = $entity['sort'].$entity['name'];
 							}
-							else {
-								$script['sort'] = $script['menu_path'];
-							}
+							unset($entity);
 
-							if (substr($script['menu_path'], -1) === '/'
-									&& substr($script['menu_path'], -2) !== '\\/') {
-								$script['menu_path'] = substr($script['menu_path'], 0, -1);
-							}
+							CArrayHelper::sort($entities, ['sort']);
 						}
 					}
-
-					$script['sort'] = $script['sort'].$script['name'];
+					unset($entities);
 				}
-				unset($script);
-			}
-
-			if ($scripts) {
-				CArrayHelper::sort($scripts, ['sort']);
 			}
 
 			$menu_data = [
@@ -206,8 +235,14 @@ class CControllerMenuPopup extends CController {
 				];
 			}
 
-			if (array_key_exists('urls', $data)) {
-				$menu_data['urls'] = $data['urls'];
+			foreach (array_values($urls) as $url) {
+				$menu_data['urls'][] = [
+					'name' => $url['name'],
+					'menu_path' => $url['menu_path'],
+					'url' => $url['url'],
+					'new_window' => $url['new_window'],
+					'confirmation' => $url['confirmation']
+				];
 			}
 
 			if (array_key_exists('tags', $data)) {
