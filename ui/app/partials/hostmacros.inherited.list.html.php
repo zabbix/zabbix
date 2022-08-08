@@ -47,7 +47,7 @@ else {
 	$table->setColumns([
 		(new CTableColumn(_('Macro')))->addClass('table-col-macro'),
 		(new CTableColumn(_('Effective value')))->addClass('table-col-value'),
-		!$data['readonly'] ? (new CTableColumn(''))->addClass('table-col-action') : null,
+		!$data['readonly'] ? (new CTableColumn())->addClass('table-col-action') : null,
 		$is_hostprototype ? (new CTableColumn())->addClass('table-col-arrow') : null,
 		$is_hostprototype ? (new CTableColumn(_('Parent host value')))->addClass('table-col-parent-value') : null,
 		(new CTableColumn())->addClass('table-col-arrow'),
