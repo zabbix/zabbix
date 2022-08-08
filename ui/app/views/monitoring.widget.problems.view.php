@@ -101,9 +101,6 @@ $allowed = [
 foreach ($data['data']['problems'] as $eventid => $problem) {
 	$trigger = $data['data']['triggers'][$problem['objectid']];
 
-	$allowed['close'] = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $data['allowed_close']);
-	$can_be_closed = $allowed['close'];
-
 	if ($problem['r_eventid'] != 0) {
 		$value = TRIGGER_VALUE_FALSE;
 		$value_str = _('RESOLVED');
@@ -111,8 +108,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$can_be_closed = false;
 	}
 	else {
-		$can_be_closed = !hasEventCloseAction($problem['acknowledges']);
-		$in_closing = !$can_be_closed;
+		$in_closing = hasEventCloseAction($problem['acknowledges']);
+		$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $data['allowed_close']
+			&& !$in_closing
+		);
 		$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 		$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 		$value_clock = $in_closing ? time() : $problem['clock'];

@@ -18,13 +18,14 @@
 **/
 
 #include "pinger.h"
+#include "zbxserver.h"
 
 #include "log.h"
-#include "zbxserver.h"
 #include "zbxicmpping.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "preproc.h"
+#include "zbxtime.h"
 
 /* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1

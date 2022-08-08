@@ -28,6 +28,8 @@
 #include "zbxtasks.h"
 #include "zbxcompress.h"
 #include "zbxavailability.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -49,7 +51,6 @@ extern unsigned int	configured_tls_connect_mode;
 #define ZBX_DATASENDER_DB_UPDATE	(ZBX_DATASENDER_HISTORY | ZBX_DATASENDER_DISCOVERY |		\
 					ZBX_DATASENDER_AUTOREGISTRATION | ZBX_DATASENDER_TASKS |	\
 					ZBX_DATASENDER_TASKS_RECV)
-
 
 /******************************************************************************
  *                                                                            *

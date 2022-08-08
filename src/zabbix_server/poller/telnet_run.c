@@ -21,8 +21,9 @@
 
 #include "zbxcomms.h"
 #include "log.h"
+#include "zbxnum.h"
 
-extern char	*CONFIG_SOURCE_IP;
+extern char    *CONFIG_SOURCE_IP;
 
 /*
  * Example: telnet.run["ls /"]

@@ -19,7 +19,9 @@
 
 #include "http.h"
 
-#include "common.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 #include "zbxcomms.h"

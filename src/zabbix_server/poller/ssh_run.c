@@ -33,10 +33,11 @@
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "zbxcomms.h"
 #include "log.h"
+#include "zbxnum.h"
 #endif
 
-extern char	*CONFIG_SOURCE_IP;
-extern char	*CONFIG_SSH_KEY_LOCATION;
+extern char    *CONFIG_SOURCE_IP;
+extern char    *CONFIG_SSH_KEY_LOCATION;
 
 #if defined(HAVE_SSH2)
 static const char	*password;
@@ -333,8 +334,8 @@ close:
 
 	return ret;
 }
-
 #elif defined(HAVE_SSH)
+
 /* example ssh.run["ls /"] */
 int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
