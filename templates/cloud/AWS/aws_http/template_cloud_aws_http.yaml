@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-05T11:12:08Z'
+  date: '2022-08-08T05:08:47Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -184,6 +184,18 @@ zabbix_export:
                 Zabbix.log(3, '[ AWS EC2 ] ERROR: ' + error);
                 return JSON.stringify({ 'error': error });
             }
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#AWS.EC2.INSTANCE.NAME}'
+                value: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#AWS.EC2.INSTANCE.NAME}'
+                value: '{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Get EC2 instances.'
           host_prototypes:
             -
@@ -356,6 +368,18 @@ zabbix_export:
                 Zabbix.log(3, '[ AWS RDS ] ERROR: ' + error);
                 return JSON.stringify({ 'error': error });
             }
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#AWS.RDS.INSTANCE.ID}'
+                value: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#AWS.RDS.INSTANCE.ID}'
+                value: '{$AWS.RDS.LLD.FILTER.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Get RDS instances.'
           host_prototypes:
             -
@@ -395,7 +419,7 @@ zabbix_export:
               path: $.DBInstanceIdentifier
         -
           uuid: ab6a97a108fb4dbc9fd1e07378721ffe
-          name: 'S3 backets discovery'
+          name: 'S3 buckets discovery'
           type: SCRIPT
           key: aws.s3.discovery
           delay: 12h
@@ -543,6 +567,18 @@ zabbix_export:
                 Zabbix.log(3, '[ AWS S3 ] ERROR: ' + error);
                 return JSON.stringify({ 'error': error });
             }
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#AWS.S3.NAME}'
+                value: '{$AWS.S3.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#AWS.S3.NAME}'
+                value: '{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Get S3 bucket instances.'
           host_prototypes:
             -
@@ -603,9 +639,33 @@ zabbix_export:
           macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
         -
+          macro: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable EC2 instances by namespace.'
+        -
+          macro: '{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered EC2 instances by namespace.'
+        -
+          macro: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable RDS instances by namespace.'
+        -
+          macro: '{$AWS.RDS.LLD.FILTER.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered RDS instances by namespace.'
+        -
           macro: '{$AWS.REGION}'
           value: us-west-1
           description: 'Amazon EC2 region code.'
+        -
+          macro: '{$AWS.S3.LLD.FILTER.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable S3 buckets by namespace.'
+        -
+          macro: '{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered S3 buckets by namespace.'
         -
           macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT

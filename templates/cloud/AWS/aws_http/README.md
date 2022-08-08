@@ -69,7 +69,13 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$AWS.ACCESS.KEY.ID} |<p>Access key ID.</p> |`` |
+|{$AWS.EC2.LLD.FILTER.NAME.MATCHES} |<p>Filter of discoverable EC2 instances by namespace.</p> |`.*` |
+|{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES} |<p>Filter to exclude discovered EC2 instances by namespace.</p> |`CHANGE_IF_NEEDED` |
+|{$AWS.RDS.LLD.FILTER.NAME.MATCHES} |<p>Filter of discoverable RDS instances by namespace.</p> |`.*` |
+|{$AWS.RDS.LLD.FILTER.NAME.NOT_MATCHES} |<p>Filter to exclude discovered RDS instances by namespace.</p> |`CHANGE_IF_NEEDED` |
 |{$AWS.REGION} |<p>Amazon EC2 region code.</p> |`us-west-1` |
+|{$AWS.S3.LLD.FILTER.NAME.MATCHES} |<p>Filter of discoverable S3 buckets by namespace.</p> |`.*` |
+|{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES} |<p>Filter to exclude discovered S3 buckets by namespace.</p> |`CHANGE_IF_NEEDED` |
 |{$AWS.SECRET.ACCESS.KEY} |<p>Secret access key.</p> |`` |
 
 ## Template links
@@ -80,9 +86,9 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|EC2 instances discovery |<p>Get EC2 instances.</p> |SCRIPT |aws.ec2.discovery |
-|RDS instances discovery |<p>Get RDS instances.</p> |SCRIPT |aws.rds.discovery |
-|S3 backets discovery |<p>Get S3 bucket instances.</p> |SCRIPT |aws.s3.discovery |
+|EC2 instances discovery |<p>Get EC2 instances.</p> |SCRIPT |aws.ec2.discovery<p>**Filter**:</p>AND <p>- {#AWS.EC2.INSTANCE.NAME} MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.NAME.MATCHES}`</p><p>- {#AWS.EC2.INSTANCE.NAME} NOT_MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}`</p> |
+|RDS instances discovery |<p>Get RDS instances.</p> |SCRIPT |aws.rds.discovery<p>**Filter**:</p>AND <p>- {#AWS.RDS.INSTANCE.ID} MATCHES_REGEX `{$AWS.RDS.LLD.FILTER.NAME.MATCHES}`</p><p>- {#AWS.RDS.INSTANCE.ID} NOT_MATCHES_REGEX `{$AWS.RDS.LLD.FILTER.NAME.NOT_MATCHES}`</p> |
+|S3 buckets discovery |<p>Get S3 bucket instances.</p> |SCRIPT |aws.s3.discovery<p>**Filter**:</p>AND <p>- {#AWS.S3.NAME} MATCHES_REGEX `{$AWS.S3.LLD.FILTER.NAME.MATCHES}`</p><p>- {#AWS.S3.NAME} NOT_MATCHES_REGEX `{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
