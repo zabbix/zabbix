@@ -271,6 +271,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_checked_out',
 						'User type' => 'User',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
@@ -286,11 +287,13 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_checked_out',
 						'User type' => 'Admin',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => []
+						'Data collection' => [],
+						'Alerts' => []
 					],
 					'message_header' => 'Cannot create user role',
 					'message_details' => 'At least one UI element must be enabled for user role "admin_ui_checked_out".'
@@ -302,11 +305,14 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_checked_out',
 						'User type' => 'Super admin',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => [],
+						'Data collection' => [],
+						'Alerts' => [],
+						'Users' => [],
 						'Administration' => []
 					],
 					'message_header' => 'Cannot create user role',
@@ -320,6 +326,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_everything_removed',
 						'User type' => 'User',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
@@ -347,11 +354,13 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_everything_removed',
 						'User type' => 'Admin',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => [],
+						'Data collection' => [],
+						'Alerts' => [],
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
 						'Enabled' => false,
@@ -378,11 +387,14 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_everything_removed',
 						'User type' => 'Super admin',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => [],
+						'Data collection' => [],
+						'Alerts' => [],
+						'Users' => [],
 						'Administration' => [],
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
@@ -523,6 +535,8 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_one_left',
 						'User type' => 'User',
+						'Dashboards' => false,
+						'Monitoring' => [],
 						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => []
@@ -536,10 +550,13 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_one_left',
 						'User type' => 'Admin',
+						'Dashboards' => false,
+						'Monitoring' => [],
 						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => []
+						'Data collection' => [],
+						'Alerts' => []
 					],
 					'message_header' => 'User role created'
 				]
@@ -550,10 +567,14 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_one_left',
 						'User type' => 'Super admin',
+						'Dashboards' => false,
+						'Monitoring' => [],
 						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => [],
+						'Data collection' => [],
+						'Alerts' => [],
+						'Users' => [],
 						'Administration' => []
 					],
 					'message_header' => 'User role created'
@@ -795,7 +816,9 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'Only read-only services',
 						'User type' => 'Super admin',
-						'Read-only access to services' => 'Service list'
+						'Read-only access to services' => 'Service list',
+						// added element 'API methods' with default value for page scroll
+						'API methods' => 'Deny list'
 					],
 					'read_services' => [
 						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service_1', 'Service_2']
@@ -1070,6 +1093,7 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
@@ -1243,7 +1267,9 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Read-only access to services' => 'Service list'
+						'Read-only access to services' => 'Service list',
+						// added element 'API methods' with default value for page scroll
+						'API methods' => 'Deny list'
 					],
 					'read_services' => [
 						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service_1', 'Service_2']
@@ -1257,7 +1283,9 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Read-write access to services' => 'Service list',
-						'Read-only access to services' => 'Service list'
+						'Read-only access to services' => 'Service list',
+						// added element 'API methods' with default value for page scroll
+						'API methods' => 'Deny list'
 					],
 					'write_services' => [
 						'xpath:(//div[@class="multiselect-control"])[1]' => ['Service_1', 'Service_2'],
