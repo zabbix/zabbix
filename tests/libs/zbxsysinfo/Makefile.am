@@ -3,7 +3,9 @@ SUBDIRS = \
 	@ARCH@
 
 if SERVER
-SERVER_tests = parse_item_key
+SERVER_tests = \
+	parse_item_key \
+	check_service_test
 endif
 
 if AGENT
@@ -19,6 +21,16 @@ if SERVER
 parse_item_key_SOURCES = \
 	parse_item_key.c \
 	../../zbxmocktest.h
+
+check_service_test_SOURCES = \
+	../../../src/libs/zbxsysinfo/simple/simple.c \
+	check_service_test.c \
+	../../zbxmocktest.h \
+	../../zbxmockutil.c \
+	../../zbxmockexit.c \
+	../../zbxmockfile.c \
+	../../zbxmocklog.c \
+	../../zbxmockdir.c
 
 parse_item_key_LDADD = \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
@@ -94,6 +106,44 @@ parse_item_key_LDADD += @SERVER_LIBS@
 parse_item_key_LDFLAGS = @SERVER_LDFLAGS@
 
 parse_item_key_CFLAGS = -I@top_srcdir@/tests
+
+check_service_test_LDADD = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
+	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
+	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
+
+check_service_test_LDADD += @SERVER_LIBS@
+check_service_test_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=tcp_expect
+check_service_test_CFLAGS = -I@top_srcdir@/tests
 endif
 
 if AGENT

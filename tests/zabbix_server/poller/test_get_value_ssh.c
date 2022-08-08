@@ -17,16 +17,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_SSH_H
-#define ZABBIX_CHECKS_SSH_H
+#include "test_get_value_ssh.h"
 
-#include "module.h"
-#include "config.h"
+#include "../../../src/zabbix_server/poller/checks_ssh.h"
+
+int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+{
+	ZBX_UNUSED(item);
+	ZBX_UNUSED(result);
+	ZBX_UNUSED(encoding);
+
+	return SYSINFO_RET_OK;
+}
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-#include "dbcache.h"
+int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
+{
+	AGENT_RESULT	result;
+	int		ret;
 
-int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result);
-#endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/
+	init_result(&result);
+	ret = get_value_ssh(item, &result);
 
-#endif
+	if (NULL != result.msg && '\0' != *(result.msg))
+	{
+		*error = zbx_malloc(NULL, sizeof(char) * strlen(result.msg));
+		zbx_strlcpy(*error, result.msg, strlen(result.msg) * sizeof(char));
+	}
+
+	free_result(&result);
+
+	return ret;
+}
+#endif /*POLLER_GET_VALUE_SSH_TEST_H*/
