@@ -1014,8 +1014,7 @@ class testUserRolesPermissions extends CWebTest {
 			$menu = CMainMenuElement::find()->one();
 			if ($data['section'] !== 'Dashboards') {
 				$menu->select($data['section']);
-			}
-			
+			}			
 			if ($data['page'] === $data['section']) {
 				$submenu = $menu->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($data['section']).
 						"]/../ul[@class='submenu']")->one();
@@ -1066,7 +1065,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Latest data',
 						'Maps',
 						'Discovery'
-				]
+					]
 				]		
 			],
 			[
