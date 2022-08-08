@@ -73,9 +73,17 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 				]);
 
 				if ($fields['serviceid'] && !$data['services']) {
-					$data['has_permissions_error'] = true;
+					$service_accessible = API::Service()->get([
+						'output' => [],
+						'serviceids' => $fields['serviceid']
+					]);
+
+					if (!$service_accessible) {
+						$data['has_permissions_error'] = true;
+					}
 				}
-				else {
+
+				if (!$data['has_permissions_error']) {
 					$timezone = new DateTimeZone($data['sla']['timezone'] !== ZBX_DEFAULT_TIMEZONE
 						? $data['sla']['timezone']
 						: CTimezoneHelper::getSystemTimezone()
