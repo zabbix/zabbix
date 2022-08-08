@@ -278,9 +278,10 @@ class CControllerHostEdit extends CController {
 
 		CArrayHelper::sort($data['host']['parentTemplates'], ['name']);
 		$this->extendLinkedTemplates($data['editable_templates']);
-		$this->extendDiscoveryRule($data['editable_discovery_rules']);
 		$this->extendProxies($data['proxies']);
 		$this->extendInventory($data['inventory_items'], $data['inventory_fields']);
+
+		$data['is_discovery_rule_editable'] = $this->isDiscoveryRuleEditable();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of host'));
@@ -367,21 +368,21 @@ class CControllerHostEdit extends CController {
 	}
 
 	/**
-	 * Function to select editable discovery rules for 'Discovered by' link.
+	 * Check if the discovery rule of the host is editable.
 	 *
-	 * @param array $editable_discovery_rule
-	 *
-	 * @return void
+	 * @return bool
 	 */
-	protected function extendDiscoveryRule(?array &$editable_discovery_rule): void {
-		$editable_discovery_rule = $this->host['discoveryRule']
-			? API::DiscoveryRule()->get([
-				'output' => [],
-				'itemids' => $this->host['discoveryRule']['itemid'],
-				'editable' => true,
-				'preservekeys' => true
-			])
-			: [];
+	protected function isDiscoveryRuleEditable(): bool {
+		if (!$this->host['discoveryRule']) {
+			return false;
+		}
+
+		return (bool) API::DiscoveryRule()->get([
+			'output' => [],
+			'itemids' => $this->host['discoveryRule']['itemid'],
+			'editable' => true,
+			'preservekeys' => true
+		]);
 	}
 
 	/**

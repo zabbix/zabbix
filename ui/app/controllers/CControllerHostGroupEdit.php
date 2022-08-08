@@ -83,6 +83,18 @@ class CControllerHostGroupEdit extends CController{
 			$data['hostPrototype'] = $group['hostPrototype'];
 		}
 
+		$data['is_discovery_rule_editable'] = false;
+		if ($data['discoveryRule']) {
+			$data['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => $data['discoveryRule']['itemid'],
+				'editable' => true,
+				'preservekeys' => true
+			]);
+		}
+
+		$data['allowed_ui_conf_hosts'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+
 		// For clone action.
 		if ($this->hasInput('name')) {
 			$data['name'] = $this->getInput('name');

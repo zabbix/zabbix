@@ -118,6 +118,15 @@ class CControllerHostGroupList extends CController {
 		CArrayHelper::sort($data['groups'], [['field' => $sort_field, 'order' => $sort_order]]);
 
 		foreach ($data['groups'] as &$group) {
+			$group['is_discovery_rule_editable'] = false;
+			if ($group['discoveryRule']) {
+				$group['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
+					'output' => [],
+					'itemids' => $group['discoveryRule']['itemid'],
+					'editable' => true,
+					'preservekeys' => true
+				]);
+			}
 			CArrayHelper::sort($group['hosts'], ['name']);
 		}
 		unset($group);

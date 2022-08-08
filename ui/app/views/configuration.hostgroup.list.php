@@ -114,27 +114,34 @@ foreach ($data['groups'] as $group) {
 	$host_count = $data['groupCounts'][$group['groupid']]['hosts'];
 
 	$name = [];
-	if ($group['discoveryRule']) {
-		if ($data['allowed_ui_conf_hosts']) {
-			$lld_name = (new CLink($group['discoveryRule']['name'],
-				(new CUrl('host_prototypes.php'))
-					->setArgument('form', 'update')
-					->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
-					->setArgument('hostid', $group['hostPrototype']['hostid'])
-					->setArgument('context', 'host')
-			));
+
+	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($group['discoveryRule']) {
+			if ($data['allowed_ui_conf_hosts'] && $group['is_discovery_rule_editable']) {
+				$lld_name = (new CLink($group['discoveryRule']['name'],
+					(new CUrl('host_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
+						->setArgument('hostid', $group['hostPrototype']['hostid'])
+						->setArgument('context', 'host')
+				));
+			}
+			elseif ($data['allowed_ui_conf_hosts']) {
+				$lld_name = new CSpan($group['discoveryRule']['name']);
+			}
+			else {
+				$lld_name = new CSpan(_('Inaccessible discovery rule'));
+			}
+
+			$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
 		}
 		else {
-			$lld_name = new CSpan($group['discoveryRule']['name']);
+			$name[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
 		}
 
-		$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
 	}
-	elseif ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-		$name[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
-		$name[] = NAME_DELIMITER;
-	}
+
 	$name[] = (new CLink(CHtml::encode($group['name']),
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'hostgroup.edit')

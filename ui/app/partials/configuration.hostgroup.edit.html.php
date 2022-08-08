@@ -33,19 +33,23 @@ $form = (new CForm())
 
 $form_grid = new CFormGrid();
 
-$discovery_rule = null;
+$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
 
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-	$discovery_rule =  $data['discoveryRule']
-		? new CLink($data['discoveryRule']['name'],
-			(new CUrl('host_prototypes.php'))
-				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
-				->setArgument('hostid', $data['hostPrototype']['hostid'])
-				->setArgument('context', 'host')
-		)
-		: (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
-	$discovered_by = [new CLabel(_('Discovered by')), new CFormField($discovery_rule)];
+	if ($data['discoveryRule']) {
+		if ($data['allowed_ui_conf_hosts'] && $data['is_discovery_rule_editable']) {
+			$discovery_rule = (new CLink($data['discoveryRule']['name'],
+					(new CUrl('host_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+						->setArgument('hostid', $data['hostPrototype']['hostid'])
+						->setArgument('context', 'host')
+				));
+		}
+		elseif ($data['allowed_ui_conf_hosts']) {
+			$discovery_rule = new CSpan($data['discoveryRule']['name']);
+		}
+	}
 }
 
 $form_grid->addItem([[new CLabel(_('Discovered by')), new CFormField($discovery_rule)]]);
