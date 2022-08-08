@@ -45,12 +45,12 @@ foreach (range(1, 7) as $day) {
 	$days_weekly[] = [
 		'label' => getDayOfWeekCaption($day),
 		'value' => $value,
-		'checked' => $data['timeperiod_type'] == (TIMEPERIOD_TYPE_WEEKLY && ($value & $data['dayofweek']))
+		'checked' => $data['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY && ($value & $data['dayofweek'])
 	];
 	$days_monthly[] = [
 		'label' => getDayOfWeekCaption($day),
 		'value' => $value,
-		'checked' => $data['timeperiod_type'] == (TIMEPERIOD_TYPE_MONTHLY && ($value & $data['dayofweek']))
+		'checked' => $data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY && ($value & $data['dayofweek'])
 	];
 }
 
@@ -61,7 +61,7 @@ foreach (range(1, 12) as $month) {
 	$months[] = [
 		'label' => getMonthCaption($month),
 		'value' => $value,
-		'checked' => $data['timeperiod_type'] == (TIMEPERIOD_TYPE_MONTHLY && ($value & $data['month']))
+		'checked' => $data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY && ($value & $data['month'])
 	];
 }
 
