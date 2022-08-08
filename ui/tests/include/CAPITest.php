@@ -137,7 +137,6 @@ class CAPITest extends CTest {
 	public function onBeforeTestCase() {
 		global $URL;
 		$URL = PHPUNIT_URL.'api_jsonrpc.php';
-		CAPIHelper::reset();
 
 		parent::onBeforeTestCase();
 	}
