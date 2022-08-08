@@ -4553,6 +4553,19 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 }
 #endif
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get PSK attributes or certificate attributes from the context of  *
+ *          established connection                                            *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     This function can be used only on server-side of TLS connection.       *
+ *     GnuTLS makes it asymmetric - see documentation for                     *
+ *     gnutls_psk_server_get_username() and gnutls_psk_client_get_hint()      *
+ *     (the latter function is not used in Zabbix).                           *
+ *     Implementation for OpenSSL is server-side only, too.                   *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char **error)
 {
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

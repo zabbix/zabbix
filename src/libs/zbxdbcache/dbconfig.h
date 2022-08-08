@@ -317,6 +317,8 @@ typedef struct
 }
 ZBX_DC_PSK;
 
+ZBX_PTR_VECTOR_DECL(item_ptr, ZBX_DC_ITEM *)
+
 typedef struct
 {
 	zbx_uint64_t	hostid;
@@ -353,7 +355,7 @@ typedef struct
 
 	zbx_vector_ptr_t	interfaces_v;	/* for quick finding of all host interfaces in */
 						/* 'config->interfaces' hashset */
-	zbx_vector_ptr_t	items;
+	zbx_vector_item_ptr_t	active_items;
 }
 ZBX_DC_HOST;
 
