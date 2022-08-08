@@ -124,13 +124,9 @@ abstract class CGraphDraw {
 
 		// i should rename no alpha to alpha at some point to get rid of some confusion
 		foreach ($this->colorsrgb as $name => $RGBA) {
-			if (isset($RGBA[3]) && function_exists('imagecolorexactalpha')
-					&& function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)) {
-				$this->colors[$name] = imagecolorexactalpha($this->im, $RGBA[0], $RGBA[1], $RGBA[2], $RGBA[3]);
-			}
-			else {
-				$this->colors[$name] = imagecolorallocate($this->im, $RGBA[0], $RGBA[1], $RGBA[2]);
-			}
+			$this->colors[$name] = array_key_exists(3, $RGBA)
+				? imagecolorexactalpha($this->im, $RGBA[0], $RGBA[1], $RGBA[2], $RGBA[3])
+				: imagecolorallocate($this->im, $RGBA[0], $RGBA[1], $RGBA[2]);
 		}
 	}
 
@@ -259,7 +255,7 @@ abstract class CGraphDraw {
 		return get_color($this->im, $color, $alfa);
 	}
 
-	public function getShadow($color, $alfa = 0) {
+	public function getShadow($color, $alpha = 0) {
 		if (isset($this->colorsrgb[$color])) {
 			$red = $this->colorsrgb[$color][0];
 			$green = $this->colorsrgb[$color][1];
@@ -270,16 +266,15 @@ abstract class CGraphDraw {
 		}
 
 		if ($this->sum > 0) {
-			$red = (int)($red * 0.6);
-			$green = (int)($green * 0.6);
-			$blue = (int)($blue * 0.6);
+			$red = (int) ($red * 0.6);
+			$green = (int) ($green * 0.6);
+			$blue = (int) ($blue * 0.6);
 		}
 
 		$RGB = [$red, $green, $blue];
 
-		if (isset($alfa) && function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
-				&& @imagecreatetruecolor(1, 1)) {
-			return imagecolorexactalpha($this->im, $RGB[0], $RGB[1], $RGB[2], $alfa);
+		if ($alpha != 0) {
+			return imagecolorexactalpha($this->im, $RGB[0], $RGB[1], $RGB[2], $alpha);
 		}
 
 		return imagecolorallocate($this->im, $RGB[0], $RGB[1], $RGB[2]);

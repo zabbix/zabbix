@@ -544,6 +544,30 @@ void	zbx_audit_host_update_json_update_tag_create_entry(zbx_uint64_t hostid, zbx
 	zbx_audit_update_json_append_no_value(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_UPDATE, buf);
 }
 
+void	zbx_audit_host_update_json_update_tag_tag(zbx_uint64_t hostid, zbx_uint64_t tagid,
+		const char *tag_old, const char *tag_new)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "host.tags[" ZBX_FS_UI64 "].tag", tagid);
+
+	zbx_audit_update_json_update_string(hostid, AUDIT_HOST_ID, buf, tag_old, tag_new);
+}
+
+void	zbx_audit_host_update_json_update_tag_value(zbx_uint64_t hostid, zbx_uint64_t tagid,
+		const char *value_old, const char *value_new)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "host.tags[" ZBX_FS_UI64 "].value", tagid);
+
+	zbx_audit_update_json_update_string(hostid, AUDIT_HOST_ID, buf, value_old, value_new);
+}
+
 void	zbx_audit_host_update_json_update_tag_type(zbx_uint64_t hostid, zbx_uint64_t tagid,
 		int automatic_old, int automatic_new)
 {

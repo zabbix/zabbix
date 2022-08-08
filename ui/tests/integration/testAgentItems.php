@@ -37,6 +37,7 @@ class testAgentItems extends CIntegrationTest {
 	const TEST_LINK_BASE_NAME = 'test_link';
 	const TEST_FILE_NAME = '/tmp/'.self::TEST_FILE_BASE_NAME;
 	const TEST_LINK_NAME = '/tmp/'.self::TEST_LINK_BASE_NAME;
+	const TEST_LINK_NAME2 = '/tmp/'.self::TEST_LINK_BASE_NAME.'2';
 	const TEST_DIR_NAME = '/tmp/dir';
 	const TEST_DIR1_NAME = 'dir1';
 	const TEST_DIR_DIR1_NAME = self::TEST_DIR_NAME.'/'.self::TEST_DIR1_NAME;
@@ -48,6 +49,7 @@ class testAgentItems extends CIntegrationTest {
 
 	private static $hostids = [];
 	private static $itemids = [];
+	private static $results = [];
 
 	// List of items to check.
 	private static $items = [
@@ -269,7 +271,7 @@ class testAgentItems extends CIntegrationTest {
 				]
 		],
 		[
-			'key' => 'vfs.file.get['.self::TEST_LINK_NAME.']',
+			'key' => 'vfs.file.get['.self::TEST_LINK_NAME2.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
@@ -277,19 +279,19 @@ class testAgentItems extends CIntegrationTest {
 			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
 			'result' => [
 					'type' => 'sym',
-					'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME,
-					'user' => 'stat -c %U '.self::TEST_LINK_NAME,
-					'group' => 'stat -c %G '.self::TEST_LINK_NAME,
-					'uid' => 'stat -c %u '.self::TEST_LINK_NAME,
-					'gid' => 'stat -c %g '.self::TEST_LINK_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME2,
+					'user' => 'stat -c %U '.self::TEST_LINK_NAME2,
+					'group' => 'stat -c %G '.self::TEST_LINK_NAME2,
+					'uid' => 'stat -c %u '.self::TEST_LINK_NAME2,
+					'gid' => 'stat -c %g '.self::TEST_LINK_NAME2,
 					'size' => 14,
 					'time' => [
 						'modify' => '2021-03-29T14:59:09+03:00'
 					],
 					'timestamp' => [
-						'access' => 'stat -c %X '.self::TEST_LINK_NAME,
+						'access' => 'stat -c %X '.self::TEST_LINK_NAME2,
 						'modify' => self::TEST_MOD_TIMESTAMP,
-						'change' => 'stat -c %Z '.self::TEST_LINK_NAME
+						'change' => 'stat -c %Z '.self::TEST_LINK_NAME2
 					]
 				]
 		],
@@ -384,9 +386,9 @@ class testAgentItems extends CIntegrationTest {
 					]
 				],
 				[
-					'basename' => self::TEST_FILE_BASE_NAME,
-					'pathname' =>  self::TEST_DIR_FILE_NAME,
-					'dirname' => self::TEST_DIR_NAME,
+					'basename' => self::TEST_LINK_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_LINK_NAME,
+					'dirname' => self::TEST_DIR_DIR1_NAME,
 					'type' => 'sym',
 					'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME,
@@ -454,9 +456,9 @@ class testAgentItems extends CIntegrationTest {
 					]
 				],
 				[
-					'basename' => self::TEST_FILE_BASE_NAME,
-					'pathname' =>  self::TEST_DIR_FILE_NAME,
-					'dirname' => self::TEST_DIR_NAME,
+					'basename' => self::TEST_LINK_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_LINK_NAME,
+					'dirname' => self::TEST_DIR_DIR1_NAME,
 					'type' => 'sym',
 					'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME,
@@ -488,6 +490,138 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'result' => 2
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['user', 'group', 'uid', 'gid', 'threads'],
+			'result' => [
+				[
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agentd',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agentd',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agentd',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agentd',
+					'threads' => 'ps --no-headers -o nlwp:1 -C zabbix_agentd'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['user', 'group', 'uid', 'gid', 'threads'],
+			'result' => [
+				[
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agentd',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agentd',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agentd',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agentd',
+					'threads' => 'ps --no-headers -o nlwp:1 -C zabbix_agentd'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid'],
+			'result' => [
+				[
+					'pid' => 'pgrep zabbix_agent2',
+					'ppid' => 'ps --no-headers -o ppid:1 -C zabbix_agent2',
+					'cmdline' => 'ps --no-headers -o cmd:1 -C zabbix_agent2',
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agent2',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agent2',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agent2',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['pid', 'ppid', 'cmdline', 'user', 'group', 'uid', 'gid'],
+			'result' => [
+				[
+					'pid' => 'pgrep zabbix_agent2',
+					'ppid' => 'ps --no-headers -o ppid:1 -C zabbix_agent2',
+					'cmdline' => 'ps --no-headers -o cmd:1 -C zabbix_agent2',
+					'user' => 'ps --no-headers -o ruser:1 -C zabbix_agent2',
+					'group' => 'ps --no-headers -o rgroup:1 -C zabbix_agent2',
+					'uid' => 'ps --no-headers -o ruid:1 -C zabbix_agent2',
+					'gid' => 'ps --no-headers -o rgid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2,,,thread]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['tid'],
+			'result' => [
+				[
+					'name' => 'zabbix_agent2',
+					'tname' => 'zabbix_agent2',
+					'tid' => 'ps --no-headers -o tid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agent2,,,thread]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['tid'],
+			'result' => [
+				[
+					'name' => 'zabbix_agent2',
+					'tname' => 'zabbix_agent2',
+					'tid' => 'ps --no-headers -o tid:1 -C zabbix_agent2'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd,,,summary]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['processes', 'threads'],
+			'result' => [
+				[
+					'name' => 'zabbix_agentd',
+					'processes' => 'ps --no-headers -C zabbix_agentd | wc -l',
+					'threads' => 'ps --no-headers -T -C zabbix_agentd | wc -l'
+				]
+			]
+		],
+		[
+			'key' => 'proc.get[zabbix_agentd,,,summary]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_COMPARE_LEFT,
+			'fields_exec' => ['processes', 'threads'],
+			'result' => [
+				[
+					'name' => 'zabbix_agentd',
+					'processes' => 'ps --no-headers -C zabbix_agentd | wc -l',
+					'threads' => 'ps --no-headers -T -C zabbix_agentd | wc -l'
+				]
+			]
 		]
 	];
 
@@ -577,11 +711,15 @@ class testAgentItems extends CIntegrationTest {
 		$this->assertTrue(@file_put_contents(self::TEST_DIR_FILE_NAME, "1st line\n2nd line\n3rd line\n") !== false);
 		$this->assertTrue(@touch(self::TEST_DIR_FILE_NAME, self::TEST_MOD_TIMESTAMP));
 
-		// Write test symlink
+		// Write test symlinks
 		if (!file_exists(self::TEST_LINK_NAME)) {
 			$this->assertTrue(@symlink(self::TEST_FILE_NAME, self::TEST_LINK_NAME));
 		}
 		$this->assertTrue(@exec('touch -h -a -m -t 202103291459.09 '.self::TEST_LINK_NAME) !== false);
+		if (!file_exists(self::TEST_LINK_NAME2)) {
+			$this->assertTrue(@symlink(self::TEST_FILE_NAME, self::TEST_LINK_NAME2));
+		}
+		$this->assertTrue(@exec('touch -h -a -m -t 202103291459.09 '.self::TEST_LINK_NAME2) !== false);
 		if (!file_exists(self::TEST_DIR_LINK_NAME)) {
 			$this->assertTrue(@symlink(self::TEST_DIR_FILE_NAME, self::TEST_DIR_LINK_NAME));
 		}
@@ -633,6 +771,7 @@ class testAgentItems extends CIntegrationTest {
 			);
 		}
 
+		$this->updateExpectedResults();
 		$this->getItemData();
 	}
 
@@ -697,6 +836,30 @@ class testAgentItems extends CIntegrationTest {
 	}
 
 	/**
+	 * Update expected result values.
+	 *
+	 * @return array
+	 */
+	public function updateExpectedResults() {
+		foreach(self::$items as $k => $item) {
+
+			if (array_key_exists('json', $item) && array_key_exists('fields_exec', $item)) {
+				self::$results[$item['component'].':'.$item['key']] = self::$items[$k]['result'];
+				foreach ($item['fields_exec'] as $dyn) {
+					$this->dynupdate(self::$results[$item['component'].':'.$item['key']], $dyn);
+				}
+
+			}
+			elseif (array_key_exists('result_exec', $item)) {
+				self::$results[$item['component'].':'.$item['key']] = exec($item['result_exec']);
+			}
+			else {
+				self::$results[$item['component'].':'.$item['key']] = $item['result'];
+			}
+		}
+	}
+
+	/**
 	 * Test if both active and passive go agent checks are processed.
 	 *
 	 * @depends testAgentItems_checkDataCollection
@@ -710,15 +873,7 @@ class testAgentItems extends CIntegrationTest {
 		}
 
 		$value = $data[$item['component'].':'.$item['key']];
-
-		if (array_key_exists('json', $item) && array_key_exists('fields_exec', $item)) {
-			foreach ($item['fields_exec'] as $dyn) {
-				$this->dynupdate($item, $dyn);
-			}
-		}
-		elseif (array_key_exists('result_exec', $item)) {
-			$item['result'] = exec($item['result_exec']);
-		}
+		$result = self::$results[$item['component'].':'.$item['key']];
 
 		switch ($item['valueType']) {
 			case ITEM_VALUE_TYPE_TEXT:
@@ -726,13 +881,13 @@ class testAgentItems extends CIntegrationTest {
 					$jsonval = json_decode($value, true);
 
 					if ($item['json'] === JSON_COMPARE_LEFT) {
-						$this->arrcmpr($item['result'], $jsonval, $item['key']);
+						$this->arrcmpr($result, $jsonval, $item['key']);
 					}
 					elseif ($item['json'] === JSON_COMPARE_RIGHT) {
-						$this->arrcmpr($jsonval, $item['result'], $item['key']);
+						$this->arrcmpr($jsonval, $result, $item['key']);
 					}
 					elseif ($item['json'] === JSON_ARRAY_COMPARE_LEFT) {
-						foreach ($item['result'] as $result_key => $result_value) {
+						foreach ($result as $result_key => $result_value) {
 							$found = false;
 							foreach ($jsonval as $jsonval_key => $jsonval_value) {
 								$found = $found || $this->arrfind($result_value, $jsonval_value);
@@ -743,8 +898,7 @@ class testAgentItems extends CIntegrationTest {
 					elseif ($item['json'] === JSON_ARRAY_COMPARE_RIGHT) {
 						foreach ($jsonval as $jsonval_key => $jsonval_value) {
 							$found = false;
-
-							foreach ($item['result'] as $result_key => $result_value) {
+							foreach ($result as $result_key => $result_value) {
 								$found = $found || $this->arrfind($jsonval_value, $result_value);
 							}
 							self::assertEquals($found, true, 'Value (jsonval_key: '.$jsonval_key.') is not found for '.$item['key']);
@@ -754,26 +908,25 @@ class testAgentItems extends CIntegrationTest {
 				else {
 					if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
 						$value = substr($value, 0, $item['threshold']);
-						$expected = substr($item['result'], 0, $item['threshold']);
+						$expected = substr($result, 0, $item['threshold']);
 					}
 					else {
-						$expected = $item['result'];
+						$expected = $result;
 					}
 
 					$this->assertEquals($expected, $value, 'Received value is not expected for '.$item['key']);
 				}
 				break;
-
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
 				if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
-					$diff = abs(abs($value) - abs($item['result']));
+					$diff = abs(abs($value) - abs($result));
 					$this->assertTrue($diff <= $item['threshold'], 'Received value ('.$value.') for '.$item['key'].
 						' differs more than defined threshold '.$diff.' > '.$item['threshold']
 					);
 				}
 				else {
-					$this->assertEquals($item['result'], $value, 'Received value is not expected for '.$item['key']);
+					$this->assertEquals($result, $value, 'Received value is not expected for '.$item['key']);
 				}
 
 				break;
