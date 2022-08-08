@@ -54,6 +54,7 @@ type Connector struct {
 	addresses                  []string
 	hostname                   string
 	session                    string
+	config_revision            uint64
 	localAddr                  net.Addr
 	lastActiveCheckErrors      []error
 	lastActiveHbErrors         []error
@@ -65,21 +66,23 @@ type Connector struct {
 }
 
 type activeChecksRequest struct {
-	Request       string `json:"request"`
-	Host          string `json:"host"`
-	Version       string `json:"version"`
-	Session       string `json:"session"`
-	HostMetadata  string `json:"host_metadata,omitempty"`
-	HostInterface string `json:"interface,omitempty"`
-	ListenIP      string `json:"ip,omitempty"`
-	ListenPort    int    `json:"port,omitempty"`
+	Request         string `json:"request"`
+	Host            string `json:"host"`
+	Version         string `json:"version"`
+	Session         string `json:"session"`
+	Config_revision uint64 `json:"config_revision"`
+	HostMetadata    string `json:"host_metadata,omitempty"`
+	HostInterface   string `json:"interface,omitempty"`
+	ListenIP        string `json:"ip,omitempty"`
+	ListenPort      int    `json:"port,omitempty"`
 }
 
 type activeChecksResponse struct {
-	Response    string               `json:"response"`
-	Info        string               `json:"info"`
-	Data        []*plugin.Request    `json:"data"`
-	Expressions []*glexpr.Expression `json:"regexp"`
+	Response        string               `json:"response"`
+	Info            string               `json:"info"`
+	Config_revision uint64               `json:"config_revision,omitempty"`
+	Data            []*plugin.Request    `json:"data"`
+	Expressions     []*glexpr.Expression `json:"regexp"`
 }
 
 type agentDataResponse struct {
@@ -149,10 +152,11 @@ func (c *Connector) refreshActiveChecks() {
 	var err error
 
 	a := activeChecksRequest{
-		Request: "active checks",
-		Host:    c.hostname,
-		Version: version.Short(),
-		Session: c.session,
+		Request:         "active checks",
+		Host:            c.hostname,
+		Version:         version.Short(),
+		Session:         c.session,
+		Config_revision: c.config_revision,
 	}
 
 	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.addresses)
@@ -229,10 +233,14 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	if response.Data == nil {
-		log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
-			c.addresses[0])
+		if c.config_revision == 0 {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
+				c.addresses[0])
+		}
 		return
 	}
+
+	c.config_revision = response.Config_revision
 
 	for i := 0; i < len(response.Data); i++ {
 		if len(response.Data[i].Key) == 0 {
