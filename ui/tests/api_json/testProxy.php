@@ -27,11 +27,8 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * @backup hosts
  */
 
-
-class testProxy extends CAPITest
-{
-	public static function proxy_delete()
-	{
+class testProxy extends CAPITest {
+	public static function proxy_delete() {
 		return [
 			// Check proxy id validation.
 			[
@@ -107,8 +104,7 @@ class testProxy extends CAPITest
 		}
 	}
 
-	public static function proxy_get()
-	{
+	public static function proxy_get() {
 		return [
 			// Check successful get.
 			[
@@ -216,8 +212,8 @@ class testProxy extends CAPITest
 	 */
 	public function testProxy_Get($params, $expected_result, $expected_error) {
 		if ($params['proxyids'] === 'proxyid1' || $params['proxyids'] === 'proxyid2'
-				|| $params['proxyids'] === 'proxyid3' || $params['proxyids'] === 'proxyid4'
-				|| $params['proxyids'] === 'proxyid7' || $params['proxyids'] === 'proxyid6') {
+			|| $params['proxyids'] === 'proxyid3' || $params['proxyids'] === 'proxyid4'
+			|| $params['proxyids'] === 'proxyid7' || $params['proxyids'] === 'proxyid6') {
 			$params['proxyids'] = (int) self::$data['proxyids'][$params['proxyids']];
 		}
 
@@ -297,8 +293,8 @@ class testProxy extends CAPITest
 				'host' => 'Active proxy PSK encryption',
 				'status' => 5,
 				'tls_accept' => 2,
-				'tls_psk_identity' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-				'tls_psk' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+				'tls_psk_identity' => 'loremipsumdolorsitametconsecteturadipiscingelit',
+				'tls_psk' => '123123123123123123123123123123123123'
 			],
 			// Active proxy with certificate connection
 			[
@@ -308,18 +304,17 @@ class testProxy extends CAPITest
 				'tls_issuer' => 'Loremipsum',
 				'tls_subject' => ''
 			],
-		// Active proxy with all three connections from proxy
+			// Active proxy with all three connections from proxy
 			[
 				'host' => 'Active proxy all connections',
 				'status' => 5,
 				'tls_accept' => 7,
-				'tls_psk_identity' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-				'tls_psk' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+				'tls_psk_identity' => 'loremipsumdolorsitametconsecteturadipiscingelit',
+				'tls_psk' => '123123123123123123123123123123123123',
 				'tls_issuer' => 'Loremipsum',
 				'tls_subject' => ''
 			],
-
-		// Passive proxy with PSK connection
+			// Passive proxy with PSK connection
 			[
 				'host' => 'Passive proxy with PSK connection to proxy',
 				'status' => 6,
@@ -330,23 +325,23 @@ class testProxy extends CAPITest
 					'port' => '10050'
 				],
 				'tls_connect' => 2,
-				'tls_psk_identity' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-				'tls_psk' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+				'tls_psk_identity' => 'loremipsumdolorsitametconsecteturadipiscingelit',
+				'tls_psk' => '123123123123123123123123123123123123'
 			],
-		// Passive proxy with Certificate connection
+			// Passive proxy with Certificate connection
 			[
-			'host' => 'Passive proxy with Certificate connection to proxy',
-			'status' => 6,
-			'interface' => [
-				'useip' => 0,
-				'ip' => '127.0.0.1',
-				'dns' => 'localhost',
-				'port' => '10050'
-			],
-			'tls_connect' => 4,
-			'tls_issuer' => 'Loremipsum',
-			'tls_subject' => 'Loremipsum'
-		]
+				'host' => 'Passive proxy with Certificate connection to proxy',
+				'status' => 6,
+				'interface' => [
+					'useip' => 0,
+					'ip' => '127.0.0.1',
+					'dns' => 'localhost',
+					'port' => '10050'
+				],
+				'tls_connect' => 4,
+				'tls_issuer' => 'Loremipsum',
+				'tls_subject' => 'Loremipsum'
+			]
 		]);
 
 		$this->assertArrayHasKey('proxyids', $proxies);
