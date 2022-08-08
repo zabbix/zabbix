@@ -23,6 +23,8 @@
 #include "zbxconf.h"
 #include "sysinfo.h"
 #include "log.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

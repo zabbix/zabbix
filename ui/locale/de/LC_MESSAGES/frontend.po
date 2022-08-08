@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-29 08:58+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-07-07 20:32+0000\n"
+"Last-Translator: Stephan Burger <stephan.burger@mail.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -521,10 +521,10 @@ msgstr "Zugriff auf Dienste"
 msgid "Ack"
 msgstr "Bestätigt"
 
-#: app/views/monitoring.widget.problems.view.php:78
+#: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr "Bestätigt"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -622,7 +622,7 @@ msgstr "Aktion"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr "Aktion"
+msgstr ""
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -693,10 +693,10 @@ msgstr "Aktion geändert"
 msgid "Actions"
 msgstr "Aktionen"
 
-#: app/views/monitoring.widget.problems.view.php:79
+#: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr "Aktionen"
+msgstr ""
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -1362,7 +1362,7 @@ msgstr "als Klartext"
 #: app/views/administration.authentication.edit.php:275
 #: app/views/administration.authentication.edit.php:309
 msgid "Assertions"
-msgstr ""
+msgstr "Aussagen"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1479,7 +1479,7 @@ msgstr "Versuche"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "Zuweisung"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1651,7 +1651,7 @@ msgstr "Verfügbar"
 #: app/views/monitoring.widget.hostavail.view.php:37
 msgctxt "compact table header"
 msgid "Available"
-msgstr "Verfügbar"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -3825,7 +3825,7 @@ msgstr "Uhr"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:72
 msgid "Clock type"
-msgstr ""
+msgstr "Typ der Uhr"
 
 #: app/partials/scheduledreport.formgrid.html.php:225
 #: app/views/administration.iconmap.edit.php:139
@@ -3974,6 +3974,13 @@ msgstr "Einträge komprimieren die älter sind als"
 #: app/views/administration.proxy.list.php:80
 msgid "Compression"
 msgstr "Kompression"
+
+#: app/views/administration.housekeeping.edit.php:164
+#: app/views/administration.housekeeping.edit.php:169
+#: app/views/administration.housekeeping.edit.php:174
+#: app/views/administration.housekeeping.edit.php:184
+msgid "Compression is not supported."
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
@@ -5124,7 +5131,7 @@ msgstr "Tag"
 #: include/classes/helpers/CSlaHelper.php:68
 msgctxt "compact table header"
 msgid "Day"
-msgstr "Tag"
+msgstr ""
 
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
@@ -5725,6 +5732,10 @@ msgstr "Details"
 msgid "Details of web scenario"
 msgstr "Details zu Web-Szenario"
 
+#: app/views/administration.housekeeping.edit.php:195
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr "Erkennungszeitraum"
@@ -6051,7 +6062,7 @@ msgstr "Host-Suchläufe"
 #: app/views/monitoring.widget.discovery.view.php:33
 msgctxt "compact table header"
 msgid "Discovery rule"
-msgstr "Host-Suchläufe"
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
@@ -6280,7 +6291,7 @@ msgstr "Downtime"
 #: app/views/monitoring.widget.slareport.view.php:100
 msgctxt "compact table header"
 msgid "Downtime"
-msgstr "Downtime"
+msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
@@ -6346,10 +6357,10 @@ msgstr "Doppelte Benutzer-ID „%1$s“ in Benutzern für Karte „%2$s“."
 msgid "Duration"
 msgstr "Dauer"
 
-#: app/views/monitoring.widget.problems.view.php:77
+#: app/views/monitoring.widget.problems.view.php:80
 msgctxt "compact table header"
 msgid "Duration"
-msgstr "Dauer"
+msgstr ""
 
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
@@ -6780,7 +6791,7 @@ msgstr "Fehler"
 #: app/views/monitoring.widget.slareport.view.php:101
 #: app/views/slareport.list.php:167
 msgid "Error budget"
-msgstr ""
+msgstr "Fehlerbudget"
 
 #: app/views/monitoring.widget.slareport.view.php:101
 msgctxt "compact table header"
@@ -6800,6 +6811,13 @@ msgstr "Fehlermeldung"
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr "Fehler! Der Zabbix-Server kann aufgrund der nicht unterstützten %1$s-Datenbankserverversion nicht gestartet werden. Muss mindestens (%2$s) sein"
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
+msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -6902,7 +6920,7 @@ msgstr "Beispiel: https://localhost/zabbix/ui/"
 #: app/partials/massupdate.macros.tab.php:103
 #: app/partials/massupdate.valuemaps.tab.php:77
 msgid "Except selected"
-msgstr ""
+msgstr "Ausgenommen ausgewählte"
 
 #: app/partials/js/scheduledreport.subscription.js.php:170
 #: app/partials/js/scheduledreport.subscription.js.php:185
@@ -6925,7 +6943,7 @@ msgstr "Ausfallzeiten ausgeschlossen"
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
 msgid "Excluded downtimes"
-msgstr ""
+msgstr "Ausgeschlossene Ausfallzeiten"
 
 #: app/views/monitoring.widget.slareport.view.php:102
 msgctxt "compact table header"
@@ -6938,7 +6956,7 @@ msgstr "Ausführen"
 
 #: include/classes/data/CItemData.php:1586
 msgid "Execute WMI query and return the JSON document with all selected objects"
-msgstr ""
+msgstr "Führen Sie die WMI-Abfrage aus und geben Sie das JSON-Dokument mit allen ausgewählten Objekten zurück"
 
 #: include/classes/data/CItemData.php:1582
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
@@ -7136,10 +7154,10 @@ msgstr "Failover-Verzögerung: %1$s"
 msgid "Failed"
 msgstr "Gescheitert"
 
-#: app/views/monitoring.widget.web.view.php:33
+#: app/views/monitoring.widget.web.view.php:34
 msgctxt "compact table header"
 msgid "Failed"
-msgstr "Gescheitert"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
@@ -7167,7 +7185,7 @@ msgstr "Einfügen des Widgets fehlgeschlagen."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:390
 msgid "Failed to select default LDAP server."
-msgstr ""
+msgstr "Standard-LDAP-Server konnte nicht ausgewählt werden."
 
 #: app/controllers/CControllerDashboardUpdate.php:141
 #: app/controllers/CControllerTemplateDashboardUpdate.php:135
@@ -7187,7 +7205,7 @@ msgstr "Die Eigenschaften der Übersichtsseite konnten nicht aktualisiert werden
 #: app/controllers/CControllerDashboardShareUpdate.php:110
 #: app/views/js/popup.dashboard.share.edit.js.php:83
 msgid "Failed to update dashboard sharing."
-msgstr ""
+msgstr "Die Dashboard-Freigabe konnte nicht aktualisiert werden."
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
@@ -7453,7 +7471,7 @@ msgstr "Formulardaten"
 #: include/classes/widgets/forms/CWidgetFormClock.php:182
 #: include/classes/widgets/forms/CWidgetFormClock.php:242
 msgid "Format"
-msgstr ""
+msgstr "Format"
 
 #: include/items.inc.php:1769 include/views/configuration.item.edit.php:734
 #: include/views/configuration.item.prototype.edit.php:707
@@ -8204,11 +8222,11 @@ msgid_plural "Hosts"
 msgstr[0] "Host"
 msgstr[1] "Host"
 
-#: app/views/monitoring.widget.problems.view.php:63
-#: app/views/monitoring.widget.problems.view.php:64
+#: app/views/monitoring.widget.problems.view.php:66
+#: app/views/monitoring.widget.problems.view.php:67
 msgctxt "compact table header"
 msgid "Host"
-msgstr "Host"
+msgstr ""
 
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
@@ -8301,12 +8319,12 @@ msgstr "Host Graphen"
 msgid "Host group"
 msgstr "Hostgruppe"
 
-#: app/views/monitoring.widget.problemhosts.view.php:31
-#: app/views/monitoring.widget.problemsbysv.view.php:40
-#: app/views/monitoring.widget.web.view.php:31
+#: app/views/monitoring.widget.problemhosts.view.php:32
+#: app/views/monitoring.widget.problemsbysv.view.php:41
+#: app/views/monitoring.widget.web.view.php:32
 msgctxt "compact table header"
 msgid "Host group"
-msgstr "Hostgruppe"
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:760
 #, c-format
@@ -8633,7 +8651,7 @@ msgstr "Ungarisch (hu_HU)"
 #: jsLoader.php:187
 msgctxt "abbreviation of severity level"
 msgid "I"
-msgstr ""
+msgstr "I"
 
 #: app/partials/massupdate.macros.tab.php:111
 msgid "I confirm to remove all macros"
@@ -9857,7 +9875,7 @@ msgstr "Erhöhung um"
 #: app/views/popup.acknowledge.edit.php:90 include/actions.inc.php:1774
 #: include/actions.inc.php:2216 include/html.inc.php:978
 msgid "Indefinitely"
-msgstr ""
+msgstr "Unbegrenzt"
 
 #: app/views/popup.tophosts.column.edit.php:152
 msgid "Indicators"
@@ -9896,11 +9914,11 @@ msgstr "Unendlichkeit"
 msgid "Info"
 msgstr "Info"
 
-#: app/views/monitoring.widget.problems.view.php:60
-#: app/views/monitoring.widget.problems.view.php:61
+#: app/views/monitoring.widget.actionlog.view.php:48
+#: app/views/monitoring.widget.problems.view.php:64
 msgctxt "compact table header"
 msgid "Info"
-msgstr "Info"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -10107,7 +10125,7 @@ msgstr "Ungültiges JSON. Beim Parsen am Server trat ein Fehler auf."
 #: app/controllers/CControllerPopupLdapTestEdit.php:44
 #: app/controllers/CControllerPopupLdapTestSend.php:50
 msgid "Invalid LDAP configuration"
-msgstr ""
+msgstr "Ungültige LDAP-Konfiguration"
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -10501,7 +10519,7 @@ msgstr "Inventarmodus"
 
 #: include/classes/helpers/CRoleHelper.php:480
 msgid "Invoke \"Execute now\" on read-only hosts"
-msgstr ""
+msgstr "Rufen Sie \"Jetzt ausführen\" auf dem schreibgeschützten Hosts auf"
 
 #: app/views/administration.user.list.php:112
 msgid "Is online?"
@@ -10605,7 +10623,7 @@ msgstr "Element im Zustand \"nicht unterstützt\""
 
 #: include/classes/widgets/views/js/widget.svggraph.form.view.js.php:268
 msgid "Item list"
-msgstr ""
+msgstr "Artikelliste"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1564
 msgid "Item not selected"
@@ -10613,7 +10631,7 @@ msgstr "Datenpunkt nicht ausgewählt"
 
 #: include/classes/widgets/views/js/widget.svggraph.form.view.js.php:262
 msgid "Item pattern"
-msgstr ""
+msgstr "Artikelmuster"
 
 #: include/classes/api/services/CItemGeneral.php:1254
 #, c-format
@@ -11273,11 +11291,11 @@ msgstr "Liste ist leer"
 
 #: include/classes/data/CItemData.php:983
 msgid "List of OS processes with attributes. Returns JSON array"
-msgstr ""
+msgstr "Liste der OS-Prozesse mit Attributen. Gibt ein JSON-Array zurück"
 
 #: include/classes/data/CItemData.php:1021
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
-msgstr ""
+msgstr "Liste der Windows-Registrierungswerte oder Schlüssel, die sich unter dem angegebenen Schlüssel befinden. Gibt JSON zurück."
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
@@ -11355,7 +11373,7 @@ msgstr "Lokal"
 
 #: include/classes/widgets/fields/CWidgetFieldTimeZone.php:58
 msgid "Local default"
-msgstr ""
+msgstr "Lokale Vorgabe"
 
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
@@ -11417,7 +11435,7 @@ msgstr "Login Blockadezeitraum"
 
 #: app/controllers/CControllerPopupLdapTestSend.php:86
 msgid "Login failed"
-msgstr ""
+msgstr "Login fehlgeschlagen"
 
 #: include/classes/validators/CLdapAuthValidator.php:87
 msgid "Login name or password is incorrect."
@@ -11425,7 +11443,7 @@ msgstr "Benutzername oder Passwort falsch."
 
 #: app/controllers/CControllerPopupLdapTestSend.php:76
 msgid "Login successful"
-msgstr ""
+msgstr "Anmeldung erfolgreich"
 
 #: app/controllers/CControllerAuditLogList.php:193
 msgid "Logout"
@@ -11455,6 +11473,11 @@ msgstr "Mo"
 msgctxt "Monday short"
 msgid "M"
 msgstr "Mo"
+
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
@@ -11615,12 +11638,12 @@ msgstr "Manuelle Host-Aktion"
 
 #: app/views/popup.acknowledge.edit.php:83
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
-msgstr ""
+msgstr "Manuelle Problemunterdrückung. Die Datum-Uhrzeit-Eingabe akzeptiert relative und absolute Zeitformate."
 
 #: include/html.inc.php:1009
 #, c-format
 msgid "Manually by: %1$s"
-msgstr ""
+msgstr "Manuell von: %1$s"
 
 #: include/actions.inc.php:2070
 msgid "Manually closed"
@@ -11952,7 +11975,7 @@ msgstr "Speichergrenze: %1$s"
 
 #: include/classes/data/CItemData.php:1433
 msgid "Memory metrics of VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id, <mode> - consumed(default)/ballooned/overhead memory"
-msgstr ""
+msgstr "Speichermetriken des VMware-Ressourcenpools, <url> – VMware-Dienst-URL, <rpid> – VMware-Ressourcenpool-ID, <mode> – verbrauchter (Standard)/aufgeblähter/Overhead-Speicher"
 
 #: include/classes/data/CItemData.php:1210
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -11989,7 +12012,7 @@ msgstr "Nachricht"
 #: app/views/monitoring.widget.actionlog.view.php:44
 msgctxt "compact table header"
 msgid "Message"
-msgstr "Nachricht"
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
@@ -12073,6 +12096,11 @@ msgstr "Die minimal erforderliche PHP-Upload-Dateigröße beträgt %1$s (Konfigu
 #, c-format
 msgid "Minimum required PHP version is %1$s."
 msgstr "Die minimal erforderliche PHP-Version ist %1$s."
+
+#: app/views/administration.housekeeping.edit.php:175
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -12257,7 +12285,7 @@ msgstr "Monat"
 #: include/classes/helpers/CSlaHelper.php:70
 msgctxt "compact table header"
 msgid "Month"
-msgstr "Monat"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
@@ -12293,7 +12321,7 @@ msgstr "Besonders kritisch, wenn alle Tochterprozesse Probleme haben"
 
 #: include/classes/helpers/CServiceHelper.php:26
 msgid "Most critical of child services"
-msgstr ""
+msgstr "Am kritischsten gegenüber eines Kind-Services"
 
 #: include/httptest.inc.php:409
 msgid "Mozilla Firefox"
@@ -12324,7 +12352,7 @@ msgstr "N"
 #: jsLoader.php:188
 msgctxt "abbreviation of severity level"
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: include/classes/helpers/CServiceHelper.php:42
 #: include/classes/helpers/CServiceHelper.php:52
@@ -12335,7 +12363,7 @@ msgstr "N%"
 
 #: include/classes/helpers/CSlaHelper.php:183
 msgid "N/A"
-msgstr ""
+msgstr "keine Angabe"
 
 #: include/discovery.inc.php:53
 msgid "NNTP"
@@ -12523,7 +12551,7 @@ msgstr "Name"
 #: app/views/monitoring.widget.plaintext.view.php:49
 msgctxt "compact table header"
 msgid "Name"
-msgstr "Name"
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
@@ -12608,11 +12636,11 @@ msgstr "Niemals"
 
 #: app/views/popup.token.edit.php:162
 msgid "New API token"
-msgstr ""
+msgstr "Neuer API-Token"
 
 #: app/views/popup.ldap.edit.php:145
 msgid "New LDAP server"
-msgstr ""
+msgstr "neuer LDAP-Server"
 
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
@@ -12644,7 +12672,7 @@ msgstr "Neues Element"
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
 msgid "New event host group"
-msgstr ""
+msgstr "Neues Ereignis einer Host-Gruppe"
 
 #: include/classes/helpers/CCorrelationHelper.php:53
 #: include/classes/helpers/CCorrelationHelper.php:123
@@ -12657,7 +12685,7 @@ msgstr "Neuer Ereignis-Marker Wert"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:94
 msgid "New excluded downtime"
-msgstr ""
+msgstr "Neue Ausfallzeiten ausgeschlossen"
 
 #: app/views/configuration.host.edit.php:65 app/views/popup.host.edit.php:97
 msgid "New host"
@@ -12925,7 +12953,7 @@ msgstr "Keine neuen Module entdeckt"
 #: include/classes/api/services/CAction.php:2779
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
-msgstr ""
+msgstr "Keine Vorgänge für Aktion „%1$s“ definiert."
 
 #: include/classes/api/services/CUser.php:1550
 #: include/classes/api/services/CUser.php:2029
@@ -13294,7 +13322,7 @@ msgstr "Nicht alle Vorlagen sind mit \"%1$s\" verknüpft."
 #: include/classes/api/services/CUserMacro.php:569
 #, c-format
 msgid "Not allowed to modify automatic user macro \"%1$s\"."
-msgstr ""
+msgstr "Das automatische Benutzermakro „%1$s“ darf nicht geändert werden."
 
 #: include/classes/api/services/CUser.php:577
 msgid "Not allowed to set language for user \"guest\"."
@@ -13324,7 +13352,7 @@ msgstr "Nicht verfügbar"
 #: app/views/monitoring.widget.hostavail.view.php:38
 msgctxt "compact table header"
 msgid "Not available"
-msgstr "Nicht verfügbar"
+msgstr ""
 
 # festgelegt, eingestuft?
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
@@ -13387,7 +13415,7 @@ msgstr "Anzahl der verfügbaren DS-Pfade, <url> - VMware-Service-URL, <uuid> - V
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:463
 msgid "Number of columns"
-msgstr ""
+msgstr "Anzahl der Spalten"
 
 #: include/classes/data/CItemData.php:882
 msgid "Number of currently open file descriptors. Returns integer"
@@ -13460,7 +13488,7 @@ msgstr "Zeilenzahl"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:126
 msgid "Number of seasons"
-msgstr ""
+msgstr "Anzahl der Saisonen"
 
 #: include/views/reports.toptriggers.php:86
 msgid "Number of status changes"
@@ -13616,10 +13644,10 @@ msgstr "Aus"
 msgid "Ok"
 msgstr "Ok"
 
-#: app/views/monitoring.widget.web.view.php:32
+#: app/views/monitoring.widget.web.view.php:33
 msgctxt "compact table header"
 msgid "Ok"
-msgstr "Ok"
+msgstr ""
 
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
@@ -13698,11 +13726,11 @@ msgstr[1] "Nur ausgewählte Probleme"
 
 #: app/views/service.list.edit.php:86
 msgid "Only services without children"
-msgstr ""
+msgstr "Nur Dienste ohne Kinder"
 
 #: app/views/service.list.edit.php:94
 msgid "Only services without problem tags"
-msgstr ""
+msgstr "Nur Dienste ohne Problem-Tags"
 
 #: include/classes/api/services/CDashboard.php:414
 msgid "Only super admins can set dashboard owner."
@@ -13766,10 +13794,10 @@ msgstr "Operation hat keine zugeordneten Vorlagen zur Ausführung."
 msgid "Operational data"
 msgstr "Operative Daten"
 
-#: app/views/monitoring.widget.problems.view.php:75
+#: app/views/monitoring.widget.problems.view.php:78
 msgctxt "compact table header"
 msgid "Operational data"
-msgstr "Operative Daten"
+msgstr ""
 
 #: app/views/configuration.correlation.edit.php:145
 #: app/views/configuration.correlation.list.php:78
@@ -13852,7 +13880,7 @@ msgstr "Befehl"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:145
 msgid "Order column"
-msgstr ""
+msgstr "Bestellen einer Spalte"
 
 #: app/partials/massupdate.macros.tab.php:119
 #: app/partials/massupdate.valuemaps.tab.php:89
@@ -14299,7 +14327,7 @@ msgstr "Übergeordnete Web-Szenarien"
 #: include/classes/api/services/CService.php:1357
 #, c-format
 msgid "Parent-child relation conflict in services \"%1$s\" and \"%2$s\"."
-msgstr ""
+msgstr "Eltern-Kind-Beziehungskonflikt in den Diensten „%1$s“ und „%2$s“."
 
 #: app/views/popup.httpstep.php:58
 #: include/views/configuration.host.discovery.edit.php:99
@@ -14586,6 +14614,10 @@ msgstr "Portugiesisch (pt_PT)"
 msgid "Position"
 msgstr "Position"
 
+#: include/classes/widgets/views/widget.item.form.view.php:143
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "Beitragsfelder erstellen"
@@ -14593,6 +14625,10 @@ msgstr "Beitragsfelder erstellen"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "Beitragstyp"
+
+#: app/views/administration.housekeeping.edit.php:165
+msgid "PostgreSQL database server version is too old."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -14633,7 +14669,7 @@ msgstr "Präprozessorschritte"
 #: app/controllers/CControllerPopupItemTestSend.php:196
 #: app/views/popup.itemtestedit.view.php:289
 msgid "Prev. time"
-msgstr ""
+msgstr "vorherige Zeit"
 
 #: app/views/administration.iconmap.edit.php:82
 #: app/views/administration.iconmap.edit.php:116
@@ -14755,11 +14791,11 @@ msgstr "Berechtigungsebene"
 msgid "Problem"
 msgstr "Problem"
 
-#: app/views/monitoring.widget.problems.view.php:67
-#: app/views/monitoring.widget.problems.view.php:68
+#: app/views/monitoring.widget.problems.view.php:70
+#: app/views/monitoring.widget.problems.view.php:71
 msgctxt "compact table header"
 msgid "Problem"
-msgstr "Problem"
+msgstr ""
 
 #: include/actions.inc.php:2059
 msgid "Problem created"
@@ -14893,7 +14929,7 @@ msgstr "Der angegebene geheime Pfad „%1$s“ ist ungültig."
 #: include/classes/vaults/CVaultCyberArk.php:70
 #, c-format
 msgid "Provided secret query string \"%1$s\" is invalid."
-msgstr ""
+msgstr "Die angegebene geheime Abfragezeichenfolge \"%1$s\" ist ungültig."
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
@@ -14986,7 +15022,7 @@ msgstr "Datei mit öffentlichem Schlüssel"
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
-msgstr ""
+msgstr "Quartal"
 
 #: include/classes/helpers/CSlaHelper.php:71
 msgctxt "compact table header"
@@ -14995,7 +15031,7 @@ msgstr ""
 
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
-msgstr ""
+msgstr "Vierteljährlich"
 
 #: app/views/popup.httpstep.php:64
 #: include/views/configuration.host.discovery.edit.php:182
@@ -15034,7 +15070,7 @@ msgstr "Warteschlangenübersicht"
 #: app/views/administration.queue.overview.proxy.php:36
 #: include/classes/helpers/CMenuHelper.php:320
 msgid "Queue overview by proxy"
-msgstr ""
+msgstr "Warteschlangenübersicht per Proxy"
 
 #: app/views/hintbox.eventlist.php:100
 #: app/views/monitoring.widget.problems.view.php:93
@@ -15057,7 +15093,7 @@ msgstr "Primärdaten"
 
 #: app/views/popup.httpstep.php:110
 msgid "Raw post"
-msgstr ""
+msgstr "Rohfassung"
 
 #: app/partials/administration.usergroup.grouprights.html.php:70
 #: app/views/administration.script.edit.php:246
@@ -15108,7 +15144,7 @@ msgstr "Lese- und Schreibzugriff auf Dienste"
 #: app/views/administration.user.edit.php:514
 #: app/views/administration.userrole.edit.php:164
 msgid "Read-write access to services with tag"
-msgstr ""
+msgstr "Lese- und Schreibzugriff auf Dienste mit Tag"
 
 #: include/classes/data/CItemData.php:902
 msgid "Reads modbus data. Returns various types"
@@ -15138,11 +15174,11 @@ msgstr "Aktuelle Probleme"
 msgid "Recipient"
 msgstr "Empfänger"
 
-#: app/views/monitoring.widget.actionlog.view.php:41
 #: app/views/monitoring.widget.actionlog.view.php:42
+#: app/views/monitoring.widget.actionlog.view.php:43
 msgctxt "compact table header"
 msgid "Recipient"
-msgstr "Empfänger"
+msgstr ""
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
@@ -15155,7 +15191,7 @@ msgstr "Empfänger"
 #: app/views/reports.auditlog.list.php:73
 #: app/views/reports.auditlog.list.php:96
 msgid "Recordset ID"
-msgstr ""
+msgstr "Recordset-ID"
 
 #: app/views/administration.user.edit.php:682
 #: include/classes/screens/CScreenProblem.php:1062
@@ -15191,10 +15227,10 @@ msgstr "Wiederherstellungsmassnahmen"
 msgid "Recovery time"
 msgstr "Wiederherstellungszeit"
 
-#: app/views/monitoring.widget.problems.view.php:56
+#: app/views/monitoring.widget.problems.view.php:59
 msgctxt "compact table header"
 msgid "Recovery time"
-msgstr "Wiederherstellungszeit"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:371
 #: include/views/js/monitoring.sysmaps.js.php:531
@@ -15207,15 +15243,15 @@ msgstr "Aktualisieren"
 
 #: app/views/popup.proxy.edit.php:216 app/views/proxy.list.php:178
 msgid "Refresh configuration"
-msgstr ""
+msgstr "Konfiguration aktualisieren"
 
 #: app/views/js/proxy.list.js.php:106
 msgid "Refresh configuration of the selected proxies?"
-msgstr ""
+msgstr "Konfiguration der ausgewählten Proxys aktualisieren?"
 
 #: app/views/js/proxy.list.js.php:107 app/views/popup.proxy.edit.php:217
 msgid "Refresh configuration of the selected proxy?"
-msgstr ""
+msgstr "Konfiguration des ausgewählten Proxys aktualisieren?"
 
 #: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:169
 msgid "Refresh interval"
@@ -15558,14 +15594,14 @@ msgstr "Berichte"
 #: include/views/configuration.item.edit.php:365
 #: include/views/configuration.item.prototype.edit.php:351
 msgid "Request body"
-msgstr ""
+msgstr "Anforderungstext"
 
 #: app/views/popup.massupdate.item.php:90
 #: include/views/configuration.host.discovery.edit.php:297
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.prototype.edit.php:340
 msgid "Request body type"
-msgstr ""
+msgstr "Körpertyp anfordern"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:71
 msgid "Request created successfully"
@@ -15577,7 +15613,7 @@ msgstr "Anfrage erfolgreich gesendet"
 
 #: app/controllers/CControllerItemMassCheckNow.php:236
 msgid "Request sent successfully. Some items are filtered due to access permissions or type."
-msgstr ""
+msgstr "Anfrage erfolgreich gesendet. Einige Elemente werden aufgrund von Zugriffsberechtigungen oder Typ gefiltert."
 
 #: include/views/configuration.host.discovery.edit.php:271
 #: include/views/configuration.item.edit.php:328
@@ -15653,7 +15689,7 @@ msgstr "Auf Standardwerte zurücksetzen"
 
 #: jsLoader.php:174
 msgid "Reset to initial view"
-msgstr ""
+msgstr "Auf Ausgangsansicht zurücksetzen"
 
 #: jsLoader.php:293
 msgid "Resolved"
@@ -15695,7 +15731,7 @@ msgstr "Anzeigeelement"
 
 #: app/views/reports.auditlog.list.php:67
 msgid "Resource ID"
-msgstr ""
+msgstr "Ressourcen-ID"
 
 #: app/views/popup.mediatypetest.edit.php:46 app/views/popup.scriptexec.php:47
 msgid "Response"
@@ -15748,14 +15784,14 @@ msgstr "Ergebnistyp"
 
 #: app/views/js/popup.itemtestedit.view.js.php:321
 msgid "Result with value map applied"
-msgstr ""
+msgstr "Ergebnis mit angewendeter Wertekarte"
 
 #: app/views/popup.httpstep.php:158
 #: include/views/configuration.host.discovery.edit.php:398
 #: include/views/configuration.item.edit.php:456
 #: include/views/configuration.item.prototype.edit.php:434
 msgid "Retrieve mode"
-msgstr ""
+msgstr "Abrufmodus"
 
 #: include/classes/data/CItemData.php:1154
 msgid "Retrieving contents of a file. Returns text"
@@ -15829,7 +15865,7 @@ msgstr "Gibt den Prozentsatz der verlorenen ICMP-Ping-Pakete zurück."
 #: app/partials/hostmacros.inherited.list.html.php:105
 #: app/partials/hostmacros.list.html.php:77 jsLoader.php:331
 msgid "Revert"
-msgstr ""
+msgstr "Zurückkehren"
 
 #: include/classes/html/CMacroValue.php:94
 msgid "Revert changes"
@@ -16001,7 +16037,7 @@ msgstr "SLA mit der ID „%1$s“ ist nicht verfügbar."
 #: app/views/monitoring.widget.slareport.view.php:98
 #: app/views/slareport.list.php:164
 msgid "SLI"
-msgstr ""
+msgstr "SLI"
 
 #: app/views/monitoring.widget.slareport.view.php:98
 msgctxt "compact table header"
@@ -16014,7 +16050,7 @@ msgstr ""
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
 msgid "SLO"
-msgstr ""
+msgstr "SLO"
 
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
@@ -16072,7 +16108,7 @@ msgstr "SNMP-OID"
 
 #: include/items.inc.php:89
 msgid "SNMP agent"
-msgstr ""
+msgstr "SNMP-Agent"
 
 #: app/controllers/CControllerPopupItemTest.php:1295
 #: app/partials/configuration.host.interface.row.php:91
@@ -16136,7 +16172,7 @@ msgstr "SP-Entitäts-ID"
 
 #: app/views/administration.authentication.edit.php:257
 msgid "SP name ID format"
-msgstr ""
+msgstr "SP Namen ID Format"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -16420,11 +16456,11 @@ msgstr "Suchmuster ist leer"
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
 msgid "Season"
-msgstr ""
+msgstr "Jahreszeit"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1121
 msgid "Season deviation window"
-msgstr ""
+msgstr "Saisonabweichungsfenster"
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
@@ -16650,7 +16686,7 @@ msgstr "Dienst"
 #: app/views/monitoring.widget.slareport.view.php:37
 msgctxt "compact table header"
 msgid "Service"
-msgstr "Dienst"
+msgstr ""
 
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
@@ -16851,11 +16887,11 @@ msgstr "Einstellungen"
 msgid "Severity"
 msgstr "Schweregrad"
 
-#: app/views/monitoring.widget.problems.view.php:71
-#: app/views/monitoring.widget.problems.view.php:72
+#: app/views/monitoring.widget.problems.view.php:74
+#: app/views/monitoring.widget.problems.view.php:75
 msgctxt "compact table header"
 msgid "Severity"
-msgstr "Schweregrad"
+msgstr ""
 
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
@@ -17048,7 +17084,7 @@ msgstr "Steuerung des Seitenbreichs"
 
 #: app/views/administration.authentication.edit.php:265
 msgid "Sign"
-msgstr ""
+msgstr "Zeichen"
 
 #: include/views/general.login.php:65 include/views/general.login.php:80
 msgid "Sign in"
@@ -17409,12 +17445,12 @@ msgstr "Statistik und Verfügbarkeit des Zabbix-Schreibcache. Cache - einer der 
 msgid "Status"
 msgstr "Status"
 
-#: app/views/monitoring.widget.actionlog.view.php:45
 #: app/views/monitoring.widget.actionlog.view.php:46
-#: app/views/monitoring.widget.problems.view.php:59
+#: app/views/monitoring.widget.actionlog.view.php:47
+#: app/views/monitoring.widget.problems.view.php:62
 msgctxt "compact table header"
 msgid "Status"
-msgstr "Status"
+msgstr ""
 
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
@@ -17536,7 +17572,7 @@ msgstr "Gespeichert in HashiCorp Vault Secret"
 #: include/classes/setup/CSetupWizard.php:757
 #: include/classes/setup/CSetupWizard.php:758
 msgid "Stored in Vault secret"
-msgstr ""
+msgstr "Gespeichert im geheimen Tresor"
 
 # Autorisierungs-Form-IPMI
 #: include/hosts.inc.php:35
@@ -17863,10 +17899,10 @@ msgstr "Tag Werte"
 msgid "Tags"
 msgstr "Marker"
 
-#: app/views/monitoring.widget.problems.view.php:80
+#: app/views/monitoring.widget.problems.view.php:83
 msgctxt "compact table header"
 msgid "Tags"
-msgstr "Marker"
+msgstr ""
 
 #: include/views/configuration.copy.elements.php:69
 #: include/views/configuration.trigger.prototype.edit.php:202
@@ -18407,11 +18443,13 @@ msgstr "Bis"
 msgid "Time"
 msgstr "Zeit"
 
-#: app/views/monitoring.widget.actionlog.view.php:34
 #: app/views/monitoring.widget.actionlog.view.php:35
+#: app/views/monitoring.widget.actionlog.view.php:36
+#: app/views/monitoring.widget.problems.view.php:40
+#: app/views/monitoring.widget.problems.view.php:41
 msgctxt "compact table header"
 msgid "Time"
-msgstr "Zeit"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
@@ -18479,7 +18517,7 @@ msgstr "Zeitstempel"
 #: app/views/monitoring.widget.plaintext.view.php:33
 msgctxt "compact table header"
 msgid "Timestamp"
-msgstr "Zeitstempel"
+msgstr ""
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
@@ -18538,10 +18576,11 @@ msgstr ""
 msgid "Total"
 msgstr "Summe"
 
-#: app/views/monitoring.widget.problemhosts.view.php:34
+#: app/views/monitoring.widget.hostavail.view.php:40
+#: app/views/monitoring.widget.problemhosts.view.php:35
 msgctxt "compact table header"
 msgid "Total"
-msgstr "Summe"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -19049,11 +19088,11 @@ msgstr "Zwei oder mehr Felder können nicht denselben Platz einnehmen."
 msgid "Type"
 msgstr "Typ"
 
-#: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.actionlog.view.php:39
+#: app/views/monitoring.widget.actionlog.view.php:40
 msgctxt "compact table header"
 msgid "Type"
-msgstr "Typ"
+msgstr ""
 
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
@@ -19201,6 +19240,14 @@ msgstr "Parameter der Einstellungs-API können nicht geladen werden."
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Die vorhandene Konfigurationsdatei kann nicht überschrieben werden."
 
+#: app/views/administration.housekeeping.edit.php:160
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:170
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr "Die Datenbankversion kann nicht abgerufen werden."
@@ -19311,10 +19358,11 @@ msgstr "Einheit"
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: app/views/monitoring.widget.web.view.php:34
+#: app/views/monitoring.widget.hostavail.view.php:39
+#: app/views/monitoring.widget.web.view.php:35
 msgctxt "compact table header"
 msgid "Unknown"
-msgstr "Unbekannt"
+msgstr ""
 
 #: app/views/reports.auditlog.list.php:119
 msgid "Unknown action"
@@ -19386,6 +19434,26 @@ msgstr "Verbindung mit Vorlagen entfernen"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Ton an"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:179
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:189
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -19576,7 +19644,7 @@ msgstr "Laufzeit"
 #: app/views/monitoring.widget.slareport.view.php:99
 msgctxt "compact table header"
 msgid "Uptime"
-msgstr "Laufzeit"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1686
 msgid "Uptime of Zabbix server process in seconds."
@@ -19973,13 +20041,33 @@ msgstr ""
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware Zwischenspeicher-Statistik. Erlaubte Modi: total, free, pfree, used und pused."
 
+#: include/classes/data/CItemData.php:1252
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Leistungsindikator des VMware-Clusters, <url> – URL des VMware-Dienstes, <id> – VMware-Cluster-ID, <Pfad> – Pfad des Leistungsindikators, <Instanz> – Instanz des Leistungsindikators"
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware-Clusterstatus, <url> – VMware-Dienst-URL, <name> – VMware-Clustername"
+
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1296
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1304
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -19988,6 +20076,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr "VMware-Rechenzentren und ihre IDs. Gibt JSON zurück"
+
+#: include/classes/data/CItemData.php:1268
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
@@ -19998,9 +20090,17 @@ msgstr "Kapazitätsstatistik des VMware-Datenspeichers in Byte oder als Prozents
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Liste der VMware-Datenspeicher-Hypervisoren, <url> – VMware-Dienst-URL, <Datenspeicher> – Datenspeichername"
 
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "Lesestatistiken des VMware-Datenspeichers, <url> – VMware-Dienst-URL, <Datenspeicher> – Datenspeichername, <Modus> – Latenz/MaxLatenz – Durchschnitt oder Maximum"
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20017,6 +20117,10 @@ msgstr "VMware-Hypervisor-BIOS-UUID, <url> – VMware-Dienst-URL, <uuid> – VMw
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "VMware-Hypervisor-HW-Herstellerzustandssensoren, <url> – VMware-Dienst-URL, <uuid> – VMware-Hypervisor-Hostname. Gibt JSON zurück"
+
+#: include/classes/data/CItemData.php:1324
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20086,6 +20190,10 @@ msgstr ""
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
@@ -20096,6 +20204,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1330
@@ -20124,6 +20236,14 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1244
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1500
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1454
@@ -20206,6 +20326,10 @@ msgstr ""
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
@@ -20220,6 +20344,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1664
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1591
@@ -20322,7 +20450,7 @@ msgstr "Wert"
 #: app/views/monitoring.widget.plaintext.view.php:51
 msgctxt "compact table header"
 msgid "Value"
-msgstr "Wert"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
@@ -20583,10 +20711,24 @@ msgstr "Warnung"
 msgid "Warning message"
 msgstr "Warnmeldung"
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr "Warnung! Nicht unterstützte Version des Datenbankservers %1$s. Sollte mindestens (%2$s) sein"
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
+msgstr ""
 
 # "remember"?
 #: jsLoader.php:301
@@ -20782,10 +20924,10 @@ msgstr "Mit Problemname"
 msgid "With problems"
 msgstr "Mit Problemen"
 
-#: app/views/monitoring.widget.problemhosts.view.php:33
+#: app/views/monitoring.widget.problemhosts.view.php:34
 msgctxt "compact table header"
 msgid "With problems"
-msgstr "Mit Problemen"
+msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
@@ -20803,10 +20945,10 @@ msgstr ""
 msgid "Without problems"
 msgstr "Ohne Probleme"
 
-#: app/views/monitoring.widget.problemhosts.view.php:32
+#: app/views/monitoring.widget.problemhosts.view.php:33
 msgctxt "compact table header"
 msgid "Without problems"
-msgstr "Ohne Probleme"
+msgstr ""
 
 #: include/forms.inc.php:343
 msgid "Without triggers"
@@ -21002,7 +21144,7 @@ msgstr "Jahr"
 #: include/classes/helpers/CSlaHelper.php:72
 msgctxt "compact table header"
 msgid "Year"
-msgstr "Jahr"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93

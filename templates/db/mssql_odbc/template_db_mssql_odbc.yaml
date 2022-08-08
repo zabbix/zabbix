@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:36:28Z'
+  version: '6.4'
+  date: '2022-07-21T13:44:03Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -25,7 +25,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Databases
@@ -2133,7 +2133,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Indicates the recovery health of a secondary replica replica:
+                Indicates the recovery health of a secondary replica:
                 0 = In progress
                 1 = Online
                 2 = Unavailable

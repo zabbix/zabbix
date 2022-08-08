@@ -24,6 +24,7 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxrtc.h"
+#include "zbxtime.h"
 
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

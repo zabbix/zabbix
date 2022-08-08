@@ -24,6 +24,8 @@
 #include "zbxexec.h"
 #include "log.h"
 #include <signal.h>
+#include "zbxstr.h"
+#include "zbxip.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_FPING_LOCATION;
