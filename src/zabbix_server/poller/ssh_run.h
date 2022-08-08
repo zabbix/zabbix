@@ -17,16 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_SSH_H
-#define ZABBIX_CHECKS_SSH_H
+#ifndef ZABBIX_SSH_RUN_H
+#define ZABBIX_SSH_RUN_H
 
-#include "module.h"
 #include "config.h"
+#include "module.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "dbcache.h"
 
-int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result);
+int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
 #endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/
 
 #endif

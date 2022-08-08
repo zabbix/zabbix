@@ -17,16 +17,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_SSH_H
-#define ZABBIX_CHECKS_SSH_H
+#include "test_get_value_telnet.h"
 
-#include "module.h"
-#include "config.h"
+#include "../../../src/zabbix_server/poller/checks_telnet.h"
 
-#if defined(HAVE_SSH2) || defined(HAVE_SSH)
-#include "dbcache.h"
+int	__wrap_telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+{
+	ZBX_UNUSED(item);
+	ZBX_UNUSED(result);
+	ZBX_UNUSED(encoding);
 
-int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result);
-#endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/
+	return SYSINFO_RET_OK;
+}
 
-#endif
+int	zbx_get_value_telnet_test_run(DC_ITEM *item, char **error)
+{
+	AGENT_RESULT	result;
+	int		ret;
+
+	init_result(&result);
+	ret = get_value_telnet(item, &result);
+
+	if (NULL != result.msg && '\0' != *(result.msg))
+	{
+		*error = zbx_malloc(NULL, sizeof(char) * strlen(result.msg));
+		zbx_strlcpy(*error, result.msg, strlen(result.msg) * sizeof(char));
+	}
+
+	free_result(&result);
+
+	return ret;
+}
