@@ -64,7 +64,7 @@ $filter = (new CFilter())
 					(new CRadioButtonList('filter_version', (int) $data['filter']['version']))
 						->addValue(_('Any'), -1)
 						->addValue(_('Current'), ZBX_PROXY_VERSION_CURRENT)
-						->addValue(_('Outdated'), 4)
+						->addValue(_('Outdated'), ZBX_PROXY_VERSION_ALL_OUTDATED)
 						->setModern(true)
 				)
 			])
@@ -93,7 +93,6 @@ $proxy_list = (new CTableInfo())
 		_('Required vps'),
 		_('Hosts')
 	]);
-
 
 foreach ($data['proxies'] as $proxyid => $proxy) {
 	$hosts = [];
