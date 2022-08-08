@@ -241,6 +241,21 @@ class CControllerHostList extends CController {
 			'preservekeys' => true
 		]);
 
+		foreach ($hosts as &$host) {
+			if ($host['discoveryRule']) {
+				$host['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
+					'output' => [],
+					'itemids' => $host['discoveryRule']['itemid'],
+					'editable' => true,
+					'preservekeys' => true
+				]);
+			}
+			else {
+				$host['is_discovery_rule_editable'] = false;
+			}
+		}
+		unset($host);
+
 		order_result($hosts, $sort_field, $sort_order);
 
 		// Selecting linked templates to templates linked to hosts.

@@ -145,7 +145,7 @@ foreach ($this->data['groups'] as $group) {
 
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 		if ($group['discoveryRule']) {
-			if ($data['allowed_ui_conf_hosts']) {
+			if ($data['allowed_ui_conf_hosts'] && $group['is_discovery_rule_editable']) {
 				$lld_name = (new CLink($group['discoveryRule']['name'],
 					(new CUrl('host_prototypes.php'))
 						->setArgument('form', 'update')
@@ -154,8 +154,11 @@ foreach ($this->data['groups'] as $group) {
 						->setArgument('context', 'host')
 				));
 			}
-			else {
+			elseif ($data['allowed_ui_conf_hosts']) {
 				$lld_name = new CSpan($group['discoveryRule']['name']);
+			}
+			else {
+				$lld_name = new CSpan(_('Inaccessible discovery rule'));
 			}
 
 			$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
