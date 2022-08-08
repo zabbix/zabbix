@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxnum.h"
 #include "zbxvariant.h"
 
 static unsigned int	hex2num(char c)
@@ -110,7 +110,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	ZBX_DOUBLE_EPSILON = 0.000001;
+	zbx_update_epsilon_to_float_precision();
 
 	mock_read_variant("in.value1", &value1);
 	mock_read_variant("in.value2", &value2);

@@ -335,7 +335,6 @@ void	zbx_list_iterator_update(zbx_list_iterator_t *iterator)
 		iterator->next = iterator->current->next;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: removes next iterator value from list                             *

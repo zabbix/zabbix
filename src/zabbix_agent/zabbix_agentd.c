@@ -22,6 +22,8 @@
 #include "zbxgetopt.h"
 #include "zbxcomms.h"
 #include "modbtype.h"
+#include "zbxstr.h"
+#include "zbxip.h"
 
 static char	*CONFIG_PID_FILE = NULL;
 

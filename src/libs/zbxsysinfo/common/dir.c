@@ -18,9 +18,11 @@
 **/
 
 #include "dir.h"
-
-#include "common.h"
 #include "sysinfo.h"
+
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
 #include "zbxregexp.h"
 #include "log.h"
 

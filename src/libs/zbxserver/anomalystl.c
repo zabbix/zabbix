@@ -19,7 +19,7 @@
 
 #include "anomalystl.h"
 
-#include "common.h"
+#include "zbxnum.h"
 #include "log.h"
 #include "zbxeval.h"
 

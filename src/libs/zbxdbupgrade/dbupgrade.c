@@ -1302,4 +1302,3 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 }
 
 #endif
-
