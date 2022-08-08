@@ -998,7 +998,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, const char **tables_hk, int count)
+static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, const char * const *tables_hk, int count)
 {
 	int		i, j;
 	zbx_uint64_t	housekeeperid;
@@ -1345,6 +1345,7 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	const char		*event_tables[] = {"events"};
 	const char		*profile_idx = "web.favorite.graphids";
 	unsigned char		history_mode, trends_mode;
+	zbx_vector_str_t	hk_history;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
 
@@ -1373,26 +1374,27 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 
 	zbx_config_get_hk_mode(&history_mode, &trends_mode);
 
-	if (ZBX_HK_MODE_PARTITION != history_mode && ZBX_HK_MODE_PARTITION != trends_mode)
-	{
-		const char	*history_trends_tables[] = {"history", "history_str", "history_uint", "history_log",
-				"history_text", "trends", "trends_uint"};
+	zbx_vector_str_create(&hk_history);
 
-		DBadd_to_housekeeper(itemids, "itemid", history_trends_tables, ARRSIZE(history_trends_tables));
-	}
-	else if (ZBX_HK_MODE_PARTITION != history_mode)
+	if (ZBX_HK_MODE_REGULAR == history_mode)
 	{
-		const char	*history_tables[] = {"history", "history_str", "history_uint", "history_log",
-				"history_text"};
-
-		DBadd_to_housekeeper(itemids, "itemid", history_tables, ARRSIZE(history_tables));
+		zbx_vector_str_append(&hk_history, "history");
+		zbx_vector_str_append(&hk_history, "history_str");
+		zbx_vector_str_append(&hk_history, "history_uint");
+		zbx_vector_str_append(&hk_history, "history_log");
+		zbx_vector_str_append(&hk_history, "history_text");
 	}
-	else if (ZBX_HK_MODE_PARTITION != trends_mode)
+
+	if (ZBX_HK_MODE_REGULAR == trends_mode)
 	{
-		const char	*trend_tables[] = {"trends", "trends_uint"};
-
-		DBadd_to_housekeeper(itemids, "itemid", trend_tables, ARRSIZE(trend_tables));
+		zbx_vector_str_append(&hk_history, "trends");
+		zbx_vector_str_append(&hk_history, "trends_uint");
 	}
+
+	if (0 != hk_history.values_num)
+		DBadd_to_housekeeper(itemids, "itemid", (const char * const *)hk_history.values, hk_history.values_num);
+
+	zbx_vector_str_destroy(&hk_history);
 
 	/* add housekeeper task to delete problems associated with item, this allows old events to be deleted */
 	DBadd_to_housekeeper(itemids, "itemid", event_tables, ARRSIZE(event_tables));
