@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-05T12:33:17Z'
+  date: '2022-08-08T08:45:10Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -1253,6 +1253,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.InboundFlows.average
+              error_handler: DISCARD_VALUE
           master_item:
             key: azure.vm.data.get
           tags:
@@ -1273,6 +1274,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.InboundFlowsMaximumCreationRate.average
+              error_handler: DISCARD_VALUE
           master_item:
             key: azure.vm.data.get
           tags:
@@ -1293,6 +1295,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.OutboundFlows.average
+              error_handler: DISCARD_VALUE
           master_item:
             key: azure.vm.data.get
           tags:
@@ -1313,6 +1316,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.OutboundFlowsMaximumCreationRate.average
+              error_handler: DISCARD_VALUE
           master_item:
             key: azure.vm.data.get
           tags:
@@ -1354,6 +1358,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.NetworkInTotal.total
+              error_handler: DISCARD_VALUE
             -
               type: MULTIPLIER
               parameters:
@@ -1379,6 +1384,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.NetworkOutTotal.total
+              error_handler: DISCARD_VALUE
             -
               type: MULTIPLIER
               parameters:
