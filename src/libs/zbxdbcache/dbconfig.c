@@ -13352,18 +13352,7 @@ int	DCget_proxy_discovery(struct zbx_json *json, char **error)
 		else
 		{
 			unsigned int	encryption;
-#if 1 // TODO: choose one format of encryption
-			if (HOST_STATUS_PROXY_PASSIVE == proxy->status)
-			{
-				zbx_json_addint64(json, "encryption", dc_host->tls_connect);
-			}
-			else
-			{
-				zbx_json_addint64(json, "encryption", dc_host->tls_accept);
-			}
-#endif
 
-#if 1
 			if (HOST_STATUS_PROXY_PASSIVE == proxy->status)
 			{
 				encryption = dc_host->tls_connect;
@@ -13402,7 +13391,6 @@ int	DCget_proxy_discovery(struct zbx_json *json, char **error)
 
 			zbx_json_adduint64(json, "item_count", dc_host->items_active_normal +
 					dc_host->items_active_notsupported + dc_host->items_disabled);
-#endif
 
 			if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->hostid)))
 			{
@@ -13438,7 +13426,6 @@ int	DCget_proxy_discovery(struct zbx_json *json, char **error)
 				zbx_json_adduint64(json, "host_count", dc_proxy->hosts_monitored + dc_proxy->hosts_not_monitored);
 
 				zbx_json_addfloat(json, "required_performance_vps", dc_proxy->required_performance);
-
 			}
 			else
 			{
