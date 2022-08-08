@@ -142,7 +142,7 @@ class CCheckBoxList extends CList {
 	 *
 	 * @return CCheckBoxList
 	 */
-	public function setVertical(bool $vertical): CCheckBoxList {
+	public function setVertical(bool $vertical = true): CCheckBoxList {
 		$this->vertical = $vertical;
 
 		return $this;
