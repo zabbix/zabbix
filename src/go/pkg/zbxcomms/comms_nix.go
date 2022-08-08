@@ -45,4 +45,3 @@ func Listen(address string, args ...interface{}) (c *Listener, err error) {
 	c = &Listener{listener: l.(*net.TCPListener), tlsconfig: tlsconfig}
 	return
 }
-
