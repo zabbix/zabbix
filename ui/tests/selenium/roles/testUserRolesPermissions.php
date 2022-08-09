@@ -285,7 +285,7 @@ class testUserRolesPermissions extends CWebTest {
 			}
 		}
 
-		$this->checkLinks($data['check_links']);
+		$this->checkLinks($data['check_links'],'Dashboards');
 	}
 
 	public static function getProblemActionsData() {
@@ -1039,87 +1039,29 @@ class testUserRolesPermissions extends CWebTest {
 			}
 			else {
 				if (array_key_exists('user_roles', $data)) {
-					$this->checkLinks($data['link']);
+					$this->checkLinks($data['link'],'Dashboards');
 					$this->signOut();
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeRoleRule($user_roles);
 					$this->signOut();
 				}
 				else {
-					$this->checkLinks($data['link']);
+					$this->checkLinks($data['link'],'Dashboards');
 					$this->signOut();
 				}
 			}
 		}
 	}
 
-	public static function getDashboardData() {
-		return [
-			[
-				[
-					'page' => 'Dashboard',
-					'button' => 'Problems',
-					'displayed_ui' => [
-						'Problems',
-						'Hosts',
-						'Latest data',
-						'Maps',
-						'Discovery'
-					]
-				]
-			],
-			[
-				[
-					'button' => 'Hosts',
-					'displayed_ui' => [
-						'Hosts',
-						'Latest data',
-						'Maps',
-						'Discovery'
-					]
-				]
-			]
-//			TODO: uncomment after ZBX-19479 fix.
-//			[
-//				[
-//					'button' => 'Overview',
-//					'displayed_ui' => [
-//						'Overview',
-//						'Latest data',
-//						'Maps',
-//						'Discovery'
-//					]
-//				]
-//			]
-		];
-	}
-
 	/**
 	 * Disabling access to Dashboard. Check warning message text and button.
-	 *
-	 * @dataProvider getDashboardData
 	 */
-	public function testUserRolesPermissions_Dashboard($data) {
+	public function testUserRolesPermissions_Dashboard() {
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
-
-		foreach ([true, false] as $action_status) {
-			$main_section = $this->query('xpath://ul[@class="menu-main"]')->query('link:Monitoring');
-
-			if (array_key_exists('page', $data)) {
-				$this->assertEquals($action_status, $main_section->one()->parents('tag:li')->query('link', $data['page'])->exists());
-			}
-
-			if ($action_status) {
-				$this->changeRoleRule(['Monitoring' => $data['displayed_ui']]);
-			}
-			else {
-				$this->checkLinks(['zabbix.php?action=dashboard.view'], $data['button']);
-				$this->changeRoleRule(['Monitoring' => ['Dashboard', 'Problems', 'Hosts', 'Latest data', 'Maps',
-						'Discovery']]
-				);
-		}
-	}
-	}
+		$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
+		$this->changeRoleRule(['Dashboards' => false]);
+		$this->checkLinks(['zabbix.php?action=dashboard.view'],'Problems');
+}
 
 	/**
 	 * Manage API token action check.
@@ -1129,7 +1071,7 @@ class testUserRolesPermissions extends CWebTest {
 		$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
 		$this->assertEquals('TEST_SERVER_NAME: API tokens', $this->page->getTitle());
 		$this->changeRoleRule(['Manage API tokens' => false]);
-		$this->checkLinks(['zabbix.php?action=user.token.list']);
+		$this->checkLinks(['zabbix.php?action=user.token.list'],'Dashboards');
 	}
 
 	public static function getRoleServiceData() {
@@ -1589,7 +1531,7 @@ class testUserRolesPermissions extends CWebTest {
 	 * @param array $links		checked links after disabling action
 	 * @param string $page		page name displayed on error message button
 	 */
-	private function checkLinks($links, $page = 'Dashboards') {
+	private function checkLinks($links, $page) {
 		foreach ($links as $link) {
 			$this->page->open($link)->waitUntilReady();
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "user_for_role". '.
