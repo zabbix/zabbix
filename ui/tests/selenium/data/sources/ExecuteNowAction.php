@@ -26,8 +26,6 @@ class ExecuteNowAction {
 	 * @return array
 	 */
 	public static function load() {
-		CDataHelper::reset();
-
 		// Create host group.
 		CDataHelper::call('hostgroup.create', [
 			['name' => 'HG-for-executenow']

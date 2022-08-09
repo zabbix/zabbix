@@ -17,16 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_SSH_H
-#define ZABBIX_CHECKS_SSH_H
+#ifndef POLLER_GET_VALUE_TELNET_TEST_H
+#define POLLER_GET_VALUE_TELNET_TEST_H
 
-#include "module.h"
-#include "config.h"
-
-#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "dbcache.h"
 
-int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result);
-#endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/
+int	zbx_get_value_telnet_test_run(DC_ITEM *item, char **error);
 
-#endif
+#endif /*POLLER_GET_VALUE_TELNET_TEST_H*/
