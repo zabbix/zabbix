@@ -52,7 +52,7 @@ $fields = [
 	'status' =>							[T_ZBX_INT, O_OPT, null,	IN([ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
 											null
 										],
-	'g_actionid' =>						[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'g_actionid' =>						[T_ZBX_INT, O_OPT,	P_ONLY_ARRAY,	DB_ID,		null],
 	'conditions' =>						[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
 	'new_condition' =>					[null,		O_OPT,	P_ONLY_ARRAY,	null,		'isset({add_condition})'],
 	'operations' =>						[null,		O_OPT,	P_AS_IS,	null,		null],

@@ -43,7 +43,7 @@ $fields = [
 	'uniqueness_criteria' => [T_ZBX_STR, O_OPT, null, null,	'isset({add}) || isset({update})', _('Device uniqueness criteria')],
 	'host_source' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
 	'name_source' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
-	'g_druleid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'g_druleid' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'dchecks' =>		[null, O_OPT, P_ONLY_TD_ARRAY,		null,		null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,

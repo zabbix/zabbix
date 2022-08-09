@@ -34,7 +34,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'screens' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'screens' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,			null],
 	'screenid' =>		[T_ZBX_INT, O_NO,  P_SYS,	DB_ID,
 		'isset({form}) && ({form} === "update" || {form} === "full_clone")'
 	],
