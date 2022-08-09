@@ -317,7 +317,7 @@ typedef struct
 }
 ZBX_DC_PSK;
 
-ZBX_PTR_VECTOR_DECL(item_ptr, ZBX_DC_ITEM *)
+ZBX_PTR_VECTOR_DECL(dc_item_ptr, ZBX_DC_ITEM *)
 
 typedef struct
 {
@@ -353,9 +353,9 @@ typedef struct
 	ZBX_DC_PSK	*tls_dc_psk;
 #endif
 
-	zbx_vector_ptr_t	interfaces_v;	/* for quick finding of all host interfaces in */
+	zbx_vector_ptr_t		interfaces_v;	/* for quick finding of all host interfaces in */
 						/* 'config->interfaces' hashset */
-	zbx_vector_item_ptr_t	active_items;
+	zbx_vector_dc_item_ptr_t	active_items;
 }
 ZBX_DC_HOST;
 

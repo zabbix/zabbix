@@ -76,7 +76,7 @@ int	sync_in_progress = 0;
 				dc_host->maintenance_type, dc_item->type)
 
 ZBX_PTR_VECTOR_IMPL(cached_proxy, zbx_cached_proxy_t *)
-ZBX_PTR_VECTOR_IMPL(item_ptr, ZBX_DC_ITEM *)
+ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 
 /******************************************************************************
  *                                                                            *
@@ -1305,7 +1305,7 @@ done:
 
 			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
-			zbx_vector_item_ptr_create_ext(&host->active_items, __config_shmem_malloc_func,
+			zbx_vector_dc_item_ptr_create_ext(&host->active_items, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
 		else
@@ -1505,7 +1505,7 @@ done:
 		}
 #endif
 		zbx_vector_ptr_destroy(&host->interfaces_v);
-		zbx_vector_item_ptr_destroy(&host->active_items);
+		zbx_vector_dc_item_ptr_destroy(&host->active_items);
 		zbx_hashset_remove_direct(&config->hosts, host);
 	}
 
@@ -2304,16 +2304,16 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			{
 				if (ITEM_TYPE_ZABBIX_ACTIVE == item->type)
 				{
-					if (FAIL != (i = zbx_vector_item_ptr_search(&host->active_items, item,
+					if (FAIL != (i = zbx_vector_dc_item_ptr_search(&host->active_items, item,
 							ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 					{
-						zbx_vector_item_ptr_remove(&host->active_items, i);
+						zbx_vector_dc_item_ptr_remove(&host->active_items, i);
 					}
 				}
 			}
 
 			if (ITEM_TYPE_ZABBIX_ACTIVE == type)
-				zbx_vector_item_ptr_append(&host->active_items, item);
+				zbx_vector_dc_item_ptr_append(&host->active_items, item);
 		}
 
 		/* store new information in item structure */
@@ -2830,10 +2830,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 
 			if (ITEM_TYPE_ZABBIX_ACTIVE == item->type)
 			{
-				if (FAIL != (i = zbx_vector_item_ptr_search(&host->active_items, item,
+				if (FAIL != (i = zbx_vector_dc_item_ptr_search(&host->active_items, item,
 						ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 				{
-					zbx_vector_item_ptr_remove(&host->active_items, i);
+					zbx_vector_dc_item_ptr_remove(&host->active_items, i);
 				}
 			}
 		}
