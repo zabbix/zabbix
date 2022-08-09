@@ -131,8 +131,8 @@ $fields = [
 	'new_application_prototype' =>	[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({parent_discoveryid})'
 									],
-	'applications' =>				[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
-	'application_prototypes' =>		[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
+	'applications' =>				[T_ZBX_STR, O_OPT, P_AS_IS,	null,		null],
+	'application_prototypes' =>		[T_ZBX_STR, O_OPT, P_AS_IS,	null,		null],
 	'massupdate_app_action' =>		[T_ZBX_INT, O_OPT, null,
 										IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 										null

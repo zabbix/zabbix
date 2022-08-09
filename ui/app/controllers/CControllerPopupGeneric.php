@@ -1167,6 +1167,7 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'application_prototypes':
+				$records = [];
 				$parent_discoveryid = $this->getInput('parent_discoveryid');
 
 				$discovery_rules = API::DiscoveryRule()->get([

@@ -31,7 +31,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'applications' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'applications' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({applicationid})'],
 	'applicationid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({form}) && {form} == "update"'],
 	'appname' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],

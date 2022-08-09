@@ -54,7 +54,7 @@ $fields = [
 	'ymax_itemid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			'(isset({add}) || isset({update})) && isset({ymax_type}) && {ymax_type} == '.GRAPH_YAXIS_TYPE_ITEM_VALUE],
 	'percent_left' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN_DBL(0, 100, 4), null, _('Percentile line (left)')],
 	'percent_right' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN_DBL(0, 100, 4), null, _('Percentile line (right)')],
-	'visible' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null],
+	'visible' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		BETWEEN(0, 1),	null],
 	'items' =>				[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,		null,			null],
 	'discover' =>			[T_ZBX_INT, O_OPT, null,		IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'show_work_period' =>	[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
