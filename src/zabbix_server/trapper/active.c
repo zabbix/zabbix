@@ -31,8 +31,6 @@
 
 extern unsigned char	program_type;
 
-#define PROXY_AUTO_REGISTRATION_HEARTBEAT	120
-
 /******************************************************************************
  *                                                                            *
  * Purpose: perform active agent auto registration                            *
@@ -160,6 +158,7 @@ out:
  *             host_metadata - [IN] host metadata                             *
  *             flag          - [IN] flag describing interface type            *
  *             interface     - [IN] interface value if flag is not default    *
+ *             revision      - [OUT] host configuration revision              *
  *             hostid        - [OUT] host ID                                  *
  *             error         - [OUT] error message                            *
  *                                                                            *
@@ -175,6 +174,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
 		zbx_uint32_t *revision, char *error)
 {
+#define PROXY_AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
 	int	ret = FAIL, heartbeat;
 
@@ -233,7 +233,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
+#undef PROXY_AUTO_REGISTRATION_HEARTBEAT
 	return ret;
 }
 

@@ -3495,15 +3495,18 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
  *                                                                            *
  * Purpose: parses history data array and process the data                    *
  *                                                                            *
- * Parameters: proxy      - [IN] the proxy                                    *
- *             jp_data    - [IN] JSON with history data array                 *
- *             session    - [IN] the data session                             *
- *             nodata_win - [OUT] counter of delayed values                   *
- *             info       - [OUT] address of a pointer to the info            *
- *                                     string (should be freed by the caller) *
- *             mode       - [IN]  item retrieve mode is used to retrieve only *
- *                                necessary data to reduce time spent holding *
- *                                read lock                                   *
+ *                                                                            *
+ * Parameters: sock           - [IN]  socket for host permission validation   *
+ *             validator_func - [IN]  function to validate item permission    *
+ *             validator_args - [IN]  validator function arguments            *
+ *             jp_data        - [IN]  JSON with history data array            *
+ *             session        - [IN]  the data session                        *
+ *             nodata_win     - [OUT] counter of delayed values               *
+ *             info           - [OUT] address of a pointer to the info        *
+ *                                    string (should be freed by the caller)  *
+ *             mode           - [IN]  item retrieve mode is used to retrieve  *
+ *                                    only necessary data to reduce time      *
+ *                                    spent holding read lock                 *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
@@ -4353,7 +4356,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 
 	if (0 == DCget_auto_registration_action_count())
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot process auto registration contents, all autoregistration actions are disabled");
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot process auto registration contents, all autoregistration actions"
+				" are disabled");
 		goto out;
 	}
 

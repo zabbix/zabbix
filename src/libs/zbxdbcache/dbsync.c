@@ -952,6 +952,17 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 #undef CONFIG_AUTOREG_TLS_FIELD_COUNT
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reads autoreg hosts table in order to cache autoreg_host entries  *
+ *          for hosts monitored directly by Zabbix server                     *
+ *                                                                            *
+ * Parameter: sync - [OUT] result of select, only during initialization       *
+ *                                                                            *
+ * Return value: SUCCEED - entries retrieved or already synced                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync)
 {
 	if (ZBX_DBSYNC_INIT != sync->mode)
