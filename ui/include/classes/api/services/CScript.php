@@ -1049,13 +1049,17 @@ class CScript extends CApiService {
 		}
 
 		$db_scripts = $this->get([
-			'output' => [],
+			'output' => ['type'],
 			'hostids' => $hostids,
 			'scriptids' => $data['scriptid']
 		]);
 
 		if (!$db_scripts) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		if ($db_scripts[0]['type'] == ZBX_SCRIPT_TYPE_URL) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot execute URL type script.'));
 		}
 
 		// execute script
