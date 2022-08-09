@@ -2598,7 +2598,7 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
 			zbx_vector_item_param_ptr_append(&new_item_params, db_item_param);
 		}
 
-		if (SUCCEED != zbx_merge_item_params(&item->item_params, &new_item_params, "item", error))
+		if (SUCCEED != zbx_merge_item_params(&item->item_params, &new_item_params, error))
 		{
 			if (0 == item->itemid)
 			{
@@ -3654,7 +3654,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		{
 			item_param = (zbx_item_param_t *)item->item_params.values[j];
 
-			if (0 != (item_param->upd_flags & ZBX_FLAG_ITEM_PARAM_DELETE))
+			if (0 != (item_param->flags & ZBX_FLAG_ITEM_PARAM_DELETE))
 			{
 				zbx_vector_uint64_append(&deleteids, item_param->item_parameterid);
 				zbx_audit_item_delete_params(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
@@ -3668,7 +3668,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 				continue;
 			}
 
-			if (0 == (item_param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE))
+			if (0 == (item_param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE))
 				continue;
 
 			update_param_num++;
@@ -3727,12 +3727,12 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 				continue;
 			}
 
-			if (0 == (item_param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE))
+			if (0 == (item_param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE))
 				continue;
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_parameter set");
 
-			if (0 != (item_param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE_NAME))
+			if (0 != (item_param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE_NAME))
 			{
 				char	*name_esc;
 
@@ -3746,7 +3746,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 				zbx_free(name_esc);
 			}
 
-			if (0 != (item_param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
+			if (0 != (item_param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
 			{
 				char	*value_esc;
 

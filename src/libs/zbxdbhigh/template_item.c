@@ -1830,7 +1830,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 		{
 			param = (zbx_item_param_t *)item->item_params.values[j];
 
-			if (0 != (param->upd_flags & ZBX_FLAG_ITEM_PARAM_DELETE))
+			if (0 != (param->flags & ZBX_FLAG_ITEM_PARAM_DELETE))
 			{
 				zbx_vector_uint64_append(&deleteids, param->item_parameterid);
 				zbx_audit_item_delete_params(item->itemid, item->flags, param->item_parameterid);
@@ -1843,7 +1843,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 				continue;
 			}
 
-			if (0 == (param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE))
+			if (0 == (param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE))
 				continue;
 
 			update_param_num++;
@@ -1879,7 +1879,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 				continue;
 			}
 
-			if (0 == (param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE))
+			if (0 == (param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE))
 				continue;
 
 			zbx_audit_item_update_json_update_params_create_entry(item->itemid, item->flags,
@@ -1887,7 +1887,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_parameter set ");
 
-			if (0 != (param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE_NAME))
+			if (0 != (param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE_NAME))
 			{
 				char	*name_esc;
 
@@ -1901,7 +1901,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 						param->item_parameterid, param->name_orig, param->name);
 			}
 
-			if (0 != (param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
+			if (0 != (param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
 			{
 				char	*value_esc;
 
@@ -2635,16 +2635,6 @@ static int	template_item_preproc_sort_by_step(const void *d1, const void *d2)
 	return 0;
 }
 
-int	zbx_item_param_sort_by_name(const zbx_item_param_t *d1, const zbx_item_param_t *d2)
-{
-	zbx_item_param_t	*ip1 = *(zbx_item_param_t * const *)d1;
-	zbx_item_param_t	*ip2 = *(zbx_item_param_t * const *)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(ip1->name, ip2->name);
-
-	return 0;
-}
-
 static int	template_lld_macro_sort_by_macro(const void *d1, const void *d2)
 {
 	zbx_template_lld_macro_t	*ip1 = *(zbx_template_lld_macro_t * const *)d1;
@@ -3038,7 +3028,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_template_item_t *)items->values[i];
-		zbx_merge_item_params(&item->item_params, &item->template_params, NULL, NULL);
+		zbx_merge_item_params(&item->item_params, &item->template_params, NULL);
 	}
 	zbx_hashset_destroy(&items_t);
 	zbx_vector_uint64_destroy(&itemids);

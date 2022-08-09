@@ -29,7 +29,7 @@ zbx_item_param_t	*zbx_item_param_create(const char *item_param_name,
 	item_param = (zbx_item_param_t *)zbx_malloc(NULL, sizeof(zbx_item_param_t));
 
 	item_param->item_parameterid = 0;
-	item_param->upd_flags = ZBX_FLAG_ITEM_PARAM_UPDATE_RESET_FLAG;
+	item_param->flags = ZBX_FLAG_ITEM_PARAM_UPDATE_RESET;
 	item_param->name = zbx_strdup(NULL, item_param_name);
 	item_param->name_orig = NULL;
 	item_param->value = zbx_strdup(NULL, item_param_value);
@@ -41,11 +41,11 @@ zbx_item_param_t	*zbx_item_param_create(const char *item_param_name,
 void	zbx_item_param_free(zbx_item_param_t *param)
 {
 
-	if (0 != (param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE_NAME))
+	if (0 != (param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE_NAME))
 		zbx_free(param->name_orig);
 	zbx_free(param->name);
 
-	if (0 != (param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
+	if (0 != (param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
 		zbx_free(param->value_orig);
 	zbx_free(param->value);
 
@@ -65,20 +65,20 @@ static int	item_param_rollback(zbx_item_param_t *item_param)
 	if (0 == item_param->item_parameterid)
 		return FAIL;
 
-	if (0 != (item_param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE_NAME))
+	if (0 != (item_param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE_NAME))
 	{
 		zbx_free(item_param->name);
 		item_param->name = item_param->name_orig;
 		item_param->name_orig = NULL;
-		item_param->upd_flags &= (~ZBX_FLAG_ITEM_PARAM_UPDATE_NAME);
+		item_param->flags &= (~ZBX_FLAG_ITEM_PARAM_UPDATE_NAME);
 	}
 
-	if (0 != (item_param->upd_flags & ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
+	if (0 != (item_param->flags & ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE))
 	{
 		zbx_free(item_param->value);
 		item_param->value = item_param->value_orig;
 		item_param->value_orig = NULL;
-		item_param->upd_flags &= (~ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE);
+		item_param->flags &= (~ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE);
 	}
 
 	return SUCCEED;
@@ -101,8 +101,7 @@ zbx_item_param_field_t;
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	item_param_check_field(const zbx_item_param_t *item_param, zbx_item_param_field_t type,
-		const char *owner, char **error)
+static int	item_param_check_field(const zbx_item_param_t *item_param, zbx_item_param_field_t type, char **error)
 {
 	const char	*field, *str;
 	size_t		field_len, str_len;
@@ -124,8 +123,8 @@ static int	item_param_check_field(const zbx_item_param_t *item_param, zbx_item_p
 
 			if (NULL != error)
 			{
-				*error = zbx_strdcatf(*error, "Cannot %s %s item_param: invalid field type.\n",
-						ZBX_ITEM_PARAM_OP(item_param), owner);
+				*error = zbx_strdcatf(*error, "Cannot %s item parameter: invalid field type.\n",
+						ZBX_ITEM_PARAM_OP(item_param));
 			}
 			return FAIL;
 	}
@@ -138,8 +137,8 @@ static int	item_param_check_field(const zbx_item_param_t *item_param, zbx_item_p
 
 			ptr_utf8 = zbx_strdup(NULL, str);
 			zbx_replace_invalid_utf8(ptr_utf8);
-			*error = zbx_strdcatf(*error, "Cannot %s %s item_param: %s \"%s\" has invalid UTF-8 sequence.\n",
-					ZBX_ITEM_PARAM_OP(item_param), owner, field, ptr_utf8);
+			*error = zbx_strdcatf(*error, "Cannot %s item parameter: %s \"%s\" has invalid UTF-8"
+					" sequence.\n", ZBX_ITEM_PARAM_OP(item_param), field, ptr_utf8);
 			zbx_free(ptr_utf8);
 		}
 
@@ -152,8 +151,8 @@ static int	item_param_check_field(const zbx_item_param_t *item_param, zbx_item_p
 	{
 		if (NULL != error)
 		{
-			*error = zbx_strdcatf(*error, "Cannot %s %s item_param: %s \"%128s...\" is too long.\n",
-					ZBX_ITEM_PARAM_OP(item_param), owner, field, str);
+			*error = zbx_strdcatf(*error, "Cannot %s item parameter: %s \"%128s...\" is too long.\n",
+					ZBX_ITEM_PARAM_OP(item_param), field, str);
 		}
 		return FAIL;
 	}
@@ -169,7 +168,7 @@ static int	item_param_check_field(const zbx_item_param_t *item_param, zbx_item_p
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	check_item_param_fields(zbx_vector_item_param_ptr_t *item_params, const char *owner, char **error)
+static int	check_item_param_fields(zbx_vector_item_param_ptr_t *item_params, char **error)
 {
 	int	i, ret = SUCCEED;
 
@@ -178,21 +177,21 @@ static int	check_item_param_fields(zbx_vector_item_param_ptr_t *item_params, con
 		zbx_item_param_t	*item_param = item_params->values[i];
 		int			errors = 0;
 
-		if (0 != (item_param->upd_flags & ZBX_FLAG_ITEM_PARAM_DELETE))
+		if (0 != (item_param->flags & ZBX_FLAG_ITEM_PARAM_DELETE))
 			continue;
 
 		if ('\0' == *item_param->name)
 		{
 			if (NULL != error)
 			{
-				*error = zbx_strdcatf(*error, "Cannot %s %s item_param: empty item_param name.\n",
-						ZBX_ITEM_PARAM_OP(item_param), owner);
+				*error = zbx_strdcatf(*error, "Cannot %s item parameter: empty item parameter name.\n",
+						ZBX_ITEM_PARAM_OP(item_param));
 			}
 			errors += FAIL;
 		}
 
-		errors += item_param_check_field(item_param, ZBX_ITEM_PARAM_NAME, owner, error);
-		errors += item_param_check_field(item_param, ZBX_ITEM_PARAM_VALUE, owner, error);
+		errors += item_param_check_field(item_param, ZBX_ITEM_PARAM_NAME, error);
+		errors += item_param_check_field(item_param, ZBX_ITEM_PARAM_VALUE, error);
 
 		if (0 > errors)
 		{
@@ -214,7 +213,6 @@ static int	check_item_param_fields(zbx_vector_item_param_ptr_t *item_params, con
  * Purpose: check new item_params for duplicate name+value combinations       *
  *                                                                            *
  * Parameters: item_params  - [IN/OUT] item_params to check                   *
- *             owner        - [IN] the owned object (host, item, trigger)     *
  *             error        - [OUT] the error message                         *
  *                                                                            *
  * Return value: SUCCEED - item_params have no duplicates                     *
@@ -224,7 +222,7 @@ static int	check_item_param_fields(zbx_vector_item_param_ptr_t *item_params, con
  *           while new item_params are removed.                               *
  *                                                                            *
  ******************************************************************************/
-static int	check_duplicate_item_params(zbx_vector_item_param_ptr_t *item_params, const char *owner, char **error)
+static int	check_duplicate_item_params(zbx_vector_item_param_ptr_t *item_params, char **error)
 {
 	int	i, j, ret = SUCCEED;
 
@@ -240,8 +238,8 @@ static int	check_duplicate_item_params(zbx_vector_item_param_ptr_t *item_params,
 			{
 				if (NULL != error)
 				{
-					*error = zbx_strdcatf(*error, "Cannot %s %s item_param: \"%s: %s\" already "
-							"exists.\n", ZBX_ITEM_PARAM_OP(left), owner, left->name,
+					*error = zbx_strdcatf(*error, "Cannot %s %s item parameter: \"%s\" already "
+							"exists.\n", ZBX_ITEM_PARAM_OP(left), left->name,
 							right->value);
 				}
 
@@ -264,7 +262,6 @@ static int	check_duplicate_item_params(zbx_vector_item_param_ptr_t *item_params,
  *                                                                            *
  * Parameters: dst    - [IN/OUT] vector of existing item_params               *
  *             src    - [IN/OUT] vector or new item_params                    *
- *             owner  - [IN] the item_param owner (host, item, trigger),      *
  *                           optional - must be specified if error parameter  *
  *                           is not null                                      *
  *             error  - [IN,OUT] the error message (appended to existing),    *
@@ -284,15 +281,14 @@ static int	check_duplicate_item_params(zbx_vector_item_param_ptr_t *item_params,
  *               FAIL - item_params were merged with errors                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_param_ptr_t *src, const char *owner,
-		char **error)
+int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_param_ptr_t *src, char **error)
 {
 	int	i, j, ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() old_item_params:%d new_item_params:%d", __func__, dst->values_num,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() old item parameters:%d new item parameters:%d", __func__, dst->values_num,
 			src->values_num);
 
-	ret = check_duplicate_item_params(src, owner, error);
+	ret = check_duplicate_item_params(src, error);
 
 	/* perform exact name + value match */
 	for (i = 0; i < dst->values_num; i++)
@@ -313,7 +309,7 @@ int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_para
 			continue;
 		}
 
-		dst->values[i]->upd_flags = ZBX_FLAG_ITEM_PARAM_DELETE;
+		dst->values[i]->flags = ZBX_FLAG_ITEM_PARAM_DELETE;
 	}
 
 	if (0 == src->values_num)
@@ -322,7 +318,7 @@ int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_para
 	/* perform item_param match */
 	for (i = 0; i < dst->values_num; i++)
 	{
-		if (ZBX_FLAG_ITEM_PARAM_DELETE != dst->values[i]->upd_flags)
+		if (ZBX_FLAG_ITEM_PARAM_DELETE != dst->values[i]->flags)
 			continue;
 
 		for (j = 0; j < src->values_num; j++)
@@ -335,7 +331,7 @@ int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_para
 		{
 			dst->values[i]->value_orig = dst->values[i]->value;
 			dst->values[i]->value = src->values[j]->value;
-			dst->values[i]->upd_flags = ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE;
+			dst->values[i]->flags = ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE;
 			src->values[j]->value = NULL;
 			zbx_item_param_free(src->values[j]);
 			zbx_vector_item_param_ptr_remove_noorder(src, j);
@@ -349,14 +345,14 @@ int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_para
 	/* update rest of the item_params */
 	for (i = 0; i < dst->values_num && 0 < src->values_num; i++)
 	{
-		if (ZBX_FLAG_ITEM_PARAM_DELETE != dst->values[i]->upd_flags)
+		if (ZBX_FLAG_ITEM_PARAM_DELETE != dst->values[i]->flags)
 			continue;
 
 		dst->values[i]->name_orig = dst->values[i]->name;
 		dst->values[i]->value_orig = dst->values[i]->value;
 		dst->values[i]->name = src->values[0]->name;
 		dst->values[i]->value = src->values[0]->value;
-		dst->values[i]->upd_flags = ZBX_FLAG_ITEM_PARAM_UPDATE_NAME | ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE;
+		dst->values[i]->flags = ZBX_FLAG_ITEM_PARAM_UPDATE_NAME | ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE;
 		src->values[0]->name = NULL;
 		src->values[0]->value = NULL;
 		zbx_item_param_free(src->values[0]);
@@ -368,12 +364,12 @@ int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_para
 	zbx_vector_item_param_ptr_append_array(dst, src->values, src->values_num);
 	zbx_vector_item_param_ptr_clear(src);
 out:
-	if (SUCCEED != check_item_param_fields(dst, owner, error))
+	if (SUCCEED != check_item_param_fields(dst, error))
 		ret = FAIL;
 
 	zbx_vector_item_param_ptr_sort(dst, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()  item_param:%d", __func__, dst->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() item parameter:%d", __func__, dst->values_num);
 
 	return ret;
 }
