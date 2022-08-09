@@ -321,7 +321,7 @@ function getMenuPopupMapElementSubmap(options) {
 	// urls
 	if (typeof options.urls !== 'undefined') {
 		sections.push({
-			label: t('URLs'),
+			label: t('Links'),
 			items: options.urls
 		});
 	}
@@ -379,7 +379,7 @@ function getMenuPopupMapElementGroup(options) {
 	// urls
 	if (typeof options.urls !== 'undefined') {
 		sections.push({
-			label: t('URLs'),
+			label: t('Links'),
 			items: options.urls
 		});
 	}
@@ -428,7 +428,7 @@ function getMenuPopupMapElementTrigger(options) {
 	// urls
 	if (typeof options.urls !== 'undefined') {
 		sections.push({
-			label: t('URLs'),
+			label: t('Links'),
 			items: options.urls
 		});
 	}
@@ -449,7 +449,7 @@ function getMenuPopupMapElementImage(options) {
 	// urls
 	if (typeof options.urls !== 'undefined') {
 		return [{
-			label: t('URLs'),
+			label: t('Links'),
 			items: options.urls
 		}];
 	}

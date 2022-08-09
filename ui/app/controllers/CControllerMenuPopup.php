@@ -131,6 +131,20 @@ class CControllerMenuPopup extends CController {
 			$scripts = [];
 			$urls = [];
 
+			if (array_key_exists('urls', $data)) {
+				foreach ($data['urls'] as &$url) {
+					$url['new_window'] = ZBX_SCRIPT_URL_NEW_WINDOW_YES;
+					$url['confirmation'] = '';
+					$url['menu_path'] = '';
+					$url['name'] = $url['label'];
+
+					unset($url['label']);
+				}
+				unset($url);
+
+				$urls = $data['urls'];
+			}
+
 			if ($all_scripts) {
 				foreach ($all_scripts as $num => $script) {
 					// Filter only host scope scripts, get rid of excess spaces and unify slashes in menu path.
@@ -146,17 +160,6 @@ class CControllerMenuPopup extends CController {
 					else {
 						$scripts[] = $script;
 					}
-				}
-
-				if (array_key_exists('urls', $data)) {
-					foreach ($data['urls'] as &$url) {
-						$url['new_window'] = ZBX_SCRIPT_URL_NEW_WINDOW_YES;
-						$url['confirmation'] = '';
-						$url['menu_path'] = '';
-					}
-					unset($url);
-
-					$urls = array_merge($urls, $data['urls']);
 				}
 
 				$scripts = self::sortEntitiesByMenuPath($scripts);
