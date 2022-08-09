@@ -1127,7 +1127,7 @@ class testUserRolesPermissions extends CWebTest {
 	public function testUserRolesPermissions_ManageApiToken() {
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
-		$this->assertEquals('API tokens', $this->page->getTitle());
+		$this->assertEquals('TEST_SERVER_NAME: API tokens', $this->page->getTitle());
 		$this->changeRoleRule(['Manage API tokens' => false]);
 		$this->checkLinks(['zabbix.php?action=user.token.list']);
 	}
@@ -1243,7 +1243,9 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'role_config' => [
 						'Read-write access to services' => 'None',
-						'Read-only access to services' => 'Service list'
+						'Read-only access to services' => 'Service list',
+						// added element 'API methods' with default value for page scroll
+						'API methods' => 'Deny list'
 					],
 					'service_list' => [
 						'xpath:(//div[@class="multiselect-control"])[2]' => 'Child of parent 1'
