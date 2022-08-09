@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -49,6 +49,8 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Prepare data for history context menu popup.
 	 *
+	 * @static
+	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
 	 *
@@ -79,6 +81,8 @@ class CControllerMenuPopup extends CController {
 
 	/**
 	 * Prepare data for host context menu popup.
+	 *
+	 * @static
 	 *
 	 * @param array  $data
 	 * @param string $data['hostid']
@@ -146,7 +150,7 @@ class CControllerMenuPopup extends CController {
 
 				if (array_key_exists('urls', $data)) {
 					foreach ($data['urls'] as &$url) {
-						$url['new_window'] = ZBX_SCRIPT_URL_NEW_WINDOW_NO;
+						$url['new_window'] = ZBX_SCRIPT_URL_NEW_WINDOW_YES;
 						$url['confirmation'] = '';
 						$url['menu_path'] = '';
 					}
@@ -155,47 +159,8 @@ class CControllerMenuPopup extends CController {
 					$urls = array_merge($urls, $data['urls']);
 				}
 
-				if ($scripts || $urls) {
-					foreach ([&$scripts, &$urls] as &$entities) {
-						if ($entities) {
-							foreach ($entities as $num => &$entity) {
-								$entity['menu_path'] = trimPath($entity['menu_path']);
-								$entity['sort'] = '';
-
-								if (strlen($entity['menu_path']) > 0) {
-									// First or only slash from beginning is trimmed.
-									if (substr($entity['menu_path'], 0, 1) === '/') {
-										$entity['menu_path'] = substr($entity['menu_path'], 1);
-									}
-
-									$entity['sort'] = $entity['menu_path'];
-
-									// If there is something more, check if last slash is present.
-									if (strlen($entity['menu_path']) > 0) {
-										if (substr($entity['menu_path'], -1) !== '/'
-												&& substr($entity['menu_path'], -2) === '\\/') {
-											$entity['sort'] = $entity['menu_path'].'/';
-										}
-										else {
-											$entity['sort'] = $entity['menu_path'];
-										}
-
-										if (substr($entity['menu_path'], -1) === '/'
-												&& substr($entity['menu_path'], -2) !== '\\/') {
-											$entity['menu_path'] = substr($entity['menu_path'], 0, -1);
-										}
-									}
-								}
-
-								$entity['sort'] = $entity['sort'].$entity['name'];
-							}
-							unset($entity);
-
-							CArrayHelper::sort($entities, ['sort']);
-						}
-					}
-					unset($entities);
-				}
+				$scripts = self::sortEntitiesByMenuPath($scripts);
+				$urls = self::sortEntitiesByMenuPath($urls);
 			}
 
 			$menu_data = [
@@ -237,11 +202,12 @@ class CControllerMenuPopup extends CController {
 
 			foreach (array_values($urls) as $url) {
 				$menu_data['urls'][] = [
-					'name' => $url['name'],
+					'label' => $url['name'],
 					'menu_path' => $url['menu_path'],
 					'url' => $url['url'],
-					'new_window' => $url['new_window'],
-					'confirmation' => $url['confirmation']
+					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : '',
+					'confirmation' => $url['confirmation'],
+					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
 				];
 			}
 
@@ -260,6 +226,8 @@ class CControllerMenuPopup extends CController {
 
 	/**
 	 * Prepare data for item latest data context menu popup.
+	 *
+	 * @static
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
@@ -318,6 +286,8 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Prepare data for item configuration context menu popup.
 	 *
+	 * @static
+	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
 	 * @param string $data['backurl']
@@ -371,6 +341,8 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Prepare data for item prototype configuration context menu popup.
 	 *
+	 * @static
+	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
 	 * @param string $data['backurl']
@@ -421,6 +393,8 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Combines map URLs with element's URLs and performs other modifications with the URLs.
 	 *
+	 * @static
+	 *
 	 * @param array  $selement
 	 * @param array  $map_urls
 	 *
@@ -465,6 +439,8 @@ class CControllerMenuPopup extends CController {
 
 	/**
 	 * Prepare data for map element context menu popup.
+	 *
+	 * @static
 	 *
 	 * @param array   $data
 	 * @param string  $data['sysmapid']
@@ -610,6 +586,8 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Prepare data for trigger context menu popup.
 	 *
+	 * @static
+	 *
 	 * @param array  $data
 	 * @param string $data['triggerid']
 	 * @param string $data['eventid']                 (optional) Mandatory for Acknowledge menu.
@@ -686,15 +664,8 @@ class CControllerMenuPopup extends CController {
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 			];
 
-			if ($db_trigger['url'] !== '') {
-				$menu_data['urls'][] = [
-					'label' => _('Trigger URL'),
-					'url' => $db_trigger['url']
-				];
-			}
-
 			$can_be_closed = ($db_trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
-					&& CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+				&& CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 			);
 			$event = [];
 
@@ -712,15 +683,6 @@ class CControllerMenuPopup extends CController {
 
 					if ($can_be_closed) {
 						$can_be_closed = !isEventClosed($event);
-					}
-
-					foreach ($event['urls'] as $url) {
-						$menu_data['urls'][] = [
-							'label' => $url['name'],
-							'url' => $url['url'],
-							'target' => '_blank',
-							'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
-						];
 					}
 				}
 			}
@@ -748,54 +710,64 @@ class CControllerMenuPopup extends CController {
 				);
 			}
 
-			$scripts_by_hosts = CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)
-				? $event ? API::Script()->getScriptsByHosts(array_keys($hosts)) : []
-				: [];
+			$scripts_by_hosts = [];
+
+			if (CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS) && $event) {
+				$scripts_by_hosts = API::Script()->getScriptsByHosts(array_keys($hosts));
+			}
 
 			// Filter only event scope scripts and get rid of excess spaces and create full name with menu path included.
 			$scripts = [];
+			$urls = [];
+
 			foreach ($scripts_by_hosts as &$host_scripts) {
-				foreach ($host_scripts as &$host_script) {
-					if (!array_key_exists($host_script['scriptid'], $scripts)
-							&& $host_script['scope'] == ZBX_SCRIPT_SCOPE_EVENT) {
-						$host_script['menu_path'] = trimPath($host_script['menu_path']);
-						$host_script['sort'] = '';
+				foreach ($host_scripts as $num => &$host_script) {
+					if ($host_script['scope'] != ZBX_SCRIPT_SCOPE_EVENT) {
+						unset($host_scripts[$num]);
+						continue;
+					}
 
-						if (strlen($host_script['menu_path']) > 0) {
-							// First or only slash from beginning is trimmed.
-							if (substr($host_script['menu_path'], 0, 1) === '/') {
-								$host_script['menu_path'] = substr($host_script['menu_path'], 1);
-							}
+					$scriptid = $host_script['scriptid'];
 
-							$host_script['sort'] = $host_script['menu_path'];
-
-							// If there is something more, check if last slash is present.
-							if (strlen($host_script['menu_path']) > 0) {
-								if (substr($host_script['menu_path'], -1) !== '/'
-										&& substr($host_script['menu_path'], -2) === '\\/') {
-									$host_script['sort'] = $host_script['menu_path'].'/';
-								}
-								else {
-									$host_script['sort'] = $host_script['menu_path'];
-								}
-
-								if (substr($host_script['menu_path'], -1) === '/'
-										&& substr($host_script['menu_path'], -2) !== '\\/') {
-									$host_script['menu_path'] = substr($host_script['menu_path'], 0, -1);
-								}
-							}
+					// Split scripts and URLs.
+					if ($host_script['type'] == ZBX_SCRIPT_TYPE_URL) {
+						if (!array_key_exists($scriptid, $urls)) {
+							$urls[$scriptid] = $host_script;
 						}
-
-						$host_script['sort'] = $host_script['sort'].$host_script['name'];
-
-						$scripts[$host_script['scriptid']] = $host_script;
+					}
+					else {
+						if (!array_key_exists($scriptid, $scripts)) {
+							$scripts[$scriptid] = $host_script;
+						}
 					}
 				}
 				unset($host_script);
 			}
 			unset($host_scripts);
 
-			CArrayHelper::sort($scripts, ['sort']);
+			if ($event) {
+				foreach ($event['urls'] as &$url) {
+					$url['new_window'] = ZBX_SCRIPT_URL_NEW_WINDOW_YES;
+					$url['confirmation'] = '';
+					$url['menu_path'] = '';
+				}
+				unset($url);
+
+				$urls = array_merge($urls, $event['urls']);
+			}
+
+			if ($db_trigger['url'] !== '') {
+				$urls = array_merge($urls, [[
+					'name' => _('Trigger URL'),
+					'url' => $db_trigger['url'],
+					'menu_path' => '',
+					'new_window' => ZBX_SCRIPT_URL_NEW_WINDOW_NO,
+					'confirmation' => ''
+				]]);
+			}
+
+			$scripts = self::sortEntitiesByMenuPath($scripts);
+			$urls = self::sortEntitiesByMenuPath($urls);
 
 			foreach (array_values($scripts) as $script) {
 				$menu_data['scripts'][] = [
@@ -803,6 +775,17 @@ class CControllerMenuPopup extends CController {
 					'menu_path' => $script['menu_path'],
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
+				];
+			}
+
+			foreach (array_values($urls) as $url) {
+				$menu_data['urls'][] = [
+					'label' => $url['name'],
+					'menu_path' => $url['menu_path'],
+					'url' => $url['url'],
+					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : '',
+					'confirmation' => $url['confirmation'],
+					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
 				];
 			}
 
@@ -815,7 +798,61 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
+	 * Process menu path and sort scripts or URLs according to it.
+	 *
+	 * @static
+	 *
+	 * @param array  $entities                 Scripts and URLs.
+	 * @param string $entities[]['name']       Name of the ccript or URL.
+	 * @param string $entities[]['menu_path']  Menu path of the ccript or URL.
+	 *
+	 * @return array
+	 */
+	private static function sortEntitiesByMenuPath(array $entities) {
+		if ($entities) {
+			foreach ($entities as &$entity) {
+				$entity['menu_path'] = trimPath($entity['menu_path']);
+				$entity['sort'] = '';
+
+				if (strlen($entity['menu_path']) > 0) {
+					// First or only slash from beginning is trimmed.
+					if (substr($entity['menu_path'], 0, 1) === '/') {
+						$entity['menu_path'] = substr($entity['menu_path'], 1);
+					}
+
+					$entity['sort'] = $entity['menu_path'];
+
+					// If there is something more, check if last slash is present.
+					if (strlen($entity['menu_path']) > 0) {
+						if (substr($entity['menu_path'], -1) !== '/'
+								&& substr($entity['menu_path'], -2) === '\\/') {
+							$entity['sort'] = $entity['menu_path'].'/';
+						}
+						else {
+							$entity['sort'] = $entity['menu_path'];
+						}
+
+						if (substr($entity['menu_path'], -1) === '/'
+								&& substr($entity['menu_path'], -2) !== '\\/') {
+							$entity['menu_path'] = substr($entity['menu_path'], 0, -1);
+						}
+					}
+				}
+
+				$entity['sort'] = $entity['sort'].$entity['name'];
+			}
+			unset($entity);
+
+			CArrayHelper::sort($entities, ['sort']);
+		}
+
+		return $entities;
+	}
+
+	/**
 	 * Prepare data for trigger macro context menu popup.
+	 *
+	 * @static
 	 *
 	 * @return array
 	 */

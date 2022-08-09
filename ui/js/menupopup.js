@@ -641,7 +641,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 	if ('urls' in options) {
 		sections[sections.length] = {
 			label: t('Links'),
-			items: options.urls
+			items: getMenuPopupURLData(options.urls, trigger_element)
 		};
 	}
 
@@ -1137,10 +1137,11 @@ function getMenuPopupURLData(urls, trigger_element) {
 		if (typeof url.menu_path !== 'undefined') {
 			const items = (url.menu_path.length > 0) ? splitPath(url.menu_path) : [];
 
-			appendTreeItem(tree, url.name, items, {
+			appendTreeItem(tree, url.label, items, {
 				url: url.url,
-				new_window: url.new_window,
-				confirmation: url.confirmation
+				target: url.target,
+				confirmation: url.confirmation,
+				rel: url.rel,
 			});
 		}
 	}
@@ -1199,10 +1200,8 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 
 			if (typeof data.params !== 'undefined') {
 				item.url = data.params.url;
-
-				if (data.params.new_window == 1) {
-					item.target = '_blank';
-				}
+				item.target = data.params.target;
+				item.rel = data.params.rel;
 
 				if (data.params.confirmation !== '') {
 					item.clickCallback = function(e) {
