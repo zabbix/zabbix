@@ -42,13 +42,13 @@ Add the following required permissions to your Zabbix IAM policy in order to col
   }
   ```
 
-To gather Request Metrics, [Enable Requests metrics](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudwatch-monitoring.html) on your Amazon S3 buckets from the AWS console.
+To gather Request metrics, [enable Requests metrics](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudwatch-monitoring.html) on your Amazon S3 buckets from the AWS console.
 
-Set macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}", "{$AWS.REGION}", "{$AWS.S3.FILTER.ID}", "{$AWS.S3.BUCKET.NAME}"
+Set the macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}", "{$AWS.REGION}", "{$AWS.S3.FILTER.ID}", "{$AWS.S3.BUCKET.NAME}"
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
-Also, see the Macros section for a list of macros used to LLD filters.
+Also, see the [Macros](#macros_used) section for a list of macros used by LLD filters.
 
 Additional information about metrics and used API methods:
 * Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html
