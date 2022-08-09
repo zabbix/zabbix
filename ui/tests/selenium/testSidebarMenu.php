@@ -31,8 +31,15 @@ class testSidebarMenu extends CWebTest {
 		return [
 			[
 				[
+					'section' => 'Dashboards',
+					'page' => 'Dashboards',
+					'header' => 'Global view'
+				]
+			],
+			[
+				[
 					'section' => 'Monitoring',
-					'page' => 'Problems'
+					'page' => 'Problems',
 				]
 			],
 			[
@@ -64,12 +71,6 @@ class testSidebarMenu extends CWebTest {
 				[
 					'section' => 'Services',
 					'page' => 'Services'
-				]
-			],
-			[
-				[
-					'section' => 'Services',
-					'page' => 'Service actions'
 				]
 			],
 			[
@@ -107,6 +108,12 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Reports',
+					'page' => 'Scheduled reports'
+				]
+			],
+			[
+				[
+					'section' => 'Reports',
 					'page' => 'Availability report'
 				]
 			],
@@ -120,14 +127,15 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Reports',
-					'page' => 'Audit',
+					'page' => 'Audit log',
 					'header' => 'Audit log'
 				]
 			],
 			[
 				[
 					'section' => 'Reports',
-					'page' => 'Action log'
+					'page' => 'Action log',
+					'header' => 'Action log'
 				]
 			],
 			[
@@ -138,36 +146,56 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Configuration',
+					'section' => 'Data collection',
+					'page' => 'Template groups'
+				]
+			],
+			[
+				[
+					'section' => 'Data collection',
 					'page' => 'Host groups'
 				]
 			],
 			[
 				[
-					'section' => 'Configuration',
+					'section' => 'Data collection',
 					'page' => 'Templates'
 				]
 			],
 			[
 				[
-					'section' => 'Configuration',
+					'section' => 'Data collection',
 					'page' => 'Hosts'
 				]
 			],
 			[
 				[
-					'section' => 'Configuration',
+					'section' => 'Data collection',
 					'page' => 'Maintenance',
 					'header' => 'Maintenance periods'
 				]
 			],
 			[
 				[
-					'section' => 'Configuration',
+					'section' => 'Data collection',
+					'page' => 'Event correlation'
+				]
+			],
+			[
+				[
+					'section' => 'Data collection',
+					'page' => 'Discovery',
+					'header' => 'Discovery rules'
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
 					'page' => 'Actions',
 					'third_level' =>
 					[
 						'Trigger actions',
+						'Service actions',
 						'Discovery actions',
 						'Autoregistration actions',
 						'Internal actions'
@@ -176,15 +204,44 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Configuration',
-					'page' => 'Event correlation'
+					'section' => 'Alerts',
+					'page' => 'Media types',
 				]
 			],
 			[
 				[
-					'section' => 'Configuration',
-					'page' => 'Discovery',
-					'header' => 'Discovery rules'
+					'section' => 'Alerts',
+					'page' => 'Scripts',
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'User groups',
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'User roles',
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'Users',
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'API tokens',
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'Authentication',
 				]
 			],
 			[
@@ -195,16 +252,26 @@ class testSidebarMenu extends CWebTest {
 					[
 						'GUI',
 						'Autoregistration',
-						'Housekeeping',
 						'Images',
 						'Icon mapping',
 						'Regular expressions',
-						'Macros',
 						'Trigger displaying options',
+						'Geographical maps',
 						'Modules',
-						'API tokens',
 						'Other'
 					]
+				]
+			],
+			[
+				[
+					'section' => 'Administration',
+					'page' => 'Audit log'
+				]
+			],
+			[
+				[
+					'section' => 'Administration',
+					'page' => 'Housekeeping'
 				]
 			],
 			[
@@ -216,37 +283,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Administration',
-					'page' => 'Authentication'
-				]
-			],
-			[
-				[
-					'section' => 'Administration',
-					'page' => 'User groups'
-				]
-			],
-			[
-				[
-					'section' => 'Administration',
-					'page' => 'User roles'
-				]
-			],
-			[
-				[
-					'section' => 'Administration',
-					'page' => 'Users'
-				]
-			],
-			[
-				[
-					'section' => 'Administration',
-					'page' => 'Media types'
-				]
-			],
-			[
-				[
-					'section' => 'Administration',
-					'page' => 'Scripts'
+					'page' => 'Macros'
 				]
 			],
 			[
@@ -284,14 +321,14 @@ class testSidebarMenu extends CWebTest {
 	 */
 	public function testSidebarMenu_Main($data) {
 		$this->page->login()->open('')->waitUntilReady();
-		$this->query('xpath://li[@class="is-selected"]/a[text()="Dashboard"]')->waitUntilReady();
+		$this->query('xpath://li[@class="is-selected"]/a[text()="Dashboards"]')->waitUntilReady();
 
 		$menu__type = ($data['section'] === 'User settings') ? 'user' : 'main';
 		// First level menu.
 		$main_section = $this->query('xpath://ul[@class="menu-'.$menu__type.'"]')->query('link', $data['section']);
 
 		// Click on the first level menu and wait for it to fully open.
-		if ($data['section'] !== 'Monitoring') {
+		if ($data['section'] !== 'Dashboards') {
 			$main_section->waitUntilReady()->one()->click();
 			$element = $this->query('xpath://a[text()="'.$data['section'].'"]/../ul[@class="submenu"]')->one();
 			CElementQuery::wait()->until(function () use ($element) {
