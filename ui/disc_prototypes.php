@@ -231,7 +231,7 @@ $fields = [
 											')',
 										_('Password')
 									],
-	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'visible' =>					[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 										IN('"itemprototype.massdelete","itemprototype.massdisable",'.
