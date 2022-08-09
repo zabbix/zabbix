@@ -79,9 +79,7 @@ $override_evaltype = (new CDiv([
 		_('Type of calculation'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$override_evaltype_select,
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-	]))->addClass(ZBX_STYLE_CELL),
-	(new CDiv([
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan(''))
 			->addStyle('white-space: normal;')
 			->setId('overrides_expression'),
