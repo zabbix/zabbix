@@ -392,10 +392,12 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			$element = $this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
 
-			try {
-				$this->assertScreenshot($element, $id);
-			}
-			catch (Exception $e) {
+			$count = count($this->errors);
+			$this->assertScreenshot($element, $id);
+
+			if ($count !== count($this->errors)) {
+				$this->errors = array_slice($this->errors, 0, $count);
+
 				sleep(3);
 				$this->assertScreenshot($element, $id);
 			}
