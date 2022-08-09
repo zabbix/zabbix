@@ -7278,7 +7278,6 @@ static void	autoreg_host_free_data(ZBX_DC_AUTOREG_HOST *autoreg_host)
 
 void	DCconfig_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts)
 {
-	ZBX_DC_AUTOREG_HOST	*autoreg_host, autoreg_host_local;
 	int			cached = 0, i;
 
 	/* hosts monitored by Zabbix proxy shouldn't be changed too frequently */
@@ -7289,8 +7288,7 @@ void	DCconfig_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts)
 	RDLOCK_CACHE;
 	for (i = 0; i < autoreg_hosts->values_num; i++)
 	{
-		autoreg_host_local.host = ((const zbx_autoreg_host_t *)autoreg_hosts->values[i])->host;
-		if (NULL != zbx_hashset_search(&config->autoreg_hosts, &autoreg_host_local))
+		if (NULL != DCfind_autoreg_host(((const zbx_autoreg_host_t *)autoreg_hosts->values[i])->host))
 			cached++;
 	}
 	UNLOCK_CACHE;
@@ -7304,9 +7302,9 @@ void	DCconfig_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts)
 
 	for (i = 0; i < autoreg_hosts->values_num; i++)
 	{
-		autoreg_host_local.host = ((const zbx_autoreg_host_t *)autoreg_hosts->values[i])->host;
-		autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_search(&config->autoreg_hosts, &autoreg_host_local);
+		ZBX_DC_AUTOREG_HOST	*autoreg_host;
 
+		autoreg_host = DCfind_autoreg_host(((const zbx_autoreg_host_t *)autoreg_hosts->values[i])->host);
 		if (NULL != autoreg_host)
 		{
 			autoreg_host_free_data(autoreg_host);
