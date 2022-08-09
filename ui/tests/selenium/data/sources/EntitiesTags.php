@@ -26,10 +26,6 @@ class EntitiesTags {
 	 * @return array
 	 */
 	public static function load() {
-		CDataHelper::reset();
-
-		CDataHelper::setSessionId(null);
-
 		// Create host groups.
 		CDataHelper::call('hostgroup.create', [
 			['name' => 'HostTags'],
