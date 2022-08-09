@@ -23,7 +23,7 @@ Additional information about metrics and used API methods:
 
 The template get AWS RDS instance metrics and uses the script item to make HTTP requests to the CloudWatch API.
 
-Before using template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.  
+Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.  
 
 Add the following required permissions to your Zabbix IAM policy in order to collect Amazon RDS metrics.  
 ```json
@@ -48,7 +48,7 @@ Set macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}", "{$AWS.REGION}", 
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
-Also, see the Macros section for a list of macros used to LLD filters.
+Also, see the Macros section for a list of macros used for LLD filters.
 
 Additional information about metrics and used API methods:
 * Full metrics list related to RDS: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html
