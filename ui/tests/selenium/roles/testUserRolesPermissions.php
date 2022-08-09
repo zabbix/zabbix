@@ -285,7 +285,7 @@ class testUserRolesPermissions extends CWebTest {
 			}
 		}
 
-		$this->checkLinks($data['check_links'],'Dashboards');
+		$this->checkLinks($data['check_links']);
 	}
 
 	public static function getProblemActionsData() {
@@ -1039,14 +1039,14 @@ class testUserRolesPermissions extends CWebTest {
 			}
 			else {
 				if (array_key_exists('user_roles', $data)) {
-					$this->checkLinks($data['link'],'Dashboards');
+					$this->checkLinks($data['link']);
 					$this->signOut();
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeRoleRule($user_roles);
 					$this->signOut();
 				}
 				else {
-					$this->checkLinks($data['link'],'Dashboards');
+					$this->checkLinks($data['link']);
 					$this->signOut();
 				}
 			}
@@ -1060,18 +1060,19 @@ class testUserRolesPermissions extends CWebTest {
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
 		$this->changeRoleRule(['Dashboards' => false]);
-		$this->checkLinks(['zabbix.php?action=dashboard.view'],'Problems');
+		$this->checkLinks(['zabbix.php?action=dashboard.view'], 'Problems');
 }
 
 	/**
 	 * Manage API token action check.
+	 * @depends testUserRolesPermissions_Dashboard
 	 */
 	public function testUserRolesPermissions_ManageApiToken() {
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
 		$this->assertEquals('TEST_SERVER_NAME: API tokens', $this->page->getTitle());
 		$this->changeRoleRule(['Manage API tokens' => false]);
-		$this->checkLinks(['zabbix.php?action=user.token.list'],'Dashboards');
+		$this->checkLinks(['zabbix.php?action=user.token.list'], 'Problems');
 	}
 
 	public static function getRoleServiceData() {
@@ -1531,7 +1532,7 @@ class testUserRolesPermissions extends CWebTest {
 	 * @param array $links		checked links after disabling action
 	 * @param string $page		page name displayed on error message button
 	 */
-	private function checkLinks($links, $page) {
+	private function checkLinks($links, $page = 'Dashboards') {
 		foreach ($links as $link) {
 			$this->page->open($link)->waitUntilReady();
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "user_for_role". '.
