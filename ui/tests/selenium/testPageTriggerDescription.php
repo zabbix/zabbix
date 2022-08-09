@@ -108,7 +108,7 @@ class testPageTriggerDescription extends CWebTest {
 			$this->assertTrue($row->query('class:icon-description')->count() === 0);
 		}
 
-		// Check trigger description in event details of the correspondign problem.
+		// Check trigger description in event details of the corresponding problem.
 		$row->getColumn('Time')->query('xpath:./a')->one()->click();
 		$this->page->waitUntilReady();
 
