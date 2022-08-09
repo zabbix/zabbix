@@ -800,7 +800,7 @@ static void	DCdump_functions(void)
 	{
 		function = (ZBX_DC_FUNCTION *)index.values[i];
 		zabbix_log(LOG_LEVEL_DEBUG, "functionid:" ZBX_FS_UI64 " triggerid:" ZBX_FS_UI64 " itemid:"
-				ZBX_FS_UI64 " function:'%s' parameter:'%s' type:%u timer_revision:%d",
+				ZBX_FS_UI64 " function:'%s' parameter:'%s' type:%u timer_revision:%u",
 				function->functionid, function->triggerid, function->itemid, function->function,
 				function->parameter, function->type, function->timer_revision);
 
