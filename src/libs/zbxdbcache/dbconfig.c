@@ -2298,20 +2298,23 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 				update_index = 1;
 		}
 
-		if (1 == found)
+		if (0 == found || item->type != type)
 		{
-			if (ITEM_TYPE_ZABBIX_ACTIVE == item->type)
+			if (1 == found)
 			{
-				if (FAIL != (i = zbx_vector_item_ptr_search(&host->active_items, item,
-						ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+				if (ITEM_TYPE_ZABBIX_ACTIVE == item->type)
 				{
-					zbx_vector_item_ptr_remove(&host->active_items, i);
+					if (FAIL != (i = zbx_vector_item_ptr_search(&host->active_items, item,
+							ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+					{
+						zbx_vector_item_ptr_remove(&host->active_items, i);
+					}
 				}
 			}
-		}
 
-		if (ITEM_TYPE_ZABBIX_ACTIVE == type)
-			zbx_vector_item_ptr_append(&host->active_items, item);
+			if (ITEM_TYPE_ZABBIX_ACTIVE == type)
+				zbx_vector_item_ptr_append(&host->active_items, item);
+		}
 
 		/* store new information in item structure */
 
@@ -7116,6 +7119,26 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Check access rights for host and get host ID and revision              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     host     - [IN] host name                                              *
+ *     sock     - [IN] connection socket context                              *
+ *     hostid   - [OUT] host ID found in configuration cache                  *
+ *     revision - [OUT] host configuration revision                           *
+ *     error    - [OUT] error message why access was denied                   *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - access is allowed or host not found, FAIL - access denied    *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     Generating of error messages is done outside of configuration cache    *
+ *     locking.                                                               *
+ *                                                                            *
+ ******************************************************************************/
 int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		zbx_uint32_t *revision, char **error)
 {
