@@ -7187,6 +7187,7 @@ int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uin
 	*hostid = dc_host->hostid;
 	*revision = MAX(dc_host->revision, config->expression_revision);
 
+	um_cache_get_host_revision(config->um_cache, ZBX_UM_CACHE_GLOBAL_MACRO_HOSTID, revision);
 	um_cache_get_host_revision(config->um_cache, *hostid, revision);
 
 	UNLOCK_CACHE;

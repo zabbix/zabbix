@@ -23,6 +23,8 @@
 #include "common.h"
 #include "zbxalgo.h"
 
+#define ZBX_UM_CACHE_GLOBAL_MACRO_HOSTID	0
+
 typedef struct
 {
 	zbx_uint64_t	macroid;

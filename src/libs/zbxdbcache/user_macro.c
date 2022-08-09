@@ -595,7 +595,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 {
 	unsigned char		tag;
 	int			ret, i;
-	zbx_uint64_t		rowid, macroid, hostid = 0, *pmacroid = &macroid;
+	zbx_uint64_t		rowid, macroid, hostid = ZBX_UM_CACHE_GLOBAL_MACRO_HOSTID, *pmacroid = &macroid;
 	char			**row;
 	zbx_um_macro_t		**pmacro;
 	zbx_um_host_t		*host;
@@ -1031,7 +1031,7 @@ static void	um_cache_get_macro(const zbx_um_cache_t *cache, const zbx_uint64_t *
 
 	if (SUCCEED != um_cache_get_host_macro(cache, hostids, hostids_num, name, context, um_macro))
 	{
-		zbx_uint64_t	hostid = 0;
+		zbx_uint64_t	hostid = ZBX_UM_CACHE_GLOBAL_MACRO_HOSTID;
 
 		um_cache_get_host_macro(cache, &hostid, 1, name, context, um_macro);
 	}
