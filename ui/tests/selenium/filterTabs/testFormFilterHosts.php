@@ -147,26 +147,22 @@ class testFormFilterHosts extends testFormFilter {
 		return [
 			[
 				[
-					'filter_form' => [
-						'Name' => 'Test name',
-						'Host groups' => ['Zabbix servers'],
-						'IP' => '192.168.10.1',
-						'DNS' => 'test.name',
-						'Port' => '10055',
-						'Average' => true,
-						'Warning' => true
-					]
+					'Name' => 'Test name',
+					'Host groups' => ['Zabbix servers'],
+					'IP' => '192.168.10.1',
+					'DNS' => 'test.name',
+					'Port' => '10055',
+					'Average' => true,
+					'Warning' => true
 				]
 			],
 			[
 				[
-					'filter_form' => [
-						'Host groups' => ['Zabbix servers'],
-						'Not classified' => true,
-						'Information' => true,
-						'Status' => 'Enabled',
-						'Show suppressed problems' => true
-					]
+					'Host groups' => ['Zabbix servers'],
+					'Not classified' => true,
+					'Information' => true,
+					'Status' => 'Enabled',
+					'Show suppressed problems' => true
 				]
 			]
 		];
@@ -178,8 +174,7 @@ class testFormFilterHosts extends testFormFilter {
 	 * @dataProvider getCheckRememberedFilterData
 	 */
 	public function testFormFilterHosts_CheckRememberedFilter($data) {
-		$this->rememberFilter($data, 'filter-create', 'zabbix');
-		$this->checkRememberedFilters($data, $this->table_selector);
+		$this->checkRememberedFilters($data);
 	}
 
 	/**
