@@ -851,7 +851,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Add symblos preprocessing',
+						'Name' => 'Add symbols preprocessing',
 						'Key' => 'item.symbols.preprocessing'
 					],
 					'preprocessing' => [
