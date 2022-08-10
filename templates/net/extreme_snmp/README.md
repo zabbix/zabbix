@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 
 ## Setup
 
@@ -62,7 +62,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|CPU |CPU utilization |<p>MIB: EXTREME-SOFTWARE-MONITOR-MIB</p><p>Total CPU utlization (percentage) as of last sampling.</p> |SNMP |system.cpu.util[extremeCpuMonitorTotalUtilization.0] |
+|CPU |CPU utilization |<p>MIB: EXTREME-SOFTWARE-MONITOR-MIB</p><p>Total CPU utilization (percentage) as of last sampling.</p> |SNMP |system.cpu.util[extremeCpuMonitorTotalUtilization.0] |
 |Fans |Fan {#SNMPVALUE}: Fan status |<p>MIB: EXTREME-SYSTEM-MIB</p><p>Operational status of a cooling fan.</p> |SNMP |sensor.fan.status[extremeFanOperational.{#SNMPINDEX}] |
 |Fans |Fan {#SNMPVALUE}: Fan speed |<p>MIB: EXTREME-SYSTEM-MIB</p><p>The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}</p> |SNMP |sensor.fan.speed[extremeFanSpeed.{#SNMPINDEX}] |
 |General |SNMP traps (fallback) |<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p> |SNMP_TRAP |snmptrap.fallback |
