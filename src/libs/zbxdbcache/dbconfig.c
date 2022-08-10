@@ -107,8 +107,8 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts);
 static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts);
 
-static int	dc_host_update_revision(ZBX_DC_HOST *host);
-static int	dc_item_update_revision(ZBX_DC_ITEM *item);
+static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint32_t revision);
+static int	dc_item_update_revision(ZBX_DC_ITEM *item, zbx_uint32_t revision);
 
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
@@ -1072,7 +1072,7 @@ static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid)
 	proxy->revision = config->revision;
 }
 
-static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_uint64_t *active_avail_diff,
+static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint32_t revision, zbx_vector_uint64_t *active_avail_diff,
 		zbx_hashset_t *activated_hosts)
 {
 	char		**row;
@@ -1114,7 +1114,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_uint64_t *active_avail_d
 		ZBX_STR2UCHAR(status, row[10]);
 
 		host = (ZBX_DC_HOST *)DCfind_id(&config->hosts, hostid, sizeof(ZBX_DC_HOST), &found);
-		host->revision = config->revision;
+		host->revision = revision;
 
 		/* see whether we should and can update 'hosts_h' and 'hosts_p' indexes at this point */
 
@@ -1515,7 +1515,7 @@ done:
 			{
 				proxy->location = ZBX_LOC_NOWHERE;
 				proxy->version = 0;
-				proxy->revision = config->revision;
+				proxy->revision = revision;
 				proxy->lastaccess = atoi(row[12]);
 				proxy->last_cfg_error_time = 0;
 				proxy->proxy_delay = 0;
@@ -1641,7 +1641,7 @@ done:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	DCsync_host_inventory(zbx_dbsync_t *sync)
+static void	DCsync_host_inventory(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	ZBX_DC_HOST_INVENTORY	*host_inventory, *host_inventory_auto;
 	zbx_uint64_t		rowid, hostid;
@@ -1692,7 +1692,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		}
 
 		if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
-			dc_host_update_revision(dc_host);
+			dc_host_update_revision(dc_host, revision);
 	}
 
 	/* remove deleted host inventory from cache */
@@ -1702,7 +1702,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 			continue;
 
 		if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &host_inventory->hostid)))
-			dc_host_update_revision(dc_host);
+			dc_host_update_revision(dc_host, revision);
 
 		for (i = 0; i < HOST_INVENTORY_FIELD_COUNT; i++)
 			dc_strpool_release(host_inventory->values[i]);
@@ -1789,6 +1789,8 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 		if (0 != diff.values_num)
 		{
 			START_SYNC;
+
+			config->revision++;
 
 			for (j = 0; j < diff.values_num; j++)
 			{
@@ -1973,7 +1975,7 @@ static void	dc_interface_snmp_remove(zbx_uint64_t interfaceid)
 	return;
 }
 
-static void	DCsync_interfaces(zbx_dbsync_t *sync)
+static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2154,7 +2156,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
-		dc_host_update_revision(host);
+		dc_host_update_revision(host, revision);
 	}
 
 	/* resolve macros in other interfaces */
@@ -2187,7 +2189,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 				}
 			}
 
-			dc_host_update_revision(host);
+			dc_host_update_revision(host, revision);
 		}
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
@@ -2337,7 +2339,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t synced)
+static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint32_t revision, int flags, zbx_synced_new_config_t synced)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2493,8 +2495,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			}
 		}
 
-		item->revision = config->revision;
-		dc_host_update_revision(host);
+		item->revision = revision;
+		dc_host_update_revision(host, revision);
 
 		if (ITEM_STATUS_ACTIVE == status)
 		{
@@ -2943,7 +2945,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &rowid)))
 			continue;
 
-		dc_item_update_revision(item);
+		dc_item_update_revision(item, revision);
 
 		if (ITEM_STATUS_ACTIVE == item->status)
 		{
@@ -3282,7 +3284,7 @@ static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	DCsync_triggers(zbx_dbsync_t *sync)
+static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -3349,7 +3351,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 		trigger->expression_bin = config_decode_serialized_expression(row[16]);
 		trigger->recovery_expression_bin = config_decode_serialized_expression(row[17]);
 		trigger->timer = atoi(row[18]);
-		trigger->revision = config->revision;
+		trigger->revision = revision;
 	}
 
 	/* remove deleted triggers from buffer */
@@ -3883,7 +3885,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 	}
 }
 
-static void	DCsync_functions(zbx_dbsync_t *sync)
+static void	DCsync_functions(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -3933,7 +3935,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		dc_strpool_replace(found, &function->parameter, row[3]);
 
 		function->type = zbx_get_function_type(function->function);
-		function->revision = config->revision;
+		function->revision = revision;
 
 		dc_item_reset_triggers(item, NULL);
 	}
@@ -3988,7 +3990,7 @@ static ZBX_DC_REGEXP	*dc_regexp_remove_expression(const char *regexp_name, zbx_u
  * Parameters: result - [IN] the result of expressions database select        *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_expressions(zbx_dbsync_t *sync)
+static void	DCsync_expressions(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -4070,7 +4072,7 @@ static void	DCsync_expressions(zbx_dbsync_t *sync)
 	}
 
 	if (0 != sync->add_num || 0 != sync->update_num || 0 != sync->remove_num)
-		config->expression_revision = config->revision;
+		config->expression_revision = revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -5063,7 +5065,7 @@ static int	dc_compare_preprocops_by_step(const void *d1, const void *d2)
  *           3 - params                                                       *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
+static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint32_t revision, int timestamp)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -5107,7 +5109,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 				preprocitem->update_time = timestamp;
 
 			if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-				dc_item_update_revision(item);
+				dc_item_update_revision(item, revision);
 		}
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
@@ -5149,7 +5151,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 		}
 
 		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &op->itemid)))
-			dc_item_update_revision(item);
+			dc_item_update_revision(item, revision);
 
 		dc_strpool_release(op->params);
 		dc_strpool_release(op->error_handler_params);
@@ -5192,7 +5194,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
  *           3 - value                                                        *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
+static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char				**row;
 	zbx_uint64_t			rowid;
@@ -5224,7 +5226,7 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 		}
 
 		if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-			dc_item_update_revision(dc_item);
+			dc_item_update_revision(dc_item, revision);
 
 		ZBX_STR2UINT64(item_script_paramid, row[0]);
 		scriptitem_params = (zbx_dc_scriptitem_param_t *)DCfind_id(&config->itemscript_params,
@@ -5263,7 +5265,7 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 			}
 
 			if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &scriptitem->itemid)))
-				dc_item_update_revision(dc_item);
+				dc_item_update_revision(dc_item, revision);
 		}
 
 		dc_strpool_release(scriptitem_params->name);
@@ -5407,7 +5409,7 @@ static void	dc_drule_dequeue(zbx_dc_drule_t *drule)
 	}
 }
 
-static void	dc_sync_drules(zbx_dbsync_t *sync)
+static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char			**row, *delay_str;
 	zbx_uint64_t		rowid, druleid, proxy_hostid;
@@ -5445,7 +5447,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 				NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
 						&drule->proxy_hostid)))
 			{
-				proxy->revision = config->revision;
+				proxy->revision = revision;
 			}
 		}
 
@@ -5453,7 +5455,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 		if (0 != drule->proxy_hostid)
 		{
 			if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxy_hostid)))
-				proxy->revision = config->revision;
+				proxy->revision = revision;
 		}
 
 		delay_str = dc_expand_user_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
@@ -5479,7 +5481,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 			dc_drule_dequeue(drule);
 
 		drule->delay = delay;
-		drule->revision = config->revision;
+		drule->revision = revision;
 	}
 
 	/* remove deleted discovery rules from cache and update proxy revision */
@@ -5491,7 +5493,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 		if (0 != drule->proxy_hostid)
 		{
 			if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxy_hostid)))
-				proxy->revision = config->revision;
+				proxy->revision = revision;
 		}
 
 		zbx_binary_heap_remove_direct(&config->drule_queue, drule->druleid);
@@ -5501,7 +5503,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	dc_sync_dchecks(zbx_dbsync_t *sync)
+static void	dc_sync_dchecks(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char		**row;
 	zbx_uint64_t	rowid, druleid, dcheckid;
@@ -5528,13 +5530,13 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync)
 		dcheck = (zbx_dc_dcheck_t *)DCfind_id(&config->dchecks, dcheckid, sizeof(zbx_dc_dcheck_t), &found);
 		dcheck->druleid = druleid;
 
-		if (drule->revision == config->revision)
+		if (drule->revision == revision)
 			continue;
 
-		drule->revision = config->revision;
+		drule->revision = revision;
 
 		if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxy_hostid)))
-			proxy->revision = config->revision;
+			proxy->revision = revision;
 	}
 
 	/* remove deleted discovery checks from cache and update proxy revision */
@@ -5544,12 +5546,12 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync)
 			continue;
 
 		if (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &druleid)) &&
-				0 != drule->proxy_hostid && drule->revision != config->revision)
+				0 != drule->proxy_hostid && drule->revision != revision)
 		{
 			if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxy_hostid)))
-				proxy->revision = config->revision;
+				proxy->revision = revision;
 
-			drule->revision = config->revision;
+			drule->revision = revision;
 		}
 
 		zbx_hashset_remove_direct(&config->dchecks, dcheck);
@@ -5563,14 +5565,14 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync)
  * Purpose: update host and its proxy revision                                *
  *                                                                            *
  ******************************************************************************/
-static int	dc_host_update_revision(ZBX_DC_HOST *host)
+static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint32_t revision)
 {
 	ZBX_DC_PROXY	*proxy;
 
-	if (host->revision == config->revision)
+	if (host->revision == revision)
 		return SUCCEED;
 
-	host->revision = config->revision;
+	host->revision = revision;
 
 	if (0 == host->proxy_hostid)
 		return SUCCEED;
@@ -5578,7 +5580,7 @@ static int	dc_host_update_revision(ZBX_DC_HOST *host)
 	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
 		return FAIL;
 
-	proxy->revision = config->revision;
+	proxy->revision = revision;
 
 	return SUCCEED;
 }
@@ -5588,19 +5590,19 @@ static int	dc_host_update_revision(ZBX_DC_HOST *host)
  * Purpose: update item, host and its proxy revision                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_item_update_revision(ZBX_DC_ITEM *item)
+static int	dc_item_update_revision(ZBX_DC_ITEM *item, zbx_uint32_t revision)
 {
 	ZBX_DC_HOST	*host;
 
-	if (item->revision == config->revision)
+	if (item->revision == revision)
 		return SUCCEED;
 
-	item->revision = config->revision;
+	item->revision = revision;
 
 	if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
 		return FAIL;
 
-	dc_host_update_revision(host);
+	dc_host_update_revision(host, revision);
 
 	return SUCCEED;
 }
@@ -5610,19 +5612,19 @@ static int	dc_item_update_revision(ZBX_DC_ITEM *item)
  * Purpose: update httptest and its parent object revision                    *
  *                                                                            *
  ******************************************************************************/
-static int	dc_httptest_update_revision(zbx_dc_httptest_t *httptest)
+static int	dc_httptest_update_revision(zbx_dc_httptest_t *httptest, zbx_uint32_t revision)
 {
 	ZBX_DC_HOST	*host;
 
-	if (httptest->revision == config->revision)
+	if (httptest->revision == revision)
 		return SUCCEED;
 
-	httptest->revision = config->revision;
+	httptest->revision = revision;
 
 	if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &httptest->hostid)))
 		return FAIL;
 
-	dc_host_update_revision(host);
+	dc_host_update_revision(host, revision);
 
 	return SUCCEED;
 }
@@ -5632,19 +5634,19 @@ static int	dc_httptest_update_revision(zbx_dc_httptest_t *httptest)
  * Purpose: update httptest step and its parent object revision               *
  *                                                                            *
  ******************************************************************************/
-static int	dc_httpstep_update_revision(zbx_dc_httpstep_t *httpstep)
+static int	dc_httpstep_update_revision(zbx_dc_httpstep_t *httpstep, zbx_uint32_t revision)
 {
 	zbx_dc_httptest_t	*httptest;
 
-	if (httpstep->revision == config->revision)
+	if (httpstep->revision == revision)
 		return SUCCEED;
 
-	httpstep->revision = config->revision;
+	httpstep->revision = revision;
 
 	if (NULL == (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httpstep->httptestid)))
 		return FAIL;
 
-	return dc_httptest_update_revision(httptest);
+	return dc_httptest_update_revision(httptest, revision);
 }
 
 static void	dc_httptest_queue(zbx_dc_httptest_t *httptest)
@@ -5677,7 +5679,7 @@ static void	dc_httptest_dequeue(zbx_dc_httptest_t *httptest)
  * Purpose: update httpstep and its parent object revision                    *
  *                                                                            *
  ******************************************************************************/
-static void	dc_sync_httptests(zbx_dbsync_t *sync)
+static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char			**row, *delay_str;
 	zbx_uint64_t		rowid, httptestid, hostid;
@@ -5702,7 +5704,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 			continue;
 
-		dc_host_update_revision(host);
+		dc_host_update_revision(host, revision);
 
 		ZBX_STR2UINT64(httptestid, row[0]);
 
@@ -5746,7 +5748,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 
 		httptest->hostid = hostid;
 		httptest->delay = delay;
-		httptest->revision = config->revision;
+		httptest->revision = revision;
 	}
 
 	/* remove deleted httptest rules from cache and update host revision */
@@ -5759,7 +5761,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 
 		if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &httptest->hostid)))
 		{
-			dc_host_update_revision(host);
+			dc_host_update_revision(host, revision);
 
 			if (FAIL != (index = zbx_vector_dc_httptest_search(&host->httptests, httptest,
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
@@ -5775,7 +5777,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	dc_sync_httptest_fields(zbx_dbsync_t *sync)
+static void	dc_sync_httptest_fields(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char			**row;
 	zbx_uint64_t		rowid, httptestid, httptest_fieldid;
@@ -5797,7 +5799,7 @@ static void	dc_sync_httptest_fields(zbx_dbsync_t *sync)
 		if (NULL == (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
 			continue;
 
-		dc_httptest_update_revision(httptest);
+		dc_httptest_update_revision(httptest, revision);
 
 		ZBX_STR2UINT64(httptest_fieldid, row[0]);
 
@@ -5820,7 +5822,7 @@ static void	dc_sync_httptest_fields(zbx_dbsync_t *sync)
 		if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests,
 				&httptest_field->httptestid)))
 		{
-			dc_httptest_update_revision(httptest);
+			dc_httptest_update_revision(httptest, revision);
 		}
 
 		zbx_hashset_remove_direct(&config->httptest_fields, httptest_field);
@@ -5829,7 +5831,7 @@ static void	dc_sync_httptest_fields(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	dc_sync_httpsteps(zbx_dbsync_t *sync)
+static void	dc_sync_httpsteps(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char			**row;
 	zbx_uint64_t		rowid, httptestid, httpstepid;
@@ -5851,9 +5853,9 @@ static void	dc_sync_httpsteps(zbx_dbsync_t *sync)
 		if (NULL == (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
 			continue;
 
-		dc_httptest_update_revision(httptest);
+		dc_httptest_update_revision(httptest, revision);
 
-		httptest->revision = config->revision;
+		httptest->revision = revision;
 
 		ZBX_STR2UINT64(httpstepid, row[0]);
 
@@ -5861,7 +5863,7 @@ static void	dc_sync_httpsteps(zbx_dbsync_t *sync)
 				sizeof(zbx_dc_httpstep_t), &found);
 
 		httpstep->httptestid = httptestid;
-		httpstep->revision = config->revision;
+		httpstep->revision = revision;
 	}
 
 	/* remove deleted httptest fields from cache and update host revision */
@@ -5876,7 +5878,7 @@ static void	dc_sync_httpsteps(zbx_dbsync_t *sync)
 		if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests,
 				&httpstep->httptestid)))
 		{
-			dc_httptest_update_revision(httptest);
+			dc_httptest_update_revision(httptest, revision);
 		}
 
 		zbx_hashset_remove_direct(&config->httpsteps, httpstep);
@@ -5885,7 +5887,7 @@ static void	dc_sync_httpsteps(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	dc_sync_httpstep_fields(zbx_dbsync_t *sync)
+static void	dc_sync_httpstep_fields(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char			**row;
 	zbx_uint64_t		rowid, httpstep_fieldid, httpstepid;
@@ -5907,7 +5909,7 @@ static void	dc_sync_httpstep_fields(zbx_dbsync_t *sync)
 		if (NULL == (httpstep = (zbx_dc_httpstep_t *)zbx_hashset_search(&config->httpsteps, &httpstepid)))
 			continue;
 
-		dc_httpstep_update_revision(httpstep);
+		dc_httpstep_update_revision(httpstep, revision);
 
 		ZBX_STR2UINT64(httpstep_fieldid, row[0]);
 
@@ -5930,7 +5932,7 @@ static void	dc_sync_httpstep_fields(zbx_dbsync_t *sync)
 		if (NULL != (httpstep = (zbx_dc_httpstep_t *)zbx_hashset_search(&config->httpsteps,
 				&httpstep_field->httpstepid)))
 		{
-			dc_httpstep_update_revision(httpstep);
+			dc_httpstep_update_revision(httpstep, revision);
 		}
 
 		zbx_hashset_remove_direct(&config->httpstep_fields, httpstep_field);
@@ -6306,10 +6308,10 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	zbx_hashset_t		trend_queue;
 	zbx_vector_uint64_t	active_avail_diff;
 	zbx_hashset_t		activated_hosts;
+	zbx_uint32_t		new_revision = config->revision + 1;
+
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	config->revision++;
 
 	zbx_hashset_create(&activated_hosts, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -6429,7 +6431,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	START_SYNC;
 	sec = zbx_time();
-	config->um_cache = um_cache_sync(config->um_cache, config->revision, &gmacro_sync, &hmacro_sync, &htmpl_sync);
+	config->um_cache = um_cache_sync(config->um_cache, new_revision, &gmacro_sync, &hmacro_sync, &htmpl_sync);
 	um_cache_sec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6498,11 +6500,11 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	START_SYNC;
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
-	DCsync_hosts(&hosts_sync, &active_avail_diff, &activated_hosts);
+	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts);
 	hsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_host_inventory(&hi_sync);
+	DCsync_host_inventory(&hi_sync, new_revision);
 	hisec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6578,13 +6580,13 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
 	sec = zbx_time();
-	DCsync_interfaces(&if_sync);
+	DCsync_interfaces(&if_sync, new_revision);
 	ifsec2 = zbx_time() - sec;
 
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, flags, synced);
+	DCsync_items(&items_sync, new_revision, flags, synced);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6601,12 +6603,12 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	/* relies on items, must be after DCsync_items() */
 	sec = zbx_time();
-	DCsync_item_preproc(&itempp_sync, sec);
+	DCsync_item_preproc(&itempp_sync, new_revision, sec);
 	itempp_sec2 = zbx_time() - sec;
 
 	/* relies on items, must be after DCsync_items() */
 	sec = zbx_time();
-	DCsync_itemscript_param(&itemscrp_sync);
+	DCsync_itemscript_param(&itemscrp_sync, new_revision);
 	itemscrp_sec2 = zbx_time() - sec;
 
 	config->item_sync_ts = time(NULL);
@@ -6629,7 +6631,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	START_SYNC;
 	sec = zbx_time();
-	DCsync_functions(&func_sync);
+	DCsync_functions(&func_sync, new_revision);
 	fsec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
@@ -6687,7 +6689,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	START_SYNC;
 
 	sec = zbx_time();
-	DCsync_triggers(&triggers_sync);
+	DCsync_triggers(&triggers_sync, new_revision);
 	tsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6695,7 +6697,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	dsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_expressions(&expr_sync);
+	DCsync_expressions(&expr_sync, new_revision);
 	expr_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6734,15 +6736,15 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	corr_operation_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	dc_sync_drules(&drules_sync);
-	dc_sync_dchecks(&dchecks_sync);
+	dc_sync_drules(&drules_sync, new_revision);
+	dc_sync_dchecks(&dchecks_sync, new_revision);
 	drules_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	dc_sync_httptests(&httptest_sync);
-	dc_sync_httptest_fields(&httptest_field_sync);
-	dc_sync_httpsteps(&httpstep_sync);
-	dc_sync_httpstep_fields(&httpstep_field_sync);
+	dc_sync_httptests(&httptest_sync, new_revision);
+	dc_sync_httptest_fields(&httptest_field_sync, new_revision);
+	dc_sync_httpsteps(&httpstep_sync, new_revision);
+	dc_sync_httpstep_fields(&httpstep_field_sync, new_revision);
 	httptest_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6784,6 +6786,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	}
 
 	update_sec = zbx_time() - sec;
+
+	config->revision = new_revision;
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
