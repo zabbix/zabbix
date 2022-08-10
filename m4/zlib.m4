@@ -29,7 +29,7 @@ AC_DEFUN([ZLIB_CHECK_CONFIG],
 [
 	AC_ARG_WITH([zlib],[
 If you want to specify zlib installation directories:
-AC_HELP_STRING([--with-zlib@<:@=DIR@:>@], [use zlib from given base install directory (DIR), default is to search through a number of common places for the zlib files.])],
+AS_HELP_STRING([--with-zlib@<:@=DIR@:>@], [use zlib from given base install directory (DIR), default is to search through a number of common places for the zlib files.])],
 		[
 			test "x$withval" = "xyes" && withval=/usr
 			ZLIB_CFLAGS="-I$withval/include"
@@ -39,7 +39,7 @@ AC_HELP_STRING([--with-zlib@<:@=DIR@:>@], [use zlib from given base install dire
 	)
 
 	AC_ARG_WITH([zlib-include],
-		AC_HELP_STRING([--with-zlib-include=DIR],
+		AS_HELP_STRING([--with-zlib-include=DIR],
 			[use zlib include headers from given path.]
 		),
 		[
@@ -49,7 +49,7 @@ AC_HELP_STRING([--with-zlib@<:@=DIR@:>@], [use zlib from given base install dire
 	)
 
 	AC_ARG_WITH([zlib-lib],
-		AC_HELP_STRING([--with-zlib-lib=DIR],
+		AS_HELP_STRING([--with-zlib-lib=DIR],
 			[use zlib libraries from given path.]
 		),
 		[

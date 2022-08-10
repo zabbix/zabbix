@@ -71,7 +71,7 @@ AC_DEFUN([LIBMODBUS_CHECK_CONFIG],
 [
   AC_ARG_WITH(libmodbus,[
 If you want to use MODBUS based checks:
-AC_HELP_STRING([--with-libmodbus@<:@=DIR@:>@],[use MODBUS package @<:@default=no@:>@, DIR is the MODBUS library install directory.])],
+AS_HELP_STRING([--with-libmodbus@<:@=DIR@:>@],[use MODBUS package @<:@default=no@:>@, DIR is the MODBUS library install directory.])],
     [
       if test "$withval" = "no"; then
         want_libmodbus="no"

@@ -86,7 +86,7 @@ AC_DEFUN([LIBOPENSSL_CHECK_CONFIG],
 [
   AC_ARG_WITH(openssl,[
 If you want to use encryption provided by OpenSSL library:
-AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@:>@, DIR is the libssl and libcrypto install directory.])],
+AS_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@:>@, DIR is the libssl and libcrypto install directory.])],
     [
 	if test "$withval" = "no"; then
 	    want_openssl="no"

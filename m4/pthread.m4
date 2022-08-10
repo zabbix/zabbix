@@ -73,7 +73,7 @@ AC_DEFUN([LIBPTHREAD_CHECK_CONFIG],
 [
 	AC_ARG_WITH([libpthread],[
 If you want to specify pthread installation directories:
-AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base install directory (DIR), default is to search through a number of common places for the libpthread files.])],
+AS_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base install directory (DIR), default is to search through a number of common places for the libpthread files.])],
 		[
 			test "x$withval" = "xyes" && withval=/usr
 			LIBPTHREAD_CFLAGS="-I$withval/include"
@@ -83,7 +83,7 @@ AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base 
 	)
 
 	AC_ARG_WITH([libpthread-include],
-		AC_HELP_STRING([--with-libpthread-include@<:@=DIR@:>@],
+		AS_HELP_STRING([--with-libpthread-include@<:@=DIR@:>@],
 			[use libpthread include headers from given path.]
 		),
 		[
@@ -93,7 +93,7 @@ AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base 
 	)
 
 	AC_ARG_WITH([libpthread-lib],
-		AC_HELP_STRING([--with-libpthread-lib@<:@=DIR@:>@],
+		AS_HELP_STRING([--with-libpthread-lib@<:@=DIR@:>@],
 			[use libpthread libraries from given path.]
 		),
 		[

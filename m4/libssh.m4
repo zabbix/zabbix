@@ -56,7 +56,7 @@ AC_DEFUN([LIBSSH_CHECK_CONFIG],
 [
   AC_ARG_WITH(ssh,[
 If you want to use SSH based checks:
-AC_HELP_STRING([--with-ssh@<:@=DIR@:>@],[use SSH package @<:@default=no@:>@, DIR is the SSH library install directory.])],
+AS_HELP_STRING([--with-ssh@<:@=DIR@:>@],[use SSH package @<:@default=no@:>@, DIR is the SSH library install directory.])],
     [
 	if test "$withval" = "no"; then
 	    want_ssh="no"

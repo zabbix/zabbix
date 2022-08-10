@@ -22,7 +22,7 @@ AC_DEFUN([LIBNETSNMP_CHECK_CONFIG],
 
   AC_ARG_WITH(net-snmp,
 [If you want to use Net-SNMP library:
-AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
+AS_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		[use Net-SNMP package @<:@default=no@:>@, optionally specify path to net-snmp-config])
 	],[ if test "$withval" = "no"; then
             want_netsnmp="no"

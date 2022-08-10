@@ -60,7 +60,7 @@ AC_DEFUN([LIBGNUTLS_CHECK_CONFIG],
 [
   AC_ARG_WITH(gnutls,[
 If you want to use encryption provided by GnuTLS library:
-AC_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>@, DIR is the libgnutls install directory.])],
+AS_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>@, DIR is the libgnutls install directory.])],
     [
 	if test "$withval" = "no"; then
 	    want_gnutls="no"

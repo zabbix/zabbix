@@ -160,7 +160,7 @@ AC_DEFUN([AX_LIB_MYSQL],
     MYSQL_CONFIG="no"
 
     AC_ARG_WITH([mysql],
-        AC_HELP_STRING([--with-mysql@<:@=ARG@:>@],
+        AS_HELP_STRING([--with-mysql@<:@=ARG@:>@],
             [use MySQL client library @<:@default=no@:>@, optionally specify path to mysql_config]
         ),
         [

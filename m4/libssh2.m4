@@ -49,7 +49,7 @@ AC_DEFUN([LIBSSH2_ACCEPT_VERSION],
 AC_DEFUN([LIBSSH2_CHECK_CONFIG],
 [
   AC_ARG_WITH(ssh2,[If you want to use SSH2 based checks:
-AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, DIR is the SSH2 library install directory.])],
+AS_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, DIR is the SSH2 library install directory.])],
     [
 	if test "$withval" = "no"; then
 	    want_ssh2="no"
