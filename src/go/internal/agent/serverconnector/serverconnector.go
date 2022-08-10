@@ -192,10 +192,15 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	data, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
+	data, errs, errRead := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
 		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
 
 	if errs != nil {
+		// server is unaware if configuration is actually delivered and saves session
+		if errRead != nil {
+			c.configRevision = 0
+		}
+
 		if !reflect.DeepEqual(errs, c.lastActiveCheckErrors) {
 			for i := 0; i < len(errs); i++ {
 				log.Warningf("[%d] %s", c.clientID, errs[i])
@@ -341,7 +346,7 @@ func (c *Connector) sendHeartbeatMsg() {
 		return
 	}
 
-	_, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
+	_, errs, _ := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
 		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig, true)
 
 	if errs != nil {

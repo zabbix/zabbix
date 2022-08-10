@@ -40,7 +40,7 @@ type activeConnection struct {
 }
 
 func (c *activeConnection) Write(data []byte, timeout time.Duration) []error {
-	b, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, timeout, time.Second*time.Duration(c.timeout),
+	b, errs, _ := zbxcomms.Exchange(&c.addresses, &c.localAddr, timeout, time.Second*time.Duration(c.timeout),
 		data, c.tlsConfig)
 	if errs != nil {
 		return errs
