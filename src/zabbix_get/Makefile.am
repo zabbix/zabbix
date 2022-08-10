@@ -12,7 +12,6 @@ zabbix_get_LDADD = \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxgetopt/libzbxgetopt.a \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
@@ -26,6 +25,7 @@ zabbix_get_LDADD = \
 	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_builddir)/src/libs/zbxip/libzbxip.a \
 	$(top_builddir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(ZBXGET_LIBS)
 
 zabbix_get_LDFLAGS = $(ZBXGET_LDFLAGS)
