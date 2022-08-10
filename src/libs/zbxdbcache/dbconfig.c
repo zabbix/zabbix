@@ -108,6 +108,8 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 
 static void	dc_reschedule_items(void);
 
+static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint32_t revision);
+
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
 /******************************************************************************
@@ -989,7 +991,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	zbx_hashset_remove_direct(&config->proxies, proxy);
 }
 
-static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_uint64_t *active_avail_diff)
+static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint32_t revision, zbx_vector_uint64_t *active_avail_diff)
 {
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -1030,7 +1032,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_vector_uint64_t *active_avail_d
 		ZBX_STR2UCHAR(status, row[10]);
 
 		host = (ZBX_DC_HOST *)DCfind_id(&config->hosts, hostid, sizeof(ZBX_DC_HOST), &found);
-		host->revision = config->revision;
+		host->revision = revision;
 
 		/* see whether we should and can update 'hosts_h' and 'hosts_p' indexes at this point */
 
@@ -1657,6 +1659,8 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 		{
 			START_SYNC;
 
+			config->revision++;
+
 			for (j = 0; j < diff.values_num; j++)
 			{
 				zbx_kv_t	*kv;
@@ -1840,7 +1844,7 @@ static void	dc_interface_snmp_remove(zbx_uint64_t interfaceid)
 	return;
 }
 
-static void	DCsync_interfaces(zbx_dbsync_t *sync)
+static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2020,6 +2024,8 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
+
+		dc_host_update_revision(host, revision);
 	}
 
 	/* resolve macros in other interfaces */
@@ -2051,6 +2057,8 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 					break;
 				}
 			}
+
+			dc_host_update_revision(host, revision);
 		}
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
@@ -2200,7 +2208,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t synced)
+static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint32_t revision, int flags, zbx_synced_new_config_t synced)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2374,8 +2382,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 			}
 		}
 
-		item->revision = config->revision;
-		host->revision = config->revision;
+		item->revision = revision;
+		dc_host_update_revision(host, revision);
 
 		if (ITEM_STATUS_ACTIVE == status)
 		{
@@ -2826,7 +2834,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 
 		if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
 		{
-			host->revision = config->revision;
+			dc_host_update_revision(host, revision);
 
 			if (ITEM_TYPE_ZABBIX_ACTIVE == item->type)
 			{
@@ -3174,7 +3182,7 @@ static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	DCsync_triggers(zbx_dbsync_t *sync)
+static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -3241,7 +3249,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 		trigger->expression_bin = config_decode_serialized_expression(row[16]);
 		trigger->recovery_expression_bin = config_decode_serialized_expression(row[17]);
 		trigger->timer = atoi(row[18]);
-		trigger->revision = config->revision;
+		trigger->revision = revision;
 	}
 
 	/* remove deleted triggers from buffer */
@@ -3775,7 +3783,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 	}
 }
 
-static void	DCsync_functions(zbx_dbsync_t *sync)
+static void	DCsync_functions(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -3825,7 +3833,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		dc_strpool_replace(found, &function->parameter, row[3]);
 
 		function->type = zbx_get_function_type(function->function);
-		function->revision = config->revision;
+		function->revision = revision;
 
 		dc_item_reset_triggers(item, NULL);
 	}
@@ -3880,7 +3888,7 @@ static ZBX_DC_REGEXP	*dc_regexp_remove_expression(const char *regexp_name, zbx_u
  * Parameters: result - [IN] the result of expressions database select        *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_expressions(zbx_dbsync_t *sync)
+static void	DCsync_expressions(zbx_dbsync_t *sync, zbx_uint32_t revision)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -3962,7 +3970,7 @@ static void	DCsync_expressions(zbx_dbsync_t *sync)
 	}
 
 	if (0 != sync->add_num || 0 != sync->update_num || 0 != sync->remove_num)
-		config->expression_revision = config->revision;
+		config->expression_revision = revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -5180,6 +5188,21 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: update host revision                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint32_t revision)
+{
+	if (host->revision == revision)
+		return SUCCEED;
+
+	host->revision = revision;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Updates group hosts in configuration cache                        *
  *                                                                            *
  * Parameters: sync - [IN] the db synchronization data                        *
@@ -5603,10 +5626,9 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	zbx_hashset_t			trend_queue;
 	zbx_vector_uint64_t		active_avail_diff;
+	zbx_uint32_t			new_revision = config->revision + 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	config->revision++;
 
 	sec = zbx_time();
 	changelog_num = zbx_dbsync_env_prepare(mode);
@@ -5725,7 +5747,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	START_SYNC;
 	sec = zbx_time();
-	config->um_cache = um_cache_sync(config->um_cache, config->revision, &gmacro_sync, &hmacro_sync, &htmpl_sync);
+	config->um_cache = um_cache_sync(config->um_cache, new_revision, &gmacro_sync, &hmacro_sync, &htmpl_sync);
 	um_cache_sec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -5776,7 +5798,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	START_SYNC;
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
-	DCsync_hosts(&hosts_sync, &active_avail_diff);
+	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff);
 	hsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -5856,13 +5878,13 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
 	sec = zbx_time();
-	DCsync_interfaces(&if_sync);
+	DCsync_interfaces(&if_sync, new_revision);
 	ifsec2 = zbx_time() - sec;
 
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, flags, synced);
+	DCsync_items(&items_sync, new_revision, flags, synced);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -5907,7 +5929,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	START_SYNC;
 	sec = zbx_time();
-	DCsync_functions(&func_sync);
+	DCsync_functions(&func_sync, new_revision);
 	fsec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
@@ -5965,7 +5987,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	START_SYNC;
 
 	sec = zbx_time();
-	DCsync_triggers(&triggers_sync);
+	DCsync_triggers(&triggers_sync, new_revision);
 	tsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -5973,7 +5995,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	dsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_expressions(&expr_sync);
+	DCsync_expressions(&expr_sync, new_revision);
 	expr_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6050,6 +6072,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	}
 
 	update_sec = zbx_time() - sec;
+
+	config->revision = new_revision;
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
