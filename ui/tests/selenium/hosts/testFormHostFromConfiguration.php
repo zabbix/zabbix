@@ -21,6 +21,8 @@
 require_once dirname(__FILE__).'/../common/testFormHost.php';
 
 /**
+ * @dataSource DiscoveredHosts
+ *
  * @backup hosts
  *
  * @onBefore prepareUpdateData
@@ -95,5 +97,9 @@ class testFormHostFromConfiguration extends testFormHost {
 	 */
 	public function testFormHostFromConfiguration_Delete($data) {
 		$this->checkDelete($data);
+	}
+
+	public function testFormHostConfiguration_DiscoveredHostLayout() {
+		$this->checkDiscoveredHostLayout();
 	}
 }

@@ -251,7 +251,8 @@ $host_tab->addRow(
 			->setModern(true)
 			->setReadonly($host_prototype['templateid'] != 0),
 		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
-			->setId('interfaces-table'),
+			->setId('interfaces-table')
+			->addClass(ZBX_STYLE_HOST_INTERFACES),
 		new CDiv(
 			(new CButton('interface-add', _('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)
@@ -300,14 +301,16 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 	// IPMI
 	$ipmi_tab = new CFormList();
 
-	$ipmi_tab->addRow(_('Authentication algorithm'),
-		(new CTextBox('ipmi_authtype', ipmiAuthTypes($parent_host['ipmi_authtype']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	);
-	$ipmi_tab->addRow(_('Privilege level'),
-		(new CTextBox('ipmi_privilege', ipmiPrivileges($parent_host['ipmi_privilege']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	);
+	$ipmi_tab->addRow(_('Authentication algorithm'), [
+		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($parent_host['ipmi_authtype']), true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		new CVar('ipmi_authtype', $parent_host['ipmi_authtype'])
+	]);
+	$ipmi_tab->addRow(_('Privilege level'), [
+		(new CTextBox('ipmi_privilege_name', ipmiPrivileges($parent_host['ipmi_privilege']), true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		new CVar('ipmi_privilege', $parent_host['ipmi_privilege'])
+	]);
 	$ipmi_tab->addRow(_('Username'),
 		(new CTextBox('ipmi_username', $parent_host['ipmi_username'], true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -317,7 +320,7 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 
-	$tabs->addTab('ipmiTab', _('IPMI'), $ipmi_tab);
+	$tabs->addTab('ipmi-tab', _('IPMI'), $ipmi_tab, TAB_INDICATOR_IPMI);
 }
 
 $tabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [

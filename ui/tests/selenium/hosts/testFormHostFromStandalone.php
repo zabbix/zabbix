@@ -21,6 +21,8 @@
 require_once dirname(__FILE__).'/../common/testFormHost.php';
 
 /**
+ * @dataSource DiscoveredHosts
+ *
  * @backup hosts
  *
  * @onBefore prepareUpdateData
@@ -98,5 +100,155 @@ class testFormHostFromStandalone extends testFormHost {
 	 */
 	public function testFormHostFromStandalone_Delete($data) {
 		$this->checkDelete($data);
+	}
+
+	public function testFormHostStandalone_DiscoveredHostLayout() {
+		$this->checkDiscoveredHostLayout();
+	}
+
+	/**
+	 * Test for checking templated objects that are linked to a discovered host and for checking their unlinkage.
+	 * This test is implemented only for Standalone scenario.
+	 */
+	public function testFormHostStandalone_DiscoveredHostLinkedTemplates() {
+		$filtered_results = [
+			[
+				'type' => 'items',
+				'form' => 'items',
+				'objects' => [
+					'before_unlink' => [
+						'Test of discovered host 1 template for unlink: Template1 item1',
+						'Test of discovered host 1 template for unlink: Template1 item2',
+						'Test of discovered host 2 template for clear: Template2 item1',
+						'Test of discovered host 2 template for clear: Template2 item2',
+						'Test of discovered host Template: Template item',
+						'Test of discovered host Template: Template item with tag'
+					],
+					'after_unlink' =>  [
+						// This template was unlinked but not cleared.
+						'Template1 item1',
+						'Template1 item2',
+						// This template was not unlinked.
+						'Test of discovered host Template: Template item',
+						'Test of discovered host Template: Template item with tag'
+					]
+				]
+			],
+			[
+				'type' => 'triggers',
+				'form' => 'triggersForm',
+				'objects' => [
+					'before_unlink' => [
+						'Test of discovered host 1 template for unlink: Template1 trigger',
+						'Test of discovered host 2 template for clear: Template2 trigger',
+						'Test of discovered host Template: Template trigger'
+					],
+					'after_unlink' =>  [
+						// This template was unlinked but not cleared.
+						'Template1 trigger',
+						// This template was not unlinked.
+						'Test of discovered host Template: Template trigger'
+					]
+				]
+			],
+			[
+				'type' => 'graphs',
+				'form' => 'graphForm',
+				'objects' => [
+					'before_unlink' => [
+						'Test of discovered host 1 template for unlink: Template1 graph',
+						'Test of discovered host 2 template for clear: Template2 graph',
+						'Test of discovered host Template: Template graph'
+					],
+					'after_unlink' =>  [
+						// This template was unlinked but not cleared.
+						'Template1 graph',
+						// This template was not unlinked.
+						'Test of discovered host Template: Template graph'
+					]
+				]
+			],
+			[
+				'type' => 'host_discovery',
+				'form' => 'discovery',
+				'objects' => [
+					'before_unlink' => [
+						'Test of discovered host 1 template for unlink: Template1 discovery rule',
+						'Test of discovered host 2 template for clear: Template2 discovery rule',
+						'Test of discovered host Template: Template discovery rule'
+					],
+					'after_unlink' =>  [
+						// This template was unlinked but not cleared.
+						'Template1 discovery rule',
+						// This template was not unlinked.
+						'Test of discovered host Template: Template discovery rule'
+					]
+				]
+			],
+			[
+				'type' => 'httpconf',
+				'form' => 'scenarios',
+				'objects' => [
+					'before_unlink' => [
+						'Test of discovered host Template: Template web scenario',
+						'Test of discovered host 1 template for unlink: Template web scenario 1',
+						'Test of discovered host 2 template for clear: Template web scenario 2'
+					],
+					'after_unlink' =>  [
+						// This template was not unlinked.
+						'Test of discovered host Template: Template web scenario',
+						// This template was unlinked but not cleared.
+						'Template web scenario 1'
+					]
+				]
+			]
+		];
+
+		$discovered_hostid = CDataHelper::get('DiscoveredHosts.discovered_hostid');
+		$this->page->login();
+
+		foreach ($filtered_results as $result) {
+			$this->page->open($result['type'].'.php?filter_set=1&filter_hostids%5B0%5D='.
+					$discovered_hostid.'&context=host')->waitUntilReady();
+
+			// Check objects on Discovered host before unlinking templates.
+			$this->assertTableDataColumn($result['objects']['before_unlink'], 'Name', 'xpath://form[@name='.
+					CXPathHelper::escapeQuotes($result['form']).']/table'
+			);
+		}
+
+		// Open Discovered host form and unlink templates from it.
+		$this->page->open($this->link.$discovered_hostid)->waitUntilReady();
+		$form = $this->query('id:host-form')->waitUntilReady()->asForm()->one();
+		$templates_table = $form->query('id:linked-templates')->asTable()->one()->waitUntilVisible();
+
+		$template_actions = [
+			'Test of discovered host 1 template for unlink' => 'Unlink',
+			'Test of discovered host 2 template for clear' => 'Unlink and clear'
+		];
+
+		foreach ($template_actions as $name => $action) {
+			$templates_table->findRow('Name', $name)->query('button', $action)->one()->waitUntilClickable()->click();
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		// TODO: Update the message details after ZBX-21366 is merged.
+		$message_details = [
+			'Templates "Test of discovered host 2 template for clear" unlinked from hosts "Discovered host from prototype 1".',
+			'Templates "Test of discovered host 1 template for unlink" unlinked from hosts "Discovered host from prototype 1".'
+		];
+
+		$this->assertMessage(TEST_GOOD, 'Host updated', $message_details);
+
+		foreach ($filtered_results as $result) {
+			// Open hosts objects and check objects on Discovered host after unlinking some templates.
+			$this->page->open($result['type'].'.php?filter_set=1&filter_hostids%5B0%5D='.
+					$discovered_hostid.'&context=host')->waitUntilReady();
+			$this->assertTableDataColumn($result['objects']['after_unlink'], 'Name', 'xpath://form[@name='.
+					CXPathHelper::escapeQuotes($result['form']).']/table'
+			);
+		}
 	}
 }

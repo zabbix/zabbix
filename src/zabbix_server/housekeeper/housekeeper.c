@@ -18,15 +18,16 @@
 **/
 
 #include "housekeeper.h"
+
 #include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxserver.h"
 #include "zbxrtc.h"
-
+#include "zbxnum.h"
+#include "zbxtime.h"
 #include "history_compress.h"
 #include "../../libs/zbxdbcache/valuecache.h"
-
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

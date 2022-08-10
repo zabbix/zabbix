@@ -109,10 +109,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
-		$this->page->removeFocus();
 		$element = $overlay->query('id:svg-graph-preview')->one();
-
-		$errors = [];
 
 		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
 		foreach ($tabs as $tab) {
@@ -125,16 +122,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 			$this->page->removeFocus();
 			sleep(1);
-			// Collect all screenshot errors.
-			try {
-				$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
-			} catch (Exception $ex) {
-				$errors[] = $ex->getMessage();
-			}
-		}
-
-		if ($errors) {
-			$this->fail(implode("\n", $errors));
+			$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
 		}
 	}
 
@@ -656,7 +644,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2022-07-04 12:53:00',
+						'From' => '2027-07-04 12:53:00',
 						'To' => 'now'
 					],
 					'error' => 'Minimum time period to display is 1 minute.'
@@ -1918,11 +1906,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @param array $form		CFormElement
 	 */
 	private function fillForm($data, $form) {
-		// TODO: after DEV-2200 change to $form->fill(CTestArrayHelper::get($data, 'main_fields', []));
-		if (CTestArrayHelper::get($data, 'main_fields')) {
-			$this->query('id:widget-dialogue-form')->asForm(['detectType' => false])->one()->waitUntilVisible()->fill($data['main_fields']);
-		}
-
+		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
 		$this->fillDatasets(CTestArrayHelper::get($data, 'Data set', []));
 
 		$tabs = ['Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
@@ -2231,8 +2215,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
-		// TODO: after DEV-2200 change to $form->fill(CTestArrayHelper::get($data, 'main_fields', []));
-		$this->query('id:widget-dialogue-form')->asForm(['detectType' => false])->one()->fill(CTestArrayHelper::get($data, 'main_fields', []));
+		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
 		$this->fillDataSets($data['Data set']);
 		$form->submit();
 
@@ -2286,8 +2269,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
-		// TODO: after DEV-2200 change to $form->fill($data['main_fields']);
-		$this->query('id:widget-dialogue-form')->asForm(['detectType' => false])->one()->fill($data['main_fields']);
+		$form->fill($data['main_fields']);
 		$this->fillDataSets($data['Data set']);
 		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_properties"]')
 						->asOverlayDialog()->one();

@@ -25,6 +25,7 @@
 #include "dbcache.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
+#include "zbxnum.h"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
@@ -2476,7 +2477,7 @@ void	DBcheck_character_set(void)
 
 		if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8, char_set, ZBX_DB_STRLIST_DELIM))
 		{
-			zbx_db_set_character_set("utf8");
+			zbx_db_set_character_set("utf8mb3");
 		}
 		else if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4, char_set,
 				ZBX_DB_STRLIST_DELIM))

@@ -18,13 +18,14 @@
 **/
 
 #include "lld.h"
+#include "zbxserver.h"
 
 #include "../db_lengths.h"
 #include "log.h"
-#include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
 #include "zbxxml.h"
+#include "zbxnum.h"
 
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
@@ -1276,7 +1277,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			ret = zbx_xml_xpath_check(pp->params, err, sizeof(err));
 			break;
 		case ZBX_PREPROC_MULTIPLIER:
-			if (FAIL == (ret = is_double(pp->params, NULL)))
+			if (FAIL == (ret = zbx_is_double(pp->params, NULL)))
 				zbx_snprintf(err, sizeof(err), "value is not numeric or out of range: %s", pp->params);
 			break;
 		case ZBX_PREPROC_VALIDATE_RANGE:
@@ -1291,12 +1292,12 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			zbx_lrtrim(param1, " ");
 			zbx_lrtrim(param2, " ");
 
-			if ('\0' != *param1 && FAIL == (ret = is_double(param1, NULL)))
+			if ('\0' != *param1 && FAIL == (ret = zbx_is_double(param1, NULL)))
 			{
 				zbx_snprintf(err, sizeof(err), "first parameter is not numeric or out of range: %s",
 						param1);
 			}
-			else if ('\0' != *param2 && FAIL == (ret = is_double(param2, NULL)))
+			else if ('\0' != *param2 && FAIL == (ret = zbx_is_double(param2, NULL)))
 			{
 				zbx_snprintf(err, sizeof(err), "second parameter is not numeric or out of range: %s",
 						param2);
@@ -4449,8 +4450,8 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 	DBbegin();
 
 	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked) &&
-			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_param_save(hostid, &items, &host_record_is_locked) &&
+			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_items_tags_save(hostid, &items, &host_record_is_locked))
 	{
 		if (ZBX_DB_OK != DBcommit())
@@ -4461,7 +4462,6 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 	}
 	else
 	{
-		ret = FAIL;
 		DBrollback();
 		goto clean;
 	}
