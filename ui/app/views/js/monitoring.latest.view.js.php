@@ -215,7 +215,9 @@
 					return post_data;
 				}, {});
 
-			post_data['subfilters_expanded'] = this.filter.getExpandedSubfilters();
+			if (this.filter) {
+				post_data['subfilters_expanded'] = this.filter.getExpandedSubfilters();
+			}
 
 			var deferred = $.ajax({
 				url: this.refresh_simple_url,
