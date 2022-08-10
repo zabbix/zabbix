@@ -18,10 +18,11 @@
 **/
 
 #include <sys/procfs.h>
-#include "common.h"
 #include "sysinfo.h"
+
 #include "zbxregexp.h"
 #include "log.h"
+#include "zbxstr.h"
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

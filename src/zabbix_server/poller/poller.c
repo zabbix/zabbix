@@ -18,12 +18,7 @@
 **/
 
 #include "poller.h"
-
-#include "zbxnix.h"
 #include "zbxserver.h"
-#include "zbxself.h"
-#include "preproc.h"
-#include "zbxrtc.h"
 
 #include "checks_agent.h"
 #include "checks_external.h"
@@ -37,12 +32,19 @@
 #include "checks_java.h"
 #include "checks_calculated.h"
 #include "checks_http.h"
+
+#include "zbxnix.h"
+#include "zbxself.h"
+#include "preproc.h"
+#include "zbxrtc.h"
 #include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
 #include "log.h"
 #include "zbxavailability.h"
 #include "zbxcomms.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
@@ -137,6 +139,23 @@ static int	interface_availability_by_item_type(unsigned char item_type, unsigned
 	return FAIL;
 }
 
+static const char	*item_type_agent_string(zbx_item_type_t item_type)
+{
+	switch (item_type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			return "Zabbix agent";
+		case ITEM_TYPE_SNMP:
+			return "SNMP agent";
+		case ITEM_TYPE_IPMI:
+			return "IPMI agent";
+		case ITEM_TYPE_JMX:
+			return "JMX agent";
+		default:
+			return "generic";
+	}
+}
+
 /********************************************************************************
  *                                                                              *
  * Purpose: activate item interface                                             *
@@ -176,12 +195,12 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, DC_ITEM *item,  unsigned ch
 	if (INTERFACE_AVAILABLE_TRUE == in.agent.available)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "resuming %s checks on host \"%s\": connection restored",
-				zbx_agent_type_string(item->type), item->host.host);
+				item_type_agent_string(item->type), item->host.host);
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": interface became available",
-				zbx_agent_type_string(item->type), item->host.host);
+				item_type_agent_string(item->type), item->host.host);
 	}
 out:
 	zbx_interface_availability_clean(&out);
@@ -230,7 +249,7 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, DC_ITEM *item, unsigned c
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
 				" first network error, wait for %d seconds",
-				zbx_agent_type_string(item->type), item->key_orig, item->host.host,
+				item_type_agent_string(item->type), item->key_orig, item->host.host,
 				out.agent.disable_until - ts->sec);
 	}
 	else if (INTERFACE_AVAILABLE_FALSE != in.agent.available)
@@ -239,14 +258,14 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, DC_ITEM *item, unsigned c
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
 					" another network error, wait for %d seconds",
-					zbx_agent_type_string(item->type), item->key_orig, item->host.host,
+					item_type_agent_string(item->type), item->key_orig, item->host.host,
 					out.agent.disable_until - ts->sec);
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "temporarily disabling %s checks on host \"%s\":"
 					" interface unavailable",
-					zbx_agent_type_string(item->type), item->host.host);
+					item_type_agent_string(item->type), item->host.host);
 		}
 	}
 

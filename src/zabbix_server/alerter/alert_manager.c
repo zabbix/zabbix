@@ -28,6 +28,7 @@
 #include "zbxembed.h"
 #include "zbxserialize.h"
 #include "zbxxml.h"
+#include "zbxtime.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1

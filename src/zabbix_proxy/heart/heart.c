@@ -23,6 +23,7 @@
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxself.h"
+#include "zbxtime.h"
 
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"

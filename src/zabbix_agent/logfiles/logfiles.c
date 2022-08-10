@@ -23,6 +23,9 @@
 #include "sysinfo.h"
 #include "cfg.h"
 #include "zbxregexp.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxsymbols.h"
@@ -3707,7 +3710,7 @@ static int	init_max_delay(int is_count_item, const AGENT_REQUEST *request, float
 		return SUCCEED;
 	}
 
-	if (SUCCEED != is_double(max_delay_str, &max_delay_tmp) || 0.0 > max_delay_tmp)
+	if (SUCCEED != zbx_is_double(max_delay_str, &max_delay_tmp) || 0.0 > max_delay_tmp)
 	{
 		*error = zbx_dsprintf(*error, "Invalid %s parameter.", (5 == max_delay_par_nr) ? "sixth" : "seventh");
 		return FAIL;

@@ -18,16 +18,17 @@
 **/
 
 #include "proxydata.h"
-#include "zbxdbhigh.h"
-#include "log.h"
 #include "proxy.h"
 
+#include "zbxdbhigh.h"
+#include "log.h"
 #include "zbxtasks.h"
 #include "zbxmutexs.h"
 #include "zbxnix.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
 #include "zbxavailability.h"
+#include "zbxnum.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;

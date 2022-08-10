@@ -22,6 +22,8 @@
 #include "zbxconf.h"
 #include "sysinfo.h"
 #include "log.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;

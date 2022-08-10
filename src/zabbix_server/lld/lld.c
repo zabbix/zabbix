@@ -19,11 +19,12 @@
 
 #include "lld.h"
 #include "proxy.h"
+#include "zbxserver.h"
 
 #include "log.h"
-#include "zbxserver.h"
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
+#include "zbxnum.h"
 
 #define OVERRIDE_STOP_TRUE	1
 

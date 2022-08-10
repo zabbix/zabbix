@@ -44,6 +44,7 @@ $fields = [
 	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
+	session_write_close();
 	exit();
 }
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
@@ -54,6 +55,7 @@ $items = hasRequest('i')
 
 if (!$items) {
 	show_error_message(_('No items defined.'));
+	session_write_close();
 	exit();
 }
 

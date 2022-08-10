@@ -28,6 +28,8 @@
 #include "zbxtasks.h"
 #include "zbxcompress.h"
 #include "zbxavailability.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
@@ -47,7 +49,6 @@ extern char		*CONFIG_SOURCE_IP;
 #define ZBX_DATASENDER_DB_UPDATE	(ZBX_DATASENDER_HISTORY | ZBX_DATASENDER_DISCOVERY |		\
 					ZBX_DATASENDER_AUTOREGISTRATION | ZBX_DATASENDER_TASKS |	\
 					ZBX_DATASENDER_TASKS_RECV)
-
 
 /******************************************************************************
  *                                                                            *

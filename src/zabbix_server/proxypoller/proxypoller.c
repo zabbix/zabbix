@@ -18,19 +18,20 @@
 **/
 
 #include "proxypoller.h"
+#include "zbxserver.h"
+#include "proxy.h"
 
-#include "common.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "zbxserver.h"
 #include "zbxdbhigh.h"
 #include "log.h"
-#include "proxy.h"
 #include "zbxcrypto.h"
 #include "../trapper/proxydata.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

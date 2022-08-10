@@ -18,13 +18,14 @@
 **/
 
 #include "audit/zbxaudit_httptest.h"
-
 #include "audit/zbxaudit.h"
+#include "audit.h"
+
 #include "log.h"
 #include "zbxalgo.h"
-#include "audit.h"
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
+#include "zbxnum.h"
 
 void	zbx_audit_httptest_create_entry(int audit_action, zbx_uint64_t httptestid, const char *name)
 {
