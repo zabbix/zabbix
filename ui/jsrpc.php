@@ -719,6 +719,9 @@ switch ($data['method']) {
 				$result = $item[0]['value_type'];
 			}
 		}
+		else {
+			$result = '';
+		}
 		break;
 
 	default:

@@ -1598,13 +1598,13 @@ class CWidgetHelper {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
-	public static function getThresholdsTemplate() {
+	public static function getThresholdsTemplate($field) {
 		return (new CRow([
-			(new CColor('thresholds[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
-			(new CTextBox('thresholds[#{rowNum}][threshold]', '#{threshold}', false))
+			(new CColor($field->getName().'[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
+			(new CTextBox($field->getName().'[#{rowNum}][threshold]', '#{threshold}', false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired(),
-			(new CButton('thresholds[#{rowNum}][remove]', _('Remove')))
+			(new CButton($field->getName().'[#{rowNum}][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 		]))

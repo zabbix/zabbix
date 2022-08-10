@@ -39,9 +39,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 	}
 
 	public function setValue($value) {
-		$this->value = (array) $value;
-
-		return $this;
+		return parent::setValue((array) $value);
 	}
 
 	/**
