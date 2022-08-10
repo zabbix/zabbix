@@ -189,6 +189,7 @@ class testDashboardForm extends CWebTest {
 		// Check if dashboard is empty.
 		$dashboard = CDashboardElement::find()->one();
 		$this->assertTrue($dashboard->isEmpty());
+
 		// Cancel dashboard editing.
 		$dashboard->cancelEditing();
 	}
@@ -561,6 +562,7 @@ class testDashboardForm extends CWebTest {
 		// Check the properties values of the cloned dashboard.
 		$original_values['Owner'] = 'Admin (Zabbix Administrator)';
 		$form->checkValue($original_values);
+
 		// Change name and save dashboard properties.
 		$form->fill(['Name' => $cloned_name]);
 		$original_values['Name'] = $cloned_name;
@@ -880,7 +882,8 @@ class testDashboardForm extends CWebTest {
 				}
 				else {
 					$this->assertFalse($table->query('xpath://tbody/tr/td[text()='.
-							CXPathHelper::escapeQuotes($share['name']).']')->one(false)->isValid());
+							CXPathHelper::escapeQuotes($share['name']).']')->one(false)->isValid()
+					);
 				}
 			}
 		}
