@@ -13,17 +13,14 @@
 
 AC_DEFUN([LIBPCRE_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <pcre.h>
-],
-[
+]], [[
 	const char* error = NULL;
 	int error_offset = -1;
 	pcre *regexp = pcre_compile("test", PCRE_UTF8, &error, &error_offset, NULL);
 	pcre_free(regexp);
-],
-found_libpcre="yes")
+]])],[found_libpcre="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBPCRE_CHECK_CONFIG],

@@ -13,18 +13,15 @@
 
 AC_DEFUN([LIBPCRE2_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
-],
-[
+]], [[
 	int error = 0;
 	PCRE2_SIZE error_offset = 0;
 	pcre2_code *regexp = pcre2_compile("test", PCRE2_ZERO_TERMINATED, PCRE2_UTF, &error, &error_offset, NULL);
 	pcre2_code_free(regexp);
-],
-found_libpcre2="yes")
+]])],[found_libpcre2="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBPCRE2_CHECK_CONFIG],

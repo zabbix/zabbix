@@ -14,15 +14,12 @@
 AC_DEFUN([ZLIB_TRY_LINK],
 [
 found_zlib=$1
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <zlib.h>
-],
-[
+]], [[
 	z_stream	defstream;
 	deflateInit(&defstream, Z_BEST_COMPRESSION);
-],
-found_zlib="yes")
+]])],[found_zlib="yes"],[])
 ])dnl
 
 AC_DEFUN([ZLIB_CHECK_CONFIG],

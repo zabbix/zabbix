@@ -29,18 +29,18 @@ CPPFLAGS="$CPPFLAGS $3"
 CFLAGS="$CFLAGS $4"
 ldap_link="no"
 
-AC_TRY_LINK([
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <stdio.h>
 #include <ldap.h>
 #include <lber.h>
 #include <ldap_schema.h>
-],[
+]], [[
 printf("%p,%p", ldap_initialize, ldap_str2attributetype);
 printf("%p", ber_free);
 return 0;
-],[
+]])],[
 ldap_link="yes"
-])
+],[])
 
 CPPFLAGS="$_save_ldap_cppflags"
 CFLAGS="$_save_ldap_cflags"

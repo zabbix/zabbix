@@ -15,15 +15,12 @@
 
 AC_DEFUN([LIBEVENT_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <stdlib.h>
 #include <event.h>
-],
-[
+]], [[
 	event_init();
-],
-found_libevent="yes")
+]])],[found_libevent="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBEVENT_CHECK_CONFIG],

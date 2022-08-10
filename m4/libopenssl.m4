@@ -19,35 +19,29 @@
 
 AC_DEFUN([LIBOPENSSL_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
-],
-[
+]], [[
 	/* check that both libssl and libcrypto are available */
 
 	SSL	*ssl = NULL;
 
 	SSL_connect(ssl);	/* a function from libssl, present in both OpenSSL 1.0.1 and 1.1.0 */
 	BIO_new(BIO_s_mem());	/* a function from libcrypto */
-],
-found_openssl="yes",)
+]])],[found_openssl="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBOPENSSL_TRY_LINK_PSK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <openssl/ssl.h>
-],
-[
+]], [[
 	/* check if OPENSSL_NO_PSK is defined */
 #ifdef OPENSSL_NO_PSK
 #	error "OPENSSL_NO_PSK is defined. PSK support will not be available."
 #endif
-],
-found_openssl_with_psk="yes",)
+]])],[found_openssl_with_psk="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBOPENSSL_ACCEPT_VERSION],

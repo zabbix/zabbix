@@ -19,14 +19,11 @@
 
 AC_DEFUN([LIBGNUTLS_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <gnutls/gnutls.h>
-],
-[
+]], [[
 	gnutls_global_init();
-],
-found_gnutls="yes",)
+]])],[found_gnutls="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBGNUTLS_ACCEPT_VERSION],

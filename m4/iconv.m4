@@ -16,17 +16,14 @@
 AC_DEFUN([LIBICONV_TRY_LINK],
 [
 found_iconv=$1
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <stdlib.h>
 #include <iconv.h>
-],
-[
+]], [[
 	iconv_t cd = iconv_open("","");
 	iconv(cd, NULL, NULL, NULL, NULL);
 	iconv_close(cd);
-],
-found_iconv="yes")
+]])],[found_iconv="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBICONV_CHECK_CONFIG],

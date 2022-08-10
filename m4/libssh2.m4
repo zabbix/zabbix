@@ -20,15 +20,12 @@
 
 AC_DEFUN([LIBSSH2_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <libssh2.h>
-],
-[
+]], [[
 	LIBSSH2_SESSION	*session;
 	session = libssh2_session_init();
-],
-found_ssh2="yes",)
+]])],[found_ssh2="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBSSH2_ACCEPT_VERSION],

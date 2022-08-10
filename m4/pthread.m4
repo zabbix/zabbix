@@ -12,18 +12,15 @@
 
 AC_DEFUN([LIBPTHREAD_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <pthread.h>
-],
-[
+]], [[
 	pthread_mutexattr_t	mta;
 	pthread_mutex_t		mutex;
 
 	pthread_mutexattr_init(&mta);
 	pthread_mutex_init(&mutex, &mta);
-],
-found_libpthread="yes")
+]])],[found_libpthread="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBPTHREAD_TRY_RUN],
