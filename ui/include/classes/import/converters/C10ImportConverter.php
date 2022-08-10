@@ -332,7 +332,7 @@ class C10ImportConverter extends CConverter {
 				ITEM_TYPE_EXTERNAL => INTERFACE_TYPE_ANY,
 				ITEM_TYPE_IPMI => INTERFACE_TYPE_IPMI,
 				ITEM_TYPE_SSH => INTERFACE_TYPE_ANY,
-				ITEM_TYPE_TELNET => INTERFACE_TYPE_ANY,
+				ITEM_TYPE_TELNET => INTERFACE_TYPE_ANY
 			];
 
 			foreach ($host['items'] as &$item) {
