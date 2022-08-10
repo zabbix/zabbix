@@ -835,7 +835,8 @@ class testDashboardForm extends CWebTest {
 					$default_permissions = ($type === 'Private') ? 'Read-only' : 'Read-write';
 					$row = $table->findRow($list, CTestArrayHelper::get($share, 'full_name', $share['name']));
 					$this->assertEquals(CTestArrayHelper::get($share, 'permissions', $default_permissions),
-							$row->getColumn('Permissions')->asSegmentedRadio()->getValue());
+							$row->getColumn('Permissions')->asSegmentedRadio()->getValue()
+					);
 				}
 				else {
 					$this->assertFalse($table->query('xpath://tbody/tr/td[text()='.
