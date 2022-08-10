@@ -142,7 +142,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t 
 	{
 		task_timestamp = now;
 
-		zbx_tm_get_remote_tasks(&tasks, 0);
+		zbx_tm_get_remote_tasks(&tasks, 0, 0);
 
 		if (0 != tasks.values_num)
 		{

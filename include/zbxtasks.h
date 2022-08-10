@@ -153,7 +153,8 @@ void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *
 void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_ptr_t *tasks);
 
 /* separate implementation for proxy and server */
-void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid);
+void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid,
+		zbx_proxy_compatibility_t compatibility);
 
 int	zbx_tm_get_diaginfo(const struct zbx_json_parse *jp, char **info);
 

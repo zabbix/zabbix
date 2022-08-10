@@ -62,7 +62,7 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
 	if (SUCCEED == status)
 	{
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-		zbx_tm_get_remote_tasks(&tasks, proxy->hostid);
+		zbx_tm_get_remote_tasks(&tasks, proxy->hostid, proxy->compatibility);
 	}
 	else
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
@@ -280,7 +280,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	proxy_get_host_active_availability(&j);
 
 	zbx_vector_ptr_create(&tasks);
-	zbx_tm_get_remote_tasks(&tasks, 0);
+	zbx_tm_get_remote_tasks(&tasks, 0, 0);
 
 	if (0 != tasks.values_num)
 		zbx_tm_json_serialize_tasks(&j, &tasks);
@@ -398,7 +398,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_vector_ptr_create(&tasks);
-	zbx_tm_get_remote_tasks(&tasks, 0);
+	zbx_tm_get_remote_tasks(&tasks, 0, 0);
 
 	if (0 != tasks.values_num)
 		zbx_tm_json_serialize_tasks(&j, &tasks);

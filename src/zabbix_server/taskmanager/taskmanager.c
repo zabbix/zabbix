@@ -1010,6 +1010,30 @@ static int	tm_expire_generic_tasks(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get proxy version compatibility with server version               *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_hostid)
+{
+	DB_ROW				row;
+	DB_RESULT			result;
+	zbx_proxy_compatibility_t	compatibility = ZBX_PROXY_VERSION_UNDEFINED;
+
+	result = DBselect(
+			"select compatibility"
+			" from host_rtdata"
+			" where hostid=" ZBX_FS_UI64, proxy_hostid);
+
+	if (NULL != (row = DBfetch(result)))
+		compatibility = atoi(row[0]);
+
+	DBfree_result(result);
+
+	return compatibility;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process task manager tasks depending on task type                 *
  *                                                                            *
  * Return value: The number of successfully processed tasks                   *
@@ -1020,7 +1044,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			type, processed_num = 0, expired_num = 0, clock, ttl;
-	zbx_uint64_t		taskid;
+	zbx_uint64_t		taskid, proxy_hostid;
 	zbx_vector_uint64_t	ack_taskids, check_now_taskids, expire_taskids, data_taskids;
 
 	zbx_vector_uint64_create(&ack_taskids);
@@ -1028,7 +1052,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 	zbx_vector_uint64_create(&expire_taskids);
 	zbx_vector_uint64_create(&data_taskids);
 
-	result = DBselect("select taskid,type,clock,ttl"
+	result = DBselect("select taskid,type,clock,ttl,proxy_hostid"
 				" from task"
 				" where status in (%d,%d)"
 				" order by taskid",
@@ -1036,10 +1060,13 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_proxy_compatibility_t	compatibility = ZBX_PROXY_VERSION_UNDEFINED;
+
 		ZBX_STR2UINT64(taskid, row[0]);
 		ZBX_STR2UCHAR(type, row[1]);
 		clock = atoi(row[2]);
 		ttl = atoi(row[3]);
+		ZBX_DBROW2UINT64(proxy_hostid, row[4]);
 
 		switch (type)
 		{
@@ -1049,8 +1076,24 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					processed_num++;
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND:
+				if (NULL != row[4])
+					compatibility = tm_get_proxy_compatibility(proxy_hostid);
+
+				if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
+				{
+					const char*	error = "Remote commands are disabled at unsupported proxies.";
+					zbx_tm_task_t	*task;
+
+					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+					task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT,
+							ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
+					task->data = zbx_tm_remote_command_result_create(taskid, FAIL, error);
+					zbx_tm_save_task(task);
+					zbx_tm_task_free(task);
+				}
+
 				/* both - 'new' and 'in progress' remote tasks should expire */
-				if (0 != ttl && clock + ttl < now)
+				if ((0 != ttl && clock + ttl < now) || (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility))
 				{
 					tm_expire_remote_command(taskid);
 					expired_num++;
@@ -1065,12 +1108,46 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 				zbx_vector_uint64_append(&ack_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_CHECK_NOW:
-				if (0 != ttl && clock + ttl < now)
+				if (NULL != row[4])
+					compatibility = tm_get_proxy_compatibility(proxy_hostid);
+
+				if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Execute now task is disabled at outdated"
+							" proxies.");
+				}
+
+				if ((0 != ttl && clock + ttl < now) || (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility))
 					zbx_vector_uint64_append(&expire_taskids, taskid);
 				else
 					zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
+				if (NULL != row[4])
+					compatibility = tm_get_proxy_compatibility(proxy_hostid);
+
+				if (ZBX_PROXY_VERSION_OUTDATED == compatibility ||
+						ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
+				{
+					const char	*error;
+					zbx_tm_task_t	*task;
+
+					if (ZBX_PROXY_VERSION_OUTDATED == compatibility)
+						error = "The requested task is disabled at outdated proxies.";
+					else
+						error = "The requested task is disabled at unsupported proxies.";
+
+					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+
+					task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
+							time(NULL), 0, 0);
+					task->data= zbx_tm_data_result_create(taskid, FAIL, error);
+					zbx_tm_save_task(task);
+					zbx_tm_task_free(task);
+
+					zbx_vector_uint64_append(&expire_taskids, taskid);
+					break;
+				}
 			case ZBX_TM_PROXYDATA:
 				/* both - 'new' and 'in progress' tasks should expire */
 				if (0 != ttl && clock + ttl < now)
