@@ -99,7 +99,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testMap');
 		$suite->addTestSuite('testDiscoveryRule');
 		$suite->addTestSuite('testAuthentication');
-        $suite->addTestSuite('testAuditlogAction');
+		$suite->addTestSuite('testAuditlogAction');
 
 		return $suite;
 	}
