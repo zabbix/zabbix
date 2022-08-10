@@ -288,6 +288,7 @@ class testDashboardForm extends CWebTest {
 		if (CTestArrayHelper::get($data, 'dashboard_properties.Name', false) && $data['expected'] === TEST_GOOD) {
 			$data['dashboard_properties']['Name'] = $data['dashboard_properties']['Name'].microtime();
 		}
+
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for update']);
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
@@ -334,12 +335,14 @@ class testDashboardForm extends CWebTest {
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard '.$action.'d');
 			$default_name = ($action === 'create') ? $this->default_values['Name'] : 'Dashboard for update';
+
 			if (CTestArrayHelper::get($data, 'trim', false)) {
 				$title = trim(preg_replace('/\s\s+/', ' ', str_replace("\n", " ", $data['dashboard_properties']['Name'])));
 			}
 			else {
 				$title = CTestArrayHelper::get($data, 'dashboard_properties.Name', $default_name);
 			}
+
 			$this->assertEquals($title, $dashboard->getTitle());
 
 			// Open dashboard from dashboard list.
@@ -356,11 +359,11 @@ class testDashboardForm extends CWebTest {
 					$this->assertEquals($old_hash, $this->getHash());
 				}
 			}
+
 			// Check dashboard properties.
 			$dashboard->editProperties();
 			$form->invalidate();
 			$form->checkValue($data['dashboard_properties']);
-
 			$dashboard->cancelEditing();
 		}
 	}
@@ -425,6 +428,7 @@ class testDashboardForm extends CWebTest {
 			$url = 'zabbix.php?action=dashboard.list';
 			$title = 'Dashboards';
 		}
+
 		$this->page->assertHeader($title);
 		$this->assertEquals(PHPUNIT_URL . $url, $this->page->getCurrentUrl());
 		$this->assertEquals($old_hash, $this->getHash());
@@ -514,8 +518,10 @@ class testDashboardForm extends CWebTest {
 		$cloned_name = 'Cloned dashboard';
 		$original_hashes = $this->getDashboardHashes($original_values['Name']);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for clone and delete'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$ids['Dashboard for clone and delete'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
+
 		// Clone dashboard.
 		$this->query('id:dashbrd-actions')->one()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->select('Clone');
@@ -527,24 +533,25 @@ class testDashboardForm extends CWebTest {
 		// Check the properties values of the cloned dashboard.
 		$original_values['Owner'] = 'Admin (Zabbix Administrator)';
 		$form->checkValue($original_values);
+
 		// Change name and save dashboard properties.
 		$form->fill(['Name' => $cloned_name]);
 		$original_values['Name'] = $cloned_name;
 		$form->submit();
 		$dashboard->save();
-		$this->page->waitUntilReady();
 
+		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard created');
 		$this->assertEquals($cloned_name, $dashboard->getTitle());
 		$dashboard->getWidget('Custom clock name');
 		$dashboard->edit();
 		$dashboard->editProperties();
 		$form->invalidate();
+
 		// Check and compare dashboard properties and hashes.
 		$form->checkValue($original_values);
 		$actual_hashes = $this->getDashboardHashes($cloned_name);
 		$this->assertEquals($original_hashes, $actual_hashes);
-
 		$dashboard->cancelEditing();
 	}
 
@@ -800,17 +807,21 @@ class testDashboardForm extends CWebTest {
 				}
 
 				$db_names = CDBHelper::getAll($query);
+
 				// Database reult format is [['username' => 'Admin'], ['username' => 'Tag-user']]
 				foreach ($db_names as $array) {
-					// Database result format should be ['Admin', 'Tag-user'] to compare with table result in UI.
+					// Result format should be ['Admin', 'Tag-user'] to compare with table result in UI.
 					$result[] = $array[$key];
 				}
+
 				natcasesort($result);
 				$result = array_values($result);
+
 				// Add name and surname to Admin user.
 				if ($list === 'Users' && $result[0] === 'Admin') {
 					$result[0] = 'Admin (Zabbix Administrator)';
 				}
+
 				$this->assertTableDataColumn($result, $list, $selector, false);
 
 				return;
@@ -822,14 +833,13 @@ class testDashboardForm extends CWebTest {
 				if ($action === USER_ACTION_ADD || $action === USER_ACTION_UPDATE) {
 					// Default permission value depends on the sharing type.
 					$default_permissions = ($type === 'Private') ? 'Read-only' : 'Read-write';
-
 					$row = $table->findRow($list, CTestArrayHelper::get($share, 'full_name', $share['name']));
 					$this->assertEquals(CTestArrayHelper::get($share, 'permissions', $default_permissions),
 							$row->getColumn('Permissions')->asSegmentedRadio()->getValue());
 				}
 				else {
-					$this->assertFalse($table->query('xpath://tbody/tr/td[text()=' .
-									CXPathHelper::escapeQuotes($share['name']).']')->one(false)->isValid());
+					$this->assertFalse($table->query('xpath://tbody/tr/td[text()='.
+							CXPathHelper::escapeQuotes($share['name']).']')->one(false)->isValid());
 				}
 			}
 		}
@@ -856,5 +866,4 @@ class testDashboardForm extends CWebTest {
 			$this->assertEquals(0, CDBHelper::getCount($query));
 		}
 	}
-
 }
