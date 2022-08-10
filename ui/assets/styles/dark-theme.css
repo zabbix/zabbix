@@ -681,6 +681,10 @@ footer {
     grid-column-start: 4 !important; }
   .form-grid .form-field table {
     width: 100%; }
+    .form-grid .form-field table .sortable td {
+      padding-bottom: 0;
+      vertical-align: middle;
+      line-height: 24px; }
   .form-grid .form-field th {
     padding: 0 5px 0 0;
     color: #737373; }
