@@ -956,6 +956,8 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 
 /* data session support */
 
+#define ZBX_SESSION_TOKEN_LEN	(16 * 2)	/* ZBX_MD5_DIGEST_SIZE * 2 */
+
 typedef struct
 {
 	zbx_uint64_t	hostid;
@@ -1119,5 +1121,9 @@ void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
 
 int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);
+
+void	zbx_dc_proxy_get_removed_hostids(zbx_uint64_t proxy_hostid, zbx_uint32_t revision,
+		zbx_vector_uint64_t *hostids);
+zbx_uint32_t	zbx_dc_get_received_revision(void);
 
 #endif

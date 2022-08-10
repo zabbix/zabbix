@@ -1085,7 +1085,7 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
  * Purpose: prepare proxy configuration data                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error)
+int	get_proxyconfig_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j, char **error)
 {
 	static const char	*proxytable[] =
 	{
@@ -1121,8 +1121,23 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 	zbx_vector_uint64_t	hosts, httptests;
 	zbx_hashset_t		itemids;
 	zbx_vector_ptr_t	keys_paths;
+	char			session[ZBX_SESSION_TOKEN_LEN + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64, __func__, proxy_hostid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64, __func__, proxy->hostid);
+
+	if (SUCCEED != zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_SESSION, session, sizeof(session), NULL))
+	{
+		*error = zbx_strdup(NULL, "cannot get session from proxy configuration request");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_CONFIG_REVISION, tmp, sizeof(tmp), NULL))
+	{
+		*error = zbx_strdup(NULL, "cannot get revision from proxy configuration request");
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "proxy configuration session:%s revision:%s", session, tmp);
 
 	zbx_hashset_create(&itemids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_create(&hosts);
@@ -1130,8 +1145,8 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 	zbx_vector_ptr_create(&keys_paths);
 
 	DBbegin();
-	get_proxy_monitored_hosts(proxy_hostid, &hosts);
-	get_proxy_monitored_httptests(proxy_hostid, &httptests);
+	get_proxy_monitored_hosts(proxy->hostid, &hosts);
+	get_proxy_monitored_httptests(proxy->hostid, &httptests);
 
 	for (i = 0; NULL != proxytable[i]; i++)
 	{
@@ -1139,35 +1154,35 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 
 		if (0 == strcmp(proxytable[i], "items"))
 		{
-			ret = get_proxyconfig_table_items(proxy_hostid, j, table, &itemids);
+			ret = get_proxyconfig_table_items(proxy->hostid, j, table, &itemids);
 		}
 		else if (0 == strcmp(proxytable[i], "item_preproc") || 0 == strcmp(proxytable[i], "item_rtdata") ||
 				0 == strcmp(proxytable[i], "item_parameter"))
 		{
 			if (0 != itemids.num_data)
-				ret = get_proxyconfig_table_items_ext(proxy_hostid, &itemids, j, table);
+				ret = get_proxyconfig_table_items_ext(proxy->hostid, &itemids, j, table);
 		}
 		else
-			ret = get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests, &keys_paths);
+			ret = get_proxyconfig_table(proxy->hostid, j, table, &hosts, &httptests, &keys_paths);
 
 		if (SUCCEED != ret)
 		{
 			*error = zbx_dsprintf(*error, "failed to get data from table \"%s\"", table->table);
-			goto out;
+			goto clean;
 		}
 	}
 
 	get_macro_secrets(&keys_paths, j);
 
 	ret = SUCCEED;
-out:
+clean:
 	DBcommit();
 	zbx_vector_ptr_clear_ext(&keys_paths, key_path_free);
 	zbx_vector_ptr_destroy(&keys_paths);
 	zbx_vector_uint64_destroy(&httptests);
 	zbx_vector_uint64_destroy(&hosts);
 	zbx_hashset_destroy(&itemids);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

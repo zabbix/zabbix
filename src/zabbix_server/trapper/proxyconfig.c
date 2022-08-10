@@ -65,7 +65,7 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED != get_proxyconfig_data(proxy.hostid, &j, &error))
+	if (SUCCEED != get_proxyconfig_data(&proxy, jp, &j, &error))
 	{
 		zbx_send_response_ext(sock, FAIL, error, NULL, flags, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
@@ -123,14 +123,37 @@ out:
  * Purpose: receive configuration tables from server (passive proxies)        *
  *                                                                            *
  ******************************************************************************/
-void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
+void	recv_proxyconfig(zbx_socket_t *sock)
 {
-	struct zbx_json_parse	jp_data, jp_kvs_paths = {0};
+	struct zbx_json_parse	jp_data, jp_config, jp_kvs_paths = {0};
 	int			ret;
+	struct zbx_json		j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update"))
+		goto out;
+
+	zbx_json_init(&j, 1024);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)zbx_dc_get_received_revision());
+
+	if (SUCCEED != (ret = zbx_tcp_send_ext(sock, j.buffer, j.buffer_size, 0, sock->protocol, CONFIG_TIMEOUT)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy configuration information to sever at \"%s\": %s",
+				sock->peer, zbx_json_strerror());
+		goto out;
+	}
+
+	if (FAIL == (ret = zbx_tcp_recv_ext(sock, CONFIG_TIMEOUT, ZBX_TCP_LARGE)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot receive proxy configuration data from server at \"%s\": %s",
+				sock->peer, zbx_json_strerror());
+		goto out;
+	}
+
+	if (SUCCEED != (ret = zbx_json_open(sock->buffer, &jp_config)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data received from server at"
 				" \"%s\": %s", sock->peer, zbx_json_strerror());
@@ -138,8 +161,13 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update"))
+	if (SUCCEED != (ret = zbx_json_brackets_by_name(&jp_config, ZBX_PROTO_TAG_DATA, &jp_data)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid proxy configuration request received from server at"
+				" \"%s\": %s", sock->peer, zbx_json_strerror());
+		zbx_send_proxy_response(sock, ret, zbx_json_strerror(), CONFIG_TIMEOUT);
 		goto out;
+	}
 
 	if (SUCCEED == process_proxyconfig(&jp_data, &jp_kvs_paths))
 	{

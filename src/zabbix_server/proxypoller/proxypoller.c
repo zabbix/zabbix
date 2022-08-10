@@ -253,18 +253,39 @@ out:
  ******************************************************************************/
 static int	proxy_send_configuration(DC_PROXY *proxy)
 {
-	char		*error = NULL, *buffer = NULL;
-	int		ret, flags = ZBX_TCP_PROTOCOL;
-	zbx_socket_t	s;
+	char			*error = NULL, *buffer = NULL;
+	int			ret, flags = ZBX_TCP_PROTOCOL;
+	zbx_socket_t		s;
 	struct zbx_json	j;
-	size_t		buffer_size, reserved = 0;
+	struct zbx_json_parse	jp;
+	size_t			buffer_size, reserved = 0;
 
 	zbx_json_init(&j, 512 * ZBX_KIBIBYTE);
-
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
-	zbx_json_addobject(&j, ZBX_PROTO_TAG_DATA);
 
-	if (SUCCEED != (ret = get_proxyconfig_data(proxy->hostid, &j, &error)))
+	if (SUCCEED != (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
+		goto out;
+
+	if (SUCCEED != (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size, reserved, ZBX_TCP_PROTOCOL)))
+		goto out;
+
+	if (FAIL == (ret = zbx_tcp_recv_ext(&s, CONFIG_TIMEOUT, 0)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot receive configuration information from proxy \"%s\": %s",
+				proxy->host, zbx_socket_strerror());
+		goto out;
+	}
+
+	if (SUCCEED != (ret = zbx_json_open(s.buffer, &jp)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse configuration information from proxy \"%s\": %s",
+				proxy->host, zbx_socket_strerror());
+		goto out;
+	}
+
+	zbx_json_clean(&j);
+
+	if (SUCCEED != (ret = get_proxyconfig_data(proxy, &jp, &j, &error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 				proxy->host, error);
@@ -285,8 +306,6 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 	}
 
-	if (SUCCEED != (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
-		goto out;
 
 	if (0 != proxy->auto_compress)
 	{
