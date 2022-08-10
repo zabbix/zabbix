@@ -167,6 +167,7 @@ class testDashboardForm extends CWebTest {
 		// Check if dashboard is empty.
 		$dashboard = CDashboardElement::find()->one();
 		$this->assertTrue($dashboard->isEmpty());
+
 		// Cancel dashboard editing.
 		$dashboard->cancelEditing();
 	}
@@ -840,14 +841,16 @@ class testDashboardForm extends CWebTest {
 				}
 				else {
 					$this->assertFalse($table->query('xpath://tbody/tr/td[text()='.
-							CXPathHelper::escapeQuotes($share['name']).']')->one(false)->isValid());
+							CXPathHelper::escapeQuotes($share['name']).']')->one(false)->isValid()
+					);
 				}
 			}
 		}
 	}
 
 	public function testDashboardForm_Delete() {
-		$widgetid = CDBHelper::getValue('SELECT widgetid FROM widget WHERE dashboardid='.zbx_dbstr(self::$ids['Dashboard for clone and delete']));
+		$widgetid = CDBHelper::getValue('SELECT widgetid FROM widget WHERE dashboardid='.
+				zbx_dbstr(self::$ids['Dashboard for clone and delete']));
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for clone and delete']);
 		CDashboardElement::find()->one()->waitUntilReady();
@@ -863,6 +866,7 @@ class testDashboardForm extends CWebTest {
 			'SELECT NULL FROM dashboard_usrgrp WHERE dashboardid='.zbx_dbstr(self::$ids['Dashboard for clone and delete']),
 			'SELECT NULL FROM widget_field wf INNER JOIN widget w ON w.widgetid=wf.widgetid WHERE w.widgetid='.$widgetid
 		];
+
 		foreach ($tables as $query) {
 			$this->assertEquals(0, CDBHelper::getCount($query));
 		}
