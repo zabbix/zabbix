@@ -32,24 +32,24 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'new_httpstep'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM,	null,				null],
-	'group_httptestid'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,				null],
+	'new_httpstep'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
+	'group_httptestid'	=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	// form
-	'hostid'          => [T_ZBX_INT, O_OPT, P_SYS, DB_ID.NOT_ZERO,          'isset({form}) || isset({add}) || isset({update})'],
-	'httptestid'      => [T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   'isset({form}) && {form} == "update"'],
-	'name'            => [T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({add}) || isset({update})', _('Name')],
-	'delay'           => [T_ZBX_STR, O_OPT, null,  null,					'isset({add}) || isset({update})'],
-	'retries'         => [T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})',
+	'hostid'          => [T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO,	'isset({form}) || isset({add}) || isset({update})'],
+	'httptestid'      => [T_ZBX_INT, O_NO,  P_SYS,	DB_ID,			'isset({form}) && {form} == "update"'],
+	'name'            => [T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
+	'delay'           => [T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
+	'retries'         => [T_ZBX_INT, O_OPT, null,	BETWEEN(1, 10),	'isset({add}) || isset({update})',
 		_('Attempts')
 	],
-	'status'          => [T_ZBX_STR, O_OPT, null,  null,                    null],
-	'agent'           => [T_ZBX_STR, O_OPT, null, null,                     'isset({add}) || isset({update})'],
-	'agent_other'     => [T_ZBX_STR, O_OPT, null, null,
+	'status'          => [T_ZBX_STR, O_OPT, null,	null,	null],
+	'agent'           => [T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'agent_other'     => [T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && {agent} == '.ZBX_AGENT_OTHER
 	],
-	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    null],
-	'steps'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    'isset({add}) || isset({update})', _('Steps')],
-	'authentication' =>		[T_ZBX_INT, O_OPT, null,
+	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'steps'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	'isset({add}) || isset({update})', _('Steps')],
+	'authentication'  => [T_ZBX_INT, O_OPT, null,
 								IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
 									HTTPTEST_AUTH_DIGEST
 								]),
@@ -90,10 +90,10 @@ $fields = [
 	'filter_status' =>		[T_ZBX_INT, O_OPT, null,
 		IN([-1, HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED]), null
 	],
-	'filter_groupids'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'filter_hostids'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
+	'filter_groupids'	=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'filter_hostids'	=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null, IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), null],
-	'filter_tags'		=> [T_ZBX_STR, O_OPT, null,	null,			null],
+	'filter_tags'		=> [T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"httptest.massclearhistory","httptest.massdelete","httptest.massdisable",'.
@@ -101,14 +101,14 @@ $fields = [
 								),
 								null
 							],
-	'clone'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
-	'del_history'		=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
-	'add'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
-	'update'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
-	'delete'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
-	'cancel'			=> [T_ZBX_STR, O_OPT, P_SYS,	null,				null],
-	'form'				=> [T_ZBX_STR, O_OPT, P_SYS,	null,				null],
-	'form_refresh'		=> [T_ZBX_INT, O_OPT, null,	null,				null],
+	'clone'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'del_history'		=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel'			=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form'				=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form_refresh'		=> [T_ZBX_INT, O_OPT, null,	null,			null],
 	// sort and sortorder
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"hostname","name","status"'),				null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]

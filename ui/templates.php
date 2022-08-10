@@ -32,18 +32,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = [
-	'groups'			=> [T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'groups'			=> [T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
-	'templates'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
+	'templates'			=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'linked_templates'	=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'add_templates'		=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'templateid'		=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
+	'templateid'		=> [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form}) && {form} == "update"'],
 	'template_name'		=> [T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Template name')],
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
-	'groupids'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'tags'				=> [T_ZBX_STR, O_OPT, null,		null,	null],
+	'groupids'			=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,	null],
+	'tags'				=> [T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
-	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
 	'valuemaps'			=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	// actions
@@ -66,13 +66,13 @@ $fields = [
 	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_name'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
-	'filter_templates' =>  [T_ZBX_INT, O_OPT, null,		DB_ID,		null],
-	'filter_groups'		=> [T_ZBX_INT, O_OPT, null,		DB_ID,		null],
+	'filter_templates' =>  [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,		null],
+	'filter_groups'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,		null],
 	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null,
 								IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
 								null
 							],
-	'filter_tags'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
+	'filter_tags'		=> [T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,		null,		null],
 	// sort and sortorder
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]

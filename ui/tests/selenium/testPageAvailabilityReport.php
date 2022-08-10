@@ -117,7 +117,7 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 		$args = [
 			'from' => date('Y-m-d H:i:s', strtotime($start_time)),
 			'to' => date('Y-m-d H:i:s', strtotime($end_time)),
-			'filter_hostids' => 50014
+			'filter_hostids' => [50014]
 		];
 
 		$this->zbxTestLogin('report2.php?'.http_build_query($args));

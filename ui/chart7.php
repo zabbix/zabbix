@@ -40,7 +40,7 @@ $fields = [
 	'graph3d' =>		[T_ZBX_INT,			O_OPT, P_NZERO,	IN('0,1'),			null],
 	'legend' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null],
 	'i' =>				[T_ZBX_STR,			O_OPT, null,	null,				null],
-	'items' =>			[T_ZBX_STR,			O_OPT, null,	null,				null],
+	'items' =>			[T_ZBX_STR,			O_OPT, P_ONLY_ARRAY,	null,		null],
 	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {

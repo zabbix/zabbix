@@ -148,11 +148,28 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		$caption = $field;
 	}
 
-	if (is_array($var) && $type != T_ZBX_RANGE_TIME) {
+	$is_array_flag = ($flags & P_ONLY_ARRAY);
+	$is_td_array_flag = ($flags & P_ONLY_TD_ARRAY);
+	$has_array_flag = $is_array_flag || $is_td_array_flag;
+
+	if (is_array($var) && $type != T_ZBX_RANGE_TIME && ($has_array_flag || $flags & P_AS_IS)) {
 		$err = ZBX_VALID_OK;
+
+		if ($flags & P_ONLY_ARRAY) {
+			$flags &= ~P_ONLY_ARRAY;
+		}
+
+		if ($flags & P_ONLY_TD_ARRAY) {
+			$flags &= ~P_ONLY_TD_ARRAY;
+			$flags |= P_ONLY_ARRAY;
+		}
 
 		foreach ($var as $v) {
 			$err |= check_type($field, $flags, $v, $type);
+
+			if (!($err & ZBX_VALID_OK)) {
+				break;
+			}
 		}
 
 		return $err;
@@ -161,7 +178,15 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	$error = false;
 	$message = '';
 
-	if ($type == T_ZBX_INT) {
+	if (!is_array($var) && $has_array_flag) {
+		$error = true;
+		$message = _s('Field "%1$s" is not array.', $caption);
+
+		if ($is_td_array_flag) {
+			$message = _s('Field "%1$s" is not two-dimensional array.', $caption);
+		}
+	}
+	elseif ($type == T_ZBX_INT) {
 		if (!zbx_is_int($var)) {
 			$error = true;
 			$message = _s('Field "%1$s" is not integer.', $caption);
