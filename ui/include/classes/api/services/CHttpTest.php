@@ -652,6 +652,11 @@ class CHttpTest extends CApiService {
 			CItemManager::delete($del_itemids);
 		}
 
+		DB::delete('httpstep', ['httptestid' => $del_httptestids]);
+		DB::delete('httpstepitem', ['itemid' => $del_httptestids]);
+		DB::delete('httptestitem', ['httptestid' => $del_httptestids]);
+		DB::delete('httptest_field', ['httptestid' => $del_httptestids]);
+		DB::delete('httpstep_field', ['httptestid' => $del_httptestids]);
 		DB::delete('httptest', ['httptestid' => $del_httptestids]);
 
 		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_SCENARIO, $db_httptests);

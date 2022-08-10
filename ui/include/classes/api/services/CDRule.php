@@ -866,6 +866,7 @@ class CDRule extends CApiService {
 			));
 		}
 
+		DB::delete('dchecks', ['druleid' => $druleids]);
 		DB::delete('drules', ['druleid' => $druleids]);
 
 		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_DISCOVERY_RULE, $db_drules);
