@@ -19,6 +19,8 @@
 
 #include "zbxcomms.h"
 
+#include "zbxstr.h"
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
