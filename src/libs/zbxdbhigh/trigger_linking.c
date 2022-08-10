@@ -18,13 +18,14 @@
 **/
 
 #include "trigger_linking.h"
-
 #include "zbxdbhigh.h"
+#include "trigger_dep_linking.h"
+
 #include "zbxeval.h"
 #include "log.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_trigger.h"
-#include "trigger_dep_linking.h"
+#include "zbxnum.h"
 
 typedef struct
 {
@@ -337,7 +338,6 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	zbx_trigger_tags_t		*trigger_tags = NULL;
 	zbx_uint64_t			triggerid, tagid;
 	zbx_db_tag_t			*db_tag;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

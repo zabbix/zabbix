@@ -19,11 +19,11 @@
 #include "zbxtrends.h"
 #include "trends.h"
 
-#include "common.h"
 #include "zbxalgo.h"
 #include "log.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
+#include "zbxnum.h"
 
 typedef struct
 {

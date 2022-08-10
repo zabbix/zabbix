@@ -55,8 +55,6 @@ class testDashboardCopyWidgets extends CWebTest {
 	 * Function creates template dashboards and defines the corresponding dashboard IDs.
 	 */
 	public static function prepareTemplateDashboardsData() {
-		CDataHelper::setSessionId(null);
-
 		$response = CDataHelper::call('templatedashboard.create', [
 			[
 				'templateid' => self::UPDATE_TEMPLATEID,

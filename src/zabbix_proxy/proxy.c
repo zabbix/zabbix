@@ -60,6 +60,7 @@
 #include "../zabbix_server/availability/avail_manager.h"
 #include "zbxserver.h"
 #include "stats/zabbix_stats.h"
+#include "zbxip.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"

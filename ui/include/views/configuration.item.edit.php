@@ -602,7 +602,7 @@ if ($data['display_interfaces']) {
 			$form->addVar('selectedInterfaceId', $data['interfaceid']);
 			$item_tab->addItem([
 				(new CLabel(_('Host interface'), 'interface'))
-					->setAsteriskMark()
+					->setAsteriskMark(itemTypeInterface($data['item']['type']) != INTERFACE_TYPE_OPT)
 					->setId('js-item-interface-label'),
 				(new CFormField((new CTextBox('interface', getHostInterface($interface), true))->setAriaRequired()))
 					->setId('js-item-interface-field')

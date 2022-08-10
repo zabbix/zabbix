@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
 #include "zbxdbhigh.h"
+
 #include "log.h"
 #include "dbcache.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
+#include "zbxnum.h"
 
 struct _zbx_template_item_preproc_t
 {
