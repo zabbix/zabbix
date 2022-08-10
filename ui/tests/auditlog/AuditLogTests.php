@@ -19,7 +19,6 @@
 **/
 
 require_once dirname(__FILE__).'/testAuditMaintenance.php';
-require_once dirname(__FILE__).'/testAuditAction.php';
 require_once dirname(__FILE__).'/testAuditUserGroups.php';
 require_once dirname(__FILE__).'/testAuditEventCorrelation.php';
 require_once dirname(__FILE__).'/testAuditDashboard.php';
@@ -38,7 +37,6 @@ class AuditLogTests {
 		$suite = new TestSuite('auditlog');
 
 		$suite->addTestSuite('testAuditMaintenance');
-		$suite->addTestSuite('testAuditAction');
 		$suite->addTestSuite('testAuditUserGroups');
 		$suite->addTestSuite('testAuditEventCorrelation');
 		$suite->addTestSuite('testAuditDashboard');
