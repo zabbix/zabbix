@@ -185,7 +185,7 @@ class testAuditlogAction extends CAPITest {
 
 	public function testAuditlogAction_Delete() {
 		$this->call('action.delete', [self::$resourceid]);
-		$this->sendGetRequest('resourcetype', 2, 5);
+		$this->sendGetRequest('resourcename', 2, 'Updated action audit');
 	}
 
 	private function sendGetRequest($output, $action, $result) {
