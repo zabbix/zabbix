@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-06-26 19:08+0000\n"
+"PO-Revision-Date: 2022-06-30 22:09+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -158,9 +158,9 @@ msgstr[2] "%1$s události"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s zařízení v odstávce"
+msgstr[1] "%1$s zařízení v odstávce"
+msgstr[2] "%1$s zařízení v odstávce"
 
 #: include/func.inc.php:2549
 #, c-format
@@ -258,9 +258,9 @@ msgstr[2] "%1$s sekund"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s nepotvrzený problém"
+msgstr[1] "%1$s nepotvrzené problémy"
+msgstr[2] "%1$s nepotvrzené problémy"
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
@@ -474,11 +474,11 @@ msgstr "API tokeny"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "Nad hodnotou"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "Úsečka"
 
 #: include/func.inc.php:1578
 msgid "Access denied"
@@ -662,7 +662,7 @@ msgstr "Log akcí"
 #: app/views/administration.script.list.php:51
 #: app/views/administration.script.list.php:90
 msgid "Action operation"
-msgstr ""
+msgstr "Akce operace"
 
 #: actionconf.php:293
 msgid "Action updated"
@@ -862,7 +862,7 @@ msgstr "Přidat"
 
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "Přidat (dosaženo limitu typů zpráv)"
 
 #: jsLoader.php:149
 msgid "Add a new widget"
@@ -1052,7 +1052,7 @@ msgstr "Rozhraní agenta"
 
 #: include/classes/data/CItemData.php:829
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Kontrola varianty agenta. Vrací 1 - pro Zabbix agenta; 2 - pro Zabbix agenta  2"
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
@@ -1292,7 +1292,7 @@ msgstr "Duben"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
-msgstr ""
+msgstr "Jste si jistí, že chcete smazat tento filtr?"
 
 #: app/views/js/administration.macros.edit.js.php:86
 msgid "Are you sure you want to delete?"
@@ -1326,7 +1326,7 @@ msgstr "Jako prostý text"
 #: app/views/administration.authentication.edit.php:275
 #: app/views/administration.authentication.edit.php:309
 msgid "Assertions"
-msgstr ""
+msgstr "Tvrzení"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1364,7 +1364,7 @@ msgstr "V (hodina:minuta)"
 
 #: app/views/administration.userrole.edit.php:115
 msgid "At least one UI element must be checked."
-msgstr ""
+msgstr "Musí být zaškrtnut alespoň jeden prvek uživatelského rozhraní."
 
 #: include/classes/api/services/CRole.php:487
 #, c-format
@@ -1373,7 +1373,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "Alespoň jedna akce je povinná."
 
 #: include/classes/api/services/CUser.php:614
 #: include/classes/api/services/CUser.php:1286
@@ -1402,7 +1402,7 @@ msgstr ""
 
 #: app/views/configuration.correlation.edit.php:159
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "Musí být vybrána alespoň jedna operace."
 
 #: include/views/configuration.action.edit.php:520
 msgid "At least one operation must exist."
@@ -1471,7 +1471,7 @@ msgstr "Ověřovací token"
 
 #: app/views/administration.authentication.edit.php:281
 msgid "AuthN requests"
-msgstr ""
+msgstr "Požadavky AuthN"
 
 #: app/controllers/CControllerAuditLogList.php:211
 #: app/views/administration.authentication.edit.php:323
@@ -1583,11 +1583,11 @@ msgstr "Automatická registrace"
 #: include/classes/helpers/CMenuHelper.php:209
 #: include/views/configuration.action.list.php:35
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "Akce automatické registrace"
 
 #: app/views/administration.housekeeping.edit.php:86
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "Doba ukládání dat automatické registrace"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:195
@@ -1620,7 +1620,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
-msgstr ""
+msgstr "Vyhnout se snadno uhodnutelným heslům"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
@@ -1673,7 +1673,7 @@ msgstr "Před hodnotou"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "Pod hodnotou"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1686,11 +1686,11 @@ msgstr "Bind heslo"
 #: app/controllers/CControllerPopupTriggerExpr.php:428
 #: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
-msgstr ""
+msgstr "Bity k posunu"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
-msgstr ""
+msgstr "Bitové funkce"
 
 #: app/views/administration.user.list.php:143
 msgid "Blocked"
@@ -1762,7 +1762,7 @@ msgstr "Dole"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr ""
+msgstr "Spodní N"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -1826,7 +1826,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1061
 msgid "CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "Procento využití CPU. Vrací desetinné číslo"
 
 #: app/views/popup.itemtestedit.view.php:300
 msgid "CRLF"
@@ -1989,9 +1989,9 @@ msgstr "Nelze přidat typ média"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze přidat modul: %1$s."
+msgstr[1] "Nelze přidat moduly: %1$s."
+msgstr[2] "Nelze přidat moduly: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -2019,7 +2019,7 @@ msgstr "Nelze přidat regulární výraz"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "Nelze přidat naplánovaný report"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -3888,6 +3888,13 @@ msgstr "Komprimovat záznamy starší než"
 msgid "Compression"
 msgstr "Komprimace"
 
+#: app/views/administration.housekeeping.edit.php:163
+#: app/views/administration.housekeeping.edit.php:168
+#: app/views/administration.housekeeping.edit.php:173
+#: app/views/administration.housekeeping.edit.php:183
+msgid "Compression is not supported."
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:319
 msgid "Concurrent sessions"
 msgstr "Souběžné relace"
@@ -5571,6 +5578,10 @@ msgstr "Detaily"
 #: httpdetails.php:27 httpdetails.php:185
 msgid "Details of web scenario"
 msgstr "Detaily web scénáře"
+
+#: app/views/administration.housekeeping.edit.php:194
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -11152,6 +11163,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "Po"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "MAC adresa A"
@@ -11754,6 +11770,11 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:106
 #, c-format
 msgid "Minimum required PHP version is %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:174
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:193
@@ -14244,6 +14265,10 @@ msgstr "Pole zpráv"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "Typ zprávy"
+
+#: app/views/administration.housekeeping.edit.php:164
+msgid "PostgreSQL database server version is too old."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -18635,6 +18660,14 @@ msgstr ""
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Nelze přepsat existující konfigurační soubor."
 
+#: app/views/administration.housekeeping.edit.php:159
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr ""
@@ -18816,6 +18849,16 @@ msgstr ""
 #: app/partials/administration.system.info.php:173
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:188
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
 msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
