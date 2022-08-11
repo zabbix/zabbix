@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-08T08:45:10Z'
+  date: '2022-08-11T12:57:51Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -21,8 +21,8 @@ zabbix_export:
         Setup:
           1. Create an Azure service principal via Azure CLI for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
-            https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fazure%2Fazure-resource-manager%2Ftoc.json&view=azure-cli-latest
-          2. Link template to the host.
+            See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
+          2. Link the template to a host.
           3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
@@ -247,12 +247,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.VM.RESOURCE_GROUP.MATCHES}'
-                formulaid: B
+                formulaid: A
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.VM.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: A
+                formulaid: B
           description: 'A list of the virtual machines in the subscription.'
           host_prototypes:
             -
@@ -376,8 +376,8 @@ zabbix_export:
         Setup:
           1. Create an Azure service principal via Azure CLI for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
-            https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli
-          2. Link template to the host.
+            See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
+          2. Link the template to a host.
           3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
