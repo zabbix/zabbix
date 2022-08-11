@@ -708,7 +708,7 @@ typedef struct
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
-	zbx_uint64_t	flags;
+	zbx_uint64_t			flags;
 }
 zbx_proxy_diff_t;
 

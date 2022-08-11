@@ -153,7 +153,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 	if (SUCCEED != zbx_check_protocol_version(&proxy, version))
 	{
 		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
-		error = zbx_strdup(error, "current proxy version is unsupported by server");
+		error = zbx_strdup(error, "current proxy version is not supported by server");
 		goto reply;
 	}
 

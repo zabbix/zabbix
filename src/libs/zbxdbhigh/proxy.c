@@ -4511,8 +4511,8 @@ int	proxy_get_history_count(void)
  *     jp      - [IN] JSON with the proxy version                             *
  *                                                                            *
  * Return value: The protocol version.                                        *
- *     SUCCEED - proxy version was successfully extracted                     *
- *     FAIL    - otherwise                                                    *
+ *     actual proxy version - if proxy version was successfully extracted     *
+ *     proxy version 3.2    - otherwise                                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp)
@@ -4527,7 +4527,7 @@ int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp)
 	}
 	else
 	{
-		return ZBX_COMPONENT_VERSION_UNDEFINED;
+		return ZBX_COMPONENT_VERSION(3, 2, 0);
 	}
 }
 
@@ -4960,6 +4960,7 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
 		return ZBX_PROXY_VERSION_OUTDATED;
 #endif
 	return ZBX_PROXY_VERSION_UNSUPPORTED;
+
 #undef SERVER_VERION
 }
 
@@ -5054,15 +5055,7 @@ int	zbx_check_protocol_version(DC_PROXY *proxy, int version)
 			zbx_update_proxy_lasterror(proxy);
 		}
 
-		if (ZBX_PROXY_VERSION_OUTDATED == compatibility && 1 == print_log)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" version %d.%d.%d is outdated, only data collection"
-					" and remote execution is available with server version %d.%d.%d.", proxy->host,
-					ZBX_COMPONENT_VERSION_MAJOR(version), ZBX_COMPONENT_VERSION_MINOR(version),
-					ZBX_COMPONENT_VERSION_PATCH(version), ZABBIX_VERSION_MAJOR,
-					ZABBIX_VERSION_MINOR, ZABBIX_VERSION_PATCH);
-		}
-		else if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
+		if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 		{
 			if (1 == print_log)
 			{
@@ -5075,6 +5068,15 @@ int	zbx_check_protocol_version(DC_PROXY *proxy, int version)
 			}
 			return FAIL;
 		}
+		else if (ZBX_PROXY_VERSION_OUTDATED == compatibility && 1 == print_log)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" version %d.%d.%d is outdated, only data collection"
+					" and remote execution is available with server version %d.%d.%d.", proxy->host,
+					ZBX_COMPONENT_VERSION_MAJOR(version), ZBX_COMPONENT_VERSION_MINOR(version),
+					ZBX_COMPONENT_VERSION_PATCH(version), ZABBIX_VERSION_MAJOR,
+					ZABBIX_VERSION_MINOR, ZABBIX_VERSION_PATCH);
+		}
+
 		else if (ZBX_PROXY_VERSION_UNDEFINED == compatibility)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;

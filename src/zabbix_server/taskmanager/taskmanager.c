@@ -1015,19 +1015,23 @@ static int	tm_expire_generic_tasks(zbx_vector_uint64_t *taskids)
  ******************************************************************************/
 static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_hostid)
 {
-	DB_ROW				row;
-	DB_RESULT			result;
 	zbx_proxy_compatibility_t	compatibility = ZBX_PROXY_VERSION_UNDEFINED;
 
-	result = DBselect(
-			"select compatibility"
-			" from host_rtdata"
-			" where hostid=" ZBX_FS_UI64, proxy_hostid);
+	if (0 < proxy_hostid)
+	{
+		DB_ROW				row;
+		DB_RESULT			result;
 
-	if (NULL != (row = DBfetch(result)))
-		compatibility = atoi(row[0]);
+		result = DBselect(
+				"select compatibility"
+				" from host_rtdata"
+				" where hostid=" ZBX_FS_UI64, proxy_hostid);
 
-	DBfree_result(result);
+		if (NULL != (row = DBfetch(result)))
+			compatibility = (zbx_proxy_compatibility_t)atoi(row[0]);
+
+		DBfree_result(result);
+	}
 
 	return compatibility;
 }
@@ -1060,7 +1064,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_proxy_compatibility_t	compatibility = ZBX_PROXY_VERSION_UNDEFINED;
+		zbx_proxy_compatibility_t	compatibility;
 
 		ZBX_STR2UINT64(taskid, row[0]);
 		ZBX_STR2UCHAR(type, row[1]);
@@ -1076,12 +1080,11 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					processed_num++;
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND:
-				if (NULL != row[4])
-					compatibility = tm_get_proxy_compatibility(proxy_hostid);
+				compatibility = tm_get_proxy_compatibility(proxy_hostid);
 
 				if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 				{
-					const char*	error = "Remote commands are disabled at unsupported proxies.";
+					const char	*error = "Remote commands are disabled at unsupported proxies.";
 					zbx_tm_task_t	*task;
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
@@ -1108,8 +1111,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 				zbx_vector_uint64_append(&ack_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_CHECK_NOW:
-				if (NULL != row[4])
-					compatibility = tm_get_proxy_compatibility(proxy_hostid);
+				compatibility = tm_get_proxy_compatibility(proxy_hostid);
 
 				if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 				{
@@ -1123,8 +1125,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
-				if (NULL != row[4])
-					compatibility = tm_get_proxy_compatibility(proxy_hostid);
+				compatibility = tm_get_proxy_compatibility(proxy_hostid);
 
 				if (ZBX_PROXY_VERSION_OUTDATED == compatibility ||
 						ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)

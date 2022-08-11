@@ -80,13 +80,9 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 				struct zbx_json	json;
 
 				if (SUCCEED == (res = DCget_proxy_discovery(&json, &error)))
-				{
 					SET_STR_RESULT(result, zbx_strdup(NULL, json.buffer));
-				}
 				else
-				{
 					SET_MSG_RESULT(result, error);
-				}
 
 				zbx_json_free(&json);
 

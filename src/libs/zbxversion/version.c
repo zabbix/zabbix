@@ -25,12 +25,14 @@
  * Purpose: Extracts protocol version from string. All three groups of digits *
  *          are extracted. Alphanumeric release candidate part is ignored.    *
  *                                                                            *
+ * Note: Function modifies argument 'value'!                                  *
+ *                                                                            *
  * Parameters:                                                                *
  *     value      - [IN] textual representation of version                    *
  *                  Example: "6.4.0alpha1"                                    *
  *                                                                            *
  * Return value: The protocol version if it was successfully extracted,       *
- *               otherwise -1                                                 *
+ *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_component_version(char *value)
@@ -60,7 +62,7 @@ int	zbx_get_component_version(char *value)
  *                  Example: "6.4.0alpha1"                                    *
  *                                                                            *
  * Return value: The protocol version if it was successfully extracted,       *
- *               otherwise -1                                                 *
+ *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_component_version_ignore_patch(char *value)

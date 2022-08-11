@@ -431,7 +431,7 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts)))
 		goto out;
 
-	/* handle pre 3.4 proxies that did not support proxy data request */
+	/* andle pre 3.4 proxies that did not support proxy data request and active/passive configuration mismatch */
 	if ('\0' == *answer)
 	{
 		proxy->version = ZBX_COMPONENT_VERSION_UNDEFINED;
@@ -556,7 +556,8 @@ static int	process_proxy(void)
 			if (proxy.proxy_tasks_nextcheck <= now)
 				check_tasks = 1;
 
-			if (proxy.proxy_data_nextcheck <= now && proxy.compatibility != ZBX_PROXY_VERSION_UNSUPPORTED)
+			if (proxy.proxy_data_nextcheck <= now && (proxy.compatibility == ZBX_PROXY_VERSION_CURRENT ||
+					proxy.compatibility == ZBX_PROXY_VERSION_OUTDATED))
 			{
 				int	more;
 
