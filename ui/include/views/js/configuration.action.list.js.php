@@ -34,10 +34,6 @@
 
 		init({eventsource}) {
 			this.eventsource = eventsource;
-			this._initActions();
-		},
-
-		_initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-action-create')) {
 					this.openActionPopup();
@@ -54,7 +50,7 @@
 			};
 
 			return PopUp('popup.action.edit', parameters, {
-				dialogueid: 'action',
+				dialogueid: 'action-edit',
 				dialogue_class: 'modal-popup-large'
 			});
 		}

@@ -25,32 +25,39 @@
  */
 
 require_once dirname(__FILE__).'/js/configuration.action.list.js.php';
+//$this->includeJsFile('popup.condition.common.js.php');
+$this->addJsFile('popup.condition.common.js');
+
 
 if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
 	$title = _('Service actions');
-	$submenu = null;
 	$doc_url = CDocHelper::CONFIGURATION_SERVICES_ACTION_LIST;
 }
-else {
+
 	$submenu_source = [
 		EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
 		EVENT_SOURCE_DISCOVERY => _('Discovery actions'),
 		EVENT_SOURCE_AUTOREGISTRATION => _('Autoregistration actions'),
-		EVENT_SOURCE_INTERNAL => _('Internal actions')
+		EVENT_SOURCE_INTERNAL => _('Internal actions'),
+		EVENT_SOURCE_SERVICE => _('Service actions')
 	];
 
 	$title = array_key_exists($data['eventsource'], $submenu_source) ? $submenu_source[$data['eventsource']] : null;
 	$submenu = [];
 	$doc_url = CDocHelper::CONFIGURATION_ACTION_LIST;
 
-//	foreach ($submenu_source as $value => $label) {
-//		$url = (new CUrl('zabbix.php'))
-//			->setArgument('action', 'action.list')
-//			->setArgument('eventsource', $value)
-//			->getUrl();
-//		$submenu[$url] = $label;
-//	}
+if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
+	$doc_url = CDocHelper::CONFIGURATION_SERVICES_ACTION_LIST;
 }
+
+	foreach ($submenu_source as $value => $label) {
+		$url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'action.list')
+			->setArgument('eventsource', $value)
+			->getUrl();
+		$submenu[$url] = $label;
+	}
+
 
 $widget = (new CWidget())
 	->setTitle($title)

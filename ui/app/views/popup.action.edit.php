@@ -27,34 +27,102 @@
  */
 
 //require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
-
+$this->addJsFile('popup.operation.common.js');
+$this->addJsFile('configuration.action.edit.js.php');
 
 $form = (new CForm())
-//	->setName('action_form')
-//	->addItem(getMessages())
+	->setName('action.edit')
 	->setId('action-form')
 	->addVar('actionid', $data['actionid'])
 	->addStyle('display: none;')
+	//->addItem(getMessages())
 	->addItem((new CInput('submit'))->addStyle('display: none;'));
-// check if I need the 'null'??
+
+if ($data['actionid']) {
+	$form->addVar('actionid', $data['actionid']);
+}
 
 // Create condition table.
 $condition_table = (new CTable(_('No conditions defined.')))
-	->setId('conditionTable')
+	->setId('conditions-table')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
+
+// $i = 0;
+// if ($data['action']['filter']['conditions']) {
+//	$actionConditionStringValues = actionConditionValueToString([$data['action']]);
+//	foreach ($data['action']['filter']['conditions'] as $cIdx => $condition) {
+//		if (!isset($condition['conditiontype'])) {
+//			$condition['conditiontype'] = 0;
+//		}
+//		if (!isset($condition['operator'])) {
+//			$condition['operator'] = 0;
+//		}
+//		if (!isset($condition['value'])) {
+//			$condition['value'] = '';
+//		}
+//		if (!array_key_exists('value2', $condition)) {
+//			$condition['value2'] = '';
+//		}
+//		if (!str_in_array($condition['conditiontype'], $data['allowedConditions'])) {
+//			continue;
+//		}
+
+//		$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
+
+//		$labelSpan = (new CSpan($label))
+//			->addClass('label')
+//			->setAttribute('data-conditiontype', $condition['conditiontype'])
+//			->setAttribute('data-formulaid', $label);
+
+//		$condition_table->addRow(
+//			[
+//				$labelSpan,
+//				(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
+//					$actionConditionStringValues[0][$cIdx], $condition['value2']
+//				)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
+//				(new CCol([
+//					(new CButton('remove', _('Remove')))
+//						->onClick('removeCondition('.$i.');')
+//						->addClass(ZBX_STYLE_BTN_LINK)
+//						->setId('conditions_table'),
+//						//->removeId(),
+//					new CVar('conditions['.$i.']', $condition)
+//				]))->addClass(ZBX_STYLE_NOWRAP)
+//			],
+//			null, 'conditions_'.$i
+//		);
+
+//		$i++;
+//	}
+//}
+
+$formula = (new CTextBox('formula', $data['action']['filter']['formula'], false,
+	DB::getFieldLength('actions', 'formula')
+))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setId('formula')
+	->setAttribute('placeholder', 'A or (B and C) &hellip;');
+
+// todo: add formula and type of calculation when at least 2 conditions are added -> in js???
 
 $condition_table->setFooter(
 	(new CSimpleButton(_('Add')))
 		->setAttribute('data-eventsource', $data['eventsource'])
-		->onClick('
-			PopUp("popup.condition.actions", {
+		->onClick('PopUp("popup.condition.actions",
+			{
 				type: '.ZBX_POPUP_CONDITION_TYPE_ACTION.',
-				source: '.$data['eventsource'].',
-			}, {dialogue_class: "modal-popup-medium"});
-		')
+				source: '.$data['eventsource'].'.
+			},
+			{
+				dialogue_class: "modal-popup-medium",
+				dialogueid: "action-edit-condition"
+			}
+		);')
 		->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('element-table-add')
 );
+
 
 // action tab
 $action_tab = (new CFormGrid())
@@ -81,10 +149,10 @@ $action_tab
 		new CFormField((new CLabel(_('At least one operation must exist.')))->setAsteriskMark())
 	);
 
-// Operations tab.
-$operations_tab = (new CFormGrid());
 
-// operations table
+
+
+// Operations table.
 $operations_table = (new CTable())
 	->setId('op-table')
 	->setAttribute('style', 'width: 100%;');
@@ -97,6 +165,20 @@ else {
 	$operations_table->setHeader([_('Details'), _('Action')]);
 }
 
+$operations_table->setFooter(
+	(new CSimpleButton(_('Add')))
+		->setAttribute('data-actionid', 0)
+		->setAttribute('data-eventsource', $data['eventsource'])
+		->onClick('
+			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource, '.ACTION_OPERATION.');
+		')
+		// TODO : fix the input to action edit popup open!!!
+		->addClass(ZBX_STYLE_BTN_LINK)
+);
+
+// Operations tab.
+$operations_tab = (new CFormGrid());
+
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 	$operations_tab->addItem([
 		(new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
@@ -106,16 +188,6 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 			->setAriaRequired()
 	]);
 }
-
-$operations_table->setFooter(
-	(new CSimpleButton(_('Add')))
-		->setAttribute('data-actionid', 0)
-		->setAttribute('data-eventsource', $data['eventsource'])
-		->onClick('
-			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource, '.ACTION_OPERATION.');
-		')
-		->addClass(ZBX_STYLE_BTN_LINK)
-);
 
 $operations_tab->addItem([
 	new CLabel(_('Operations')),
@@ -137,10 +209,11 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 			//	->setAttribute('data-actionid', $data['actionid'])
 			->setAttribute('data-eventsource', $data['eventsource'])
 			->onClick('
-				operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
+					action_edit_popup.open(this, this.dataset.actionid, this.dataset.eventsource,
 					'.ACTION_RECOVERY_OPERATION.'
 				);
 			')
+			// TODO : fix the input to action edit popup open!!!
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
@@ -166,10 +239,11 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			->setAttribute('data-actionid', $data['actionid'])
 			->setAttribute('data-eventsource', $data['eventsource'])
 			->onClick('
-				operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
+			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
 					'.ACTION_UPDATE_OPERATION.'
 				);
 			')
+				// TODO : fix the input to action edit popup open!!!
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
@@ -213,24 +287,27 @@ $tabs = (new CTabView())
 $form
 	->addItem($tabs)
 	->addItem(
-		(new CScriptTag('action_edit_popup.init();'))->setOnDocumentReady()
+		(new CScriptTag('action_edit_popup.init('.json_encode([
+				'condition_operators' => condition_operator2str(),
+				'condition_types' => condition_type2str()
+			]).');'))
+			->setOnDocumentReady()
 	);
 
-$title = _('Action');
 $buttons = [
 	[
 		'title' => _('Add'),
 		'class' => 'js-add',
 		'keepOpen' => true,
 		'isSubmit' => true,
-		// add function submit()
 		'action' => 'action_edit_popup.submit();'
 	]
+	// todo: add function submit()
 ];
 
 $output = [
-	'header' => $title,
-	// 'doc_url' => CDocHelper::getUrl(CDocHelper::CONFIGURATION_ACTION_EDIT), do I need this?
+	'header' => _('Actions'),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::CONFIGURATION_ACTION_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().

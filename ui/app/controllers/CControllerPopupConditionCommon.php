@@ -24,7 +24,9 @@
  */
 abstract class CControllerPopupConditionCommon extends CController {
 
+
 	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableSIDvalidation();
 	}
 
@@ -55,6 +57,7 @@ abstract class CControllerPopupConditionCommon extends CController {
 	}
 
 	protected function doAction() {
+
 		if ($this->hasInput('validate')) {
 			$this->setResponse(
 				(new CControllerResponseData(

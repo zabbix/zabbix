@@ -60,6 +60,7 @@ class CControllerActionList extends CController {
 	}
 
 	protected function doAction(): void {
+
 		$eventsource = getRequest('eventsource');
 		$sort_field = $this->getInput('sort', CProfile::get('web.action.list.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.action.list.sortorder', ZBX_SORT_UP));

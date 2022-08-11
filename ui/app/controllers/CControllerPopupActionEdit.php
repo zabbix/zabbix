@@ -18,6 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once dirname(__FILE__).'/../../include/actions.inc.php';
+// todo: check if needed here
 
 class CControllerPopupActionEdit extends CController {
 
@@ -32,7 +34,9 @@ class CControllerPopupActionEdit extends CController {
 			'g_actionid' => 'array_id',
 			'filter_set' => 'string',
 			'filter_rst' =>	'string',
+			'add_condition' => 'string',
 			'filter_name' =>'string',
+			'new_condition' => 'string',
 			'filter_status' =>'in '.implode(',', [-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])
 		];
 
@@ -51,14 +55,71 @@ class CControllerPopupActionEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		// E.S. TODO: pass all the variables. E.g. $data: actionid, action [recovery_operations] allowedOperations
+
+		// TODO: pass all the variables. E.g. $data: actionid, action [recovery_operations] allowedOperations
 		// TODO : $operations: operationtype, opconditions, opmessage $operationid
 
-		$data['eventsource'] = getRequest('eventsource');
+		$eventsource = $this->getInput('eventsource');
+
+		// if ($this->getInput('add_condition') && $this->getInput('new_condition')) {
+		// $this->addCondition();
+		// }
+
+		$data = [
+			'eventsource' => $eventsource,
+			'actionid' => $this->getInput('g_actionid')
+		];
+
 		$response = new CControllerResponseData($data);
 
-		//$response->setTitle(_('Configuration of actions'));
-
 		$this->setResponse($response);
+	}
+
+	// TODO: fix this. check, what I need, and what I don't
+	protected function addCondition() {
+
+		$newCondition = $this->getInput('new_condition');
+
+		if ($newCondition) {
+			$conditions = $this->getInput('conditions', []);
+
+			// When adding new condition, in order to check for an existing condition, it must have a not null value.
+			if ($newCondition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
+				$newCondition['value'] = '';
+			}
+
+			// check existing conditions and remove duplicate condition values
+			foreach ($conditions as $condition) {
+				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
+					if (is_array($newCondition['value'])) {
+						foreach ($newCondition['value'] as $key => $newValue) {
+							if ($condition['value'] == $newValue) {
+								unset($newCondition['value'][$key]);
+							}
+						}
+					} else {
+						if ($newCondition['value'] == $condition['value'] && (!array_key_exists('value2', $newCondition)
+								|| $newCondition['value2'] === $condition['value2'])) {
+							$newCondition['value'] = null;
+						}
+					}
+				}
+			}
+
+			$usedFormulaIds = zbx_objectValues($conditions, 'formulaid');
+
+			if (isset($newCondition['value'])) {
+				$newConditionValues = zbx_toArray($newCondition['value']);
+				foreach ($newConditionValues as $newValue) {
+					$condition = $newCondition;
+					$condition['value'] = $newValue;
+					$condition['formulaid'] = CConditionHelper::getNextFormulaId($usedFormulaIds);
+					$usedFormulaIds[] = $condition['formulaid'];
+					$conditions[] = $condition;
+				}
+			}
+
+			$_REQUEST['conditions'] = $conditions;
+		}
 	}
 }

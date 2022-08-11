@@ -19,7 +19,7 @@
 **/
 
 
-function condition_operator2str($operator) {
+function condition_operator2str($operator = null) {
 	$operators = [
 		CONDITION_OPERATOR_EQUAL  => _('equals'),
 		CONDITION_OPERATOR_NOT_EQUAL  => _('does not equal'),
@@ -35,10 +35,12 @@ function condition_operator2str($operator) {
 		CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
 	];
 
-	return $operators[$operator];
+	return $operator !== null
+		? $operators[$operator]
+		: $operators;
 }
 
-function condition_type2str($type) {
+function condition_type2str($type = null) {
 	$types = [
 		CONDITION_TYPE_SUPPRESSED => _('Problem is suppressed'),
 		CONDITION_TYPE_TRIGGER_NAME => _('Trigger name'),
@@ -68,7 +70,9 @@ function condition_type2str($type) {
 		CONDITION_TYPE_SERVICE_NAME => _('Service name')
 	];
 
-	return $types[$type];
+	return $type !== null
+		? $types[$type]
+		: $types;
 }
 
 function discovery_object2str($object = null) {

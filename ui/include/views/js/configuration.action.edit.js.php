@@ -784,6 +784,7 @@
 
 		const condition_form = new FormData(document.forms['popup.condition']);
 		overlay.xhr = this.validateNewCondition(condition_form);
+
 		overlay.xhr
 			.fail(({statusText}) => {
 				overlay.$dialogue.$body.find('output.msg-bad').remove();

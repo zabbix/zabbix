@@ -31,7 +31,9 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 			'validate' =>			'in 1',
 			'condition_type' =>		'in '.implode(',', [CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_TEMPLATE, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_TRIGGER_NAME, CONDITION_TYPE_TRIGGER_SEVERITY, CONDITION_TYPE_TIME_PERIOD, CONDITION_TYPE_SUPPRESSED, CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK, CONDITION_TYPE_DOBJECT, CONDITION_TYPE_PROXY, CONDITION_TYPE_DHOST_IP, CONDITION_TYPE_DSERVICE_TYPE, CONDITION_TYPE_DSERVICE_PORT, CONDITION_TYPE_DSTATUS, CONDITION_TYPE_DUPTIME, CONDITION_TYPE_DVALUE, CONDITION_TYPE_EVENT_ACKNOWLEDGED, CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_EVENT_TYPE, CONDITION_TYPE_HOST_METADATA, CONDITION_TYPE_EVENT_TAG, CONDITION_TYPE_EVENT_TAG_VALUE, CONDITION_TYPE_SERVICE, CONDITION_TYPE_SERVICE_NAME]),
 			'trigger_context' =>	'in '.implode(',', ['host', 'template']),
-			'operator' =>			'in '.implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_IN, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_NOT_IN, CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP])
+			'operator' =>			'in '.implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_IN, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_NOT_IN, CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]),
+			'value' =>				'',
+			'value2' =>				''
 		];
 	}
 
@@ -68,8 +70,8 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 			'inputs' =>  [
 				'conditiontype' => $this->getInput('condition_type'),
 				'operator' => $this->getInput('operator'),
-				'value' => getRequest('value'),
-				'value2' => getRequest('value2')
+				'value' => $this->getInput('value'),
+				'value2' => $this->getInput('value2')
 			]
 		];
 	}
@@ -78,8 +80,8 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 		$validator = new CActionCondValidator();
 		$is_valid = $validator->validate([
 			'conditiontype' => $this->getInput('condition_type'),
-			'value' => getRequest('value'),
-			'value2' => getRequest('value2'),
+			'value' => $this->getInput('value'),
+			'value2' => $this->getInput('value2'),
 			'operator' => $this->getInput('operator')
 		]);
 

@@ -53,8 +53,13 @@ function submitConditionPopup(response, overlay) {
 	}
 
 	// XHR has finished, but the state is still considered as loading at form submission.
-	overlay.setLoading();
-	submitFormWithParam(form_name, form_param, '1');
+//	overlay.setLoading();
+	this.overlay = overlays_stack.getById('popup.condition');
+	this.dialogue = this.overlay.$dialogue[0];
+	this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+	//const fields = getFormFields(this.form);
+
+	this.overlay.setLoading();
 }
 
 /**

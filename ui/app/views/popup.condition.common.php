@@ -24,7 +24,9 @@
  * @var array $data
  */
 
-$inline_js = '';
+//require_once dirname(__FILE__).'/js/popup.condition.common.js.php';
+$inline_js = getPagePostJs().$this->readJsFile('popup.condition.common.js.php');
+require_once dirname(__FILE__).'/../../include/actions.inc.php';
 
 $form = (new CForm())
 	->cleanItems()
@@ -32,11 +34,14 @@ $form = (new CForm())
 	->setName('popup.condition')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
-	->addVar('type', $data['type']);
+	->addVar('type', '1')
+	->addVar('source', '0')
+	->addVar('source', '0');
+	//->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-if (array_key_exists('source', $data)) {
-	$form->addVar('source', $data['source']);
-}
+// if (array_key_exists('source', $data)) {
+// $form->addVar('source', $data['source']);
+// }
 
 $condition_type = (int) $data['last_type'];
 $form_grid = (new CFormGrid())->cleanItems();
@@ -68,7 +73,7 @@ switch ($data['type']) {
 					), CCorrelationHelper::getOperatorsByConditionType(ZBX_CORR_CONDITION_OLD_EVENT_TAG)[0]);
 				$new_condition_tag = (new CTextAreaFlexible('tag'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
-				$inline_js .= $new_condition_tag->getPostJS();
+			$inline_js .= $new_condition_tag->getPostJS();
 
 				$form_grid
 					->addItem([
@@ -705,7 +710,10 @@ switch ($data['type']) {
 							->addOptions(CSelect::createOptionsFromArray($operators_by_condition[CONDITION_TYPE_DVALUE]))
 						)
 					])
-					->addItem([_('Value'), $new_condition_value]);
+					->addItem([
+						new CLabel(_('Value')),
+						new CFormField($new_condition_value)
+					]);
 
 				break;
 
@@ -881,8 +889,8 @@ switch ($data['type']) {
 				)
 			]);
 
-		$inline_js .= '$(() => $("#condition-type").on("change",'
-			.'(e) => reloadPopup($(e.target).closest("form").get(0), "popup.condition.operations")));';
+//		$inline_js .= '$(() => $("#condition-type").on("change",'
+//			.'(e) => reloadPopup($(e.target).closest("form").get(0), "popup.condition.operations")));';
 
 		// Acknowledge form elements.
 		$operators_options = [];
@@ -919,7 +927,7 @@ $form->addItem([
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $inline_js,
+	'script_inline' => $inline_js . 'condition_popup.init();',
 	'body' => $form->toString(),
 	'buttons' => [
 		[
@@ -927,7 +935,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return validateConditionPopup(overlay);'
+			'action' => 'condition_popup.submit(overlay)'
 		]
 	]
 ];
