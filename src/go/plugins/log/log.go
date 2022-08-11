@@ -79,7 +79,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	} else {
 		data = meta.Data.(*metadata)
 		if !itemutil.CompareKeysParams(key, params, data.key, data.params) {
-			p.Debugf("item %d key has been changed, resetting log metadata", ctx.ItemID())
 			zbxlib.FreeActiveMetric(data.blob)
 			data.key = key
 			data.params = params

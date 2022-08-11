@@ -73,7 +73,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		data = &metadata{key: key, params: params}
 		runtime.SetFinalizer(data, func(d *metadata) { zbxlib.FreeActiveMetric(d.blob) })
 		if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
-			return
+			return nil, err
 		}
 		meta.Data = data
 	} else {
