@@ -294,7 +294,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *                                     server                                 *
  *             host                  - address of host                        *
  *             port                  - port number on host                    *
- *             config_revision_local - revision of proessed configuration     *
+ *             config_revision_local - revision of processed configuration    *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on an incorrect format of string                        *

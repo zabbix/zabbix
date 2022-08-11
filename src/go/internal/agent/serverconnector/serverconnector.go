@@ -417,6 +417,7 @@ func (c *Connector) updateOptions(options *agent.AgentOptions) {
 func newToken() string {
 	h := md5.New()
 	_ = binary.Write(h, binary.LittleEndian, time.Now().UnixNano())
+
 	return hex.EncodeToString(h.Sum(nil))
 }
 
