@@ -991,16 +991,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE ti
 					break;
 				default:	/* not a directory => regular file */
 					if (0 != (types & ZBX_FT_FILE) && 0 != match)
-					{
-						wpath = zbx_utf8_to_unicode(path);
-						if (FAIL == link_processed(data.dwFileAttributes, wpath, &descriptors,
-								path))
-						{
-							++count;
-						}
-
-						zbx_free(wpath);
-					}
+						++count;
 free_path:
 					zbx_free(path);
 			}
