@@ -18,14 +18,16 @@
 **/
 
 #include "snmptrapper.h"
+#include "zbxserver.h"
+#include "proxy.h"
 
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "log.h"
-#include "proxy.h"
-#include "zbxserver.h"
 #include "zbxregexp.h"
 #include "preproc.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 static int	trap_fd = -1;
 static off_t	trap_lastsize;

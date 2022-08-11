@@ -17,10 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
-
 #include "zbxdb.h"
+
+#include "zbxstr.h"
+#include "zbxtime.h"
+#include "log.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
@@ -1956,7 +1957,6 @@ static size_t	zbx_db_bytea_unescape(u_char *io)
 	return o - io;
 }
 #endif
-
 
 #if defined(HAVE_ORACLE)
 static void	db_set_fetch_error(int dberr)
