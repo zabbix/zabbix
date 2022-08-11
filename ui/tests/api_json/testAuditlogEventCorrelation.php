@@ -36,7 +36,7 @@ class testAuditlogEventCorrelation extends CAPITest {
 				"operations[99004]\":[\"add\"],\"correlation.operations[99004].type\":[\"add\",\"1\"],".
 				"\"correlation.operations[99004].corr_operationid\":[\"add\",\"99004\"],\"correlation.correlationid".
 				"\":[\"add\",\"99004\"]}";
-		
+
 		$create = $this->call('correlation.create', [
 			[
 				'name' => 'New event correlation for audit',
