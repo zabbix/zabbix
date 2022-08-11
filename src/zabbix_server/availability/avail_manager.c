@@ -216,6 +216,8 @@ static void	send_avail_check_status_response(zbx_avail_active_hb_cache_t *cache,
 
 	data_len = zbx_availability_serialize_active_status_response(&data, status);
 	zbx_ipc_client_send(client, ZBX_IPC_AVAILMAN_ACTIVE_STATUS, data, data_len);
+
+	zbx_free(data);
 }
 
 static void	process_confsync_diff(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)

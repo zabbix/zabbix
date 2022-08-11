@@ -60,7 +60,7 @@ class CRegexValidator extends CValidator
 			}
 		});
 
-		preg_match('/'.$value.'/', null);
+		preg_match('/'.$value.'/', '');
 
 		restore_error_handler();
 
