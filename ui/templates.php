@@ -45,7 +45,7 @@ $fields = [
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
-	'valuemaps'			=> [T_ZBX_STR, O_OPT, null,		null,	null],
+	'valuemaps'			=> [T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"template.export","template.massdelete","template.massdeleteclear"'),
@@ -61,13 +61,13 @@ $fields = [
 	'delete_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'cancel'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form'				=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'form_refresh'		=> [T_ZBX_INT, O_OPT, null,		null,	null],
+	'form_refresh'		=> [T_ZBX_INT, O_OPT, null,			null,	null],
 	// filter
-	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_name'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
-	'filter_templates' =>  [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,		null],
-	'filter_groups'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,		null],
+	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'filter_name'		=> [T_ZBX_STR, O_OPT, null,			null,	null],
+	'filter_templates' =>  [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_groups'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null,
 								IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
 								null
