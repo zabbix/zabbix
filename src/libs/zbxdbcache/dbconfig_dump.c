@@ -135,9 +135,38 @@ static void	DCdump_hosts(void)
 			zabbix_log(LOG_LEVEL_TRACE, "    httptestid:" ZBX_FS_UI64,
 					host->httptests.values[j]->httptestid);
 		}
+
+		zabbix_log(LOG_LEVEL_TRACE, "  active items:");
+		for (j = 0; j < host->active_items.values_num; j++)
+		{
+			ZBX_DC_ITEM	*item = host->active_items.values[j];
+
+			zabbix_log(LOG_LEVEL_TRACE, "    itemid:" ZBX_FS_UI64, item->itemid);
+		}
 	}
 
 	zbx_vector_ptr_destroy(&index);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
+static void	DCdump_autoreg_hosts(void)
+{
+	ZBX_DC_AUTOREG_HOST	*autoreg_host;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&config->autoreg_hosts, &iter);
+
+	while (NULL != (autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, " host:'%s' listen_ip:'%s' listen_dns:'%s' host_metadata:'%s' flags:%d"
+				" timestamp:%d listen_port:%u",
+				autoreg_host->host, autoreg_host->listen_ip, autoreg_host->listen_dns,
+				autoreg_host->host_metadata, autoreg_host->flags, autoreg_host->timestamp,
+				autoreg_host->listen_port);
+	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
@@ -790,7 +819,7 @@ static void	DCdump_functions(void)
 	{
 		function = (ZBX_DC_FUNCTION *)index.values[i];
 		zabbix_log(LOG_LEVEL_DEBUG, "functionid:" ZBX_FS_UI64 " triggerid:" ZBX_FS_UI64 " itemid:"
-				ZBX_FS_UI64 " function:'%s' parameter:'%s' type:%u timer_revision:%d",
+				ZBX_FS_UI64 " function:'%s' parameter:'%s' type:%u timer_revision:%u",
 				function->functionid, function->triggerid, function->itemid, function->function,
 				function->parameter, function->type, function->timer_revision);
 
@@ -1445,4 +1474,5 @@ void	DCdump_configuration(void)
 	DCdump_httptest_fields();
 	DCdump_httpsteps();
 	DCdump_httpstep_fields();
+	DCdump_autoreg_hosts();
 }

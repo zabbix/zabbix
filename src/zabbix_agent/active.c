@@ -290,9 +290,11 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *                                                                            *
  * Purpose: Parse list of active checks received from server                  *
  *                                                                            *
- * Parameters: str  - NULL terminated string received from server             *
- *             host - address of host                                         *
- *             port - port number on host                                     *
+ * Parameters: str                   - NULL terminated string received from   *
+ *                                     server                                 *
+ *             host                  - address of host                        *
+ *             port                  - port number on host                    *
+ *             config_revision_local - revision of proessed configuration     *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on an incorrect format of string                        *
@@ -304,7 +306,8 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *           <key>:<refresh time>:<last log size>:<modification time>         *
  *                                                                            *
  ******************************************************************************/
-static int	parse_list_of_checks(char *str, const char *host, unsigned short port)
+static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
+		zbx_uint32_t *config_revision_local)
 {
 	const char		*p;
 	size_t			name_alloc = 0, key_orig_alloc = 0;
@@ -316,6 +319,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	ZBX_ACTIVE_METRIC	*metric;
 	zbx_vector_str_t	received_metrics;
 	int			delay, mtime, expression_type, case_sensitive, i, j, ret = FAIL;
+	zbx_uint32_t		config_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -343,13 +347,28 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		goto out;
 	}
 
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_CONFIG_REVISION, tmp, sizeof(tmp), NULL))
+	{
+		config_revision = 0;
+	}
+	else if (FAIL == is_uint32(tmp, &config_revision))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "\"%s\" is not a valid revision", tmp);
+		goto out;
+	}
+
 	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
+		if (0 != *config_revision_local)
+			goto success;
+
 		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
 		goto out;
 	}
 
- 	p = NULL;
+	*config_revision_local = config_revision;
+
+	p = NULL;
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
 /* {"data":[{"key":"system.cpu.num",...,...},{...},...]}
@@ -504,7 +523,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 			add_regexp_ex(&regexps, name, expression, expression_type, exp_delimiter, case_sensitive);
 		}
 	}
-
+success:
 	ret = SUCCEED;
 out:
 	zbx_vector_str_clear_ext(&received_metrics, zbx_str_free);
@@ -587,7 +606,8 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
  *               FAIL on other cases                                          *
  *                                                                            *
  ******************************************************************************/
-static int	refresh_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *zbx_config_tls)
+static int	refresh_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *zbx_config_tls,
+		zbx_uint32_t *config_revision_local)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -636,6 +656,9 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t
 	if (ZBX_DEFAULT_AGENT_PORT != CONFIG_LISTEN_PORT)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, (zbx_uint64_t)CONFIG_LISTEN_PORT);
 
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)*config_revision_local);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_SESSION, session_token, ZBX_JSON_TYPE_STRING);
+
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
 	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, CONFIG_TIMEOUT, CONFIG_TIMEOUT,
@@ -658,10 +681,12 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t
 							((zbx_addr_t *)addrs->values[0])->port);
 				}
 				parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port);
+						((zbx_addr_t *)addrs->values[0])->port, config_revision_local);
 			}
 			else
 			{
+				/* server is unaware if configuration is actually delivered and saves session */
+				*config_revision_local = 0;
 				zabbix_log(level, "Unable to receive from [%s]:%d [%s]",
 						((zbx_addr_t *)addrs->values[0])->ip,
 						((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror());
@@ -1416,6 +1441,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_thread_activechk_args	activechk_args, *activechks_args_in;
 	time_t				nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0,
 					heartbeat_nextcheck = 0;
+	zbx_uint32_t			config_revision_local = 0;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -1479,7 +1505,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		{
 			zbx_setproctitle("active checks #%d [getting list of active checks]", process_num);
 
-			if (FAIL == refresh_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls))
+			if (FAIL == refresh_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
+					&config_revision_local))
 			{
 				nextrefresh = time(NULL) + 60;
 			}

@@ -309,7 +309,6 @@ typedef struct
 }
 ZBX_DC_SCRIPTITEM;
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 typedef struct
 {
 	const char	*tls_psk_identity;	/* pre-shared key identity           */
@@ -317,7 +316,8 @@ typedef struct
 	unsigned int	refcount;		/* reference count                   */
 }
 ZBX_DC_PSK;
-#endif
+
+ZBX_PTR_VECTOR_DECL(dc_item_ptr, ZBX_DC_ITEM *)
 
 typedef struct
 {
@@ -386,14 +386,27 @@ typedef struct
 	ZBX_DC_PSK	*tls_dc_psk;
 #endif
 
-	zbx_vector_ptr_t	interfaces_v;	/* for quick finding of all host interfaces in */
+	zbx_vector_ptr_t		interfaces_v;	/* for quick finding of all host interfaces in */
 						/* 'config->interfaces' hashset */
 
 	zbx_vector_dc_httptest_t	httptests;
+	zbx_vector_dc_item_ptr_t	active_items;
 }
 ZBX_DC_HOST;
 
 ZBX_PTR_VECTOR_DECL(dc_host, ZBX_DC_HOST *)
+
+typedef struct
+{
+	const char	*host;
+	const char	*listen_ip;
+	const char	*listen_dns;
+	const char	*host_metadata;
+	int		flags;
+	int		timestamp;
+	unsigned short	listen_port;
+}
+ZBX_DC_AUTOREG_HOST;
 
 typedef struct
 {
@@ -836,6 +849,7 @@ typedef struct
 	int			item_sync_ts;
 
 	unsigned int		internal_actions;		/* number of enabled internal actions */
+	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */
 
 	zbx_uint32_t		revision;
 	zbx_uint32_t		expression_revision;
@@ -878,6 +892,7 @@ typedef struct
 	zbx_hashset_t		hosts_h;		/* for searching hosts by 'host' name */
 	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
 	zbx_hashset_t		proxies;
+	zbx_hashset_t		autoreg_hosts;
 	zbx_hashset_t		host_inventories;
 	zbx_hashset_t		host_inventories_auto;	/* For caching of automatically populated host inventories. */
 	 	 	 	 	 	 	/* Configuration syncer will read host_inventories without  */
@@ -923,6 +938,7 @@ typedef struct
 	zbx_hashset_t		httptest_fields;
 	zbx_hashset_t		httpsteps;
 	zbx_hashset_t		httpstep_fields;
+	zbx_hashset_t		sessions[ZBX_SESSION_TYPE_COUNT];
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	zbx_binary_heap_t	trigger_queue;

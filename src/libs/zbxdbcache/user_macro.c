@@ -595,7 +595,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 {
 	unsigned char		tag;
 	int			ret, i;
-	zbx_uint64_t		rowid, macroid, hostid = 0, *pmacroid = &macroid;
+	zbx_uint64_t		rowid, macroid, hostid = ZBX_UM_CACHE_GLOBAL_MACRO_HOSTID, *pmacroid = &macroid;
 	char			**row;
 	zbx_um_macro_t		**pmacro;
 	zbx_um_host_t		*host;
@@ -1031,7 +1031,7 @@ static void	um_cache_get_macro(const zbx_um_cache_t *cache, const zbx_uint64_t *
 
 	if (SUCCEED != um_cache_get_host_macro(cache, hostids, hostids_num, name, context, um_macro))
 	{
-		zbx_uint64_t	hostid = 0;
+		zbx_uint64_t	hostid = ZBX_UM_CACHE_GLOBAL_MACRO_HOSTID;
 
 		um_cache_get_host_macro(cache, &hostid, 1, name, context, um_macro);
 	}
@@ -1247,4 +1247,22 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 	zbx_vector_uint64_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
+int	um_cache_get_host_revision(const zbx_um_cache_t *cache, zbx_uint64_t hostid, zbx_uint32_t *revision)
+{
+	const zbx_um_host_t	* const *phost;
+	int			i;
+	zbx_uint64_t		*phostid = &hostid;
+
+	if (NULL == (phost = (const zbx_um_host_t * const *)zbx_hashset_search(&cache->hosts, &phostid)))
+		return FAIL;
+
+	if ((*phost)->revision > *revision)
+		*revision = (*phost)->revision;
+
+	for (i = 0; i < (*phost)->templateids.values_num; i++)
+		um_cache_get_host_revision(cache, (*phost)->templateids.values[i], revision);
+
+	return SUCCEED;
 }

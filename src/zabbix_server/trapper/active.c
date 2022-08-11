@@ -23,6 +23,8 @@
 #include "log.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
+#include "zbxcrypto.h"
+
 #include "zbxnum.h"
 #include "zbxcomms.h"
 #include "zbxip.h"
@@ -52,13 +54,14 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
 	const char	*p;
 	const char	*p_ip, *p_dns;
+	int		now;
 
 	p_ip = ip;
 	p_dns = dns;
 
 	if (ZBX_CONN_DEFAULT == flag)
 		p = ip;
-	else if (ZBX_CONN_IP  == flag)
+	else if (ZBX_CONN_IP == flag)
 		p_ip = p = interface;
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
@@ -77,20 +80,30 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	}
 	zbx_alarm_off();
 
-	DBbegin();
+	now = time(NULL);
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
+	DCconfig_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now);
+
+	do
 	{
-		DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
-				(int)time(NULL));
-	}
-	else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
-		DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag);
+		DBbegin();
 
-	DBcommit();
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		{
+			DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
+					(unsigned short)flag, now);
+		}
+		else
+		{
+			DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata,
+					(unsigned short)flag, now);
+		}
+	}
+	while (ZBX_DB_DOWN == DBcommit());
 }
 
-static int	zbx_autoreg_check_permissions(const char *host, const char *ip, unsigned short port,
+static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, unsigned short port,
 		const zbx_socket_t *sock)
 {
 	zbx_config_t	cfg;
@@ -145,6 +158,7 @@ out:
  *             host_metadata - [IN] host metadata                             *
  *             flag          - [IN] flag describing interface type            *
  *             interface     - [IN] interface value if flag is not default    *
+ *             revision      - [OUT] host configuration revision              *
  *             hostid        - [OUT] host ID                                  *
  *             error         - [OUT] error message                            *
  *                                                                            *
@@ -158,14 +172,11 @@ out:
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
-		char *error)
+		zbx_uint32_t *revision, zbx_uint32_t *config_revision, char *error)
 {
-	char			*host_esc, *ch_error, *old_metadata, *old_ip, *old_dns, *old_flag, *old_port;
-	DB_RESULT		result;
-	DB_ROW			row;
-	unsigned short		old_port_v;
-	int			tls_offset = 0, ret = FAIL;
-	zbx_conn_flags_t	old_flag_v;
+#define PROXY_AUTO_REGISTRATION_HEARTBEAT	120
+	char	*ch_error;
+	int	ret = FAIL, heartbeat;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
 
@@ -176,159 +187,54 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		goto out;
 	}
 
-	host_esc = DBdyn_escape_string(host);
-
-	result =
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		DBselect(
-			"select h.hostid,h.status,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,"
-			"a.host_metadata,a.listen_ip,a.listen_dns,a.listen_port,a.flags"
-			" from hosts h"
-				" left join autoreg_host a"
-					" on a.proxy_hostid is null and a.host=h.host"
-			" where h.host='%s'"
-				" and h.status in (%d,%d)"
-				" and h.flags<>%d"
-				" and h.proxy_hostid is null",
-			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
-#else
-		DBselect(
-			"select h.hostid,h.status,h.tls_accept,a.host_metadata,a.listen_ip,a.listen_dns,a.listen_port,"
-			"a.flags"
-			" from hosts h"
-				" left join autoreg_host a"
-					" on a.proxy_hostid is null and a.host=h.host"
-			" where h.host='%s'"
-				" and h.status in (%d,%d)"
-				" and h.flags<>%d"
-				" and h.proxy_hostid is null",
-			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
-#endif
-	if (NULL != (row = DBfetch(result)))
+	/* if host exists then check host connection permissions */
+	if (FAIL == DCcheck_host_permissions(host, sock, hostid, revision, config_revision, &ch_error))
 	{
-		if (0 == ((unsigned int)atoi(row[2]) & sock->connection_type))
-		{
-			zbx_snprintf(error, MAX_STRING_LEN, "connection of type \"%s\" is not allowed for host"
-					" \"%s\"", zbx_tcp_connection_type_name(sock->connection_type), host);
-			goto done;
-		}
-
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
-		{
-			zbx_tls_conn_attr_t	attr;
-
-			if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-
-				zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
-						" \"%s\"", host);
-				goto done;
-			}
-
-			/* simplified match, not compliant with RFC 4517, 4518 */
-			if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
-			{
-				zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for"
-						" host \"%s\"", host);
-				goto done;
-			}
-
-			/* simplified match, not compliant with RFC 4517, 4518 */
-			if ('\0' != *row[4] && 0 != strcmp(row[4], attr.subject))
-			{
-				zbx_snprintf(error, MAX_STRING_LEN, "certificate subject does not match for"
-						" host \"%s\"", host);
-				goto done;
-			}
-		}
-#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
-		else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
-		{
-			zbx_tls_conn_attr_t	attr;
-
-			if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-
-				zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
-						" \"%s\"", host);
-				goto done;
-			}
-
-			if (strlen(row[5]) != attr.psk_identity_len ||
-					0 != memcmp(row[5], attr.psk_identity, attr.psk_identity_len))
-			{
-				zbx_snprintf(error, MAX_STRING_LEN, "false PSK identity for host \"%s\"", host);
-				goto done;
-			}
-		}
-#endif
-		tls_offset = 3;
-#endif
-		old_metadata = row[3 + tls_offset];
-		old_ip = row[4 + tls_offset];
-		old_dns = row[5 + tls_offset];
-		old_port = row[6 + tls_offset];
-		old_flag = row[7 + tls_offset];
-		old_port_v = (unsigned short)(SUCCEED == DBis_null(old_port)) ? 0 : atoi(old_port);
-		old_flag_v = (zbx_conn_flags_t)(SUCCEED == DBis_null(old_flag)) ? ZBX_CONN_DEFAULT : atoi(old_flag);
-		/* metadata is available only on Zabbix server */
-		if (SUCCEED == DBis_null(old_flag) || 0 != strcmp(old_metadata, host_metadata) ||
-				(ZBX_CONN_IP  == flag && ( 0 != strcmp(old_ip, interface)  || old_port_v != port)) ||
-				(ZBX_CONN_DNS == flag && ( 0 != strcmp(old_dns, interface) || old_port_v != port)) ||
-				(old_flag_v != flag))
-		{
-			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
-		}
-
-		if (HOST_STATUS_MONITORED != atoi(row[1]))
-		{
-			zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not monitored", host);
-			goto done;
-		}
-
-		ZBX_STR2UINT64(*hostid, row[0]);
-		ret = SUCCEED;
+		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
+		zbx_free(ch_error);
+		goto out;
 	}
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		heartbeat = PROXY_AUTO_REGISTRATION_HEARTBEAT;
 	else
+		heartbeat = 0;
+
+	/* if host does not exist then check autoregistration connection permissions */
+	if (0 == *hostid)
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
 
-		if (SUCCEED == zbx_autoreg_check_permissions(host, ip, port, sock))
-			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
-	}
-done:
-	DBfree_result(result);
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != DCget_auto_registration_action_count())
+		{
+			if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
+			{
+				if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface,
+						(int)time(NULL), heartbeat))
+				{
+					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
+							interface);
+				}
+			}
+		}
 
-	zbx_free(host_esc);
+		goto out;
+	}
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != DCget_auto_registration_action_count())
+	{
+		if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL),
+				heartbeat))
+		{
+			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+		}
+	}
+
+	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
+#undef PROXY_AUTO_REGISTRATION_HEARTBEAT
 	return ret;
-}
-
-static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_vector_uint64_t *itemids)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	itemid;
-
-	result = DBselect(
-			"select itemid"
-			" from items"
-			" where type=%d"
-				" and flags<>%d"
-				" and hostid=" ZBX_FS_UI64,
-			ITEM_TYPE_ZABBIX_ACTIVE, ZBX_FLAG_DISCOVERY_PROTOTYPE, hostid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		zbx_vector_uint64_append(itemids, itemid);
-	}
-	DBfree_result(result);
 }
 
 /******************************************************************************
@@ -349,9 +255,9 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 {
 	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
 	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
-	int			ret = FAIL, i;
+	int			ret = FAIL, i, num = 0;
 	zbx_uint64_t		hostid;
-	zbx_vector_uint64_t	itemids;
+	zbx_uint32_t		revision, config_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -368,16 +274,17 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 	}
 
 	/* no host metadata in older versions of agent */
-	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",  &hostid, error))
+	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",  &hostid, &revision,
+			&config_revision, error))
+	{
 		goto out;
+	}
 
-	zbx_vector_uint64_create(&itemids);
-
-	get_list_of_active_checks(hostid, &itemids);
+	num = DCconfig_get_active_items_count_by_hostid(hostid);
 
 	buffer = (char *)zbx_malloc(buffer, buffer_alloc);
 
-	if (0 != itemids.values_num)
+	if (0 != num)
 	{
 		DC_ITEM			*dc_items;
 		int			*errcodes;
@@ -385,19 +292,19 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 		um_handle = zbx_dc_open_user_macros();
 
-		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
-		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
+		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * num);
+		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * num);
 
-		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
+		DCconfig_get_active_items_by_hostid(dc_items, hostid, errcodes, num);
 
-		for (i = 0; i < itemids.values_num; i++)
+		for (i = 0; i < num; i++)
 		{
 			int	delay;
 
 			if (SUCCEED != errcodes[i])
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() Item [" ZBX_FS_UI64 "] was not found in the"
-						" server cache. Not sending now.", __func__, itemids.values[i]);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() Item for host [" ZBX_FS_UI64 "] was not found in the"
+						" server cache.", __func__, hostid);
 				continue;
 			}
 
@@ -417,15 +324,13 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 					dc_items[i].key_orig, delay, dc_items[i].lastlogsize);
 		}
 
-		DCconfig_clean_items(dc_items, errcodes, itemids.values_num);
+		DCconfig_clean_items(dc_items, errcodes, num);
 
 		zbx_free(errcodes);
 		zbx_free(dc_items);
 
 		zbx_dc_close_user_macros(um_handle);
 	}
-
-	zbx_vector_uint64_destroy(&itemids);
 
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, "ZBX_EOF\n");
 
@@ -530,15 +435,15 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	char			host[ZBX_HOSTNAME_BUF_LEN], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
 	struct zbx_json		json;
-	int			ret = FAIL, i, version;
+	int			ret = FAIL, i, version, num = 0;
 	zbx_uint64_t		hostid;
+	zbx_uint32_t		revision, config_revision, agent_config_revision;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminated string */
 	size_t			interface_alloc = 1;		/* for at least NUL-terminated string */
 	size_t			buffer_size, reserved = 0;
 	unsigned short		port;
-	zbx_vector_uint64_t	itemids;
 	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
-
+	zbx_session_t		*session = NULL;
 	zbx_vector_ptr_t	regexps;
 	zbx_vector_str_t	names;
 
@@ -600,8 +505,21 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 	}
 
-	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, &hostid, error))
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CONFIG_REVISION, tmp, sizeof(tmp), NULL))
+	{
+		agent_config_revision = 0;
+	}
+	else if (FAIL == is_uint32(tmp, &agent_config_revision))
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "\"%s\" is not a valid revision", tmp);
 		goto error;
+	}
+
+	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, &hostid, &revision,
+			&config_revision, error))
+	{
+		goto error;
+	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp), NULL) ||
 			FAIL == (version = zbx_get_component_version(tmp)))
@@ -609,33 +527,50 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		version = ZBX_COMPONENT_VERSION(4, 2);
 	}
 
-	zbx_vector_uint64_create(&itemids);
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SESSION, tmp, sizeof(tmp), NULL))
+	{
+		size_t	token_len;
 
-	get_list_of_active_checks(hostid, &itemids);
+		if (zbx_get_token_len() != (token_len = strlen(tmp)))
+		{
+			zbx_snprintf(error, MAX_STRING_LEN, "invalid session token length %d", (int)token_len);
+			ret = FAIL;
+			goto error;
+		}
+
+		session = zbx_dc_get_or_create_session(hostid, tmp, ZBX_SESSION_TYPE_CONFIG);
+	}
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
-	if (0 != itemids.values_num)
+	if (NULL == session || 0 == session->last_id || agent_config_revision != revision)
+	{
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)config_revision);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+		/* determine items count to ensure allocation is done outside of a lock */
+		num = DCconfig_get_active_items_count_by_hostid(hostid);
+	}
+
+	if (0 != num)
 	{
 		DC_ITEM			*dc_items;
 		int			*errcodes, delay;
 		zbx_dc_um_handle_t	*um_handle;
 
+		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * num);
+		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * num);
+		DCconfig_get_active_items_by_hostid(dc_items, hostid, errcodes, num);
+
 		um_handle = zbx_dc_open_user_macros();
 
-		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
-		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
-
-		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
-
-		for (i = 0; i < itemids.values_num; i++)
+		for (i = 0; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() Item [" ZBX_FS_UI64 "] was not found in the"
-						" server cache. Not sending now.", __func__, itemids.values[i]);
+				/* items or host removed between checking item count and retrieving items */
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() Item for host [" ZBX_FS_UI64 "] was not found in the"
+						" server cache.", __func__, hostid);
 				continue;
 			}
 
@@ -690,7 +625,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			zbx_free(dc_items[i].key);
 		}
 
-		DCconfig_clean_items(dc_items, errcodes, itemids.values_num);
+		DCconfig_clean_items(dc_items, errcodes, num);
 
 		zbx_free(errcodes);
 		zbx_free(dc_items);
@@ -702,8 +637,6 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	if (ZBX_COMPONENT_VERSION(4,4) == version || ZBX_COMPONENT_VERSION(5,0) == version)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, 600);
-
-	zbx_vector_uint64_destroy(&itemids);
 
 	DCget_expressions_by_names(&regexps, (const char * const *)names.values, names.values_num);
 
@@ -765,6 +698,13 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	zbx_json_free(&json);
+
+	if (SUCCEED == ret)
+	{
+		/* remember if configuration was successfully sent for new session */
+		if (NULL != session)
+			session->last_id = (zbx_uint64_t)revision;
+	}
 
 	goto out;
 error:
