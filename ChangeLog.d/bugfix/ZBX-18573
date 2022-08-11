@@ -1,1 +1,1 @@
-...G...... [ZBX-18573] removed hardlink uniqueness check on windows (dgoloscapov)
+...G...... [ZBX-18573] improved performance of directory scanning by Agent on Windows (dgoloscapov)
