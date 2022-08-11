@@ -500,7 +500,7 @@
 					yaxisside: 0,
 					sortorder: number,
 					flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
-					color: colorPalette.getNextColor(form),
+					color: colorPalette.getNextColor(form.querySelectorAll('.color-picker input')),
 					name: list.values[i].name
 				};
 				const $row = $(itemTpl.evaluate(item));
