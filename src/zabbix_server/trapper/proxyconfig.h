@@ -27,6 +27,6 @@ extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
 void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp);
-void	recv_proxyconfig(zbx_socket_t *sock);
+void	recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tlsv);
 
 #endif

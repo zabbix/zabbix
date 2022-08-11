@@ -123,7 +123,7 @@ out:
  * Purpose: receive configuration tables from server (passive proxies)        *
  *                                                                            *
  ******************************************************************************/
-void	recv_proxyconfig(zbx_socket_t *sock)
+void	recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls)
 {
 	struct zbx_json_parse	jp_data, jp_config, jp_kvs_paths = {0};
 	int			ret;
@@ -131,7 +131,7 @@ void	recv_proxyconfig(zbx_socket_t *sock)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update"))
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update", zbx_config_tls))
 		goto out;
 
 	zbx_json_init(&j, 1024);

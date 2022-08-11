@@ -26,6 +26,7 @@
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 #include "httpmacro.h"
+#include "zbxnum.h"
 
 typedef struct
 {

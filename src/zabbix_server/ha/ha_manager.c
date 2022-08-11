@@ -28,6 +28,9 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_ha.h"
 #include "audit/zbxaudit_settings.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxip.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
@@ -738,7 +741,6 @@ static int	ha_db_check_unavailable_nodes(zbx_ha_info_t *info, zbx_vector_ha_node
 			continue;
 		}
 
-
 		if (db_time >= nodes->values[i]->lastaccess + info->failover_delay)
 		{
 			zbx_vector_str_append(&unavailable_nodes, nodes->values[i]->ha_nodeid.str);
@@ -1297,7 +1299,6 @@ static void	ha_remove_node(zbx_ha_info_t *info, zbx_ipc_client_t *client, const 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: reply to ha_status request                                        *
@@ -1327,7 +1328,6 @@ static void	ha_send_status(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 }
-
 
 /******************************************************************************
  *                                                                            *

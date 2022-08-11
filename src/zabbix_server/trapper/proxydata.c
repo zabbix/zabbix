@@ -18,16 +18,17 @@
 **/
 
 #include "proxydata.h"
-#include "zbxdbhigh.h"
-#include "log.h"
 #include "proxy.h"
 
+#include "zbxdbhigh.h"
+#include "log.h"
 #include "zbxtasks.h"
 #include "zbxmutexs.h"
 #include "zbxnix.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
 #include "zbxavailability.h"
+#include "zbxnum.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
@@ -245,11 +246,12 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
  *                                                                            *
- * Parameters: sock - [IN] the connection socket                              *
- *             ts   - [IN] the connection timestamp                           *
+ * Parameters: sock           - [IN] the connection socket                    *
+ *             ts             - [IN] the connection timestamp                 *
+ *             zbx_config_tls - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
+void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_tls_t *zbx_config_tls)
 {
 	struct zbx_json		j;
 	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
@@ -261,7 +263,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request"))
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request", zbx_config_tls))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */
 		goto out;
@@ -373,11 +375,12 @@ out:
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
  *                                                                            *
- * Parameters: sock - [IN] the connection socket                              *
- *             ts   - [IN] the connection timestamp                           *
+ * Parameters: sock           - [IN] the connection socket                    *
+ *             ts             - [IN] the connection timestamp                 *
+ *             zbx_config_tls - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
+void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_tls_t *zbx_config_tls)
 {
 	struct zbx_json		j;
 	char			*error = NULL, *buffer = NULL;
@@ -387,7 +390,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request"))
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request", zbx_config_tls))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */
 		goto out;

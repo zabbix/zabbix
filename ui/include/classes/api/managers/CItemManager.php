@@ -201,11 +201,15 @@ class CItemManager {
 			'value_id' => $del_itemids
 		]);
 
-		$table_names = ['trends', 'trends_uint', 'history_text', 'history_log', 'history_uint', 'history_str',
-			'history', 'events'
-		];
+		$table_names = ['events'];
 
-		$ins_housekeeper = [];
+		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) != 0) {
+			array_push($table_names, 'history', 'history_str', 'history_uint', 'history_log', 'history_text');
+		}
+
+		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) != 0) {
+			array_push($table_names,'trends', 'trends_uint');
+		}
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
 			if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) === ZBX_DB_EXTENSION_TIMESCALEDB) {
@@ -222,6 +226,8 @@ class CItemManager {
 				}
 			}
 		}
+
+		$ins_housekeeper = [];
 
 		foreach ($del_itemids as $del_itemid) {
 			foreach ($table_names as $table_name) {

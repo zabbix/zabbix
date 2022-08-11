@@ -19,12 +19,12 @@
 
 #include "httppoller.h"
 
-#include "common.h"
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "httptest.h"
+#include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

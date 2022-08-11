@@ -23,6 +23,7 @@
 #include "dbsync.h"
 #include "dbconfig.h"
 #include "zbxregexp.h"
+#include "zbxnum.h"
 
 extern zbx_shmem_info_t	*config_mem;
 ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
@@ -118,7 +119,6 @@ int	um_macro_compare(const void *d1, const void *d2)
 
 	return 0;
 }
-
 
 /*********************************************************************************
  *                                                                               *
@@ -580,7 +580,6 @@ out:
 
 	return ret;
 }
-
 
 /*********************************************************************************
  *                                                                               *
