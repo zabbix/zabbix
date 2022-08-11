@@ -7164,7 +7164,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
  *                                                                            *
  ******************************************************************************/
 int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
-		zbx_uint32_t *revision, zbx_uint32_t *config_revision, char **error)
+		zbx_uint32_t *revision, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -7214,7 +7214,9 @@ int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uin
 	um_cache_get_host_revision(config->um_cache, ZBX_UM_CACHE_GLOBAL_MACRO_HOSTID, revision);
 	um_cache_get_host_revision(config->um_cache, *hostid, revision);
 
-	*config_revision = config->revision;
+	/* configuration is not yet fully synced */
+	if (*revision > config->revision)
+		*revision = config->revision;
 
 	UNLOCK_CACHE;
 
