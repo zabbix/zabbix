@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 #include "zbxmockdb.h"
 
-#include "common.h"
+#include "zbxnum.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "zbxdb.h"

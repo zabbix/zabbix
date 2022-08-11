@@ -638,12 +638,13 @@ class testFormItemPrototype extends CLegacyWebTest {
 				case INTERFACE_TYPE_AGENT :
 				case INTERFACE_TYPE_ANY :
 				case INTERFACE_TYPE_JMX :
+				case INTERFACE_TYPE_OPT :
 					$this->zbxTestTextPresent('Host interface');
 					$dbInterfaces = DBselect(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
+							(($interfaceType == INTERFACE_TYPE_ANY || $interfaceType === INTERFACE_TYPE_OPT) ? '' : ' AND type='.$interfaceType)
 					);
 					while ($row = DBfetch($dbInterfaces)) {
 						$data[] = [$row];

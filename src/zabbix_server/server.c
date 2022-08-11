@@ -19,6 +19,8 @@
 
 #include "config.h"
 
+#include "zbxserver.h"
+
 #ifdef HAVE_SQLITE3
 #	error SQLite is not supported as a main Zabbix database backend.
 #endif
@@ -73,10 +75,10 @@
 #include "ha/ha.h"
 #include "zbxrtc.h"
 #include "zbxha.h"
-#include "zbxserver.h"
 #include "stats/zabbix_stats.h"
 #include "zbxdiag.h"
 #include "diag/diag_server.h"
+#include "zbxip.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -181,7 +183,12 @@ static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 zbx_cuid_t	ha_sessionid;
 static char	*CONFIG_PID_FILE = NULL;
 
-unsigned char			program_type	= ZBX_PROGRAM_TYPE_SERVER;
+unsigned char	program_type = ZBX_PROGRAM_TYPE_SERVER;
+static unsigned char	get_program_type(void)
+{
+	return program_type;
+}
+
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
 ZBX_THREAD_LOCAL int		process_num	= 0;
 ZBX_THREAD_LOCAL int		server_num	= 0;
@@ -312,32 +319,7 @@ char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
-/* TLS parameters */
-unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in server, defined for linking */
-									/* with tls.c */
-unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in server, defined for linking */
-									/* with tls.c */
-char	*CONFIG_TLS_CA_FILE		= NULL;
-char	*CONFIG_TLS_CRL_FILE		= NULL;
-char	*CONFIG_TLS_CERT_FILE		= NULL;
-char	*CONFIG_TLS_KEY_FILE		= NULL;
-char	*CONFIG_TLS_CIPHER_CERT13	= NULL;
-char	*CONFIG_TLS_CIPHER_CERT		= NULL;
-char	*CONFIG_TLS_CIPHER_PSK13	= NULL;
-char	*CONFIG_TLS_CIPHER_PSK		= NULL;
-char	*CONFIG_TLS_CIPHER_ALL13	= NULL;
-char	*CONFIG_TLS_CIPHER_ALL		= NULL;
-char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/* not used in server, defined for linking with tls.c */
-char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/* not used in server, defined for linking with tls.c */
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-/* the following TLS parameters are not used in server, they are defined for linking with tls.c */
-char	*CONFIG_TLS_CONNECT		= NULL;
-char	*CONFIG_TLS_ACCEPT		= NULL;
-char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
-char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
-char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
-char	*CONFIG_TLS_PSK_FILE		= NULL;
-#endif
+static zbx_config_tls_t	*zbx_config_tls = NULL;
 
 char	*CONFIG_HA_NODE_NAME		= NULL;
 char	*CONFIG_NODE_ADDRESS	= NULL;
@@ -707,20 +689,26 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSCAFile", CONFIG_TLS_CA_FILE, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", CONFIG_TLS_CRL_FILE, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCertFile", CONFIG_TLS_CERT_FILE, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", CONFIG_TLS_KEY_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCAFile", zbx_config_tls->ca_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
 #endif
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", CONFIG_TLS_CIPHER_CERT, "GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", CONFIG_TLS_CIPHER_PSK, "GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", CONFIG_TLS_CIPHER_ALL, "GnuTLS or OpenSSL"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
+			"GnuTLS or OpenSSL"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
+			"GnuTLS or OpenSSL"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
+			"GnuTLS or OpenSSL"));
 #endif
 #if !defined(HAVE_OPENSSL)
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", CONFIG_TLS_CIPHER_CERT13, "OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", CONFIG_TLS_CIPHER_PSK13, "OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", CONFIG_TLS_CIPHER_ALL13, "OpenSSL 1.1.1 or newer"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
+			"OpenSSL 1.1.1 or newer"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", zbx_config_tls->cipher_psk13,
+			"OpenSSL 1.1.1 or newer"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", zbx_config_tls->cipher_all13,
+			"OpenSSL 1.1.1 or newer"));
 #endif
 
 #if !defined(HAVE_OPENIPMI)
@@ -748,7 +736,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
  ******************************************************************************/
 static void	zbx_load_config(ZBX_TASK_EX *task)
 {
-	static struct cfg_line	cfg[] =
+	struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
@@ -910,25 +898,25 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+		{"TLSCAFile",			&(zbx_config_tls->ca_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
+		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
+		{"TLSCertFile",			&(zbx_config_tls->cert_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
+		{"TLSKeyFile",			&(zbx_config_tls->key_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&CONFIG_TLS_CIPHER_CERT13,		TYPE_STRING,
+		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&CONFIG_TLS_CIPHER_CERT,		TYPE_STRING,
+		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&CONFIG_TLS_CIPHER_PSK13,		TYPE_STRING,
+		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&CONFIG_TLS_CIPHER_PSK,			TYPE_STRING,
+		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll13",		&CONFIG_TLS_CIPHER_ALL13,		TYPE_STRING,
+		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll",		&CONFIG_TLS_CIPHER_ALL,			TYPE_STRING,
+		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -975,9 +963,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
-
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
-
 	zbx_set_defaults();
 
 	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
@@ -987,7 +973,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	zbx_db_validate_config();
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_validate_config();
+	zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, get_program_type);
 #endif
 }
 
@@ -1072,6 +1058,8 @@ static void	zbx_on_exit(int ret)
 	setproctitle_free_env();
 #endif
 
+	zbx_config_tls_free(zbx_config_tls);
+
 	exit(EXIT_SUCCESS);
 }
 
@@ -1092,6 +1080,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
 
+	zbx_config_tls = zbx_config_tls_new();
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
@@ -1163,7 +1152,6 @@ int	main(int argc, char **argv)
 
 	/* required for simple checks */
 	init_metrics();
-
 	zbx_load_config(&t);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
@@ -1196,45 +1184,18 @@ static void	zbx_check_db(void)
 	struct zbx_json			db_version_json;
 	int				result = SUCCEED;
 
-	DBextract_version_info(&db_version_info);
+	memset(&db_version_info, 0, sizeof(db_version_info));
+	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
 
-	if (db_version_info.current_version < db_version_info.min_version)
+	if (SUCCEED == result)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Error! Current %s database server version is too old (%s)",
-				db_version_info.database, db_version_info.friendly_current_version);
-		zabbix_log(LOG_LEVEL_ERR, "Must be a least %s", db_version_info.friendly_min_version);
-		result = FAIL;
-	}
-	else if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag)
-	{
-		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
-		{
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix server due to unsupported %s database server"
-					" version (%s)", db_version_info.database,
-					db_version_info.friendly_current_version);
-			zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s)",
-					db_version_info.friendly_min_supported_version);
-			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
-			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
-					" in Zabbix server configuration file at your own risk.");
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			result = FAIL;
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database server version (%s)",
-					db_version_info.database, db_version_info.friendly_current_version);
-			zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s)",
-					db_version_info.friendly_min_supported_version);
-			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
-			zabbix_log(LOG_LEVEL_ERR, " ");
-			db_version_info.flag = DB_VERSION_NOT_SUPPORTED_WARNING;
-		}
+		zbx_db_extract_dbextension_info(&db_version_info);
 	}
 
-	if(SUCCEED == result && (SUCCEED != DBcheck_capabilities(db_version_info.current_version) ||
+	if (SUCCEED == result && (
+#ifdef HAVE_POSTGRESQL
+			SUCCEED != zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
+#endif
 			SUCCEED != DBcheck_version()))
 	{
 		result = FAIL;
@@ -1242,7 +1203,7 @@ static void	zbx_check_db(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if(SUCCEED == DBfield_exists("config", "dbversion_status"))
+	if (SUCCEED == DBfield_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -1259,14 +1220,17 @@ static void	zbx_check_db(void)
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)
-			zbx_history_check_version(&db_version_json);
+			zbx_history_check_version(&db_version_json, &result);
 
-		DBflush_version_requirements(db_version_json.buffer);
+		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
 	}
 
 	DBclose();
 	zbx_free(db_version_info.friendly_current_version);
+	zbx_free(db_version_info.extension);
+	zbx_free(db_version_info.ext_friendly_current_version);
+	zbx_free(db_version_info.ext_lic);
 
 	if(SUCCEED != result)
 	{
@@ -1281,8 +1245,17 @@ static void	zbx_check_db(void)
  ******************************************************************************/
 static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc)
 {
-	int	i, ret = SUCCEED;
-	char	*error = NULL;
+	int				i, ret = SUCCEED;
+	char				*error = NULL;
+
+	zbx_thread_args_t		thread_args;
+	zbx_thread_poller_args		poller_args = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
+	zbx_thread_trapper_args		trapper_args = {zbx_config_tls, get_program_type, listen_sock};
+	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type};
+	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, get_program_type};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
+	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
+							zbx_config_tls->key_file, get_program_type};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1356,9 +1329,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	for (i = 0; i < threads_num; i++)
 	{
-		zbx_thread_args_t	thread_args;
-		unsigned char		poller_type;
-
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.process_type, &thread_args.process_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -1410,17 +1380,17 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_vc_enable();
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
-				poller_type = ZBX_POLLER_TYPE_NORMAL;
-				thread_args.args = &poller_type;
+				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_UNREACHABLE:
-				poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-				thread_args.args = &poller_type;
+				poller_args.poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
-				thread_args.args = listen_sock;
+				thread_args.args = &trapper_args;
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
@@ -1439,6 +1409,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(httppoller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERER:
+				thread_args.args = &discoverer_args;
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
@@ -1446,17 +1417,19 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ESCALATOR:
+				thread_args.args = &escalator_args;
 				zbx_thread_start(escalator_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
-				poller_type = ZBX_POLLER_TYPE_JAVA;
-				thread_args.args = &poller_type;
+				poller_args.poller_type = ZBX_POLLER_TYPE_JAVA;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
 				zbx_thread_start(snmptrapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PROXYPOLLER:
+				thread_args.args = &proxy_poller_args;
 				zbx_thread_start(proxypoller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SELFMON:
@@ -1495,8 +1468,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(alert_syncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTORYPOLLER:
-				poller_type = ZBX_POLLER_TYPE_HISTORY;
-				thread_args.args = &poller_type;
+				poller_args.poller_type = ZBX_POLLER_TYPE_HISTORY;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
@@ -1507,14 +1480,15 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(report_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTWRITER:
+				thread_args.args = &report_writer_args;
 				zbx_thread_start(report_writer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
 				zbx_thread_start(trigger_housekeeper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
-				poller_type = ZBX_POLLER_TYPE_ODBC;
-				thread_args.args = &poller_type;
+				poller_args.poller_type = ZBX_POLLER_TYPE_ODBC;
+				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 		}
@@ -1730,7 +1704,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-
 	zbx_initialize_events();
 
 	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
@@ -1795,7 +1768,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != DBcheck_double_type())
 	{
 		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_DISABLED;
-		ZBX_DOUBLE_EPSILON = 0.000001;
+		zbx_update_epsilon_to_float_precision();
 		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
 	}
 

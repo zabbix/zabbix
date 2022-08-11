@@ -19,7 +19,8 @@
 
 #include "zbxvariant.h"
 
-#include "common.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *

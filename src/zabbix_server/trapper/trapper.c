@@ -18,9 +18,10 @@
 **/
 
 #include "trapper.h"
+#include "zbxserver.h"
+#include "proxy.h"
 
 #include "log.h"
-#include "proxy.h"
 #include "zbxself.h"
 #include "active.h"
 #include "nodecommand.h"
@@ -28,7 +29,6 @@
 #include "proxydata.h"
 #include "zbxnix.h"
 #include "zbxcommshigh.h"
-#include "zbxserver.h"
 #include "../poller/checks_snmp.h"
 #include "trapper_auth.h"
 #include "trapper_preproc.h"
@@ -36,6 +36,9 @@
 #include "trapper_item_test.h"
 #include "trapper_request.h"
 #include "zbxavailability.h"
+#include "zbxxml.h"
+#include "base64.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -982,8 +985,99 @@ static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 	return SUCCEED;
 }
 
+static int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
+		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
+		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
+		char *severity, size_t severity_len)
+{
+	int	i, ret = SUCCEED;
+	char	*data_b64 = NULL;
 
-static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts)
+	assert(NULL != host && 0 != host_len);
+	assert(NULL != key && 0 != key_len);
+	assert(NULL != data && 0 != data_len);
+	assert(NULL != lastlogsize && 0 != lastlogsize_len);
+	assert(NULL != timestamp && 0 != timestamp_len);
+	assert(NULL != source && 0 != source_len);
+	assert(NULL != severity && 0 != severity_len);
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "host", &data_b64))
+	{
+		str_base64_decode(data_b64, host, (int)host_len - 1, &i);
+		host[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+	{
+		*host = '\0';
+		ret = FAIL;
+	}
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "key", &data_b64))
+	{
+		str_base64_decode(data_b64, key, (int)key_len - 1, &i);
+		key[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+	{
+		*key = '\0';
+		ret = FAIL;
+	}
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "data", &data_b64))
+	{
+		str_base64_decode(data_b64, data, (int)data_len - 1, &i);
+		data[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+	{
+		*data = '\0';
+		ret = FAIL;
+	}
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "lastlogsize", &data_b64))
+	{
+		str_base64_decode(data_b64, lastlogsize, (int)lastlogsize_len - 1, &i);
+		lastlogsize[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+		*lastlogsize = '\0';
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "timestamp", &data_b64))
+	{
+		str_base64_decode(data_b64, timestamp, (int)timestamp_len - 1, &i);
+		timestamp[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+		*timestamp = '\0';
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "source", &data_b64))
+	{
+		str_base64_decode(data_b64, source, (int)source_len - 1, &i);
+		source[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+		*source = '\0';
+
+	if (SUCCEED == zbx_xml_get_data_dyn(xml, "severity", &data_b64))
+	{
+		str_base64_decode(data_b64, severity, (int)severity_len - 1, &i);
+		severity[i] = '\0';
+		zbx_xml_free_data_dyn(&data_b64);
+	}
+	else
+		*severity = '\0';
+
+	return ret;
+}
+
+static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	int	ret = SUCCEED;
 
@@ -994,7 +1088,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	if ('{' == *s)	/* JSON protocol */
 	{
 		struct zbx_json_parse	jp;
-		char			value[MAX_STRING_LEN];
+		char			value[MAX_STRING_LEN] = "";
 
 		if (SUCCEED != zbx_json_open(s, &jp))
 		{
@@ -1018,7 +1112,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 				zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server"
 						" at \"%s\", datalen " ZBX_FS_SIZE_T,
 						sock->peer, (zbx_fs_size_t)(jp.end - jp.start + 1));
-				recv_proxyconfig(sock, &jp);
+				recv_proxyconfig(sock, &jp, zbx_config_tls);
 			}
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
 			{
@@ -1051,14 +1145,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_TASKS))
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-					zbx_send_task_data(sock, ts);
+					zbx_send_task_data(sock, ts, zbx_config_tls);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					zbx_recv_proxy_data(sock, &jp, ts);
 				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-					zbx_send_proxy_data(sock, ts);
+					zbx_send_proxy_data(sock, ts, zbx_config_tls);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
 			{
@@ -1141,7 +1235,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 		if ('<' == *s)	/* XML protocol */
 		{
-			zbx_comms_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
+			comms_parse_response(s, host, sizeof(host), key, sizeof(key), value_dec,
 					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp,
 					sizeof(timestamp), source, sizeof(source), severity, sizeof(severity));
 
@@ -1194,18 +1288,20 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	return ret;
 }
 
-static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts)
+static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_tls_t *zbx_config_tls)
 {
 	ssize_t	bytes_received;
 
 	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
 		return;
 
-	process_trap(sock, sock->buffer, bytes_received, ts);
+	process_trap(sock, sock->buffer, bytes_received, ts, zbx_config_tls);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
 {
+	zbx_thread_trapper_args	*trapper_args_in = (zbx_thread_trapper_args *)
+					(((zbx_thread_args_t *)args)->args);
 	double			sec = 0.0;
 	zbx_socket_t		s;
 	int			ret;
@@ -1218,15 +1314,16 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(trapper_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	memcpy(&s, (zbx_socket_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_socket_t));
+	memcpy(&s, trapper_args_in->listen_sock, sizeof(zbx_socket_t));
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(trapper_args_in->zbx_config_tls, trapper_args_in->zbx_get_program_type_cb_arg);
 	find_psk_in_cache = DCget_psk_by_identity;
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
@@ -1285,7 +1382,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			}
 #endif
 			sec = zbx_time();
-			process_trapper_child(&s, &ts);
+			process_trapper_child(&s, &ts, trapper_args_in->zbx_config_tls);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

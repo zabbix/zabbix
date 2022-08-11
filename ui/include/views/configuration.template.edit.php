@@ -140,7 +140,7 @@ $templates_field_items[] = (new CMultiSelect([
 
 $template_tab
 	->addRow(
-		new CLabel(_('Templates')),
+		new CLabel(_('Templates'), 'add_templates__ms'),
 		(count($templates_field_items) > 1)
 			? (new CDiv($templates_field_items))->addClass('linked-templates')
 			: $templates_field_items
@@ -192,7 +192,8 @@ $tabs->addTab('macroTab', _('Macros'),
 			->setModern(true)
 		)
 		->addRow(null, new CPartial($tmpl, [
-			'macros' => $data['macros']
+			'macros' => $data['macros'],
+			'readonly' => $data['readonly']
 		]), 'macros_container'),
 	TAB_INDICATOR_MACROS
 );

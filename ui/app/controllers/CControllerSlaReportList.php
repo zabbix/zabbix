@@ -154,13 +154,18 @@ class CControllerSlaReportList extends CController {
 		CProfile::update('web.slareport.list.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.slareport.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
+		$timezone = new DateTimeZone($sla !== null && $sla['timezone'] !== ZBX_DEFAULT_TIMEZONE
+			? $sla['timezone']
+			: CTimezoneHelper::getSystemTimezone()
+		);
+
 		$period_from = null;
 
 		if ($filter['date_from'] !== '') {
 			$parser = new CAbsoluteTimeParser();
 			$parser->parse($filter['date_from']);
 			$period_from = $parser
-				->getDateTime(true, new DateTimeZone('UTC'))
+				->getDateTime(true, $timezone)
 				->getTimestamp();
 		}
 
@@ -170,7 +175,7 @@ class CControllerSlaReportList extends CController {
 			$parser = new CAbsoluteTimeParser();
 			$parser->parse($filter['date_to']);
 			$period_to = $parser
-				->getDateTime(false, new DateTimeZone('UTC'))
+				->getDateTime(false, $timezone)
 				->getTimestamp();
 		}
 

@@ -1,33 +1,33 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-04-28T08:05:02Z'
+  version: '6.0'
+  date: '2022-06-09T11:50:44Z'
   media_types:
     -
       name: Express.ms
       type: WEBHOOK
       parameters:
-        4:
+        -
           name: event_source
           value: '{EVENT.SOURCE}'
-        6:
+        -
           name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
-        5:
+        -
           name: event_value
           value: '{EVENT.VALUE}'
-        2:
+        -
           name: express_message
           value: '{ALERT.MESSAGE}'
-        1:
+        -
           name: express_send_to
           value: '{ALERT.SENDTO}'
-        3:
+        -
           name: express_tags
           value: '{EVENT.TAGSJSON}'
-        7:
+        -
           name: express_token
           value: '<PLACE BOT TOKEN>'
-        0:
+        -
           name: express_url
           value: '<PLACE INSTANCE URL>'
       script: |
@@ -111,7 +111,7 @@ zabbix_export:
                             body: Express.params.message
                         }
                     };
-                    url = 'api/v3/botx/notification/callback/direct';
+                    url = 'api/v4/botx/notifications/direct';
                 }
                 else {
                     data = {

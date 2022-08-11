@@ -104,7 +104,7 @@ $form_grid
 		)
 	])
 	->addItem([
-		new CLabel(_('Start time')),
+		new CLabel(_('Start time'), 'hours'),
 		new CFormField(
 			(new CDiv([
 				(new CNumericBox('hours', $data['hours'], 2))

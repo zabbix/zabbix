@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:37:16Z'
+  version: '6.4'
+  date: '2022-07-22T09:11:29Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -21,7 +21,7 @@ zabbix_export:
         ENTITY-MIB
         IF-MIB
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -246,7 +246,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: EXTREME-SOFTWARE-MONITOR-MIB
-            Total CPU utlization (percentage) as of last sampling.
+            Total CPU utilization (percentage) as of last sampling.
           tags:
             -
               tag: component

@@ -24,6 +24,8 @@ class CSvgGraphArea extends CSvgGraphLine {
 	public const ZBX_STYLE_CLASS = 'svg-graph-area';
 
 	public function __construct(array $path, array $metric) {
+		$this->path = $path;
+
 		parent::__construct($path, $metric, false);
 
 		$this->options = $metric['options'] + [
@@ -36,6 +38,8 @@ class CSvgGraphArea extends CSvgGraphLine {
 
 		parent::draw();
 
-		$this->closePath();
+		if (count($this->path) > 1) {
+			$this->closePath();
+		}
 	}
 }

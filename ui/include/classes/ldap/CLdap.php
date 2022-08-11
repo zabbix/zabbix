@@ -227,7 +227,7 @@ class CLdap {
 		$base = $this->makeFilter($this->cnf['base_dn'], $info);
 		$filter = $this->makeFilter($this->cnf['search_filter'], $info);
 		$sr = @ldap_search($this->ds, $base, $filter);
-		$result = is_resource($sr) ? @ldap_get_entries($this->ds, $sr) : [];
+		$result = $sr !== false ? @ldap_get_entries($this->ds, $sr) : [];
 
 		// don't accept more or less than one response
 		if (!$result || $result['count'] != 1) {

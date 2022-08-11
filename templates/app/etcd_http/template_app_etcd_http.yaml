@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:33:19Z'
+  version: '6.4'
+  date: '2022-07-21T13:37:51Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Get Etcd metrics by HTTP agent.
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -1353,7 +1353,7 @@ zabbix_export:
                   value: '{#ETCD.PEER}'
             -
               uuid: 2521ccfc16fc43069001883b85aa0243
-              name: 'Etcd: Etcd peer {#ETCD.PEER}: Receive failures failures'
+              name: 'Etcd: Etcd peer {#ETCD.PEER}: Receive failures'
               type: DEPENDENT
               key: 'etcd.received.fail.rate[{#ETCD.PEER}]'
               delay: '0'

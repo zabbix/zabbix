@@ -30,3 +30,6 @@ libzbxtrapper_server_a_SOURCES = \
 libzbxtrapper_proxy_a_SOURCES = \
 	trapper_proxy.c \
 	trapper_request.h
+
+libzbxtrapper_a_CFLAGS = \
+	$(LIBXML2_CFLAGS)

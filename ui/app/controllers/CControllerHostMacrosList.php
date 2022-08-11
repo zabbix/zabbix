@@ -37,6 +37,7 @@ class CControllerHostMacrosList extends CController {
 			'macros'				=> 'array',
 			'show_inherited_macros' => 'required|in 0,1',
 			'templateids'			=> 'array_db hosts.hostid',
+			'readonly'				=> 'required|in 0,1',
 			'parent_hostid'			=> 'id'
 		];
 
@@ -81,6 +82,7 @@ class CControllerHostMacrosList extends CController {
 	protected function doAction() {
 		$macros = $this->getInput('macros', []);
 		$show_inherited_macros = (bool) $this->getInput('show_inherited_macros', 0);
+		$readonly = (bool) $this->getInput('readonly', 0);
 		$parent_hostid = $this->hasInput('parent_hostid') ? $this->getInput('parent_hostid') : null;
 
 		if ($macros) {
@@ -102,7 +104,7 @@ class CControllerHostMacrosList extends CController {
 
 		$macros = array_values(order_macros($macros, 'macro'));
 
-		if (!$macros) {
+		if (!$macros && !$readonly) {
 			$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
 			if ($show_inherited_macros) {
 				$macro['inherited_type'] = ZBX_PROPERTY_OWN;
@@ -122,6 +124,7 @@ class CControllerHostMacrosList extends CController {
 		$data = [
 			'macros' => $macros,
 			'show_inherited_macros' => $show_inherited_macros,
+			'readonly' => $readonly,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

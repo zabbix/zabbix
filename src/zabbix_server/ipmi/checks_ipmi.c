@@ -21,6 +21,8 @@
 
 #ifdef HAVE_OPENIPMI
 
+#include "zbxtime.h"
+
 #include "checks_ipmi.h"
 
 /* Theoretically it should be enough max 16 bytes for sensor ID and terminating '\0' (see SDR record format in IPMI */

@@ -28,6 +28,10 @@ package zbxlib
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 
+void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *zbx_config_tls, unsigned int accept, unsigned int connect,
+		char *PSKIdentity, char *PSKKey, char *CAFile, char *CRLFile, char *CertFile, char *KeyFile,
+		char *ServerCertIssuer, char *ServerCertSubject);
+
 extern int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
 
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
@@ -42,7 +46,7 @@ int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sen
 
 int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		char **error);
+		const zbx_config_tls_t *zbx_config_tls, char **error);
 
 typedef struct
 {
@@ -143,6 +147,8 @@ import (
 	"errors"
 	"time"
 	"unsafe"
+	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/tls"
 )
 
 type EventLogItem struct {
@@ -173,10 +179,33 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 
 	result := C.new_eventlog_result(C.int(item.Output.PersistSlotsAvailable()))
 
+	var tlsConfig *tls.Config
+	var err error
+	var ctlsConfig C.zbx_config_tls_t;
+	var ctlsConfig_p *C.zbx_config_tls_t;
+
+	if tlsConfig, err = agent.GetTLSConfig(&agent.Options); err != nil {
+		result := &EventLogResult{
+			Ts:    time.Now(),
+			Error: err,
+		}
+		item.Results = append(item.Results, result)
+
+		return
+	}
+	if (nil != tlsConfig) {
+		C.zbx_config_tls_init_for_agent2(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
+			(C.CString)(tlsConfig.PSKIdentity), (C.CString)(tlsConfig.PSKKey),
+			(C.CString)(tlsConfig.CAFile), (C.CString)(tlsConfig.CRLFile), (C.CString)(tlsConfig.CertFile),
+			(C.CString)(tlsConfig.KeyFile), (C.CString)(tlsConfig.ServerCertIssuer),
+			(C.CString)(tlsConfig.ServerCertSubject));
+		ctlsConfig_p = &ctlsConfig
+	}
+
 	var cerrmsg *C.char
 	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
 		C.zbx_vector_ptr_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
-		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, &cerrmsg)
+		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, ctlsConfig_p, &cerrmsg)
 
 	// add cached results
 	var cvalue, csource *C.char
