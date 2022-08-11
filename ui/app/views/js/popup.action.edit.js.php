@@ -39,8 +39,6 @@ window.action_edit_popup = new class {
 			// todo: add row as one element, not 3 different ones.
 			// todo: add multiselect title, not value
 
-			console.log(e.detail)
-
 			this.row = document.createElement('tr');
 			this.row.append(this.createLabelCell());
 			this.row.append(this.createNameCell(e.detail.inputs));
@@ -135,6 +133,61 @@ window.action_edit_popup = new class {
 		this.operation_command = new OperationViewCommand(this.$obj.find('>ul>li[id^="operation-command"]'));
 		this.operation_attr = new OperationViewAttr(this.$obj.find('>ul>li[id^="operation-attr"]'));
 		this.operation_condition = new OperationViewCondition(this.$obj.find('>ul>li[id^="operation-condition"]'));
+	}
+
+	submit() {
+		const fields = getFormFields(this.form);
+
+		const curl = new Curl('zabbix.php', false);
+		curl.setArgument('action', 'action.create');
+
+		this._post(curl.getUrl(), fields, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+		});
+	}
+
+	_post(url, data, success_callback) {
+
+		fetch(url, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				return response;
+			})
+			.then(success_callback)
+			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
 	}
 
 }
