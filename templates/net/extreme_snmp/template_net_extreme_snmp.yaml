@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-07-22T08:28:41Z'
+  date: '2022-04-14T10:42:35Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -246,7 +246,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: EXTREME-SOFTWARE-MONITOR-MIB
-            Total CPU utilization (percentage) as of last sampling.
+            Total CPU utlization (percentage) as of last sampling.
           tags:
             -
               tag: component
@@ -1503,8 +1503,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Extreme EXOS SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                        host: 'Extreme EXOS SNMP'
       valuemaps:
         -
           uuid: 60e2bd909e284621a8a21810623b0e94

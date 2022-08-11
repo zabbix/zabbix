@@ -342,7 +342,7 @@ $mediaOptionsForm = (new CFormList('options'))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	);
-$tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm, TAB_INDICATOR_MEDIATYPE_OPTIONS);
+$tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm);
 
 // append buttons to form
 $cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

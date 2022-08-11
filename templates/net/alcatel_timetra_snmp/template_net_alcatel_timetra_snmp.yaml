@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-07-22T08:31:13Z'
+  date: '2022-04-14T09:48:29Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -1215,7 +1215,7 @@ zabbix_export:
               description: |
                 MIB: TIMETRA-SYSTEM-MIB
                 The overall status of an equipped power supply.
-                For AC multiple power supplies, this represents the overall status of the first power supply in the tray (or shelf).
+                For AC multiple powersupplies, this represents the overall status of the first power supplyin the tray (or shelf).
                 For any other type, this represents the overall status of the power supply.
                 If tmnxChassisPowerSupply1Status is'deviceStateOk', then all monitored statuses are 'deviceStateOk'.
                 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.
@@ -1252,7 +1252,7 @@ zabbix_export:
               description: |
                 MIB: TIMETRA-SYSTEM-MIB
                 The overall status of an equipped power supply.
-                For AC multiple power supplies, this represents the overall status of the second power supply in the tray (or shelf).
+                For AC multiple powersupplies, this represents the overall status of the second power supplyin the tray (or shelf).
                 For any other type, this field is unused and set to 'deviceNotEquipped'.
                 If tmnxChassisPowerSupply2Status is 'deviceStateOk', then all monitored statuses are 'deviceStateOk'.
                 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.
@@ -1481,8 +1481,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Alcatel Timetra TiMOS SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                        host: 'Alcatel Timetra TiMOS SNMP'
       valuemaps:
         -
           uuid: b31f48e2216f441daa0b05561ac2ab6a

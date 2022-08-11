@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-01T08:11:33Z'
+  date: '2022-04-06T19:26:57Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -149,7 +149,7 @@ zabbix_export:
               name: 'Apache: has been restarted'
               event_name: 'Apache: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
               tags:
                 -
@@ -595,7 +595,7 @@ zabbix_export:
                   
                   // Multiversion metrics
                   output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime;
-                  output.ServerVersion = output.ServerVersion || output.Server;
+                  output.ServerVersion = output.Server || output.ServerVersion;
                   
                   // Parse "Scoreboard" to get worker count.
                   if (typeof output.Scoreboard === 'string') {
@@ -871,8 +871,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Apache by Zabbix agent'
                         name: 'Apache: Requests per second'
+                        host: 'Apache by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -887,8 +887,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Apache by Zabbix agent'
                         name: 'Apache: Workers total'
+                        host: 'Apache by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -911,8 +911,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Apache by Zabbix agent'
                         name: 'Apache: Current async connections{#SINGLETON}'
+                        host: 'Apache by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -936,8 +936,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Apache by Zabbix agent'
                         name: 'Apache: Current async processes{#SINGLETON}'
+                        host: 'Apache by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -952,8 +952,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Apache by Zabbix agent'
                         name: 'Apache: Worker states'
+                        host: 'Apache by Zabbix agent'
       valuemaps:
         -
           uuid: 452297e814a84b08a72730a7b777e378

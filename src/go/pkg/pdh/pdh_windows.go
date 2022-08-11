@@ -75,35 +75,33 @@ type CounterPathElements struct {
 func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 	ObjectsNames = make(map[string]string)
 
+	engBuf, err := getRegQueryCounters(HKEY_PERFORMANCE_NLSTEXT)
+	if err != nil {
+		return
+	}
+
 	locNames, err := win32.PdhEnumObject()
 	if err != nil {
 		return err
 	}
 
+	var wcharEngIndex, wcharEngName []uint16
 	englishCounters := make(map[string]int)
-
-	engBuf, err := getRegQueryCounters(HKEY_PERFORMANCE_NLSTEXT)
-	if err == nil {
-		var wcharEngIndex, wcharEngName []uint16
-
-		for len(engBuf) != 0 {
-			wcharEngIndex, engBuf = win32.NextField(engBuf)
-			if len(wcharEngIndex) == 0 {
-				break
-			}
-			wcharEngName, engBuf = win32.NextField(engBuf)
-			if len(wcharEngName) == 0 {
-				break
-			}
-
-			idx, err := strconv.Atoi(windows.UTF16ToString(wcharEngIndex))
-			if err != nil {
-				return err
-			}
-			englishCounters[windows.UTF16ToString(wcharEngName)] = idx
+	for len(engBuf) != 0 {
+		wcharEngIndex, engBuf = win32.NextField(engBuf)
+		if len(wcharEngIndex) == 0 {
+			break
 		}
-	} else {
-		log.Warningf("cannot read localized object names: %s", err.Error())
+		wcharEngName, engBuf = win32.NextField(engBuf)
+		if len(wcharEngName) == 0 {
+			break
+		}
+
+		idx, err := strconv.Atoi(windows.UTF16ToString(wcharEngIndex))
+		if err != nil {
+			return err
+		}
+		englishCounters[windows.UTF16ToString(wcharEngName)] = idx
 	}
 
 	objectsLocal := make(map[int]string)
