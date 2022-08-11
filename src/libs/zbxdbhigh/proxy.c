@@ -4526,7 +4526,9 @@ int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp)
 		return version;
 	}
 	else
-		return ZBX_COMPONENT_VERSION(3, 2, 0);
+	{
+		return ZBX_COMPONENT_VERSION_UNDEFINED;
+	}
 }
 
 /******************************************************************************

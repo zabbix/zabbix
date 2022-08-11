@@ -434,7 +434,7 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 	/* handle pre 3.4 proxies that did not support proxy data request */
 	if ('\0' == *answer)
 	{
-		proxy->version = ZBX_COMPONENT_VERSION(3, 2, 0);
+		proxy->version = ZBX_COMPONENT_VERSION_UNDEFINED;
 		zbx_free(answer);
 		ret = FAIL;
 		goto out;
