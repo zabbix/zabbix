@@ -1121,6 +1121,7 @@ class testUserRolesPermissions extends CWebTest {
 			if ($data['section'] !== 'Dashboards') {
 				$menu->select($data['section']);
 			}
+
 			if ($data['page'] === $data['section']) {
 				$submenu = $menu->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($data['section']).
 						"]/../ul[@class='submenu']")->one();
@@ -1178,7 +1179,7 @@ class testUserRolesPermissions extends CWebTest {
 		$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
 		$this->changeRoleRule(['Dashboards' => false]);
 		$this->checkLinks(['zabbix.php?action=dashboard.view'], 'Problems');
-}
+	}
 
 	public static function getRoleServiceData() {
 		return [
