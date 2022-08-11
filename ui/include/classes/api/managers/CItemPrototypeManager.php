@@ -145,8 +145,6 @@ class CItemPrototypeManager {
 
 		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
-		DB::delete('httptestitem', ['itemid' => $del_itemids]);
-		DB::delete('httpstepitem', ['itemid' => $del_itemids]);
 		DB::update('items', [
 			'values' => ['templateid' => 0, 'master_itemid' => 0],
 			'where' => ['itemid' => $del_itemids]

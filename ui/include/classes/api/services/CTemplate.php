@@ -687,7 +687,6 @@ class CTemplate extends CHostGeneral {
 
 		// Finally delete the template.
 		DB::delete('host_tag', ['hostid' => $templateids]);
-		DB::delete('httptest', ['hostid' => $templateids]);
 		DB::delete('hosts', ['hostid' => $templateids]);
 
 		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_TEMPLATE, $db_templates);
