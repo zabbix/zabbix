@@ -1,0 +1,2018 @@
+zabbix_export:
+  version: '6.2'
+  date: '2022-08-08T08:45:10Z'
+  template_groups:
+    -
+      uuid: c2c162144c2d4c5491c8801193af4945
+      name: Templates/Cloud
+  host_groups:
+    -
+      uuid: 137f19e6e2dc4219b33553b812627bc2
+      name: 'Virtual machines'
+  templates:
+    -
+      uuid: fa58228fee8a4e34a7c6503950d1c615
+      template: 'Azure by HTTP'
+      name: 'Azure by HTTP'
+      description: |
+        The template to monitor Microsoft Azure by HTTP.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create an Azure service principal via Azure CLI for your subscription.
+            `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+            https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fazure%2Fazure-resource-manager%2Ftoc.json&view=azure-cli-latest
+          2. Link template to the host.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.42
+      groups:
+        -
+          name: Templates/Cloud
+      items:
+        -
+          uuid: 7b2fe9a7ee164718933eb456b0068fea
+          name: 'Azure: Get errors'
+          type: DEPENDENT
+          key: azure.get.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.errors
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.get.resources
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: 502cb582546046a29267715763c46bff
+              expression: 'length(last(/Azure by HTTP/azure.get.errors))>0'
+              name: 'Azure: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in requests to API.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: fb6abf3631b240b08357ea9ce9ba89a4
+          name: 'Azure: Get resources'
+          type: SCRIPT
+          key: azure.get.resources
+          delay: 10m
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Azure = {
+                params: {},
+                token: null,
+            
+                setParams: function (params) {
+                    ['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    Azure.params = params;
+                },
+            
+                request: function (url, data) {
+                    if (typeof data === 'undefined' || data === null) {
+                        data = '';
+                    }
+            
+                    var response, request = new HttpRequest();
+                    if (Azure.token) {
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + Azure.token);
+                    }
+            
+                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            
+                    if (data !== '') {
+                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
+                        response = request.post(url, data);
+                    }
+                    else {
+                        response = request.get(url);
+                    }
+            
+                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() !== 200 || response === null) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    }
+                }
+            };
+            
+            var result,
+                data = {};
+                data['errors'] = {};
+            
+            try {
+                Azure.setParams(JSON.parse(value));
+            
+                try {
+                    result = Azure.request(
+                            'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) +'/oauth2/token',
+                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
+                    );
+            
+                    if ('access_token' in result) {
+                        Azure.token = result['access_token'];
+                    } else {
+                        throw 'Auth response does not contain access token.';
+                    }
+                }
+                catch (error) {
+                    data.errors.auth = error.toString();
+                }
+            
+                if (!('auth' in data.errors)) {
+                    try {
+                        raw_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.Compute/virtualMachines?api-version=2022-03-01');
+                        
+                        if ('nextLink' in raw_data) {
+                            next_data = raw_data;
+                            while ('nextLink' in next_data) {
+                                next_data = Azure.request(next_data.nextLink);
+                                next_data.value.forEach(function (value) {
+                                    raw_data.value.push(value);
+                                });
+                            }
+                        }
+                        
+                        raw_data.value.forEach(function (value) {
+                            value.resourceGroup = value.id.split("/")[4];
+                        });
+            
+                        data.resources = raw_data;
+                    }
+                    catch (error) {
+                        data.errors.resources = error.toString();
+                    }
+                }
+            }
+            catch (error) {
+                data.errors.params = error.toString();
+            }
+            
+            if (Object.keys(data.errors).length !== 0) {
+                errors = 'Failed to receive data:';
+                for (var error in data.errors) {
+                    errors += '\n' + error + ' : ' + data.errors[error];
+                }
+                data.errors = errors;
+            }
+            else {
+                data.errors = '';
+            }
+            
+            return JSON.stringify(data);
+          description: 'The JSON with result of API requests.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: app_id
+              value: '{$AZURE.APP_ID}'
+            -
+              name: password
+              value: '{$AZURE.PASSWORD}'
+            -
+              name: tenant_id
+              value: '{$AZURE.TENANT_ID}'
+            -
+              name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION_ID}'
+          tags:
+            -
+              tag: component
+              value: raw
+      discovery_rules:
+        -
+          uuid: f9386233186648ce828f406c52972ce5
+          name: 'Virtual machines discovery'
+          type: DEPENDENT
+          key: azure.vm.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: ^Microsoft.Compute/virtualMachines$
+                formulaid: G
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.VM.NAME.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.VM.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.VM.LOCATION.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.VM.LOCATION.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.VM.RESOURCE_GROUP.MATCHES}'
+                formulaid: B
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.VM.RESOURCE_GROUP.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+          description: 'A list of the virtual machines in the subscription.'
+          host_prototypes:
+            -
+              uuid: d08c0ee33c924b28bf1fed571da6c7f4
+              host: 'Azure virtual machine {#NAME}'
+              name: 'Azure virtual machine {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: 'Virtual machines'
+              templates:
+                -
+                  name: 'Azure virtual machine by HTTP'
+              macros:
+                -
+                  macro: '{$AZURE.RESOURCE_ID}'
+                  value: '{#ID}'
+              tags:
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: os
+                  value: '{#OS}'
+                -
+                  tag: resource-group
+                  value: '{#GROUP}'
+                -
+                  tag: size
+                  value: '{#SIZE}'
+          master_item:
+            key: azure.get.resources
+          lld_macro_paths:
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#LOCATION}'
+              path: $.location
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#OS}'
+              path: $.properties.storageProfile.osDisk.osType
+            -
+              lld_macro: '{#SIZE}'
+              path: $.properties.hardwareProfile.vmSize
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.resources.value
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: azure
+      macros:
+        -
+          macro: '{$AZURE.APP_ID}'
+          description: 'Microsoft Azure app ID.'
+        -
+          macro: '{$AZURE.DATA.TIMEOUT}'
+          value: 15s
+          description: 'Response timeout for API.'
+        -
+          macro: '{$AZURE.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Microsoft Azure password.'
+        -
+          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          description: 'Microsoft Azure subscription ID.'
+        -
+          macro: '{$AZURE.TENANT_ID}'
+          description: 'Microsoft Azure tenant ID.'
+        -
+          macro: '{$AZURE.VM.LOCATION.MATCHES}'
+          value: '.*'
+          description: 'This macro used in virtual machines discovery rule.'
+        -
+          macro: '{$AZURE.VM.LOCATION.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro used in virtual machines discovery rule.'
+        -
+          macro: '{$AZURE.VM.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro used in virtual machines discovery rule.'
+        -
+          macro: '{$AZURE.VM.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro used in virtual machines discovery rule.'
+        -
+          macro: '{$AZURE.VM.RESOURCE_GROUP.MATCHES}'
+          value: '.*'
+          description: 'This macro used in virtual machines discovery rule.'
+        -
+          macro: '{$AZURE.VM.RESOURCE_GROUP.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro used in virtual machines discovery rule.'
+    -
+      uuid: 820fa4a1565c43e4aac07a691a5bface
+      template: 'Azure virtual machine by HTTP'
+      name: 'Azure virtual machine by HTTP'
+      description: |
+        The template to monitor Microsoft Azure virtual machines by HTTP.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create an Azure service principal via Azure CLI for your subscription.
+            `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+            https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli
+          2. Link template to the host.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.42
+      groups:
+        -
+          name: Templates/Cloud
+      items:
+        -
+          uuid: c299999d69904340acd44fead6c7672c
+          name: 'Azure: Availability status detailed'
+          type: DEPENDENT
+          key: azure.vm.availability.details
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Summary description of the availability status.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.health.summary
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: 25e2af44bfbf4e9083ce493d85232088
+          name: 'Azure: Availability state'
+          type: DEPENDENT
+          key: azure.vm.availability.state
+          delay: '0'
+          history: 7d
+          description: 'Availability status of the resource.'
+          valuemap:
+            name: 'Azure resource health state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.health.availabilityState
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '3'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Available
+                - '0'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Degraded
+                - '1'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Unavailable
+                - '2'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Unknown
+                - '3'
+            -
+              type: IN_RANGE
+              parameters:
+                - '0'
+                - '3'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '3'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: c0170d8a09ae460da923fe773b2b0bd0
+              expression: 'last(/Azure virtual machine by HTTP/azure.vm.availability.state)=1'
+              name: 'Azure: Virtual machine is degraded'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The resource is in degraded state.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: e1b85765b83445ebbf15f02d782b9858
+              expression: 'last(/Azure virtual machine by HTTP/azure.vm.availability.state)=3'
+              name: 'Azure: Virtual machine is in unknown state'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The resource state is unknown.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: b3d764ff735e44f8806cc4d29090719e
+              expression: 'last(/Azure virtual machine by HTTP/azure.vm.availability.state)=2'
+              name: 'Azure: Virtual machine is unavailable'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The resource state is unavailable.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: a93308573303437487d151de340fcaed
+          name: 'Azure: VM cached bandwidth consumed percentage'
+          type: DEPENDENT
+          key: azure.vm.cached.bandwidth.consumed.percentage
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'Percentage of cached disk bandwidth consumed by the VM.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.VMCachedBandwidthConsumedPercentage.average
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 989dec26d97d44b6bd4a84fdbd37dec5
+          name: 'Azure: VM cached IOPS consumed percentage'
+          type: DEPENDENT
+          key: azure.vm.cached.iops.consumed.percentage
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'Percentage of cached disk IOPS consumed by the VM.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.VMCachedIOPSConsumedPercentage.average
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: fb0641ca8f104cf1bebdced63cd6af16
+          name: 'Azure: CPU credits consumed'
+          type: DEPENDENT
+          key: azure.vm.cpu.credits.consumed
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of credits consumed by the Virtual Machine. Only available on B-series burstable VMs.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.CPUCreditsConsumed.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 963752cbaba046cab1f05b0cbcff3137
+          name: 'Azure: CPU credits remaining'
+          type: DEPENDENT
+          key: azure.vm.cpu.credits.remaining
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of credits available to burst. Only available on B-series burstable VMs.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.CPUCreditsRemaining.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 492edacf92544a95a5aa7b034efa7931
+          name: 'Azure: Percentage CPU'
+          type: DEPENDENT
+          key: azure.vm.cpu.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The percentage of allocated compute units that are currently in use by the Virtual Machine(s).'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.PercentageCPU.average
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+          triggers:
+            -
+              uuid: 9e6d9394570641418b4291befb1e38e5
+              expression: 'min(/Azure virtual machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}'
+              name: 'Azure: High CPU utilization'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'CPU utilization is too high. the system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 47cda13c203e4f1e9918eb73fd8afa20
+          name: 'Azure: Data disk bandwidth consumed percentage'
+          type: DEPENDENT
+          key: azure.vm.data.disk.bandwidth.consumed.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of data disk bandwidth consumed per minute.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskBandwidthConsumedPercentage.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 3121980d3319431691ed9e98d176430b
+          name: 'Azure: Data disk IOPS consumed percentage'
+          type: DEPENDENT
+          key: azure.vm.data.disk.iops.consumed.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of data disk I/Os consumed per minute.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskIOPSConsumedPercentage.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: d0fb23206d564e1da746bff3369056c1
+          name: 'Azure: Data disk max burst bandwidth'
+          type: DEPENDENT
+          key: azure.vm.data.disk.max.bandwidth
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Maximum bytes per second throughput Data Disk can achieve with bursting.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskMaxBurstBandwidth.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 6afcbb02c53243faa341670f155678e4
+          name: 'Azure: Data disk max burst IOPS'
+          type: DEPENDENT
+          key: azure.vm.data.disk.max.iops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'Maximum IOPS Data Disk can achieve with bursting.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskMaxBurstIOPS.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: b81f304bbc2a42df9b0550ecdc1ec6b7
+          name: 'Azure: Data disk queue depth'
+          type: DEPENDENT
+          key: azure.vm.data.disk.queue.depth
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Data Disk Queue Depth(or Queue Length).'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskQueueDepth.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 021d92f3075544319191d6f85a701222
+          name: 'Azure: Data disk read rate'
+          type: DEPENDENT
+          key: azure.vm.data.disk.read.bps
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Bytes/Sec read from a single disk during monitoring period.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskReadBytessec.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: cc31283ab96548b7bdcc88e89dfae53c
+          name: 'Azure: Data disk read operations/sec'
+          type: DEPENDENT
+          key: azure.vm.data.disk.read.ops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'Read IOPS from a single disk during monitoring period.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskReadOperationsSec.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: c61ad4af97c243cca75bbece40eea795
+          name: 'Azure: Data disk target bandwidth'
+          type: DEPENDENT
+          key: azure.vm.data.disk.target.bandwidth
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Baseline bytes per second throughput Data Disk can achieve without bursting.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskTargetBandwidth.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 9370988456e74b889700ea5798d17092
+          name: 'Azure: Data disk target IOPS'
+          type: DEPENDENT
+          key: azure.vm.data.disk.target.iops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'Baseline IOPS Data Disk can achieve without bursting.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskTargetIOPS.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 68c730e4904f402cb12fb71b45fede02
+          name: 'Azure: Data disk used burst BPS credits percentage'
+          type: DEPENDENT
+          key: azure.vm.data.disk.used.burst.bandwidth
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of Data Disk burst bandwidth credits used so far.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskUsedBurstBPSCreditsPercentage.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 731a82833bdd42c59c453adf8625e3b4
+          name: 'Azure: Data disk used burst IO credits percentage'
+          type: DEPENDENT
+          key: azure.vm.data.disk.used.burst.iops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of Data Disk burst I/O credits used so far.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskUsedBurstIOCreditsPercentage.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: b8712f8fd60a43f6b099d9eafed19945
+          name: 'Azure: Data disk write rate'
+          type: DEPENDENT
+          key: azure.vm.data.disk.write.bps
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Bytes/Sec written to a single disk during monitoring period.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskWriteBytessec.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 87794f5a502b4e2db91f820483e38fb3
+          name: 'Azure: Data disk write operations/sec'
+          type: DEPENDENT
+          key: azure.vm.data.disk.write.ops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'Write IOPS from a single disk during monitoring period.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DataDiskWriteOperationsSec.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: e253c2a908944be1a033fc3df550d979
+          name: 'Azure: Get errors'
+          type: DEPENDENT
+          key: azure.vm.data.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.errors
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: 87236c99652643ba800601a461d66d94
+              expression: 'length(last(/Azure virtual machine by HTTP/azure.vm.data.errors))>0'
+              name: 'Azure: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in requests to API.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: cff54514d795495da8bc1152e02631aa
+          name: 'Azure: Get data'
+          type: SCRIPT
+          key: azure.vm.data.get
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var AzureVM = {
+                params: {},
+                token: null,
+            
+                setParams: function (params) {
+                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    AzureVM.params = params;
+                },
+            
+            
+                request: function (url, data) {
+                    if (typeof data === 'undefined' || data === null) {
+                        data = '';
+                    }
+            
+                    var response, request = new HttpRequest();
+                        if (AzureVM.token) {
+                            request.addHeader('Accept: application/json');
+                            request.addHeader('Authorization: Bearer ' + AzureVM.token);
+                        }
+                
+                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            
+                    if (data !== '') {
+                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
+                        response = request.post(url, data);
+                    }
+                    else {
+                        response = request.get(url);
+                    }
+            
+                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() !== 200 || response === null) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    }
+            }
+            
+            };
+            
+            var metrics = [
+                'Percentage CPU',
+                'Network In',
+                'Network Out',
+                'Disk Read Bytes',
+                'Disk Write Bytes',
+                'Disk Read Operations/Sec',
+                'Disk Write Operations/Sec',
+                'CPU Credits Remaining',
+                'CPU Credits Consumed',
+                'Data Disk Read Bytes/sec',
+                'Data Disk Write Bytes/sec',
+                'Data Disk Read Operations/Sec',
+                'Data Disk Write Operations/Sec',
+                'Data Disk Queue Depth',
+                'Data Disk Bandwidth Consumed Percentage',
+                'Data Disk IOPS Consumed Percentage',
+                'Data Disk Target Bandwidth',
+                'Data Disk Target IOPS',
+                'Data Disk Max Burst Bandwidth',
+                'Data Disk Max Burst IOPS',
+                'Data Disk Used Burst BPS Credits Percentage',
+                'Data Disk Used Burst IO Credits Percentage',
+                'OS Disk Read Bytes/sec',
+                'OS Disk Write Bytes/sec',
+                'OS Disk Read Operations/Sec',
+                'OS Disk Write Operations/Sec',
+                'OS Disk Queue Depth',
+                'OS Disk Bandwidth Consumed Percentage',
+                'OS Disk IOPS Consumed Percentage',
+                'OS Disk Target Bandwidth',
+                'OS Disk Target IOPS',
+                'OS Disk Max Burst Bandwidth',
+                'OS Disk Max Burst IOPS',
+                'OS Disk Used Burst BPS Credits Percentage',
+                'OS Disk Used Burst IO Credits Percentage',
+                'Inbound Flows',
+                'Outbound Flows',
+                'Inbound Flows Maximum Creation Rate',
+                'Outbound Flows Maximum Creation Rate',
+                'Premium Data Disk Cache Read Hit',
+                'Premium Data Disk Cache Read Miss',
+                'Premium OS Disk Cache Read Hit',
+                'Premium OS Disk Cache Read Miss',
+                'VM Cached Bandwidth Consumed Percentage',
+                'VM Cached IOPS Consumed Percentage',
+                'VM Uncached Bandwidth Consumed Percentage',
+                'VM Uncached IOPS Consumed Percentage',
+                'Network In Total',
+                'Network Out Total',
+                'Available Memory Bytes'
+            ],
+                prepared_metrics = [],
+                data = {};
+                data['errors'] = {};
+                data['metrics'] = {};
+            
+            try {
+                AzureVM.setParams(JSON.parse(value));
+            
+                try {
+                    result = AzureVM.request(
+                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureVM.params.tenant_id) +'/oauth2/token',
+                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureVM.params.app_id) + '&client_secret=' + encodeURIComponent(AzureVM.params.password)
+                    );
+            
+                    if ('access_token' in result) {
+                        AzureVM.token = result['access_token'];
+                    } else {
+                        throw 'Auth response does not contain access token.';
+                    }
+                }
+                catch (error) {
+                    data.errors.auth = error.toString();
+                }
+            
+                if (!('auth' in data.errors)) {
+                    try {
+                        health = AzureVM.request('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+                        data.health = health.value[0].properties;
+                    }
+                    catch (error) {
+                        data.errors.health = error.toString();
+                    }
+            
+                    for (var i = 0; i < metrics.length; i += 20) {
+                        var chunk = metrics.slice(i, i + 20);
+            
+                        prepared_metrics.push(
+                            chunk.map(function(element) {
+                                return encodeURIComponent(element);
+                            }).join(',')
+                        );
+                    }
+            
+                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+                    
+                    for (var j in prepared_metrics) {
+                        try {
+                            metrics_data = AzureVM.request('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+                            for (k in metrics_data.value) {
+                                data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 3];
+                            }
+                        }
+                        catch (error) {
+                            data.errors[prepared_metrics[j]] = error.toString();
+                        }
+                    } 
+                }
+            }
+            catch (error) {
+                data.errors.params = error.toString();
+            }
+            
+            if (Object.keys(data.errors).length !== 0) {
+                errors = 'Failed to receive data:';
+                for (var error in data.errors) {
+                    errors += '\n' + error + ' : ' + data.errors[error];
+                }
+                data.errors = errors;
+            }
+            else {
+                data.errors = '';
+            }
+            
+            return JSON.stringify(data);
+          description: 'The JSON with result of API requests.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: app_id
+              value: '{$AZURE.APP_ID}'
+            -
+              name: password
+              value: '{$AZURE.PASSWORD}'
+            -
+              name: tenant_id
+              value: '{$AZURE.TENANT_ID}'
+            -
+              name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION_ID}'
+            -
+              name: resource_id
+              value: '{$AZURE.RESOURCE_ID}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 1dc9f8d45b6f48a38f701f089cbcb279
+          name: 'Azure: Disk read rate'
+          type: DEPENDENT
+          key: azure.vm.disk.read.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Bytes read from disk during monitoring period (1 minute).'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DiskReadBytes.total
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.0167'
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: cd3240d31a4f42a89b5c9817ea288b5a
+          name: 'Azure: Disk read Operations/Sec'
+          type: DEPENDENT
+          key: azure.vm.disk.read.ops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'Disk read IOPS.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DiskReadOperationsSec.average
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: b5e2070bde1444ea809ba4e0a29b05d9
+          name: 'Azure: Disk write rate'
+          type: DEPENDENT
+          key: azure.vm.disk.write.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Bytes written to disk during monitoring period (1 minute).'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DiskWriteBytes.total
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.0167'
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 0d93d1b510614c1f83418bd481f1e7cb
+          name: 'Azure: Disk write Operations/Sec'
+          type: DEPENDENT
+          key: azure.vm.disk.write.ops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'Disk write IOPS.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.DiskWriteOperationsSec.average
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 3a30a59aabd54c8b8feb1f4a8ba06db5
+          name: 'Azure: Inbound flows'
+          type: DEPENDENT
+          key: azure.vm.flows.inbound
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Inbound Flows are number of current flows in the inbound direction (traffic going into the VM).'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.InboundFlows.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 3964ffbb7ea949f69863edcf91f5c555
+          name: 'Azure: Inbound flows max creation rate'
+          type: DEPENDENT
+          key: azure.vm.flows.inbound.max
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The maximum creation rate of inbound flows (traffic going into the VM).'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.InboundFlowsMaximumCreationRate.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 2084cb1d010a4ab494c0826c458d922a
+          name: 'Azure: Outbound flows'
+          type: DEPENDENT
+          key: azure.vm.flows.outbound
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Outbound Flows are number of current flows in the outbound direction (traffic going out of the VM).'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OutboundFlows.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: eac3e6b53d394e3289fc03bf5772799c
+          name: 'Azure: Outbound flows max creation rate'
+          type: DEPENDENT
+          key: azure.vm.flows.outbound.max
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The maximum creation rate of outbound flows (traffic going out of the VM).'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OutboundFlowsMaximumCreationRate.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 0a354c9b104b468d9749adfd28d1373e
+          name: 'Azure: Available memory'
+          type: DEPENDENT
+          key: azure.vm.memory.available
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Amount of physical memory, in bytes, immediately available for allocation to a process or for system use in the Virtual Machine.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.AvailableMemoryBytes.average
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 411c5f6fcb374c4c90e2951a546c0c08
+          name: 'Azure: Network in total'
+          type: DEPENDENT
+          key: azure.vm.network.in.total
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: bps
+          description: 'The number of bytes received on all network interfaces by the Virtual Machine(s) (Incoming Traffic).'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.NetworkInTotal.total
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1333'
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: ee2ef1d1e2844ae8be2a5f04c86631ba
+          name: 'Azure: Network out total'
+          type: DEPENDENT
+          key: azure.vm.network.out.total
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: bps
+          description: 'The number of bytes out on all network interfaces by the Virtual Machine(s) (Outgoing Traffic).'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.NetworkOutTotal.total
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1333'
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 24c58e473c5c4b8388a0e78ae38378fc
+          name: 'Azure: OS disk bandwidth consumed percentage'
+          type: DEPENDENT
+          key: azure.vm.os.disk.bandwidth.consumed.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of operating system disk bandwidth consumed per minute.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskBandwidthConsumedPercentage.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 33a7fff9758046e3be07dad6c0a710ca
+          name: 'Azure: OS disk IOPS consumed percentage'
+          type: DEPENDENT
+          key: azure.vm.os.disk.iops.consumed.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of operating system disk I/Os consumed per minute.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskIOPSConsumedPercentage.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 7d0ca132bc264ac08e3c55809bdc40d1
+          name: 'Azure: OS disk max burst bandwidth'
+          type: DEPENDENT
+          key: azure.vm.os.disk.max.bandwidth
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Maximum bytes per second throughput OS Disk can achieve with bursting.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskMaxBurstBandwidth.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 8374282688dc4fabb770c07eb335c666
+          name: 'Azure: OS disk max burst IOPS'
+          type: DEPENDENT
+          key: azure.vm.os.disk.max.iops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'Maximum IOPS OS Disk can achieve with bursting.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskMaxBurstIOPS.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: ca8fe9d0ea58482c9bb8b83a716362a2
+          name: 'Azure: OS disk queue depth'
+          type: DEPENDENT
+          key: azure.vm.os.disk.queue.depth
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'OS Disk Queue Depth(or Queue Length).'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskQueueDepth.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 30265aac759d45769769eae081f570ac
+          name: 'Azure: OS disk read rate'
+          type: DEPENDENT
+          key: azure.vm.os.disk.read.bps
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Bytes/Sec read from a single disk during monitoring period for OS disk.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskReadBytessec.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: f11fcbbd63234993a9c301dc8bac3e80
+          name: 'Azure: OS disk read operations/sec'
+          type: DEPENDENT
+          key: azure.vm.os.disk.read.ops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'Read IOPS from a single disk during monitoring period for OS disk.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskReadOperationsSec.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 5cc422b7da3145fa885a88bb6165e3b9
+          name: 'Azure: OS disk target bandwidth'
+          type: DEPENDENT
+          key: azure.vm.os.disk.target.bandwidth
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Baseline bytes per second throughput OS Disk can achieve without bursting.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskTargetBandwidth.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 556941b1df5d470f8de628230b085623
+          name: 'Azure: OS disk target IOPS'
+          type: DEPENDENT
+          key: azure.vm.os.disk.target.iops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'Baseline IOPS OS Disk can achieve without bursting.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskTargetIOPS.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 9d42609950864c899a0d63b94f1d2235
+          name: 'Azure: OS disk used burst BPS credits percentage'
+          type: DEPENDENT
+          key: azure.vm.os.disk.used.burst.bandwidth
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of OS Disk burst bandwidth credits used so far.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskUsedBurstBPSCreditsPercentage.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: c08f45df2e594e1fab01ba63df7da05b
+          name: 'Azure: OS disk used burst IO credits percentage'
+          type: DEPENDENT
+          key: azure.vm.os.disk.used.burst.iops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of OS Disk burst I/O credits used so far.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskUsedBurstIOCreditsPercentage.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 7645519a786b42908f1ec693128899c2
+          name: 'Azure: OS disk write rate'
+          type: DEPENDENT
+          key: azure.vm.os.disk.write.bps
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Bytes/Sec written to a single disk during monitoring period for OS disk.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskWriteBytessec.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 1e9392bc0c934e7d93f743c86e36e23e
+          name: 'Azure: OS disk write operations/sec'
+          type: DEPENDENT
+          key: azure.vm.os.disk.write.ops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'Write IOPS from a single disk during monitoring period for OS disk.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.OSDiskWriteOperationsSec.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: d6fcff826cfa486d945f33708be2f630
+          name: 'Azure: Premium data disk cache read hit'
+          type: DEPENDENT
+          key: azure.vm.premium.data.disk.cache.read.hit
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'Premium data disk cache read hit.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.PremiumDataDiskCacheReadHit.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 288853ee5d08442fa43f8df1dfcc7823
+          name: 'Azure: Premium data disk cache read miss'
+          type: DEPENDENT
+          key: azure.vm.premium.data.disk.cache.read.miss
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'Premium data disk cache read miss.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.PremiumDataDiskCacheReadMiss.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 66b629ae3d7e4abeaf0282414c91876f
+          name: 'Azure: Premium OS disk cache read hit'
+          type: DEPENDENT
+          key: azure.vm.premium.os.disk.cache.read.hit
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'Premium OS disk cache read hit.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.PremiumOSDiskCacheReadHit.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 3927f34d5d0649d7ac29703f64054dbf
+          name: 'Azure: Premium OS disk cache read miss'
+          type: DEPENDENT
+          key: azure.vm.premium.os.disk.cache.read.miss
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'Premium OS disk cache read miss.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.PremiumOSDiskCacheReadMiss.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: d6e85395e34b4288988a5287d287f182
+          name: 'Azure: VM uncached bandwidth consumed percentage'
+          type: DEPENDENT
+          key: azure.vm.uncached.bandwidth.consumed.percentage
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'Percentage of uncached disk bandwidth consumed by the VM.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.VMUncachedBandwidthConsumedPercentage.average
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 124203560922429bb32b76c45f24b2b9
+          name: 'Azure: VM uncached IOPS consumed percentage'
+          type: DEPENDENT
+          key: azure.vm.uncached.iops.consumed.percentage
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'Percentage of uncached disk IOPS consumed by the VM.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.VMUncachedIOPSConsumedPercentage.average
+          master_item:
+            key: azure.vm.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: azure
+      macros:
+        -
+          macro: '{$AZURE.APP_ID}'
+          description: 'Microsoft Azure app ID.'
+        -
+          macro: '{$AZURE.DATA.TIMEOUT}'
+          value: 60s
+          description: 'Response timeout for API.'
+        -
+          macro: '{$AZURE.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Microsoft Azure password.'
+        -
+          macro: '{$AZURE.RESOURCE_ID}'
+          description: 'Microsoft Azure virtual machine ID.'
+        -
+          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          description: 'Microsoft Azure subscription ID.'
+        -
+          macro: '{$AZURE.TENANT_ID}'
+          description: 'Microsoft Azure tenant ID.'
+        -
+          macro: '{$AZURE.VM.CPU.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the CPU utilization in %.'
+      valuemaps:
+        -
+          uuid: 38c8ce1516704ec2a6f1ea9686db56b9
+          name: 'Azure resource health state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Available
+            -
+              value: '1'
+              newvalue: Degraded
+            -
+              value: '2'
+              newvalue: Unavailable
+            -
+              value: '3'
+              newvalue: Unknown
+  graphs:
+    -
+      uuid: 781dd83ed494465bbf2c16efbc753a51
+      name: 'Azure: Data disk read/write bytes'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.data.disk.read.bps
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.data.disk.write.bps
+    -
+      uuid: 7d198b2f6186498ab39ece80f3f7b30e
+      name: 'Azure: Data disk read/write rates'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.data.disk.read.ops
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.data.disk.write.ops
+    -
+      uuid: a2d0eb282276486896067f8a30f8ea51
+      name: 'Azure: Disk read/write bytes'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.disk.read.bytes
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.disk.write.bytes
+    -
+      uuid: 58a8c6942314408ab0e88b15d53f67e5
+      name: 'Azure: Disk read/write rates'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.disk.read.ops
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.disk.write.ops
+    -
+      uuid: b427ad3dbb8d4f8caf1edfb0cab04733
+      name: 'Azure: Flows'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.flows.inbound
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.flows.outbound
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.flows.inbound.max
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.flows.outbound.max
+    -
+      uuid: f0f37dc8840a45ba8e8cb62f5fea6804
+      name: 'Azure: Network traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.network.in.total
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.network.out.total
+    -
+      uuid: 41bd1642704c4d3fbe4fb34c8c389320
+      name: 'Azure: OS disk read/write bytes'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.os.disk.read.bps
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.os.disk.write.bps
+    -
+      uuid: df77fe1de4ae46f98744ff73ed427b3b
+      name: 'Azure: OS disk read/write rates'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.os.disk.read.ops
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.os.disk.write.ops
+    -
+      uuid: 3051d683b44b48ee94030465254abc7f
+      name: 'Azure: Premium data disk cache read'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.premium.data.disk.cache.read.hit
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.premium.data.disk.cache.read.miss
+    -
+      uuid: d727dc11deaa46b282892552c9b03752
+      name: 'Azure: Premium OS disk cache read'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.premium.os.disk.cache.read.hit
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure virtual machine by HTTP'
+            key: azure.vm.premium.os.disk.cache.read.miss
