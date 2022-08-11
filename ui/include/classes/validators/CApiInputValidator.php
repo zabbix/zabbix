@@ -2554,14 +2554,14 @@ class CApiInputValidator {
 			return true;
 		}
 
-		[$year, $month, $day] = sscanf($data, '%d-%d-%d');
+		$date = DateTime::createFromFormat(ZBX_DATE, $data);
 
-		if (!checkdate($month, $day, $year)) {
+		if (!$date || $date->format(ZBX_DATE) !== $data) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a date in YYYY-MM-DD format is expected'));
 			return false;
 		}
 
-		if (!validateDateInterval($year, $month, $day)) {
+		if (!validateDateInterval($date->format('Y'), $date->format('m'), $date->format('d'))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_s('value must be between "%1$s" and "%2$s"', '1970-01-01', '2038-01-18')
 			);

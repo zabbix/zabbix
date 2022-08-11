@@ -28,7 +28,7 @@ $hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['template
 
 $filter_column_left = (new CFormList())
 	->addRow(
-		(new CLabel(_('Host groups'), 'filter_groups__ms')),
+		(new CLabel(_('Host groups'), 'filter_groupids__ms')),
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
 			'object_name' => 'hostGroup',
@@ -47,7 +47,7 @@ $filter_column_left = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 	)
 	->addRow(
-		(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hosts__ms')),
+		(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
 			'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',

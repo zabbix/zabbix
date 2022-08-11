@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-05-19 19:26+0000\n"
+"PO-Revision-Date: 2022-08-03 20:13+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -1141,7 +1141,7 @@ msgstr "Wszystkie problemy"
 #: include/views/configuration.trigger.prototype.edit.php:514
 #: include/views/configuration.triggers.edit.php:542
 msgid "All problems if tag values match"
-msgstr "Wszystkie problemy, jeśli wartość tag'a się pasuje"
+msgstr "Wszystkie problemy, jeśli wartości znaczników są równe"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
@@ -1149,7 +1149,7 @@ msgstr "Wszystkie usługi"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
-msgstr "Wszystkie etykiety"
+msgstr "Wszystkie znaczniki"
 
 #: include/html.inc.php:267
 msgid "All templates"
@@ -1274,7 +1274,7 @@ msgstr "Zastosuj"
 
 #: include/views/configuration.hostgroups.edit.php:46
 msgid "Apply permissions and tag filters to all subgroups"
-msgstr "Dodaj uprawnienia i etykietę filtrów do wszystkich podgrup"
+msgstr "Dodaj uprawnienia i filtry znaczników do wszystkich podgrup"
 
 #: include/views/configuration.maintenance.list.php:67
 #: include/views/configuration.maintenance.list.php:101
@@ -2143,7 +2143,7 @@ msgstr[2] "Nie można skopiować wyzwalaczy"
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Nie można skopiować wyzwalacza \"%1$s\", ponieważ jego wyrażanie zawiera wiele hostów."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2854,7 +2854,7 @@ msgstr "Nie można połączyć szablonu"
 #: include/classes/api/services/CHostBase.php:520
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do hosta \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do hosta \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:678
 #: include/classes/api/services/CHostBase.php:755
@@ -2870,12 +2870,12 @@ msgstr "Nie można podłączyć szablonu \"%1$s\" do hosta \"%2$s\" ze względu 
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Nie można podłączyć szablonu \"%1$s\" do hosta \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podłączony dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do prototypu hosta \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do prototypu hosta \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podłączony dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:675
 #: include/classes/api/services/CHostBase.php:752
@@ -2891,17 +2891,17 @@ msgstr "Nie można podłączyć szablonu \"%1$s\" do prototypu hosta \"%2$s\" ze
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Nie można podłączyć szablonu \"%1$s\" do prototypu hosta \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podłączony dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because circular linkage (%3$s) will occurs."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ spowoduje to linkowane kołowe (%3$s)."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ spowoduje to podłączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CHostBase.php:514
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr "Nie można podlinkować szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
+msgstr "Nie można podłączyć szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ szablon nadrzędny \"%3$s\" byłby podłączony dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:672
 #: include/classes/api/services/CHostBase.php:749
@@ -2917,12 +2917,12 @@ msgstr "Nie można podłączyć szablonu \"%1$s\" do szablonu \"%2$s\" ze wzglę
 #: include/classes/api/services/CHostBase.php:502
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "Nie można podłączyć szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ spowoduje to podłączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Nie można podłączyć szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podłączony dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:705
 #, c-format
@@ -3108,22 +3108,22 @@ msgstr "Nie można odłączyć szablonu"
 #: include/classes/api/services/CHostBase.php:331
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Nie można odłączyć szablonu \"%1$s\" od hosta \"%2$s\" z względu na zależność wyzwalacza \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:415
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
-msgstr ""
+msgstr "Nie można odłączyć szablonu \"%1$s\" od szablonu \"%2$s\" z względu na zależność wyzwalacza \"%3$s\" na hoście \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:414
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
-msgstr ""
+msgstr "Nie można odłączyć szablonu \"%1$s\" od szablonu \"%2$s\" z względu na zależność wyzwalacza \"%3$s\" na szablonie \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:330
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Nie można odłączyć szablonu \"%1$s\" od szablonu \"%2$s\" ze względu na zależność wyzwalacza \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
@@ -3148,7 +3148,7 @@ msgstr "Nie można odłączyć szablonu \"%1$s\" bez szablonu \"%2$s\" od szablo
 #: include/classes/api/services/CHostGeneral.php:1037
 #, c-format
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
-msgstr "Nie można odlinkować wyzwalacza \"%1$s\", posiada on elementy z szablonu, który pozostaje podlinkowany do hosta."
+msgstr "Nie można odłączyć wyzwalacza \"%1$s\", posiada on elementy z szablonu, który pozostaje podłączony do hosta."
 
 #: include/classes/api/services/CAction.php:2636
 #, c-format
@@ -3706,6 +3706,10 @@ msgstr "Cykliczne połączenia szablonów są zabronione."
 msgid "Class %1$s not found for action %2$s."
 msgstr "Klasa %1$s nie znaleziono dla akcji %2$s."
 
+#: include/classes/core/ZBase.php:494
+msgid "Class not found."
+msgstr "Nie znaleziono klasy."
+
 #: include/views/configuration.httpconf.list.php:217
 #: include/views/configuration.item.list.php:297
 msgid "Clear history"
@@ -3883,6 +3887,13 @@ msgstr "Kompresja rekordów starszych niż"
 #: app/views/administration.proxy.list.php:79
 msgid "Compression"
 msgstr "Kompresja"
+
+#: app/views/administration.housekeeping.edit.php:163
+#: app/views/administration.housekeeping.edit.php:168
+#: app/views/administration.housekeeping.edit.php:173
+#: app/views/administration.housekeeping.edit.php:183
+msgid "Compression is not supported."
+msgstr "Kompresja nie jest wspierana."
 
 #: app/views/administration.mediatype.edit.php:319
 msgid "Concurrent sessions"
@@ -5568,6 +5579,10 @@ msgstr "Szczegóły"
 msgid "Details of web scenario"
 msgstr "Szczegóły scenariusza sieci www"
 
+#: app/views/administration.housekeeping.edit.php:194
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr "Okres wykrywania"
@@ -6604,6 +6619,13 @@ msgstr "Komunikat błędu"
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr "Błąd! Nie można uruchomić serwera Zabbix przez niewspieraną wersję (%1$s) bazy danych. Wersja musi być niemniejsza niż %2$s"
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
+msgstr "Błąd! Nie można uruchomić serwera Zabbix."
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -11141,6 +11163,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "P"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr "M"
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "MAC adres A"
@@ -11744,6 +11771,11 @@ msgstr "Wymagany minimalny rozmiar pliku do wgrania dla PHP jest %1$s (konfigura
 #, c-format
 msgid "Minimum required PHP version is %1$s."
 msgstr "Wymagana minimalna wersja PHP to %1$s."
+
+#: app/views/administration.housekeeping.edit.php:174
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
+msgstr "Wymagana minimalna wersja TimescaleDB to %1$s."
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -13041,7 +13073,7 @@ msgstr "Liczba pozycji w historii proxy, które jeszcze nie zostały wysłane do
 
 #: include/classes/data/CItemData.php:1668
 msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
-msgstr ""
+msgstr "Liczba pozycji w kolejce, które są opóźnione o od-do sekund włącznie."
 
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -14222,6 +14254,10 @@ msgstr "Portugalski (pt_PT)"
 msgid "Position"
 msgstr "Pozycja"
 
+#: include/classes/widgets/views/widget.item.form.view.php:142
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr "Pozycja jest ignorowana dla jednostek s, uptime i unixtime."
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "Pola metody post"
@@ -14229,6 +14265,10 @@ msgstr "Pola metody post"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "Typ metody post"
+
+#: app/views/administration.housekeeping.edit.php:164
+msgid "PostgreSQL database server version is too old."
+msgstr "Wersja serwera bazy danych PostgreSQL jest za stara."
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -17245,7 +17285,7 @@ msgstr "Tabela \"%1$s\" nie posiada pola o nazwie \"%2$s\"."
 #: app/views/popup.condition.common.php:323 include/hosts.inc.php:144
 #: include/views/inventory.host.list.php:90
 msgid "Tag"
-msgstr "Etykieta"
+msgstr "Znacznik"
 
 #: app/partials/monitoring.latest.filter.php:172
 #: app/partials/monitoring.problem.filter.php:233
@@ -17498,6 +17538,10 @@ msgstr "Szablony"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Szablony \"%1$s\" odłączone od hostów \"%2$s\"."
 
+#: app/partials/configuration.host.edit.html.php:215
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr "Szablonów połączonych przez wykrywanie hostów nie można odłączyć."
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr "Zaktualizowane szablony"
@@ -17628,17 +17672,17 @@ msgstr "Sklonowany szablon zawiera zdefiniowane makra użytkownika o typie \"Sec
 #: include/classes/api/services/CTriggerGeneral.php:2245
 #, c-format
 msgid "The dependency of trigger \"%1$s\" on trigger \"%2$s\" already exists."
-msgstr ""
+msgstr "Zależność wyzwalacza \"%1$s\" od wyzwalacza \"%2$s\" już istnieje."
 
 #: include/classes/api/services/CTriggerGeneral.php:2249
 #, c-format
 msgid "The dependency of trigger prototype \"%1$s\" on trigger \"%2$s\" already exists."
-msgstr ""
+msgstr "Zależność prototypu wyzwalacza \"%1$s\" od wyzwalacza \"%2$s\" już istnieje."
 
 #: include/classes/api/services/CTriggerGeneral.php:2250
 #, c-format
 msgid "The dependency of trigger prototype \"%1$s\" on trigger prototype \"%2$s\" already exists."
-msgstr ""
+msgstr "Zależność prototypu wyzwalacza \"%1$s\" od prototypu wyzwalacza \"%2$s\" już istnieje."
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
@@ -18075,57 +18119,57 @@ msgstr "Wyzwalacz \"%1$s\" należy do szablonów z różnymi odsyłaczami."
 #: include/triggers.inc.php:372 include/triggers.inc.php:433
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od nieistniejącego wyzwalacza \"%2$s\" na hoście \"%3$s\"."
 
 #: include/triggers.inc.php:373 include/triggers.inc.php:434
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od nieistniejącego wyzwalacza \"%2$s\" na szablonie \"%3$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2728
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z hosta \"%3$s\", ponieważ zależności od wyzwalaczy z podrzędnego szablonu lub hosta są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2727
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z szablonu \"%3$s\", ponieważ zależności od wyzwalaczy z podrzędnego szablonu lub hosta są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2621
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z szablonu \"%3$s\", ponieważ zależności od wyzwalaczy z szablonu nadrzędnego są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2354
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ dla hosta \"%4$s\" wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2349
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ dla szablonu \"%4$s\" wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2365
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2472
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ zależności wyzwalaczy hosta od wyzwalaczy szablonu są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2857
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ szablon \"%3$s\" nie jest połączony z hostem \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2856
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "Wyzwalacz \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ szablon \"%3$s\" nie jest połączony z szablonem \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
@@ -18235,62 +18279,62 @@ msgstr "Prototyp wyzwalacza \"%1$s\"należy do szablonów z różnymi odsyłacza
 #: include/classes/api/services/CDiscoveryRule.php:916
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od nieistniejącego wyzwalacza \"%2$s\" na hoście \"%3$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:915
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od nieistniejącego wyzwalacza \"%2$s\" na szablonie\"%3$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2733
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z hosta \"%3$s\", ponieważ zależności od wyzwalaczy z podrzędnego szablonu lub hosta są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2732
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z szablonu \"%3$s\", ponieważ zależności od wyzwalaczy z podrzędnego szablonu lub hosta są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2622
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\" z szablonu \"%3$s\", ponieważ zależności od wyzwalaczy z szablonu nadrzędnego są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2473
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ zależności wyzwalaczy hosta od wyzwalaczy szablonu są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:2862
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ szablon \"%3$s\" nie jest połączony z hostem \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2861
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od wyzwalacza \"%2$s\", ponieważ szablon \"%3$s\" nie jest połączony z szablonem \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2355
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od prototypu wyzwalacza \"%2$s\", ponieważ dla hosta \"%4$s\" wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2350
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od prototypu wyzwalacza \"%2$s\", ponieważ dla szablonu \"%4$s\" wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2366
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od prototypu wyzwalacza \"%2$s\", ponieważ wystąpiłoby połączenie kołowe (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:1325
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" nie może zależeć od prototypu wyzwalacza \"%2$s\", ponieważ zależności od prototypów wyzwalacza z innej reguły wykrywania niskopoziomowego są niedozwolone."
 
 #: include/classes/api/services/CTriggerGeneral.php:1716
 #, c-format
@@ -18616,6 +18660,14 @@ msgstr "Nie można załadować parametrów API do ustawień."
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Nie można nadpisać istniejącego pliku konfiguracji."
 
+#: app/views/administration.housekeeping.edit.php:159
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr "Nie można ustalić stanu obsługi kompresji TimescaleDB."
+
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unable to retrieve TimescaleDB version."
+msgstr "Nie można ustalić wersji TimescaleDB."
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr "Nie można ustalić wersji bazy danych."
@@ -18788,6 +18840,26 @@ msgstr "Odłącz od szablonów"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Włącz głos"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr "Wersja serwera bazodanowego %1$s nie jest wspierana. Musi być nie mniejsza niż %2$s."
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr "Wersja serwera bazodanowego %1$s nie jest wspierana. Musi być nie większa niż %2$s."
+
+#: app/views/administration.housekeeping.edit.php:178
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr "Nieobsługiwana wersja TimescaleDB. Powinna wynosić co najmniej %1$s."
+
+#: app/views/administration.housekeeping.edit.php:188
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr "Nieobsługiwana wersja TimescaleDB. Powinna wynosić co najwyżej %1$s."
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -18977,6 +19049,10 @@ msgstr "Użyj własnych kolorów dla stanów zdarzeń"
 #: jsLoader.php:402
 msgid "Use default"
 msgstr "Użyj domyślnej"
+
+#: app/partials/configuration.host.edit.html.php:216
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
+msgstr "Użyj formularza konfiguracji prototypu hosta, aby usunąć automatycznie podłączone szablony przy najbliższym wykryciu."
 
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
 msgid "Use if severity"
@@ -19882,10 +19958,24 @@ msgstr "Ostrzeżenie"
 msgid "Warning message"
 msgstr "Wiadomość ostrzegająca"
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr "Uwaga! Nie można ustalić wersji bazy danych."
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr "Uwaga! Wersja serwera bazodanowego %1$s nie jest wspierana. Powinna być nie mniejsza niż %2$s."
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr "Uwaga! Wersja serwera bazodanowego %1$s nie jest wspierana. Powinna być nie mniejsza niż %2$s"
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
+msgstr "Uwaga! Wersja serwera bazodanowego %1$s nie jest wspierana. Powinna być nie większa niż %2$s."
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -20964,7 +21054,7 @@ msgstr "nie można ustawić wartości parametru \"%1$s\""
 
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
-msgstr "nie można odlinkować"
+msgstr "nie można odłączyć"
 
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
@@ -22269,7 +22359,7 @@ msgstr "tabela \"%1$s\" nie została znaleziona"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #, c-format
 msgid "the tag \"%1$s\" is missing"
-msgstr "brak tag-a \"%1$s\""
+msgstr "brak taga \"%1$s\""
 
 #: app/views/popup.maintenance.period.php:126 include/maintenances.inc.php:107
 msgid "third"

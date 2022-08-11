@@ -351,20 +351,55 @@ void	zbx_audit_trigger_update_json_delete_tags(zbx_uint64_t triggerid, int flags
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
 
+#define TRIGGER_RESOURCE_KEY_RESOLVE_TAG(resource, nested)							\
+	if (AUDIT_RESOURCE_TRIGGER == resource_type)								\
+	{													\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "trigger.tag[" ZBX_FS_UI64	\
+				"]"#nested#resource, triggertagid);						\
+	}													\
+	else if (AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)						\
+	{													\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "triggerprototype.tag["	\
+				ZBX_FS_UI64 "]"#nested#resource, triggertagid);					\
+	}													\
+	else													\
+	{													\
+		THIS_SHOULD_NEVER_HAPPEN;									\
+		return;												\
+	}
+
 #define PREPARE_AUDIT_TRIGGER_UPDATE_TAG(resource, type1, type2)						\
-void	zbx_audit_trigger_update_json_update_tag_##resource(zbx_uint64_t triggerid, zbx_uint64_t triggertagid,	\
-		type1 resource##_old, type1 resource##_new)							\
+void	zbx_audit_trigger_update_json_update_tag_##resource(zbx_uint64_t triggerid, int trigger_flags,		\
+		zbx_uint64_t triggertagid, type1 resource##_old, type1 resource##_new)				\
 {														\
-	char	buf[AUDIT_DETAILS_KEY_LEN];									\
+	int	resource_type;											\
+	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
 														\
 	RETURN_IF_AUDIT_OFF();											\
+	resource_type = trigger_flag_to_resource_type(trigger_flags);						\
 														\
-	zbx_snprintf(buf, sizeof(buf), "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);				\
+	TRIGGER_RESOURCE_KEY_RESOLVE_TAG(resource,.)								\
 														\
-	zbx_audit_update_json_update_##type2(triggerid, AUDIT_TRIGGER_ID, buf, resource##_old, resource##_new);	\
+	zbx_audit_update_json_update_##type2(triggerid, AUDIT_TRIGGER_ID, audit_key_##resource, resource##_old,	\
+			resource##_new);									\
 }
 
 PREPARE_AUDIT_TRIGGER_UPDATE_TAG(tag, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE_TAG(value, const char*, string)
 
 #undef PREPARE_AUDIT_TRIGGER_UPDATE_TAG
+
+void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(zbx_uint64_t triggerid, int trigger_flags,
+		zbx_uint64_t triggertagid)
+{
+	int	resource_type;
+	char	audit_key_[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	resource_type = trigger_flag_to_resource_type(trigger_flags);
+
+	TRIGGER_RESOURCE_KEY_RESOLVE_TAG(,)
+
+	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_UPDATE, audit_key_);
+}

@@ -263,22 +263,50 @@ class CDBHelper {
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
-			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
-			$db_name = $DB['DATABASE'];
-			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
 
-			exec('pg_dump'.$server.' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' '.$db_name.' -f'.$file,
-				$output, $result_code
-			);
+			$cmd = 'pg_dump';
+
+			if ($DB['SERVER'] !== 'v') {
+				$cmd .= ' --host='.$DB['SERVER'];
+			}
+
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' --port='.$DB['PORT'];
+			}
+
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
+			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --dbname='.$DB['DATABASE'];
+			$cmd .= ' --table='.implode(' --table=', $tables).' --file='.$file;
+
+			exec($cmd, $output, $result_code);
 
 			if ($result_code != 0) {
 				throw new Exception('Failed to backup "'.implode('", "', $top_tables).'".');
 			}
 		}
 		else {
-			foreach ($tables as $table) {
-				DBexecute('DROP TABLE IF EXISTS '.$table.$suffix);
-				DBexecute('CREATE TABLE '.$table.$suffix.' AS SELECT * FROM '.$table);
+			if ($DB['PASSWORD'] !== '') {
+				putenv('MYSQL_PWD='.$DB['PASSWORD']);
+			}
+
+			$cmd = 'mysqldump';
+
+			if ($DB['SERVER'] !== 'v') {
+				$cmd .= ' --host='.$DB['SERVER'];
+			}
+
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' --port='.$DB['PORT'];
+			}
+
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump.gz';
+			$cmd .= ' --user='.$DB['USER'].' --add-drop-table '.$DB['DATABASE'];
+			$cmd .= ' '.implode(' ', $tables).' | gzip -c > '.$file;
+
+			exec($cmd, $output, $result_code);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to backup "'.implode('", "', $top_tables).'".');
 			}
 		}
 	}
@@ -301,39 +329,75 @@ class CDBHelper {
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
-			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
-			$db_name = $DB['DATABASE'];
-			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
 
-			exec('pg_restore'.$server.' -U'.$DB['USER'].' -Fd -j5 --clean -d '.$db_name.' '.$file, $output,
-				$result_code
-			);
+			$cmd = 'pg_restore';
+
+			if ($DB['SERVER'] !== 'v') {
+				$cmd .= ' --host='.$DB['SERVER'];
+			}
+
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' --port='.$DB['PORT'];
+			}
+
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
+			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --clean --dbname='.$DB['DATABASE'];
+			$cmd .= ' '.$file;
+
+			exec($cmd, $output, $result_code);
 
 			if ($result_code != 0) {
 				throw new Exception('Failed to restore "'.$file.'".');
 			}
 
-			exec('rm -rf '.$file);
+			if (strstr(strtolower(PHP_OS), 'win') !== false) {
+				$file = str_replace('/', '\\', $file);
+				exec('rd '.$file.' /q /s');
+			}
+			else {
+				exec('rm -rf '.$file, $output, $result_code);
+			}
 
 			if ($result_code != 0) {
 				throw new Exception('Failed to remove "'.$file.'".');
 			}
 		}
 		else {
-			$result = DBselect('SELECT @@unique_checks,@@foreign_key_checks');
-			$row = DBfetch($result);
-			DBexecute('SET unique_checks=0,foreign_key_checks=0');
-
-			foreach (array_reverse($tables) as $table) {
-				DBexecute('DELETE FROM '.$table);
+			if ($DB['PASSWORD'] !== '') {
+				putenv('MYSQL_PWD='.$DB['PASSWORD']);
 			}
 
-			foreach ($tables as $table) {
-				DBexecute('INSERT INTO '.$table.' SELECT * FROM '.$table.$suffix);
-				DBexecute('DROP TABLE '.$table.$suffix);
+			$cmd = 'mysql';
+
+			if ($DB['SERVER'] !== 'v') {
+				$cmd .= ' --host='.$DB['SERVER'];
 			}
 
-			DBexecute('SET foreign_key_checks='.$row['@@foreign_key_checks'].',unique_checks='.$row['@@unique_checks']);
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' --port='.$DB['PORT'];
+			}
+
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump.gz';
+			$cmd .= ' --user='.$DB['USER'].' '.$DB['DATABASE'];
+			$cmd = 'gzip -cd '.$file.' | '.$cmd;
+
+			exec($cmd, $output, $result_code);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to restore "'.$file.'".');
+			}
+
+			if (strstr(strtolower(PHP_OS), 'win') !== false) {
+				$file = str_replace('/', '\\', $file);
+				exec('del '.$file);
+			}
+			else {
+				exec('rm -rf '.$file, $output, $result_code);
+			}
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to remove "'.$file.'".');
+			}
 		}
 	}
 

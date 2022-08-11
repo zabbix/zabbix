@@ -200,7 +200,7 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &utf8))
+	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &utf8))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert header to utf8");
 		goto out;
@@ -266,7 +266,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 		goto out;
 	}
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &url))
+	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &url))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert URL to utf8");
 		goto out;
@@ -274,7 +274,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	if (0 == duk_is_null_or_undefined(ctx, 1))
 	{
-		if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 1), &contents))
+		if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 1), &contents))
 		{
 			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,
 					"cannot convert request contents to utf8");
@@ -704,7 +704,7 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 
 	if (0 == duk_is_null_or_undefined(ctx, 1))
 	{
-		if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 1), &username))
+		if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 1), &username))
 		{
 			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert username to utf8");
 			goto out;
@@ -713,7 +713,7 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 
 	if (0 == duk_is_null_or_undefined(ctx, 2))
 	{
-		if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 2), &password))
+		if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 2), &password))
 		{
 			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert username to utf8");
 			goto out;
