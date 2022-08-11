@@ -710,5 +710,4 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 		}
 	}
 }
-
 #endif
