@@ -3,18 +3,21 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor Microsoft Azure by HTTP.
 It works without any external scripts and uses the script item.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Create an Azure service principal via Azure CLI for your subscription.
-  `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
-  https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fazure%2Fazure-resource-manager%2Ftoc.json&view=azure-cli-latest
-2. Link template to the host.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
 3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
 
 ## Zabbix configuration
@@ -70,18 +73,21 @@ You can also provide feedback, discuss the template or ask for help with it at [
 
 ## Overview
 
-For Zabbix version: 6.4 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor Microsoft Azure virtual machines by HTTP.
 It works without any external scripts and uses the script item.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Create an Azure service principal via Azure CLI for your subscription.
-  `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
-  https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli
-2. Link template to the host.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
 3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
 
 ## Zabbix configuration
