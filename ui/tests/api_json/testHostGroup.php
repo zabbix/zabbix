@@ -450,7 +450,7 @@ class testHostGroup extends CAPITest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'hostgroup' => [
 					'groupid' => '50005',
-					'name' => 'API host group update as zabbix admin without peremissions'
+					'name' => 'API host group update as zabbix admin without permissions'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -475,7 +475,7 @@ class testHostGroup extends CAPITest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'hostgroup' => [
 					'groupid' => '50005',
-					'name' => 'API host group update as zabbix user without peremissions'
+					'name' => 'API host group update as zabbix user without permissions'
 				],
 				'expected_error' => 'No permissions to call "hostgroup.update".'
 			],
