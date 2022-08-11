@@ -335,8 +335,6 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 		}
 		else
 		{
-			struct zbx_json_parse	jp;
-
 			if (SUCCEED != zbx_json_open(s.buffer, &jp))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "invalid configuration data response received from proxy"
