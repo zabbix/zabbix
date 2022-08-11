@@ -56,6 +56,7 @@ require_once dirname(__FILE__).'/testDiscoveryRule.php';
 require_once dirname(__FILE__).'/testDependentItems.php';
 require_once dirname(__FILE__).'/testAuthentication.php';
 require_once dirname(__FILE__).'/testAuditlogAction.php';
+require_once dirname(__FILE__).'/testAuditlogEventCorrelation.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -100,6 +101,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testDiscoveryRule');
 		$suite->addTestSuite('testAuthentication');
 		$suite->addTestSuite('testAuditlogAction');
+		$suite->addTestSuite('testAuditlogEventCorrelation');
 
 		return $suite;
 	}
