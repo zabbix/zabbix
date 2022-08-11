@@ -3,13 +3,13 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 The template to monitor Microsoft Azure by HTTP.
 It works without any external scripts and uses the script item.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Create an Azure service principal via Azure CLI for your subscription.
 
@@ -73,13 +73,13 @@ You can also provide feedback, discuss the template or ask for help with it at [
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 The template to monitor Microsoft Azure virtual machines by HTTP.
 It works without any external scripts and uses the script item.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Create an Azure service principal via Azure CLI for your subscription.
 
