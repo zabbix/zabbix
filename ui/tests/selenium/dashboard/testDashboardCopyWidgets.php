@@ -235,7 +235,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
 			$copied_widget_form = $copied_widget->edit();
 			$copied_widget_form->fill(['Filter' => 'Test copy Map navigation tree']);
-			$copied_widget_form->submit()->waitUntilReady();
+			$copied_widget_form->submit();
 		}
 
 		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
