@@ -49,7 +49,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 		$time = '';
 		$units = '';
 		$decimals = null;
-		$raw_units = null;
+		$last_value = null;
 		$is_dynamic = ($this->hasInput('dynamic_hostid')
 				&& ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
 					|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM)
@@ -322,19 +322,23 @@ class CControllerWidgetItemView extends CControllerWidget {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+		$color = $fields['bg_color'];
 
-		if ($raw_units !== null && $number_parser->parse($raw_units['value']) == CParser::PARSE_SUCCESS) {
-			$raw_units['value'] = $number_parser->calcValue();
+		if (array_key_exists('thresholds', $fields) && $last_value !== null) {
+			foreach ($fields['thresholds'] as $threshold) {
+				if ($last_value < $threshold['threshold']) {
+					break;
+				}
+
+				$color = $threshold['color'];
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
 			'cells' => $cells,
 			'url' => $url,
-			'bg_color' => $fields['bg_color'],
-			'thresholds' => $fields['thresholds'],
-			'raw_value' => $raw_units !== null ? $raw_units['value'] : null,
+			'bg_color' => $color,
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

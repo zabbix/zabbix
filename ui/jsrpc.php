@@ -712,7 +712,7 @@ switch ($data['method']) {
 		if (array_key_exists('itemid', $data)) {
 			$item = API::Item()->get([
 				'output' => ['value_type'],
-				'itemids' => [$data['itemid'] ?: null]
+				'itemids' => $data['itemid']
 			]);
 
 			if ($item) {

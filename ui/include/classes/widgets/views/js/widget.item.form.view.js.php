@@ -135,8 +135,7 @@ window.widget_item_form = new class {
 
 	updateWarningIcon() {
 		const ms_item_data = $('#itemid').multiSelect('getData');
-
-		if (ms_item_data.length) {
+		if (ms_item_data.length > 0) {
 			const curl = new Curl('jsrpc.php', false);
 			curl.setArgument('method', 'item_value_type.get');
 			curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
@@ -161,6 +160,9 @@ window.widget_item_form = new class {
 				.catch((exception) => {
 					console.log('Could not get value data type of the item:', exception);
 				});
+		}
+		else {
+			document.getElementById('item-value-thresholds-warning').style.display = '';
 		}
 	}
 };

@@ -38,26 +38,44 @@ class CWidgetFieldThresholds extends CWidgetField {
 		$this->setDefault([]);
 	}
 
-	public function setValue($value) {
-		return parent::setValue((array) $value);
-	}
+	public function validate($strict = false): array {
+		$errors = parent::validate();
 
-	/**
-	 * Get field value. If no value is set, will return default value.
-	 *
-	 * @return mixed
-	 */
-	public function getValue() {
-		$value = parent::getValue();
+		if ($errors) {
+			return $errors;
+		}
 
-		$keys = array_keys($value);
-		foreach ($keys as $key) {
-			if ($value[$key]['threshold'] === '') {
-				unset($value[$key]);
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+
+		$thresholds = [];
+
+		foreach ($this->getValue() as $threshold) {
+			$order_threshold = trim($threshold['threshold']);
+
+			if ($order_threshold !== '' && $number_parser->parse($order_threshold) == CParser::PARSE_SUCCESS) {
+				$thresholds[] = $threshold + ['order_threshold' => $number_parser->calcValue()];
 			}
 		}
 
-		return $value;
+		if ($thresholds) {
+			CArrayHelper::sort($thresholds, ['order_threshold']);
+
+			$thresholds_sorted = [];
+
+			foreach ($thresholds as $threshold) {
+				unset($threshold['order_threshold']);
+
+				$thresholds_sorted[] = $threshold;
+			}
+
+			$this->setValue($thresholds_sorted);
+		}
+
+		return $errors;
+	}
+
+	public function setValue($value) {
+		return parent::setValue((array) $value);
 	}
 
 	/**
