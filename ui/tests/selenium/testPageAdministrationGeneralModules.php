@@ -520,7 +520,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->page->waitUntilReady();
 		// Check message after loading modules.
 		if ($first_load) {
-			// Each loaded module name is checked separately due to difference in their sorting on Jenkinsand locally.
+			// Each loaded module name is checked separately due to difference in their sorting on Jenkins and locally.
 			$this->assertMessage(TEST_GOOD, 'Modules updated', ['Modules added:', '1st Module name',
 					'2nd Module name !@#$%^&*()_+', '4th Module', '5th Module', 'шестой модуль']);
 		}
