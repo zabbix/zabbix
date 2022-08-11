@@ -559,7 +559,8 @@ class CSvgGraphHelper {
 
 				$aggregate_interval = timeUnitToSeconds($metric['options']['aggregate_interval'], true);
 
-				if ($aggregate_interval === null) {
+				if ($aggregate_interval === null || $aggregate_interval < 1
+						|| $aggregate_interval > ZBX_MAX_TIMESHIFT) {
 					continue;
 				}
 
