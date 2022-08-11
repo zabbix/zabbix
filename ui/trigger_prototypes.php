@@ -76,7 +76,7 @@ $fields = [
 													),
 													null
 												],
-	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
+	'visible' =>								[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
 	'toggle_expression_constructor' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'toggle_recovery_expression_constructor' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_expression' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
