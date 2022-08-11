@@ -473,8 +473,6 @@
 			$('#itemButtonsRow').before($row);
 			$row.find('.<?= ZBX_STYLE_COLOR_PICKER ?> input').colorpicker();
 
-			colorPalette.incrementNextColor();
-
 			!this.graphs.readonly && this.rewriteNameLinks();
 		},
 

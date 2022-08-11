@@ -317,7 +317,8 @@ window.widget_svggraph_form = new class {
 
 		this._dataset_wrapper.insertAdjacentHTML('beforeend', template.evaluate({
 			rowNum: this._dataset_index++,
-			color: (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>) ? '' : colorPalette.getNextColor(this._form)
+			color: (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>) ? '' :
+				colorPalette.getNextColor(form.querySelectorAll('.color-picker input'))
 		}));
 
 		const dataset = this._getOpenedDataset();
@@ -474,7 +475,7 @@ window.widget_svggraph_form = new class {
 		}));
 
 		jQuery(`#items_${dataset_index}_${item_next_index}_color`)
-			.val(colorPalette.getNextColor(this._form))
+			.val(colorPalette.getNextColor(this._form.querySelectorAll('.color-picker input')))
 			.colorpicker();
 	}
 

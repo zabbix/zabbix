@@ -37,7 +37,9 @@ window.tophosts_column_edit_form = new class {
 			template: '#thresholds-row-tmpl',
 			dataCallback: (row_data) => {
 				if (!('color' in row_data)) {
-					row_data.color = colorPalette.getNextColor(this._$widget_form[0]);
+					row_data.color = colorPalette.getNextColor(
+						this._$widget_form[0].querySelectorAll('.color-picker input')
+					);
 				}
 			}
 		});

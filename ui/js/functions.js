@@ -163,35 +163,39 @@ function getUniqueId() {
 var colorPalette = (function() {
 	'use strict';
 
-	var current_color = 0,
-		palette = [];
+	let palette = [];
 
 	return {
-		incrementNextColor: function() {
-			if (++current_color == palette.length) {
-				current_color = 0;
-			}
-		},
-
 		/**
 		 * Gets next color from palette.
 		 *
 		 * @return string	hexadecimal color code
 		 */
-		getNextColor: function(form) {
+		getNextColor: function(used_colors) {
 			const color_usage = [];
-
 			for (const color of palette) {
-				color_usage[color] = 0;
+				color_usage.push({
+					color: color,
+					count: 0
+				});
 			}
 
-			for (const colorpicker of form.querySelectorAll('.color-picker input')) {
-				color_usage[colorpicker.value]++;
+			for (const colorpicker of used_colors) {
+				let color = color_usage.find(function(el) {
+					return el.color == colorpicker.value;
+				});
+				if (color != undefined) {
+					color.count++;
+				}
 			}
 
-			const least_frequent = Object.values(color_usage).sort()[0];
+			const least_frequent_count = color_usage.map((item) => item.count).sort(function(a, b) {
+				return a - b;
+			})[0];
 
-			return Object.keys(color_usage).find(key => color_usage[key] == least_frequent);
+			return color_usage.find((item) => {
+				return item.count == least_frequent_count;
+			}).color;
 		},
 
 		/**
@@ -201,7 +205,6 @@ var colorPalette = (function() {
 		 */
 		setThemeColors: function(colors) {
 			palette = colors;
-			current_color = 0;
 		}
 	}
 }());
