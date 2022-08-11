@@ -2534,37 +2534,62 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$usermacros = [];
 
 		foreach ($data as $hostid => $script) {
-			foreach ($script as $scriptid => $fields) {
-				$matched_macros = self::extractMacros($fields, $types);
+			// Reset matched macros for each host.
+			$matched_macros = [
+				'macros' => ['host' => [], 'interface' => [], 'user_data' => [], 'inventory' => []],
+				'usermacros' => []
+			];
 
-				foreach ($matched_macros['macros']['host'] as $token) {
-					if ($token === '{HOST.ID}') {
-						$macro_values[$scriptid][$token] = $hostid;
+			foreach ($script as $fields) {
+				$exctarcted_macros = self::extractMacros($fields, $types);
+
+				// $type = 'macros' and 'usermacros'
+				foreach ($exctarcted_macros as $type => $macro_list) {
+					if ($type === 'usermacros') {
+						foreach ($macro_list as $macro => $value) {
+							$matched_macros[$type][$macro] = null;
+						}
 					}
 					else {
-						$macro_values[$scriptid][$token] = UNRESOLVED_MACRO_STRING;
-						$macros['host'][$hostid][$scriptid] = true;
+						foreach ($macro_list as $key => $other_macros) {
+							// $key = 'host', 'interface', 'user_data' and 'inventory'
+							foreach ($other_macros as $macro) {
+								if (!in_array($macro, $matched_macros[$type][$key])) {
+									$matched_macros[$type][$key][] = $macro;
+								}
+							}
+						}
 					}
 				}
+			}
 
-				foreach ($matched_macros['macros']['interface'] as $token) {
-					$macro_values[$scriptid][$token] = UNRESOLVED_MACRO_STRING;
-					$macros['interface'][$hostid][$scriptid] = true;
+			foreach ($matched_macros['macros']['host'] as $token) {
+				if ($token === '{HOST.ID}') {
+					$macro_values[$hostid][$token] = $hostid;
 				}
+				else {
+					$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['host'][$hostid][$hostid] = true;
+				}
+			}
 
-				foreach ($matched_macros['macros']['inventory'] as $token) {
-					$macro_values[$scriptid][$token] = UNRESOLVED_MACRO_STRING;
-					$macros['inventory'][$hostid][$scriptid] = true;
-				}
+			foreach ($matched_macros['macros']['interface'] as $token) {
+				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['interface'][$hostid][$hostid] = true;
+			}
 
-				foreach ($matched_macros['macros']['user_data'] as $token) {
-					$macro_values[$scriptid][$token] = UNRESOLVED_MACRO_STRING;
-					$macros['user_data'][$scriptid] = true;
-				}
+			foreach ($matched_macros['macros']['inventory'] as $token) {
+				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['inventory'][$hostid][$hostid] = true;
+			}
 
-				if ($matched_macros['usermacros']) {
-					$usermacros[$scriptid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
-				}
+			foreach ($matched_macros['macros']['user_data'] as $token) {
+				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['user_data'][$hostid] = true;
+			}
+
+			if ($matched_macros['usermacros']) {
+				$usermacros[$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
@@ -2573,16 +2598,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserDataMacros($macro_values);
 
-		foreach ($this->getUserMacros($usermacros) as $scriptid => $usermacros_data) {
-			$macro_values[$scriptid] = array_key_exists($scriptid, $macro_values)
-				? array_merge($macro_values[$scriptid], $usermacros_data['macros'])
+		foreach ($this->getUserMacros($usermacros) as $hostid => $usermacros_data) {
+			$macro_values[$hostid] = array_key_exists($hostid, $macro_values)
+				? array_merge($macro_values[$hostid], $usermacros_data['macros'])
 				: $usermacros_data['macros'];
 		}
 
-		foreach ($data as &$scripts) {
-			foreach ($scripts as $scriptid => &$fields) {
+		foreach ($data as $hostid => &$scripts) {
+			foreach ($scripts as &$fields) {
 				foreach ($fields as &$value) {
-					$value = strtr($value, $macro_values[$scriptid]);
+					$value = strtr($value, $macro_values[$hostid]);
 				}
 				unset($value);
 			}
