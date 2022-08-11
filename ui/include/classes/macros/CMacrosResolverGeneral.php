@@ -2691,6 +2691,77 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Get and resolve user data macros like name, surname, username. Input array contains a collection of prepared
+	 * and unresolved macros. Get data from API service, because direct requests to API do no have CWebUser data.
+	 *
+	 * Example input:
+	 *     array (
+	 *         0 => array (
+	 *             '{USER.FULLNAME}' => '*UNKNOWN*',
+	 *         ),
+	 *         1 => array (
+	 *             '{USER.NAME}' => '*UNKNOWN*',
+	 *             '{USER.SURNAME}' => '*UNKNOWN*',
+	 *         )
+	 *     )
+	 *
+	 * Output:
+	 *     array (
+	 *         0 => array (
+	 *             '{USER.FULLNAME}' => 'Zabbix Administrator',
+	 *         ),
+	 *         1 => array (
+	 *             '{USER.NAME}' => 'Zabbix',
+	 *             '{USER.SURNAME}' => 'Administrator',
+	 *         )
+	 *     )
+	 *
+	 * @static
+	 *
+	 * @param array $macro_values  Array of macros to be replaced.
+	 *
+	 * @return array
+	 */
+	protected static function getUserDataMacros(array $macro_values): array {
+		foreach ($macro_values as &$macros) {
+			foreach ($macros as $macro => &$value) {
+				switch ($macro) {
+					case '{USER.ALIAS}': // Deprecated in version 5.4.
+					case '{USER.USERNAME}':
+						$value = CApiService::$userData['username'];
+						break;
+
+					case '{USER.FULLNAME}':
+						$fullname = [];
+
+						foreach (['name', 'surname'] as $field) {
+							if (CApiService::$userData[$field] !== '') {
+								$fullname[] = CApiService::$userData[$field];
+							}
+						}
+
+						$value = $fullname
+							? implode(' ', array_merge($fullname, ['('.CApiService::$userData['username'].')']))
+							: CApiService::$userData['username'];
+						break;
+
+					case '{USER.NAME}':
+						$value = CApiService::$userData['name'];
+						break;
+
+					case '{USER.SURNAME}':
+						$value = CApiService::$userData['surname'];
+						break;
+				}
+			}
+			unset($value);
+		}
+		unset($macros);
+
+		return $macro_values;
+	}
+
+	/**
 	 * Get macro value refer by type.
 	 *
 	 * @static

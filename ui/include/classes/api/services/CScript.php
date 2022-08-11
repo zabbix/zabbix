@@ -1086,7 +1086,8 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Returns all the scripts that are available on each given host.
+	 * Returns all the scripts that are available on each given host. Automatically resolves macros in
+	 * confirmation and URL fields.
 	 *
 	 * @param $hostids
 	 *
@@ -1106,7 +1107,10 @@ class CScript extends CApiService {
 		}
 
 		$scripts = $this->get([
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
+				'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username', 'password',
+				'publickey', 'privatekey', 'menu_path', 'url', 'new_window'
+			],
 			'hostids' => $hostids,
 			'sortfield' => 'name',
 			'preservekeys' => true
@@ -1119,38 +1123,50 @@ class CScript extends CApiService {
 		], $scripts, $hostids);
 
 		if ($scripts) {
-			// resolve macros
 			$macros_data = [];
+
 			foreach ($scripts as $scriptid => $script) {
-				if (!empty($script['confirmation'])) {
-					foreach ($script['hosts'] as $host) {
-						if (isset($scripts_by_host[$host['hostid']])) {
-							$macros_data[$host['hostid']][$scriptid] = $script['confirmation'];
+				foreach ($script['hosts'] as $host) {
+					$hostid = $host['hostid'];
+
+					if (array_key_exists($hostid, $scripts_by_host)) {
+						if (strpos($script['confirmation'], '{') !== false) {
+							$macros_data[$hostid][$scriptid]['confirmation'] = $script['confirmation'];
+						}
+
+						if (strpos($script['url'], '{') !== false) {
+							$macros_data[$hostid][$scriptid]['url'] = $script['url'];
 						}
 					}
 				}
 			}
-			if ($macros_data) {
-				$macros_data = CMacrosResolverHelper::resolve([
-					'config' => 'scriptConfirmation',
-					'data' => $macros_data
-				]);
-			}
+
+			$macros_data = CMacrosResolverHelper::resolveManualHostActionScripts($macros_data);
 
 			foreach ($scripts as $scriptid => $script) {
 				$hosts = $script['hosts'];
 				unset($script['hosts']);
-				// set script to host
+
+				// Set script to host.
 				foreach ($hosts as $host) {
 					$hostid = $host['hostid'];
 
-					if (isset($scripts_by_host[$hostid])) {
+					if (array_key_exists($hostid, $scripts_by_host)) {
 						$size = count($scripts_by_host[$hostid]);
 						$scripts_by_host[$hostid][$size] = $script;
 
-						// set confirmation text with resolved macros
-						if (isset($macros_data[$hostid][$scriptid]) && $script['confirmation']) {
-							$scripts_by_host[$hostid][$size]['confirmation'] = $macros_data[$hostid][$scriptid];
+						// Set confirmation and URL with resolved macros.
+						if (array_key_exists($hostid, $macros_data)
+								&& array_key_exists($scriptid, $macros_data[$hostid])) {
+							$macro_values = $macros_data[$hostid][$scriptid];
+
+							if (strpos($script['confirmation'], '{') !== false) {
+								$scripts_by_host[$hostid][$size]['confirmation'] = $macro_values['confirmation'];
+							}
+
+							if (strpos($script['url'], '{') !== false) {
+								$scripts_by_host[$hostid][$size]['url'] = $macro_values['url'];
+							}
 						}
 					}
 				}

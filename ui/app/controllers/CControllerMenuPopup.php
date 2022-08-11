@@ -690,18 +690,6 @@ class CControllerMenuPopup extends CController {
 				}
 			}
 
-			if (array_key_exists('urls', $menu_data)) {
-				foreach ($menu_data['urls'] as &$url) {
-					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
-						$url['url'] = 'javascript: alert(\''.
-							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
-						'\');';
-						unset($url['target'], $url['rel']);
-					}
-				}
-				unset($url);
-			}
-
 			if (array_key_exists('acknowledge', $data)) {
 				$menu_data['acknowledge'] = ((bool) $data['acknowledge']
 						&& (CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
@@ -790,6 +778,18 @@ class CControllerMenuPopup extends CController {
 					'confirmation' => $url['confirmation'],
 					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
 				];
+			}
+
+			if (array_key_exists('urls', $menu_data)) {
+				foreach ($menu_data['urls'] as &$url) {
+					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
+						$url['url'] = 'javascript: alert(\''.
+							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
+						'\');';
+						unset($url['target'], $url['rel']);
+					}
+				}
+				unset($url);
 			}
 
 			return $menu_data;

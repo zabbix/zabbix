@@ -27,10 +27,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @var array
 	 */
 	protected $configs = [
-		'scriptConfirmation' => [
-			'types' => ['host', 'interfaceWithoutPort', 'user', 'user_data'],
-			'method' => 'resolveTexts'
-		],
 		'httpTestName' => [
 			'types' => ['host', 'interfaceWithoutPort', 'user'],
 			'method' => 'resolveTexts'
@@ -2485,5 +2481,115 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		return $events;
+	}
+
+	/**
+	 * Resolve macros for manual host action scripts. Resolves host macros, interface macros, inventory, user macros
+	 * and user data macros.
+	 *
+	 * @param array $data                        Array of hosts with ID as keys.
+	 * @param array $data[<hostid>]              Array of scripts. Contains script ID as keys.
+	 * @param array $data[<hostid>][<scriptid>]  Array of script fields to resolve macros for.
+	 *
+	 * Example input:
+	 *     array (
+	 *         10084 => array (
+	 *             57 => array (
+	 *                 'confirmation' => 'Are you sure you want to edit {HOST.HOST} now?',
+	 *                 'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
+	 *             ),
+	 *             61 => array(
+	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?'
+	 *             )
+	 *         )
+	 *     )
+	 *
+	 * Output:
+	 *     array (
+	 *         10084 => array (
+	 *             57 => array (
+	 *                 'confirmation' => 'Are you sure you want to edit Zabbix server now?',
+	 *                 'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid=10084'
+	 *             ),
+	 *             61 => array (
+	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?'
+	 *             )
+	 *         )
+	 *     )
+	 *
+	 * @return array
+	 */
+	public function resolveManualHostActionScripts(array $data): array {
+		$types = [
+			'macros' => [
+				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
+				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
+				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'],
+				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
+			],
+			'usermacros' => true
+		];
+		$macro_values = [];
+		$macros = ['host' => [], 'interface' => [], 'user_data' => [], 'inventory' => []];
+		$usermacros = [];
+
+		foreach ($data as $hostid => $script) {
+			foreach ($script as $scriptid => $fields) {
+				$matched_macros = self::extractMacros($fields, $types);
+
+				foreach ($matched_macros['macros']['host'] as $token) {
+					if ($token === '{HOST.ID}') {
+						$macro_values[$scriptid][$token] = $hostid;
+					}
+					else {
+						$macro_values[$scriptid][$token] = UNRESOLVED_MACRO_STRING;
+						$macros['host'][$hostid][$scriptid] = true;
+					}
+				}
+
+				foreach ($matched_macros['macros']['interface'] as $token) {
+					$macro_values[$scriptid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['interface'][$hostid][$scriptid] = true;
+				}
+
+				foreach ($matched_macros['macros']['inventory'] as $token) {
+					$macro_values[$scriptid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['inventory'][$hostid][$scriptid] = true;
+				}
+
+				foreach ($matched_macros['macros']['user_data'] as $token) {
+					$macro_values[$scriptid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['user_data'][$scriptid] = true;
+				}
+
+				if ($matched_macros['usermacros']) {
+					$usermacros[$scriptid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
+				}
+			}
+		}
+
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
+		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
+		$macro_values = self::getUserDataMacros($macro_values);
+
+		foreach ($this->getUserMacros($usermacros) as $scriptid => $usermacros_data) {
+			$macro_values[$scriptid] = array_key_exists($scriptid, $macro_values)
+				? array_merge($macro_values[$scriptid], $usermacros_data['macros'])
+				: $usermacros_data['macros'];
+		}
+
+		foreach ($data as &$scripts) {
+			foreach ($scripts as $scriptid => &$fields) {
+				foreach ($fields as &$value) {
+					$value = strtr($value, $macro_values[$scriptid]);
+				}
+				unset($value);
+			}
+			unset($fields);
+		}
+		unset($scripts);
+
+		return $data;
 	}
 }

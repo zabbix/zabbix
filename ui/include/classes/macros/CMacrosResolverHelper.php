@@ -735,4 +735,22 @@ class CMacrosResolverHelper {
 
 		return self::$macrosResolver->resolveMediaTypeUrls($events, $urls);
 	}
+
+	/**
+	 * Resolve macros for manual host action scripts. Resolves host macros, interface macros, inventory, user macros
+	 * and user data macros.
+	 *
+	 * @static
+	 *
+	 * @param array $data                        Array of hosts with ID as keys.
+	 * @param array $data[<hostid>]              Array of scripts. Contains script ID as keys.
+	 * @param array $data[<hostid>][<scriptid>]  Array of script fields to resolve macros for.
+	 *
+	 * @return array
+	 */
+	public static function resolveManualHostActionScripts(array $data): array {
+		self::init();
+
+		return self::$macrosResolver->resolveManualHostActionScripts($data);
+	}
 }
