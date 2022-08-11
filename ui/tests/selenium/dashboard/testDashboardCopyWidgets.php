@@ -168,27 +168,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			$url = 'zabbix.php?action=dashboard.view&dashboardid=';
 		}
 
-		// Mapping for tags in problem widgets.
-		$mapping = [
-			'tag',
-			[
-				'name' => 'match',
-				'class' => CSegmentedRadioElement::class
-			],
-			'value'
-		];
 		$this->page->login()->open($url.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 
 		// Get fields from widget form to compare them with new widget after copying.
-		$fields = $dashboard->getWidget($widget_name)->edit()->getFields();
+		$widget = $dashboard->getWidget($widget_name)->edit();
+		$original_form = $widget->getFields()->asValues();
 
-		// Add tag fields mapping to form for problem widgets.
+		// Get tags of original widget.
 		if (stristr($widget_name, 'Problem')) {
-			$fields->set('', $fields->get('')->asMultifieldTable(['mapping' => $mapping]));
+			$tags = $widget->query('id:tags_table_tags')->asMultifieldTable()->one()->getValue();
 		}
 
-		$original_form = $fields->asValues();
 		$original_widget_size = $replace
 			? self::REPLACED_WIDGET_SIZE
 			: CDBHelper::getRow('SELECT w.width, w.height'.
@@ -229,7 +220,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		// Wait until widget is pasted and loading spinner disappeared.
 		sleep(1);
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
-		$copied_widget = $dashboard->getWidgets()->last()->waitUntilReady();
+		$copied_widget = $dashboard->getWidgets()->last();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
@@ -241,9 +232,11 @@ class testDashboardCopyWidgets extends CWebTest {
 		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
 		$copied_fields = $copied_widget->edit()->getFields();
 
-		// Add tag fields mapping to form for newly copied problem widgets.
+		// Check tags of original and copied widget.
 		if (stristr($widget_name, 'Problem')) {
-			$copied_fields->set('', $copied_fields->get('')->asMultifieldTable(['mapping' => $mapping]));
+			$copied_tags = COverlayDialogElement::find()->waitUntilReady()->one()->query('id:tags_table_tags')
+					->asMultifieldTable()->one()->getValue();
+			$this->assertEquals($tags, $copied_tags);
 		}
 
 		$copied_form = $copied_fields->asValues();
