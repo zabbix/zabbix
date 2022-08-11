@@ -125,9 +125,10 @@ out:
  ******************************************************************************/
 void	recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls)
 {
-	struct zbx_json_parse	jp_data, jp_config, jp_kvs_paths = {0};
+	struct zbx_json_parse	jp_config, jp_kvs_paths = {0};
 	int			ret;
 	struct zbx_json		j;
+	char			*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -153,7 +154,7 @@ void	recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_json_open(sock->buffer, &jp_config)))
+	if (NULL != sock->buffer && SUCCEED != (ret = zbx_json_open(sock->buffer, &jp_config)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data received from server at"
 				" \"%s\": %s", sock->peer, zbx_json_strerror());
@@ -161,21 +162,11 @@ void	recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(&jp_config, ZBX_PROTO_TAG_DATA, &jp_data)))
+	if (SUCCEED == (ret = process_proxyconfig(&jp_config, &error)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid proxy configuration request received from server at"
-				" \"%s\": %s", sock->peer, zbx_json_strerror());
-		zbx_send_proxy_response(sock, ret, zbx_json_strerror(), CONFIG_TIMEOUT);
-		goto out;
-	}
-
-	if (SUCCEED == process_proxyconfig(&jp_data, &jp_kvs_paths))
-	{
-		char	*error = NULL;
-
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
 		{
-			if (NULL != jp_kvs_paths.start)
+			if (SUCCEED == zbx_json_brackets_by_name(&jp_config, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
 				DCsync_kvs_paths(&jp_kvs_paths);
 		}
 		else
@@ -185,7 +176,12 @@ void	recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls
 			zbx_free(error);
 		}
 	}
-	zbx_send_proxy_response(sock, ret, NULL, CONFIG_TIMEOUT);
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy onfiguration data received from server at"
+				" \"%s\": %s", sock->peer, error);
+	}
+	zbx_send_proxy_response(sock, ret, error, CONFIG_TIMEOUT);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

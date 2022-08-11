@@ -1615,8 +1615,10 @@ done:
 				proxy->nodata_win.values_num = 0;
 				proxy->nodata_win.period_end = 0;
 
-				zbx_vector_dc_host_create(&proxy->hosts);
-				zbx_vector_host_rev_create(&proxy->removed_hosts);
+				zbx_vector_dc_host_create_ext(&proxy->hosts,  __config_shmem_malloc_func,
+						__config_shmem_realloc_func, __config_shmem_free_func);
+				zbx_vector_host_rev_create_ext(&proxy->removed_hosts, __config_shmem_malloc_func,
+						__config_shmem_realloc_func, __config_shmem_free_func);
 			}
 
 			proxy->auto_compress = atoi(row[16 + ZBX_HOST_TLS_OFFSET]);
@@ -14263,7 +14265,7 @@ const char	*zbx_dc_get_session_token(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns data session, creates a new session if none found         *
+ * Purpose: return session, create a new session if none found                *
  *                                                                            *
  * Parameter: hostid - [IN] the host (proxy) identifier                       *
  *            token  - [IN] the session token (not NULL)                      *
@@ -14305,6 +14307,57 @@ zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *tok
 		session->lastaccess = now;
 
 	return session;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update session revision/lastaccess in cache or create new session *
+ *          if necessary                                                      *
+ *                                                                            *
+ * Parameter: hostid - [IN] the host (proxy) identifier                       *
+ *            token  - [IN] the session token (not NULL)                      *
+ *            session_config_revision - [IN] the session configuration        *
+ *                          revision                                          *
+ *            config_revision - [OUT] - the cached configuration revision     *
+ *                                                                            *
+ * Return value: The number of created sessions                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token,
+		zbx_uint64_t session_config_revision, zbx_uint64_t *config_revision)
+{
+	zbx_session_t	*session, session_local;
+	time_t		now;
+
+	now = time(NULL);
+	session_local.hostid = hostid;
+	session_local.token = token;
+
+	RDLOCK_CACHE;
+	if (NULL != (session = (zbx_session_t *)zbx_hashset_search(&config->sessions[ZBX_SESSION_TYPE_CONFIG],
+			&session_local)))
+	{
+		/* one session cannot be updated at the same time by different processes,            */
+		/* so updating its properties without reallocating memory can be done with read lock */
+		session->last_id = session_config_revision;
+		session_local.lastaccess = now;
+	}
+	*config_revision = config->revision;
+	UNLOCK_CACHE;
+
+	if (NULL != session)
+		return 0;
+
+	session_local.last_id = session_config_revision;
+	session_local.lastaccess = now;
+
+	WRLOCK_CACHE;
+	session_local.token = dc_strdup(token);
+	session = (zbx_session_t *)zbx_hashset_insert(&config->sessions[ZBX_SESSION_TYPE_CONFIG], &session_local,
+			sizeof(session_local));
+	UNLOCK_CACHE;
+
+	return 1;	/* a session was created */
 }
 
 /******************************************************************************
@@ -15339,17 +15392,38 @@ void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get hostids removed from proxy since last proxy configuration     *
- *          update                                                            *
+ * Purpose: get the configuration revision received from server               *
  *                                                                            *
- * Parameter: proxy_hostid - [IN] the proxy hostid                            *
- *            revision     - [IN] the proxy configuration revision            *
- *            hostids      - [OUT] the hostsids removed from proxy since last *
- *                                 proxy configuration sync                   *
+ * Comments: The revision is accessed without locking because no other process*
+ *           can access it at the same time.                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_proxy_get_removed_hostids(zbx_uint64_t proxy_hostid, zbx_uint32_t revision,
-		zbx_vector_uint64_t *hostids)
+zbx_uint64_t	zbx_dc_get_received_revision(void)
+{
+	return config->received_revision;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cache the configuration revision received from server             *
+ *                                                                            *
+ * Comments: The revision is updated without locking because no other process *
+ *           can access it at the same time.                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_update_received_revision(zbx_uint64_t revision)
+{
+	config->received_revision = revision;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get hosts/httptests for proxy configuration update                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
+		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
+		zbx_vector_uint64_t *httptestids)
 {
 	ZBX_DC_PROXY	*proxy;
 
@@ -15357,24 +15431,45 @@ void	zbx_dc_proxy_get_removed_hostids(zbx_uint64_t proxy_hostid, zbx_uint32_t re
 
 	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_hostid)))
 	{
-		int	i;
+		int	i, j;
 
-		for (i = 0; i < proxy->removed_hosts.values_num; )
+		zbx_vector_uint64_reserve(hostids, (size_t)proxy->hosts.values_num);
+
+		for (i = 0; i < proxy->hosts.values_num; i++)
 		{
-			if (proxy->removed_hosts.values[i].revision > revision)
+			ZBX_DC_HOST	*host = proxy->hosts.values[i];
+
+			zbx_vector_uint64_append(hostids, host->hostid);
+
+			if (host->revision > revision)
 			{
-				zbx_vector_uint64_append(hostids, proxy->removed_hosts.values[i].hostid);
-				i++;
+				zbx_vector_uint64_append(updated_hostids, host->hostid);
+
+				for (j = 0; j < host->httptests.values_num; j++)
+					zbx_vector_uint64_append(httptestids, host->httptests.values[j]->httptestid);
 			}
-			else
+		}
+
+		/* check for full sync */
+		if (0 != revision)
+		{
+			for (i = 0; i < proxy->removed_hosts.values_num; )
 			{
-				/* this operation can be done with read lock:                 */
-				/*   - removal from vector does not allocate/free memory      */
-				/*   - to configuration requests for the same proxy cannot be */
-				/*     processed at the same time                             */
-				/*   - configuration syncer uses write lock to update         */
-				/*     removed hosts on proxy                                 */
-				zbx_vector_host_rev_remove_noorder(&proxy->removed_hosts, i);
+				if (proxy->removed_hosts.values[i].revision > revision)
+				{
+					zbx_vector_uint64_append(removed_hostids, proxy->removed_hosts.values[i].hostid);
+					i++;
+				}
+				else
+				{
+					/* this operation can be done with read lock:                  */
+					/*   - removal from vector does not allocate/free memory       */
+					/*   - two configuration requests for the same proxy cannot be */
+					/*     processed at the same time                              */
+					/*   - configuration syncer uses write lock to update          */
+					/*     removed hosts on proxy                                  */
+					zbx_vector_host_rev_remove_noorder(&proxy->removed_hosts, i);
+				}
 			}
 		}
 	}
@@ -15382,11 +15477,15 @@ void	zbx_dc_proxy_get_removed_hostids(zbx_uint64_t proxy_hostid, zbx_uint32_t re
 	UNLOCK_CACHE;
 }
 
-zbx_uint32_t	zbx_dc_get_received_revision(void)
+void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, zbx_uint64_t revision,
+		zbx_vector_uint64_t *macro_hostids, int *global)
 {
-	return config->received_revision;
-}
+	RDLOCK_CACHE;
 
+	um_cache_get_macro_updates(config->um_cache, hostids, revision, macro_hostids, global);
+
+	UNLOCK_CACHE;
+}
 
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"

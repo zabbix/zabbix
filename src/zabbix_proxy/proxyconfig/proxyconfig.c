@@ -47,6 +47,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	char			value[16], *error = NULL, *buffer = NULL;
 	size_t			buffer_size, reserved;
 	struct zbx_json		j;
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -58,7 +59,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)zbx_dc_get_received_revision());
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, zbx_dc_get_received_revision());
 
 	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
 	{
@@ -123,18 +124,30 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
 			sock.peer, (zbx_fs_size_t)*data_size);
 
-	if (SUCCEED == process_proxyconfig(&jp, &jp_kvs_paths))
+	if (SUCCEED == (ret = process_proxyconfig(&jp, &error)))
 	{
 		DCsync_configuration(ZBX_DBSYNC_UPDATE, *synced);
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
-		if (NULL != jp_kvs_paths.start)
+		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
 			DCsync_kvs_paths(&jp_kvs_paths);
 
 		DCupdate_interfaces_availability();
 	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process received configuration data from server at \"%s\": %s",
+				sock.peer, error);
+		zbx_free(error);
+	}
 error:
 	zbx_disconnect_from_server(&sock);
+	if (SUCCEED != ret)
+	{
+		/* reset received config_revision to force full resync after data transfer failure */
+		zbx_dc_update_received_revision(0);
+	}
+
 out:
 	zbx_free(error);
 	zbx_free(buffer);

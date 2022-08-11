@@ -268,20 +268,20 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 		goto out;
 
 	if (SUCCEED != (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size, reserved, ZBX_TCP_PROTOCOL)))
-		goto out;
+		goto clean;
 
 	if (FAIL == (ret = zbx_tcp_recv_ext(&s, CONFIG_TIMEOUT, 0)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive configuration information from proxy \"%s\": %s",
 				proxy->host, zbx_socket_strerror());
-		goto out;
+		goto clean;
 	}
 
 	if (SUCCEED != (ret = zbx_json_open(s.buffer, &jp)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse configuration information from proxy \"%s\": %s",
 				proxy->host, zbx_socket_strerror());
-		goto out;
+		goto clean;
 	}
 
 	zbx_json_clean(&j);
@@ -290,7 +290,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 				proxy->host, error);
-		goto out;
+		goto clean;
 	}
 
 	if (0 != proxy->auto_compress)
@@ -299,7 +299,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 		{
 			zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
 			ret = FAIL;
-			goto out;
+			goto clean;
 		}
 
 		flags |= ZBX_TCP_COMPRESS;
@@ -349,7 +349,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 			}
 		}
 	}
-
+clean:
 	disconnect_proxy(&s);
 out:
 	zbx_free(buffer);

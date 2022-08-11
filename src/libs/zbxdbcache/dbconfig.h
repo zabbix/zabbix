@@ -854,7 +854,7 @@ typedef struct
 	zbx_uint32_t		revision;
 	zbx_uint32_t		expression_revision;
 	zbx_uint32_t		autoreg_tls_revision;
-	zbx_uint32_t		received_revision;		/* the received revision (proxies) */
+	zbx_uint64_t		received_revision;		/* the received revision (proxies) */
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */

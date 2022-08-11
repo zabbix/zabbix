@@ -1036,6 +1036,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by h.proxy_hostid");
 		if (NULL == (sync->dbresult = DBselect("%s", sql)))
 			ret = FAIL;
 		goto out;
