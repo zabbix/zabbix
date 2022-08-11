@@ -38,7 +38,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Monitoring',
-					'page' => 'Problems',
+					'page' => 'Problems'
 				]
 			],
 			[
@@ -126,15 +126,13 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Reports',
-					'page' => 'Audit log',
-					'header' => 'Audit log'
+					'page' => 'Audit log'
 				]
 			],
 			[
 				[
 					'section' => 'Reports',
-					'page' => 'Action log',
-					'header' => 'Action log'
+					'page' => 'Action log'
 				]
 			],
 			[
@@ -336,13 +334,10 @@ class testSidebarMenu extends CWebTest {
 			});
 
 			$submenu = $element->query('link', $data['page'])->one();
-		}
-		else {
-			$submenu = $main_section->one()->parents('tag:li')->query('link', $data['page'])->one();
-		}
 
-		// Open second level menu.
-		$submenu->waitUntilClickable()->click();
+			// Open second level menu.
+			$submenu->waitUntilClickable()->click();
+		}
 
 		// Checking 3rd level menu.
 		if (array_key_exists('third_level', $data)) {

@@ -788,6 +788,119 @@ class testUserRolesPermissions extends CWebTest {
 			],
 			[
 				[
+					'section' => 'Alerts',
+					'page' => 'Actions',
+					'displayed_ui' => [
+						'Media types',
+						'Scripts'
+					],
+					'link' => [
+						'actionconf.php?eventsource=0',
+						'actionconf.php?eventsource=1',
+						'actionconf.php?eventsource=2',
+						'actionconf.php?eventsource=3',
+						'actionconf.php?eventsource=4'
+					]
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Media types',
+					'displayed_ui' => [
+						'Trigger actions',
+						'Service actions',
+						'Discovery actions',
+						'Autoregistration actions',
+						'Internal actions',
+						'Scripts'
+					],
+					'link' => ['zabbix.php?action=mediatype.list']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Scripts',
+					'displayed_ui' => [
+						'Trigger actions',
+						'Service actions',
+						'Discovery actions',
+						'Autoregistration actions',
+						'Internal actions',
+						'Media types'
+					],
+					'link' => ['zabbix.php?action=script.list']
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'User groups',
+					'displayed_ui' => [
+						'User roles',
+						'Users',
+						'API tokens',
+						'Authentication'
+					],
+					'link' => ['zabbix.php?action=usergroup.list']
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'user_roles' => true,
+					'page' => 'User roles',
+					'displayed_ui' => [
+						'User groups',
+						'Users',
+						'API tokens',
+						'Authentication'
+					],
+					'link' => ['zabbix.php?action=userrole.list']
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'Users',
+					'displayed_ui' => [
+						'User groups',
+						'User roles',
+						'API tokens',
+						'Authentication'
+					],
+					'link' => ['zabbix.php?action=user.list']
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'API tokens',
+					'displayed_ui' => [
+						'User groups',
+						'User roles',
+						'Users',
+						'Authentication'
+					],
+					'link' => ['zabbix.php?action=token.list']
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'Authentication',
+					'displayed_ui' => [
+						'User groups',
+						'User roles',
+						'Users',
+						'API tokens'
+					],
+					'link' => ['zabbix.php?action=authentication.edit']
+				]
+			],
+			[
+				[
 					'section' => 'Administration',
 					'page' => 'General',
 					'displayed_ui' => [
@@ -998,20 +1111,13 @@ class testUserRolesPermissions extends CWebTest {
 				'Users',
 				'API tokens',
 				'Authentication'
-			],
-			'Administration' => [
-				'General',
-				'Audit log',
-				'Housekeeping',
-				'Proxies',
-				'Macros',
-				'Queue'
 			]
 		];
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
 		foreach ([true, false] as $action_status) {
 			$menu = CMainMenuElement::find()->one();
+
 			if ($data['section'] !== 'Dashboards') {
 				$menu->select($data['section']);
 			}
@@ -1054,6 +1160,17 @@ class testUserRolesPermissions extends CWebTest {
 	}
 
 	/**
+	 * Manage API token action check.
+	 */
+	public function testUserRolesPermissions_ManageApiToken() {
+		$this->page->userLogin('user_for_role', 'zabbixzabbix');
+		$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
+		$this->assertEquals('TEST_SERVER_NAME: API tokens', $this->page->getTitle());
+		$this->changeRoleRule(['Manage API tokens' => false]);
+		$this->checkLinks(['zabbix.php?action=user.token.list']);
+	}
+
+	/**
 	 * Disabling access to Dashboard. Check warning message text and button.
 	 */
 	public function testUserRolesPermissions_Dashboard() {
@@ -1062,18 +1179,6 @@ class testUserRolesPermissions extends CWebTest {
 		$this->changeRoleRule(['Dashboards' => false]);
 		$this->checkLinks(['zabbix.php?action=dashboard.view'], 'Problems');
 }
-
-	/**
-	 * Manage API token action check.
-	 * @depends testUserRolesPermissions_Dashboard
-	 */
-	public function testUserRolesPermissions_ManageApiToken() {
-		$this->page->userLogin('user_for_role', 'zabbixzabbix');
-		$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
-		$this->assertEquals('TEST_SERVER_NAME: API tokens', $this->page->getTitle());
-		$this->changeRoleRule(['Manage API tokens' => false]);
-		$this->checkLinks(['zabbix.php?action=user.token.list'], 'Problems');
-	}
 
 	public static function getRoleServiceData() {
 		return [

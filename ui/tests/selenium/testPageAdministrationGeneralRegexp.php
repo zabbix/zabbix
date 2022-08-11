@@ -55,10 +55,9 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
-		$this->assertEquals([
-			'GUI', 'Autoregistration', 'Images', 'Icon mapping', 'Regular expressions',
-			'Trigger displaying options', 'Geographical maps', 'Modules', 'Other'
-		], $popup_menu->getItems()->asText());
+		$this->assertEquals(['GUI', 'Autoregistration', 'Images', 'Icon mapping', 'Regular expressions',
+			'Trigger displaying options', 'Geographical maps', 'Modules', 'Other'], $popup_menu->getItems()->asText()
+		);
 
 		$this->zbxTestAssertElementPresentXpath('//button[text()="New regular expression"]');
 
