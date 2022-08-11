@@ -322,6 +322,12 @@ class CControllerWidgetItemView extends CControllerWidget {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+
+		if ($raw_units !== null && $number_parser->parse($raw_units['value']) == CParser::PARSE_SUCCESS) {
+			$raw_units['value'] = $number_parser->calcValue();
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
 			'cells' => $cells,
