@@ -26,7 +26,7 @@ type AgentOptions struct {
 	DebugLevel               int      `conf:"optional,range=0:5,default=3"`
 	PidFile                  string   `conf:"optional"`
 	ServerActive             string   `conf:"optional"`
-	RefreshActiveChecks      int      `conf:"optional,range=5:86400,default=5"`
+	RefreshActiveChecks      int      `conf:"optional,range=1:86400,default=5"`
 	Timeout                  int      `conf:"optional,range=1:30,default=3"`
 	Hostname                 string   `conf:"optional"`
 	HostnameItem             string   `conf:"optional"`
