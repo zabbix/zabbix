@@ -57,6 +57,7 @@ require_once dirname(__FILE__).'/testDependentItems.php';
 require_once dirname(__FILE__).'/testAuthentication.php';
 require_once dirname(__FILE__).'/testAuditlogAction.php';
 require_once dirname(__FILE__).'/testAuditlogEventCorrelation.php';
+require_once dirname(__FILE__).'/testAuditlogIconMap.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -102,6 +103,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testAuthentication');
 		$suite->addTestSuite('testAuditlogAction');
 		$suite->addTestSuite('testAuditlogEventCorrelation');
+		$suite->addTestSuite('testAuditlogIconMap');
 
 		return $suite;
 	}
