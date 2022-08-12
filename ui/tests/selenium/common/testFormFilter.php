@@ -97,8 +97,7 @@ class testFormFilter extends CWebTest {
 	 * @param string $table_selector	selector of a table with filtered data
 	 */
 	public function checkRememberedFilters($data, $table_selector = 'class:list-table') {
-		$this->page->login();
-		$this->page->open($this->url)->waitUntilReady();
+		$this->page->login()->open($this->url.'&filter_reset=1')->waitUntilReady();
 
 		// Checking if home tab is selected.
 		$xpath = 'xpath://li[@data-target="tabfilter_0"]';
@@ -110,35 +109,26 @@ class testFormFilter extends CWebTest {
 		$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
 		$home_form->fill($data);
 
-		$result_table = $this->query($table_selector)->one();
+		$result_table = $this->query($table_selector)->asTable()->waitUntilPresent()->one();
 		$this->query('name:filter_apply')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$result_table->waitUntilReloaded();
+		$filter_result = $result_table->getRows()->asText();
 
-		$table = $this->query($table_selector)->asTable()->waitUntilReady()->one();
-		$rows = $table->getRows();
-		$filtered_rows_count = ($rows->count() === 1 && $rows->asText() === ['No data found.'])
-			? 0
-			: $rows->count();
-
+		// Go to another page, to check saved filter after.
 		$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
+
+		// Open filter page again.
 		$this->page->open($this->url)->waitUntilReady();
 
-		// Checking that data exists after saving filter.
-		$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
-		$this->assertTrue($home_form->checkValue($data));
-		$result_table->waitUntilReloaded();
-		$new_rows = $table->getRows();
+		// Check that filter form fileds and table result match.
+		$home_form->invalidate();
+		$home_form->checkValue($data);
+		$this->assertEquals($filter_result, $result_table->getRows()->asText());
 
-		$new_filtered_rows_count = ($rows->count() === 1 && $new_rows->asText() === ['No data found.'])
-			? 0
-			: $new_rows->count();
-
-		$this->assertEquals($filtered_rows_count, $new_filtered_rows_count);
+		// Reset filter not to interfere next tests.
 		$this->query('name:filter_reset')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
-
-
 	}
 
 	/**

@@ -158,7 +158,7 @@ class testFormFilterHosts extends testFormFilter {
 			],
 			[
 				[
-					'Host groups' => ['Zabbix servers'],
+					'Port' => '10050',
 					'Not classified' => true,
 					'Information' => true,
 					'Status' => 'Enabled',

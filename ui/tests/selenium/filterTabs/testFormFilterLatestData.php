@@ -228,15 +228,15 @@ class testFormFilterLatestData extends testFormFilter {
 				[
 					'Host groups' => ['Zabbix servers'],
 					'Hosts' => ['ЗАББИКС Сервер'],
-					'Name' => 'New Name',
-					'Show tags' => '2'
+					'Name' => 'Free',
+					'Show tags' => '1'
 				]
 			],
 			[
 				[
-					'Host groups' => ['Zabbix servers'],
-					'Hosts' => ['ЗАББИКС Сервер'],
+					'Name' => 'Total',
 					'Tag display priority' => 'Alfa, Beta',
+					'id:tag_name_format_0' => 'Shortened',
 					'Show details' => true
 				]
 			]
