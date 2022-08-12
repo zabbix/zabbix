@@ -846,7 +846,7 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(5050)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6000)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6010)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6020)[];
-/*extern zbx_dbpatch_t	DBPATCH_VERSION(6030)[];*/
+extern zbx_dbpatch_t	DBPATCH_VERSION(6030)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -875,7 +875,7 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(6000), "6.0 maintenance"},
 	{DBPATCH_VERSION(6010), "6.2 development"},
 	{DBPATCH_VERSION(6020), "6.2 maintenance"},
-/*	{DBPATCH_VERSION(6030), "6.4 development"},*/
+	{DBPATCH_VERSION(6030), "6.4 development"},
 	{NULL}
 };
 
@@ -1302,4 +1302,3 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 }
 
 #endif
-

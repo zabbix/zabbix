@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 /**
  * @backup config
  */
-class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGeneral {
+class testFormAdministrationHousekeeper extends testFormAdministrationGeneral {
 
 	public $config_link = 'zabbix.php?action=housekeeping.edit';
 	public $form_selector = 'id:housekeeping';
@@ -95,14 +95,14 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 	/**
 	 * Test for checking form layout.
 	 */
-	public function testFormAdministrationGeneralHousekeeper_CheckLayout() {
+	public function testFormAdministrationHousekeeper_CheckLayout() {
 		$this->page->login()->open($this->config_link);
 		$this->page->assertTitle('Configuration of housekeeping');
 		$this->page->assertHeader('Housekeeping');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 		$this->assertTrue($form->query('link:Audit settings')->exists());
 
-		$headers = ['Events and alerts', 'Services', 'Audit', 'User sessions', 'History', 'Trends'];
+		$headers = ['Events and alerts', 'Services', 'Audit log', 'User sessions', 'History', 'Trends'];
 		foreach ($headers as $header) {
 			$this->assertTrue($this->query('xpath://h4[text()="'.$header.'"]')->one()->isVisible());
 		}
@@ -151,14 +151,14 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 	/**
 	 * Test for checking form update without changing any data.
 	 */
-	public function testFormAdministrationGeneralHousekeeper_SimpleUpdate() {
+	public function testFormAdministrationHousekeeper_SimpleUpdate() {
 		$this->executeSimpleUpdate();
 	}
 
 	/**
 	 * Test for checking 'Reset defaults' button.
 	 */
-	public function testFormAdministrationGeneralHousekeeper_ResetButton() {
+	public function testFormAdministrationHousekeeper_ResetButton() {
 		$this->executeResetButtonTest();
 	}
 
@@ -1623,7 +1623,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 	 *
 	 * @dataProvider getCheckFormData
 	 */
-	public function testFormAdministrationGeneralHousekeeper_CheckForm($data) {
+	public function testFormAdministrationHousekeeper_CheckForm($data) {
 		$this->executeCheckForm($data);
 	}
 }

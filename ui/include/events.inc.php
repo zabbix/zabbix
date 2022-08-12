@@ -642,7 +642,13 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
 						$tags[$element[$key]][] = (new CSimpleButton($value))
-							->setAttribute('data-subfilter-tag', ['subfilter_tags['.$tag['tag'].'][]', $tag['value']])
+							->setAttribute('data-key', $tag['tag'])
+							->setAttribute('data-value', $tag['value'])
+							->onClick(
+								'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+									'this.dataset.value'.
+								']);'
+							)
 							->addClass(ZBX_STYLE_BTN_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
@@ -672,7 +678,13 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
 						$hint_content[$element[$key]][] = (new CSimpleButton($value))
-							->setAttribute('data-subfilter-tag', ['subfilter_tags['.$tag['tag'].'][]', $tag['value']])
+							->setAttribute('data-key', $tag['tag'])
+							->setAttribute('data-value', $tag['value'])
+							->onClick(
+								'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+									'this.dataset.value'.
+								']);'
+							)
 							->addClass(ZBX_STYLE_BTN_TAG)
 							->setHint(getTagString($tag), '', false);
 					}

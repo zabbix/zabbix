@@ -18,17 +18,18 @@
 **/
 
 #include "scripts.h"
+#include "zbxserver.h"
 
 #include "../poller/checks_agent.h"
 #include "../ipmi/ipmi.h"
 #include "../poller/checks_ssh.h"
 #include "../poller/checks_telnet.h"
 #include "zbxexec.h"
-#include "zbxserver.h"
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxtasks.h"
 #include "zbxembed.h"
+#include "zbxnum.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;

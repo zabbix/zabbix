@@ -21,6 +21,8 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
+#include "zbxstr.h"
+
 void	zbx_mock_test_entry(void **state)
 {
 	size_t		key_len, buf_len;

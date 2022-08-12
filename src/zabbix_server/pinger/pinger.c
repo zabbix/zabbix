@@ -18,13 +18,14 @@
 **/
 
 #include "pinger.h"
+#include "zbxserver.h"
 
 #include "log.h"
-#include "zbxserver.h"
 #include "zbxicmpping.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "preproc.h"
+#include "zbxtime.h"
 
 /* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1
@@ -286,7 +287,15 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	}
 
 	if (NULL == (tmp = get_rparam(&request, 0)) || '\0' == *tmp)
+	{
+		if (NULL == host_addr || '\0' == *host_addr)
+		{
+			zbx_snprintf(error, (size_t)max_error_len,
+						"Ping item must have target or host interface specified.");
+			goto out;
+		}
 		*addr = strdup(host_addr);
+	}
 	else
 		*addr = strdup(tmp);
 
