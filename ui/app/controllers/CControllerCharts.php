@@ -241,7 +241,10 @@ abstract class CControllerCharts extends CController {
 		 * Calculate how many additional items would match the filtering results after selecting each of provided host
 		 * subfilters. So item MUST match all subfilters except the tested one.
 		 */
+
 		foreach ($graphs as $graph) {
+
+			$subfilter_graph_tags = [];
 			// Calculate the counters of tag existence subfilter options.
 			foreach ($graph['tags'] as $tag) {
 				$graph_matches = true;
@@ -256,7 +259,20 @@ abstract class CControllerCharts extends CController {
 				}
 
 				if ($graph_matches) {
-					$subfilter_options['tagnames'][$tag['tag']]['count']++;
+					$subfilter_graph_tags[$tag['tag']] = $tag['tag'];
+				}
+			}
+
+			foreach ($subfilter_graph_tags as $name) {
+				$subfilter_options['tagnames'][$name]['count']++;
+
+				// Adjust tag count if there is selected tags.
+				if (array_key_exists('tagnames', $subfilters)
+						&& array_key_exists($name, $subfilters['tagnames'])) {
+					foreach ($graph['tags'] as $tag)
+						if (!$subfilter_options['tagnames'][$tag['tag']]['selected']) {
+							$subfilter_options['tagnames'][$tag['tag']]['count']--;
+						}
 				}
 			}
 
@@ -275,6 +291,16 @@ abstract class CControllerCharts extends CController {
 
 				if ($graph_matches) {
 					$subfilter_options['tags'][$tag['tag']][$tag['value']]['count']++;
+
+					// Adjust tag value count if there is selected tag values.
+					if (array_key_exists('tags', $subfilters) && array_key_exists($tag['tag'], $subfilters['tags'])
+							&& array_key_exists($tag['value'], $subfilters['tags'][$tag['tag']])) {
+						foreach ($graph['tags'] as $tags) {
+							if (!$subfilter_options['tags'][$tags['tag']][$tags['value']]['selected']) {
+								$subfilter_options['tags'][$tags['tag']][$tags['value']]['count']--;
+							}
+						}
+					}
 				}
 			}
 		}
