@@ -241,10 +241,9 @@ abstract class CControllerCharts extends CController {
 		 * Calculate how many additional items would match the filtering results after selecting each of provided host
 		 * subfilters. So item MUST match all subfilters except the tested one.
 		 */
-
 		foreach ($graphs as $graph) {
-
 			$subfilter_graph_tags = [];
+			
 			// Calculate the counters of tag existence subfilter options.
 			foreach ($graph['tags'] as $tag) {
 				$graph_matches = true;
