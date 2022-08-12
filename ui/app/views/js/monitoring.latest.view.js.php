@@ -79,16 +79,12 @@
 				}
 			});
 
-			document.addEventListener('click', (event) => {
-				if (event.target.classList.contains('<?= ZBX_STYLE_BTN_TAG ?>')) {
-					view.setSubfilter(JSON.parse(event.target.dataset.subfilterTag));
-				}
-			});
-
 			// Tags must be activated also using the enter button on keyboard.
 			document.addEventListener('keydown', (event) => {
 				if (event.which == 13 && event.target.classList.contains('<?= ZBX_STYLE_BTN_TAG ?>')) {
-					view.setSubfilter(JSON.parse(event.target.dataset.subfilterTag));
+					view.setSubfilter([`subfilter_tags[${encodeURIComponent(event.target.dataset.key)}][]`,
+						event.target.dataset.value
+					]);
 				}
 			});
 		},
