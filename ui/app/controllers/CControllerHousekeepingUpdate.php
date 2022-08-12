@@ -76,7 +76,7 @@ class CControllerHousekeepingUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_HOUSEKEEPING);
 	}
 
 	protected function doAction(): void {
