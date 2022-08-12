@@ -330,12 +330,11 @@ func (c *Listener) Close() (err error) {
 }
 
 func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration,
-	data []byte, args ...interface{}) ([]byte, []error, error) {
+	data []byte, args ...interface{}) (b []byte, errs []error, errRead error) {
 	log.Tracef("connecting to %s [timeout:%s, connection timeout:%s]", *addresses, timeout, connect_timeout)
 
 	var tlsconfig *tls.Config
 	var err error
-	var errs []error
 	var c *Connection
 	var no_response = false
 
@@ -390,7 +389,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 
 	log.Tracef("receiving data from [%s]", (*addresses)[0])
 
-	b, err := c.Read()
+	b, err = c.Read()
 	if err != nil {
 		errs = append(errs, fmt.Errorf("cannot receive data from [%s]: %s", (*addresses)[0], err))
 		log.Tracef("%s", errs[len(errs)-1])
