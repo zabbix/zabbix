@@ -81,7 +81,7 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 		$is_valid = $validator->validate([
 			'conditiontype' => $this->getInput('condition_type'),
 			'value' => $this->getInput('value'),
-			'value2' => $this->getInput('value2'),
+			'value2' => $this->hasInput('value2') ? $this->getInput('value2') : null,
 			'operator' => $this->getInput('operator')
 		]);
 

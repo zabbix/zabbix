@@ -19,19 +19,18 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/actions.inc.php';
-// todo: check if needed here
 
 class CControllerPopupActionEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' => 'in '.implode(',', [
-				// is service necessary here?
 					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
 					EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
 					EVENT_SOURCE_SERVICE
 				]),
 			'g_actionid' => 'array_id',
+			'actionid' => 'string',
 			'filter_set' => 'string',
 			'filter_rst' =>	'string',
 			'add_condition' => 'string',
@@ -50,76 +49,67 @@ class CControllerPopupActionEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		// is this enough?
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS);
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS)) {
+			return false;
+		}
+
+		if ($this->hasInput('actionid')) {
+			$this->action = API::Action()->get([
+				'output' => ['actionid', 'name', 'esc_period', 'eventsource', 'status', 'pause_suppressed', 'notify_if_canceled'],
+				'actionids' => $this->getInput('actionid'),
+				'selectOperations' => 'extend',
+				'selectFilter' => 'extend'
+			]);
+
+			if (!$this->action) {
+				return false;
+			}
+			$this->action = $this->action[0];
+		}
+		else {
+			$this->action = null;
+		}
+
+
+		return true;
+
 	}
 
 	protected function doAction(): void {
 
-		// TODO: pass all the variables. E.g. $data: actionid, action [recovery_operations] allowedOperations
-		// TODO : $operations: operationtype, opconditions, opmessage $operationid
+		$eventsource = $this->getInput('eventsource', EVENT_SOURCE_TRIGGERS);
 
-		$eventsource = $this->getInput('eventsource');
-
-		// if ($this->getInput('add_condition') && $this->getInput('new_condition')) {
-		// $this->addCondition();
-		// }
-
-		$data = [
-			'eventsource' => $eventsource,
-			'actionid' => $this->getInput('g_actionid')
-		];
+		if ($this->action !== null) {
+			$data = [
+				'eventsource' => $eventsource,
+				'actionid' => $this->action['actionid'],
+				'action' => [
+					'name' => $this->action['name'],
+					'esc_period' => $this->action['esc_period'],
+					'eventsource' => $eventsource,
+					'status' => $this->action['status'],
+					'operations' => $this->action['operations'],
+					'filter' => $this->action['filter']
+				]
+			];
+		}
+		else {
+			$data = [
+				'eventsource' => $eventsource,
+				'actionid' => $this->getInput('actionid', ''),
+				'action' => [
+					'name' => '',
+					'esc_period' => '',
+					'eventsource' => $eventsource,
+					'status' =>'',
+					'operations' => [],
+					'filter' => ''
+				]
+			];
+		}
 
 		$response = new CControllerResponseData($data);
 
 		$this->setResponse($response);
-	}
-
-	// TODO: fix this. check, what I need, and what I don't
-	protected function addCondition() {
-
-		$newCondition = $this->getInput('new_condition');
-
-		if ($newCondition) {
-			$conditions = $this->getInput('conditions', []);
-
-			// When adding new condition, in order to check for an existing condition, it must have a not null value.
-			if ($newCondition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
-				$newCondition['value'] = '';
-			}
-
-			// check existing conditions and remove duplicate condition values
-			foreach ($conditions as $condition) {
-				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
-					if (is_array($newCondition['value'])) {
-						foreach ($newCondition['value'] as $key => $newValue) {
-							if ($condition['value'] == $newValue) {
-								unset($newCondition['value'][$key]);
-							}
-						}
-					} else {
-						if ($newCondition['value'] == $condition['value'] && (!array_key_exists('value2', $newCondition)
-								|| $newCondition['value2'] === $condition['value2'])) {
-							$newCondition['value'] = null;
-						}
-					}
-				}
-			}
-
-			$usedFormulaIds = zbx_objectValues($conditions, 'formulaid');
-
-			if (isset($newCondition['value'])) {
-				$newConditionValues = zbx_toArray($newCondition['value']);
-				foreach ($newConditionValues as $newValue) {
-					$condition = $newCondition;
-					$condition['value'] = $newValue;
-					$condition['formulaid'] = CConditionHelper::getNextFormulaId($usedFormulaIds);
-					$usedFormulaIds[] = $condition['formulaid'];
-					$conditions[] = $condition;
-				}
-			}
-
-			$_REQUEST['conditions'] = $conditions;
-		}
 	}
 }

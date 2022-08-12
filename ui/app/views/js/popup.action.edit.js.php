@@ -21,18 +21,35 @@
 
 window.action_edit_popup = new class {
 
-	init(condition_operators) {
+	init(data) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.condition_operators = condition_operators;
+		this.condition_operators = data.condition_operators;
 		this.row_num = 0;
+
 	//	this.footer = this.overlay.$dialogue.$footer[0];
 	//	this.curl = new Curl('zabbix.php');
 	//	this.curl.setArgument('action', 'action.list');
 	//	this.curl.setArgument('eventsource', 0);
 
 		document.getElementById('action-form').style.display = '';
+
+		document.querySelector('.js-condition-create').addEventListener('click', () => {
+			const overlay = this.openConditionPopup();
+			const dialogue = overlay.$dialogue;
+
+			dialogue.addEventListener('dialogue.submit', (e) => {
+				clearMessages();
+
+				addMessage(makeMessageBox('good', [], e.detail.title, true, false));
+			});
+		});
+
+	/*	if (data.conditions){
+			data.conditions.forEach(
+			)*/
+	//	}
 
 		this.dialogue.addEventListener('dialogue.submit', (e) => {
 
@@ -45,8 +62,25 @@ window.action_edit_popup = new class {
 			this.row.append(this.createRemoveCell());
 
 			$('#conditions-table tr:last').before(this.row);
+
+			processTypeOfCalculation();
+
 		});
 	}
+
+	openConditionPopup() {
+		const parameters = {
+			type: <?= ZBX_POPUP_CONDITION_TYPE_ACTION ?>,
+			source: 0
+		};
+
+		return PopUp('popup.condition.actions', parameters, {
+			dialogueid: 'condition',
+			dialogue_class: 'modal-popup-medium'
+		});
+
+	}
+
 
 	// createHiddenInput(conditiontype, operator, value, value2) { // ????
 	// todo: add hidden input to action edit form
@@ -86,7 +120,7 @@ window.action_edit_popup = new class {
 		btn.addEventListener('click', () => btn.closest('tr').remove());
 
 		cell.appendChild(btn);
-
+		this.processTypeOfCalculation();
 		return cell;
 	}
 
@@ -188,6 +222,32 @@ window.action_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	processTypeOfCalculation() {
+
+		var show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
+			$labels = jQuery('#conditions-table .label');
+
+		console.log($labels.length);
+		jQuery('#evaltype').closest('li').toggle($labels.length > 1);
+		jQuery('#conditionLabel').toggle(!show_formula);
+		jQuery('#formula').toggle(show_formula);
+
+		if ($labels.length > 1) {
+			var conditions = [];
+
+			$labels.each(function(index, label) {
+				$label = jQuery(label);
+
+				conditions.push({
+					id: $label.data('formulaid'),
+					type: $label.data('conditiontype')
+				});
+			});
+
+			jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
+		}
 	}
 
 }

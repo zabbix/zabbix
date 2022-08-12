@@ -30,25 +30,23 @@
 
 <script>
 	const view = {
-		eventsource: null,
+	//	eventsource: null,
 
 		init({eventsource}) {
-			this.eventsource = eventsource;
+			//this.eventsource = eventsource;
 			document.addEventListener('click', (e) => {
+
 				if (e.target.classList.contains('js-action-create')) {
-					this.openActionPopup();
+					this.openActionPopup({eventsource: eventsource});
 				}
 				else if (e.target.classList.contains('js-action-edit')) {
-					this.openActionPopup({actionid: e.target.dataset.actionid});		// pass the action id for edit not create functionality.
+					this.openActionPopup({eventsource: eventsource, actionid: e.target.attributes.actionid.nodeValue});
+
 				}
 			});
 		},
 
-		openActionPopup() {
-			const parameters = {
-				eventsource: this.eventsource
-			};
-
+		openActionPopup(parameters = {}) {
 			return PopUp('popup.action.edit', parameters, {
 				dialogueid: 'action-edit',
 				dialogue_class: 'modal-popup-large'

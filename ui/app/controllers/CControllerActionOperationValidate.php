@@ -20,7 +20,6 @@
 
 
 class CControllerActionOperationValidate extends CController {
-
 	protected function checkInput() {
 		$fields = [
 			'operation' => 'array',

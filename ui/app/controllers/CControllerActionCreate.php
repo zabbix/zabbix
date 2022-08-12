@@ -81,6 +81,8 @@ class CControllerActionCreate extends CController {
 			'update_operations' => []
 		];
 
+		// todo : receive data from form
+
 //		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
 //			foreach ($action[$operation_group] as &$operation) {
 //				if ($operation_group === 'operations') {
@@ -233,6 +235,7 @@ class CControllerActionCreate extends CController {
 		if ($result) {
 			uncheckTableRows($eventsource);
 		}
+
 		show_messages($result, $messageSuccess, $messageFailed);
 	}
 }

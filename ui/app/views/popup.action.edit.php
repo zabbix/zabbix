@@ -33,7 +33,7 @@ $this->addJsFile('configuration.action.edit.js.php');
 $form = (new CForm())
 	->setName('action.edit')
 	->setId('action-form')
-	->addVar('actionid', $data['actionid'])
+	->addVar('actionid', $data['actionid']?:null)
 	->addStyle('display: none;')
 	//->addItem(getMessages())
 	->addItem((new CInput('submit'))->addStyle('display: none;'));
@@ -42,15 +42,59 @@ if ($data['actionid']) {
 	$form->addVar('actionid', $data['actionid']);
 }
 
+// Action tab.
+$action_tab = (new CFormGrid())
+	->addItem([
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		(new CTextBox('name', $data['action']['name']?:''))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
+	]);
+
+
+//$formula = (new CTextBox('formula', $data['action']['filter']['formula'], false,
+//	DB::getFieldLength('actions', 'formula')
+//))
+//	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+//	->setId('formula')
+//	->setAttribute('placeholder', 'A or (B and C) &hellip;');
+
+//$action_tab
+//	->addItem([
+//		new CLabel(_('Type of calculation'), 'label-evaltype'),
+//		[
+//			new CFormField(
+//				(new CSelect('evaltype'))
+//					->setId('evaltype')
+//					->setFocusableElementId('label-evaltype')
+//					->setValue($data['action']['filter']['evaltype'])
+//					->addOptions(CSelect::createOptionsFromArray([
+//						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+//						CONDITION_EVAL_TYPE_AND => _('And'),
+//						CONDITION_EVAL_TYPE_OR => _('Or'),
+//						CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+//					])),
+//			),
+//			new CFormField((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)),
+//			new CFormField((new CSpan())->setId('conditionLabel'))
+//		]
+//	]);
+// todo: add formula and type of calculation when at least 2 conditions are added -> in js???
+
 // Create condition table.
 $condition_table = (new CTable(_('No conditions defined.')))
-	->setId('conditions-table')
+	->setId('conditionTable')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
 
-// $i = 0;
+$i = 0;
+$row = [];
+
 // if ($data['action']['filter']['conditions']) {
+
 //	$actionConditionStringValues = actionConditionValueToString([$data['action']]);
+
 //	foreach ($data['action']['filter']['conditions'] as $cIdx => $condition) {
 //		if (!isset($condition['conditiontype'])) {
 //			$condition['conditiontype'] = 0;
@@ -63,6 +107,7 @@ $condition_table = (new CTable(_('No conditions defined.')))
 //		}
 //		if (!array_key_exists('value2', $condition)) {
 //			$condition['value2'] = '';
+
 //		}
 //		if (!str_in_array($condition['conditiontype'], $data['allowedConditions'])) {
 //			continue;
@@ -75,72 +120,48 @@ $condition_table = (new CTable(_('No conditions defined.')))
 //			->setAttribute('data-conditiontype', $condition['conditiontype'])
 //			->setAttribute('data-formulaid', $label);
 
-//		$condition_table->addRow(
-//			[
-//				$labelSpan,
-//				(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
-//					$actionConditionStringValues[0][$cIdx], $condition['value2']
-//				)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
-//				(new CCol([
-//					(new CButton('remove', _('Remove')))
-//						->onClick('removeCondition('.$i.');')
-//						->addClass(ZBX_STYLE_BTN_LINK)
-//						->setId('conditions_table'),
-//						//->removeId(),
-//					new CVar('conditions['.$i.']', $condition)
-//				]))->addClass(ZBX_STYLE_NOWRAP)
-//			],
-//			null, 'conditions_'.$i
-//		);
+//		$row = [
+//			getConditionDescription($condition['conditiontype'], $condition['operator'],
+//			$actionConditionStringValues[0][$cIdx], $condition['value2'])
+//		];
 
-//		$i++;
+//		$condition_table
+//			->addItem([
+//				[
+//					$labelSpan,
+//					(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
+//						$actionConditionStringValues[0][$cIdx], $condition['value2']
+//					)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
+//					(new CCol([
+//						(new CButton('remove', _('Remove')))
+//							->onClick('removeCondition('.$i.');')
+//							->addClass(ZBX_STYLE_BTN_LINK)
+//							->removeId(),
+//						new CVar('conditions['.$i.']', $condition)
+//					]))->addClass(ZBX_STYLE_NOWRAP)
+//				],
+//				null, 'conditions_'.$i
+//			]);
+
+	//	$i++;
 //	}
 //}
 
-$formula = (new CTextBox('formula', $data['action']['filter']['formula'], false,
-	DB::getFieldLength('actions', 'formula')
-))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setId('formula')
-	->setAttribute('placeholder', 'A or (B and C) &hellip;');
-
-// todo: add formula and type of calculation when at least 2 conditions are added -> in js???
-
 $condition_table->setFooter(
 	(new CSimpleButton(_('Add')))
-		->setAttribute('data-eventsource', $data['eventsource'])
-		->onClick('PopUp("popup.condition.actions",
-			{
-				type: '.ZBX_POPUP_CONDITION_TYPE_ACTION.',
-				source: '.$data['eventsource'].'.
-			},
-			{
-				dialogue_class: "modal-popup-medium",
-				dialogueid: "action-edit-condition"
-			}
-		);')
+	->setAttribute('data-eventsource', $data['eventsource'])
 		->addClass(ZBX_STYLE_BTN_LINK)
-	->addClass('element-table-add')
+	->addClass('js-condition-create')
 );
 
-
 // action tab
-$action_tab = (new CFormGrid())
-	->addItem([
-		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['action']['name']?:null))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
-	])
+$action_tab
 	->addItem([
 		new CLabel(_('Conditions')),
 		(new CFormField($condition_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	]);
-
-$action_tab
+	])
 	->addItem([
 		new CLabel(_('Enabled'), 'status'),
 		new CFormField((new CCheckBox('status', ACTION_STATUS_ENABLED))->setChecked($data['action']['status'] == ACTION_STATUS_ENABLED))
@@ -159,7 +180,7 @@ $operations_table = (new CTable())
 
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 	$operations_table->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration'), _('Action')]);
-	//$delays = count_operations_delay($data['action']['operations'], $data['action']['esc_period']);
+	$delays = count_operations_delay($data['action']['operations'], $data['action']['esc_period']);
 }
 else {
 	$operations_table->setHeader([_('Details'), _('Action')]);
@@ -275,6 +296,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		]);
 }
 
+
 $operations_tab->addItem(
 	new CFormField((new CLabel(_('At least one operation must exist.')))->setAsteriskMark())
 );
@@ -289,9 +311,10 @@ $form
 	->addItem(
 		(new CScriptTag('action_edit_popup.init('.json_encode([
 				'condition_operators' => condition_operator2str(),
-				'condition_types' => condition_type2str()
-			]).');'))
-			->setOnDocumentReady()
+				'condition_types' => condition_type2str(),
+				'conditions' => $data['action']['filter']['conditions']
+			]).');
+			'))->setOnDocumentReady()
 	);
 
 $buttons = [
@@ -302,7 +325,6 @@ $buttons = [
 		'isSubmit' => true,
 		'action' => 'action_edit_popup.submit();'
 	]
-	// todo: add function submit()
 ];
 
 $output = [

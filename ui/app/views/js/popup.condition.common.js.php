@@ -23,7 +23,7 @@ window.condition_popup = new class {
 
 	init() {
 		this.curl = new Curl('zabbix.php', false);
-		this.curl.setArgument('action', 'popup.condition.actions');
+		this.curl.setArgument('action', 'popup.action.edit');
 		//this.dialogue = this.overlay.$dialogue[0];
 		//this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		//this.validate(overlay);
@@ -38,13 +38,17 @@ window.condition_popup = new class {
 
 		this.overlay.setLoading();
 
-		this.curl = new Curl('zabbix.php', false);
-		this.curl.setArgument('action', 'popup.condition.actions');
-		this.curl.setArgument('validate', '1');
+		let curl = new Curl('zabbix.php', false);
 
-		this._post(this.curl.getUrl(), fields, (response) => {
+		//fields.action = 'conditions.validate';
+
+		curl.setArgument('action', 'popup.condition.actions');
+		curl.setArgument('validate', '1');
+
+		//curl.setArgument('action', 'conditions.validate');
+
+		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
-			console.log(fields);
 
 			const $action_edit = overlays_stack.getById('action-edit').$dialogue[0];
 			$action_edit.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
