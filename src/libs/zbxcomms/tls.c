@@ -3935,6 +3935,102 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 }
 #endif
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get PSK attributes or certificate attributes from the context of  *
+ *          established connection                                            *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     This function can be used only on server-side of TLS connection.       *
+ *     GnuTLS makes it asymmetric - see documentation for                     *
+ *     gnutls_psk_server_get_username() and gnutls_psk_client_get_hint()      *
+ *     (the latter function is not used in Zabbix).                           *
+ *     Implementation for OpenSSL is server-side only, too.                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char **error)
+{
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_cert(sock, attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_psk(sock, attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+#endif
+	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
+	{
+		*error = zbx_strdup(*error, "internal error: invalid connection type");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+#endif
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate PSK attributes or certificate attributes from the        *
+ *          context of established connection                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tls_validate_attr(const zbx_socket_t *sock, const zbx_tls_conn_attr_t *attr, const char *tls_issuer,
+		const char *tls_subject, const char *tls_psk_identity, const char **msg)
+{
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	{
+		/* simplified match, not compliant with RFC 4517, 4518 */
+		if ('\0' != *tls_issuer && 0 != strcmp(tls_issuer, attr->issuer))
+		{
+			*msg = "certificate issuer does not match";
+			return FAIL;
+		}
+
+		/* simplified match, not compliant with RFC 4517, 4518 */
+		if ('\0' != *tls_subject && 0 != strcmp(tls_subject, attr->subject))
+		{
+			*msg = "certificate subject does not match";
+			return FAIL;
+		}
+	}
+#if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (NULL != tls_psk_identity)
+		{
+			if (strlen(tls_psk_identity) != attr->psk_identity_len ||
+					0 != memcmp(tls_psk_identity, attr->psk_identity,
+					attr->psk_identity_len))
+			{
+				*msg = "false PSK identity";
+				return FAIL;
+			}
+		}
+		else
+		{
+			*msg = "missing PSK";
+			return FAIL;
+		}
+	}
+#endif
+#endif
+	return SUCCEED;
+}
+
 #if defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *

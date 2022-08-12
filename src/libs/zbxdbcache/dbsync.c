@@ -954,6 +954,33 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: reads autoreg hosts table in order to cache autoreg_host entries  *
+ *          for hosts monitored directly by Zabbix server                     *
+ *                                                                            *
+ * Parameter: sync - [OUT] result of select, only during initialization       *
+ *                                                                            *
+ * Return value: SUCCEED - entries retrieved or already synced                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync)
+{
+	if (ZBX_DBSYNC_INIT != sync->mode)
+		return SUCCEED;
+
+	if (NULL == (sync->dbresult = DBselect(
+			"select host,listen_ip,listen_dns,host_metadata,flags,listen_port"
+			" from autoreg_host"
+			" where proxy_hostid is null")))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: compares hosts table with cached configuration data               *
  *          and populates the changeset                                       *
  *                                                                            *
