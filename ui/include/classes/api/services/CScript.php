@@ -27,6 +27,7 @@ class CScript extends CApiService {
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'getscriptsbyhosts' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'getscriptsbyevents' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
@@ -1174,6 +1175,123 @@ class CScript extends CApiService {
 		}
 
 		return $scripts_by_host;
+	}
+
+	/**
+	 * Returns all the scripts that are available on each given event. Automatically resolves macros in
+	 * confirmation and URL fields.
+	 *
+	 * @param $eventids
+	 *
+	 * @return array
+	 */
+	public function getScriptsByEvents($eventids) {
+		zbx_value2array($eventids);
+
+		$scripts_by_events = [];
+
+		if (!$eventids) {
+			return $scripts_by_events;
+		}
+
+		foreach ($eventids as $eventid) {
+			$scripts_by_events[$eventid] = [];
+		}
+
+		$events = API::Event()->get([
+			'output' => ['objectid', 'value', 'name', 'severirity'],
+			'selectHosts' => ['hostid'],
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventids' => $eventids,
+			'preservekeys' => true
+		]);
+
+		if (!$events) {
+			return $scripts_by_events;
+		}
+
+		$hostids = [];
+		foreach ($events as $event) {
+			foreach ($event['hosts'] as $host) {
+				$hostids[$host['hostid']] = true;
+			}
+		}
+
+		$scripts = $this->get([
+			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
+				'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username', 'password',
+				'publickey', 'privatekey', 'menu_path', 'url', 'new_window'
+			],
+			'hostids' => array_keys($hostids),
+			'sortfield' => 'name',
+			'preservekeys' => true
+		]);
+
+		$scripts = $this->addRelatedGroupsAndHosts([
+			'selectGroups' => null,
+			'selectHostGroups' => null,
+			'selectHosts' => ['hostid']
+		], $scripts, array_keys($hostids));
+
+		if ($scripts) {
+			$macros_data = [];
+
+			foreach ($scripts as $scriptid => $script) {
+				foreach ($events as $eventid => $event) {
+					foreach ($event['hosts'] as $event_host) {
+						foreach ($script['hosts'] as $host) {
+							if (bccomp($host['hostid'], $event_host['hostid']) == 0
+									&& array_key_exists($eventid, $scripts_by_events)) {
+								if (strpos($script['confirmation'], '{') !== false) {
+									$macros_data[$eventid][$scriptid]['confirmation'] = $script['confirmation'];
+								}
+
+								if (strpos($script['url'], '{') !== false) {
+									$macros_data[$eventid][$scriptid]['url'] = $script['url'];
+								}
+							}
+						}
+					}
+				}
+			}
+
+			$macros_data = CMacrosResolverHelper::resolveManualEventActionScripts($macros_data, $events);
+
+			foreach ($scripts as $scriptid => $script) {
+				$hosts = $script['hosts'];
+				unset($script['hosts']);
+
+				foreach ($events as $eventid => $event) {
+					foreach ($event['hosts'] as $event_host) {
+						foreach ($hosts as $host) {
+							if (bccomp($host['hostid'], $event_host['hostid']) == 0
+									&& array_key_exists($eventid, $scripts_by_events)) {
+								$size = count($scripts_by_events[$eventid]);
+								$scripts_by_events[$eventid][$size] = $script;
+
+								// Set confirmation and URL with resolved macros.
+								if (array_key_exists($eventid, $macros_data)
+										&& array_key_exists($scriptid, $macros_data[$eventid])) {
+									$macro_values = $macros_data[$eventid][$scriptid];
+
+									if (strpos($script['confirmation'], '{') !== false) {
+										$scripts_by_events[$eventid][$size]['confirmation'] =
+											$macro_values['confirmation'];
+									}
+
+									if (strpos($script['url'], '{') !== false) {
+										$scripts_by_events[$eventid][$size]['url'] = $macro_values['url'];
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return $scripts_by_events;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {

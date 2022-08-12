@@ -676,7 +676,7 @@ class CControllerMenuPopup extends CController {
 				$menu_data['eventid'] = $data['eventid'];
 
 				$events = API::Event()->get([
-					'output' => ['r_eventid', 'urls'],
+					'output' => ['eventid', 'r_eventid', 'urls'],
 					'select_acknowledges' => ['action'],
 					'eventids' => $data['eventid']
 				]);
@@ -701,40 +701,40 @@ class CControllerMenuPopup extends CController {
 				);
 			}
 
-			$scripts_by_hosts = [];
+			$scripts_by_events = [];
 
 			if (CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS) && $event) {
-				$scripts_by_hosts = API::Script()->getScriptsByHosts(array_keys($hosts));
+				$scripts_by_events = API::Script()->getScriptsByEvents([$event['eventid']]);
 			}
 
 			// Filter only event scope scripts and get rid of excess spaces and create full name with menu path included.
 			$scripts = [];
 			$urls = [];
 
-			foreach ($scripts_by_hosts as &$host_scripts) {
-				foreach ($host_scripts as $num => &$host_script) {
-					if ($host_script['scope'] != ZBX_SCRIPT_SCOPE_EVENT) {
-						unset($host_scripts[$num]);
+			foreach ($scripts_by_events as &$event_scripts) {
+				foreach ($event_scripts as $num => &$event_script) {
+					if ($event_script['scope'] != ZBX_SCRIPT_SCOPE_EVENT) {
+						unset($event_script[$num]);
 						continue;
 					}
 
-					$scriptid = $host_script['scriptid'];
+					$scriptid = $event_script['scriptid'];
 
 					// Split scripts and URLs.
-					if ($host_script['type'] == ZBX_SCRIPT_TYPE_URL) {
+					if ($event_script['type'] == ZBX_SCRIPT_TYPE_URL) {
 						if (!array_key_exists($scriptid, $urls)) {
-							$urls[$scriptid] = $host_script;
+							$urls[$scriptid] = $event_script;
 						}
 					}
 					else {
 						if (!array_key_exists($scriptid, $scripts)) {
-							$scripts[$scriptid] = $host_script;
+							$scripts[$scriptid] = $event_script;
 						}
 					}
 				}
-				unset($host_script);
+				unset($event_script);
 			}
-			unset($host_scripts);
+			unset($event_scripts);
 
 			if ($event) {
 				foreach ($event['urls'] as &$url) {

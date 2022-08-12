@@ -742,9 +742,9 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param array $data                        Array of hosts with ID as keys.
+	 * @param array $data                        Array of unersolved macros.
 	 * @param array $data[<hostid>]              Array of scripts. Contains script ID as keys.
-	 * @param array $data[<hostid>][<scriptid>]  Array of script fields to resolve macros for.
+	 * @param array $data[<hostid>][<scriptid>]  Script fields to resolve macros for.
 	 *
 	 * @return array
 	 */
@@ -752,5 +752,26 @@ class CMacrosResolverHelper {
 		self::init();
 
 		return self::$macrosResolver->resolveManualHostActionScripts($data);
+	}
+
+	/**
+	 * Resolve macros for manual event action scripts. Resolves host<1-9> macros, interface<1-9> macros,
+	 * inventory<1-9> macros, user macros, event macros and user data macros.
+	 *
+	 * @param array $data                                  Array of unersolved macros.
+	 * @param array $data[<eventid>]                       Array of scripts. Contains script ID as keys.
+	 * @param array $data[<eventid>][<scriptid>]           Script fields to resolve macros for.
+	 * @param array $events                                Array of events.
+	 * @param array $events[<eventid>]                     Event fields.
+	 * @param array $events[<eventid>][hosts]              Array of hosts that created the event.
+	 * @param array $events[<eventid>][hosts][][<hostid>]  Host ID.
+	 * @param array $events[<eventid>][objectid]           Trigger ID.
+	 *
+	 * @return array
+	 */
+	public static function resolveManualEventActionScripts(array $data, array $events): array {
+		self::init();
+
+		return self::$macrosResolver->resolveManualEventActionScripts($data, $events);
 	}
 }
