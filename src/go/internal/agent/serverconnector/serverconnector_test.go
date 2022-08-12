@@ -86,6 +86,7 @@ func TestToken(t *testing.T) {
 		token := newToken()
 		if len(token) != 32 {
 			t.Errorf("Expected token length 32 while got %d", len(token))
+
 			return
 		}
 		if _, ok := tokens[token]; ok {
