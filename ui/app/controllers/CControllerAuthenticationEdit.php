@@ -46,6 +46,7 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_removed_userdirectoryids' =>	'array',
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
+			'saml_scim_enabled' =>				'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
 			'saml_idp_entityid' =>				'db config.saml_idp_entityid',
 			'saml_sso_url' =>					'db config.saml_sso_url',
 			'saml_slo_url' =>					'db config.saml_slo_url',
@@ -60,6 +61,11 @@ class CControllerAuthenticationEdit extends CController {
 			'saml_encrypt_nameid' =>			'in 0,1',
 			'saml_encrypt_assertions' =>		'in 0,1',
 			'saml_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'saml_group_name_attribute' =>		'db config.saml_group_name_attribute',
+			'saml_user_name_attribute' =>		'db config.saml_user_name_attribute',
+			'saml_user_lastname_attribute' =>	'db config.saml_user_lastname_attribute',
+			'saml_authorization_token' =>		'db config.saml_authorization_token',
+			'saml_groups' =>					'array',
 			'passwd_min_length' =>				'int32',
 			'passwd_check_rules' =>				'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)
 		];
@@ -105,6 +111,7 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
 			CAuthenticationHelper::SAML_AUTH_ENABLED,
+			CAuthenticationHelper::SAML_SCIM_ENABLED,
 			CAuthenticationHelper::SAML_IDP_ENTITYID,
 			CAuthenticationHelper::SAML_SSO_URL,
 			CAuthenticationHelper::SAML_SLO_URL,
@@ -119,6 +126,10 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::SAML_ENCRYPT_NAMEID,
 			CAuthenticationHelper::SAML_ENCRYPT_ASSERTIONS,
 			CAuthenticationHelper::SAML_CASE_SENSITIVE,
+			CAuthenticationHelper::SAML_GROUP_NAME_ATTRIBUTE,
+			CAuthenticationHelper::SAML_USER_NAME_ATTRIBUTE,
+			CAuthenticationHelper::SAML_USER_LASTNAME_ATTRIBUTE,
+			CAuthenticationHelper::SAML_AUTHORIZATION_TOKEN,
 			CAuthenticationHelper::PASSWD_MIN_LENGTH,
 			CAuthenticationHelper::PASSWD_CHECK_RULES
 		];
@@ -139,6 +150,7 @@ class CControllerAuthenticationEdit extends CController {
 				'ldap_configured',
 				'ldap_case_sensitive',
 				'saml_auth_enabled',
+				'saml_scim_enable',
 				'saml_idp_entityid',
 				'saml_sso_url',
 				'saml_slo_url',
@@ -153,6 +165,10 @@ class CControllerAuthenticationEdit extends CController {
 				'saml_encrypt_nameid',
 				'saml_encrypt_assertions',
 				'saml_case_sensitive',
+				'saml_group_name_attribute',
+				'saml_user_name_attribute',
+				'saml_user_lastname_attribute',
+				'saml_authorization_token',
 				'passwd_min_length',
 				'passwd_check_rules'
 			]);
@@ -187,6 +203,54 @@ class CControllerAuthenticationEdit extends CController {
 		$data['saml_enabled'] = ($openssl_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED);
 		$data['db_authentication_type'] = CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
+		$data['saml_allow_scim'] = $data['saml_group_name_attribute'] === '';
+
+		$user_groups = [
+			[
+				'name' => 'SAML group',
+				'usrgrpid' => 14
+			],
+			[
+				'name' => '	Zabbix administrators',
+				'usrgrpid' => 7
+			]
+		];
+
+		$user_role = [
+			[
+				'roleid' => 2,
+				'name' => 'Admin role'
+			]
+		];
+
+		$group_name = implode(', ',array_column($user_groups, 'name'));
+		$group_id = implode(', ',array_column($user_groups, 'usrgrpid'));
+
+		$data['saml_groups'] = [
+			[
+				'idp_group_name' => 'Default mapping',
+				'user_group_name' => $group_name,
+				'role_name' => $user_role[0]['name'],
+				'roleid' => $user_role[0]['roleid'],
+				'usrgrpid' => $group_id,
+			],
+			[
+				'idp_group_name' => 'Developers',
+				'user_group_name' => 'Zabbix SAML',
+				'user_group_id' => '123',
+				'role_name' => 'Admin role',
+				'roleid' => '2'
+			]
+		];
+
+		$data['saml_media_type_mappings'] = [
+			[
+				'media_type_mapping_name' => 'Email media type',
+				'media_type_name' => 'Email',
+				'media_type_attribute' => 'userEmail',
+				'mediatypeid' => 1
+			]
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of authentication'));

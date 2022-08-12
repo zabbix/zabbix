@@ -23,7 +23,7 @@
  * @var CView $this
  * @var array $data
  */
-
+//sdii($data);
 $this->includeJsFile('administration.authentication.edit.js.php');
 
 // Authentication general fields.
@@ -215,6 +215,15 @@ $saml_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
+		new CLabel(_('Enable SCIM provisioning'), 'saml_scim_enabled'),
+		new CFormField(
+			(new CCheckBox('saml_scim_enabled', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
+				->setChecked($data['saml_scim_enabled'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
+				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
+				->setEnabled($data['saml_enabled'])
+		)
+	])
+	->addItem([
 		(new CLabel(_('IdP entity ID'), 'saml_idp_entityid'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('saml_idp_entityid', $data['saml_idp_entityid'], false,
@@ -331,6 +340,121 @@ $saml_tab = (new CFormGrid())
 				->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
 				->setEnabled($data['saml_enabled'])
 		)
+	])
+	->addItem([
+		new CLabel(_('Allow SCIM provisioning'), 'saml_allow_scim'),
+		new CFormField(
+			(new CCheckBox('saml_allow_scim'))
+				->setChecked($data['saml_allow_scim'])
+				->setEnabled($data['saml_enabled'])
+		)
+	])
+	->addItem([
+		(new CLabel(_('Group name attribute'), 'saml_group_name_attribute'))
+			->setAsteriskMark()
+			->addClass('saml-allow-scim'),
+		(new CFormField(
+			(new CTextBox('saml_group_name_attribute', $data['saml_group_name_attribute'], false,
+//				DB::getFieldLength('config', 'saml_group_name_attribute')
+			))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->addClass('saml-allow-scim')
+	])
+	->addItem([
+		(new CLabel(_('User name attribute'), 'saml_user_name_attribute'))->addClass('saml-allow-scim'),
+		(new CFormField(
+			(new CTextBox('saml_user_name_attribute', '', false,
+//				DB::getFieldLength('config', 'saml_user_name_attribute')
+			))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass('saml-allow-scim')
+	])
+	->addItem([
+		(new CLabel(_('User lastname attribute'), 'saml_user_lastname_attribute'))->addClass('saml-allow-scim'),
+		(new CFormField(
+			(new CTextBox('saml_user_lastname_attribute', '', false,
+//				DB::getFieldLength('config', 'saml_user_lastname_attribute')
+			))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass('saml-allow-scim')
+	])
+	->addItem([
+		(new CLabel(_('Authorization token'), 'saml_authorization_token'))
+			->setAsteriskMark()
+			->addClass('saml-allow-scim'),
+		(new CFormField(
+			(new CTextBox('saml_authorization_token', '', false,
+//				DB::getFieldLength('config', 'saml_authorization_token')
+			))
+				->setAriaRequired()
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass('saml-allow-scim')
+	])
+	->addItem([(new CLabel(_('User group mapping')))->addClass('saml-allow-scim'),
+		(new CFormField(
+			(new CDiv(
+				(new CTable())
+					->setId('saml-group-table')
+					->setAttribute('style', 'width: 100%;')
+					->setHeader((new CRowHeader([
+						(make_sorting_header(_('SAML group pattern'), 'name','name', 'ASC', 'zabbix.php'))
+							->addClass(ZBX_STYLE_LEFT)
+							->addStyle('width: 35%'),
+						(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
+						(new CColHeader(_('User role')))->addClass(ZBX_STYLE_LEFT),
+						(new CColHeader(_('Action')))->addClass(ZBX_STYLE_LEFT)
+					]))->addClass(ZBX_STYLE_GREY))
+					->addItem(
+						(new CTag('tfoot', true))
+							->addItem(
+								(new CCol(
+									(new CSimpleButton(_('Add')))
+										->addClass(ZBX_STYLE_BTN_LINK)
+										->addClass('js-add')
+								))->setColSpan(5)
+							)
+					)
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass('saml-allow-scim')
+	])
+	->addItem([(new CLabel([
+		_('Media type mapping'),
+		makeHelpIcon(
+			_('Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications.')
+		)]))->addClass('saml-allow-scim'),
+		(new CFormField(
+			(new CDiv(
+				(new CTable())
+					->setId('saml-media-type-mapping-table')
+					->setHeader(
+						(new CRowHeader([
+							(make_sorting_header(_('Name '), 'name','name', 'ASC', 'zabbix.php'))
+								->addClass(ZBX_STYLE_LEFT)
+								->addStyle('width: 35%'),
+							(new CColHeader(_('Media type')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
+							(new CColHeader(_('Attribute')))->addClass(ZBX_STYLE_NOWRAP)->addClass(ZBX_STYLE_LEFT),
+							(new CColHeader(_('')))->addClass(ZBX_STYLE_LEFT)
+						]))->addClass(ZBX_STYLE_GREY)
+					)
+					->addItem(
+						(new CTag('tfoot', true))
+							->addItem(
+								(new CCol(
+									(new CSimpleButton(_('Add')))
+										->addClass(ZBX_STYLE_BTN_LINK)
+										->addClass('js-add')
+								))->setColSpan(5)
+							)
+					)
+					->addStyle('width: 100%;')
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+
+		))->addClass('saml-allow-scim')
 	]);
 
 (new CWidget())
@@ -359,7 +483,9 @@ $saml_tab = (new CFormGrid())
 	'view.init('. json_encode([
 		'ldap_servers' => $data['ldap_servers'],
 		'ldap_default_row_index' => $data['ldap_default_row_index'],
-		'db_authentication_type' => $data['db_authentication_type']
+		'db_authentication_type' => $data['db_authentication_type'],
+		'saml_groups' => $data['saml_groups'],
+		'saml_media_type_mappings' => $data['saml_media_type_mappings']
 	], JSON_FORCE_OBJECT).');'
 ))
 	->setOnDocumentReady()

@@ -35,11 +35,14 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	public const PASSWD_CHECK_RULES = 'passwd_check_rules';
 	public const PASSWD_MIN_LENGTH = 'passwd_min_length';
 	public const SAML_AUTH_ENABLED = 'saml_auth_enabled';
+	public const SAML_AUTHORIZATION_TOKEN = 'saml_authorization_token';
 	public const SAML_CASE_SENSITIVE = 'saml_case_sensitive';
+	public const SAML_GROUP_NAME_ATTRIBUTE = 'saml_group_name_attribute';
 	public const SAML_ENCRYPT_ASSERTIONS = 'saml_encrypt_assertions';
 	public const SAML_ENCRYPT_NAMEID = 'saml_encrypt_nameid';
 	public const SAML_IDP_ENTITYID = 'saml_idp_entityid';
 	public const SAML_NAMEID_FORMAT = 'saml_nameid_format';
+	public const SAML_SCIM_ENABLED = 'saml_scim_enabled';
 	public const SAML_SIGN_ASSERTIONS = 'saml_sign_assertions';
 	public const SAML_SIGN_AUTHN_REQUESTS = 'saml_sign_authn_requests';
 	public const SAML_SIGN_LOGOUT_REQUESTS = 'saml_sign_logout_requests';
@@ -48,6 +51,8 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	public const SAML_SLO_URL = 'saml_slo_url';
 	public const SAML_SP_ENTITYID = 'saml_sp_entityid';
 	public const SAML_SSO_URL = 'saml_sso_url';
+	public const SAML_USER_LASTNAME_ATTRIBUTE = 'saml_user_lastname_attribute';
+	public const SAML_USER_NAME_ATTRIBUTE = 'saml_user_name_attribute';
 	public const SAML_USERNAME_ATTRIBUTE = 'saml_username_attribute';
 
 	/**
