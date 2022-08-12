@@ -1,6 +1,11 @@
 Changes for 6.4.0alpha1
 
 New features:
+.D.G...PS. [ZBXNEXT-7852] added incremental active check refresh for active agents (vso)
+.........T [ZBXNEXT-7834] added templates for Microsoft Azure and Azure virtual machines (vkhaliev)
+..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
+.........T [ZBXNEXT-7792] added template AWS RDS instance by HTTP (ychukina)
+.........T [ZBXNEXT-7819] added template AWS S3 bucket by HTTP (ychukina)
 .......PS. [ZBXNEXT-2878] added new vmware.*.property items (MVekslers)
 .......PS. [ZBXNEXT-7814] updated max supported mariadb version to 10.8 (yurii)
 .......PS. [ZBXNEXT-5229] added support vmware tags for hv, vm, ds, cl and dc (MVekslers)
@@ -10,6 +15,16 @@ New features:
 .........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
+..F....... [ZBX-21041] fixed broken layout of inherited macros table and added missing column name (dpetra)
+..F....... [ZBXNEXT-7830] implemented better menu structure (dpetra)
+........S. [ZBX-19893] fixed script parameters updates during linking (arimdjonoks)
+...G...... [ZBX-21295] changed system.cpu.load[percpu] to split based on online cpus in Zabbix agent 2 (esneiders)
+...G...... [ZBX-18573] improved performance of directory scanning by Agent on Windows (dgoloscapov)
+..F....... [ZBX-20889] fixed special characters in item-tags breaking the subfilter in the latest data and graphs (acikuns)
+..F....... [ZBX-21355] fixed default regular expression issues when php8.1 is used (acikuns)
+..F....... [ZBX-19399] fixed browser error when editing a map navigation widget which hasn't yet been fully loaded (dpetra)
+..F....... [ZBX-21315] fixed latest data page freezing in kiosk mode (rdetlavs)
+..F....... [ZBX-21165] fixed max length and trim function for field Remove domain name (dpetra)
 ..F....... [ZBX-21311] fixed runtime error for host and host prototype graph preview tabs (dpetra)
 ..F....... [ZBX-21327] fixed acknowledge link is clickable without any permission to update the problem (rdetlavs)
 .........T [ZBX-20901] changed host macro in MySQL by Zabbix agent template to use TCP/IP connection method explicitly (drasihov)
