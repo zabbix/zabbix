@@ -38,10 +38,18 @@ class DiscoveredHosts {
 	 * @return array
 	 */
 	public static function load() {
+		// Create hostgroup for discovered host test.
+		$hostgroups = CDataHelper::call('hostgroup.create', [
+			[
+				'name' => 'Group for discovered host test'
+			]
+		]);
+		$hostgroupid = $hostgroups['groupids'][0];
+
 		$hosts = CDataHelper::call('host.create', [
 			'host' => 'Test of discovered host',
 			'groups' => [
-				['groupid' => 4]
+				['groupid' => $hostgroupid]
 			],
 			'interfaces' => [
 				'type'=> 1,
