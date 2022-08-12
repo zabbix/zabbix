@@ -1084,8 +1084,8 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 
 				if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 				{
-					const char	*error = "Remote commands are disabled at unsupported proxies.";
 					zbx_tm_task_t	*task;
+					const char	*error = "Remote commands are disabled at unsupported proxies.";
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT,
@@ -1115,7 +1115,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 
 				if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "Execute now task is disabled at outdated"
+					zabbix_log(LOG_LEVEL_WARNING, "Execute now task is disabled at unsupported"
 							" proxies.");
 				}
 
@@ -1130,16 +1130,11 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 				if (ZBX_PROXY_VERSION_OUTDATED == compatibility ||
 						ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 				{
-					const char	*error;
 					zbx_tm_task_t	*task;
-
-					if (ZBX_PROXY_VERSION_OUTDATED == compatibility)
-						error = "The requested task is disabled at outdated proxies.";
-					else
-						error = "The requested task is disabled at unsupported proxies.";
+					const char	*error = "The requested task is disabled. Proxy major version"
+							" does not match server major verion.";
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
-
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
 							time(NULL), 0, 0);
 					task->data= zbx_tm_data_result_create(taskid, FAIL, error);
