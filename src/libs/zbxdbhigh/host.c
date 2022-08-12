@@ -3076,6 +3076,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes)
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
 		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
 		(void)zbx_merge_tags(&host_prototype->tags, &host_prototype->new_tags, NULL, NULL);
 	}
 
