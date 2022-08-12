@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @backup users
+ */
 class testFormLogin extends CLegacyWebTest {
 
 	public static function data() {

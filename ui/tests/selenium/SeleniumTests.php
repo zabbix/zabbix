@@ -96,6 +96,15 @@ require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 
+// Preprocessing.
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneHost.php';
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneTemplate.php';
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItem.php';
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItemPrototype.php';
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
+
+
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 
@@ -165,12 +174,6 @@ require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneHost.php';
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneTemplate.php';
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItem.php';
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItemPrototype.php';
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDiscovery.php';
-require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 require_once dirname(__FILE__).'/services/testFormServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php';
@@ -314,6 +317,15 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormMacrosHostPrototype');
 		$suite->addTestSuite('testFormMacrosTemplate');
 
+		// Preprocessing.
+		$suite->addTestSuite('testFormPreprocessingCloneHost');
+		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
+		$suite->addTestSuite('testFormPreprocessingItem');
+		$suite->addTestSuite('testFormPreprocessingItemPrototype');
+		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
+		$suite->addTestSuite('testFormPreprocessingTest');
+
+
 
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
@@ -389,12 +401,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormServicesServices');
 		$suite->addTestSuite('testFormNetworkDiscovery');
-		$suite->addTestSuite('testFormPreprocessingCloneHost');
-		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
-		$suite->addTestSuite('testFormPreprocessingItem');
-		$suite->addTestSuite('testFormPreprocessingItemPrototype');
-		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
-		$suite->addTestSuite('testFormPreprocessingTest');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');
