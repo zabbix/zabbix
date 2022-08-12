@@ -18,36 +18,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/testPageReportsAuditValues.php';
+
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup config_autoreg_tls, config, ids
  */
-class testAuditAutoregistration extends testPageReportsAuditValues {
+class testAuditlogAutoregistration extends CAPITest {
 
-	/**
-	 * Id of Autoregistration.
-	 *
-	 * @var integer
-	 */
-	protected static $ids = 1;
+	public function testAuditlogAutoregistration_Update() {
+		$updated = "{\"autoregistration.tls_accept\":[\"update\",\"3\",\"1\"],\"autoregistration.tls_psk_identity\":[".
+				"\"update\",\"******\",\"******\"],\"autoregistration.tls_psk\":[\"update\",\"******\",\"******\"]}";
 
-	public $updated = "autoregistration.tls_accept: 1 => 3".
-			"\nautoregistration.tls_psk: ****** => ******".
-			"\nautoregistration.tls_psk_identity: ****** => ******";
-
-	public $resource_name = 'Autoregistration';
-
-	/**
-	 * Check audit of updated Autoregistration.
-	 */
-	public function testAuditAutoregistration_Update() {
-		CDataHelper::call('autoregistration.update', [
+		$this->call('autoregistration.update', [
 			'tls_accept' => '3',
 			'tls_psk_identity' => 'PSK 001',
 			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
 		]);
 
-		$this->checkAuditValues(self::$ids, 'Update');
+		$get = $this->call('auditlog.get', [
+			'output' => ['details'],
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'filter' => [
+				'resourceid' => 1,
+				'action' => 1
+			]
+		]);
+
+		$this->assertEquals($updated, $get['result'][0]['details']);
 	}
 }
