@@ -320,6 +320,8 @@ typedef struct
 #endif
 	char		proxy_address[HOST_PROXY_ADDRESS_LEN_MAX];
 	int		last_version_error_time;
+
+	zbx_uint64_t	revision;
 }
 DC_PROXY;
 
@@ -1002,10 +1004,20 @@ typedef struct
 }
 zbx_session_t;
 
+typedef struct
+{
+	zbx_uint64_t	config;		/* configuration cache revision, increased every sync */
+	zbx_uint64_t	expression;	/* global expression revision */
+	zbx_uint64_t	autoreg_tls;	/* autoregistration tls revision */
+	zbx_uint64_t	upstream;	/* configuration revision received from server */
+	zbx_uint64_t	config_table;	/* the global configuration revision (config table) */
+}
+zbx_dc_revision_t;
+
 const char	*zbx_dc_get_session_token(void);
 zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *token, zbx_session_type_t session_type);
 int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_uint64_t session_config_revision,
-		zbx_uint64_t *config_revision);
+		zbx_dc_revision_t *config_revision);
 void		zbx_dc_cleanup_sessions(void);
 
 void		zbx_dc_cleanup_autoreg_host(void);
@@ -1166,7 +1178,7 @@ void	zbx_dc_update_received_revision(zbx_uint64_t revision);
 
 void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
-		zbx_vector_uint64_t *httptestids);
+		zbx_vector_uint64_t *httptestids, zbx_uint64_t *discovery_groupid);
 
 void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, zbx_uint64_t revision,
 		zbx_vector_uint64_t *macro_hostids, int *global);

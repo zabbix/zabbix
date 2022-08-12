@@ -198,6 +198,7 @@
 #define ZBX_PROTO_TAG_CONFIG_REVISION		"config_revision"
 #define ZBX_PROTO_TAG_FULL_SYNC			"full_sync"
 #define ZBX_PROTO_TAG_MACRO_SECRETS		"macro.secrets"
+#define ZBX_PROTO_TAG_REMOVED_HOSTIDS		"del_hostids"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

@@ -931,11 +931,7 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
-		if ('\0' == dbsync_env.cache->autoreg_psk_identity[0])	/* no autoregistration PSK in cache */
-		{
-			tag = ZBX_DBSYNC_ROW_ADD;
-		}
-		else if (FAIL == dbsync_compare_str(dbrow[0], dbsync_env.cache->autoreg_psk_identity) ||
+		if (FAIL == dbsync_compare_str(dbrow[0], dbsync_env.cache->autoreg_psk_identity) ||
 				FAIL == dbsync_compare_str(dbrow[1], dbsync_env.cache->autoreg_psk))
 		{
 			tag = ZBX_DBSYNC_ROW_UPDATE;

@@ -33,7 +33,7 @@ static void	DCdump_config(void)
 	if (NULL == config->config)
 		goto out;
 
-	zabbix_log(LOG_LEVEL_TRACE, "revision:%u", config->config->revision);
+	zabbix_log(LOG_LEVEL_TRACE, "revision:" ZBX_FS_UI64, config->revision.config_table);
 	zabbix_log(LOG_LEVEL_TRACE, "discovery_groupid:" ZBX_FS_UI64, config->config->discovery_groupid);
 	zabbix_log(LOG_LEVEL_TRACE, "snmptrap_logging:%hhu", config->config->snmptrap_logging);
 	zabbix_log(LOG_LEVEL_TRACE, "default_inventory_mode:%d", config->config->default_inventory_mode);
@@ -100,7 +100,7 @@ static void	DCdump_hosts(void)
 		int	j;
 
 		host = (ZBX_DC_HOST *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " host:'%s' name:'%s' status:%u revision:%u",
+		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " host:'%s' name:'%s' status:%u revision:" ZBX_FS_UI64,
 				host->hostid, host->host, host->name, host->status, host->revision);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  proxy_hostid:" ZBX_FS_UI64, host->proxy_hostid);
@@ -228,7 +228,7 @@ static void	DCdump_proxies(void)
 	for (i = 0; i < index.values_num; i++)
 	{
 		proxy = (ZBX_DC_PROXY *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " location:%u revision:%u", proxy->hostid,
+		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " location:%u revision:" ZBX_FS_UI64, proxy->hostid,
 				proxy->location, proxy->revision);
 		zabbix_log(LOG_LEVEL_TRACE, "  proxy_address:'%s'", proxy->proxy_address);
 		zabbix_log(LOG_LEVEL_TRACE, "  compress:%d", proxy->auto_compress);
@@ -240,7 +240,7 @@ static void	DCdump_proxies(void)
 
 		zabbix_log(LOG_LEVEL_TRACE, "  removed hosts:%d", proxy->removed_hosts.values_num);
 				for (j = 0; j < proxy->removed_hosts.values_num; j++)
-			zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64 " revision:%u",
+			zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64,
 					proxy->removed_hosts.values[j].hostid, proxy->removed_hosts.values[j].revision);
 	}
 
@@ -605,7 +605,7 @@ static void	DCdump_items(void)
 	for (i = 0; i < index.values_num; i++)
 	{
 		item = (ZBX_DC_ITEM *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " key:'%s' revision:%u",
+		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " key:'%s' revision:" ZBX_FS_UI64,
 				item->itemid, item->hostid, item->key, item->revision);
 		zabbix_log(LOG_LEVEL_TRACE, "  type:%u value_type:%u", item->type, item->value_type);
 		zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64, item->interfaceid);
@@ -819,7 +819,7 @@ static void	DCdump_functions(void)
 	{
 		function = (ZBX_DC_FUNCTION *)index.values[i];
 		zabbix_log(LOG_LEVEL_DEBUG, "functionid:" ZBX_FS_UI64 " triggerid:" ZBX_FS_UI64 " itemid:"
-				ZBX_FS_UI64 " function:'%s' parameter:'%s' type:%u timer_revision:%u",
+				ZBX_FS_UI64 " function:'%s' parameter:'%s' type:%u timer_revision:" ZBX_FS_UI64,
 				function->functionid, function->triggerid, function->itemid, function->function,
 				function->parameter, function->type, function->timer_revision);
 
@@ -956,7 +956,7 @@ static void	DCdump_expressions(void)
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
-	zabbix_log(LOG_LEVEL_TRACE, "expression_revision:%u", config->expression_revision);
+	zabbix_log(LOG_LEVEL_TRACE, "expression_revision:" ZBX_FS_UI64, config->revision.expression);
 
 	zbx_vector_ptr_create(&index);
 	zbx_hashset_iter_reset(&config->expressions, &iter);
@@ -1344,7 +1344,7 @@ static void	DCdump_drules(void)
 	zbx_hashset_iter_reset(&config->drules, &iter);
 	while (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "druleid:" ZBX_FS_UI64 " proxy_hostid:" ZBX_FS_UI64 " revision:%u",
+		zabbix_log(LOG_LEVEL_TRACE, "druleid:" ZBX_FS_UI64 " proxy_hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64,
 				drule->druleid, drule->proxy_hostid, drule->revision);
 		zabbix_log(LOG_LEVEL_TRACE, "  status:%u delay:%d location:%d nextcheck:%ld",
 				drule->status, drule->delay, drule->location, (long int)drule->nextcheck);
@@ -1380,7 +1380,7 @@ static void	DCdump_httptests(void)
 	zbx_hashset_iter_reset(&config->httptests, &iter);
 	while (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "httptestid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " revision:%u",
+		zabbix_log(LOG_LEVEL_TRACE, "httptestid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64,
 				httptest->httptestid, httptest->hostid, httptest->revision);
 		zabbix_log(LOG_LEVEL_TRACE, "  status:%u delay:%d location:%d nextcheck:%ld",
 				httptest->status, httptest->delay, httptest->location, (long int)httptest->nextcheck);
@@ -1442,7 +1442,10 @@ static void	DCdump_httpstep_fields(void)
 
 void	DCdump_configuration(void)
 {
-	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:%u) ===", config->revision);
+	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:" ZBX_FS_UI64 ") ===",
+			config->revision.config);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  autoreg_tls_revision:" ZBX_FS_UI64, config->revision.autoreg_tls);
 
 	DCdump_config();
 	DCdump_hosts();

@@ -41,8 +41,8 @@ typedef struct
 	const unsigned char	*expression_bin;
 	const unsigned char	*recovery_expression_bin;
 	int			lastchange;
-	zbx_uint32_t		revision;
-	zbx_uint32_t		timer_revision;
+	zbx_uint64_t		revision;
+	zbx_uint64_t		timer_revision;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -84,8 +84,8 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*function;
 	const char	*parameter;
-	zbx_uint32_t	revision;
-	zbx_uint32_t	timer_revision;
+	zbx_uint64_t	revision;
+	zbx_uint64_t	timer_revision;
 	unsigned char	type;
 }
 ZBX_DC_FUNCTION;
@@ -107,7 +107,7 @@ typedef struct
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
-	zbx_uint32_t		revision;
+	zbx_uint64_t		revision;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
@@ -327,7 +327,7 @@ typedef struct
 	int		delay;
 	unsigned char	status;
 	unsigned char	location;
-	zbx_uint32_t	revision;
+	zbx_uint64_t	revision;
 }
 zbx_dc_httptest_t;
 
@@ -342,7 +342,7 @@ typedef struct
 {
 	zbx_uint64_t	httpstepid;
 	zbx_uint64_t	httptestid;
-	zbx_uint32_t	revision;
+	zbx_uint64_t	revision;
 }
 zbx_dc_httpstep_t;
 
@@ -371,7 +371,7 @@ typedef struct
 	const char	*name;
 	int		maintenance_from;
 	int		data_expected_from;
-	zbx_uint32_t	revision;
+	zbx_uint64_t	revision;
 
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
@@ -426,7 +426,7 @@ ZBX_DC_HOST_H;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	zbx_uint32_t	revision;
+	zbx_uint64_t	revision;
 }
 zbx_host_rev_t;
 
@@ -452,7 +452,7 @@ typedef struct
 	unsigned char		auto_compress;
 	const char		*proxy_address;
 	int			last_version_error_time;
-	zbx_uint32_t		revision;
+	zbx_uint64_t		revision;
 
 	zbx_vector_dc_host_t	hosts;
 
@@ -577,7 +577,6 @@ typedef struct
 	unsigned char	autoreg_tls_accept;
 	const char	*default_timezone;
 	int		auditlog_enabled;
-	zbx_uint32_t	revision;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
@@ -829,7 +828,7 @@ typedef struct
 	int		delay;
 	unsigned char	status;
 	unsigned char	location;
-	zbx_uint32_t	revision;
+	zbx_uint64_t	revision;
 }
 zbx_dc_drule_t;
 
@@ -851,10 +850,7 @@ typedef struct
 	unsigned int		internal_actions;		/* number of enabled internal actions */
 	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */
 
-	zbx_uint32_t		revision;
-	zbx_uint32_t		expression_revision;
-	zbx_uint32_t		autoreg_tls_revision;
-	zbx_uint64_t		received_revision;		/* the received revision (proxies) */
+	zbx_dc_revision_t	revision;
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */
@@ -1009,7 +1005,7 @@ char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int h
 #define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
 
-zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint32_t revision, zbx_dbsync_t *gmacros,
+zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_dbsync_t *gmacros,
 		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls);
 
 #endif
