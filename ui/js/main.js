@@ -486,13 +486,20 @@ var hintBox = {
 
 		jQuery(appendTo).append(box);
 
-		var removeHandler = function() {
-			hintBox.deleteHint(target);
-		};
+		const observer = new MutationObserver(() => {
+			if (document.body.contains(target)) {
+				return;
+			}
 
-		jQuery(target)
-			.off('remove', removeHandler)
-			.on('remove', removeHandler);
+			observer.disconnect();
+
+			hintBox.deleteHint(target);
+		})
+
+		observer.observe(document, {
+			childList: true,
+			subtree: true
+		})
 
 		return box;
 	},
