@@ -1,8 +1,19 @@
 Changes for 6.2.2rc1
 
 New features:
+.........T [ZBXNEXT-7834] added templates for Microsoft Azure and Azure virtual machines (vkhaliev)
+.........T [ZBXNEXT-7792] added template AWS RDS instance by HTTP (ychukina)
+.........T [ZBXNEXT-7819] added template AWS S3 bucket by HTTP (ychukina)
 
 Bug fixes:
+..F....... [ZBX-21041] fixed broken layout of inherited macros table and added missing column name (dpetra)
+...G...... [ZBX-21295] changed system.cpu.load[percpu] to split based on online cpus in Zabbix agent 2 (esneiders)
+...G...... [ZBX-18573] improved performance of directory scanning by Agent on Windows (dgoloscapov)
+..F....... [ZBX-20889] fixed special characters in item-tags breaking the subfilter in the latest data and graphs (acikuns)
+..F....... [ZBX-21355] fixed default regular expression issues when php8.1 is used (acikuns)
+..F....... [ZBX-19399] fixed browser error when editing a map navigation widget which hasn't yet been fully loaded (dpetra)
+..F....... [ZBX-21315] fixed latest data page freezing in kiosk mode (rdetlavs)
+..F....... [ZBX-21165] fixed max length and trim function for field Remove domain name (dpetra)
 ..F....... [ZBX-21311] fixed runtime error for host and host prototype graph preview tabs (dpetra)
 ..F....... [ZBX-21327] fixed acknowledge link is clickable without any permission to update the problem (rdetlavs)
 .........T [ZBX-20901] changed host macro in MySQL by Zabbix agent template to use TCP/IP connection method explicitly (drasihov)
