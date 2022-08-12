@@ -200,7 +200,7 @@ class testRole extends CAPITest {
 							[
 								'name' => 'administration.queue',
 								'status' => '1'
-							],
+							]
 						],
 						'ui.default_access' => '0',
 						'services.read.mode' => '1',
@@ -357,7 +357,7 @@ class testRole extends CAPITest {
 								'status' => '1'
 							]
 						],
-					'ui.default_access' => '0',
+					'ui.default_access' => '0'
 					]
 				],
 				'expected_error' =>
@@ -374,7 +374,7 @@ class testRole extends CAPITest {
 								'status' => '1'
 							]
 						],
-					'ui.default_access' => '0',
+					'ui.default_access' => '0'
 					]
 				],
 				'expected_error' =>
@@ -497,7 +497,7 @@ class testRole extends CAPITest {
 								'status' => '1'
 							]
 						],
-					'ui.default_access' => '0',
+					'ui.default_access' => '0'
 					]
 				],
 				'expected_error' => null
@@ -591,7 +591,7 @@ class testRole extends CAPITest {
 								'status' => '1'
 							]
 						],
-					'ui.default_access' => '0',
+					'ui.default_access' => '0'
 					]
 				],
 				'expected_error' =>

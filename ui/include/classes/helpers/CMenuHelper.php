@@ -274,7 +274,7 @@ class CMenuHelper {
 				? (new CMenuItem(_('Scripts')))
 					->setAction('script.list')
 					->setAliases(['script.edit'])
-				: null,
+				: null
 		];
 		$submenu_alerts = array_filter($submenu_alerts);
 

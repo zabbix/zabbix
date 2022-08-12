@@ -203,43 +203,43 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Alerts',
-					'page' => 'Media types',
+					'page' => 'Media types'
 				]
 			],
 			[
 				[
 					'section' => 'Alerts',
-					'page' => 'Scripts',
+					'page' => 'Scripts'
 				]
 			],
 			[
 				[
 					'section' => 'Users',
-					'page' => 'User groups',
+					'page' => 'User groups'
 				]
 			],
 			[
 				[
 					'section' => 'Users',
-					'page' => 'User roles',
+					'page' => 'User roles'
 				]
 			],
 			[
 				[
 					'section' => 'Users',
-					'page' => 'Users',
+					'page' => 'Users'
 				]
 			],
 			[
 				[
 					'section' => 'Users',
-					'page' => 'API tokens',
+					'page' => 'API tokens'
 				]
 			],
 			[
 				[
 					'section' => 'Users',
-					'page' => 'Authentication',
+					'page' => 'Authentication'
 				]
 			],
 			[
