@@ -67,6 +67,7 @@ require_once dirname(__FILE__).'/testAuditlogScheduledReport.php';
 require_once dirname(__FILE__).'/testAuditlogSettings.php';
 require_once dirname(__FILE__).'/testAuditlogUser.php';
 require_once dirname(__FILE__).'/testAuditlogUserGroups.php';
+require_once dirname(__FILE__).'/testAuditlogToken.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -122,6 +123,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testAuditlogSettings');
 		$suite->addTestSuite('testAuditlogUser');
 		$suite->addTestSuite('testAuditlogUserGroups');
+		$suite->addTestSuite('testAuditlogToken');
 
 		return $suite;
 	}
