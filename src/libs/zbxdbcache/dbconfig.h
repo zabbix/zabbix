@@ -41,8 +41,8 @@ typedef struct
 	const unsigned char	*expression_bin;
 	const unsigned char	*recovery_expression_bin;
 	int			lastchange;
-	int			revision;
-	int			timer_revision;
+	zbx_uint32_t		revision;
+	zbx_uint32_t		timer_revision;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -84,8 +84,8 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*function;
 	const char	*parameter;
-	int		revision;
-	int		timer_revision;
+	zbx_uint32_t	revision;
+	zbx_uint32_t	timer_revision;
 	unsigned char	type;
 }
 ZBX_DC_FUNCTION;
@@ -107,6 +107,7 @@ typedef struct
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
+	zbx_uint32_t		revision;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
@@ -308,7 +309,6 @@ typedef struct
 }
 ZBX_DC_SCRIPTITEM;
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 typedef struct
 {
 	const char	*tls_psk_identity;	/* pre-shared key identity           */
@@ -316,7 +316,8 @@ typedef struct
 	unsigned int	refcount;		/* reference count                   */
 }
 ZBX_DC_PSK;
-#endif
+
+ZBX_PTR_VECTOR_DECL(dc_item_ptr, ZBX_DC_ITEM *)
 
 typedef struct
 {
@@ -334,6 +335,7 @@ typedef struct
 	const char	*name;
 	int		maintenance_from;
 	int		data_expected_from;
+	zbx_uint32_t	revision;
 
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
@@ -351,10 +353,23 @@ typedef struct
 	ZBX_DC_PSK	*tls_dc_psk;
 #endif
 
-	zbx_vector_ptr_t	interfaces_v;	/* for quick finding of all host interfaces in */
+	zbx_vector_ptr_t		interfaces_v;	/* for quick finding of all host interfaces in */
 						/* 'config->interfaces' hashset */
+	zbx_vector_dc_item_ptr_t	active_items;
 }
 ZBX_DC_HOST;
+
+typedef struct
+{
+	const char	*host;
+	const char	*listen_ip;
+	const char	*listen_dns;
+	const char	*host_metadata;
+	int		flags;
+	int		timestamp;
+	unsigned short	listen_port;
+}
+ZBX_DC_AUTOREG_HOST;
 
 typedef struct
 {
@@ -762,9 +777,12 @@ typedef struct
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
 	int			item_sync_ts;
-	int			sync_start_ts;
 
 	unsigned int		internal_actions;		/* number of enabled internal actions */
+	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */
+
+	zbx_uint32_t		revision;
+	zbx_uint32_t		expression_revision;
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */
@@ -802,6 +820,7 @@ typedef struct
 	zbx_hashset_t		hosts_h;		/* for searching hosts by 'host' name */
 	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
 	zbx_hashset_t		proxies;
+	zbx_hashset_t		autoreg_hosts;
 	zbx_hashset_t		host_inventories;
 	zbx_hashset_t		host_inventories_auto;	/* For caching of automatically populated host inventories. */
 	 	 	 	 	 	 	/* Configuration syncer will read host_inventories without  */
@@ -840,7 +859,7 @@ typedef struct
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
 #endif
-	zbx_hashset_t		data_sessions;
+	zbx_hashset_t		sessions[ZBX_SESSION_TYPE_COUNT];
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	zbx_binary_heap_t	trigger_queue;
@@ -909,7 +928,8 @@ char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int h
 #define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
 
-zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_dbsync_t *hmacros,
-		zbx_dbsync_t *htmpls);
+
+zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache,  zbx_uint32_t revision, zbx_dbsync_t *gmacros,
+		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls);
 
 #endif

@@ -31,9 +31,9 @@
 #include "cfg.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-extern char	*CONFIG_TLS_SERVER_CERT_ISSUER;
-extern char	*CONFIG_TLS_SERVER_CERT_SUBJECT;
-extern char	*CONFIG_TLS_PSK_IDENTITY;
+extern char	*config_tls_server_cert_issuer;
+extern char	*config_tls_server_cert_subject;
+extern char	*config_tls_psk_identity;
 #endif
 
 static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_ptr_t *addrs,
@@ -67,16 +67,16 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 }
 
 int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
-		int connect_timeout, unsigned int tls_connect, int retry_interval, int level)
+		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *zbx_config_tls)
 {
-	int	res;
-	char	*tls_arg1, *tls_arg2;
+	int		res;
+	const char	*tls_arg1, *tls_arg2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s]:%d [timeout:%d, connection timeout:%d]", __func__,
 			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout,
 			connect_timeout);
 
-	switch (tls_connect)
+	switch (zbx_config_tls->connect_mode)
 	{
 		case ZBX_TCP_SEC_UNENCRYPTED:
 			tls_arg1 = NULL;
@@ -84,11 +84,11 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 			break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		case ZBX_TCP_SEC_TLS_CERT:
-			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
-			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+			tls_arg1 = zbx_config_tls->server_cert_issuer;
+			tls_arg2 = zbx_config_tls->server_cert_subject;
 			break;
 		case ZBX_TCP_SEC_TLS_PSK:
-			tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
+			tls_arg1 = zbx_config_tls->psk_identity;
 			tls_arg2 = NULL;	/* zbx_tls_connect() will find PSK */
 			break;
 #endif
@@ -97,8 +97,8 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 			return FAIL;
 	}
 
-	if (FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs, timeout, connect_timeout, tls_connect,
-			tls_arg1, tls_arg2, level)))
+	if (FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs, timeout, connect_timeout,
+			zbx_config_tls->connect_mode, tls_arg1, tls_arg2, level)))
 	{
 		if (0 != retry_interval)
 		{
@@ -109,7 +109,8 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 					retry_interval);
 
 			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs,
-					timeout, connect_timeout, tls_connect, tls_arg1, tls_arg2, LOG_LEVEL_DEBUG)))
+					timeout, connect_timeout, zbx_config_tls->connect_mode, tls_arg1,
+					tls_arg2, LOG_LEVEL_DEBUG)))
 			{
 				int	now = (int)time(NULL);
 

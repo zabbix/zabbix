@@ -32,9 +32,6 @@ extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern char	*CONFIG_WEBSERVICE_URL;
-extern char	*CONFIG_TLS_CA_FILE;
-extern char	*CONFIG_TLS_CERT_FILE;
-extern char	*CONFIG_TLS_KEY_FILE;
 
 typedef struct
 {
@@ -82,19 +79,24 @@ static char	*rw_curl_error(CURLcode err)
  *                                                                            *
  * Purpose: get report from web service                                       *
  *                                                                            *
- * Parameters: url         - [IN] the report url                              *
- *             cookie      - [IN] the authentication cookie                   *
- *             width       - [IN] the report width                            *
- *             height      - [IN] the report height                           *
- *             report      - [OUT] the downloaded report                      *
- *             report_size - [OUT] the report size                            *
+ * Parameters: url                  - [IN] the report url                     *
+ *             cookie               - [IN] the authentication cookie          *
+ *             width                - [IN] the report width                   *
+ *             height               - [IN] the report height                  *
+ *             report               - [OUT] the downloaded report             *
+ *             report_size          - [OUT] the report size                   *
+ *             config_tls_ca_file   - [IN]                                    *
+ *             config_tls_cert_file - [IN]                                    *
+ *             config_tls_key_file  - [IN]                                    *
+ *             error                - [OUT] the error message                 *
  *                                                                            *
  * Return value: SUCCEED - the report was downloaded successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	rw_get_report(const char *url, const char *cookie, int width, int height, char **report,
-		size_t *report_size, char **error)
+		size_t *report_size, const char *config_tls_ca_file, const char *config_tls_cert_file,
+		const char *config_tls_key_file, char **error)
 {
 #if !defined(HAVE_LIBCURL)
 	ZBX_UNUSED(url);
@@ -103,6 +105,9 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 	ZBX_UNUSED(height);
 	ZBX_UNUSED(report);
 	ZBX_UNUSED(report_size);
+	ZBX_UNUSED(config_tls_ca_file);
+	ZBX_UNUSED(config_tls_cert_file);
+	ZBX_UNUSED(config_tls_key_file);
 
 	*error = zbx_strdup(NULL, "application compiled without cURL library");
 	return FAIL;
@@ -160,11 +165,11 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 		goto out;
 	}
 
-	if (NULL != CONFIG_TLS_CA_FILE && '\0' != *CONFIG_TLS_CA_FILE)
+	if (NULL != config_tls_ca_file && '\0' != *config_tls_ca_file)
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, CONFIG_TLS_CA_FILE)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, CONFIG_TLS_CERT_FILE)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, CONFIG_TLS_KEY_FILE)))
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_tls_ca_file)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, config_tls_cert_file)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_tls_key_file)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
 					(curl_error = rw_curl_error(err)));
@@ -242,19 +247,25 @@ out:
  *                                                                            *
  * Purpose: to begin report dispatch                                          *
  *                                                                            *
- * Parameters: msg      - [IN] the request message                            *
- *             dispatch - [IN] the alerter dispatch                           *
- *             error    - [OUT] the error message                             *
+ * Parameters: msg                  - [IN] the request message                *
+ *             dispatch             - [IN] the alerter dispatch               *
+ *             config_tls_ca_file   - [IN]                                    *
+ *             config_tls_cert_file - [IN]                                    *
+ *             config_tls_key_file  - [IN]                                    *
+ *             error                - [OUT] the error message                 *
  *                                                                            *
  * Return value: SUCCEED - the report was started successfully                *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispatch, char **error)
+static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispatch,
+		const char *config_tls_ca_file, const char *config_tls_cert_file, const char *config_tls_key_file,
+		char **error)
 {
 	zbx_vector_ptr_pair_t	params;
 	int			i, ret, width, height;
-	char			*url, *cookie, *subject = "", *message = "", *report = NULL, *name;
+	const char		*subject = "", *message = "";
+	char			*url, *cookie, *report = NULL, *name;
 	size_t			report_size = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -280,7 +291,8 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 		}
 	}
 
-	if (SUCCEED == (ret = rw_get_report(url, cookie, width, height, &report, &report_size, error)))
+	if (SUCCEED == (ret = rw_get_report(url, cookie, width, height, &report, &report_size, config_tls_ca_file,
+			config_tls_cert_file, config_tls_key_file, error)))
 	{
 		ret = zbx_alerter_begin_dispatch(dispatch, subject, message, name, "application/pdf", report,
 				report_size, error);
@@ -390,14 +402,15 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 {
 #define	ZBX_STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 					/* once in STAT_INTERVAL seconds */
-
-	pid_t			ppid;
-	char			*error = NULL;
-	zbx_ipc_socket_t	socket;
-	zbx_ipc_message_t	message;
-	zbx_alerter_dispatch_t	dispatch = {0};
-	int			report_status = FAIL, started_num = 0, sent_num = 0, finished_num = 0;
-	double			time_now, time_stat, time_wake, time_idle = 0;
+	zbx_thread_report_writer_args	*poller_args_in = (zbx_thread_report_writer_args *)
+							(((zbx_thread_args_t *)args)->args);
+	pid_t				ppid;
+	char				*error = NULL;
+	zbx_ipc_socket_t		socket;
+	zbx_ipc_message_t		message;
+	zbx_alerter_dispatch_t		dispatch = {0};
+	int				report_status = FAIL, started_num = 0, sent_num = 0, finished_num = 0;
+	double				time_now, time_stat, time_wake, time_idle = 0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -417,8 +430,9 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	ppid = getppid();
 	zbx_ipc_socket_write(&socket, ZBX_IPC_REPORTER_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
+			get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
@@ -461,10 +475,17 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 		switch (message.code)
 		{
 			case ZBX_IPC_REPORTER_BEGIN_REPORT:
-				if (SUCCEED != (report_status = rw_begin_report(&message, &dispatch, &error)))
+				if (SUCCEED != (report_status = rw_begin_report(&message, &dispatch,
+						poller_args_in->config_tls_ca_file,
+						poller_args_in->config_tls_cert_file,
+						poller_args_in->config_tls_key_file, &error)))
+				{
 					zabbix_log(LOG_LEVEL_DEBUG, "failed to begin report dispatch: %s", error);
+				}
 				else
+				{
 					started_num++;
+				}
 				break;
 			case ZBX_IPC_REPORTER_SEND_REPORT:
 				if (SUCCEED == report_status)

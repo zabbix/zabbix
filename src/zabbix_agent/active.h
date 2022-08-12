@@ -23,6 +23,7 @@
 #include "zbxtime.h"
 #include "zbxthreads.h"
 #include "zbxalgo.h"
+#include "zbxcomms.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_HOST_METADATA;
@@ -45,8 +46,10 @@ typedef struct
 {
 	zbx_vector_ptr_t	addrs;
 	char			*hostname;
+	zbx_config_tls_t	*zbx_config_tls;
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 }
-ZBX_THREAD_ACTIVECHK_ARGS;
+zbx_thread_activechk_args;
 
 typedef struct
 {
