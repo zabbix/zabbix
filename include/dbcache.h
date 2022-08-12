@@ -285,7 +285,7 @@ zbx_trigger_items_t;
 
 typedef struct
 {
-	zbx_uint64_t	hostid;
+	zbx_uint64_t			hostid;
 char					host[ZBX_HOSTNAME_BUF_LEN];
 int					proxy_config_nextcheck;
 int					proxy_data_nextcheck;
