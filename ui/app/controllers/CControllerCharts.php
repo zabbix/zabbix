@@ -243,7 +243,7 @@ abstract class CControllerCharts extends CController {
 		 */
 		foreach ($graphs as $graph) {
 			$subfilter_graph_tags = [];
-			
+
 			// Calculate the counters of tag existence subfilter options.
 			foreach ($graph['tags'] as $tag) {
 				$graph_matches = true;
