@@ -1984,7 +1984,7 @@ class testFormHost extends CWebTest {
 						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'maxlength' => 128, 'enabled' => false],
 						['name' => 'Visible name', 'value' => '', 'maxlength' => 128, 'enabled' => false],
 						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
-						['name' => 'Host groups', 'value' => ['Zabbix servers'], 'enabled' => false],
+						['name' => 'Host groups', 'value' => ['Group for discovered host test'], 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' =>  '127.0.0.1',
 								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' =>  '',
