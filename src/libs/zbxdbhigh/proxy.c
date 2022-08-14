@@ -2007,6 +2007,27 @@ static int	process_proxyconfig_table(zbx_vector_table_data_t *config_tables, con
 	return insert_proxyconfig_rows(td, error);
 }
 
+static int	process_proxyconfig_network_discovery(zbx_vector_table_data_t *config_tables, char **error)
+{
+	zbx_table_data_t	*dchecks;
+
+	dchecks = get_proxyconfig_table(config_tables, "dchecks");
+
+	if (NULL != dchecks && SUCCEED != delete_proxyconfig_rows(dchecks, error))
+		return FAIL;
+
+	if (SUCCEED != process_proxyconfig_table(config_tables, "drules", "name", error))
+		return FAIL;
+
+	if (NULL == dchecks)
+		return SUCCEED;
+
+	if (SUCCEED != update_proxyconfig_rows(dchecks, NULL, error))
+		return FAIL;
+
+	return insert_proxyconfig_rows(dchecks, error);
+}
+
 static int	process_proxyconfig_data(zbx_vector_table_data_t *config_tables, char **error)
 {
 	int	i;
@@ -2020,6 +2041,9 @@ static int	process_proxyconfig_data(zbx_vector_table_data_t *config_tables, char
 		return FAIL;
 
 	if (SUCCEED != process_proxyconfig_table(config_tables, "config_autoreg_tls", NULL, error))
+		return FAIL;
+
+	if (SUCCEED != process_proxyconfig_network_discovery(config_tables, error))
 		return FAIL;
 
 	return SUCCEED;
