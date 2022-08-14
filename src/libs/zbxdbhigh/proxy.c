@@ -2049,6 +2049,50 @@ static int	process_proxyconfig_regexps(zbx_vector_table_data_t *config_tables, c
 	return insert_proxyconfig_rows(expressions, error);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update config and hstgrp configuration                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	process_proxyconfig_config(zbx_vector_table_data_t *config_tables, char **error)
+{
+	zbx_table_data_t	*hstgrp;
+
+	if (NULL != (hstgrp = get_proxyconfig_table(config_tables, "hstgrp")))
+	{
+		/* Only id of the host group used for network discovery is sent to proxy. */
+		/* This means that there will be no host group updates -  only one group  */
+		/* will be inserted and the old one (if exists) deleted.                  */
+		/* Because names are not synced the existing group must be renamed before */
+		/* inserting new group or there would be name key violation.              */
+		if (0 != hstgrp->del_ids.values_num)
+		{
+			int ret;
+#ifdef HAVE_MYSQL
+			ret = DBexecute("update hstgrp set name=concat('#',name)");
+#else
+			ret = DBexecute("update hstgrp set name='#'||name");
+#endif
+			if (ZBX_DB_OK >= ret)
+			{
+				*error = zbx_strdup(NULL, "cannot rename hstgrp name");
+				return FAIL;
+			}
+		}
+
+		if (SUCCEED != insert_proxyconfig_rows(hstgrp, error))
+			return FAIL;
+	}
+
+	if (SUCCEED != process_proxyconfig_table(config_tables, "config", NULL, error))
+		return FAIL;
+
+	if (NULL != hstgrp)
+		return delete_proxyconfig_rows(hstgrp, error);
+
+	return SUCCEED;
+}
+
 static int	process_proxyconfig_data(zbx_vector_table_data_t *config_tables, char **error)
 {
 	int	i;
@@ -2068,6 +2112,9 @@ static int	process_proxyconfig_data(zbx_vector_table_data_t *config_tables, char
 		return FAIL;
 
 	if (SUCCEED != process_proxyconfig_regexps(config_tables, error))
+		return FAIL;
+
+	if (SUCCEED != process_proxyconfig_config(config_tables, error))
 		return FAIL;
 
 	return SUCCEED;
