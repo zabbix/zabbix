@@ -2028,6 +2028,27 @@ static int	process_proxyconfig_network_discovery(zbx_vector_table_data_t *config
 	return insert_proxyconfig_rows(dchecks, error);
 }
 
+static int	process_proxyconfig_regexps(zbx_vector_table_data_t *config_tables, char **error)
+{
+	zbx_table_data_t	*expressions;
+
+	expressions = get_proxyconfig_table(config_tables, "expressions");
+
+	if (NULL != expressions && SUCCEED != delete_proxyconfig_rows(expressions, error))
+		return FAIL;
+
+	if (SUCCEED != process_proxyconfig_table(config_tables, "regexps", "name", error))
+		return FAIL;
+
+	if (NULL == expressions)
+		return SUCCEED;
+
+	if (SUCCEED != update_proxyconfig_rows(expressions, NULL, error))
+		return FAIL;
+
+	return insert_proxyconfig_rows(expressions, error);
+}
+
 static int	process_proxyconfig_data(zbx_vector_table_data_t *config_tables, char **error)
 {
 	int	i;
@@ -2044,6 +2065,9 @@ static int	process_proxyconfig_data(zbx_vector_table_data_t *config_tables, char
 		return FAIL;
 
 	if (SUCCEED != process_proxyconfig_network_discovery(config_tables, error))
+		return FAIL;
+
+	if (SUCCEED != process_proxyconfig_regexps(config_tables, error))
 		return FAIL;
 
 	return SUCCEED;
