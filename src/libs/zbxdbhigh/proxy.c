@@ -768,14 +768,14 @@ static int	get_proxyconfig_table_data(const char *table_name, const char *key_na
 
 	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
 
-	if (NULL == key_name || 0 != key_ids->values_num)
+	if (NULL == key_ids || 0 != key_ids->values_num)
 	{
 
-		if (NULL != key_name || NULL != filter)
+		if (NULL != key_ids || NULL != filter)
 		{
 			const char	*keyword = " where";
 
-			if (NULL != key_name)
+			if (NULL != key_ids)
 			{
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, keyword);
 				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, key_name, key_ids->values,
@@ -1373,28 +1373,36 @@ typedef struct
 	const ZBX_TABLE			*table;
 	zbx_vector_const_field_t	fields;
 	zbx_hashset_t			rows;
+
+	/* identifiers of the rows that must be deleted */
 	zbx_vector_uint64_t		del_ids;
+
+	/* row that must be updated */
 	zbx_vector_table_row_ptr_t	updates;
+
+	/* to avoid unique key conflicts when syncing rows the key */
+	/* field will be renamed for all update rows and marked    */
+	/* for update                                              */
+	const char			*rename_field;
+
+	/* To avoid self referencing foreign key conflicts when */
+	/* syncing rows the reset field will be set to NULL for */
+	/* all update and delete rows and marked for update.    */
+	/* As such only ID fields can be set as reset_field.    */
+	const char			*reset_field;
 }
 zbx_table_data_t;
 
-ZBX_VECTOR_DECL(table_data, zbx_table_data_t)
-ZBX_VECTOR_IMPL(table_data, zbx_table_data_t)
+ZBX_PTR_VECTOR_DECL(table_data_ptr, zbx_table_data_t *)
+ZBX_PTR_VECTOR_IMPL(table_data_ptr, zbx_table_data_t *)
 
-static void	clear_proxyconfig_table(zbx_table_data_t *td)
+void	table_data_free(zbx_table_data_t *td)
 {
 	zbx_vector_const_field_destroy(&td->fields);
 	zbx_vector_uint64_destroy(&td->del_ids);
 	zbx_vector_table_row_ptr_destroy(&td->updates);
 	zbx_hashset_destroy(&td->rows);
-}
-
-static void	clear_proxyconfig_tables(zbx_vector_table_data_t *config_tables)
-{
-	int	i;
-
-	for (i = 0; i < config_tables->values_num; i++)
-		clear_proxyconfig_table(&config_tables->values[i]);
+	zbx_free(td);
 }
 
 static int	parse_proxyconfig_table_fields(zbx_table_data_t *td, struct zbx_json_parse *jp_table, char **error)
@@ -1478,7 +1486,7 @@ out:
 	return ret;
 }
 
-static int	parse_proxyconfig_data(struct zbx_json_parse *jp_data, zbx_vector_table_data_t *config_tables,
+static int	parse_proxyconfig_data(struct zbx_json_parse *jp_data, zbx_vector_table_data_ptr_t *config_tables,
 		char **error)
 {
 	const char		*p;
@@ -1522,7 +1530,8 @@ static int	parse_proxyconfig_data(struct zbx_json_parse *jp_data, zbx_vector_tab
 	/* iterate the tables (lines 2, 22 and 25 in T1) */
 	for (p = NULL; NULL != (p = zbx_json_pair_next(jp_data, p, buf, sizeof(buf))); )
 	{
-		zbx_table_data_t	td;
+		zbx_table_data_t	*td;
+		const ZBX_TABLE		*table;
 
 		if (FAIL == zbx_json_brackets_open(p, &jp_table))
 		{
@@ -1530,26 +1539,44 @@ static int	parse_proxyconfig_data(struct zbx_json_parse *jp_data, zbx_vector_tab
 			goto out;
 		}
 
-		if (NULL == (td.table = DBget_table(buf)))
+		if (NULL == (table = DBget_table(buf)))
 		{
 			*error = zbx_dsprintf(NULL, "invalid table name \"%s\"", buf);
 			goto out;
 			break;
 		}
 
-		zbx_vector_const_field_create(&td.fields);
-		zbx_hashset_create(&td.rows, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_create(&td.del_ids);
-		zbx_vector_table_row_ptr_create(&td.updates);
+		td = (zbx_table_data_t *)zbx_malloc(NULL, sizeof(zbx_table_data_t));
+		memset(td, 0, sizeof(zbx_table_data_t));
 
-		if (SUCCEED != parse_proxyconfig_table_fields(&td, &jp_table, error) ||
-				SUCCEED != parse_proxyconfig_table_rows(&td, &jp_table, error))
+		zbx_vector_const_field_create(&td->fields);
+		zbx_hashset_create(&td->rows, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_create(&td->del_ids);
+		zbx_vector_table_row_ptr_create(&td->updates);
+
+		if (0 == strcmp(table->table, "globalmacro"))
+			td->rename_field = "macro";
+		if (0 == strcmp(table->table, "hostmacro"))
+			td->rename_field = "macro";
+		else if (0 == strcmp(table->table, "drules"))
+			td->rename_field = "name";
+		else if (0 == strcmp(table->table, "regexps"))
+			td->rename_field = "name";
+		else if (0 == strcmp(table->table, "httptest"))
+			td->rename_field = "name";
+		else if (0 == strcmp(table->table, "hosts"))
+			td->rename_field = "host";
+		else if (0 == strcmp(table->table, "items"))
+			td->reset_field = "master_itemid";
+
+		if (SUCCEED != parse_proxyconfig_table_fields(td, &jp_table, error) ||
+				SUCCEED != parse_proxyconfig_table_rows(td, &jp_table, error))
 		{
-			clear_proxyconfig_table(&td);
+			table_data_free(td);
 			goto out;
 		}
 
-		zbx_vector_table_data_append(config_tables, td);
+		zbx_vector_table_data_ptr_append(config_tables, td);
 	}
 
 	ret = SUCCEED;
@@ -1595,14 +1622,14 @@ static void	dump_proxyconfig_table(zbx_table_data_t *td)
 	zbx_free(buf);
 }
 
-static void	dump_proxyconfig_data(const zbx_vector_table_data_t *config_tables)
+static void	dump_proxyconfig_data(const zbx_vector_table_data_ptr_t *config_tables)
 {
 	int	i;
 
 	zabbix_log(LOG_LEVEL_TRACE, "=== Received configuration ===");
 
 	for (i = 0; i < config_tables->values_num; i++)
-		dump_proxyconfig_table(&config_tables->values[i]);
+		dump_proxyconfig_table(config_tables->values[i]);
 }
 
 static int	compare_proxyconfig_row(zbx_table_row_t *row, DB_ROW dbrow, char **buf, size_t *buf_alloc)
@@ -1664,52 +1691,88 @@ static int	delete_proxyconfig_rows(const zbx_table_data_t *td, char **error)
 	return ret;
 }
 
-static int	rename_proxyconfig_rows(zbx_table_data_t *td, const char *rename_field, char **error)
+static int	table_data_get_field_index(const zbx_table_data_t *td, const char *field_name)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	int			i, ret, rename_index;
-	zbx_vector_uint64_t	renameids;
+	int	i;
 
 	/* skip first field - recid */
 	for (i = 1; i < td->fields.values_num; i++)
 	{
-		if (0 == strcmp(td->fields.values[i].field->name, rename_field))
-		{
-			rename_index = i;
-			break;
-		}
+		if (0 == strcmp(td->fields.values[i].field->name, field_name))
+			return i;
 	}
 
-	if (i == td->fields.values_num)
+	return -1;
+}
+
+static int	prepare_proxyconfig_rows(zbx_table_data_t *td, char **error)
+{
+	char			*sql = NULL, delim = ' ';
+	size_t			sql_alloc = 0, sql_offset = 0;
+	int			i, ret, rename_index = -1, reset_index = -1;
+	zbx_vector_uint64_t	updateids;
+
+	if (NULL == td->rename_field && NULL == td->reset_field)
+		return SUCCEED;
+
+	if (NULL != td->rename_field && -1 == (rename_index = table_data_get_field_index(td, td->rename_field)))
 	{
-		*error = zbx_dsprintf(NULL, "unknown rename field \"%s\" for table \"%s\"", rename_field,
+		*error = zbx_dsprintf(NULL, "unknown rename field \"%s\" for table \"%s\"", td->rename_field,
 				td->table->table);
 		return FAIL;
 	}
 
-	zbx_vector_uint64_create(&renameids);
-	zbx_vector_uint64_reserve(&renameids, td->updates.values_num);
+	if (NULL != td->reset_field)
+	{
+		if (-1 == (reset_index = table_data_get_field_index(td, td->reset_field)))
+		{
+			*error = zbx_dsprintf(NULL, "unknown rename field \"%s\" for table \"%s\"", td->reset_field,
+					td->table->table);
+			return FAIL;
+		}
+
+		if (ZBX_TYPE_ID != td->fields.values[reset_index].field->type)
+		{
+			*error = zbx_dsprintf(NULL, "only ID fields can be reset");
+			return FAIL;
+		}
+	}
+
+	zbx_vector_uint64_create(&updateids);
+	zbx_vector_uint64_reserve(&updateids, td->updates.values_num);
 
 	for (i = 0; i < td->updates.values_num; i++)
 	{
-		zbx_vector_uint64_append(&renameids, td->updates.values[i]->recid);
+		zbx_vector_uint64_append(&updateids, td->updates.values[i]->recid);
 
-		/* force renamed field to be updated */
-		zbx_flags128_set(&td->updates.values[i]->flags, rename_index);
+		/* force renamed/reset fields to be updated */
+
+		if (-1 != rename_index)
+			zbx_flags128_set(&td->updates.values[i]->flags, rename_index);
+
+		if (-1 != reset_index)
+			zbx_flags128_set(&td->updates.values[i]->flags, reset_index);
 	}
 
-	zbx_vector_uint64_sort(&renameids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	if (-1 != reset_index)
+		zbx_vector_uint64_append_array(&updateids, td->del_ids.values, td->del_ids.values_num);
 
-#ifdef HAVE_MYSQL
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s=concat('#',%s) where",
-			td->table->table, rename_field, rename_field);
-#else
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s='#'||%s where",
-			td->table->table, rename_field, rename_field);
-#endif
+	zbx_vector_uint64_sort(&updateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid, renameids.values, renameids.values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set", td->table->table);
+
+	if (-1 != rename_index)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s=" ZBX_SQL_CONCAT(),
+				delim, td->rename_field, "'#'", td->rename_field);
+		delim = ',';
+	}
+
+	if (-1 != reset_index)
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s=null", delim, td->reset_field);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid, updateids.values, updateids.values_num);
 
 	if (ZBX_DB_OK > DBexecute("%s", sql))
 	{
@@ -1720,12 +1783,12 @@ static int	rename_proxyconfig_rows(zbx_table_data_t *td, const char *rename_fiel
 		ret = SUCCEED;
 
 	zbx_free(sql);
-	zbx_vector_uint64_destroy(&renameids);
+	zbx_vector_uint64_destroy(&updateids);
 
 	return ret;
 }
 
-static int	update_proxyconfig_rows(zbx_table_data_t *td, const char *rename_field, char **error)
+static int	update_proxyconfig_rows(zbx_table_data_t *td, char **error)
 {
 	char	*sql = NULL, *buf;
 	size_t	sql_alloc = 0, sql_offset = 0, buf_alloc = ZBX_KIBIBYTE;
@@ -1733,9 +1796,6 @@ static int	update_proxyconfig_rows(zbx_table_data_t *td, const char *rename_fiel
 
 	if (0 == td->updates.values_num)
 		return SUCCEED;
-
-	if (NULL != rename_field && SUCCEED != rename_proxyconfig_rows(td, rename_field, error))
-		return FAIL;
 
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
 
@@ -1820,12 +1880,16 @@ ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 
 static int	insert_proxyconfig_rows(zbx_table_data_t *td, char **error)
 {
-	int				ret = SUCCEED;
+	int				ret = SUCCEED, reset_index = -1;
 	zbx_hashset_iter_t		iter;
 	zbx_vector_table_row_ptr_t	rows;
 	zbx_table_row_t			*row;
 	char				*buf;
 	size_t				buf_alloc = ZBX_KIBIBYTE;
+
+	/* invalid reset_index would have resulted in earlier error during row preparation */
+	if (NULL != td->reset_field)
+		reset_index = table_data_get_field_index(td, td->reset_field);
 
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
 	zbx_vector_table_row_ptr_create(&rows);
@@ -1857,8 +1921,10 @@ static int	insert_proxyconfig_rows(zbx_table_data_t *td, char **error)
 			const char	*pf = NULL;
 			zbx_json_type_t	type;
 
-			for (j = 0; NULL != (pf = zbx_json_next_value_dyn(&rows.values[i]->columns, pf, &buf,
-					&buf_alloc, &type)); j++)
+			row = rows.values[i];
+
+			for (j = 0; NULL != (pf = zbx_json_next_value_dyn(&row->columns, pf, &buf, &buf_alloc, &type));
+					j++)
 			{
 				value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
 
@@ -1872,7 +1938,19 @@ static int	insert_proxyconfig_rows(zbx_table_data_t *td, char **error)
 						break;
 					case ZBX_TYPE_ID:
 						if (ZBX_JSON_TYPE_NULL != type)
-							ZBX_STR2UINT64(value->ui64, buf);
+						{
+							if (j == reset_index)
+							{
+								/* insert null ID and add this row to updates, */
+								/* so the correct ID will be updated later     */
+								zbx_flags128_set(&row->flags, ZBX_PROXYCONFIG_ROW_EXISTS);
+								zbx_flags128_set(&row->flags, j);
+								zbx_vector_table_row_ptr_append(&td->updates, row);
+								value->ui64 = 0;
+							}
+							else
+								ZBX_STR2UINT64(value->ui64, buf);
+						}
 						else
 							value->ui64 = 0;
 						break;
@@ -1930,15 +2008,19 @@ clean:
 	return ret;
 }
 
-static void	prepare_proxyconfig_table(zbx_table_data_t *td)
+static void	prepare_proxyconfig_table(zbx_table_data_t *td, const char *key_field, zbx_vector_uint64_t *key_ids,
+		zbx_vector_uint64_t *recids)
 {
-	DB_RESULT			result;
-	DB_ROW				dbrow;
-	char				*sql = NULL, *buf;
-	size_t				sql_alloc = 0, sql_offset = 0, buf_alloc = ZBX_KIBIBYTE;
-	zbx_uint64_t			recid;
-	zbx_table_row_t			*row;
-	int				i;
+	DB_RESULT	result;
+	DB_ROW		dbrow;
+	char		*sql = NULL, *buf;
+	size_t		sql_alloc = 0, sql_offset = 0, buf_alloc = ZBX_KIBIBYTE;
+	zbx_uint64_t	recid;
+	zbx_table_row_t	*row;
+	int		i;
+
+	if (NULL != key_ids && 0 == key_ids->values_num)
+		return;
 
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
 
@@ -1947,13 +2029,22 @@ static void	prepare_proxyconfig_table(zbx_table_data_t *td)
 	for (i = 1; i < td->fields.values_num; i++)
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s", td->fields.values[i].field->name);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s order by %s", td->table->table, td->table->recid);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", td->table->table);
+	if (NULL != key_ids)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, key_field, key_ids->values, key_ids->values_num);
+	}
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by %s", td->table->recid);
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (dbrow = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(recid, dbrow[0]);
+
+		if (NULL != recids)
+			zbx_vector_uint64_append(recids, recid);
 
 		if (NULL == (row = (zbx_table_row_t *)zbx_hashset_search(&td->rows, &recid)))
 		{
@@ -1975,78 +2066,100 @@ static void	prepare_proxyconfig_table(zbx_table_data_t *td)
 	if (0 != td->updates.values_num)
 		zbx_vector_table_row_ptr_sort(&td->updates, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
+	if (NULL != recids)
+		zbx_vector_uint64_sort(recids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-static zbx_table_data_t	*get_proxyconfig_table(zbx_vector_table_data_t *config_tables, const char *name)
+static zbx_table_data_t	*get_proxyconfig_table(zbx_vector_table_data_ptr_t *config_tables, const char *name)
 {
 	int	i;
 
 	for (i = 0; i < config_tables->values_num; i++)
 	{
-		if (0 == strcmp(config_tables->values[i].table->table, name))
-			return &config_tables->values[i];
+		if (0 == strcmp(config_tables->values[i]->table->table, name))
+			return config_tables->values[i];
 	}
 
 	return NULL;
 }
 
-static int	process_proxyconfig_table(zbx_vector_table_data_t *config_tables, const char *table,
-		const char *rename_field, char **error)
+static int	process_proxyconfig_table(zbx_vector_table_data_ptr_t *config_tables, const char *table, char **error)
 {
 	zbx_table_data_t	*td;
 
 	if (NULL == (td = get_proxyconfig_table(config_tables, table)))
 		return SUCCEED;
 
+	prepare_proxyconfig_table(td, NULL, NULL, NULL);
+
+	if (SUCCEED != prepare_proxyconfig_rows(td, error))
+		return FAIL;
+
 	if (SUCCEED != delete_proxyconfig_rows(td, error))
 		return FAIL;
 
-	if (SUCCEED != update_proxyconfig_rows(td, rename_field, error))
+	if (SUCCEED != insert_proxyconfig_rows(td, error))
 		return FAIL;
 
-	return insert_proxyconfig_rows(td, error);
+	return update_proxyconfig_rows(td, error);
 }
 
-static int	process_proxyconfig_network_discovery(zbx_vector_table_data_t *config_tables, char **error)
+static int	process_proxyconfig_network_discovery(zbx_vector_table_data_ptr_t *config_tables, char **error)
 {
 	zbx_table_data_t	*dchecks;
 
 	dchecks = get_proxyconfig_table(config_tables, "dchecks");
 
-	if (NULL != dchecks && SUCCEED != delete_proxyconfig_rows(dchecks, error))
-		return FAIL;
+	if (NULL != dchecks)
+	{
+		prepare_proxyconfig_table(dchecks, NULL, NULL, NULL);
 
-	if (SUCCEED != process_proxyconfig_table(config_tables, "drules", "name", error))
+		if (SUCCEED != prepare_proxyconfig_rows(dchecks, error))
+			return FAIL;
+
+		if (SUCCEED != delete_proxyconfig_rows(dchecks, error))
+			return FAIL;
+	}
+
+	if (SUCCEED != process_proxyconfig_table(config_tables, "drules", error))
 		return FAIL;
 
 	if (NULL == dchecks)
 		return SUCCEED;
 
-	if (SUCCEED != update_proxyconfig_rows(dchecks, NULL, error))
+	if (SUCCEED != insert_proxyconfig_rows(dchecks, error))
 		return FAIL;
 
-	return insert_proxyconfig_rows(dchecks, error);
+	return update_proxyconfig_rows(dchecks, error);
 }
 
-static int	process_proxyconfig_regexps(zbx_vector_table_data_t *config_tables, char **error)
+static int	process_proxyconfig_regexps(zbx_vector_table_data_ptr_t *config_tables, char **error)
 {
 	zbx_table_data_t	*expressions;
 
 	expressions = get_proxyconfig_table(config_tables, "expressions");
 
-	if (NULL != expressions && SUCCEED != delete_proxyconfig_rows(expressions, error))
-		return FAIL;
+	if (NULL != expressions)
+	{
+		prepare_proxyconfig_table(expressions, NULL, NULL, NULL);
 
-	if (SUCCEED != process_proxyconfig_table(config_tables, "regexps", "name", error))
+		if (SUCCEED != prepare_proxyconfig_rows(expressions, error))
+			return FAIL;
+
+		if (SUCCEED != delete_proxyconfig_rows(expressions, error))
+			return FAIL;
+	}
+
+	if (SUCCEED != process_proxyconfig_table(config_tables, "regexps", error))
 		return FAIL;
 
 	if (NULL == expressions)
 		return SUCCEED;
 
-	if (SUCCEED != update_proxyconfig_rows(expressions, NULL, error))
+	if (SUCCEED != insert_proxyconfig_rows(expressions, error))
 		return FAIL;
 
-	return insert_proxyconfig_rows(expressions, error);
+	return update_proxyconfig_rows(expressions, error);
 }
 
 /******************************************************************************
@@ -2054,12 +2167,14 @@ static int	process_proxyconfig_regexps(zbx_vector_table_data_t *config_tables, c
  * Purpose: update config and hstgrp configuration                            *
  *                                                                            *
  ******************************************************************************/
-static int	process_proxyconfig_config(zbx_vector_table_data_t *config_tables, char **error)
+static int	process_proxyconfig_config(zbx_vector_table_data_ptr_t *config_tables, char **error)
 {
 	zbx_table_data_t	*hstgrp;
 
 	if (NULL != (hstgrp = get_proxyconfig_table(config_tables, "hstgrp")))
 	{
+		prepare_proxyconfig_table(hstgrp, NULL, NULL, NULL);
+
 		/* Only id of the host group used for network discovery is sent to proxy. */
 		/* This means that there will be no host group updates -  only one group  */
 		/* will be inserted and the old one (if exists) deleted.                  */
@@ -2067,13 +2182,7 @@ static int	process_proxyconfig_config(zbx_vector_table_data_t *config_tables, ch
 		/* inserting new group or there would be name key violation.              */
 		if (0 != hstgrp->del_ids.values_num)
 		{
-			int ret;
-#ifdef HAVE_MYSQL
-			ret = DBexecute("update hstgrp set name=concat('#',name)");
-#else
-			ret = DBexecute("update hstgrp set name='#'||name");
-#endif
-			if (ZBX_DB_OK >= ret)
+			if (ZBX_DB_OK >= DBexecute("update hstgrp set name=" ZBX_SQL_CONCAT(), "'#'", "name"))
 			{
 				*error = zbx_strdup(NULL, "cannot rename hstgrp name");
 				return FAIL;
@@ -2084,7 +2193,7 @@ static int	process_proxyconfig_config(zbx_vector_table_data_t *config_tables, ch
 			return FAIL;
 	}
 
-	if (SUCCEED != process_proxyconfig_table(config_tables, "config", NULL, error))
+	if (SUCCEED != process_proxyconfig_table(config_tables, "config", error))
 		return FAIL;
 
 	if (NULL != hstgrp)
@@ -2093,19 +2202,262 @@ static int	process_proxyconfig_config(zbx_vector_table_data_t *config_tables, ch
 	return SUCCEED;
 }
 
-static int	process_proxyconfig_data(zbx_vector_table_data_t *config_tables, char **error)
-{
-	int	i;
+#define ZBX_GET_PROXYCONFIG_TABLE(table)					\
+	if (NULL == (table = get_proxyconfig_table(config_tables, #table)))	\
+	{									\
+		*error = zbx_strdup(NULL, "cannot find " #table " data");	\
+		return FAIL;							\
+	}									\
+	zbx_vector_table_data_ptr_append(&host_tables, table)
 
-	for (i = 0; i < config_tables->values_num; i++)
-		prepare_proxyconfig_table(&config_tables->values[i]);
+static int	process_proxyconfig_hosts(zbx_vector_table_data_ptr_t *config_tables, int full_sync, char **error)
+{
+	zbx_table_data_t		*hosts, *host_inventory, *interface, *interface_snmp, *items, *item_rtdata,
+					*item_preproc, *item_parameter, *httptest, *httptestitem, *httptest_field,
+					*httpstep, *httpstepitem, *httpstep_field;
+	int				i, ret = FAIL;
+	zbx_vector_table_data_ptr_t	host_tables;
+
+	if (NULL == (hosts = get_proxyconfig_table(config_tables, "hosts")))
+		return SUCCEED;
+
+	zbx_vector_table_data_ptr_create(&host_tables);
+	zbx_vector_table_data_ptr_append(&host_tables, hosts);
+
+	/* host related tables must always be present (even empty) if at least one host is synced */
+	ZBX_GET_PROXYCONFIG_TABLE(host_inventory);
+	ZBX_GET_PROXYCONFIG_TABLE(interface);
+	ZBX_GET_PROXYCONFIG_TABLE(interface_snmp);
+	ZBX_GET_PROXYCONFIG_TABLE(items);
+	ZBX_GET_PROXYCONFIG_TABLE(item_rtdata);
+	ZBX_GET_PROXYCONFIG_TABLE(item_preproc);
+	ZBX_GET_PROXYCONFIG_TABLE(item_parameter);
+	ZBX_GET_PROXYCONFIG_TABLE(httptest);
+	ZBX_GET_PROXYCONFIG_TABLE(httptestitem);
+	ZBX_GET_PROXYCONFIG_TABLE(httptest_field);
+	ZBX_GET_PROXYCONFIG_TABLE(httpstep);
+	ZBX_GET_PROXYCONFIG_TABLE(httpstepitem);
+	ZBX_GET_PROXYCONFIG_TABLE(httpstep_field);
+
+	if (0 != full_sync)
+	{
+		zbx_vector_uint64_t	hostids, interfaceids, itemids, httptestids, httpstepids;
+
+		zbx_vector_uint64_create(&hostids);
+		zbx_vector_uint64_create(&interfaceids);
+		zbx_vector_uint64_create(&itemids);
+		zbx_vector_uint64_create(&httptestids);
+		zbx_vector_uint64_create(&httpstepids);
+
+		prepare_proxyconfig_table(hosts, NULL, NULL, &hostids);
+		prepare_proxyconfig_table(host_inventory, "hostid", &hostids, NULL);
+		prepare_proxyconfig_table(interface, "hostid", &hostids, &interfaceids);
+		prepare_proxyconfig_table(interface_snmp, "interace", &interfaceids, NULL);
+
+		prepare_proxyconfig_table(items, "hostid", &hostids, &itemids);
+		prepare_proxyconfig_table(item_rtdata, "itemid", &itemids, NULL);
+		prepare_proxyconfig_table(item_preproc, "itemid", &itemids, NULL);
+		prepare_proxyconfig_table(item_parameter, "itemid", &itemids, NULL);
+
+		prepare_proxyconfig_table(httptest, "hostid", &hostids, &httptestids);
+		prepare_proxyconfig_table(httptestitem, "httptestid", &httptestids, NULL);
+		prepare_proxyconfig_table(httptest_field, "httptestid", &httptestids, NULL);
+		prepare_proxyconfig_table(httpstep, "httptestid", &httptestids, &httpstepids);
+		prepare_proxyconfig_table(httpstepitem, "httpstepid", &httpstepids, NULL);
+		prepare_proxyconfig_table(httpstep_field, "httpstepid", &httpstepids, NULL);
+
+		zbx_vector_uint64_destroy(&httpstepids);
+		zbx_vector_uint64_destroy(&httptestids);
+		zbx_vector_uint64_destroy(&itemids);
+		zbx_vector_uint64_destroy(&interfaceids);
+		zbx_vector_uint64_destroy(&hostids);
+	}
+	else
+	{
+		prepare_proxyconfig_table(hosts, NULL, NULL, NULL);
+		prepare_proxyconfig_table(host_inventory, NULL, NULL, NULL);
+		prepare_proxyconfig_table(interface, NULL, NULL, NULL);
+		prepare_proxyconfig_table(interface_snmp, NULL, NULL, NULL);
+
+		prepare_proxyconfig_table(items, NULL, NULL, NULL);
+		prepare_proxyconfig_table(item_rtdata, NULL, NULL, NULL);
+		prepare_proxyconfig_table(item_preproc, NULL, NULL, NULL);
+		prepare_proxyconfig_table(item_parameter, NULL, NULL, NULL);
+
+		prepare_proxyconfig_table(httptest, NULL, NULL, NULL);
+		prepare_proxyconfig_table(httptestitem, NULL, NULL, NULL);
+		prepare_proxyconfig_table(httptest_field, NULL, NULL, NULL);
+		prepare_proxyconfig_table(httpstep, NULL, NULL, NULL);
+		prepare_proxyconfig_table(httpstepitem, NULL, NULL, NULL);
+		prepare_proxyconfig_table(httpstep_field, NULL, NULL, NULL);
+	}
+
+	/* remove rows in reverse order to avoid depending on cascaded deletes */
+	for (i = host_tables.values_num - 1; 0 >= i; i--)
+	{
+		if (SUCCEED != prepare_proxyconfig_rows(host_tables.values[i], error))
+			goto out;
+
+		if (SUCCEED != delete_proxyconfig_rows(host_tables.values[i], error))
+			goto out;
+	}
+
+	for (i = 0; i < host_tables.values_num; i++)
+	{
+		if (SUCCEED != insert_proxyconfig_rows(host_tables.values[i], error))
+			goto out;
+
+		if (SUCCEED != update_proxyconfig_rows(host_tables.values[i], error))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_vector_table_data_ptr_destroy(&host_tables);
+
+	return ret;
+}
+
+static void	prepare_proxyconfig_hostmacros(zbx_table_data_t *hostmacro, zbx_table_data_t *hosts_templates,
+		int full_sync)
+{
+	zbx_vector_uint64_t	hostids, *key_ids = NULL;
+	zbx_hashset_iter_t	iter;
+	zbx_table_row_t		*row;
+	char			*key_field = NULL;
+
+	zbx_vector_uint64_create(&hostids);
+
+	if (0 == full_sync)
+	{
+		zbx_hashset_iter_reset(&hostmacro->rows, &iter);
+		while (NULL != (row = (zbx_table_row_t *)zbx_hashset_iter_next(&iter)))
+		{
+			const char	*pf;
+			char		buf[ZBX_MAX_UINT64_LEN + 1];
+			zbx_uint64_t	hostid;
+
+			pf = zbx_json_next(&row->columns, NULL);
+
+			zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL);
+			if (SUCCEED == is_uint64(buf, &hostid))
+				zbx_vector_uint64_append(&hostids, hostid);
+		}
+
+		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		key_ids = &hostids;
+		key_field = "hostid";
+	}
+
+	prepare_proxyconfig_table(hostmacro, key_field, key_ids, NULL);
+	prepare_proxyconfig_table(hosts_templates, key_field, key_ids, NULL);
+
+	zbx_vector_uint64_destroy(&hostids);
+}
+
+static int	process_proxyconfig_templates(zbx_table_data_t *hosts_templates, char **error)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_table_row_t		*row;
+	zbx_vector_uint64_t	templateids;
+	int			ret;
+
+	zbx_vector_uint64_create(&templateids);
+
+	zbx_hashset_iter_reset(&hosts_templates->rows, &iter);
+	while (NULL != (row = (zbx_table_row_t *)zbx_hashset_iter_next(&iter)))
+	{
+		const char	*pf;
+		char		buf[ZBX_MAX_UINT64_LEN + 1];
+		zbx_uint64_t	templateid;
+
+		pf = zbx_json_next(&row->columns, NULL);
+
+		if (NULL == (pf = zbx_json_next(&row->columns, pf)))
+		{
+			*error = zbx_strdup(NULL, "not enough columns in host template data");
+			goto out;
+		}
+
+		zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL);
+
+		if (SUCCEED == is_uint64(buf, &templateid))
+			zbx_vector_uint64_append(&templateids, templateid);
+	}
+
+	/* check for existing templates and create empty templates if necessary */
+	if (0 != templateids.values_num)
+	{
+		DB_ROW		dbrow;
+		DB_RESULT	result;
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
+		zbx_hashset_t	templates;
+		zbx_db_insert_t	db_insert;
+		int		i;
+
+		zbx_hashset_create(&templates, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select hostid from hosts where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
+				templateids.values_num);
+
+		result = DBselect("%s", sql);
+		zbx_free(sql);
+
+		while (NULL != (dbrow = DBfetch(result)))
+		{
+			zbx_uint64_t	templateid;
+
+			ZBX_STR2UINT64(templateid, dbrow[0]);
+			zbx_hashset_insert(&templates, &templateid, sizeof(templateid));
+		}
+		DBfree_result(result);
+
+		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "status", NULL);
+
+		for (i = 0; i < templateids.values_num; i++)
+		{
+			if (NULL != zbx_hashset_search(&templates, &templateids.values[i]))
+				continue;
+
+			zbx_db_insert_add_values(&db_insert, templateids.values[i], (int)HOST_STATUS_TEMPLATE);
+		}
+
+		ret = zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+
+		zbx_hashset_destroy(&templates);
+
+		if (SUCCEED != ret)
+			goto out;
+	}
+
+	if (SUCCEED != insert_proxyconfig_rows(hosts_templates, error))
+		goto out;
+
+	ret = update_proxyconfig_rows(hosts_templates, error);
+out:
+	zbx_vector_uint64_destroy(&templateids);
+
+	return ret;
+}
+
+static int	process_proxyconfig_data(zbx_vector_table_data_ptr_t *config_tables, int full_sync, char **error)
+{
+	zbx_table_data_t	*hostmacro, *hosts_templates;
 
 	/* first process isolated tables without relations to other tables */
 
-	if (SUCCEED != process_proxyconfig_table(config_tables, "globalmacro", "macro", error))
+	if (SUCCEED != process_proxyconfig_table(config_tables, "globalmacro", error))
 		return FAIL;
 
-	if (SUCCEED != process_proxyconfig_table(config_tables, "config_autoreg_tls", NULL, error))
+	if (SUCCEED != process_proxyconfig_table(config_tables, "config_autoreg_tls", error))
 		return FAIL;
 
 	if (SUCCEED != process_proxyconfig_network_discovery(config_tables, error))
@@ -2116,6 +2468,44 @@ static int	process_proxyconfig_data(zbx_vector_table_data_t *config_tables, char
 
 	if (SUCCEED != process_proxyconfig_config(config_tables, error))
 		return FAIL;
+
+	if (NULL != (hostmacro = get_proxyconfig_table(config_tables, "hostmacro")))
+	{
+		if (NULL == (hosts_templates = get_proxyconfig_table(config_tables, "hosts_templates")))
+		{
+			*error = zbx_strdup(NULL, "cannot find host template data");
+			return FAIL;
+		}
+
+		prepare_proxyconfig_hostmacros(hostmacro, hosts_templates, full_sync);
+
+		if (SUCCEED != prepare_proxyconfig_rows(hostmacro, error))
+			return FAIL;
+
+		if (SUCCEED != delete_proxyconfig_rows(hostmacro, error))
+			return FAIL;
+
+		if (SUCCEED != prepare_proxyconfig_rows(hosts_templates, error))
+			return FAIL;
+
+		if (SUCCEED != delete_proxyconfig_rows(hosts_templates, error))
+			return FAIL;
+	}
+
+	if (SUCCEED != process_proxyconfig_hosts(config_tables, full_sync, error))
+		return FAIL;
+
+	if (NULL != hostmacro)
+	{
+		if (SUCCEED != process_proxyconfig_templates(hosts_templates, error))
+			return FAIL;
+
+		if (SUCCEED != insert_proxyconfig_rows(hostmacro, error))
+			return FAIL;
+
+		if (SUCCEED != update_proxyconfig_rows(hostmacro, error))
+			return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -2129,8 +2519,8 @@ static int	process_proxyconfig_data(zbx_vector_table_data_t *config_tables, char
  ******************************************************************************/
 int	process_proxyconfig(struct zbx_json_parse *jp, char **error)
 {
-	zbx_vector_table_data_t	config_tables;
-	int			ret = FAIL;
+	zbx_vector_table_data_ptr_t	config_tables;
+	int			ret = FAIL, full_sync = 0;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1];
 	struct zbx_json_parse	jp_data;
 	zbx_uint64_t		config_revision;
@@ -2155,8 +2545,11 @@ int	process_proxyconfig(struct zbx_json_parse *jp, char **error)
 		goto out;
 	}
 
-	zbx_vector_table_data_create(&config_tables);
-	zbx_vector_table_data_reserve(&config_tables, ZBX_PROXYCONFIG_TABLE_NUM);
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_FULL_SYNC, tmp, sizeof(tmp), NULL))
+		full_sync = atoi(tmp);
+
+	zbx_vector_table_data_ptr_create(&config_tables);
+	zbx_vector_table_data_ptr_reserve(&config_tables, ZBX_PROXYCONFIG_TABLE_NUM);
 
 	if (SUCCEED == parse_proxyconfig_data(&jp_data, &config_tables, error))
 	{
@@ -2165,14 +2558,14 @@ int	process_proxyconfig(struct zbx_json_parse *jp, char **error)
 
 		DBbegin();
 
-		if (SUCCEED == (ret = process_proxyconfig_data(&config_tables, error)))
+		if (SUCCEED == (ret = process_proxyconfig_data(&config_tables, full_sync, error)))
 			DBcommit();
 		else
 			DBrollback();
 	}
 
-	clear_proxyconfig_tables(&config_tables);
-	zbx_vector_table_data_destroy(&config_tables);
+	zbx_vector_table_data_ptr_clear_ext(&config_tables, table_data_free);
+	zbx_vector_table_data_ptr_destroy(&config_tables);
 
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
