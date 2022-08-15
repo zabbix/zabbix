@@ -159,6 +159,13 @@ static int	DBpatch_6030025(void)
 	return DBdrop_field("httptest", "nextcheck");
 }
 
+static int	DBpatch_6030026(void)
+{
+	const ZBX_FIELD field = {"discovery_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("config", &field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -191,5 +198,6 @@ DBPATCH_ADD(6030022, 0, 1)
 DBPATCH_ADD(6030023, 0, 1)
 DBPATCH_ADD(6030024, 0, 1)
 DBPATCH_ADD(6030025, 0, 1)
+DBPATCH_ADD(6030026, 0, 1)
 
 DBPATCH_END()
