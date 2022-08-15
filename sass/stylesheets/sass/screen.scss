@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20220519';
-$browser-sprite-path: '../img/browser-sprite.png?20220519';
+$sprite-path: '../img/icon-sprite.svg?20220722';
+$browser-sprite-path: '../img/browser-sprite.png?20220722';
 
 @import "utils/mixins";
 
@@ -6322,10 +6322,18 @@ z-select,
 }
 
 .global-macro-table,
-.inherited-macros-table,
 .host-macros-table {
 	.table-col-value,
 	.table-col-template-value {
+		width: 300px;
+	}
+}
+
+.inherited-macros-table {
+	.table-col-value,
+	.table-col-parent-value,
+	.table-col-template-value,
+	.table-col-global-value {
 		width: 300px;
 	}
 }
