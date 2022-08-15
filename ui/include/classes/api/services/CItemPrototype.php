@@ -652,7 +652,7 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		$db_items = $this->get([
-			'output' => ['itemid', 'name', 'templateid', 'flags'],
+			'output' => ['itemid', 'name', 'templateid'],
 			'itemids' => $itemids,
 			'editable' => true,
 			'preservekeys' => true
@@ -662,9 +662,11 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		foreach ($itemids as $itemid) {
+		foreach ($itemids as $i => $itemid) {
 			if ($db_items[$itemid]['templateid'] != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete inherited item prototype.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+					_('cannot delete inherited item prototype')
+				));
 			}
 		}
 	}
@@ -721,6 +723,46 @@ class CItemPrototype extends CItemGeneral {
 		unset($item);
 
 		$this->inherit($items, [], $hostids);
+	}
+
+	/**
+	 * @param array $ruleids
+	 */
+	public static function unlinkTemplateObjects(array $ruleids): void {
+		$result = DBselect(
+			'SELECT id.itemid,i.name,i.templateid,i.valuemapid,i.uuid,h.status AS host_status'.
+			' FROM item_discovery id,items i,hosts h'.
+			' WHERE id.itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
+				' AND '.dbConditionId('id.parent_itemid', $ruleids).
+				' AND '.dbConditionId('i.templateid', [0], true)
+		);
+
+		$items = [];
+		$db_items = [];
+		$item_prototypeids = [];
+
+		while ($row = DBfetch($result)) {
+			$item = [
+				'itemid' => $row['itemid'],
+				'templateid' => 0,
+				'valuemapid' => 0
+			];
+
+			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+				$item += ['uuid' => generateUuidV4()];
+			}
+
+			$items[] = $item;
+			$db_items[$row['itemid']] = $row;
+
+			if (in_array($row['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+					&& $row['valuemapid'] != 0) {
+				$item_prototypeids[] = $row['itemid'];
+			}
+		}
+
+		self::updateForce($items, $db_items);
 	}
 
 	/**
@@ -888,64 +930,13 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * Deletes item prototypes and related entities without permission check.
-	 *
 	 * @param array $db_items
 	 */
-	public static function deleteForce(array $db_items) {
-		$del_itemids = [];
-		$del_items = [];
+	public static function deleteForce(array $db_items): void {
+		self::addInheritedItems($db_items);
+		self::addDependentItems($db_items);
 
-		// Select parent and their inherited items.
-		$parent_itemids = array_column($db_items, 'itemid');
-
-		do {
-			$child_items = DBselect(
-				'SELECT i.itemid,i.name,i.flags'.
-				' FROM items i'.
-				' WHERE '.dbConditionId('i.templateid', $parent_itemids)
-			);
-
-			$del_itemids += array_flip($parent_itemids);
-			$parent_itemids = [];
-
-			while ($child_item = DBfetch($child_items)) {
-				$itemid = $child_item['itemid'];
-				$del_items[$itemid] = $child_item;
-
-				if (!array_key_exists($itemid, $del_itemids)) {
-					$parent_itemids[] = $child_item['itemid'];
-				}
-			}
-		} while ($parent_itemids);
-
-		// Select dependent items.
-		// Note: We are not separating normal from discovered items at this point.
-		$dep_itemids = array_keys($del_itemids);
-		$del_itemids = [];
-
-		do {
-			$dep_items = DBselect(
-				'SELECT i.itemid,i.name,i.flags'.
-				' FROM items i'.
-				' WHERE i.type='.ITEM_TYPE_DEPENDENT.
-					' AND '.dbConditionInt('i.master_itemid', $dep_itemids)
-			);
-
-			$del_itemids += array_flip($dep_itemids);
-			$dep_itemids = [];
-
-			while ($dep_item = DBfetch($dep_items)) {
-				$itemid = $dep_item['itemid'];
-				$del_items[$itemid] = $dep_item;
-
-				if (!array_key_exists($itemid, $del_itemids)) {
-					$dep_itemids[] = $itemid;
-				}
-			}
-		} while ($dep_itemids);
-
-		$del_itemids = array_keys($del_itemids);
+		$del_itemids = array_keys($db_items);
 
 		// Lock item prototypes before delete to prevent server from adding new LLD elements.
 		DBselect(
@@ -955,79 +946,66 @@ class CItemPrototype extends CItemGeneral {
 			' FOR UPDATE'
 		);
 
-		// Deleting graph prototypes, which will remain without item prototypes.
-		$db_graphs = DBselect(
-			'SELECT DISTINCT gi.graphid'.
-			' FROM graphs_items gi'.
-			' WHERE '.dbConditionInt('gi.itemid', $del_itemids).
-				' AND NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM graphs_items gii,items i'.
-					' WHERE gi.graphid=gii.graphid'.
-						' AND gii.itemid=i.itemid'.
-						' AND '.dbConditionInt('gii.itemid', $del_itemids, true).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
-				')'
-		);
+		self::deleteAffectedGraphPrototypes($del_itemids);
+		self::resetGraphsYAxis($del_itemids);
 
-		$del_graphids = [];
+		self::deleteDiscoveredItems($del_itemids);
 
-		while ($db_graph = DBfetch($db_graphs)) {
-			$del_graphids[] = $db_graph['graphid'];
-		}
+		self::deleteAffectedTriggers($del_itemids);
 
-		if ($del_graphids) {
-			CGraphPrototypeManager::delete($del_graphids);
-		}
-
-		// Cleanup ymin_itemid and ymax_itemid fields for graphs and graph prototypes.
-		DB::update('graphs', [
-			'values' => [
-				'ymin_type' => GRAPH_YAXIS_TYPE_CALCULATED,
-				'ymin_itemid' => null
-			],
-			'where' => ['ymin_itemid' => $del_itemids]
-		]);
-
-		DB::update('graphs', [
-			'values' => [
-				'ymax_type' => GRAPH_YAXIS_TYPE_CALCULATED,
-				'ymax_itemid' => null
-			],
-			'where' => ['ymax_itemid' => $del_itemids]
-		]);
-
-		// Delete discovered items.
-		$del_discovered_items = DBfetchColumn(DBselect(
-			'SELECT i.itemid,i.name,i.flags'.
-			' FROM items i,item_discovery id'.
-			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionInt('id.parent_itemid', $del_itemids)
-		), 'itemid');
-
-		if ($del_discovered_items) {
-			CItem::deleteForce($del_discovered_items);
-		}
-
-		// Deleting trigger prototypes.
-		$del_triggerids = DBfetchColumn(DBselect(
-			'SELECT DISTINCT f.triggerid'.
-			' FROM functions f'.
-			' WHERE '.dbConditionInt('f.itemid', $del_itemids)
-		), 'triggerid');
-
-		if ($del_triggerids) {
-			CTriggerPrototypeManager::delete($del_triggerids);
-		}
-
-		DB::delete('item_tag', ['itemid' => $del_itemids]);
+		DB::delete('item_discovery', ['itemid' => $del_itemids]);
+		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
+		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::update('items', [
 			'values' => ['templateid' => 0, 'master_itemid' => 0],
 			'where' => ['itemid' => $del_itemids]
 		]);
 		DB::delete('items', ['itemid' => $del_itemids]);
 
-		self::massAddAuditLog(CAudit::ACTION_DELETE, $del_items);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ITEM_PROTOTYPE, $db_items);
+	}
+
+	/**
+	 * Delete graph prototypes, which would remain without item prototypes after the given item prototypes deletion.
+	 *
+	 * @param array $del_itemids
+	 */
+	private static function deleteAffectedGraphPrototypes(array $del_itemids): void {
+		$del_graphids = DBfetchColumn(DBselect(
+			'SELECT DISTINCT gi.graphid'.
+			' FROM graphs_items gi'.
+			' WHERE '.dbConditionId('gi.itemid', $del_itemids).
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM graphs_items gii,items i'.
+					' WHERE gi.graphid=gii.graphid'.
+						' AND gii.itemid=i.itemid'.
+						' AND '.dbConditionId('gii.itemid', $del_itemids, true).
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
+				')'
+		), 'graphid');
+
+		if ($del_graphids) {
+			CGraphPrototypeManager::delete($del_graphids);
+		}
+	}
+
+	/**
+	 * Delete discovered items of the given item prototypes.
+	 *
+	 * @param array $del_itemids
+	 */
+	private static function deleteDiscoveredItems(array $del_itemids): void {
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT id.itemid,i.name'.
+			' FROM item_discovery id,items i'.
+			' WHERE id.itemid=i.itemid'.
+				' AND '.dbConditionId('id.parent_itemid', $del_itemids)
+		), 'itemid');
+
+		if ($db_items) {
+			CItem::deleteForce($db_items);
+		}
 	}
 }

@@ -1479,10 +1479,19 @@ class CHost extends CHostGeneral {
 		}
 
 		// delete the items
-		$del_items = API::Item()->get([
-			'output' => ['itemid', 'name', 'flags'],
-			'templateids' => $hostids,
-			'nopermissions' => true,
+		$db_items = DB::select('items', [
+			'output' => ['itemid', 'name'],
+			'filter' => [
+				'hostid' => $hostids,
+				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+				'type' => CItem::SUPPORTED_ITEM_TYPES
+			],
+			'preservekeys' => true
+		]);
+
+		if ($db_items) {
+			CItem::deleteForce($db_items);
+		}
 			'preservekeys' => true
 		]);
 

@@ -45,15 +45,15 @@ class CDiscoveryRuleManager {
 		$ruleids = array_merge($ruleids, $child_ruleids);
 
 		// Delete item prototypes.
-		$db_item_prototypes = DBfetchArray(DBselect(
-			'SELECT i.itemid,i.name,i.flags'.
+		$db_items = DBfetchArray(DBselect(
+			'SELECT id.itemid,i.name'.
 			' FROM item_discovery id,items i'.
-			' WHERE i.itemid=id.itemid'.
+			' WHERE id.itemid=i.itemid'.
 				' AND '.dbConditionInt('parent_itemid', $ruleids)
 		));
 
-		if ($db_item_prototypes) {
-			CItemPrototype::deleteForce($db_item_prototypes);
+		if ($db_items) {
+			CItemPrototype::deleteForce($db_items);
 		}
 
 		// Delete host prototypes.

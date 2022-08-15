@@ -712,6 +712,77 @@ class CDiscoveryRule extends CItemGeneralOld {
 	}
 
 	/**
+	 * @param array      $templateids
+	 * @param array|null $hostids
+	 */
+	public static function unlinkTemplateObjects(array $templateids, array $hostids = null): void {
+		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
+
+		$result = DBselect(
+			'SELECT ii.itemid,h.status AS host_status'.
+			' FROM items i,items ii,hosts h'.
+			' WHERE i.itemid=ii.templateid'.
+				' AND ii.hostid=h.hostid'.
+				' AND '.dbConditionId('i.hostid', $templateids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE]).
+				$hostids_condition
+		);
+
+		$upd_items = [];
+		$ruleids = [];
+
+		while ($row = DBfetch($result)) {
+			$upd_item = [
+				'templateid' => 0,
+				'valuemapid' => 0
+			];
+
+			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+				$upd_item += ['uuid' => generateUuidV4()];
+			}
+
+			$upd_items[] = [
+				'values' => $upd_item,
+				'where' => ['itemid' => $row['itemid']]
+			];
+
+			$ruleids[] = $row['itemid'];
+		}
+
+		if ($upd_items) {
+			DB::update('items', $upd_items);
+
+			/*
+			 * TODO: The trigger prototypes and graphs also should be updated here when new audit log will be added for
+			 * them.
+			 */
+			CItemPrototype::unlinkTemplateObjects($ruleids);
+			CHostPrototype::unlinkTemplateObjects($ruleids);
+		}
+	}
+
+	/**
+	 * @param array      $templateids
+	 * @param array|null $hostids
+	 */
+	public static function clearTemplateObjects(array $templateids, array $hostids = null): void {
+		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
+
+		$ruleids = DBfetchColumn(DBselect(
+			'SELECT ii.itemid'.
+			' FROM items i,items ii'.
+			' WHERE i.itemid=ii.templateid'.
+				' AND '.dbConditionId('i.hostid', $templateids).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE]).
+				$hostids_condition
+		), 'itemid');
+
+		if ($ruleids) {
+			CDiscoveryRuleManager::delete($ruleids);
+		}
+	}
+
+	/**
 	 * Copies all of the triggers from the source discovery to the target discovery rule.
 	 *
 	 * @param array  $src_discovery       The source discovery rule to copy from.

@@ -1657,6 +1657,46 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
+	 * @param array $ruleids
+	 */
+	public static function unlinkTemplateObjects(array $ruleids): void {
+		$result = DBselect(
+			'SELECT hd.hostid,h.status AS host_status'.
+			' FROM host_discovery hd,items i,hosts h'.
+			' WHERE hd.parent_itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_itemid', $ruleids)
+		);
+
+		$upd_host_prototypes = [];
+		$hostids = [];
+
+		while ($row = DBfetch($result)) {
+			$upd_host_prototype = ['templateid' => 0];
+
+			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+				$upd_host_prototype += ['uuid' => generateUuidV4()];
+			}
+
+			$upd_host_prototypes[$row['hostid']] = [
+				'values' => $upd_host_prototype,
+				'where' => ['hostid' => $row['hostid']]
+			];
+
+			$hostids[] = $row['hostid'];
+		}
+
+		if ($upd_host_prototypes) {
+			DB::update('hosts', $upd_host_prototypes);
+
+			DB::update('group_prototype', [
+				'values' => ['templateid' => 0],
+				'where' => ['hostid' => $hostids]
+			]);
+		}
+	}
+
+	/**
 	 * Updates the children of the host prototypes on the given hosts and propagates the inheritance to the child hosts.
 	 *
 	 * @param array      $host_prototypes

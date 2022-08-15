@@ -1038,36 +1038,6 @@ abstract class CItemGeneral extends CApiService {
 		}
 	}
 
-	protected static function massAddAuditLog(int $action, array $items = [], array $items_old = []): void {
-		static $resource_types = [
-			ZBX_FLAG_DISCOVERY_NORMAL => CAudit::RESOURCE_ITEM,
-			ZBX_FLAG_DISCOVERY_CREATED => CAudit::RESOURCE_ITEM,
-			ZBX_FLAG_DISCOVERY_RULE => CAudit::RESOURCE_DISCOVERY_RULE,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => CAudit::RESOURCE_ITEM_PROTOTYPE
-		];
-
-		$items_by_flag = [];
-		$items_old_by_flag = [];
-
-		foreach ($items as $itemid => $item) {
-			$items_by_flag[$item['flags']][$item['itemid']] = $item;
-			unset($items[$itemid]);
-
-			if ($items_old) {
-				$items_old_by_flag[$item['flags']][$item['itemid']] = $items_old[$item['itemid']];
-				unset($items_old[$item['itemid']]);
-			}
-		}
-
-		foreach ($items_by_flag as $flags => $items) {
-			if ($items) {
-				self::addAuditLog($action, $resource_types[$flags], $items,
-					array_key_exists($flags, $items_old_by_flag) ? $items_old_by_flag[$flags] : []
-				);
-			}
-		}
-	}
-
 	/**
 	 * @param array $items
 	 */
@@ -1162,6 +1132,10 @@ abstract class CItemGeneral extends CApiService {
 		$defaults = CItemBaseHelper::getFieldDefaults();
 
 		foreach ($items as &$item) {
+			if (!array_key_exists('type', $db_items[$item['itemid']])) {
+				continue;
+			}
+
 			$db_item = $db_items[$item['itemid']];
 
 			if ($item['type'] != $db_item['type']) {
@@ -1233,6 +1207,10 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 			else {
+				if (!array_key_exists('type', $db_items[$item['itemid']])) {
+					continue;
+				}
+
 				if ($item['type'] == ITEM_TYPE_SCRIPT) {
 					if (array_key_exists('parameters', $item)) {
 						$update = true;
@@ -2610,6 +2588,134 @@ abstract class CItemGeneral extends CApiService {
 		while ($db_item_tag = DBfetch($db_item_tags)) {
 			$db_items[$db_item_tag['itemid']]['tags'][$db_item_tag['itemtagid']] =
 				array_diff_key($db_item_tag, array_flip(['itemid']));
+		}
+	}
+
+	/**
+	 * Add the inherited items of the given items to the given item array.
+	 *
+	 * @param array $db_items
+	 */
+	public static function addInheritedItems(array &$db_items): void {
+		$templateids = array_keys($db_items);
+
+		do {
+			$result = DBselect(
+				'SELECT i.itemid,i.name'.
+				' FROM items i'.
+				' WHERE '.dbConditionId('i.templateid', $templateids)
+			);
+
+			$templateids = [];
+
+			while ($row = DBfetch($result)) {
+				if (!array_key_exists($row['itemid'], $db_items)) {
+					$templateids[] = $row['itemid'];
+
+					$db_items[$row['itemid']] = $row;
+				}
+			}
+		} while ($templateids);
+	}
+
+	/**
+	 * Add the dependent items of the given items to the given item array. Also add the dependent LLD rules and item
+	 * prototypes to the given appropriate variables.
+	 *
+	 * @param array      $db_items
+	 * @param array|null $del_ruleids
+	 * @param array|null $db_item_prototypes
+	 */
+	protected static function addDependentItems(array &$db_items, array &$del_ruleids = null,
+			array &$db_item_prototypes = null): void {
+		$del_ruleids = [];
+		$db_item_prototypes = [];
+
+		$master_itemids = array_keys($db_items);
+
+		do {
+			$options = [
+				'output' => ['itemid', 'name', 'flags'],
+				'filter' => ['master_itemid' => $master_itemids]
+			];
+			$result = DBselect(DB::makeSql('items', $options));
+
+			$master_itemids = [];
+
+			while ($row = DBfetch($result)) {
+				if ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
+					$del_ruleids[] = $row['itemid'];
+				}
+				elseif ($row['flags'] ==  ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					$master_itemids[] = $row['itemid'];
+
+					$db_item_prototypes[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
+				}
+				else {
+					if (!array_key_exists($row['itemid'], $db_items)) {
+						$master_itemids[] = $row['itemid'];
+
+						$db_items[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
+					}
+				}
+			}
+		} while ($master_itemids);
+	}
+
+	/**
+	 * Reset the MIN and MAX values of Y axis in the graphs, if such are calculated using the given items.
+	 *
+	 * @param array $del_itemids
+	 */
+	protected static function resetGraphsYAxis(array $del_itemids): void {
+		DB::update('graphs', [
+			'values' => [
+				'ymin_type' => GRAPH_YAXIS_TYPE_CALCULATED,
+				'ymin_itemid' => null
+			],
+			'where' => ['ymin_itemid' => $del_itemids]
+		]);
+
+		DB::update('graphs', [
+			'values' => [
+				'ymax_type' => GRAPH_YAXIS_TYPE_CALCULATED,
+				'ymax_itemid' => null
+			],
+			'where' => ['ymax_itemid' => $del_itemids]
+		]);
+	}
+
+	/**
+	 * Delete triggers and trigger prototypes, which contain the given items in the expression.
+	 *
+	 * @param array $del_itemids
+	 */
+	protected static function deleteAffectedTriggers(array $del_itemids): void {
+		$result = DBselect(
+			'SELECT DISTINCT f.triggerid,t.flags'.
+			' FROM functions f,triggers t'.
+			' WHERE f.triggerid=t.triggerid'.
+				' AND '.dbConditionInt('f.itemid', $del_itemids)
+		);
+
+		$del_trigger_prototypeids = [];
+		$del_triggerids = [];
+
+		while ($row = DBfetch($result)) {
+			if ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$del_trigger_prototypeids[] = $row['triggerid'];
+			}
+			else {
+				$del_triggerids[] = $row['triggerid'];
+			}
+		}
+
+		if ($del_triggerids) {
+			CTriggerManager::delete($del_triggerids);
+		}
+
+		if ($del_trigger_prototypeids) {
+			CTriggerPrototypeManager::delete($del_trigger_prototypeids);
 		}
 	}
 }

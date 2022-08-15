@@ -538,15 +538,16 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// delete the items
-		$del_items = API::Item()->get([
-			'output' => ['itemid', 'name', 'flags'],
-			'templateids' => $templateids,
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT i.itemid,i.name'.
+			' FROM items i'.
+			' WHERE '.dbConditionId('i.hostid', $templateids).
+			' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL]).
+			' AND '.dbConditionInt('i.type', CItem::SUPPORTED_ITEM_TYPES)
+		), 'itemid');
 
-		if ($del_items) {
-			CItem::deleteForce($del_items);
+		if ($db_items) {
+			CItem::deleteForce($db_items);
 		}
 
 		// delete host from maps
