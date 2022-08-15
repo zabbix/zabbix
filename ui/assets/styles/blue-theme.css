@@ -6799,7 +6799,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
   line-height: 24px; }
 
 #itemsTable .table-col-handle {
-  width: 26px; }
+  width: 10px; }
 #itemsTable .table-col-no {
   width: 20px; }
 #itemsTable .table-col-name-normal {
