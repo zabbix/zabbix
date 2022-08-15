@@ -36,6 +36,13 @@ ZBX_PTR_VECTOR_IMPL(um_host, zbx_um_host_t *)
 extern char	*CONFIG_VAULTDBPATH;
 extern unsigned char	program_type;
 
+typedef enum
+{
+	ZBX_UM_UPDATE_HOST,
+	ZBX_UM_UPDATE_MACRO
+}
+zbx_um_update_cause_t;
+
 /*********************************************************************************
  *                                                                               *
  * Purpose: create duplicate user macro cache                                    *
@@ -235,6 +242,8 @@ static zbx_um_host_t	*um_host_dup(zbx_um_host_t *host)
 	dup = (zbx_um_host_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_um_host_t));
 	dup->hostid = host->hostid;
 	dup->refcount = 1;
+	dup->macro_revision = host->macro_revision;
+	dup->link_revision = host->link_revision;
 
 	zbx_vector_uint64_create_ext(&dup->templateids, __config_shmem_malloc_func, __config_shmem_realloc_func,
 			__config_shmem_free_func);
@@ -293,7 +302,8 @@ static zbx_um_host_t	*um_cache_create_host(zbx_um_cache_t *cache, zbx_uint64_t h
 	host = (zbx_um_host_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_um_host_t));
 	host->hostid = hostid;
 	host->refcount = 1;
-	host->revision = cache->revision;
+	host->macro_revision = cache->revision;
+	host->link_revision = cache->revision;
 	zbx_vector_uint64_create_ext(&host->templateids, __config_shmem_malloc_func, __config_shmem_realloc_func,
 			__config_shmem_free_func);
 	zbx_vector_um_macro_create_ext(&host->macros, __config_shmem_malloc_func, __config_shmem_realloc_func,
@@ -311,7 +321,8 @@ static zbx_um_host_t	*um_cache_create_host(zbx_um_cache_t *cache, zbx_uint64_t h
  * Comments: If the host is used by other processes it will be duplicated.       *
  *                                                                               *
  *********************************************************************************/
-static zbx_um_host_t	*um_cache_acquire_host(zbx_um_cache_t *cache, zbx_uint64_t hostid)
+static zbx_um_host_t	*um_cache_acquire_host(zbx_um_cache_t *cache, zbx_uint64_t hostid,
+		zbx_um_update_cause_t cause)
 {
 	zbx_uint64_t	*phostid = &hostid;
 	zbx_um_host_t	**phost;
@@ -326,9 +337,18 @@ static zbx_um_host_t	*um_cache_acquire_host(zbx_um_cache_t *cache, zbx_uint64_t 
 
 		/* hosts are acquired when there are changes to be made, */
 		/* meaning host revision must be updated                 */
-		(*phost)->revision = cache->revision;
+		switch (cause)
+		{
+			case ZBX_UM_UPDATE_HOST:
+				(*phost)->link_revision = cache->revision;
+				break;
+			case ZBX_UM_UPDATE_MACRO:
+				(*phost)->macro_revision = cache->revision;
+				break;
+		}
 
 		return *phost;
+
 	}
 
 	return NULL;
@@ -645,7 +665,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 
 		if (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_search(user_macros, &pmacroid)))
 		{
-			host = um_cache_acquire_host(cache, (*pmacro)->hostid);
+			host = um_cache_acquire_host(cache, (*pmacro)->hostid, ZBX_UM_UPDATE_MACRO);
 
 			if (SUCCEED == um_macro_is_locked(*pmacro))
 			{
@@ -670,7 +690,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 				}
 
 				/* acquire new host */
-				host = um_cache_acquire_host(cache, hostid);
+				host = um_cache_acquire_host(cache, hostid, ZBX_UM_UPDATE_MACRO);
 			}
 
 			dc_strpool_release((*pmacro)->name);
@@ -697,7 +717,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 			macro->value = NULL;
 			pmacro = zbx_hashset_insert(user_macros, &macro, sizeof(macro));
 
-			host = um_cache_acquire_host(cache, hostid);
+			host = um_cache_acquire_host(cache, hostid, ZBX_UM_UPDATE_MACRO);
 		}
 
 		(*pmacro)->hostid = hostid;
@@ -733,7 +753,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 		if (ZBX_MACRO_VALUE_VAULT == (*pmacro)->type)
 			um_macro_deregister_kvs(*pmacro);
 
-		if (NULL != (host = um_cache_acquire_host(cache, (*pmacro)->hostid)))
+		if (NULL != (host = um_cache_acquire_host(cache, (*pmacro)->hostid, ZBX_UM_UPDATE_MACRO)))
 		{
 			um_host_remove_macro(host, *pmacro);
 			zbx_vector_um_host_append(&hosts, host);
@@ -792,7 +812,7 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(hostid, row[0]);
 
-		if (NULL == (host = um_cache_acquire_host(cache, hostid)))
+		if (NULL == (host = um_cache_acquire_host(cache, hostid, ZBX_UM_UPDATE_HOST)))
 			host = um_cache_create_host(cache, hostid);
 
 		ZBX_DBROW2UINT64(templateid, row[1]);
@@ -806,7 +826,7 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(hostid, row[0]);
 
-		if (NULL == (host = um_cache_acquire_host(cache, hostid)))
+		if (NULL == (host = um_cache_acquire_host(cache, hostid, ZBX_UM_UPDATE_HOST)))
 			continue;
 
 		ZBX_DBROW2UINT64(templateid, row[1]);
@@ -1128,7 +1148,7 @@ void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, 
  *             value          - [IN] the new value (stored in string pool)       *
  *                                                                               *
  *********************************************************************************/
-zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, zbx_uint32_t revision,
+zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, zbx_uint64_t revision,
 		const zbx_vector_uint64_pair_t *host_macro_ids, const char *value)
 {
 	int			i;
@@ -1155,7 +1175,7 @@ zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, zbx_uint32_t
 		if (NULL == (pmacro = (zbx_um_macro_t **)zbx_hashset_search(user_macros, &pmacroid)))
 			continue;
 
-		if (NULL == (host = um_cache_acquire_host(cache, (*pmacro)->hostid)))
+		if (NULL == (host = um_cache_acquire_host(cache, (*pmacro)->hostid, ZBX_UM_UPDATE_MACRO)))
 			continue;
 
 		if (SUCCEED == um_macro_is_locked(*pmacro))
@@ -1202,8 +1222,8 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 	zbx_hashset_iter_reset(&cache->hosts, &iter);
 	while (NULL != (phost = (zbx_um_host_t **)zbx_hashset_iter_next(&iter)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " refcount:%u revision:%u", (*phost)->hostid,
-				(*phost)->refcount, (*phost)->revision);
+		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " refcount:%u revision:" ZBX_FS_UI64, (*phost)->hostid,
+				(*phost)->refcount, (*phost)->macro_revision);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  macros:");
 
@@ -1249,7 +1269,7 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
-int	um_cache_get_host_revision(const zbx_um_cache_t *cache, zbx_uint64_t hostid, zbx_uint32_t *revision)
+int	um_cache_get_host_revision(const zbx_um_cache_t *cache, zbx_uint64_t hostid, zbx_uint64_t *revision)
 {
 	const zbx_um_host_t	* const *phost;
 	int			i;
@@ -1258,8 +1278,8 @@ int	um_cache_get_host_revision(const zbx_um_cache_t *cache, zbx_uint64_t hostid,
 	if (NULL == (phost = (const zbx_um_host_t * const *)zbx_hashset_search(&cache->hosts, &phostid)))
 		return FAIL;
 
-	if ((*phost)->revision > *revision)
-		*revision = (*phost)->revision;
+	if ((*phost)->macro_revision > *revision)
+		*revision = (*phost)->macro_revision;
 
 	for (i = 0; i < (*phost)->templateids.values_num; i++)
 		um_cache_get_host_revision(cache, (*phost)->templateids.values[i], revision);
@@ -1276,7 +1296,11 @@ static void	um_cache_get_hostids(const zbx_um_cache_t *cache, const zbx_uint64_t
 	if (NULL == (phost = (zbx_um_host_t **)zbx_hashset_search(&cache->hosts, &phostid)))
 		return;
 
-	if ((*phost)->revision > revision)
+	/* if host-template linking has changed, force macro update for all children */
+	if ((*phost)->link_revision > revision)
+		revision = 0;
+
+	if ((*phost)->macro_revision > revision)
 		zbx_vector_uint64_append(macro_hostids, (*phost)->hostid);
 
 	for (i = 0; i < (*phost)->templateids.values_num; i++)
@@ -1305,7 +1329,7 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_vector_ui
 
 	/* check revision of global macro 'host' (hostid 0) */
 	if (NULL != (phost = (zbx_um_host_t **)zbx_hashset_search(&cache->hosts, &phostid)) &&
-			(*phost)->revision > revision)
+			(*phost)->macro_revision > revision)
 	{
 		*global = SUCCEED;
 	}

@@ -754,9 +754,6 @@ int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_reques
 		goto out;
 	}
 
-	// WDN: force full resync for testing
-	proxy_config_revision = 0;
-
 	if (0 != zbx_dc_register_config_session(proxy->hostid, token, proxy_config_revision, &dc_revision) ||
 			0 == proxy_config_revision)
 	{
