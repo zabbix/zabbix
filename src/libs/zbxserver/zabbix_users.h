@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZABBIX_USERS_H_
 #define ZABBIX_ZABBIX_USERS_H_
 
-#include "common.h"
+#include "zbxcommon.h"
 
 int	check_perm2system(zbx_uint64_t userid);
 char	*get_user_timezone(zbx_uint64_t userid);

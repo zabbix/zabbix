@@ -19,7 +19,7 @@
 
 #include "ssh_run.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 
 /* the size of temporary buffer used to read from data channel */
 #define DATA_BUFFER_SIZE	4096

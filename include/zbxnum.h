@@ -20,7 +20,7 @@
 #ifndef ZABBIX_NUM_H
 #define ZABBIX_NUM_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #define is_ushort(str, value) \
 	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned short), 0x0, 0xFFFF)
