@@ -30,7 +30,7 @@ $form = (new CForm())
 	->cleanItems()
 	->setId('popup.condition')
 	->setName('popup.condition')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('type', $data['type']);
 

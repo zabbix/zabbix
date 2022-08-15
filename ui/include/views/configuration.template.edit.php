@@ -42,7 +42,7 @@ if (!hasRequest('form_refresh')) {
 $form = (new CForm())
 	->setId('templates-form')
 	->setName('templatesForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['templateid'] != 0) {

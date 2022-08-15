@@ -48,7 +48,7 @@ if ($data['hostid'] != 0) {
 // create form
 $form = (new CForm('post', (new CUrl())->getUrl()))
 	->setName('elements_form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar($data['elements_field'], $data['elements'])
 	->addVar('hostid', $data['hostid']);

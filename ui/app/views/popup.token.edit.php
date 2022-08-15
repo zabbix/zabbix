@@ -31,7 +31,7 @@ $url = (new CUrl('zabbix.php'))
 $token_form = (new CForm('post', $url))
 	->setId('token_form')
 	->setName('token')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('admin_mode', $data['admin_mode'])
 	->addVar('tokenid', $data['tokenid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));

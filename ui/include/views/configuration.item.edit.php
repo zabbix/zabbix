@@ -42,7 +42,7 @@ $url = (new CUrl('items.php'))
 $form = (new CForm('post', $url))
 	->setId('item-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 
