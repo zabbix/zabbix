@@ -74,6 +74,13 @@ abstract class CItemGeneral extends CApiService {
 	protected const VALUE_TYPE_FIELD_NAMES = [];
 
 	/**
+	 * Value of audit log resource.
+	 *
+	 * @var int
+	 */
+	protected const AUDIT_RESOURCE = -1;
+
+	/**
 	 * @abstract
 	 *
 	 * @param array $options
@@ -1061,6 +1068,9 @@ abstract class CItemGeneral extends CApiService {
 		}
 	}
 
+	/**
+	 * @param array $items
+	 */
 	public static function createForce(array &$items): void {
 		$itemids = DB::insert('items', $items);
 
@@ -1100,7 +1110,7 @@ abstract class CItemGeneral extends CApiService {
 		self::updatePreprocessing($items);
 		self::updateTags($items);
 
-		self::massAddAuditLog(CAudit::ACTION_ADD, $items);
+		self::addAuditLog(CAudit::ACTION_ADD, static::AUDIT_RESOURCE, $items);
 
 		foreach ($items as &$item) {
 			$item['host_status'] = array_shift($host_statuses);
@@ -1109,15 +1119,8 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Common update handler for Items and derivatives.
-	 *
-	 * @param array  $items     Updates to apply.
-	 * @param string $items[<num>]['itemid']
-	 * @param int    $items[<num>]['type']
-	 * @param int    $items[<num>]['host_status']
-	 * @param string $items[<num>]['name']
-	 * @param int    $items[<num>]['flags']
-	 * @param array  $db_items  Current versions of items, indexed by itemid.
+	 * @param array $items
+	 * @param array $db_items
 	 */
 	public static function updateForce(array &$items, array $db_items): void {
 		// Helps to avoid deadlocks.
@@ -1127,7 +1130,7 @@ abstract class CItemGeneral extends CApiService {
 
 		$upd_items = [];
 
-		foreach ($items as &$item) {
+		foreach ($items as $item) {
 			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
 
 			if ($upd_item) {
@@ -1137,7 +1140,6 @@ abstract class CItemGeneral extends CApiService {
 				];
 			}
 		}
-		unset($item);
 
 		if ($upd_items) {
 			DB::update('items', $upd_items);
@@ -1147,7 +1149,7 @@ abstract class CItemGeneral extends CApiService {
 		self::updatePreprocessing($items, $db_items);
 		self::updateTags($items, $db_items);
 
-		self::massAddAuditLog(CAudit::ACTION_UPDATE, $items, $db_items);
+		self::addAuditLog(CAudit::ACTION_UPDATE, static::AUDIT_RESOURCE, $items, $db_items);
 	}
 
 	/**

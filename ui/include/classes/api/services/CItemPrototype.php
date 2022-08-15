@@ -86,6 +86,11 @@ class CItemPrototype extends CItemGeneral {
 	];
 
 	/**
+	 * @inheritDoc
+	 */
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_ITEM_PROTOTYPE;
+
+	/**
 	 * Get ItemPrototype data.
 	 */
 	public function get($options = []) {

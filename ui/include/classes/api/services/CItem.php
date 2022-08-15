@@ -86,6 +86,11 @@ class CItem extends CItemGeneral {
 	];
 
 	/**
+	 * @inheritDoc
+	 */
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_ITEM;
+
+	/**
 	 * Get items data.
 	 *
 	 * @param array  $options
