@@ -77,7 +77,6 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 
 	private function openGlobalMacros() {
 		$this->zbxTestLogin('zabbix.php?action=macros.edit');
-		$this->query('id:page-title-general')->asPopupButton()->one()->select('Macros');
 
 		$this->zbxTestCheckTitle('Configuration of macros');
 		$this->zbxTestCheckHeader('Macros');

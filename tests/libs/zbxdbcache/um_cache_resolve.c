@@ -69,7 +69,7 @@ void	zbx_mock_test_entry(void **state)
 
 	um_mock_cache_diff(&mock_cache0, &mock_cache, &gmacros, &hmacros, &htmpls);
 	cache = um_cache_create();
-	cache = um_cache_sync(cache, &gmacros, &hmacros, &htmpls);
+	cache = um_cache_sync(cache, 0, &gmacros, &hmacros, &htmpls);
 
 	mock_dbsync_clear(&gmacros);
 	mock_dbsync_clear(&hmacros);

@@ -46,7 +46,7 @@ typedef struct
 	/* the current process state (see ZBX_PROCESS_STATE_* defines) */
 	unsigned char	state;
 }
-zxb_stat_process_cache_t;
+zbx_stat_process_cache_t;
 
 /* process state statistics */
 typedef struct
@@ -61,7 +61,7 @@ typedef struct
 	zbx_uint64_t			counter_used[ZBX_PROCESS_STATE_COUNT];
 
 	/* the process state cache */
-	zxb_stat_process_cache_t	cache;
+	zbx_stat_process_cache_t	cache;
 }
 zbx_stat_process_t;
 
