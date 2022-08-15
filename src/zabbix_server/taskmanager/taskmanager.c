@@ -1125,26 +1125,30 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
-				compatibility = tm_get_proxy_compatibility(proxy_hostid);
-
-				if (ZBX_PROXY_VERSION_OUTDATED == compatibility ||
-						ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
-				{
-					zbx_tm_task_t	*task;
-					const char	*error = "The requested task is disabled. Proxy major version"
-							" does not match server major verion.";
-
-					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
-					task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
-							time(NULL), 0, 0);
-					task->data= zbx_tm_data_result_create(taskid, FAIL, error);
-					zbx_tm_save_task(task);
-					zbx_tm_task_free(task);
-
-					zbx_vector_uint64_append(&expire_taskids, taskid);
-					break;
-				}
 			case ZBX_TM_PROXYDATA:
+				if (ZBX_TM_TASK_DATA == type)
+				{
+					compatibility = tm_get_proxy_compatibility(proxy_hostid);
+
+					if (ZBX_PROXY_VERSION_OUTDATED == compatibility ||
+							ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
+					{
+						zbx_tm_task_t	*task;
+						const char	*error = "The requested task is disabled. Proxy major version"
+								" does not match server major verion.";
+
+						zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+						task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
+								time(NULL), 0, 0);
+						task->data= zbx_tm_data_result_create(taskid, FAIL, error);
+						zbx_tm_save_task(task);
+						zbx_tm_task_free(task);
+
+						zbx_vector_uint64_append(&expire_taskids, taskid);
+						break;
+					}
+				}
+
 				/* both - 'new' and 'in progress' tasks should expire */
 				if (0 != ttl && clock + ttl < now)
 					zbx_vector_uint64_append(&expire_taskids, taskid);
