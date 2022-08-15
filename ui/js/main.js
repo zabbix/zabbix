@@ -486,17 +486,17 @@ var hintBox = {
 
 		jQuery(appendTo).append(box);
 
-		const observer = new MutationObserver(() => {
-			if (document.body.contains(target)) {
+		target.observer = new MutationObserver(() => {
+			const node = target instanceof Node ? target : target[0];
+
+			if (document.body.contains(node)) {
 				return;
 			}
-
-			observer.disconnect();
 
 			hintBox.deleteHint(target);
 		})
 
-		observer.observe(document, {
+		target.observer.observe(document, {
 			childList: true,
 			subtree: true
 		})
@@ -627,6 +627,12 @@ var hintBox = {
 				}
 				delete target.isStatic;
 			}
+		}
+
+		if (target.observer !== undefined) {
+			target.observer.disconnect();
+
+			delete target.observer;
 		}
 	},
 
