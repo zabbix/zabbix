@@ -677,36 +677,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get host group (discovery group) data from database               *
- *                                                                            *
- * Parameters: discovery_groupid - [IN] the discovery group id                *
- *             j                 - [OUT] the output json                      *
- *             error             - [OUT] the error message                    *
- *                                                                            *
- * Return value: SUCCEED - the data was read successfully                     *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	proxyconfig_get_hstgrp_data(zbx_uint64_t discovery_groupid, struct zbx_json *j, char **error)
-{
-	zbx_vector_uint64_t	groupids;
-	int			ret;
-
-	zbx_vector_uint64_create(&groupids);
-	zbx_vector_uint64_append(&groupids, discovery_groupid);
-
-	if (SUCCEED != proxyconfig_get_table_data("hstgrp", "t.groupid", &groupids, NULL, NULL, j, error))
-		goto out;
-
-	ret = SUCCEED;
-out:
-	zbx_vector_uint64_destroy(&groupids);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: get httptest and related data from database                       *
  *                                                                            *
  * Parameters: httptestids - [IN] the httptest identifiers                    *
@@ -840,9 +810,6 @@ int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_reques
 
 	if (proxy_config_revision < dc_revision.config_table)
 	{
-		if (SUCCEED != proxyconfig_get_hstgrp_data(discovery_groupid, j, error))
-			goto clean;
-
 		if (SUCCEED != proxyconfig_get_table_data("config", NULL, NULL, NULL, NULL, j, error))
 			goto clean;
 	}

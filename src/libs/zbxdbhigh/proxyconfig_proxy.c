@@ -877,46 +877,6 @@ static int	proxyconfig_process_regexps(zbx_vector_table_data_ptr_t *config_table
 	return proxyconfig_update_rows(expressions, error);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: update config and hstgrp configuration                            *
- *                                                                            *
- ******************************************************************************/
-static int	proxyconfig_process_config(zbx_vector_table_data_ptr_t *config_tables, char **error)
-{
-	zbx_table_data_t	*hstgrp;
-
-	if (NULL != (hstgrp = proxyconfig_get_table(config_tables, "hstgrp")))
-	{
-		proxyconfig_prepare_table(hstgrp, NULL, NULL, NULL);
-
-		/* Only id of the host group used for network discovery is sent to proxy. */
-		/* This means that there will be no host group updates -  only one group  */
-		/* will be inserted and the old one (if exists) deleted.                  */
-		/* Because names are not synced the existing group must be renamed before */
-		/* inserting new group or there would be name key violation.              */
-		if (0 != hstgrp->del_ids.values_num)
-		{
-			if (ZBX_DB_OK >= DBexecute("update hstgrp set name=" ZBX_SQL_CONCAT(), "'#'", "name"))
-			{
-				*error = zbx_strdup(NULL, "cannot rename hstgrp name");
-				return FAIL;
-			}
-		}
-
-		if (SUCCEED != proxyconfig_insert_rows(hstgrp, error))
-			return FAIL;
-	}
-
-	if (SUCCEED != proxyconfig_process_table(config_tables, "config", error))
-		return FAIL;
-
-	if (NULL != hstgrp)
-		return proxyconfig_delete_rows(hstgrp, error);
-
-	return SUCCEED;
-}
-
 #define ZBX_proxyconfig_GET_TABLE(table)					\
 	if (NULL == (table = proxyconfig_get_table(config_tables, #table)))	\
 	{									\
@@ -1175,13 +1135,13 @@ static int	proxyconfig_process_data(zbx_vector_table_data_ptr_t *config_tables, 
 	if (SUCCEED != proxyconfig_process_table(config_tables, "config_autoreg_tls", error))
 		return FAIL;
 
+	if (SUCCEED != proxyconfig_process_table(config_tables, "config", error))
+		return FAIL;
+
 	if (SUCCEED != proxyconfig_process_network_discovery(config_tables, error))
 		return FAIL;
 
 	if (SUCCEED != proxyconfig_process_regexps(config_tables, error))
-		return FAIL;
-
-	if (SUCCEED != proxyconfig_process_config(config_tables, error))
 		return FAIL;
 
 	if (NULL != (hostmacro = proxyconfig_get_table(config_tables, "hostmacro")))
