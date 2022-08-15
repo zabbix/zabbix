@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = hasRequest('parent_discoveryid') ? _('Configuration of graph prototypes') : _('Configuration of graphs');
 $page['file'] = 'graphs.php';
-$page['scripts'] = ['colorpicker.js'];
+$page['scripts'] = ['colorpicker.js', 'multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -82,7 +82,7 @@ $fields = [
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name","discover"'),					null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-$percentVisible = getRequest('visible');
+$percentVisible = getRequest('visible', []);
 if (!isset($percentVisible['percent_left'])) {
 	unset($_REQUEST['percent_left']);
 }
@@ -509,9 +509,9 @@ elseif (isset($_REQUEST['form'])) {
 
 	if ($data['graphid'] != 0 && ($data['readonly'] || !$data['form_refresh'])) {
 		$options = [
-			'graphids' => $data['graphid'],
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid']
+			'selectHosts' => ['hostid'],
+			'graphids' => $data['graphid']
 		];
 
 		if ($data['parent_discoveryid'] === null) {
@@ -599,7 +599,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['show_triggers'] = getRequest('show_triggers', 0);
 		$data['show_legend'] = getRequest('show_legend', 0);
 		$data['show_3d'] = getRequest('show_3d', 0);
-		$data['visible'] = getRequest('visible');
+		$data['visible'] = getRequest('visible', []);
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
 		$data['items'] = $gitems;
@@ -620,12 +620,32 @@ elseif (isset($_REQUEST['form'])) {
 		$data['show_triggers'] = $_REQUEST['show_triggers'] = 1;
 	}
 
+	if ($data['ymax_itemid'] || $data['ymin_itemid']) {
+		$options = [
+			'output' => ['itemid', 'hostid', 'name', 'key_'],
+			'selectHosts' => ['name'],
+			'itemids' => [$data['ymax_itemid'], $data['ymin_itemid']],
+			'webitems' => true,
+			'preservekeys' => true
+		];
+
+		$items = API::Item()->get($options);
+
+		if ($data['parent_discoveryid'] !== null) {
+			$items = $items + API::ItemPrototype()->get($options);
+		}
+
+		$data['yaxis_items'] = $items;
+
+		unset($items);
+	}
+
 	// items
 	if ($data['items']) {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'flags'],
 			'selectHosts' => ['hostid', 'name'],
-			'itemids' => zbx_objectValues($data['items'], 'itemid'),
+			'itemids' => array_column($data['items'], 'itemid'),
 			'filter' => [
 				'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
 			],
