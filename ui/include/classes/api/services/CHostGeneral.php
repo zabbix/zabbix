@@ -588,56 +588,12 @@ abstract class CHostGeneral extends CHostBase {
 		if ($clear) {
 			CDiscoveryRule::clearTemplateObjects($templateids, $hostids);
 			CItem::clearTemplateObjects($templateids, $hostids);
+			CHttpTest::clearTemplateObjects($templateids, $hostids);
 		}
 		else {
 			CDiscoveryRule::unlinkTemplateObjects($templateids, $hostids);
 			CItem::unlinkTemplateObjects($templateids, $hostids);
-		}
-
-		// http tests
-		$upd_httptests = [];
-
-		$sqlWhere = '';
-		if ($hostids !== null) {
-			$sqlWhere = ' AND '.dbConditionInt('ht1.hostid', $hostids);
-		}
-		$sql = 'SELECT DISTINCT ht1.httptestid,h.status as host_status'.
-				' FROM httptest ht1,httptest ht2,hosts h'.
-				' WHERE ht1.templateid=ht2.httptestid'.
-					' AND ht1.hostid=h.hostid'.
-					' AND '.dbConditionInt('ht2.hostid', $templateids).
-				$sqlWhere;
-
-		$httptests = DBSelect($sql);
-
-		while ($httptest = DBfetch($httptests)) {
-			if ($clear) {
-				$upd_httptests[$httptest['httptestid']] = true;
-			}
-			else {
-				$upd_httptest = ['templateid' => 0];
-
-				if ($httptest['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_httptest['uuid'] = generateUuidV4();
-				}
-
-				$upd_httptests[$httptest['httptestid']] = [
-					'values' => $upd_httptest,
-					'where' => ['httptestid' => $httptest['httptestid']]
-				];
-			}
-		}
-
-		if ($upd_httptests) {
-			if ($clear) {
-				$result = API::HttpTest()->delete(array_keys($upd_httptests), true);
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear Web scenarios.'));
-				}
-			}
-			else {
-				DB::update('httptest', $upd_httptests);
-			}
+			CHttpTest::unlinkTemplateObjects($templateids, $hostids);
 		}
 	}
 
@@ -1123,56 +1079,12 @@ abstract class CHostGeneral extends CHostBase {
 		if ($clear) {
 			CDiscoveryRule::clearTemplateObjects($templateids, $targetids);
 			CItem::clearTemplateObjects($templateids, $targetids);
+			CHttpTest::clearTemplateObjects($templateids, $targetids);
 		}
 		else {
 			CDiscoveryRule::unlinkTemplateObjects($templateids, $targetids);
 			CItem::unlinkTemplateObjects($templateids, $targetids);
-		}
-
-		// http tests
-		$upd_httptests = [];
-
-		$sqlWhere = '';
-		if (!is_null($targetids)) {
-			$sqlWhere = ' AND '.dbConditionInt('ht1.hostid', $targetids);
-		}
-		$sql = 'SELECT DISTINCT ht1.httptestid,h.status as host_status'.
-				' FROM httptest ht1,httptest ht2,hosts h'.
-				' WHERE ht1.templateid=ht2.httptestid'.
-					' AND ht1.hostid=h.hostid'.
-					' AND '.dbConditionInt('ht2.hostid', $templateids).
-				$sqlWhere;
-
-		$httptests = DBSelect($sql);
-
-		while ($httptest = DBfetch($httptests)) {
-			if ($clear) {
-				$upd_httptests[$httptest['httptestid']] = true;
-			}
-			else {
-				$upd_httptest = ['templateid' => 0];
-
-				if ($httptest['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_httptest['uuid'] = generateUuidV4();
-				}
-
-				$upd_httptests[$httptest['httptestid']] = [
-					'values' => $upd_httptest,
-					'where' => ['httptestid' => $httptest['httptestid']]
-				];
-			}
-		}
-
-		if ($upd_httptests) {
-			if ($clear) {
-				$result = API::HttpTest()->delete(array_keys($upd_httptests), true);
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear Web scenarios.'));
-				}
-			}
-			else {
-				DB::update('httptest', $upd_httptests);
-			}
+			CHttpTest::unlinkTemplateObjects($templateids, $targetids);
 		}
 
 		parent::unlink($templateids, $targetids);

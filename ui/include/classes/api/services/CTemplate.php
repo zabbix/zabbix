@@ -619,15 +619,15 @@ class CTemplate extends CHostGeneral {
 			'operationid'=>$delOperationids
 		]);
 
-		// http tests
-		$delHttpTests = API::HttpTest()->get([
-			'templateids' => $templateids,
-			'output' => ['httptestid'],
-			'nopermissions' => 1,
+		// delete web scenarios
+		$db_httptests = DB::select('httptest', [
+			'output' => ['httptestid', 'name'],
+			'filter' => ['hostid' => $templateids],
 			'preservekeys' => true
 		]);
-		if (!empty($delHttpTests)) {
-			API::HttpTest()->delete(array_keys($delHttpTests), true);
+
+		if ($db_httptests) {
+			CHttpTest::deleteForce($db_httptests);
 		}
 
 		// Get host prototype operations from LLD overrides where this template is linked.

@@ -1492,21 +1492,16 @@ class CHost extends CHostGeneral {
 		if ($db_items) {
 			CItem::deleteForce($db_items);
 		}
+
+		// delete web scenarios
+		$db_httptests = DB::select('httptest', [
+			'output' => ['httptestid', 'name'],
+			'filter' => ['hostid' => $hostids],
 			'preservekeys' => true
 		]);
 
-		if ($del_items) {
-			CItem::deleteForce($del_items);
-		}
-
-		// delete web tests
-		$delHttptests = [];
-		$dbHttptests = get_httptests_by_hostid($hostids);
-		while ($dbHttptest = DBfetch($dbHttptests)) {
-			$delHttptests[$dbHttptest['httptestid']] = $dbHttptest['httptestid'];
-		}
-		if (!empty($delHttptests)) {
-			API::HttpTest()->delete($delHttptests, true);
+		if ($db_httptests) {
+			CHttpTest::deleteForce($db_httptests);
 		}
 
 		// delete host from maps

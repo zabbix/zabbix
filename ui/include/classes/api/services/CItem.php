@@ -835,8 +835,9 @@ class CItem extends CItemGeneral {
 				'inventory_link', 'logtimefmt', 'description', 'status'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'filter' => [
+				'hostid' => $templateids,
 				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
-				'hostid' => $templateids
+				'type' => self::SUPPORTED_ITEM_TYPES
 			],
 			'preservekeys' => true
 		]);
