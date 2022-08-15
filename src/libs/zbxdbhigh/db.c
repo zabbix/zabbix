@@ -3330,7 +3330,7 @@ int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx
  * Return value: SUCCEED - one or more of the specified records were          *
  *                         successfully locked                                *
  *               FAIL    - the table does not contain any of the specified    *
- *                         records                                            *
+ *                         records or 'table' name not found                  *
  *                                                                            *
  ******************************************************************************/
 int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
