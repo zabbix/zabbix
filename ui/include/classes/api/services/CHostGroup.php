@@ -1526,7 +1526,6 @@ class CHostGroup extends CApiService {
 				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
-
 		}
 
 		// adding host prototype

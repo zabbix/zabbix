@@ -84,6 +84,7 @@ class CControllerHostGroupEdit extends CController{
 		}
 
 		$data['is_discovery_rule_editable'] = false;
+
 		if ($data['discoveryRule']) {
 			$data['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
 				'output' => [],
