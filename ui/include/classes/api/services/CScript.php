@@ -1199,7 +1199,7 @@ class CScript extends CApiService {
 		}
 
 		$events = API::Event()->get([
-			'output' => ['objectid', 'value', 'name', 'severirity'],
+			'output' => ['objectid', 'value', 'name', 'severity'],
 			'selectHosts' => ['hostid'],
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
