@@ -286,7 +286,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 
 	zbx_json_clean(&j);
 
-	if (SUCCEED != (ret = get_proxyconfig_data(proxy, &jp, &j, &error)))
+	if (SUCCEED != (ret = proxyconfig_get_data(proxy, &jp, &j, &error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 				proxy->host, error);

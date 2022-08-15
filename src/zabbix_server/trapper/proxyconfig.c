@@ -65,7 +65,7 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED != get_proxyconfig_data(&proxy, jp, &j, &error))
+	if (SUCCEED != proxyconfig_get_data(&proxy, jp, &j, &error))
 	{
 		zbx_send_response_ext(sock, FAIL, error, NULL, flags, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
@@ -162,7 +162,7 @@ void	recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls
 		goto out;
 	}
 
-	if (SUCCEED == (ret = process_proxyconfig(&jp_config, &error)))
+	if (SUCCEED == (ret = proxyconfig_process(&jp_config, &error)))
 	{
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
 		{

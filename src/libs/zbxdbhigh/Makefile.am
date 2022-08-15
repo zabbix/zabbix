@@ -21,7 +21,9 @@ libzbxdbhigh_a_SOURCES = \
 	graph_linking.h \
 	tag.c \
 	lld_override.c \
-	mediatype.c
+	mediatype.c \
+	proxyconfig_server.c \
+	proxyconfig_proxy.c
 
 libzbxdbhigh_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \

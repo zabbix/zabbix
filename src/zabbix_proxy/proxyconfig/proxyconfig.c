@@ -124,7 +124,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
 			sock.peer, (zbx_fs_size_t)*data_size);
 
-	if (SUCCEED == (ret = process_proxyconfig(&jp, &error)))
+	if (SUCCEED == (ret = proxyconfig_process(&jp, &error)))
 	{
 		DCsync_configuration(ZBX_DBSYNC_UPDATE, *synced);
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
