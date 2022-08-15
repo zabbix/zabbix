@@ -1956,7 +1956,8 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t **item, int range_start)
 	{
 		zbx_vc_item_t	new_item = {.itemid = itemid, .value_type = value_type};
 
-		if (NULL == (*item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(new_item))))
+		if (NULL == (*item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &new_item,
+				sizeof(new_item))))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			ret = FAIL;
