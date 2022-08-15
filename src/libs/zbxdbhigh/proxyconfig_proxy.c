@@ -29,7 +29,6 @@ zbx_const_field_ptr_t;
 ZBX_VECTOR_DECL(const_field, zbx_const_field_ptr_t)
 ZBX_VECTOR_IMPL(const_field, zbx_const_field_ptr_t)
 
-
 typedef struct
 {
 	zbx_uint64_t	blocks[128 / 64];
@@ -1292,6 +1291,105 @@ static int	proxyconfig_process_data(zbx_vector_table_data_ptr_t *config_tables, 
 	return SUCCEED;
 }
 
+static int	proxyconfig_delete_hosts(const zbx_vector_uint64_t *hostids, char **error)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	int			ret = FAIL;
+	zbx_vector_uint64_t	itemids, httptestids, httpstepids;
+
+	zbx_vector_uint64_create(&itemids);
+	zbx_vector_uint64_create(&httptestids);
+	zbx_vector_uint64_create(&httpstepids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid from items where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	DBselect_uint64(sql, &itemids);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select httptestid from httptest where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	DBselect_uint64(sql, &httptestids);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select httpstepid from httpstep where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", httptestids.values, httptestids.values_num);
+	DBselect_uint64(sql, &httpstepids);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httpstep_field where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid", httpstepids.values, httpstepids.values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httpstepitem where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid", httpstepids.values, httpstepids.values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httpstep where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid", httpstepids.values, httpstepids.values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httptest_field where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", httptestids.values, httptestids.values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httptestitem where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", httptestids.values, httptestids.values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httptest where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", httptestids.values, httptestids.values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_preproc where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update items set master_itemid=null where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from items where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&httpstepids);
+	zbx_vector_uint64_destroy(&httptestids);
+	zbx_vector_uint64_destroy(&itemids);
+
+	if (SUCCEED != ret)
+		*error = zbx_strdup(NULL, "cannot delete hosts");
+
+	return ret;
+}
+
 #define proxyconfig_ZBX_TABLE_NUM	24
 
 /******************************************************************************
@@ -1302,29 +1400,31 @@ static int	proxyconfig_process_data(zbx_vector_table_data_ptr_t *config_tables, 
 int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 {
 	zbx_vector_table_data_ptr_t	config_tables;
-	int			ret = FAIL, full_sync = 0;
+	int			ret = SUCCEED, full_sync = 0;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1];
-	struct zbx_json_parse	jp_data;
+	struct zbx_json_parse	jp_data, jp_del_hostids;
 	zbx_uint64_t		config_revision;
+	zbx_vector_uint64_t	del_hostids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	if (1 == jp->end - jp->start)
 	{
 		/* no configuration updates */
-		ret = SUCCEED;
 		goto out;
 	}
 
 	if (SUCCEED != (ret = zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CONFIG_REVISION, tmp, sizeof(tmp), NULL)))
 	{
 		*error = zbx_strdup(NULL, "no config_revision tag in proxy configuration response");
+		ret = FAIL;
 		goto out;
 	}
 
 	if (SUCCEED != (ret = is_uint64(tmp, &config_revision)))
 	{
 		*error = zbx_strdup(NULL, "invalid config_revision value in proxy configuration response");
+		ret = FAIL;
 		goto out;
 	}
 
@@ -1333,34 +1433,56 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 
 	zbx_vector_table_data_ptr_create(&config_tables);
 	zbx_vector_table_data_ptr_reserve(&config_tables, proxyconfig_ZBX_TABLE_NUM);
+	zbx_vector_uint64_create(&del_hostids);
 
 	// WDN remove
 
 	zabbix_increase_log_level();
 	zabbix_increase_log_level();
 
-	if (SUCCEED == proxyconfig_parse_data(&jp_data, &config_tables, error))
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
+		ret = proxyconfig_parse_data(&jp_data, &config_tables, error);
+
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			proxyconfig_dump_data(&config_tables);
 
 		proxyconfig_add_default_tables(&config_tables);
-
-		DBbegin();
-
-		if (SUCCEED == (ret = proxyconfig_process_data(&config_tables, full_sync, error)))
-		{
-			if (ZBX_DB_OK == DBcommit())
-				zbx_dc_update_received_revision(config_revision);
-		}
-		else
-			DBrollback();
 	}
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_REMOVED_HOSTIDS, &jp_del_hostids))
+	{
+		const char	*p;
+		zbx_uint64_t	hostid;
+
+		for (p = 0; NULL != (p = zbx_json_next_value(&jp_del_hostids, p, tmp, sizeof(tmp), NULL));)
+		{
+			if (SUCCEED == is_uint64(tmp, &hostid))
+				zbx_vector_uint64_append(&del_hostids, hostid);
+		}
+	}
+
+	DBbegin();
+
+	if (0 != config_tables.values_num)
+		ret = proxyconfig_process_data(&config_tables, full_sync, error);
+
+	if (SUCCEED == ret && 0 != del_hostids.values_num)
+		proxyconfig_delete_hosts(&del_hostids, error);
+
+	if (SUCCEED == ret)
+	{
+		if (ZBX_DB_OK == DBcommit())
+			zbx_dc_update_received_revision(config_revision);
+	}
+	else
+		DBrollback();
 
 	// WDN remove
 	zabbix_decrease_log_level();
 	zabbix_decrease_log_level();
 
+	zbx_vector_uint64_destroy(&del_hostids);
 	zbx_vector_table_data_ptr_clear_ext(&config_tables, table_data_free);
 	zbx_vector_table_data_ptr_destroy(&config_tables);
 
