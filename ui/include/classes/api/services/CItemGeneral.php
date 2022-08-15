@@ -218,7 +218,7 @@ abstract class CItemGeneral extends CApiService {
 	protected static function getTagsValidationRules(): array {
 		return ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
 			'tag' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_tag', 'tag')],
-			'value' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value'), 'default' => DB::getDefault('item_tag', 'value')]
+			'value' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value')]
 		]];
 	}
 
@@ -1369,56 +1369,56 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected static function updateTags(array &$items, array $db_items = null): void {
 		$ins_tags = [];
-		$del_tags = [];
+		$del_itemtagids = [];
 
 		foreach ($items as &$item) {
 			if (!array_key_exists('tags', $item)) {
 				continue;
 			}
 
-			$db_tags = [];
-
-			if ($db_items !== null) {
-				foreach ($db_items[$item['itemid']]['tags'] as $db_tag) {
-					$db_tags[$db_tag['tag']][$db_tag['value']] = $db_tag['itemtagid'];
-					$del_tags[$db_tag['itemtagid']] = true;
-				}
-			}
+			$db_tags = ($db_items !== null) ? $db_items[$item['itemid']]['tags'] : [];
 
 			foreach ($item['tags'] as &$tag) {
-				if (array_key_exists($tag['tag'], $db_tags) && array_key_exists($tag['value'], $db_tags[$tag['tag']])) {
-					$tag['itemtagid'] = $db_tags[$tag['tag']][$tag['value']];
-					unset($del_tags[$tag['itemtagid']]);
+				$db_itemtagid = key(array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
+					return $tag['tag'] == $db_tag['tag']
+						&& (!array_key_exists('value', $tag) || $tag['value'] === $db_tag['value']);
+				}));
+
+				if ($db_itemtagid !== null) {
+					$tag['itemtagid'] = $db_itemtagid;
+					unset($db_tags[$db_itemtagid]);
 				}
 				else {
 					$ins_tags[] = ['itemid' => $item['itemid']] + $tag;
 				}
+
+				$del_itemtagids = array_merge($del_itemtagids, array_keys($db_tags));
 			}
 			unset($tag);
 		}
 		unset($item);
 
-		if ($del_tags) {
-			DB::delete('item_tag', ['itemtagid' => array_keys($del_tags)]);
+		if ($del_itemtagids) {
+			DB::delete('item_tag', ['itemtagid' => $del_itemtagids]);
 		}
 
 		if ($ins_tags) {
 			$itemtagids = DB::insert('item_tag', $ins_tags);
-
-			foreach ($items as &$item) {
-				if (!array_key_exists('tags', $item)) {
-					continue;
-				}
-
-				foreach ($item['tags'] as &$tag) {
-					if (!array_key_exists('itemtagid', $tag)) {
-						$tag['itemtagid'] = array_shift($itemtagids);
-					}
-				}
-				unset($tag);
-			}
-			unset($item);
 		}
+
+		foreach ($items as &$item) {
+			if (!array_key_exists('tags', $item)) {
+				continue;
+			}
+
+			foreach ($item['tags'] as &$tag) {
+				if (!array_key_exists('itemtagid', $tag)) {
+					$tag['itemtagid'] = array_shift($itemtagids);
+				}
+			}
+			unset($tag);
+		}
+		unset($item);
 	}
 
 	/**
