@@ -353,7 +353,7 @@ typedef struct
 }
 zbx_dc_httpstep_field_t;
 
-ZBX_PTR_VECTOR_DECL(dc_httptest, zbx_dc_httptest_t *)
+ZBX_PTR_VECTOR_DECL(dc_httptest_ptr, zbx_dc_httptest_t *)
 
 typedef struct
 {
@@ -389,12 +389,12 @@ typedef struct
 	zbx_vector_ptr_t		interfaces_v;	/* for quick finding of all host interfaces in */
 						/* 'config->interfaces' hashset */
 
-	zbx_vector_dc_httptest_t	httptests;
+	zbx_vector_dc_httptest_ptr_t	httptests;
 	zbx_vector_dc_item_ptr_t	active_items;
 }
 ZBX_DC_HOST;
 
-ZBX_PTR_VECTOR_DECL(dc_host, ZBX_DC_HOST *)
+ZBX_PTR_VECTOR_DECL(dc_host_ptr, ZBX_DC_HOST *)
 
 typedef struct
 {
@@ -454,9 +454,8 @@ typedef struct
 	int			last_version_error_time;
 	zbx_uint64_t		revision;
 
-	zbx_vector_dc_host_t	hosts;
-
-	zbx_vector_host_rev_t	removed_hosts;
+	zbx_vector_dc_host_ptr_t	hosts;
+	zbx_vector_host_rev_t		removed_hosts;
 }
 ZBX_DC_PROXY;
 

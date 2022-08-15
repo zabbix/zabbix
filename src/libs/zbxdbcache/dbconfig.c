@@ -75,9 +75,9 @@ int	sync_in_progress = 0;
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
 				dc_host->maintenance_type, dc_item->type)
 
-ZBX_PTR_VECTOR_IMPL(cached_proxy, zbx_cached_proxy_t *)
-ZBX_PTR_VECTOR_IMPL(dc_httptest, zbx_dc_httptest_t *)
-ZBX_PTR_VECTOR_IMPL(dc_host, ZBX_DC_HOST *)
+ZBX_PTR_VECTOR_IMPL(cached_proxy_ptr, zbx_cached_proxy_t *)
+ZBX_PTR_VECTOR_IMPL(dc_httptest_ptr, zbx_dc_httptest_t *)
+ZBX_PTR_VECTOR_IMPL(dc_host_ptr, ZBX_DC_HOST *)
 ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
 
@@ -1125,7 +1125,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	}
 
 	dc_strpool_release(proxy->proxy_address);
-	zbx_vector_dc_host_destroy(&proxy->hosts);
+	zbx_vector_dc_host_ptr_destroy(&proxy->hosts);
 	zbx_vector_host_rev_destroy(&proxy->removed_hosts);
 
 	zbx_hashset_remove_direct(&config->proxies, proxy);
@@ -1144,10 +1144,10 @@ static void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hosti
 	rev.revision = revision;
 	zbx_vector_host_rev_append(&proxy->removed_hosts, rev);
 
-	if (FAIL == (i = zbx_vector_dc_host_search(&proxy->hosts, host, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+	if (FAIL == (i = zbx_vector_dc_host_ptr_search(&proxy->hosts, host, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 		return;
 
-	zbx_vector_dc_host_remove_noorder(&proxy->hosts, i);
+	zbx_vector_dc_host_ptr_remove_noorder(&proxy->hosts, i);
 	proxy->revision = revision;
 }
 
@@ -1158,7 +1158,7 @@ static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid,
 	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_hostid)))
 		return;
 
-	zbx_vector_dc_host_append(&proxy->hosts, host);
+	zbx_vector_dc_host_ptr_append(&proxy->hosts, host);
 	proxy->revision = revision;
 }
 
@@ -1479,7 +1479,7 @@ done:
 			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
 
-			zbx_vector_dc_httptest_create_ext(&host->httptests, __config_shmem_malloc_func,
+			zbx_vector_dc_httptest_ptr_create_ext(&host->httptests, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
 			zbx_vector_dc_item_ptr_create_ext(&host->active_items, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
@@ -1615,7 +1615,7 @@ done:
 				proxy->nodata_win.values_num = 0;
 				proxy->nodata_win.period_end = 0;
 
-				zbx_vector_dc_host_create_ext(&proxy->hosts,  __config_shmem_malloc_func,
+				zbx_vector_dc_host_ptr_create_ext(&proxy->hosts,  __config_shmem_malloc_func,
 						__config_shmem_realloc_func, __config_shmem_free_func);
 				zbx_vector_host_rev_create_ext(&proxy->removed_hosts, __config_shmem_malloc_func,
 						__config_shmem_realloc_func, __config_shmem_free_func);
@@ -1726,7 +1726,7 @@ done:
 		zbx_vector_dc_item_ptr_destroy(&host->active_items);
 		zbx_hashset_remove_direct(&config->hosts, host);
 
-		zbx_vector_dc_httptest_destroy(&host->httptests);
+		zbx_vector_dc_httptest_ptr_destroy(&host->httptests);
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -5852,7 +5852,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint32_t revision)
 		{
 			httptest->location = ZBX_LOC_NOWHERE;
 			httptest->nextcheck = 0;
-			zbx_vector_dc_httptest_append(&host->httptests, httptest);
+			zbx_vector_dc_httptest_ptr_append(&host->httptests, httptest);
 		}
 
 		delay_str = dc_expand_user_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
@@ -5895,10 +5895,10 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint32_t revision)
 		{
 			dc_host_update_revision(host, revision);
 
-			if (FAIL != (index = zbx_vector_dc_httptest_search(&host->httptests, httptest,
+			if (FAIL != (index = zbx_vector_dc_httptest_ptr_search(&host->httptests, httptest,
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
-				zbx_vector_dc_httptest_remove(&host->httptests, index);
+				zbx_vector_dc_httptest_ptr_remove(&host->httptests, index);
 			}
 		}
 
@@ -13636,14 +13636,14 @@ int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
  * Purpose: retrieve proxyids for all cached proxies                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies)
+void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_ptr_t *proxies)
 {
 	ZBX_DC_HOST_H		*dc_host;
 	zbx_hashset_iter_t	iter;
 
 	RDLOCK_CACHE;
 
-	zbx_vector_cached_proxy_reserve(proxies, (size_t)config->hosts_p.num_data);
+	zbx_vector_cached_proxy_ptr_reserve(proxies, (size_t)config->hosts_p.num_data);
 	zbx_hashset_iter_reset(&config->hosts_p, &iter);
 
 	while (NULL != (dc_host = (ZBX_DC_HOST_H *)zbx_hashset_iter_next(&iter)))
@@ -13656,7 +13656,7 @@ void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies)
 		proxy->hostid = dc_host->host_ptr->hostid;
 		proxy->status = dc_host->host_ptr->status;
 
-		zbx_vector_cached_proxy_append(proxies, proxy);
+		zbx_vector_cached_proxy_ptr_append(proxies, proxy);
 	}
 
 	UNLOCK_CACHE;
@@ -15185,14 +15185,14 @@ static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts)
  ******************************************************************************/
 static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
 {
-	zbx_vector_dc_httptest_t	httptests;
+	zbx_vector_dc_httptest_ptr_t	httptests;
 	zbx_hashset_iter_t		iter;
 	int				i;
 	zbx_uint64_t			*phostid;
 	ZBX_DC_HOST			*host;
 	time_t				now;
 
-	zbx_vector_dc_httptest_create(&httptests);
+	zbx_vector_dc_httptest_ptr_create(&httptests);
 
 	now = time(NULL);
 
@@ -15207,7 +15207,7 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
 			if (ZBX_LOC_NOWHERE != host->httptests.values[i]->location)
 				continue;
 
-			zbx_vector_dc_httptest_append(&httptests, host->httptests.values[i]);
+			zbx_vector_dc_httptest_ptr_append(&httptests, host->httptests.values[i]);
 		}
 	}
 
@@ -15226,7 +15226,7 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
 		UNLOCK_CACHE;
 	}
 
-	zbx_vector_dc_httptest_destroy(&httptests);
+	zbx_vector_dc_httptest_ptr_destroy(&httptests);
 }
 
 

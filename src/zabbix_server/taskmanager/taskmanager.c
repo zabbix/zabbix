@@ -1132,10 +1132,10 @@ static void	tm_remove_old_tasks(int now)
 static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 {
 	int				i, notify_proxypollers = 0;
-	zbx_vector_cached_proxy_t	proxies;
+	zbx_vector_cached_proxy_ptr_t	proxies;
 	zbx_vector_ptr_t		tasks_active;
 
-	zbx_vector_cached_proxy_create(&proxies);
+	zbx_vector_cached_proxy_ptr_create(&proxies);
 
 	zbx_vector_ptr_create(&tasks_active);
 
@@ -1187,8 +1187,8 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 	zbx_vector_ptr_destroy(&tasks_active);
 
-	zbx_vector_cached_proxy_clear_ext(&proxies, zbx_cached_proxy_free);
-	zbx_vector_cached_proxy_destroy(&proxies);
+	zbx_vector_cached_proxy_ptr_clear_ext(&proxies, zbx_cached_proxy_free);
+	zbx_vector_cached_proxy_ptr_destroy(&proxies);
 }
 
 /******************************************************************************

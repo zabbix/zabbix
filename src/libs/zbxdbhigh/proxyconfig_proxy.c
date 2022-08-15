@@ -40,11 +40,6 @@ static void	zbx_flags128_set(zbx_flags128_t *flags, int bit)
 	flags->blocks[bit >> 6] |= (__UINT16_C(1) << (bit & 0x3f));
 }
 
-static void	zbx_flags128_unset(zbx_flags128_t *flags, int bit)
-{
-	flags->blocks[bit >> 6] &= ~(__UINT16_C(1) << (bit & 0x3f));
-}
-
 static void	zbx_flags128_init(zbx_flags128_t *flags)
 {
 	memset(flags->blocks, 0, sizeof(zbx_uint64_t) * (128 / 64));
