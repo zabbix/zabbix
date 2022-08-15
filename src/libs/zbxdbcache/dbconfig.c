@@ -8110,7 +8110,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
  *                                                                            *
  ******************************************************************************/
 int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
-		zbx_uint32_t *revision, zbx_uint32_t *config_revision, char **error)
+		zbx_uint64_t *revision, zbx_uint64_t *config_revision, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

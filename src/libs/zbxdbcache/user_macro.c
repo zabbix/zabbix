@@ -1214,16 +1214,17 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 	zbx_vector_uint64_t	ids;
 	int			i;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() hosts:%d refcount:%u revision:%u", __func__, cache->hosts.num_data,
-			cache->refcount, cache->revision);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() hosts:%d refcount:%u revision:" ZBX_FS_UI64, __func__,
+			cache->hosts.num_data, cache->refcount, cache->revision);
 
 	zbx_vector_uint64_create(&ids);
 
 	zbx_hashset_iter_reset(&cache->hosts, &iter);
 	while (NULL != (phost = (zbx_um_host_t **)zbx_hashset_iter_next(&iter)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " refcount:%u revision:" ZBX_FS_UI64, (*phost)->hostid,
-				(*phost)->refcount, (*phost)->macro_revision);
+		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " refcount:%u link_revision:" ZBX_FS_UI64
+				" macro_revision:" ZBX_FS_UI64, (*phost)->hostid,
+				(*phost)->refcount, (*phost)->link_revision, (*phost)->macro_revision);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  macros:");
 
