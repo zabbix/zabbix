@@ -560,6 +560,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK == ret)
 	{
+		/* in contrast to "set names utf8" results of this call will survive auto-reconnects     */
 		/* utf8mb3 and utf8 are currently aliases but one of them might be missing, attempt both */
 		if (0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB3) &&
 				0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8))
