@@ -1236,6 +1236,7 @@ class CScript extends CApiService {
 
 		if ($scripts) {
 			$macros_data = [];
+			$processed_scripts = [];
 
 			foreach ($scripts as $scriptid => $script) {
 				foreach ($events as $eventid => $event) {
@@ -1266,7 +1267,8 @@ class CScript extends CApiService {
 					foreach ($event['hosts'] as $event_host) {
 						foreach ($hosts as $host) {
 							if (bccomp($host['hostid'], $event_host['hostid']) == 0
-									&& array_key_exists($eventid, $scripts_by_events)) {
+									&& array_key_exists($eventid, $scripts_by_events)
+									&& !array_key_exists($scriptid, $processed_scripts)) {
 								$size = count($scripts_by_events[$eventid]);
 								$scripts_by_events[$eventid][$size] = $script;
 
@@ -1284,6 +1286,8 @@ class CScript extends CApiService {
 										$scripts_by_events[$eventid][$size]['url'] = $macro_values['url'];
 									}
 								}
+
+								$processed_scripts[$scriptid] = true;
 							}
 						}
 					}
