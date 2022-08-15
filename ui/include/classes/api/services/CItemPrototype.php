@@ -763,6 +763,30 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		self::updateForce($items, $db_items);
+
+		if ($item_prototypeids) {
+			$result = DBselect(
+				'SELECT id.itemid,i.name,i.valuemapid'.
+				' FROM item_discovery id,items i'.
+				' WHERE id.itemid=i.itemid'.
+					' AND '.dbConditionId('id.parent_itemid', $item_prototypeids)
+			);
+
+			$items = [];
+			$db_items = [];
+
+			while ($row = DBfetch($result)) {
+				$item = [
+					'itemid' => $row['itemid'],
+					'valuemapid' => 0
+				];
+
+				$items[] = $item;
+				$db_items[$row['itemid']] = $row;
+			}
+
+			CItem::updateForce($items, $db_items);
+		}
 	}
 
 	/**
