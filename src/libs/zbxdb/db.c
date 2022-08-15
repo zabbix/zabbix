@@ -558,9 +558,15 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
 
-	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
-	if (ZBX_DB_OK == ret && 0 != mysql_set_character_set(conn, "utf8mb3"))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"utf8mb3\"");
+	if (ZBX_DB_OK == ret)
+	{
+		/* utf8mb3 and utf8 are currently aliases but one of them might be missing, attempt both */
+		if (0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB3) &&
+				0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set");
+		}
+	}
 
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
