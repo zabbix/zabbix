@@ -237,6 +237,7 @@ if (hasRequest('form')) {
 		$data['group'] = reset($groups);
 
 		$data['group']['is_discovery_rule_editable'] = false;
+
 		if ($data['group']['discoveryRule']) {
 			$data['group']['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
 				'output' => [],
@@ -345,6 +346,7 @@ else {
 
 	foreach ($data['groups'] as &$group) {
 		$group['is_discovery_rule_editable'] = false;
+
 		if ($group['discoveryRule']) {
 			$group['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
 				'output' => [],
@@ -353,6 +355,7 @@ else {
 				'preservekeys' => true
 			]);
 		}
+
 		order_result($group['hosts'], 'name');
 		order_result($group['templates'], 'name');
 	}
