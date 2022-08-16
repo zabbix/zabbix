@@ -28,15 +28,18 @@ class CControllerActionUpdate extends CController {
 	protected function checkInput(): bool {
 		// TODO: check If additional fields are necessarry
 		$fields = [
-			'eventsource' => 'in '.implode(',', [
-				EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTOREGISTRATION,
-				EVENT_SOURCE_INTERNAL,EVENT_SOURCE_SERVICE
-			]),
+			'eventsource' => 'required|in '.implode(',', [
+					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTOREGISTRATION,
+					EVENT_SOURCE_INTERNAL,EVENT_SOURCE_SERVICE
+				]),
 			'name' => 'string|required',
-			'status' => 'string',
+			'actionid' => 'id',
+			'status' => 'in '.implode(',', [ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
 			'operations' => 'array',
 			'recovery_operations' => 'array',
-			'update_operations' => 'arrat'
+			'update_operations' => 'array',
+			'esc_period' => '',
+			'filter' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -45,8 +48,7 @@ class CControllerActionUpdate extends CController {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
-		//return $ret;
-		return true;
+		return $ret;
 	}
 
 	protected function checkPermissions(): bool {
@@ -56,11 +58,7 @@ class CControllerActionUpdate extends CController {
 
 	protected function doAction(): void
 	{
-		$eventsource = 0;
-
-		// pass fake data to test if create functionality works
-
-
+		$eventsource = $this->getInput('eventsource');
 		// todo : receive data from form
 
 //		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
@@ -200,11 +198,11 @@ class CControllerActionUpdate extends CController {
 //		}
 
 		$action = [
-			'name' => 'sometest1',
-			'actionid' => '7',
-			'status' => '0',
-			'eventsource' => '0',
-			'esc_period' => '1h',
+			'name' => $this->getInput('name'),
+			'actionid' => $this->getInput('actionid'),
+			'status' => $this->getInput('status'),
+			'eventsource' => $this->getInput('eventsource'),
+			'esc_period' => $this->getInput('esc_period'),
 			'operations' => [
 				[
 					"esc_step_from" => '1',

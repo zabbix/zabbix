@@ -33,13 +33,10 @@ $form = (new CForm())
 	->setName('action.edit')
 	->setId('action-form')
 	->addVar('actionid', $data['actionid']?:null)
+	->addVar('eventsource', $data['eventsource'])
 	->addStyle('display: none;')
 	//->addItem(getMessages())
 	->addItem((new CInput('submit'))->addStyle('display: none;'));
-
-if ($data['actionid']) {
-	$form->addVar('actionid', $data['actionid']);
-}
 
 // Action tab.
 $action_tab = (new CFormGrid())
@@ -162,7 +159,8 @@ $action_tab
 	])
 	->addItem([
 		new CLabel(_('Enabled'), 'status'),
-		new CFormField((new CCheckBox('status', ACTION_STATUS_ENABLED))->setChecked($data['action']['status'] == ACTION_STATUS_ENABLED))
+		new CFormField((new CCheckBox('status', ACTION_STATUS_ENABLED))
+			->setChecked($data['action']['status'] == ACTION_STATUS_ENABLED))
 	])
 	->addItem(
 		new CFormField((new CLabel(_('At least one operation must exist.')))->setAsteriskMark())

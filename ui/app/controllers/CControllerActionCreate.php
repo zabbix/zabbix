@@ -26,33 +26,32 @@ class CControllerActionCreate extends CController {
 	}
 
 	protected function checkInput(): bool {
+		// todo: update input rules
 		$fields = [
-			'eventsource' => 'in '.implode(',', [
+			'eventsource' => 'required|in '.implode(',', [
 				EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTOREGISTRATION,
 				EVENT_SOURCE_INTERNAL,EVENT_SOURCE_SERVICE
 			]),
 			'name' => 'string|required',
-			'status' => 'string',
-			'operations' => 'int',
+			'status' => 'in '.implode(',', [ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
+			'operations' => 'array',
 			'recovery_operations' => 'array',
 			'update_operations' => 'array',
-			'esc_period' => 'string',
+			'esc_period' => '',
 			'filter' => 'array'
 		];
 
-		//$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-//		if (!$ret) {
-//			$this->setResponse(new CControllerResponseFatal());
-//		}
-		//return $ret;
+		if (!$ret) {
+			$this->setResponse(new CControllerResponseFatal());
+		}
 
-		return true;
+		return $ret;
 	}
 
 	protected function checkPermissions(): bool {
-		// todo: add permission check
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS);
 	}
 
 	protected function doAction(): void {
@@ -197,10 +196,10 @@ class CControllerActionCreate extends CController {
 
 		// pass fake data to test if create functionality works
 		$action = [
-			'name' => 'sometest6',
-			'status' => '0',
-			'eventsource' => '0',
-			'esc_period' => '1h',
+			'name' => $this->getInput('name'),
+			'status' => $this->getInput('status'),
+			'eventsource' => $this->getInput('eventsource'),
+			'esc_period' => $this->getInput('esc_period', '1h'),
 			'operations' => [
 				[
 					"esc_step_from" => '1',
@@ -226,13 +225,13 @@ class CControllerActionCreate extends CController {
 					[
 						'conditiontype' => '3',
 						'operator' => '2',
-						'value' => 'dd'
+						'value' => 'testdata'
 					]
 				],
 				'evaltype' => '0'
 			],
-			//	'pause_suppressed' => '1',
-			//	'notify_if_canceled' => '1'
+				'pause_suppressed' => '1',
+				'notify_if_canceled' => '1'
 		];
 
 		DBstart();
@@ -254,6 +253,6 @@ class CControllerActionCreate extends CController {
 		}
 
 		show_messages($result, $messageSuccess, $messageFailed);
-	//	var_dump(array_column(get_and_clear_messages(), 'message')); exit;
+		//var_dump(array_column(get_and_clear_messages(), 'message')); exit;
 	}
 }

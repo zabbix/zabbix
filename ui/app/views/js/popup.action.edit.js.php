@@ -58,7 +58,7 @@ window.action_edit_popup = new class {
 			// todo: add multiselect title, not value
 
 			this.row = document.createElement('tr');
-			this.createRow(this.row, e.detail.inputs)
+			this.createRow(this.row, e.detail.inputs);
 
 			$('#conditionTable tr:last').before(this.row);
 			// addMessage(makeMessageBox('good', [], e.detail.title, true, false))
@@ -148,6 +148,7 @@ window.action_edit_popup = new class {
 
 	submit() {
 		const fields = getFormFields(this.form);
+		console.log(fields);
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', this.actionid !== '' ? 'action.update' : 'action.create');
 

@@ -35,6 +35,7 @@ window.condition_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		const fields = getFormFields(this.form);
+		console.log(fields);
 
 		this.overlay.setLoading();
 
