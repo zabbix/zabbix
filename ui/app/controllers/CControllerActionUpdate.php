@@ -27,7 +27,6 @@ class CControllerActionUpdate extends CController {
 
 	protected function checkInput(): bool {
 		// TODO: check If additional fields are necessarry
-
 		$fields = [
 			'eventsource' => 'in '.implode(',', [
 				EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTOREGISTRATION,
@@ -46,6 +45,7 @@ class CControllerActionUpdate extends CController {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
+		//return $ret;
 		return true;
 	}
 
@@ -59,45 +59,7 @@ class CControllerActionUpdate extends CController {
 		$eventsource = 0;
 
 		// pass fake data to test if create functionality works
-		$action = [
-			'name' => 'sometest2',
-			'actionid' => '7',
-			'status' => '0',
-			'eventsource' => '0',
-			'esc_period' => '1h',
-			'operations' => [
-				[
-					"esc_step_from" => '1',
-					'esc_step_to' => '1',
-					'esc_period' => '0',
-					'opmessage_grp' => [
-						['usrgrpid' => '8']
-					],
-					'opmessage' => [
-						'mediatypeid' => '0',
-						'default_msg' => '1'
-					],
-					'evaltype' => '0',
-					'operationtype' => '0',
-					'opconditions' => [],
-					'opmessage_usr' => []
-				]
-			],
-			'recovery_operations' => [],
-			'update_operations' => [],
-			'filter' => [
-				'conditions' => [
-					[
-						'conditiontype' => '3',
-						'operator' => '2',
-						'value' => 'dd'
-					]
-				],
-				'evaltype' => '0'
-			],
-			//	'pause_suppressed' => '1',
-			//	'notify_if_canceled' => '1'
-		];
+
 
 		// todo : receive data from form
 
@@ -236,6 +198,46 @@ class CControllerActionUpdate extends CController {
 //				unset($action['update_operations']);
 //				break;
 //		}
+
+		$action = [
+			'name' => 'sometest2',
+			'actionid' => '7',
+			'status' => '0',
+			'eventsource' => '0',
+			'esc_period' => '1h',
+			'operations' => [
+				[
+					"esc_step_from" => '1',
+					'esc_step_to' => '1',
+					'esc_period' => '0',
+					'opmessage_grp' => [
+						['usrgrpid' => '8']
+					],
+					'opmessage' => [
+						'mediatypeid' => '0',
+						'default_msg' => '1'
+					],
+					'evaltype' => '0',
+					'operationtype' => '0',
+					'opconditions' => [],
+					'opmessage_usr' => []
+				]
+			],
+			'recovery_operations' => [],
+			'update_operations' => [],
+			'filter' => [
+				'conditions' => [
+					[
+						'conditiontype' => '3',
+						'operator' => '2',
+						'value' => 'dd'
+					]
+				],
+				'evaltype' => '0'
+			],
+			//	'pause_suppressed' => '1',
+			//	'notify_if_canceled' => '1'
+		];
 
 		DBstart();
 

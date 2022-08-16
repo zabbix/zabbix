@@ -73,8 +73,6 @@ window.action_edit_popup = new class {
 	//	}
 	}
 
-
-
 	openConditionPopup() {
 		const parameters = {
 			type: <?= ZBX_POPUP_CONDITION_TYPE_ACTION ?>,
@@ -85,7 +83,6 @@ window.action_edit_popup = new class {
 			dialogueid: 'condition',
 			dialogue_class: 'modal-popup-medium'
 		});
-
 	}
 
 	// createHiddenInput(conditiontype, operator, value, value2) { // ????
@@ -131,26 +128,37 @@ window.action_edit_popup = new class {
 	}
 
 	openOperationPopup(trigger_element, eventsource, recovery_phase, actionid) {
-		this.trigger_element = trigger_element;
-		this.eventsource = eventsource;
-		this.recovery_phase = recovery_phase;
-		this.actionid = actionid;
-
-		this.overlay = overlayDialogue({
-			class: 'modal-popup modal-popup-medium',
-			title: t('Operation details')
-		});
-
-
-		const props = {
-			recovery_phase,
-			cmd: <?= OPERATION_TYPE_UPDATE_MESSAGE ?>,
-			scriptid: null
+		const parameters = {
+			trigger_element: trigger_element,
+			eventsource: eventsource,
+			recovery_phase: recovery_phase,
+			actionid: actionid
 		};
 
-		this.view = this.OperationView(props);
-		this.view.onupdate = () => this.overlay.centerDialog();
+		return PopUp('popup.operations', parameters, {
+			dialogueid: 'condition',
+			dialogue_class: 'modal-popup-medium'
+		});
 	}
+
+
+	// openOperationPopup(trigger_element, eventsource, recovery_phase, actionid) {
+	//	this.trigger_element = trigger_element;
+	//	this.eventsource = eventsource;
+	//	this.recovery_phase = recovery_phase;
+	//	this.actionid = actionid;
+	//	this.overlay = overlayDialogue({
+	//		class: 'modal-popup modal-popup-medium',
+	//		title: t('Operation details')
+	//	});
+	//	const props = {
+	//		recovery_phase,
+	//		cmd: <?//= OPERATION_TYPE_UPDATE_MESSAGE ?>//,
+	//		scriptid: null
+	//	};
+	//	this.view = this.OperationView(props);
+	//	this.view.onupdate = () => this.overlay.centerDialog();
+	//}
 
 	// operation_details = {
 	// open(target, actionid, eventsource, recovery_phase, operation) {

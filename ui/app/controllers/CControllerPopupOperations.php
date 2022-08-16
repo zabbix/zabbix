@@ -22,21 +22,39 @@
 /**
  * Actions new condition popup.
  */
-class CControllerActionOperations extends CController {
+class CControllerPopupOperations extends CController {
 
 	protected function checkInput()
 	{
 		// TODO: Implement checkInput() method.
+		return true;
 	}
 
 	protected function checkPermissions()
 	{
 		// TODO: Implement checkPermissions() method.
+		return true;
 	}
 
 	protected function doAction()
 	{
-		// TODO: Implement doAction() method.
+		$data = [
+			'eventsource' => '0',
+			'actionid' => $this->getInput('actionid', ''),
+			'action' => [
+				'name' => '',
+				'esc_period' => '',
+				'eventsource' => '0',
+				'status' =>'',
+				'operations' => [],
+				'filter' => [
+					'conditions' => []
+				]
+			]
+		];
+
+		$response = new CControllerResponseData($data);
+		$this->setResponse($response);
 	}
 
 }

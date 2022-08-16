@@ -256,6 +256,6 @@ class CControllerActionCreate extends CController {
 //		}
 
 		//show_messages($result, $messageSuccess, $messageFailed);
-		var_dump(array_column(get_and_clear_messages(), 'message')); exit;
+	//	var_dump(array_column(get_and_clear_messages(), 'message')); exit;
 	}
 }

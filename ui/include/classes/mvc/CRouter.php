@@ -207,6 +207,7 @@ class CRouter {
 		'popup.mediatype.message'					=> ['CControllerPopupMediatypeMessage',					'layout.json',			'popup.mediatype.message'],
 		'popup.mediatypetest.edit'					=> ['CControllerPopupMediatypeTestEdit',				'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'					=> ['CControllerPopupMediatypeTestSend',				'layout.json',			null],
+		'popup.operations'							=> ['CControllerPopupOperations',						'layout.json',			'popup.operations'],
 		'popup.proxy.edit'							=> ['CControllerPopupProxyEdit',						'layout.json',			'popup.proxy.edit'],
 		'popup.scheduledreport.create'				=> ['CControllerPopupScheduledReportCreate',			'layout.json',			null],
 		'popup.scheduledreport.edit'				=> ['CControllerPopupScheduledReportEdit',				'layout.json',			'popup.scheduledreport.edit'],

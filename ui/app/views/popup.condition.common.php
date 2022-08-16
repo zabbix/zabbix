@@ -24,7 +24,6 @@
  * @var array $data
  */
 
-//require_once dirname(__FILE__).'/js/popup.condition.common.js.php';
 $inline_js = getPagePostJs().$this->readJsFile('popup.condition.common.js.php');
 require_once dirname(__FILE__).'/../../include/actions.inc.php';
 

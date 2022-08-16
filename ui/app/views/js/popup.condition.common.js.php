@@ -84,9 +84,9 @@ window.condition_popup = new class {
 						title = exception.error.title;
 						messages = exception.error.messages;
 					}
-					// else {
-					// 	messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-					// }
+					else {
+						messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+					}
 
 					const message_box = makeMessageBox('bad', messages, title)[0];
 					this.form.parentNode.insertBefore(message_box, this.form);
