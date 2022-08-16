@@ -204,6 +204,7 @@ require_once dirname(__FILE__).'/reports/testFormScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 require_once dirname(__FILE__).'/testSID.php';
+require_once dirname(__FILE__).'/testAuditManual.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -397,6 +398,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageScheduledReport');
 		$suite->addTestSuite('testScheduledReportPermissions');
 		$suite->addTestSuite('testSID');
+		$suite->addTestSuite('testAuditManual');
 
 		return $suite;
 	}
