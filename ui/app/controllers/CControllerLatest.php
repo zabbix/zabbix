@@ -260,14 +260,6 @@ abstract class CControllerLatest extends CController {
 			$input['tags'] = array_values($input['tags']);
 		}
 
-		if (array_key_exists('subfilter_tags', $input) && $input['subfilter_tags']) {
-			$subfilter_tags_tmp = [];
-			foreach ($input['subfilter_tags'] as $k => $v) {
-				$subfilter_tags_tmp[urldecode($k)] = $v;
-			}
-			$input['subfilter_tags'] = $subfilter_tags_tmp;
-		}
-
 		return $input;
 	}
 
