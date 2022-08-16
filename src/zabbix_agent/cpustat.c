@@ -127,6 +127,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	char				*error = NULL;
 	int				idx, ret = FAIL;
 #ifdef _WINDOWS
+	int	cpu_groups;
 	wchar_t				cpu[16]; /* 16 is enough to store instance name string (group and index) */
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
@@ -150,8 +151,20 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	/* the group. So, for 72-thread system there will be two groups with 36 threads each and Windows will  */
 	/* report counters "\Processor Information(0, n)" with 0 <= n <= 31 and "\Processor Information(1,n)". */
 
-	if (pcpus->count <= 64)
+	/* Microsoft documentation clearly says that, systems with fewer than 64 logical processors always     */
+	/* have a single processor group, Group 0. However, Zabbix users reported a rare bug, when there are   */
+	/* two processor groups on systems with 64 or less logical CPUs. This resulted in having the           */
+	/* "\Processor(n)" counters for only one processor group out of two. The actual root cause of this bug */
+	/* is not known. However, a similar case was described at stackoverflow.com, and the root cause there  */
+	/* was in interoperation between BIOS and Windows:                                                     */
+	/* https://stackoverflow.com/questions/28098082/unable-to-use-more-than-one-processor-group-for-my-threads-in-a-c-sharp-app */
+
+	cpu_groups = get_cpu_group_num_win32();
+
+	if (64 >= pcpus->count && 1 == cpu_groups)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%d CPUs and 1 processor group, using \"Processor\" counter", pcpus->count);
+
 		for (idx = 0; idx <= pcpus->count; idx++)
 		{
 			if (0 == idx)
@@ -171,9 +184,11 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	}
 	else
 	{
-		int	gidx, cpu_groups, cpus_per_group, numa_nodes;
+		int	gidx, cpus_per_group, numa_nodes;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "more than 64 CPUs, using \"Processor Information\" counter");
+		zabbix_log(LOG_LEVEL_DEBUG, "%d CPUs and %d processor groups, using \"Processor Information\" counter",
+				pcpus->count, cpu_groups);
+
 
 		cpe.szObjectName = get_builtin_object_name(PCI_INFORMATION_PROCESSOR_TIME);
 		cpe.szCounterName = get_builtin_counter_name(PCI_INFORMATION_PROCESSOR_TIME);
@@ -183,7 +198,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		/* processor group on non-NUMA systems or NUMA node number when NUMA is available. There may be more */
 		/* NUMA nodes than processor groups. */
 		numa_nodes = get_numa_node_num_win32();
-		cpu_groups = numa_nodes == 1 ? get_cpu_group_num_win32() : numa_nodes;
+		cpu_groups = numa_nodes == 1 ? cpu_groups : numa_nodes;
 		cpus_per_group = pcpus->count / cpu_groups;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "cpu_groups = %d, cpus_per_group = %d, cpus = %d", cpu_groups,
