@@ -145,7 +145,7 @@ class CControllerSlaReportList extends CController {
 					->getDateTime(true, $timezone)
 					->getTimestamp();
 
-				if ($period_from > ZBX_MAX_DATE) {
+				if ($period_from < 0 || $period_from > ZBX_MAX_DATE) {
 					$period_from = null;
 
 					error(_s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a time is expected')));
@@ -164,7 +164,7 @@ class CControllerSlaReportList extends CController {
 					->getDateTime(false, $timezone)
 					->getTimestamp();
 
-				if ($period_to > ZBX_MAX_DATE) {
+				if ($period_to < 0 || $period_to > ZBX_MAX_DATE) {
 					$period_to = null;
 
 					error(_s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a time is expected')));
