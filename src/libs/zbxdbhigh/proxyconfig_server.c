@@ -223,10 +223,16 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
 
 	proxyconfig_get_fields(&sql, &sql_alloc, &sql_offset, table, j);
+	zbx_json_addarray(j, "data");
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s t", table->table);
 
 	if (NULL != hostids)
 	{
+		/* no hosts to get macros from, send empty data */
+		if (0 == hostids->values_num)
+			goto end;
+
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid", hostids->values, hostids->values_num);
 		offset = 1;
@@ -243,7 +249,6 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 		goto out;
 	}
 
-	zbx_json_addarray(j, "data");
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s t", table->table);
 
 	while (NULL != (row = DBfetch(result)))
@@ -307,7 +312,7 @@ next:
 			zbx_free(path);
 	}
 	DBfree_result(result);
-
+end:
 	zbx_json_close(j);
 	zbx_json_close(j);
 
