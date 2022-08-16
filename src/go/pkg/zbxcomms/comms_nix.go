@@ -40,8 +40,9 @@ func Listen(address string, args ...interface{}) (c *Listener, err error) {
 	}
 	l, tmperr := net.Listen("tcp", address)
 	if tmperr != nil {
-		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
+		return nil, fmt.Errorf("Listen failed: %w", tmperr.Error())
 	}
 	c = &Listener{listener: l.(*net.TCPListener), tlsconfig: tlsconfig}
+
 	return
 }
