@@ -156,6 +156,50 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	proxyconfig_remove_unused_templates(void)
+{
+	zbx_vector_uint64_t	hostids;
+	int			removed_num;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&hostids);
+
+	zbx_dc_get_unused_macro_templates(&hostids);
+
+	if (0 != hostids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		DBbegin();
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts_templates where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+		DBexecute("%s", sql);
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hostmacro where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+		DBexecute("%s", sql);
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+		DBexecute("%s", sql);
+
+		DBcommit();
+
+		zbx_free(sql);
+	}
+
+	removed_num = hostids.values_num;
+
+	zbx_vector_uint64_destroy(&hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() removed:%d", __func__, removed_num);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically request config data                                  *
@@ -168,7 +212,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_thread_proxyconfig_args	*proxyconfig_args_in = (zbx_thread_proxyconfig_args *)
 							(((zbx_thread_args_t *)args)->args);
 	size_t				data_size;
-	double				sec;
+	double				sec, last_template_cleanup_sec = 0;
 	zbx_ipc_async_socket_t		rtc;
 	int				sleeptime;
 	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
@@ -247,6 +291,12 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), (zbx_fs_size_t)data_size, sec,
 				CONFIG_PROXYCONFIG_FREQUENCY);
+
+		if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
+		{
+			proxyconfig_remove_unused_templates();
+			last_template_cleanup_sec = sec;
+		}
 
 		sleeptime = CONFIG_PROXYCONFIG_FREQUENCY;
 	}

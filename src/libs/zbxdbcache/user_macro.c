@@ -1346,3 +1346,76 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_vector_ui
 		zbx_vector_uint64_uniq(macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 }
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: recursively remove templates linked to the hostid from unused_hosts  *
+ *          the specified revision                                               *
+ *                                                                               *
+ * Parameters: cache        - [IN] the user macro cache                          *
+ *             hostid       - [IN] the parent hostid                             *
+ *             unused_hosts - [IN/OUT] the templates not linked to any host      *
+ *                                     either directly or through other templates*
+ *                                                                               *
+ *********************************************************************************/
+static void	um_cache_check_used_templates(const zbx_um_cache_t *cache, zbx_uint64_t hostid,
+		zbx_hashset_t *unused_hosts)
+{
+	void		*data;
+	zbx_um_host_t	**phost;
+	zbx_uint64_t	*phostid = &hostid;
+	int		i;
+
+	if (NULL == (phost = (zbx_um_host_t **)zbx_hashset_search(&cache->hosts, &phostid)))
+		return;
+
+	if (NULL != (data = zbx_hashset_search(unused_hosts, &hostid)))
+		zbx_hashset_remove_direct(unused_hosts, data);
+
+	for (i = 0; i < (*phost)->templateids.values_num; i++)
+		um_cache_check_used_templates(cache, (*phost)->templateids.values[i], unused_hosts);
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: get identifiers of templates not linked to the specified hosts       *
+ *          neither directly nor through other templates                         *
+ *                                                                               *
+ * Parameters: cache       - [IN] the user macro cache                           *
+ *             hostids     - [IN] the parent hostids                             *
+ *             templateids - [IN/OUT] the templates not linked to any host       *
+ *                                     neither directly nor through other        *
+ *                                     templates                                 *
+ *                                                                               *
+ *********************************************************************************/
+void	um_cache_get_unused_templates(zbx_um_cache_t *cache, const zbx_vector_uint64_t *hostids,
+		zbx_vector_uint64_t *templateids)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_um_host_t		**phost;
+	zbx_hashset_t		unused_hosts;
+	int			i;
+	zbx_uint64_t		*phostid;
+
+	zbx_hashset_create(&unused_hosts, cache->hosts.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&cache->hosts, &iter);
+	while (NULL != (phost = (zbx_um_host_t **)zbx_hashset_iter_next(&iter)))
+	{
+		/* skip globalmacro host object */
+		if (0 == (*phost)->hostid)
+			continue;
+
+		zbx_hashset_insert(&unused_hosts, &(*phost)->hostid, sizeof(zbx_uint64_t));
+	}
+
+	for (i = 0; i < hostids->values_num; i++)
+		um_cache_check_used_templates(cache, hostids->values[i], &unused_hosts);
+
+	zbx_hashset_iter_reset(&unused_hosts, &iter);
+	while (NULL != (phostid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_uint64_append(templateids, *phostid);
+
+	zbx_hashset_destroy(&unused_hosts);
+}

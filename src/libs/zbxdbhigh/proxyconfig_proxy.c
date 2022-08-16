@@ -20,6 +20,33 @@
 #include "proxy.h"
 #include "zbxdbhigh.h"
 
+/*
+ * The configuration sync is split into 4 parts for each table:
+ * 1) proxyconfig_prepare_rows()
+ *    Renames rename_field to '#'||rename_field for all rows to be updated. It's done to avoid
+ *    possible conflicts when two field values used in unique index are swapped.
+ *    Resets reset_field to null for all rows to be deleted or updated. It's done to avoid
+ *    possible foreign key violation when rows in self referencing table are updated or deleted.
+ *    The changed fields are marked as updated, so during update processing the correct values
+ *    will be assigned to them.
+ *
+ * 2) proxyconfig_delete_rows()
+ *    Deletes all existing rows within scope that are not present in received table data. The scope
+ *    is limited to received hosts when partial updates are done.
+ *
+ * 3) proxyconfig_insert_rows()
+ *    Inserts new rows that were not present in database.
+ *
+ * 4) proxyconfig_update_rows()
+ *    Update changed fields.
+ *
+ * When processing related tables (for example drules, dchecks) the prepare and delete operations are
+ * done from child tables to master tables. The insert and update operations are done from master
+ * tables to child tables. This is done to avoid child rows being removed with cascaded deletes and
+ * have parent rows updated/inserted when updating/inserting child rows.
+ *
+ */
+
 typedef struct
 {
 	const ZBX_FIELD	*field;
@@ -29,6 +56,9 @@ zbx_const_field_ptr_t;
 ZBX_VECTOR_DECL(const_field, zbx_const_field_ptr_t)
 ZBX_VECTOR_IMPL(const_field, zbx_const_field_ptr_t)
 
+/*
+ * 128 bit flags to support update flags for host_invetory table which has more that 64 columns
+ */
 typedef struct
 {
 	zbx_uint64_t	blocks[128 / 64];
@@ -118,6 +148,13 @@ void	table_data_free(zbx_table_data_t *td)
 	zbx_free(td);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get table data by name from configuration updates                 *
+ *                                                                            *
+ * Return: The parsed table data or NULL if table data was not found          *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_table_data_t	*proxyconfig_get_table(zbx_vector_table_data_ptr_t *config_tables, const char *name)
 {
 	int	i;
@@ -131,7 +168,21 @@ static zbx_table_data_t	*proxyconfig_get_table(zbx_vector_table_data_ptr_t *conf
 	return NULL;
 }
 
-static int	proxyconfig_parse_table_fields(zbx_table_data_t *td, struct zbx_json_parse *jp_table, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate parsed table fields against fields retrieved from        *
+ *          database schema                                                   *
+ *                                                                            *
+ * Parameters: td       - [IN] the table                                      *
+ *             jp_table - [IN] the received table data in json format         *
+ *             error    - [OUT] the error message                             *
+ *                                                                            *
+ * Return: SUCCEED - the parsed fields match schema fields                    *
+ *         FAIL    - otherwise                                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxyconfig_validate_table_fields(const zbx_table_data_t *td, struct zbx_json_parse *jp_table,
+		char **error)
 {
 	const char		*p;
 	int			ret = FAIL, i;
@@ -170,6 +221,18 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse table rows in received configuration data                   *
+ *                                                                            *
+ * Parameters: td       - [IN] the table                                      *
+ *             jp_table - [IN] the received table data in json format         *
+ *             error    - [OUT] the error message                             *
+ *                                                                            *
+ * Return: SUCCEED - the rows were parsed successfully                        *
+ *         FAIL    - otherwise                                                *
+ *                                                                            *
+ ******************************************************************************/
 static int	proxyconfig_parse_table_rows(zbx_table_data_t *td, struct zbx_json_parse *jp_table, char **error)
 {
 	const char		*p, *pf;
@@ -211,6 +274,15 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create and initialize table data object                           *
+ *                                                                            *
+ * Parameters: name - [IN] the table name                                     *
+ *                                                                            *
+ * Return: The table data object or null, if invalid table name was given.    *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 {
 	const ZBX_TABLE		*table;
@@ -232,6 +304,8 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 	zbx_hashset_create(&td->rows, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_create(&td->del_ids);
 	zbx_vector_table_row_ptr_create(&td->updates);
+
+	/* apply table specific configuration settings */
 
 	if (0 == strcmp(table->table, "globalmacro"))
 	{
@@ -261,6 +335,8 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 	else if (0 == strcmp(table->table, "items"))
 		td->reset_field = "master_itemid";
 
+	/* get table fields from database schema */
+
 	field = table->fields;
 	ptr.field = field++;
 	zbx_vector_const_field_append(&td->fields, ptr);
@@ -277,6 +353,18 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 	return td;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse received configuration data                                 *
+ *                                                                            *
+ * Parameters: jp_data       - [IN] the configuration data in json format     *
+ *             config_tables - [OUT] the parsed table data                    *
+ *             error         - [IN] the error message                         *
+ *                                                                            *
+ * Return: SUCCEED - the rows were parsed successfully                        *
+ *         FAIL    - otherwise                                                *
+ *                                                                            *
+ ******************************************************************************/
 static int	proxyconfig_parse_data(struct zbx_json_parse *jp_data, zbx_vector_table_data_ptr_t *config_tables,
 		char **error)
 {
@@ -336,7 +424,7 @@ static int	proxyconfig_parse_data(struct zbx_json_parse *jp_data, zbx_vector_tab
 			break;
 		}
 
-		if (SUCCEED != proxyconfig_parse_table_fields(td, &jp_table, error) ||
+		if (SUCCEED != proxyconfig_validate_table_fields(td, &jp_table, error) ||
 				SUCCEED != proxyconfig_parse_table_rows(td, &jp_table, error))
 		{
 			table_data_free(td);
@@ -354,6 +442,8 @@ out:
 /******************************************************************************
  *                                                                            *
  * Purpose: add default tables to configuration data                          *
+ *                                                                            *
+ * Parameters: config_tables - [IN] the parsed table data                     *
  *                                                                            *
  * Comments: In some cases empty tables might not be sent, but still need to  *
  *           be processed to support old data removal. This function adds     *
@@ -374,6 +464,13 @@ static void	proxyconfig_add_default_tables(zbx_vector_table_data_ptr_t *config_t
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dump table data object contents                                   *
+ *                                                                            *
+ * Parameters: td - [IN] the table data object                                *
+ *                                                                            *
+ ******************************************************************************/
 static void	proxyconfig_dump_table(zbx_table_data_t *td)
 {
 	char			*str = NULL;
@@ -412,6 +509,13 @@ static void	proxyconfig_dump_table(zbx_table_data_t *td)
 	zbx_free(buf);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dump parsed configuration contents                                *
+ *                                                                            *
+ * Parameters: config_tables - [IN] the parsed table data                     *
+ *                                                                            *
+ ******************************************************************************/
 static void	proxyconfig_dump_data(const zbx_vector_table_data_ptr_t *config_tables)
 {
 	int	i;
@@ -422,6 +526,23 @@ static void	proxyconfig_dump_data(const zbx_vector_table_data_ptr_t *config_tabl
 		proxyconfig_dump_table(config_tables->values[i]);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare database row with received data                           *
+ *                                                                            *
+ * Parameters: row       - [IN] the received row                              *
+ *             dbrow     - [IN] the database row                              *
+ *             buf       - [IN/OUT] the buffer for value parsing              *
+ *             buf_alloc - [IN/OUT] the buffer size                           *
+ *                                                                            *
+ * Return value: SUCCEED - the rows match                                     *
+ *               FAIl - the rows doesn't match                                *
+ *                                                                            *
+ * Comments: The checked rows will be flagged as 'exists'. Also update flag   *
+ *           will be set for each unmatching column. Finally global row       *
+ *           uppdate flag will be set if at last one match failed.            *
+ *                                                                            *
+ ******************************************************************************/
 static int	proxyconfig_compare_row(zbx_table_row_t *row, DB_ROW dbrow, char **buf, size_t *buf_alloc)
 {
 	int		i, ret = SUCCEED;
@@ -455,6 +576,41 @@ static int	proxyconfig_compare_row(zbx_table_row_t *row, DB_ROW dbrow, char **bu
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get field index in table fields list by name                      *
+ *                                                                            *
+ * Parameters: td         - [IN] the table data object                        *
+ *             field_name - [OUT] the field name                              *
+ *                                                                            *
+ * Return value: The field index or -1 if field was not found.                *
+ *                                                                            *
+ ******************************************************************************/
+static int	table_data_get_field_index(const zbx_table_data_t *td, const char *field_name)
+{
+	int	i;
+
+	/* skip first field - recid */
+	for (i = 1; i < td->fields.values_num; i++)
+	{
+		if (0 == strcmp(td->fields.values[i].field->name, field_name))
+			return i;
+	}
+
+	return -1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: delete rows that are not present in new configuration data        *
+ *                                                                            *
+ * Parameters: td    - [IN] the table data object                             *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - the rows were deleted successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	proxyconfig_delete_rows(const zbx_table_data_t *td, char **error)
 {
 	char	*sql = NULL;
@@ -481,20 +637,17 @@ static int	proxyconfig_delete_rows(const zbx_table_data_t *td, char **error)
 	return ret;
 }
 
-static int	table_data_get_field_index(const zbx_table_data_t *td, const char *field_name)
-{
-	int	i;
-
-	/* skip first field - recid */
-	for (i = 1; i < td->fields.values_num; i++)
-	{
-		if (0 == strcmp(td->fields.values[i].field->name, field_name))
-			return i;
-	}
-
-	return -1;
-}
-
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare existing rows for udpate/delete                           *
+ *                                                                            *
+ * Parameters: td    - [IN] the table data object                             *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - the rows were prepared successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	proxyconfig_prepare_rows(zbx_table_data_t *td, char **error)
 {
 	char			*sql = NULL, delim = ' ';
@@ -585,6 +738,17 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update existing rows with new field values                        *
+ *                                                                            *
+ * Parameters: td    - [IN] the table data object                             *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - the rows were updated successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 {
 	char	*sql = NULL, *buf;
@@ -675,6 +839,17 @@ out:
 ZBX_PTR_VECTOR_DECL(db_value_ptr, zbx_db_value_t *)
 ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: insert new rows                                                   *
+ *                                                                            *
+ * Parameters: td    - [IN] the table data object                             *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - the rows were inserted successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 {
 	int				ret = SUCCEED, reset_index = -1;
@@ -807,6 +982,21 @@ clean:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare table for configuration sync by checking existing data    *
+ *          against received data and mark row updates/deletes accordingly    *
+ *                                                                            *
+ * Parameters: td        - [IN] the table data object                         *
+ *             key_field - [IN] the key field (optional)                      *
+ *             key_ids   - [IN] the key identifiers (optional)                *
+ *             recids    - [OUT] the selected row record identifiers          *
+ *                               (optional)                                   *
+ *                                                                            *
+ * Comments: The key_field and key_ids allow to specify scope within which the*
+ *           table sync will be made.                                         *
+ *                                                                            *
+ ******************************************************************************/
 static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_field, zbx_vector_uint64_t *key_ids,
 		zbx_vector_uint64_t *recids)
 {
@@ -874,7 +1064,19 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 		zbx_vector_uint64_sort(recids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-static int	proxyconfig_process_table(zbx_vector_table_data_ptr_t *config_tables, const char *table, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync table rows                                                   *
+ *                                                                            *
+ * Parameters: config_tables - [IN] the received table data                   *
+ *             table         - [IN] the name of table to sync                 *
+ *             error         - [OUT] the error message                        *
+ *                                                                            *
+ * Return value: SUCCEED - the table was synced successfully                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxyconfig_sync_table(zbx_vector_table_data_ptr_t *config_tables, const char *table, char **error)
 {
 	zbx_table_data_t	*td;
 
@@ -895,7 +1097,18 @@ static int	proxyconfig_process_table(zbx_vector_table_data_ptr_t *config_tables,
 	return proxyconfig_update_rows(td, error);
 }
 
-static int	proxyconfig_process_network_discovery(zbx_vector_table_data_ptr_t *config_tables, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync network discovery tables                                     *
+ *                                                                            *
+ * Parameters: config_tables - [IN] the received table data                   *
+ *             error         - [OUT] the error message                        *
+ *                                                                            *
+ * Return value: SUCCEED - the tables were synced successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxyconfig_sync_network_discovery(zbx_vector_table_data_ptr_t *config_tables, char **error)
 {
 	zbx_table_data_t	*dchecks;
 
@@ -912,7 +1125,7 @@ static int	proxyconfig_process_network_discovery(zbx_vector_table_data_ptr_t *co
 			return FAIL;
 	}
 
-	if (SUCCEED != proxyconfig_process_table(config_tables, "drules", error))
+	if (SUCCEED != proxyconfig_sync_table(config_tables, "drules", error))
 		return FAIL;
 
 	if (NULL == dchecks)
@@ -924,7 +1137,18 @@ static int	proxyconfig_process_network_discovery(zbx_vector_table_data_ptr_t *co
 	return proxyconfig_update_rows(dchecks, error);
 }
 
-static int	proxyconfig_process_regexps(zbx_vector_table_data_ptr_t *config_tables, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync global regular expression tables                             *
+ *                                                                            *
+ * Parameters: config_tables - [IN] the received table data                   *
+ *             error         - [OUT] the error message                        *
+ *                                                                            *
+ * Return value: SUCCEED - the tables were synced successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxyconfig_sync_regexps(zbx_vector_table_data_ptr_t *config_tables, char **error)
 {
 	zbx_table_data_t	*expressions;
 
@@ -941,7 +1165,7 @@ static int	proxyconfig_process_regexps(zbx_vector_table_data_ptr_t *config_table
 			return FAIL;
 	}
 
-	if (SUCCEED != proxyconfig_process_table(config_tables, "regexps", error))
+	if (SUCCEED != proxyconfig_sync_table(config_tables, "regexps", error))
 		return FAIL;
 
 	if (NULL == expressions)
@@ -961,7 +1185,20 @@ static int	proxyconfig_process_regexps(zbx_vector_table_data_ptr_t *config_table
 	}									\
 	zbx_vector_table_data_ptr_append(&host_tables, table)
 
-static int	proxyconfig_process_hosts(zbx_vector_table_data_ptr_t *config_tables, int full_sync, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync host and related tables                                      *
+ *                                                                            *
+ * Parameters: config_tables - [IN] the received table data                   *
+ *             full_sync     - [IN] 1 if full sync must be done, 0 otherwise  *
+ *             table         - [IN] the name of table to sync                 *
+ *             error         - [OUT] the error message                        *
+ *                                                                            *
+ * Return value: SUCCEED - the tables were synced successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxyconfig_sync_hosts(zbx_vector_table_data_ptr_t *config_tables, int full_sync, char **error)
 {
 	zbx_table_data_t		*hosts, *host_inventory, *interface, *interface_snmp, *items, *item_rtdata,
 					*item_preproc, *item_parameter, *httptest, *httptestitem, *httptest_field,
@@ -1077,6 +1314,15 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare hostmacro and hosts_templates tables                      *
+ *                                                                            *
+ * Parameters: hostmacro       - [IN] the hostmacro table                     *
+ *             hosts_templates - [IN] the hosts templates table               *
+ *             full_sync       - [IN] 1 if full sync must be done, 0 otherwise*
+ *                                                                            *
+ ******************************************************************************/
 static void	proxyconfig_prepare_hostmacros(zbx_table_data_t *hostmacro, zbx_table_data_t *hosts_templates,
 		int full_sync)
 {
@@ -1131,7 +1377,19 @@ static void	proxyconfig_prepare_hostmacros(zbx_table_data_t *hostmacro, zbx_tabl
 	zbx_vector_uint64_destroy(&hostids);
 }
 
-static int	proxyconfig_process_templates(zbx_table_data_t *hosts_templates, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync templates by creating empty templates when necessary to link *
+ *          to other templates                                                *
+ *                                                                            *
+ * Parameters: hosts_templates - [IN] the hosts_temlates data                 *
+ *             error           - [OUT] the error message                      *
+ *                                                                            *
+ * Return value: SUCCEED - the templates were synced successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, char **error)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_table_row_t		*row;
@@ -1222,27 +1480,39 @@ out:
 	return ret;
 }
 
-static int	proxyconfig_process_data(zbx_vector_table_data_ptr_t *config_tables, int full_sync, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync received configuration data                                  *
+ *                                                                            *
+ * Parameters: config_tables - [IN] the received table data                   *
+ *             full_sync     - [IN] 1 if full sync must be done, 0 otherwise  *
+ *             error         - [OUT] the error message                        *
+ *                                                                            *
+ * Return value: SUCCEED - the tables were synced successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int full_sync, char **error)
 {
 	zbx_table_data_t	*hostmacro, *hosts_templates;
 
 	/* first process isolated tables without relations to other tables */
 
-	if (SUCCEED != proxyconfig_process_table(config_tables, "globalmacro", error))
+	if (SUCCEED != proxyconfig_sync_table(config_tables, "globalmacro", error))
 		return FAIL;
 
-	if (SUCCEED != proxyconfig_process_table(config_tables, "config_autoreg_tls", error))
+	if (SUCCEED != proxyconfig_sync_table(config_tables, "config_autoreg_tls", error))
 		return FAIL;
 
-	if (SUCCEED != proxyconfig_process_table(config_tables, "config", error))
+	if (SUCCEED != proxyconfig_sync_table(config_tables, "config", error))
 		return FAIL;
 
 	/* process related tables by scope */
 
-	if (SUCCEED != proxyconfig_process_network_discovery(config_tables, error))
+	if (SUCCEED != proxyconfig_sync_network_discovery(config_tables, error))
 		return FAIL;
 
-	if (SUCCEED != proxyconfig_process_regexps(config_tables, error))
+	if (SUCCEED != proxyconfig_sync_regexps(config_tables, error))
 		return FAIL;
 
 	if (NULL != (hostmacro = proxyconfig_get_table(config_tables, "hostmacro")))
@@ -1268,12 +1538,12 @@ static int	proxyconfig_process_data(zbx_vector_table_data_ptr_t *config_tables, 
 			return FAIL;
 	}
 
-	if (SUCCEED != proxyconfig_process_hosts(config_tables, full_sync, error))
+	if (SUCCEED != proxyconfig_sync_hosts(config_tables, full_sync, error))
 		return FAIL;
 
 	if (NULL != hostmacro)
 	{
-		if (SUCCEED != proxyconfig_process_templates(hosts_templates, error))
+		if (SUCCEED != proxyconfig_sync_templates(hosts_templates, error))
 			return FAIL;
 
 		if (SUCCEED != proxyconfig_insert_rows(hostmacro, error))
@@ -1286,6 +1556,17 @@ static int	proxyconfig_process_data(zbx_vector_table_data_ptr_t *config_tables, 
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: delete unmonitored hosts and their contents                       *
+ *                                                                            *
+ * Parameters: hostids - [IN] identifiers of the hosts to delete              *
+ *             error   - [OUT] the error message                              *
+ *                                                                            *
+ * Return value: SUCCEED - the hosts were deleted successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	proxyconfig_delete_hosts(const zbx_vector_uint64_t *hostids, char **error)
 {
 	char			*sql = NULL;
@@ -1430,11 +1711,6 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 	zbx_vector_table_data_ptr_reserve(&config_tables, proxyconfig_ZBX_TABLE_NUM);
 	zbx_vector_uint64_create(&del_hostids);
 
-	// WDN remove
-
-	zabbix_increase_log_level();
-	zabbix_increase_log_level();
-
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		ret = proxyconfig_parse_data(&jp_data, &config_tables, error);
@@ -1460,7 +1736,7 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 	DBbegin();
 
 	if (0 != config_tables.values_num)
-		ret = proxyconfig_process_data(&config_tables, full_sync, error);
+		ret = proxyconfig_sync_data(&config_tables, full_sync, error);
 
 	if (SUCCEED == ret && 0 != del_hostids.values_num)
 		proxyconfig_delete_hosts(&del_hostids, error);
@@ -1472,10 +1748,6 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 	}
 	else
 		DBrollback();
-
-	// WDN remove
-	zabbix_decrease_log_level();
-	zabbix_decrease_log_level();
 
 	zbx_vector_uint64_destroy(&del_hostids);
 	zbx_vector_table_data_ptr_clear_ext(&config_tables, table_data_free);

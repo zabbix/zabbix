@@ -15491,6 +15491,30 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, zbx_uint64_t r
 	UNLOCK_CACHE;
 }
 
+void	zbx_dc_get_unused_macro_templates(zbx_vector_uint64_t *templateids)
+{
+	zbx_vector_uint64_t	hostids;
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_HOST		*host;
+
+	zbx_vector_uint64_create(&hostids);
+
+	RDLOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->hosts, &iter);
+	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_uint64_append(&hostids, host->hostid);
+
+	um_cache_get_unused_templates(config->um_cache, &hostids, templateids);
+
+	UNLOCK_CACHE;
+
+	if (0 != templateids->values_num)
+		zbx_vector_uint64_sort(templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_uint64_destroy(&hostids);
+}
+
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
 #	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"

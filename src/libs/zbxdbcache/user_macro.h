@@ -81,6 +81,9 @@ int	um_cache_get_host_revision(const zbx_um_cache_t *cache, zbx_uint64_t hostid,
 void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_vector_uint64_t *hostids,
 		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global);
 
+void	um_cache_get_unused_templates(zbx_um_cache_t *cache, const zbx_vector_uint64_t *hostids,
+		zbx_vector_uint64_t *templateids);
+
 void	um_cache_dump(zbx_um_cache_t *cache);
 
 #endif
