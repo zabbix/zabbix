@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:35:21Z'
+  date: '2022-08-16T02:58:59Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -15,6 +15,7 @@ zabbix_export:
         
         MIBs used:
         FROGFOOT-RESOURCES-MIB
+        HOST-RESOURCES-MIB
         SNMPv2-MIB
         IEEE802dot11-MIB
         IF-MIB
@@ -286,6 +287,34 @@ zabbix_export:
               tag: component
               value: system
         -
+          uuid: 0d47c914219e4da0a7d67631d8171244
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: eabbdf5343fb42bfa3e5f13bc51ad66d
           name: 'System location'
           type: SNMP_AGENT
@@ -348,6 +377,28 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: de270e3ac6874ca59a236a040d82c099
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 2fbfe02459724f089b5bcd31ff6245d9
           name: 'System object ID'
           type: SNMP_AGENT
@@ -370,45 +421,6 @@ zabbix_export:
               tag: component
               value: system
         -
-          uuid: de270e3ac6874ca59a236a040d82c099
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 2d9ed5a3b714461bbcdc4c530f955e5b
-              expression: 'last(/Ubiquiti AirOS SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/Ubiquiti AirOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
           uuid: 6393f8a84fd4417abdccd8bd867aac7e
           name: 'Memory (buffers)'
           type: SNMP_AGENT
@@ -418,7 +430,7 @@ zabbix_export:
           units: B
           description: |
             MIB: FROGFOOT-RESOURCES-MIB
-            Memory used by kernel buffers (Buffers in /proc/meminfo)
+            Memory used by kernel buffers (Buffers in /proc/meminfo).
           preprocessing:
             -
               type: MULTIPLIER
@@ -438,7 +450,7 @@ zabbix_export:
           units: B
           description: |
             MIB: FROGFOOT-RESOURCES-MIB
-            Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)
+            Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo).
           preprocessing:
             -
               type: MULTIPLIER
@@ -476,7 +488,7 @@ zabbix_export:
           units: B
           description: |
             MIB: FROGFOOT-RESOURCES-MIB
-            Total memory in Bytes
+            Total memory in Bytes.
           preprocessing:
             -
               type: MULTIPLIER
@@ -495,7 +507,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '(last(//vm.memory.total[memTotal.0])-(last(//vm.memory.free[memFree.0])+last(//vm.memory.buffers[memBuffer.0])+last(//vm.memory.cached[memCache.0])))/last(//vm.memory.total[memTotal.0])*100'
-          description: 'Memory utilization in %'
+          description: 'Memory utilization in %.'
           tags:
             -
               tag: component
@@ -1118,8 +1130,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFDESCR}: Network traffic'
                         host: 'Ubiquiti AirOS SNMP'
+                        name: 'Interface {#IFDESCR}: Network traffic'
       valuemaps:
         -
           uuid: 2fc5bef495074d0e86641cc136e3dcde
@@ -2028,6 +2040,23 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: 2d9ed5a3b714461bbcdc4c530f955e5b
+      expression: '(last(/Ubiquiti AirOS SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Ubiquiti AirOS SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Ubiquiti AirOS SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Ubiquiti AirOS SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/Ubiquiti AirOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: acb2b7447a6449a591db186a4db81643
