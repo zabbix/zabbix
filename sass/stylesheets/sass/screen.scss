@@ -6393,10 +6393,18 @@ z-select,
 }
 
 .global-macro-table,
-.inherited-macros-table,
 .host-macros-table {
 	.table-col-value,
 	.table-col-template-value {
+		width: 300px;
+	}
+}
+
+.inherited-macros-table {
+	.table-col-value,
+	.table-col-parent-value,
+	.table-col-template-value,
+	.table-col-global-value {
 		width: 300px;
 	}
 }
