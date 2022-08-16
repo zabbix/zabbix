@@ -21,15 +21,15 @@
 
 window.action_edit_popup = new class {
 
-	// init({condition_operators, condition_types, conditions, actionid}) {
-	init(data) {
+	init({condition_operators, condition_types, conditions, actionid}) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.data = data; // todo: fix
+		this.condition_operators = condition_operators;
+		this.condition_types = condition_types;
+		this.conditions = conditions;
+		this.actionid = actionid;
 		this.row_num = 0;
-		this.actionid = data.actionid;
-
 		//this.footer = this.overlay.$dialogue.$footer[0];
 		//this.curl = new Curl('zabbix.php');
 		//this.curl.setArgument('action', 'action.list');
@@ -37,12 +37,13 @@ window.action_edit_popup = new class {
 
 		document.getElementById('action-form').style.display = '';
 
+		// todo: rewrite this prettier:
 		document.querySelector('.js-condition-create').addEventListener('click', () => {
 			this.openConditionPopup();
 		})
 
 		document.querySelector('.js-operation-details').addEventListener('click', () => {
-			this.openOperationPopup();
+			this.openOperationPopup(this.actionid, '0', '0');
 		})
 
 		document.querySelector('.js-recovery-operations-create').addEventListener('click', () => {
@@ -54,23 +55,27 @@ window.action_edit_popup = new class {
 		})
 
 		this.dialogue.addEventListener('dialogue.submit', (e) => {
-			// todo: add row as one element, not 3 different ones.
 			// todo: add multiselect title, not value
 
 			this.row = document.createElement('tr');
-			this.row.append(this.createLabelCell());
-			this.row.append(this.createNameCell(e.detail.inputs));
-			this.row.append(this.createRemoveCell());
+			this.createRow(this.row, e.detail.inputs)
 
 			$('#conditionTable tr:last').before(this.row);
 			// addMessage(makeMessageBox('good', [], e.detail.title, true, false))
 			// processTypeOfCalculation();
 		});
 
-	/*	if (data.conditions){
-			data.conditions.forEach(
+		// todo: add existing data to conditions table (for action edit)
+		/*	if (data.conditions){
+				data.conditions.forEach(
 			)*/
 	//	}
+	}
+
+	createRow(row, input) {
+		row.append(this.createLabelCell());
+		row.append(this.createNameCell(input));
+		row.append(this.createRemoveCell());
 	}
 
 	openConditionPopup() {
@@ -86,7 +91,7 @@ window.action_edit_popup = new class {
 	}
 
 	// createHiddenInput(conditiontype, operator, value, value2) { // ????
-	// todo: add hidden input to action edit form
+	// todo: add hidden input to action edit form???
 	// }
 
 	createLabelCell() {
@@ -103,8 +108,8 @@ window.action_edit_popup = new class {
 		const value_cell = document.createElement('em');
 
 		condition_cell.textContent = (
-			this.data['condition_types'][input.conditiontype] + " " +
-			this.data['condition_operators'][input.operator] + " "
+			this.condition_types[input.conditiontype] + " " +
+			this.condition_operators[input.operator] + " "
 		);
 		value_cell.textContent = input.value;
 
@@ -123,13 +128,13 @@ window.action_edit_popup = new class {
 		btn.addEventListener('click', () => btn.closest('tr').remove());
 
 		cell.appendChild(btn);
-		//this.processTypeOfCalculation();
+		// this.processTypeOfCalculation();
 		return cell;
 	}
 
-	openOperationPopup(trigger_element, eventsource, recovery_phase, actionid) {
+	openOperationPopup(eventsource, recovery_phase, actionid) {
 		const parameters = {
-			trigger_element: trigger_element,
+			// trigger_element: trigger_element,
 			eventsource: eventsource,
 			recovery_phase: recovery_phase,
 			actionid: actionid
@@ -138,76 +143,6 @@ window.action_edit_popup = new class {
 		return PopUp('popup.operations', parameters, {
 			dialogueid: 'condition',
 			dialogue_class: 'modal-popup-medium'
-		});
-	}
-
-
-	// openOperationPopup(trigger_element, eventsource, recovery_phase, actionid) {
-	//	this.trigger_element = trigger_element;
-	//	this.eventsource = eventsource;
-	//	this.recovery_phase = recovery_phase;
-	//	this.actionid = actionid;
-	//	this.overlay = overlayDialogue({
-	//		class: 'modal-popup modal-popup-medium',
-	//		title: t('Operation details')
-	//	});
-	//	const props = {
-	//		recovery_phase,
-	//		cmd: <?//= OPERATION_TYPE_UPDATE_MESSAGE ?>//,
-	//		scriptid: null
-	//	};
-	//	this.view = this.OperationView(props);
-	//	this.view.onupdate = () => this.overlay.centerDialog();
-	//}
-
-	// operation_details = {
-	// open(target, actionid, eventsource, recovery_phase, operation) {
-
-	//		const operation_popup = new OperationPopup(target, eventsource, recovery_phase, actionid);
-	//		operation_popup.load(operation);
-	//		window.operation_popup = operation_popup;
-	//	}
-	//}
-
-	OperationView(props) {
-		this.props = props;
-		this.$obj = $($('#operation-popup-tmpl').html());
-		this.$wrapper = this.$obj.find('>ul');
-		this.operation_type = this.OperationViewType(this.$obj.find('>ul>li[id^="operation-type"]'));
-		//this.$current_focus = this.operation_type.$select;
-		debugger;
-		this.operation_type.onchange = ({cmd, scriptid}) => {
-
-			this.props.cmd = cmd;
-			this.props.scriptid = scriptid;
-			this.render();
-			this.onupdate();
-			this.operation_type.$select.focus();
-		};
-
-		this.operation_steps = new OperationViewSteps(this.$obj.find('>ul>li[id^="operation-step"]'));
-		this.operation_message = new OperationViewMessage(this.$obj.find('>ul>li[id^="operation-message"]'));
-		this.operation_command = new OperationViewCommand(this.$obj.find('>ul>li[id^="operation-command"]'));
-		this.operation_attr = new OperationViewAttr(this.$obj.find('>ul>li[id^="operation-attr"]'));
-		this.operation_condition = new OperationViewCondition(this.$obj.find('>ul>li[id^="operation-condition"]'));
-	}
-
-	OperationViewType($obj) {
-		this.$obj = $obj;
-		this.$select = this.$obj.find('z-select');
-		this.$select.on('change', ({target}) => {
-
-			var script_pattern = /^scriptid\[([\d]+)\]|cmd\[([\d]+)\]$/,
-				command_pattern = /^cmd\[([\d]+)\]$/,
-				script_match = script_pattern.exec(target.value),
-				command_match = command_pattern.exec(target.value);
-
-			if (command_match != null) {
-				this.onchange({cmd: command_match[1], scriptid: null});
-			}
-			else if (script_match != null) {
-				this.onchange({cmd: null, scriptid: script_match[1]});
-			}
 		});
 	}
 
@@ -289,5 +224,4 @@ window.action_edit_popup = new class {
 	//		jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
 	//	}
 	//}
-
 }

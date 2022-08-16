@@ -79,25 +79,6 @@ $form_grid->addItem(
 	'operation-message-notice'
 ));
 
-
-// Message recipient (user groups) row.
-//$form_list->addRow(_('Send to user groups'), (new CDiv(
-//	(new CTable())
-//		->addStyle('width: 100%;')
-//		->setHeader([_('User group'), _('Action')])
-//		->addRow(
-//			(new CRow(
-//				(new CCol(
-//					(new CButton(null, _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-//				))->setColSpan(2)
-//			))->setId('operation-message-user-groups-footer')
-//		)
-//	))
-//		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-//		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-//	'operation-message-user-groups'
-//);
-
 $form_grid->addItem([
 	new CLabel(_('Send to user groups')),
 	(new CFormField(
@@ -309,7 +290,8 @@ $output = [
 	'header' => _('Operation details'),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('popup.operation.common.js.php').'condition_popup.init();',
+	'script_inline' => getPagePostJs().$this->readJsFile('popup.operation.common.js.php').
+		'condition_popup.init();',
 	//'script_inline' => getPagePostJs().
 	//	$this->readJsFile('popup.operations.js.php')
 ];

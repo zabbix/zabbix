@@ -56,10 +56,7 @@ class CControllerActionCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		// $eventsource = 0;
-
-
-
+		$eventsource = 0;
 		// todo : receive data from form
 
 //		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
@@ -200,7 +197,7 @@ class CControllerActionCreate extends CController {
 
 		// pass fake data to test if create functionality works
 		$action = [
-			'name' => 'sometest4',
+			'name' => 'sometest6',
 			'status' => '0',
 			'eventsource' => '0',
 			'esc_period' => '1h',
@@ -245,17 +242,18 @@ class CControllerActionCreate extends CController {
 		$messageSuccess = _('Action added');
 		$messageFailed = _('Cannot add action');
 
-//		if ($result) {
-//			unset($_REQUEST['form']);
-//		}
+		if ($result) {
+			unset($_REQUEST['form']);
+		}
+
 		DBend($result);
 		$result = DBend($result);
 
-//		if ($result) {
-//			uncheckTableRows($eventsource);
-//		}
+		if ($result) {
+			uncheckTableRows($eventsource);
+		}
 
-		//show_messages($result, $messageSuccess, $messageFailed);
+		show_messages($result, $messageSuccess, $messageFailed);
 	//	var_dump(array_column(get_and_clear_messages(), 'message')); exit;
 	}
 }

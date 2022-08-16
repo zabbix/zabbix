@@ -200,7 +200,7 @@ class CControllerActionUpdate extends CController {
 //		}
 
 		$action = [
-			'name' => 'sometest2',
+			'name' => 'sometest1',
 			'actionid' => '7',
 			'status' => '0',
 			'eventsource' => '0',

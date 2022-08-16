@@ -36,6 +36,8 @@ class CControllerActionList extends CController {
 			'filter_set' => 'in 1',
 			'filter_rst' =>	'in 1',
 			'filter_name' =>'string',
+			'sort' => 'in '.implode(',', ['name', 'status']),
+			'sortorder' => 'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
 			'filter_status' =>'in '.implode(',', [-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])
 		];
 		// todo: check error messaging for input field validation
@@ -61,7 +63,7 @@ class CControllerActionList extends CController {
 
 	protected function doAction(): void {
 
-		$eventsource = getRequest('eventsource');
+		$eventsource = $this->getInput('eventsource', EVENT_SOURCE_TRIGGERS);
 		$sort_field = $this->getInput('sort', CProfile::get('web.action.list.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.action.list.sortorder', ZBX_SORT_UP));
 
@@ -107,7 +109,7 @@ class CControllerActionList extends CController {
 			'sortfield' => $sort_field,
 			'limit' => $limit
 		]);
-	//	order_result($data['actions'], $sort_field, $sort_order);
+		order_result($data['actions'], $sort_field, $sort_order);
 
 		// pager
 		if (hasRequest('page')) {

@@ -34,7 +34,7 @@ $form = (new CForm())
 	->setId('action-form')
 	->addVar('actionid', $data['actionid']?:null)
 	->addStyle('display: none;')
-	// ->addItem(getMessages())
+	//->addItem(getMessages())
 	->addItem((new CInput('submit'))->addStyle('display: none;'));
 
 if ($data['actionid']) {
@@ -50,7 +50,6 @@ $action_tab = (new CFormGrid())
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	]);
-
 
 //$formula = (new CTextBox('formula', $data['action']['filter']['formula'], false,
 //	DB::getFieldLength('actions', 'formula')
@@ -186,10 +185,10 @@ $operations_table->setFooter(
 	(new CSimpleButton(_('Add')))
 		->setAttribute('data-actionid', 0)
 		->setAttribute('data-eventsource', $data['eventsource'])
-//		->onClick('
-//			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource, '.ACTION_OPERATION.');
-//		')
 		->addClass('js-operation-details')
+		->setAttribute('actionid', $data['actionid'])
+		->setAttribute('eventsource', $data['eventsource'])
+		->setAttribute('operation_type', ACTION_OPERATION)
 		// TODO : fix the input to action edit popup open!!!
 		->addClass(ZBX_STYLE_BTN_LINK)
 );
@@ -200,8 +199,7 @@ $operations_tab = (new CFormGrid());
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 	$operations_tab->addItem([
 		(new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
-		//(new CTextBox('esc_period', $data['action']['esc_period']))
-		(new CTextBox('esc_period', '1h'))
+		(new CTextBox('esc_period', $data['action']['esc_period']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 	]);
@@ -224,7 +222,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 
 	$operations_table->setFooter(
 		(new CSimpleButton(_('Add')))
-			//	->setAttribute('data-actionid', $data['actionid'])
+			->setAttribute('data-actionid', $data['actionid'])
 			->setAttribute('data-eventsource', $data['eventsource'])
 //			->onClick('
 //					action_edit_popup.open(this, this.dataset.actionid, this.dataset.eventsource,
@@ -245,8 +243,6 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 
 // Update operations.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_SERVICE) {
-	//$action_formname = $actionForm->getName();
-
 	$operations_table = (new CTable())
 		->setId('upd-table')
 		->setAttribute('style', 'width: 100%;')
@@ -280,7 +276,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			new CLabel(_('Pause operations for suppressed problems'), 'pause_suppressed'),
 			new CFormField(
 				(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
-				//->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
+				->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
 				->setChecked(true)
 			)
 		])
@@ -288,7 +284,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			new CLabel(_('Notify about canceled escalations'), 'notify_if_canceled'),
 			new CFormField(
 				(new CCheckBox('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_TRUE))
-					//->setChecked($data['action']['notify_if_canceled'] == ACTION_NOTIFY_IF_CANCELED_TRUE)
+					->setChecked($data['action']['notify_if_canceled'] == ACTION_NOTIFY_IF_CANCELED_TRUE)
 					->setChecked(true)
 			)
 		]);

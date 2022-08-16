@@ -18,6 +18,10 @@
 **/
 
 window.operation_popup = new class {
+	init() {
+
+	}
+
 	submit(overlay) {
 		this.overlay = overlay;
 		this.dialogue = this.overlay.$dialogue[0];
