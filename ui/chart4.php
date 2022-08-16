@@ -32,6 +32,7 @@ $fields = [
 	'triggerid' => [T_ZBX_INT, O_MAND, P_SYS, DB_ID, null]
 ];
 if (!check_fields($fields)) {
+	session_write_close();
 	exit();
 }
 
@@ -138,9 +139,9 @@ $maxX = 900;
 $minX = 0;
 
 for ($i = 1; $i <= $weeks; $i++) {
-	$x1 = (900 / 52) * $sizeX * ($i - 1 - $minX) / ($maxX - $minX);
+	$x1 = (int) ((900 / 52) * $sizeX * ($i - 1 - $minX) / ($maxX - $minX));
 
-	$yt = $sizeY * $true[$i - 1] / 100;
+	$yt = (int) ($sizeY * $true[$i - 1] / 100);
 	if ($yt > 0) {
 		imagefilledrectangle($im, $x1 + $shiftX, $shiftYup, $x1 + $shiftX + 8, $yt + $shiftYup, imagecolorallocate($im, 235, 120, 120)); // red
 	}

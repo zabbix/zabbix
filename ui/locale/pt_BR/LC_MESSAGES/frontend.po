@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-05-12 21:40+0000\n"
-"Last-Translator: George Lemos <georgedpsl@hotmail.com>\n"
+"PO-Revision-Date: 2022-07-04 18:23+0000\n"
+"Last-Translator: Nilton Röhricht Junior <rohricht@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -397,12 +397,12 @@ msgstr "Métodos da API"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "API token"
-msgstr ""
+msgstr "Token da API"
 
 #: include/classes/api/services/CToken.php:299
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "O token de API \"%1$s\" já existe para o id de usuário \"%2$s\"."
 
 #: app/controllers/CControllerTokenCreate.php:98
 msgid "API token added"
@@ -486,12 +486,12 @@ msgstr "Acesso a ações"
 #: app/views/administration.user.edit.php:570
 #: app/views/administration.userrole.edit.php:222
 msgid "Access to modules"
-msgstr ""
+msgstr "Acesso aos módulos"
 
 #: app/views/administration.user.edit.php:474
 #: app/views/administration.userrole.edit.php:134
 msgid "Access to services"
-msgstr ""
+msgstr "Acesso aos serviços"
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66 include/actions.inc.php:161
@@ -507,7 +507,7 @@ msgstr "Reconhecer"
 
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "Reconhecer problemas"
 
 #: app/views/popup.condition.common.php:684 include/actions.inc.php:2075
 #: include/events.inc.php:196
@@ -602,7 +602,7 @@ msgstr "A ação \"%1$s\" já existe."
 #: include/classes/api/services/CRole.php:761
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "Ação \"%2$s\" não está disponível para a função de usuário \"%1$s\"."
 
 #: actionconf.php:301
 msgid "Action added"
@@ -611,7 +611,7 @@ msgstr "Ação incluída"
 #: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "A classe de ação %1$s deve estender a classe %2$s."
 
 #: actionconf.php:323
 msgid "Action deleted"
@@ -640,7 +640,7 @@ msgstr "Log de ações"
 #: app/views/administration.script.list.php:51
 #: app/views/administration.script.list.php:90
 msgid "Action operation"
-msgstr ""
+msgstr "Operação de ação"
 
 #: actionconf.php:293
 msgid "Action updated"
@@ -840,7 +840,7 @@ msgstr "Adicionar"
 
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "Adicionar (limite de tipo de mensagem atingido)"
 
 #: jsLoader.php:149
 msgid "Add a new widget"
@@ -852,15 +852,15 @@ msgstr "Adicionar elemento filho"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
-msgstr ""
+msgstr "Adicionar serviço filho"
 
 #: app/views/js/popup.service.edit.js.php:401
 msgid "Add child services"
-msgstr ""
+msgstr "Adicionar serviços filho"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "Adicionar de"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -868,12 +868,12 @@ msgstr "Adicionar host"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Adicionar coluna de item"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
 msgid "Add missing"
-msgstr ""
+msgstr "Adicionar ausente"
 
 #: jsLoader.php:205
 msgid "Add multiple maps"
@@ -886,7 +886,7 @@ msgstr "Adicionar novo conjunto de dados"
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:266
 msgid "Add new interface"
-msgstr ""
+msgstr "Adicionar nova interface"
 
 #: include/classes/widgets/CWidgetHelper.php:906
 msgid "Add new override"
@@ -895,15 +895,15 @@ msgstr "Adicionar nova sobreposição"
 #: app/views/js/configuration.dashboard.edit.js.php:202
 #: app/views/js/monitoring.dashboard.view.js.php:290
 msgid "Add page"
-msgstr ""
+msgstr "Adicionar página"
 
 #: app/views/js/popup.service.edit.js.php:431
 msgid "Add parent services"
-msgstr ""
+msgstr "Adicionar serviços pai"
 
 #: include/classes/helpers/CRoleHelper.php:461
 msgid "Add problem comments"
-msgstr ""
+msgstr "Adicionar comentários do problema"
 
 #: app/views/popup.massupdate.trigger.php:101
 #: include/views/configuration.graph.edit.php:408
@@ -913,11 +913,11 @@ msgstr "Adicionar protótipo"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:127
 msgid "Add scheduled report"
-msgstr ""
+msgstr "Adicionar relatório programado"
 
 #: app/views/js/administration.userrole.edit.js.php:210
 msgid "Add services"
-msgstr ""
+msgstr "Adicionar serviços"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:68
 msgid "Add submaps"
@@ -925,7 +925,7 @@ msgstr "Adicionar submapas"
 
 #: app/controllers/CControllerFavouriteDelete.php:69 include/html.inc.php:153
 msgid "Add to favorites"
-msgstr ""
+msgstr "Adicionar aos favotiros"
 
 #: include/actions.inc.php:1033
 msgid "Add to host group"
@@ -937,11 +937,11 @@ msgstr "Adicionar aos grupos de hosts"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "Adicionar usuário"
 
 #: app/partials/scheduledreport.subscription.php:46
 msgid "Add user group"
-msgstr ""
+msgstr "Adicionar grupo de usuário"
 
 #: app/views/js/configuration.dashboard.edit.js.php:198
 #: app/views/js/monitoring.dashboard.view.js.php:286
@@ -952,7 +952,7 @@ msgstr "Adicionar widget"
 #: app/controllers/CControllerAuditLogList.php:356
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
-msgstr ""
+msgstr "Adicionado"
 
 #: jsLoader.php:340
 #, c-format
@@ -962,15 +962,15 @@ msgstr "Adicionado, %1$s"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "Regra adicional"
 
 #: app/views/popup.service.edit.php:182
 msgid "Additional rules"
-msgstr ""
+msgstr "Regras adicionais"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "Endereço"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -984,7 +984,7 @@ msgstr "Administração"
 #: app/views/popup.service.edit.php:158
 #: include/classes/widgets/forms/CWidgetFormItem.php:69
 msgid "Advanced configuration"
-msgstr ""
+msgstr "Configuração avançada"
 
 # segui demais "labels" que estão sendo tratados como "texto"
 #: include/views/monitoring.sysmap.edit.php:158
@@ -993,7 +993,7 @@ msgstr "Textos avançados"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
-msgstr ""
+msgstr "Após o valor"
 
 #: include/events.inc.php:288
 msgid "Age"
@@ -1019,7 +1019,7 @@ msgstr "Criptografia do agente"
 
 #: include/classes/data/CItemData.php:817
 msgid "Agent host metadata. Returns string"
-msgstr ""
+msgstr "Metadados do host do agente. Retorna string "
 
 #: include/classes/data/CItemData.php:821
 msgid "Agent host name. Returns string"
@@ -1031,25 +1031,25 @@ msgstr "Interfaces do agente"
 
 #: include/classes/data/CItemData.php:829
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Verificação da variante do agente. Retorna 1 - para Zabbix Agent; 2 - para Zabbix Agent 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
-msgstr ""
+msgstr "Agregar"
 
 #: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
-msgstr ""
+msgstr "Funções agregadas"
 
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
 msgid "Aggregation function"
-msgstr ""
+msgstr "Função de agregação"
 
 #: app/views/popup.tophosts.column.edit.php:139
 #: include/classes/widgets/CWidgetHelper.php:1308
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Intervalo de agragação"
 
 #: include/actions.inc.php:2106
 msgid "Alert message"
@@ -1057,7 +1057,7 @@ msgstr "Mensagem de alerta"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
-msgstr ""
+msgstr "Algoritmo"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1136,7 +1136,7 @@ msgstr "Todos os templates"
 
 #: app/views/administration.userrole.edit.php:289
 msgid "Allow list"
-msgstr ""
+msgstr "Lista de permissões"
 
 #: app/views/popup.massupdate.trigger.php:60 include/triggers.inc.php:991
 #: include/views/configuration.trigger.prototype.edit.php:526
@@ -1153,7 +1153,7 @@ msgstr "Hosts permitidos"
 
 #: app/views/administration.user.edit.php:619
 msgid "Allowed methods"
-msgstr ""
+msgstr "Métodos permitidos"
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -1296,7 +1296,7 @@ msgstr "Aritimética"
 #: app/views/popup.tophosts.column.edit.php:150
 #: include/classes/helpers/CServiceHelper.php:148
 msgid "As is"
-msgstr ""
+msgstr "Como é"
 
 #: include/views/monitoring.history.php:102
 msgid "As plain text"
@@ -1305,7 +1305,7 @@ msgstr "Como texto puro"
 #: app/views/administration.authentication.edit.php:275
 #: app/views/administration.authentication.edit.php:309
 msgid "Assertions"
-msgstr ""
+msgstr "Asserções"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1346,21 +1346,21 @@ msgstr "Pelo menos um elemento de interface do usuário deve ser verificado."
 #: include/classes/api/services/CRole.php:487
 #, c-format
 msgid "At least one UI element must be enabled for user role \"%1$s\"."
-msgstr ""
+msgstr "Pelo menos um elemento de UI deve ser habilitado para a função de usuário \"%1$s\"."
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "É obrigatório pelo menos uma ação"
 
 #: include/classes/api/services/CUser.php:614
 #: include/classes/api/services/CUser.php:1286
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr ""
+msgstr "Pelo menos um usuário ativo deve existir com a função \"%1$s\"."
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "Pelo menos um dia da semana ou dia do mês deve ser informado."
 
 #: include/classes/api/services/CMaintenance.php:382
 #: include/classes/api/services/CMaintenance.php:574
@@ -1371,15 +1371,15 @@ msgstr "Ao menos um grupo de host ou host deve ser selecionado."
 #: include/classes/api/services/CHostGroup.php:1111
 #: include/classes/api/services/CHostGroup.php:1268
 msgid "At least one host or template must be specified."
-msgstr ""
+msgstr "Pelo menos um host ou modelo de ser informado."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "Pelo menos um de MySQL, PostgreSQL ou Oracle deve ser suportado."
 
 #: app/views/configuration.correlation.edit.php:159
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "Pelo menos uma operação deve ser selecionada"
 
 #: include/views/configuration.action.edit.php:520
 msgid "At least one operation must exist."
@@ -1387,7 +1387,7 @@ msgstr "Ao menos uma operação deve existir."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "É obrigatória pelo menos uma operação ou mensagem de atualização"
 
 #: app/views/popup.acknowledge.edit.php:105
 msgid "At least one update operation or message must exist."
@@ -1399,7 +1399,7 @@ msgstr "Ao menos um usuário ou grupo de usuários deve ser selecionado."
 
 #: include/classes/api/services/CReport.php:343
 msgid "At least one user or user group must be specified."
-msgstr ""
+msgstr "Pelo menos um usuário ou grupo de usuários deve ser informado."
 
 #: app/views/administration.mediatype.edit.php:340
 msgid "Attempt interval"
@@ -1444,11 +1444,11 @@ msgstr "Agosto"
 #: app/views/administration.token.view.php:38
 #: app/views/administration.user.token.view.php:37
 msgid "Auth token"
-msgstr ""
+msgstr "Token de autenticação"
 
 #: app/views/administration.authentication.edit.php:281
 msgid "AuthN requests"
-msgstr ""
+msgstr "Solicitações de autenticação AuthN"
 
 #: app/controllers/CControllerAuditLogList.php:211
 #: app/views/administration.authentication.edit.php:323
@@ -1508,7 +1508,7 @@ msgstr "Autorização"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
@@ -1555,16 +1555,16 @@ msgstr "Seleção automática de ícone"
 #: include/classes/helpers/CMediatypeHelper.php:189
 #: include/classes/helpers/CMenuHelper.php:249 include/html.inc.php:890
 msgid "Autoregistration"
-msgstr ""
+msgstr "Autorregistro"
 
 #: include/classes/helpers/CMenuHelper.php:209
 #: include/views/configuration.action.list.php:35
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "Ações de autorregistro"
 
 #: app/views/administration.housekeeping.edit.php:86
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "Período de armazenamento de dados de autorregistro"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:195
@@ -1597,7 +1597,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
-msgstr ""
+msgstr "Evite senhas fáceis de adivinhar"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
@@ -1617,7 +1617,7 @@ msgstr "Fundo"
 #: include/classes/widgets/forms/CWidgetFormItem.php:384
 #: include/views/js/monitoring.sysmaps.js.php:564
 msgid "Background color"
-msgstr ""
+msgstr "Cor de fundo"
 
 #: include/views/monitoring.sysmap.edit.php:121
 msgid "Background image"
@@ -1638,7 +1638,7 @@ msgstr "Base DN"
 #: include/classes/widgets/CWidgetHelper.php:954
 #: include/classes/widgets/CWidgetHelper.php:1210
 msgid "Base color"
-msgstr ""
+msgstr "Cor base"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
@@ -1646,11 +1646,11 @@ msgstr "Basico"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
-msgstr ""
+msgstr "Antes do valor"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "Abaixo do valor"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1713,7 +1713,7 @@ msgstr "Borda"
 
 #: include/views/js/monitoring.sysmaps.js.php:595
 msgid "Border color"
-msgstr ""
+msgstr "Cor de borda"
 
 #: include/views/js/monitoring.sysmaps.js.php:573
 msgid "Border type"
@@ -1725,7 +1725,7 @@ msgstr "Largura da borda"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "Ambas as senhas devem ser iguais"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:108
 #: include/classes/widgets/forms/CWidgetFormItem.php:189
@@ -1803,11 +1803,11 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1061
 msgid "CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "Porcentagem de utilização de CPU. Retorna float"
 
 #: app/views/popup.itemtestedit.view.php:300
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: include/items.inc.php:1829
 msgid "CSV to JSON"
@@ -1816,7 +1816,7 @@ msgstr "CSV para JSON"
 #: include/classes/validators/CApiInputValidator.php:2717
 #: include/classes/validators/CNewValidator.php:310
 msgid "CUID is expected"
-msgstr ""
+msgstr "CUID é esperado"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:177
 #: include/views/configuration.graph.edit.php:252
@@ -1896,7 +1896,7 @@ msgstr "Não foi possível adicionar o correlacionamento"
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "Não é possível adicionar página de painel: foi adicionado número máximo %1$d de páginas de painel."
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
@@ -1955,7 +1955,7 @@ msgstr "Não foi possível adicionar período de manutenção"
 #: include/classes/api/services/CMap.php:1559
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "Não é possível  adicionar elemento de mapa do mapa \"%1$s\" devido referência circular."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
@@ -1995,7 +1995,7 @@ msgstr "Não foi possível atualizar expressão regular"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "Não é possível adicionar relatório programado"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -2034,7 +2034,7 @@ msgstr "Não foi possível adicionar a apresentação de telas"
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "Não é possível adicionar widget: espaço livre insuficiente no painel."
 
 #: jsLoader.php:343
 msgctxt "screen reader"
@@ -2054,7 +2054,7 @@ msgstr "Não foi possível se conectar ao servidor LDAP."
 #: include/forms.inc.php:1990 include/forms.inc.php:2000
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "Não é possível construir a árvore de expressão: %1$s."
 
 #: include/classes/api/services/CRole.php:792
 msgid "Cannot change the user type of own role."
@@ -2116,7 +2116,7 @@ msgstr[1] "Não foi possível copiar as triggers"
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Não é possível copiar o gatilho \"%1$s\", porque há múltiplos hosts na expressão."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2156,13 +2156,13 @@ msgstr "Não foi possível criar o ícone no mapa"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "Não é possível criar relatório programado"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Não é possível criar o serviço \"%1$s\": %2$s."
 
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Cannot create the configuration file."
@@ -2171,18 +2171,18 @@ msgstr "Não foi possível criar o arquivo de configuração."
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
-msgstr ""
+msgstr "Não é possível criar a função de usuário"
 
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
-msgstr[0] ""
+msgstr[0] "Não é possível excluir o token de API"
 msgstr[1] ""
 
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] ""
+msgstr[0] "Não é possível excluir o SLA"
 msgstr[1] ""
 
 #: include/classes/api/services/CUser.php:1257
@@ -3631,6 +3631,10 @@ msgstr "Referências cruzadas entre templates não são permitidas."
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
 
+#: include/classes/core/ZBase.php:494
+msgid "Class not found."
+msgstr ""
+
 #: include/views/configuration.httpconf.list.php:217
 #: include/views/configuration.item.list.php:297
 msgid "Clear history"
@@ -3808,6 +3812,13 @@ msgstr ""
 #: app/views/administration.proxy.list.php:79
 msgid "Compression"
 msgstr "Compressão"
+
+#: app/views/administration.housekeeping.edit.php:163
+#: app/views/administration.housekeeping.edit.php:168
+#: app/views/administration.housekeeping.edit.php:173
+#: app/views/administration.housekeeping.edit.php:183
+msgid "Compression is not supported."
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:319
 msgid "Concurrent sessions"
@@ -5480,6 +5491,10 @@ msgstr "Detalhes"
 msgid "Details of web scenario"
 msgstr "Detalhes do cenário web"
 
+#: app/views/administration.housekeeping.edit.php:194
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr ""
@@ -6514,6 +6529,13 @@ msgstr "Mensagem de erro"
 #: app/partials/administration.system.info.php:161
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
 msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
@@ -11036,6 +11058,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "S"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "Endereço MAC A"
@@ -11634,6 +11661,11 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:106
 #, c-format
 msgid "Minimum required PHP version is %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:174
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:193
@@ -13796,6 +13828,10 @@ msgstr "Autobusca herdada"
 msgid "Parent graphs"
 msgstr "Gráficos herdados"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
 msgid "Parent items"
@@ -14109,6 +14145,10 @@ msgstr "Português de Portugal (pt_BR)"
 msgid "Position"
 msgstr ""
 
+#: include/classes/widgets/views/widget.item.form.view.php:142
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "Campos de postagem"
@@ -14116,6 +14156,10 @@ msgstr "Campos de postagem"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "Tipo do post"
+
+#: app/views/administration.housekeeping.edit.php:164
+msgid "PostgreSQL database server version is too old."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -17376,6 +17420,10 @@ msgstr "Templates"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Os templates \"%1$s\" foram desvinculados dos hosts \"%2$s\"."
 
+#: app/partials/configuration.host.edit.html.php:215
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr ""
@@ -18488,6 +18536,14 @@ msgstr ""
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Não foi possível sobrescrever o arquivo de configuração existente."
 
+#: app/views/administration.housekeeping.edit.php:159
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr ""
@@ -18660,6 +18716,26 @@ msgstr "Desvincular dos templates"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Som"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:188
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -18847,6 +18923,10 @@ msgstr ""
 
 #: jsLoader.php:402
 msgid "Use default"
+msgstr ""
+
+#: app/partials/configuration.host.edit.html.php:216
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
 msgstr ""
 
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
@@ -19748,9 +19828,23 @@ msgstr "Aviso"
 msgid "Warning message"
 msgstr ""
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
 msgstr ""
 
 #: jsLoader.php:301

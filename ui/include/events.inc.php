@@ -182,7 +182,7 @@ function make_event_details(array $event, array $allowed) {
 		])
 		->addRow([
 			_('Operational data'),
-			$event['opdata']
+			$event['opdata']->addClass(ZBX_STYLE_WORDBREAK)
 		])
 		->addRow([
 			_('Severity'),
@@ -261,7 +261,7 @@ function make_event_details(array $event, array $allowed) {
 
 	$table
 		->addRow([_('Tags'), $tags[$event['eventid']]])
-		->addRow([_('Description'), (new CDiv(zbx_str2links($event['comments'])))]);
+		->addRow([_('Description'), (new CDiv(zbx_str2links($event['comments'])))->addClass(ZBX_STYLE_WORDBREAK)]);
 
 	return $table;
 }
@@ -487,7 +487,8 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  *                                            - 'eventid' - for events and problems (default);
  *                                            - 'hostid' - for hosts and host prototypes;
  *                                            - 'templateid' - for templates;
- *                                            - 'triggerid' - for triggers.
+ *                                            - 'triggerid' - for triggers;
+ *                                            - 'httptestid' - for web scenarios.
  * @param int    $list_tag_count             Maximum number of tags to display.
  * @param array  $filter_tags                An array of tag filtering data.
  * @param ?array $subfilter_tags             Array of selected sub-filter tags. Null when tags are not clickable.
@@ -557,7 +558,13 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
 						$tags[$element[$key]][] = (new CSimpleButton($value))
-							->setAttribute('data-subfilter-tag', ['subfilter_tags['.$tag['tag'].'][]', $tag['value']])
+							->setAttribute('data-key', $tag['tag'])
+							->setAttribute('data-value', $tag['value'])
+							->onClick(
+								'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+									'this.dataset.value'.
+								']);'
+							)
 							->addClass(ZBX_STYLE_BTN_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
@@ -587,7 +594,13 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
 						$hint_content[$element[$key]][] = (new CSimpleButton($value))
-							->setAttribute('data-subfilter-tag', ['subfilter_tags['.$tag['tag'].'][]', $tag['value']])
+							->setAttribute('data-key', $tag['tag'])
+							->setAttribute('data-value', $tag['value'])
+							->onClick(
+								'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+									'this.dataset.value'.
+								']);'
+							)
 							->addClass(ZBX_STYLE_BTN_TAG)
 							->setHint(getTagString($tag), '', false);
 					}

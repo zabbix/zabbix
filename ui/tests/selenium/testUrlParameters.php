@@ -803,9 +803,7 @@ class testUrlParameters extends CLegacyWebTest {
 					],
 					[
 						'url' => 'hostinventoriesoverview.php?filter_groups%5B%5D=9999999&filter_groupby=&filter_set=1',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
+						'text_present' => 'Host inventory overview'
 					],
 					[
 						'url' => 'hostinventoriesoverview.php',
