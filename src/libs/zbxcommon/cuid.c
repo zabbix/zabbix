@@ -26,7 +26,7 @@
 #	include <sys/utsname.h>
 #endif
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #define CUID_PID_BLOCK_SIZE		2
 #define CUID_HOSTNAME_BLOCK_SIZE	2

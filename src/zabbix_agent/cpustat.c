@@ -19,7 +19,7 @@
 
 #include "cpustat.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"

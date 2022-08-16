@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXDB_H
 #define ZABBIX_ZBXDB_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxjson.h"
 
 #define ZBX_DB_OK	0

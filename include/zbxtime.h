@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TIME_H
 #define ZABBIX_TIME_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 typedef struct
 {
