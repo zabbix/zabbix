@@ -33,9 +33,9 @@ $form = (new CForm())
 
 $form_grid = new CFormGrid();
 
-$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
+if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
 
-if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	if ($data['discoveryRule']) {
 		if ($data['allowed_ui_conf_hosts'] && $data['is_discovery_rule_editable']) {
 			$discovery_rule = (new CLink($data['discoveryRule']['name'],
@@ -50,9 +50,9 @@ if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 			$discovery_rule = new CSpan($data['discoveryRule']['name']);
 		}
 	}
-}
 
-$form_grid->addItem([[new CLabel(_('Discovered by')), new CFormField($discovery_rule)]]);
+	$form_grid->addItem([[new CLabel(_('Discovered by')), new CFormField($discovery_rule)]]);
+}
 
 $form_grid->addItem([
 		(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),

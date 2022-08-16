@@ -75,26 +75,21 @@ class CControllerHostGroupEdit extends CController{
 				'selectHostPrototype' => ['hostid'],
 				'groupids' => $data['groupid']
 			]);
-			$group = $groups[0];
-			$data['name'] = $group['name'];
-			$data['flags'] = $group['flags'];
-			$data['hosts'] = $group['hosts'];
-			$data['discoveryRule'] = $group['discoveryRule'];
-			$data['hostPrototype'] = $group['hostPrototype'];
+
+			$data = array_merge($data, $groups[0]);
+			$data['is_discovery_rule_editable'] = false;
+
+			if ($data['discoveryRule']) {
+				$data['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
+					'output' => [],
+					'itemids' => $data['discoveryRule']['itemid'],
+					'editable' => true,
+					'preservekeys' => true
+				]);
+			}
+
+			$data['allowed_ui_conf_hosts'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 		}
-
-		$data['is_discovery_rule_editable'] = false;
-
-		if ($data['discoveryRule']) {
-			$data['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
-				'output' => [],
-				'itemids' => $data['discoveryRule']['itemid'],
-				'editable' => true,
-				'preservekeys' => true
-			]);
-		}
-
-		$data['allowed_ui_conf_hosts'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 
 		// For clone action.
 		if ($this->hasInput('name')) {
