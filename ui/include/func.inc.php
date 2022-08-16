@@ -2159,12 +2159,11 @@ function hasErrorMessages() {
 /**
  * Clears table rows selection's cookies.
  *
- * @param string $parentid  parent ID, is used as sessionStorage suffix
- * @param array  $keepids   checked rows ids
+ * @param string $name     entity name, used as sessionStorage suffix
+ * @param array  $keepids  checked rows ids
  */
-function uncheckTableRows($parentid = null, $keepids = []) {
-	$basename = basename($_SERVER['SCRIPT_NAME'], '.php');
-	$key = implode('_', ['cb', $basename, $parentid]);
+function uncheckTableRows($name = null, $keepids = []) {
+	$key = 'cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').($name !== null ? '_'.$name : '');
 
 	if ($keepids) {
 		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.

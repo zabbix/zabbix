@@ -510,6 +510,15 @@ elseif (hasRequest('action') && getRequest('action') == 'action.massdelete' && h
 	show_messages($result, _('Selected actions deleted'), _('Cannot delete selected actions'));
 }
 
+if (hasRequest('action') && hasRequest('g_actionid') && !$result) {
+	$actions = API::Action()->get([
+		'actionids' => getRequest('g_actionid'),
+		'output' => [],
+		'editable' => true
+	]);
+	uncheckTableRows(null, zbx_objectValues($actions, 'actionid'));
+}
+
 /*
  * Display
  */
