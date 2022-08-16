@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T09:48:14Z'
+  date: '2022-08-16T10:49:00Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -555,19 +555,19 @@ zabbix_export:
         -
           macro: '{$AZURE.MYSQL.DB.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro used in MySQL servers discovery rules.'
         -
           macro: '{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro used in MySQL servers discovery rules.'
         -
           macro: '{$AZURE.MYSQL.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro used in MySQL servers discovery rules.'
         -
           macro: '{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro used in MySQL servers discovery rules.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -579,7 +579,7 @@ zabbix_export:
         -
           macro: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used indiscovery rules.'
+          description: 'This macro used in discovery rules.'
         -
           macro: '{$AZURE.SUBSCRIPTION_ID}'
           description: 'Microsoft Azure subscription ID.'
@@ -865,7 +865,7 @@ zabbix_export:
               uuid: 5af82cc95239479c86c7ab3dabcfb592
               expression: 'min(/Azure MySQL flexible servers by HTTP/azure.db.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure: High CPU utilization'
-              opdata: '{ITEM.LASTVALUE1}'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'CPU utilization is too high. the system might be slow to respond.'
               tags:
@@ -951,6 +951,18 @@ zabbix_export:
             -
               tag: component
               value: memory
+          triggers:
+            -
+              uuid: 89c031f356084208ae33d695a53b8d3e
+              expression: 'min(/Azure MySQL flexible servers by HTTP/azure.db.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
+              name: 'Azure: High memory utilization'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: de712334db1440309fa68f9252d4f9bc
           name: 'Azure: Get data'
@@ -1282,6 +1294,29 @@ zabbix_export:
             -
               tag: component
               value: storage
+          triggers:
+            -
+              uuid: 1703edc1553644e5aa25d35928c5eafd
+              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              name: 'Azure: Storage space is critically low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Critical storage space utilization.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+            -
+              uuid: a2ec23a5e77c40aa9e45d214f4e06ca1
+              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              name: 'Azure: Storage space is low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'High storage space utilization.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 9f96e947eee646f890742676e9f9a22a
           name: 'Azure: Storage used'
@@ -1322,6 +1357,18 @@ zabbix_export:
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of the CPU utilization in %.'
+        -
+          macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the memory utilization in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the storage utilization in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
+          value: '80'
+          description: 'The warning threshold of the storage utilization in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -1554,7 +1601,7 @@ zabbix_export:
               uuid: 7115fb320e2b4cc1ad1739c8a6cee155
               expression: 'min(/Azure MySQL single servers by HTTP/azure.db.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure: High CPU utilization'
-              opdata: '{ITEM.LASTVALUE1}'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'CPU utilization is too high. the system might be slow to respond.'
               tags:
@@ -1640,6 +1687,18 @@ zabbix_export:
             -
               tag: component
               value: memory
+          triggers:
+            -
+              uuid: a67b35f1ac674d6692b0b2bcd6f89bd8
+              expression: 'min(/Azure MySQL single servers by HTTP/azure.db.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
+              name: 'Azure: High memory utilization'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: cd62d92ef0384ea9acf0cae71c88ebc6
           name: 'Azure: Get data'
@@ -1952,6 +2011,29 @@ zabbix_export:
             -
               tag: component
               value: storage
+          triggers:
+            -
+              uuid: 3afcb840e8004822a2dada2a89971f69
+              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              name: 'Azure: Storage space is critically low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Critical storage space utilization.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+            -
+              uuid: 2e605f906b284f769e7c880d4e642b43
+              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              name: 'Azure: Storage space is low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'High storage space utilization.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 7f553d8a0898477b87a2828e51efcfcc
           name: 'Azure: Server log storage limit'
@@ -2055,6 +2137,18 @@ zabbix_export:
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of the CPU utilization in %.'
+        -
+          macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the memory utilization in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the storage utilization in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
+          value: '80'
+          description: 'The warning threshold of the storage utilization in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -3575,6 +3669,42 @@ zabbix_export:
               newvalue: Unknown
   graphs:
     -
+      uuid: 750ae48e6ef749c19a06f4bbe716f92f
+      name: 'Azure: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.connections.active
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.connections.total
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.connections.aborted
+    -
+      uuid: 360a24b56be74cf48df3135008437824
+      name: 'Azure: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.connections.active
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.connections.failed
+    -
       uuid: 781dd83ed494465bbf2c16efbc753a51
       name: 'Azure: Data disk read/write bytes'
       graph_items:
@@ -3677,6 +3807,36 @@ zabbix_export:
             host: 'Azure virtual machine by HTTP'
             key: azure.vm.network.out.total
     -
+      uuid: dc6840162405481ebc1c3c98fdfcaef1
+      name: 'Azure: Network traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.network.egress
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.network.ingress
+    -
+      uuid: f929f47602734f82a79f22a5f4446f61
+      name: 'Azure: Network traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.network.egress
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.network.ingress
+    -
       uuid: 41bd1642704c4d3fbe4fb34c8c389320
       name: 'Azure: OS disk read/write bytes'
       graph_items:
@@ -3736,3 +3896,48 @@ zabbix_export:
           item:
             host: 'Azure virtual machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
+    -
+      uuid: 3fcf43fd338e4902874d940fc0bec8b9
+      name: 'Azure: Server log storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.storage.server.log.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.storage.server.log.limit
+    -
+      uuid: 4210e6b4ed8744589dce88217e961a56
+      name: 'Azure: Storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.storage.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.storage.limit
+    -
+      uuid: bdc178e6faaa4850badc0c60c7c80d40
+      name: 'Azure: Storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.storage.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.storage.limit

@@ -30,13 +30,13 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`15s` |
-|{$AZURE.MYSQL.DB.LOCATION.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
-|{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$AZURE.MYSQL.DB.NAME.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
-|{$AZURE.MYSQL.DB.NAME.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.MYSQL.DB.LOCATION.MATCHES} |<p>This macro used in MySQL servers discovery rules.</p> |`.*` |
+|{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES} |<p>This macro used in MySQL servers discovery rules.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.MYSQL.DB.NAME.MATCHES} |<p>This macro used in MySQL servers discovery rules.</p> |`.*` |
+|{$AZURE.MYSQL.DB.NAME.NOT_MATCHES} |<p>This macro used in MySQL servers discovery rules.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.RESOURCE_GROUP.MATCHES} |<p>This macro used in discovery rules.</p> |`.*` |
-|{$AZURE.RESOURCE_GROUP.NOT_MATCHES} |<p>This macro used indiscovery rules.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.RESOURCE_GROUP.NOT_MATCHES} |<p>This macro used in discovery rules.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 |{$AZURE.VM.LOCATION.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
@@ -224,6 +224,9 @@ No specific Zabbix configuration is required.
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
+|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
@@ -270,6 +273,9 @@ There are no template links in this template.
 |Azure: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.availability.state)=1` |AVERAGE | |
 |Azure: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.availability.state)=3` |WARNING | |
 |Azure: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL flexible servers by HTTP/azure.db.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL flexible servers by HTTP/azure.db.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
@@ -309,6 +315,9 @@ No specific Zabbix configuration is required.
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
+|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
@@ -354,6 +363,9 @@ There are no template links in this template.
 |Azure: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.availability.state)=1` |AVERAGE | |
 |Azure: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.availability.state)=3` |WARNING | |
 |Azure: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL single servers by HTTP/azure.db.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL single servers by HTTP/azure.db.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
