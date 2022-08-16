@@ -948,10 +948,8 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 
 	while (SUCCEED == zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		ZBX_DC_AUTOREG_HOST	*autoreg_host, autoreg_host_local;
+		ZBX_DC_AUTOREG_HOST	*autoreg_host, autoreg_host_local = {.host = row[0]};
 		int			found;
-
-		autoreg_host_local.host = row[0];
 
 		autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_search(&config->autoreg_hosts, &autoreg_host_local);
 		if (NULL == autoreg_host)
@@ -7268,10 +7266,8 @@ int	DCis_autoreg_host_changed(const char *host, unsigned short port, const char 
 void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
 		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now)
 {
-	ZBX_DC_AUTOREG_HOST	*dc_autoreg_host, dc_autoreg_host_local;
+	ZBX_DC_AUTOREG_HOST	*dc_autoreg_host, dc_autoreg_host_local = {.host = host};
 	int			found;
-
-	dc_autoreg_host_local.host = host;
 
 	WRLOCK_CACHE;
 
