@@ -71,7 +71,7 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 				'conditiontype' => $this->getInput('condition_type'),
 				'operator' => $this->getInput('operator'),
 				'value' => $this->getInput('value'),
-				'value2' => $this->getInput('value2')
+				'value2' => $this->hasInput('value2')? $this->getInput('value2') : ''
 			]
 		];
 	}

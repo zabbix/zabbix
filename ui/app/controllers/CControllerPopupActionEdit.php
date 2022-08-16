@@ -103,7 +103,9 @@ class CControllerPopupActionEdit extends CController {
 					'eventsource' => $eventsource,
 					'status' =>'',
 					'operations' => [],
-					'filter' => ''
+					'filter' => [
+						'conditions' => []
+					]
 				]
 			];
 		}

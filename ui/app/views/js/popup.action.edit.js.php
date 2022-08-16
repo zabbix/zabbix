@@ -21,38 +21,39 @@
 
 window.action_edit_popup = new class {
 
+	// init({condition_operators, condition_types, conditions, actionid}) {
 	init(data) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.condition_operators = data.condition_operators;
+		this.data = data; // todo: fix
 		this.row_num = 0;
+		this.actionid = data.actionid;
 
-	//	this.footer = this.overlay.$dialogue.$footer[0];
-	//	this.curl = new Curl('zabbix.php');
-	//	this.curl.setArgument('action', 'action.list');
-	//	this.curl.setArgument('eventsource', 0);
+		//this.footer = this.overlay.$dialogue.$footer[0];
+		//this.curl = new Curl('zabbix.php');
+		//this.curl.setArgument('action', 'action.list');
+		//this.curl.setArgument('eventsource', 0);
 
 		document.getElementById('action-form').style.display = '';
 
 		document.querySelector('.js-condition-create').addEventListener('click', () => {
-			const overlay = this.openConditionPopup();
-			const dialogue = overlay.$dialogue;
+			this.openConditionPopup();
+		})
 
-			dialogue.addEventListener('dialogue.submit', (e) => {
-				clearMessages();
+		document.querySelector('.js-operation-details').addEventListener('click', () => {
+			this.openOperationPopup();
+		})
 
-				addMessage(makeMessageBox('good', [], e.detail.title, true, false));
-			});
-		});
+		document.querySelector('.js-recovery-operations-create').addEventListener('click', () => {
+			this.openOperationPopup();
+		})
 
-	/*	if (data.conditions){
-			data.conditions.forEach(
-			)*/
-	//	}
+		document.querySelector('.js-update-operations-create').addEventListener('click', () => {
+			this.openOperationPopup();
+		})
 
 		this.dialogue.addEventListener('dialogue.submit', (e) => {
-
 			// todo: add row as one element, not 3 different ones.
 			// todo: add multiselect title, not value
 
@@ -61,12 +62,18 @@ window.action_edit_popup = new class {
 			this.row.append(this.createNameCell(e.detail.inputs));
 			this.row.append(this.createRemoveCell());
 
-			$('#conditions-table tr:last').before(this.row);
-
-			processTypeOfCalculation();
-
+			$('#conditionTable tr:last').before(this.row);
+			// addMessage(makeMessageBox('good', [], e.detail.title, true, false))
+			// processTypeOfCalculation();
 		});
+
+	/*	if (data.conditions){
+			data.conditions.forEach(
+			)*/
+	//	}
 	}
+
+
 
 	openConditionPopup() {
 		const parameters = {
@@ -80,7 +87,6 @@ window.action_edit_popup = new class {
 		});
 
 	}
-
 
 	// createHiddenInput(conditiontype, operator, value, value2) { // ????
 	// todo: add hidden input to action edit form
@@ -100,8 +106,8 @@ window.action_edit_popup = new class {
 		const value_cell = document.createElement('em');
 
 		condition_cell.textContent = (
-			this.condition_operators['condition_types'][input.conditiontype] + " " +
-			this.condition_operators['condition_operators'][input.operator] + " "
+			this.data['condition_types'][input.conditiontype] + " " +
+			this.data['condition_operators'][input.operator] + " "
 		);
 		value_cell.textContent = input.value;
 
@@ -120,41 +126,50 @@ window.action_edit_popup = new class {
 		btn.addEventListener('click', () => btn.closest('tr').remove());
 
 		cell.appendChild(btn);
-		this.processTypeOfCalculation();
+		//this.processTypeOfCalculation();
 		return cell;
 	}
 
-
-	open(target, actionid, eventsource, recovery_phase, operation) {
-		this.trigger_element = target;
+	openOperationPopup(trigger_element, eventsource, recovery_phase, actionid) {
+		this.trigger_element = trigger_element;
 		this.eventsource = eventsource;
 		this.recovery_phase = recovery_phase;
 		this.actionid = actionid;
 
 		this.overlay = overlayDialogue({
 			class: 'modal-popup modal-popup-medium',
-			title: ('Operation details'),
-			content: this.eventsource
+			title: t('Operation details')
 		});
+
 
 		const props = {
 			recovery_phase,
-			cmd: operation_details.OPERATION_TYPE_MESSAGE,
+			cmd: <?= OPERATION_TYPE_UPDATE_MESSAGE ?>,
 			scriptid: null
 		};
 
-		this.view = new OperationView(props);
+		this.view = this.OperationView(props);
 		this.view.onupdate = () => this.overlay.centerDialog();
 	}
+
+	// operation_details = {
+	// open(target, actionid, eventsource, recovery_phase, operation) {
+
+	//		const operation_popup = new OperationPopup(target, eventsource, recovery_phase, actionid);
+	//		operation_popup.load(operation);
+	//		window.operation_popup = operation_popup;
+	//	}
+	//}
 
 	OperationView(props) {
 		this.props = props;
 		this.$obj = $($('#operation-popup-tmpl').html());
 		this.$wrapper = this.$obj.find('>ul');
-		this.operation_type = new OperationViewType(this.$obj.find('>ul>li[id^="operation-type"]'));
-		this.$current_focus = this.operation_type.$select;
-
+		this.operation_type = this.OperationViewType(this.$obj.find('>ul>li[id^="operation-type"]'));
+		//this.$current_focus = this.operation_type.$select;
+		debugger;
 		this.operation_type.onchange = ({cmd, scriptid}) => {
+
 			this.props.cmd = cmd;
 			this.props.scriptid = scriptid;
 			this.render();
@@ -169,11 +184,29 @@ window.action_edit_popup = new class {
 		this.operation_condition = new OperationViewCondition(this.$obj.find('>ul>li[id^="operation-condition"]'));
 	}
 
+	OperationViewType($obj) {
+		this.$obj = $obj;
+		this.$select = this.$obj.find('z-select');
+		this.$select.on('change', ({target}) => {
+
+			var script_pattern = /^scriptid\[([\d]+)\]|cmd\[([\d]+)\]$/,
+				command_pattern = /^cmd\[([\d]+)\]$/,
+				script_match = script_pattern.exec(target.value),
+				command_match = command_pattern.exec(target.value);
+
+			if (command_match != null) {
+				this.onchange({cmd: command_match[1], scriptid: null});
+			}
+			else if (script_match != null) {
+				this.onchange({cmd: null, scriptid: script_match[1]});
+			}
+		});
+	}
+
 	submit() {
 		const fields = getFormFields(this.form);
-
 		const curl = new Curl('zabbix.php', false);
-		curl.setArgument('action', 'action.create');
+		curl.setArgument('action', this.actionid !== '' ? 'action.update' : 'action.create');
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
@@ -183,7 +216,6 @@ window.action_edit_popup = new class {
 	}
 
 	_post(url, data, success_callback) {
-
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -224,30 +256,30 @@ window.action_edit_popup = new class {
 			});
 	}
 
-	processTypeOfCalculation() {
+	// processTypeOfCalculation() {
 
-		var show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
-			$labels = jQuery('#conditions-table .label');
+	//	var show_formula = (jQuery('#evaltype').val() == <?//= CONDITION_EVAL_TYPE_EXPRESSION ?>//),
+	//		$labels = jQuery('#conditions-table .label');
 
-		console.log($labels.length);
-		jQuery('#evaltype').closest('li').toggle($labels.length > 1);
-		jQuery('#conditionLabel').toggle(!show_formula);
-		jQuery('#formula').toggle(show_formula);
+	//	console.log($labels.length);
+	//	jQuery('#evaltype').closest('li').toggle($labels.length > 1);
+	//	jQuery('#conditionLabel').toggle(!show_formula);
+	//	jQuery('#formula').toggle(show_formula);
 
-		if ($labels.length > 1) {
-			var conditions = [];
+	//	if ($labels.length > 1) {
+	//		var conditions = [];
 
-			$labels.each(function(index, label) {
-				$label = jQuery(label);
+	//		$labels.each(function(index, label) {
+	//			$label = jQuery(label);
 
-				conditions.push({
-					id: $label.data('formulaid'),
-					type: $label.data('conditiontype')
-				});
-			});
+	//			conditions.push({
+	//				id: $label.data('formulaid'),
+	//				type: $label.data('conditiontype')
+	//			});
+	//		});
 
-			jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
-		}
-	}
+	//		jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
+	//	}
+	//}
 
 }

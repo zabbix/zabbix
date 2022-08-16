@@ -26,7 +26,6 @@
  * @var array $data
  */
 
-//require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 $this->addJsFile('popup.operation.common.js');
 $this->addJsFile('configuration.action.edit.js.php');
 
@@ -35,7 +34,7 @@ $form = (new CForm())
 	->setId('action-form')
 	->addVar('actionid', $data['actionid']?:null)
 	->addStyle('display: none;')
-	//->addItem(getMessages())
+	// ->addItem(getMessages())
 	->addItem((new CInput('submit'))->addStyle('display: none;'));
 
 if ($data['actionid']) {
@@ -170,9 +169,6 @@ $action_tab
 		new CFormField((new CLabel(_('At least one operation must exist.')))->setAsteriskMark())
 	);
 
-
-
-
 // Operations table.
 $operations_table = (new CTable())
 	->setId('op-table')
@@ -190,9 +186,10 @@ $operations_table->setFooter(
 	(new CSimpleButton(_('Add')))
 		->setAttribute('data-actionid', 0)
 		->setAttribute('data-eventsource', $data['eventsource'])
-		->onClick('
-			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource, '.ACTION_OPERATION.');
-		')
+//		->onClick('
+//			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource, '.ACTION_OPERATION.');
+//		')
+		->addClass('js-operation-details')
 		// TODO : fix the input to action edit popup open!!!
 		->addClass(ZBX_STYLE_BTN_LINK)
 );
@@ -229,12 +226,12 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 		(new CSimpleButton(_('Add')))
 			//	->setAttribute('data-actionid', $data['actionid'])
 			->setAttribute('data-eventsource', $data['eventsource'])
-			->onClick('
-					action_edit_popup.open(this, this.dataset.actionid, this.dataset.eventsource,
-					'.ACTION_RECOVERY_OPERATION.'
-				);
-			')
-			// TODO : fix the input to action edit popup open!!!
+//			->onClick('
+//					action_edit_popup.open(this, this.dataset.actionid, this.dataset.eventsource,
+//					'.ACTION_RECOVERY_OPERATION.'
+//				);
+//			')
+			->addClass('js-recovery-operations-create')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
@@ -259,11 +256,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			(new CSimpleButton(_('Add')))
 			->setAttribute('data-actionid', $data['actionid'])
 			->setAttribute('data-eventsource', $data['eventsource'])
-			->onClick('
-			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
-					'.ACTION_UPDATE_OPERATION.'
-				);
-			')
+//			->onClick('
+//			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
+//					'.ACTION_UPDATE_OPERATION.'
+//				);
+//			')
+			->addClass('js-update-operations-create')
 				// TODO : fix the input to action edit popup open!!!
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
@@ -312,7 +310,8 @@ $form
 		(new CScriptTag('action_edit_popup.init('.json_encode([
 				'condition_operators' => condition_operator2str(),
 				'condition_types' => condition_type2str(),
-				'conditions' => $data['action']['filter']['conditions']
+				'conditions' => $data['action']['filter']['conditions'],
+				'actionid' => $data['actionid']
 			]).');
 			'))->setOnDocumentReady()
 	);
