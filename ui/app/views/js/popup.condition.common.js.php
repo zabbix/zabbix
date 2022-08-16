@@ -35,17 +35,14 @@ window.condition_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		const fields = getFormFields(this.form);
-		console.log(fields);
 
 		this.overlay.setLoading();
 
 		let curl = new Curl('zabbix.php', false);
 
 		//fields.action = 'conditions.validate';
-
 		curl.setArgument('action', 'popup.condition.actions');
 		curl.setArgument('validate', '1');
-
 		//curl.setArgument('action', 'conditions.validate');
 
 		this._post(curl.getUrl(), fields, (response) => {
