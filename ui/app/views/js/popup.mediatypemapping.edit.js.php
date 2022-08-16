@@ -33,7 +33,7 @@ window.media_type_mapping_edit_popup = new class {
 	}
 
 	init() {
-		this.overlay = overlays_stack.getById('saml_media_type_mapping_edit');
+		this.overlay = overlays_stack.getById('media_type_mapping_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 	}

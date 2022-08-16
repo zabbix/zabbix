@@ -113,9 +113,13 @@
 						this.editSamlUserGroup(e.target.closest('tr'));
 					}
 					else if (e.target.classList.contains('js-remove')) {
-						const table = e.target.closest('table');
-
 						e.target.closest('tr').remove()
+					}
+					else if (e.target.classList.contains('js-enabled')) {
+						this.toggleFallbackStatus('off', e.target.closest('td'));
+					}
+					else if (e.target.classList.contains('js-disabled')) {
+						this.toggleFallbackStatus('on', e.target.closest('td'));
 					}
 				});
 
@@ -129,8 +133,6 @@
 						this.editSamlMediaTypeMapping(e.target.closest('tr'));
 					}
 					else if (e.target.classList.contains('js-remove')) {
-						const table = e.target.closest('table');
-
 						e.target.closest('tr').remove()
 					}
 				});
@@ -140,6 +142,19 @@
 					e.preventDefault();
 				}
 			});
+		}
+
+		toggleFallbackStatus(action, target) {
+			const new_action = document.createElement('td');
+			if (action === 'on') {
+				new_action.innerHTML = '<button type="button" class="<?= ZBX_STYLE_BTN_LINK . ' ' . ZBX_STYLE_GREEN?> js-enabled"><?= _('Enabled') ?></button>';
+				new_action.innerHTML += '<input type="hidden" name="saml_groups[#{row_index}][fallback_status]" value="1">';
+			}
+			else if (action === 'off') {
+				new_action.innerHTML = '<button type="button" class="<?= ZBX_STYLE_BTN_LINK . ' ' . ZBX_STYLE_RED?> js-disabled"><?= _('Disabled') ?></button>';
+				new_action.innerHTML += '<input type="hidden" name="saml_groups[#{row_index}][fallback_status]" value="0">';
+			}
+			target.replaceWith(new_action);
 		}
 
 		_authFormSubmit() {
@@ -207,7 +222,7 @@
 				};
 			}
 
-			const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'saml_group_edit'});
+			const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const saml_group = e.detail;
@@ -243,7 +258,7 @@
 				};
 			}
 
-			const overlay = PopUp('popup.mediatypemapping.edit', popup_params, {dialogueid: 'saml_media_type_mapping_edit'});
+			const overlay = PopUp('popup.mediatypemapping.edit', popup_params, {dialogueid: 'media_type_mapping_edit'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const saml_media_type_mapping = e.detail;
@@ -356,7 +371,20 @@
 		_prepareSamlGroupRow(saml_group) {
 			const template_saml_group_row = new Template(this._templateSamlGroupRow());
 			const template = document.createElement('template');
-
+			if (saml_group.is_fallback == true) {
+				if (saml_group.fallback_status == 1) {
+					saml_group.action = t('Enabled');
+					saml_group.action_class = 'js-enabled green';
+				}
+				else {
+					saml_group.action = t('Disabled');
+					saml_group.action_class = 'js-disabled red';
+				}
+			}
+			else {
+				saml_group.action = t('Remove');
+				saml_group.action_class = 'js-remove';
+			}
 			template.innerHTML = template_saml_group_row.evaluate(saml_group).trim();
 
 			return template.content.firstChild;
@@ -408,11 +436,12 @@
 						<input type="hidden" name="saml_groups[#{row_index}][idp_group_name]" value="#{idp_group_name}">
 						<input type="hidden" name="saml_groups[#{row_index}][usrgrpid]" value="#{usrgrpid}">
 						<input type="hidden" name="saml_groups[#{row_index}][roleid]" value="#{roleid}">
+						<input type="hidden" name="saml_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
 					</td>
-					<td class="">#{user_group_name}</td>
-					<td class="">#{role_name}</td>
+					<td class="wordbreak">#{user_group_name}</td>
+					<td class="wordbreak">#{role_name}</td>
 					<td>
-						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> #{action_class}">#{action}</button>
 					</td>
 				</tr>
 			`;
@@ -428,8 +457,8 @@
 						<input type="hidden" name="saml_media_mapping[#{row_index}][mediatypeid]" value="#{mediatypeid}">
 						<input type="hidden" name="saml_media_mapping[#{row_index}][media_type_attribute]" value="#{media_type_attribute}">
 					</td>
-					<td class="">#{media_type_name}</td>
-					<td class="">#{media_type_attribute}</td>
+					<td class="wordbreak">#{media_type_name}</td>
+					<td class="wordbreak">#{media_type_attribute}</td>
 					<td>
 						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
 					</td>

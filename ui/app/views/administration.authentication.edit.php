@@ -23,7 +23,7 @@
  * @var CView $this
  * @var array $data
  */
-//sdii($data);
+
 $this->includeJsFile('administration.authentication.edit.js.php');
 
 // Authentication general fields.
@@ -165,6 +165,14 @@ $ldap_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
+		new CLabel(_('LDAP JIT provisioning'), 'ldap_jit_provisioning'),
+		new CFormField(
+			(new CCheckBox('ldap_jit_provisioning', ZBX_AUTH_LDAP_ENABLED))
+				->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
+				->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
+		)
+	])
+	->addItem([
 		(new CLabel(_('Servers')))->setAsteriskMark(),
 		new CFormField(
 			(new CDiv(
@@ -201,9 +209,20 @@ $ldap_tab = (new CFormGrid())
 				->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 				->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
 		)
+	])
+	->addItem([
+		new CLabel(_('Provisioning period'), 'provisioning_period'),
+		new CFormField(
+			(new CTextBox('provisioning_period', '8h'))
+				->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
+		)
 	]);
 
 // SAML authentication fields.
+$view_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'authentication.edit')
+	->getUrl();
+
 $saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable SAML authentication'), 'saml_auth_enabled'),
@@ -398,13 +417,12 @@ $saml_tab = (new CFormGrid())
 					->setId('saml-group-table')
 					->setAttribute('style', 'width: 100%;')
 					->setHeader((new CRowHeader([
-						(make_sorting_header(_('SAML group pattern'), 'name','name', 'ASC', 'zabbix.php'))
-							->addClass(ZBX_STYLE_LEFT)
-							->addStyle('width: 35%'),
+						(new CColHeader(_('SAML group pattern')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
 						(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
 						(new CColHeader(_('User role')))->addClass(ZBX_STYLE_LEFT),
 						(new CColHeader(_('Action')))->addClass(ZBX_STYLE_LEFT)
-					]))->addClass(ZBX_STYLE_GREY))
+					]))->addClass(ZBX_STYLE_GREY)
+					)
 					->addItem(
 						(new CTag('tfoot', true))
 							->addItem(
@@ -431,9 +449,7 @@ $saml_tab = (new CFormGrid())
 					->setId('saml-media-type-mapping-table')
 					->setHeader(
 						(new CRowHeader([
-							(make_sorting_header(_('Name '), 'name','name', 'ASC', 'zabbix.php'))
-								->addClass(ZBX_STYLE_LEFT)
-								->addStyle('width: 35%'),
+							(new CColHeader(_('Name ')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
 							(new CColHeader(_('Media type')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
 							(new CColHeader(_('Attribute')))->addClass(ZBX_STYLE_NOWRAP)->addClass(ZBX_STYLE_LEFT),
 							(new CColHeader(_('')))->addClass(ZBX_STYLE_LEFT)

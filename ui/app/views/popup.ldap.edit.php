@@ -112,6 +112,162 @@ $form = (new CForm('post', $form_action))
 			)
 		])
 		->addItem([
+			new CLabel(_('Allow JIT provisioning'), 'allow_jit_provisioning'),
+			new CFormField(
+				(new CCheckBox('allow_jit_provisioning'))->setChecked($data['allow_jit_provisioning'])
+			)
+		])
+		->addItem([
+			(new CLabel(_('Group base DN'), 'group_base_dn'))
+				->setAsteriskMark()
+				->addClass('allow-jit-provisioning'),
+			(new CFormField(
+				(new CTextBox('group_base_dn', $data['group_base_dn'], false,
+//					DB::getFieldLength('userdirectory', 'name')
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
+					->setAttribute('autofocus', 'autofocus')
+			))->addClass('allow-jit-provisioning')
+		])
+		->addItem([
+			(new CLabel(_('Group name attribute'), 'group_name_attribute'))
+				->setAsteriskMark()
+				->addClass('allow-jit-provisioning'),
+			(new CFormField(
+				(new CTextBox('group_name_attribute', $data['group_name_attribute'], false,
+//					DB::getFieldLength('userdirectory', 'name')
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
+					->setAttribute('autofocus', 'autofocus')
+			))->addClass('allow-jit-provisioning')
+		])
+		->addItem([
+			(new CLabel(_('Group member attribute'), 'group_member_attribute'))
+				->setAsteriskMark()
+				->addClass('allow-jit-provisioning'),
+			(new CFormField(
+				(new CTextBox('group_member_attribute', $data['group_member_attribute'], false,
+//					DB::getFieldLength('userdirectory', 'name')
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
+					->setAttribute('autofocus', 'autofocus')
+
+			))->addClass('allow-jit-provisioning')
+		])
+		->addItem([
+			(new CLabel(_('Group filter'), 'group_filter'))
+				->setAsteriskMark()
+				->addClass('allow-jit-provisioning'),
+			(new CFormField(
+				(new CTextBox('group_filter', $data['group_filter'], false,
+//					DB::getFieldLength('userdirectory', 'name')
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
+					->setAttribute('autofocus', 'autofocus')
+			))->addClass('allow-jit-provisioning')
+		])
+		->addItem([
+			(new CLabel(_('User group membership attribute'), 'user_group_membership'))
+				->setAsteriskMark()
+				->addClass('allow-jit-provisioning'),
+			(new CFormField(
+				(new CTextBox('user_group_membership', $data['user_group_membership'], false,
+//					DB::getFieldLength('userdirectory', 'name')
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
+					->setAttribute('autofocus', 'autofocus')
+			))->addClass('allow-jit-provisioning')
+		])
+		->addItem([
+			(new CLabel(_('User name attribute'), 'user_name_attribute'))->addClass('allow-jit-provisioning'),
+			(new CFormField(
+				(new CTextBox('user_name_attribute', $data['user_name_attribute'], false,
+//					DB::getFieldLength('userdirectory', 'name')
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
+					->setAttribute('autofocus', 'autofocus')
+			))->addClass('allow-jit-provisioning')
+		])
+		->addItem([
+			(new CLabel(_('User last name attribute'), 'user_last_name_attribute'))->addClass('allow-jit-provisioning'),
+			(new CFormField(
+				(new CTextBox('user_last_name_attribute', $data['user_last_name_attribute'], false,
+//					DB::getFieldLength('userdirectory', 'name')
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
+					->setAttribute('autofocus', 'autofocus')
+			))->addClass('allow-jit-provisioning')
+		])
+		->addItem([(new CLabel(_('User group mapping')))->addClass('allow-jit-provisioning'),
+			(new CFormField(
+				(new CDiv(
+					(new CTable())
+						->setId('ldap-user-groups-table')
+						->setHeader(
+							(new CRowHeader([
+								(new CColHeader(_('LDAP group pattern ')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
+								(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
+								(new CColHeader(_('User role')))->addClass(ZBX_STYLE_LEFT),
+								(new CColHeader(_('Action')))->addClass(ZBX_STYLE_LEFT)
+							]))->addClass(ZBX_STYLE_GREY)
+						)
+						->addItem(
+							(new CTag('tfoot', true))
+								->addItem(
+									(new CCol(
+										(new CSimpleButton(_('Add')))
+											->addClass(ZBX_STYLE_BTN_LINK)
+											->addClass('js-add')
+									))->setColSpan(5)
+								)
+						)
+						->addStyle('width: 100%;')
+				))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			))->addClass('allow-jit-provisioning')
+		])
+		->addItem([(new CLabel([
+				_('Media type mapping'),
+				makeHelpIcon(
+					_('Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications.')
+			)]))->addClass('allow-jit-provisioning'),
+			(new CFormField(
+				(new CDiv(
+					(new CTable())
+						->setId('ldap-media-type-mapping-table')
+						->setHeader(
+							(new CRowHeader([
+								(new CColHeader(_('Name ')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
+								(new CColHeader(_('Media type')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
+								(new CColHeader(_('Attribute')))->addClass(ZBX_STYLE_NOWRAP)->addClass(ZBX_STYLE_LEFT),
+								(new CColHeader(_('')))->addClass(ZBX_STYLE_LEFT)
+							]))->addClass(ZBX_STYLE_GREY)
+						)
+						->addItem(
+							(new CTag('tfoot', true))
+								->addItem(
+									(new CCol(
+										(new CSimpleButton(_('Add')))
+											->addClass(ZBX_STYLE_BTN_LINK)
+											->addClass('js-add')
+									))->setColSpan(5)
+								)
+						)
+						->addStyle('width: 100%;')
+				))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			))->addClass('allow-jit-provisioning')
+		])
+		->addItem([
 			new CLabel(_('Advanced configuration'), 'advanced_configuration'),
 			new CFormField(
 				(new CCheckBox('advanced_configuration'))->setChecked($data['advanced_configuration'])
@@ -137,7 +293,10 @@ $form = (new CForm('post', $form_action))
 	)
 	->addItem(
 		(new CScriptTag('
-			ldap_edit_popup.init();
+			ldap_edit_popup.init('. json_encode([
+				'ldap_user_groups' => $data['ldap_user_groups'],
+				'ldap_media_type_mappings' => $data['ldap_media_type_mappings']
+			], JSON_FORCE_OBJECT) .');
 		'))->setOnDocumentReady()
 	);
 

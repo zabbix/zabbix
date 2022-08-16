@@ -1988,6 +1988,18 @@ button {
 	padding: 0;
 	min-height: inherit;
 
+	//color: $font-color;
+
+	&.red {
+		color: $red;
+		border-bottom: 1px dotted $red
+	}
+
+	&.green {
+		color: $green;
+		border-bottom: 1px dotted $green
+	}
+
 	&:hover {
 		@extend .btn-link;
 	}

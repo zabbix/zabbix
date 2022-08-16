@@ -4177,6 +4177,12 @@ button {
   font-size: inherit;
   padding: 0;
   min-height: inherit; }
+  .btn-link.red {
+    color: #e45959;
+    border-bottom: 1px dotted #e45959; }
+  .btn-link.green {
+    color: #59db8f;
+    border-bottom: 1px dotted #59db8f; }
   .btn-link:focus {
     outline: none;
     margin-bottom: -2px !important;

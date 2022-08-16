@@ -228,18 +228,21 @@ class CControllerAuthenticationEdit extends CController {
 
 		$data['saml_groups'] = [
 			[
-				'idp_group_name' => 'Default mapping',
-				'user_group_name' => $group_name,
-				'role_name' => $user_role[0]['name'],
-				'roleid' => $user_role[0]['roleid'],
-				'usrgrpid' => $group_id,
-			],
-			[
 				'idp_group_name' => 'Developers',
 				'user_group_name' => 'Zabbix SAML',
 				'user_group_id' => '123',
 				'role_name' => 'Admin role',
-				'roleid' => '2'
+				'roleid' => '2',
+				'is_fallback' => false
+			],
+			[
+				'idp_group_name' => 'Fallback group',
+				'user_group_name' => $group_name,
+				'role_name' => $user_role[0]['name'],
+				'roleid' => $user_role[0]['roleid'],
+				'usrgrpid' => $group_id,
+				'is_fallback' => true,
+				'fallback_status' => 0
 			]
 		];
 
