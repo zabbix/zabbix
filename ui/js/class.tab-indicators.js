@@ -352,7 +352,7 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver() {
-		const target_node = document.querySelector('#tbl_macros');
+		const target_node = document.getElementById('macros_container');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
