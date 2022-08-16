@@ -328,6 +328,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 #else
 	pid_t			pid;
 	int			fd;
+	sigset_t	mask, orig_mask;
 #endif
 
 	*error = '\0';
@@ -463,6 +464,11 @@ close:
 	zbx_free(wdir);
 
 #else	/* not _WINDOWS */
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the signal: %s", zbx_strerror(errno));
 
 	zbx_alarm_on(timeout);
 
@@ -534,6 +540,9 @@ close:
 		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
 
 	zbx_alarm_off();
+
+	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot restore sigprocmask: %s", zbx_strerror(errno));
 
 #endif	/* _WINDOWS */
 
