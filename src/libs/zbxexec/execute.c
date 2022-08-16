@@ -315,6 +315,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 #else
 	pid_t			pid;
 	int			fd;
+	sigset_t	mask, orig_mask;
 #endif
 
 	*error = '\0';
@@ -446,6 +447,9 @@ close:
 	zbx_free(wcmd);
 
 #else	/* not _WINDOWS */
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_alarm_on(timeout);
 
@@ -517,6 +521,7 @@ close:
 		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
 
 	zbx_alarm_off();
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 
 #endif	/* _WINDOWS */
 
