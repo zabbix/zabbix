@@ -41,7 +41,7 @@ $filter_actions_options = [];
 
 foreach ($data['actions'] as $value => $name) {
 	$filter_actions_options[] = [
-		'name' => $name,
+		'label' => $name,
 		'value' => $value,
 		'checked' => in_array($value, $data['auditlog_actions'])
 	];
@@ -49,8 +49,8 @@ foreach ($data['actions'] as $value => $name) {
 
 $filter_actions = (new CCheckBoxList('filter_actions'))
 	->setId('filter-actions')
-	->addClass(ZBX_STYLE_COLUMNS)
-	->addClass(ZBX_STYLE_COLUMNS_3)
+	->setColumns(3)
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setOptions($filter_actions_options);
 
 $filter_form = (new CFormList())
