@@ -4431,7 +4431,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 			if ('/' == path[len - 1])
 				path[len - 1] = '\0';
 
-			for (ptr = path + len - 2; ptr > path && *ptr != '/'; ptr--)
+			for (ptr = path + len - 2; ptr > path && *ptr != '/' && *ptr != ':'; ptr--)
 				;
 
 			uuid = zbx_strdup(NULL, ptr + 1);
