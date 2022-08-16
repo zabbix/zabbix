@@ -30,15 +30,19 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`15s` |
+|{$AZURE.MYSQL.DB.LOCATION.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
+|{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.MYSQL.DB.NAME.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
+|{$AZURE.MYSQL.DB.NAME.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
+|{$AZURE.RESOURCE_GROUP.MATCHES} |<p>This macro used in discovery rules.</p> |`.*` |
+|{$AZURE.RESOURCE_GROUP.NOT_MATCHES} |<p>This macro used indiscovery rules.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 |{$AZURE.VM.LOCATION.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
 |{$AZURE.VM.LOCATION.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.VM.NAME.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
 |{$AZURE.VM.NAME.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$AZURE.VM.RESOURCE_GROUP.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
-|{$AZURE.VM.RESOURCE_GROUP.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
 
 ## Template links
 
@@ -48,7 +52,9 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Virtual machines discovery |<p>A list of the virtual machines in the subscription.</p> |DEPENDENT |azure.vm.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Compute/virtualMachines$`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.VM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.VM.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.VM.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.VM.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.VM.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.VM.RESOURCE_GROUP.NOT_MATCHES}`</p> |
+|MySQL flexible servers discovery |<p>A list of the flexible MySQL servers in the subscription.</p> |DEPENDENT |azure.mysql.flexible.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforMySQL/flexibleServers$`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p> |
+|MySQL single servers discovery |<p>A list of the single MySQL servers in the subscription.</p> |DEPENDENT |azure.mysql.single.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforMySQL/servers$`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p> |
+|Virtual machines discovery |<p>A list of the virtual machines in the subscription.</p> |DEPENDENT |azure.vm.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Compute/virtualMachines$`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.VM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.VM.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.VM.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.VM.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -88,7 +94,7 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
 
 ## Zabbix configuration
 
@@ -179,6 +185,175 @@ There are no template links in this template.
 |Azure: Virtual machine is degraded |<p>The resource is in degraded state.</p> |`last(/Azure virtual machine by HTTP/azure.vm.availability.state)=1` |AVERAGE | |
 |Azure: Virtual machine is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure virtual machine by HTTP/azure.vm.availability.state)=3` |WARNING | |
 |Azure: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure virtual machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}` |HIGH | |
+
+## Feedback
+
+Please report any issues with the template at https://support.zabbix.com
+
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+
+# Azure MySQL flexible servers by HTTP
+
+## Overview
+
+For Zabbix version: 6.2 and higher  
+The template to monitor Microsoft Azure virtual machines by HTTP.
+It works without any external scripts and uses the script item.
+
+## Setup
+
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+
+1. Create an Azure service principal via Azure CLI for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`60s` |
+|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
+|{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
+|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+
+## Template links
+
+There are no template links in this template.
+
+## Discovery rules
+
+
+## Items collected
+
+|Group|Name|Description|Type|Key and additional info|
+|-----|----|-----------|----|---------------------|
+|Azure |Azure: Get data |<p>The JSON with result of API requests.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure: Availability state |<p>Availability status of the resource.</p> |DEPENDENT |azure.db.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure: Availability status detailed |<p>Summary description of the availability status.</p> |DEPENDENT |azure.db.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure: Percentage CPU |<p>Host CPU percent.</p> |DEPENDENT |azure.db.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.maximum`</p> |
+|Azure |Azure: Memory utilization |<p>Host memory percent.</p> |DEPENDENT |azure.db.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.maximum`</p> |
+|Azure |Azure: Network out |<p>Host network egress in bytes.</p> |DEPENDENT |azure.db.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure: Network in |<p>Host network ingress in bytes.</p> |DEPENDENT |azure.db.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure: Connections active |<p>Active connections count.</p> |DEPENDENT |azure.db.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.maximum`</p> |
+|Azure |Azure: Connections total |<p>Total connections count.</p> |DEPENDENT |azure.db.connections.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.total_connections.total`</p> |
+|Azure |Azure: Connections aborted |<p>Aborted connections count.</p> |DEPENDENT |azure.db.connections.aborted<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.aborted_connections.total`</p> |
+|Azure |Azure: Queries |<p>Queries count.</p> |DEPENDENT |azure.db.queries<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Queries.total`</p> |
+|Azure |Azure: IO consumption percent |<p>IO Percent.</p> |DEPENDENT |azure.db.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.maximum`</p> |
+|Azure |Azure: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.maximum`</p> |
+|Azure |Azure: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.maximum`</p> |
+|Azure |Azure: Storage limit |<p>Storage limit in bytes.</p> |DEPENDENT |azure.db.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
+|Azure |Azure: Backup storage used |<p>Backup storage used in bytes.</p> |DEPENDENT |azure.db.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.maximum`</p> |
+|Azure |Azure: Replication lag |<p>Replication lag in seconds.</p> |DEPENDENT |azure.db.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.replication_lag.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure: CPU credits remaining |<p>CPU credits remaining.</p> |DEPENDENT |azure.db.cpu.credits.remaining<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_remaining.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure: CPU credits consumed |<p>CPU credits consumed.</p> |DEPENDENT |azure.db.cpu.credits.consumed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_consumed.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+
+## Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----|----|----|
+|Azure: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL flexible servers by HTTP/azure.db.data.errors))>0` |AVERAGE | |
+|Azure: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.availability.state)=2` |HIGH | |
+|Azure: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.availability.state)=1` |AVERAGE | |
+|Azure: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.availability.state)=3` |WARNING | |
+|Azure: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL flexible servers by HTTP/azure.db.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+
+## Feedback
+
+Please report any issues with the template at https://support.zabbix.com
+
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+
+# Azure MySQL single servers by HTTP
+
+## Overview
+
+For Zabbix version: 6.2 and higher  
+The template to monitor Microsoft Azure virtual machines by HTTP.
+It works without any external scripts and uses the script item.
+
+## Setup
+
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+
+1. Create an Azure service principal via Azure CLI for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`60s` |
+|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
+|{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
+|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+
+## Template links
+
+There are no template links in this template.
+
+## Discovery rules
+
+
+## Items collected
+
+|Group|Name|Description|Type|Key and additional info|
+|-----|----|-----------|----|---------------------|
+|Azure |Azure: Get data |<p>The JSON with result of API requests.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure: Availability state |<p>Availability status of the resource.</p> |DEPENDENT |azure.db.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure: Availability status detailed |<p>Summary description of the availability status.</p> |DEPENDENT |azure.db.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure: Percentage CPU |<p>Host CPU percent.</p> |DEPENDENT |azure.db.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.average`</p> |
+|Azure |Azure: Memory utilization |<p>Host memory percent.</p> |DEPENDENT |azure.db.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.average`</p> |
+|Azure |Azure: Network out |<p>Network out across active connections.</p> |DEPENDENT |azure.db.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure: Network in |<p>Network in across active connections.</p> |DEPENDENT |azure.db.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure: Connections active |<p>Active connections count.</p> |DEPENDENT |azure.db.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.average`</p> |
+|Azure |Azure: Connections failed |<p>Failed connections count.</p> |DEPENDENT |azure.db.connections.failed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connections_failed.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure: IO consumption percent |<p>IO Percent.</p> |DEPENDENT |azure.db.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.average`</p> |
+|Azure |Azure: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.average`</p> |
+|Azure |Azure: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.average`</p> |
+|Azure |Azure: Storage limit |<p>Storage limit in bytes.</p> |DEPENDENT |azure.db.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
+|Azure |Azure: Backup storage used |<p>Backup storage used in bytes.</p> |DEPENDENT |azure.db.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.average`</p> |
+|Azure |Azure: Replication lag |<p>Replication lag in seconds.</p> |DEPENDENT |azure.db.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.seconds_behind_master.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure: Server log storage percent |<p>Server log storage utilization in %.</p> |DEPENDENT |azure.db.storage.server.log.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_percent.average`</p> |
+|Azure |Azure: Server log storage used |<p>Used server log storage space in bytes.</p> |DEPENDENT |azure.db.storage.server.log.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_usage.average`</p> |
+|Azure |Azure: Server log storage limit |<p>Server log storage limit in bytes.</p> |DEPENDENT |azure.db.storage.server.log.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_limit.maximum`</p> |
+
+## Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----|----|----|
+|Azure: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL single servers by HTTP/azure.db.data.errors))>0` |AVERAGE | |
+|Azure: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.availability.state)=2` |HIGH | |
+|Azure: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.availability.state)=1` |AVERAGE | |
+|Azure: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.availability.state)=3` |WARNING | |
+|Azure: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL single servers by HTTP/azure.db.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
 
 ## Feedback
 
