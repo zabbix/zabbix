@@ -104,6 +104,23 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItemPrototyp
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 
+// Proxies.
+require_once dirname(__FILE__).'/proxies/testFormAdministrationGeneralProxies.php';
+require_once dirname(__FILE__).'/proxies/testPageAdministrationGeneralProxies.php';
+
+
+// Reports.
+require_once dirname(__FILE__).'/reports/testFormScheduledReport.php';
+require_once dirname(__FILE__).'/reports/testPageAvailabilityReport.php';
+require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
+require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
+require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
+require_once dirname(__FILE__).'/reports/testPageReportsSystemInformation.php';
+require_once dirname(__FILE__).'/reports/testPageReportsTriggerTop.php';
+require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
+require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
+
+
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
@@ -118,7 +135,6 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testPageAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
-require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
@@ -148,8 +164,7 @@ require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationLdap.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationSaml.php';
-require_once dirname(__FILE__).'/proxies/testFormAdministrationGeneralProxies.php';
-require_once dirname(__FILE__).'/proxies/testPageAdministrationGeneralProxies.php';
+
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAuditLog.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
@@ -223,14 +238,6 @@ require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
 require_once dirname(__FILE__).'/roles/testPageUserRoles.php';
 require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
-require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
-require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
-require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
-require_once dirname(__FILE__).'/reports/testPageReportsSystemInformation.php';
-require_once dirname(__FILE__).'/reports/testPageReportsTriggerTop.php';
-require_once dirname(__FILE__).'/reports/testFormScheduledReport.php';
-require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
-require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 require_once dirname(__FILE__).'/testSID.php';
 
 use PHPUnit\Framework\TestSuite;
@@ -325,6 +332,20 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
 		$suite->addTestSuite('testFormPreprocessingTest');
 
+		// Proxies.
+		$suite->addTestSuite('testFormAdministrationGeneralProxies');
+		$suite->addTestSuite('testPageAdministrationGeneralProxies');
+
+		// Reports.
+		$suite->addTestSuite('testFormScheduledReport');
+		$suite->addTestSuite('testPageAvailabilityReport');
+		$suite->addTestSuite('testPageReportsActionLog');
+		$suite->addTestSuite('testPageReportsAudit');
+		$suite->addTestSuite('testPageReportsNotifications');
+		$suite->addTestSuite('testPageReportsSystemInformation');
+		$suite->addTestSuite('testPageReportsTriggerTop');
+		$suite->addTestSuite('testPageScheduledReport');
+		$suite->addTestSuite('testScheduledReportPermissions');
 
 
 		$suite->addTestSuite('testExecuteNow');
@@ -337,7 +358,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
 		$suite->addTestSuite('testPageAdministrationScripts');
-		$suite->addTestSuite('testPageAvailabilityReport');
 		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageGraphPrototypes');
 		$suite->addTestSuite('testPageProblems');
@@ -361,11 +381,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageQueueOverview');
 		$suite->addTestSuite('testPageQueueOverviewByProxy');
 */
-		$suite->addTestSuite('testPageReportsActionLog');
-		$suite->addTestSuite('testPageReportsAudit');
-		$suite->addTestSuite('testPageReportsNotifications');
-		$suite->addTestSuite('testPageReportsSystemInformation');
-		$suite->addTestSuite('testPageReportsTriggerTop');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageTemplates');
@@ -377,8 +392,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
 		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
 		$suite->addTestSuite('testFormAdministrationAuthenticationLdap');
-		$suite->addTestSuite('testFormAdministrationGeneralProxies');
-		$suite->addTestSuite('testPageAdministrationGeneralProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
