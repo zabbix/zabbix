@@ -15492,28 +15492,21 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, zbx_uint64_t r
 	UNLOCK_CACHE;
 }
 
-void	zbx_dc_get_unused_macro_templates(zbx_vector_uint64_t *templateids)
+void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vector_uint64_t *hostids,
+		zbx_vector_uint64_t *templateids)
 {
-	zbx_vector_uint64_t	hostids;
-	zbx_hashset_iter_t	iter;
-	ZBX_DC_HOST		*host;
-
-	zbx_vector_uint64_create(&hostids);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	RDLOCK_CACHE;
 
-	zbx_hashset_iter_reset(&config->hosts, &iter);
-	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_uint64_append(&hostids, host->hostid);
-
-	um_cache_get_unused_templates(config->um_cache, &hostids, templateids);
+	um_cache_get_unused_templates(config->um_cache, templates, hostids, templateids);
 
 	UNLOCK_CACHE;
 
 	if (0 != templateids->values_num)
 		zbx_vector_uint64_sort(templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_vector_uint64_destroy(&hostids);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
 
 #ifdef HAVE_TESTS

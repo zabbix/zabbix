@@ -158,16 +158,38 @@ out:
 
 static void	proxyconfig_remove_unused_templates(void)
 {
-	zbx_vector_uint64_t	hostids;
+	zbx_vector_uint64_t	hostids, templateids;
+	zbx_hashset_t		templates;
 	int			removed_num;
+	DB_ROW			row;
+	DB_RESULT		result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_create(&templateids);
+	zbx_hashset_create(&templates, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_dc_get_unused_macro_templates(&hostids);
+	result = DBselect("select hostid,status from hosts");
 
-	if (0 != hostids.values_num)
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	hostid;
+		unsigned char	status;
+
+		ZBX_STR2UINT64(hostid, row[0]);
+		ZBX_STR2UCHAR(status, row[1]);
+
+		if (HOST_STATUS_TEMPLATE == status)
+			zbx_hashset_insert(&templates, &hostid, sizeof(hostid));
+		else
+			zbx_vector_uint64_append(&hostids, hostid);
+	}
+	DBfree_result(result);
+
+	zbx_dc_get_unused_macro_templates(&templates, &hostids, &templateids);
+
+	if (0 != templateids.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
@@ -175,17 +197,20 @@ static void	proxyconfig_remove_unused_templates(void)
 		DBbegin();
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts_templates where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
+				templateids.values_num);
 		DBexecute("%s", sql);
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hostmacro where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
+				templateids.values_num);
 		DBexecute("%s", sql);
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
+				templateids.values_num);
 		DBexecute("%s", sql);
 
 		DBcommit();
@@ -193,8 +218,10 @@ static void	proxyconfig_remove_unused_templates(void)
 		zbx_free(sql);
 	}
 
-	removed_num = hostids.values_num;
+	removed_num = templateids.values_num;
 
+	zbx_hashset_destroy(&templates);
+	zbx_vector_uint64_destroy(&templateids);
 	zbx_vector_uint64_destroy(&hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() removed:%d", __func__, removed_num);
@@ -212,7 +239,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_thread_proxyconfig_args	*proxyconfig_args_in = (zbx_thread_proxyconfig_args *)
 							(((zbx_thread_args_t *)args)->args);
 	size_t				data_size;
-	double				sec, last_template_cleanup_sec = 0;
+	double				sec, last_template_cleanup_sec = 0, interval;
 	zbx_ipc_async_socket_t		rtc;
 	int				sleeptime;
 	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
@@ -272,6 +299,12 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 				DCupdate_interfaces_availability();
 				zbx_rtc_notify_config_sync(&rtc);
 
+				if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
+				{
+					proxyconfig_remove_unused_templates();
+					last_template_cleanup_sec = sec;
+				}
+
 				zbx_setproctitle("%s [synced config in " ZBX_FS_DBL " sec]",
 						get_process_type_string(process_type), zbx_time() - sec);
 			}
@@ -286,10 +319,10 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
 		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->zbx_config_tls);
-		sec = zbx_time() - sec;
+		interval = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), (zbx_fs_size_t)data_size, sec,
+				get_process_type_string(process_type), (zbx_fs_size_t)data_size, interval,
 				CONFIG_PROXYCONFIG_FREQUENCY);
 
 		if (SEC_PER_HOUR < sec - last_template_cleanup_sec)

@@ -1360,12 +1360,11 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_vector_ui
  *                                                                               *
  * Parameters: cache        - [IN] the user macro cache                          *
  *             hostid       - [IN] the parent hostid                             *
- *             unused_hosts - [IN/OUT] the templates not linked to any host      *
- *                                     either directly or through other templates*
+ *             templates    - [IN/OUT] the templates                             *
  *                                                                               *
  *********************************************************************************/
 static void	um_cache_check_used_templates(const zbx_um_cache_t *cache, zbx_uint64_t hostid,
-		zbx_hashset_t *unused_hosts)
+		zbx_hashset_t *templates)
 {
 	void		*data;
 	zbx_um_host_t	**phost;
@@ -1375,11 +1374,11 @@ static void	um_cache_check_used_templates(const zbx_um_cache_t *cache, zbx_uint6
 	if (NULL == (phost = (zbx_um_host_t **)zbx_hashset_search(&cache->hosts, &phostid)))
 		return;
 
-	if (NULL != (data = zbx_hashset_search(unused_hosts, &hostid)))
-		zbx_hashset_remove_direct(unused_hosts, data);
+	if (NULL != (data = zbx_hashset_search(templates, &hostid)))
+		zbx_hashset_remove_direct(templates, data);
 
 	for (i = 0; i < (*phost)->templateids.values_num; i++)
-		um_cache_check_used_templates(cache, (*phost)->templateids.values[i], unused_hosts);
+		um_cache_check_used_templates(cache, (*phost)->templateids.values[i], templates);
 }
 
 /*********************************************************************************
@@ -1388,42 +1387,26 @@ static void	um_cache_check_used_templates(const zbx_um_cache_t *cache, zbx_uint6
  *          neither directly nor through other templates                         *
  *                                                                               *
  * Parameters: cache       - [IN] the user macro cache                           *
- *             hostids     - [IN] the parent hostids                             *
+ *             templates   - [IN] the database templates                         *
+ *             hostids     - [IN] the database hosts                             *
  *             templateids - [IN/OUT] the templates not linked to any host       *
  *                                     neither directly nor through other        *
  *                                     templates                                 *
  *                                                                               *
  *********************************************************************************/
-void	um_cache_get_unused_templates(zbx_um_cache_t *cache, const zbx_vector_uint64_t *hostids,
-		zbx_vector_uint64_t *templateids)
+void	um_cache_get_unused_templates(zbx_um_cache_t *cache, zbx_hashset_t *templates,
+		const zbx_vector_uint64_t *hostids, zbx_vector_uint64_t *templateids)
 {
 	zbx_hashset_iter_t	iter;
-	zbx_um_host_t		**phost;
-	zbx_hashset_t		unused_hosts;
 	int			i;
 	zbx_uint64_t		*phostid;
 
-	zbx_hashset_create(&unused_hosts, cache->hosts.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_hashset_iter_reset(&cache->hosts, &iter);
-	while (NULL != (phost = (zbx_um_host_t **)zbx_hashset_iter_next(&iter)))
-	{
-		/* skip globalmacro host object */
-		if (0 == (*phost)->hostid)
-			continue;
-
-		zbx_hashset_insert(&unused_hosts, &(*phost)->hostid, sizeof(zbx_uint64_t));
-	}
-
 	for (i = 0; i < hostids->values_num; i++)
-		um_cache_check_used_templates(cache, hostids->values[i], &unused_hosts);
+		um_cache_check_used_templates(cache, hostids->values[i], templates);
 
-	zbx_hashset_iter_reset(&unused_hosts, &iter);
+	zbx_hashset_iter_reset(templates, &iter);
 	while (NULL != (phostid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
 		zbx_vector_uint64_append(templateids, *phostid);
-
-	zbx_hashset_destroy(&unused_hosts);
 }
 
 /*********************************************************************************

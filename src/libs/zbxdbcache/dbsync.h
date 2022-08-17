@@ -161,6 +161,7 @@ int	zbx_dbsync_prepare_httptests(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_httptest_fields(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_httpsteps(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_httpstep_fields(zbx_dbsync_t *sync);
+void	zbx_dbsync_clear_user_macros(void);
 
 
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */
