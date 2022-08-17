@@ -38,7 +38,7 @@ static void	mock_get_hostids(zbx_vector_uint64_t *hostids, zbx_mock_handle_t han
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(hhostid, &hostid_s)))
 			fail_msg("Cannot read hostid: %s", zbx_mock_error_string(err));
 
-		if (SUCCEED != is_uint64(hostid_s, &hostid))
+		if (SUCCEED != zbx_is_uint64(hostid_s, &hostid))
 			fail_msg("Invalid hostid: %s", hostid_s);
 
 		zbx_vector_uint64_append(hostids, hostid);

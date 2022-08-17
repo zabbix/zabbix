@@ -75,8 +75,8 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
 void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base);
 const char	*zbx_timespec_str(const zbx_timespec_t *ts);
 int	zbx_get_week_number(const struct tm *tm);
-int	is_time_suffix(const char *str, int *value, int length);
-int	calculate_sleeptime(int nextcheck, int max_sleeptime);
+int	zbx_is_time_suffix(const char *str, int *value, int length);
+int	zbx_calculate_sleeptime(int nextcheck, int max_sleeptime);
 
 char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date, const char *tz);

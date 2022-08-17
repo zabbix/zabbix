@@ -33,7 +33,7 @@
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	is_ip4(const char *ip)
+int	zbx_is_ip4(const char *ip)
 {
 	const char	*p = ip;
 	int		digits = 0, dots = 0, res = FAIL, octet = 0;
@@ -82,7 +82,7 @@ int	is_ip4(const char *ip)
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	is_ip6(const char *ip)
+int	zbx_is_ip6(const char *ip)
 {
 	const char	*p = ip, *last_colon;
 	int		xdigits = 0, only_xdigits = 0, colons = 0, dbl_colons = 0, res;
@@ -125,7 +125,7 @@ int	is_ip6(const char *ip)
 	else if (1 == only_xdigits)
 		res = SUCCEED;
 	else if (7 > colons && (last_colon = strrchr(ip, ':')) < p)
-		res = is_ip4(last_colon + 1);	/* past last column is ipv4 mapped address */
+		res = zbx_is_ip4(last_colon + 1);	/* past last column is ipv4 mapped address */
 	else
 		res = FAIL;
 
@@ -144,12 +144,12 @@ int	is_ip6(const char *ip)
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	is_supported_ip(const char *ip)
+int	zbx_is_supported_ip(const char *ip)
 {
-	if (SUCCEED == is_ip4(ip))
+	if (SUCCEED == zbx_is_ip4(ip))
 		return SUCCEED;
 #ifdef HAVE_IPV6
-	if (SUCCEED == is_ip6(ip))
+	if (SUCCEED == zbx_is_ip6(ip))
 		return SUCCEED;
 #endif
 	return FAIL;
@@ -167,7 +167,7 @@ int	is_supported_ip(const char *ip)
  ******************************************************************************/
 int	is_ip(const char *ip)
 {
-	return SUCCEED == is_ip4(ip) ? SUCCEED : is_ip6(ip);
+	return SUCCEED == zbx_is_ip4(ip) ? SUCCEED : zbx_is_ip6(ip);
 }
 
 /******************************************************************************
@@ -181,7 +181,7 @@ int	is_ip(const char *ip)
  * Return value: FAIL - out of range, SUCCEED - within the range              *
  *                                                                            *
  ******************************************************************************/
-int	ip_in_list(const char *list, const char *ip)
+int	zbx_ip_in_list(const char *list, const char *ip)
 {
 	int		ipaddress[8];
 	zbx_iprange_t	iprange;
@@ -192,13 +192,13 @@ int	ip_in_list(const char *list, const char *ip)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' ip:'%s'", __func__, list, ip);
 
-	if (SUCCEED != iprange_parse(&iprange, ip))
+	if (SUCCEED != zbx_iprange_parse(&iprange, ip))
 		goto out;
 #ifndef HAVE_IPV6
 	if (ZBX_IPRANGE_V6 == iprange.type)
 		goto out;
 #endif
-	iprange_first(&iprange, ipaddress);
+	zbx_iprange_first(&iprange, ipaddress);
 
 	for (ptr = list; '\0' != *ptr; list = ptr + 1)
 	{
@@ -208,13 +208,13 @@ int	ip_in_list(const char *list, const char *ip)
 		address_offset = 0;
 		zbx_strncpy_alloc(&address, &address_alloc, &address_offset, list, (size_t)(ptr - list));
 
-		if (SUCCEED != iprange_parse(&iprange, address))
+		if (SUCCEED != zbx_iprange_parse(&iprange, address))
 			continue;
 #ifndef HAVE_IPV6
 		if (ZBX_IPRANGE_V6 == iprange.type)
 			continue;
 #endif
-		if (SUCCEED == iprange_validate(&iprange, ipaddress))
+		if (SUCCEED == zbx_iprange_validate(&iprange, ipaddress))
 		{
 			ret = SUCCEED;
 			break;
@@ -233,7 +233,7 @@ out:
  * Purpose: parse a ServerActive element like "IP<:port>" or "[IPv6]<:port>"  *
  *                                                                            *
  ******************************************************************************/
-int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default)
+int	zbx_parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default)
 {
 #ifdef HAVE_IPV6
 	char	*r1 = NULL;
@@ -254,17 +254,17 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 		if (':' != r1[1] && '\0' != r1[1])
 			goto fail;
 
-		if (':' == r1[1] && SUCCEED != is_ushort(r1 + 2, port))
+		if (':' == r1[1] && SUCCEED != zbx_is_ushort(r1 + 2, port))
 			goto fail;
 
 		*r1 = '\0';
 
-		if (SUCCEED != is_ip6(str))
+		if (SUCCEED != zbx_is_ip6(str))
 			goto fail;
 
 		*host = zbx_strdup(*host, str);
 	}
-	else if (SUCCEED == is_ip6(str))
+	else if (SUCCEED == zbx_is_ip6(str))
 	{
 		*host = zbx_strdup(*host, str);
 	}
@@ -273,7 +273,7 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 #endif
 		if (NULL != (r2 = strchr(str, ':')))
 		{
-			if (SUCCEED != is_ushort(r2 + 1, port))
+			if (SUCCEED != zbx_is_ushort(r2 + 1, port))
 				goto fail;
 
 			*r2 = '\0';

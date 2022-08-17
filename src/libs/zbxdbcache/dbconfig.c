@@ -404,7 +404,7 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 	if (0 != (flags & ZBX_HOST_UNREACHABLE) && NULL != interface && 0 != (disable_until =
 			DCget_disable_until(item, interface)))
 	{
-		item->nextcheck = calculate_item_nextcheck_unreachable(simple_interval,
+		item->nextcheck = zbx_zbx_calculate_item_nextcheck_unreachable(simple_interval,
 				custom_intervals, disable_until);
 	}
 	else
@@ -414,14 +414,14 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 				ITEM_TYPE_ZABBIX_ACTIVE != item->type &&
 				ZBX_DEFAULT_ITEM_UPDATE_INTERVAL < simple_interval)
 		{
-			item->nextcheck = calculate_item_nextcheck(seed, item->type, ZBX_DEFAULT_ITEM_UPDATE_INTERVAL,
+			item->nextcheck = zbx_calculate_item_nextcheck(seed, item->type, ZBX_DEFAULT_ITEM_UPDATE_INTERVAL,
 					NULL, now);
 		}
 		else
 		{
 			/* supported items and items that could not have been scheduled previously, but had */
 			/* their update interval fixed, should be scheduled using their update intervals */
-			item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals,
+			item->nextcheck = zbx_calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals,
 					now);
 		}
 	}
@@ -704,7 +704,7 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
  ******************************************************************************/
 static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value_raw)
 {
-	if (SUCCEED != is_time_suffix(value_raw, value, ZBX_LENGTH_UNLIMITED))
+	if (SUCCEED != zbx_is_time_suffix(value_raw, value, ZBX_LENGTH_UNLIMITED))
 		return FAIL;
 
 	if (0 != non_zero && 0 == *value)
@@ -780,7 +780,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	ZBX_STR2UCHAR(config->config->autoreg_tls_accept, row[27]);
 	ZBX_STR2UCHAR(config->config->db.history_compression_status, row[28]);
 
-	if (SUCCEED != is_time_suffix(row[29], &config->config->db.history_compress_older, ZBX_LENGTH_UNLIMITED))
+	if (SUCCEED != zbx_is_time_suffix(row[29], &config->config->db.history_compress_older, ZBX_LENGTH_UNLIMITED))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid history compression age: %s", row[29]);
 		config->config->db.history_compress_older = 0;
@@ -1719,7 +1719,7 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			addr = zbx_strdup(NULL, interface->ip);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
 					NULL, &addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+			if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 				dc_strpool_replace(1, &interface->ip, addr);
 			zbx_free(addr);
 		}
@@ -1729,7 +1729,7 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			addr = zbx_strdup(NULL, interface->dns);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+			if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 				dc_strpool_replace(1, &interface->dns, addr);
 			zbx_free(addr);
 		}
@@ -6987,7 +6987,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned 
 	dst_host->proxy_hostid = src_host->proxy_hostid;
 	dst_host->status = src_host->status;
 
-	strscpy(dst_host->host, src_host->host);
+	zbx_strscpy(dst_host->host, src_host->host);
 
 	if (ZBX_ITEM_GET_HOSTNAME & mode)
 		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
@@ -7004,8 +7004,8 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned 
 		dst_host->tls_connect = src_host->tls_connect;
 		dst_host->tls_accept = src_host->tls_accept;
 	#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		strscpy(dst_host->tls_issuer, src_host->tls_issuer);
-		strscpy(dst_host->tls_subject, src_host->tls_subject);
+		zbx_strscpy(dst_host->tls_issuer, src_host->tls_issuer);
+		zbx_strscpy(dst_host->tls_subject, src_host->tls_subject);
 
 		if (NULL == src_host->tls_dc_psk)
 		{
@@ -7014,16 +7014,16 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned 
 		}
 		else
 		{
-			strscpy(dst_host->tls_psk_identity, src_host->tls_dc_psk->tls_psk_identity);
-			strscpy(dst_host->tls_psk, src_host->tls_dc_psk->tls_psk);
+			zbx_strscpy(dst_host->tls_psk_identity, src_host->tls_dc_psk->tls_psk_identity);
+			zbx_strscpy(dst_host->tls_psk, src_host->tls_dc_psk->tls_psk);
 		}
 	#endif
 		if (NULL != (ipmihost = (ZBX_DC_IPMIHOST *)zbx_hashset_search(&config->ipmihosts, &src_host->hostid)))
 		{
 			dst_host->ipmi_authtype = ipmihost->ipmi_authtype;
 			dst_host->ipmi_privilege = ipmihost->ipmi_privilege;
-			strscpy(dst_host->ipmi_username, ipmihost->ipmi_username);
-			strscpy(dst_host->ipmi_password, ipmihost->ipmi_password);
+			zbx_strscpy(dst_host->ipmi_username, ipmihost->ipmi_username);
+			zbx_strscpy(dst_host->ipmi_password, ipmihost->ipmi_password);
 		}
 		else
 		{
@@ -7449,16 +7449,16 @@ static void	DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE 
 	if (NULL != src_interface)
 	{
 		dst_interface->interfaceid = src_interface->interfaceid;
-		strscpy(dst_interface->ip_orig, src_interface->ip);
-		strscpy(dst_interface->dns_orig, src_interface->dns);
-		strscpy(dst_interface->port_orig, src_interface->port);
+		zbx_strscpy(dst_interface->ip_orig, src_interface->ip);
+		zbx_strscpy(dst_interface->dns_orig, src_interface->dns);
+		zbx_strscpy(dst_interface->port_orig, src_interface->port);
 		dst_interface->useip = src_interface->useip;
 		dst_interface->type = src_interface->type;
 		dst_interface->main = src_interface->main;
 		dst_interface->available = src_interface->available;
 		dst_interface->disable_until = src_interface->disable_until;
 		dst_interface->errors_from = src_interface->errors_from;
-		strscpy(dst_interface->error, src_interface->error);
+		zbx_strscpy(dst_interface->error, src_interface->error);
 	}
 	else
 	{
@@ -7514,7 +7514,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 		dst_item->history_period = NULL;
 	dst_item->trends_period = NULL;
 
-	strscpy(dst_item->key_orig, src_item->key);
+	zbx_strscpy(dst_item->key_orig, src_item->key);
 
 	if (ZBX_ITEM_GET_MISC & mode)
 	{
@@ -7551,7 +7551,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 				if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems,
 						&src_item->itemid)))
 				{
-					strscpy(dst_item->logtimefmt, logitem->logtimefmt);
+					zbx_strscpy(dst_item->logtimefmt, logitem->logtimefmt);
 				}
 				else
 					*dst_item->logtimefmt = '\0';
@@ -7577,15 +7577,15 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 
 			if (NULL != snmpitem && NULL != snmp)
 			{
-				strscpy(dst_item->snmp_community_orig, snmp->community);
-				strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
-				strscpy(dst_item->snmpv3_securityname_orig, snmp->securityname);
+				zbx_strscpy(dst_item->snmp_community_orig, snmp->community);
+				zbx_strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
+				zbx_strscpy(dst_item->snmpv3_securityname_orig, snmp->securityname);
 				dst_item->snmpv3_securitylevel = snmp->securitylevel;
-				strscpy(dst_item->snmpv3_authpassphrase_orig, snmp->authpassphrase);
-				strscpy(dst_item->snmpv3_privpassphrase_orig, snmp->privpassphrase);
+				zbx_strscpy(dst_item->snmpv3_authpassphrase_orig, snmp->authpassphrase);
+				zbx_strscpy(dst_item->snmpv3_privpassphrase_orig, snmp->privpassphrase);
 				dst_item->snmpv3_authprotocol = snmp->authprotocol;
 				dst_item->snmpv3_privprotocol = snmp->privprotocol;
-				strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
+				zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 				dst_item->snmp_version = snmp->version;
 			}
 			else
@@ -7611,13 +7611,13 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 			break;
 		case ITEM_TYPE_TRAPPER:
 			if (NULL != (trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&config->trapitems, &src_item->itemid)))
-				strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
+				zbx_strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
 			else
 				*dst_item->trapper_hosts = '\0';
 			break;
 		case ITEM_TYPE_IPMI:
 			if (NULL != (ipmiitem = (ZBX_DC_IPMIITEM *)zbx_hashset_search(&config->ipmiitems, &src_item->itemid)))
-				strscpy(dst_item->ipmi_sensor, ipmiitem->ipmi_sensor);
+				zbx_strscpy(dst_item->ipmi_sensor, ipmiitem->ipmi_sensor);
 			else
 				*dst_item->ipmi_sensor = '\0';
 			break;
@@ -7625,8 +7625,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 			if (NULL != (dbitem = (ZBX_DC_DBITEM *)zbx_hashset_search(&config->dbitems, &src_item->itemid)))
 			{
 				dst_item->params = zbx_strdup(NULL, dbitem->params);
-				strscpy(dst_item->username_orig, dbitem->username);
-				strscpy(dst_item->password_orig, dbitem->password);
+				zbx_strscpy(dst_item->username_orig, dbitem->username);
+				zbx_strscpy(dst_item->password_orig, dbitem->password);
 			}
 			else
 			{
@@ -7642,10 +7642,10 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 			if (NULL != (sshitem = (ZBX_DC_SSHITEM *)zbx_hashset_search(&config->sshitems, &src_item->itemid)))
 			{
 				dst_item->authtype = sshitem->authtype;
-				strscpy(dst_item->username_orig, sshitem->username);
-				strscpy(dst_item->publickey_orig, sshitem->publickey);
-				strscpy(dst_item->privatekey_orig, sshitem->privatekey);
-				strscpy(dst_item->password_orig, sshitem->password);
+				zbx_strscpy(dst_item->username_orig, sshitem->username);
+				zbx_strscpy(dst_item->publickey_orig, sshitem->publickey);
+				zbx_strscpy(dst_item->privatekey_orig, sshitem->privatekey);
+				zbx_strscpy(dst_item->password_orig, sshitem->password);
 				dst_item->params = zbx_strdup(NULL, sshitem->params);
 			}
 			else
@@ -7665,28 +7665,28 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 		case ITEM_TYPE_HTTPAGENT:
 			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &src_item->itemid)))
 			{
-				strscpy(dst_item->timeout_orig, httpitem->timeout);
-				strscpy(dst_item->url_orig, httpitem->url);
-				strscpy(dst_item->query_fields_orig, httpitem->query_fields);
-				strscpy(dst_item->status_codes_orig, httpitem->status_codes);
+				zbx_strscpy(dst_item->timeout_orig, httpitem->timeout);
+				zbx_strscpy(dst_item->url_orig, httpitem->url);
+				zbx_strscpy(dst_item->query_fields_orig, httpitem->query_fields);
+				zbx_strscpy(dst_item->status_codes_orig, httpitem->status_codes);
 				dst_item->follow_redirects = httpitem->follow_redirects;
 				dst_item->post_type = httpitem->post_type;
-				strscpy(dst_item->http_proxy_orig, httpitem->http_proxy);
+				zbx_strscpy(dst_item->http_proxy_orig, httpitem->http_proxy);
 				dst_item->headers = zbx_strdup(NULL, httpitem->headers);
 				dst_item->retrieve_mode = httpitem->retrieve_mode;
 				dst_item->request_method = httpitem->request_method;
 				dst_item->output_format = httpitem->output_format;
-				strscpy(dst_item->ssl_cert_file_orig, httpitem->ssl_cert_file);
-				strscpy(dst_item->ssl_key_file_orig, httpitem->ssl_key_file);
-				strscpy(dst_item->ssl_key_password_orig, httpitem->ssl_key_password);
+				zbx_strscpy(dst_item->ssl_cert_file_orig, httpitem->ssl_cert_file);
+				zbx_strscpy(dst_item->ssl_key_file_orig, httpitem->ssl_key_file);
+				zbx_strscpy(dst_item->ssl_key_password_orig, httpitem->ssl_key_password);
 				dst_item->verify_peer = httpitem->verify_peer;
 				dst_item->verify_host = httpitem->verify_host;
 				dst_item->authtype = httpitem->authtype;
-				strscpy(dst_item->username_orig, httpitem->username);
-				strscpy(dst_item->password_orig, httpitem->password);
+				zbx_strscpy(dst_item->username_orig, httpitem->username);
+				zbx_strscpy(dst_item->password_orig, httpitem->password);
 				dst_item->posts = zbx_strdup(NULL, httpitem->posts);
 				dst_item->allow_traps = httpitem->allow_traps;
-				strscpy(dst_item->trapper_hosts, httpitem->trapper_hosts);
+				zbx_strscpy(dst_item->trapper_hosts, httpitem->trapper_hosts);
 			}
 			else
 			{
@@ -7733,7 +7733,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-				strscpy(dst_item->timeout_orig, scriptitem->timeout);
+				zbx_strscpy(dst_item->timeout_orig, scriptitem->timeout);
 				dst_item->params = zbx_strdup(NULL, scriptitem->script);
 
 				for (i = 0; i < scriptitem->params.values_num; i++)
@@ -7759,8 +7759,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 		case ITEM_TYPE_TELNET:
 			if (NULL != (telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems, &src_item->itemid)))
 			{
-				strscpy(dst_item->username_orig, telnetitem->username);
-				strscpy(dst_item->password_orig, telnetitem->password);
+				zbx_strscpy(dst_item->username_orig, telnetitem->username);
+				zbx_strscpy(dst_item->password_orig, telnetitem->password);
 				dst_item->params = zbx_strdup(NULL, telnetitem->params);
 			}
 			else
@@ -7775,8 +7775,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 		case ITEM_TYPE_SIMPLE:
 			if (NULL != (simpleitem = (ZBX_DC_SIMPLEITEM *)zbx_hashset_search(&config->simpleitems, &src_item->itemid)))
 			{
-				strscpy(dst_item->username_orig, simpleitem->username);
-				strscpy(dst_item->password_orig, simpleitem->password);
+				zbx_strscpy(dst_item->username_orig, simpleitem->username);
+				zbx_strscpy(dst_item->password_orig, simpleitem->password);
 			}
 			else
 			{
@@ -7789,9 +7789,9 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 		case ITEM_TYPE_JMX:
 			if (NULL != (jmxitem = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &src_item->itemid)))
 			{
-				strscpy(dst_item->username_orig, jmxitem->username);
-				strscpy(dst_item->password_orig, jmxitem->password);
-				strscpy(dst_item->jmx_endpoint_orig, jmxitem->jmx_endpoint);
+				zbx_strscpy(dst_item->username_orig, jmxitem->username);
+				zbx_strscpy(dst_item->password_orig, jmxitem->password);
+				zbx_strscpy(dst_item->jmx_endpoint_orig, jmxitem->jmx_endpoint);
 			}
 			else
 			{
@@ -8133,7 +8133,7 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_ITE
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
 				NULL, NULL, &item->trends_period, MACRO_TYPE_COMMON, NULL, 0);
 
-		if (SUCCEED != is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
 			item->trends_sec = ZBX_HK_PERIOD_MAX;
 
 		if (0 != item->trends_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
@@ -8147,7 +8147,7 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_ITE
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
 				NULL, NULL, &item->history_period, MACRO_TYPE_COMMON, NULL, 0);
 
-		if (SUCCEED != is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;
 
 		if (0 != item->history_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
@@ -10609,14 +10609,14 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 
 	if (NULL != (host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
 	{
-		strscpy(dst_proxy->host, host->host);
-		strscpy(dst_proxy->proxy_address, src_proxy->proxy_address);
+		zbx_strscpy(dst_proxy->host, host->host);
+		zbx_strscpy(dst_proxy->proxy_address, src_proxy->proxy_address);
 
 		dst_proxy->tls_connect = host->tls_connect;
 		dst_proxy->tls_accept = host->tls_accept;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		strscpy(dst_proxy->tls_issuer, host->tls_issuer);
-		strscpy(dst_proxy->tls_subject, host->tls_subject);
+		zbx_strscpy(dst_proxy->tls_issuer, host->tls_issuer);
+		zbx_strscpy(dst_proxy->tls_subject, host->tls_subject);
 
 		if (NULL == host->tls_dc_psk)
 		{
@@ -10625,8 +10625,8 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 		}
 		else
 		{
-			strscpy(dst_proxy->tls_psk_identity, host->tls_dc_psk->tls_psk_identity);
-			strscpy(dst_proxy->tls_psk, host->tls_dc_psk->tls_psk);
+			zbx_strscpy(dst_proxy->tls_psk_identity, host->tls_dc_psk->tls_psk_identity);
+			zbx_strscpy(dst_proxy->tls_psk, host->tls_dc_psk->tls_psk);
 		}
 #endif
 	}
@@ -10651,8 +10651,8 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 	{
 		const ZBX_DC_INTERFACE	*interface = interface_ht->interface_ptr;
 
-		strscpy(dst_proxy->addr_orig, interface->useip ? interface->ip : interface->dns);
-		strscpy(dst_proxy->port_orig, interface->port);
+		zbx_strscpy(dst_proxy->addr_orig, interface->useip ? interface->ip : interface->dns);
+		zbx_strscpy(dst_proxy->port_orig, interface->port);
 	}
 	else
 	{
@@ -12826,9 +12826,9 @@ int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, 
 		dst->type = src->type;
 		dst->main = src->main;
 		dst->useip = src->useip;
-		strscpy(dst->ip_orig, src->ip);
-		strscpy(dst->dns_orig, src->dns);
-		strscpy(dst->port_orig, src->port);
+		zbx_strscpy(dst->ip_orig, src->ip);
+		zbx_strscpy(dst->dns_orig, src->dns);
+		zbx_strscpy(dst->port_orig, src->port);
 		dst->addr = (1 == src->useip ? dst->ip_orig : dst->dns_orig);
 
 		if (INTERFACE_TYPE_SNMP == dst->type)

@@ -870,7 +870,7 @@ int	zbx_is_double_suffix(const char *str, unsigned char flags)
  *           s, m, h, d, w                                                    *
  *                                                                            *
  ******************************************************************************/
-double	str2double(const char *str)
+double	zbx_str2double(const char *str)
 {
 	size_t	sz;
 
