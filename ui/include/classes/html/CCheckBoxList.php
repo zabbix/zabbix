@@ -185,7 +185,7 @@ class CCheckBoxList extends CList {
 				->setChecked($value['checked'])
 				->setEnabled($this->enabled);
 
-			if (array_key_exists('id', $value) || $this->uniqid === '') {
+			if (array_key_exists('id', $value) || $this->uniqid !== '') {
 				$checkbox->setId(array_key_exists('id', $value)
 					? $value['id']
 					: $checkbox->getId().'_'.$this->uniqid
