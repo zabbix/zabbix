@@ -6,9 +6,10 @@ dbschema.c: $(top_srcdir)/create/src/schema.tmpl
 
 clean:
 	rm -f dbschema.c dbschema.o libzbxdbschema.a
+endif
+
 noinst_LIBRARIES = libzbxdbschema.a
 
 libzbxdbschema_a_SOURCES = \
 	dbschema.c
-endif
 
