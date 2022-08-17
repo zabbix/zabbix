@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:38:04Z'
+  date: '2022-08-16T10:57:05Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -15,6 +15,7 @@ zabbix_export:
         
         MIBs used:
         RFC1213-MIB
+        HOST-RESOURCES-MIB
         ADSL-LINE-MIB
         ZYXEL-IES5000-MIB
         IF-MIB
@@ -27,7 +28,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -86,6 +87,37 @@ zabbix_export:
             -
               tag: component
               value: inventory
+        -
+          uuid: 5fa56229a8854d62bb6c516da873d63b
+          name: 'ZYXEL IES-500x: Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.25.1.1.0
+          key: zyxel.ies500x.hw.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized.
+            Note that this is different from sysUpTime in the SNMPv2-MIB
+            [RFC1907] because sysUpTime is the uptime of the
+            network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
         -
           uuid: cd669772d4454a359f1c372dce4a01de
           name: 'ZYXEL IES-500x: Location'
@@ -203,10 +235,10 @@ zabbix_export:
               value: inventory
         -
           uuid: 28df2d29a94d429d811dd40ceb510fcf
-          name: 'ZYXEL IES-500x: Uptime'
+          name: 'ZYXEL IES-500x: Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.3.0
-          key: zyxel.ies500x.uptime
+          key: zyxel.ies500x.net.uptime
           delay: 30s
           history: 2w
           trends: 0d
@@ -225,19 +257,6 @@ zabbix_export:
             -
               tag: component
               value: system
-          triggers:
-            -
-              uuid: d618295a763f42cd9063fad5cd600c34
-              expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.uptime)<10m'
-              name: 'ZYXEL IES-500x: has been restarted'
-              event_name: 'ZYXEL IES-500x: has been restarted (uptime < 10m)'
-              priority: INFO
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
-              tags:
-                -
-                  tag: scope
-                  value: notice
       discovery_rules:
         -
           uuid: 2ddba614e41f4014abef703418439e2a
@@ -2605,3 +2624,16 @@ zabbix_export:
             -
               value: '7'
               newvalue: lowerLayerDown
+  triggers:
+    -
+      uuid: d618295a763f42cd9063fad5cd600c34
+      expression: '(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.hw.uptime)>0 and last(/ZYXEL IES-500x SNMP/zyxel.ies500x.hw.uptime)<10m) or (last(/ZYXEL IES-500x SNMP/zyxel.ies500x.hw.uptime)=0 and last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.uptime)<10m)'
+      name: 'ZYXEL IES-500x: Host has been restarted'
+      event_name: 'ZYXEL IES-500x: {HOST.NAME} has been restarted (uptime < 10m)'
+      priority: INFO
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice

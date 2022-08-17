@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:37:35Z'
+  date: '2022-08-16T11:17:15Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -15,6 +15,7 @@ zabbix_export:
         
         MIBs used:
         TPLINK-SYSINFO-MIB
+        HOST-RESOURCES-MIB
         SNMPv2-MIB
         TPLINK-SYSMONITOR-MIB
         IF-MIB
@@ -29,7 +30,7 @@ zabbix_export:
           Version: Prior to version V2_170323
           Device: T2600G-28TS 2.0
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -285,6 +286,34 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
+          uuid: 964e73aa4e534b50bd1d93e137ca41f1
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 20690cbfeb924ec79f67200da3e0577c
           name: 'Hardware version(revision)'
           type: SNMP_AGENT
@@ -369,6 +398,28 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: cb63d68e6d0143049534225d1d69da12
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 78034b7a1d964b199f6a12c43821c27e
           name: 'System object ID'
           type: SNMP_AGENT
@@ -390,45 +441,6 @@ zabbix_export:
             -
               tag: component
               value: system
-        -
-          uuid: cb63d68e6d0143049534225d1d69da12
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 63b45803131d4391abfa313a222339e5
-              expression: 'last(/TP-LINK SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/TP-LINK SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
         -
           uuid: b6cd5b22d8014aa18fdb7735d77cc84c
           name: 'SNMP agent availability'
@@ -2045,3 +2057,20 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: 63b45803131d4391abfa313a222339e5
+      expression: '(last(/TP-LINK SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/TP-LINK SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/TP-LINK SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/TP-LINK SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/TP-LINK SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice
