@@ -11,4 +11,4 @@ libzbxdbschema_a_SOURCES = \
 	dbschema.c
 
 clean:
-	rm -f dbschema.c
+	rm -f dbschema.c dbschema.o libzbxdbschema.a
