@@ -1127,7 +1127,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	int				i, db_type, ret;
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
+#ifdef HAVE_SQLITE3
 	zbx_stat_t			db_stat;
+#endif
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_poller_args		poller_args = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
@@ -1329,6 +1331,7 @@ dbinit:
 
 	if (SUCCEED != DBcheck_version())
 	{
+#ifdef HAVE_SQLITE3
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", CONFIG_DBNAME);
 		zbx_db_deinit();
 
@@ -1339,6 +1342,9 @@ dbinit:
 			exit(EXIT_FAILURE);
 		}
 		goto dbinit;
+#else
+		exit(EXIT_FAILURE);
+#endif
 	}
 
 	change_proxy_history_count(proxy_get_history_count());
