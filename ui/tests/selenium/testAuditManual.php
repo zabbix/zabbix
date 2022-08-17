@@ -29,12 +29,12 @@ class testAuditManual extends CWebTest {
 	use TableTrait;
 
 	/**
-	 * Attach Behaviors to the test.
+	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
+		return [CMessageBehavior::class];
 	}
 
 	/**
@@ -253,7 +253,7 @@ class testAuditManual extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		foreach($actions as $action => $audit) {
 			$form->fill(['Resource' => $resource_name, 'Resource ID' => $resourceid]);
-			$form->query('xpath://label[text()="' . $action . '"]/../input[contains(@id, "filter_actions")]')
+			$form->query('xpath://label[text()="'.$action.'"]/../input[contains(@id, "filter_actions")]')
 					->asCheckbox()->one()->check();
 			$form->submit()->waitUntilReloaded();
 
@@ -274,6 +274,48 @@ class testAuditManual extends CWebTest {
 			if (COverlayDialogElement::find()->exists()) {
 				COverlayDialogElement::find()->one()->close();
 			}
+
+			// Values taken from column after filtering audit.
+			$columns = ['Time', 'User', 'IP', 'Recordset ID'];
+			$result = [];
+			foreach ($columns as $column) {
+				$column_value = $table->getRow(0)->getColumn($column)->getText();
+
+				// Need to convert time to epoch format and change to string.
+				if ($column === 'Time') {
+					$column_value = strval(strtotime($column_value));
+				}
+				$result[] = $column_value;
+			}
+
+			// Compare values from DB and audit page.
+			switch ($action) {
+				case 'Failed login':
+					$actionid = 9;
+					break;
+				case 'Login':
+					$actionid = 8;
+					break;
+				case 'Logout':
+					$actionid = 4;
+					break;
+				case 'Add':
+					$actionid = 0;
+					break;
+				case 'Update':
+					$actionid = 1;
+					break;
+				case 'Delete':
+					$actionid = 2;
+					break;
+				case 'History clear':
+					$actionid = 10;
+					break;
+			}
+
+			$dbaudit = CDBHelper::getAll('SELECT clock, username, ip, recordsetid FROM auditlog WHERE (resourceid, action)=('
+					.zbx_dbstr($resourceid).','.zbx_dbstr($actionid).') ORDER BY clock DESC LIMIT 1');
+			$this->assertEquals([], array_diff($result, $dbaudit[0]));
 
 			// Reset audit filter.
 			$this->query('name:zbx_filter')->asForm()->one()->query('button:Reset')->one()->click();
