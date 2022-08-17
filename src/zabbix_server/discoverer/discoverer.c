@@ -767,7 +767,7 @@ static int	process_discovery(time_t *nextcheck)
 	do
 	{
 		result = DBselect(
-				"select distinct r.iprange,r.name,c.dcheckid,r.proxy_hostid,r.delay"
+				"select distinct r.iprange,r.name,c.dcheckid,r.delay"
 				" from drules r"
 					" left join dchecks c"
 						" on c.druleid=r.druleid"
@@ -776,9 +776,11 @@ static int	process_discovery(time_t *nextcheck)
 
 		if (NULL != (row = DBfetch(result)))
 		{
+			ZBX_DB_DRULE	drule;
+
 			rule_count++;
 
-			delay_str = zbx_strdup(delay_str, row[4]);
+			delay_str = zbx_strdup(delay_str, row[3]);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 					&delay_str, MACRO_TYPE_COMMON, NULL, 0);
 
@@ -789,15 +791,13 @@ static int	process_discovery(time_t *nextcheck)
 
 				delay = 0;
 			}
-			else if (SUCCEED == DBis_null(row[3]))
+			else
 			{
-				ZBX_DB_DRULE	drule;
-
 				memset(&drule, 0, sizeof(drule));
 
 				drule.druleid = druleid;
-				drule.iprange = row[1];
-				drule.name = row[2];
+				drule.iprange = row[0];
+				drule.name = row[1];
 				ZBX_DBROW2UINT64(drule.unique_dcheckid, row[2]);
 
 				process_rule(&drule);
