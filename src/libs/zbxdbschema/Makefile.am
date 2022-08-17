@@ -9,3 +9,6 @@ noinst_LIBRARIES = libzbxdbschema.a
 
 libzbxdbschema_a_SOURCES = \
 	dbschema.c
+
+clean:
+	rm -f dbschema.c
