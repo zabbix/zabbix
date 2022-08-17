@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         MIBs used:
         UCD-DISKIO-MIB
-        
+
         Template tooling version used: 0.41
       groups:
         -
@@ -141,7 +141,7 @@ zabbix_export:
         MIBs used:
         HOST-RESOURCES-MIB
         UCD-SNMP-MIB
-        
+
         Template tooling version used: 0.41
       groups:
         -
@@ -654,7 +654,7 @@ zabbix_export:
         MIBs used:
         HOST-RESOURCES-MIB
         UCD-SNMP-MIB
-        
+
         Template tooling version used: 0.41
       groups:
         -
@@ -936,11 +936,11 @@ zabbix_export:
       description: |
         MIBs used:
         UCD-SNMP-MIB
-        
+
         Known Issues:
-        
+
           Description: Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.
-        
+
         Template tooling version used: 0.41
       groups:
         -
@@ -977,7 +977,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: 'last(//system.swap.free[memAvailSwap.0])/last(//system.swap.total[memTotalSwap.0])*100'
+          params: '(last(//system.swap.total[memTotalSwap.0]) <> 0) * last(//system.swap.free[memAvailSwap.0]) / (last(//system.swap.total[memTotalSwap.0]) + (last(//system.swap.total[memTotalSwap.0]) = 0) ) * 100'
           description: 'The free space of swap volume/file in percent.'
           tags:
             -
