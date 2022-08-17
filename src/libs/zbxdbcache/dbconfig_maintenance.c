@@ -19,11 +19,13 @@
 
 #include "dbconfig.h"
 
-#include "common.h"
 #include "log.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "dbsync.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxexpr.h"
 
 extern int		CONFIG_TIMER_FORKS;
 

@@ -18,9 +18,9 @@
 **/
 
 #include "system.h"
-
-#include "common.h"
 #include "zbxsysinfo_common.h"
+
+#include "zbxtime.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "sysinfo.h"

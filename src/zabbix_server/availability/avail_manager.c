@@ -24,6 +24,8 @@
 #include "zbxavailability.h"
 #include "zbxipcservice.h"
 #include "zbxnix.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -214,6 +216,8 @@ static void	send_avail_check_status_response(zbx_avail_active_hb_cache_t *cache,
 
 	data_len = zbx_availability_serialize_active_status_response(&data, status);
 	zbx_ipc_client_send(client, ZBX_IPC_AVAILMAN_ACTIVE_STATUS, data, data_len);
+
+	zbx_free(data);
 }
 
 static void	process_confsync_diff(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)
@@ -323,7 +327,6 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 	db_update_active_check_status(&status_unknown, INTERFACE_AVAILABLE_UNKNOWN);
 	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE);
 	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE);
-
 
 	if (ZBX_DB_OK == DBcommit())
 		zbx_hashset_clear(&cache->queue);

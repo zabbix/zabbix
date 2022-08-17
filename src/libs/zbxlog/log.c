@@ -22,6 +22,8 @@
 #include "zbxmutexs.h"
 #include "zbxthreads.h"
 #include "cfg.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "zbxwinservice.h"

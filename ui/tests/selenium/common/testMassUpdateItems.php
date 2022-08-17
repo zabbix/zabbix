@@ -124,7 +124,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'TELNET agent']
 					],
-					'details' => 'No interface found.'
+					'details' => 'No authentication user name specified.'
 				]
 			],
 			[

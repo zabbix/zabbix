@@ -20,6 +20,7 @@
 #include "vmware.h"
 #include "zbxnix.h"
 #include "zbxself.h"
+#include "zbxtime.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 

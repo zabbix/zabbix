@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-03 22:21+0000\n"
+"PO-Revision-Date: 2022-08-03 20:09+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -642,7 +642,7 @@ msgstr "Akcja"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Akcja"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -718,7 +718,7 @@ msgstr "Akcje"
 #: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Akcje"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -1120,6 +1120,11 @@ msgstr "Agregacja odstępów"
 msgid "Alert message"
 msgstr "Wiadomość ostrzegawcza"
 
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CRoleHelper.php:338
+msgid "Alerts"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
 msgstr "Algorytm"
@@ -1193,7 +1198,7 @@ msgstr "Wszystkie usługi"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
-msgstr "Wszystkie etykiety"
+msgstr "Wszystkie znaczniki"
 
 #: include/html.inc.php:267
 msgid "All templates"
@@ -1322,7 +1327,7 @@ msgstr "Zastosuj"
 
 #: include/views/configuration.hostgroups.edit.php:48
 msgid "Apply permissions and tag filters to all subgroups"
-msgstr "Dodaj uprawnienia i etykietę filtrów do wszystkich podgrup"
+msgstr "Dodaj uprawnienia i filtry znaczników do wszystkich podgrup"
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
@@ -1673,7 +1678,7 @@ msgstr "Dostępny"
 #: app/views/monitoring.widget.hostavail.view.php:37
 msgctxt "compact table header"
 msgid "Available"
-msgstr ""
+msgstr "Dostępny"
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -4056,7 +4061,7 @@ msgstr "Kompresja"
 #: app/views/administration.housekeeping.edit.php:174
 #: app/views/administration.housekeeping.edit.php:184
 msgid "Compression is not supported."
-msgstr ""
+msgstr "Kompresja nie jest wspierana."
 
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
@@ -5060,6 +5065,11 @@ msgstr "Linia przerywana"
 msgid "Data"
 msgstr "Data"
 
+#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CRoleHelper.php:337
+msgid "Data collection"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
 #, c-format
@@ -5207,7 +5217,7 @@ msgstr "Dzień"
 #: include/classes/helpers/CSlaHelper.php:68
 msgctxt "compact table header"
 msgid "Day"
-msgstr ""
+msgstr "Dzień"
 
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
@@ -6136,7 +6146,7 @@ msgstr "Reguła wykrywania"
 #: app/views/monitoring.widget.discovery.view.php:33
 msgctxt "compact table header"
 msgid "Discovery rule"
-msgstr ""
+msgstr "Reguła wykrywania"
 
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
@@ -6437,7 +6447,7 @@ msgstr "Czas trwania"
 #: app/views/monitoring.widget.problems.view.php:80
 msgctxt "compact table header"
 msgid "Duration"
-msgstr ""
+msgstr "Czas trwania"
 
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
@@ -6870,7 +6880,7 @@ msgstr "Dopuszczalna niedostępność"
 #: app/views/monitoring.widget.slareport.view.php:101
 msgctxt "compact table header"
 msgid "Error budget"
-msgstr ""
+msgstr "Dopuszczalna niedostępność"
 
 #: include/db.inc.php:518
 #, c-format
@@ -6891,7 +6901,7 @@ msgstr "Błąd! Nie można uruchomić serwera Zabbix przez niewspieraną wersję
 #: app/partials/administration.system.info.php:159
 #: app/partials/administration.system.info.php:172
 msgid "Error! Unable to start Zabbix server."
-msgstr ""
+msgstr "Błąd! Nie można uruchomić serwera Zabbix."
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -7232,7 +7242,7 @@ msgstr "Niepowodzenie"
 #: app/views/monitoring.widget.web.view.php:34
 msgctxt "compact table header"
 msgid "Failed"
-msgstr ""
+msgstr "Niepowodzenie"
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
@@ -8398,7 +8408,7 @@ msgstr "Grupa hostów"
 #: app/views/monitoring.widget.web.view.php:32
 msgctxt "compact table header"
 msgid "Host group"
-msgstr ""
+msgstr "Grupa hostów"
 
 #: include/classes/api/services/CHostGroup.php:760
 #, c-format
@@ -12102,7 +12112,7 @@ msgstr "Wiadomość"
 #: app/views/monitoring.widget.actionlog.view.php:44
 msgctxt "compact table header"
 msgid "Message"
-msgstr ""
+msgstr "Wiadomość"
 
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
@@ -12190,7 +12200,7 @@ msgstr "Wymagana minimalna wersja PHP to %1$s."
 #: app/views/administration.housekeeping.edit.php:175
 #, c-format
 msgid "Minimum required TimescaleDB version is %1$s."
-msgstr ""
+msgstr "Wymagana minimalna wersja TimescaleDB to %1$s."
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -12380,7 +12390,7 @@ msgstr "Miesiąc"
 #: include/classes/helpers/CSlaHelper.php:70
 msgctxt "compact table header"
 msgid "Month"
-msgstr ""
+msgstr "Miesiąc"
 
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
@@ -12646,7 +12656,7 @@ msgstr "Nazwa"
 #: app/views/monitoring.widget.plaintext.view.php:49
 msgctxt "compact table header"
 msgid "Name"
-msgstr ""
+msgstr "Nazwa"
 
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
@@ -13447,7 +13457,7 @@ msgstr "Niedostępny"
 #: app/views/monitoring.widget.hostavail.view.php:38
 msgctxt "compact table header"
 msgid "Not available"
-msgstr ""
+msgstr "Niedostępny"
 
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
@@ -13890,7 +13900,7 @@ msgstr "Dane operacyjne"
 #: app/views/monitoring.widget.problems.view.php:78
 msgctxt "compact table header"
 msgid "Operational data"
-msgstr ""
+msgstr "Dane operacyjne"
 
 #: app/views/configuration.correlation.edit.php:145
 #: app/views/configuration.correlation.list.php:78
@@ -14391,6 +14401,10 @@ msgstr "Nadrzędne reguły wykrywania"
 msgid "Parent graphs"
 msgstr "Nadrzędne wykresy"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
 msgid "Parent items"
@@ -14706,7 +14720,7 @@ msgstr "Pozycja"
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
-msgstr ""
+msgstr "Pozycja jest ignorowana dla jednostek s, uptime i unixtime."
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -14718,7 +14732,7 @@ msgstr "Typ metody post"
 
 #: app/views/administration.housekeeping.edit.php:165
 msgid "PostgreSQL database server version is too old."
-msgstr ""
+msgstr "Wersja serwera bazy danych PostgreSQL jest za stara."
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -15117,7 +15131,7 @@ msgstr "Kwartał"
 #: include/classes/helpers/CSlaHelper.php:71
 msgctxt "compact table header"
 msgid "Quarter"
-msgstr ""
+msgstr "Kwartał"
 
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
@@ -15268,7 +15282,7 @@ msgstr "Odbiorca"
 #: app/views/monitoring.widget.actionlog.view.php:43
 msgctxt "compact table header"
 msgid "Recipient"
-msgstr ""
+msgstr "Odbiorca"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
@@ -15320,7 +15334,7 @@ msgstr "Czas przywrócenia"
 #: app/views/monitoring.widget.problems.view.php:59
 msgctxt "compact table header"
 msgid "Recovery time"
-msgstr ""
+msgstr "Czas przywrócenia"
 
 #: include/views/js/monitoring.sysmaps.js.php:371
 #: include/views/js/monitoring.sysmaps.js.php:531
@@ -16781,7 +16795,7 @@ msgstr "Usługa"
 #: app/views/monitoring.widget.slareport.view.php:37
 msgctxt "compact table header"
 msgid "Service"
-msgstr ""
+msgstr "Usługa"
 
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
@@ -16987,7 +17001,7 @@ msgstr "Poziom"
 #: app/views/monitoring.widget.problems.view.php:75
 msgctxt "compact table header"
 msgid "Severity"
-msgstr ""
+msgstr "Poziom"
 
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
@@ -17893,7 +17907,7 @@ msgstr "Tabela \"%1$s\" nie posiada pola o nazwie \"%2$s\"."
 #: app/views/popup.condition.common.php:323 include/hosts.inc.php:144
 #: include/views/inventory.host.list.php:92
 msgid "Tag"
-msgstr "Etykieta"
+msgstr "Znacznik"
 
 #: app/partials/monitoring.latest.filter.php:172
 #: app/partials/monitoring.problem.filter.php:233
@@ -17991,7 +18005,7 @@ msgstr "Znaczniki"
 #: app/views/monitoring.widget.problems.view.php:83
 msgctxt "compact table header"
 msgid "Tags"
-msgstr ""
+msgstr "Znaczniki"
 
 #: include/views/configuration.copy.elements.php:69
 #: include/views/configuration.trigger.prototype.edit.php:202
@@ -18541,7 +18555,7 @@ msgstr "Czas"
 #: app/views/monitoring.widget.problems.view.php:41
 msgctxt "compact table header"
 msgid "Time"
-msgstr ""
+msgstr "Czas"
 
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
@@ -18672,7 +18686,7 @@ msgstr "Ogółem"
 #: app/views/monitoring.widget.problemhosts.view.php:35
 msgctxt "compact table header"
 msgid "Total"
-msgstr ""
+msgstr "Ogółem"
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -19188,7 +19202,7 @@ msgstr "Typ"
 #: app/views/monitoring.widget.actionlog.view.php:40
 msgctxt "compact table header"
 msgid "Type"
-msgstr ""
+msgstr "Typ"
 
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
@@ -19338,11 +19352,11 @@ msgstr "Nie można nadpisać istniejącego pliku konfiguracji."
 
 #: app/views/administration.housekeeping.edit.php:160
 msgid "Unable to retrieve TimescaleDB compression support status."
-msgstr ""
+msgstr "Nie można ustalić stanu obsługi kompresji TimescaleDB."
 
 #: app/views/administration.housekeeping.edit.php:170
 msgid "Unable to retrieve TimescaleDB version."
-msgstr ""
+msgstr "Nie można ustalić wersji TimescaleDB."
 
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
@@ -19533,22 +19547,22 @@ msgstr "Włącz głos"
 #: app/partials/administration.system.info.php:160
 #, c-format
 msgid "Unsupported %1$s database server version. Must be at least %2$s."
-msgstr ""
+msgstr "Wersja serwera bazodanowego %1$s nie jest wspierana. Musi być przynajmniej %2$s."
 
 #: app/partials/administration.system.info.php:173
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
-msgstr ""
+msgstr "Wersja serwera bazodanowego %1$s nie jest wspierana. Nie może być większa niż %2$s."
 
 #: app/views/administration.housekeeping.edit.php:179
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
-msgstr ""
+msgstr "Nieobsługiwana wersja TimescaleDB. Powinna wynosić co najmniej %1$s."
 
 #: app/views/administration.housekeeping.edit.php:189
 #, c-format
 msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
-msgstr ""
+msgstr "Nieobsługiwana wersja TimescaleDB. Powinna wynosić co najwyżej %1$s."
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -19740,7 +19754,7 @@ msgstr "Czas pracy"
 #: app/views/monitoring.widget.slareport.view.php:99
 msgctxt "compact table header"
 msgid "Uptime"
-msgstr ""
+msgstr "Czas pracy"
 
 #: include/classes/data/CItemData.php:1686
 msgid "Uptime of Zabbix server process in seconds."
@@ -20930,7 +20944,7 @@ msgstr "Tydzień"
 #: include/classes/helpers/CSlaHelper.php:69
 msgctxt "compact table header"
 msgid "Week"
-msgstr ""
+msgstr "Tydzień"
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -21029,7 +21043,7 @@ msgstr "Z problemami"
 #: app/views/monitoring.widget.problemhosts.view.php:34
 msgctxt "compact table header"
 msgid "With problems"
-msgstr ""
+msgstr "Z problemami"
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
@@ -21050,7 +21064,7 @@ msgstr "Bez problemów"
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgctxt "compact table header"
 msgid "Without problems"
-msgstr ""
+msgstr "Bez problemów"
 
 #: include/forms.inc.php:343
 msgid "Without triggers"
@@ -21246,7 +21260,7 @@ msgstr "Rok"
 #: include/classes/helpers/CSlaHelper.php:72
 msgctxt "compact table header"
 msgid "Year"
-msgstr ""
+msgstr "Rok"
 
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93
@@ -23272,7 +23286,7 @@ msgstr "tabela \"%1$s\" nie została znaleziona"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #, c-format
 msgid "the tag \"%1$s\" is missing"
-msgstr "brak tag-a \"%1$s\""
+msgstr "brak taga \"%1$s\""
 
 #: app/views/popup.maintenance.period.php:126 include/maintenances.inc.php:107
 msgid "third"

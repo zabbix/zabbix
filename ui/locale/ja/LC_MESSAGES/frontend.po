@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-21 12:03+0000\n"
+"PO-Revision-Date: 2022-07-31 04:13+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -1075,6 +1075,11 @@ msgstr "アグリゲーション間隔"
 #: include/actions.inc.php:2106
 msgid "Alert message"
 msgstr "通知メッセージ"
+
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CRoleHelper.php:338
+msgid "Alerts"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -4891,6 +4896,11 @@ msgstr "破線"
 #: include/classes/widgets/CWidgetHelper.php:587
 msgid "Data"
 msgstr "取得データ"
+
+#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CRoleHelper.php:337
+msgid "Data collection"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
@@ -11350,7 +11360,7 @@ msgstr "M"
 #: include/func.inc.php:592 jsLoader.php:226
 msgctxt "month short"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
@@ -14156,6 +14166,10 @@ msgstr "親ディスカバリルール"
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "親グラフ"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55

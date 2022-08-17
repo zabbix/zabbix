@@ -18,13 +18,14 @@
 **/
 
 #include "software.h"
-
 #include "sysinfo.h"
+
 #include "zbxalgo.h"
 #include "zbxexec.h"
 #include "cfg.h"
 #include "zbxregexp.h"
 #include "log.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #       include <sys/utsname.h>
