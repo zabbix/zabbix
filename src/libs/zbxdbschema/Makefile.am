@@ -12,4 +12,3 @@ noinst_LIBRARIES = libzbxdbschema.a
 
 libzbxdbschema_a_SOURCES = \
 	dbschema.c
-
