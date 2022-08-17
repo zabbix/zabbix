@@ -624,7 +624,7 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
 	{
 		if (0 == strncmp(key, MVAR_HOST_HOST, ZBX_CONST_STRLEN(MVAR_HOST_HOST)))
 		{
-			int	offset = 0;
+			size_t	offset = 0;
 
 			if ('}' == key[ZBX_CONST_STRLEN(MVAR_HOST_HOST)])
 			{
@@ -659,7 +659,7 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
 	{
 		if (0 == strncmp(key, MVAR_ITEM_KEY, ZBX_CONST_STRLEN(MVAR_ITEM_KEY)))
 		{
-			int	offset = 0;
+			size_t	offset = 0;
 
 			if ('}' == key[ZBX_CONST_STRLEN(MVAR_ITEM_KEY)])
 			{
