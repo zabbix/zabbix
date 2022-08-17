@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-06-29T14:26:50Z'
+  date: '2022-08-17T11:03:51Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -20,8 +20,8 @@ zabbix_export:
           begemotSnmpdModulePath."pf"     = "/usr/lib/snmp_pf.so"
           3. Start bsnmpd daemon with the following command:
           /etc/rc.d/bsnmpd start
-          4. Setup firewall rule to get access from Zabbix proxy or Zabbix server by SNMP (https://docs.opnsense.org/manual/firewall.html).
-          5. Link template to the host.
+          4. Setup a firewall rule to get access from Zabbix proxy or Zabbix server by SNMP (https://docs.opnsense.org/manual/firewall.html).
+          5. Link the template to a host.
         
         
         MIBs used:
@@ -1617,23 +1617,23 @@ zabbix_export:
         -
           macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
-          description: 'This macro used in filters of network interfaces discovery rule.'
+          description: 'This macro is used in filters of network interfaces discovery rule.'
         -
           macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in filters of network interfaces discovery rule.'
+          description: 'This macro is used in filters of network interfaces discovery rule.'
         -
           macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '^em[0-9]+$'
-          description: 'This macro used in filters of network interfaces discovery rule.'
+          description: 'This macro is used in filters of network interfaces discovery rule.'
         -
           macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: ^$
-          description: 'This macro used in filters of network interfaces discovery rule.'
+          description: 'This macro is used in filters of network interfaces discovery rule.'
         -
           macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
-          description: 'This macro used in filters of network interfaces discovery rule.'
+          description: 'This macro is used in filters of network interfaces discovery rule.'
         -
           macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
@@ -1641,11 +1641,11 @@ zabbix_export:
         -
           macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
-          description: 'This macro used in filters of network interfaces discovery rule.'
+          description: 'This macro is used in filters of network interfaces discovery rule.'
         -
           macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in filters of network interfaces discovery rule.'
+          description: 'This macro is used in filters of network interfaces discovery rule.'
         -
           macro: '{$SNMP.TIMEOUT}'
           value: 5m
