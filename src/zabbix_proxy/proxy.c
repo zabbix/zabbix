@@ -1127,6 +1127,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	int				i, db_type, ret;
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
+	zbx_stat_t			db_stat;
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_poller_args		poller_args = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
@@ -1300,7 +1301,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
+dbinit:
 	if (SUCCEED != DBinit(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
@@ -1327,7 +1328,18 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_check_db();
 
 	if (SUCCEED != DBcheck_version())
-		exit(EXIT_FAILURE);
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", CONFIG_DBNAME);
+		zbx_db_deinit();
+
+		if (0 != zbx_stat(CONFIG_DBNAME, &db_stat) || 0 == S_ISREG(db_stat.st_mode) ||
+				0 != unlink(CONFIG_DBNAME))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file: \"%s\", exiting...");
+			exit(EXIT_FAILURE);
+		}
+		goto dbinit;
+	}
 
 	change_proxy_history_count(proxy_get_history_count());
 
