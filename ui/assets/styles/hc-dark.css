@@ -5812,10 +5812,16 @@ svg {
 .visibility-hidden {
   visibility: hidden; }
 
-.checkbox-list li {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 24px; }
+.checkbox-list {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), 1fr); }
+  .checkbox-list.vertical {
+    grid-template-rows: repeat(var(--rows), 1fr);
+    grid-auto-flow: column; }
+  .checkbox-list li {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 24px; }
 
 .columns-wrapper {
   display: flex;
