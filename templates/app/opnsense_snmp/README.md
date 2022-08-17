@@ -22,8 +22,8 @@ begemotSnmpdModulePath."hostres" = "/usr/lib/snmp_hostres.so"
 begemotSnmpdModulePath."pf"     = "/usr/lib/snmp_pf.so"
 3. Start bsnmpd daemon with the following command:  
 /etc/rc.d/bsnmpd start
-4. Setup firewall rule to get access from Zabbix proxy or Zabbix server by SNMP (https://docs.opnsense.org/manual/firewall.html).
-5. Link template to the host.
+4. Setup a firewall rule to get access from Zabbix proxy or Zabbix server by SNMP (https://docs.opnsense.org/manual/firewall.html).
+5. Link the template to a host.
 
 
 ## Zabbix configuration
@@ -41,14 +41,14 @@ No specific Zabbix configuration is required.
 |{$NET.IF.IFADMINSTATUS.NOT_MATCHES} |<p>Ignore down(2) administrative status.</p> |`^2$` |
 |{$NET.IF.IFALIAS.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`.*` |
 |{$NET.IF.IFALIAS.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$NET.IF.IFDESCR.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`.*` |
-|{$NET.IF.IFDESCR.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$NET.IF.IFNAME.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^em[0-9]+$` |
-|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^$` |
-|{$NET.IF.IFOPERSTATUS.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^.*$` |
+|{$NET.IF.IFDESCR.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`.*` |
+|{$NET.IF.IFDESCR.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$NET.IF.IFNAME.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`^em[0-9]+$` |
+|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`^$` |
+|{$NET.IF.IFOPERSTATUS.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`^.*$` |
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES} |<p>Ignore notPresent(6).</p> |`^6$` |
-|{$NET.IF.IFTYPE.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`.*` |
-|{$NET.IF.IFTYPE.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$NET.IF.IFTYPE.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`.*` |
+|{$NET.IF.IFTYPE.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$SNMP.TIMEOUT} |<p>The time interval for SNMP availability trigger.</p> |`5m` |
 |{$SOURCE.TRACKING.TABLE.UTIL.MAX} |<p>Threshold of source tracking table utilization trigger in %.</p> |`90` |
 |{$STATE.TABLE.UTIL.MAX} |<p>Threshold of state table utilization trigger in %.</p> |`90` |
