@@ -1308,7 +1308,7 @@ class CItem extends CItemGeneral {
 		self::addDependentItems($db_items, $del_ruleids, $db_item_prototypes);
 
 		if ($del_ruleids) {
-			CDiscoveryRuleManager::delete(array_keys($del_ruleids));
+			CDiscoveryRuleManager::delete($del_ruleids);
 		}
 
 		if ($db_item_prototypes) {
@@ -1325,6 +1325,8 @@ class CItem extends CItemGeneral {
 
 		self::clearHistoryAndTrends($del_itemids);
 
+		DB::delete('graphs_items', ['itemid' => $del_itemids]);
+		DB::delete('widget_field', ['value_itemid' => $del_itemids]);
 		DB::delete('item_discovery', ['itemid' => $del_itemids]);
 		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);

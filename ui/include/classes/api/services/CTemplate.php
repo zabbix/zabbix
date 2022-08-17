@@ -538,13 +538,15 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// delete the items
-		$db_items = DBfetchArrayAssoc(DBselect(
-			'SELECT i.itemid,i.name'.
-			' FROM items i'.
-			' WHERE '.dbConditionId('i.hostid', $templateids).
-			' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL]).
-			' AND '.dbConditionInt('i.type', CItem::SUPPORTED_ITEM_TYPES)
-		), 'itemid');
+		$db_items = DB::select('items', [
+			'output' => ['itemid', 'name'],
+			'filter' => [
+				'hostid' => $templateids,
+				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+				'type' => CItem::SUPPORTED_ITEM_TYPES
+			],
+			'preservekeys' => true
+		]);
 
 		if ($db_items) {
 			CItem::deleteForce($db_items);
