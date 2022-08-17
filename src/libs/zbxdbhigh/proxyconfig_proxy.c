@@ -1666,6 +1666,46 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: delete corresponding records when all macros are removed/templates*
+ *          unlinked from a host                                              *
+ *                                                                            *
+ * Parameters: hostids - [IN] identifiers of the cleared hosts                *
+ *             error   - [OUT] the error message                              *
+ *                                                                            *
+ * Return value: SUCCEED - the hosts were cleared successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxyconfig_delete_hostmacros(const zbx_vector_uint64_t *hostids, char **error)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hostmacro where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts_templates where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	ret = SUCCEED;
+
+out:
+	zbx_free(sql);
+
+	if (FAIL == ret)
+		*error = zbx_strdup(NULL, "cannot delete host macros");
+
+	return ret;
+}
+
 #define proxyconfig_ZBX_TABLE_NUM	24
 
 /******************************************************************************
@@ -1680,7 +1720,7 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 	char			tmp[ZBX_MAX_UINT64_LEN + 1];
 	struct zbx_json_parse	jp_data, jp_del_hostids;
 	zbx_uint64_t		config_revision;
-	zbx_vector_uint64_t	del_hostids;
+	zbx_vector_uint64_t	del_hostids, del_macro_hostids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1710,6 +1750,7 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 	zbx_vector_table_data_ptr_create(&config_tables);
 	zbx_vector_table_data_ptr_reserve(&config_tables, proxyconfig_ZBX_TABLE_NUM);
 	zbx_vector_uint64_create(&del_hostids);
+	zbx_vector_uint64_create(&del_macro_hostids);
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
@@ -1733,6 +1774,18 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 		}
 	}
 
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS, &jp_del_hostids))
+	{
+		const char	*p;
+		zbx_uint64_t	hostid;
+
+		for (p = 0; NULL != (p = zbx_json_next_value(&jp_del_hostids, p, tmp, sizeof(tmp), NULL));)
+		{
+			if (SUCCEED == is_uint64(tmp, &hostid))
+				zbx_vector_uint64_append(&del_macro_hostids, hostid);
+		}
+	}
+
 	DBbegin();
 
 	if (0 != config_tables.values_num)
@@ -1740,6 +1793,9 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 
 	if (SUCCEED == ret && 0 != del_hostids.values_num)
 		proxyconfig_delete_hosts(&del_hostids, error);
+
+	if (SUCCEED == ret && 0 != del_macro_hostids.values_num)
+		proxyconfig_delete_hostmacros(&del_macro_hostids, error);
 
 	if (SUCCEED == ret)
 	{
@@ -1749,6 +1805,7 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 	else
 		DBrollback();
 
+	zbx_vector_uint64_destroy(&del_macro_hostids);
 	zbx_vector_uint64_destroy(&del_hostids);
 	zbx_vector_table_data_ptr_clear_ext(&config_tables, table_data_free);
 	zbx_vector_table_data_ptr_destroy(&config_tables);

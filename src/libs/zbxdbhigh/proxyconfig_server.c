@@ -419,25 +419,28 @@ out:
  * Purpose: get macro data (globalmacro, hostmacro, hosts_templates) from     *
  *          database                                                          *
  *                                                                            *
- * Parameters: hostids    - [IN] the target host identifiers                  *
- *             revision   - [IN] the current proxy config revision            *
- *             keys_paths - [OUT] the vault macro path/key                    *
- *             j          - [OUT] the output json                             *
- *             error      - [OUT] the error message                           *
+ * Parameters: hostids           - [IN] the target host identifiers           *
+ *             revision          - [IN] the current proxy config revision     *
+ *             keys_paths        - [OUT] the vault macro path/key             *
+ *             j                 - [OUT] the output json                      *
+ *             del_macro_hostids - [OUT] the identifiers of cleared host      *
+ *                                       objects (without macros or linked    *
+ *                                       templates)                           *
+ *             error             - [OUT] the error message                    *
  *                                                                            *
  * Return value: SUCCEED - the data was read successfully                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	proxyconfig_get_macro_data(const zbx_vector_uint64_t *hostids, zbx_uint64_t revision,
-		zbx_vector_ptr_t *keys_paths, struct zbx_json *j, char **error)
+		zbx_vector_ptr_t *keys_paths, struct zbx_json *j, zbx_vector_uint64_t *del_macro_hostids, char **error)
 {
 	zbx_vector_uint64_t	macro_hostids;
 	int			global_macros, ret = FAIL;
 
 	zbx_vector_uint64_create(&macro_hostids);
 
-	zbx_dc_get_macro_updates(hostids, revision, &macro_hostids, &global_macros);
+	zbx_dc_get_macro_updates(hostids, revision, &macro_hostids, &global_macros, del_macro_hostids);
 
 	if (0 == revision || SUCCEED == global_macros)
 	{
@@ -732,7 +735,7 @@ out:
 int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j, char **error)
 {
 	int			i, ret = FAIL;
-	zbx_vector_uint64_t	hostids, httptestids, updated_hostids, removed_hostids;
+	zbx_vector_uint64_t	hostids, httptestids, updated_hostids, removed_hostids, del_macro_hostids;
 	zbx_hashset_t		itemids;
 	zbx_vector_ptr_t	keys_paths;
 	char			token[ZBX_SESSION_TOKEN_LEN + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
@@ -782,6 +785,7 @@ int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_reques
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&updated_hostids);
 	zbx_vector_uint64_create(&removed_hostids);
+	zbx_vector_uint64_create(&del_macro_hostids);
 	zbx_vector_uint64_create(&httptestids);
 	zbx_vector_ptr_create(&keys_paths);
 
@@ -798,8 +802,11 @@ int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_reques
 			goto clean;
 	}
 
-	if (SUCCEED != proxyconfig_get_macro_data(&hostids, proxy_config_revision, &keys_paths, j, error))
+	if (SUCCEED != proxyconfig_get_macro_data(&hostids, proxy_config_revision, &keys_paths, j, &del_macro_hostids,
+			error))
+	{
 		goto clean;
+	}
 
 	if (proxy_config_revision < proxy->revision)
 	{
@@ -840,6 +847,16 @@ int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_reques
 		zbx_json_close(j);
 	}
 
+	if (0 != del_macro_hostids.values_num)
+	{
+		zbx_json_addarray(j, ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS);
+
+		for (i = 0; i < del_macro_hostids.values_num; i++)
+			zbx_json_adduint64(j, NULL, del_macro_hostids.values[i]);
+
+		zbx_json_close(j);
+	}
+
 	if (0 != keys_paths.values_num)
 		get_macro_secrets(&keys_paths, j);
 
@@ -853,6 +870,7 @@ clean:
 	zbx_vector_ptr_clear_ext(&keys_paths, key_path_free);
 	zbx_vector_ptr_destroy(&keys_paths);
 	zbx_vector_uint64_destroy(&httptestids);
+	zbx_vector_uint64_destroy(&del_macro_hostids);
 	zbx_vector_uint64_destroy(&removed_hostids);
 	zbx_vector_uint64_destroy(&updated_hostids);
 	zbx_vector_uint64_destroy(&hostids);

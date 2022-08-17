@@ -6642,6 +6642,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
 	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts);
+	zbx_dbsync_clear_user_macros();
 	hsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -15482,11 +15483,11 @@ void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t rev
 }
 
 void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, zbx_uint64_t revision,
-		zbx_vector_uint64_t *macro_hostids, int *global)
+		zbx_vector_uint64_t *macro_hostids, int *global, zbx_vector_uint64_t *del_macro_hostids)
 {
 	RDLOCK_CACHE;
 
-	um_cache_get_macro_updates(config->um_cache, hostids, revision, macro_hostids, global);
+	um_cache_get_macro_updates(config->um_cache, hostids, revision, macro_hostids, global, del_macro_hostids);
 
 	UNLOCK_CACHE;
 }

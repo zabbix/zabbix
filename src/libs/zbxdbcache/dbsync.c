@@ -3982,3 +3982,13 @@ out:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove deleted hosts/templates from user macro cache              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbsync_clear_user_macros(void)
+{
+	um_cache_remove_hosts(config->um_cache, &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)].deletes);
+}

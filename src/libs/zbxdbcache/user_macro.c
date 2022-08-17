@@ -771,18 +771,10 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 	{
 		if (0 == hosts.values[i]->macros.values_num)
 		{
-			if (0 == hosts.values[i]->templateids.values_num)
-			{
-				zbx_hashset_remove(&cache->hosts, &hosts.values[i]);
-				um_host_release(hosts.values[i]);
-			}
-			else
-			{
-				/* recreate empty-macros vector to release memory */
-				zbx_vector_um_macro_destroy(&hosts.values[i]->macros);
-				zbx_vector_um_macro_create_ext(&hosts.values[i]->macros, __config_shmem_malloc_func,
-						__config_shmem_realloc_func, __config_shmem_free_func);
-			}
+			/* recreate empty-macros vector to release memory */
+			zbx_vector_um_macro_destroy(&hosts.values[i]->macros);
+			zbx_vector_um_macro_create_ext(&hosts.values[i]->macros, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
 		else
 			zbx_vector_um_macro_sort(&hosts.values[i]->macros, um_macro_compare_by_name_context);
@@ -838,18 +830,9 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
 				zbx_vector_uint64_remove_noorder(&host->templateids, i);
 				if (0 == host->templateids.values_num)
 				{
-					if (0 == host->macros.values_num)
-					{
-						zbx_hashset_remove(&cache->hosts, &host);
-						um_host_release(host);
-					}
-					else
-					{
-						zbx_vector_uint64_destroy(&host->templateids);
-						zbx_vector_uint64_create_ext(&host->templateids,
-								__config_shmem_malloc_func, __config_shmem_realloc_func,
-								__config_shmem_free_func);
-					}
+					zbx_vector_uint64_destroy(&host->templateids);
+					zbx_vector_uint64_create_ext(&host->templateids, __config_shmem_malloc_func,
+							__config_shmem_realloc_func, __config_shmem_free_func);
 				}
 				break;
 			}
@@ -1289,7 +1272,7 @@ int	um_cache_get_host_revision(const zbx_um_cache_t *cache, zbx_uint64_t hostid,
 }
 
 static void	um_cache_get_hostids(const zbx_um_cache_t *cache, const zbx_uint64_t *phostid, zbx_uint64_t revision,
-		zbx_vector_uint64_t *macro_hostids)
+		zbx_vector_um_host_t *hosts)
 {
 	zbx_um_host_t	**phost;
 	int		i;
@@ -1302,10 +1285,10 @@ static void	um_cache_get_hostids(const zbx_um_cache_t *cache, const zbx_uint64_t
 		revision = 0;
 
 	if ((*phost)->macro_revision > revision)
-		zbx_vector_uint64_append(macro_hostids, (*phost)->hostid);
+		zbx_vector_um_host_append(hosts, *phost);
 
 	for (i = 0; i < (*phost)->templateids.values_num; i++)
-		um_cache_get_hostids(cache, &(*phost)->templateids.values[i], revision, macro_hostids);
+		um_cache_get_hostids(cache, &(*phost)->templateids.values[i], revision, hosts);
 }
 
 /*********************************************************************************
@@ -1313,20 +1296,26 @@ static void	um_cache_get_hostids(const zbx_um_cache_t *cache, const zbx_uint64_t
  * Purpose: get identifiers of user macro host objects that were updated since   *
  *          the specified revision                                               *
  *                                                                               *
- * Parameters: cache         - [IN] the user macro cache                         *
- *             hostids       - [IN] identifiers of the hosts to check            *
- *             revision      - [IN] the revision                                 *
- *             macro_hostids - [OUT] the identifiers of updated host objects     *
- *             global        - [OUT] SUCCEED - if global macros were updated,    *
+ * Parameters: cache             - [IN] the user macro cache                     *
+ *             hostids           - [IN] identifiers of the hosts to check        *
+ *             revision          - [IN] the revision                             *
+ *             macro_hostids     - [OUT] the identifiers of updated host objects *
+ *             global            - [OUT] SUCCEED - if global macros were updated,*
  *                                   FAIL otherwise                              *
+ *             del_macro_hostids - [OUT] the identifiers of cleared host objects *
+ *                                  (without macros or linked templates)         *
  *                                                                               *
  *********************************************************************************/
 void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_vector_uint64_t *hostids,
-		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global)
+		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global,
+		zbx_vector_uint64_t *del_macro_hostids)
 {
-	int		i;
-	zbx_um_host_t	**phost;
-	zbx_uint64_t	hostid = 0, *phostid = &hostid;
+	int			i;
+	zbx_um_host_t		**phost;
+	zbx_uint64_t		hostid = 0, *phostid = &hostid;
+	zbx_vector_um_host_t	hosts;
+
+	zbx_vector_um_host_create(&hosts);
 
 	/* check revision of global macro 'host' (hostid 0) */
 	if (NULL != (phost = (zbx_um_host_t **)zbx_hashset_search(&cache->hosts, &phostid)) &&
@@ -1338,13 +1327,30 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_vector_ui
 		*global = FAIL;
 
 	for (i = 0; i < hostids->values_num; i++)
-		um_cache_get_hostids(cache, &hostids->values[i], revision, macro_hostids);
+		um_cache_get_hostids(cache, &hostids->values[i], revision, &hosts);
 
-	if (0 != macro_hostids->values_num)
+	for (i = 0; i < hosts.values_num; i++)
 	{
-		zbx_vector_uint64_sort(macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		if (0 != hosts.values[i]->macros.values_num || 0 != hosts.values[i]->templateids.values_num)
+			zbx_vector_uint64_append(macro_hostids, hosts.values[i]->hostid);
+		else
+			zbx_vector_uint64_append(del_macro_hostids, hosts.values[i]->hostid);
+
+		if (0 != macro_hostids->values_num)
+		{
+			zbx_vector_uint64_sort(macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		}
+
+		/* skip when full sync */
+		if (0 == revision && 0 != del_macro_hostids->values_num)
+		{
+			zbx_vector_uint64_sort(del_macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(del_macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		}
 	}
+
+	zbx_vector_um_host_destroy(&hosts);
 }
 
 /*********************************************************************************
@@ -1418,4 +1424,29 @@ void	um_cache_get_unused_templates(zbx_um_cache_t *cache, const zbx_vector_uint6
 		zbx_vector_uint64_append(templateids, *phostid);
 
 	zbx_hashset_destroy(&unused_hosts);
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: remove deleted hosts/templates from user macro cache                 *
+ *                                                                               *
+ * Parameters: cache   - [IN] the user macro cache                               *
+ *             hostids - [IN] the deleted host/template identifiers              *
+ *                                                                               *
+ *********************************************************************************/
+void	um_cache_remove_hosts(zbx_um_cache_t *cache, const zbx_vector_uint64_t *hostids)
+{
+	zbx_um_host_t	**phost;
+	int		i;
+
+	for (i = 0; i < hostids->values_num; i++)
+	{
+		zbx_uint64_t	*phostid = &hostids->values[i];
+
+		if (NULL != (phost = (zbx_um_host_t **)zbx_hashset_search(&cache->hosts, &phostid)))
+		{
+			zbx_hashset_remove_direct(&cache->hosts, phost);
+			um_host_release(*phost);
+		}
+	}
 }
