@@ -165,7 +165,7 @@ int	zbx_is_supported_ip(const char *ip)
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	is_ip(const char *ip)
+int	zbx_is_ip(const char *ip)
 {
 	return SUCCEED == zbx_is_ip4(ip) ? SUCCEED : zbx_is_ip6(ip);
 }

@@ -431,7 +431,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type)
+char	*zbx_get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type)
 {
 	char	*buf = NULL;
 	size_t	sz;
@@ -658,7 +658,7 @@ clean:
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_key_param((char *param, int num, char *buf, size_t max_len)
+int	zbx_get_key_param(char *param, int num, char *buf, size_t max_len)
 {
 	int	ret;
 	char	*pl, *pr;
@@ -689,7 +689,7 @@ int	zbx_get_key_param((char *param, int num, char *buf, size_t max_len)
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_num_key_param((char *param)
+int	zbx_num_key_param(char *param)
 {
 	int	ret;
 	char	*pl, *pr;

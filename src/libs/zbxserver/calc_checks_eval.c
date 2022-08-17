@@ -1469,7 +1469,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
 			continue;
 
-		if (0 != zbx_get_key_param((dcitem->key_orig, pos, bucket, sizeof(bucket)))
+		if (0 != zbx_get_key_param(dcitem->key_orig, pos, bucket, sizeof(bucket)))
 			continue;
 
 		zbx_strupper(bucket);
