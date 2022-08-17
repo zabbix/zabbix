@@ -33,6 +33,8 @@ window.widget_item_form = new class {
 		this.advance_configuration = document.getElementById('adv_conf');
 		this.units_show = document.getElementById('units_show');
 
+		document.getElementById('item-value-thresholds-warning').style.display = 'none';
+
 		jQuery('#itemid').on('change', this.updateWarningIcon);
 
 		for (const colorpicker of this.form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
@@ -141,11 +143,7 @@ window.widget_item_form = new class {
 			curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 			curl.setArgument('itemid', ms_item_data[0].id);
 
-			fetch(curl.getUrl(), {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({itemid: ms_item_data[0].id})
-			})
+			fetch(curl.getUrl())
 				.then((response) => response.json())
 				.then((response) => {
 					switch (response.result) {
