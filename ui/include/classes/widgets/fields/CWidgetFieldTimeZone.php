@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,53 +21,32 @@
 
 class CWidgetFieldTimeZone extends CWidgetField {
 
-	private $values;
+	private array $values;
 
-	/**
-	 * CSelect widget field.
-	 *
-	 * @param string $name    Field name in form
-	 * @param string $label   Label for the field in form
-	 * @param array  $values  Key/value pairs of select option values. Key - saved in DB. Value - visible to user.
-	 */
-	public function __construct($name, $label, $values = null) {
+	public function __construct(string $name, string $label = null, array $values = null) {
 		parent::__construct($name, $label);
-
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 
 		if ($values === null) {
 			$this->values = $this->generateValues();
 		}
 
-		$this->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
+		$this
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
+			->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
 	}
 
-	public function setValue($value) {
-		return parent::setValue($value);
-	}
-
-	public function getValues() {
+	public function getValues(): array {
 		return $this->values;
 	}
 
-	private function generateValues() {
-		return [
-			ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(),
-				_('System default')
-			),
-			TIMEZONE_DEFAULT_LOCAL => _('Local default')
-		] + CTimezoneHelper::getList();
-	}
-
-	public function getJavascript() {
+	public function getJavaScript(): string {
 		return '
-			var timezone_select =  document.getElementById("'.$this->getName().'");
-			var local_time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-			var timezone_from_list = timezone_select.getOptionByValue(local_time_zone);
+			var timezone_select = document.getElementById("'.$this->getName().'");
+			var timezone_from_list = timezone_select.getOptionByValue(Intl.DateTimeFormat().resolvedOptions().timeZone);
 			var local_list_item = timezone_select.getOptionByValue("'.TIMEZONE_DEFAULT_LOCAL.'");
 
 			if (timezone_from_list && local_list_item) {
-				const title = local_list_item.label + ": " + timezone_from_list.label;
+				const title = `${local_list_item.label}: ${timezone_from_list.label}`;
 				local_list_item.label = title;
 				local_list_item._node.innerText = title;
 
@@ -76,5 +55,14 @@ class CWidgetFieldTimeZone extends CWidgetField {
 				}
 			}
 		';
+	}
+
+	private function generateValues(): array {
+		return [
+			ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(),
+				_('System default')
+			),
+			TIMEZONE_DEFAULT_LOCAL => _('Local default')
+		] + CTimezoneHelper::getList();
 	}
 }

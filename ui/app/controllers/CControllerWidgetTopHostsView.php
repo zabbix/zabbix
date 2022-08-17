@@ -27,7 +27,7 @@ class CControllerWidgetTopHostsView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_TOP_HOSTS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 
@@ -39,7 +39,7 @@ class CControllerWidgetTopHostsView extends CControllerDashboardWidgetView {
 			]
 		];
 
-		$data += self::getData($this->getForm()->getFieldsData());
+		$data += self::getData($this->getForm()->getFieldsValues());
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
@@ -95,7 +95,7 @@ class CControllerWidgetTopHostsView extends CControllerDashboardWidgetView {
 			}
 		);
 
-		if ($fields['order'] == CWidgetFormTopHosts::ORDER_TOPN) {
+		if ($fields['order'] == CWidgetFormTopHosts::ORDER_TOP_N) {
 			if ($master_items_only_numeric_present) {
 				arsort($master_item_values, SORT_NUMERIC);
 
@@ -174,7 +174,7 @@ class CControllerWidgetTopHostsView extends CControllerDashboardWidgetView {
 			}
 			else {
 				$numeric_only = self::isNumericOnlyColumn($column);
-				$column_items = !$calc_extremes || $column['min'] !== '' && $column['max'] !== ''
+				$column_items = !$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')
 					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
 					: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
 

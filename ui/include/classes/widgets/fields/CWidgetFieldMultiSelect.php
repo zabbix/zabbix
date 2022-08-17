@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,106 +19,68 @@
 **/
 
 
-class CWidgetFieldMs extends CWidgetField {
+abstract class CWidgetFieldMultiSelect extends CWidgetField {
 
-	/**
-	 * Is selecting multiple objects or a single one?
-	 *
-	 * @var bool
-	 */
-	protected $multiple = true;
+	// Is selecting multiple objects or a single one?
+	private bool $is_multiple = true;
 
-	/**
-	 * Additional filter parameters used for data selection.
-	 *
-	 * @var array
-	 */
-	protected $filter_parameters = [];
+	// Additional filter parameters used for data selection.
+	protected array $filter_parameters = [];
 
-	/**
-	 * Multiselect widget field.
-	 * Will create text box field with select button, that will allow to select specified resource.
-	 *
-	 * @param string $name  Field name in form.
-	 * @param string $label Label for the field in form.
-	 */
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this->setDefault([]);
 	}
 
-	/**
-	 * Set additional validation flags.
-	 *
-	 * @param int $flags
-	 *
-	 * @return CWidgetFieldMs
-	 */
-	public function setFlags($flags) {
+	public function setValue($value): self {
+		$this->value = (array) $value;
+
+		return $this;
+	}
+
+	public function setFlags(int $flags): self {
 		parent::setFlags($flags);
 
-		if ($flags & self::FLAG_NOT_EMPTY) {
+		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
 			$strict_validation_rules = $this->getValidationRules();
 			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
 			$this->setStrictValidationRules($strict_validation_rules);
 		}
 		else {
-			$this->setStrictValidationRules(null);
+			$this->setStrictValidationRules();
 		}
-
-		return $this;
-	}
-
-	/**
-	 * @return CWidgetFieldMs
-	 */
-	public function setValue($value) {
-		$this->value = (array) $value;
 
 		return $this;
 	}
 
 	/**
 	 * Is selecting multiple values or a single value?
-	 *
-	 * @return bool
 	 */
-	public function isMultiple() {
-		return $this->multiple;
+	public function isMultiple(): bool {
+		return $this->is_multiple;
 	}
 
 	/**
 	 * Set field to multiple objects mode.
-	 *
-	 * @param bool $multiple
-	 *
-	 * @return CWidgetFieldMs
 	 */
-	public function setMultiple($multiple) {
-		$this->multiple = $multiple;
+	public function setMultiple(bool $is_multiple = true): self {
+		$this->is_multiple = $is_multiple;
 
 		return $this;
 	}
 
 	/**
 	 * Get additional filter parameters.
-	 *
-	 * @return array
 	 */
-	public function getFilterParameters() {
+	public function getFilterParameters(): array {
 		return $this->filter_parameters;
 	}
 
 	/**
 	 * Set an additional filter parameter for data selection.
-	 *
-	 * @param string $name
-	 * @param mixed $value
-	 *
-	 * @return CWidgetFieldMs
 	 */
-	public function setFilterParameter($name, $value) {
+	public function setFilterParameter(string $name, $value): self {
 		$this->filter_parameters[$name] = $value;
 
 		return $this;

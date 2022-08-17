@@ -848,7 +848,7 @@ define('SCREEN_SORT_TRIGGERS_NAME_DESC',			16);
 
 define('SCREEN_MODE_PREVIEW',	0);
 define('SCREEN_MODE_EDIT',		1);
-define('SCREEN_MODE_SLIDESHOW',		2);
+define('SCREEN_MODE_SLIDESHOW',	2);
 define('SCREEN_MODE_JS',		3);
 
 define('SCREEN_REFRESH_RESPONSIVENESS',	10);
@@ -1165,7 +1165,8 @@ define('SVG_GRAPH_PERCENTILE_LEFT_ON',		1);
 define('SVG_GRAPH_PERCENTILE_RIGHT_OFF',	0);
 define('SVG_GRAPH_PERCENTILE_RIGHT_ON',		1);
 
-define('SVG_GRAPH_CUSTOM_TIME', 1);
+define('SVG_GRAPH_CUSTOM_TIME_OFF',	0);
+define('SVG_GRAPH_CUSTOM_TIME_ON',	1);
 
 define('SVG_GRAPH_LEGEND_OFF',	0);
 define('SVG_GRAPH_LEGEND_ON',	1);
@@ -1179,11 +1180,13 @@ define('SVG_GRAPH_LEGEND_LINES_MAX',	10);
 define('SVG_GRAPH_LEGEND_COLUMNS_MIN',	1);
 define('SVG_GRAPH_LEGEND_COLUMNS_MAX',	4);
 
-define('SVG_GRAPH_PROBLEMS_SHOW', 1);
+define('SVG_GRAPH_PROBLEMS_OFF',	0);
+define('SVG_GRAPH_PROBLEMS_ON',		1);
 
 define('SVG_GRAPH_SELECTED_ITEM_PROBLEMS', 1);
 
-define('SVG_GRAPH_AXIS_SHOW', 1);
+define('SVG_GRAPH_AXIS_OFF',	0);
+define('SVG_GRAPH_AXIS_ON',		1);
 
 define('SVG_GRAPH_AXIS_UNITS_AUTO',		0);
 define('SVG_GRAPH_AXIS_UNITS_STATIC',	1);
@@ -1279,6 +1282,9 @@ define('ZBX_FUNCTION_TYPE_MATH',		4);
 define('ZBX_FUNCTION_TYPE_OPERATOR',	5);
 define('ZBX_FUNCTION_TYPE_PREDICTION',	6);
 define('ZBX_FUNCTION_TYPE_STRING',		7);
+
+define('ZBX_TIMELINE_OFF',	0);
+define('ZBX_TIMELINE_ON',	1);
 
 /**
  * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead

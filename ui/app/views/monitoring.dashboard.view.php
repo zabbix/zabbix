@@ -260,6 +260,7 @@ $html_page
 	view.init('.json_encode([
 		'dashboard' => $data['dashboard'],
 		'widget_defaults' => $data['widget_defaults'],
+		'widget_last_type' => $data['widget_last_type'],
 		'has_time_selector' => $data['has_time_selector'],
 		'time_period' => $data['time_period'],
 		'dynamic' => $data['dynamic'],

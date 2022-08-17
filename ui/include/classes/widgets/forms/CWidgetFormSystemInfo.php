@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -24,20 +24,18 @@
  */
 class CWidgetFormSystemInfo extends CWidgetForm {
 
-	public function __construct($data, $templateid) {
-		parent::__construct($data, $templateid, WIDGET_SYSTEM_INFO);
+	public function __construct(array $values, ?string $templateid) {
+		parent::__construct(WIDGET_SYSTEM_INFO, $values, $templateid);
+	}
 
-		$field_info_type = (new CWidgetFieldRadioButtonList('info_type', _('Show'), [
-			ZBX_SYSTEM_INFO_SERVER_STATS => _('System stats'),
-			ZBX_SYSTEM_INFO_HAC_STATUS => _('High availability nodes')
-		]))
-			->setDefault(ZBX_SYSTEM_INFO_SERVER_STATS)
-			->setModern(true);
+	protected function addFields(): self {
+		parent::addFields();
 
-		if (array_key_exists('info_type', $this->data)) {
-			$field_info_type->setValue($this->data['info_type']);
-		}
-
-		$this->fields[$field_info_type->getName()] = $field_info_type;
+		return $this->addField(
+			(new CWidgetFieldRadioButtonList('info_type', _('Show'), [
+				ZBX_SYSTEM_INFO_SERVER_STATS => _('System stats'),
+				ZBX_SYSTEM_INFO_HAC_STATUS => _('High availability nodes')
+			]))->setDefault(ZBX_SYSTEM_INFO_SERVER_STATS)
+		);
 	}
 }

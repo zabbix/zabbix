@@ -178,12 +178,12 @@ if (array_key_exists('render_html', $data)) {
 	return;
 }
 
-(new CScriptTemplate('filter-monitoring-hosts'))
+(new CTemplateTag('filter-monitoring-hosts'))
 	->setAttribute('data-template', 'monitoring.host.filter')
 	->addItem($template)
 	->show();
 
-(new CScriptTemplate('filter-tag-row-tmpl'))
+(new CTemplateTag('filter-tag-row-tmpl'))
 	->addItem(
 		(new CRow([
 			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}'))

@@ -986,11 +986,11 @@ class CItem extends CItemGeneral {
 				$conflictedLink = reset($conflictedLink);
 
 				// which of updated items populates this link?
-				$beingSavedItemName = '';
+				$being_saved_item_name = '';
 				foreach ($items as $item) {
 					if ($item['inventory_link'] == $conflictedLink) {
 						if (isset($item['name'])) {
-							$beingSavedItemName = $item['name'];
+							$being_saved_item_name = $item['name'];
 						}
 						else {
 							$thisItem = API::Item()->get([
@@ -998,14 +998,14 @@ class CItem extends CItemGeneral {
 								'filter' => ['itemid' => $item['itemid']],
 								'nopermissions' => true
 							]);
-							$beingSavedItemName = $thisItem[0]['name'];
+							$being_saved_item_name = $thisItem[0]['name'];
 						}
 						break;
 					}
 				}
 
 				// name of the original item that already populates the field
-				$originalItem = API::Item()->get([
+				$original_item = API::Item()->get([
 					'output' => ['name'],
 					'filter' => [
 						'hostid' => $hostId,
@@ -1013,13 +1013,13 @@ class CItem extends CItemGeneral {
 					],
 					'nopermissions' => true
 				]);
-				$originalItemName = $originalItem[0]['name'];
+				$originalItemName = $original_item[0]['name'];
 
 				self::exception(
 					ZBX_API_ERROR_PARAMETERS,
 					_s(
 						'Two items ("%1$s" and "%2$s") cannot populate one host inventory field "%3$s", this would lead to a conflict.',
-						$beingSavedItemName,
+						$being_saved_item_name,
 						$originalItemName,
 						$possibleHostInventories[$conflictedLink]['title']
 					)

@@ -25,12 +25,11 @@ class CControllerDashboardWidgetEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
+			'type' =>						'string|required',
+			'fields' =>						'array',
 			'templateid' =>					'db dashboard.templateid',
-			'type' =>						'string',
 			'name' =>						'string',
 			'view_mode' =>					'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
-			'prev_type' =>					'string',
-			'fields' =>						'json',
 			'unique_id' =>					'string',
 			'dashboard_page_unique_id' =>	'string'
 		];
@@ -42,22 +41,23 @@ class CControllerDashboardWidgetEdit extends CController {
 				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
 				: CWidgetConfig::CONTEXT_DASHBOARD;
 
-			if ($this->hasInput('type')) {
-				if (!CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context)) {
-					error(_('Widget type is not supported in this context.'));
+			if (!CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context)) {
+				error(_('Widget type is not supported in this context.'));
 
-					$ret = false;
-				}
+				$ret = false;
 			}
 		}
 
 		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
+				(new CControllerResponseData([
+					'main_block' => json_encode([
+						'header' => $this->hasInput('unique_id') ? _('Edit widget') : _('Add widget'),
+						'error' => [
+							'messages' => array_column(get_and_clear_messages(), 'message')
+						]
+					])
+				]))->disableView()
 			);
 		}
 
@@ -71,50 +71,38 @@ class CControllerDashboardWidgetEdit extends CController {
 	}
 
 	protected function doAction() {
-		$known_widget_types = CWidgetConfig::getKnownWidgetTypes($this->context);
+		$known_types = CWidgetConfig::getKnownWidgetTypes($this->context);
+		natsort($known_types);
 
-		natsort($known_widget_types);
-
-		if ($this->hasInput('type')) {
-			$type = $this->getInput('type');
-
-			if (!array_key_exists($type, $known_widget_types) || $this->getInput('prev_type', $type) !== $type) {
-				CProfile::update('web.dashboard.last_widget_type', $type, PROFILE_TYPE_STR);
-			}
-		}
-		else {
-			$type = CProfile::get('web.dashboard.last_widget_type');
-			if (!array_key_exists($type, $known_widget_types)) {
-				$type = array_keys($known_widget_types)[0];
-			}
-		}
+		$deprecated_types = array_intersect_key($known_types,
+			array_flip(CWidgetConfig::DEPRECATED_WIDGETS)
+		);
 
 		$templateid = ($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD)
 			? $this->getInput('templateid')
 			: null;
 
-		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'), $templateid);
+		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', []), $templateid);
 
 		// Transforms corrupted data to default values.
 		$form->validate();
 
 		$this->setResponse(new CControllerResponseData([
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
-			'dialogue' => [
-				'type' => $type,
-				'name' => $this->getInput('name', ''),
-				'view_mode' => $this->getInput('view_mode', ZBX_WIDGET_VIEW_MODE_NORMAL),
-				'fields' => $form->getFields()
-			],
-			'templateid' => $templateid,
+			'name' => $this->getInput('name', ''),
+			'type' => $this->getInput('type'),
+			'known_types' => array_diff_key($known_types, $deprecated_types),
+			'deprecated_types' => $deprecated_types,
+			'fields' => $form->getFields(),
+			'view_mode' => $this->getInput('view_mode', ZBX_WIDGET_VIEW_MODE_NORMAL),
 			'unique_id' => $this->hasInput('unique_id') ? $this->getInput('unique_id') : null,
 			'dashboard_page_unique_id' => $this->hasInput('dashboard_page_unique_id')
 				? $this->getInput('dashboard_page_unique_id')
 				: null,
-			'known_widget_types' => $known_widget_types,
-			'captions' => $this->getCaptions($form)
+			'captions' => $this->getCaptions($form),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			],
+//			'templateid' => $templateid, // TODO: AS - really needs templateid?
 		]));
 	}
 
@@ -182,35 +170,35 @@ class CControllerDashboardWidgetEdit extends CController {
 		];
 
 		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldMsGroup) {
+			if ($field instanceof CWidgetFieldMultiSelectGroup) {
 				$key = 'groups';
 				$var = 'group';
 			}
-			elseif ($field instanceof CWidgetFieldMsHost) {
+			elseif ($field instanceof CWidgetFieldMultiSelectHost) {
 				$key = 'hosts';
 				$var = 'host';
 			}
-			elseif ($field instanceof CWidgetFieldMsItem) {
+			elseif ($field instanceof CWidgetFieldMultiSelectItem) {
 				$key = 'items';
 				$var = 'item';
 			}
-			elseif ($field instanceof CWidgetFieldMsGraph) {
+			elseif ($field instanceof CWidgetFieldMultiSelectGraph) {
 				$key = 'graphs';
 				$var = 'graph';
 			}
-			elseif ($field instanceof CWidgetFieldMsItemPrototype) {
+			elseif ($field instanceof CWidgetFieldMultiSelectItemPrototype) {
 				$key = 'item_prototypes';
 				$var = 'prototype_item';
 			}
-			elseif ($field instanceof CWidgetFieldMsGraphPrototype) {
+			elseif ($field instanceof CWidgetFieldMultiSelectGraphPrototype) {
 				$key = 'graph_prototypes';
 				$var = 'prototype_graph';
 			}
-			elseif ($field instanceof CWidgetFieldMsService) {
+			elseif ($field instanceof CWidgetFieldMultiSelectService) {
 				$key = 'services';
 				$var = 'service';
 			}
-			elseif ($field instanceof CWidgetFieldMsSla) {
+			elseif ($field instanceof CWidgetFieldMultiSelectSla) {
 				$key = 'slas';
 				$var = 'sla';
 			}

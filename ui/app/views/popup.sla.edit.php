@@ -136,7 +136,7 @@ $sla_tab = (new CFormGrid())
 								->addClass('element-table-add')
 						))
 					),
-				(new CScriptTemplate('service-tag-row-tmpl'))
+				(new CTemplateTag('service-tag-row-tmpl'))
 					->addItem(
 						(new CRow([
 							(new CTextBox('service_tags[#{rowNum}][tag]', '#{tag}', false,

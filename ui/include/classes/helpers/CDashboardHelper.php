@@ -100,9 +100,9 @@ class CDashboardHelper {
 				$fields_orig = self::convertWidgetFields($widget['fields']);
 
 				// Transforms corrupted data to default values.
-				$widget_form = CWidgetConfig::getForm($widget['type'], json_encode($fields_orig), $templateid);
+				$widget_form = CWidgetConfig::getForm($widget['type'], $fields_orig, $templateid);
 				$widget_form->validate();
-				$fields = $widget_form->getFieldsData();
+				$fields = $widget_form->getFieldsValues();
 
 				if ($with_rf_rate) {
 					$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widgetid);
@@ -446,7 +446,7 @@ class CDashboardHelper {
 					break 2;
 				}
 
-				$widget_fields = array_key_exists('fields', $widget) ? $widget['fields'] : '{}';
+				$widget_fields = array_key_exists('fields', $widget) ? $widget['fields'] : [];
 				$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget_fields, $templateid);
 				unset($widget['fields']);
 

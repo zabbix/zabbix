@@ -29,12 +29,12 @@ class CControllerWidgetProblemHostsView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_PROBLEM_HOSTS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 
 		$filter_groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 		$filter_hostids = $fields['hostids'] ? $fields['hostids'] : null;

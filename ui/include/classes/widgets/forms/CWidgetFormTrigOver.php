@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -24,90 +24,44 @@
  */
 class CWidgetFormTrigOver extends CWidgetForm {
 
-	public function __construct($data, $templateid) {
-		parent::__construct($data, $templateid, WIDGET_TRIG_OVER);
+	public function __construct(array $values, ?string $templateid) {
+		parent::__construct(WIDGET_TRIG_OVER, $values, $templateid);
+	}
 
-		$this->data = self::convertDottedKeys($this->data);
+	public function addFields(): self {
+		parent::addFields();
 
-		// Output information option.
-		$field_show = (new CWidgetFieldRadioButtonList('show', _('Show'), [
-			TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problems'),
-			TRIGGERS_OPTION_IN_PROBLEM => _('Problems'),
-			TRIGGERS_OPTION_ALL => _('Any')
-		]))
-			->setDefault(TRIGGERS_OPTION_RECENT_PROBLEM)
-			->setModern(true);
-
-		if (array_key_exists('show', $this->data)) {
-			$field_show->setValue($this->data['show']);
-		}
-
-		$this->fields[$field_show->getName()] = $field_show;
-
-		// Host groups.
-		$field_groups = new CWidgetFieldMsGroup('groupids', _('Host groups'));
-
-		if (array_key_exists('groupids', $this->data)) {
-			$field_groups->setValue($this->data['groupids']);
-		}
-
-		$this->fields[$field_groups->getName()] = $field_groups;
-
-		// Hosts.
-		$field_hosts = new CWidgetFieldMsHost('hostids', _('Hosts'));
-		$field_hosts->filter_preselect_host_group_field = 'groupids_';
-
-		if (array_key_exists('hostids', $this->data)) {
-			$field_hosts->setValue($this->data['hostids']);
-		}
-
-		$this->fields[$field_hosts->getName()] = $field_hosts;
-
-		// Tag evaltype (And/Or).
-		$field_evaltype = (new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
-			TAG_EVAL_TYPE_AND_OR => _('And/Or'),
-			TAG_EVAL_TYPE_OR => _('Or')
-		]))
-			->setDefault(TAG_EVAL_TYPE_AND_OR)
-			->setModern(true);
-
-		if (array_key_exists('evaltype', $this->data)) {
-			$field_evaltype->setValue($this->data['evaltype']);
-		}
-
-		$this->fields[$field_evaltype->getName()] = $field_evaltype;
-
-		// Tags array: tag, operator and value. No label, because it belongs to previous group.
-		$field_tags = new CWidgetFieldTags('tags', '');
-
-		if (array_key_exists('tags', $this->data)) {
-			$field_tags->setValue($this->data['tags']);
-		}
-
-		$this->fields[$field_tags->getName()] = $field_tags;
-
-		// Show suppressed problems.
-		$field_show_suppressed = (new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems')))
-			->setDefault(ZBX_PROBLEM_SUPPRESSED_FALSE);
-
-		if (array_key_exists('show_suppressed', $this->data)) {
-			$field_show_suppressed->setValue($this->data['show_suppressed']);
-		}
-
-		$this->fields[$field_show_suppressed->getName()] = $field_show_suppressed;
-
-		// Hosts names location.
-		$field_style = (new CWidgetFieldRadioButtonList('style', _('Hosts location'), [
-			STYLE_LEFT => _('Left'),
-			STYLE_TOP => _('Top')
-		]))
-			->setDefault(STYLE_LEFT)
-			->setModern(true);
-
-		if (array_key_exists('style', $this->data)) {
-			$field_style->setValue($this->data['style']);
-		}
-
-		$this->fields[$field_style->getName()] = $field_style;
+		return $this
+			->addField(
+				(new CWidgetFieldRadioButtonList('show', _('Show'), [
+					TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problems'),
+					TRIGGERS_OPTION_IN_PROBLEM => _('Problems'),
+					TRIGGERS_OPTION_ALL => _('Any')
+				]))->setDefault(TRIGGERS_OPTION_RECENT_PROBLEM)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			)
+			->addField(
+				new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
+			)
+			->addField(
+				(new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
+					TAG_EVAL_TYPE_OR => _('Or')
+				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
+			)
+			->addField(
+				new CWidgetFieldTags('tags')
+			)
+			->addField(
+				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
+			)
+			->addField(
+				(new CWidgetFieldRadioButtonList('style', _('Hosts location'), [
+					STYLE_LEFT => _('Left'),
+					STYLE_TOP => _('Top')
+				]))->setDefault(STYLE_LEFT)
+			);
 	}
 }

@@ -27,12 +27,12 @@ class CControllerWidgetDataOverView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_DATA_OVER);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 		$hostids = $fields['hostids'] ? $fields['hostids'] : null;

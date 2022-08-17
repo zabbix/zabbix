@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,22 +19,18 @@
 **/
 
 
-class CWidgetFieldMsGraphPrototype extends CWidgetFieldMs {
+class CWidgetFieldMultiSelectGraphPrototype extends CWidgetFieldMultiSelect {
 
-	public function __construct($name, $label, $hostid = null) {
+	public function __construct(string $name, string $label = null, $hostid = null) {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE);
 
 		if ($hostid === null) {
-			$this->filter_parameters += [
-				'real_hosts' => true
-			];
+			$this->setFilterParameter('real_hosts', true);
 		}
 		else {
-			$this->filter_parameters += [
-				'hostid' => $hostid
-			];
+			$this->setFilterParameter('hostid', $hostid);
 		}
 	}
 }

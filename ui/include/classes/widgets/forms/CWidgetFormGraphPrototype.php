@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -24,72 +24,70 @@
  */
 class CWidgetFormGraphPrototype extends CWidgetForm {
 
-	public function __construct($data, $templateid) {
-		parent::__construct($data, $templateid, WIDGET_GRAPH_PROTOTYPE);
+	private const DEFAULT_COLUMNS_COUNT = 2;
+	private const DEFAULT_ROWS_COUNT = 1;
 
-		// Select graph type field.
-		$field_source = (new CWidgetFieldRadioButtonList('source_type', _('Source'), [
-			ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
-			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE => _('Simple graph prototype')
-		]))
-			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE)
-			->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
-			->setModern(true);
+	public function __construct(array $values, ?string $templateid) {
+		parent::__construct(WIDGET_GRAPH_PROTOTYPE, $values, $templateid);
+	}
 
-		if (array_key_exists('source_type', $this->data)) {
-			$field_source->setValue($this->data['source_type']);
-		}
+	protected function addFields(): self {
+		parent::addFields();
 
-		$this->fields[$field_source->getName()] = $field_source;
+		$this->addField(
+			(new CWidgetFieldRadioButtonList('source_type', _('Source'), [
+				ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
+				ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE => _('Simple graph prototype')
+			]))
+				->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE)
+				->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
+		);
 
-		if (array_key_exists('source_type', $this->data)
-				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
-			// Select simple graph prototype field.
-			$field_item_prototype = (new CWidgetFieldMsItemPrototype('itemid', _('Item prototype'), $templateid))
+		if (array_key_exists('source_type', $this->values)
+				&& $this->values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
+
+			$field_item_prototype = (new CWidgetFieldMultiSelectItemPrototype('itemid', _('Item prototype'),
+				$this->templateid
+			))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false)
 				->setFilterParameter('numeric', true);
 
-			if ($templateid === null) {
-				// For groups and hosts selection.
+			if ($this->templateid === null) {
 				$field_item_prototype->setFilterParameter('with_simple_graph_item_prototypes', true);
 			}
 
-			if (array_key_exists('itemid', $this->data)) {
-				$field_item_prototype->setValue($this->data['itemid']);
-			}
-
-			$this->fields[$field_item_prototype->getName()] = $field_item_prototype;
+			$this->addField($field_item_prototype);
 		}
 		else {
-			// Select graph prototype field.
-			$field_graph_prototype = (new CWidgetFieldMsGraphPrototype('graphid', _('Graph prototype'), $templateid))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->setMultiple(false);
-
-			if (array_key_exists('graphid', $this->data)) {
-				$field_graph_prototype->setValue($this->data['graphid']);
-			}
-
-			$this->fields[$field_graph_prototype->getName()] = $field_graph_prototype;
+			$this->addField(
+				(new CWidgetFieldMultiSelectGraphPrototype('graphid', _('Graph prototype'), $this->templateid))
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+					->setMultiple(false)
+			);
 		}
 
-		// Show legend checkbox.
-		$field_legend = (new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1);
+		$this
+			->addField(
+				(new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1)
+			)
+			->addField($this->templateid === null
+				? new CWidgetFieldCheckBox('dynamic', _('Dynamic item'))
+				: null
+			)
+			->addField(
+				(new CWidgetFieldIntegerBox('columns', _('Columns'), 1, DASHBOARD_MAX_COLUMNS))
+					->setDefault(self::DEFAULT_COLUMNS_COUNT)
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				(new CWidgetFieldIntegerBox('rows', _('Rows'), 1,
+					floor(DASHBOARD_WIDGET_MAX_ROWS / DASHBOARD_WIDGET_MIN_ROWS)
+				))
+					->setDefault(self::DEFAULT_ROWS_COUNT)
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			);
 
-		if (array_key_exists('show_legend', $this->data)) {
-			$field_legend->setValue($this->data['show_legend']);
-		}
-
-		$this->fields[$field_legend->getName()] = $field_legend;
-
-		// Dynamic item.
-		if ($templateid === null) {
-			$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
-
-			$field_dynamic->setValue(array_key_exists('dynamic', $this->data) ? $this->data['dynamic'] : false);
-
-			$this->fields[$field_dynamic->getName()] = $field_dynamic;
-		}
+		return $this;
 	}
 }

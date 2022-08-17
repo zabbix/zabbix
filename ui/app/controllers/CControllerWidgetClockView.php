@@ -27,13 +27,13 @@ class CControllerWidgetClockView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_CLOCK);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json',
+			'fields' => 'required|array',
 			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 		$config_defaults = [
 			'name' => $this->getDefaultName(),
 			'type' => $fields['clock_type'],

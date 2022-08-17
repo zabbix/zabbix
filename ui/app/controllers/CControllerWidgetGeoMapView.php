@@ -53,13 +53,13 @@ class CControllerWidgetGeoMapView extends CControllerDashboardWidgetView {
 			'initial_load' => 'in 0,1',
 			'widgetid' => 'db widget.widgetid',
 			'unique_id' => 'required|string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 
 	protected function doAction() {
 		$this->widgetid = $this->getInput('widgetid', 0);
-		$this->fields = $this->getForm()->getFieldsData();
+		$this->fields = $this->getForm()->getFieldsValues();
 
 		$data = [
 			'name' => $this->getInput('name', $this->getDefaultName()),

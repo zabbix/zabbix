@@ -27,14 +27,14 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		$this->setType(WIDGET_GRAPH_PROTOTYPE);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json',
+			'fields' => 'required|array',
 			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
 			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 
 		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
 			$data = $this->doGraphPrototype($fields);

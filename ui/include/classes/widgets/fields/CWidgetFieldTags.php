@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,34 +21,21 @@
 
 class CWidgetFieldTags extends CWidgetField {
 
-	/**
-	 * Create widget field for Tags selection.
-	 *
-	 * @param string $name   Field name in form.
-	 * @param string $label  Label for the field in form.
-	 */
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-			'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-			'operator'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
-			'value'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255]
-		]]);
-		$this->setDefault([]);
-	}
-
-	public function setValue($value) {
-		$this->value = (array) $value;
-
-		return $this;
+		$this
+			->setDefault([])
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
+			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
+				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+				'operator'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+				'value'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255]
+			]]);
 	}
 
 	/**
 	 * Get field value. If no value is set, will return default value.
-	 *
-	 * @return mixed
 	 */
 	public function getValue() {
 		$value = parent::getValue();
@@ -62,35 +49,34 @@ class CWidgetFieldTags extends CWidgetField {
 		return $value;
 	}
 
+	public function setValue($value): self {
+		$this->value = (array) $value;
+
+		return $this;
+	}
+
 	/**
 	 * Add dynamic row script and fix the distance between AND/OR buttons and tag inputs below them.
 	 *
 	 * @return string
 	 */
-	public function getJavascript() {
-		return 'var tags_table = jQuery("#tags_table_'.$this->getName().'");'.
-
-			'tags_table'.
-				'.dynamicRows({template: "#tag-row-tmpl"})'.
-				'.on("afteradd.dynamicRows", function() {'.
-					'var rows = this.querySelectorAll(".form_row");'.
-					'new CTagFilterItem(rows[rows.length - 1]);'.
-				'});'.
+	public function getJavaScript(): string {
+		return '
+			jQuery("#tags_table_'.$this->getName().'")
+				.dynamicRows({template: "#tag-row-tmpl"})
+				.on("afteradd.dynamicRows", function() {
+					const rows = this.querySelectorAll(".form_row");
+					new CTagFilterItem(rows[rows.length - 1]);
+				});
 
 			// Init existing fields once loaded.
-			'document.querySelectorAll("#tags_table_'.$this->getName().' .form_row").forEach(row => {'.
-				'new CTagFilterItem(row);'.
-			'});';
+			document.querySelectorAll("#tags_table_'.$this->getName().' .form_row").forEach(row => {
+				new CTagFilterItem(row);
+			});
+		';
 	}
 
-	/**
-	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
-	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
-	 * fields it causes significant performance decrease.
-	 *
-	 * @param array $widget_fields   reference to Array of widget fields.
-	 */
-	public function toApi(array &$widget_fields = []) {
+	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
 		foreach ($value as $index => $val) {

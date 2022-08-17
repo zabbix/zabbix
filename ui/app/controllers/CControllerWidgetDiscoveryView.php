@@ -29,7 +29,7 @@ class CControllerWidgetDiscoveryView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_DISCOVERY);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 

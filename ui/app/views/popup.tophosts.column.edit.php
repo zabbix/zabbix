@@ -230,7 +230,7 @@ $thresholds = (new CDiv(
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $thresholds->addItem(
-	(new CScriptTemplate('thresholds-row-tmpl'))
+	(new CTemplateTag('thresholds-row-tmpl'))
 		->addItem((new CRow([
 			(new CColor('thresholds[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
 			(new CTextBox('thresholds[#{rowNum}][threshold]', '#{threshold}', false))

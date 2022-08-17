@@ -38,56 +38,56 @@ $form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dia
 );
 
 // Time type.
-$form_grid->addItem([
-	CWidgetHelper::getLabel($fields['time_type']),
-	new CFormField(CWidgetHelper::getSelect($fields['time_type']))
-]);
+//$form_grid->addItem([
+//	CWidgetHelper::getLabel($fields['time_type']),
+//	new CFormField(CWidgetHelper::getSelect($fields['time_type']))
+//]);
 
 // Item.
-if (array_key_exists('itemid', $fields)) {
-	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
-		$form->getName()
-	);
-	$form_grid->addItem([
-		CWidgetHelper::getMultiselectLabel($fields['itemid']),
-		new CFormField($field_itemid)
-	]);
-	$scripts[] = $field_itemid->getPostJS();
-}
+// if (array_key_exists('itemid', $fields)) {
+//	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
+//		$form->getName()
+//	);
+//	$form_grid->addItem([
+//		CWidgetHelper::getMultiselectLabel($fields['itemid']),
+//		new CFormField($field_itemid)
+//	]);
+//	$scripts[] = $field_itemid->getPostJS();
+//}
 
 // Clock type.
-$form_grid->addItem([
-	CWidgetHelper::getLabel($fields['clock_type']),
-	new CFormField(CWidgetHelper::getRadioButtonList($fields['clock_type']))
-]);
+//$form_grid->addItem([
+//	CWidgetHelper::getLabel($fields['clock_type']),
+//	new CFormField(CWidgetHelper::getRadioButtonList($fields['clock_type']))
+//]);
 
 // Show.
-$form_grid->addItem([
-	CWidgetHelper::getLabel($fields['show'])->addClass('js-row-show'),
-	(new CFormField(
-		CWidgetHelper::getCheckBoxList($fields['show'], [
-			WIDGET_CLOCK_SHOW_DATE => _('Date'),
-			WIDGET_CLOCK_SHOW_TIME => _('Time'),
-			WIDGET_CLOCK_SHOW_TIMEZONE => _('Time zone')
-		])
-	))->addClass('js-row-show')
-]);
+//$form_grid->addItem([
+//	CWidgetHelper::getLabel($fields['show'])->addClass('js-row-show'),
+//	(new CFormField(
+//		CWidgetHelper::getCheckBoxList($fields['show'], [
+//			WIDGET_CLOCK_SHOW_DATE => _('Date'),
+//			WIDGET_CLOCK_SHOW_TIME => _('Time'),
+//			WIDGET_CLOCK_SHOW_TIMEZONE => _('Time zone')
+//		])
+//	))->addClass('js-row-show')
+//]);
 
 // Advanced configuration.
-$form_grid->addItem([
-	CWidgetHelper::getLabel($fields['adv_conf'])->addClass('js-row-adv-conf'),
-	(new CFormField(
-		CWidgetHelper::getCheckBox($fields['adv_conf'])
-	))->addClass('js-row-adv-conf')
-]);
+//$form_grid->addItem([
+//	CWidgetHelper::getLabel($fields['adv_conf'])->addClass('js-row-adv-conf'),
+//	(new CFormField(
+//		CWidgetHelper::getCheckBox($fields['adv_conf'])
+//	))->addClass('js-row-adv-conf')
+//]);
 
 // Background color.
-$form_grid->addItem([
-	CWidgetHelper::getLabel($fields['bg_color'])->addClass('js-row-bg-color'),
-	(new CFormField(
-		CWidgetHelper::getColor($fields['bg_color'], true)
-	))->addClass('js-row-bg-color')
-]);
+//$form_grid->addItem([
+//	CWidgetHelper::getLabel($fields['bg_color'])->addClass('js-row-bg-color'),
+//	(new CFormField(
+//		CWidgetHelper::getColor($fields['bg_color'], true)
+//	))->addClass('js-row-bg-color')
+//]);
 
 // Date.
 $form_grid->addItem([
@@ -113,7 +113,7 @@ $form_grid->addItem([
 $form_grid->addItem([
 	(new CLabel(_('Time')))
 		->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP_LABEL)
-		->addClass('js-row-time'),
+		->addClass(' js-row-time'),
 	(new CDiv([
 		CWidgetHelper::getLabel($fields['time_size']),
 		(new CFormField([CWidgetHelper::getIntegerBox($fields['time_size']), '%']))->addClass('field-size'),
@@ -165,7 +165,7 @@ $form_grid->addItem([
 		->addClass('js-row-tzone')
 ]);
 
-$scripts[] = $fields['tzone_timezone']->getJavascript();
+$scripts[] = $fields['tzone_timezone']->getJavaScript();
 
 $form->addItem($form_grid);
 

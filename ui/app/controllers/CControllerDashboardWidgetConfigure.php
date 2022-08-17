@@ -29,9 +29,9 @@ class CControllerDashboardWidgetConfigure extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'templateid' =>	'db dashboard.templateid',
 			'type' =>		'required|string',
-			'fields' =>		'json',
+			'fields' =>		'array',
+			'templateid' =>	'db dashboard.templateid',
 			'view_mode' =>	'required|in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER])
 		];
 
@@ -67,9 +67,7 @@ class CControllerDashboardWidgetConfigure extends CController {
 	}
 
 	protected function doAction() {
-		$type = $this->getInput('type');
-
-		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'),
+		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', []),
 			($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
 		);
 
@@ -77,7 +75,7 @@ class CControllerDashboardWidgetConfigure extends CController {
 		$form->validate();
 
 		$output = [
-			'configuration' => CWidgetConfig::getConfiguration($type, $form->getFieldsData(),
+			'configuration' => CWidgetConfig::getConfiguration($this->getInput('type'), $form->getFieldsValues(),
 				$this->getInput('view_mode')
 			)
 		];

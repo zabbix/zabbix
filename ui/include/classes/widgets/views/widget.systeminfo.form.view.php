@@ -26,12 +26,12 @@
  * @var array $data
  */
 
-$fields = $data['dialogue']['fields'];
+$fields = $data['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'],
+$form_grid = CWidgetHelper::createFormGrid($data['name'], $data['type'],
+	$data['view_mode'], $data['known_types'],
 	$data['templateid'] === null ? $fields['rf_rate'] : null
 );
 

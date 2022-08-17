@@ -27,12 +27,12 @@ class CControllerWidgetHostAvailView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_HOST_AVAIL);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 
 		$interface_types = CItem::INTERFACE_TYPES_BY_PRIORITY;
 

@@ -48,6 +48,7 @@ class CDashboard extends CBaseComponent {
 		widget_min_rows,
 		widget_max_rows,
 		widget_defaults,
+		widget_last_type,
 		is_editable,
 		is_edit_mode,
 		can_edit_dashboards,
@@ -86,6 +87,7 @@ class CDashboard extends CBaseComponent {
 		this._widget_min_rows = widget_min_rows;
 		this._widget_max_rows = widget_max_rows;
 		this._widget_defaults = widget_defaults;
+		this._widget_last_type = widget_last_type;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._can_edit_dashboards = can_edit_dashboards;
@@ -691,7 +693,7 @@ class CDashboard extends CBaseComponent {
 		for (const widget_data of widgets_data) {
 			request_widgets_data.push({
 				type: widget_data.type,
-				fields: JSON.stringify(widget_data.fields)
+				fields: widget_data.fields
 			});
 		}
 
@@ -1127,7 +1129,16 @@ class CDashboard extends CBaseComponent {
 	}
 
 	editWidgetProperties(properties = {}, {new_widget_pos = null} = {}) {
-		const overlay = PopUp('dashboard.widget.edit', {
+		if (properties.type === undefined) {
+			properties.type = this._widget_last_type;
+		}
+
+		if (properties.type !== this._widget_last_type) {
+			this._widget_last_type = properties.type;
+			updateUserProfile('web.dashboard.last_widget_type', properties.type, [], PROFILE_TYPE_STR);
+		}
+
+		const overlay = PopUp(`widget.${properties.type}.edit`, {
 			templateid: this._data.templateid ?? undefined,
 			...properties
 		}, {
@@ -1207,12 +1218,11 @@ class CDashboard extends CBaseComponent {
 
 		const properties = {
 			type: fields.type,
-			prev_type: overlay.data.original_properties.type,
 			unique_id: overlay.data.original_properties.unique_id ?? undefined,
 			dashboard_page_unique_id: overlay.data.original_properties.dashboard_page_unique_id ?? undefined
 		};
 
-		if (properties.type === properties.prev_type) {
+		if (properties.type === overlay.data.original_properties.type) {
 			properties.name = fields.name;
 			properties.view_mode = fields.show_header == 1
 				? ZBX_WIDGET_VIEW_MODE_NORMAL
@@ -1222,7 +1232,7 @@ class CDashboard extends CBaseComponent {
 			delete fields.name;
 			delete fields.show_header;
 
-			properties.fields = JSON.stringify(fields);
+			properties.fields = fields;
 		}
 
 		this.editWidgetProperties(properties, {new_widget_pos: this._new_widget_pos});
@@ -1333,8 +1343,6 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}) {
-		const fields_str = Object.keys(fields).length > 0 ? JSON.stringify(fields) : undefined;
-
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'dashboard.widget.check');
@@ -1342,7 +1350,7 @@ class CDashboard extends CBaseComponent {
 		return fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({templateid, type, name, view_mode, fields: fields_str})
+			body: JSON.stringify({templateid, type, name, view_mode, fields})
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -1353,8 +1361,6 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}) {
-		const fields_str = Object.keys(fields).length > 0 ? JSON.stringify(fields) : undefined;
-
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'dashboard.widget.configure');
@@ -1362,7 +1368,7 @@ class CDashboard extends CBaseComponent {
 		return fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({templateid, type, view_mode, fields: fields_str})
+			body: JSON.stringify({templateid, type, view_mode, fields})
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -1780,7 +1786,7 @@ class CDashboard extends CBaseComponent {
 					type: widget.getType(),
 					name: widget.getName(),
 					view_mode: widget.getViewMode(),
-					fields: JSON.stringify(widget.getFields()),
+					fields: widget.getFields(),
 					unique_id: widget.getUniqueId(),
 					dashboard_page_unique_id: dashboard_page.getUniqueId()
 				});

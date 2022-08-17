@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,22 +19,17 @@
 **/
 
 
-/**
- * Widget Field for numeric data.
- */
 class CWidgetFieldNumericBox extends CWidgetField {
 
-	private $placeholder;
-	private $width;
+	private int $width = ZBX_TEXTAREA_NUMERIC_BIG_WIDTH;
+
+	private string $placeholder = '';
 
 	/**
 	 * A numeric box widget field.
 	 * Supported signed decimal values with suffix (KMGTsmhdw).
-	 *
-	 * @param string $name   field name in form
-	 * @param string $label  label for the field in form
 	 */
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
@@ -42,27 +37,23 @@ class CWidgetFieldNumericBox extends CWidgetField {
 		$this->setDefault('');
 	}
 
-	public function getMaxLength() {
-		return strlen((string) $this->max);
+	public function getPlaceholder(): string {
+		return $this->placeholder;
 	}
 
-	public function setPlaceholder($placeholder) {
+	public function setPlaceholder(string $placeholder): self {
 		$this->placeholder = $placeholder;
 
 		return $this;
 	}
 
-	public function getPlaceholder() {
-		return $this->placeholder;
+	public function getWidth(): int {
+		return $this->width;
 	}
 
-	public function setWidth($width) {
+	public function setWidth(int $width): self {
 		$this->width = $width;
 
 		return $this;
-	}
-
-	public function getWidth() {
-		return $this->width;
 	}
 }

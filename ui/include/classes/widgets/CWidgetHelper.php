@@ -24,86 +24,72 @@ class CWidgetHelper {
 	public const DATASET_TYPE_SINGLE_ITEM = 0;
 	public const DATASET_TYPE_PATTERN_ITEM = 1;
 
-	/**
-	 * Create CForm for widget configuration form.
-	 *
-	 * @return CForm
-	 */
-	public static function createForm(): CForm {
-		return (new CForm('post'))
-			->cleanItems()
-			->setId('widget-dialogue-form')
-			->setName('widget_dialogue_form')
-			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FORM);
-	}
 
-	/**
-	 * Create CFormGrid for widget configuration form with default fields in it.
-	 *
-	 * @param string                  $name
-	 * @param string                  $type
-	 * @param int                     $view_mode  ZBX_WIDGET_VIEW_MODE_NORMAL | ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
-	 * @param array                   $known_widget_types
-	 * @param CWidgetFieldSelect|null $field_rf_rate
-	 *
-	 * @return CFormGrid
-	 */
-	public static function createFormGrid(string $name, string $type, int $view_mode, array $known_widget_types,
-			?CWidgetFieldSelect $field_rf_rate): CFormGrid {
+//	public static function createForm(): CForm {
+//		return (new CForm('post'))
+//			->cleanItems()
+//			->setId('widget-dialogue-form')
+//			->setName('widget_dialogue_form')
+//			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FORM);
+//	}
 
-		$deprecated_widget_types = array_intersect_key($known_widget_types,
-			array_flip(CWidgetConfig::DEPRECATED_WIDGETS)
-		);
 
-		$widget_types_select = (new CSelect('type'))
-			->setFocusableElementId('label-type')
-			->setId('type')
-			->setValue($type)
-			->setAttribute('autofocus', 'autofocus')
-			->addOptions(CSelect::createOptionsFromArray(
-				array_diff_key($known_widget_types, $deprecated_widget_types))
-			);
+//	public static function createFormGrid(string $name, string $type, int $view_mode, array $known_widget_types,
+//			?CWidgetFieldSelect $field_rf_rate): CFormGrid {
 
-		if ($deprecated_widget_types) {
-			$widget_types_select->addOptionGroup(
-				(new CSelectOptionGroup(_('Deprecated')))
-					->addOptions(CSelect::createOptionsFromArray($deprecated_widget_types))
-			);
-		}
+//		$deprecated_widget_types = array_intersect_key($known_widget_types,
+//			array_flip(CWidgetConfig::DEPRECATED_WIDGETS)
+//		);
 
-		return (new CFormGrid())
-			->addItem([
-				new CLabel(_('Type'), 'label-type'),
-				new CFormField(array_key_exists($type, $deprecated_widget_types)
-					? [$widget_types_select, ' ', makeWarningIcon(_('Widget is deprecated.'))]
-					: $widget_types_select
-				)
-			])
-			->addItem(
-				(new CFormField(
-					(new CCheckBox('show_header'))
-						->setLabel(_('Show header'))
-						->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
-						->setId('show_header')
-						->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
-				))->addClass('form-field-show-header')
-			)
-			->addItem([
-				new CLabel(_('Name'), 'name'),
-				new CFormField(
-					(new CTextBox('name', $name))
-						->setAttribute('placeholder', _('default'))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				)
-			])
-			->addItem($field_rf_rate !== null
-				? [
-					self::getLabel($field_rf_rate),
-					new CFormField(self::getSelect($field_rf_rate))
-				]
-				: null
-			);
-	}
+//		$widget_types_select = (new CSelect('type'))
+//			->setFocusableElementId('label-type')
+//			->setId('type')
+//			->setValue($type)
+//			->setAttribute('autofocus', 'autofocus')
+//			->addOptions(CSelect::createOptionsFromArray(
+//				array_diff_key($known_widget_types, $deprecated_widget_types))
+//			);
+
+//		if ($deprecated_widget_types) {
+//			$widget_types_select->addOptionGroup(
+//				(new CSelectOptionGroup(_('Deprecated')))
+//					->addOptions(CSelect::createOptionsFromArray($deprecated_widget_types))
+//			);
+//		}
+
+//		return (new CFormGrid())
+//			->addItem([
+//				new CLabel(_('Type'), 'label-type'),
+//				new CFormField(array_key_exists($type, $deprecated_widget_types)
+//					? [$widget_types_select, ' ', makeWarningIcon(_('Widget is deprecated.'))]
+//					: $widget_types_select
+//				)
+//			])
+//			->addItem(
+//				(new CFormField(
+//					(new CCheckBox('show_header'))
+//						->setLabel(_('Show header'))
+//						->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
+//						->setId('show_header')
+//						->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
+//				))->addClass('form-field-show-header')
+//			)
+//			->addItem([
+//				new CLabel(_('Name'), 'name'),
+//				new CFormField(
+//					(new CTextBox('name', $name))
+//						->setAttribute('placeholder', _('default'))
+//						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+//				)
+//			])
+//			->addItem($field_rf_rate !== null
+//				? [
+//					self::getLabel($field_rf_rate),
+//					new CFormField(self::getSelect($field_rf_rate))
+//				]
+//				: null
+//			);
+//	}
 
 	/**
 	 * Creates label linked to the field.
@@ -130,20 +116,15 @@ class CWidgetHelper {
 			->addClass($class);
 	}
 
-	/**
-	 * @param CWidgetFieldSelect $field
-	 *
-	 * @return CSelect
-	 */
-	public static function getSelect($field) {
-		return (new CSelect($field->getName()))
-			->setId($field->getName())
-			->setFocusableElementId('label-'.$field->getName())
-			->setValue($field->getValue())
-			->addOptions(CSelect::createOptionsFromArray($field->getValues()))
-			->setDisabled($field->getFlags() & CWidgetField::FLAG_DISABLED)
-			->setAriaRequired(self::isAriaRequired($field));
-	}
+//	public static function getSelect($field) {
+//		return (new CSelect($field->getName()))
+//			->setId($field->getName())
+//			->setFocusableElementId('label-'.$field->getName())
+//			->setValue($field->getValue())
+//			->addOptions(CSelect::createOptionsFromArray($field->getValues()))
+//			->setDisabled($field->getFlags() & CWidgetField::FLAG_DISABLED)
+//			->setAriaRequired(self::isAriaRequired($field));
+//	}
 
 	/**
 	 * @param CWidgetFieldTextArea $field
@@ -234,46 +215,35 @@ class CWidgetHelper {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
-	/**
-	 * @param CWidgetFieldCheckBox $field
-	 *
-	 * @return array
-	 */
-	public static function getCheckBox($field) {
-		return [(new CVar($field->getName(), '0'))->removeId(), (new CCheckBox($field->getName()))
-			->setChecked((bool) $field->getValue())
-			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-			->setLabel($field->getCaption())
-			->onChange($field->getAction())
-		];
-	}
+//	public static function getCheckBox($field) {
+//		return [(new CVar($field->getName(), '0'))->removeId(), (new CCheckBox($field->getName()))
+//			->setChecked((bool) $field->getValue())
+//			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+//			->setLabel($field->getCaption())
+//			->onChange($field->getAction())
+//		];
+//	}
 
-	/**
-	 * @param CWidgetFieldColor $field
-	 * @param bool              $use_default  Tell the Color picker whether to use Default color feature or not.
-	 *
-	 * @return CColor
-	 */
-	public static function getColor($field, $use_default = false) {
-		// appendColorPickerJs(false), because the script responsible for it is in widget.item.form.view.
-		$color_picker = (new CColor($field->getName(), $field->getValue()))->appendColorPickerJs(false);
-		if ($use_default) {
-			$color_picker->enableUseDefault();
-		}
-		return $color_picker;
-	}
+//	public static function getColor($field, $use_default = false) {
+//		// appendColorPickerJs(false), because the script responsible for it is in widget.item.form.view.
+//		$color_picker = (new CColor($field->getName(), $field->getValue()))->appendColorPickerJs(false);
+//		if ($use_default) {
+//			$color_picker->enableUseDefault();
+//		}
+//		return $color_picker;
+//	}
 
 	/**
 	 * Creates label linked to the multiselect field.
 	 *
-	 * @param CWidgetFieldMs $field
+	 * @param CWidgetFieldMultiSelect $field
 	 *
 	 * @return CLabel
 	 */
 	public static function getMultiselectLabel($field) {
 		$field_name = $field->getName();
 
-		if ($field instanceof CWidgetFieldMs) {
+		if ($field instanceof CWidgetFieldMultiSelect) {
 			$field_name .= ($field->isMultiple() ? '[]' : '');
 		}
 		else {
@@ -284,42 +254,35 @@ class CWidgetHelper {
 			->setAsteriskMark(self::isAriaRequired($field));
 	}
 
-	/**
-	 * @param CWidgetFieldMs $field
-	 * @param array $captions
-	 * @param string $form_name
-	 *
-	 * @return CMultiSelect
-	 */
-	private static function getMultiselectField($field, $captions, $form_name, $object_name, $popup_options) {
-		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
-		$options = [
-			'name' => $field_name,
-			'object_name' => $object_name,
-			'multiple' => $field->isMultiple(),
-			'data' => $captions,
-			'popup' => [
-				'parameters' => [
-					'dstfrm' => $form_name,
-					'dstfld1' => zbx_formatDomId($field_name)
-				] + $popup_options
-			],
-			'add_post_js' => false
-		];
+//	private static function getMultiselectField($field, $captions, $form_name, $object_name, $popup_options) {
+//		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
+//		$options = [
+//			'name' => $field_name,
+//			'object_name' => $object_name,
+//			'multiple' => $field->isMultiple(),
+//			'data' => $captions,
+//			'popup' => [
+//				'parameters' => [
+//					'dstfrm' => $form_name,
+//					'dstfld1' => zbx_formatDomId($field_name)
+//				] + $popup_options
+//			],
+//			'add_post_js' => false
+//		];
 
-		if ($field instanceof CWidgetFieldMsHost && $field->filter_preselect_host_group_field) {
-			$options['popup']['filter_preselect_fields']['hostgroups'] = $field->filter_preselect_host_group_field;
-		}
+//		if ($field instanceof CWidgetFieldMultiSelectHost && $field->filter_preselect_host_group_field) {
+//			$options['popup']['filter_preselect_fields']['hostgroups'] = $field->filter_preselect_host_group_field;
+//		}
 
-		return (new CMultiSelect($options))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(self::isAriaRequired($field));
-	}
+//		return (new CMultiSelect($options))
+//			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+//			->setAriaRequired(self::isAriaRequired($field));
+//	}
 
 	/**
-	 * @param CWidgetFieldMsGroup $field
-	 * @param array $captions
-	 * @param string $form_name
+	 * @param CWidgetFieldMultiSelectGroup $field
+	 * @param array                        $captions
+	 * @param string                       $form_name
 	 *
 	 * @return CMultiSelect
 	 */
@@ -332,38 +295,24 @@ class CWidgetHelper {
 		] + $field->getFilterParameters());
 	}
 
-	/**
-	 * @param CWidgetFieldMsHost $field
-	 * @param array $captions
-	 * @param string $form_name
-	 *
-	 * @return CMultiSelect
-	 */
-	public static function getHost($field, $captions, $form_name) {
-		return self::getMultiselectField($field, $captions, $form_name, 'hosts', [
-			'srctbl' => 'hosts',
-			'srcfld1' => 'hostid'
-		] + $field->getFilterParameters());
-	}
+//	public static function getHost($field, $captions, $form_name) {
+//		return self::getMultiselectField($field, $captions, $form_name, 'hosts', [
+//			'srctbl' => 'hosts',
+//			'srcfld1' => 'hostid'
+//		] + $field->getFilterParameters());
+//	}
+
+//	public static function getItem($field, $captions, $form_name) {
+//		return self::getMultiselectField($field, $captions, $form_name, 'items', [
+//			'srctbl' => 'items',
+//			'srcfld1' => 'itemid'
+//		] + $field->getFilterParameters());
+//	}
 
 	/**
-	 * @param CWidgetFieldMsItem $field
-	 * @param array $captions
-	 * @param string $form_name
-	 *
-	 * @return CMultiSelect
-	 */
-	public static function getItem($field, $captions, $form_name) {
-		return self::getMultiselectField($field, $captions, $form_name, 'items', [
-			'srctbl' => 'items',
-			'srcfld1' => 'itemid'
-		] + $field->getFilterParameters());
-	}
-
-	/**
-	 * @param CWidgetFieldMsGraph $field
-	 * @param array $captions
-	 * @param string $form_name
+	 * @param CWidgetFieldMultiSelectGraph $field
+	 * @param array                        $captions
+	 * @param string                       $form_name
 	 *
 	 * @return CMultiSelect
 	 */
@@ -377,9 +326,9 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMsItemPrototype $field
-	 * @param array $captions
-	 * @param string $form_name
+	 * @param CWidgetFieldMultiSelectItemPrototype $field
+	 * @param array                                $captions
+	 * @param string                               $form_name
 	 *
 	 * @return CMultiSelect
 	 */
@@ -391,9 +340,9 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMsGraphPrototype $field
-	 * @param array $captions
-	 * @param string $form_name
+	 * @param CWidgetFieldMultiSelectGraphPrototype $field
+	 * @param array                                 $captions
+	 * @param string                                $form_name
 	 *
 	 * @return CMultiSelect
 	 */
@@ -407,9 +356,9 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMsService $field
-	 * @param array $captions
-	 * @param string $form_name
+	 * @param CWidgetFieldMultiSelectService $field
+	 * @param array                          $captions
+	 * @param string                         $form_name
 	 *
 	 * @return CMultiSelect
 	 */
@@ -427,9 +376,9 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMsSla $field
-	 * @param array $captions
-	 * @param string $form_name
+	 * @param CWidgetFieldMultiSelectSla $field
+	 * @param array                      $captions
+	 * @param string                     $form_name
 	 *
 	 * @return CMultiSelect
 	 */
@@ -469,18 +418,13 @@ class CWidgetHelper {
 			->setAriaRequired(self::isAriaRequired($field));
 	}
 
-	/**
-	 * @param CWidgetFieldIntegerBox $field
-	 *
-	 * @return CNumericBox
-	 */
-	public static function getIntegerBox(CWidgetFieldIntegerBox $field): CNumericBox {
-		return (new CNumericBox($field->getName(), $field->getValue(), $field->getMaxLength(), false,
-			($field->getFlags() & CWidgetField::FLAG_NOT_EMPTY) == 0
-		))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-			->setAriaRequired(self::isAriaRequired($field));
-	}
+//	public static function getIntegerBox(CWidgetFieldIntegerBox $field): CNumericBox {
+//		return (new CNumericBox($field->getName(), $field->getValue(), $field->getMaxLength(), false,
+//			($field->getFlags() & CWidgetField::FLAG_NOT_EMPTY) == 0
+//		))
+//			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+//			->setAriaRequired(self::isAriaRequired($field));
+//	}
 
 	/**
 	 * @param CWidgetFieldNumericBox $field
@@ -495,24 +439,19 @@ class CWidgetHelper {
 			->setWidth($field->getWidth());
 	}
 
-	/**
-	 * @param CWidgetFieldRadioButtonList $field
-	 *
-	 * @return CRadioButtonList
-	 */
-	public static function getRadioButtonList($field) {
-		$radio_button_list = (new CRadioButtonList($field->getName(), $field->getValue()))
-			->setModern($field->getModern())
-			->setAriaRequired(self::isAriaRequired($field));
+//	public static function getRadioButtonList($field) {
+//		$radio_button_list = (new CRadioButtonList($field->getName(), $field->getValue()))
+//			->setModern(true)
+//			->setAriaRequired(self::isAriaRequired($field));
 
-		foreach ($field->getValues() as $key => $value) {
-			$radio_button_list
-				->addValue($value, $key, null, $field->getAction())
-				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
-		}
+//		foreach ($field->getValues() as $key => $value) {
+//			$radio_button_list
+//				->addValue($value, $key, null, $field->getAction())
+//				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
+//		}
 
-		return $radio_button_list;
-	}
+//		return $radio_button_list;
+//	}
 
 	/**
 	 * @param CWidgetFieldSeverities $field
@@ -526,33 +465,26 @@ class CWidgetHelper {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
-	/**
-	 * @param CWidgetFieldCheckBoxList $field
-	 * @param array                    $list        Option list array.
-	 * @param array                    $class_list  List of additional CSS classes.
-	 *
-	 * @return CList
-	 */
-	public static function getCheckBoxList($field, array $list, array $class_list = []) {
-		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
-		if ($class_list) {
-			foreach ($class_list as $class) {
-				$checkbox_list->addClass($class);
-			}
-		}
+//	public static function getCheckBoxList($field, array $list, array $class_list = []) {
+//		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+//		if ($class_list) {
+//			foreach ($class_list as $class) {
+//				$checkbox_list->addClass($class);
+//			}
+//		}
 
-		foreach ($list as $key => $label) {
-			$checkbox_list->addItem(
-				(new CCheckBox($field->getName().'[]', $key))
-					->setLabel($label)
-					->setId($field->getName().'_'.$key)
-					->setChecked(in_array($key, $field->getValue()))
-					->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-			);
-		}
+//		foreach ($list as $key => $label) {
+//			$checkbox_list->addItem(
+//				(new CCheckBox($field->getName().'[]', $key))
+//					->setLabel($label)
+//					->setId($field->getName().'_'.$key)
+//					->setChecked(in_array($key, $field->getValue()))
+//					->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+//			);
+//		}
 
-		return $checkbox_list;
-	}
+//		return $checkbox_list;
+//	}
 
 	/**
 	 * @param CWidgetFieldColumnsList $field  Widget columns field.

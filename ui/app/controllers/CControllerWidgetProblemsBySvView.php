@@ -29,13 +29,13 @@ class CControllerWidgetProblemsBySvView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_PROBLEMS_BY_SV);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json',
+			'fields' => 'required|array',
 			'initial_load' => 'in 0,1'
 		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 
 		$filter = [
 			'groupids' => getSubGroups($fields['groupids']),

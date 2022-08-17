@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -25,51 +25,43 @@
 class CWidgetFieldGraphDataSet extends CWidgetField {
 
 	// Predefined colors for data-sets in JSON format. Each next data set takes next sequential value from palette.
-	const DEFAULT_COLOR_PALETTE = ["FF465C","B0AF07","0EC9AC","524BBC","ED1248","D1E754","2AB5FF","385CC7","EC1594","BAE37D","6AC8FF","EE2B29","3CA20D","6F4BBC","00A1FF","F3601B","1CAE59","45CFDB","894BBC","6D6D6D"];
+	public const DEFAULT_COLOR_PALETTE = [
+		'FF465C', 'B0AF07', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D',
+		'6AC8FF', 'EE2B29', '3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB', '894BBC', '6D6D6D'
+	];
 
 	// First color from the default color palette.
-	const DEFAULT_COLOR = 'FF465C';
+	private const DEFAULT_COLOR = 'FF465C';
 
-	/**
-	 * Create widget field for Data set selection.
-	 *
-	 * @param string $name   Field name in form.
-	 * @param string $label  Label for the field in form.
-	 */
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-			'dataset_type'			=> ['type' => API_INT32, 'in' => implode(',', [CWidgetHelper::DATASET_TYPE_SINGLE_ITEM, CWidgetHelper::DATASET_TYPE_PATTERN_ITEM])],
-			'hosts'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
-			'items'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
-			'itemids'				=> ['type' => API_IDS, 'flags' => null],
-			'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'type'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
-			'stacked'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_STACKED_OFF, SVG_GRAPH_STACKED_ON])],
-			'width'					=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
-			'pointsize'				=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
-			'transparency'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
-			'fill'					=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
-			'missingdatafunc'		=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO, SVG_GRAPH_MISSING_DATA_LAST_KNOWN])],
-			'axisy'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
-			'timeshift'				=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
-			'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
-			'aggregate_interval'	=> ['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
-			'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])],
-			'approximation'			=> ['type' => API_INT32, 'in' => implode(',', [APPROXIMATION_MIN, APPROXIMATION_AVG, APPROXIMATION_MAX, APPROXIMATION_ALL])]
-		]]);
-
-		$this->setDefault([]);
+		$this
+			->setDefault([])
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
+			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
+				'dataset_type'			=> ['type' => API_INT32, 'in' => implode(',', [CWidgetHelper::DATASET_TYPE_SINGLE_ITEM, CWidgetHelper::DATASET_TYPE_PATTERN_ITEM])],
+				'hosts'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
+				'items'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
+				'itemids'				=> ['type' => API_IDS, 'flags' => null],
+				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'type'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
+				'stacked'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_STACKED_OFF, SVG_GRAPH_STACKED_ON])],
+				'width'					=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
+				'pointsize'				=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
+				'transparency'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
+				'fill'					=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
+				'missingdatafunc'		=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO, SVG_GRAPH_MISSING_DATA_LAST_KNOWN])],
+				'axisy'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
+				'timeshift'				=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
+				'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
+				'aggregate_interval'	=> ['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
+				'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])],
+				'approximation'			=> ['type' => API_INT32, 'in' => implode(',', [APPROXIMATION_MIN, APPROXIMATION_AVG, APPROXIMATION_MAX, APPROXIMATION_ALL])]
+			]]);
 	}
 
-	/**
-	 * Set field values for the datasets.
-	 *
-	 * @return $this
-	 */
-	public function setValue($value) {
+	public function setValue($value): self {
 		$data_sets = [];
 
 		foreach ((array) $value as $data_set) {
@@ -79,14 +71,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		return parent::setValue($data_sets);
 	}
 
-	/**
-	 * Set additional flags, which can be used in configuration form.
-	 *
-	 * @param int $flags
-	 *
-	 * @return $this
-	 */
-	public function setFlags($flags) {
+	public function setFlags($flags): self {
 		parent::setFlags($flags);
 
 		if ($flags & self::FLAG_NOT_EMPTY) {
@@ -98,18 +83,13 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			$this->setStrictValidationRules($strict_validation_rules);
 		}
 		else {
-			$this->setStrictValidationRules(null);
+			$this->setStrictValidationRules();
 		}
 
 		return $this;
 	}
 
-	/**
-	 * Default values filled in newly created data set or used as unspecified values.
-	 *
-	 * @return array
-	 */
-	public static function getDefaults() {
+	public static function getDefaults(): array {
 		return [
 			'dataset_type' => CWidgetHelper::DATASET_TYPE_PATTERN_ITEM,
 			'hosts' => [],
@@ -132,11 +112,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		];
 	}
 
-	/**
-	 * @param bool $strict  Widget form submit validation?
-	 *
-	 * @return array  Errors.
-	 */
 	public function validate(bool $strict = false): array {
 		$errors = [];
 
@@ -196,14 +171,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		return $errors;
 	}
 
-	/**
-	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
-	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
-	 * fields it causes significant performance decrease.
-	 *
-	 * @param array $widget_fields  Reference to array of widget fields.
-	 */
-	public function toApi(array &$widget_fields = []) {
+	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
 		$dataset_fields = [

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,74 +21,113 @@
 
 class CWidgetForm {
 
-	protected $fields;
+	protected string $type;
+	protected ?string $templateid;
 
-	/**
-	 * Widget fields array that came from AJAX request.
-	 *
-	 * @var array
-	 */
-	protected $data;
+	protected array $values;
+	protected array $fields = [];
 
-	protected $templateid;
-
-	public function __construct($data, $templateid, $type) {
-		$this->data = json_decode($data, true);
-
+	public function __construct(string $type, array $values, ?string $templateid) {
+		$this->type = $type;
 		$this->templateid = $templateid;
 
-		$this->fields = [];
+		$this->values = $this->normalizeValues($values);
 
-		if ($templateid === null) {
-			// Refresh interval field.
+		$this
+			->addFields()
+			->setFieldsValues();
+	}
+
+	public function addField(?CWidgetField $field): self {
+		if ($field !== null) {
+			$this->fields[$field->getName()] = $field;
+		}
+
+		return $this;
+	}
+
+	public function getFields(): array {
+		return $this->fields;
+	}
+
+	public function getFieldValue(string $field_name) {
+		return $this->fields[$field_name]->getValue();
+	}
+
+	public function getFieldsValues(): array {
+		$values = [];
+
+		foreach ($this->fields as $field) {
+			$values[$field->getName()] = $field->getValue();
+		}
+
+		return $values;
+	}
+
+	private function setFieldsValues(): void {
+		foreach ($this->fields as $field) {
+			if (array_key_exists($field->getName(), $this->values)) {
+				$field->setValue($this->values[$field->getName()]);
+			}
+		}
+	}
+
+	/**
+	 * Validate form fields.
+	 *
+	 * @param bool $strict  Enables more strict validation of the form fields.
+	 *                      Must be enabled for validation of input parameters in the widget configuration form.
+	 *
+	 * @return array
+	 */
+	public function validate(bool $strict = false): array {
+		$errors = [];
+
+		foreach ($this->fields as $field) {
+			$errors = array_merge($errors, $field->validate($strict));
+		}
+
+		return $errors;
+	}
+
+	/**
+	 * Prepares array, ready to be passed to CDashboard API functions.
+	 *
+	 * @return array  Array of widget fields ready for saving in API.
+	 */
+	public function fieldsToApi(): array {
+		$api_fields = [];
+
+		foreach ($this->fields as $field) {
+			$field->toApi($api_fields);
+		}
+
+		return $api_fields;
+	}
+
+	protected function normalizeValues(array $values): array {
+		return self::convertDottedKeys($values);
+	}
+
+	protected function addFields(): self {
+		if ($this->templateid === null) {
 			$default_rf_rate = '';
 
 			foreach (CWidgetConfig::getRfRates() as $rf_rate => $label) {
-				if ($rf_rate == CWidgetConfig::getDefaultRfRate($type)) {
+				if ($rf_rate === CWidgetConfig::getDefaultRfRate($this->type)) {
 					$default_rf_rate = $label;
 					break;
 				}
 			}
 
-			$rf_rates = [
-				-1 => _('Default').' ('.$default_rf_rate.')'
-			];
-			$rf_rates += CWidgetConfig::getRfRates();
-
-			$rf_rate_field = (new CWidgetFieldSelect('rf_rate', _('Refresh interval'), $rf_rates))
-				->setDefault(-1);
-
-			if (array_key_exists('rf_rate', $this->data)) {
-				$rf_rate_field->setValue($this->data['rf_rate']);
-			}
-
-			$this->fields[$rf_rate_field->getName()] = $rf_rate_field;
+			$this->addField(
+				new CWidgetFieldSelect('rf_rate', _('Refresh interval'), [
+					CWidgetFieldSelect::DEFAULT_VALUE => _('Default').' ('.$default_rf_rate.')'
+				] + CWidgetConfig::getRfRates())
+			);
 		}
 
-		// Add Columns and Rows fields for Iterator widgets.
-
-		if (CWidgetConfig::isIterator($type)) {
-			$field_columns = (new CWidgetFieldIntegerBox('columns', _('Columns'), 1, DASHBOARD_MAX_COLUMNS))
-				->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
-				->setDefault(2);
-
-			if (array_key_exists('columns', $this->data)) {
-				$field_columns->setValue($this->data['columns']);
-			}
-
-			$this->fields[$field_columns->getName()] = $field_columns;
-
-			$field_rows = (new CWidgetFieldIntegerBox('rows', _('Rows'), 1,
-					floor(DASHBOARD_WIDGET_MAX_ROWS / DASHBOARD_WIDGET_MIN_ROWS)))
-				->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
-				->setDefault(1);
-
-			if (array_key_exists('rows', $this->data)) {
-				$field_rows->setValue($this->data['rows']);
-			}
-
-			$this->fields[$field_rows->getName()] = $field_rows;
-		}
+		return $this;
 	}
 
 	/**
@@ -119,9 +158,9 @@ class CWidgetForm {
 	 *
 	 * @return array
 	 */
-	protected static function convertDottedKeys(array $data) {
+	protected static function convertDottedKeys(array $data): array {
 		// API doesn't guarantee fields to be retrieved in same order as stored. Sorting by key...
-		uksort($data, function ($key1, $key2) {
+		uksort($data, static function ($key1, $key2) {
 			foreach (['key1', 'key2'] as $var) {
 				if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', (string) $$var, $matches) === 1) {
 					$$var = $matches[1].'.'.$matches[3].'.'.$matches[2].'.'.$matches[4];
@@ -151,63 +190,5 @@ class CWidgetForm {
 		}
 
 		return $data;
-	}
-
-	/**
-	 * Return fields for this form.
-	 *
-	 * @return array  An array of CWidgetField.
-	 */
-	public function getFields() {
-		return $this->fields;
-	}
-
-	/**
-	 * Returns widget fields data as array.
-	 *
-	 * @return array  Key/value pairs where key is field name and value is it's data.
-	 */
-	public function getFieldsData() {
-		$data = [];
-
-		foreach ($this->fields as $field) {
-			/* @var $field CWidgetField */
-			$data[$field->getName()] = $field->getValue();
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Validate form fields.
-	 *
-	 * @param bool $strict  Enables more strict validation of the form fields.
-	 *                      Must be enabled for validation of input parameters in the widget configuration form.
-	 *
-	 * @return array
-	 */
-	public function validate($strict = false) {
-		$errors = [];
-
-		foreach ($this->fields as $field) {
-			$errors = array_merge($errors, $field->validate($strict));
-		}
-
-		return $errors;
-	}
-
-	/**
-	 * Prepares array, ready to be passed to CDashboard API functions.
-	 *
-	 * @return array  Array of widget fields ready for saving in API.
-	 */
-	public function fieldsToApi() {
-		$api_fields = [];
-
-		foreach ($this->fields as $field) {
-			$field->toApi($api_fields);
-		}
-
-		return $api_fields;
 	}
 }

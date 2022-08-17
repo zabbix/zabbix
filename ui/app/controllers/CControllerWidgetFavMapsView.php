@@ -29,7 +29,7 @@ class CControllerWidgetFavMapsView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_FAV_MAPS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 

@@ -27,13 +27,13 @@ class CControllerWidgetTrigOverView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_TRIG_OVER);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json',
+			'fields' => 'required|array',
 			'initial_load' => 'in 0,1'
 		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 
 		$data = [
 			'name' => $this->getInput('name', $this->getDefaultName()),

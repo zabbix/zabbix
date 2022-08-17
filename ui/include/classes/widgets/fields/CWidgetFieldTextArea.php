@@ -21,51 +21,38 @@
 
 class CWidgetFieldTextArea extends CWidgetField {
 
-	private $width;
+	private int $width = ZBX_TEXTAREA_STANDARD_WIDTH;
 
-	/**
-	 * Textarea widget field.
-	 *
-	 * @param string $name   Field name in form.
-	 * @param string $label  Label for the field in form.
-	 */
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setDefault('');
-		$this->width = ZBX_TEXTAREA_STANDARD_WIDTH;
+		$this
+			->setDefault('')
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
-	/**
-	 * Set additional flags, which can be used in configuration form.
-	 *
-	 * @param int $flags
-	 *
-	 * @return $this
-	 */
-	public function setFlags($flags) {
+	public function setFlags(int $flags): self {
 		parent::setFlags($flags);
 
-		if ($flags & self::FLAG_NOT_EMPTY) {
+		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
 			$strict_validation_rules = $this->getValidationRules();
 			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
 			$this->setStrictValidationRules($strict_validation_rules);
 		}
 		else {
-			$this->setStrictValidationRules(null);
+			$this->setStrictValidationRules();
 		}
 
 		return $this;
 	}
 
-	public function setWidth($width) {
+	public function getWidth(): int {
+		return $this->width;
+	}
+
+	public function setWidth(int $width): self {
 		$this->width = $width;
 
 		return $this;
-	}
-
-	public function getWidth() {
-		return $this->width;
 	}
 }

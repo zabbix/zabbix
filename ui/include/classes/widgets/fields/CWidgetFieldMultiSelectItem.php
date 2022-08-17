@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,25 +19,18 @@
 **/
 
 
-class CWidgetFieldMsHost extends CWidgetFieldMs {
+class CWidgetFieldMultiSelectItem extends CWidgetFieldMultiSelect {
 
-	/**
-	 * ID for Host group Multiselect element used to prefill Application PoPup Host group filter.
-	 * Analog for multiselect filter_preselect_fields['hostgroups'] property.
-	 *
-	 * @var string  (nullable) ID for Multiselect element.
-	 */
-	public $filter_preselect_host_group_field;
-
-	/**
-	 * Create widget field for Host selection
-	 *
-	 * @param string      $name     field name in form
-	 * @param string      $label    label for the field in form
-	 */
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label = null, $hostid = null) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
+
+		if ($hostid === null) {
+			$this->setFilterParameter('real_hosts', true);
+		}
+		else {
+			$this->setFilterParameter('hostid', $hostid);
+		}
 	}
 }

@@ -628,7 +628,7 @@ class CWidget extends CBaseComponent {
 			dashboardid: this._dashboard.dashboardid ?? undefined,
 			widgetid: this._widgetid ?? undefined,
 			name: this._name !== '' ? this._name : undefined,
-			fields: Object.keys(this._fields).length > 0 ? JSON.stringify(this._fields) : undefined,
+			fields: this._fields,
 			view_mode: this._view_mode,
 			edit_mode: this._is_edit_mode ? 1 : 0,
 			dynamic_hostid: this._dashboard.templateid !== null || this.supportsDynamicHosts()

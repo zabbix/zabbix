@@ -76,7 +76,7 @@ $form_grid
 	->addItem(
 		new CFormField(CWidgetHelper::getTags($fields['tags']))
 	);
-$scripts[] = $fields['tags']->getJavascript();
+$scripts[] = $fields['tags']->getJavaScript();
 $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Show hosts in maintenance.

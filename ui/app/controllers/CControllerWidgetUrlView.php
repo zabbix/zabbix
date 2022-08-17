@@ -27,13 +27,13 @@ class CControllerWidgetUrlView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_URL);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json',
+			'fields' => 'required|array',
 			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 		$error = null;
 
 		$is_template_dashboard = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD);

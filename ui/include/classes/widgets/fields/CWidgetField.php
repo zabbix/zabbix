@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -18,32 +18,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetField {
 
-	const FLAG_ACKNOWLEDGES = 0x01;
-	const FLAG_NOT_EMPTY = 0x02;
-	const FLAG_LABEL_ASTERISK = 0x04;
-	const FLAG_DISABLED = 0x08;
+abstract class CWidgetField {
 
-	protected $name;
-	protected $full_name;
-	protected $label;
+	public const FLAG_ACKNOWLEDGES = 0x01;
+	public const FLAG_NOT_EMPTY = 0x02;
+	public const FLAG_LABEL_ASTERISK = 0x04;
+	public const FLAG_DISABLED = 0x08;
+
+	protected string $name;
+	protected ?string $label;
+	protected ?string $full_name = null;
+
+	protected ?int $save_type = null;
+
 	protected $value;
 	protected $default;
-	protected $save_type;
-	protected $action;
-	protected $validation_rules = [];
-	protected $strict_validation_rules = null;
-	protected $ex_validation_rules = [];
-	protected $flags;
+
+	protected ?string $action = null;
+
+	protected int $flags;
+
+	protected array $validation_rules = [];
+	protected ?array $strict_validation_rules = null;
+	protected array $ex_validation_rules = [];
 
 	/**
-	 * Create widget field (general)
-	 *
-	 * @param string $name   Field name in form.
-	 * @param string $label  Label for the field in form.
+	 * @param string      $name   Field name in form.
+	 * @param string|null $label  Label for the field in form.
 	 */
-	public function __construct($name, $label = null) {
+	public function __construct(string $name, string $label = null) {
 		$this->name = $name;
 		$this->label = $label;
 		$this->value = null;
@@ -51,161 +55,72 @@ class CWidgetField {
 		$this->flags = 0x00;
 	}
 
-	public function setValue($value) {
+	public function getName(): string {
+		return $this->name;
+	}
+
+	public function getLabel(): ?string {
+		return $this->label;
+	}
+
+	/**
+	 * Set field full name which will appear in case of error messages. For example:
+	 * Invalid parameter "<FULL NAME>": too many decimal places.
+	 */
+	public function setFullName(string $name): self {
+		$this->full_name = $name;
+
+		return $this;
+	}
+
+	/**
+	 * Get field value. If no value is set, will return default value.
+	 */
+	public function getValue() {
+		return ($this->value === null) ? $this->default : $this->value;
+	}
+
+	public function setValue($value): self {
 		$this->value = $value;
 
 		return $this;
 	}
 
-	public function setDefault($value) {
+	public function setDefault($value): self {
 		$this->default = $value;
 
 		return $this;
+	}
+
+	public function getAction(): ?string {
+		return $this->action;
 	}
 
 	/**
 	 * Set JS code that will be called on field change.
 	 *
 	 * @param string $action  JS function to call on field change.
-	 *
-	 * @return $this
 	 */
-	public function setAction($action) {
+	public function setAction(string $action): self {
 		$this->action = $action;
-
-		return $this;
-	}
-
-	protected function setSaveType($save_type) {
-		switch ($save_type) {
-			case ZBX_WIDGET_FIELD_TYPE_INT32:
-				$this->validation_rules = ['type' => API_INT32];
-				break;
-
-			case ZBX_WIDGET_FIELD_TYPE_STR:
-				$this->validation_rules = ['type' => API_STRING_UTF8, 'length' => 255];
-				break;
-
-			case ZBX_WIDGET_FIELD_TYPE_GROUP:
-			case ZBX_WIDGET_FIELD_TYPE_HOST:
-			case ZBX_WIDGET_FIELD_TYPE_ITEM:
-			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-			case ZBX_WIDGET_FIELD_TYPE_SERVICE:
-			case ZBX_WIDGET_FIELD_TYPE_SLA:
-				$this->validation_rules = ['type' => API_IDS];
-				break;
-
-			case ZBX_WIDGET_FIELD_TYPE_MAP:
-				$this->validation_rules = ['type' => API_ID];
-				break;
-
-			default:
-				exit(_('Internal error.'));
-		}
-
-		$this->save_type = $save_type;
-
-		return $this;
-	}
-
-	protected function setValidationRules(array $validation_rules) {
-		$this->validation_rules = $validation_rules;
-	}
-
-	protected function getValidationRules() {
-		return $this->validation_rules;
-	}
-
-	/**
-	 * Set validation rules for "strict" mode.
-	 *
-	 * @param array|null $strict_validation_rules
-	 */
-	protected function setStrictValidationRules(array $strict_validation_rules = null) {
-		$this->strict_validation_rules = $strict_validation_rules;
-	}
-
-	protected function setExValidationRules(array $ex_validation_rules) {
-		$this->ex_validation_rules = $ex_validation_rules;
-	}
-
-	/**
-	 * Get field value. If no value is set, will return default value.
-	 *
-	 * @return mixed
-	 */
-	public function getValue() {
-		return ($this->value === null) ? $this->default : $this->value;
-	}
-
-	public function getLabel() {
-		return $this->label;
-	}
-
-	public function getName() {
-		return $this->name;
-	}
-
-	/**
-	 * Set field full name which will appear in case of error messages. For example:
-	 * Invalid parameter "<FULL NAME>": too many decimal places.
-	 *
-	 * @param string $name
-	 *
-	 * @return CWidgetField
-	 */
-	public function setFullName($name) {
-		$this->full_name = $name;
-
-		return $this;
-	}
-
-	public function getAction() {
-		return $this->action;
-	}
-
-	public function getSaveType() {
-		return $this->save_type;
-	}
-
-	/**
-	 * Set additional flags for validation rule array.
-	 *
-	 * @param array $validation_rule
-	 * @param int   $flag
-	 *
-	 */
-	protected static function setValidationRuleFlag(array &$validation_rule, $flag) {
-		if (array_key_exists('flags', $validation_rule)) {
-			$validation_rule['flags'] |= $flag;
-		}
-		else {
-			$validation_rule['flags'] = $flag;
-		}
-	}
-
-	/**
-	 * Set additional flags, which can be used in configuration form.
-	 *
-	 * @param int $flags
-	 *
-	 * @return $this
-	 */
-	public function setFlags($flags) {
-		$this->flags = $flags;
 
 		return $this;
 	}
 
 	/**
 	 * Get additional flags, which can be used in configuration form.
-	 *
-	 * @return int
 	 */
-	public function getFlags() {
+	public function getFlags(): int {
 		return $this->flags;
+	}
+
+	/**
+	 * Set additional flags, which can be used in configuration form.
+	 */
+	public function setFlags(int $flags): self {
+		$this->flags = $flags;
+
+		return $this;
 	}
 
 	/**
@@ -247,7 +162,7 @@ class CWidgetField {
 	 *
 	 * @param array $widget_fields   reference to Array of widget fields.
 	 */
-	public function toApi(array &$widget_fields = []) {
+	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
 		if ($value !== null && $value !== $this->default) {
@@ -266,6 +181,77 @@ class CWidgetField {
 				$widget_field['value'] = $value;
 				$widget_fields[] = $widget_field;
 			}
+		}
+	}
+
+	protected function setSaveType($save_type): self {
+		switch ($save_type) {
+			case ZBX_WIDGET_FIELD_TYPE_INT32:
+				$this->validation_rules = ['type' => API_INT32];
+				break;
+
+			case ZBX_WIDGET_FIELD_TYPE_STR:
+				$this->validation_rules = ['type' => API_STRING_UTF8, 'length' => 255];
+				break;
+
+			case ZBX_WIDGET_FIELD_TYPE_GROUP:
+			case ZBX_WIDGET_FIELD_TYPE_HOST:
+			case ZBX_WIDGET_FIELD_TYPE_ITEM:
+			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+			case ZBX_WIDGET_FIELD_TYPE_SERVICE:
+			case ZBX_WIDGET_FIELD_TYPE_SLA:
+				$this->validation_rules = ['type' => API_IDS];
+				break;
+
+			case ZBX_WIDGET_FIELD_TYPE_MAP:
+				$this->validation_rules = ['type' => API_ID];
+				break;
+
+			default:
+				exit(_('Internal error.'));
+		}
+
+		$this->save_type = $save_type;
+
+		return $this;
+	}
+
+	protected function getValidationRules(): array {
+		return $this->validation_rules;
+	}
+
+	protected function setValidationRules(array $validation_rules): self {
+		$this->validation_rules = $validation_rules;
+
+		return $this;
+	}
+
+	/**
+	 * Set validation rules for "strict" mode.
+	 */
+	protected function setStrictValidationRules(array $strict_validation_rules = null): self {
+		$this->strict_validation_rules = $strict_validation_rules;
+
+		return $this;
+	}
+
+	protected function setExValidationRules(array $ex_validation_rules): self {
+		$this->ex_validation_rules = $ex_validation_rules;
+
+		return $this;
+	}
+
+	/**
+	 * Set additional flags for validation rule array.
+	 */
+	protected static function setValidationRuleFlag(array &$validation_rule, int $flag): void {
+		if (array_key_exists('flags', $validation_rule)) {
+			$validation_rule['flags'] |= $flag;
+		}
+		else {
+			$validation_rule['flags'] = $flag;
 		}
 	}
 }

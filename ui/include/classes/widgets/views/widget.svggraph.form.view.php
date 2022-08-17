@@ -284,8 +284,8 @@ function getLegendTab(array $fields, array &$scripts): CDiv {
 }
 
 function getProblemsTab(array $fields, array &$scripts, array &$jq_templates, string $form_name): CFormGrid {
-	$scripts[] = $fields['problemhosts']->getJavascript();
-	$scripts[] = $fields['tags']->getJavascript();
+	$scripts[] = $fields['problemhosts']->getJavaScript();
+	$scripts[] = $fields['tags']->getJavaScript();
 	$jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 	return (new CFormGrid())

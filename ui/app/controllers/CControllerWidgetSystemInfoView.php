@@ -29,12 +29,12 @@ class CControllerWidgetSystemInfoView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_SYSTEM_INFO);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),

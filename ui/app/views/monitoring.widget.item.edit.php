@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -15,21 +15,16 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
-class CWidgetFieldHidden extends CWidgetField {
+/**
+ * System information widget form view.
+ *
+ * @var CView $this
+ * @var array $data
+ */
 
-	/**
-	 * Hidden widget field. Will not be displayed for user. Can contain string, int or id type value.
-	 *
-	 * @param string $name       field name in form
-	 * @param int    $save_type  ZBX_WIDGET_FIELD_TYPE_ constant. Defines how field will be saved in database.
-	 */
-	public function __construct($name, $save_type) {
-		parent::__construct($name, null);
-
-		$this->setSaveType($save_type);
-	}
-}
+(new CWidgetFormView($data))
+	->show();

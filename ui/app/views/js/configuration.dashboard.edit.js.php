@@ -31,7 +31,7 @@
 		is_busy: false,
 		is_busy_saving: false,
 
-		init({dashboard, widget_defaults, time_period, page}) {
+		init({dashboard, widget_defaults, widget_last_type, time_period, page}) {
 			this.dashboard = dashboard;
 			this.page = page;
 
@@ -60,12 +60,13 @@
 				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
 				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-				widget_defaults: widget_defaults,
+				widget_defaults,
+				widget_last_type,
 				is_editable: true,
 				is_edit_mode: true,
 				can_edit_dashboards: true,
 				is_kiosk_mode: false,
-				time_period: time_period,
+				time_period,
 				dynamic_hostid: null
 			});
 

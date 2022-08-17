@@ -27,7 +27,7 @@ class CControllerWidgetSlaReportView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_SLA_REPORT);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 
@@ -35,7 +35,7 @@ class CControllerWidgetSlaReportView extends CControllerDashboardWidgetView {
 	 * @throws APIException
 	 */
 	protected function doAction(): void {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 
 		$data = [
 			'name' => $this->getInput('name', $this->getDefaultName()),

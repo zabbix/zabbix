@@ -15,23 +15,16 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
-?>
 
 
-window.widget_form = new class {
-	init() {
-		document.getElementById('type').addEventListener('change', () => ZABBIX.Dashboard.reloadWidgetProperties());
+/**
+ * System information widget form view.
+ *
+ * @var CView $this
+ * @var array $data
+ */
 
-		document.getElementById('widget-dialogue-form').addEventListener('change', (e) => {
-			const is_trimmable = e.target.matches(
-				'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])'
-			);
-
-			if (is_trimmable) {
-				e.target.value = e.target.value.trim();
-			}
-		}, {capture: true});
-	}
-};
+(new CWidgetFormView($data))
+	->show();

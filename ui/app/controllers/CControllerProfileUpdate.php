@@ -41,6 +41,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.correlation.filter.active':
 				case 'web.dashboard.filter.active':
 				case 'web.dashboard.hostid':
+				case 'web.dashboard.last_widget_type':
 				case 'web.discovery.filter.active':
 				case 'web.discoveryconf.filter.active':
 				case 'web.hostgroups.filter.active':
@@ -104,6 +105,7 @@ class CControllerProfileUpdate extends CController {
 
 		if ($ret) {
 			switch ($this->getInput('idx')) {
+				case 'web.dashboard.last_widget_type':
 				case 'web.dashboard.widget.geomap.default_view':
 				case 'web.dashboard.widget.geomap.severity_filter':
 					$ret = $this->hasInput('value_str');
@@ -132,6 +134,15 @@ class CControllerProfileUpdate extends CController {
 		DBstart();
 		switch ($idx) {
 			// PROFILE_TYPE_STR
+			case 'web.dashboard.last_widget_type':
+				$value_str = $this->getInput('value_str');
+				if ($value_str === '') {
+					CProfile::delete($idx);
+				}
+				else {
+					CProfile::update($idx, $value_str, PROFILE_TYPE_STR);
+				}
+				break;
 			case 'web.dashboard.widget.geomap.default_view':
 			case 'web.dashboard.widget.geomap.severity_filter':
 				$value_str = $this->getInput('value_str');

@@ -31,7 +31,7 @@ class CControllerWidgetItemView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_ITEM);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json',
+			'fields' => 'required|array',
 			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
@@ -41,7 +41,7 @@ class CControllerWidgetItemView extends CControllerDashboardWidgetView {
 		$cells = [];
 		$url = null;
 		$error = '';
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$description = '';
 		$value = null;

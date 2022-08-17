@@ -1554,27 +1554,21 @@ footer {
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
-form.dashboard-widget-clock .fields-group-date,
-form.dashboard-widget-clock .fields-group-time,
-form.dashboard-widget-clock .fields-group-tzone {
+form.dashboard-widget-clock .fields-group.fields-group-date, form.dashboard-widget-clock .fields-group.fields-group-time, form.dashboard-widget-clock .fields-group.fields-group-tzone {
   display: grid;
   grid-template-columns: 60px 120px repeat(2, minmax(60px, max-content) auto);
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  form.dashboard-widget-clock .fields-group-date label,
-  form.dashboard-widget-clock .fields-group-time label,
-  form.dashboard-widget-clock .fields-group-tzone label {
+  form.dashboard-widget-clock .fields-group.fields-group-date label, form.dashboard-widget-clock .fields-group.fields-group-time label, form.dashboard-widget-clock .fields-group.fields-group-tzone label {
     text-align: right; }
-  form.dashboard-widget-clock .fields-group-date .field-size input,
-  form.dashboard-widget-clock .fields-group-time .field-size input,
-  form.dashboard-widget-clock .fields-group-tzone .field-size input {
+  form.dashboard-widget-clock .fields-group.fields-group-date .field-size input, form.dashboard-widget-clock .fields-group.fields-group-time .field-size input, form.dashboard-widget-clock .fields-group.fields-group-tzone .field-size input {
     margin-right: 5px; }
-form.dashboard-widget-clock .fields-group-time .field-format {
+form.dashboard-widget-clock .fields-group.fields-group-time .field-format {
   grid-column: 4 / -1; }
-form.dashboard-widget-clock .fields-group-tzone .field-format {
+form.dashboard-widget-clock .fields-group.fields-group-tzone .field-format {
   grid-column: 2 / -1; }
-form.dashboard-widget-clock .fields-group-tzone .field-timezone {
+form.dashboard-widget-clock .fields-group.fields-group-tzone .field-timezone {
   grid-column: 2 / -1; }
 
 div.dashboard-widget-clock.clock-digital {

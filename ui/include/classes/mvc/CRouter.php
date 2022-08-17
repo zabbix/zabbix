@@ -22,38 +22,28 @@
 class CRouter {
 	/**
 	 * Layout used for view rendering.
-	 *
-	 * @var string
 	 */
-	private $layout = null;
+	private ?string $layout = null;
 
 	/**
 	 * Controller class for action handling.
-	 *
-	 * @var string
 	 */
-	private $controller = null;
+	private ?string $controller = null;
 
 	/**
 	 * View used to generate HTML, CSV, JSON and other content.
-	 *
-	 * @var string
 	 */
-	private $view = null;
+	private ?string $view = null;
 
 	/**
 	 * Unique action (request) identifier.
-	 *
-	 * @var string
 	 */
-	private $action = null;
+	private ?string $action = null;
 
 	/**
 	 * Mapping between action and corresponding controller, layout and view.
-	 *
-	 * @var array
 	 */
-	private $routes = [
+	private array $routes = [
 		// action									controller												layout					view
 		'action.operation.get'						=> ['CControllerActionOperationGet',					'layout.json',			null],
 		'action.operation.validate'					=> ['CControllerActionOperationValidate',				'layout.json',			null],
@@ -86,7 +76,6 @@ class CRouter {
 		'dashboard.view'							=> ['CControllerDashboardView',							'layout.htmlpage',		'monitoring.dashboard.view'],
 		'dashboard.widget.check'					=> ['CControllerDashboardWidgetCheck',					'layout.json',			null],
 		'dashboard.widget.configure'				=> ['CControllerDashboardWidgetConfigure',				'layout.json',			null],
-		'dashboard.widget.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.dashboard.widget.edit'],
 		'dashboard.widget.rfrate'					=> ['CControllerDashboardWidgetRfRate',					'layout.json',			null],
 		'dashboard.widgets.sanitize'				=> ['CControllerDashboardWidgetsSanitize',				'layout.json',			null],
 		'discovery.create'							=> ['CControllerDiscoveryCreate',						null,					null],
@@ -315,6 +304,8 @@ class CRouter {
 		'userrole.list'								=> ['CControllerUserroleList',							'layout.htmlpage',		'administration.userrole.list'],
 		'userrole.update'							=> ['CControllerUserroleUpdate',						null,					null],
 		'web.view'									=> ['CControllerWebView',								'layout.htmlpage',		'monitoring.web.view'],
+
+
 		'widget.actionlog.view'						=> ['CControllerWidgetActionLogView',					'layout.widget',		'monitoring.widget.actionlog.view'],
 		'widget.clock.view'							=> ['CControllerWidgetClockView',						'layout.widget',		'monitoring.widget.clock.view'],
 		'widget.dataover.view'						=> ['CControllerWidgetDataOverView',					'layout.widget',		'monitoring.widget.dataover.view'],
@@ -327,8 +318,6 @@ class CRouter {
 		'widget.hostavail.view'						=> ['CControllerWidgetHostAvailView',					'layout.widget',		'monitoring.widget.hostavail.view'],
 		'widget.item.view'							=> ['CControllerWidgetItemView',						'layout.widget',		'monitoring.widget.item.view'],
 		'widget.map.view'							=> ['CControllerWidgetMapView',							'layout.widget',		'monitoring.widget.map.view'],
-		'widget.navtree.item.edit'					=> ['CControllerWidgetNavTreeItemEdit',					'layout.json',			'monitoring.widget.navtreeitem.edit'],
-		'widget.navtree.item.update'				=> ['CControllerWidgetNavTreeItemUpdate',				'layout.json',			null],
 		'widget.navtree.view'						=> ['CControllerWidgetNavTreeView',						'layout.widget',		'monitoring.widget.navtree.view'],
 		'widget.plaintext.view'						=> ['CControllerWidgetPlainTextView',					'layout.widget',		'monitoring.widget.plaintext.view'],
 		'widget.problemhosts.view'					=> ['CControllerWidgetProblemHostsView',				'layout.widget',		'monitoring.widget.problemhosts.view'],
@@ -341,6 +330,34 @@ class CRouter {
 		'widget.trigover.view'						=> ['CControllerWidgetTrigOverView',					'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'							=> ['CControllerWidgetUrlView',							'layout.widget',		'monitoring.widget.url.view'],
 		'widget.web.view'							=> ['CControllerWidgetWebView',							'layout.widget',		'monitoring.widget.web.view'],
+
+		'widget.actionlog.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.actionlog.edit'],
+		'widget.clock.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.clock.edit'],
+		'widget.dataover.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.dataover.edit'],
+		'widget.discovery.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.discovery.edit'],
+		'widget.favgraphs.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.favgraphs.edit'],
+		'widget.favmaps.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.favmaps.edit'],
+		'widget.geomap.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.geomap.edit'],
+		'widget.graph.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.graph.edit'],
+		'widget.graphprototype.edit'				=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.graphprototype.edit'],
+		'widget.hostavail.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.hostavail.edit'],
+		'widget.item.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.item.edit'],
+		'widget.map.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.map.edit'],
+		'widget.navtree.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.navtree.edit'],
+		'widget.plaintext.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.plaintext.edit'],
+		'widget.problemhosts.edit'					=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.problemhosts.edit'],
+		'widget.problems.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.problems.edit'],
+		'widget.problemsbysv.edit'					=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.problemsbysv.edit'],
+		'widget.slareport.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.slareport.edit'],
+		'widget.svggraph.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.svggraph.edit'],
+		'widget.systeminfo.edit'					=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.systeminfo.edit'],
+		'widget.tophosts.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.tophosts.edit'],
+		'widget.trigover.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.trigover.edit'],
+		'widget.url.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.url.edit'],
+		'widget.web.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.web.edit'],
+
+		'widget.navtree.item.edit'					=> ['CControllerWidgetNavTreeItemEdit',					'layout.json',			'monitoring.widget.navtreeitem.edit'],
+		'widget.navtree.item.update'				=> ['CControllerWidgetNavTreeItemUpdate',				'layout.json',			null],
 
 		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],
@@ -422,8 +439,6 @@ class CRouter {
 
 	/**
 	 * Returns layout name.
-	 *
-	 * @return string|null
 	 */
 	public function getLayout(): ?string {
 		return $this->layout;
@@ -431,8 +446,6 @@ class CRouter {
 
 	/**
 	 * Returns controller name.
-	 *
-	 * @return string|null
 	 */
 	public function getController(): ?string {
 		return $this->controller;
@@ -440,8 +453,6 @@ class CRouter {
 
 	/**
 	 * Returns view name.
-	 *
-	 * @return string|null
 	 */
 	public function getView(): ?string {
 		return $this->view;
@@ -449,8 +460,6 @@ class CRouter {
 
 	/**
 	 * Returns action name.
-	 *
-	 * @return string|null
 	 */
 	public function getAction(): ?string {
 		return $this->action;

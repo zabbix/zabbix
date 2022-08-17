@@ -740,7 +740,7 @@ class CSvgGraphHelper {
 	 * Find problems at given time period that matches specified problem options.
 	 */
 	private static function getProblems(array $metrics, array $problem_options, array $time_period): array {
-		if ($problem_options['show_problems'] != SVG_GRAPH_PROBLEMS_SHOW) {
+		if ($problem_options['show_problems'] == SVG_GRAPH_PROBLEMS_OFF) {
 			return [];
 		}
 

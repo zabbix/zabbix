@@ -29,7 +29,7 @@ class CControllerWidgetFavGraphsView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_FAV_GRAPHS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 

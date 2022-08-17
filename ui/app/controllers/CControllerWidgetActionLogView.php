@@ -27,12 +27,12 @@ class CControllerWidgetActionLogView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_ACTION_LOG);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$alerts = $this->getAlerts($sortfield, $sortorder, $fields['show_lines']);

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,15 +21,9 @@
 
 class CWidgetFieldHostPatternSelect extends CWidgetField {
 
-	private $placeholder;
+	private string $placeholder = '';
 
-	/**
-	 * Textarea widget field.
-	 *
-	 * @param string $name  field name in form
-	 * @param string $label  label for the field in form
-	 */
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this->setDefault([]);
@@ -41,14 +35,7 @@ class CWidgetFieldHostPatternSelect extends CWidgetField {
 		$this->setValidationRules(['type' => API_STRINGS_UTF8]);
 	}
 
-	/**
-	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
-	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
-	 * fields it causes significant performance decrease.
-	 *
-	 * @param array $widget_fields   reference to array of widget fields.
-	 */
-	public function toApi(array &$widget_fields = []) {
+	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
 		if ($value !== $this->default) {
@@ -62,19 +49,19 @@ class CWidgetFieldHostPatternSelect extends CWidgetField {
 		}
 	}
 
-	public function setPlaceholder($placeholder) {
+	public function getPlaceholder(): string {
+		return $this->placeholder;
+	}
+
+	public function setPlaceholder(string $placeholder): self {
 		$this->placeholder = $placeholder;
 
 		return $this;
 	}
 
-	public function getPlaceholder() {
-		return $this->placeholder;
-	}
+	public function getJavaScript(): string {
+		$field_id = zbx_formatDomId($this->getName().'[]');
 
-	public function getJavascript() {
-		$fieldid = zbx_formatDomId($this->getName().'[]');
-
-		return 'jQuery("#'.$fieldid.'").multiSelect(jQuery("#'.$fieldid.'").data("params"));';
+		return 'jQuery("#'.$field_id.'").multiSelect(jQuery("#'.$field_id.'").data("params"));';
 	}
 }

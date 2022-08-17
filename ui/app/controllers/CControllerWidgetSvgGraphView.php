@@ -40,12 +40,12 @@ class CControllerWidgetSvgGraphView extends CControllerDashboardWidgetView {
 			'preview' => 'in 1',
 			'from' => 'string',
 			'to' => 'string',
-			'fields' => 'json'
+			'fields' => 'required|array'
 		]);
 	}
 
 	protected function doAction(): void {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 		$edit_mode = $this->getInput('edit_mode', 0);
 		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
 		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
@@ -102,19 +102,19 @@ class CControllerWidgetSvgGraphView extends CControllerDashboardWidgetView {
 				'time_to' => $time_to
 			],
 			'axes' => [
-				'show_left_y_axis' => $fields['lefty'] == SVG_GRAPH_AXIS_SHOW,
+				'show_left_y_axis' => $fields['lefty'] == SVG_GRAPH_AXIS_ON,
 				'left_y_min' => $lefty_min,
 				'left_y_max' => $lefty_max,
 				'left_y_units' => $fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
 					? $fields['lefty_static_units']
 					: null,
-				'show_right_y_axis' => $fields['righty'] == SVG_GRAPH_AXIS_SHOW,
+				'show_right_y_axis' => $fields['righty'] == SVG_GRAPH_AXIS_ON,
 				'right_y_min' => $righty_min,
 				'right_y_max' => $righty_max,
 				'right_y_units' => $fields['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
 					? $fields['righty_static_units']
 					: null,
-				'show_x_axis' => $fields['axisx'] == SVG_GRAPH_AXIS_SHOW
+				'show_x_axis' => $fields['axisx'] == SVG_GRAPH_AXIS_ON
 			],
 			'legend' => [
 				'show_legend' => $fields['legend'] == SVG_GRAPH_LEGEND_ON,
@@ -123,7 +123,7 @@ class CControllerWidgetSvgGraphView extends CControllerDashboardWidgetView {
 				'legend_statistic' => $fields['legend_statistic']
 			],
 			'problems' => [
-				'show_problems' => $fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW,
+				'show_problems' => $fields['show_problems'] == SVG_GRAPH_PROBLEMS_ON,
 				'graph_item_problems' => $fields['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS,
 				'problemhosts' => $fields['problemhosts'],
 				'severities' => $fields['severities'],

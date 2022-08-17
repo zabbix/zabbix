@@ -47,7 +47,7 @@ class CControllerDashboardWidgetsSanitize extends CController {
 			foreach ($this->getInput('widgets', []) as $widget) {
 				$validator = new CNewValidator($widget, [
 					'type' =>	'required|string',
-					'fields' =>	'required|json'
+					'fields' =>	'required|array'
 				]);
 
 				foreach ($validator->getAllErrors() as $error) {

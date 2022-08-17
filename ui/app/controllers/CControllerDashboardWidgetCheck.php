@@ -29,10 +29,10 @@ class CControllerDashboardWidgetCheck extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'templateid' =>	'db dashboard.templateid',
 			'type' =>		'required|string',
-			'name' =>		'required|string',
-			'fields' =>		'json'
+			'fields' =>		'array',
+			'templateid' =>	'db dashboard.templateid',
+			'name' =>		'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -67,7 +67,7 @@ class CControllerDashboardWidgetCheck extends CController {
 	}
 
 	protected function doAction() {
-		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', '{}'),
+		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', []),
 			($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
 		);
 

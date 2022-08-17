@@ -74,7 +74,7 @@ if (array_key_exists('filter_widget_reference', $fields)) {
 		CWidgetHelper::getLabel($fields['filter_widget_reference']),
 		new CFormField(CWidgetHelper::getEmptySelect($fields['filter_widget_reference']))
 	]);
-	$scripts[] = $fields['filter_widget_reference']->getJavascript();
+	$scripts[] = $fields['filter_widget_reference']->getJavaScript();
 }
 
 $form->addItem($form_grid);

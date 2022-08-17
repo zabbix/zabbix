@@ -68,6 +68,8 @@ class CView {
 	 */
 	private $directory;
 
+	private static $last_directory;
+
 	/**
 	 * List of JavaScript files for inclusion into a HTML page using <script src="...">.
 	 *
@@ -114,8 +116,14 @@ class CView {
 			throw new RuntimeException(sprintf('View not readable: "%s".', $file_path));
 		}
 
+		self::$last_directory = $this->directory;
+
 		$this->name = $name;
 		$this->data = $data;
+	}
+
+	public static function getLastDirectory(): string {
+		return self::$last_directory;
 	}
 
 	/**

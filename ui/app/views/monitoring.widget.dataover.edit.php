@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -15,26 +15,16 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
-class CWidgetFieldMsGraph extends CWidgetFieldMs {
+/**
+ * System information widget form view.
+ *
+ * @var CView $this
+ * @var array $data
+ */
 
-	public function __construct($name, $label, $hostid = null) {
-		parent::__construct($name, $label);
-
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
-
-		if ($hostid === null) {
-			$this->filter_parameters += [
-				'real_hosts' => true
-			];
-		}
-		else {
-			$this->filter_parameters += [
-				'hostid' => $hostid
-			];
-		}
-	}
-}
+(new CWidgetFormView($data))
+	->show();

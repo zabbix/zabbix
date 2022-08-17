@@ -26,15 +26,14 @@
  * @var array $data
  */
 
-$fields = $data['dialogue']['fields'];
+$fields = $data['fields'];
 
 $form = CWidgetHelper::createForm();
 
 $scripts = [];
 
-$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'],
-	$data['templateid'] === null ? $fields['rf_rate'] : null
+$form_grid = CWidgetHelper::createFormGrid($data['name'], $data['type'], $data['view_mode'], $data['known_types'],
+	array_key_exists('rf_rate', $fields) ? $fields['rf_rate'] : null
 );
 
 // Host groups.
@@ -88,7 +87,7 @@ $form_grid
 	->addItem(
 		new CFormField(CWidgetHelper::getTags($fields['tags']))
 	);
-$scripts[] = $fields['tags']->getJavascript();
+$scripts[] = $fields['tags']->getJavaScript();
 $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Show suppressed problems.

@@ -27,13 +27,13 @@ class CControllerWidgetProblemsView extends CControllerDashboardWidgetView {
 		$this->setType(WIDGET_PROBLEMS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json',
+			'fields' => 'required|array',
 			'initial_load' => 'in 0,1'
 		]);
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 
 		$data = CScreenProblem::getData([
 			'show' => $fields['show'],

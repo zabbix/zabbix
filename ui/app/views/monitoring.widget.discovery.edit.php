@@ -15,38 +15,16 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
 /**
- * Class to embed script HTML template.
+ * System information widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
-class CScriptTemplate extends CTag {
 
-	/**
-	 * Create a <script type="text/x-jquery-tmpl" id="{$id}"> HTML template.
-	 *
-	 * @param string $id  Template id
-	 */
-	public function __construct($id) {
-		parent::__construct('script', true);
-		$this->setAttribute('type', 'text/x-jquery-tmpl');
-		$this->setId($id);
-	}
-
-	public function addItem($value) {
-		if (is_array($value)) {
-			array_map([$this, 'addItem'], $value);
-		}
-		else {
-			$this->items[] = $value;
-		}
-
-		return $this;
-	}
-
-	protected function bodyToString(): string {
-		return implode("\n", $this->items);
-	}
-}
+(new CWidgetFormView($data))
+	->show();

@@ -33,7 +33,7 @@
 		is_busy: false,
 		is_busy_saving: false,
 
-		init({dashboard, time_period, dynamic, has_time_selector, widget_defaults, web_layout_mode}) {
+		init({dashboard, time_period, dynamic, has_time_selector, widget_defaults, widget_last_type, web_layout_mode}) {
 			this.dashboard = dashboard;
 			this.time_period = time_period;
 			this.dynamic = dynamic;
@@ -73,13 +73,14 @@
 				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
 				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-				widget_defaults: widget_defaults,
+				widget_defaults,
+				widget_last_type,
 				is_editable: dashboard.can_edit_dashboards && dashboard.editable
 					&& web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				is_edit_mode: dashboard.dashboardid === null,
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
-				time_period: time_period,
+				time_period,
 				dynamic_hostid: dynamic.host ? dynamic.host.id : null
 			});
 

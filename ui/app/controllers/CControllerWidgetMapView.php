@@ -29,7 +29,7 @@ class CControllerWidgetMapView extends CControllerDashboardWidgetView {
 		$this->setValidationRules([
 			'name' => 'string',
 			'initial_load' => 'in 0,1',
-			'fields' => 'json',
+			'fields' => 'required|array',
 			'current_sysmapid' => 'db sysmaps.sysmapid',
 			'unique_id' => 'string',
 			'previous_maps' => 'array'
@@ -37,7 +37,7 @@ class CControllerWidgetMapView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 		$sysmap_data = null;
 		$previous_map = null;
 		$sysmapid = null;

@@ -194,4 +194,6 @@ $mediaTypeForm->addItem([
 ]);
 
 // append form to widget
-$html_page->addItem($mediaTypeForm)->show();
+$html_page
+	->addItem($mediaTypeForm)
+	->show();

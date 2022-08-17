@@ -29,7 +29,7 @@ class CControllerWidgetGraphView extends CControllerDashboardWidgetView {
 			'name' => 'string',
 			'edit_mode' => 'in 0,1',
 			'dashboardid' => 'db dashboard.dashboardid',
-			'fields' => 'json',
+			'fields' => 'required|array',
 			'dynamic_hostid' => 'db hosts.hostid',
 			'content_width' => 'int32',
 			'content_height' => 'int32'
@@ -37,7 +37,7 @@ class CControllerWidgetGraphView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$fields = $this->getForm()->getFieldsValues();
 		$edit_mode = (int) $this->getInput('edit_mode', 0);
 
 		$width = (int) $this->getInput('content_width', 100);

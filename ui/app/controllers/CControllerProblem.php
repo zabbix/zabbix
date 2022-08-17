@@ -44,7 +44,7 @@ abstract class CControllerProblem extends CController {
 		'show_suppressed' => 0,
 		'unacknowledged' => 0,
 		'compact_view' => 0,
-		'show_timeline' => 1,
+		'show_timeline' => ZBX_TIMELINE_ON,
 		'details' => 0,
 		'highlight_row' => 0,
 		'show_opdata' => OPERATIONAL_DATA_SHOW_NONE,

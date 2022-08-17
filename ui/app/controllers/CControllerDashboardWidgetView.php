@@ -111,7 +111,7 @@ abstract class CControllerDashboardWidgetView extends CController {
 		$ret = $this->validateInput($validation_rules);
 
 		if ($ret) {
-			$this->form = CWidgetConfig::getForm($this->type, $this->getInput('fields', '{}'),
+			$this->form = CWidgetConfig::getForm($this->type, $this->getInput('fields', []),
 				$this->hasInput('templateid') ? $this->getInput('templateid') : null
 			);
 

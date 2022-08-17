@@ -764,7 +764,7 @@ window.widget_svggraph_form = new class {
 				form_fields.or[i] = jQuery.extend({'hosts': [], 'items': []}, form_fields.or[i]);
 			}
 		}
-		data.fields = JSON.stringify(form_fields);
+		data.fields = form_fields;
 
 		if (preview_data.xhr) {
 			preview_data.xhr.abort();

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,39 +21,35 @@
 
 class CWidgetFieldWidgetSelect extends CWidgetField {
 
+	public const DEFAULT_VALUE = -1;
+
 	private $search_by_value;
 
 	/**
 	 * Field that creates a selection of widgets in current dashboard, filtered by given key of widget array.
 	 *
-	 * @param string $name         Name of field in config form and widget['fields'] array.
-	 * @param string $label        Field label in config form.
-	 * @param mixed  $search_type  Value that will be searched in widgets.
+	 * @param string $search_by_value  Value that will be searched in widgets.
 	 */
-	public function __construct($name, $label, $search_by_value) {
+	public function __construct(string $name, string $label = null, string $search_by_value = '') {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->search_by_value = $search_by_value;
+
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
-	/**
-	 * Set additional flags, which can be used in configuration form.
-	 *
-	 * @param int $flags
-	 *
-	 * @return $this
-	 */
-	public function setFlags($flags) {
+	public function setFlags(int $flags): self {
 		parent::setFlags($flags);
 
-		if ($flags & self::FLAG_NOT_EMPTY) {
+		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
 			$strict_validation_rules = $this->getValidationRules();
 			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
 			$this->setStrictValidationRules($strict_validation_rules);
 		}
 		else {
-			$this->setStrictValidationRules(null);
+			$this->setStrictValidationRules();
 		}
 
 		return $this;
@@ -64,7 +60,7 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 	 *
 	 * @return string
 	 */
-	public function getJavascript() {
+	public function getJavaScript() {
 		return '
 			var filter_select = document.getElementById("'.$this->getName().'");
 
@@ -82,19 +78,11 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 		';
 	}
 
-	public function setValue($value) {
+	public function setValue($value): self {
 		if ($value === '' || ctype_alnum($value)) {
 			$this->value = $value;
 		}
 
 		return $this;
-	}
-
-	public function setAction($action) {
-		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
-	}
-
-	public function getAction() {
-		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
 	}
 }

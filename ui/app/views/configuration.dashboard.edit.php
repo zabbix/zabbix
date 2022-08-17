@@ -113,6 +113,7 @@ $html_page
 	view.init('.json_encode([
 		'dashboard' => $data['dashboard'],
 		'widget_defaults' => $data['widget_defaults'],
+		'widget_last_type' => $data['widget_last_type'],
 		'time_period' => $data['time_period'],
 		'page' => $data['page']
 	]).');

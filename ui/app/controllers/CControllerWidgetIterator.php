@@ -65,7 +65,7 @@ abstract class CControllerWidgetIterator extends CControllerDashboardWidgetView 
 	 * @return int  Number of child widgets.
 	 */
 	protected function getIteratorPageSize() {
-		$fields_data = $this->getForm()->getFieldsData();
+		$fields_data = $this->getForm()->getFieldsValues();
 
 		return min($fields_data['rows'] * $fields_data['columns'],
 			floor(DASHBOARD_MAX_COLUMNS * DASHBOARD_WIDGET_MAX_ROWS / DASHBOARD_WIDGET_MIN_ROWS)

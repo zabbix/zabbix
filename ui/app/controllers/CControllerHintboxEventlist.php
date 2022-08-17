@@ -34,7 +34,7 @@ class CControllerHintboxEventlist extends CController {
 		$fields = [
 			'triggerid' =>			'required|db triggers.triggerid',
 			'eventid_till' =>		'required|db events.eventid',
-			'show_timeline' =>		'required|in 0,1',
+			'show_timeline' =>		'required|in '.implode(',', [ZBX_TIMELINE_OFF, ZBX_TIMELINE_ON]),
 			'show_tags' =>			'required|in '.implode(',', [SHOW_TAGS_NONE, SHOW_TAGS_1, SHOW_TAGS_2, SHOW_TAGS_3]),
 			'filter_tags' =>		'array',
 			'tag_name_format' =>	'required|in '.implode(',', [TAG_NAME_FULL, TAG_NAME_SHORTENED, TAG_NAME_NONE]),
