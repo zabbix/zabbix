@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
- * @backup ids, media_type
+ * @backup ids, media_type, auditlog
  */
 class testAuditManual extends CWebTest {
 	use TableTrait;
