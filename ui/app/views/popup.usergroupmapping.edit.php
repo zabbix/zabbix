@@ -75,22 +75,32 @@ $user_role_multiselect = (new CMultiSelect([
 	->setId('roleid');
 $inline_js .= $user_role_multiselect->getPostJS();
 
-$name_hint_icon = makeHelpIcon([
+if ($data['is_fallback'] == true) {
+	$name_formfield = $data['idp_group_name'];
+	$name_hint_icon = makeHelpIcon([
+		_('Use fallback group to define user groups and a role for users not covered by group mapping.'),
+	])
+		->addClass(ZBX_STYLE_LIST_DASHED);
+}
+else {
+	$name_formfield = (new CTextBox('idp_group_name', $data['idp_group_name']))
+		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+		->setId('idp_group_name');
+	$name_hint_icon = makeHelpIcon([
 		_('Naming requirements:'),
 		(new CList([
 			_('group name must match LDAP group name'),
 			_("wildcard patterns with '*' may be used")
 		]))->addClass(ZBX_STYLE_LIST_DASHED)
 	])
-->addClass(ZBX_STYLE_LIST_DASHED);
+		->addClass(ZBX_STYLE_LIST_DASHED);
+}
 
 $form
 	->addItem((new CFormGrid())
 		->addItem([
-			(new CLabel([$data['name_label']], 'idp_group_name'))->setAsteriskMark(),
-			new CFormField((new CTextBox('idp_group_name', $data['idp_group_name']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setId('idp_group_name'))
+			(new CLabel([$data['name_label'], $name_hint_icon], 'idp_group_name'))->setAsteriskMark(),
+			new CFormField($name_formfield)
 		])
 		->addItem([
 			(new CLabel(_('User groups'), 'user_groups__ms'))->setAsteriskMark(),

@@ -30,7 +30,7 @@ window.ldap_edit_popup = new class {
 		this.advanced_chbox = null;
 	}
 
-	init(data) {
+	init({ldap_user_groups, ldap_media_type_mappings}) {
 		this.overlay = overlays_stack.getById('ldap_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -41,8 +41,9 @@ window.ldap_edit_popup = new class {
 		this.toggleAllowJitProvisioning(this.allow_jit_chbox.checked);
 
 		this._addEventListeners();
-		this._addLdapUserGroups(data.ldap_user_groups);
-		this._addLdapMediaTypeMapping(data.ldap_media_type_mappings);
+		this._addLdapUserGroups(ldap_user_groups);
+		this._addLdapMediaTypeMapping(ldap_media_type_mappings);
+		this.initSortable(document.getElementById('ldap-user-groups-table'));
 
 		if (document.getElementById('bind-password-btn') !== null) {
 			document.getElementById('bind-password-btn').addEventListener('click', this.showPasswordField);
@@ -116,6 +117,46 @@ window.ldap_edit_popup = new class {
 			new_action.innerHTML += '<input type="hidden" name="ldap_groups[#{row_index}][fallback_status]" value="0">';
 		}
 		target.replaceWith(new_action);
+	}
+
+	initSortable(element) {
+		const is_disabled = element.querySelectorAll('tr.sortable').length < 2;
+
+		$(element).sortable({
+			disabled: is_disabled,
+			items: 'tbody tr.sortable',
+			axis: 'y',
+			containment: 'parent',
+			cursor: 'grabbing',
+			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			tolerance: 'pointer',
+			opacity: 0.6,
+			helper: function(e, ui) {
+				for (let td of ui.find('>td')) {
+					let $td = $(td);
+					$td.attr('width', $td.width())
+				}
+
+				// when dragging element on safari, it jumps out of the table
+				if (SF) {
+					// move back draggable element to proper position
+					ui.css('left', (ui.offset().left - 2) + 'px');
+				}
+
+				return ui;
+			},
+			stop: function(e, ui) {
+				ui.item.find('>td').removeAttr('width');
+				ui.item.removeAttr('style');
+			},
+			start: function(e, ui) {
+				$(ui.placeholder).height($(ui.helper).height());
+			}
+		});
+
+		for (const drag_icon of element.querySelectorAll('div.<?= ZBX_STYLE_DRAG_ICON ?>')) {
+			drag_icon.classList.toggle('<?= ZBX_STYLE_DISABLED ?>', is_disabled);
+		}
 	}
 
 	showPasswordField(e) {
@@ -238,7 +279,8 @@ window.ldap_edit_popup = new class {
 			popup_params = {
 				idp_group_name: row.querySelector(`[name="ldap_groups[${row_index}][idp_group_name]"`).value,
 				usrgrpid: row.querySelector(`[name="ldap_groups[${row_index}][usrgrpid]"`).value,
-				roleid: row.querySelector(`[name="ldap_groups[${row_index}][roleid]"`).value
+				roleid: row.querySelector(`[name="ldap_groups[${row_index}][roleid]"`).value,
+				is_fallback: row.querySelector(`[name="ldap_groups[${row_index}][is_fallback]"`).value
 			};
 		}
 		else {
@@ -355,12 +397,17 @@ window.ldap_edit_popup = new class {
 
 	_templateLdapUserGroupRow() {
 		return `
-				<tr data-row_index="#{row_index}">
+				<tr data-row_index="#{row_index}" class="sortable">
+					<td class="td-drag-icon">
+						<div class="drag-icon ui-sortable-handle"></div>
+					</td>
 					<td>
 						<a href="javascript:void(0);" class="wordwrap js-edit">#{idp_group_name}</a>
 						<input type="hidden" name="ldap_groups[#{row_index}][idp_group_name]" value="#{idp_group_name}">
 						<input type="hidden" name="ldap_groups[#{row_index}][usrgrpid]" value="#{usrgrpid}">
 						<input type="hidden" name="ldap_groups[#{row_index}][roleid]" value="#{roleid}">
+						<input type="hidden" name="ldap_groups[#{row_index}][is_fallback]" value="#{is_fallback}">
+						<input type="hidden" name="ldap_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
 					</td>
 					<td class="wordbreak">#{user_group_name}</td>
 					<td class="wordbreak">#{role_name}</td>

@@ -117,7 +117,7 @@ class CControllerPopupLdapEdit extends CController {
 				'user_group_id' => '456',
 				'role_name' => 'Admin role',
 				'roleid' => '2',
-				'is_fallback' => false
+				'is_fallback' => 0
 			],
 			[
 				'idp_group_name' => 'Fallback group',
@@ -125,7 +125,7 @@ class CControllerPopupLdapEdit extends CController {
 				'usrgrpid' => 13,
 				'role_name' => 'Super admin',
 				'roleid' => 3,
-				'is_fallback' => true,
+				'is_fallback' => 1,
 				'fallback_status' => 0
 			]
 		];

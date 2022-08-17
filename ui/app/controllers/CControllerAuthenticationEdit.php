@@ -233,7 +233,7 @@ class CControllerAuthenticationEdit extends CController {
 				'user_group_id' => '123',
 				'role_name' => 'Admin role',
 				'roleid' => '2',
-				'is_fallback' => false
+				'is_fallback' => 0
 			],
 			[
 				'idp_group_name' => 'Fallback group',
@@ -241,7 +241,7 @@ class CControllerAuthenticationEdit extends CController {
 				'role_name' => $user_role[0]['name'],
 				'roleid' => $user_role[0]['roleid'],
 				'usrgrpid' => $group_id,
-				'is_fallback' => true,
+				'is_fallback' => 1,
 				'fallback_status' => 0
 			]
 		];
