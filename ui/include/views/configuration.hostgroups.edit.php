@@ -33,7 +33,7 @@ $form = (new CForm())
 
 $form_list = (new CFormList('hostgroupFormList'));
 
-if ($data['groupid'] !== null && $data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+if ($data['groupid'] != 0 && $data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$name = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
 
 	if ($data['group']['discoveryRule']) {
