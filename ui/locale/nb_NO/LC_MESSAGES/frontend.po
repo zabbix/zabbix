@@ -13824,6 +13824,10 @@ msgstr "Oppdagelsesregler for foreldre"
 msgid "Parent graphs"
 msgstr "Foreldre grafer"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
 msgid "Parent items"
