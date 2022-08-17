@@ -137,7 +137,7 @@ class CServiceHelper {
 		$status_names = [];
 
 		foreach (CSeverityHelper::getSeverities() as $severity) {
-			$status_names[$severity['value']] = $severity['name'];
+			$status_names[$severity['value']] = $severity['label'];
 		}
 
 		return $status_names;
