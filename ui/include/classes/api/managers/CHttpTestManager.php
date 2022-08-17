@@ -198,7 +198,7 @@ class CHttpTestManager {
 			$status_updated = array_key_exists('status', $httptest) && $httptest['status'] != $db_httptest['status'];
 			$delay_updated = array_key_exists('delay', $httptest) && $httptest['delay'] !== $db_httptest['delay'];
 			$templateid_updated = array_key_exists('templateid', $httptest)
-				&& $httptest['templateid'] !== $db_httptest['templateid'];
+				&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0;
 
 			if ($name_updated || $status_updated || $delay_updated || $templateid_updated
 					|| array_key_exists('tags', $httptest)) {
@@ -356,7 +356,7 @@ class CHttpTestManager {
 			$status_updated = array_key_exists('status', $httptest) && $httptest['status'] != $db_httptest['status'];
 			$delay_updated = array_key_exists('delay', $httptest) && $httptest['delay'] != $db_httptest['delay'];
 			$templateid_updated = array_key_exists('templateid', $httptest)
-				&& $httptest['templateid'] !== $db_httptest['templateid'];
+				&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0;
 
 			if (array_key_exists('steps', $httptest) || $name_updated || $status_updated || $delay_updated
 					|| $templateid_updated || array_key_exists('tags', $httptest)) {
@@ -658,7 +658,7 @@ class CHttpTestManager {
 				}
 
 				if (array_key_exists('templateid', $httptest)
-						&& $httptest['templateid'] !== $db_httptest['templateid']) {
+						&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0) {
 					$item_key = array_key_exists('key_', $item) ? $item['key_'] : $db_item['key_'];
 
 					$item['templateid'] = $httptest['templateid'] === '0'
@@ -701,7 +701,7 @@ class CHttpTestManager {
 					}
 
 					if (array_key_exists('templateid', $httptest)
-							&& $httptest['templateid'] !== $db_httptest['templateid']) {
+							&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0) {
 						$item_key = array_key_exists('key_', $item) ? $item['key_'] : $db_item['key_'];
 
 						$item['templateid'] = $httptest['templateid'] === '0'
@@ -1460,7 +1460,7 @@ class CHttpTestManager {
 					$exHttpTest = $hostHttpTest['byName'][$httpTest['name']];
 
 					if (bccomp($exHttpTest['templateid'], $httpTestId) == 0
-							|| $exHttpTest['templateid'] != 0
+							|| $exHttpTest['templateid'] !== '0'
 							|| !$this->compareHttpSteps($httpTest, $exHttpTest)) {
 						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
 						throw new Exception(
