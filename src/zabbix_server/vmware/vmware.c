@@ -27,9 +27,7 @@
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "zbxnix.h"
-#include "zbxself.h"
 #include "zbxstr.h"
-#include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
 
@@ -7666,6 +7664,11 @@ static void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zb
 		cqv->response = NULL;
 		cqv->status = ZBX_VMWARE_CQV_VALUE;
 	}
+	else if ('\0' != *cqv->instance->mode && 0 == strcmp(cqv->instance->mode, "json"))
+	{
+		zbx_xmlnode_to_json(node, &cqv->response);
+		cqv->status = ZBX_VMWARE_CQV_VALUE;
+	}
 	else if (NULL != node->xmlChildrenNode && XML_TEXT_NODE == node->xmlChildrenNode->type)
 	{
 		cqv->response = zbx_xml_node_read_value(xdoc, node, ".");
@@ -7688,16 +7691,17 @@ static void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zb
  * Purpose: load vmware object property info from VC                          *
  *                                                                            *
  * Parameters: easyhandle - [IN] the CURL handle                              *
+ *             collector  - [IN] the name of vmware property collector        *
  *             cq_values  - [IN/OUT] the vector with custom query entries     *
  *                                     and responses                          *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_props_load(CURL *easyhandle, zbx_vector_cq_value_t *cq_values)
+static void	vmware_service_props_load(CURL *easyhandle, const char *collector, zbx_vector_cq_value_t *cq_values)
 {
 #	define ZBX_POST_OBJ_PROP									\
 		ZBX_POST_VSPHERE_HEADER									\
 		"<ns0:RetrievePropertiesEx>"								\
-			"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"		\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"		\
 			"<ns0:specSet>"									\
 				"<ns0:propSet>"								\
 					"<ns0:type>%s</ns0:type>"					\
@@ -7726,8 +7730,8 @@ static void	vmware_service_props_load(CURL *easyhandle, zbx_vector_cq_value_t *c
 			continue;
 
 		zbx_xml_free_doc(doc);
-		zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_OBJ_PROP, cqv->instance->soap_type, cqv->instance->key,
-				cqv->instance->soap_type, cqv->instance->id);
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_OBJ_PROP, collector, cqv->instance->soap_type,
+				cqv->instance->key, cqv->instance->soap_type, cqv->instance->id);
 		total++;
 
 		if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, &error))
@@ -7946,7 +7950,8 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_uuid_compare);
 
 	vmware_service_dvswitch_load(easyhandle, &dvs_query_values);
-	vmware_service_props_load(easyhandle, &prop_query_values);
+	vmware_service_props_load(easyhandle, vmware_service_objects[service->type].property_collector,
+			&prop_query_values);
 	zbx_vector_vmware_alarm_sort(&data->alarms, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
 	if (0 == service->eventlog.req_sz && 0 == evt_pause)
