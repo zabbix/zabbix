@@ -54,17 +54,16 @@ class testAuditManual extends CWebTest {
 		}
 
 		// Find filter form and check labels.
-		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals(['Users', 'Resource', 'Resource ID', 'Recordset ID', 'Actions'], $form->getLabels()->asText());
+		$this->assertEquals(['Users', 'Resource', 'Resource ID', 'Recordset ID', 'Actions'],
+				$this->query('name:zbx_filter')->asForm()->one()->getLabels()->asText());
 
 		// Find table and check table headers.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertEquals(['Time', 'User', 'IP', 'Resource', 'ID', 'Action', 'Recordset ID', 'Details'], $table->getHeadersText());
+		$this->assertEquals(['Time', 'User', 'IP', 'Resource', 'ID', 'Action', 'Recordset ID', 'Details'],
+				$this->query('class:list-table')->asTable()->one()->getHeadersText());
 
 		// Find action checkboxes and check labels.
-		$action_list = $this->query('id:filter-actions')->asCheckboxList()->one();
 		$this->assertEquals(['Add', 'Delete', 'Execute', 'Failed login', 'History clear', 'Login', 'Logout', 'Update'],
-			$action_list->getLabels()->asText()
+				$this->query('id:filter-actions')->asCheckboxList()->one()->getLabels()->asText()
 		);
 	}
 
@@ -73,8 +72,6 @@ class testAuditManual extends CWebTest {
 	 */
 	public function testAuditManual_ActionsCheckbox() {
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
-		$action_list = ['Add', 'Delete', 'Execute', 'Failed login', 'History clear', 'Login', 'Logout', 'Update'];
-		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$errors = [];
 
 		// Resource name with checkboxes that are enabled.
@@ -122,8 +119,9 @@ class testAuditManual extends CWebTest {
 
 		foreach ($resource_actions as $resource => $actions) {
 			$status = true;
-			$form->fill(['Resource' => $resource]);
-			$left_actions = array_values(array_diff($action_list, $actions));
+			$this->query('name:zbx_filter')->asForm()->one()->fill(['Resource' => $resource]);
+			$left_actions = array_values(array_diff(['Add', 'Delete', 'Execute', 'Failed login', 'History clear',
+					'Login', 'Logout', 'Update'], $actions));
 
 			// At first, we need to check that correct checkboxes is enabled. Then we check that all others are disabled.
 			for ($i = 1; $i <= 2; $i++) {
