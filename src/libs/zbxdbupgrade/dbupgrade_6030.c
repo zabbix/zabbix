@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
 
@@ -31,135 +31,214 @@ extern unsigned char	program_type;
 
 static int	DBpatch_6030000(void)
 {
-	return DBcreate_changelog_insert_trigger("drules", "druleid");
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_db_insert_t		db_insert;
+	int			ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = DBselect("select roleid,type,name,value_int from role_rule where name in ("
+			"'ui.configuration.actions',"
+			"'ui.services.actions',"
+			"'ui.administration.general')");
+
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int", NULL);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	roleid;
+		int		value_int, type;
+
+		ZBX_STR2UINT64(roleid, row[0]);
+		type = atoi(row[1]);
+		value_int = atoi(row[3]);
+
+		if (0 == strcmp(row[2], "ui.configuration.actions"))
+		{
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.configuration.autoregistration_actions", value_int);
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.configuration.discovery_actions", value_int);
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.configuration.internal_actions", value_int);
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.configuration.trigger_actions", value_int);
+		}
+		else if (0 == strcmp(row[2], "ui.administration.general"))
+		{
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.administration.housekeeping", value_int);
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.administration.macros", value_int);
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.administration.api_tokens", value_int);
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.administration.audit_log", value_int);
+		}
+		else
+		{
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, type,
+					"ui.configuration.service_actions", value_int);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
+
+	if (SUCCEED == (ret = zbx_db_insert_execute(&db_insert)))
+	{
+		if (ZBX_DB_OK > DBexecute("delete from role_rule where name in ("
+			"'ui.configuration.actions',"
+			"'ui.services.actions')"))
+		{
+			ret = FAIL;
+		}
+	}
+
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
 }
 
 static int	DBpatch_6030001(void)
 {
-	return DBcreate_changelog_update_trigger("drules", "druleid");
+	return DBcreate_changelog_insert_trigger("drules", "druleid");
 }
 
 static int	DBpatch_6030002(void)
 {
-	return DBcreate_changelog_delete_trigger("drules", "druleid");
+	return DBcreate_changelog_update_trigger("drules", "druleid");
 }
 
 static int	DBpatch_6030003(void)
 {
-	return DBcreate_changelog_insert_trigger("dchecks", "dcheckid");
+	return DBcreate_changelog_delete_trigger("drules", "druleid");
 }
 
 static int	DBpatch_6030004(void)
 {
-	return DBcreate_changelog_update_trigger("dchecks", "dcheckid");
+	return DBcreate_changelog_insert_trigger("dchecks", "dcheckid");
 }
 
 static int	DBpatch_6030005(void)
 {
-	return DBcreate_changelog_delete_trigger("dchecks", "dcheckid");
+	return DBcreate_changelog_update_trigger("dchecks", "dcheckid");
 }
 
 static int	DBpatch_6030006(void)
 {
-	return DBcreate_changelog_insert_trigger("httptest", "httptestid");
+	return DBcreate_changelog_delete_trigger("dchecks", "dcheckid");
 }
 
 static int	DBpatch_6030007(void)
 {
-	return DBcreate_changelog_update_trigger("httptest", "httptestid");
+	return DBcreate_changelog_insert_trigger("httptest", "httptestid");
 }
 
 static int	DBpatch_6030008(void)
 {
-	return DBcreate_changelog_delete_trigger("httptest", "httptestid");
+	return DBcreate_changelog_update_trigger("httptest", "httptestid");
 }
 
 static int	DBpatch_6030009(void)
 {
-	return DBcreate_changelog_insert_trigger("httptest_field", "httptest_fieldid");
+	return DBcreate_changelog_delete_trigger("httptest", "httptestid");
 }
 
 static int	DBpatch_6030010(void)
 {
-	return DBcreate_changelog_update_trigger("httptest_field", "httptest_fieldid");
+	return DBcreate_changelog_insert_trigger("httptest_field", "httptest_fieldid");
 }
 
 static int	DBpatch_6030011(void)
 {
-	return DBcreate_changelog_delete_trigger("httptest_field", "httptest_fieldid");
+	return DBcreate_changelog_update_trigger("httptest_field", "httptest_fieldid");
 }
 
 static int	DBpatch_6030012(void)
 {
-	return DBcreate_changelog_insert_trigger("httptestitem", "httptestitemid");
+	return DBcreate_changelog_delete_trigger("httptest_field", "httptest_fieldid");
 }
 
 static int	DBpatch_6030013(void)
 {
-	return DBcreate_changelog_update_trigger("httptestitem", "httptestitemid");
+	return DBcreate_changelog_insert_trigger("httptestitem", "httptestitemid");
 }
 
 static int	DBpatch_6030014(void)
 {
-	return DBcreate_changelog_delete_trigger("httptestitem", "httptestitemid");
+	return DBcreate_changelog_update_trigger("httptestitem", "httptestitemid");
 }
 
 static int	DBpatch_6030015(void)
 {
-	return DBcreate_changelog_insert_trigger("httpstep", "httpstepid");
+	return DBcreate_changelog_delete_trigger("httptestitem", "httptestitemid");
 }
 
 static int	DBpatch_6030016(void)
 {
-	return DBcreate_changelog_update_trigger("httpstep", "httpstepid");
+	return DBcreate_changelog_insert_trigger("httpstep", "httpstepid");
 }
 
 static int	DBpatch_6030017(void)
 {
-	return DBcreate_changelog_delete_trigger("httpstep", "httpstepid");
+	return DBcreate_changelog_update_trigger("httpstep", "httpstepid");
 }
 
 static int	DBpatch_6030018(void)
 {
-	return DBcreate_changelog_insert_trigger("httpstep_field", "httpstep_fieldid");
+	return DBcreate_changelog_delete_trigger("httpstep", "httpstepid");
 }
 
 static int	DBpatch_6030019(void)
 {
-	return DBcreate_changelog_update_trigger("httpstep_field", "httpstep_fieldid");
+	return DBcreate_changelog_insert_trigger("httpstep_field", "httpstep_fieldid");
 }
 
 static int	DBpatch_6030020(void)
 {
-	return DBcreate_changelog_delete_trigger("httpstep_field", "httpstep_fieldid");
+	return DBcreate_changelog_update_trigger("httpstep_field", "httpstep_fieldid");
 }
 
 static int	DBpatch_6030021(void)
 {
-	return DBcreate_changelog_insert_trigger("httpstepitem", "httpstepitemid");
+	return DBcreate_changelog_delete_trigger("httpstep_field", "httpstep_fieldid");
 }
 
 static int	DBpatch_6030022(void)
 {
-	return DBcreate_changelog_update_trigger("httpstepitem", "httpstepitemid");
+	return DBcreate_changelog_insert_trigger("httpstepitem", "httpstepitemid");
 }
 
 static int	DBpatch_6030023(void)
 {
-	return DBcreate_changelog_delete_trigger("httpstepitem", "httpstepitemid");
+	return DBcreate_changelog_update_trigger("httpstepitem", "httpstepitemid");
 }
 
 static int	DBpatch_6030024(void)
 {
-	return DBdrop_field("drules", "nextcheck");
+	return DBcreate_changelog_delete_trigger("httpstepitem", "httpstepitemid");
 }
 
 static int	DBpatch_6030025(void)
 {
-	return DBdrop_field("httptest", "nextcheck");
+	return DBdrop_field("drules", "nextcheck");
 }
 
 static int	DBpatch_6030026(void)
+{
+	return DBdrop_field("httptest", "nextcheck");
+}
+
+static int	DBpatch_6030027(void)
 {
 	const ZBX_FIELD field = {"discovery_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
@@ -199,5 +278,6 @@ DBPATCH_ADD(6030023, 0, 1)
 DBPATCH_ADD(6030024, 0, 1)
 DBPATCH_ADD(6030025, 0, 1)
 DBPATCH_ADD(6030026, 0, 1)
+DBPATCH_ADD(6030027, 0, 1)
 
 DBPATCH_END()

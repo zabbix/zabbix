@@ -68,7 +68,7 @@ $c{"before"} = "/*
 **/
 
 #include \"zbxdbschema.h\"
-#include \"common.h\"
+#include \"zbxcommon.h\"
 
 const ZBX_TABLE\ttables[] = {
 

@@ -19,7 +19,7 @@
 
 #include "dbconfig.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 #include "zbxalgo.h"
 #include "dbcache.h"

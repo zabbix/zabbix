@@ -112,10 +112,8 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts);
 static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts);
 
-static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint32_t revision);
-static int	dc_item_update_revision(ZBX_DC_ITEM *item, zbx_uint32_t revision);
-
-static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint32_t revision);
+static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint64_t revision);
+static int	dc_item_update_revision(ZBX_DC_ITEM *item, zbx_uint64_t revision);
 
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
@@ -1085,10 +1083,8 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 
 	while (SUCCEED == zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		ZBX_DC_AUTOREG_HOST	*autoreg_host, autoreg_host_local;
+		ZBX_DC_AUTOREG_HOST	*autoreg_host, autoreg_host_local = {.host = row[0]};
 		int			found;
-
-		autoreg_host_local.host = row[0];
 
 		autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_search(&config->autoreg_hosts, &autoreg_host_local);
 		if (NULL == autoreg_host)
@@ -1131,7 +1127,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	zbx_hashset_remove_direct(&config->proxies, proxy);
 }
 
-static void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid, zbx_uint32_t revision)
+static void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid, zbx_uint64_t revision)
 {
 	ZBX_DC_PROXY	*proxy;
 	int		i;
@@ -1151,7 +1147,7 @@ static void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hosti
 	proxy->revision = revision;
 }
 
-static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid, zbx_uint32_t revision)
+static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid, zbx_uint64_t revision)
 {
 	ZBX_DC_PROXY	*proxy;
 
@@ -1162,7 +1158,8 @@ static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid,
 	proxy->revision = revision;
 }
 
-static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint32_t revision, zbx_vector_uint64_t *active_avail_diff,
+
+static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_uint64_t *active_avail_diff,
 		zbx_hashset_t *activated_hosts)
 {
 	char		**row;
@@ -5697,7 +5694,7 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync, zbx_uint32_t revision)
  * Purpose: update host and its proxy revision                                *
  *                                                                            *
  ******************************************************************************/
-static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint32_t revision)
+static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint64_t revision)
 {
 	ZBX_DC_PROXY	*proxy;
 
@@ -5722,7 +5719,7 @@ static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint32_t revision)
  * Purpose: update item, host and its proxy revision                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_item_update_revision(ZBX_DC_ITEM *item, zbx_uint32_t revision)
+static int	dc_item_update_revision(ZBX_DC_ITEM *item, zbx_uint64_t revision)
 {
 	ZBX_DC_HOST	*host;
 
@@ -8111,7 +8108,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
  *                                                                            *
  ******************************************************************************/
 int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
-		zbx_uint64_t *revision, zbx_uint64_t *config_revision, char **error)
+		zbx_uint64_t *revision, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -8161,7 +8158,9 @@ int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uin
 	um_cache_get_host_revision(config->um_cache, ZBX_UM_CACHE_GLOBAL_MACRO_HOSTID, revision);
 	um_cache_get_host_revision(config->um_cache, *hostid, revision);
 
-	*config_revision = config->revision.config;
+	/* configuration is not yet fully synced */
+	if (*revision > config->revision.config)
+		*revision = config->revision.config;
 
 	UNLOCK_CACHE;
 
@@ -8213,10 +8212,8 @@ int	DCis_autoreg_host_changed(const char *host, unsigned short port, const char 
 void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
 		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now)
 {
-	ZBX_DC_AUTOREG_HOST	*dc_autoreg_host, dc_autoreg_host_local;
+	ZBX_DC_AUTOREG_HOST	*dc_autoreg_host, dc_autoreg_host_local = {.host = host};
 	int			found;
-
-	dc_autoreg_host_local.host = host;
 
 	WRLOCK_CACHE;
 
@@ -15015,7 +15012,7 @@ static void	dc_check_item_activation(ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
  *                                                                            *
  * Purpose: get items with changed expanded delay value                       *
  *                                                                            *
- * Parameters: activated_hosts - [IN] the activated hosts                     *
+ * Parameters: activated_hosts - [IN]                                         *
  *             items           - [OUT] items to be rescheduled because of     *
  *                                     delay changes                          *
  *             activated_items - [OUT] items to be rescheduled because host   *
@@ -15098,7 +15095,6 @@ static void	dc_reschedule_item(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int n
 			DCitem_poller_type_update(item, host, ZBX_ITEM_COLLECTED);
 
 		DCupdate_item_queue(item, item->poller_type, old_nextcheck);
-
 	}
 	else
 	{
@@ -15120,7 +15116,7 @@ static void	dc_reschedule_item(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int n
 static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts)
 {
 	zbx_vector_item_delay_t		items;
-	zbx_vector_ptr_pair_t	activated_items;
+	zbx_vector_ptr_pair_t		activated_items;
 
 	zbx_vector_item_delay_create(&items);
 	zbx_vector_ptr_pair_create(&activated_items);

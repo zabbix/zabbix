@@ -1120,6 +1120,11 @@ msgstr "Agregacja odstępów"
 msgid "Alert message"
 msgstr "Wiadomość ostrzegawcza"
 
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CRoleHelper.php:338
+msgid "Alerts"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
 msgstr "Algorytm"
@@ -5059,6 +5064,11 @@ msgstr "Linia przerywana"
 #: include/classes/widgets/CWidgetHelper.php:587
 msgid "Data"
 msgstr "Data"
+
+#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CRoleHelper.php:337
+msgid "Data collection"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
@@ -14390,6 +14400,10 @@ msgstr "Nadrzędne reguły wykrywania"
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "Nadrzędne wykresy"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55

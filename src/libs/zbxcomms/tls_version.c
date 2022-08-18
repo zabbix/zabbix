@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcomms.h"
-#include "common.h"
+#include "zbxcommon.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 

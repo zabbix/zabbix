@@ -20,7 +20,7 @@
 #ifndef ZABBIX_STR_H
 #define ZABBIX_STR_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 

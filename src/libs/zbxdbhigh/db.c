@@ -3330,7 +3330,7 @@ int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx
  * Return value: SUCCEED - one or more of the specified records were          *
  *                         successfully locked                                *
  *               FAIL    - the table does not contain any of the specified    *
- *                         records                                            *
+ *                         records or 'table' name not found                  *
  *                                                                            *
  ******************************************************************************/
 int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
@@ -3346,7 +3346,13 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 	if (0 == zbx_db_txn_level())
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __func__);
 
-	t = DBget_table(table);
+	if (NULL == (t = DBget_table(table)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, table);
+		THIS_SHOULD_NEVER_HAPPEN;
+		ret = FAIL;
+		goto out;
+	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select null from %s where", table);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, t->recid, ids->values, ids->values_num);
@@ -3361,7 +3367,7 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 		ret = SUCCEED;
 
 	DBfree_result(result);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

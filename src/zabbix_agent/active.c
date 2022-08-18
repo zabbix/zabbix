@@ -294,10 +294,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *                                     server                                 *
  *             host                  - address of host                        *
  *             port                  - port number on host                    *
- *             config_revision_local - revision of proessed configuration     *
- *                                                                            *
- * Return value: returns SUCCEED on successful parsing,                       *
- *               FAIL on an incorrect format of string                        *
+ *             config_revision_local - revision of processed configuration    *
  *                                                                            *
  * Comments:                                                                  *
  *    String represented as "ZBX_EOF" termination list                        *
@@ -306,7 +303,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *           <key>:<refresh time>:<last log size>:<modification time>         *
  *                                                                            *
  ******************************************************************************/
-static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
+static void	parse_list_of_checks(char *str, const char *host, unsigned short port,
 		zbx_uint32_t *config_revision_local)
 {
 	const char		*p;
@@ -532,8 +529,6 @@ out:
 	zbx_free(name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
 }
 
 /*********************************************************************************

@@ -227,7 +227,7 @@ static int	variant_to_ui64(zbx_variant_t *value)
 			if (ZBX_MAX_UINT64 <= value->data.dbl)
 				return FAIL;
 
-			zbx_variant_set_ui64(value, value->data.dbl);
+			zbx_variant_set_ui64(value, (zbx_uint64_t)(value->data.dbl));
 			return SUCCEED;
 		case ZBX_VARIANT_STR:
 			zbx_strlcpy(buffer, value->data.str, sizeof(buffer));

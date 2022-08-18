@@ -1099,6 +1099,11 @@ msgstr ""
 msgid "Alert message"
 msgstr ""
 
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CRoleHelper.php:338
+msgid "Alerts"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
 msgstr ""
@@ -4964,6 +4969,11 @@ msgstr ""
 #: app/views/popup.tophosts.column.edit.php:58
 #: include/classes/widgets/CWidgetHelper.php:587
 msgid "Data"
+msgstr ""
+
+#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CRoleHelper.php:337
+msgid "Data collection"
 msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
@@ -14262,6 +14272,10 @@ msgstr ""
 
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
+msgstr ""
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
 msgstr ""
 
 #: include/views/configuration.item.edit.php:57

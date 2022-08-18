@@ -20,7 +20,7 @@
 #ifndef ZABBIX_HTTPTEST_H
 #define ZABBIX_HTTPTEST_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 int	process_httptests(int now, time_t *nextcheck);
 

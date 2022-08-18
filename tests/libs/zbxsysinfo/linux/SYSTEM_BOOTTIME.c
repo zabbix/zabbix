@@ -20,7 +20,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "sysinfo.h"
 
 void	zbx_mock_test_entry(void **state)

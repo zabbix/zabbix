@@ -20,7 +20,7 @@
 #ifndef ZBX_USER_MACRO_H
 #define ZBX_USER_MACRO_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxalgo.h"
 
 #define ZBX_UM_CACHE_GLOBAL_MACRO_HOSTID	0

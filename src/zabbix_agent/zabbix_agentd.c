@@ -819,7 +819,7 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
  ******************************************************************************/
 static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 {
-#define MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY	5
+#define MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY	1
 #define MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY	SEC_PER_DAY
 	static char			*active_hosts;
 	zbx_vector_str_t		hostnames;
