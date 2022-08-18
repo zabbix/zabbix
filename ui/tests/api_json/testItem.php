@@ -47,7 +47,7 @@ class testItem extends CAPITest {
 			ITEM_TYPE_DEPENDENT => null,
 			ITEM_TYPE_HTTPAGENT => '50022',
 			ITEM_TYPE_SNMP => '50029',
-			ITEM_TYPE_SCRIPT => '50022'
+			ITEM_TYPE_SCRIPT => null
 		];
 		$item_type_tests = [];
 
@@ -109,7 +109,6 @@ class testItem extends CAPITest {
 						'timeout' => '30s'
 					];
 
-					$interfaceid = false;
 					break;
 
 				case ITEM_TYPE_CALCULATED:
@@ -138,6 +137,25 @@ class testItem extends CAPITest {
 				],
 				'expected_error' => null
 			];
+		}
+
+		$interfaces_tests = [];
+		$optional = [ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_HTTPAGENT];
+		$required = [ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_IPMI, ITEM_TYPE_ZABBIX, ITEM_TYPE_JMX];
+
+		foreach ($item_type_tests as $item_type_test) {
+			if (in_array($item_type_test['request_data']['type'], $optional)) {
+				unset($item_type_test['request_data']['interfaceid']);
+				$interfaces_tests[] = $item_type_test;
+
+				$item_type_test['request_data']['interfaceid'] = '0';
+				$interfaces_tests[] = $item_type_test;
+			}
+			else if (in_array($item_type_test['request_data']['type'], $required)) {
+				unset($item_type_test['request_data']['interfaceid']);
+				$item_type_test['expected_error'] = 'No interface found.';
+				$interfaces_tests[] = $item_type_test;
+			}
 		}
 
 		return [
@@ -266,34 +284,8 @@ class testItem extends CAPITest {
 					]
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "0".'
-			],
-
-			'HTTP Agent item without direct interface' => [
-				'request_data' => [
-					'hostid' => '50009',
-					'name' => 'NoInterfaceItem123',
-					'key_' => '1234',
-					'interfaceid' => 0,
-					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'type' => ITEM_TYPE_HTTPAGENT,
-					'delay' => '30s',
-					'url' => '192.168.0.1'
-				],
-				'expected_error' => null
-			],
-			'Sample/Simple Check item requires interface' => [
-				'request_data' => [
-					'hostid' => '50009',
-					'name' => 'NoInterfaceItem123',
-					'key_' => '1234',
-					'interfaceid' => 0,
-					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'type' => ITEM_TYPE_SIMPLE,
-					'delay' => '30s'
-				],
-				'expected_error' => 'No interface found.'
 			]
-		] + $item_type_tests;
+		] + $item_type_tests + $interfaces_tests;
 	}
 
 	/**

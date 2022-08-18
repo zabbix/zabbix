@@ -221,11 +221,11 @@ class testTriggerLinking extends CIntegrationTest {
 
 	public function checkTriggersCreate() {
 
-		$response = $this->call('host.get', ['filter' => ['host' => self::HOST_NAME]]);
+		$response = $this->callUntilDataIsPresent('host.get', ['filter' => ['host' => self::HOST_NAME]], 10, 2);
 		$this->assertArrayHasKey(0, $response['result'], json_encode($response, JSON_PRETTY_PRINT));
 		$this->assertArrayHasKey('host', $response['result'][0]);
 
-		$response = $this->call('trigger.get', [
+		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'selectTags' => 'extend',
 			'filter' => [
 				'host' => self::HOST_NAME
@@ -253,8 +253,7 @@ class testTriggerLinking extends CIntegrationTest {
 			],
 			'selectFunctions' => 'extend',
 			'sortfield' => 'description'
-		]
-		);
+		], 10, 2);
 
 		$this->assertEquals(self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE,
 							count($response['result']));
@@ -302,7 +301,6 @@ class testTriggerLinking extends CIntegrationTest {
 	public function testTriggerLinking_checkMe() {
 		$this->reloadConfigurationCache();
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->checkTriggersCreate();
 	}
 }

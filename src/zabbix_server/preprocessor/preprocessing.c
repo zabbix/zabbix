@@ -19,7 +19,7 @@
 
 #include "preprocessing.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 #include "zbxserialize.h"
 #include "preproc_history.h"

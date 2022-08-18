@@ -26,6 +26,9 @@
 #include "alerter_protocol.h"
 #include "zbxservice.h"
 #include "dbcache.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxexpr.h"
 
 #define ZBX_POLL_INTERVAL	1
 
@@ -910,9 +913,8 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 
 ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 {
-	double		sec1, sec2;
-	int		alerts_num, sleeptime, nextcheck, freq_watchdog, time_watchdog = 0, time_cleanup = 0,
-			results_num;
+	double		sec1, sec2, time_cleanup = 0, time_watchdog = 0;
+	int		alerts_num, sleeptime, nextcheck, freq_watchdog, results_num;
 	zbx_am_db_t	amdb;
 	char		*error = NULL;
 

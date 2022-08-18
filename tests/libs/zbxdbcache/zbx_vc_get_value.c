@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxnum.h"
 #include "valuecache.h"
 #include "valuecache_test.h"
 #include "mocks/valuecache/valuecache_mock.h"

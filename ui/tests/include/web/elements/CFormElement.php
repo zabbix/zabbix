@@ -51,8 +51,7 @@ class CFormElement extends CElement {
 	public static function createInstance(RemoteWebElement $element, $options = []) {
 		$instance = parent::createInstance($element, $options);
 
-		// TODO: remove condition with detectType after DEV-2200.
-		if (CTestArrayHelper::get($options, 'detectType', true) && get_class($instance) !== CGridFormElement::class) {
+		if (get_class($instance) !== CGridFormElement::class) {
 			$grid = $instance->query('xpath:.//div[contains(@class, "form-grid")]')->one(false);
 			if ($grid->isValid() && !$grid->parents('xpath:*[contains(@class, "table-forms-td-right")]')->exists()) {
 				return $instance->asGridForm($options);
@@ -442,6 +441,12 @@ class CFormElement extends CElement {
 	public function checkValue($expected, $raise_exception = true) {
 		if ($expected && is_array($expected)) {
 			foreach ($expected as $field => $value) {
+				if ($value instanceof \Closure) {
+					$function = new ReflectionFunction($value);
+					$variables = $function->getStaticVariables();
+					$value = $variables['value'];
+				}
+
 				if ($this->checkFieldValue($field, $value, $raise_exception) === false) {
 					return false;
 				}

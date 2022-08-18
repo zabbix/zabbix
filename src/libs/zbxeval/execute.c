@@ -17,13 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxeval.h"
+#include "eval.h"
+
 #include "log.h"
 #include "zbxalgo.h"
-#include "zbxeval.h"
 #include "zbxvariant.h"
-
-#include "eval.h"
+#include "zbxnum.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
 
 /* exit code in addition to SUCCEED/FAIL */
 #define UNKNOWN		1

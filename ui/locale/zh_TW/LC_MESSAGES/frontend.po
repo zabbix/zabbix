@@ -503,6 +503,11 @@ msgstr ""
 msgid "Ack"
 msgstr "知悉"
 
+#: app/views/monitoring.widget.problems.view.php:81
+msgctxt "compact table header"
+msgid "Ack"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "知悉"
@@ -596,6 +601,11 @@ msgstr ""
 msgid "Action"
 msgstr "動作"
 
+#: app/views/monitoring.widget.actionlog.view.php:37
+msgctxt "compact table header"
+msgid "Action"
+msgstr ""
+
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
@@ -662,6 +672,11 @@ msgstr "動作已更新"
 #: jsLoader.php:352 tr_events.php:183
 msgid "Actions"
 msgstr "動作"
+
+#: app/views/monitoring.widget.problems.view.php:82
+msgctxt "compact table header"
+msgid "Actions"
+msgstr ""
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -1061,6 +1076,11 @@ msgstr ""
 
 #: include/actions.inc.php:2106
 msgid "Alert message"
+msgstr ""
+
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CRoleHelper.php:338
+msgid "Alerts"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
@@ -1608,6 +1628,11 @@ msgstr "可用性報表"
 #: include/classes/html/CHostAvailability.php:80
 msgid "Available"
 msgstr "可用"
+
+#: app/views/monitoring.widget.hostavail.view.php:37
+msgctxt "compact table header"
+msgid "Available"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -3878,6 +3903,13 @@ msgstr ""
 msgid "Compression"
 msgstr ""
 
+#: app/views/administration.housekeeping.edit.php:164
+#: app/views/administration.housekeeping.edit.php:169
+#: app/views/administration.housekeeping.edit.php:174
+#: app/views/administration.housekeeping.edit.php:184
+msgid "Compression is not supported."
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
 msgstr ""
@@ -4861,6 +4893,11 @@ msgstr "虛線"
 msgid "Data"
 msgstr ""
 
+#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CRoleHelper.php:337
+msgid "Data collection"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
 #, c-format
@@ -5004,6 +5041,11 @@ msgstr ""
 #: include/classes/helpers/CSlaHelper.php:58 report4.php:177
 msgid "Day"
 msgstr "日"
+
+#: include/classes/helpers/CSlaHelper.php:68
+msgctxt "compact table header"
+msgid "Day"
+msgstr ""
 
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
@@ -5604,6 +5646,10 @@ msgstr "細節"
 msgid "Details of web scenario"
 msgstr ""
 
+#: app/views/administration.housekeeping.edit.php:195
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr ""
@@ -5925,6 +5971,11 @@ msgstr ""
 msgid "Discovery rule"
 msgstr "探索規則"
 
+#: app/views/monitoring.widget.discovery.view.php:33
+msgctxt "compact table header"
+msgid "Discovery rule"
+msgstr ""
+
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -6147,6 +6198,11 @@ msgstr ""
 msgid "Downtime"
 msgstr "斷線時間"
 
+#: app/views/monitoring.widget.slareport.view.php:100
+msgctxt "compact table header"
+msgid "Downtime"
+msgstr ""
+
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
 #: include/classes/widgets/CWidgetHelper.php:969
@@ -6210,6 +6266,11 @@ msgstr ""
 #: include/views/configuration.action.edit.php:174
 msgid "Duration"
 msgstr "持續時間"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
+msgid "Duration"
+msgstr ""
 
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
@@ -6639,6 +6700,11 @@ msgstr "錯誤"
 msgid "Error budget"
 msgstr ""
 
+#: app/views/monitoring.widget.slareport.view.php:101
+msgctxt "compact table header"
+msgid "Error budget"
+msgstr ""
+
 #: include/db.inc.php:518
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
@@ -6651,6 +6717,13 @@ msgstr ""
 #: app/partials/administration.system.info.php:161
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
 msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
@@ -6775,6 +6848,11 @@ msgstr ""
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
+msgid "Excluded downtimes"
+msgstr ""
+
+#: app/views/monitoring.widget.slareport.view.php:102
+msgctxt "compact table header"
 msgid "Excluded downtimes"
 msgstr ""
 
@@ -6981,6 +7059,11 @@ msgstr ""
 #: include/views/administration.auditacts.list.php:90
 msgid "Failed"
 msgstr "已失敗"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
+msgid "Failed"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
@@ -8039,6 +8122,12 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "主機"
 
+#: app/views/monitoring.widget.problems.view.php:66
+#: app/views/monitoring.widget.problems.view.php:67
+msgctxt "compact table header"
+msgid "Host"
+msgstr ""
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8126,6 +8215,13 @@ msgstr ""
 #: report2.php:400
 msgid "Host group"
 msgstr "主機群組"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+#: app/views/monitoring.widget.problemsbysv.view.php:41
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Host group"
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:760
 #, c-format
@@ -9711,6 +9807,12 @@ msgstr ""
 msgid "Info"
 msgstr "資訊"
 
+#: app/views/monitoring.widget.actionlog.view.php:48
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Info"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -11254,6 +11356,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "Mac位址A"
@@ -11781,6 +11888,11 @@ msgstr ""
 msgid "Message"
 msgstr "訊息"
 
+#: app/views/monitoring.widget.actionlog.view.php:44
+msgctxt "compact table header"
+msgid "Message"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
 msgstr ""
@@ -11862,6 +11974,11 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:106
 #, c-format
 msgid "Minimum required PHP version is %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:175
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:193
@@ -12038,6 +12155,11 @@ msgstr ""
 #: include/classes/helpers/CSlaHelper.php:60 report4.php:165
 msgid "Month"
 msgstr "月"
+
+#: include/classes/helpers/CSlaHelper.php:70
+msgctxt "compact table header"
+msgid "Month"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
@@ -12299,6 +12421,11 @@ msgstr ""
 #: report2.php:509 sysmaps.php:38 trigger_prototypes.php:37 triggers.php:45
 msgid "Name"
 msgstr "名稱"
+
+#: app/views/monitoring.widget.plaintext.view.php:49
+msgctxt "compact table header"
+msgid "Name"
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
@@ -13096,6 +13223,11 @@ msgstr ""
 msgid "Not available"
 msgstr "不可用"
 
+#: app/views/monitoring.widget.hostavail.view.php:38
+msgctxt "compact table header"
+msgid "Not available"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
 msgstr "未分類"
@@ -13384,6 +13516,11 @@ msgstr "關"
 msgid "Ok"
 msgstr "正常"
 
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
+msgid "Ok"
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13524,6 +13661,11 @@ msgstr "操作並無模板來操作."
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr ""
 
@@ -14026,6 +14168,10 @@ msgstr "上層探索規則"
 msgid "Parent graphs"
 msgstr ""
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
 msgid "Parent items"
@@ -14339,12 +14485,20 @@ msgstr ""
 msgid "Position"
 msgstr ""
 
+#: include/classes/widgets/views/widget.item.form.view.php:143
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr ""
 
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:165
+msgid "PostgreSQL database server version is too old."
 msgstr ""
 
 #: include/classes/data/CItemData.php:1370
@@ -14506,6 +14660,12 @@ msgstr "優先權層級"
 #: include/views/js/monitoring.sysmaps.js.php:276
 msgid "Problem"
 msgstr "問題"
+
+#: app/views/monitoring.widget.problems.view.php:70
+#: app/views/monitoring.widget.problems.view.php:71
+msgctxt "compact table header"
+msgid "Problem"
+msgstr ""
 
 #: include/actions.inc.php:2059
 msgid "Problem created"
@@ -14733,6 +14893,11 @@ msgstr "公開金鑰檔"
 msgid "Quarter"
 msgstr ""
 
+#: include/classes/helpers/CSlaHelper.php:71
+msgctxt "compact table header"
+msgid "Quarter"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
 msgstr ""
@@ -14878,6 +15043,12 @@ msgstr ""
 msgid "Recipient"
 msgstr "接收者"
 
+#: app/views/monitoring.widget.actionlog.view.php:42
+#: app/views/monitoring.widget.actionlog.view.php:43
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr ""
@@ -14922,6 +15093,11 @@ msgstr ""
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr ""
 
@@ -15725,11 +15901,22 @@ msgstr ""
 msgid "SLI"
 msgstr ""
 
+#: app/views/monitoring.widget.slareport.view.php:98
+msgctxt "compact table header"
+msgid "SLI"
+msgstr ""
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
+msgid "SLO"
+msgstr ""
+
+#: app/views/monitoring.widget.slareport.view.php:38
+#: app/views/monitoring.widget.slareport.view.php:97
+msgctxt "compact table header"
 msgid "SLO"
 msgstr ""
 
@@ -16354,6 +16541,11 @@ msgstr ""
 msgid "Service"
 msgstr "服務"
 
+#: app/views/monitoring.widget.slareport.view.php:37
+msgctxt "compact table header"
+msgid "Service"
+msgstr ""
+
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
 #, c-format
@@ -16552,6 +16744,12 @@ msgstr ""
 #: include/views/reports.toptriggers.php:86
 msgid "Severity"
 msgstr "嚴重性"
+
+#: app/views/monitoring.widget.problems.view.php:74
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
+msgid "Severity"
+msgstr ""
 
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
@@ -17102,6 +17300,13 @@ msgstr ""
 msgid "Status"
 msgstr "狀態"
 
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.actionlog.view.php:47
+#: app/views/monitoring.widget.problems.view.php:62
+msgctxt "compact table header"
+msgid "Status"
+msgstr ""
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr ""
@@ -17542,6 +17747,11 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
+msgid "Tags"
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:83
+msgctxt "compact table header"
 msgid "Tags"
 msgstr ""
 
@@ -18081,6 +18291,14 @@ msgstr "直到"
 msgid "Time"
 msgstr "時間"
 
+#: app/views/monitoring.widget.actionlog.view.php:35
+#: app/views/monitoring.widget.actionlog.view.php:36
+#: app/views/monitoring.widget.problems.view.php:40
+#: app/views/monitoring.widget.problems.view.php:41
+msgctxt "compact table header"
+msgid "Time"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr ""
@@ -18144,6 +18362,11 @@ msgstr "逾時"
 msgid "Timestamp"
 msgstr "時間戳"
 
+#: app/views/monitoring.widget.plaintext.view.php:33
+msgctxt "compact table header"
+msgid "Timestamp"
+msgstr ""
+
 #: app/views/sla.list.php:91
 msgid "Timezone"
 msgstr ""
@@ -18200,6 +18423,12 @@ msgstr ""
 #: app/views/monitoring.widget.problemhosts.view.php:34
 msgid "Total"
 msgstr "合計"
+
+#: app/views/monitoring.widget.hostavail.view.php:40
+#: app/views/monitoring.widget.problemhosts.view.php:35
+msgctxt "compact table header"
+msgid "Total"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -18703,6 +18932,12 @@ msgstr ""
 msgid "Type"
 msgstr "類型"
 
+#: app/views/monitoring.widget.actionlog.view.php:39
+#: app/views/monitoring.widget.actionlog.view.php:40
+msgctxt "compact table header"
+msgid "Type"
+msgstr ""
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "類型(全細節)"
@@ -18849,6 +19084,14 @@ msgstr ""
 msgid "Unable to overwrite the existing configuration file."
 msgstr ""
 
+#: app/views/administration.housekeeping.edit.php:160
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:170
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr ""
@@ -18959,6 +19202,12 @@ msgstr "單位"
 msgid "Unknown"
 msgstr "未知的"
 
+#: app/views/monitoring.widget.hostavail.view.php:39
+#: app/views/monitoring.widget.web.view.php:35
+msgctxt "compact table header"
+msgid "Unknown"
+msgstr ""
+
 #: app/views/reports.auditlog.list.php:119
 msgid "Unknown action"
 msgstr "未知的操作"
@@ -19028,6 +19277,26 @@ msgstr "自模板斷連"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "開聲音"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:179
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:189
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -19213,6 +19482,11 @@ msgstr "上層拓墣圖"
 #: include/classes/screens/CScreenDiscovery.php:120
 msgid "Uptime"
 msgstr "在線時間"
+
+#: app/views/monitoring.widget.slareport.view.php:99
+msgctxt "compact table header"
+msgid "Uptime"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1686
 msgid "Uptime of Zabbix server process in seconds."
@@ -19604,12 +19878,32 @@ msgstr ""
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1252
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1296
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1304
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1251
@@ -19618,6 +19912,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1268
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1242
@@ -19629,8 +19927,16 @@ msgstr ""
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1246
@@ -19647,6 +19953,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1324
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1350
@@ -19717,6 +20027,10 @@ msgstr ""
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
@@ -19727,6 +20041,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1330
@@ -19755,6 +20073,14 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1244
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1500
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1454
@@ -19837,6 +20163,10 @@ msgstr ""
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
@@ -19851,6 +20181,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1664
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1591
@@ -19949,6 +20283,11 @@ msgstr ""
 #, c-format
 msgid "Value"
 msgstr "ֵ值"
+
+#: app/views/monitoring.widget.plaintext.view.php:51
+msgctxt "compact table header"
+msgid "Value"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
@@ -20209,9 +20548,23 @@ msgstr "警示"
 msgid "Warning message"
 msgstr ""
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
 msgstr ""
 
 #: jsLoader.php:301
@@ -20303,6 +20656,11 @@ msgstr "週三"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:120
 #: include/classes/helpers/CSlaHelper.php:59
+msgid "Week"
+msgstr ""
+
+#: include/classes/helpers/CSlaHelper.php:69
+msgctxt "compact table header"
 msgid "Week"
 msgstr ""
 
@@ -20400,6 +20758,11 @@ msgstr ""
 msgid "With problems"
 msgstr "有問題"
 
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
+msgid "With problems"
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr ""
@@ -20415,6 +20778,11 @@ msgstr ""
 #: app/views/monitoring.widget.problemhosts.view.php:32
 msgid "Without problems"
 msgstr "無問題"
+
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "Without problems"
+msgstr ""
 
 #: include/forms.inc.php:343
 msgid "Without triggers"
@@ -20606,6 +20974,11 @@ msgstr ""
 #: include/classes/helpers/CSlaHelper.php:62 report4.php:118 report4.php:154
 msgid "Year"
 msgstr "年"
+
+#: include/classes/helpers/CSlaHelper.php:72
+msgctxt "compact table header"
+msgid "Year"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93

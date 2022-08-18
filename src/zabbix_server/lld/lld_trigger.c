@@ -18,13 +18,13 @@
 **/
 
 #include "lld.h"
+#include "zbxserver.h"
 
 #include "../db_lengths.h"
 #include "log.h"
-#include "zbxserver.h"
-
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_trigger.h"
+#include "zbxnum.h"
 
 typedef struct
 {
@@ -2459,12 +2459,12 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		zbx_vector_uint64_append(&trigger_protoids, trigger_prototype->triggerid);
 	}
 
-	if (SUCCEED != DBlock_hostid(hostid) || SUCCEED != DBlock_triggerids(&trigger_protoids))
+	if (0 != new_functions)
 	{
-		/* the host or trigger prototype was removed while processing lld rule */
-		DBrollback();
-		ret = FAIL;
-		goto out;
+		functionid = DBget_maxid_num("functions", new_functions);
+
+		zbx_db_insert_prepare(&db_insert_tfunctions, "functions", "functionid", "itemid", "triggerid",
+				"name", "parameter", NULL);
 	}
 
 	if (0 != new_triggers)
@@ -2480,12 +2480,12 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				NULL);
 	}
 
-	if (0 != new_functions)
+	if (0 != new_tags)
 	{
-		functionid = DBget_maxid_num("functions", new_functions);
+		triggertagid = DBget_maxid_num("trigger_tag", new_tags);
 
-		zbx_db_insert_prepare(&db_insert_tfunctions, "functions", "functionid", "itemid", "triggerid",
-				"name", "parameter", NULL);
+		zbx_db_insert_prepare(&db_insert_ttags, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
+				NULL);
 	}
 
 	if (0 != new_dependencies)
@@ -2496,12 +2496,12 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				"triggerid_up", NULL);
 	}
 
-	if (0 != new_tags)
+	if (SUCCEED != DBlock_hostid(hostid) || SUCCEED != DBlock_triggerids(&trigger_protoids))
 	{
-		triggertagid = DBget_maxid_num("trigger_tag", new_tags);
-
-		zbx_db_insert_prepare(&db_insert_ttags, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
-				NULL);
+		/* the host or trigger prototype was removed while processing lld rule */
+		DBrollback();
+		ret = FAIL;
+		goto out;
 	}
 
 	if (0 != upd_triggers || 0 != del_functionids.values_num ||

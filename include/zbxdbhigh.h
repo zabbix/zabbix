@@ -23,6 +23,8 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxdbschema.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -441,11 +443,11 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
-void	DBextract_version_info(struct zbx_db_version_info_t *version_info);
-void	DBflush_version_requirements(const char *version);
-int	DBcheck_capabilities(zbx_uint32_t db_version);
-
+void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
+void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info);
+void	zbx_db_flush_version_requirements(const char *version);
 #ifdef HAVE_POSTGRESQL
+int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
 char	*zbx_db_get_schema_esc(void);
 #endif
 
@@ -549,7 +551,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts);
 
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		unsigned int connection_type, const char *host_metadata, unsigned short flag);
+		unsigned int connection_type, const char *host_metadata, unsigned short flag, int now);
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
@@ -757,10 +759,37 @@ ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
 
 zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value);
 void		zbx_db_tag_free(zbx_db_tag_t *tag);
-int		zbx_db_tag_compare_func(const void *d1, const void *d2);
-int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
+
+typedef struct _zbx_item_param_t zbx_item_param_t;
+struct _zbx_item_param_t
+{
+	zbx_uint64_t	item_parameterid;
+#define ZBX_FLAG_ITEM_PARAM_UPDATE_RESET	__UINT64_C(0x000000000000)
+#define ZBX_FLAG_ITEM_PARAM_UPDATE_NAME		__UINT64_C(0x000000000001)
+#define ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE	__UINT64_C(0x000000000002)
+#define ZBX_FLAG_ITEM_PARAM_UPDATE			\
+		(ZBX_FLAG_ITEM_PARAM_UPDATE_NAME |	\
+		ZBX_FLAG_ITEM_PARAM_UPDATE_VALUE	\
+		)
+
+#define ZBX_FLAG_ITEM_PARAM_DELETE		__UINT64_C(0x000000010000)
+
+	zbx_uint64_t	flags;
+	char		*name_orig;
+	char		*name;
+	char		*value_orig;
+	char		*value;
+};
+
+ZBX_PTR_VECTOR_DECL(item_param_ptr, zbx_item_param_t *)
+
+zbx_item_param_t	*zbx_item_param_create(const char *item_param_name,
+		const char *item_param_value);
+void	zbx_item_param_free(zbx_item_param_t *param);
+
 
 int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, const char *owner, char **error);
+int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_param_ptr_t *src, char **error);
 
 typedef enum
 {
@@ -805,5 +834,7 @@ int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint
 void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
+
+int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
 
 #endif /* ZABBIX_DBHIGH_H */

@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxmedia.h"
+
+#include "zbxstr.h"
 #include "log.h"
 #include "zbxcomms.h"
 #include "base64.h"
 #include "zbxalgo.h"
-
-#include "zbxmedia.h"
 
 /* number of characters per line when wrapping Base64 data in Email */
 #define ZBX_EMAIL_B64_MAXLINE			76
@@ -36,6 +36,8 @@
 
 /* separator for multipart mixed messages */
 #define ZBX_MULTIPART_MIXED_BOUNDARY	"MULTIPART-MIXED-BOUNDARY"
+
+extern char	*CONFIG_SSL_CA_LOCATION;
 
 /******************************************************************************
  *                                                                            *
@@ -662,8 +664,6 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 
 	if (SMTP_SECURITY_NONE != smtp_security)
 	{
-		extern char	*CONFIG_SSL_CA_LOCATION;
-
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER,
 						0 == smtp_verify_peer ? 0L : 1L)) ||
 				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST,

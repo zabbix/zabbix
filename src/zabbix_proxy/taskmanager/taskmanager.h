@@ -17,11 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TASKMANAGER_H
-#define ZABBIX_TASKMANAGER_H
+#ifndef ZABBIX_PROXY_TASKMANAGER_H
+#define ZABBIX_PROXY_TASKMANAGER_H
 
 #include "zbxthreads.h"
 
+#include "zbxcomms.h"
+
+typedef struct
+{
+	zbx_config_tls_t	*zbx_config_tls;
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+}
+zbx_thread_taskmanager_args;
+
 ZBX_THREAD_ENTRY(taskmanager_thread, args);
 
-#endif
+#endif /*ZABBIX_PROXY_TASKMANAGER_H*/

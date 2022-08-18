@@ -154,7 +154,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'svg' => $svg_options['svg'].$svg_options['legend'],
 			'svg_options' => $svg_options,
 			'preview' => $preview,
-			'info' => $edit_mode ? null : self::makeWidgetInfo($fields),
+			'info' => self::makeWidgetInfo($fields),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

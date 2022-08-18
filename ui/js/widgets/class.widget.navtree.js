@@ -93,7 +93,7 @@ class CWidgetNavTree extends CWidget {
 
 		super.setEditMode();
 
-		if (this._state === WIDGET_STATE_ACTIVE) {
+		if (this._has_contents && this._state === WIDGET_STATE_ACTIVE) {
 			this._makeTree();
 			this._activateTree();
 			this._activateContentsEvents();
@@ -975,7 +975,8 @@ class CWidgetNavTree extends CWidget {
 							'action': () => {}
 						}
 					],
-					'dialogueid': 'navtreeitem'
+					'dialogueid': 'navtreeitem',
+					'script_inline': resp.script_inline
 				}, trigger_elmnt);
 			}
 		});

@@ -1385,26 +1385,22 @@ class CItem extends CItemGeneral {
 	private static function clearHistoryAndTrends(array $del_itemids): void {
 		global $DB;
 
-		$table_names = ['events', 'history', 'history_log', 'history_str', 'history_text', 'history_uint', 'trends',
-			'trends_uint'
-		];
-		$ins_housekeeper = [];
+		$table_names = ['events'];
 
-		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-			if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) === ZBX_DB_EXTENSION_TIMESCALEDB) {
-				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) == 1
-						&& CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
-					$table_names = array_diff($table_names,
-						['history', 'history_log', 'history_str', 'history_text', 'history_uint']
-					);
-				}
+		$timescale_extension = $DB['TYPE'] === ZBX_DB_POSTGRESQL
+			&& CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) === ZBX_DB_EXTENSION_TIMESCALEDB;
 
-				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) == 1
-						&& CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 1) {
-					$table_names = array_diff($table_names, ['trends', 'trends_uint']);
-				}
-			}
+		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) == 1
+				&& (!$timescale_extension || CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 0)) {
+			array_push($table_names, 'history', 'history_log', 'history_str', 'history_text', 'history_uint');
 		}
+
+		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) == 1
+				&& (!$timescale_extension || CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 0)) {
+			array_push($table_names, 'trends', 'trends_uint');
+		}
+
+		$ins_housekeeper = [];
 
 		foreach ($del_itemids as $del_itemid) {
 			foreach ($table_names as $table_name) {

@@ -22,6 +22,7 @@ require_once dirname(__FILE__) .'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 
 /**
  * Test the mass update of items and item prototypes.
@@ -117,13 +118,13 @@ class testMassUpdateItems extends CWebTest{
 				[
 					'expected' => TEST_BAD,
 					'names' => [
-						'7_IPMI',
-						'8_IPMI'
+						'13_DB_Monitor',
+						'14_DB_Monitor'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'SNMP trap']
+						'Type' => ['id' => 'type', 'value' => 'TELNET agent']
 					],
-					'details' => 'Invalid parameter "/1/interfaceid": the host interface ID of type "SNMP" is expected.'
+					'details' => 'Invalid parameter "/1": the parameter "username" is missing.'
 				]
 			],
 			[
@@ -1732,7 +1733,13 @@ class testMassUpdateItems extends CWebTest{
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
 				$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
-				$table->query('link', $name)->one()->waitUntilClickable()->click();
+				// TODO: not stable test testPageMassUpdateItems_ChangePreprocessing#8 on Jenkins, failed to properly waitUntilReady for page
+				try {
+					$table->query('link', $name)->one()->waitUntilClickable()->click();
+				}
+				catch (ElementClickInterceptedException $e) {
+					$table->query('link', $name)->one()->waitUntilClickable()->click();
+				}
 				$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 				$form->selectTab('Preprocessing');
 				$this->assertPreprocessingSteps($data['Preprocessing steps']);

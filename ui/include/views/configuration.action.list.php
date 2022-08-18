@@ -24,37 +24,48 @@
  * @var array $data
  */
 
-if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
-	$title = _('Service actions');
-	$submenu = null;
-	$doc_url = CDocHelper::CONFIGURATION_SERVICES_ACTION_LIST;
+$submenu_source = [];
+
+if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS)) {
+	$submenu_source[EVENT_SOURCE_TRIGGERS] = _('Trigger actions');
 }
-else {
-	$submenu_source = [
-		EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
-		EVENT_SOURCE_DISCOVERY => _('Discovery actions'),
-		EVENT_SOURCE_AUTOREGISTRATION => _('Autoregistration actions'),
-		EVENT_SOURCE_INTERNAL => _('Internal actions')
-	];
 
-	$title = array_key_exists($data['eventsource'], $submenu_source) ? $submenu_source[$data['eventsource']] : null;
-	$submenu = [];
-	$doc_url = CDocHelper::CONFIGURATION_ACTION_LIST;
-
-	foreach ($submenu_source as $value => $label) {
-		$url = (new CUrl('actionconf.php'))
-			->setArgument('eventsource', $value)
-			->getUrl();
-
-		$submenu[$url] = $label;
-	}
+if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS)) {
+	$submenu_source[EVENT_SOURCE_SERVICE] = _('Service actions');
 }
+
+if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS)) {
+	$submenu_source[EVENT_SOURCE_DISCOVERY] = _('Discovery actions');
+}
+
+if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS)) {
+	$submenu_source[EVENT_SOURCE_AUTOREGISTRATION] = _('Autoregistration actions');
+}
+
+if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS)) {
+	$submenu_source[EVENT_SOURCE_INTERNAL] = _('Internal actions');
+}
+
+$title = $submenu_source[$data['eventsource']];
+$submenu = [];
+
+foreach ($submenu_source as $value => $label) {
+	$url = (new CUrl('actionconf.php'))
+		->setArgument('eventsource', $value)
+		->getUrl();
+
+	$submenu[$url] = $label;
+}
+
+$data['eventsource'] == EVENT_SOURCE_SERVICE
+	? $doc_url = CDocHelper::CONFIGURATION_SERVICES_ACTION_LIST
+	: $doc_url = CDocHelper::CONFIGURATION_ACTION_LIST;
 
 $current_url = (new CUrl('actionconf.php'))->setArgument('eventsource', $data['eventsource']);
 
 $widget = (new CWidget())
 	->setTitle($title)
-	->setTitleSubmenu($submenu ? ['main_section' => ['items' => $submenu]] : null)
+	->setTitleSubmenu(['main_section' => ['items' => $submenu]])
 	->setDocUrl(CDocHelper::getUrl($doc_url))
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))

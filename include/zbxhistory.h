@@ -22,6 +22,7 @@
 
 #include "zbxvariant.h"
 #include "zbxjson.h"
+#include "zbxtime.h"
 
 /* the item history value */
 typedef struct
@@ -52,7 +53,6 @@ void	zbx_history_value2variant(const history_value_t *value, unsigned char value
 /* mirrors the vector creation function to vector destroying function.                    */
 #define zbx_history_record_vector_create(vector)	zbx_vector_history_record_create(vector)
 
-
 int	zbx_history_init(char **error);
 void	zbx_history_destroy(void);
 
@@ -61,7 +61,7 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 		zbx_vector_history_record_t *values);
 
 int	zbx_history_requires_trends(int value_type);
-void	zbx_history_check_version(struct zbx_json *json);
+void	zbx_history_check_version(struct zbx_json *json, int *result);
 
 #define FLUSH_SUCCEED		0
 #define FLUSH_FAIL		-1

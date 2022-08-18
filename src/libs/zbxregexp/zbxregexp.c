@@ -19,7 +19,7 @@
 
 #include "zbxregexp.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "log.h"
 
 #ifdef HAVE_PCRE_H
@@ -257,7 +257,10 @@ static unsigned long int compute_recursion_limit(void)
 	else
 		return 10000;	/* if stack size cannot be retrieved then assume ~8 MB */
 #else
-	return ZBX_REGEXP_RECURSION_LIMIT;
+#define REGEXP_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
+
+	return REGEXP_RECURSION_LIMIT;
+#undef REGEXP_RECURSION_LIMIT
 #endif
 }
 
@@ -348,6 +351,8 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 	else
 	{
+		flags |= PCRE2_NO_UTF_CHECK;
+
 		if (0 <= (r = pcre2_match(regexp->pcre2_regexp, (PCRE2_SPTR)string, PCRE2_ZERO_TERMINATED, 0, flags,
 			match_data, regexp->match_ctx)))
 		{

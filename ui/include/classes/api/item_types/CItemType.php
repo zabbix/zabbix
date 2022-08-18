@@ -98,6 +98,10 @@ abstract class CItemType {
 		switch ($field_name) {
 			case 'interfaceid':
 				switch (static::TYPE) {
+					case ITEM_TYPE_SIMPLE:
+					case ITEM_TYPE_EXTERNAL:
+					case ITEM_TYPE_SSH:
+					case ITEM_TYPE_TELNET:
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
@@ -200,6 +204,10 @@ abstract class CItemType {
 		switch ($field_name) {
 			case 'interfaceid':
 				switch (static::TYPE) {
+					case ITEM_TYPE_SIMPLE:
+					case ITEM_TYPE_EXTERNAL:
+					case ITEM_TYPE_SSH:
+					case ITEM_TYPE_TELNET:
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function () use ($db_item): bool {
@@ -211,10 +219,17 @@ abstract class CItemType {
 					default:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function () use ($db_item): bool {
+								$non_interface_type = in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL,
+									ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
+									ITEM_TYPE_SCRIPT
+								]);
+
+								$opt_interface_type = in_array($db_item['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL,
+									ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_HTTPAGENT
+								]);
+
 								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
-									&& in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-										ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
-									]);
+									&& ($non_interface_type || ($opt_interface_type && $db_item['interfaceid'] === '0'));
 							}, 'type' => API_ID, 'flags' => API_REQUIRED],
 							['if' => static function () use ($db_item): bool {
 								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);

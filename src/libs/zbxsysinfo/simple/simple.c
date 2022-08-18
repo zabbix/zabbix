@@ -18,9 +18,12 @@
 **/
 
 #include "simple.h"
-
-#include "common.h"
 #include "sysinfo.h"
+
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxip.h"
 #include "zbxcomms.h"
 #include "log.h"
 #include "cfg.h"
@@ -319,7 +322,15 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	}
 
 	if (NULL == ip_str || '\0' == *ip_str)
+	{
+		if (NULL == default_addr || '\0' == *default_addr)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL,
+					"Check service item must have IP parameter or host interface specified."));
+			return SYSINFO_RET_FAIL;
+		}
 		strscpy(ip, default_addr);
+	}
 	else
 		strscpy(ip, ip_str);
 

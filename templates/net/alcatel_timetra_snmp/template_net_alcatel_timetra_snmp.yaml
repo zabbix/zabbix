@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:36:57Z'
+  version: '6.4'
+  date: '2022-08-16T11:03:47Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -16,11 +16,12 @@ zabbix_export:
         MIBs used:
         EtherLike-MIB
         TIMETRA-SYSTEM-MIB
+        HOST-RESOURCES-MIB
         SNMPv2-MIB
         TIMETRA-CHASSIS-MIB
         IF-MIB
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -237,6 +238,34 @@ zabbix_export:
               tag: component
               value: system
         -
+          uuid: 3ea3106277c64428950b4a5b6c4aedd0
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 597b68e7ddb8482280122de489424041
           name: 'System location'
           type: SNMP_AGENT
@@ -299,6 +328,28 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: e80e3dfbf1a447be87f1b6853c66555b
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: f0df5a577f5c46689578302df065a3d6
           name: 'System object ID'
           type: SNMP_AGENT
@@ -358,45 +409,6 @@ zabbix_export:
                 -
                   name: 'System name has changed'
                   expression: 'last(/Alcatel Timetra TiMOS SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS SNMP/system.name))>0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
-          uuid: e80e3dfbf1a447be87f1b6853c66555b
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 3b6324116e5940b5aaea72adca4dbbf6
-              expression: 'last(/Alcatel Timetra TiMOS SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/Alcatel Timetra TiMOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               tags:
                 -
                   tag: scope
@@ -1215,7 +1227,7 @@ zabbix_export:
               description: |
                 MIB: TIMETRA-SYSTEM-MIB
                 The overall status of an equipped power supply.
-                For AC multiple powersupplies, this represents the overall status of the first power supplyin the tray (or shelf).
+                For AC multiple power supplies, this represents the overall status of the first power supply in the tray (or shelf).
                 For any other type, this represents the overall status of the power supply.
                 If tmnxChassisPowerSupply1Status is'deviceStateOk', then all monitored statuses are 'deviceStateOk'.
                 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.
@@ -1252,7 +1264,7 @@ zabbix_export:
               description: |
                 MIB: TIMETRA-SYSTEM-MIB
                 The overall status of an equipped power supply.
-                For AC multiple powersupplies, this represents the overall status of the second power supplyin the tray (or shelf).
+                For AC multiple power supplies, this represents the overall status of the second power supply in the tray (or shelf).
                 For any other type, this field is unused and set to 'deviceNotEquipped'.
                 If tmnxChassisPowerSupply2Status is 'deviceStateOk', then all monitored statuses are 'deviceStateOk'.
                 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.
@@ -2423,6 +2435,23 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: 3b6324116e5940b5aaea72adca4dbbf6
+      expression: '(last(/Alcatel Timetra TiMOS SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Alcatel Timetra TiMOS SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Alcatel Timetra TiMOS SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Alcatel Timetra TiMOS SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/Alcatel Timetra TiMOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 7300eff1609b497aa7628ed83b36a481
