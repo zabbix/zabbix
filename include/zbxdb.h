@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXDB_H
 #define ZABBIX_ZBXDB_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxjson.h"
 
 #define ZBX_DB_OK	0
@@ -96,6 +96,20 @@ int	zbx_db_txn_level(void);
 int	zbx_db_txn_error(void);
 int	zbx_db_txn_end_error(void);
 const char	*zbx_db_last_strerr(void);
+
+typedef enum
+{
+	ERR_Z3001 = 3001,
+	ERR_Z3002,
+	ERR_Z3003,
+	ERR_Z3004,
+	ERR_Z3005,
+	ERR_Z3006,
+	ERR_Z3007,
+	ERR_Z3008
+}
+zbx_err_codes_t;
+
 zbx_err_codes_t	zbx_db_last_errcode(void);
 
 #ifdef HAVE_POSTGRESQL
@@ -192,8 +206,8 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 			20001
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY 		"2.0.1"
 #define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
-#define ZBX_TIMESCALE_MAX_VERSION				20699
-#define ZBX_TIMESCALE_MAX_VERSION_FRIENDLY			"2.6"
+#define ZBX_TIMESCALE_MAX_VERSION				20799
+#define ZBX_TIMESCALE_MAX_VERSION_FRIENDLY			"2.7"
 #define ZBX_TIMESCALE_LICENSE_APACHE				"apache"
 #define ZBX_TIMESCALE_LICENSE_APACHE_FRIENDLY			"TimescaleDB Apache 2 Edition"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
@@ -299,5 +313,4 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 #if defined(HAVE_MYSQL)
 void zbx_db_set_character_set(const char *char_set);
 #endif
-
 #endif

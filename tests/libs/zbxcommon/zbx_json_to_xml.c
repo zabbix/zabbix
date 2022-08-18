@@ -21,6 +21,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxxml.h"
+#include "zbxstr.h"
 
 #define ZBX_XML_HEADER_SIZE	22
 

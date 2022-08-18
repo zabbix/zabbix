@@ -24,6 +24,7 @@
 #include "zbxserialize.h"
 #include "base64.h"
 #include "zbxeval.h"
+#include "zbxnum.h"
 
 #define ZBX_DBSYNC_OBJ_HOST		1
 #define ZBX_DBSYNC_OBJ_HOST_TAG		2
@@ -322,7 +323,7 @@ void	zbx_dbsync_env_init(ZBX_DC_CONFIG *cache)
  *          database time                                                     *
  *                                                                            *
  ******************************************************************************/
-static void	dbsync_prune_changelog()
+static void	dbsync_prune_changelog(void)
 {
 	static int		last_prune_time;
 	int			now;
@@ -949,6 +950,33 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 
 	return SUCCEED;
 #undef CONFIG_AUTOREG_TLS_FIELD_COUNT
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reads autoreg hosts table in order to cache autoreg_host entries  *
+ *          for hosts monitored directly by Zabbix server                     *
+ *                                                                            *
+ * Parameter: sync - [OUT] result of select, only during initialization       *
+ *                                                                            *
+ * Return value: SUCCEED - entries retrieved or already synced                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync)
+{
+	if (ZBX_DBSYNC_INIT != sync->mode)
+		return SUCCEED;
+
+	if (NULL == (sync->dbresult = DBselect(
+			"select host,listen_ip,listen_dns,host_metadata,flags,listen_port"
+			" from autoreg_host"
+			" where proxy_hostid is null")))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************

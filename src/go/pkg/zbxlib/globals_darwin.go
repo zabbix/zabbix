@@ -21,6 +21,11 @@ package zbxlib
 
 /*
 #cgo LDFLAGS: ${SRCDIR}/../../../zabbix_agent/logfiles/libzbxlogfiles.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxnum/libzbxnum.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxstr/libzbxstr.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxparam/libzbxparam.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxexpr/libzbxexpr.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxip/libzbxip.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcomms/libzbxcomms.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcommon/libzbxcommon.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcrypto/libzbxcrypto.a
@@ -43,7 +48,7 @@ package zbxlib
 #cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
 #cgo LDFLAGS: -lz -lresolv
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "sysinfo.h"
 #include "zbxcomms.h"
 #include "log.h"
@@ -59,29 +64,6 @@ int	CONFIG_UNSAFE_USER_PARAMETERS= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS= 0;
 char	*CONFIG_SOURCE_IP= NULL;
-
-unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
-unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
-
-char *CONFIG_TLS_CONNECT= NULL;
-char *CONFIG_TLS_ACCEPT	= NULL;
-char *CONFIG_TLS_CA_FILE = NULL;
-char *CONFIG_TLS_CRL_FILE = NULL;
-char *CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
-char *CONFIG_TLS_SERVER_CERT_SUBJECT = NULL;
-char *CONFIG_TLS_CERT_FILE = NULL;
-char *CONFIG_TLS_KEY_FILE = NULL;
-char *CONFIG_TLS_PSK_IDENTITY = NULL;
-char *CONFIG_TLS_PSK_FILE = NULL;
-
-char *CONFIG_TLS_CIPHER_CERT13 = NULL;
-char *CONFIG_TLS_CIPHER_CERT = NULL;
-char *CONFIG_TLS_CIPHER_PSK13 = NULL;
-char *CONFIG_TLS_CIPHER_PSK = NULL;
-char *CONFIG_TLS_CIPHER_ALL13 = NULL;
-char *CONFIG_TLS_CIPHER_ALL = NULL;
-char *CONFIG_TLS_CIPHER_CMD13 = NULL;
-char *CONFIG_TLS_CIPHER_CMD = NULL;
 
 int	CONFIG_PASSIVE_FORKS = 0;
 int	CONFIG_ACTIVE_FORKS = 0;

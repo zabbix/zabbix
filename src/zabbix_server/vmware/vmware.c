@@ -27,6 +27,11 @@
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "zbxnix.h"
+#include "zbxself.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxip.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
@@ -268,9 +273,6 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_HV_DATASTORES()									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
 	"/*[local-name()='val']/*[@type='Datastore']"
-
-#define ZBX_XPATH_HV_DATASTORE_MOUNTINFO(id)								\
-	ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_DS, "[text()='" id "']")
 
 #define ZBX_XPATH_HV_VMS()										\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
@@ -738,14 +740,21 @@ static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **r
  *             easyhandle - [IN] the CURL handle                              *
  *             request    - [IN] the http request                             *
  *             xdoc       - [OUT] the xml document response (optional)        *
+ *             token      - [OUT] the soap token for next query (optional)    *
  *             error      - [OUT] the error message in the case of failure    *
  *                                (optional)                                  *
  *                                                                            *
  * Return value: SUCCEED - the SOAP request was completed successfully        *
  *               FAIL    - the SOAP request has failed                        *
  ******************************************************************************/
-static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc, char **error)
+static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc,
+		char **token , char **error)
 {
+#	define ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN			\
+		"/*[local-name()='Envelope']/*[local-name()='Body']"	\
+		"/*[local-name()='RetrievePropertiesExResponse']"	\
+		"/*[local-name()='returnval']/*[local-name()='token'][1]"
+
 	xmlDoc		*doc;
 	ZBX_HTTPPAGE	*resp;
 	int		ret = SUCCEED;
@@ -779,7 +788,29 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 	else
 		ret = FAIL;
 
+	if (SUCCEED == ret && NULL != xdoc)
+	{
+		char	*tkn;
+
+		tkn = zbx_xml_doc_read_value(*xdoc, ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN);
+
+		if (NULL != token)
+		{
+			*token = tkn;
+			tkn = NULL;
+		}
+		else if (NULL != tkn && NULL != fn_parent)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s() SOAP response has next unprocessed page: %s", fn_parent,
+					tkn);
+		}
+
+		zbx_str_free(tkn);
+	}
+
 	return ret;
+
+#	undef ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN
 }
 
 /******************************************************************************
@@ -2577,7 +2608,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 				vmware_service_objects[ZBX_VMWARE_TYPE_VCENTER].session_manager,
 				username_esc, password_esc);
 
-		if (SUCCEED != zbx_soap_post(__func__, easyhandle, xml, &doc, error) && NULL == doc)
+		if (SUCCEED != zbx_soap_post(__func__, easyhandle, xml, &doc, NULL, error) && NULL == doc)
 			goto out;
 
 		if (NULL == *error)
@@ -2607,7 +2638,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH, vmware_service_objects[service->type].session_manager,
 			username_esc, password_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, xml, NULL, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, xml, NULL, NULL, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -2643,7 +2674,7 @@ static int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle
 	char	tmp[MAX_STRING_LEN];
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_LOGOUT, vmware_service_objects[service->type].session_manager);
-	return zbx_soap_post(__func__, easyhandle, tmp, NULL, error);
+	return zbx_soap_post(__func__, easyhandle, tmp, NULL, NULL, error);
 }
 
 typedef struct
@@ -2657,20 +2688,16 @@ zbx_property_collection_iter;
 static int	zbx_property_collection_init(CURL *easyhandle, const char *property_collection_query,
 		const char *property_collector, zbx_property_collection_iter **iter, xmlDoc **xdoc, char **error)
 {
-#	define ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN			\
-		"/*[local-name()='Envelope']/*[local-name()='Body']"	\
-		"/*[local-name()='RetrievePropertiesExResponse']"	\
-		"/*[local-name()='returnval']/*[local-name()='token']"
-
 	*iter = (zbx_property_collection_iter *)zbx_malloc(*iter, sizeof(zbx_property_collection_iter));
 	(*iter)->property_collector = property_collector;
 	(*iter)->easyhandle = easyhandle;
 	(*iter)->token = NULL;
 
-	if (SUCCEED != zbx_soap_post("zbx_property_collection_init", (*iter)->easyhandle, property_collection_query, xdoc, error))
+	if (SUCCEED != zbx_soap_post(__func__, (*iter)->easyhandle, property_collection_query, xdoc, &(*iter)->token,
+			error))
+	{
 		return FAIL;
-
-	(*iter)->token = zbx_xml_doc_read_value(*xdoc, ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN);
+	}
 
 	return SUCCEED;
 }
@@ -2688,7 +2715,7 @@ static int	zbx_property_collection_next(zbx_property_collection_iter *iter, xmlD
 #	define ZBX_XPATH_CONTINUE_RETRIEVE_PROPERTIES_TOKEN			\
 		"/*[local-name()='Envelope']/*[local-name()='Body']"		\
 		"/*[local-name()='ContinueRetrievePropertiesExResponse']"	\
-		"/*[local-name()='returnval']/*[local-name()='token']"
+		"/*[local-name()='returnval']/*[local-name()='token'][1]"
 
 	char	*token_esc, post[MAX_STRING_LEN];
 
@@ -2699,13 +2726,16 @@ static int	zbx_property_collection_next(zbx_property_collection_iter *iter, xmlD
 	zbx_snprintf(post, sizeof(post), ZBX_POST_CONTINUE_RETRIEVE_PROPERTIES, iter->property_collector, token_esc);
 	zbx_free(token_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, iter->easyhandle, post, xdoc, error))
+	if (SUCCEED != zbx_soap_post(__func__, iter->easyhandle, post, xdoc, NULL, error))
 		return FAIL;
 
 	zbx_free(iter->token);
 	iter->token = zbx_xml_doc_read_value(*xdoc, ZBX_XPATH_CONTINUE_RETRIEVE_PROPERTIES_TOKEN);
 
 	return SUCCEED;
+
+#	undef ZBX_POST_CONTINUE_RETRIEVE_PROPERTIES
+#	undef ZBX_XPATH_CONTINUE_RETRIEVE_PROPERTIES_TOKEN
 }
 
 static void	zbx_property_collection_free(zbx_property_collection_iter *iter)
@@ -2741,7 +2771,7 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 
 	xmlDoc	*doc = NULL;
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_VMWARE_CONTENTS, &doc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_VMWARE_CONTENTS, &doc, NULL, error))
 	{
 		zbx_xml_free_doc(doc);
 		return FAIL;
@@ -2801,7 +2831,7 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 			vmware_service_objects[service->type].performance_manager, type, id_esc);
 	zbx_free(id_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, error))
 		goto out;
 
 	if (NULL != (value = zbx_xml_doc_read_value(doc, ZBX_XPATH_ISAGGREGATE())))
@@ -2912,7 +2942,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 			vmware_service_objects[service->type].property_collector,
 			vmware_service_objects[service->type].performance_manager);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, error))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -3455,7 +3485,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 
 	zbx_free(vmid_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, xdoc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, xdoc, NULL, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -3893,7 +3923,7 @@ static int	vmware_service_alarm_details_update(const zbx_vmware_service_t *servi
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_GET_ALARMS,
 			vmware_service_objects[service->type].property_collector, alarm_id);
 
-	if (FAIL == zbx_soap_post(__func__, easyhandle, tmp, &doc_details, error))
+	if (FAIL == zbx_soap_post(__func__, easyhandle, tmp, &doc_details, NULL, error))
 		goto out;
 
 	detail = (zbx_vmware_alarm_details_t *)zbx_malloc(NULL, sizeof(zbx_vmware_alarm_details_t));
@@ -4197,7 +4227,8 @@ static int	vmware_service_refresh_datastore_info(CURL *easyhandle, const char *i
 	int		ret = FAIL;
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_REFRESH_DATASTORE, id);
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, NULL, error))
+
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, NULL, NULL, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -4335,7 +4366,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	zbx_free(id_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, &error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, &error))
 		goto out;
 
 	name = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("name"));
@@ -4461,21 +4492,9 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 					"%s"									\
 					"%s"									\
 				"</ns0:propSet>"								\
-				"<ns0:propSet>"									\
-					"<ns0:type>Datastore</ns0:type>"					\
-					"<ns0:pathSet>host[\"%s\"].mountInfo.mounted</ns0:pathSet>"		\
-					"<ns0:pathSet>host[\"%s\"].mountInfo.accessible</ns0:pathSet>"		\
-					"<ns0:pathSet>host[\"%s\"].mountInfo.accessMode</ns0:pathSet>"		\
-				"</ns0:propSet>"								\
 				"<ns0:objectSet>"								\
 					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"				\
 					"<ns0:skip>false</ns0:skip>"						\
-					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"			\
-						"<ns0:name>DSObject</ns0:name>"					\
-						"<ns0:type>HostSystem</ns0:type>"				\
-						"<ns0:path>datastore</ns0:path>"				\
-						"<ns0:skip>false</ns0:skip>"					\
-					"</ns0:selectSet>"							\
 				"</ns0:objectSet>"								\
 			"</ns0:specSet>"									\
 			"<ns0:options/>"									\
@@ -4504,13 +4523,13 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 	hvid_esc = zbx_xml_escape_dyn(hvid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DETAILS, vmware_service_objects[service->type].property_collector,
-			props, cq_prop, hvid_esc, hvid_esc, hvid_esc, hvid_esc);
+			props, cq_prop, hvid_esc);
 
 	zbx_free(hvid_esc);
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP request: %s", __func__, tmp);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, xdoc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, xdoc, NULL, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -4620,7 +4639,7 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 			vmware_service_objects[service->type].property_collector,
 			NULL != hv->clusterid ? ZBX_POST_SOAP_CUSTER : ZBX_POST_SOAP_FOLDER, hv->id);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, error))
 		goto out;
 
 	if (NULL == (hv->datacenter_name = zbx_xml_doc_read_value(doc,
@@ -4728,7 +4747,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		zbx_free(hvid_esc);
 		zbx_free(scsi_req);
 
-		ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, error);
+		ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, NULL, error);
 		zbx_free(tmp);
 	}
 	else
@@ -4848,43 +4867,22 @@ static int	vmware_cq_instance_id_compare(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: populate array of values from an xml data                         *
  *                                                                            *
- * Parameters: xdoc   - [IN] XML document                                     *
- *             ds_id  - [IN] datastore id                                     *
+ * Parameters: xdoc    - [IN] XML document                                    *
+ *             ds_node - [IN] xml node with datastore info                    *
+ *             ds_id   - [IN] datastore id (for logging)                      *
  *                                                                            *
- * Return: Upon successful completion the function return SUCCEED.            *
- *         Otherwise, FAIL is returned.                                       *
+ * Return: bitmap value of HV access mode to DS                               *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, const char *ds_id)
+static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, const char *ds_id)
 {
 
-	zbx_uint64_t		mi_access = ZBX_VMWARE_DS_NONE;
-	char			tmp[MAX_STRING_LEN];
-	xmlXPathContext		*xpathCtx;
-	xmlXPathObject		*xpathObj;
-	xmlNode			*xml_node;
-	char			*value;
+	zbx_uint64_t	mi_access = ZBX_VMWARE_DS_NONE;
+	char		*value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() for DS:%s", __func__, ds_id);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_DATASTORE_MOUNTINFO("%s"), ds_id);
-	xpathCtx = xmlXPathNewContext(xdoc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)tmp, xpathCtx)))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot make montinfo parsing query for DS:%s", ds_id);
-		goto clean;
-	}
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find items in mountinfo for DS:%s", ds_id);
-		goto clean;
-	}
-
-	xml_node = xpathObj->nodesetval->nodeTab[0];
-
-	if (NULL != (value = zbx_xml_node_read_value(xdoc, xml_node, ZBX_XPATH_PROP_SUFFIX("mounted"))))
+	if (NULL != (value = zbx_xml_node_read_value(xdoc, ds_node, ZBX_XPATH_PROP_SUFFIX("mounted"))))
 	{
 		if (0 == strcmp(value, "true"))
 			mi_access |= ZBX_VMWARE_DS_MOUNTED;
@@ -4894,7 +4892,7 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, const char *ds_id)
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find item 'mounted' in mountinfo for DS:%s", ds_id);
 
-	if (NULL != (value = zbx_xml_node_read_value(xdoc, xml_node, ZBX_XPATH_PROP_SUFFIX("accessible"))))
+	if (NULL != (value = zbx_xml_node_read_value(xdoc, ds_node, ZBX_XPATH_PROP_SUFFIX("accessible"))))
 	{
 		if (0 == strcmp(value, "true"))
 			mi_access |= ZBX_VMWARE_DS_ACCESSIBLE;
@@ -4904,7 +4902,7 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, const char *ds_id)
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find item 'accessible' in accessible for DS:%s", ds_id);
 
-	if (NULL != (value = zbx_xml_node_read_value(xdoc, xml_node, ZBX_XPATH_PROP_SUFFIX("accessMode"))))
+	if (NULL != (value = zbx_xml_node_read_value(xdoc, ds_node, ZBX_XPATH_PROP_SUFFIX("accessMode"))))
 	{
 		if (0 == strcmp(value, "readWrite"))
 			mi_access |= ZBX_VMWARE_DS_READWRITE;
@@ -4916,9 +4914,6 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, const char *ds_id)
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find item 'accessMode' in mountinfo for DS:%s", ds_id);
 
-clean:
-	xmlXPathFreeObject(xpathObj);
-	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() mountinfo:" ZBX_FS_UI64, __func__, mi_access);
 
 	return mi_access;
@@ -5129,6 +5124,180 @@ out:
 }
 
 /******************************************************************************
+ * Function: vmware_hv_ds_access_parse                                        *
+ *                                                                            *
+ * Purpose: read access state of hv to ds                                     *
+ *                                                                            *
+ * Parameters: xdoc    - [IN] the xml data with DS access info                *
+ *             hv_dss  - [IN] the vector with all DS connected to HV          *
+ *             hv_uuid - [IN] the uuid of HV                                  *
+ *             hv_id   - [IN] the id of HV (for logging)                      *
+ *             dss     - [IN/OUT] the vector with all Datastores              *
+ *                                                                            *
+ * Return value: count of updated DS                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_hv_ds_access_parse(xmlDoc *xdoc, const zbx_vector_str_t *hv_dss, const char *hv_uuid,
+		const char *hv_id, zbx_vector_vmware_datastore_t *dss)
+{
+	int		i, parsed_num = 0;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	xpathCtx = xmlXPathNewContext(xdoc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_OBJECTS_BY_TYPE(ZBX_VMWARE_SOAP_DS),
+			xpathCtx)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot make xpath for Datastore list query.");
+		goto clean;
+	}
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find Datastores in the list.");
+		goto clean;
+	}
+
+	nodeset = xpathObj->nodesetval;
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		int				j;
+		char				*value;
+		zbx_vmware_datastore_t		*ds, ds_cmp;
+		zbx_str_uint64_pair_t		hv_ds_access;
+
+		if (NULL == (value = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XPATH_NN("obj"))))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "skipping DS record without ID, xml number '%d'", i);
+			continue;
+		}
+
+		if (FAIL == (j = zbx_vector_str_bsearch(hv_dss, value, ZBX_DEFAULT_STR_COMPARE_FUNC)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "DS:%s not connected to HV:%s", value, hv_id);
+			zbx_str_free(value);
+			continue;
+		}
+
+		zbx_str_free(value);
+
+		ds_cmp.id = hv_dss->values[j];
+
+		if (FAIL == (j = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_id_compare)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Datastore \"%s\" not found on hypervisor \"%s\".", __func__,
+					ds_cmp.id, hv_id);
+			continue;
+		}
+
+		ds = dss->values[j];
+		hv_ds_access.name = zbx_strdup(NULL, hv_uuid);
+		hv_ds_access.value = vmware_hv_get_ds_access(xdoc, nodeset->nodeTab[i], ds->id);
+		zbx_vector_str_uint64_pair_append_ptr(&ds->hv_uuids_access, &hv_ds_access);
+		parsed_num++;
+	}
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() parsed:%d", __func__, parsed_num);
+
+	return parsed_num;
+}
+
+/******************************************************************************
+ * Function: vmware_hv_ds_access_update                                       *
+ *                                                                            *
+ * Purpose: update access state of hv to ds                                   *
+ *                                                                            *
+ * Parameters: service      - [IN] the vmware service                         *
+ *             easyhandle   - [IN] the CURL handle                            *
+ *             hv_uuid      - [IN] the vmware hypervisor uuid                 *
+ *             hv_id        - [IN] the vmware hypervisor id                   *
+ *             hv_dss       - [IN] the vector with all DS connected to HV     *
+ *             dss          - [IN/OUT] the vector with all Datastores         *
+ *             error        - [OUT] the error message in the case of failure  *
+ *                                                                            *
+ * Return value: SUCCEED - the access state was updated successfully          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyhandle, const char *hv_uuid,
+		const char *hv_id, const zbx_vector_str_t *hv_dss, zbx_vector_vmware_datastore_t *dss, char **error)
+{
+#	define ZBX_POST_HV_DS_ACCESS 									\
+		ZBX_POST_VSPHERE_HEADER									\
+		"<ns0:RetrievePropertiesEx>"								\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
+			"<ns0:specSet>"									\
+				"<ns0:propSet>"								\
+					"<ns0:type>Datastore</ns0:type>"				\
+					"<ns0:pathSet>host[\"%s\"].mountInfo.mounted</ns0:pathSet>"	\
+					"<ns0:pathSet>host[\"%s\"].mountInfo.accessible</ns0:pathSet>"	\
+					"<ns0:pathSet>host[\"%s\"].mountInfo.accessMode</ns0:pathSet>"	\
+				"</ns0:propSet>"							\
+				"<ns0:objectSet>"							\
+					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"			\
+					"<ns0:skip>false</ns0:skip>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"		\
+						"<ns0:name>DSObject</ns0:name>"				\
+						"<ns0:type>HostSystem</ns0:type>"			\
+						"<ns0:path>datastore</ns0:path>"			\
+						"<ns0:skip>false</ns0:skip>"				\
+					"</ns0:selectSet>"						\
+				"</ns0:objectSet>"							\
+			"</ns0:specSet>"								\
+			"<ns0:options/>"								\
+		"</ns0:RetrievePropertiesEx>"								\
+		ZBX_POST_VSPHERE_FOOTER
+
+	char				*hvid_esc, tmp[MAX_STRING_LEN];
+	int				ret = FAIL, updated = 0;
+	xmlDoc				*doc = NULL;
+	zbx_property_collection_iter	*iter = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hv id:%s hv dss:%d dss:%d", __func__, hv_id, hv_dss->values_num,
+			dss->values_num);
+
+	hvid_esc = zbx_xml_escape_dyn(hv_id);
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DS_ACCESS, vmware_service_objects[service->type].property_collector,
+			hvid_esc, hvid_esc, hvid_esc, hvid_esc);
+	zbx_free(hvid_esc);
+
+	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", &iter, &doc, error))
+		goto out;
+
+	updated += vmware_hv_ds_access_parse(doc, hv_dss, hv_uuid, hv_id, dss);
+
+	while (NULL != iter->token)
+	{
+		zbx_xml_free_doc(doc);
+		doc = NULL;
+
+		if (SUCCEED != zbx_property_collection_next(iter, &doc, error))
+			goto out;
+
+		updated += vmware_hv_ds_access_parse(doc, hv_dss, hv_uuid, hv_id, dss);
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_property_collection_free(iter);
+	zbx_xml_free_doc(doc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s for %d / %d", __func__, zbx_result_string(ret), updated,
+			hv_dss->values_num);
+
+	return ret;
+
+#	undef ZBX_POST_HV_DS_ACCESS
+}
+
+/******************************************************************************
  *                                                                            *
  * Purpose: sorting function to sort Datastore names vector by name           *
  *                                                                            *
@@ -5223,6 +5392,8 @@ int	vmware_resourcepool_compare_id(const void *r1, const void *r2)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_service_init_hv                                           *
+ *                                                                            *
  * Purpose: initialize vmware hypervisor object                               *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
@@ -5295,6 +5466,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		goto out;
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
+	zbx_vector_str_sort(&datastores, ZBX_DEFAULT_STR_COMPARE_FUNC);
 	zbx_vector_vmware_dsname_reserve(&hv->dsnames, (size_t)datastores.values_num);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): %d datastores are connected to hypervisor \"%s\"", __func__,
 			datastores.values_num, hv->id);
@@ -5302,10 +5474,12 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	if (SUCCEED != vmware_service_hv_get_multipath_data(service, easyhandle, details, id, &multipath_data, error))
 		goto out;
 
+	if (SUCCEED != vmware_hv_ds_access_update(service, easyhandle, hv->uuid, hv->id, &datastores, dss, error))
+		goto out;
+
 	for (i = 0; i < datastores.values_num; i++)
 	{
 		zbx_vmware_datastore_t	*ds, ds_cmp;
-		zbx_str_uint64_pair_t	hv_ds_access;
 		zbx_vmware_dsname_t	*dsname;
 
 		ds_cmp.id = datastores.values[i];
@@ -5318,10 +5492,6 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		}
 
 		ds = dss->values[j];
-		hv_ds_access.name = zbx_strdup(NULL, hv->uuid);
-		hv_ds_access.value = vmware_hv_get_ds_access(details, ds->id);
-		zbx_vector_str_uint64_pair_append_ptr(&ds->hv_uuids_access, &hv_ds_access);
-
 		dsname = (zbx_vmware_dsname_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dsname_t));
 		dsname->name = zbx_strdup(NULL, ds->name);
 		dsname->uuid = zbx_strdup(NULL, ds->uuid);
@@ -5452,7 +5622,7 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		char	*error;
+		char	*error = NULL;
 
 		if (NULL == (id = zbx_xml_node_read_value(doc, nodeset->nodeTab[i], ZBX_XPATH_NN("obj"))))
 		{
@@ -5852,7 +6022,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CREATE_EVENT_COLLECTOR,
 			vmware_service_objects[service->type].event_manager);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, error))
 		goto out;
 
 	if (NULL == (*event_session = zbx_xml_doc_read_value(doc, "/*/*/*/*[@type='EventHistoryCollector']")))
@@ -5903,7 +6073,7 @@ static int	vmware_service_reset_event_history_collector(CURL *easyhandle, const 
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, NULL, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, NULL, NULL, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -5952,7 +6122,7 @@ static int	vmware_service_read_previous_events(CURL *easyhandle, const char *eve
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, xdoc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, xdoc, NULL, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -6009,7 +6179,7 @@ static int	vmware_service_get_event_latestpage(const zbx_vmware_service_t *servi
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, xdoc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, xdoc, NULL, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -6054,7 +6224,7 @@ static int	vmware_service_destroy_event_session(CURL *easyhandle, const char *ev
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, NULL, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, NULL, NULL, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -6480,7 +6650,7 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 			vmware_service_objects[service->type].property_collector,
 			vmware_service_objects[service->type].event_manager);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, error))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -6698,7 +6868,7 @@ static int	vmware_service_get_cluster_data(CURL *easyhandle, xmlDoc **data, char
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_VCENTER_CLUSTER, data, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_VCENTER_CLUSTER, data, NULL, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -6762,7 +6932,7 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 
 	zbx_free(clusterid_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, error))
 		goto out;
 
 	*status = zbx_xml_doc_read_value(doc, ZBX_XPATH_PROP_NAME("summary.overallStatus"));
@@ -6951,7 +7121,7 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, zbx_vmware_servi
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_MAXQUERYMETRICS, &doc, error))
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_MAXQUERYMETRICS, &doc, NULL, error))
 	{
 		if (NULL == doc)	/* if not SOAP error */
 			goto out;
@@ -7395,7 +7565,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_FETCH_DV_PORTS, cqv->instance->soap_type, cqv->instance->id,
 				criteria);
 
-		if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, &error))
+		if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, &error))
 		{
 			cqv->status = ZBX_VMWARE_CQV_ERROR;
 			cqv->response = error;
@@ -7462,7 +7632,7 @@ static void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() %s id:%s key:%s response length:%d node type:%d", fn_parent,
 			ZBX_VMWARE_CQV_ERROR == cqv->status ? "FAIL" : "SUCCEED", cqv->instance->id,
 			cqv->instance->key, NULL == cqv->response ? -1 : (int)strlen(cqv->response),
-			NULL != node && NULL != node->xmlChildrenNode ? node->xmlChildrenNode->type : -1);
+			NULL != node && NULL != node->xmlChildrenNode ? (int)node->xmlChildrenNode->type : -1);
 }
 
 /******************************************************************************
@@ -7512,7 +7682,7 @@ static void	vmware_service_props_load(CURL *easyhandle, zbx_vector_cq_value_t *c
 				cqv->instance->soap_type, cqv->instance->id);
 		total++;
 
-		if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, &error))
+		if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, &error))
 		{
 			cqv->status = ZBX_VMWARE_CQV_ERROR;
 			cqv->response = error;
@@ -8238,7 +8408,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP request: %s", __func__, tmp);
 
-		if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, &error))
+		if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, &error))
 		{
 			for (j = i + 1; j < entities->values_num; j++)
 			{

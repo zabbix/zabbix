@@ -71,7 +71,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 							$this->zbxTestInputType('new_tag_filter_value', $value);
 						}
 
-						$this->zbxTestClickXpath("//ul[@id='tagFilterFormList']//button[text()='Add']");
+						$this->zbxTestClickXpath("//div[@id='tag_filter_tab']//button[text()='Add']");
 						$xpath = '//table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]';
 						$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath)	);
 					}

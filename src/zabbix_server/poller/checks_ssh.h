@@ -26,9 +26,6 @@
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "dbcache.h"
 
-extern char	*CONFIG_SOURCE_IP;
-extern char	*CONFIG_SSH_KEY_LOCATION;
-
 int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result);
 #endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/
 

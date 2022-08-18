@@ -28,6 +28,7 @@
 #include "zbxembed.h"
 #include "zbxserialize.h"
 #include "zbxxml.h"
+#include "zbxtime.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
@@ -847,7 +848,8 @@ static zbx_am_alert_t	*am_pop_alert(zbx_am_t *manager)
 	if (NULL == (mediatype = am_pop_mediatype(manager)))
 		return NULL;
 
-	alertpool = am_pop_alertpool(mediatype);
+	if (NULL == (alertpool = am_pop_alertpool(mediatype)))
+		return NULL;
 
 	elem = zbx_binary_heap_find_min(&alertpool->queue);
 	alert = (zbx_am_alert_t *)elem->data;
@@ -2268,9 +2270,9 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
-		now = time_now;
+		now = (int)time_now;
 
-		if (time_ping + ZBX_DB_PING_FREQUENCY < now)
+		if ((time_ping + ZBX_DB_PING_FREQUENCY) < now)
 		{
 			manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE);
 			DBclose();

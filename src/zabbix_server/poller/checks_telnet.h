@@ -23,8 +23,6 @@
 #include "module.h"
 #include "dbcache.h"
 
-extern char	*CONFIG_SOURCE_IP;
-
 int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result);
 
 #endif

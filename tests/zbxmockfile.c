@@ -29,7 +29,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #define ZBX_MOCK_MAX_FILES	16
 

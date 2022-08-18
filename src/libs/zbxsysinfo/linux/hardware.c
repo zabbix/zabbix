@@ -18,15 +18,16 @@
 **/
 
 #include "hardware.h"
-
-#include "../common/zbxsysinfo_common.h"
 #include "sysinfo.h"
+#include "../common/zbxsysinfo_common.h"
+
 #include <sys/mman.h>
 #include <setjmp.h>
 #include <signal.h>
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "log.h"
+#include "zbxnum.h"
 
 static ZBX_THREAD_LOCAL volatile char sigbus_handler_set;
 static ZBX_THREAD_LOCAL sigjmp_buf sigbus_jmp_buf;

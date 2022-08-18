@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 #include "zbxmockjson.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "zbxjson.h"
 #include "../../../src/libs/zbxjson/json.h"
 

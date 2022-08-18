@@ -19,7 +19,7 @@
 
 #include "global.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "embed.h"
 #include "duktape.h"
 #include "base64.h"
@@ -246,7 +246,6 @@ static duk_ret_t	es_hmac(duk_context *ctx)
 
 	return 1;
 }
-
 
 /******************************************************************************
  *                                                                            *

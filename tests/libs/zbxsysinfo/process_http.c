@@ -22,6 +22,8 @@
 
 #include "zbxdbhigh.h"
 #include "sysinfo.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 static char	*called_key = NULL;
 
