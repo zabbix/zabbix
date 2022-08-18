@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
-#include "zbxjson.h"
 #include "../common/zbxsysinfo_common.h"
+
+#include "zbxjson.h"
 #include "log.h"
+#include "zbxnum.h"
 
 static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64_t *field_value, char **error)
 {

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_DBSYNC_H
 #define ZABBIX_DBSYNC_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "dbconfig.h"
 
 /* no changes */
@@ -120,6 +120,7 @@ int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsign
 
 int	zbx_dbsync_compare_config(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync);

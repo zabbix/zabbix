@@ -230,22 +230,29 @@ final class CItemData {
 			'net.tcp.service[service,<ip>,<port>]',
 			'net.udp.service.perf[service,<ip>,<port>]',
 			'net.udp.service[service,<ip>,<port>]',
+			'vmware.alarms.get[<url>]',
 			'vmware.cl.perfcounter[<url>,<id>,<path>,<instance>]',
+			'vmware.cluster.alarms.get[<url>,<id>]',
 			'vmware.cluster.discovery[<url>]',
+			'vmware.cluster.property[<url>,<id>,<prop>]',
 			'vmware.cluster.status[<url>,<name>]',
 			'vmware.cluster.tags.get[<url>,<id>]',
+			'vmware.datastore.alarms.get[<url>,<uuid>]',
 			'vmware.datastore.discovery[<url>]',
 			'vmware.datastore.hv.list[<url>,<datastore>]',
+			'vmware.datastore.property[<url>,<uuid>,<prop>]',
 			'vmware.datastore.read[<url>,<datastore>,<mode>]',
 			'vmware.datastore.size[<url>,<datastore>,<mode>]',
 			'vmware.datastore.tags.get[<url>,<uuid>]',
 			'vmware.datastore.write[<url>,<datastore>,<mode>]',
+			'vmware.dc.alarms.get[<url>,<id>]',
 			'vmware.dc.discovery[<url>]',
 			'vmware.dc.tags.get[<url>,<id>]',
 			'vmware.dvswitch.discovery[<url>]',
 			'vmware.dvswitch.fetchports.get[<url>,<filter>,<mode>]',
 			'vmware.eventlog[<url>,<mode>]',
 			'vmware.fullname[<url>]',
+			'vmware.hv.alarms.get[<url>,<uuid>]',
 			'vmware.hv.cluster.name[<url>,<uuid>]',
 			'vmware.hv.connectionstate[<url>,<uuid>]',
 			'vmware.hv.cpu.usage.perf[<url>,<uuid>]',
@@ -279,6 +286,7 @@ final class CItemData {
 			'vmware.hv.network.out[<url>,<uuid>,<mode>]',
 			'vmware.hv.perfcounter[<url>,<uuid>,<path>,<instance>]',
 			'vmware.hv.power[<url>,<uuid>,<max>]',
+			'vmware.hv.property[<url>,<uuid>,<prop>]',
 			'vmware.hv.sensor.health.state[<url>,<uuid>]',
 			'vmware.hv.sensors.get[<url>,<uuid>]',
 			'vmware.hv.status[<url>,<uuid>]',
@@ -289,6 +297,7 @@ final class CItemData {
 			'vmware.rp.cpu.usage[<url>,<rpid>]',
 			'vmware.rp.memory[<url>,<rpid>,<mode>]',
 			'vmware.version[<url>]',
+			'vmware.vm.alarms.get[<url>,<uuid>]',
 			'vmware.vm.attribute[<url>,<uuid>,<name>]',
 			'vmware.vm.cluster.name[<url>,<uuid>]',
 			'vmware.vm.consolidationneeded[<url>,<uuid>]',
@@ -320,6 +329,7 @@ final class CItemData {
 			'vmware.vm.net.if.usage[<url>,<uuid>,<instance>]',
 			'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
 			'vmware.vm.powerstate[<url>,<uuid>]',
+			'vmware.vm.property[<url>,<uuid>,<prop>]',
 			'vmware.vm.snapshot.get[<url>,<uuid>]',
 			'vmware.vm.state[<url>,<uuid>]',
 			'vmware.vm.storage.committed[<url>,<uuid>]',
@@ -388,6 +398,36 @@ final class CItemData {
 	];
 
 	/**
+	 * Generates an array used to generate item type lookups in the form: item_type => [key_names].
+	 *
+	 * @return array
+	 */
+	public static function getKeysByItemType(): array {
+		$keys_by_type = self::KEYS_BY_TYPE;
+		$keys_by_type_shortened = [];
+
+		foreach ($keys_by_type as $item_type => $available_keys) {
+			$available_keys_shortened = [];
+
+			foreach ($available_keys as $key) {
+				$param_start_pos = strpos($key, '[');
+
+				if ($param_start_pos !== false) {
+					$key = substr($key, 0, $param_start_pos);
+				}
+
+				if (!array_key_exists($key, $available_keys_shortened)) {
+					$available_keys_shortened[] = $key;
+				}
+			}
+
+			$keys_by_type_shortened[$item_type] = $available_keys_shortened;
+		}
+
+		return $keys_by_type_shortened;
+	}
+
+	/**
 	 * Returns items available for the given item type as an array of key => details.
 	 *
 	 * @param int $type  ITEM_TYPE_ZABBIX, ITEM_TYPE_INTERNAL, etc.
@@ -399,12 +439,12 @@ final class CItemData {
 	}
 
 	/**
-	 * Generate an array used for item type lookups in the form: key_name => value_type.
+	 * Generates an array used to generate item type of information lookups in the form: key_name => value_type.
 	 * Value type set to null if key return type varies based on parameters.
 	 *
 	 * @return array
 	 */
-	public static function getTypeSuggestionsByKey(): array {
+	public static function getValueTypeByKey(): array {
 		$type_suggestions = [];
 		$keys = self::get();
 
@@ -1234,12 +1274,24 @@ final class CItemData {
 				'description' => _('Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage'),
 				'value_type' => null
 			],
+			'vmware.alarms.get[<url>]' => [
+				'description' => _('VMware virtual center alarms data, returns JSON, <url> - VMware service URL'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'vmware.cl.perfcounter[<url>,<id>,<path>,<instance>]' => [
 				'description' => _('VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
+			'vmware.cluster.alarms.get[<url>,<id>]' => [
+				'description' => _('VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'vmware.cluster.discovery[<url>]' => [
 				'description' => _('Discovery of VMware clusters, <url> - VMware service URL. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'vmware.cluster.property[<url>,<id>,<prop>]' => [
+				'description' => _('VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.cluster.status[<url>,<name>]' => [
@@ -1250,12 +1302,20 @@ final class CItemData {
 				'description' => _('VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
+			'vmware.datastore.alarms.get[<url>,<uuid>]' => [
+				'description' => _('VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'vmware.datastore.discovery[<url>]' => [
 				'description' => _('Discovery of VMware datastores, <url> - VMware service URL. Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.datastore.hv.list[<url>,<datastore>]' => [
 				'description' => _('VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'vmware.datastore.property[<url>,<uuid>,<prop>]' => [
+				'description' => _('VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.datastore.read[<url>,<datastore>,<mode>]' => [
@@ -1272,6 +1332,10 @@ final class CItemData {
 			],
 			'vmware.datastore.write[<url>,<datastore>,<mode>]' => [
 				'description' => _('VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'vmware.dc.alarms.get[<url>,<id>]' => [
+				'description' => _('VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.dc.discovery[<url>]' => [
@@ -1297,6 +1361,10 @@ final class CItemData {
 			'vmware.fullname[<url>]' => [
 				'description' => _('VMware service full name, <url> - VMware service URL'),
 				'value_type' => ITEM_VALUE_TYPE_STR
+			],
+			'vmware.hv.alarms.get[<url>,<uuid>]' => [
+				'description' => _('VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.hv.cluster.name[<url>,<uuid>]' => [
 				'description' => _('VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
@@ -1430,6 +1498,10 @@ final class CItemData {
 				'description' => _('Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
+			'vmware.hv.property[<url>,<uuid>,<prop>]' => [
+				'description' => _('VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'vmware.hv.sensor.health.state[<url>,<uuid>]' => [
 				'description' => _('VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
@@ -1469,6 +1541,10 @@ final class CItemData {
 			'vmware.version[<url>]' => [
 				'description' => _('VMware service version, <url> - VMware service URL'),
 				'value_type' => ITEM_VALUE_TYPE_STR
+			],
+			'vmware.vm.alarms.get[<url>,<uuid>]' => [
+				'description' => _('VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.vm.attribute[<url>,<uuid>,<name>]' => [
 				'description' => _('VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name'),
@@ -1593,6 +1669,10 @@ final class CItemData {
 			'vmware.vm.powerstate[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vmware.vm.property[<url>,<uuid>,<prop>]' => [
+				'description' => _('VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.vm.snapshot.get[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON'),

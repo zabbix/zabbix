@@ -40,7 +40,6 @@ class CRoleHelper {
 	public const UI_REPORTS_NOTIFICATIONS = 'ui.reports.notifications';
 	public const UI_REPORTS_SCHEDULED_REPORTS = 'ui.reports.scheduled_reports';
 	public const UI_SERVICES_SERVICES = 'ui.services.services';
-	public const UI_SERVICES_ACTIONS = 'ui.services.actions';
 	public const UI_SERVICES_SLA = 'ui.services.sla';
 	public const UI_SERVICES_SLA_REPORT = 'ui.services.sla_report';
 	public const UI_CONFIGURATION_TEMPLATE_GROUPS = 'ui.configuration.template_groups';
@@ -48,15 +47,23 @@ class CRoleHelper {
 	public const UI_CONFIGURATION_TEMPLATES = 'ui.configuration.templates';
 	public const UI_CONFIGURATION_HOSTS = 'ui.configuration.hosts';
 	public const UI_CONFIGURATION_MAINTENANCE = 'ui.configuration.maintenance';
-	public const UI_CONFIGURATION_ACTIONS = 'ui.configuration.actions';
+	public const UI_CONFIGURATION_TRIGGER_ACTIONS =  'ui.configuration.trigger_actions';
+	public const UI_CONFIGURATION_SERVICE_ACTIONS = 'ui.configuration.service_actions';
+	public const UI_CONFIGURATION_DISCOVERY_ACTIONS =  'ui.configuration.discovery_actions';
+	public const UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS =  'ui.configuration.autoregistration_actions';
+	public const UI_CONFIGURATION_INTERNAL_ACTIONS =  'ui.configuration.internal_actions';
 	public const UI_CONFIGURATION_EVENT_CORRELATION = 'ui.configuration.event_correlation';
 	public const UI_CONFIGURATION_DISCOVERY = 'ui.configuration.discovery';
 	public const UI_ADMINISTRATION_GENERAL = 'ui.administration.general';
+	public const UI_ADMINISTRATION_AUDIT_LOG = 'ui.administration.audit_log';
+	public const UI_ADMINISTRATION_HOUSEKEEPING = 'ui.administration.housekeeping';
 	public const UI_ADMINISTRATION_PROXIES = 'ui.administration.proxies';
+	public const UI_ADMINISTRATION_MACROS = 'ui.administration.macros';
 	public const UI_ADMINISTRATION_AUTHENTICATION = 'ui.administration.authentication';
 	public const UI_ADMINISTRATION_USER_GROUPS = 'ui.administration.user_groups';
 	public const UI_ADMINISTRATION_USER_ROLES = 'ui.administration.user_roles';
 	public const UI_ADMINISTRATION_USERS = 'ui.administration.users';
+	public const UI_ADMINISTRATION_API_TOKENS = 'ui.administration.api_tokens';
 	public const UI_ADMINISTRATION_MEDIA_TYPES = 'ui.administration.media_types';
 	public const UI_ADMINISTRATION_SCRIPTS = 'ui.administration.scripts';
 	public const UI_ADMINISTRATION_QUEUE = 'ui.administration.queue';
@@ -75,11 +82,14 @@ class CRoleHelper {
 	public const ACTIONS_MANAGE_SLA = 'actions.manage_sla';
 	public const ACTIONS_INVOKE_EXECUTE_NOW = 'actions.invoke_execute_now';
 
+	public const UI_SECTION_DASHBOARDS = 'ui.dashboards';
 	public const UI_SECTION_MONITORING = 'ui.monitoring';
 	public const UI_SECTION_SERVICES = 'ui.services';
 	public const UI_SECTION_INVENTORY = 'ui.inventory';
 	public const UI_SECTION_REPORTS = 'ui.reports';
-	public const UI_SECTION_CONFIGURATION = 'ui.configuration';
+	public const UI_SECTION_DATA_COLLECTION = 'ui.data_collection';
+	public const UI_SECTION_ALERTS = 'ui.alerts';
+	public const UI_SECTION_USERS = 'ui.users';
 	public const UI_SECTION_ADMINISTRATION = 'ui.administration';
 
 	public const API_ANY_METHOD = '.*';
@@ -219,51 +229,58 @@ class CRoleHelper {
 	 */
 	public static function getUiElementsByUserType(int $user_type): array {
 		$rules = [
-			self::UI_INVENTORY_HOSTS,
-			self::UI_INVENTORY_OVERVIEW,
 			self::UI_MONITORING_DASHBOARD,
+			self::UI_MONITORING_PROBLEMS,
 			self::UI_MONITORING_HOSTS,
 			self::UI_MONITORING_LATEST_DATA,
 			self::UI_MONITORING_MAPS,
-			self::UI_MONITORING_PROBLEMS,
-			self::UI_REPORTS_AVAILABILITY_REPORT,
-			self::UI_REPORTS_TOP_TRIGGERS,
 			self::UI_SERVICES_SERVICES,
-			self::UI_SERVICES_SLA_REPORT
+			self::UI_SERVICES_SLA_REPORT,
+			self::UI_INVENTORY_OVERVIEW,
+			self::UI_INVENTORY_HOSTS,
+			self::UI_REPORTS_AVAILABILITY_REPORT,
+			self::UI_REPORTS_TOP_TRIGGERS
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules = array_merge($rules, [
-				self::UI_CONFIGURATION_ACTIONS,
-				self::UI_CONFIGURATION_DISCOVERY,
+				self::UI_MONITORING_DISCOVERY,
+				self::UI_SERVICES_SLA,
+				self::UI_REPORTS_SCHEDULED_REPORTS,
+				self::UI_REPORTS_NOTIFICATIONS,
+				self::UI_CONFIGURATION_TEMPLATE_GROUPS,
 				self::UI_CONFIGURATION_HOST_GROUPS,
+				self::UI_CONFIGURATION_TEMPLATES,
 				self::UI_CONFIGURATION_HOSTS,
 				self::UI_CONFIGURATION_MAINTENANCE,
-				self::UI_CONFIGURATION_TEMPLATES,
-				self::UI_CONFIGURATION_TEMPLATE_GROUPS,
-				self::UI_MONITORING_DISCOVERY,
-				self::UI_REPORTS_NOTIFICATIONS,
-				self::UI_REPORTS_SCHEDULED_REPORTS,
-				self::UI_SERVICES_ACTIONS,
-				self::UI_SERVICES_SLA
+				self::UI_CONFIGURATION_DISCOVERY,
+				self::UI_CONFIGURATION_TRIGGER_ACTIONS,
+				self::UI_CONFIGURATION_SERVICE_ACTIONS,
+				self::UI_CONFIGURATION_DISCOVERY_ACTIONS,
+				self::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS,
+				self::UI_CONFIGURATION_INTERNAL_ACTIONS
 			]);
 		}
 
 		if ($user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules = array_merge($rules, [
-				self::UI_ADMINISTRATION_AUTHENTICATION,
-				self::UI_ADMINISTRATION_GENERAL,
+				self::UI_REPORTS_SYSTEM_INFO,
+				self::UI_REPORTS_AUDIT,
+				self::UI_REPORTS_ACTION_LOG,
+				self::UI_CONFIGURATION_EVENT_CORRELATION,
 				self::UI_ADMINISTRATION_MEDIA_TYPES,
-				self::UI_ADMINISTRATION_PROXIES,
-				self::UI_ADMINISTRATION_QUEUE,
 				self::UI_ADMINISTRATION_SCRIPTS,
 				self::UI_ADMINISTRATION_USER_GROUPS,
 				self::UI_ADMINISTRATION_USER_ROLES,
 				self::UI_ADMINISTRATION_USERS,
-				self::UI_CONFIGURATION_EVENT_CORRELATION,
-				self::UI_REPORTS_ACTION_LOG,
-				self::UI_REPORTS_AUDIT,
-				self::UI_REPORTS_SYSTEM_INFO
+				self::UI_ADMINISTRATION_API_TOKENS,
+				self::UI_ADMINISTRATION_AUTHENTICATION,
+				self::UI_ADMINISTRATION_GENERAL,
+				self::UI_ADMINISTRATION_AUDIT_LOG,
+				self::UI_ADMINISTRATION_HOUSEKEEPING,
+				self::UI_ADMINISTRATION_PROXIES,
+				self::UI_ADMINISTRATION_MACROS,
+				self::UI_ADMINISTRATION_QUEUE
 			]);
 		}
 
@@ -308,6 +325,7 @@ class CRoleHelper {
 	 */
 	public static function getUiSectionsLabels(int $user_type): array {
 		$sections = [
+			self::UI_SECTION_DASHBOARDS => _('Dashboards'),
 			self::UI_SECTION_MONITORING => _('Monitoring'),
 			self::UI_SECTION_SERVICES => _('Services'),
 			self::UI_SECTION_INVENTORY => _('Inventory'),
@@ -315,11 +333,17 @@ class CRoleHelper {
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
-			$sections += [self::UI_SECTION_CONFIGURATION => _('Configuration')];
+			$sections += [
+				self::UI_SECTION_DATA_COLLECTION => _('Data collection'),
+				self::UI_SECTION_ALERTS => _('Alerts')
+			];
 		}
 
 		if ($user_type === USER_TYPE_SUPER_ADMIN) {
-			$sections += [self::UI_SECTION_ADMINISTRATION => _('Administration')];
+			$sections += [
+				self::UI_SECTION_USERS => _('Users'),
+				self::UI_SECTION_ADMINISTRATION => _('Administration')
+			];
 		}
 
 		return $sections;
@@ -337,9 +361,13 @@ class CRoleHelper {
 	 */
 	public static function getUiSectionRulesLabels(string $ui_section_name, int $user_type): array {
 		switch ($ui_section_name) {
+			case self::UI_SECTION_DASHBOARDS:
+				return [
+					self::UI_MONITORING_DASHBOARD => 'Dashboards'
+				];
+
 			case self::UI_SECTION_MONITORING:
 				$labels = [
-					self::UI_MONITORING_DASHBOARD => _('Dashboard'),
 					self::UI_MONITORING_PROBLEMS => _('Problems'),
 					self::UI_MONITORING_HOSTS => _('Hosts'),
 					self::UI_MONITORING_LATEST_DATA => _('Latest data'),
@@ -353,10 +381,7 @@ class CRoleHelper {
 				return $labels;
 
 			case self::UI_SECTION_SERVICES:
-				$labels = [
-					self::UI_SERVICES_SERVICES => _('Services'),
-					self::UI_SERVICES_ACTIONS => _('Service actions')
-				];
+				$labels = [self::UI_SERVICES_SERVICES => _('Services')];
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels += [self::UI_SERVICES_SLA => _('SLA')];
@@ -378,6 +403,12 @@ class CRoleHelper {
 					$labels += [self::UI_REPORTS_SYSTEM_INFO => _('System information')];
 				}
 
+				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [
+						self::UI_REPORTS_SCHEDULED_REPORTS => _('Scheduled reports')
+					];
+				}
+
 				$labels += [
 					self::UI_REPORTS_AVAILABILITY_REPORT => _('Availability report'),
 					self::UI_REPORTS_TOP_TRIGGERS => _('Triggers top 100')
@@ -385,20 +416,20 @@ class CRoleHelper {
 
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels += [
-						self::UI_REPORTS_AUDIT => _('Audit'),
+						self::UI_REPORTS_AUDIT => _('Audit log'),
 						self::UI_REPORTS_ACTION_LOG => _('Action log')
 					];
 				}
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels += [
-						self::UI_REPORTS_NOTIFICATIONS => _('Notifications'),
-						self::UI_REPORTS_SCHEDULED_REPORTS => _('Scheduled reports')
+						self::UI_REPORTS_NOTIFICATIONS => _('Notifications')
 					];
 				}
 
 				return $labels;
-			case self::UI_SECTION_CONFIGURATION:
+
+			case self::UI_SECTION_DATA_COLLECTION:
 				$labels = [];
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
@@ -407,8 +438,7 @@ class CRoleHelper {
 						self::UI_CONFIGURATION_HOST_GROUPS => _('Host groups'),
 						self::UI_CONFIGURATION_TEMPLATES => _('Templates'),
 						self::UI_CONFIGURATION_HOSTS => _('Hosts'),
-						self::UI_CONFIGURATION_MAINTENANCE => _('Maintenance'),
-						self::UI_CONFIGURATION_ACTIONS => _('Actions')
+						self::UI_CONFIGURATION_MAINTENANCE => _('Maintenance')
 					];
 				}
 
@@ -421,19 +451,54 @@ class CRoleHelper {
 				}
 
 				return $labels;
+
+			case self::UI_SECTION_ALERTS:
+				$labels = [];
+
+				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [
+						self::UI_CONFIGURATION_TRIGGER_ACTIONS => _('Trigger actions'),
+						self::UI_CONFIGURATION_SERVICE_ACTIONS => _('Service actions'),
+						self::UI_CONFIGURATION_DISCOVERY_ACTIONS => _('Discovery actions'),
+						self::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS  => _('Autoregistration actions'),
+						self::UI_CONFIGURATION_INTERNAL_ACTIONS  => _('Internal actions')
+						];
+				}
+
+				if ($user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [
+						self::UI_ADMINISTRATION_MEDIA_TYPES => _('Media types'),
+						self::UI_ADMINISTRATION_SCRIPTS => _('Scripts')
+					];
+				}
+
+				return $labels;
+
+			case self::UI_SECTION_USERS:
+				$labels = [];
+
+				if ($user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels = [
+						self::UI_ADMINISTRATION_USER_GROUPS => _('User groups'),
+						self::UI_ADMINISTRATION_USER_ROLES => _('User roles'),
+						self::UI_ADMINISTRATION_USERS => _('Users'),
+						self::UI_ADMINISTRATION_API_TOKENS => _('API tokens'),
+						self::UI_ADMINISTRATION_AUTHENTICATION => _('Authentication')
+					];
+				}
+
+				return $labels;
+
 			case self::UI_SECTION_ADMINISTRATION:
 				$labels = [];
 
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels = [
 						self::UI_ADMINISTRATION_GENERAL => _('General'),
+						self::UI_ADMINISTRATION_AUDIT_LOG => _('Audit log'),
+						self::UI_ADMINISTRATION_HOUSEKEEPING => _('Housekeeping'),
 						self::UI_ADMINISTRATION_PROXIES => _('Proxies'),
-						self::UI_ADMINISTRATION_AUTHENTICATION => _('Authentication'),
-						self::UI_ADMINISTRATION_USER_GROUPS => _('User groups'),
-						self::UI_ADMINISTRATION_USER_ROLES => _('User roles'),
-						self::UI_ADMINISTRATION_USERS => _('Users'),
-						self::UI_ADMINISTRATION_MEDIA_TYPES => _('Media types'),
-						self::UI_ADMINISTRATION_SCRIPTS => _('Scripts'),
+						self::UI_ADMINISTRATION_MACROS => _('Macros'),
 						self::UI_ADMINISTRATION_QUEUE => _('Queue')
 					];
 				}

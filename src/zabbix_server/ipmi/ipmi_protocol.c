@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_OPENIPMI
 
@@ -25,7 +25,6 @@
 
 #include "zbxserialize.h"
 #include "zbxserver.h"
-
 
 zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hostid, zbx_uint64_t objectid,
 		const char *addr, unsigned short port, signed char authtype, unsigned char privilege,

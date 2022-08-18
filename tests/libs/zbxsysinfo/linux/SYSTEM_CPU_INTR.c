@@ -3,7 +3,7 @@
 #include "zbxmockhelper.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "module.h"
 #include "sysinfo.h"
 

@@ -93,7 +93,7 @@ class CWidgetNavTree extends CWidget {
 
 		super.setEditMode();
 
-		if (this._state === WIDGET_STATE_ACTIVE) {
+		if (this._has_contents && this._state === WIDGET_STATE_ACTIVE) {
 			this._makeTree();
 			this._activateTree();
 			this._activateContentsEvents();

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -30,40 +30,40 @@ $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
-);
-
 $scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.svggraph.form.view.js.php')];
 $jq_templates = [];
+
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
+);
 
 $graph_preview = (new CDiv())
 	->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)
 	->addItem((new CDiv())->setId('svg-graph-preview'));
 
 $form_tabs = (new CTabView())
-	->addTab('data_set',  _('Data set'), getDatasetTab($fields, $jq_templates, $form->getName()),
+	->addTab('data_set', _('Data set'), getDatasetTab($fields, $jq_templates, $form->getName()),
 		TAB_INDICATOR_GRAPH_DATASET
 	)
-	->addTab('displaying_options',  _('Displaying options'), getDisplayOptionsTab($fields), TAB_INDICATOR_GRAPH_DISPLAY_OPTIONS)
-	->addTab('time_period',  _('Time period'), getTimePeriodTab($fields), TAB_INDICATOR_GRAPH_TIME)
-	->addTab('axes',  _('Axes'), getAxesTab($fields))
-	->addTab('legend_tab',  _('Legend'), getLegendTab($fields, $scripts), TAB_INDICATOR_GRAPH_LEGEND)
-	->addTab('problems',  _('Problems'), getProblemsTab($fields, $scripts, $jq_templates, $form->getName()),
+	->addTab('displaying_options', _('Displaying options'), getDisplayOptionsTab($fields),
+		TAB_INDICATOR_GRAPH_DISPLAY_OPTIONS
+	)
+	->addTab('time_period', _('Time period'), getTimePeriodTab($fields), TAB_INDICATOR_GRAPH_TIME)
+	->addTab('axes', _('Axes'), getAxesTab($fields), TAB_INDICATOR_GRAPH_AXES)
+	->addTab('legend_tab', _('Legend'), getLegendTab($fields, $scripts), TAB_INDICATOR_GRAPH_LEGEND)
+	->addTab('problems', _('Problems'), getProblemsTab($fields, $scripts, $jq_templates, $form->getName()),
 		TAB_INDICATOR_GRAPH_PROBLEMS
 	)
-	->addTab('overrides',  _('Overrides'), getOverridesTab($fields, $scripts, $jq_templates, $form->getName()),
+	->addTab('overrides', _('Overrides'), getOverridesTab($fields, $scripts, $jq_templates, $form->getName()),
 		TAB_INDICATOR_GRAPH_OVERRIDES
 	)
 	->addClass('graph-widget-config-tabs')
 	->setSelected(0);
-
 $scripts[] = $form_tabs->makeJavascript();
 
 $form
-	->addItem($form_list)
+	->addItem($form_grid)
 	->addItem($graph_preview)
 	->addItem($form_tabs);
 

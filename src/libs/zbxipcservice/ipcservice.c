@@ -1,4 +1,4 @@
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_IPCSERVICE
 
@@ -6,10 +6,10 @@
 #	include <event.h>
 #endif
 
-#include "zbxtypes.h"
+#include "zbxipcservice.h"
 #include "zbxalgo.h"
 #include "log.h"
-#include "zbxipcservice.h"
+#include "zbxstr.h"
 
 #define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
 

@@ -25,8 +25,12 @@ libzbxpoller_a_SOURCES = \
 	checks_simple_vmware.h \
 	checks_snmp.c \
 	checks_snmp.h \
+	ssh_run.c \
+	ssh_run.h \
 	checks_ssh.c \
 	checks_ssh.h \
+	telnet_run.c \
+	telnet_run.h \
 	checks_telnet.c \
 	checks_telnet.h \
 	poller.c \
@@ -45,6 +49,7 @@ libzbxpoller_a_CFLAGS = \
 	-I$(top_srcdir)/src/libs/zbxdbcache \
 	$(SNMP_CFLAGS) \
 	$(SSH2_CFLAGS) \
-	$(SSH_CFLAGS)
+	$(SSH_CFLAGS) \
+	$(LIBXML2_CFLAGS)
 
 libzbxpoller_server_a_CFLAGS = -I$(top_srcdir)/src/libs/zbxdbcache
