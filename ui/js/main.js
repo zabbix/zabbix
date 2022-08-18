@@ -494,13 +494,20 @@ var hintBox = {
 
 		jQuery(appendTo).append(box);
 
-		var removeHandler = function() {
-			hintBox.deleteHint(target);
-		};
+		target.observer = new MutationObserver(() => {
+			const node = target instanceof Node ? target : target[0];
 
-		jQuery(target)
-			.off('remove', removeHandler)
-			.on('remove', removeHandler);
+			if (document.body.contains(node)) {
+				return;
+			}
+
+			hintBox.deleteHint(target);
+		})
+
+		target.observer.observe(document, {
+			childList: true,
+			subtree: true
+		})
 
 		return box;
 	},
@@ -628,6 +635,12 @@ var hintBox = {
 				}
 				delete target.isStatic;
 			}
+		}
+
+		if (target.observer !== undefined) {
+			target.observer.disconnect();
+
+			delete target.observer;
 		}
 	},
 
