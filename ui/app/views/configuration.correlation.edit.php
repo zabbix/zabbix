@@ -139,27 +139,25 @@ $form_list
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	)
-	->addRow(
-		_('Operations'),[
-			(new CCheckBoxList())
-				->setVertical(true)
-				->setOptions([
-					[
-						'label' => _('Close old events'),
-						'checked' => $data['op_close_old'],
-						'name' => 'op_close_old',
-						'id' => 'operation_0_type',
-						'value' => '1'
-					],
-					[
-						'label' => _('Close new events'),
-						'checked' => $data['op_close_new'],
-						'name' => 'op_close_new',
-						'id' => 'operation_1_type',
-						'value' => '1'
-					]
-				])
-		]
+	->addRow(_('Operations'),
+		(new CCheckBoxList())
+			->setVertical(true)
+			->setOptions([
+				[
+					'label' => _('Close old events'),
+					'checked' => $data['op_close_old'],
+					'name' => 'op_close_old',
+					'id' => 'operation_0_type',
+					'value' => '1'
+				],
+				[
+					'label' => _('Close new events'),
+					'checked' => $data['op_close_new'],
+					'name' => 'op_close_new',
+					'id' => 'operation_1_type',
+					'value' => '1'
+				]
+			])
 	)
 	->addRow('', (new CDiv((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())))
 	->addRow(_('Enabled'),
