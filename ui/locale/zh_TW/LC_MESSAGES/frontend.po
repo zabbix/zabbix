@@ -13714,6 +13714,10 @@ msgstr "上層探索規則"
 msgid "Parent graphs"
 msgstr ""
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
 msgid "Parent items"
