@@ -1889,7 +1889,7 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox.qemu.maxmem[{#QEMU.ID}]'
             -
-              uuid: 7141231d90914090a285f35b5630deda
+              uuid: 391421ce25c74c14abe35723965f3357
               name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Network usage'
               graph_items:
                 -
