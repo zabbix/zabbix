@@ -654,6 +654,7 @@ class CScript extends CApiService {
 			$api_input_rules['uniq'] = [['name']];
 			$common_fields['name']['flags'] |= API_REQUIRED;
 			$common_fields['type']['flags'] = API_REQUIRED;
+			$common_fields['scope']['flags'] = API_REQUIRED;
 		}
 		else {
 			$api_input_rules['uniq'] = [['scriptid'], ['name']];
