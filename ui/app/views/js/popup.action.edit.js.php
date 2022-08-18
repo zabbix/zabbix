@@ -17,6 +17,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
+
+/**
+ * @var CView $this
+ */
 ?>
 
 window.action_edit_popup = new class {
@@ -54,16 +59,16 @@ window.action_edit_popup = new class {
 			this.openOperationPopup();
 		})
 
-		this.dialogue.addEventListener('dialogue.submit', (e) => {
-			// todo: add multiselect title, not value
+		// this.dialogue.addEventListener('dialogue.submit', (e) => {
+		// todo: add multiselect title, not value
 
-			this.row = document.createElement('tr');
-			this.createRow(this.row, e.detail.inputs);
+		//	this.row = document.createElement('tr');
+		//	this.createRow(this.row, e.detail.inputs);
 
-			$('#conditionTable tr:last').before(this.row);
-			// addMessage(makeMessageBox('good', [], e.detail.title, true, false))
-			// processTypeOfCalculation();
-		});
+		//	$('#conditionTable tr:last').before(this.row);
+		//	// addMessage(makeMessageBox('good', [], e.detail.title, true, false))
+		//	// processTypeOfCalculation();
+		//});
 
 		// todo: add existing data to conditions table (for action edit)
 		/*	if (data.conditions){
@@ -151,14 +156,10 @@ window.action_edit_popup = new class {
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', this.actionid !== '' ? 'action.update' : 'action.create');
 
-		this._post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
-		});
+		this._post(curl.getUrl(), fields);
 	}
 
-	_post(url, data, success_callback) {
+	_post(url, data) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -169,10 +170,10 @@ window.action_edit_popup = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				return response;
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 			})
-			.then(success_callback)
 			.catch((exception) => {
 				for (const element of this.form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
@@ -224,4 +225,6 @@ window.action_edit_popup = new class {
 	//		jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
 	//	}
 	//}
+
+
 }

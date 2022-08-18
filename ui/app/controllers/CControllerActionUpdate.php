@@ -32,7 +32,7 @@ class CControllerActionUpdate extends CController {
 					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTOREGISTRATION,
 					EVENT_SOURCE_INTERNAL,EVENT_SOURCE_SERVICE
 				]),
-			'name' => 'string|required',
+			'name' => 'string|required|not_empty',
 			'actionid' => 'id',
 			'status' => 'in '.implode(',', [ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
 			'operations' => 'array',
@@ -45,15 +45,20 @@ class CControllerActionUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions(): bool {
-		// todo: add permission check
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS);
 	}
 
 	protected function doAction(): void
@@ -201,7 +206,7 @@ class CControllerActionUpdate extends CController {
 			'name' => $this->getInput('name'),
 			'actionid' => $this->getInput('actionid'),
 			'status' => $this->getInput('status'),
-			'eventsource' => $this->getInput('eventsource'),
+			'eventsource' => $eventsource,
 			'esc_period' => $this->getInput('esc_period'),
 			'operations' => [
 				[
@@ -233,26 +238,30 @@ class CControllerActionUpdate extends CController {
 				],
 				'evaltype' => '0'
 			],
-			//	'pause_suppressed' => '1',
-			//	'notify_if_canceled' => '1'
+				'pause_suppressed' => '1',
+				'notify_if_canceled' => '1'
 		];
 
 		DBstart();
 
 		$result = API::Action()->update($action);
 
-		$messageSuccess = _('Action updated');
-		$messageFailed = _('Cannot update action');
-
-		if ($result) {
-			unset($_REQUEST['form']);
-		}
-
 		$result = DBend($result);
 
 		if ($result) {
-			uncheckTableRows($eventsource);
+			$output['success']['title'] =  _('Action updated');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
-		show_messages($result, $messageSuccess, $messageFailed);
+		else {
+			$output['error'] = [
+				'title' => _('Cannot update action'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

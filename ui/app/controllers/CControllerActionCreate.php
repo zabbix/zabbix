@@ -32,7 +32,7 @@ class CControllerActionCreate extends CController {
 				EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTOREGISTRATION,
 				EVENT_SOURCE_INTERNAL,EVENT_SOURCE_SERVICE
 			]),
-			'name' => 'string|required',
+			'name' => 'string|required|not_empty',
 			'status' => 'in '.implode(',', [ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
 			'operations' => 'array',
 			'recovery_operations' => 'array',
@@ -44,7 +44,13 @@ class CControllerActionCreate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -241,18 +247,33 @@ class CControllerActionCreate extends CController {
 		$messageSuccess = _('Action added');
 		$messageFailed = _('Cannot add action');
 
-		if ($result) {
-			unset($_REQUEST['form']);
-		}
+//		if ($result) {
+//			unset($_REQUEST['form']);
+//		}
 
-		DBend($result);
+	//	DBend($result);
 		$result = DBend($result);
 
+//		if ($result) {
+//			uncheckTableRows($eventsource);
+//		}
+
+	//	show_messages($result, $messageSuccess, $messageFailed);
+
 		if ($result) {
-			uncheckTableRows($eventsource);
+			$output['success']['title'] = _('Action added');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
+		}
+		else {
+			$output['error'] = [
+				'title' => _('Cannot add action'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		show_messages($result, $messageSuccess, $messageFailed);
-		//var_dump(array_column(get_and_clear_messages(), 'message')); exit;
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

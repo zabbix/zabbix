@@ -22,8 +22,8 @@
 window.condition_popup = new class {
 
 	init() {
-		this.curl = new Curl('zabbix.php', false);
-		this.curl.setArgument('action', 'popup.action.edit');
+		//this.curl = new Curl('zabbix.php', false);
+		//this.curl.setArgument('action', 'popup.action.edit');
 		//this.dialogue = this.overlay.$dialogue[0];
 		//this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		//this.validate(overlay);
@@ -51,7 +51,6 @@ window.condition_popup = new class {
 			const $action_edit = overlays_stack.getById('action-edit').$dialogue[0];
 			$action_edit.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
-
 	}
 
 		_post(url, data, success_callback) {

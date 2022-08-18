@@ -24,24 +24,42 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate() ?>
-</script>
+<!--<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">-->
+<!--	--><?//= CTagFilterFieldHelper::getTemplate() ?>
+<!--</script>-->
 
 <script>
 	const view = {
 	//	eventsource: null,
 
 		init({eventsource}) {
-			//this.eventsource = eventsource;
+			this.eventsource = eventsource;
 			document.addEventListener('click', (e) => {
 
 				if (e.target.classList.contains('js-action-create')) {
-					this.openActionPopup({eventsource: eventsource});
+					// todo: clean init -> make this edit function
+					const overlay = this.openActionPopup({eventsource: eventsource});
+
+					overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+						postMessageOk(e.detail.title);
+
+						if ('messages' in e.detail) {
+							postMessageDetails('success', e.detail.messages);
+						}
+						location.href = location.href;
+					});
 				}
 				else if (e.target.classList.contains('js-action-edit')) {
-					this.openActionPopup({eventsource: eventsource, actionid: e.target.attributes.actionid.nodeValue});
+					// todo: clean init -> make this edit function
+					const overlay = this.openActionPopup({eventsource: eventsource, actionid: e.target.attributes.actionid.nodeValue});
+					overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+						postMessageOk(e.detail.title);
 
+						if ('messages' in e.detail) {
+							postMessageDetails('success', e.detail.messages);
+						}
+						location.href = location.href;
+					});
 				}
 			});
 		},
