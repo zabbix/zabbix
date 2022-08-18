@@ -242,17 +242,12 @@ class CControllerHostList extends CController {
 		]);
 
 		foreach ($hosts as &$host) {
-			if ($host['discoveryRule']) {
-				$host['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
+			$host['is_discovery_rule_editable'] = $host['discoveryRule']
+				&& API::DiscoveryRule()->get([
 					'output' => [],
 					'itemids' => $host['discoveryRule']['itemid'],
-					'editable' => true,
-					'preservekeys' => true
+					'editable' => true
 				]);
-			}
-			else {
-				$host['is_discovery_rule_editable'] = false;
-			}
 		}
 		unset($host);
 
