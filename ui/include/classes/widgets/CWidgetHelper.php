@@ -1547,23 +1547,15 @@ class CWidgetHelper {
 			])
 			->setFooter(new CRow(
 				new CCol(
-					(new CSimpleButton(null, _('Add')))
+					(new CSimpleButton(_('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-add')
 				)
 			));
 
 		foreach ($field->getValue() as $i => $threshold) {
-			$thresholds_table->addRow([
-				(new CColor('thresholds['.$i.'][color]', $threshold['color']))->appendColorPickerJs(false),
-				(new CTextBox('thresholds['.$i.'][threshold]', $threshold['threshold'], false))
-					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-					->setAriaRequired(),
-				(new CButton('thresholds['.$i.'][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-				],
-				'form_row'
+			$thresholds_table->addRow(
+				self::getThresholdsTemplate($field->getName(), $i, $threshold['color'], $threshold['threshold'])
 			);
 		}
 
@@ -1572,18 +1564,17 @@ class CWidgetHelper {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
-	public static function getThresholdsTemplate($field) {
+	public static function getThresholdsTemplate($name, $index = '#{rowNum}', $color = '#{color}',
+		$threshold = '#{threshold}'): CRow {
 		return (new CRow([
-			(new CColor($field->getName().'[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
-			(new CTextBox($field->getName().'[#{rowNum}][threshold]', '#{threshold}', false))
+			(new CColor($name.'['.$index.'][color]', $color))->appendColorPickerJs(false),
+			(new CTextBox($name.'['.$index.'][threshold]', $threshold, false))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired(),
-			(new CButton($field->getName().'[#{rowNum}][remove]', _('Remove')))
+			(new CButton($name.'['.$index.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
-		]))
-			->addClass('form_row')
-			->toString();
+		]))->addClass('form_row');
 	}
 
 	/**

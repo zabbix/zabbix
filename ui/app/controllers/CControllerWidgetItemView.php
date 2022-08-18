@@ -322,12 +322,10 @@ class CControllerWidgetItemView extends CControllerWidget {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 
-		$color = $fields['bg_color'];
+		$bg_color = $fields['bg_color'];
 
 		if (array_key_exists('thresholds', $fields) && $last_value !== null) {
 			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
-			$thresholds = [];
 
 			foreach ($fields['thresholds'] as $threshold) {
 				if ($number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
@@ -337,7 +335,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 						break;
 					}
 
-					$color = $threshold['color'];
+					$bg_color = $threshold['color'];
 				}
 			}
 		}
@@ -346,7 +344,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 			'name' => $this->getInput('name', $name),
 			'cells' => $cells,
 			'url' => $url,
-			'bg_color' => $color,
+			'bg_color' => $bg_color,
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
