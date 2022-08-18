@@ -201,8 +201,8 @@
 
 		_uncheckTableRows(keepids) {
 			const page = this.is_filtered
-				? 'service'
-				: 'service_' + this.path.concat(this.serviceid !== null ? [this.serviceid] : []).join('_');
+				? 'service_' + this.path.concat(this.serviceid !== null ? [this.serviceid] : []).join('_')
+				: 'service';
 
 			uncheckTableRows(page, keepids);
 		}
