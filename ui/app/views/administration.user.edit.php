@@ -53,6 +53,11 @@ if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
+if ($data['userdirectoryid'] !== 0) {
+	CMessageHelper::addWarning("This user is IdP provisioned, manual changes for provisioned fields are not allowed");
+	show_messages();
+}
+
 // Create form.
 $user_form = (new CForm())
 	->setId('user-form')
@@ -73,16 +78,19 @@ if ($data['action'] === 'user.edit') {
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 				->setAttribute('maxlength', DB::getFieldLength('users', 'username'))
+				->setEnabled(!$data['readonly'])
 		)
 		->addRow(_x('Name', 'user first name'),
 			(new CTextBox('name', $data['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('users', 'name'))
+				->setEnabled(!$data['readonly'])
 		)
 		->addRow(_('Last name'),
 			(new CTextBox('surname', $data['surname']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('users', 'surname'))
+				->setEnabled(!$data['readonly'])
 		)
 		->addRow(
 			(new CLabel(_('Groups'), 'user_groups__ms'))->setAsteriskMark(),
@@ -90,6 +98,7 @@ if ($data['action'] === 'user.edit') {
 				'name' => 'user_groups[]',
 				'object_name' => 'usersGroups',
 				'data' => $data['groups'],
+				'disabled' => $data['readonly'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'usrgrp',
@@ -179,6 +188,7 @@ else {
 			->setAttribute('autofocus', 'autofocus')
 			->onClick('submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
+		->setEnabled(!$data['readonly'])
 	);
 }
 
@@ -802,6 +812,11 @@ else {
 		[(new CRedirectButton(_('Cancel'), CMenuHelper::getFirstUrl()))->setId('cancel')]
 	));
 }
+
+if ($data['readonly']) {
+	$tabs->setDisabled([1, 2]);
+}
+
 
 // Append tab to form.
 $user_form->addItem($tabs);
