@@ -369,7 +369,8 @@ class CHttpTestManager {
 		}
 
 		$result = DBselect(
-			'SELECT hs.httptestid,hs.httpstepid,hsi.type AS test_type,hsi.itemid,i.name,i.key_,i.status'.
+			'SELECT hs.httptestid,hs.httpstepid,hsi.type AS test_type,hsi.itemid,i.name,i.key_,i.status,i.delay,'.
+				'i.templateid'.
 			' FROM httpstep hs,httpstepitem hsi,items i'.
 			' WHERE hs.httpstepid=hsi.httpstepid'.
 				' AND hsi.itemid=i.itemid'.
@@ -818,6 +819,7 @@ class CHttpTestManager {
 	private static function updateSteps(array &$httptests, array $db_httptests = null): void {
 		$ins_steps = [];
 		$upd_steps = [];
+		$update_step_items = false;
 		$del_stepids = [];
 		$del_db_items = [];
 
@@ -864,6 +866,10 @@ class CHttpTestManager {
 						];
 					}
 
+					if (array_key_exists('items', $db_steps[$step['httpstepid']])) {
+						$update_step_items = true;
+					}
+
 					unset($db_steps[$step['httpstepid']]);
 				}
 				else {
@@ -902,7 +908,9 @@ class CHttpTestManager {
 
 		if ($upd_steps) {
 			DB::update('httpstep', $upd_steps);
+		}
 
+		if ($update_step_items) {
 			self::updateStepItems($httptests, $db_httptests);
 		}
 
@@ -946,7 +954,8 @@ class CHttpTestManager {
 			$db_httptest = $db_httptests[$httptest['httptestid']];
 
 			foreach ($httptest['steps'] as $step) {
-				if (!array_key_exists('httpstepid', $step)) {
+				if (!array_key_exists('httpstepid', $step)
+						|| !array_key_exists('items', $db_httptest['steps'][$step['httpstepid']])) {
 					continue;
 				}
 
