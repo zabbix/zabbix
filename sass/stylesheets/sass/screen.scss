@@ -4859,6 +4859,12 @@ svg {
 	display: none;
 }
 
+.submit-button-hidden {
+	visibility: hidden;
+	position: absolute;
+	max-height: 0;
+}
+
 .visibility-hidden {
 	visibility: hidden;
 }

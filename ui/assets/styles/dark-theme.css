@@ -6143,6 +6143,11 @@ svg {
 .display-none, .table-forms > li.display-none {
   display: none; }
 
+.submit-button-hidden {
+  visibility: hidden;
+  position: absolute;
+  max-height: 0; }
+
 .visibility-hidden {
   visibility: hidden; }
 
