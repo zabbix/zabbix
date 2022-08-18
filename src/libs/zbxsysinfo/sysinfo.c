@@ -27,6 +27,9 @@
 #endif
 #include "zbxalgo.h"
 #include "zbxregexp.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
 
 extern int	CONFIG_TIMEOUT;
 
@@ -1256,7 +1259,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_trim_float(c);
 
-			if (SUCCEED == is_double(c, &dbl_tmp))
+			if (SUCCEED == zbx_is_double(c, &dbl_tmp))
 			{
 				SET_DBL_RESULT(result, dbl_tmp);
 				ret = SUCCEED;
@@ -1349,7 +1352,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	{
 		zbx_trim_float(result->str);
 
-		if (SUCCEED != is_double(result->str, &value))
+		if (SUCCEED != zbx_is_double(result->str, &value))
 			return NULL;
 
 		SET_DBL_RESULT(result, value);
@@ -1358,7 +1361,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	{
 		zbx_trim_float(result->text);
 
-		if (SUCCEED != is_double(result->text, &value))
+		if (SUCCEED != zbx_is_double(result->text, &value))
 			return NULL;
 
 		SET_DBL_RESULT(result, value);
@@ -1682,7 +1685,7 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 	if (*data_alloc - *data_offset < value_len + 1 + sizeof(int))
 	{
 		while (*data_alloc - *data_offset < value_len + 1 + sizeof(int))
-			*data_alloc *= 1.5;
+			*data_alloc = (size_t)(*data_alloc * 1.5);
 
 		*data = (char *)zbx_realloc(*data, *data_alloc);
 	}
@@ -1834,7 +1837,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		if ((int)(data_alloc - data_offset) < n + 1)
 		{
 			while ((int)(data_alloc - data_offset) < n + 1)
-				data_alloc *= 1.5;
+				data_alloc = (size_t)(data_alloc * 1.5);
 
 			data = (char *)zbx_realloc(data, data_alloc);
 		}

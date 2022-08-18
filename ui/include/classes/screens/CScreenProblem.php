@@ -968,8 +968,6 @@ class CScreenProblem extends CScreenBase {
 					$cell_r_clock = '';
 				}
 
-				$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed['close']);
-
 				if ($problem['r_eventid'] != 0) {
 					$value = TRIGGER_VALUE_FALSE;
 					$value_str = _('RESOLVED');
@@ -977,8 +975,10 @@ class CScreenProblem extends CScreenBase {
 					$can_be_closed = false;
 				}
 				else {
-					$can_be_closed = !hasEventCloseAction($problem['acknowledges']);
-					$in_closing = !$can_be_closed;
+					$in_closing = hasEventCloseAction($problem['acknowledges']);
+					$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed['close']
+						&& !$in_closing
+					);
 					$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 					$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 					$value_clock = $in_closing ? time() : $problem['clock'];
@@ -1054,8 +1054,8 @@ class CScreenProblem extends CScreenBase {
 					? makeTriggerDependencies($dependencies[$trigger['triggerid']])
 					: [];
 				$description[] = (new CLinkAction($problem['name']))
-					->addClass(ZBX_STYLE_WORDWRAP)
-					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']));
+					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']))
+					->addClass(ZBX_STYLE_WORDBREAK);
 
 				$opdata = null;
 
@@ -1078,9 +1078,7 @@ class CScreenProblem extends CScreenBase {
 								'events' => true,
 								'html' => true
 							]
-						)))
-							->addClass('opdata')
-							->addClass(ZBX_STYLE_WORDWRAP);
+						)))->addClass('opdata');
 
 						if ($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM) {
 							$description[] = ' (';
@@ -1096,8 +1094,10 @@ class CScreenProblem extends CScreenBase {
 					$description[] = BR();
 
 					if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-						$description[] = [_('Problem'), ': ', (new CDiv($trigger['expression_html']))->addClass(ZBX_STYLE_WORDWRAP), BR()];
-						$description[] = [_('Recovery'), ': ', (new CDiv($trigger['recovery_expression_html']))->addClass(ZBX_STYLE_WORDWRAP)];
+						$description[] = [_('Problem'), ': ', (new CDiv($trigger['expression_html']))
+							->addClass(ZBX_STYLE_WORDWRAP), BR()];
+						$description[] = [_('Recovery'), ': ', (new CDiv($trigger['recovery_expression_html']))
+							->addClass(ZBX_STYLE_WORDWRAP)];
 					}
 					else {
 						$description[] = (new CDiv($trigger['expression_html']))->addClass(ZBX_STYLE_WORDWRAP);
@@ -1151,7 +1151,7 @@ class CScreenProblem extends CScreenBase {
 					$this->data['filter']['compact_view']
 						? (new CDiv($description))->addClass(ZBX_STYLE_ACTION_CONTAINER)
 						: $description,
-					($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
+					($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata->addClass(ZBX_STYLE_WORDBREAK) : null,
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),

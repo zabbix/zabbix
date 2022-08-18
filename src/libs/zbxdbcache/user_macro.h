@@ -20,8 +20,10 @@
 #ifndef ZBX_USER_MACRO_H
 #define ZBX_USER_MACRO_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxalgo.h"
+
+#define ZBX_UM_CACHE_GLOBAL_MACRO_HOSTID	0
 
 typedef struct
 {
@@ -44,6 +46,7 @@ typedef struct
 	zbx_vector_uint64_t	templateids;
 	zbx_vector_um_macro_t	macros;
 	zbx_uint32_t		refcount;
+	zbx_uint32_t		revision;
 }
 zbx_um_host_t;
 
@@ -53,6 +56,7 @@ typedef struct
 {
 	zbx_hashset_t	hosts;
 	zbx_uint32_t	refcount;
+	zbx_uint32_t	revision;
 }
 zbx_um_cache_t;
 
@@ -63,16 +67,16 @@ zbx_um_cache_t	*um_cache_create(void);
 void	um_cache_release(zbx_um_cache_t *cache);
 void	um_macro_release(zbx_um_macro_t *macro);
 
-zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, const zbx_vector_uint64_pair_t *host_macro_ids,
-		const char *value);
+zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, zbx_uint32_t revision,
+		const zbx_vector_uint64_pair_t *host_macro_ids, const char *value);
 
 int	um_macro_check_vault_location(const zbx_um_macro_t *macro, const char *location);
 
 void	um_cache_resolve_const(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
-		const char *macro, const char **value);
+		const char *macro, int env, const char **value);
 void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num, const char *macro,
 		int env, char **value);
-
+int	um_cache_get_host_revision(const zbx_um_cache_t *cache, zbx_uint64_t hostid, zbx_uint32_t *revision);
 
 void	um_cache_dump(zbx_um_cache_t *cache);
 

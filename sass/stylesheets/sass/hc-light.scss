@@ -40,6 +40,7 @@ $font-selected-color: #ffffff;
 $font-alt-color: #333333;
 $body-bg-color: #ffffff;
 $overlay-bg-color: #000000;
+$overlay-border-color: #383838;
 
 // Main menu
 $menu-main-color: #ffffff;
@@ -91,13 +92,17 @@ $menu-user-selected-arrow-bg-position: -579px -434px;
 $sidebar-server-name-color: #9f9f9f;
 
 $menu-main-icons: (
+	dashboards: -570px -856px,
 	dashboard: -570px -664px,
 	problems: -570px -688px,
 	monitoring: -570px -712px,
 	services: -570px -832px,
 	inventory: -570px -736px,
 	reports: -570px -760px,
+	data-collection: -570px -784px,
+	alerts: -570px -879px,
 	configuration: -570px -784px,
+	users: -570px -904px,
 	administration: -570px -808px
 );
 
@@ -133,6 +138,7 @@ $form-font-color: #000000;
 $form-bg-color: #ffffff;
 $form-border-color: #888888;
 $form-border-focus-color: #000000;
+$form-fields-group-border-color: #888888;
 
 $form-disabled-font-color: #9f9f9f;
 $form-disabled-bg-color: #f0f0f0;
@@ -836,6 +842,18 @@ a.link-action {
 	}
 }
 
+.overlay-dialogue {
+	.list-table {
+		th:first-child {
+			padding-left: 0px;
+		}
+
+		td:first-child {
+			padding-left: 42px;
+		}
+	}
+}
+
 // Checkbox disabling.
 .filter-highlight-row-cb {
 	display: none;
@@ -1382,5 +1400,23 @@ td.inactive-bg {
 
 	&>:last-child::after {
 		content: "";
+	}
+}
+
+// HOST INTERFACES
+
+.interfaces {
+	.interface-row {
+		&[data-type="2"] {
+			.interface-btn-toggle {
+				background-position: -165px -690px;
+			}
+
+			&.list-accordion-item-opened {
+				.interface-btn-toggle {
+					background-position: -165px -655px;
+				}
+			}
+		}
 	}
 }

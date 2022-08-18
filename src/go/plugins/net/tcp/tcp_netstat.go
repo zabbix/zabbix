@@ -121,8 +121,9 @@ func (p *Plugin) exportNetTcpSocketCount(params []string) (result int, err error
 // netStatTcpCount - returns number of TCP sockets that match parameters.
 func netStatTcpCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP, rNet *net.IPNet, rport int,
 	state netstat.SkState) (result int, err error) {
+	count := 0
 
-	tabs, err := netstat.TCPSocks(func(s *netstat.SockTabEntry) bool {
+	_, err = netstat.TCPSocks(func(s *netstat.SockTabEntry) bool {
 		if state != 0 && s.State != state {
 			return false
 		}
@@ -145,13 +146,14 @@ func netStatTcpCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP,
 			return false
 		}
 
-		return true
+		count++
+		return false
 	})
 	if err != nil {
 		return 0, err
 	}
 
-	tabs6, err := netstat.TCP6Socks(func(s *netstat.SockTabEntry) bool {
+	_, err = netstat.TCP6Socks(func(s *netstat.SockTabEntry) bool {
 		if state != 0 && s.State != state {
 			return false
 		}
@@ -173,12 +175,12 @@ func netStatTcpCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP,
 		if rNet != nil && !rNet.Contains(s.RemoteAddr.IP) {
 			return false
 		}
-
-		return true
+		count++
+		return false
 	})
 	if err != nil {
 		return 0, err
 	}
 
-	return len(tabs) + len(tabs6), nil
+	return count, nil
 }

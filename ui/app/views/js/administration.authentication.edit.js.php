@@ -83,13 +83,15 @@
 				});
 			});
 
-			document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
-				this.form.querySelectorAll('[name^=saml_]').forEach(field => {
-					if (!field.isSameNode(e.target)) {
-						field.disabled = !e.target.checked;
-					}
+			if (document.getElementById('saml_auth_enabled') !== null) {
+				document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
+					this.form.querySelectorAll('[name^=saml_]').forEach(field => {
+						if (!field.isSameNode(e.target)) {
+							field.disabled = !e.target.checked;
+						}
+					});
 				});
-			});
+			}
 
 			this.form.addEventListener('submit', (e) => {
 				if (!this._authFormSubmit()) {
@@ -99,8 +101,8 @@
 		}
 
 		_authFormSubmit() {
-			const fields_to_trim = ['#saml_idp_entityid', '#saml_sso_url', '#saml_slo_url', '#saml_username_attribute',
-				'#saml_sp_entityid', '#saml_nameid_format'
+			const fields_to_trim = ['#http_strip_domains', '#saml_idp_entityid', '#saml_sso_url', '#saml_slo_url',
+				'#saml_username_attribute', '#saml_sp_entityid', '#saml_nameid_format'
 			];
 			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
 				elem.value = elem.value.trim();

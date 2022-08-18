@@ -18,15 +18,16 @@
 **/
 
 #include "checks_internal.h"
+#include "zbxserver.h"
 
 #include "checks_java.h"
 #include "zbxself.h"
 #include "preproc.h"
 #include "zbxtrends.h"
 #include "../vmware/vmware.h"
-#include "zbxserver.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 #include "zbxavailability.h"
+#include "zbxnum.h"
 
 extern unsigned char	program_type;
 

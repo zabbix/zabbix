@@ -19,8 +19,8 @@
 
 #include "zbxalgo.h"
 
-#include "common.h"
 #include "log.h"
+#include "zbxnum.h"
 
 #define DB_INFINITY	(1e12 - 1e-4)
 
@@ -998,6 +998,11 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 
 		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_ERROR;
+	}
+	else if (FIT_POLYNOMIAL == fit)
+	{
+		if ((unsigned)n <= k)
+			return ZBX_MATH_ERROR;
 	}
 
 	zbx_matrix_struct_alloc(&coefficients);

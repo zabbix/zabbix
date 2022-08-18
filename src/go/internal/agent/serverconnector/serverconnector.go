@@ -20,6 +20,9 @@
 package serverconnector
 
 import (
+	"crypto/md5"
+	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -50,6 +53,8 @@ type Connector struct {
 	input                      chan interface{}
 	addresses                  []string
 	hostname                   string
+	session                    string
+	configRevision             uint64
 	localAddr                  net.Addr
 	lastActiveCheckErrors      []error
 	lastActiveHbErrors         []error
@@ -61,20 +66,23 @@ type Connector struct {
 }
 
 type activeChecksRequest struct {
-	Request       string `json:"request"`
-	Host          string `json:"host"`
-	Version       string `json:"version"`
-	HostMetadata  string `json:"host_metadata,omitempty"`
-	HostInterface string `json:"interface,omitempty"`
-	ListenIP      string `json:"ip,omitempty"`
-	ListenPort    int    `json:"port,omitempty"`
+	Request        string `json:"request"`
+	Host           string `json:"host"`
+	Version        string `json:"version"`
+	Session        string `json:"session"`
+	ConfigRevision uint64 `json:"config_revision"`
+	HostMetadata   string `json:"host_metadata,omitempty"`
+	HostInterface  string `json:"interface,omitempty"`
+	ListenIP       string `json:"ip,omitempty"`
+	ListenPort     int    `json:"port,omitempty"`
 }
 
 type activeChecksResponse struct {
-	Response    string               `json:"response"`
-	Info        string               `json:"info"`
-	Data        []*plugin.Request    `json:"data"`
-	Expressions []*glexpr.Expression `json:"regexp"`
+	Response       string               `json:"response"`
+	Info           string               `json:"info"`
+	ConfigRevision uint64               `json:"config_revision,omitempty"`
+	Data           []*plugin.Request    `json:"data"`
+	Expressions    []*glexpr.Expression `json:"regexp"`
 }
 
 type agentDataResponse struct {
@@ -144,9 +152,11 @@ func (c *Connector) refreshActiveChecks() {
 	var err error
 
 	a := activeChecksRequest{
-		Request: "active checks",
-		Host:    c.hostname,
-		Version: version.Short(),
+		Request:        "active checks",
+		Host:           c.hostname,
+		Version:        version.Short(),
+		Session:        c.session,
+		ConfigRevision: c.configRevision,
 	}
 
 	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.addresses)
@@ -182,10 +192,15 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	data, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
+	data, errs, errRead := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
 		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
 
 	if errs != nil {
+		// server is unaware if configuration is actually delivered and saves session
+		if errRead != nil {
+			c.configRevision = 0
+		}
+
 		if !reflect.DeepEqual(errs, c.lastActiveCheckErrors) {
 			for i := 0; i < len(errs); i++ {
 				log.Warningf("[%d] %s", c.clientID, errs[i])
@@ -223,10 +238,14 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	if response.Data == nil {
-		log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
-			c.addresses[0])
+		if c.configRevision == 0 {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
+				c.addresses[0])
+		}
 		return
 	}
+
+	c.configRevision = response.ConfigRevision
 
 	for i := 0; i < len(response.Data); i++ {
 		if len(response.Data[i].Key) == 0 {
@@ -327,7 +346,7 @@ func (c *Connector) sendHeartbeatMsg() {
 		return
 	}
 
-	_, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
+	_, errs, _ := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
 		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig, true)
 
 	if errs != nil {
@@ -395,6 +414,13 @@ func (c *Connector) updateOptions(options *agent.AgentOptions) {
 	c.localAddr = &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0}
 }
 
+func newToken() string {
+	h := md5.New()
+	_ = binary.Write(h, binary.LittleEndian, time.Now().UnixNano())
+
+	return hex.EncodeToString(h.Sum(nil))
+}
+
 func New(taskManager scheduler.Scheduler, addresses []string, hostname string,
 	options *agent.AgentOptions) (connector *Connector, err error) {
 	c := &Connector{
@@ -403,6 +429,7 @@ func New(taskManager scheduler.Scheduler, addresses []string, hostname string,
 		hostname:    hostname,
 		input:       make(chan interface{}, 10),
 		clientID:    agent.NewClientID(),
+		session:     newToken(),
 	}
 
 	c.updateOptions(options)
@@ -416,6 +443,7 @@ func New(taskManager scheduler.Scheduler, addresses []string, hostname string,
 		localAddr: c.localAddr,
 		tlsConfig: c.tlsConfig,
 		timeout:   options.Timeout,
+		session:   c.session,
 	}
 	c.resultCache = resultcache.New(&agent.Options, c.clientID, ac)
 
