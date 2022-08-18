@@ -1992,12 +1992,12 @@ button {
 
 	&.red {
 		color: $red;
-		border-bottom: 1px dotted $red
+		border-color: $red
 	}
 
 	&.green {
 		color: $green;
-		border-bottom: 1px dotted $green
+		border-color: $green
 	}
 
 	&:hover {
@@ -2010,6 +2010,14 @@ button {
 		margin-bottom: -2px !important;
 		border-bottom: 2px solid rgba($link-hover-color, .5);
 		box-shadow: 0 0 0 0 !important;
+
+		&.red {
+			border-color: $red
+		}
+
+		&.green {
+			border-color: $green
+		}
 	}
 
 	&:active {

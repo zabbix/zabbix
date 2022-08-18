@@ -4134,15 +4134,19 @@ button {
   min-height: inherit; }
   .btn-link.red {
     color: #ff5050;
-    border-bottom: 1px dotted #ff5050; }
+    border-color: #ff5050; }
   .btn-link.green {
     color: #23d545;
-    border-bottom: 1px dotted #23d545; }
+    border-color: #23d545; }
   .btn-link:focus {
     outline: none;
     margin-bottom: -2px !important;
     border-bottom: 2px solid rgba(255, 255, 255, 0.5);
     box-shadow: 0 0 0 0 !important; }
+    .btn-link:focus.red {
+      border-color: #ff5050; }
+    .btn-link:focus.green {
+      border-color: #23d545; }
   .btn-link[disabled] {
     background-color: transparent; }
     .btn-link[disabled]:hover {
