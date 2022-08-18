@@ -13591,7 +13591,7 @@ static void	dc_check_item_activation(ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
  *                                                                            *
  * Purpose: get items with changed expanded delay value                       *
  *                                                                            *
- * Parameters: activated_hosts - [IN] the activated hosts                     *
+ * Parameters: activated_hosts - [IN]                                         *
  *             items           - [OUT] items to be rescheduled because of     *
  *                                     delay changes                          *
  *             activated_items - [OUT] items to be rescheduled because host   *
