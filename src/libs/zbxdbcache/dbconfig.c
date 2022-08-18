@@ -13674,7 +13674,6 @@ static void	dc_reschedule_item(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int n
 			DCitem_poller_type_update(item, host, ZBX_ITEM_COLLECTED);
 
 		DCupdate_item_queue(item, item->poller_type, old_nextcheck);
-
 	}
 	else
 	{
@@ -13696,7 +13695,7 @@ static void	dc_reschedule_item(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int n
 static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts)
 {
 	zbx_vector_item_delay_t		items;
-	zbx_vector_ptr_pair_t	activated_items;
+	zbx_vector_ptr_pair_t		activated_items;
 
 	zbx_vector_item_delay_create(&items);
 	zbx_vector_ptr_pair_create(&activated_items);
