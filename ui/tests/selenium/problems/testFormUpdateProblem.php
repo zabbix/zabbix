@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup hosts,hstgrp
+ * @backup hosts, hstgrp
  *
  * @onBefore prepareProblemsData
  */
@@ -35,6 +35,13 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	protected static $hostid;
 
+	/**
+	 * Ids of the triggers for problems.
+	 *
+	 * @var array
+	 */
+	protected static $triggerids;
+
 	public function prepareProblemsData() {
 		// Create hostgroup for hosts with items triggers.
 		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for Problems Update']]);
@@ -44,17 +51,7 @@ class testFormUpdateProblem extends CWebTest {
 		// Create host for items and triggers.
 		$hosts = CDataHelper::call('host.create', [
 			'host' => 'Host for Problems Update',
-			'groups' => [['groupid' => $groupid]],
-			'interfaces' => [
-				[
-					'type' => 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => '10050'
-				]
-			]
+			'groups' => [['groupid' => $groupid]]
 		]);
 		$this->assertArrayHasKey('hostids', $hosts);
 		self::$hostid = $hosts['hostids'][0];
@@ -75,14 +72,6 @@ class testFormUpdateProblem extends CWebTest {
 
 		$items = CDataHelper::call('item.create', $items_data);
 		$this->assertArrayHasKey('itemids', $items);
-		$itemids = CDataHelper::getIds('name');
-
-		// Add value to items.
-		CDataHelper::addItemData($itemids['float'], 0);
-		CDataHelper::addItemData($itemids['char'], '0');
-		CDataHelper::addItemData($itemids['log'], '0');
-		CDataHelper::addItemData($itemids['unsigned'], 0);
-		CDataHelper::addItemData($itemids['text'], '0');
 
 		// Create triggers based on items.
 		$triggers_data = [];
@@ -94,103 +83,167 @@ class testFormUpdateProblem extends CWebTest {
 			];
 		}
 
-		$triggers = CDataHelper::call('trigger.create', $triggers_data);
+		$triggers = CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Trigger for float',
+				'expression' => 'last(/Host for Problems Update/float)=0',
+				'priority' => 0
+			],
+			[
+				'description' => 'Trigger for char',
+				'expression' => 'last(/Host for Problems Update/char)=0',
+				'priority' => 1,
+				'manual_close' => 1
+			],
+			[
+				'description' => 'Trigger for log',
+				'expression' => 'last(/Host for Problems Update/log)=0',
+				'priority' => 2
+			],
+			[
+				'description' => 'Trigger for unsigned',
+				'expression' => 'last(/Host for Problems Update/unsigned)=0',
+				'priority' => 3
+			],
+			[
+				'description' => 'Trigger for text',
+				'expression' => 'last(/Host for Problems Update/text)=0',
+				'priority' => 4
+			]
+		]);
 		$this->assertArrayHasKey('triggerids', $triggers);
-		$triggerids = CDataHelper::getIds('description');
+		self::$triggerids = CDataHelper::getIds('description');
 
 		// Create events.
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100550, 0, 0, '.
-				zbx_dbstr($triggerids['Trigger for float']).', '.zbx_dbstr(time()).', 0, 0, '.zbx_dbstr('Trigger for float').', 0)');
+				zbx_dbstr(self::$triggerids ['Trigger for float']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger for float').', 0)'
+		);
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100551, 0, 0, '.
-				zbx_dbstr($triggerids['Trigger for char']).', '.zbx_dbstr(time()).', 0, 0, '.zbx_dbstr('Trigger for char').', 1)');
+				zbx_dbstr(self::$triggerids ['Trigger for char']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger for char').', 1)'
+		);
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100552, 0, 0, '.
-				zbx_dbstr($triggerids['Trigger for log']).', '.zbx_dbstr(time()).', 0, 0, '.zbx_dbstr('Trigger for log').', 2)');
+				zbx_dbstr(self::$triggerids ['Trigger for log']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger for log').', 2)'
+		);
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100553, 0, 0, '.
-				zbx_dbstr($triggerids['Trigger for unsigned']).', '.zbx_dbstr(time()).', 0, 0, '.zbx_dbstr('Trigger for unsigned').', 3)');
+				zbx_dbstr(self::$triggerids ['Trigger for unsigned']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger for unsigned').', 3)'
+		);
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100554, 0, 0, '.
-				zbx_dbstr($triggerids['Trigger for text']).', '.zbx_dbstr(time()).', 0, 0, '.zbx_dbstr('Trigger for text').', 4)');
+		zbx_dbstr(self::$triggerids ['Trigger for text']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger for text').', 4)'
+		);
 
 		// Create problems.
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100550, 0, 0, '.
-				zbx_dbstr($triggerids['Trigger for float']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for float').', 0)');
+				zbx_dbstr(self::$triggerids ['Trigger for float']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for float').', 0)'
+		);
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100551, 0, 0, '.
-				zbx_dbstr($triggerids['Trigger for char']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for char').', 1)');
+				zbx_dbstr(self::$triggerids ['Trigger for char']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for char').', 1)'
+		);
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100552, 0, 0, '.
-				zbx_dbstr($triggerids['Trigger for log']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for log').', 2)');
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100553, 0, 0, '.
-				zbx_dbstr($triggerids['Trigger for unsigned']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for unsigned').', 3)');
+				zbx_dbstr(self::$triggerids ['Trigger for log']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for log').', 2)'
+		);
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity, acknowledged) VALUES (100553, 0, 0, '.
+				zbx_dbstr(self::$triggerids ['Trigger for unsigned']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for unsigned').', 3, 1)'
+		);
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100554, 0, 0, '.
-				zbx_dbstr($triggerids['Trigger for text']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for text').', 4)');
+				zbx_dbstr(self::$triggerids ['Trigger for text']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for text').', 4)'
+		);
 
-		// Change triggers' state to Problem.
+		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for char'.
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for float'));
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for char'));
+		DBexecute('UPDATE triggers SET value = 1, manual_close = 1, WHERE description = '.zbx_dbstr('Trigger for char'));
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for log'));
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for unsigned'));
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for text'));
+
+		// Suppress the problem: 'Trigger for text'.
+		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10050, 100554, NULL, 0)');
+
+		// Acknowledge the problem: 'Trigger for unsigned'.
+		CDataHelper::call('event.acknowledge', [
+			'eventids' => 100553,
+			'action' => 6,
+			'message' => 'Acknowleged event'
+		]);
 	}
 
-
-
-	public function getProblemsCount() {
+	public function getLayoutData() {
 		return [
 			[
 				[
-					'count' => 1
+					'problems' => ['Trigger for float']
 				]
 			],
-//			[
-//				[
-//					'count' => 3
-//				]
-//			]
+			[
+				[
+					'problems' => ['Trigger for char'],
+					'close_enabled' => true
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for float', 'Trigger for char'],
+					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
+							'Acknowledge', 'Close problem', ''],
+					'close_enabled' => true
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for text'],
+					'unsuppress_enabled' => true
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for unsigned'],
+					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
+							'Unsuppress', 'Unacknowledge', 'Close problem', ''],
+					'message' => 'Acknowleged event',
+					'unacknowledge' => true,
+
+
+					// Add history!
+					'history' => []
+				]
+			]
 		];
 	}
 
 	/**
-	 * @dataProvider getProblemsCount
+	 * @dataProvider getLayoutData
 	 */
 	public function testFormUpdateProblem_Layout($data) {
 		// Open filtered Problems list.
-		$this->page->login()->open('zabbix.php?&action=problem.view&hostids%5B%5D='.self::$hostid)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 
-		$problem_names = [
-			'Trigger for float',
-			'Trigger for char',
-			'Trigger for log',
-			'Trigger for unsigned',
-			'Trigger for text'
-		];
-
-		// Get random problem name.
-		$count = array_rand($problem_names, $data['count']);
-
-		$names = $problem_names[$count];
-		$table->findRows('Problem', $names)->select();
+		$table->findRows('Problem', $data['problems'])->select();
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Update problem', $dialog->getTitle());
 		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
 
-		$this->assertEquals(['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-				'Acknowledge', 'Close problem', ''], $form->getLabels()->asText()
-		);
+		$count = count($data['problems']);
+		$default_labels = ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
+				'Acknowledge', 'Close problem', ''];
+		$this->assertEquals(CTestArrayHelper::get($data, 'labels', $default_labels), $form->getLabels()->asText());
+
+		$problem = $count > 1 ? $count.' problems selected.' : $data['problems'][0];
+		$this->assertTrue($form->query('xpath://div[@class="wordbreak" and text()='.CXPathHelper::escapeQuotes($problem).']')->exists());
 
 		$fields = [
-//			'Problem' => ['value' => 'Test trigger with tag'],
-			'id:message' => ['maxlength' => 2048, 'enabled' => true],
+			'id:message' => ['value' => '', 'maxlength' => 2048, 'enabled' => true],
 			'id:scope_0' => ['value' => true, 'enabled' => true],    // Only selected problem.
 			'id:scope_1' => ['value' => false, 'enabled' => true],   // Selected and all other problems of related triggers.
 			'id:change_severity' => ['value' => false, 'enabled' => true],
 			'id:severity' => ['value' => 'Not classified', 'enabled' => false],
-			'id:suppress_problem' => ['value' => false, 'enabled' => false],
+			'id:suppress_problem' => ['value' => false, 'enabled' => true],
 			'id:suppress_time_option' => ['value' => 'Until', 'enabled' => false],
 			'id:suppress_until_problem' => ['maxlength' => 19, 'value' => 'now+1d', 'enabled' => false],
-			'id:unsuppress_problem' => ['value' => false, 'enabled' => false],
-			'Acknowledge' => ['value' => false, 'enabled' => true],
-			'Close problem' => ['value' => false, 'enabled' => false]
+			'id:unsuppress_problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'unsuppress_enabled', false)],
+			(CTestArrayHelper::get($data, 'unacknowledge') ? 'Unacknowledge' : 'Acknowledge') => ['value' => false, 'enabled' => true],
+			'Close problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'close_enabled', false)]
 		];
 
 		foreach ($fields as $field => $attribute) {
@@ -218,5 +271,8 @@ class testFormUpdateProblem extends CWebTest {
 		foreach ($button_queries as $query => $clickable) {
 			$this->assertEquals($clickable, $dialog->query($query)->one()->isClickable());
 		}
+
+
+		$dialog->close();
 	}
 }
