@@ -29,6 +29,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 @import "layout/form-grid";
 
 @import "components/buttons";
+@import "components/checkbox-list";
 @import "components/color-picker";
 @import "components/dashboard/dashboard";
 @import "components/dashboard/widget-clock";
@@ -4861,22 +4862,6 @@ svg {
 
 .visibility-hidden {
 	visibility: hidden;
-}
-
-.checkbox-list {
-	display: grid;
-	grid-template-columns: repeat(var(--columns), 1fr);
-
-	&.vertical {
-		grid-template-rows: repeat(var(--rows), 1fr);
-		grid-auto-flow: column;
-	}
-
-	li {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		line-height: 24px;
-	}
 }
 
 .columns-wrapper {

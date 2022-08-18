@@ -50,7 +50,6 @@ foreach ($data['actions'] as $value => $name) {
 $filter_actions = (new CCheckBoxList('filter_actions'))
 	->setId('filter-actions')
 	->setColumns(3)
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setOptions($filter_actions_options);
 
 $filter_form = (new CFormList())
