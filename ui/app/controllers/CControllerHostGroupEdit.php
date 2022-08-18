@@ -77,16 +77,13 @@ class CControllerHostGroupEdit extends CController{
 			]);
 
 			$data = array_merge($data, $groups[0]);
-			$data['is_discovery_rule_editable'] = false;
 
-			if ($data['discoveryRule']) {
-				$data['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
+			$data['is_discovery_rule_editable'] = $data['discoveryRule']
+				&& API::DiscoveryRule()->get([
 					'output' => [],
 					'itemids' => $data['discoveryRule']['itemid'],
-					'editable' => true,
-					'preservekeys' => true
+					'editable' => true
 				]);
-			}
 
 			$data['allowed_ui_conf_hosts'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 		}

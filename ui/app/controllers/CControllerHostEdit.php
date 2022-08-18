@@ -281,7 +281,12 @@ class CControllerHostEdit extends CController {
 		$this->extendProxies($data['proxies']);
 		$this->extendInventory($data['inventory_items'], $data['inventory_fields']);
 
-		$data['is_discovery_rule_editable'] = $this->isDiscoveryRuleEditable();
+		$data['is_discovery_rule_editable'] = $this->host['discoveryRule']
+			&& API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => $this->host['discoveryRule']['itemid'],
+				'editable' => true
+			]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of host'));
@@ -365,24 +370,6 @@ class CControllerHostEdit extends CController {
 				'preservekeys' => true
 			])
 			: [];
-	}
-
-	/**
-	 * Check if the discovery rule of the host is editable.
-	 *
-	 * @return bool
-	 */
-	protected function isDiscoveryRuleEditable(): bool {
-		if (!$this->host['discoveryRule']) {
-			return false;
-		}
-
-		return (bool) API::DiscoveryRule()->get([
-			'output' => [],
-			'itemids' => $this->host['discoveryRule']['itemid'],
-			'editable' => true,
-			'preservekeys' => true
-		]);
 	}
 
 	/**
