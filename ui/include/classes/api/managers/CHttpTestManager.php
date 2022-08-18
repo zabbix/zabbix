@@ -1152,7 +1152,7 @@ class CHttpTestManager {
 				if (array_key_exists('variables', $step)) {
 					$db_variables = $db_step !== null ? array_column($db_step['variables'], null, 'name') : [];
 
-					foreach ($step['variables'] as  &$variable) {
+					foreach ($step['variables'] as &$variable) {
 						if (array_key_exists($variable['name'], $db_variables)) {
 							$db_variable = $db_variables[$variable['name']];
 
@@ -1476,6 +1476,13 @@ class CHttpTestManager {
 				if ($exHttpTest) {
 					$newHttpTest['httptestid'] = $exHttpTest['httptestid'];
 
+					if (array_key_exists('variables', $newHttpTest)) {
+						foreach ($newHttpTest['variables'] as &$variable) {
+							unset($variable['httptest_fieldid']);
+						}
+						unset($variable);
+					}
+
 					if (isset($hostHttpTest['byTemplateId'][$httpTestId])) {
 						$this->setHttpTestParent($exHttpTest['httptestid'], $httpTestId);
 
@@ -1669,6 +1676,13 @@ class CHttpTestManager {
 			}
 			else {
 				unset($step['httpstepid']);
+			}
+
+			if (array_key_exists('variables', $step)) {
+				foreach ($step['variables'] as &$variable) {
+					unset($variable['httpstep_fieldid']);
+				}
+				unset($variable);
 			}
 
 			$result[] = $step;
