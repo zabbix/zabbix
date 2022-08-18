@@ -2284,6 +2284,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
     background-color: #ff3a3a; }
   .msg-bad::after {
     background-position: -122px -325px; }
+  .msg-bad .msg-details {
+    padding-right: 10px; }
 
 .msg-good {
   border-color: #23d545; }
