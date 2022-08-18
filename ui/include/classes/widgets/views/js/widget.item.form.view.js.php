@@ -33,8 +33,6 @@ window.widget_item_form = new class {
 		this.advance_configuration = document.getElementById('adv_conf');
 		this.units_show = document.getElementById('units_show');
 
-		document.getElementById('item-value-thresholds-warning').style.display = 'none';
-
 		jQuery('#itemid').on('change', this.updateWarningIcon);
 
 		for (const colorpicker of this.form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
@@ -136,6 +134,8 @@ window.widget_item_form = new class {
 	}
 
 	updateWarningIcon() {
+		document.getElementById('item-value-thresholds-warning').style.display = 'none';
+
 		const ms_item_data = $('#itemid').multiSelect('getData');
 		if (ms_item_data.length > 0) {
 			const curl = new Curl('jsrpc.php', false);

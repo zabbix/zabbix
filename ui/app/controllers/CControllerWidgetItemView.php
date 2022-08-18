@@ -332,16 +332,13 @@ class CControllerWidgetItemView extends CControllerWidget {
 			foreach ($fields['thresholds'] as $threshold) {
 				if ($number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
 					$threshold['threshold'] = $number_parser->calcValue();
-					$thresholds[] = $threshold;
-				}
-			}
 
-			foreach ($thresholds as $threshold) {
-				if ($last_value < $threshold['threshold']) {
-					break;
-				}
+					if ($last_value < $threshold['threshold']) {
+						break;
+					}
 
-				$color = $threshold['color'];
+					$color = $threshold['color'];
+				}
 			}
 		}
 
