@@ -2283,7 +2283,7 @@ class CApiInputValidatorTest extends TestCase {
 					['type' => '2', 'value' => '125']
 				],
 				'/',
-				'Incorrect validation rules.'
+				'Incorrect API_MULTIPLE validation rules.'
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
