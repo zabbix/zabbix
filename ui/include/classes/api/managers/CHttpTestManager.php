@@ -399,6 +399,10 @@ class CHttpTestManager {
 			$httptestids[] = $httptest['httptestid'];
 
 			foreach ($db_httptests[$httptest['httptestid']]['steps'] as &$db_step) {
+				if (!array_key_exists('items', $db_step)) {
+					continue;
+				}
+
 				foreach ($db_step['items'] as &$db_item) {
 					$db_item['tags'] = [];
 				}
