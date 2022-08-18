@@ -1303,7 +1303,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+#ifdef HAVE_SQLITE3
 dbinit:
+#endif
 	if (SUCCEED != DBinit(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
@@ -1333,7 +1335,7 @@ dbinit:
 	{
 #ifdef HAVE_SQLITE3
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", CONFIG_DBNAME);
-		zbx_db_deinit();
+		DBdeinit();
 
 		if (0 != zbx_stat(CONFIG_DBNAME, &db_stat) || 0 == S_ISREG(db_stat.st_mode) ||
 				0 != unlink(CONFIG_DBNAME))
