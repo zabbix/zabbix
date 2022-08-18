@@ -141,8 +141,7 @@ $form_list
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	)
-	->addRow(
-		_('Operations'),[
+	->addRow(_('Operations'),
 		(new CCheckBoxList())
 			->setVertical(true)
 			->setOptions([
@@ -161,7 +160,6 @@ $form_list
 					'value' => '1'
 				]
 			])
-		]
 	)
 	->addRow('', (new CDiv((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())))
 	->addRow(_('Enabled'),
