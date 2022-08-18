@@ -991,7 +991,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 			ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
 			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
-		if (ZBX_HK_MODE_PARTITION != onfig->config->hk.trends_mode)
+		if (ZBX_HK_MODE_PARTITION != config->config->hk.trends_mode)
 		{
 			config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
 			config->revision.config_table = revision;
@@ -5501,7 +5501,7 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
  * Return value: nextcheck value                                              *
  *                                                                            *
  ******************************************************************************/
-time_t	dc_calculate_nextcheck(zbx_uint64_t seed, unsigned int delay, time_t now)
+static time_t	dc_calculate_nextcheck(zbx_uint64_t seed, unsigned int delay, time_t now)
 {
 	time_t	nextcheck;
 

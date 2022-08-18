@@ -67,7 +67,7 @@ zbx_flags128_t;
 
 static void	zbx_flags128_set(zbx_flags128_t *flags, int bit)
 {
-	flags->blocks[bit >> 6] |= (__UINT16_C(1) << (bit & 0x3f));
+	flags->blocks[bit >> 6] |= (__UINT64_C(1) << (bit & 0x3f));
 }
 
 static void	zbx_flags128_init(zbx_flags128_t *flags)
@@ -77,7 +77,7 @@ static void	zbx_flags128_init(zbx_flags128_t *flags)
 
 static int	zbx_flags128_isset(zbx_flags128_t *flags, int bit)
 {
-	return (0 != (flags->blocks[bit >> 6] & (__UINT16_C(1) << (bit & 0x3f)))) ? SUCCEED : FAIL;
+	return (0 != (flags->blocks[bit >> 6] & (__UINT64_C(1) << (bit & 0x3f)))) ? SUCCEED : FAIL;
 }
 
 static int	zbx_flags128_isclear(zbx_flags128_t *flags)
@@ -138,7 +138,7 @@ zbx_table_data_t;
 ZBX_PTR_VECTOR_DECL(table_data_ptr, zbx_table_data_t *)
 ZBX_PTR_VECTOR_IMPL(table_data_ptr, zbx_table_data_t *)
 
-void	table_data_free(zbx_table_data_t *td)
+static void	table_data_free(zbx_table_data_t *td)
 {
 	zbx_vector_const_field_destroy(&td->fields);
 	zbx_vector_uint64_destroy(&td->del_ids);
