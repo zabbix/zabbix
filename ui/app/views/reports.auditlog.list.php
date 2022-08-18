@@ -49,9 +49,8 @@ foreach ($data['actions'] as $value => $name) {
 
 $filter_actions = (new CCheckBoxList('filter_actions'))
 	->setId('filter-actions')
-	->setOptions($filter_actions_options)
 	->setColumns(3)
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	->setOptions($filter_actions_options);
 
 $filter_form = (new CFormList())
 	->addRow(new CLabel(_('Users'), 'filter_userids__ms'), [
