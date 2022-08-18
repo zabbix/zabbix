@@ -182,7 +182,7 @@ var colorPalette = (function() {
 
 			for (const colorpicker of used_colors) {
 				let color = color_usage.find(function(el) {
-					return el.color == colorpicker.value;
+					return el.color == colorpicker;
 				});
 				if (color != undefined) {
 					color.count++;

@@ -315,10 +315,19 @@ window.widget_svggraph_form = new class {
 			? new Template(jQuery('#dataset-single-item-tmpl').html())
 			: new Template(jQuery('#dataset-pattern-item-tmpl').html());
 
+		let colors = this._form.querySelectorAll('.color-picker input');
+		let used_colors = [];
+
+		for (const color of colors) {
+			if (color.value !== '') {
+				used_colors.push((color.value));
+			}
+		}
+
 		this._dataset_wrapper.insertAdjacentHTML('beforeend', template.evaluate({
 			rowNum: this._dataset_index++,
 			color: (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>) ? '' :
-				colorPalette.getNextColor(form.querySelectorAll('.color-picker input'))
+				colorPalette.getNextColor(used_colors)
 		}));
 
 		const dataset = this._getOpenedDataset();
@@ -474,8 +483,17 @@ window.widget_svggraph_form = new class {
 			itemid: itemid
 		}));
 
+		let colors = this._form.querySelectorAll('.color-picker input');
+		let used_colors = [];
+
+		for (const color of colors) {
+			if (color.value !== '') {
+				used_colors.push((color.value));
+			}
+		}
+
 		jQuery(`#items_${dataset_index}_${item_next_index}_color`)
-			.val(colorPalette.getNextColor(this._form.querySelectorAll('.color-picker input')))
+			.val(colorPalette.getNextColor(used_colors))
 			.colorpicker();
 	}
 
