@@ -148,11 +148,11 @@ class CControllerSlaReportList extends CController {
 				if ($period_from < 0 || $period_from > ZBX_MAX_DATE) {
 					$period_from = null;
 
-					error(_s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a time is expected')));
+					error(_s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a date is expected')));
 				}
 			}
 			else {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a time is expected')));
+				error(_s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a date is expected')));
 			}
 		}
 
@@ -167,11 +167,11 @@ class CControllerSlaReportList extends CController {
 				if ($period_to < 0 || $period_to > ZBX_MAX_DATE) {
 					$period_to = null;
 
-					error(_s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a time is expected')));
+					error(_s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a date is expected')));
 				}
 			}
 			else {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a time is expected')));
+				error(_s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a date is expected')));
 			}
 		}
 
