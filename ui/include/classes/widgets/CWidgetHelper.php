@@ -1538,16 +1538,16 @@ class CWidgetHelper {
 
 	public static function getThresholds($field) {
 		$thresholds_table = (new CTable())
+			->setId('thresholds_table_'.$field->getName())
+			->addClass(ZBX_STYLE_TABLE_FORMS)
 			->setHeader([
 				'',
 				(new CColHeader(_('Threshold')))->setWidth('100%'),
 				_('Action')
 			])
-			->setId('thresholds_table_'.$field->getName())
-			->addClass(ZBX_STYLE_TABLE_FORMS)
 			->setFooter(new CRow(
 				new CCol(
-					(new CButton(null, _('Add')))
+					(new CSimpleButton(null, _('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-add')
 				)
