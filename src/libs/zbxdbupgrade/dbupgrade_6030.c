@@ -245,6 +245,126 @@ static int	DBpatch_6030027(void)
 	return DBdrop_not_null("config", &field);
 }
 
+static int	DBpatch_6030028(void)
+{
+	return DBdrop_foreign_key("dchecks", 1);
+}
+
+static int	DBpatch_6030029(void)
+{
+	const ZBX_FIELD	field = {"druleid", NULL, "drules", "druleid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("dchecks", 1, &field);
+}
+
+static int	DBpatch_6030030(void)
+{
+	return DBdrop_foreign_key("httptest", 2);
+}
+
+static int	DBpatch_6030031(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httptest", 2, &field);
+}
+
+static int	DBpatch_6030032(void)
+{
+	return DBdrop_foreign_key("httptest", 3);
+}
+
+static int	DBpatch_6030033(void)
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httptest", 3, &field);
+}
+
+static int	DBpatch_6030034(void)
+{
+	return DBdrop_foreign_key("httpstep", 1);
+}
+
+static int	DBpatch_6030035(void)
+{
+	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httpstep", 1, &field);
+}
+
+static int	DBpatch_6030036(void)
+{
+	return DBdrop_foreign_key("httptestitem", 1);
+}
+
+static int	DBpatch_6030037(void)
+{
+	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httptestitem", 1, &field);
+}
+
+static int	DBpatch_6030038(void)
+{
+	return DBdrop_foreign_key("httptestitem", 2);
+}
+
+static int	DBpatch_6030039(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httptestitem", 2, &field);
+}
+
+static int	DBpatch_6030040(void)
+{
+	return DBdrop_foreign_key("httpstepitem", 1);
+}
+
+static int	DBpatch_6030041(void)
+{
+	const ZBX_FIELD	field = {"httpstepid", NULL, "httpstep", "httpstepid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httpstepitem", 1, &field);
+}
+
+static int	DBpatch_6030042(void)
+{
+	return DBdrop_foreign_key("httpstepitem", 2);
+}
+
+static int	DBpatch_6030043(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httpstepitem", 2, &field);
+}
+
+static int	DBpatch_6030044(void)
+{
+	return DBdrop_foreign_key("httptest_field", 1);
+}
+
+static int	DBpatch_6030045(void)
+{
+	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httptest_field", 1, &field);
+}
+
+static int	DBpatch_6030046(void)
+{
+	return DBdrop_foreign_key("httpstep_field", 1);
+}
+
+static int	DBpatch_6030047(void)
+{
+	const ZBX_FIELD	field = {"httpstepid", NULL, "httpstep", "httpstepid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httpstep_field", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -279,5 +399,25 @@ DBPATCH_ADD(6030024, 0, 1)
 DBPATCH_ADD(6030025, 0, 1)
 DBPATCH_ADD(6030026, 0, 1)
 DBPATCH_ADD(6030027, 0, 1)
+DBPATCH_ADD(6030028, 0, 1)
+DBPATCH_ADD(6030029, 0, 1)
+DBPATCH_ADD(6030030, 0, 1)
+DBPATCH_ADD(6030031, 0, 1)
+DBPATCH_ADD(6030032, 0, 1)
+DBPATCH_ADD(6030033, 0, 1)
+DBPATCH_ADD(6030034, 0, 1)
+DBPATCH_ADD(6030035, 0, 1)
+DBPATCH_ADD(6030036, 0, 1)
+DBPATCH_ADD(6030037, 0, 1)
+DBPATCH_ADD(6030038, 0, 1)
+DBPATCH_ADD(6030039, 0, 1)
+DBPATCH_ADD(6030040, 0, 1)
+DBPATCH_ADD(6030041, 0, 1)
+DBPATCH_ADD(6030042, 0, 1)
+DBPATCH_ADD(6030043, 0, 1)
+DBPATCH_ADD(6030044, 0, 1)
+DBPATCH_ADD(6030045, 0, 1)
+DBPATCH_ADD(6030046, 0, 1)
+DBPATCH_ADD(6030047, 0, 1)
 
 DBPATCH_END()
