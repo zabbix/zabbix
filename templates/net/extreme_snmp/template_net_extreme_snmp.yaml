@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:37:16Z'
+  version: '6.4'
+  date: '2022-08-16T11:09:10Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -14,14 +14,15 @@ zabbix_export:
         Template Extreme EXOS
         
         MIBs used:
-        EtherLike-MIB
         EXTREME-SYSTEM-MIB
+        IF-MIB
+        EtherLike-MIB
+        HOST-RESOURCES-MIB
         SNMPv2-MIB
         EXTREME-SOFTWARE-MONITOR-MIB
         ENTITY-MIB
-        IF-MIB
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -246,7 +247,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: EXTREME-SOFTWARE-MONITOR-MIB
-            Total CPU utlization (percentage) as of last sampling.
+            Total CPU utilization (percentage) as of last sampling.
           tags:
             -
               tag: component
@@ -377,6 +378,34 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
+          uuid: 9e9db5d7fe5f4f4e8fc6581813699c1e
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 8ec263e1593e48d18b3e50f215e94196
           name: 'Hardware version(revision)'
           type: SNMP_AGENT
@@ -459,6 +488,28 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: 92f8e91c4d2c423984cb14440bc83328
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 041115a5c3f44c8c9a9e1e0c7bc7203e
           name: 'System object ID'
           type: SNMP_AGENT
@@ -517,45 +568,6 @@ zabbix_export:
                 -
                   name: 'System name has changed'
                   expression: 'last(/Extreme EXOS SNMP/system.name,#1)<>last(/Extreme EXOS SNMP/system.name,#2) and length(last(/Extreme EXOS SNMP/system.name))>0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
-          uuid: 92f8e91c4d2c423984cb14440bc83328
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: bb967f81aaad4a00ae7916ea80574ae0
-              expression: 'last(/Extreme EXOS SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/Extreme EXOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               tags:
                 -
                   tag: scope
@@ -2483,6 +2495,22 @@ zabbix_export:
         -
           tag: scope
           value: performance
+    -
+      uuid: bb967f81aaad4a00ae7916ea80574ae0
+      expression: '(last(/Extreme EXOS SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Extreme EXOS SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Extreme EXOS SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Extreme EXOS SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/Extreme EXOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 9dc8bc10d4044889bd53c56f1da45c60

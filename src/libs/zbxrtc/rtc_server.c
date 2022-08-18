@@ -22,7 +22,7 @@
 #include "zbxjson.h"
 #include "zbxha.h"
 #include "zbxtypes.h"
-#include "common.h"
+#include "zbxcommon.h"
 
 #include "rtc.h"
 #include "zbxservice.h"

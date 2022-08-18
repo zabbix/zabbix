@@ -297,7 +297,7 @@ $fields = [
 	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'), null]
 ];
 
-if (getRequest('type') == ITEM_TYPE_HTTPAGENT && getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
+if (getRequest('interfaceid') == INTERFACE_TYPE_OPT && itemTypeInterface(getRequest('type')) == INTERFACE_TYPE_OPT) {
 	unset($fields['interfaceid']);
 	unset($_REQUEST['interfaceid']);
 }
@@ -513,10 +513,7 @@ if (hasRequest('preprocessing')) {
  */
 $result = false;
 if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
-	$result = false;
-	if ($item = get_item_by_itemid($_REQUEST['itemid'])) {
-		$result = API::Item()->delete([getRequest('itemid')]);
-	}
+	$result = API::Item()->delete([getRequest('itemid')]);
 
 	if ($result) {
 		uncheckTableRows(getRequest('checkbox_hash'));

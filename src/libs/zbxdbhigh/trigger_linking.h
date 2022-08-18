@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TRIGGER_LINKING_H
 #define ZABBIX_TRIGGER_LINKING_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxalgo.h"
 
 int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, char **error);

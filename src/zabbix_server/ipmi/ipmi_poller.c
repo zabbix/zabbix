@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_OPENIPMI
 
@@ -29,7 +29,7 @@
 #include "zbxipcservice.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
-
+#include "zbxtime.h"
 
 #define ZBX_IPMI_MANAGER_CLEANUP_DELAY		SEC_PER_DAY
 

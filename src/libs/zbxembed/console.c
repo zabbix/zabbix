@@ -18,12 +18,13 @@
 **/
 
 #include "console.h"
+#include "embed.h"
 
-#include "common.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "embed.h"
 #include "duktape.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 /******************************************************************************
  *                                                                            *

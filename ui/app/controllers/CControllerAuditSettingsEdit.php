@@ -42,7 +42,7 @@ class CControllerAuditSettingsEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_AUDIT_LOG);
 	}
 
 	protected function doAction(): void {

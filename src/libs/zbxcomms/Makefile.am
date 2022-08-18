@@ -8,7 +8,8 @@ libzbxcomms_a_SOURCES = \
 	telnet.c \
 	tls.h \
 	tls.c \
-	tls_version.c
+	tls_version.c \
+	tls_validate.c
 
 libzbxcomms_a_CFLAGS = \
 		$(LIBXML2_CFLAGS) \

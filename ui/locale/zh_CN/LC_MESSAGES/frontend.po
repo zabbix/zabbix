@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-01 15:19+0000\n"
+"PO-Revision-Date: 2022-08-11 23:35+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -504,7 +504,7 @@ msgstr "访问服务"
 msgid "Ack"
 msgstr "确认"
 
-#: app/views/monitoring.widget.problems.view.php:78
+#: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
 msgstr "确认"
@@ -605,7 +605,7 @@ msgstr "动作"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr "动作"
+msgstr "行动"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -674,7 +674,7 @@ msgstr "动作已更新"
 msgid "Actions"
 msgstr "动作"
 
-#: app/views/monitoring.widget.problems.view.php:79
+#: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
 msgstr "动作"
@@ -1078,6 +1078,11 @@ msgstr "聚合时间间隔"
 #: include/actions.inc.php:2106
 msgid "Alert message"
 msgstr "告警消息"
+
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CRoleHelper.php:338
+msgid "Alerts"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -3894,6 +3899,13 @@ msgstr "压缩早于"
 msgid "Compression"
 msgstr "压缩"
 
+#: app/views/administration.housekeeping.edit.php:164
+#: app/views/administration.housekeeping.edit.php:169
+#: app/views/administration.housekeeping.edit.php:174
+#: app/views/administration.housekeeping.edit.php:184
+msgid "Compression is not supported."
+msgstr "不支持压缩。"
+
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
 msgstr "并发会话"
@@ -4888,6 +4900,11 @@ msgstr "虚线"
 msgid "Data"
 msgstr "数据"
 
+#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CRoleHelper.php:337
+msgid "Data collection"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
 #, c-format
@@ -5035,7 +5052,7 @@ msgstr "日"
 #: include/classes/helpers/CSlaHelper.php:68
 msgctxt "compact table header"
 msgid "Day"
-msgstr "日"
+msgstr "天"
 
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
@@ -5636,6 +5653,10 @@ msgstr "详情"
 msgid "Details of web scenario"
 msgstr "Web 场景详情"
 
+#: app/views/administration.housekeeping.edit.php:195
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr "检测到的 TimescaleDB 许可证不支持压缩。 TimescaleDB 社区版支持压缩。"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr "检测周期"
@@ -6186,7 +6207,7 @@ msgstr "断线时间"
 #: app/views/monitoring.widget.slareport.view.php:100
 msgctxt "compact table header"
 msgid "Downtime"
-msgstr "断线时间"
+msgstr "停机时间"
 
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
@@ -6252,10 +6273,10 @@ msgstr "用户ID \"%1$s\" 与 \"%2$s\" 冲突"
 msgid "Duration"
 msgstr "持续时间"
 
-#: app/views/monitoring.widget.problems.view.php:77
+#: app/views/monitoring.widget.problems.view.php:80
 msgctxt "compact table header"
 msgid "Duration"
-msgstr "持续时间"
+msgstr "期间"
 
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
@@ -6704,6 +6725,13 @@ msgstr "错误信息"
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr "错误！由于 %1$s 数据库服务器版本不受支持，无法启动 Zabbix 服务器。必须至少为 (%2$s)"
 
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
+msgstr "错误！无法启动 Zabbix 服务器。"
+
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
 #, c-format
@@ -7038,10 +7066,10 @@ msgstr "故障转移延迟：%1$s"
 msgid "Failed"
 msgstr "已失败"
 
-#: app/views/monitoring.widget.web.view.php:33
+#: app/views/monitoring.widget.web.view.php:34
 msgctxt "compact table header"
 msgid "Failed"
-msgstr "已失败"
+msgstr "失败的"
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
@@ -8099,8 +8127,8 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "主机"
 
-#: app/views/monitoring.widget.problems.view.php:63
-#: app/views/monitoring.widget.problems.view.php:64
+#: app/views/monitoring.widget.problems.view.php:66
+#: app/views/monitoring.widget.problems.view.php:67
 msgctxt "compact table header"
 msgid "Host"
 msgstr "主机"
@@ -8193,12 +8221,12 @@ msgstr "主机图形"
 msgid "Host group"
 msgstr "主机群组"
 
-#: app/views/monitoring.widget.problemhosts.view.php:31
-#: app/views/monitoring.widget.problemsbysv.view.php:40
-#: app/views/monitoring.widget.web.view.php:31
+#: app/views/monitoring.widget.problemhosts.view.php:32
+#: app/views/monitoring.widget.problemsbysv.view.php:41
+#: app/views/monitoring.widget.web.view.php:32
 msgctxt "compact table header"
 msgid "Host group"
-msgstr "主机群组"
+msgstr "主机组"
 
 #: include/classes/api/services/CHostGroup.php:760
 #, c-format
@@ -9784,8 +9812,8 @@ msgstr "无穷"
 msgid "Info"
 msgstr "信息"
 
-#: app/views/monitoring.widget.problems.view.php:60
-#: app/views/monitoring.widget.problems.view.php:61
+#: app/views/monitoring.widget.actionlog.view.php:48
+#: app/views/monitoring.widget.problems.view.php:64
 msgctxt "compact table header"
 msgid "Info"
 msgstr "信息"
@@ -11333,6 +11361,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr "月"
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "Mac 地址 A"
@@ -11861,7 +11894,7 @@ msgstr "消息"
 #: app/views/monitoring.widget.actionlog.view.php:44
 msgctxt "compact table header"
 msgid "Message"
-msgstr "消息"
+msgstr "信息"
 
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
@@ -11945,6 +11978,11 @@ msgstr "所需求的最小PHP上传文件大小是%1$s (配置项\"upload_max_fi
 #, c-format
 msgid "Minimum required PHP version is %1$s."
 msgstr "所需的最低 PHP 版本为 %1$s。"
+
+#: app/views/administration.housekeeping.edit.php:175
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
+msgstr "所需的最低 TimescaleDB 版本为 %1$s。"
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -13325,7 +13363,7 @@ msgstr "行数"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:126
 msgid "Number of seasons"
-msgstr "季节数"
+msgstr "时期数"
 
 #: include/views/reports.toptriggers.php:86
 msgid "Number of status changes"
@@ -13481,7 +13519,7 @@ msgstr "关"
 msgid "Ok"
 msgstr "正常"
 
-#: app/views/monitoring.widget.web.view.php:32
+#: app/views/monitoring.widget.web.view.php:33
 msgctxt "compact table header"
 msgid "Ok"
 msgstr "正常"
@@ -13629,10 +13667,10 @@ msgstr "操作无对应的模板。"
 msgid "Operational data"
 msgstr "操作数据"
 
-#: app/views/monitoring.widget.problems.view.php:75
+#: app/views/monitoring.widget.problems.view.php:78
 msgctxt "compact table header"
 msgid "Operational data"
-msgstr "操作数据"
+msgstr "运营数据"
 
 #: app/views/configuration.correlation.edit.php:145
 #: app/views/configuration.correlation.list.php:78
@@ -14133,6 +14171,10 @@ msgstr "上层探索规则"
 msgid "Parent graphs"
 msgstr "父图表"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
 msgid "Parent items"
@@ -14446,6 +14488,10 @@ msgstr "葡萄牙语 (pt_PT)"
 msgid "Position"
 msgstr "位置"
 
+#: include/classes/widgets/views/widget.item.form.view.php:143
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr "对于 s、uptime 和 unixtime 单位，位置将被忽略。"
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "发布字段"
@@ -14453,6 +14499,10 @@ msgstr "发布字段"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "发布类型"
+
+#: app/views/administration.housekeeping.edit.php:165
+msgid "PostgreSQL database server version is too old."
+msgstr "PostgreSQL 数据库服务器版本太旧。"
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -14614,8 +14664,8 @@ msgstr "优先权层级"
 msgid "Problem"
 msgstr "问题"
 
-#: app/views/monitoring.widget.problems.view.php:67
-#: app/views/monitoring.widget.problems.view.php:68
+#: app/views/monitoring.widget.problems.view.php:70
+#: app/views/monitoring.widget.problems.view.php:71
 msgctxt "compact table header"
 msgid "Problem"
 msgstr "问题"
@@ -14849,7 +14899,7 @@ msgstr "季"
 #: include/classes/helpers/CSlaHelper.php:71
 msgctxt "compact table header"
 msgid "Quarter"
-msgstr "季"
+msgstr "四分之一"
 
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
@@ -14996,11 +15046,11 @@ msgstr "最近的问题"
 msgid "Recipient"
 msgstr "接收者"
 
-#: app/views/monitoring.widget.actionlog.view.php:41
 #: app/views/monitoring.widget.actionlog.view.php:42
+#: app/views/monitoring.widget.actionlog.view.php:43
 msgctxt "compact table header"
 msgid "Recipient"
-msgstr "接收者"
+msgstr "收件人"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
@@ -15049,7 +15099,7 @@ msgstr "恢复操作"
 msgid "Recovery time"
 msgstr "恢复时间"
 
-#: app/views/monitoring.widget.problems.view.php:56
+#: app/views/monitoring.widget.problems.view.php:59
 msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "恢复时间"
@@ -15857,7 +15907,7 @@ msgstr "SLI"
 #: app/views/monitoring.widget.slareport.view.php:98
 msgctxt "compact table header"
 msgid "SLI"
-msgstr "SLI"
+msgstr "服务水平指标SLI"
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
@@ -15871,7 +15921,7 @@ msgstr "SLO"
 #: app/views/monitoring.widget.slareport.view.php:97
 msgctxt "compact table header"
 msgid "SLO"
-msgstr "SLO"
+msgstr "服务水平目标SLO"
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
@@ -16267,11 +16317,11 @@ msgstr "查找式样为空"
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
 msgid "Season"
-msgstr "季节"
+msgstr "时期"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1121
 msgid "Season deviation window"
-msgstr "季节偏差窗口"
+msgstr "时期偏差窗口"
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
@@ -16697,8 +16747,8 @@ msgstr "设置"
 msgid "Severity"
 msgstr "严重性"
 
-#: app/views/monitoring.widget.problems.view.php:71
-#: app/views/monitoring.widget.problems.view.php:72
+#: app/views/monitoring.widget.problems.view.php:74
+#: app/views/monitoring.widget.problems.view.php:75
 msgctxt "compact table header"
 msgid "Severity"
 msgstr "严重性"
@@ -17252,9 +17302,9 @@ msgstr "Zabbix 写缓存的统计和可用性。缓存 - 值之一（模式：al
 msgid "Status"
 msgstr "状态"
 
-#: app/views/monitoring.widget.actionlog.view.php:45
 #: app/views/monitoring.widget.actionlog.view.php:46
-#: app/views/monitoring.widget.problems.view.php:59
+#: app/views/monitoring.widget.actionlog.view.php:47
+#: app/views/monitoring.widget.problems.view.php:62
 msgctxt "compact table header"
 msgid "Status"
 msgstr "状态"
@@ -17702,10 +17752,10 @@ msgstr "标签值"
 msgid "Tags"
 msgstr "标记"
 
-#: app/views/monitoring.widget.problems.view.php:80
+#: app/views/monitoring.widget.problems.view.php:83
 msgctxt "compact table header"
 msgid "Tags"
-msgstr "标记"
+msgstr "标签"
 
 #: include/views/configuration.copy.elements.php:69
 #: include/views/configuration.trigger.prototype.edit.php:202
@@ -18243,8 +18293,10 @@ msgstr "直到"
 msgid "Time"
 msgstr "时间"
 
-#: app/views/monitoring.widget.actionlog.view.php:34
 #: app/views/monitoring.widget.actionlog.view.php:35
+#: app/views/monitoring.widget.actionlog.view.php:36
+#: app/views/monitoring.widget.problems.view.php:40
+#: app/views/monitoring.widget.problems.view.php:41
 msgctxt "compact table header"
 msgid "Time"
 msgstr "时间"
@@ -18374,7 +18426,8 @@ msgstr "前排主机"
 msgid "Total"
 msgstr "合计"
 
-#: app/views/monitoring.widget.problemhosts.view.php:34
+#: app/views/monitoring.widget.hostavail.view.php:40
+#: app/views/monitoring.widget.problemhosts.view.php:35
 msgctxt "compact table header"
 msgid "Total"
 msgstr "合计"
@@ -18881,8 +18934,8 @@ msgstr "两个或多个字段不能占用相同的空间。"
 msgid "Type"
 msgstr "类型"
 
-#: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.actionlog.view.php:39
+#: app/views/monitoring.widget.actionlog.view.php:40
 msgctxt "compact table header"
 msgid "Type"
 msgstr "类型"
@@ -19033,6 +19086,14 @@ msgstr "无法加载设置API的参数。"
 msgid "Unable to overwrite the existing configuration file."
 msgstr "无法覆盖已经存在的配置文件。"
 
+#: app/views/administration.housekeeping.edit.php:160
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr "无法检索 TimescaleDB 压缩支持状态。"
+
+#: app/views/administration.housekeeping.edit.php:170
+msgid "Unable to retrieve TimescaleDB version."
+msgstr "无法检索 TimescaleDB 版本。"
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr "无法检索数据库版本。"
@@ -19143,10 +19204,11 @@ msgstr "单位"
 msgid "Unknown"
 msgstr "未知的"
 
-#: app/views/monitoring.widget.web.view.php:34
+#: app/views/monitoring.widget.hostavail.view.php:39
+#: app/views/monitoring.widget.web.view.php:35
 msgctxt "compact table header"
 msgid "Unknown"
-msgstr "未知的"
+msgstr "未知"
 
 #: app/views/reports.auditlog.list.php:119
 msgid "Unknown action"
@@ -19217,6 +19279,26 @@ msgstr "自模板断开链接"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "取消静音"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr "不支持的 %1$s 数据库服务版本。必须至少为 %2$s。"
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr "不支持的 %1$s 数据库服务版本。不得高于 %2$s。"
+
+#: app/views/administration.housekeeping.edit.php:179
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr "不受支持的 TimescaleDB 版本。应至少为 %1$s。"
+
+#: app/views/administration.housekeeping.edit.php:189
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr "不受支持的 TimescaleDB 版本。不应高于 %1$s。"
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -19798,13 +19880,33 @@ msgstr "VMware FetchDVPorts 包装器，<url> - VMware 服务 URL，<filter> - v
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware缓存统计.可用的mode有:total, free, pfree, used and pused."
 
+#: include/classes/data/CItemData.php:1252
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr "VMware 集群警报数据，返回 JSON，<url> - VMware 服务 URL，<id> - VMware 集群 id"
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware 集群性能计数器，<url> - VMware 服务 URL，<id> - VMware 集群 id，<path> - 性能计数器路径，<instance> - 性能计数器实例"
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr "VMware 集群属性，<url> - VMware 服务 URL，<id> - VMware 集群 id，<prop> - 属性路径"
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware集群状态, <url> - VMware 服务 URL, <name> - VMware 集群名称"
+
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr "VMware 集群标签数组，<url> - VMware 服务 URL，<id> - VMware 集群 ID"
+
+#: include/classes/data/CItemData.php:1296
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr "VMware 数据中心警报数据，返回 JSON，<url> - VMware 服务 URL，<id> - VMware 数据中心 ID"
+
+#: include/classes/data/CItemData.php:1304
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
+msgstr "VMware 数据中心标签数组，<url> - VMware 服务 URL，<id> - VMware 数据中心 ID。返回 JSON"
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -19813,6 +19915,10 @@ msgstr "VMware 数据中心及其 ID，<url> - VMware 服务 URL。返回 JSON"
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr "VMware 数据中心及其 ID。返回 JSON"
+
+#: include/classes/data/CItemData.php:1268
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
+msgstr "VMware 数据存储警报数据，返回 JSON，<url> - VMware 服务 URL，<uuid> - VMware 数据存储名称"
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
@@ -19823,9 +19929,17 @@ msgstr "VMware数据存储容量统计信息，以字节为单位，以百分比
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "VMware 数据存储管理程序列表，<url> - VMware 服务 URL，<datastore> - 数据存储名称"
 
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr "VMware 数据存储属性，<url> - VMware 服务 URL，<uuid> - 数据存储名称，<prop> - 属性路径"
+
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "VMware 数据存储读取统计信息，<url> - VMware 服务 URL，<datastore> - 数据存储名称，<mode> - 延迟/最大延迟 - 平均值或最大值"
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
+msgstr "VMware 数据存储标签数组，<url> - VMware 服务 URL，<uuid> - VMware 数据存储 uuid。返回 JSON"
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -19842,6 +19956,10 @@ msgstr "VMware hypervisor BIOS UUID，<url> - VMware 服务 URL，<uuid> - VMwar
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "VMware hypervisor硬件供应商状态传感器，<url> - VMware 服务 URL，<uuid> - VMware 管理程序主机名。返回 JSON"
+
+#: include/classes/data/CItemData.php:1324
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr "VMware 管理程序警报数据，返回 JSON，<url> - VMware 服务 URL，<uuid> - VMware 管理程序主机名"
 
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19911,6 +20029,10 @@ msgstr "VMware hypervisor 处理器型号, <url> - VMware 服务 URL, <uuid> - V
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor 处理器使用率单位Hz, <url> - VMware 服务 URL, <uuid> - VMware hypervisor 主机名"
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr "VMware 管理程序属性，<url> - VMware 服务 URL，<uuid> - VMware 管理程序主机名，<prop> - 属性路径"
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "VMware hypervisor传感器值，<url> - VMware 服务 URL，<uuid> - VMware 管理程序主机名。返回 JSON"
@@ -19922,6 +20044,10 @@ msgstr "VMware hypervisor序列号，<url> - VMware 服务 URL，<uuid> - VMware
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor 状态, <url> - VMware 服务 URL, <uuid> - VMware hypervisor 主机名"
+
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr "VMware 管理程序标签数组，<url> - VMware 服务 URL，<uuid> - VMware 管理程序主机名。返回 JSON"
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19950,6 +20076,14 @@ msgstr "VMware 服务完整名, <url> - VMware 服务 URL"
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware 服务版本, <url> - VMware 服务 URL"
+
+#: include/classes/data/CItemData.php:1244
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr "VMware 虚拟中心报警数据，返回 JSON，<url> - VMware 服务 URL"
+
+#: include/classes/data/CItemData.php:1500
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
+msgstr "VMware 虚拟机告警数据，返回 JSON，<url> - VMware 服务 URL，<uuid> - VMware 虚拟机名称"
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20031,6 +20165,10 @@ msgstr "VMware虚拟机处理器准备时间ms，<url> - VMware服务URL，<uuid
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware 虚拟机处理器使用率，单位Hz, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机主机名"
 
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr "VMware 虚机属性，<url> - VMware 服务 URL，<uuid> - VMware 虚机主机名，<prop> - 属性路径"
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware 虚拟机共享内存大小, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机主机名"
@@ -20046,6 +20184,10 @@ msgstr "VMware 虚拟机状态，<url> - VMware 服务 URL，<uuid> - VMware 虚
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware 虚拟机交换分区大小, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机主机名"
+
+#: include/classes/data/CItemData.php:1664
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr "VMware 虚拟机标签数组，<url> - VMware 服务 URL，<uuid> - VMware 虚拟机主机名。返回 JSON"
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
@@ -20408,10 +20550,24 @@ msgstr "告警"
 msgid "Warning message"
 msgstr "告警信息"
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr "警告！无法检索数据库版本。"
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr "警告！不支持的 %1$s 数据库服务器版本。至少应为 %2$s。"
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr "警告！%1$s 数据库服务器版本不支持。至少应为 (%2$s)"
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
+msgstr "警告！不支持的 %1$s 数据库服务器版本。不应高于 %2$s。"
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -20508,7 +20664,7 @@ msgstr "星期"
 #: include/classes/helpers/CSlaHelper.php:69
 msgctxt "compact table header"
 msgid "Week"
-msgstr "星期"
+msgstr "周"
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -20604,10 +20760,10 @@ msgstr "带有问题名称"
 msgid "With problems"
 msgstr "异常设备"
 
-#: app/views/monitoring.widget.problemhosts.view.php:33
+#: app/views/monitoring.widget.problemhosts.view.php:34
 msgctxt "compact table header"
 msgid "With problems"
-msgstr "异常设备"
+msgstr "异常"
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
@@ -20625,10 +20781,10 @@ msgstr "无数据"
 msgid "Without problems"
 msgstr "正常设备"
 
-#: app/views/monitoring.widget.problemhosts.view.php:32
+#: app/views/monitoring.widget.problemhosts.view.php:33
 msgctxt "compact table header"
 msgid "Without problems"
-msgstr "正常设备"
+msgstr "正常"
 
 #: include/forms.inc.php:343
 msgid "Without triggers"
@@ -21331,11 +21487,11 @@ msgstr "avg() - 周期 T 内的平均值"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1053
 msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
-msgstr "baselinedev() - 返回前几个时间段相同数据周期与最后一个数据周期之间的偏差（stddevpop算法）"
+msgstr "baselinedev() - 返回前几个时间段相同数据时期与最后一个数据时期之间的偏差（stddevpop算法）"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1060
 msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
-msgstr "baselinewma() - 通过平均季节数据周期计算基线"
+msgstr "baselinewma() - 通过平均时期内数据计算基线"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"

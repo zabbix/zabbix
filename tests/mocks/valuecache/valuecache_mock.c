@@ -17,23 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxmockassert.h"
+#include "zbxmockdata.h"
+#include "zbxmockutil.h"
+#include "valuecache_mock.h"
+
+#include "valuecache.h"
+#include "zbxnum.h"
 #include "log.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "history.h"
-#include "valuecache.h"
 #include "dbcache.h"
 
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include "zbxmockassert.h"
-#include "zbxmockdata.h"
-#include "zbxmockutil.h"
-#include "valuecache_mock.h"
 
 /*
  * data source

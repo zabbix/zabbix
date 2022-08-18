@@ -1,0 +1,1 @@
+...G...... [ZBX-20260] fixed system.cpu.util unable to get usage data of cores on second NUMA node (mprihodko)

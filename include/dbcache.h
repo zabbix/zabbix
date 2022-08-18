@@ -40,6 +40,15 @@
 #define	ZBX_POLLER_TYPE_ODBC		6
 #define	ZBX_POLLER_TYPE_COUNT		7	/* number of poller types */
 
+
+typedef enum
+{
+	ZBX_SESSION_TYPE_DATA = 0,
+	ZBX_SESSION_TYPE_CONFIG,
+	ZBX_SESSION_TYPE_COUNT,
+}
+zbx_session_type_t;
+
 #define MAX_JAVA_ITEMS		32
 #define MAX_SNMP_ITEMS		128
 #define MAX_POLLER_ITEMS	128	/* MAX(MAX_JAVA_ITEMS, MAX_SNMP_ITEMS) */
@@ -314,6 +323,21 @@ typedef struct
 }
 DC_PROXY;
 
+typedef struct
+{
+	zbx_uint64_t	autoreg_hostid;
+	zbx_uint64_t	hostid;
+	char		*host;
+	char		*ip;
+	char		*dns;
+	char		*host_metadata;
+	int		now;
+	unsigned short	port;
+	unsigned short	flag;
+	unsigned int	connection_type;
+}
+zbx_autoreg_host_t;
+
 #define ZBX_ACTION_OPCLASS_NONE			0
 #define ZBX_ACTION_OPCLASS_NORMAL		1
 #define ZBX_ACTION_OPCLASS_RECOVERY		2
@@ -564,9 +588,13 @@ typedef struct
 	unsigned char	type;
 	unsigned char	error_handler;
 	char		*params;
+	char		*params_orig;
 	char		*error_handler_params;
 }
 zbx_preproc_op_t;
+
+#define ZBX_PREPROC_MACRO_UPDATE_TRUE	1
+#define ZBX_PREPROC_MACRO_UPDATE_FALSE	0
 
 typedef struct
 {
@@ -578,6 +606,7 @@ typedef struct
 	int			dep_itemids_num;
 	int			preproc_ops_num;
 	int			update_time;
+	int			macro_update;
 
 	zbx_uint64_pair_t	*dep_itemids;
 	zbx_preproc_op_t	*preproc_ops;
@@ -725,6 +754,8 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errco
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode);
+int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid);
+void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, int *errcodes, size_t num);
 void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
@@ -747,6 +778,10 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items);
 int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *nextcheck);
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
+
+void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
+		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now);
+void	DCconfig_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
@@ -793,6 +828,10 @@ int	DCconfig_get_proxypoller_nextcheck(void);
 #define ZBX_PROXY_TASKS_NEXTCHECK	0x04
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int proxy_conn_err);
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
+int	DCcheck_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
+		zbx_uint32_t *revision, char **error);
+int	DCis_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
+		zbx_conn_flags_t flag, const char *interface, int now, int heartbeat);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage);
@@ -847,6 +886,7 @@ int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error);
 int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **error);
 
 unsigned int	DCget_internal_action_count(void);
+unsigned int	DCget_auto_registration_action_count(void);
 
 /* global configuration support */
 #define ZBX_DISCOVERY_GROUPID_UNDEFINED	0
@@ -954,15 +994,18 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	zbx_uint64_t	last_valueid;
+	zbx_uint64_t	last_id;
 	const char	*token;
 	time_t		lastaccess;
 }
-zbx_data_session_t;
+zbx_session_t;
 
 const char	*zbx_dc_get_session_token(void);
-zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token);
-void	zbx_dc_cleanup_data_sessions(void);
+zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *token,
+		zbx_session_type_t session_type);
+void		zbx_dc_cleanup_sessions(void);
+
+void		zbx_dc_cleanup_autoreg_host(void);
 
 /* maintenance support */
 
@@ -1043,7 +1086,7 @@ typedef struct
 	zbx_uint64_t		hostid;
 	zbx_uint32_t		type;
 	unsigned char		lock;		/* 1 if the timer has locked trigger, 0 otherwise */
-	int			revision;	/* revision */
+	zbx_uint32_t		revision;	/* revision */
 	time_t			lastcheck;
 	zbx_timespec_t		eval_ts;	/* the history time for which trigger must be recalculated */
 	zbx_timespec_t		check_ts;	/* time when timer must be checked */
