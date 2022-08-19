@@ -27,19 +27,6 @@
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 
-#if defined(HAVE_POSTGRESQL)
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
-#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
-#elif defined(HAVE_MYSQL)
-#	define ZBX_DB_STRLIST_DELIM		','
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8,utf8mb3"
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4 	"utf8mb4"
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET		ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 "," ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
-#	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin,utf8mb4_bin"
-#endif
-
 #ifdef HAVE_ORACLE
 #	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
 #		define	ZBX_SQL_EXEC_FROM	ZBX_CONST_STRLEN(ZBX_PLSQL_BEGIN)
@@ -2432,19 +2419,8 @@ void	DBcheck_character_set(void)
 		char	*char_set = row[0];
 		char	*collation = row[1];
 
-		if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8, char_set, ZBX_DB_STRLIST_DELIM))
-		{
-			zbx_db_set_character_set("utf8mb3");
-		}
-		else if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4, char_set,
-				ZBX_DB_STRLIST_DELIM))
-		{
-			zbx_db_set_character_set("utf8mb4");
-		}
-		else
-		{
+		if (FAIL == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET, char_set, ZBX_DB_STRLIST_DELIM))
 			zbx_warn_char_set(CONFIG_DBNAME, char_set);
-		}
 
 		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{
