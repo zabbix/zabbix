@@ -591,6 +591,7 @@ class testFormUpdateProblem extends CWebTest {
 				[
 					'problems' => ['Trigger for unsigned', 'Trigger for char', 'Trigger for float'],
 					'fields' => [
+						'id:scope_1' => true,
 						'id:change_severity' => true,
 						'id:severity' => 'Information',
 						'id:suppress_problem' => true,
@@ -698,7 +699,6 @@ class testFormUpdateProblem extends CWebTest {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
 		$form->fill($data['fields']);
-
 		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
