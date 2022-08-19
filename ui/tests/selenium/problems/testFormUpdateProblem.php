@@ -185,36 +185,24 @@ class testFormUpdateProblem extends CWebTest {
 						'Acknowledge' => 'Confirms the problem is noticed (acknowledging user will be recorded). '.
 								'Status change triggers action update operation.'
 					],
-					'history' => []
+					'history' => [],
+					'Acknowledge' => true
 				]
 			],
 			[
 				[
 					'problems' => ['Trigger for char'],
 					'close_enabled' => true,
-					'history' => []
-				]
-			],
-			[
-				[
-					'problems' => ['Trigger for float', 'Trigger for char'],
-					// If more than one problems selected - History label is absent.
-					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-							'Acknowledge', 'Close problem', ''],
-					'close_enabled' => true,
-					'hintboxes' => [
-						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
-						'Unsuppress' => 'Deactivates manual suppression.',
-						'Acknowledge' => 'Confirms the problem is noticed (acknowledging user will be recorded). '.
-								'Status change triggers action update operation.'
-					]
+					'history' => [],
+					'Acknowledge' => true
 				]
 			],
 			[
 				[
 					'problems' => ['Trigger for text'],
 					'unsuppress_enabled' => true,
-					'history' => []
+					'history' => [],
+					'Acknowledge' => true
 				]
 			],
 			[
@@ -224,7 +212,7 @@ class testFormUpdateProblem extends CWebTest {
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
 							'Unsuppress', 'Unacknowledge', 'Close problem', ''],
 					'message' => 'Acknowleged event',
-					'unacknowledge' => true,
+					'Unacknowledge' => true,
 					'history' => [' Admin (Zabbix Administrator) Acknowleged event'],
 					'hintboxes' => [
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
@@ -236,7 +224,45 @@ class testFormUpdateProblem extends CWebTest {
 			[
 				[
 					'problems' => ['Trigger for log'],
-					'history' => []
+					'history' => [],
+					'Acknowledge' => true
+				]
+			],
+			// Two problems.
+			[
+				[
+					'problems' => ['Trigger for float', 'Trigger for char'],
+					// If more than one problems selected - History label is absent.
+					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
+							'Acknowledge', 'Close problem', ''],
+					'close_enabled' => true,
+					'Acknowledge' => true,
+					'hintboxes' => [
+						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
+						'Unsuppress' => 'Deactivates manual suppression.',
+						'Acknowledge' => 'Confirms the problem is noticed (acknowledging user will be recorded). '.
+								'Status change triggers action update operation.'
+					]
+				]
+			],
+			// Five problems.
+			[
+				[
+					'problems' => ['Trigger for float', 'Trigger for char', 'Trigger for log', 'Trigger for unsigned', 'Trigger for text'],
+					// If more than one problems selected - History label is absent.
+					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
+							'Acknowledge', 'Unacknowledge', 'Close problem', ''],
+					'hintboxes' => [
+						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
+						'Unsuppress' => 'Deactivates manual suppression.',
+						'Acknowledge' => 'Confirms the problem is noticed (acknowledging user will be recorded). '.
+								'Status change triggers action update operation.',
+						'Unacknowledge' => 'Undo problem acknowledgement.'
+					],
+					'close_enabled' => true,
+					'unsuppress_enabled' => true,
+					'Acknowledge' => true,
+					'Unacknowledge' => true
 				]
 			]
 		];
@@ -308,7 +334,6 @@ class testFormUpdateProblem extends CWebTest {
 			'id:suppress_time_option' => ['value' => 'Until', 'enabled' => false],
 			'id:suppress_until_problem' => ['maxlength' => 19, 'value' => 'now+1d', 'enabled' => false],
 			'id:unsuppress_problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'unsuppress_enabled', false)],
-			(CTestArrayHelper::get($data, 'unacknowledge') ? 'Unacknowledge' : 'Acknowledge') => ['value' => false, 'enabled' => true],
 			'Close problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'close_enabled', false)]
 		];
 
@@ -323,6 +348,15 @@ class testFormUpdateProblem extends CWebTest {
 
 			if (array_key_exists('maxlength', $attributes)) {
 				$this->assertEquals($attributes['maxlength'], $form->getField($field)->getAttribute('maxlength'));
+			}
+		}
+
+		// Check default values for 'Acknowledge' and  'Unacknowledge' fileds.
+		foreach (['Acknowledge', 'Unacknowledge'] as $label) {
+			if (array_key_exists($label, $data)) {
+				$field = $form->getField($label);
+				$this->assertEquals(false, $field->getValue());
+				$this->assertTrue($field->isEnabled());
 			}
 		}
 
