@@ -234,9 +234,9 @@ $saml_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Enable SCIM provisioning'), 'saml_scim_enabled'),
+		new CLabel(_('Enable JIT provisioning'), 'saml_jit_enabled'),
 		new CFormField(
-			(new CCheckBox('saml_scim_enabled', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
+			(new CCheckBox('saml_jit_enabled', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
 				->setChecked($data['saml_scim_enabled'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
 				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
 				->setEnabled($data['saml_enabled'])
@@ -361,9 +361,9 @@ $saml_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Allow SCIM provisioning'), 'saml_allow_scim'),
+		new CLabel(_('Allow JIT provisioning'), 'saml_allow_jit'),
 		new CFormField(
-			(new CCheckBox('saml_allow_scim'))
+			(new CCheckBox('saml_allow_jit'))
 				->setChecked($data['saml_allow_scim'])
 				->setEnabled($data['saml_enabled'])
 		)
@@ -398,18 +398,6 @@ $saml_tab = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass('saml-allow-scim')
 	])
-	->addItem([
-		(new CLabel(_('Authorization token'), 'saml_authorization_token'))
-			->setAsteriskMark()
-			->addClass('saml-allow-scim'),
-		(new CFormField(
-			(new CTextBox('saml_authorization_token', '', false,
-//				DB::getFieldLength('config', 'saml_authorization_token')
-			))
-				->setAriaRequired()
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass('saml-allow-scim')
-	])
 	->addItem([(new CLabel(_('User group mapping')))->addClass('saml-allow-scim'),
 		(new CFormField(
 			(new CDiv(
@@ -417,6 +405,7 @@ $saml_tab = (new CFormGrid())
 					->setId('saml-group-table')
 					->setAttribute('style', 'width: 100%;')
 					->setHeader((new CRowHeader([
+						'',
 						(new CColHeader(_('SAML group pattern')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
 						(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
 						(new CColHeader(_('User role')))->addClass(ZBX_STYLE_LEFT),
@@ -470,6 +459,25 @@ $saml_tab = (new CFormGrid())
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 
+		))->addClass('saml-allow-scim')
+	])
+	->addItem([
+		(new CLabel(_('Enable SCIM provisioning'), 'saml_scim_enabled'))->addClass('saml-allow-scim'),
+		(new CFormField(
+			(new CCheckBox('saml_scim_enabled', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
+				->setChecked($data['saml_scim_enabled'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
+				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
+		))->addClass('saml-allow-scim')
+	])
+	->addItem([
+		(new CLabel(_('Authorization token'), 'saml_authorization_token'))
+			->addClass('saml-allow-scim'),
+		(new CFormField(
+			(new CTextBox('saml_authorization_token', '', false,
+//				DB::getFieldLength('config', 'saml_authorization_token')
+			))
+				->setAriaRequired()
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass('saml-allow-scim')
 	]);
 

@@ -72,7 +72,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
 				'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-					'rows_per_page', 'url', 'roleid', 'timezone'
+					'rows_per_page', 'url', 'roleid', 'timezone', 'userdirectoryid'
 				],
 				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
 				'selectUsrgrps' => ['usrgrpid'],
@@ -246,6 +246,17 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'filter' => ['status' => MODULE_STATUS_ENABLED],
 			'preservekeys' => true
 		]);
+
+		$data['readonly'] = false;
+		$this->user['userdirectoryid'] = 1; 			// TODO: delete, when API is finalized.
+		$data['userdirectoryid'] = $this->user['userdirectoryid'];
+		if ($this->user['userdirectoryid'] !== 0) {
+			$data['idp_type'] = API::UserDirectory()->get([
+				'output' => ['idp_type'],
+				'userdirectoryids' => $this->user['userdirectoryid']
+			]);
+			$data['readonly'] = true;
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));

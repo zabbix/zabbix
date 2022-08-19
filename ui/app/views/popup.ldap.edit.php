@@ -212,6 +212,7 @@ $form = (new CForm('post', $form_action))
 						->setId('ldap-user-groups-table')
 						->setHeader(
 							(new CRowHeader([
+								'',
 								(new CColHeader(_('LDAP group pattern ')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
 								(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
 								(new CColHeader(_('User role')))->addClass(ZBX_STYLE_LEFT),

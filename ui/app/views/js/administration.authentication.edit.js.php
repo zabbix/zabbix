@@ -30,20 +30,21 @@
 		constructor() {
 			this.form = null;
 			this.db_authentication_type = null;
-			this.allow_scim = null;
+			this.allow_jit = null;
 		}
 
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_groups, saml_media_type_mappings}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
-			this.allow_scim = document.getElementById('saml_allow_scim');
+			this.allow_jit = document.getElementById('saml_allow_jit');
 
 			this._addEventListeners();
 			this._addLdapServers(ldap_servers, ldap_default_row_index);
 			this._addSamlUserGroups(saml_groups);
 			this._addSamlMediaTypeMapping(saml_media_type_mappings);
 
-			this.toggleScimProvisioning(this.allow_scim.checked);
+			this.toggleScimProvisioning(this.allow_jit.checked);
+			this.initSortable(document.getElementById('saml-group-table'));
 		}
 
 		_addEventListeners() {
@@ -99,7 +100,7 @@
 				});
 			}
 
-			this.allow_scim.addEventListener('change', (e) => {
+			this.allow_jit.addEventListener('change', (e) => {
 				this.toggleScimProvisioning(e.target.checked);
 			});
 
@@ -157,6 +158,46 @@
 			target.replaceWith(new_action);
 		}
 
+		initSortable(element) {
+			const is_disabled = element.querySelectorAll('tr.sortable').length < 2;
+
+			$(element).sortable({
+				disabled: is_disabled,
+				items: 'tbody tr.sortable',
+				axis: 'y',
+				containment: 'parent',
+				cursor: 'grabbing',
+				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				tolerance: 'pointer',
+				opacity: 0.6,
+				helper: function(e, ui) {
+					for (let td of ui.find('>td')) {
+						let $td = $(td);
+						$td.attr('width', $td.width())
+					}
+
+					// when dragging element on safari, it jumps out of the table
+					if (SF) {
+						// move back draggable element to proper position
+						ui.css('left', (ui.offset().left - 2) + 'px');
+					}
+
+					return ui;
+				},
+				stop: function(e, ui) {
+					ui.item.find('>td').removeAttr('width');
+					ui.item.removeAttr('style');
+				},
+				start: function(e, ui) {
+					$(ui.placeholder).height($(ui.helper).height());
+				}
+			});
+
+			for (const drag_icon of element.querySelectorAll('div.<?= ZBX_STYLE_DRAG_ICON ?>')) {
+				drag_icon.classList.toggle('<?= ZBX_STYLE_DISABLED ?>', is_disabled);
+			}
+		}
+
 		_authFormSubmit() {
 			const fields_to_trim = ['#saml_idp_entityid', '#saml_sso_url', '#saml_slo_url', '#saml_username_attribute',
 				'#saml_sp_entityid', '#saml_nameid_format'
@@ -212,15 +253,16 @@
 					idp_group_name: row.querySelector(`[name="saml_groups[${row_index}][idp_group_name]"`).value,
 					usrgrpid: row.querySelector(`[name="saml_groups[${row_index}][usrgrpid]"`).value,
 					roleid: row.querySelector(`[name="saml_groups[${row_index}][roleid]"`).value,
-					name_label: t('SAML group pattern')
+					is_fallback: row.querySelector(`[name="saml_groups[${row_index}][is_fallback]"`).value
 				};
 			}
 			else {
 				popup_params = {
-					add_group: 1,
-					name_label: t('SAML group pattern')
+					add_group: 1
 				};
 			}
+
+			popup_params.name_label = t('SAML group pattern');
 
 			const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
@@ -430,12 +472,16 @@
 
 		_templateSamlGroupRow() {
 			return `
-				<tr data-row_index="#{row_index}">
+				<tr data-row_index="#{row_index}" class="sortable">
+					<td class="td-drag-icon">
+						<div class="drag-icon ui-sortable-handle"></div>
+					</td>
 					<td>
 						<a href="javascript:void(0);" class="wordwrap js-edit">#{idp_group_name}</a>
 						<input type="hidden" name="saml_groups[#{row_index}][idp_group_name]" value="#{idp_group_name}">
 						<input type="hidden" name="saml_groups[#{row_index}][usrgrpid]" value="#{usrgrpid}">
 						<input type="hidden" name="saml_groups[#{row_index}][roleid]" value="#{roleid}">
+						<input type="hidden" name="saml_groups[#{row_index}][is_fallback]" value="#{is_fallback}">
 						<input type="hidden" name="saml_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
 					</td>
 					<td class="wordbreak">#{user_group_name}</td>
