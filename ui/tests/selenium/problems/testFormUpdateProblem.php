@@ -189,7 +189,7 @@ class testFormUpdateProblem extends CWebTest {
 		CDataHelper::call('event.acknowledge', [
 			'eventids' => 100553,
 			'action' => 6,
-			'message' => 'Acknowleged event'
+			'message' => 'Acknowledged event'
 		]);
 	}
 
@@ -231,9 +231,9 @@ class testFormUpdateProblem extends CWebTest {
 					// If problem is Aknowledged - label is changed to Unacknowledge.
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
 							'Unsuppress', 'Unacknowledge', 'Close problem', ''],
-					'message' => 'Acknowleged event',
+					'message' => 'Acknowledged event',
 					'Unacknowledge' => true,
-					'history' => [' Admin (Zabbix Administrator) Acknowleged event'],
+					'history' => [' Admin (Zabbix Administrator) Acknowledged event'],
 					'hintboxes' => [
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
 						'Unsuppress' => 'Deactivates manual suppression.',
@@ -375,7 +375,7 @@ class testFormUpdateProblem extends CWebTest {
 			}
 		}
 
-		// Check default values for 'Acknowledge' and  'Unacknowledge' fileds.
+		// Check default values for 'Acknowledge' and  'Unacknowledge' fields.
 		foreach (['Acknowledge', 'Unacknowledge'] as $label) {
 			if (array_key_exists($label, $data)) {
 				$field = $form->getField($label);
