@@ -341,7 +341,7 @@ else {
 	order_result($data['groups'], $sortField, $sortOrder);
 
 	foreach ($data['groups'] as &$group) {
-		$data['is_discovery_rule_editable'] = $group['discoveryRule']
+		$group['is_discovery_rule_editable'] = $group['discoveryRule']
 			&& API::DiscoveryRule()->get([
 				'output' => [],
 				'itemids' => $group['discoveryRule']['itemid'],
