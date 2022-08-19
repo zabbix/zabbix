@@ -242,7 +242,7 @@ class testPageReportsAuditDisplay extends CWebTest {
 
 			// Save audit data from table in UI and database.
 			$this->page->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
-			$audit_values = $this->getTableValues();
+			$audit_values = $this->getTableRowValue();
 			$hash = CDBHelper::getHash('SELECT * FROM auditlog');
 
 			// Check information in audit page that audit is disabled/enabled.
@@ -260,11 +260,11 @@ class testPageReportsAuditDisplay extends CWebTest {
 			$this->page->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 
 			if (!$status) {
-				$this->assertEquals($audit_values, $this->getTableValues());
+				$this->assertEquals($audit_values, $this->getTableRowValue());
 				$this->assertEquals($hash, CDBHelper::getHash('SELECT * FROM auditlog'));
 			}
 			else {
-				$this->assertNotEquals($audit_values, $this->getTableValues());
+				$this->assertNotEquals($audit_values, $this->getTableRowValue());
 				$this->assertNotEquals($hash, CDBHelper::getHash('SELECT * FROM auditlog'));
 			}
 		}
@@ -359,13 +359,13 @@ class testPageReportsAuditDisplay extends CWebTest {
 	}
 
 	/**
-	 * Get table values from each column.
+	 * Get table values from row each column.
 	 */
-	private function getTableValues() {
+	private function getTableRowValue() {
 		$headers = $this->query('class:list-table')->asTable()->one()->getHeadersText();
 		$result = [];
 		foreach ($headers as $header) {
-			$result[] = $this->getTableResult($header);
+			$result[] = $this->query('class:list-table')->asTable()->one()->getRow(0)->getColumn($header)->getText();
 		}
 
 		return $result;
