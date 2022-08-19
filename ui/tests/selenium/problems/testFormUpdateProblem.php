@@ -291,7 +291,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check History field.
 		if (array_key_exists('history', $data)) {
-			$history = ($data['history'] === []) ? $data['history'] : [gmdate('Y-m-d H:i:s', self::$time).$data['history'][0]];
+			$history = ($data['history'] === []) ? $data['history'] : [date('Y-m-d H:i:s', self::$time).$data['history'][0]];
 			$history_table = $form->getField('History')->asTable();
 			$this->assertEquals(['Time', 'User', 'User action', 'Message'], $history_table->getHeadersText());
 			$this->assertEquals($history, $history_table->getRows()->asText());
