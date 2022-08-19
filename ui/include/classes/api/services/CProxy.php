@@ -571,7 +571,7 @@ class CProxy extends CApiService {
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]],
 										['if' => ['field' => 'status', 'in' => HOST_STATUS_PROXY_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]]
 									]],
@@ -900,7 +900,7 @@ class CProxy extends CApiService {
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]],
 										['if' => ['field' => 'status', 'in' => HOST_STATUS_PROXY_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]]
 			]],
