@@ -42,6 +42,13 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	protected static $triggerids;
 
+	/**
+	 * Time when events were created.
+	 *
+	 * @var string
+	 */
+	protected static $time;
+
 	public function prepareProblemsData() {
 		// Create hostgroup for hosts with items triggers.
 		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for Problems Update']]);
@@ -115,37 +122,38 @@ class testFormUpdateProblem extends CWebTest {
 		self::$triggerids = CDataHelper::getIds('description');
 
 		// Create events.
+		self::$time = time();
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100550, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for float']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger for float').', 0)'
+				zbx_dbstr(self::$triggerids ['Trigger for float']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for float').', 0)'
 		);
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100551, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for char']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger for char').', 1)'
+				zbx_dbstr(self::$triggerids ['Trigger for char']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for char').', 1)'
 		);
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100552, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for log']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger for log').', 2)'
+				zbx_dbstr(self::$triggerids ['Trigger for log']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for log').', 2)'
 		);
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100553, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for unsigned']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger for unsigned').', 3)'
+				zbx_dbstr(self::$triggerids ['Trigger for unsigned']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for unsigned').', 3)'
 		);
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100554, 0, 0, '.
-		zbx_dbstr(self::$triggerids ['Trigger for text']).', '.zbx_dbstr(time()).', 0, 1, '.zbx_dbstr('Trigger for text').', 4)'
+		zbx_dbstr(self::$triggerids ['Trigger for text']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for text').', 4)'
 		);
 
 		// Create problems.
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100550, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for float']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for float').', 0)'
+				zbx_dbstr(self::$triggerids ['Trigger for float']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for float').', 0)'
 		);
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100551, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for char']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for char').', 1)'
+				zbx_dbstr(self::$triggerids ['Trigger for char']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for char').', 1)'
 		);
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100552, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for log']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for log').', 2)'
+				zbx_dbstr(self::$triggerids ['Trigger for log']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for log').', 2)'
 		);
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity, acknowledged) VALUES (100553, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for unsigned']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for unsigned').', 3, 1)'
+				zbx_dbstr(self::$triggerids ['Trigger for unsigned']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for unsigned').', 3, 1)'
 		);
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100554, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for text']).', '.zbx_dbstr(time()).', 0, '.zbx_dbstr('Trigger for text').', 4)'
+				zbx_dbstr(self::$triggerids ['Trigger for text']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for text').', 4)'
 		);
 
 		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for char'.
@@ -170,40 +178,59 @@ class testFormUpdateProblem extends CWebTest {
 		return [
 			[
 				[
-					'problems' => ['Trigger for float']
+					'problems' => ['Trigger for float'],
+					'hintboxes' => [
+						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
+						'Unsuppress' => 'Deactivates manual suppression.',
+						'Acknowledge' => 'Confirms the problem is noticed (acknowledging user will be recorded). '.
+								'Status change triggers action update operation.'
+					],
+					'history' => []
 				]
 			],
 			[
 				[
 					'problems' => ['Trigger for char'],
-					'close_enabled' => true
+					'close_enabled' => true,
+					'history' => []
 				]
 			],
 			[
 				[
 					'problems' => ['Trigger for float', 'Trigger for char'],
+					// If more than one problems selected - History label is absent.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
 							'Acknowledge', 'Close problem', ''],
-					'close_enabled' => true
+					'close_enabled' => true,
+					'hintboxes' => [
+						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
+						'Unsuppress' => 'Deactivates manual suppression.',
+						'Acknowledge' => 'Confirms the problem is noticed (acknowledging user will be recorded). '.
+								'Status change triggers action update operation.'
+					]
 				]
 			],
 			[
 				[
 					'problems' => ['Trigger for text'],
-					'unsuppress_enabled' => true
+					'unsuppress_enabled' => true,
+					'history' => []
 				]
 			],
 			[
 				[
 					'problems' => ['Trigger for unsigned'],
+					// If problem is Aknowledged - label is changed to Unacknowledge.
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
 							'Unsuppress', 'Unacknowledge', 'Close problem', ''],
 					'message' => 'Acknowleged event',
 					'unacknowledge' => true,
-
-
-					// Add history!
-					'history' => []
+					'history' => [' Admin (Zabbix Administrator) Acknowleged event'],
+					'hintboxes' => [
+						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
+						'Unsuppress' => 'Deactivates manual suppression.',
+						'Unacknowledge' => 'Undo problem acknowledgement.'
+					]
 				]
 			]
 		];
@@ -216,7 +243,6 @@ class testFormUpdateProblem extends CWebTest {
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
-
 		$table->findRows('Problem', $data['problems'])->select();
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 
@@ -231,6 +257,36 @@ class testFormUpdateProblem extends CWebTest {
 
 		$problem = $count > 1 ? $count.' problems selected.' : $data['problems'][0];
 		$this->assertTrue($form->query('xpath://div[@class="wordbreak" and text()='.CXPathHelper::escapeQuotes($problem).']')->exists());
+
+		// Check first label in Scope field.
+		$scope_field = $form->getField('Scope');
+		$scope_label_query = $count > 1
+			? 'xpath:.//label[text()="Only selected problems"]/sup[text()='.CXPathHelper::escapeQuotes($count.' events').']'
+			: 'xpath:.//label[text()="Only selected problem"]';
+
+		// Check second label in Scope field.
+		$this->assertTrue($scope_field->query($scope_label_query)->exists());
+		$this->assertTrue($form->getField('Scope')->query("xpath:.//label[text()=".
+				"\"Selected and all other problems of related triggers\"]/sup[text()=".
+				CXPathHelper::escapeQuotes($count > 1 ? $count.' events' : '1 event')."]")->exists()
+		);
+
+		if (CTestArrayHelper::get($data, 'hintboxes')) {
+			foreach ($data['hintboxes'] as $field => $text) {
+				$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']/a')->one()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
+				$this->assertEquals($text, $hint->getText());
+				$hint->query('class:overlay-close-btn')->waitUntilClickable()->one()->click();
+			}
+		}
+
+		// Check History field.
+		if (CTestArrayHelper::get($data, 'history')) {
+			$history = [gmdate('Y-m-d H:i:s', self::$time).$data['history'][0]];
+			$history_table = $form->getField('History')->asTable();
+			$this->assertEquals(['Time', 'User', 'User action', 'Message'], $history_table->getHeadersText());
+//			$this->assertEquals($history, $history_table->getRows()->asText());
+		}
 
 		$fields = [
 			'id:message' => ['value' => '', 'maxlength' => 2048, 'enabled' => true],
@@ -271,7 +327,6 @@ class testFormUpdateProblem extends CWebTest {
 		foreach ($button_queries as $query => $clickable) {
 			$this->assertEquals($clickable, $dialog->query($query)->one()->isClickable());
 		}
-
 
 		$dialog->close();
 	}
