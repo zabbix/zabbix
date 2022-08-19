@@ -659,60 +659,62 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			else {
 				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+			}
+		}
 
-				$child_upd_items = [];
+		if ($parent_itemids) {
+			$child_upd_items = [];
 
-				while ($parent_itemids) {
-					$result = DBselect(
-						'SELECT i.itemid,i.flags,h.status AS host_status'.
-						' FROM items i,hosts h'.
-						' WHERE i.hostid=h.hostid'.
-							' AND '.dbConditionId('i.templateid', $parent_itemids)
-					);
+			while ($parent_itemids) {
+				$result = DBselect(
+					'SELECT i.itemid,i.flags,h.status AS host_status'.
+					' FROM items i,hosts h'.
+					' WHERE i.hostid=h.hostid'.
+						' AND '.dbConditionId('i.templateid', $parent_itemids)
+				);
 
-					$parent_itemids = [];
+				$parent_itemids = [];
 
-					while ($row = DBfetch($result)) {
-						$parent_itemids[] = $row['itemid'];
+				while ($row = DBfetch($result)) {
+					$parent_itemids[] = $row['itemid'];
 
-						$child_upd_items[] = [
-							'values' => ['valuemapid' => '0'],
-							'where' => ['itemid' => $row['itemid']]
-						];
-
-						if (in_array($row['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
-								&& $row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-							$item_prototypeids[] = $row['itemid'];
-						}
-					}
-				}
-
-				if ($child_upd_items) {
-					DB::update('items', $child_upd_items);
-				}
-
-				if ($item_prototypeids) {
-					$options = [
-						'output' => ['itemid'],
-						'filter' => ['parent_itemid' => $item_prototypeids],
-						'sortfield' => ['itemid'],
-						'sortorder' => [ZBX_SORT_DOWN]
+					$child_upd_items[] = [
+						'values' => ['valuemapid' => '0'],
+						'where' => ['itemid' => $row['itemid']]
 					];
-					$result = DBselect(DB::makeSql('item_discovery', $options));
 
-					$upd_discovered_items = [];
-
-					while ($row = DBfetch($result)) {
-						$upd_discovered_items[] = [
-							'values' => ['valuemapid' => '0'],
-							'where' => ['itemid' => $row['itemid']]
-						];
-					}
-
-					if ($upd_discovered_items) {
-						DB::update('items', $upd_discovered_items);
+					if (in_array($row['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+							&& $row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$item_prototypeids[] = $row['itemid'];
 					}
 				}
+			}
+
+			if ($child_upd_items) {
+				DB::update('items', $child_upd_items);
+			}
+		}
+
+		if ($item_prototypeids) {
+			$options = [
+				'output' => ['itemid'],
+				'filter' => ['parent_itemid' => $item_prototypeids],
+				'sortfield' => ['itemid'],
+				'sortorder' => [ZBX_SORT_DOWN]
+			];
+			$result = DBselect(DB::makeSql('item_discovery', $options));
+
+			$upd_discovered_items = [];
+
+			while ($row = DBfetch($result)) {
+				$upd_discovered_items[] = [
+					'values' => ['valuemapid' => '0'],
+					'where' => ['itemid' => $row['itemid']]
+				];
+			}
+
+			if ($upd_discovered_items) {
+				DB::update('items', $upd_discovered_items);
 			}
 		}
 
