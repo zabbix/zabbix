@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup ids, media_type, auditlog, config
  */
-class testAuditManual extends CWebTest {
+class testPageReportsAuditDisplay extends CWebTest {
 	use TableTrait;
 
 	/**
@@ -43,9 +43,9 @@ class testAuditManual extends CWebTest {
 	protected static $id;
 
 	/**
-	 * Check Audit page layout.
+	 * Check audit page layout.
 	 */
-	public function testAuditManual_Layout() {
+	public function testPageReportsAuditDisplay_Layout() {
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 
 		// If the filter is not visible - enable it.
@@ -55,24 +55,16 @@ class testAuditManual extends CWebTest {
 
 		// Find filter form and check labels.
 		$this->assertEquals(['Users', 'Resource', 'Resource ID', 'Recordset ID', 'Actions'],
-				$this->query('name:zbx_filter')->asForm()->one()->getLabels()->asText());
+			$this->query('name:zbx_filter')->asForm()->one()->getLabels()->asText());
 
 		// Find table and check table headers.
 		$this->assertEquals(['Time', 'User', 'IP', 'Resource', 'ID', 'Action', 'Recordset ID', 'Details'],
-				$this->query('class:list-table')->asTable()->one()->getHeadersText());
+			$this->query('class:list-table')->asTable()->one()->getHeadersText());
 
 		// Find action checkboxes and check labels.
 		$this->assertEquals(['Add', 'Delete', 'Execute', 'Failed login', 'History clear', 'Login', 'Logout', 'Update'],
-				$this->query('id:filter-actions')->asCheckboxList()->one()->getLabels()->asText()
+			$this->query('id:filter-actions')->asCheckboxList()->one()->getLabels()->asText()
 		);
-	}
-
-	/**
-	 * Check that actions checkboxes correctly enables/disables switching resources.
-	 */
-	public function testAuditManual_ActionsCheckbox() {
-		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
-		$errors = [];
 
 		// Resource name with checkboxes that are enabled.
 		$resource_actions =[
@@ -117,6 +109,8 @@ class testAuditManual extends CWebTest {
 			'Web scenario' => ['Add', 'Delete', 'Update']
 		];
 
+		// Check that actions checkboxes correctly enables/disables switching resources.
+		$errors = [];
 		foreach ($resource_actions as $resource => $actions) {
 			$status = true;
 			$this->query('name:zbx_filter')->asForm()->one()->fill(['Resource' => $resource]);
@@ -151,7 +145,7 @@ class testAuditManual extends CWebTest {
 	/**
 	 * Create media type and check audit page.
 	 */
-	public function testAuditManual_Add() {
+	public function testPageReportsAuditDisplay_Add() {
 		$this->page->login()->open('zabbix.php?action=mediatype.edit')->waitUntilReady();
 		$form = $this->query('id:media-type-form')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => 'AAA']);
@@ -171,9 +165,9 @@ class testAuditManual extends CWebTest {
 	/**
 	 * Update media type and check audit page.
 	 *
-	 * @depends testAuditManual_Add
+	 * @depends testPageReportsAuditDisplay_Add
 	 */
-	public function testAuditManual_Update() {
+	public function testPageReportsAuditDisplay_Update() {
 		$this->page->login()->open('zabbix.php?action=mediatype.edit&mediatypeid='.self::$id)->waitUntilReady();
 		$form = $this->query('id:media-type-form')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => 'AAA_update', 'SMTP helo' => 'updated.com', 'SMTP email' => 'update@email.com']);
@@ -191,10 +185,10 @@ class testAuditManual extends CWebTest {
 	/**
 	 * Delete media type and check audit page.
 	 *
-	 * @depends testAuditManual_Add
+	 * @depends testPageReportsAuditDisplay_Add
 	 */
-	public function testAuditManual_Delete() {
-		$this->page->login()->open('zabbix.php?action=mediatype.edit&mediatypeid=' . self::$id)->waitUntilReady();
+	public function testPageReportsAuditDisplay_Delete() {
+		$this->page->login()->open('zabbix.php?action=mediatype.edit&mediatypeid='.self::$id)->waitUntilReady();
 		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		CElementQuery::getPage()->acceptAlert();
 		$this->assertMessage(TEST_GOOD, 'Media type deleted');
@@ -207,7 +201,7 @@ class testAuditManual extends CWebTest {
 	/**
 	 * Clear history and trends in item and check audit page.
 	 */
-	public function testAuditManual_HistoryClear() {
+	public function testPageReportsAuditDisplay_HistoryClear() {
 		$this->page->login()->open('items.php?form=update&hostid=99204&itemid=99106&context=host')->waitUntilReady();
 		$this->query('id:del_history')->waitUntilClickable()->one()->click();
 		CElementQuery::getPage()->acceptAlert();
@@ -221,7 +215,7 @@ class testAuditManual extends CWebTest {
 	/**
 	 * Check that Login, Logout and Failed login works and displayed correctly.
 	 */
-	public function testAuditManual_LoginLogoutFailed() {
+	public function testPageReportsAuditDisplay_LoginLogoutFailed() {
 		$this->page->userLogin('Admin', 'zabbixaaa');
 		$this->page->userLogin('Admin', 'zabbix');
 		$this->query('link:Sign out')->waitUntilVisible()->one()->click();
@@ -229,66 +223,51 @@ class testAuditManual extends CWebTest {
 
 		// Check that all info displayed correctly in audit.
 		$user_audit = '';
-		$this->checkAuditValues('User', 1, ['Failed login' => $user_audit, 'Login' => $user_audit, 'Logout' => $user_audit]);
+		$this->checkAuditValues('User', 1, ['Failed login' => $user_audit, 'Login' => $user_audit,
+				'Logout' => $user_audit]);
 	}
 
 	/**
 	 * Check that there is no audit logs after disabling audit.
 	 */
-	public function testAuditManual_Disabled() {
-		$this->page->login()->open('zabbix.php?action=audit.settings.edit')->waitUntilReady();
+	public function testPageReportsAuditDisplay_DisabledEnabled() {
+		$this->page->login();
+		foreach ([false, true] as $status) {
+			$this->page->open('zabbix.php?action=audit.settings.edit')->waitUntilReady();
 
-		// Disable audit.
-		$settings_form = $this->query('id:audit-settings')->asForm()->one();
-		$settings_form->fill(['Enable audit logging' => false])->submit();
-		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+			// Disable audit.
+			$settings_form = $this->query('id:audit-settings')->asForm()->one();
+			$settings_form->fill(['Enable audit logging' => $status])->submit();
+			$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
-		// Save audit data from table in UI and database.
-		$this->page->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
-		$values_before = $this->getTableValues();
-		$hash_before = CDBHelper::getHash('SELECT * FROM auditlog');
+			// Save audit data from table in UI and database.
+			$this->page->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
+			$audit_values = $this->getTableValues();
+			$hash = CDBHelper::getHash('SELECT * FROM auditlog');
 
-		// Check information that audit is disabled displayed in audit page.
-		$this->assertEquals('settings.auditlog_enabled: 1 => 0',
-				$this->query('class:list-table')->asTable()->one()->getRow(0)->getColumn('Details')->getText());
+			// Check information in audit page that audit is disabled/enabled.
+			$audit_status = (!$status) ? 'settings.auditlog_enabled: 1 => 0' : 'settings.auditlog_enabled: 0 => 1';
+			$this->assertEquals($audit_status, $this->query('class:list-table')->asTable()->one()->getRow(0)->
+					getColumn('Details')->getText());
 
-		// Add new media type. If audit is disabled - no new data should appear in audit page/database.
-		$this->page->open('zabbix.php?action=mediatype.edit')->waitUntilReady();
-		$media_form = $this->query('id:media-type-form')->asForm()->waitUntilReady()->one();
-		$media_form->fill(['Name' => 'BBB']);
-		$media_form->submit();
-		$this->assertMessage(TEST_GOOD, 'Media type added');
+			// Add new media type. If audit is disabled - no new data should appear in audit page/database.
+			$this->page->open('zabbix.php?action=mediatype.edit')->waitUntilReady();
+			$name = (!$status) ? 'BBB' : 'CCC';
+			$this->query('id:media-type-form')->asForm()->waitUntilReady()->one()->fill(['Name' => $name])->submit();
+			$this->assertMessage(TEST_GOOD, 'Media type added');
 
-		// Compare audit after disabling audit and adding media type.
-		$this->page->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
-		$this->assertEquals($values_before, $this->getTableValues());
-		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM auditlog'));
+			// Compare audit after disabling/enabling audit and adding media type.
+			$this->page->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 
-		// Enable audit.
-		$this->page->open('zabbix.php?action=audit.settings.edit')->waitUntilReady();
-		$settings_form->fill(['Enable audit logging' => true])->submit();
-		$this->assertMessage(TEST_GOOD, 'Configuration updated');
-
-		// Check information that audit is enabled displayed in audit page.
-		$this->page->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
-		$this->assertEquals('settings.auditlog_enabled: 0 => 1',
-				$this->query('class:list-table')->asTable()->one()->getRow(0)->getColumn('Details')->getText());
-
-		// Save audit data from table in UI and database after enabling audit.
-		$values_after = $this->getTableValues();
-		$hash_after = CDBHelper::getHash('SELECT * FROM auditlog');
-
-		// Add new media type. If audit is enabled - new data should appear in audit page/database.
-		$this->page->open('zabbix.php?action=mediatype.edit')->waitUntilReady();
-		$media_form = $this->query('id:media-type-form')->asForm()->waitUntilReady()->one();
-		$media_form->fill(['Name' => 'CCC']);
-		$media_form->submit();
-		$this->assertMessage(TEST_GOOD, 'Media type added');
-
-		// Check that new data was added to audit and database.
-		$this->page->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
-		$this->assertNotEquals($values_after, $this->getTableValues());
-		$this->assertNotEquals($hash_after, CDBHelper::getHash('SELECT * FROM auditlog'));
+			if (!$status) {
+				$this->assertEquals($audit_values, $this->getTableValues());
+				$this->assertEquals($hash, CDBHelper::getHash('SELECT * FROM auditlog'));
+			}
+			else {
+				$this->assertNotEquals($audit_values, $this->getTableValues());
+				$this->assertNotEquals($hash, CDBHelper::getHash('SELECT * FROM auditlog'));
+			}
+		}
 	}
 
 	/**
