@@ -2056,8 +2056,16 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.27rc1
 
 New features:
+.........T [ZBXNEXT-7520] added template for OPNsense (drasihov)
 
 Bug fixes:
+...G...... [ZBX-21328] fixed Zabbix agent 2 log and eventlog items behavior to match Zabbix agent when key has been updated (vso)
+...G...... [ZBX-21234] fixed net.dns to return 0 when server is unreachable in Zabbix agent 2 (esneiders)
+...G...PS. [ZBX-21445] improved performance by only calling res_init() on changed resolv.conf if glibc lower than 2.26 is used (vso)
+.......PS. [ZBX-21385] fixed setting of character set for MySQL and MariaDB when utf8mb3 is missing while utf8 is present (vso)
+..F....... [ZBX-20975] fixed PHP TypeError in inaccessible dashboard view (miks)
+A......... [ZBX-19769] fixed performance when Host API is filtering records by severity or suppressed problems (miks)
+..F....... [ZBX-19176] fixed multiple performance issues in map navigation tree widget and map (miks)
 ...G...... [ZBX-21295] changed system.cpu.load[percpu] to split based on online cpus in Zabbix agent 2 (esneiders)
 ...G...... [ZBX-18573] improved performance of directory scanning by Agent on Windows (dgoloscapov)
 ........S. [ZBX-21138] blocked housekeeper history/trends record creation on item removal when history/trends houseekeeping is disabled (wiper)
