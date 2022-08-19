@@ -27,9 +27,8 @@ class CControllerActionDelete extends CController {
 					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 					EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 				]),
-			'g_actionid' => 'array_id|required|not_empty'
+			'g_actionid' => 'array_id',
 		];
-
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
@@ -50,6 +49,7 @@ class CControllerActionDelete extends CController {
 	}
 
 	protected function doAction(): void {
+
 		$eventsource = $this->getInput('eventsource');
 
 		if ($this->hasInput('g_actionid')) {

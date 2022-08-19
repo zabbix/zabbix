@@ -18,12 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-/**
- * @var CView $this
- */
 ?>
-
 window.action_edit_popup = new class {
 
 	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
@@ -36,43 +31,19 @@ window.action_edit_popup = new class {
 		this.actionid = actionid;
 		this.eventsource = eventsource
 		this.row_num = 0;
-		//this.footer = this.overlay.$dialogue.$footer[0];
-		//this.curl = new Curl('zabbix.php');
-		//this.curl.setArgument('action', 'action.list');
-		//this.curl.setArgument('eventsource', 0);
 
-		document.getElementById('action-form').style.display = '';
+		this.processTypeOfCalculation();
 
-		// todo: rewrite this prettier:
-		document.querySelector('.js-condition-create').addEventListener('click', () => {
-			this.openConditionPopup();
-		})
-
-		if (document.querySelector('.js-operation-details')) {
-			document.querySelector('.js-operation-details').addEventListener('click', () => {
-				this.openOperationPopup('0', '0', this.actionid);
-			})
-		}
-		if (document.querySelector('.js-recovery-operations-create')) {
-			document.querySelector('.js-recovery-operations-create').addEventListener('click', () => {
-				this.openOperationPopup();
-			})
-		}
-		if (document.querySelector('.js-update-operations-create')) {
-			document.querySelector('.js-update-operations-create').addEventListener('click', () => {
-				this.openOperationPopup();
-			})
-		}
+		this._initActionButtons();
 
 		this.dialogue.addEventListener('condition.dialogue.submit', (e) => {
 		// todo: add multiselect title, not value
 
 			this.row = document.createElement('tr');
 			this.createRow(this.row, e.detail.inputs);
-
+			this.processTypeOfCalculation();
 			$('#conditionTable tr:last').before(this.row);
-			// addMessage(makeMessageBox('good', [], e.detail.title, true, false))
-			// processTypeOfCalculation();
+
 		});
 
 		// todo: add existing data to conditions table (for action edit)
@@ -82,10 +53,27 @@ window.action_edit_popup = new class {
 	//	}
 	}
 
-	createRow(row, input) {
-		row.append(this.createLabelCell());
-		row.append(this.createNameCell(input));
-		row.append(this.createRemoveCell());
+	_initActionButtons() {
+		document.addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-condition-create')) {
+				this.openConditionPopup();
+			}
+			else if (e.target.classList.contains('js-operation-details')) {
+				this.openOperationPopup('0', '0', this.actionid);
+			}
+			else if (e.target.classList.contains('js-recovery-operations-create')) {
+				this.openOperationPopup();
+			}
+			else if (e.target.classList.contains('js-update-operations-create')) {
+				this.openOperationPopup();
+			}
+			else if (e.target.classList.contains('js-action-clone')) {
+				this._clone();
+			}
+			else if (e.target.classList.contains('js-action-delete')) {
+				this._delete();
+			}
+		});
 	}
 
 	openConditionPopup() {
@@ -98,6 +86,29 @@ window.action_edit_popup = new class {
 			dialogueid: 'condition',
 			dialogue_class: 'modal-popup-medium'
 		});
+	}
+
+	openOperationPopup(eventsource, recovery_phase, actionid) {
+		const parameters = {
+			// trigger_element: trigger_element,
+			eventsource: eventsource,
+			recovery_phase: recovery_phase,
+			actionid: actionid
+		};
+
+		return PopUp('popup.operations', parameters, {
+			dialogueid: 'condition',
+			dialogue_class: 'modal-popup-medium'
+		});
+	}
+
+	createRow(row, input) {
+		row.append(this.createLabelCell());
+		row.append(this.createNameCell(input));
+		row.append(this.createRemoveCell());
+
+		const table = document.getElementById('conditionTable');
+		this.row_count = table.rows.length -1;
 	}
 
 	// createHiddenInput(conditiontype, operator, value, value2) { // ????
@@ -140,20 +151,6 @@ window.action_edit_popup = new class {
 		cell.appendChild(btn);
 		// this.processTypeOfCalculation();
 		return cell;
-	}
-
-	openOperationPopup(eventsource, recovery_phase, actionid) {
-		const parameters = {
-			// trigger_element: trigger_element,
-			eventsource: eventsource,
-			recovery_phase: recovery_phase,
-			actionid: actionid
-		};
-
-		return PopUp('popup.operations', parameters, {
-			dialogueid: 'condition',
-			dialogue_class: 'modal-popup-medium'
-		});
 	}
 
 	submit() {
@@ -205,31 +202,82 @@ window.action_edit_popup = new class {
 			});
 	}
 
-	// processTypeOfCalculation() {
+	_clone() {
+		// this.overlay.setLoading();
+		// const parameters = getFormFields(this.form);
 
-	//	var show_formula = (jQuery('#evaltype').val() == <?//= CONDITION_EVAL_TYPE_EXPRESSION ?>//),
-	//		$labels = jQuery('#conditions-table .label');
+		// PopUp('popup.action.edit', {name: getFormFields(this.form).name}, {
+		//	dialogueid: 'action-edit',
+		//	dialogue_class: 'modal-popup-large'
+		// });
+	}
 
-	//	console.log($labels.length);
-	//	jQuery('#evaltype').closest('li').toggle($labels.length > 1);
-	//	jQuery('#conditionLabel').toggle(!show_formula);
-	//	jQuery('#formula').toggle(show_formula);
+	_delete() {
+		const curl = new Curl('zabbix.php', false);
+		curl.setArgument('action', 'action.delete');
+		curl.addSID();
 
-	//	if ($labels.length > 1) {
-	//		var conditions = [];
+		// fetch(curl.getUrl(), {
+		//	method: 'POST',
+		//	headers: {'Content-Type': 'application/json'},
+		//	body: JSON.stringify({g_actionid: [this.actionid], eventsource: this.eventsource})
+		// })
+		//	.then((response) => response.json())
+		//	.then((response) => {
+		//		if ('error' in response) {
+		//			throw {error: response.error};
+		//		}
+		//		overlayDialogueDestroy(this.overlay.dialogueid);
 
-	//		$labels.each(function(index, label) {
-	//			$label = jQuery(label);
+		//		this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+		//	})
+		//	.catch((exception) => {
+		//		for (const element of this.form.parentNode.children) {
+		//			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+		//				element.parentNode.removeChild(element);
+		//			}
+		//		}
 
-	//			conditions.push({
-	//				id: $label.data('formulaid'),
-	//				type: $label.data('conditiontype')
-	//			});
-	//		});
+		//		let title, messages;
 
-	//		jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
-	//	}
-	//}
+		//		if (typeof exception === 'object' && 'error' in exception) {
+		//			title = exception.error.title;
+		//			messages = exception.error.messages;
+		//		}
+		//		else {
+		//			messages = [<?//= json_encode(_('Unexpected server error.')) ?>//];
+		//		}
 
+		//		const message_box = makeMessageBox('bad', messages, title)[0];
 
+		//		this.form.parentNode.insertBefore(message_box, this.form);
+		//	})
+		//	.finally(() => {
+		//		this.overlay.unsetLoading();
+		//	});
+	}
+
+	processTypeOfCalculation() {
+		var show_formula = (this.row_count == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
+			$labels = jQuery('#conditionTable .label');
+
+		jQuery('#evaltype').toggle(this.row_count > 1);
+		jQuery('#label-evaltype').toggle(this.row_count > 1);
+		jQuery('#formula').toggle(this.row_count > 1);
+
+		// if (this.row_count > 1) {
+		//	var conditions = [];
+
+		//	$labels.each(function(index, label) {
+		//		$label = jQuery(label);
+
+		//		conditions.push({
+		//			id: $label.data('formulaid'),
+		//			type: $label.data('conditiontype')
+		//		});
+		//	});
+
+		//	jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
+		//}
+	}
 }

@@ -34,9 +34,7 @@ $form = (new CForm())
 	->setId('action-form')
 	->addVar('actionid', $data['actionid']?:null)
 	->addVar('eventsource', $data['eventsource'])
-	->addStyle('display: none;')
-	//->addItem(getMessages())
-	->addItem((new CInput('submit'))->addStyle('display: none;'));
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 // Action tab.
 $action_tab = (new CFormGrid())
@@ -48,34 +46,31 @@ $action_tab = (new CFormGrid())
 			->setAttribute('autofocus', 'autofocus')
 	]);
 
-//$formula = (new CTextBox('formula', $data['action']['filter']['formula'], false,
-//	DB::getFieldLength('actions', 'formula')
-//))
-//	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-//	->setId('formula')
-//	->setAttribute('placeholder', 'A or (B and C) &hellip;');
+$formula = (new CTextBox('formula', $data['action']['filter']['formula'],
+	DB::getFieldLength('actions', 'formula')
+))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setId('formula')
+	->setAttribute('placeholder', 'A or (B and C) &hellip;');
 
-//$action_tab
-//	->addItem([
-//		new CLabel(_('Type of calculation'), 'label-evaltype'),
-//		[
-//			new CFormField(
-//				(new CSelect('evaltype'))
-//					->setId('evaltype')
-//					->setFocusableElementId('label-evaltype')
-//					->setValue($data['action']['filter']['evaltype'])
-//					->addOptions(CSelect::createOptionsFromArray([
-//						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-//						CONDITION_EVAL_TYPE_AND => _('And'),
-//						CONDITION_EVAL_TYPE_OR => _('Or'),
-//						CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-//					])),
-//			),
-//			new CFormField((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)),
-//			new CFormField((new CSpan())->setId('conditionLabel'))
-//		]
-//	]);
-// todo: add formula and type of calculation when at least 2 conditions are added -> in js???
+$action_tab
+	->addItem([
+		(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('label-evaltype'),
+		[
+				(new CSelect('evaltype'))
+					->setId('evaltype')
+					->setFocusableElementId('label-evaltype')
+					->setValue($data['action']['filter']['evaltype'])
+					->addOptions(CSelect::createOptionsFromArray([
+						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+						CONDITION_EVAL_TYPE_AND => _('And'),
+						CONDITION_EVAL_TYPE_OR => _('Or'),
+						CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+					])),
+		//	new CFormField((new CSpan())->setId('conditionLabel')),
+			new CFormField($formula)
+		]
+	]);
 
 // Create condition table.
 $condition_table = (new CTable(_('No conditions defined.')))
@@ -83,8 +78,8 @@ $condition_table = (new CTable(_('No conditions defined.')))
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
 
-$i = 0;
-$row = [];
+//$i = 0;
+//$row = [];
 
 // if ($data['action']['filter']['conditions']) {
 
@@ -210,6 +205,11 @@ $operations_tab->addItem([
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 ]);
 
+if ($data['action']['operations']) {
+	$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], [$data['action']], ACTION_OPERATION);
+}
+
+
 // Recovery operations table.
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 	// Create operation table.
@@ -311,15 +311,43 @@ $form
 			'))->setOnDocumentReady()
 	);
 
-$buttons = [
-	[
-		'title' => _('Add'),
-		'class' => 'js-add',
-		'keepOpen' => true,
-		'isSubmit' => true,
-		'action' => 'action_edit_popup.submit();'
-	]
-];
+if ($data['actionid'] !== '') {
+	$buttons = [
+		[
+			'title' => _('Update'),
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'action_edit_popup.submit();'
+		],
+		[
+			'title' => _('Clone'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-action-clone']),
+			'keepOpen' => true,
+			'isSubmit' => false,
+			//'action' => 'action_edit_popup._clone();'
+		],
+		[
+			'title' => _('Delete'),
+			'confirmation' => _('Delete current action?'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-action-delete']),
+			'keepOpen' => true,
+			'isSubmit' => false,
+			//'action' => 'action_edit_popup._delete();'
+		]
+	];
+}
+else {
+	$buttons = [
+		[
+			'title' => _('Add'),
+			'class' => 'js-add',
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'action_edit_popup.submit();'
+		]
+	];
+}
+
 
 $output = [
 	'header' => _('Actions'),

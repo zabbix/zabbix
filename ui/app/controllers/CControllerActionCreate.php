@@ -207,6 +207,7 @@ class CControllerActionCreate extends CController {
 			'filter' => [
 				'conditions' => [
 					[
+						'formula' => '',
 						'conditiontype' => '3',
 						'operator' => '2',
 						'value' => 'testdata'

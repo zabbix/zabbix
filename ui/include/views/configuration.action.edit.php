@@ -137,7 +137,8 @@ $action_tab
 					])),
 			),
 			new CFormField((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)),
-			new CFormField((new CSpan())->setId('conditionLabel'))
+			new CFormField((new CSpan())->setId('conditionLabel')),
+			$formula
 		]
 ]);
 $condition_table->addItem([

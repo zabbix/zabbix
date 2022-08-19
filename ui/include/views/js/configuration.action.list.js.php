@@ -60,7 +60,8 @@
 		openActionPopup(parameters = {}) {
 			return PopUp('popup.action.edit', parameters, {
 				dialogueid: 'action-edit',
-				dialogue_class: 'modal-popup-large'
+				dialogue_class: 'modal-popup-large',
+				name: ''
 			});
 		}
 	};
