@@ -382,6 +382,7 @@ class CUserGroup extends CApiService {
 		if ($names) {
 			$this->checkDuplicates($names);
 		}
+		$this->checkIfBelongsToProvisionGroup($usrgrps);
 		$this->checkUsers($usrgrps);
 		$this->checkHimself($usrgrps, __FUNCTION__, $db_usrgrps);
 		$this->checkUsersWithoutGroups($usrgrps);
@@ -407,6 +408,43 @@ class CUserGroup extends CApiService {
 
 		if ($db_usrgrps) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%1$s" already exists.', $db_usrgrps[0]['name']));
+		}
+	}
+
+	/**
+	 * Check if user group is not linked to user directories.
+	 *
+	 * @param array  $usrgrps
+	 *
+	 * @throws APIException  if group is linked to enabled user directory.
+	 */
+	private function checkIfBelongsToProvisionGroup(array $usrgrps): void {
+		$usrgrpids = array_column(array_filter($usrgrps, function ($usrgrp) {
+			return array_key_exists('users', $usrgrp);
+		}), 'usrgrpid');
+
+		if (!$usrgrpids) {
+			return;
+		}
+
+		$db_userdirectories = API::UserDirectory()->get([
+			'output' => [],
+			'selectProvisionGroups' => ['user_groups'],
+			'filter' => [
+				'provision_status' => JIT_PROVISIONING_ENABLED
+			],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_userdirectories as $userdirectories) {
+			foreach ($userdirectories['provision_groups'] as $idpgroup) {
+				$db_usrgrpids = array_column($idpgroup['user_groups'], 'usrgrpid');
+				$provision_usrgrps = array_intersect_assoc($usrgrpids, $db_usrgrpids);
+
+				if ($provision_usrgrps) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%1$s" is used for user provisioning.', reset($provision_usrgrps)));
+				}
+			}
 		}
 	}
 
