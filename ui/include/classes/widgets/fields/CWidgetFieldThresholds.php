@@ -50,26 +50,19 @@ class CWidgetFieldThresholds extends CWidgetField {
 		$thresholds = [];
 
 		foreach ($this->getValue() as $threshold) {
-			$order_threshold = trim($threshold['threshold']);
+			$threshold['threshold'] = trim($threshold['threshold']);
 
-			if ($order_threshold !== '' && $number_parser->parse($order_threshold) == CParser::PARSE_SUCCESS) {
-				$thresholds[] = $threshold + ['order_threshold' => $number_parser->calcValue()];
+			if ($threshold['threshold'] !== ''
+					&& $number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
+				$thresholds[] = $threshold + ['value' => $number_parser->calcValue()];
 			}
 		}
 
-		if ($thresholds) {
-			CArrayHelper::sort($thresholds, ['order_threshold']);
+		CArrayHelper::sort($thresholds, ['value']);
 
-			$thresholds_sorted = [];
+		$thresholds = array_values($thresholds);
 
-			foreach ($thresholds as $threshold) {
-				unset($threshold['order_threshold']);
-
-				$thresholds_sorted[] = $threshold;
-			}
-
-			$this->setValue($thresholds_sorted);
-		}
+		$this->setValue($thresholds);
 
 		return $errors;
 	}
