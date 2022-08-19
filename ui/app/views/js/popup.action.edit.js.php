@@ -47,28 +47,32 @@ window.action_edit_popup = new class {
 			this.openConditionPopup();
 		})
 
-		document.querySelector('.js-operation-details').addEventListener('click', () => {
-			this.openOperationPopup(this.actionid, '0', '0');
-		})
+		if (document.querySelector('.js-operation-details')) {
+			document.querySelector('.js-operation-details').addEventListener('click', () => {
+				this.openOperationPopup('0', '0', this.actionid);
+			})
+		}
+		if (document.querySelector('.js-recovery-operations-create')) {
+			document.querySelector('.js-recovery-operations-create').addEventListener('click', () => {
+				this.openOperationPopup();
+			})
+		}
+		if (document.querySelector('.js-update-operations-create')) {
+			document.querySelector('.js-update-operations-create').addEventListener('click', () => {
+				this.openOperationPopup();
+			})
+		}
 
-		document.querySelector('.js-recovery-operations-create').addEventListener('click', () => {
-			this.openOperationPopup();
-		})
-
-		document.querySelector('.js-update-operations-create').addEventListener('click', () => {
-			this.openOperationPopup();
-		})
-
-		// this.dialogue.addEventListener('dialogue.submit', (e) => {
+		this.dialogue.addEventListener('condition.dialogue.submit', (e) => {
 		// todo: add multiselect title, not value
 
-		//	this.row = document.createElement('tr');
-		//	this.createRow(this.row, e.detail.inputs);
+			this.row = document.createElement('tr');
+			this.createRow(this.row, e.detail.inputs);
 
-		//	$('#conditionTable tr:last').before(this.row);
-		//	// addMessage(makeMessageBox('good', [], e.detail.title, true, false))
-		//	// processTypeOfCalculation();
-		//});
+			$('#conditionTable tr:last').before(this.row);
+			// addMessage(makeMessageBox('good', [], e.detail.title, true, false))
+			// processTypeOfCalculation();
+		});
 
 		// todo: add existing data to conditions table (for action edit)
 		/*	if (data.conditions){

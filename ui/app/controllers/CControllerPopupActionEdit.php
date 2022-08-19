@@ -25,9 +25,8 @@ class CControllerPopupActionEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' => 'in '.implode(',', [
-					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
-					EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
-					EVENT_SOURCE_SERVICE
+					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+					EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 				]),
 			'g_actionid' => 'array_id',
 			'actionid' => 'string',
@@ -70,13 +69,11 @@ class CControllerPopupActionEdit extends CController {
 			$this->action = null;
 		}
 
-
 		return true;
 
 	}
 
 	protected function doAction(): void {
-
 		$eventsource = $this->getInput('eventsource', EVENT_SOURCE_TRIGGERS);
 
 		if ($this->action !== null) {
@@ -99,7 +96,7 @@ class CControllerPopupActionEdit extends CController {
 				'actionid' => $this->getInput('actionid', ''),
 				'action' => [
 					'name' => '',
-					'esc_period' => '',
+					'esc_period' => DB::getDefault('actions', 'esc_period'),
 					'eventsource' => $eventsource,
 					'status' =>'',
 					'operations' => [],

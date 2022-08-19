@@ -25,9 +25,7 @@
  */
 
 require_once dirname(__FILE__).'/js/configuration.action.list.js.php';
-//$this->includeJsFile('popup.condition.common.js.php');
 $this->addJsFile('popup.condition.common.js');
-
 
 if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
 	$title = _('Service actions');
@@ -57,7 +55,6 @@ if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
 			->getUrl();
 		$submenu[$url] = $label;
 	}
-
 
 $widget = (new CWidget())
 	->setTitle($title)

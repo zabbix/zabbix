@@ -49,7 +49,7 @@ window.condition_popup = new class {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			const $action_edit = overlays_stack.getById('action-edit').$dialogue[0];
-			$action_edit.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			$action_edit.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
 		});
 	}
 

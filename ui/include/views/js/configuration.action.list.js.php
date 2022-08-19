@@ -24,16 +24,9 @@
  */
 ?>
 
-<!--<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">-->
-<!--	--><?//= CTagFilterFieldHelper::getTemplate() ?>
-<!--</script>-->
-
 <script>
 	const view = {
-	//	eventsource: null,
-
 		init({eventsource}) {
-			this.eventsource = eventsource;
 			document.addEventListener('click', (e) => {
 
 				if (e.target.classList.contains('js-action-create')) {

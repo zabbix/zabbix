@@ -24,14 +24,12 @@ class CControllerActionEnable extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource'=> 'in '.implode(',', [
-					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
-					EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL
+					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+					EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 				]),
 			'g_actionid' => 'array_id|required|not_empty'
 		];
-		// something else?
 
-	// TODO: fix error messaging here
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
@@ -48,31 +46,14 @@ class CControllerActionEnable extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$eventsource = $this->getInput('eventsource');
-		$check_actionids = [];
-		$check_actionids += array_fill_keys(getRequest('g_actionid'), true);
-
-		if ($check_actionids) {
-			$actions = API::Action()->get([
-				'output' => [],
-				'actionids' => array_keys($check_actionids),
-				'filter' => [
-					'eventsource' => $eventsource
-				],
-				'editable' => true
-			]);
-
-			return (count($actions) == count($check_actionids));
-		}
-
-		return false;
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS);
 	}
 
 	protected function doAction(): void {
-		$eventsource = getRequest('eventsource');
+		$eventsource = $this->getInput('eventsource');
 
-		if (hasRequest('g_actionid')) {
-			$actionids = getRequest('g_actionid', []);
+		if ($this->hasInput('g_actionid')) {
+			$actionids = $this->getInput('g_actionid', []);
 			$actions_count = count($actionids);
 			$actions = [];
 

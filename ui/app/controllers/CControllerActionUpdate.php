@@ -34,7 +34,7 @@ class CControllerActionUpdate extends CController {
 				]),
 			'name' => 'string|required|not_empty',
 			'actionid' => 'id',
-			'status' => 'in '.implode(',', [ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
+			'status' => 'in '.ACTION_STATUS_ENABLED,
 			'operations' => 'array',
 			'recovery_operations' => 'array',
 			'update_operations' => 'array',
@@ -64,7 +64,7 @@ class CControllerActionUpdate extends CController {
 	protected function doAction(): void
 	{
 		$eventsource = $this->getInput('eventsource');
-		// todo : receive data from form
+		// todo : receive conditions table and operations tables data from form
 
 //		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
 //			foreach ($action[$operation_group] as &$operation) {
@@ -182,37 +182,15 @@ class CControllerActionUpdate extends CController {
 //			$action['filter'] = $filter;
 //		}
 
-//		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-//			$action['esc_period'] = getRequest('esc_period', DB::getDefault('actions', 'esc_period'));
-//		}
-
-//		if ($eventsource == EVENT_SOURCE_TRIGGERS) {
-//			$action['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
-//			$action['notify_if_canceled'] = getRequest('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
-//		}
-
-//		switch ($eventsource) {
-//			case EVENT_SOURCE_DISCOVERY:
-//			case EVENT_SOURCE_AUTOREGISTRATION:
-//				unset($action['recovery_operations']);
-//			// break; is not missing here
-
-//			case EVENT_SOURCE_INTERNAL:
-//				unset($action['update_operations']);
-//				break;
-//		}
-
 		$action = [
 			'name' => $this->getInput('name'),
 			'actionid' => $this->getInput('actionid'),
-			'status' => $this->getInput('status'),
+			'status' => $this->hasInput('status') ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED,
 			'eventsource' => $eventsource,
-			'esc_period' => $this->getInput('esc_period'),
 			'operations' => [
 				[
 					"esc_step_from" => '1',
 					'esc_step_to' => '1',
-					'esc_period' => '0',
 					'opmessage_grp' => [
 						['usrgrpid' => '8']
 					],
@@ -237,10 +215,69 @@ class CControllerActionUpdate extends CController {
 					]
 				],
 				'evaltype' => '0'
-			],
-				'pause_suppressed' => '1',
-				'notify_if_canceled' => '1'
+			]
 		];
+
+		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
+			$action['esc_period'] = $this->getInput('esc_period', DB::getDefault('actions', 'esc_period'));
+		}
+
+		if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+			$action['pause_suppressed'] = $this->getInput('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
+			$action['notify_if_canceled'] = $this->getInput('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
+		}
+
+		if ($eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
+			// todo : remove this. this is just for testing
+			$action['filter']['conditions'][0]['conditiontype'] = '22';
+			$action['filter']['conditions'][0]['operator'] = '2';
+			$action['filter']['conditions'][0]['value'] = 'srv';
+			$action['filter']['evaltype'] = '0';
+			$action['operations'][0]['operationtype'] = '4';
+			$action['operations'][0]['opgroup'] = [['groupid' => '2']];
+			unset(
+				$action['operations'][0]['opmessage'], $action['operations'][0]['opmessage_usr'],
+				$action['operations'][0]['opmessage_grp']
+			);
+		}
+
+		if ($eventsource == EVENT_SOURCE_INTERNAL || $eventsource == EVENT_SOURCE_SERVICE ||
+				$eventsource == EVENT_SOURCE_DISCOVERY || $eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
+			// todo : remove this. this is just for testing
+			unset ($action['operations'][0]['evaltype'], $action['operations'][0]['opconditions']);
+		}
+
+		if ($eventsource == EVENT_SOURCE_DISCOVERY) {
+			// todo : remove this. this is just for testing
+			$action['filter']['conditions'][0]['conditiontype'] = '21';
+			$action['filter']['conditions'][0]['operator'] = '0';
+			$action['filter']['conditions'][0]['value'] = 1;
+			unset ($action['operations'][0]['esc_step_from'], $action['operations'][0]['esc_step_to']);
+		}
+
+		if ($eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
+			// todo : remove this. this is just for testing
+			unset ($action['operations'][0]['esc_step_from'], $action['operations'][0]['esc_step_to']);
+		}
+
+		if ($eventsource == EVENT_SOURCE_INTERNAL || $eventsource == EVENT_SOURCE_SERVICE) {
+			// todo : remove this. this is just for testing
+			$action['filter']['conditions'][0]['conditiontype'] = '26';
+			$action['filter']['conditions'][0]['operator'] = '0';
+			$action['filter']['conditions'][0]['value'] = 'test';
+			$action['filter']['conditions'][0]['value2'] = 'test2';
+		}
+
+		switch ($eventsource) {
+			case EVENT_SOURCE_DISCOVERY:
+			case EVENT_SOURCE_AUTOREGISTRATION:
+				unset($action['recovery_operations']);
+			// break; is not missing here
+
+			case EVENT_SOURCE_INTERNAL:
+				unset($action['update_operations']);
+				break;
+		}
 
 		DBstart();
 

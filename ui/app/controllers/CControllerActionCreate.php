@@ -33,11 +33,11 @@ class CControllerActionCreate extends CController {
 				EVENT_SOURCE_INTERNAL,EVENT_SOURCE_SERVICE
 			]),
 			'name' => 'string|required|not_empty',
-			'status' => 'in '.implode(',', [ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
+			'status' => 'in '.ACTION_STATUS_ENABLED,
 			'operations' => 'array',
 			'recovery_operations' => 'array',
 			'update_operations' => 'array',
-			'esc_period' => '',
+			'esc_period' => 'string|not_empty',
 			'filter' => 'array'
 		];
 
@@ -61,9 +61,9 @@ class CControllerActionCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$eventsource = 0;
-		// todo : receive data from form
+		$eventsource = $this->getInput('eventsource');
 
+		// todo : receive conditions table and operations tables data from form
 //		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
 //			foreach ($action[$operation_group] as &$operation) {
 //				if ($operation_group === 'operations') {
@@ -180,37 +180,15 @@ class CControllerActionCreate extends CController {
 //			$action['filter'] = $filter;
 //		}
 
-//		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-//			$action['esc_period'] = getRequest('esc_period', DB::getDefault('actions', 'esc_period'));
-//		}
 
-//		if ($eventsource == EVENT_SOURCE_TRIGGERS) {
-//			$action['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
-//			$action['notify_if_canceled'] = getRequest('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
-//		}
-
-//		switch ($eventsource) {
-//			case EVENT_SOURCE_DISCOVERY:
-//			case EVENT_SOURCE_AUTOREGISTRATION:
-//				unset($action['recovery_operations']);
-//			// break; is not missing here
-
-//			case EVENT_SOURCE_INTERNAL:
-//				unset($action['update_operations']);
-//				break;
-//		}
-
-		// pass fake data to test if create functionality works
 		$action = [
 			'name' => $this->getInput('name'),
-			'status' => $this->getInput('status'),
+			'status' => $this->hasInput('status') ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED,
 			'eventsource' => $this->getInput('eventsource'),
-			'esc_period' => $this->getInput('esc_period', '1h'),
 			'operations' => [
 				[
 					"esc_step_from" => '1',
 					'esc_step_to' => '1',
-					'esc_period' => '0',
 					'opmessage_grp' => [
 						['usrgrpid' => '8']
 					],
@@ -235,30 +213,76 @@ class CControllerActionCreate extends CController {
 					]
 				],
 				'evaltype' => '0'
-			],
-				'pause_suppressed' => '1',
-				'notify_if_canceled' => '1'
+			]
 		];
+
+		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
+			$action['esc_period'] = $this->getInput('esc_period', DB::getDefault('actions', 'esc_period'));
+		}
+
+		if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+			$action['pause_suppressed'] = $this->getInput('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
+			$action['notify_if_canceled'] = $this->getInput('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
+		}
+
+		if ($eventsource == EVENT_SOURCE_DISCOVERY || $eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
+			// todo : remove this. this is just for testing
+			unset($action['esc_period'], $action['operations'][0]['esc_step_from'],
+				$action['operations'][0]['esc_step_to'], $action['operations'][0]['evaltype'],
+				$action['operations'][0]['opconditions']
+			);
+		}
+
+		if ($eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
+			// todo : remove this. this is just for testing
+			$action['filter']['conditions'][0]['conditiontype'] = '22';
+			$action['filter']['conditions'][0]['operator'] = '2';
+			$action['filter']['conditions'][0]['value'] = 'srv';
+			$action['filter']['evaltype'] = '0';
+			$action['operations'][0]['operationtype'] = '4';
+			$action['operations'][0]['opgroup'] = [['groupid' => '2']];
+			unset(
+				$action['operations'][0]['opmessage'], $action['operations'][0]['opmessage_usr'],
+				$action['operations'][0]['opmessage_grp']
+			);
+		}
+
+		if ($eventsource == EVENT_SOURCE_INTERNAL || $eventsource == EVENT_SOURCE_SERVICE) {
+			// todo : remove this. this is just for testing
+			unset ($action['operations'][0]['evaltype'], $action['operations'][0]['opconditions']);
+		}
+
+		if ($eventsource == EVENT_SOURCE_DISCOVERY) {
+			// todo : remove this. this is just for testing
+			$action['filter']['conditions'][0]['conditiontype'] = '21';
+			$action['filter']['conditions'][0]['operator'] = '0';
+			$action['filter']['conditions'][0]['value'] = 1;
+		}
+
+		if ($eventsource == EVENT_SOURCE_INTERNAL || $eventsource == EVENT_SOURCE_SERVICE) {
+			// todo : remove this. this is just for testing
+			$action['filter']['conditions'][0]['conditiontype'] = '26';
+			$action['filter']['conditions'][0]['operator'] = '0';
+			$action['filter']['conditions'][0]['value'] = 'test';
+			$action['filter']['conditions'][0]['value2'] = 'test2';
+		}
+
+		switch ($eventsource) {
+			case EVENT_SOURCE_DISCOVERY:
+			case EVENT_SOURCE_AUTOREGISTRATION:
+				unset($action['recovery_operations']);
+			// break; is not missing here
+
+			case EVENT_SOURCE_INTERNAL:
+				unset($action['update_operations']);
+				break;
+		}
 
 		DBstart();
 
 		$result = API::Action()->create($action);
 
-		$messageSuccess = _('Action added');
-		$messageFailed = _('Cannot add action');
-
-//		if ($result) {
-//			unset($_REQUEST['form']);
-//		}
-
-	//	DBend($result);
 		$result = DBend($result);
-
-//		if ($result) {
-//			uncheckTableRows($eventsource);
-//		}
-
-	//	show_messages($result, $messageSuccess, $messageFailed);
 
 		if ($result) {
 			$output['success']['title'] = _('Action added');
