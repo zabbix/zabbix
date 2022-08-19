@@ -53,7 +53,7 @@ if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
-if ($data['userdirectoryid'] !== 0) {
+if ($data['readonly'] == true) {
 	CMessageHelper::addWarning("This user is IdP provisioned, manual changes for provisioned fields are not allowed");
 	show_messages();
 }

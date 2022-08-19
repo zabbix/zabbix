@@ -126,7 +126,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['username'] = $this->user['username'];
 			$data['name'] = $this->user['name'];
 			$data['surname'] = $this->user['surname'];
-			$user_groups = zbx_objectValues($this->user['usrgrps'], 'usrgrpid');
+			$user_groups = array_column($this->user['usrgrps'], 'usrgrpid');
 			$data['change_password'] = $this->hasInput('change_password') || $this->hasInput('password1');
 			$data['password1'] = '';
 			$data['password2'] = '';
@@ -248,13 +248,9 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		]);
 
 		$data['readonly'] = false;
-		$this->user['userdirectoryid'] = 1; 			// TODO: delete, when API is finalized.
 		$data['userdirectoryid'] = $this->user['userdirectoryid'];
-		if ($this->user['userdirectoryid'] !== 0) {
-			$data['idp_type'] = API::UserDirectory()->get([
-				'output' => ['idp_type'],
-				'userdirectoryids' => $this->user['userdirectoryid']
-			]);
+
+		if ($this->user['userdirectoryid'] != 0) {
 			$data['readonly'] = true;
 		}
 
