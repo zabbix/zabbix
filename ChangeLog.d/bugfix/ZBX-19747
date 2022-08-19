@@ -1,0 +1,1 @@
+A......... [ZBX-19747] fixed inability to delete a template that have an item prototype with valuemap, if such is linked to host and discovered item was created (vmaksimovs)
