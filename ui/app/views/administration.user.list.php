@@ -37,18 +37,7 @@ $widget = (new CWidget())
 			->cleanItems()
 			->setName('main_filter')
 			->setAttribute('aria-label', _('Main filter'))
-			->addItem((new CVar('action', 'user.list'))->removeId())
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('User group'), 'label-filter-usrgrpid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					(new CSelect('filter_usrgrpid'))
-						->setId('filter-usrgrpid')
-						->setValue($data['filter_usrgrpid'])
-						->setFocusableElementId('label-filter-usrgrpid')
-						->addOptions(CSelect::createOptionsFromArray($data['user_groups']))
-				])
-			),
+			->addItem((new CVar('action', 'user.list'))->removeId()),
 			(new CTag('nav', true,
 				(new CList())
 					->addItem(new CRedirectButton(_('Create user'), 'zabbix.php?action=user.edit'))
@@ -60,32 +49,58 @@ $widget = (new CWidget())
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Username'),
+			(new CFormGrid())->addItem([_('Username'),
 				(new CTextBox('filter_username', $data['filter']['username']))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
-			),
-			(new CFormList())->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			),
-			(new CFormList())->addRow(_('Last name'),
-				(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			),
-			(new CFormList())->addRow((new CLabel(_('User roles'), 'filter_roles__ms')),
-				(new CMultiSelect([
-					'name' => 'filter_roles[]',
-					'object_name' => 'roles',
-					'data' => $data['filter']['roles'],
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'roles',
-							'srcfld1' => 'roleid',
-							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_roles_'
+			])
+				->addItem([_('Name'),
+					(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				])
+				->addItem([_('Last name'),
+					(new CTextBox('filter_surname', $data['filter']['surname']))
+						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				]),
+			(new CFormGrid())
+				->addItem([(new CLabel(_('User roles'), 'filter_roles__ms')),
+					(new CMultiSelect([
+						'name' => 'filter_roles[]',
+						'object_name' => 'roles',
+						'data' => $data['filter']['roles'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'roles',
+								'srcfld1' => 'roleid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_roles_'
+							]
 						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
+					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				])
+				->addItem([(new CLabel(_('User groups'), 'filter_usrgrpids__ms')),
+					(new CMultiSelect([
+						'name' => 'filter_usrgrpids[]',
+						'object_name' => 'usersGroups',
+						'data' => $data['filter']['usrgrpids'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'usrgrp',
+								'srcfld1' => 'usrgrpid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_usrgrpids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				])
+				->addItem([
+					new CLabel(_('Source '), 'filter_source'),
+					(new CSelect('filter_source'))
+						->setId('filter-source')
+						->setValue($data['filter']['source'])
+						->setFocusableElementId('filter_source')
+						->addOptions(CSelect::createOptionsFromArray($data['source']))
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				])
 		])
 		->addVar('action', 'user.list')
 	);
@@ -114,7 +129,8 @@ $table = (new CTableInfo())
 		_('Frontend access'),
 		_('API access'),
 		_('Debug mode'),
-		_('Status')
+		_('Status'),
+		_('Source')
 	]);
 
 foreach ($data['users'] as $user) {
@@ -221,9 +237,20 @@ foreach ($data['users'] as $user) {
 		}
 	}
 
+	$data_action = null;
+
+	if ($user['source'] === _('LDAP')) {
+		$data_action = 'ldap';
+	}
+
+	$checkbox = new CCheckBox('userids['.$userid.']', $userid);
+	if ($data_action != null) {
+		$checkbox->setAttribute('data-actions', $data_action);
+	}
+
 	// Append user to table.
 	$table->addRow([
-		new CCheckBox('userids['.$userid.']', $userid),
+		$checkbox,
 		(new CCol($username))->addClass(ZBX_STYLE_NOWRAP),
 		$user['name'],
 		$user['surname'],
@@ -238,7 +265,8 @@ foreach ($data['users'] as $user) {
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_GREEN),
 		($user['users_status'] == GROUP_STATUS_DISABLED)
 			? (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED)
-			: (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
+			: (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN),
+		$user['source']
 	]);
 }
 
@@ -247,6 +275,8 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'userids', [
+		'user.provision' => ['name' => _('Provision now'), 'attributes' => ['data-required' => 'ldap'],
+			'confirm' => _('Provision selected LDAP users?')],
 		'user.unblock' => ['name' => _('Unblock'), 'confirm' => _('Unblock selected users?')],
 		'user.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected users?')]
 	], 'user')

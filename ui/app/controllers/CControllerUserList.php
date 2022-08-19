@@ -32,11 +32,12 @@ class CControllerUserList extends CController {
 			'uncheck' =>			'in 1',
 			'filter_set' =>			'in 1',
 			'filter_rst' =>			'in 1',
-			'filter_usrgrpid' =>	'db usrgrp.usrgrpid',
 			'filter_username' =>	'string',
 			'filter_name' =>		'string',
 			'filter_surname' =>		'string',
 			'filter_roles' =>		'array_id',
+			'filter_usrgrpids'=>	'array_id',
+			'filter_source' =>		'id',
 			'page' =>				'ge 1'
 		];
 
@@ -54,9 +55,6 @@ class CControllerUserList extends CController {
 	}
 
 	protected function doAction() {
-		$filter_usrgrpid = $this->getInput('filter_usrgrpid', CProfile::get('web.user.filter.usrgrpid', 0));
-		CProfile::update('web.user.filter.usrgrpid', $filter_usrgrpid, PROFILE_TYPE_ID);
-
 		$sortfield = $this->getInput('sort', CProfile::get('web.user.sort', 'username'));
 		$sortorder = $this->getInput('sortorder', CProfile::get('web.user.sortorder', ZBX_SORT_UP));
 		CProfile::update('web.user.sort', $sortfield, PROFILE_TYPE_STR);
@@ -67,19 +65,27 @@ class CControllerUserList extends CController {
 			CProfile::update('web.user.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.user.filter_surname', $this->getInput('filter_surname', ''), PROFILE_TYPE_STR);
 			CProfile::updateArray('web.user.filter_roles', $this->getInput('filter_roles', []), PROFILE_TYPE_ID);
+			CProfile::updateArray('web.user.filter_usrgrpids', $this->getInput('filter_usrgrpids', []),
+				PROFILE_TYPE_ID
+			);
+			CProfile::update('web.user.filter_source', $this->getInput('filter_source', ''), PROFILE_TYPE_STR);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.user.filter_username');
 			CProfile::delete('web.user.filter_name');
 			CProfile::delete('web.user.filter_surname');
 			CProfile::deleteIdx('web.user.filter_roles');
+			CProfile::deleteIdx('web.user.filter_usrgrpids');
+			CProfile::delete('web.user.filter_source');
 		}
 
 		$filter = [
 			'username' => CProfile::get('web.user.filter_username', ''),
 			'name' => CProfile::get('web.user.filter_name', ''),
 			'surname' => CProfile::get('web.user.filter_surname', ''),
-			'roles' => CProfile::getArray('web.user.filter_roles', [])
+			'roles' => CProfile::getArray('web.user.filter_roles', []),
+			'usrgrpids' => CProfile::getArray('web.user.filter_usrgrpids', []),
+			'source' => CProfile::get('web.user.filter_source', '')
 		];
 
 		$data = [
@@ -89,11 +95,6 @@ class CControllerUserList extends CController {
 			'filter' => $filter,
 			'profileIdx' => 'web.user.filter',
 			'active_tab' => CProfile::get('web.user.filter.active', 1),
-			'user_groups' => API::UserGroup()->get([
-				'output' => ['name'],
-				'preservekeys' => true
-			]),
-			'filter_usrgrpid' => $filter_usrgrpid,
 			'sessions' => [],
 			'allowed_ui_user_groups' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS)
 		];
@@ -105,16 +106,20 @@ class CControllerUserList extends CController {
 			]), ['roleid' => 'id'])
 			: [];
 
-		CArrayHelper::sort($data['user_groups'], ['name']);
+		$data['filter']['usrgrpids'] = $filter['usrgrpids']
+			? CArrayHelper::renameObjectsKeys(API::UserGroup()->get([
+				'output' => ['usrgrpid', 'name'],
+				'usrgrpids' => $filter['usrgrpids']
+			]), ['usrgrpid' => 'id'])
+			: [];
 
-		foreach ($data['user_groups'] as $usrgrpid => $usrgrp) {
-			$data['user_groups'][$usrgrpid] = $usrgrp['name'];
-		}
-		$data['user_groups'] = [0 => _('All')] + $data['user_groups'];
+		$data['source'] = [_('All'), _('Internal'), _('LDAP'), _('SAML')];
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['users'] = API::User()->get([
-			'output' => ['userid', 'username', 'name', 'surname', 'autologout', 'attempt_failed', 'roleid'],
+			'output' => ['userid', 'username', 'name', 'surname', 'autologout', 'attempt_failed', 'roleid',
+				'userdirectoryid'
+			],
 			'selectUsrgrps' => ['name', 'gui_access', 'users_status'],
 			'selectRole' => ['name'],
 			'search' => [
@@ -125,15 +130,39 @@ class CControllerUserList extends CController {
 			'filter' => [
 				'roleid' => ($filter['roles'] == -1) ? null : $filter['roles']
 			],
-			'usrgrpids' => ($filter_usrgrpid == 0) ? null : $filter_usrgrpid,
+			'usrgrpids' => ($filter['usrgrpids'] == []) ? null : $filter['usrgrpids'],
 			'getAccess' => true,
 			'limit' => $limit
 		]);
 
 		foreach ($data['users'] as &$user) {
 			$user['role_name'] = $user['role']['name'];
+
+			if ($user['userdirectoryid'] == 0) {
+				$user['source'] = _('Internal');
+			}
+			else {
+				$idp_type = API::UserDirectory()->get([
+					'output' => ['idp_type'],
+					'userdirectoryids' => $user['userdirectoryid']
+				]);
+
+				if ($idp_type[0]['idp_type'] == 1) {
+					$user['source'] = _('LDAP');
+				}
+				else {
+					$user['source'] = _('SAML');
+				}
+			}
 		}
 		unset($user);
+
+		if ($filter['source'] != 0) {
+			$filter_source_name = $data['source'][$filter['source']];
+			$data['users'] = array_filter($data['users'], function ($user) use ($filter_source_name) {
+				return ($user['source'] === $filter_source_name);
+			});
+		}
 
 		// data sort and pager
 		CArrayHelper::sort($data['users'], [['field' => $sortfield, 'order' => $sortorder]]);
@@ -152,7 +181,7 @@ class CControllerUserList extends CController {
 		$db_sessions = DBselect(
 			'SELECT s.userid,MAX(s.lastaccess) AS lastaccess,s.status'.
 			' FROM sessions s'.
-			' WHERE '.dbConditionInt('s.userid', zbx_objectValues($data['users'], 'userid')).
+			' WHERE '.dbConditionInt('s.userid', array_column($data['users'], 'userid')).
 			' GROUP BY s.userid,s.status'
 		);
 		while ($db_session = DBfetch($db_sessions)) {
