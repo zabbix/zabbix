@@ -49,6 +49,25 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	protected static $time;
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
+	/**
+	 * Get all dashboard related tables hash values.
+	 */
+	public static function getHash() {
+		return CDBHelper::getHash('SELECT * FROM events') .
+				CDBHelper::getHash('SELECT * FROM problem').
+				CDBHelper::getHash('SELECT * FROM triggers').
+				CDBHelper::getHash('SELECT * FROM event_suppress');
+	}
+
 	public function prepareProblemsData() {
 		// Create hostgroup for hosts with items triggers.
 		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for Problems Update']]);
@@ -186,7 +205,8 @@ class testFormUpdateProblem extends CWebTest {
 								'Status change triggers action update operation.'
 					],
 					'history' => [],
-					'Acknowledge' => true
+					'Acknowledge' => true,
+					'check_suppress' => true
 				]
 			],
 			[
@@ -332,7 +352,7 @@ class testFormUpdateProblem extends CWebTest {
 			'id:severity' => ['value' => 'Not classified', 'enabled' => false],
 			'id:suppress_problem' => ['value' => false, 'enabled' => true],
 			'id:suppress_time_option' => ['value' => 'Until', 'enabled' => false],
-			'id:suppress_until_problem' => ['maxlength' => 19, 'value' => 'now+1d', 'enabled' => false],
+			'id:suppress_until_problem' => ['maxlength' => 19, 'value' => 'now+1d', 'enabled' => false, 'placeholder' => 'now+1d'],
 			'id:unsuppress_problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'unsuppress_enabled', false)],
 			'Close problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'close_enabled', false)]
 		];
@@ -349,6 +369,10 @@ class testFormUpdateProblem extends CWebTest {
 			if (array_key_exists('maxlength', $attributes)) {
 				$this->assertEquals($attributes['maxlength'], $form->getField($field)->getAttribute('maxlength'));
 			}
+
+			if (array_key_exists('placeholder', $attributes)) {
+				$this->assertEquals($attributes['placeholder'], $form->getField($field)->getAttribute('placeholder'));
+			}
 		}
 
 		// Check default values for 'Acknowledge' and  'Unacknowledge' fileds.
@@ -357,6 +381,21 @@ class testFormUpdateProblem extends CWebTest {
 				$field = $form->getField($label);
 				$this->assertEquals(false, $field->getValue());
 				$this->assertTrue($field->isEnabled());
+			}
+		}
+
+		// Check Suppress and Unsuppress checkboxes editability.
+		if (CTestArrayHelper::get($data, 'unsuppress_enabled')) {
+			$suppress_combinations = [
+				['id:suppress_problem', 'id:unsuppress_problem'],
+				['id:unsuppress_problem', 'id:suppress_problem']
+			];
+
+			foreach ($suppress_combinations as $checkboxes) {
+				foreach ([true, false] as $state) {
+					$form->fill([$checkboxes[0] => $state]);
+					$this->assertTrue($form->getField($checkboxes[1])->isEnabled(!$state));
+				}
 			}
 		}
 
@@ -373,6 +412,308 @@ class testFormUpdateProblem extends CWebTest {
 			$this->assertEquals($clickable, $dialog->query($query)->one()->isClickable());
 		}
 
+		// Check Suppress field.
+		if (CTestArrayHelper::get($data, 'check_suppress')) {
+			$form->fill(['id:suppress_problem' => true]);
+
+			// Check Until field is enabled.
+			$this->assertTrue($form->getField('id:suppress_time_option')->isEnabled());
+			$this->assertTrue($form->getField('id:suppress_until_problem')->isEnabled());
+
+
+			// Check calendar.
+			$calendar = $form->query('xpath:.//button[@id="suppress_until_problem_calendar"]')->one();
+			$calendar->waitUntilClickable()->click();
+			$calendar_overlay = $this->query('xpath://div[@aria-label="Calendar"]');
+			$this->assertTrue($calendar_overlay->exists());
+			$calendar->click();
+			$this->assertFalse($calendar_overlay->exists());
+
+			// Check Until field is disabled.
+			$form->fill(['id:suppress_time_option' => 'Indefinitely']);
+			$this->assertFalse($form->getField('id:suppress_until_problem')->isEnabled());
+			$this->assertEquals(false, $calendar->isClickable());
+		}
+
+		// Check Suppress/Unsuppress fields depending on Close problem checkbox.
+		if (CTestArrayHelper::get($data, 'close_enabled') && CTestArrayHelper::get($data, 'unsuppress_enabled')) {
+			foreach ([true, false] as $state) {
+				$form->fill(['id:close_problem' => $state]);
+				$this->assertFalse($form->getField('id:suppress_problem')->isEnabled($state));
+				$this->assertFalse($form->getField('id:unsuppress_problem')->isEnabled($state));
+			}
+		}
+
+		// Check asterisk text.
+		$this->assertTrue($form->query('xpath://label[@class="form-label-asterisk" and '.
+				'text()="At least one update operation or message must exist."]')->exists()
+		);
+
 		$dialog->close();
+	}
+
+	public function getFormData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'problems' => ['Trigger for float'],
+					'fields' => [
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => '2020-08-01 00:00:00'
+					],
+					'error' => 'Incorrect value for field "Suppress": invalid time.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'problems' => ['Trigger for float', 'Trigger for log'],
+					'fields' => [
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => '2040-08-01'
+					],
+					'error' => 'Incorrect value for field "Suppress": invalid time.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'problems' => ['Trigger for text'],
+					'fields' => [
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => '2040-08-01 00:00:00'
+					],
+					'error' => 'Incorrect value for field "Suppress": invalid time.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'problems' => ['Trigger for float', 'Trigger for log'],
+					'fields' => [
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => '2040-08-01 00:00:00'
+					],
+					'error' => 'Incorrect value for field "Suppress": invalid time.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'problems' => ['Trigger for text'],
+					'fields' => [
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => '00:00:00'
+					],
+					'error' => 'Incorrect value for field "suppress_until_problem": a time is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'problems' => ['Trigger for text'],
+					'fields' => [
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => 'now+16y'
+					],
+					'error' => 'Incorrect value for field "Suppress": invalid time.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'problems' => ['Trigger for text'],
+					'fields' => [
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => 'now-1d'
+					],
+					'error' => 'Incorrect value for field "Suppress": invalid time.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'problems' => ['Trigger for text'],
+					'fields' => [
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => '-3d'
+					],
+					'error' => 'Incorrect value for field "suppress_until_problem": a time is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'problems' => ['Trigger for char'],
+					'fields' => [
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => 'text'
+					],
+					'error' => 'Incorrect value for field "suppress_until_problem": a time is expected.'
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for float'],
+					'fields' => [
+						'id:message' => 'test message text',
+						'id:change_severity' => true,
+						'id:severity' => 'Warning',
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Indefinitely',
+						'Acknowledge' => true
+					]
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for text', 'Trigger for log'],
+					'fields' => [
+						'id:change_severity' => true,
+						'id:severity' => 'Not classified',
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => 'now+30s'
+					]
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for unsigned', 'Trigger for char', 'Trigger for float'],
+					'fields' => [
+						'id:change_severity' => true,
+						'id:severity' => 'Information',
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => 'now+2h'
+					]
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for char'],
+					'fields' => [
+						'id:change_severity' => true,
+						'id:severity' => 'Average',
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => 'now+3d'
+					]
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for unsigned'],
+					'fields' => [
+						'id:change_severity' => true,
+						'id:severity' => 'High',
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => 'now+15y'
+					]
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for log'],
+					'fields' => [
+						'id:change_severity' => true,
+						'id:severity' => 'Disaster',
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => 'now+18w'
+					]
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for text', 'Trigger for log'],
+					'fields' => [
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => 'now+9M'
+					]
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for text'],
+					'fields' => [
+						'id:unsuppress_problem' => true
+					]
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for unsigned'],
+					'fields' => [
+						'Unacknowledge' => true
+					]
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for char'],
+					'fields' => [
+						'Close problem' => true
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getFormData
+	 */
+	public function testFormUpdateProblem_Form($data) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = $this->getHash();
+		}
+
+		// Open filtered Problems list.
+		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		$count = count($data['problems']);
+		$table->findRows('Problem', $data['problems']);
+
+		if ($count > 1) {
+			$table->findRows('Problem', $data['problems'])->select();
+			$this->query('button:Mass update')->waitUntilClickable()->one()->click();
+		}
+		else {
+			$table->findRow('Problem', $data['problems'][0])->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		}
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
+		$form->fill($data['fields']);
+
+		$form->submit();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertTrue($dialog->isVisible());
+			$this->assertMessage(TEST_BAD, null, $data['error']);
+			$this->assertEquals($old_hash, $this->getHash());
+			$dialog->close();
+		}
+		else {
+			$dialog->waitUntilNotPresent();
+			$this->page->waitUntilReady();
+			$this->page->assertHeader('Problems');
+
+			$message = ($count > 1) ? 'Events updated' : 'Event updated';
+			$this->assertMessage(TEST_GOOD, $message);
+		}
 	}
 }
