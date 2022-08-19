@@ -184,9 +184,9 @@ class testFormUpdateProblem extends CWebTest {
 						'Unsuppress' => 'Deactivates manual suppression.',
 						'Acknowledge' => 'Confirms the problem is noticed (acknowledging user will be recorded). '.
 								'Status change triggers action update operation.'
-					]
-				],
-				'history' => []
+					],
+					'history' => []
+				]
 			],
 			[
 				[
