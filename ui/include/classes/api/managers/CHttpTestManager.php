@@ -214,7 +214,7 @@ class CHttpTestManager {
 			'SELECT hi.httptestid,hi.itemid,hi.type AS test_type,i.name,i.key_,i.status,i.delay,i.templateid'.
 			' FROM httptestitem hi,items i'.
 			' WHERE hi.itemid=i.itemid'.
-				' AND '.dbConditionId('hi.httptestid', [$httptest['httptestid']])
+				' AND '.dbConditionId('hi.httptestid', $httptestids)
 		);
 
 		while ($row = DBfetch($result)) {
@@ -1685,7 +1685,6 @@ class CHttpTestManager {
 
 			if (isset($exSteps[$stepName])) {
 				$step['httpstepid'] = $exSteps[$stepName];
-				$step['httptestid'] = $exHttpTestId;
 			}
 			else {
 				unset($step['httpstepid']);
