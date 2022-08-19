@@ -619,10 +619,11 @@ abstract class CHostGeneral extends CHostBase {
 
 				if ($item['valuemapid'] !== '0') {
 					$upd_item['valuemapid'] = '0';
-					$parent_itemids[] = $item['itemid'];
 
-					if (in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
-							&& $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
+						$parent_itemids[] = $item['itemid'];
+					}
+					elseif ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$item_prototypeids[] = $item['itemid'];
 					}
 				}
@@ -691,23 +692,21 @@ abstract class CHostGeneral extends CHostBase {
 				}
 
 				if ($item_prototypeids) {
-					$result = DBselect(
-						'SELECT id.itemid,i.name,i.valuemapid'.
-						' FROM item_discovery id,items i'.
-						' WHERE id.itemid=i.itemid'.
-							' AND '.dbConditionId('id.parent_itemid', $item_prototypeids).
-						' ORDER BY id.itemid DESC'
-					);
+					$options = [
+						'output' => ['itemid'],
+						'filter' => ['parent_itemid' => $item_prototypeids],
+						'sortfield' => ['itemid'],
+						'sortorder' => [ZBX_SORT_DOWN]
+					];
+					$result = DBselect(DB::makeSql('item_discovery', $options));
 
 					$upd_discovered_items = [];
 
 					while ($row = DBfetch($result)) {
-						if ($row['valuemapid'] !== '0') {
-							$upd_discovered_items[] = [
-								'values' => ['valuemapid' => '0'],
-								'where' => ['itemid' => $row['itemid']]
-							];
-						}
+						$upd_discovered_items[] = [
+							'values' => ['valuemapid' => '0'],
+							'where' => ['itemid' => $row['itemid']]
+						];
 					}
 
 					if ($upd_discovered_items) {
@@ -1353,23 +1352,21 @@ abstract class CHostGeneral extends CHostBase {
 				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 
 				if ($item_prototypeids) {
-					$result = DBselect(
-						'SELECT id.itemid,i.name,i.valuemapid'.
-						' FROM item_discovery id,items i'.
-						' WHERE id.itemid=i.itemid'.
-							' AND '.dbConditionId('id.parent_itemid', $item_prototypeids).
-						' ORDER BY id.itemid DESC'
-					);
+					$options = [
+						'output' => ['itemid'],
+						'filter' => ['parent_itemid' => $item_prototypeids],
+						'sortfield' => ['itemid'],
+						'sortorder' => [ZBX_SORT_DOWN]
+					];
+					$result = DBselect(DB::makeSql('item_discovery', $options));
 
 					$upd_discovered_items = [];
 
 					while ($row = DBfetch($result)) {
-						if ($row['valuemapid'] !== '0') {
-							$upd_discovered_items[] = [
-								'values' => ['valuemapid' => '0'],
-								'where' => ['itemid' => $row['itemid']]
-							];
-						}
+						$upd_discovered_items[] = [
+							'values' => ['valuemapid' => '0'],
+							'where' => ['itemid' => $row['itemid']]
+						];
 					}
 
 					if ($upd_discovered_items) {
