@@ -1,11 +1,30 @@
 Changes for 6.2.2rc1
 
 New features:
+.........T [ZBXNEXT-7520] added template for OPNsense (drasihov)
 .........T [ZBXNEXT-7834] added templates for Microsoft Azure and Azure virtual machines (vkhaliev)
 .........T [ZBXNEXT-7792] added template AWS RDS instance by HTTP (ychukina)
 .........T [ZBXNEXT-7819] added template AWS S3 bucket by HTTP (ychukina)
 
 Bug fixes:
+..F....... [ZBX-20920] fixed problem of empty psk fields sent to audit log when any proxy parameter is updated (dpetra)
+..F....... [ZBX-21342] fixed sessionStorage not being updated when deleting services (rdetlavs)
+..F....... [ZBX-20809] fixed problem with stuck widget action popovers (dpetra)
+A......... [ZBX-19747] fixed inability to delete a template containing an item prototype with a valuemap, if the template is linked to a host and the discovered item was created (vmaksimovs)
+...G...... [ZBX-21328] fixed Zabbix agent 2 log and eventlog items behavior to match Zabbix agent when key has been updated (vso)
+...G...PS. [ZBX-21445] improved performance by only calling res_init() on changed resolv.conf if glibc lower than 2.26 is used (vso)
+...G...... [ZBX-21234] fixed net.dns to return 0 when server is unreachable in Zabbix agent 2 (esneiders)
+.......PS. [ZBX-21440] fixed setting of character set for MySQL and MariaDB when utf8 is missing while utf8mb4 is present (vso)
+........S. [ZBX-21436] fixed preprocessing not working after unassigning host from proxy (wiper)
+.......PS. [ZBX-21430] fixed item rescheduling after reenabling host or unassigning host from proxy (wiper)
+.........T [ZBX-21455] fixed trigger for uptime in "Proxmox VE by HTTP" template (egordymov)
+.........T [ZBX-15984] added hardware uptime in SNMP templates (drasihov)
+..F....... [ZBX-21322] fixed runtime error in Graph widget (rdetlavs)
+...G...... [ZBX-20260] fixed system.cpu.util unable to get usage data of cores on second NUMA node (mprihodko)
+........S. [ZBX-21419] fixed crash appearing during session retrieval (arimdjonoks)
+..F....... [ZBX-20975] fixed PHP TypeError in inaccessible dashboard view (miks)
+A......... [ZBX-19769] fixed performance when Host API is filtering records by severity or suppressed problems (miks)
+..F....... [ZBX-19176] fixed multiple performance issues in map navigation tree widget and map (miks)
 ..F....... [ZBX-21041] fixed broken layout of inherited macros table and added missing column name (dpetra)
 ...G...... [ZBX-21295] changed system.cpu.load[percpu] to split based on online cpus in Zabbix agent 2 (esneiders)
 ...G...... [ZBX-18573] improved performance of directory scanning by Agent on Windows (dgoloscapov)
