@@ -184,9 +184,9 @@ class testFormUpdateProblem extends CWebTest {
 						'Unsuppress' => 'Deactivates manual suppression.',
 						'Acknowledge' => 'Confirms the problem is noticed (acknowledging user will be recorded). '.
 								'Status change triggers action update operation.'
-					],
-					'history' => []
-				]
+					]
+				],
+				'history' => []
 			],
 			[
 				[
@@ -232,6 +232,12 @@ class testFormUpdateProblem extends CWebTest {
 						'Unacknowledge' => 'Undo problem acknowledgement.'
 					]
 				]
+			],
+			[
+				[
+					'problems' => ['Trigger for log'],
+					'history' => []
+				]
 			]
 		];
 	}
@@ -250,11 +256,13 @@ class testFormUpdateProblem extends CWebTest {
 		$this->assertEquals('Update problem', $dialog->getTitle());
 		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
 
+		// Check form labels.
 		$count = count($data['problems']);
 		$default_labels = ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
 				'Acknowledge', 'Close problem', ''];
 		$this->assertEquals(CTestArrayHelper::get($data, 'labels', $default_labels), $form->getLabels()->asText());
 
+		// Check "Problem" field value.
 		$problem = $count > 1 ? $count.' problems selected.' : $data['problems'][0];
 		$this->assertTrue($form->query('xpath://div[@class="wordbreak" and text()='.CXPathHelper::escapeQuotes($problem).']')->exists());
 
@@ -271,6 +279,7 @@ class testFormUpdateProblem extends CWebTest {
 				CXPathHelper::escapeQuotes($count > 1 ? $count.' events' : '1 event')."]")->exists()
 		);
 
+		// Check Hintboxes.
 		if (CTestArrayHelper::get($data, 'hintboxes')) {
 			foreach ($data['hintboxes'] as $field => $text) {
 				$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']/a')->one()->click();
@@ -281,13 +290,14 @@ class testFormUpdateProblem extends CWebTest {
 		}
 
 		// Check History field.
-		if (CTestArrayHelper::get($data, 'history')) {
-			$history = [gmdate('Y-m-d H:i:s', self::$time).$data['history'][0]];
+		if (array_key_exists('history', $data)) {
+			$history = ($data['history'] === []) ? $data['history'] : [gmdate('Y-m-d H:i:s', self::$time).$data['history'][0]];
 			$history_table = $form->getField('History')->asTable();
 			$this->assertEquals(['Time', 'User', 'User action', 'Message'], $history_table->getHeadersText());
-//			$this->assertEquals($history, $history_table->getRows()->asText());
+			$this->assertEquals($history, $history_table->getRows()->asText());
 		}
 
+		// Check fields' default values and attributes.
 		$fields = [
 			'id:message' => ['value' => '', 'maxlength' => 2048, 'enabled' => true],
 			'id:scope_0' => ['value' => true, 'enabled' => true],    // Only selected problem.
@@ -302,20 +312,21 @@ class testFormUpdateProblem extends CWebTest {
 			'Close problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'close_enabled', false)]
 		];
 
-		foreach ($fields as $field => $attribute) {
-			if (array_key_exists('value', $attribute)) {
-				$this->assertEquals($attribute['value'], $form->getField($field)->getValue());
+		foreach ($fields as $field => $attributes) {
+			if (array_key_exists('value', $attributes)) {
+				$this->assertEquals($attributes['value'], $form->getField($field)->getValue());
 			}
 
-			if (array_key_exists('enabled', $attribute)) {
-				$this->assertTrue($form->getField($field)->isEnabled($attribute['enabled']));
+			if (array_key_exists('enabled', $attributes)) {
+				$this->assertTrue($form->getField($field)->isEnabled($attributes['enabled']));
 			}
 
-			if (array_key_exists('maxlength', $attribute)) {
-				$this->assertEquals($attribute['maxlength'], $form->getField($field)->getAttribute('maxlength'));
+			if (array_key_exists('maxlength', $attributes)) {
+				$this->assertEquals($attributes['maxlength'], $form->getField($field)->getAttribute('maxlength'));
 			}
 		}
 
+		// Check other buttons in overlay.
 		$button_queries = [
 			'xpath:.//a[@title="Help"]' => true,
 			'xpath:.//button[@title="Close"]' => true,
