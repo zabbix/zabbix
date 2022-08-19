@@ -70,7 +70,6 @@ class CUserDirectory extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options) {
-
 		$this->validateGet($options);
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
@@ -97,7 +96,6 @@ class CUserDirectory extends CApiService {
 		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		$db_userdirectories = [];
-
 		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
 				return $row['rowscount'];
@@ -120,8 +118,8 @@ class CUserDirectory extends CApiService {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sql_parts) {
 		$sql_parts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sql_parts);
-		$selected_ldap_fields = [];
 
+		$selected_ldap_fields = [];
 		foreach ($this->ldap_output_fields as $field) {
 			if ($this->outputIsRequested($field, $options['output'])) {
 				$selected_ldap_fields[] = 'ldap.'.$field;
@@ -134,7 +132,10 @@ class CUserDirectory extends CApiService {
 				'using' => 'userdirectoryid'
 			];
 			$sql_parts['left_table'] = ['alias' => $tableAlias, 'table' => $tableName];
-			$sql_parts['select'] = array_merge($sql_parts['select'], $selected_ldap_fields);
+
+			if (!$options['countOutput']) {
+				$sql_parts['select'] = array_merge($sql_parts['select'], $selected_ldap_fields);
+			}
 		}
 
 		$selected_saml_fields = [];
@@ -150,7 +151,10 @@ class CUserDirectory extends CApiService {
 				'using' => 'userdirectoryid'
 			];
 			$sql_parts['left_table'] = ['alias' => $tableAlias, 'table' => $tableName];
-			$sql_parts['select'] = array_merge($sql_parts['select'], $selected_saml_fields);
+
+			if (!$options['countOutput']) {
+				$sql_parts['select'] = array_merge($sql_parts['select'], $selected_saml_fields);
+			}
 		}
 
 		return $sql_parts;
@@ -164,17 +168,15 @@ class CUserDirectory extends CApiService {
 			'userdirectoryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'userdirectoryid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-//				'host' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-//				'name' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'provision_status' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
 				'idp_type' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [IDP_TYPE_LDAP, IDP_TYPE_SAML])]
 			]],
-//			'search' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_fill_keys(
-//				['base_dn', 'bind_dn', 'description', 'host', 'name', 'search_attribute', 'search_filter'],
-//				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-//			)],
-//			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
-//			'startSearch' =>				['type' => API_FLAG, 'default' => false],
+			'search' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'name' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'description' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>				['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>		['type' => API_BOOLEAN, 'default' => false],
 			// output
@@ -659,6 +661,11 @@ class CUserDirectory extends CApiService {
 	 */
 	public function delete(array $userdirectoryids): array {
 		self::validateDelete($userdirectoryids, $db_userdirectories);
+
+		DB::update('users', [[
+			'values' => ['userdirectoryid' => 0],
+			'where' => ['userdirectoryid' => $userdirectoryids]
+		]]);
 
 		DB::delete('userdirectory', ['userdirectoryid' => $userdirectoryids]);
 
