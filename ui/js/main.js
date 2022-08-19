@@ -622,7 +622,7 @@ var hintBox = {
 			delete target.hintBoxItem;
 
 			if (target.isStatic) {
-				if (jQuery(target).data('return-control') !== 'undefined') {
+				if (jQuery(target).data('return-control') !== undefined) {
 					jQuery(target).data('return-control').focus();
 				}
 				delete target.isStatic;
