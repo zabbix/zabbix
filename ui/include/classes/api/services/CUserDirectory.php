@@ -31,33 +31,36 @@ class CUserDirectory extends CApiService {
 
 	protected $tableName = 'userdirectory';
 	protected $tableAlias = 'ud';
-	protected $sortColumns = ['host', 'name'];
+	protected $sortColumns = ['name'];
 
 	/**
-	 * @var array
-	 */
-	protected $output_fields = ['userdirectoryid', 'name', 'description', 'host', 'port', 'base_dn', 'bind_dn',
-		'search_attribute', 'start_tls', 'search_filter', 'idp_type', 'idp_entityid', 'sso_url', 'slo_url',
-		'username_attribute', 'sp_entityid', 'nameid_format', 'sign_attributes', 'encrypt_attributes',
-		'provision_status', 'lastname_attribute', 'group_basedn', 'group_name', 'group_member', 'group_filter',
-		'group_membership'
-	];
-
-	/**
-	 * List of supported values in 'sign_attributes' field when Identity provider is SAML.
+	 * Common UserDirectory properties.
 	 *
 	 * @var array
 	 */
-	protected const SAML_SIGH_ATTRIBUTES = [
-		'messages', 'assertions', 'authn_requests', 'logout_requests', 'logout_responses'
-	];
+	protected $output_fields = ['userdirectoryid', 'name', 'idp_type', 'provision_status', 'description'];
 
 	/**
-	 * List of supported values in 'encrypt_attributes' field when Identity provider is SAML.
+	 * LDAP specific properties.
 	 *
 	 * @var array
 	 */
-	protected const SAML_ENCRYPT_ATTRIBUTES = ['nameid', 'assertions'];
+	protected $ldap_output_fields = [
+		'host', 'port', 'base_dn', 'search_attribute', 'bind_dn', 'bind_password', 'start_tls', 'search_filter',
+		'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
+		'user_lastname'
+	];
+
+	/**
+	 * SAML specific properties.
+	 *
+	 * @var array
+	 */
+	protected $saml_output_fields = [
+		'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
+		'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
+		'encrypt_assertions', 'group_name', 'user_username', 'user_lastname', 'scim_status', 'scim_token'
+	];
 
 	/**
 	 * @param array $options
@@ -67,52 +70,35 @@ class CUserDirectory extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options) {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			// filter
-			'userdirectoryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'userdirectoryid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'host' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'provision_status' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
-				'idp_type' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [IDP_TYPE_LDAP, IDP_TYPE_SAML])]
-			]],
-			'search' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_fill_keys(
-				['base_dn', 'bind_dn', 'description', 'host', 'name', 'search_attribute', 'search_filter'],
-				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			)],
-			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>				['type' => API_FLAG, 'default' => false],
-			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
-			'searchWildcardsEnabled' =>		['type' => API_BOOLEAN, 'default' => false],
-			// output
-			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', $this->output_fields), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>				['type' => API_FLAG, 'default' => false],
-			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode']), 'default' => null],
-			'selectProvisionMedia' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['name', 'mediatypeid', 'attribute']), 'default' => null],
-			'selectProvisionGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups']), 'default' => null],
-			// sort and limit
-			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
-			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
-			'limit' =>						['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
-			// flags
-			'preservekeys' =>				['type' => API_BOOLEAN, 'default' => false]
-		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		$this->validateGet($options);
+
+		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = array_merge(
+				$this->output_fields, $this->ldap_output_fields, $this->saml_output_fields
+			);
 		}
 
-		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = $this->output_fields;
+		$sql_parts = [
+			'select' => ['userdirectory' => 'ud.userdirectoryid'],
+			'from' => ['userdirectory' => 'userdirectory ud'],
+			'left_join' => [],
+			'order' => [],
+			'group' => []
+		];
+
+		if ($options['userdirectoryids'] !== null) {
+			$sql_parts['where']['userdirectoryid'] = dbConditionInt('ud.userdirectoryid', $options['userdirectoryids']);
 		}
+
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+
+		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		$db_userdirectories = [];
 
-		$sql = $this->createSelectQuery($this->tableName, $options);
-		$resource = DBselect($sql, $options['limit']);
-
-		while ($row = DBfetch($resource)) {
+		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
 				return $row['rowscount'];
 			}
@@ -130,6 +116,84 @@ class CUserDirectory extends CApiService {
 		}
 
 		return $db_userdirectories;
+	}
+
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sql_parts) {
+		$sql_parts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sql_parts);
+		$selected_ldap_fields = [];
+
+		foreach ($this->ldap_output_fields as $field) {
+			if ($this->outputIsRequested($field, $options['output'])) {
+				$selected_ldap_fields[] = 'ldap.'.$field;
+			}
+		}
+		if ($selected_ldap_fields) {
+			$sql_parts['left_join'][] = [
+				'alias' => 'ldap',
+				'table' => 'userdirectory_ldap',
+				'using' => 'userdirectoryid'
+			];
+			$sql_parts['left_table'] = ['alias' => $tableAlias, 'table' => $tableName];
+			$sql_parts['select'] = array_merge($sql_parts['select'], $selected_ldap_fields);
+		}
+
+		$selected_saml_fields = [];
+		foreach ($this->saml_output_fields as $field) {
+			if ($this->outputIsRequested($field, $options['output'])) {
+				$selected_saml_fields[] = 'saml.'.$field;
+			}
+		}
+		if ($selected_saml_fields) {
+			$sql_parts['left_join'][] = [
+				'alias' => 'saml',
+				'table' => 'userdirectory_saml',
+				'using' => 'userdirectoryid'
+			];
+			$sql_parts['left_table'] = ['alias' => $tableAlias, 'table' => $tableName];
+			$sql_parts['select'] = array_merge($sql_parts['select'], $selected_saml_fields);
+		}
+
+		return $sql_parts;
+	}
+
+	private function validateGet(array &$options): void {
+		$output_fields = array_merge($this->output_fields, $this->ldap_output_fields, $this->saml_output_fields);
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter
+			'userdirectoryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'filter' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'userdirectoryid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+//				'host' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+//				'name' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'provision_status' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
+				'idp_type' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [IDP_TYPE_LDAP, IDP_TYPE_SAML])]
+			]],
+//			'search' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_fill_keys(
+//				['base_dn', 'bind_dn', 'description', 'host', 'name', 'search_attribute', 'search_filter'],
+//				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+//			)],
+//			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
+//			'startSearch' =>				['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>		['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>				['type' => API_FLAG, 'default' => false],
+			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode']), 'default' => null],
+			'selectProvisionMedia' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['name', 'mediatypeid', 'attribute']), 'default' => null],
+			'selectProvisionGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups', 'sortorder']), 'default' => null],
+			// sort and limit
+			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['name']), 'uniq' => true, 'default' => []],
+			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
+			'limit' =>						['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'preservekeys' =>				['type' => API_BOOLEAN, 'default' => false]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -207,14 +271,11 @@ class CUserDirectory extends CApiService {
 		unset($row);
 
 		if ($options['selectProvisionMedia'] === API_OUTPUT_EXTEND) {
-			$output = ['userdirectoryid', 'name', 'mediatypeid', 'attribute'];
-		}
-		else {
-			$output = array_unique(array_merge(['userdirectoryid'], $options['selectProvisionMedia']));
+			$options['selectProvisionMedia'] = ['name', 'mediatypeid', 'attribute'];
 		}
 
-		$db_provisioning_media = DB::select('provision_media', [
-			'output' => $output,
+		$db_provisioning_media = DB::select('userdirectory_media', [
+			'output' => array_merge($options['selectProvisionMedia'], ['userdirectoryid']),
 			'filter' => [
 				'userdirectoryid' => array_keys($result)
 			]
@@ -243,45 +304,44 @@ class CUserDirectory extends CApiService {
 		unset($row);
 
 		if ($options['selectProvisionGroups'] === API_OUTPUT_EXTEND) {
-			$output = ['userdirectoryid', 'is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups'];
-		}
-		else {
-			$output = array_unique(array_merge(['userdirectoryid'], $options['selectProvisionGroups']));
-		}
-
-		$usergroup = array_search('user_groups', $output);
-		$user_groups_requested = $usergroup !== false;
-		if ($user_groups_requested) {
-			unset($output[$usergroup]);
+			$options['selectProvisionGroups'] = [
+				'is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups', 'sortorder'
+			];
 		}
 
-		$db_provision_idpgroups = DB::select('provision_idpgroup', [
-			'output' => $output,
+		$user_groups_index = array_search('user_groups', $options['selectProvisionGroups']);
+		if ($user_groups_index !== false) {
+			unset($options['selectProvisionGroups'][$user_groups_index]);
+		}
+
+		$db_provision_idpgroups = DB::select('userdirectory_idpgroup', [
+			'output' => array_merge($options['selectProvisionGroups'], ['userdirectoryid', 'userdirectory_idpgroupid']),
 			'filter' => [
 				'userdirectoryid' => array_keys($result)
 			],
 			'preservekeys' => true
 		]);
 
-		$db_provision_usergroups = $user_groups_requested && $db_provision_idpgroups
-			? DB::select('provision_usergroup', [
-				'output' => ['usrgrpid', 'provision_idpgroupid'],
+		$db_provision_usergroups = $user_groups_index !== false && $db_provision_idpgroups
+			? DB::select('userdirectory_usrgrp', [
+				'output' => ['usrgrpid', 'userdirectory_idpgroupid'],
 				'filter' => [
-					'provision_idpgroupid' => array_keys($db_provision_idpgroups)
+					'userdirectory_idpgroupid' => array_keys($db_provision_idpgroups)
 				]
 			])
 			: [];
 
 		$provision_usergroups = [];
 		foreach ($db_provision_usergroups as $usrgrp) {
-			$provision_usergroups[$usrgrp['provision_idpgroupid']][] = [
+			$provision_usergroups[$usrgrp['userdirectory_idpgroupid']][] = [
 				'usrgrpid' => $usrgrp['usrgrpid']
 			];
 		}
 
 		foreach ($db_provision_idpgroups as $db_provision_idpgroup) {
-			$idpgroup = array_diff_key($db_provision_idpgroup, array_flip(['userdirectoryid']));
-			if ($user_groups_requested) {
+			$idpgroup = array_intersect_key($db_provision_idpgroup, array_flip($options['selectProvisionGroups']));
+
+			if ($user_groups_index !== false) {
 				$provision_idpgroupid = $db_provision_idpgroup['userdirectoryid'];
 				$idpgroup['user_groups'] = array_key_exists($provision_idpgroupid, $provision_usergroups)
 					? $provision_usergroups[$provision_idpgroupid]
@@ -302,62 +362,87 @@ class CUserDirectory extends CApiService {
 	public function create(array $userdirectories): array {
 		self::validateCreate($userdirectories);
 
-		// Properties 'sign_attributes' and 'encrypt_attributes' are stored in json-serialized array.
-		foreach ($userdirectories as &$userdirectory) {
-			if (array_key_exists('sign_attributes', $userdirectory)) {
-				$userdirectory['sign_attributes'] = json_encode($userdirectory['sign_attributes']);
-			}
-			if (array_key_exists('encrypt_attributes', $userdirectory)) {
-				$userdirectory['encrypt_attributes'] = json_encode($userdirectory['encrypt_attributes']);
-			}
-		}
-		unset($userdirectory);
+		$db_ldap_idp_count = DB::select('userdirectory', [
+			'countOutput' => true,
+			'filter' => [
+				'idp_type' => IDP_TYPE_LDAP
+			]
+		]);
 
-		$db_count = DB::select('userdirectory', ['countOutput' => true]);
 		$userdirectoryids = DB::insert('userdirectory', $userdirectories);
-		$provision_media = [];
-
-		$provision_groups_count = array_sum(array_map(function ($userdirectory) {
-			return array_key_exists('provision_groups', $userdirectory) ? count($userdirectory['provision_groups']) : 0;
-		}, $userdirectories));
+		$userdirectory_media = [];
+		$userdirectory_idpgroups = [];
+		$userdirectory_usrgrps = [];
+		$create_idps_ldap = [];
+		$create_idps_saml = [];
 
 		foreach ($userdirectories as $index => &$userdirectory) {
 			$userdirectory['userdirectoryid'] = $userdirectoryids[$index];
 
+			if ($userdirectory['idp_type'] == IDP_TYPE_LDAP) {
+				$create_idps_ldap[] = $userdirectory;
+			}
+			elseif ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
+				$create_idps_saml[] = $userdirectory;
+			}
+
 			if (array_key_exists('provision_media', $userdirectory)) {
 				foreach ($userdirectory['provision_media'] as $media) {
-					$provision_media[] = [
+					$userdirectory_media[] = [
 						'userdirectoryid' => $userdirectory['userdirectoryid']
 					] + $media;
 				}
 			}
 
 			if (array_key_exists('provision_groups', $userdirectory)) {
-				foreach ($userdirectory['provision_groups'] as $groups) {
-					$groups['userdirectoryid'] = $userdirectory['userdirectoryid'];
-					$idpgroupid = DB::insertBatch('provision_idpgroup', [$groups]);
-
-					$user_groups = array_map(function ($usrgrp) use ($idpgroupid) {
-						return ['provision_idpgroupid' => reset($idpgroupid)] + $usrgrp;
-					}, $groups['user_groups']);
-
-					if ($user_groups) {
-						DB::insertBatch('provision_usergroup', $user_groups);
-					}
+				foreach ($userdirectory['provision_groups'] as $num => $groups) {
+					$userdirectory_idpgroups[] = [
+						'userdirectoryid' => $userdirectory['userdirectoryid'],
+						'sortorder' => ++$num
+					] + $groups;
 				}
 			}
 		}
 		unset($userdirectory);
 
-		if ($provision_media) {
-			DB::insertBatch('provision_media', $provision_media);
+		if ($userdirectory_idpgroups) {
+			$idpgroupids = DB::insertBatch('userdirectory_idpgroup', $userdirectory_idpgroups);
+
+			foreach ($idpgroupids as $index => $idpgroupid) {
+				if (array_key_exists('user_groups', $userdirectory_idpgroups[$index])) {
+					foreach ($userdirectory_idpgroups[$index]['user_groups'] as $usrgrp) {
+						$userdirectory_usrgrps[] = [
+							'userdirectory_idpgroupid' => $idpgroupid,
+							'usrgrpid' => $usrgrp['usrgrpid']
+						];
+					}
+				}
+			}
+
+			if ($userdirectory_usrgrps) {
+				DB::insertBatch('userdirectory_usrgrp', $userdirectory_usrgrps);
+			}
+		}
+
+		if ($create_idps_ldap) {
+			DB::insertBatch('userdirectory_ldap', $create_idps_ldap);
+		}
+
+		if ($create_idps_saml) {
+			DB::insertBatch('userdirectory_saml', $create_idps_saml);
+		}
+
+		if ($userdirectory_media) {
+			DB::insertBatch('userdirectory_media', $userdirectory_media);
 		}
 
 		// TODO
 		//self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USERDIRECTORY, $userdirectories);
 
-		if (!$db_count) {
-			API::Authentication()->update(['ldap_userdirectoryid' => reset($userdirectoryids)]);
+		if ($db_ldap_idp_count == 0 && $create_idps_ldap) {
+			// TODO: should ↓this↓ be recorded in audit log as well?
+			$idp_ldap = reset($create_idps_ldap);
+			API::Authentication()->update(['ldap_userdirectoryid' => $idp_ldap['userdirectoryid']]);
 		}
 
 		return ['userdirectoryids' => $userdirectoryids];
@@ -380,7 +465,7 @@ class CUserDirectory extends CApiService {
 	}
 
 	/**
-	 * Validate if only one user directory of type IDP_SAML exists.
+	 * Validate if only one user directory of type IDP_TYPE_SAML exists.
 	 *
 	 * @return void
 	 */
@@ -400,7 +485,9 @@ class CUserDirectory extends CApiService {
 		]);
 
 		if ($saml_userdirectory != 0) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Only one user directory of type "SAML" can exist.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Only one user directory of type "%1$s" can exist.', IDP_TYPE_SAML)
+			);
 		}
 	}
 
@@ -412,34 +499,63 @@ class CUserDirectory extends CApiService {
 	 * @return array
 	 */
 	public function update(array $userdirectories): array {
-		self::validateUpdate($userdirectories, $db_userdirectories);
+		$this->validateUpdate($userdirectories, $db_userdirectories);
 
 		$upd_userdirectories = [];
+		$upd_userdirectories_ldap = [];
+		$upd_userdirectories_saml = [];
 
 		foreach ($userdirectories as $userdirectory) {
-			$upd_userdirectory = DB::getUpdatedValues('userdirectory', $userdirectory,
+			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
+
+			$upd_userdirectory = DB::getUpdatedValues('userdirectory',
+				array_intersect_key($userdirectory, array_flip($this->output_fields)),
 				$db_userdirectories[$userdirectory['userdirectoryid']]
 			);
-
 			if ($upd_userdirectory) {
 				$upd_userdirectories[] = [
 					'values' => $upd_userdirectory,
 					'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
 				];
 			}
+
+			if ($db_userdirectory['idp_type'] == IDP_TYPE_LDAP) {
+				$upd_userdirectory_ldap = DB::getUpdatedValues('userdirectory_ldap',
+					array_intersect_key($userdirectory, array_flip($this->ldap_output_fields)),
+					$db_userdirectories[$userdirectory['userdirectoryid']]
+				);
+				if ($upd_userdirectory_ldap) {
+					$upd_userdirectories_ldap[] = [
+						'values' => $upd_userdirectory_ldap,
+						'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
+					];
+				}
+			}
+			elseif ($db_userdirectory['idp_type'] == IDP_TYPE_SAML) {
+				$upd_userdirectory_saml = DB::getUpdatedValues('userdirectory_saml',
+					array_intersect_key($userdirectory, array_flip($this->saml_output_fields)),
+					$db_userdirectories[$userdirectory['userdirectoryid']]
+				);
+				if ($upd_userdirectory_saml) {
+					$upd_userdirectories_saml[] = [
+						'values' => $upd_userdirectory_saml,
+						'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
+					];
+				}
+			}
 		}
+
+		DB::update('userdirectory', $upd_userdirectories);
+		DB::update('userdirectory_ldap', $upd_userdirectories_ldap);
+		DB::update('userdirectory_saml', $upd_userdirectories_saml);
 
 		$this->updateProvisionMedia($userdirectories);
 		$this->updateProvisionGroups($userdirectories);
 
-		if ($upd_userdirectories) {
-			DB::update('userdirectory', $upd_userdirectories);
-
-			// TODO:
+		// TODO:
 //			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USERDIRECTORY, $userdirectories,
 //				$db_userdirectories
 //			);
-		}
 
 		return ['userdirectoryids' => array_column($userdirectories, 'userdirectoryid')];
 	}
@@ -455,7 +571,7 @@ class CUserDirectory extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function validateUpdate(array &$userdirectories, ?array &$db_userdirectories): void {
+	private function validateUpdate(array &$userdirectories, ?array &$db_userdirectories): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
 			'userdirectoryid' => ['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
@@ -463,8 +579,8 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_userdirectories = DB::select('userdirectory', [
-			'output' => ['name', 'idp_type'],
+		$db_userdirectories = $this->get([
+			'output' => API_OUTPUT_EXTEND,
 			'userdirectoryids' => array_column($userdirectories, 'userdirectoryid'),
 			'preservekeys' => true
 		]);
@@ -546,7 +662,7 @@ class CUserDirectory extends CApiService {
 
 		DB::delete('userdirectory', ['userdirectoryid' => $userdirectoryids]);
 
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_userdirectories);
+		//self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_userdirectories);
 
 		return ['userdirectoryids' => $userdirectoryids];
 	}
@@ -617,7 +733,7 @@ class CUserDirectory extends CApiService {
 	 * @return bool
 	 */
 	public function test(array $userdirectory): bool {
-		self::validateTest($userdirectory);
+		$this->validateTest($userdirectory);
 
 		$user = [
 			'username' => $userdirectory['test_username'],
@@ -642,17 +758,17 @@ class CUserDirectory extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected static function validateTest(array &$userdirectory): void {
+	protected function validateTest(array &$userdirectory): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 			'userdirectoryid' =>	['type' => API_ID, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
+			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'host')],
 			'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'base_dn')],
-			'bind_dn' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_dn'), 'default' => ''],
-			'bind_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_password')],
-			'search_attribute' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'search_attribute')],
+			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'base_dn')],
+			'bind_dn' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'bind_dn'), 'default' => ''],
+			'bind_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'bind_password')],
+			'search_attribute' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_attribute')],
 			'start_tls' =>			['type' => API_INT32, 'in' => ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON, 'default' => ZBX_AUTH_START_TLS_OFF],
-			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'search_filter'), 'default' => ''],
+			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_filter'), 'default' => ''],
 			'test_username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'test_password' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		]];
@@ -662,11 +778,14 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($userdirectory['userdirectoryid'] !== null) {
-			$db_userdirectory = DB::select('userdirectory', [
+			$db_userdirectory = $this->get([
 				'output' => ['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
 					'search_filter'
 				],
-				'userdirectoryids' => $userdirectory['userdirectoryid']
+				'userdirectoryids' => $userdirectory['userdirectoryid'],
+				'filter' => [
+					'idp_type' => IDP_TYPE_LDAP
+				]
 			]);
 			$db_userdirectory = reset($db_userdirectory);
 
@@ -685,29 +804,29 @@ class CUserDirectory extends CApiService {
 	 */
 	private function updateProvisionMedia(array $userdirectories): void {
 		$userdirectories = array_column($userdirectories, null, 'userdirectoryid');
+		$userdirectoryids = array_keys(array_filter($userdirectories, function ($userdirectory) {
+			return array_key_exists('provision_media', $userdirectory);
+		}));
 
-		$db_provision_media = DB::select('provision_media', [
-			'output' => ['provision_mediaid', 'userdirectoryid', 'mediatypeid', 'name', 'attribute'],
+		$db_provision_media = DB::select('userdirectory_media', [
+			'output' => ['userdirectory_mediaid', 'userdirectoryid', 'mediatypeid', 'name', 'attribute'],
 			'filter' => [
-				'userdirectoryid' => array_column($userdirectories, 'userdirectoryid')
+				'userdirectoryid' => $userdirectoryids
 			]
 		]);
 
-		$provision_media_remove = [];
+		$provision_media_remove = array_fill_keys($userdirectoryids, []);
 		foreach ($db_provision_media as $media) {
-			$provision_media_remove[$media['userdirectoryid']][$media['provision_mediaid']] = [
+			$provision_media_remove[$media['userdirectoryid']][$media['userdirectory_mediaid']] = [
 				'mediatypeid' => $media['mediatypeid'],
 				'name' => $media['name'],
 				'attribute' => $media['attribute']
 			];
 		}
 
-		foreach ($userdirectories as &$userdirectory) {
-			if (!array_key_exists('provision_media', $userdirectory)) {
-				continue;
-			}
-
-			$userdirectoryid = $userdirectory['userdirectoryid'];
+		// Remove unchanged provision media entries.
+		foreach ($userdirectoryids as $userdirectoryid) {
+			$userdirectory = $userdirectories[$userdirectoryid];
 			foreach ($provision_media_remove[$userdirectoryid] as $provision_mediaid => $provision_media_data) {
 				foreach ($userdirectory['provision_media'] as $index => $new_provision_media) {
 					if ($provision_media_data == $new_provision_media) {
@@ -725,77 +844,76 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($provision_mediaids_remove) {
-			DB::delete('provision_media', ['provision_mediaid' => $provision_mediaids_remove]);
+			DB::delete('userdirectory_media', ['userdirectory_mediaid' => $provision_mediaids_remove]);
 		}
 
 		// Collect new provision media entries.
 		$provision_media_insert = [];
-		foreach ($userdirectories as $userdirectoryid => $userdirectory) {
-			if (!array_key_exists('provision_media', $userdirectory)) {
-				continue;
-			}
-
-			foreach ($userdirectory['provision_media'] as $media) {
+		foreach ($userdirectoryids as $userdirectoryid) {
+			foreach ($userdirectories[$userdirectoryid]['provision_media'] as $media) {
 				$provision_media_insert[] = ['userdirectoryid' => $userdirectoryid] + $media;
 			}
 		}
 
 		if ($provision_media_insert) {
-			DB::insertBatch('provision_media', $provision_media_insert);
+			DB::insertBatch('userdirectory_media', $provision_media_insert);
 		}
 	}
 
 	private function updateProvisionGroups(array $userdirectories): void {
 		$userdirectories = array_column($userdirectories, null, 'userdirectoryid');
+		$userdirectoryids = array_keys(array_filter($userdirectories, function ($userdirectory) {
+			return array_key_exists('provision_groups', $userdirectory);
+		}));
 
-		$db_provision_groups = DB::select('provision_idpgroup', [
-			'output' => ['provision_idpgroupid', 'userdirectoryid', 'roleid', 'is_fallback', 'fallback_status', 'name'],
+		$db_provision_groups = DB::select('userdirectory_idpgroup', [
+			'output' => ['userdirectory_idpgroupid', 'userdirectoryid', 'roleid', 'is_fallback', 'fallback_status',
+				'name', 'sortorder'
+			],
 			'filter' => [
-				'userdirectoryid' => array_column($userdirectories, 'userdirectoryid')
+				'userdirectoryid' => $userdirectoryids
+			],
+			'preservekeys' => true
+		]);
+
+		$db_provision_usrgrps = DB::select('userdirectory_usrgrp', [
+			'output' => ['userdirectory_idpgroupid', 'usrgrpid'],
+			'filter' => [
+				'userdirectory_idpgroupid' => array_keys($db_provision_groups)
 			]
 		]);
 
-		$db_provision_usergroup = DB::select('provision_usergroup', [
-			'output' => ['provision_idpgroupid', 'usrgrpid'],
-			'filter' => [
-				'provision_idpgroupid' => array_column($db_provision_groups, 'provision_idpgroupid')
-			]
-		]);
-
-		$provision_usrgrps = [];
-		foreach ($db_provision_usergroup as $usergroup) {
-			$provision_usrgrps[$usergroup['provision_idpgroupid']][] = [
-				'usrgrpid' => $usergroup['usrgrpid']
+		$db_provision_usergroups = [];
+		foreach ($db_provision_usrgrps as $usrgrps) {
+			$db_provision_usergroups[$usrgrps['userdirectory_idpgroupid']][] = [
+				'usrgrpid' => $usrgrps['usrgrpid']
 			];
 		}
 
-		$provision_groups_remove = [];
-		foreach ($db_provision_groups as $group) {
-			$user_groups = $provision_usrgrps[$group['provision_idpgroupid']];
-			CArrayHelper::sort($user_groups, ['usrgrpid']);
-
-			$provision_groups_remove[$group['userdirectoryid']][$group['provision_idpgroupid']] = [
-				'roleid' => $group['roleid'],
-				'is_fallback' => $group['is_fallback'],
-				'fallback_status' => $group['fallback_status'],
-				'name' => $group['name'],
-				'user_groups' => array_values($user_groups)
-			];
+		$provision_groups_remove = array_fill_keys($userdirectoryids, []);
+		foreach ($db_provision_groups as $idpgroupid => $idpgroup) {
+			CArrayHelper::sort($db_provision_usergroups[$idpgroupid], ['usrgrpid']);
+			$provision_groups_remove[$idpgroup['userdirectoryid']][$idpgroupid] = [
+				'user_groups' => array_values($db_provision_usergroups[$idpgroupid])
+			] + array_intersect_key($idpgroup, array_flip([
+				'roleid', 'is_fallback', 'fallback_status', 'name', 'sortorder'
+			]));
 		}
 
-		foreach ($userdirectories as $userdirectory) {
-			if (!array_key_exists('provision_media', $userdirectory)) {
-				continue;
+		foreach ($userdirectoryids as $userdirectoryid) {
+			// Add sortorder value for each provision group.
+			foreach ($userdirectories[$userdirectoryid]['provision_groups'] as $index => $provision_group) {
+				$userdirectories[$userdirectoryid]['provision_groups'][$index]['sortorder'] = $index + 1;
 			}
 
-			$userdirectoryid = $userdirectory['userdirectoryid'];
-			foreach ($provision_groups_remove[$userdirectoryid] as $provision_groupid => $provision_group_data) {
-				foreach ($userdirectory['provision_groups'] as $index => $new_provision_group) {
+			// Unset provision groups that actually have not been changed.
+			foreach ($provision_groups_remove[$userdirectoryid] as $idpgroup => $idpgroup) {
+				foreach ($userdirectories[$userdirectoryid]['provision_groups'] as $index => $new_provision_group) {
 					CArrayHelper::sort($new_provision_group['user_groups'], ['usrgrpid']);
 					$new_provision_group['user_groups'] = array_values($new_provision_group['user_groups']);
 
-					if ($provision_group_data == $new_provision_group) {
-						unset($provision_groups_remove[$userdirectoryid][$provision_groupid]);
+					if ($idpgroup == $new_provision_group) {
+						unset($provision_groups_remove[$userdirectoryid][$idpgroup]);
 						unset($userdirectories[$userdirectoryid]['provision_groups'][$index]);
 					}
 				}
@@ -804,29 +922,36 @@ class CUserDirectory extends CApiService {
 
 		// Collect IDs to remove.
 		$provision_groupids_remove = [];
-		foreach ($provision_groups_remove as $group_remove) {
-			$provision_groupids_remove = array_merge($provision_groupids_remove, array_keys($group_remove));
+		foreach ($provision_groups_remove as $groups_remove) {
+			$provision_groupids_remove = array_merge($provision_groupids_remove, array_keys($groups_remove));
 		}
 
 		if ($provision_groupids_remove) {
-			DB::delete('provision_idpgroup', ['provision_idpgroupid' => $provision_groupids_remove]);
+			DB::delete('userdirectory_idpgroup', ['userdirectory_idpgroupid' => $provision_groupids_remove]);
 		}
 
-		// Collect new provision media entries.
-		foreach ($userdirectories as $userdirectoryid => $userdirectory) {
-			if (array_key_exists('provision_groups', $userdirectory)) {
-				foreach ($userdirectory['provision_groups'] as $groups) {
-					$groups['userdirectoryid'] = $userdirectoryid;
-					$idpgroupid = DB::insertBatch('provision_idpgroup', [$groups]);
+		// Record new provision groups.
+		$idpgroups_insert = [];
+		foreach ($userdirectoryids as $userdirectoryid) {
+			foreach ($userdirectories[$userdirectoryid]['provision_groups'] as $groups) {
+				$idpgroups_insert[] = ['userdirectoryid' => $userdirectoryid] + $groups;
+			}
+		}
 
-					$user_groups = array_map(function ($usrgrp) use ($idpgroupid) {
-						return ['provision_idpgroupid' => reset($idpgroupid)] + $usrgrp;
-					}, $groups['user_groups']);
+		if ($idpgroups_insert) {
+			$idpgroupids = DB::insertBatch('userdirectory_idpgroup', $idpgroups_insert);
 
-					if ($user_groups) {
-						DB::insertBatch('provision_usergroup', $user_groups);
-					}
+			$user_groups = [];
+			foreach ($idpgroupids as $index => $idpgroupid) {
+				$idpgroup = $idpgroups_insert[$index];
+
+				foreach ($idpgroup['user_groups'] as $usrgrp) {
+					$user_groups[] = ['userdirectory_idpgroupid' => $idpgroupid] + $usrgrp;
 				}
+			}
+
+			if ($user_groups) {
+				DB::insertBatch('userdirectory_usrgrp', $user_groups);
 			}
 		}
 	}
@@ -835,8 +960,10 @@ class CUserDirectory extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'idp_type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [IDP_TYPE_LDAP, IDP_TYPE_SAML])],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'name')],
+			'provision_status' =>	['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]), 'default' => DB::getDefault('userdirectory', 'provision_status')],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'description'), 'length' => DB::getFieldLength('userdirectory', 'description')],
 			'host' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'host')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'port' =>				['type' => API_MULTIPLE, 'rules' => [
@@ -844,23 +971,19 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'base_dn' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'base_dn')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'base_dn')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'bind_dn' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_dn')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'bind_dn')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'bind_password' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'bind_password')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'bind_password')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'search_attribute' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'search_attribute')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'description' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'description')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_attribute')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'start_tls' =>			['type' => API_MULTIPLE, 'rules' => [
@@ -868,75 +991,106 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'search_filter' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'search_filter')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_filter')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'group_basedn' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'group_basedn')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_basedn')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'group_name' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'group_name')],
-										['else' => true, 'type' => API_UNEXPECTED]
+			'group_name' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_name')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'group_name')]
+			]],
+			'user_username' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'user_username')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'user_username')]
+			]],
+			'user_lastname' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'user_lastname')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'user_lastname')]
 			]],
 			'group_member' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'group_member')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_member')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'group_filter' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'group_filter')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_filter')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'group_membership' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'group_membership')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_membership')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'idp_entityid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'idp_entityid')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_entityid')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sso_url' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'sso_url')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_saml', 'sso_url')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'slo_url' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'slo_url')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'slo_url')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_entityid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'sp_entityid')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_saml', 'sp_entityid')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'nameid_format' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'nameid_format')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'sign_attributes' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', self::SAML_SIGH_ATTRIBUTES)],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'encrypt_attributes' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', self::SAML_ENCRYPT_ATTRIBUTES)],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'nameid_format')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'username_attribute' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'username_attribute')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_saml', 'username_attribute')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'lastname_attribute' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'lastname_attribute')],
+			'sign_messages' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'sign_messages')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'user_provisioning' =>	['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
+			'sign_assertions' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'sign_assertions')],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'sign_authn_requests' => ['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'sign_authn_requests')],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'sign_logout_requests' => ['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'sign_logout_requests')],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'sign_logout_responses' => ['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'sign_logout_responses')],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'encrypt_nameid' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'encrypt_nameid')],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'encrypt_assertions' => ['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'encrypt_assertions')],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'scim_status' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'scim_status')],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'scim_token' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'default' => DB::getDefault('userdirectory_saml', 'scim_token')],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'provision_media' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('provision_media', 'name')],
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
 				'mediatypeid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('provision_media', 'attribute')]
+				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
 			]],
 			'provision_groups' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 				'is_fallback' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GROUP_MAPPING_REGULAR, GROUP_MAPPING_FALLBACK])],
 				'fallback_status' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GROUP_MAPPING_FALLBACK_OFF, GROUP_MAPPING_FALLBACK_ON])],
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('provision_idpgroup', 'is_fallback')],
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_idpgroup', 'is_fallback')],
 				'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 					'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
@@ -945,12 +1099,27 @@ class CUserDirectory extends CApiService {
 		]];
 
 		if ($method === 'update') {
+			// Make all fields optional and remove default values.
+			foreach ($api_input_rules['fields'] as &$field) {
+				if (array_key_exists('rules', $field)) {
+					foreach ($field['rules'] as &$rule) {
+						if (array_key_exists('flags', $rule) && API_REQUIRED & $rule['flags']) {
+							$rule['flags'] &= ~API_REQUIRED;
+						}
+						unset($rule['default']);
+					}
+					unset($rule);
+				}
+				else {
+					if (array_key_exists('flags', $field) && API_REQUIRED & $field['flags']) {
+						$field['flags'] &= ~API_REQUIRED;
+					}
+					unset($field['default']);
+				}
+			}
+			unset($field);
+
 			$api_input_rules['fields']['userdirectoryid'] = ['type' => API_ID, 'flags' => API_REQUIRED];
-			$api_input_rules['fields']['name']['flags'] &= ~API_REQUIRED;
-			$api_input_rules['fields']['host']['rules'][0]['flags'] &= ~API_REQUIRED;
-			$api_input_rules['fields']['port']['rules'][0]['flags'] &= ~API_REQUIRED;
-			$api_input_rules['fields']['base_dn']['rules'][0]['flags'] &= ~API_REQUIRED;
-			$api_input_rules['fields']['search_attribute']['rules'][0]['flags'] &= ~API_REQUIRED;
 		}
 
 		return $api_input_rules;

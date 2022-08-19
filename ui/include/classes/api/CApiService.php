@@ -451,7 +451,7 @@ class CApiService {
 	 */
 	protected static function createSelectQueryFromParts(array $sqlParts) {
 		$sql_left_join = '';
-		if (array_key_exists('left_join', $sqlParts)) {
+		if (array_key_exists('left_join', $sqlParts) && $sqlParts['left_join']) {
 			$l_table = DB::getSchema($sqlParts['left_table']['table']);
 
 			foreach ($sqlParts['left_join'] as $left_join) {
