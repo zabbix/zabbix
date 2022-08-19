@@ -124,7 +124,7 @@ foreach ($data['groups'] as $group) {
 						->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
 						->setArgument('hostid', $group['hostPrototype']['hostid'])
 						->setArgument('context', 'host')
-				));
+				))->addClass(ZBX_STYLE_LINK_ALT);
 			}
 			elseif ($data['allowed_ui_conf_hosts']) {
 				$lld_name = new CSpan($group['discoveryRule']['name']);
