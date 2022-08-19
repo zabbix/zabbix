@@ -523,7 +523,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$allowed_fields = array_fill_keys([
 					'itemid', 'delay', 'delay_flex', 'history', 'trends', 'history_mode', 'trends_mode', 'allow_traps',
 					'description', 'status', 'discover', 'tags', 'username', 'password', 'authtype', 'publickey',
-					'privatekey'
+					'privatekey', 'params'
 				], true);
 
 				foreach ($item as $field => $value) {
