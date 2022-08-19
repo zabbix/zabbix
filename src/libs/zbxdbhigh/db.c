@@ -27,17 +27,6 @@
 #include "zbxalgo.h"
 #include "cfg.h"
 
-#if defined(HAVE_POSTGRESQL)
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
-#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
-#elif defined(HAVE_MYSQL)
-#	define ZBX_DB_STRLIST_DELIM		','
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8,utf8mb3"
-#	define ZBX_SUPPORTED_DB_COLLATION	"utf8_bin,utf8mb3_bin"
-#endif
-
 typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;
