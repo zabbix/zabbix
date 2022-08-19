@@ -305,7 +305,8 @@ $form
 				'condition_operators' => condition_operator2str(),
 				'condition_types' => condition_type2str(),
 				'conditions' => $data['action']['filter']['conditions'],
-				'actionid' => $data['actionid']
+				'actionid' => $data['actionid'],
+				'eventsource' => $data['eventsource']
 			]).');
 			'))->setOnDocumentReady()
 	);

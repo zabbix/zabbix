@@ -26,7 +26,7 @@
 
 window.action_edit_popup = new class {
 
-	init({condition_operators, condition_types, conditions, actionid}) {
+	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -34,6 +34,7 @@ window.action_edit_popup = new class {
 		this.condition_types = condition_types;
 		this.conditions = conditions;
 		this.actionid = actionid;
+		this.eventsource = eventsource
 		this.row_num = 0;
 		//this.footer = this.overlay.$dialogue.$footer[0];
 		//this.curl = new Curl('zabbix.php');
@@ -90,7 +91,7 @@ window.action_edit_popup = new class {
 	openConditionPopup() {
 		const parameters = {
 			type: <?= ZBX_POPUP_CONDITION_TYPE_ACTION ?>,
-			source: 0
+			source: this.eventsource
 		};
 
 		return PopUp('popup.condition.actions', parameters, {
