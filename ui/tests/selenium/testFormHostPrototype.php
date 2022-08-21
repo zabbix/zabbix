@@ -667,14 +667,14 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Authentication algorithm', 'Privilege level', 'Username', 'Password']);
 
 		$old_values = [
-			['field' => 'authtype', 'value' => 'Default'],
-			['field' => 'privilege', 'value' => 'User'],
-			['field' => 'username', 'value' => ''],
-			['field' => 'password', 'value' => '']
+			['field' => 'ipmi_authtype', 'value' => 'Default'],
+			['field' => 'ipmi_privilege', 'value' => 'User'],
+			['field' => 'ipmi_username', 'value' => ''],
+			['field' => 'ipmi_password', 'value' => '']
 		];
 
 		foreach ($old_values as $old_value) {
-			$this->zbxTestAssertElementValue('ipmi_'.$old_value['field'], $old_value['value']);
+			$this->zbxTestAssertElementValue($old_value['field'], $old_value['value']);
 		}
 
 		// Go to host and change IPMI settings.
@@ -683,18 +683,18 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$form->selectTab('IPMI');
 
 		$new_values = [
-			['field' => 'authtype', 'value' => 'MD2'],
-			['field' => 'privilege', 'value' => 'Operator'],
-			['field' => 'username', 'value' => 'TestUsername'],
-			['field' => 'password', 'value' => 'TestPassword']
+			['field' => 'ipmi_authtype', 'value' => 'MD2'],
+			['field' => 'ipmi_privilege', 'value' => 'Operator'],
+			['field' => 'ipmi_username', 'value' => 'TestUsername'],
+			['field' => 'ipmi_password', 'value' => 'TestPassword']
 		];
 		foreach ($new_values as $new_value) {
-			$tag = $this->webDriver->findElement(WebDriverBy::id('ipmi_'.$new_value['field']))->getTagName();
-			if ($tag === 'select') {
-				$this->zbxTestDropdownSelect('ipmi_'.$new_value['field'], $new_value['value']);
+			$tag = $this->webDriver->findElement(WebDriverBy::id($new_value['field']))->getTagName();
+			if ($tag === 'z-select') {
+				$this->query('name:'.$new_value['field'])->asDropdown()->one()->select($new_value['value']);
 			}
 			else {
-				$this->zbxTestInputType('ipmi_'.$new_value['field'], $new_value['value']);
+				$this->zbxTestInputType($new_value['field'], $new_value['value']);
 			}
 		}
 		$form->submit();
@@ -705,12 +705,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 				'&context=host&hostid='.self::HOST_PROTOTYPE_ID);
 		$prototype_form = $this->query('id:host-prototype-form')->asForm()->one()->waitUntilVisible();
 		$prototype_form->selectTab('IPMI');
-		// Change field ids.
-		$new_values[0]['field'] = 'authtype_name';
-		$new_values[1]['field'] = 'privilege_name';
 
 		foreach ($new_values as $new_value) {
-			$this->zbxTestAssertElementValue('ipmi_'.$new_value['field'], $new_value['value']);
+			$this->zbxTestAssertElementValue($new_value['field'], $new_value['value']);
 		}
 	}
 
