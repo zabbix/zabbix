@@ -667,8 +667,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Authentication algorithm', 'Privilege level', 'Username', 'Password']);
 
 		$old_values = [
-			['field' => 'authtype_name', 'value' => 'Default'],
-			['field' => 'privilege_name', 'value' => 'User'],
+			['field' => 'authtype', 'value' => 'Default'],
+			['field' => 'privilege', 'value' => 'User'],
 			['field' => 'username', 'value' => ''],
 			['field' => 'password', 'value' => '']
 		];
