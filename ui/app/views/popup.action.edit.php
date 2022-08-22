@@ -56,7 +56,7 @@ $formula = (new CTextBox('formula', $data['action']['filter']['formula'],
 $action_tab
 	->addItem([
 		(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('label-evaltype'),
-		new CFormField([
+		(new CFormField([
 			(new CSelect('evaltype'))
 				->setId('evaltype')
 				->setFocusableElementId('label-evaltype')
@@ -69,7 +69,7 @@ $action_tab
 				])),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$formula
-		])
+		]))->setId('evaltype-formfield')
 	]);
 
 // Create condition table.

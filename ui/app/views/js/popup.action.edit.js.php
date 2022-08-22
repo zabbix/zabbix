@@ -34,7 +34,7 @@ window.action_edit_popup = new class {
 
 		this._initActionButtons();
 		this.createExistingConditionRow(conditions);
-		//this.processTypeOfCalculation();
+		this.processTypeOfCalculation();
 
 		this.dialogue.addEventListener('condition.dialogue.submit', (e) => {
 		// todo: add multiselect title, not value
@@ -64,6 +64,10 @@ window.action_edit_popup = new class {
 			}
 			else if (e.target.classList.contains('js-action-delete')) {
 				this._delete();
+			}
+			else if (e.target.classList.contains('element-table-remove')) {
+				this.row_count--;
+				this.processTypeOfCalculation();
 			}
 		});
 	}
@@ -285,9 +289,11 @@ window.action_edit_popup = new class {
 		var show_formula = (this.row_count == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
 			$labels = jQuery('#conditionTable .label');
 
+		jQuery('#evaltype-formfield').toggle(this.row_count > 1);
 		jQuery('#evaltype').toggle(this.row_count > 1);
 		jQuery('#label-evaltype').toggle(this.row_count > 1);
 		jQuery('#formula').toggle(this.row_count > 1);
+
 
 		// if (this.row_count > 1) {
 		//	var conditions = [];
