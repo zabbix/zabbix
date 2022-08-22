@@ -38,7 +38,7 @@ window.action_edit_popup = new class {
 
 		this.dialogue.addEventListener('condition.dialogue.submit', (e) => {
 		// todo: add multiselect title, not value
-
+			this.row = document.createElement('tr');
 			this.createRow(this.row, e.detail.inputs);
 			this.processTypeOfCalculation();
 			$('#conditionTable tr:last').before(this.row);

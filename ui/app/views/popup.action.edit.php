@@ -56,20 +56,20 @@ $formula = (new CTextBox('formula', $data['action']['filter']['formula'],
 $action_tab
 	->addItem([
 		(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('label-evaltype'),
-		[
-				(new CSelect('evaltype'))
-					->setId('evaltype')
-					->setFocusableElementId('label-evaltype')
-					->setValue($data['action']['filter']['evaltype'])
-					->addOptions(CSelect::createOptionsFromArray([
-						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-						CONDITION_EVAL_TYPE_AND => _('And'),
-						CONDITION_EVAL_TYPE_OR => _('Or'),
-						CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-					])),
-		//	new CFormField((new CSpan())->setId('conditionLabel')),
-			new CFormField($formula)
-		]
+		new CFormField([
+			(new CSelect('evaltype'))
+				->setId('evaltype')
+				->setFocusableElementId('label-evaltype')
+				->setValue($data['action']['filter']['evaltype'])
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				])),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$formula
+		])
 	]);
 
 // Create condition table.

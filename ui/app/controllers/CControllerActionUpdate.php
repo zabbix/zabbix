@@ -31,7 +31,7 @@ class CControllerActionUpdate extends CController {
 			'eventsource' => 'required|in '.implode(',', [
 					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTOREGISTRATION,
 					EVENT_SOURCE_INTERNAL,EVENT_SOURCE_SERVICE
-				]),
+			]),
 			'name' => 'string|required|not_empty',
 			'actionid' => 'id',
 			'status' => 'in '.ACTION_STATUS_ENABLED,
@@ -39,7 +39,12 @@ class CControllerActionUpdate extends CController {
 			'recovery_operations' => 'array',
 			'update_operations' => 'array',
 			'esc_period' => '',
-			'filter' => 'array'
+			'filter' => 'array',
+			'conditions' => 'array',
+			'evaltype' => 'in '.implode(',', [
+				CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
+				CONDITION_EVAL_TYPE_EXPRESSION
+			]),
 		];
 
 		$ret = $this->validateInput($fields);
@@ -148,40 +153,6 @@ class CControllerActionUpdate extends CController {
 //			unset($operation);
 //		}
 
-//		$filter = [
-//			'conditions' => [],
-//			'evaltype' => '0'
-//		];
-
-//		if ($filter['conditions'] || hasRequest('update')) {
-//			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-//				if (count($filter['conditions']) > 1) {
-//					$filter['formula'] = getRequest('formula');
-//				}
-//				else {
-//					// If only one or no conditions are left, reset the evaltype to "and/or".
-//					$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
-//				}
-//			}
-
-//			foreach ($filter['conditions'] as &$condition) {
-//				if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-//					unset($condition['formulaid']);
-//				}
-
-//				if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
-//					unset($condition['value']);
-//				}
-
-//				if ($condition['conditiontype'] != CONDITION_TYPE_EVENT_TAG_VALUE) {
-//					unset($condition['value2']);
-//				}
-//			}
-//			unset($condition);
-
-//			$action['filter'] = $filter;
-//		}
-
 		$action = [
 			'name' => $this->getInput('name'),
 			'actionid' => $this->getInput('actionid'),
@@ -205,18 +176,42 @@ class CControllerActionUpdate extends CController {
 				]
 			],
 			'recovery_operations' => [],
-			'update_operations' => [],
-			'filter' => [
-				'conditions' => [
-					[
-						'conditiontype' => '3',
-						'operator' => '2',
-						'value' => 'dd'
-					]
-				],
-				'evaltype' => '0'
-			]
+			'update_operations' => []
 		];
+
+		$filter = [
+			'conditions' => $this->getInput('conditions', []),
+			'evaltype' => $this->getInput('evaltype')
+		];
+
+		if ($filter['conditions']) {
+			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				if (count($filter['conditions']) > 1) {
+					$filter['formula'] = getRequest('formula');
+				}
+				else {
+					// If only one or no conditions are left, reset the evaltype to "and/or".
+					$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+				}
+			}
+
+			foreach ($filter['conditions'] as &$condition) {
+				if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					unset($condition['formulaid']);
+				}
+
+				if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
+					unset($condition['value']);
+				}
+
+				if ($condition['conditiontype'] != CONDITION_TYPE_EVENT_TAG_VALUE) {
+					unset($condition['value2']);
+				}
+			}
+			unset($condition);
+
+			$action['filter'] = $filter;
+		}
 
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 			$action['esc_period'] = $this->getInput('esc_period', DB::getDefault('actions', 'esc_period'));
@@ -229,10 +224,6 @@ class CControllerActionUpdate extends CController {
 
 		if ($eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
 			// todo : remove this. this is just for testing
-			$action['filter']['conditions'][0]['conditiontype'] = '22';
-			$action['filter']['conditions'][0]['operator'] = '2';
-			$action['filter']['conditions'][0]['value'] = 'srv';
-			$action['filter']['evaltype'] = '0';
 			$action['operations'][0]['operationtype'] = '4';
 			$action['operations'][0]['opgroup'] = [['groupid' => '2']];
 			unset(
@@ -249,23 +240,12 @@ class CControllerActionUpdate extends CController {
 
 		if ($eventsource == EVENT_SOURCE_DISCOVERY) {
 			// todo : remove this. this is just for testing
-			$action['filter']['conditions'][0]['conditiontype'] = '21';
-			$action['filter']['conditions'][0]['operator'] = '0';
-			$action['filter']['conditions'][0]['value'] = 1;
 			unset ($action['operations'][0]['esc_step_from'], $action['operations'][0]['esc_step_to']);
 		}
 
 		if ($eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
 			// todo : remove this. this is just for testing
 			unset ($action['operations'][0]['esc_step_from'], $action['operations'][0]['esc_step_to']);
-		}
-
-		if ($eventsource == EVENT_SOURCE_INTERNAL || $eventsource == EVENT_SOURCE_SERVICE) {
-			// todo : remove this. this is just for testing
-			$action['filter']['conditions'][0]['conditiontype'] = '26';
-			$action['filter']['conditions'][0]['operator'] = '0';
-			$action['filter']['conditions'][0]['value'] = 'test';
-			$action['filter']['conditions'][0]['value2'] = 'test2';
 		}
 
 		switch ($eventsource) {
