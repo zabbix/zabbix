@@ -32,25 +32,17 @@ window.action_edit_popup = new class {
 		this.eventsource = eventsource
 		this.row_num = 0;
 
-		this.processTypeOfCalculation();
-
 		this._initActionButtons();
+		this.createExistingConditionRow(conditions);
+		//this.processTypeOfCalculation();
 
 		this.dialogue.addEventListener('condition.dialogue.submit', (e) => {
 		// todo: add multiselect title, not value
 
-			this.row = document.createElement('tr');
 			this.createRow(this.row, e.detail.inputs);
 			this.processTypeOfCalculation();
 			$('#conditionTable tr:last').before(this.row);
-
 		});
-
-		// todo: add existing data to conditions table (for action edit)
-		/*	if (data.conditions){
-				data.conditions.forEach(
-			)*/
-	//	}
 	}
 
 	_initActionButtons() {
@@ -166,6 +158,23 @@ window.action_edit_popup = new class {
 		cell.appendChild(btn);
 		// this.processTypeOfCalculation();
 		return cell;
+	}
+
+	createExistingConditionRow(conditions) {
+		conditions.forEach(condition => {
+				const row = document.createElement('tr');
+				const cell = document.createElement('td');
+
+				this.label = condition.formulaid;
+				cell.append(this.label)
+				row.append(cell)
+				this.row_num ++;
+				row.append(this.createNameCell(condition));
+				row.append(this.createRemoveCell());
+
+				$('#conditionTable tr:last').before(row);
+			}
+		)
 	}
 
 	submit() {
