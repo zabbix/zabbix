@@ -1565,7 +1565,7 @@ class CWidgetHelper {
 	}
 
 	public static function getThresholdsTemplate($name, $index = '#{rowNum}', $color = '#{color}',
-		$threshold = '#{threshold}'): CRow {
+			$threshold = '#{threshold}'): CRow {
 		return (new CRow([
 			(new CColor($name.'['.$index.'][color]', $color))->appendColorPickerJs(false),
 			(new CTextBox($name.'['.$index.'][threshold]', $threshold, false))

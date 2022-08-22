@@ -101,7 +101,7 @@ else {
 		new CLink($rows, $data['url'])
 	))->addClass('dashboard-widget-item');
 
-	$body->addStyle('background-color: #'.$data['bg_color']);
+	$body->addStyle('background-color: #'.$data['bg_color'].';');
 }
 
 $output = [

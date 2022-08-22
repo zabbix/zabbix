@@ -33,7 +33,7 @@ window.widget_item_form = new class {
 		this.advance_configuration = document.getElementById('adv_conf');
 		this.units_show = document.getElementById('units_show');
 
-		jQuery('#itemid').on('change', this.updateWarningIcon);
+		jQuery('#itemid').on('change', () => this.updateWarningIcon());
 
 		for (const colorpicker of this.form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
@@ -137,6 +137,7 @@ window.widget_item_form = new class {
 		document.getElementById('item-value-thresholds-warning').style.display = 'none';
 
 		const ms_item_data = $('#itemid').multiSelect('getData');
+
 		if (ms_item_data.length > 0) {
 			const curl = new Curl('jsrpc.php', false);
 			curl.setArgument('method', 'item_value_type.get');
@@ -158,9 +159,6 @@ window.widget_item_form = new class {
 				.catch((exception) => {
 					console.log('Could not get value data type of the item:', exception);
 				});
-		}
-		else {
-			document.getElementById('item-value-thresholds-warning').style.display = '';
 		}
 	}
 };
