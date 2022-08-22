@@ -20,7 +20,7 @@
 #ifndef ZABBIX_THREADS_H
 #define ZABBIX_THREADS_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	/* the ZBXEndThread function is implemented in service.c file */

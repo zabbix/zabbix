@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PARAM_H
 #define ZABBIX_PARAM_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type);
 int	num_param(const char *p);

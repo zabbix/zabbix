@@ -23,7 +23,7 @@
 #include <sys/dlpi_ext.h>
 #include <sys/mib.h>
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "sysinfo.h"
 #include "zbxjson.h"
 

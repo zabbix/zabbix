@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-09 19:31+0000\n"
+"PO-Revision-Date: 2022-08-19 14:42+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -4983,7 +4983,7 @@ msgstr "נתונים"
 #: include/classes/helpers/CMenuHelper.php:215
 #: include/classes/helpers/CRoleHelper.php:337
 msgid "Data collection"
-msgstr ""
+msgstr "איסוף נתונים"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
@@ -14285,7 +14285,7 @@ msgstr "תרשימי הורה"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "ערך מארח הורה"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -20017,7 +20017,7 @@ msgstr "סטטיסטיקת זיכרון מטמון של VMware. המצבים ה�
 
 #: include/classes/data/CItemData.php:1252
 msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "מצב נתוני התראות בקלאסטר VMware,‏ מחזירה JSON,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה קלאסטר VMware"
 
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
@@ -20025,7 +20025,7 @@ msgstr "מודד ביצועי קלאסטר VMware,‏ <url> - כתובת שיר�
 
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
-msgstr ""
+msgstr "עדיפות קלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה קלאסטר VMware,‏ <prop> - נתיב מאפיין"
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"

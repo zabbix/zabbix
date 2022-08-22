@@ -46,3 +46,4 @@ CREATE TABLE history_text (
 	ns                       number(10)      DEFAULT '0'               NOT NULL,
 	CONSTRAINT PK_HISTORY_TEXT PRIMARY KEY (itemid,clock,ns)
 );
+

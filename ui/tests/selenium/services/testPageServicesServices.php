@@ -906,7 +906,7 @@ class testPageServicesServices extends CWebTest {
 			$this->assertSame($headers, $table->getHeadersText());
 		}
 
-		// Reset filer not to impact the results of next tests.
+		// Reset filter not to impact the results of next tests.
 		$filter_form->query('button:Reset')->one()->click();
 
 		// Check breadcrumbs and "Parent services" headers disappeared.

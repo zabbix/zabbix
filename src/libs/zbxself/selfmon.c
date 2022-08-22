@@ -20,7 +20,7 @@
 #include "selfmon.h"
 
 #include "zbxself.h"
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifndef _WINDOWS
 #	include "zbxmutexs.h"

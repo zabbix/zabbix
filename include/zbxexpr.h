@@ -20,7 +20,7 @@
 #ifndef ZABBIX_EXPR_H
 #define ZABBIX_EXPR_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);

@@ -22,7 +22,7 @@
 #include "zbxmockutil.h"
 
 #include "config.h"
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "zbxdbhigh.h"

@@ -22,7 +22,7 @@
 #include "fatal.h"
 #include "sigcommon.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "cfg.h"
 #include "log.h"
 #include "control.h"

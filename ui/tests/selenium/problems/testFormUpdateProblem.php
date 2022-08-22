@@ -178,7 +178,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for char'.
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for float'));
-		DBexecute('UPDATE triggers SET value = 1, manual_close = 1, WHERE description = '.zbx_dbstr('Trigger for char'));
+		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.zbx_dbstr('Trigger for char'));
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for log'));
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for unsigned'));
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for text'));

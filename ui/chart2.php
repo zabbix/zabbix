@@ -151,12 +151,12 @@ if (hasRequest('outer')) {
 	$graph->setOuter(getRequest('outer'));
 }
 
-$min_dimentions = $graph->getMinDimensions();
-if ($min_dimentions['width'] > $graph->getWidth()) {
-	$graph->setWidth($min_dimentions['width']);
+$min_dimensions = $graph->getMinDimensions();
+if ($min_dimensions['width'] > $graph->getWidth()) {
+	$graph->setWidth($min_dimensions['width']);
 }
-if ($min_dimentions['height'] > $graph->getHeight()) {
-	$graph->setHeight($min_dimentions['height']);
+if ($min_dimensions['height'] > $graph->getHeight()) {
+	$graph->setHeight($min_dimensions['height']);
 }
 
 if (getRequest('onlyHeight', '0') === '1') {

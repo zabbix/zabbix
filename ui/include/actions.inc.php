@@ -1746,7 +1746,7 @@ function makeEventActionsIcons($eventid, $actions, $users) {
 }
 
 /**
- * Create icon with hintbox for event suppresions.
+ * Create icon with hintbox for event suppressions.
  * Records must be passed in the order starting from latest by field 'clock'.
  *
  * @param array  $data

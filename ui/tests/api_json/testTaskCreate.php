@@ -92,7 +92,7 @@ class testTaskCreate extends CAPITest {
 		];
 
 		// Create host interfaces separately.
-		$insterfaces_data = [
+		$interfaces_data = [
 			[
 				'hostid' => self::$data['hostids']['monitored'],
 				'type' => INTERFACE_TYPE_AGENT,
@@ -112,7 +112,7 @@ class testTaskCreate extends CAPITest {
 				'port' => '10060'
 			]
 		];
-		$interfaces = CDataHelper::call('hostinterface.create', $insterfaces_data);
+		$interfaces = CDataHelper::call('hostinterface.create', $interfaces_data);
 		$this->assertArrayHasKey('interfaceids', $interfaces);
 		$interfaceid_monitored = $interfaces['interfaceids'][0];
 		$interfaceid_not_monitored = $interfaces['interfaceids'][1];
