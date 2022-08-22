@@ -464,6 +464,8 @@ close:
 	zbx_free(wdir);
 
 #else	/* not _WINDOWS */
+	/* block signals to prevent interruption of statements when runtime control command is issued */
+	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR1);
 	sigaddset(&mask, SIGUSR2);
 
