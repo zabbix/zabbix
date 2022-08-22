@@ -460,8 +460,8 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Item two discard uncahnged',
-						'Key' => 'item-two-discard-uncahnged'
+						'Name' => 'Item two discard unchanged',
+						'Key' => 'item-two-discard-unchanged'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged'],
@@ -608,7 +608,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Two equal discard unchanged with heartbeat',
-						'Key' => 'two-equal-discard-uncahnged-with-heartbeat'
+						'Key' => 'two-equal-discard-unchanged-with-heartbeat'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
@@ -622,7 +622,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Two different discard unchanged with heartbeat',
-						'Key' => 'two-different-discard-uncahnged-with-heartbeat'
+						'Key' => 'two-different-discard-unchanged-with-heartbeat'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
@@ -636,7 +636,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat empty',
-						'Key' => 'discard-uncahnged-with-heartbeat-empty'
+						'Key' => 'discard-unchanged-with-heartbeat-empty'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat']
@@ -649,7 +649,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat symbols',
-						'Key' => 'discard-uncahnged-with-heartbeat-symbols'
+						'Key' => 'discard-unchanged-with-heartbeat-symbols'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '3g!@#$%^&*()-=']
@@ -662,7 +662,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discardunchanged with heartbeat letters string',
-						'Key' => 'discard-uncahnged-with-heartbeat-letters-string'
+						'Key' => 'discard-unchanged-with-heartbeat-letters-string'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => 'abc']
@@ -675,7 +675,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat comma',
-						'Key' => 'discard-uncahnged-with-heartbeat-comma'
+						'Key' => 'discard-unchanged-with-heartbeat-comma'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1,5']
@@ -688,7 +688,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat dot',
-						'Key' => 'discard-uncahnged-with-heartbeat-dot'
+						'Key' => 'discard-unchanged-with-heartbeat-dot'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1.5']
@@ -701,7 +701,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat negative',
-						'Key' => 'discard-uncahnged-with-heartbeat-negative'
+						'Key' => 'discard-unchanged-with-heartbeat-negative'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '-3']
@@ -714,7 +714,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat zero',
-						'Key' => 'discard-uncahnged-with-heartbeat-zero'
+						'Key' => 'discard-unchanged-with-heartbeat-zero'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '0']
@@ -727,7 +727,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat maximum',
-						'Key' => 'uncahnged-with-heartbeat-max'
+						'Key' => 'unchanged-with-heartbeat-max'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '788400001']
