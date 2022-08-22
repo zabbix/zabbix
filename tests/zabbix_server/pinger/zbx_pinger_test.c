@@ -20,7 +20,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
-#include "common.h"
+#include "zbxcommon.h"
 
 #include "../../../src/zabbix_server/pinger/pinger.c"
 

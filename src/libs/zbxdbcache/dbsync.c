@@ -954,6 +954,33 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: reads autoreg hosts table in order to cache autoreg_host entries  *
+ *          for hosts monitored directly by Zabbix server                     *
+ *                                                                            *
+ * Parameter: sync - [OUT] result of select, only during initialization       *
+ *                                                                            *
+ * Return value: SUCCEED - entries retrieved or already synced                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync)
+{
+	if (ZBX_DBSYNC_INIT != sync->mode)
+		return SUCCEED;
+
+	if (NULL == (sync->dbresult = DBselect(
+			"select host,listen_ip,listen_dns,host_metadata,flags,listen_port"
+			" from autoreg_host"
+			" where proxy_hostid is null")))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: compares hosts table with cached configuration data               *
  *          and populates the changeset                                       *
  *                                                                            *
@@ -3075,18 +3102,8 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	int	ret = SUCCEED;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,pp.error_handler,"
-				"pp.error_handler_params"
-			" from item_preproc pp,items i,hosts h"
-			" where pp.itemid=i.itemid"
-				" and i.hostid=h.hostid"
-				" and (h.proxy_hostid is null"
-					" or i.type in (%d,%d,%d))"
-				" and h.status in (%d,%d)"
-				" and i.flags<>%d",
-			ITEM_TYPE_INTERNAL, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE);
+			"select item_preprocid,itemid,type,params,step,error_handler,error_handler_params"
+			" from item_preproc");
 
 	dbsync_prepare(sync, 7, NULL);
 
@@ -3097,7 +3114,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "pp.item_preprocid", "and",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "item_preprocid", "where",
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_PREPROC)]);
 out:
 	zbx_free(sql);

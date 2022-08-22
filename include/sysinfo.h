@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SYSINFO_H
 #define ZABBIX_SYSINFO_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "module.h"
 
 /* CHECK RESULT */

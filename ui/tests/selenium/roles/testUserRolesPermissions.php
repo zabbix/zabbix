@@ -516,11 +516,14 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	public function testUserRolesPermissions_Module() {
 		$pages_before = [
+			'Dashboards',
 			'Monitoring',
 			'Services',
 			'Inventory',
 			'Reports',
-			'Configuration',
+			'Data collection',
+			'Alerts',
+			'Users',
 			'Administration',
 			'Module 5 menu'
 		];
@@ -568,7 +571,7 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Inventory',
 					'page' => 'Hosts',
 					'displayed_ui' => [
-							'Overview'
+						'Overview'
 					],
 					'link' => ['hostinventories.php']
 				]
@@ -581,7 +584,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Scheduled reports',
 						'System information',
 						'Triggers top 100',
-						'Audit',
+						'Audit log',
 						'Action log',
 						'Notifications'
 					],
@@ -596,7 +599,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Scheduled reports',
 						'Availability report',
 						'Triggers top 100',
-						'Audit',
+						'Audit log',
 						'Action log',
 						'Notifications'
 					],
@@ -611,7 +614,7 @@ class testUserRolesPermissions extends CWebTest {
 						'System information',
 						'Scheduled reports',
 						'Triggers top 100',
-						'Audit',
+						'Audit log',
 						'Action log',
 						'Notifications'
 					],
@@ -626,7 +629,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Availability report',
 						'System information',
 						'Scheduled reports',
-						'Audit',
+						'Audit log',
 						'Action log',
 						'Notifications'
 					],
@@ -636,7 +639,7 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'section' => 'Reports',
-					'page' => 'Audit',
+					'page' => 'Audit log',
 					'displayed_ui' => [
 						'Availability report',
 						'System information',
@@ -657,7 +660,7 @@ class testUserRolesPermissions extends CWebTest {
 						'System information',
 						'Scheduled reports',
 						'Triggers top 100',
-						'Audit',
+						'Audit log',
 						'Notifications'
 					],
 					'link' => ['auditacts.php']
@@ -672,7 +675,7 @@ class testUserRolesPermissions extends CWebTest {
 						'System information',
 						'Scheduled reports',
 						'Triggers top 100',
-						'Audit',
+						'Audit log',
 						'Action log'
 					],
 					'link' => ['report4.php']
@@ -680,13 +683,28 @@ class testUserRolesPermissions extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Configuration',
-					'page' => 'Host groups',
+					'section' => 'Data collection',
+					'page' => 'Template groups',
 					'displayed_ui' => [
+						'Host groups',
 						'Templates',
 						'Hosts',
 						'Maintenance',
-						'Actions',
+						'Event correlation',
+						'Discovery'
+					],
+					'link' => ['zabbix.php?action=templategroup.list']
+				]
+			],
+			[
+				[
+					'section' => 'Data collection',
+					'page' => 'Host groups',
+					'displayed_ui' => [
+						'Template groups',
+						'Templates',
+						'Hosts',
+						'Maintenance',
 						'Event correlation',
 						'Discovery'
 					],
@@ -695,13 +713,13 @@ class testUserRolesPermissions extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Configuration',
+					'section' => 'Data collection',
 					'page' => 'Templates',
 					'displayed_ui' => [
+						'Template groups',
 						'Host groups',
 						'Hosts',
 						'Maintenance',
-						'Actions',
 						'Event correlation',
 						'Discovery'
 					],
@@ -710,13 +728,13 @@ class testUserRolesPermissions extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Configuration',
+					'section' => 'Data collection',
 					'page' => 'Hosts',
 					'displayed_ui' => [
+						'Template groups',
 						'Host groups',
 						'Templates',
 						'Maintenance',
-						'Actions',
 						'Event correlation',
 						'Discovery'
 					],
@@ -725,13 +743,13 @@ class testUserRolesPermissions extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Configuration',
+					'section' => 'Data collection',
 					'page' => 'Maintenance',
 					'displayed_ui' => [
+						'Template groups',
 						'Host groups',
 						'Templates',
 						'Hosts',
-						'Actions',
 						'Event correlation',
 						'Discovery'
 					],
@@ -740,34 +758,14 @@ class testUserRolesPermissions extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Configuration',
-					'page' => 'Actions',
-					'displayed_ui' => [
-						'Host groups',
-						'Templates',
-						'Hosts',
-						'Maintenance',
-						'Event correlation',
-						'Discovery'
-					],
-					'link' => [
-						'actionconf.php?eventsource=0',
-						'actionconf.php?eventsource=1',
-						'actionconf.php?eventsource=2',
-						'actionconf.php?eventsource=3'
-					]
-				]
-			],
-			[
-				[
-					'section' => 'Configuration',
+					'section' => 'Data collection',
 					'page' => 'Event correlation',
 					'displayed_ui' => [
+						'Template groups',
 						'Host groups',
 						'Templates',
 						'Hosts',
 						'Maintenance',
-						'Actions',
 						'Discovery'
 					],
 					'link' => ['zabbix.php?action=correlation.list']
@@ -775,14 +773,14 @@ class testUserRolesPermissions extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Configuration',
+					'section' => 'Data collection',
 					'page' => 'Discovery',
 					'displayed_ui' => [
+						'Template groups',
 						'Host groups',
 						'Templates',
 						'Hosts',
 						'Maintenance',
-						'Actions',
 						'Event correlation'
 					],
 					'link' => ['zabbix.php?action=discovery.list']
@@ -790,28 +788,136 @@ class testUserRolesPermissions extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Administration',
-					'page' => 'General',
+					'section' => 'Alerts',
+					'page' => 'Actions',
 					'displayed_ui' => [
-						'Proxies',
-						'Authentication',
+						'Media types',
+						'Scripts'
+					],
+					'link' => [
+						'actionconf.php?eventsource=0',
+						'actionconf.php?eventsource=1',
+						'actionconf.php?eventsource=2',
+						'actionconf.php?eventsource=3',
+						'actionconf.php?eventsource=4'
+					]
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Media types',
+					'displayed_ui' => [
+						'Trigger actions',
+						'Service actions',
+						'Discovery actions',
+						'Autoregistration actions',
+						'Internal actions',
+						'Scripts'
+					],
+					'link' => ['zabbix.php?action=mediatype.list']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Scripts',
+					'displayed_ui' => [
+						'Trigger actions',
+						'Service actions',
+						'Discovery actions',
+						'Autoregistration actions',
+						'Internal actions',
+						'Media types'
+					],
+					'link' => ['zabbix.php?action=script.list']
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'User groups',
+					'displayed_ui' => [
+						'User roles',
+						'Users',
+						'API tokens',
+						'Authentication'
+					],
+					'link' => ['zabbix.php?action=usergroup.list']
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'user_roles' => true,
+					'page' => 'User roles',
+					'displayed_ui' => [
+						'User groups',
+						'Users',
+						'API tokens',
+						'Authentication'
+					],
+					'link' => ['zabbix.php?action=userrole.list']
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'Users',
+					'displayed_ui' => [
+						'User groups',
+						'User roles',
+						'API tokens',
+						'Authentication'
+					],
+					'link' => ['zabbix.php?action=user.list']
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'API tokens',
+					'displayed_ui' => [
 						'User groups',
 						'User roles',
 						'Users',
-						'Media types',
-						'Scripts',
+						'Authentication'
+					],
+					'link' => ['zabbix.php?action=token.list']
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'Authentication',
+					'displayed_ui' => [
+						'User groups',
+						'User roles',
+						'Users',
+						'API tokens'
+					],
+					'link' => ['zabbix.php?action=authentication.edit']
+				]
+			],
+			[
+				[
+					'section' => 'Administration',
+					'page' => 'General',
+					'displayed_ui' => [
+						'Audit log',
+						'Housekeeping',
+						'Proxies',
+						'Macros',
 						'Queue'
 					],
 					'link' => [
 						'zabbix.php?action=gui.edit',
 						'zabbix.php?action=autoreg.edit',
-						'zabbix.php?action=housekeeping.edit',
 						'zabbix.php?action=image.list',
 						'zabbix.php?action=iconmap.list',
 						'zabbix.php?action=regex.list',
-						'zabbix.php?action=macros.edit',
-						'zabbix.php?action=token.list',
 						'zabbix.php?action=trigdisplay.edit',
+						'zabbix.php?action=geomaps.edit',
 						'zabbix.php?action=module.list',
 						'zabbix.php?action=miscconfig.edit'
 					]
@@ -820,15 +926,40 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'section' => 'Administration',
+					'page' => 'Audit log',
+					'displayed_ui' => [
+						'General',
+						'Proxies',
+						'Housekeeping',
+						'Macros',
+						'Queue'
+					],
+					'link' => ['zabbix.php?action=audit.settings.edit']
+				]
+			],
+			[
+				[
+					'section' => 'Administration',
+					'page' => 'Housekeeping',
+					'displayed_ui' => [
+						'General',
+						'Audit log',
+						'Proxies',
+						'Macros',
+						'Queue'
+					],
+					'link' => ['zabbix.php?action=housekeeping.edit']
+				]
+			],
+			[
+				[
+					'section' => 'Administration',
 					'page' => 'Proxies',
 					'displayed_ui' => [
 						'General',
-						'Authentication',
-						'User groups',
-						'User roles',
-						'Users',
-						'Media types',
-						'Scripts',
+						'Audit log',
+						'Housekeeping',
+						'Macros',
 						'Queue'
 					],
 					'link' => ['zabbix.php?action=proxy.list']
@@ -837,86 +968,15 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'section' => 'Administration',
-					'page' => 'Authentication',
+					'page' => 'Macros',
 					'displayed_ui' => [
 						'General',
+						'Audit log',
+						'Housekeeping',
 						'Proxies',
-						'User groups',
-						'User roles',
-						'Users',
-						'Media types',
-						'Scripts',
 						'Queue'
 					],
-					'link' => ['zabbix.php?action=authentication.edit']
-				]
-			],
-			[
-				[
-					'section' => 'Administration',
-					'page' => 'User groups',
-					'displayed_ui' => [
-						'General',
-						'Proxies',
-						'Authentication',
-						'User roles',
-						'Users',
-						'Media types',
-						'Scripts',
-						'Queue'
-					],
-					'link' => ['zabbix.php?action=usergroup.list']
-				]
-			],
-			[
-				[
-					'section' => 'Administration',
-					'page' => 'Users',
-					'displayed_ui' => [
-						'General',
-						'Proxies',
-						'Authentication',
-						'User roles',
-						'User groups',
-						'Media types',
-						'Scripts',
-						'Queue'
-					],
-					'link' => ['zabbix.php?action=user.list']
-				]
-			],
-			[
-				[
-					'section' => 'Administration',
-					'page' => 'Media types',
-					'displayed_ui' => [
-						'General',
-						'Proxies',
-						'Authentication',
-						'User roles',
-						'User groups',
-						'Users',
-						'Scripts',
-						'Queue'
-					],
-					'link' => ['zabbix.php?action=mediatype.list']
-				]
-			],
-			[
-				[
-					'section' => 'Administration',
-					'page' => 'Scripts',
-					'displayed_ui' => [
-						'General',
-						'Proxies',
-						'Authentication',
-						'User roles',
-						'User groups',
-						'Users',
-						'Media types',
-						'Queue'
-					],
-					'link' => ['zabbix.php?action=script.list']
+					'link' => ['zabbix.php?action=macros.edit']
 				]
 			],
 			[
@@ -925,13 +985,10 @@ class testUserRolesPermissions extends CWebTest {
 					'page' => 'Queue',
 					'displayed_ui' => [
 						'General',
+						'Audit log',
+						'Housekeeping',
 						'Proxies',
-						'Authentication',
-						'User roles',
-						'User groups',
-						'Users',
-						'Media types',
-						'Scripts'
+						'Macros'
 					],
 					'link' => [
 						'zabbix.php?action=queue.overview',
@@ -942,28 +999,9 @@ class testUserRolesPermissions extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Administration',
-					'user_roles' => true,
-					'page' => 'User roles',
-					'displayed_ui' => [
-						'General',
-						'Proxies',
-						'Authentication',
-						'Queue',
-						'User groups',
-						'Users',
-						'Media types',
-						'Scripts'
-					],
-					'link' => ['zabbix.php?action=userrole.list']
-				]
-			],
-			[
-				[
 					'section' => 'Monitoring',
 					'page' => 'Problems',
 					'displayed_ui' => [
-						'Dashboard',
 						'Hosts',
 						'Latest data',
 						'Maps',
@@ -977,7 +1015,6 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Monitoring',
 					'page' => 'Hosts',
 					'displayed_ui' => [
-						'Dashboard',
 						'Problems',
 						'Latest data',
 						'Maps',
@@ -991,7 +1028,6 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Monitoring',
 					'page' => 'Latest data',
 					'displayed_ui' => [
-						'Dashboard',
 						'Problems',
 						'Hosts',
 						'Maps',
@@ -1005,7 +1041,6 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Monitoring',
 					'page' => 'Maps',
 					'displayed_ui' => [
-						'Dashboard',
 						'Problems',
 						'Hosts',
 						'Latest data',
@@ -1019,7 +1054,6 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Monitoring',
 					'page' => 'Discovery',
 					'displayed_ui' => [
-						'Dashboard',
 						'Problems',
 						'Hosts',
 						'Latest data',
@@ -1033,7 +1067,6 @@ class testUserRolesPermissions extends CWebTest {
 					'section' => 'Services',
 					'page' => 'Services',
 					'displayed_ui' => [
-						'Service actions',
 						'SLA',
 						'SLA report'
 					],
@@ -1043,22 +1076,9 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'section' => 'Services',
-					'page' => 'Service actions',
-					'displayed_ui' => [
-						'Services',
-						'SLA',
-						'SLA report'
-					],
-					'link' => ['actionconf.php?eventsource=4']
-				]
-			],
-			[
-				[
-					'section' => 'Services',
 					'page' => 'SLA',
 					'displayed_ui' => [
 						'Services',
-						'Service actions',
 						'SLA report'
 					],
 					'link' => ['zabbix.php?action=sla.list']
@@ -1070,7 +1090,6 @@ class testUserRolesPermissions extends CWebTest {
 					'page' => 'SLA report',
 					'displayed_ui' => [
 						'Services',
-						'Service actions',
 						'SLA'
 					],
 					'link' => ['zabbix.php?action=slareport.list']
@@ -1086,22 +1105,20 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	public function testUserRolesPermissions_UI($data) {
 		$user_roles = [
-			'Administration' => [
-				'General',
-				'Proxies',
-				'Authentication',
-				'User roles',
+			'Users' => [
 				'User groups',
+				'User roles',
 				'Users',
-				'Media types',
-				'Scripts'
+				'API tokens',
+				'Authentication'
 			]
 		];
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
 		foreach ([true, false] as $action_status) {
 			$menu = CMainMenuElement::find()->one();
-			if ($data['section'] !== 'Monitoring') {
+
+			if ($data['section'] !== 'Dashboards') {
 				$menu->select($data['section']);
 			}
 
@@ -1143,74 +1160,6 @@ class testUserRolesPermissions extends CWebTest {
 		}
 	}
 
-	public static function getDashboardData() {
-		return [
-			[
-				[
-					'page' => 'Dashboard',
-					'button' => 'Problems',
-					'displayed_ui' => [
-						'Problems',
-						'Hosts',
-						'Latest data',
-						'Maps',
-						'Discovery'
-					]
-				]
-			],
-			[
-				[
-					'button' => 'Hosts',
-					'displayed_ui' => [
-						'Hosts',
-						'Latest data',
-						'Maps',
-						'Discovery'
-					]
-				]
-			]
-//			TODO: uncomment after ZBX-19479 fix.
-//			[
-//				[
-//					'button' => 'Overview',
-//					'displayed_ui' => [
-//						'Overview',
-//						'Latest data',
-//						'Maps',
-//						'Discovery'
-//					]
-//				]
-//			]
-		];
-	}
-
-	/**
-	 * Disabling access to Dashboard. Check warning message text and button.
-	 *
-	 * @dataProvider getDashboardData
-	 */
-	public function testUserRolesPermissions_Dashboard($data) {
-		$this->page->userLogin('user_for_role', 'zabbixzabbix');
-
-		foreach ([true, false] as $action_status) {
-			$main_section = $this->query('xpath://ul[@class="menu-main"]')->query('link:Monitoring');
-
-			if (array_key_exists('page', $data)) {
-				$this->assertEquals($action_status, $main_section->one()->parents('tag:li')->query('link', $data['page'])->exists());
-			}
-
-			if ($action_status) {
-				$this->changeRoleRule(['Monitoring' => $data['displayed_ui']]);
-			}
-			else {
-				$this->checkLinks(['zabbix.php?action=dashboard.view'], $data['button']);
-				$this->changeRoleRule(['Monitoring' => ['Dashboard', 'Problems', 'Hosts', 'Latest data', 'Maps',
-						'Discovery']]
-				);
-			}
-		}
-	}
-
 	/**
 	 * Manage API token action check.
 	 */
@@ -1220,6 +1169,16 @@ class testUserRolesPermissions extends CWebTest {
 		$this->assertEquals('TEST_SERVER_NAME: API tokens', $this->page->getTitle());
 		$this->changeRoleRule(['Manage API tokens' => false]);
 		$this->checkLinks(['zabbix.php?action=user.token.list']);
+	}
+
+	/**
+	 * Disabling access to Dashboard. Check warning message text and button.
+	 */
+	public function testUserRolesPermissions_Dashboard() {
+		$this->page->userLogin('user_for_role', 'zabbixzabbix');
+		$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
+		$this->changeRoleRule(['Dashboards' => false]);
+		$this->checkLinks(['zabbix.php?action=dashboard.view'], 'Problems');
 	}
 
 	public static function getRoleServiceData() {
@@ -1333,7 +1292,9 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'role_config' => [
 						'Read-write access to services' => 'None',
-						'Read-only access to services' => 'Service list'
+						'Read-only access to services' => 'Service list',
+						// added element 'API methods' with default value for page scroll
+						'API methods' => 'Deny list'
 					],
 					'service_list' => [
 						'xpath:(//div[@class="multiselect-control"])[2]' => 'Child of parent 1'
@@ -1396,11 +1357,13 @@ class testUserRolesPermissions extends CWebTest {
 			$form->fill($data['service_list']);
 		}
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'User role updated');
 		$this->page->logout();
 
 		// Login as user that belongs to the updated row and check access to services based on applied configuration.
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=service.list')->waitUntilReady();
+		$this->assertEquals('user_for_role', $this->query('xpath://a[text()="User settings"]')->one()->getAttribute('title'));
 
 		$services_mode = $this->query('id:list_mode')->asSegmentedRadio()->one(false);
 
@@ -1677,14 +1640,14 @@ class testUserRolesPermissions extends CWebTest {
 	 * @param array $links		checked links after disabling action
 	 * @param string $page		page name displayed on error message button
 	 */
-	private function checkLinks($links, $page = 'Dashboard') {
+	private function checkLinks($links, $page = 'Dashboards') {
 		foreach ($links as $link) {
 			$this->page->open($link)->waitUntilReady();
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "user_for_role". '.
 					'You have no permissions to access this page.');
 			$this->query('button:Go to "'.$page.'"')->one()->waitUntilClickable()->click();
 
-			if ($page === 'Dashboard') {
+			if ($page === 'Dashboards') {
 				$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 			}
 		}

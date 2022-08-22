@@ -19,7 +19,7 @@
 
 #include "dbconfig.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
@@ -99,8 +99,8 @@ static void	DCdump_hosts(void)
 		int	j;
 
 		host = (ZBX_DC_HOST *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " host:'%s' name:'%s' status:%u", host->hostid,
-				host->host, host->name, host->status);
+		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " host:'%s' name:'%s' status:%u revision:%u",
+				host->hostid, host->host, host->name, host->status, host->revision);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  proxy_hostid:" ZBX_FS_UI64, host->proxy_hostid);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", host->data_expected_from);
@@ -127,9 +127,37 @@ static void	DCdump_hosts(void)
 
 			zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64, interface->interfaceid);
 		}
+
+		for (j = 0; j < host->active_items.values_num; j++)
+		{
+			ZBX_DC_ITEM	*item = host->active_items.values[j];
+
+			zabbix_log(LOG_LEVEL_TRACE, "  itemid:" ZBX_FS_UI64, item->itemid);
+		}
 	}
 
 	zbx_vector_ptr_destroy(&index);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
+static void	DCdump_autoreg_hosts(void)
+{
+	ZBX_DC_AUTOREG_HOST	*autoreg_host;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&config->autoreg_hosts, &iter);
+
+	while (NULL != (autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, " host:'%s' listen_ip:'%s' listen_dns:'%s' host_metadata:'%s' flags:%d"
+				" timestamp:%d listen_port:%u",
+				autoreg_host->host, autoreg_host->listen_ip, autoreg_host->listen_dns,
+				autoreg_host->host_metadata, autoreg_host->flags, autoreg_host->timestamp,
+				autoreg_host->listen_port);
+	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
@@ -558,8 +586,8 @@ static void	DCdump_items(void)
 	for (i = 0; i < index.values_num; i++)
 	{
 		item = (ZBX_DC_ITEM *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " key:'%s'",
-				item->itemid, item->hostid, item->key);
+		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " key:'%s' revision:%u",
+				item->itemid, item->hostid, item->key, item->revision);
 		zabbix_log(LOG_LEVEL_TRACE, "  type:%u value_type:%u", item->type, item->value_type);
 		zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64, item->interfaceid);
 		zabbix_log(LOG_LEVEL_TRACE, "  state:%u error:'%s'", item->state, item->error);
@@ -772,7 +800,7 @@ static void	DCdump_functions(void)
 	{
 		function = (ZBX_DC_FUNCTION *)index.values[i];
 		zabbix_log(LOG_LEVEL_DEBUG, "functionid:" ZBX_FS_UI64 " triggerid:" ZBX_FS_UI64 " itemid:"
-				ZBX_FS_UI64 " function:'%s' parameter:'%s' type:%u timer_revision:%d",
+				ZBX_FS_UI64 " function:'%s' parameter:'%s' type:%u timer_revision:%u",
 				function->functionid, function->triggerid, function->itemid, function->function,
 				function->parameter, function->type, function->timer_revision);
 
@@ -908,6 +936,8 @@ static void	DCdump_expressions(void)
 	zbx_vector_ptr_t	index;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zabbix_log(LOG_LEVEL_TRACE, "expression_revision:%u", config->expression_revision);
 
 	zbx_vector_ptr_create(&index);
 	zbx_hashset_iter_reset(&config->expressions, &iter);
@@ -1287,6 +1317,8 @@ static void	DCdump_maintenances(void)
 
 void	DCdump_configuration(void)
 {
+	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:%u) ===", config->revision);
+
 	DCdump_config();
 	DCdump_hosts();
 	DCdump_host_tags();
@@ -1311,4 +1343,5 @@ void	DCdump_configuration(void)
 	DCdump_host_groups();
 	DCdump_host_group_index();
 	DCdump_maintenances();
+	DCdump_autoreg_hosts();
 }
