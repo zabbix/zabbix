@@ -1538,7 +1538,7 @@ class CWidgetHelper {
 
 	public static function getThresholds($field) {
 		$thresholds_table = (new CTable())
-			->setId('thresholds_table_'.$field->getName())
+			->setId($field->getName().'-thresholds-table')
 			->addClass(ZBX_STYLE_TABLE_FORMS)
 			->setHeader([
 				'',

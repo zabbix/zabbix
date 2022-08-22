@@ -78,10 +78,10 @@ class CWidgetFieldThresholds extends CWidgetField {
 	 */
 	public function getJavascript() {
 		return '
-			var thresholds_table = jQuery("#thresholds_table_'.$this->getName().'");
+			var thresholds_table = jQuery("#'.$this->getName().'-thresholds-table");
 
 			thresholds_table
-				.dynamicRows({template: "#'.$this->getName().'"})
+				.dynamicRows({template: "#'.$this->getName().'-row-tmpl"})
 				.on("afteradd.dynamicRows", function(opt) {
 					const rows = this.querySelectorAll(".form_row");
 					jQuery(".color-picker input", rows[rows.length - 1])
