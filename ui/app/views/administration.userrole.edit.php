@@ -91,19 +91,14 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 		$form_grid->addItem([
 			new CLabel($section_label, $first_rule_key),
 			new CFormField(
-				(new CCheckBoxList())
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setOptions([[
-						'id' => $first_rule_key,
-						'name' => str_replace('.', '_', $first_rule_key),
-						'value' => 1,
-						'checked' => array_key_exists($first_rule_key, $data['rules']['ui'])
-							&& $data['rules']['ui'][$first_rule_key],
-						'unchecked_value' => 0
-					]])
-					->setVertical()
-					->setColumns(3)
-					->setEnabled(!$data['readonly'])
+				(new CCheckBox(str_replace('.', '_', $first_rule_key), 1))
+					->setId($first_rule_key)
+					->setChecked(
+						array_key_exists($first_rule_key, $data['rules']['ui'])
+						&& $data['rules']['ui'][$first_rule_key]
+					)
+					->setReadonly($data['readonly'])
+					->setUncheckedValue(0)
 			)
 		]);
 	} else {
