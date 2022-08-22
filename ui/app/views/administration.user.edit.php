@@ -73,24 +73,23 @@ if ($data['action'] === 'user.edit') {
 	$user_form_list
 		->addRow((new CLabel(_('Username'), 'username'))->setAsteriskMark(),
 			(new CTextBox('username', $data['username']))
-				->setReadonly($data['db_user']['username'] === ZBX_GUEST_USER)
+				->setReadonly($data['db_user']['username'] === ZBX_GUEST_USER || $data['readonly'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 				->setAttribute('maxlength', DB::getFieldLength('users', 'username'))
-				->setEnabled(!$data['readonly'])
 		)
 		->addRow(_x('Name', 'user first name'),
 			(new CTextBox('name', $data['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('users', 'name'))
-				->setEnabled(!$data['readonly'])
+				->setReadonly($data['readonly'])
 		)
 		->addRow(_('Last name'),
 			(new CTextBox('surname', $data['surname']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('users', 'surname'))
-				->setEnabled(!$data['readonly'])
+				->setReadonly($data['readonly'])
 		)
 		->addRow(
 			(new CLabel(_('Groups'), 'user_groups__ms'))->setAsteriskMark(),
