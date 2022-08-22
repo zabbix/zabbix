@@ -179,6 +179,7 @@ A......... [ZBX-19769] fixed performance when Host API is filtering records by s
 .......PS. [ZBX-21153] fixed info collection about access to VMware DS for HV with large number of connected DS (MVekslers)
 ........S. [ZBX-19821] fixed host prototype interface update when linking templates (wiper)
 ..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+..F....... [ZBX-21333] fixed housekeeper table usage with disabled housekeeping (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.1
@@ -488,6 +489,7 @@ A......... [ZBX-19769] fixed performance when Host API is filtering records by s
 .......PS. [ZBX-21153] fixed info collection about access to VMware DS for HV with large number of connected DS (MVekslers)
 ........S. [ZBX-19821] fixed host prototype interface update when linking templates (wiper)
 ..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+..F....... [ZBX-21333] fixed housekeeper table usage with disabled housekeeping (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.7
@@ -2540,6 +2542,7 @@ A......... [ZBX-19769] fixed performance when Host API is filtering records by s
 ........S. [ZBX-20656] updated active proxy throttling to allow task transfer (wiper)
 .......PS. [ZBX-21153] fixed info collection about access to VMware DS for HV with large number of connected DS (MVekslers)
 ..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+..F....... [ZBX-21333] fixed housekeeper table usage with disabled housekeeping (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.26
