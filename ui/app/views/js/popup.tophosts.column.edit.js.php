@@ -37,12 +37,12 @@ window.tophosts_column_edit_form = new class {
 			template: '#thresholds-row-tmpl',
 			dataCallback: (row_data) => {
 				if (!('color' in row_data)) {
-					let colors = this._$widget_form[0].querySelectorAll('.color-picker input');
-					let used_colors = [];
+					const colors = this._$widget_form[0].querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
+					const used_colors = [];
 
 					for (const color of colors) {
 						if (color.value !== '') {
-							used_colors.push((color.value));
+							used_colors.push(color.value);
 						}
 					}
 

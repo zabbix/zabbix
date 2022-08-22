@@ -501,19 +501,18 @@
 				return false;
 			}
 
-			form = document.getElementsByName(this.form_name)[0];
-
+			const form = document.getElementsByName(this.form_name)[0];
 			const itemTpl = new Template($('#tmpl-item-row-' + this.graphs.graphtype).html());
 
 			for (let i = 0; i < list.values.length; i++) {
-				let colors = form.querySelectorAll('.color-picker input');
-				let used_colors = [];
+				const used_colors = [];
 
-				for (const color of colors) {
+				for (const color of form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 					if (color.value !== '') {
-						used_colors.push((color.value));
+						used_colors.push(color.value);
 					}
 				}
+
 				const number = $('#itemsTable tr.sortable').length;
 				const item = {
 					number: number,

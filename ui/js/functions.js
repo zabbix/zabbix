@@ -169,39 +169,38 @@ var colorPalette = (function() {
 		/**
 		 * Gets next color from palette.
 		 *
-		 * @return string	hexadecimal color code
+		 * @param {array} used_colors  Array of already used hexadecimal color codes.
+		 *
+		 * @return string  Hexadecimal color code.
 		 */
 		getNextColor: function(used_colors) {
-			const color_usage = [];
-			for (const color of palette) {
-				color_usage.push({
-					color: color,
-					count: 0
-				});
-			}
+			const palette_usage = {};
 
-			for (const colorpicker of used_colors) {
-				let color = color_usage.find(function(el) {
-					return el.color == colorpicker;
-				});
-				if (color != undefined) {
-					color.count++;
+			for (const color of used_colors) {
+				if (palette.includes(color)) {
+					palette_usage[color] = ++palette_usage[color] || 1;
 				}
 			}
 
-			const least_frequent_count = color_usage.map((item) => item.count).sort(function(a, b) {
-				return a - b;
-			})[0];
+			if (!Object.keys(palette_usage).length) {
+				return palette[0] || '';
+			}
 
-			return color_usage.find((item) => {
-				return item.count == least_frequent_count;
-			}).color;
+			for (const color of palette) {
+				if (!(color in palette_usage)) {
+					palette_usage[color] = 0;
+				}
+			}
+
+			const min_used_color_count = Math.min(...Object.values(palette_usage));
+
+			return Object.keys(palette_usage).find(color => palette_usage[color] == min_used_color_count);
 		},
 
 		/**
-		 * Set theme specific color palette.
+		 * Set color palette.
 		 *
-		 * @param array colors  Array of hexadecimal color codes.
+		 * @param {array} colors  Array of hexadecimal color codes.
 		 */
 		setThemeColors: function(colors) {
 			palette = colors;

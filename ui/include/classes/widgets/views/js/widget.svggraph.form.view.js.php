@@ -315,19 +315,19 @@ window.widget_svggraph_form = new class {
 			? new Template(jQuery('#dataset-single-item-tmpl').html())
 			: new Template(jQuery('#dataset-pattern-item-tmpl').html());
 
-		let colors = this._form.querySelectorAll('.color-picker input');
-		let used_colors = [];
+		const used_colors = [];
 
-		for (const color of colors) {
+		for (const color of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			if (color.value !== '') {
-				used_colors.push((color.value));
+				used_colors.push(color.value);
 			}
 		}
 
 		this._dataset_wrapper.insertAdjacentHTML('beforeend', template.evaluate({
 			rowNum: this._dataset_index++,
-			color: (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>) ? '' :
-				colorPalette.getNextColor(used_colors)
+			color: type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>
+				? ''
+				: colorPalette.getNextColor(used_colors)
 		}));
 
 		const dataset = this._getOpenedDataset();
@@ -484,12 +484,11 @@ window.widget_svggraph_form = new class {
 			itemid: itemid
 		}));
 
-		let colors = this._form.querySelectorAll('.color-picker input');
-		let used_colors = [];
+		const used_colors = [];
 
-		for (const color of colors) {
+		for (const color of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			if (color.value !== '') {
-				used_colors.push((color.value));
+				used_colors.push(color.value);
 			}
 		}
 
