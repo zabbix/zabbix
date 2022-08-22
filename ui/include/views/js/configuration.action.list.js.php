@@ -107,9 +107,6 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					debugger;
-					console.log(chkbxRange.getSelectedIds());
-					debugger;
 					if ('error' in response) {
 						if ('title' in response.error) {
 							postMessageError(response.error.title);

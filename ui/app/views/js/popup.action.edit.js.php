@@ -227,7 +227,7 @@ window.action_edit_popup = new class {
 		this.overlay.setLoading();
 		const parameters = getFormFields(this.form);
 
-		PopUp('popup.action.edit', {name: getFormFields(this.form).name}, {
+		PopUp('popup.action.edit', {parameters}, {
 			dialogueid: 'action-edit',
 			dialogue_class: 'modal-popup-large'
 		});
