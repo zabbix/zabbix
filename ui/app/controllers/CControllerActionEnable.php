@@ -70,7 +70,7 @@ class CControllerActionEnable extends CController {
 				CMessageHelper::setErrorTitle(_n('Cannot enable action ', 'Cannot enable actions', $actions_count));
 			}
 
-			uncheckTableRows($eventsource);
+			uncheckTableRows('g_actionid');
 
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'action.list')

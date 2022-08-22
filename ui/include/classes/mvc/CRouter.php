@@ -57,7 +57,7 @@ class CRouter {
 		// action									controller												layout					view
 		'action.create'								=> ['CControllerActionCreate',							'layout.json',			null],
 		'action.enable'								=> ['CControllerActionEnable',							null,					null],
-		'action.delete'								=> ['CControllerActionDelete',							null,					null],
+		'action.delete'								=> ['CControllerActionDelete',							'layout.json',					null],
 		'action.disable'							=> ['CControllerActionDisable',							null,					null],
 		'action.update'								=> ['CControllerActionUpdate',							'layout.json',					null],
 		'action.list'								=> ['CControllerActionList',							'layout.htmlpage',		'configuration.action.list'],

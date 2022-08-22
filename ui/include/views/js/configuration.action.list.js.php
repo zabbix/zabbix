@@ -27,10 +27,14 @@
 <script>
 	const view = {
 		init({eventsource}) {
+			this.eventsource = eventsource;
+
 			document.addEventListener('click', (e) => {
 
 				if (e.target.classList.contains('js-action-create')) {
+
 					// todo: clean init -> make this edit function
+
 					const overlay = this.openActionPopup({eventsource: eventsource});
 
 					overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
@@ -43,8 +47,13 @@
 					});
 				}
 				else if (e.target.classList.contains('js-action-edit')) {
+
 					// todo: clean init -> make this edit function
-					const overlay = this.openActionPopup({eventsource: eventsource, actionid: e.target.attributes.actionid.nodeValue});
+
+					const overlay = this.openActionPopup({
+						eventsource: eventsource,
+						actionid: e.target.attributes.actionid.nodeValue
+					});
 					overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 						postMessageOk(e.detail.title);
 
@@ -53,8 +62,30 @@
 						}
 						location.href = location.href;
 					});
+
+					overlay.$dialogue[0].addEventListener('dialogue.delete', this.actionDelete, {once: true});
 				}
-			});
+
+				else if (e.target.classList.contains('action-delete')) {
+					this.massDeleteActions()
+				}
+
+			})
+		},
+
+		actionDelete(e) {
+			const data = e.detail;
+
+			if ('success' in data) {
+				postMessageOk(data.success.title);
+
+				if ('messages' in data.success) {
+					postMessageDetails('success', data.success.messages);
+				}
+			}
+
+			uncheckTableRows('actionForm');
+			location.href = location.href;
 		},
 
 		openActionPopup(parameters = {}) {
@@ -62,6 +93,54 @@
 				dialogueid: 'action-edit',
 				dialogue_class: 'modal-popup-large'
 			});
-		}
+		},
+
+		massDeleteActions() {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'action.delete');
+			curl.setArgument('eventsource', this.eventsource);
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: urlEncodeData({g_actionid: Object.keys(chkbxRange.getSelectedIds())})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					debugger;
+					console.log(chkbxRange.getSelectedIds());
+					debugger;
+					if ('error' in response) {
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+
+						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows('g_actionid');
+					}
+					else if ('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+
+						uncheckTableRows('g_actionid');
+					}
+
+					location.href = location.href;
+				})
+				.catch(() => {
+					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
+					addMessage(message_box);
+				})
+				.finally(() => {
+					uncheckTableRows('g_actionid');
+				});
+		},
 	};
 </script>

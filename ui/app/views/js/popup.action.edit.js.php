@@ -59,12 +59,6 @@ window.action_edit_popup = new class {
 			else if (e.target.classList.contains('js-update-operations-create')) {
 				this.openOperationPopup();
 			}
-			else if (e.target.classList.contains('js-action-clone')) {
-				this._clone();
-			}
-			else if (e.target.classList.contains('js-action-delete')) {
-				this._delete();
-			}
 			else if (e.target.classList.contains('element-table-remove')) {
 				this.row_count--;
 				this.processTypeOfCalculation();
@@ -160,7 +154,6 @@ window.action_edit_popup = new class {
 		btn.addEventListener('click', () => btn.closest('tr').remove());
 
 		cell.appendChild(btn);
-		// this.processTypeOfCalculation();
 		return cell;
 	}
 
@@ -230,84 +223,74 @@ window.action_edit_popup = new class {
 			});
 	}
 
-	_clone() {
-		// this.overlay.setLoading();
-		// const parameters = getFormFields(this.form);
+	clone() {
+		this.overlay.setLoading();
+		const parameters = getFormFields(this.form);
 
-		// PopUp('popup.action.edit', {name: getFormFields(this.form).name}, {
-		//	dialogueid: 'action-edit',
-		//	dialogue_class: 'modal-popup-large'
-		// });
+		PopUp('popup.action.edit', {name: getFormFields(this.form).name}, {
+			dialogueid: 'action-edit',
+			dialogue_class: 'modal-popup-large'
+		});
 	}
 
-	_delete() {
-		const curl = new Curl('zabbix.php', false);
+	delete(actionid) {
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'action.delete');
-		curl.addSID();
+		curl.setArgument('eventsource', this.eventsource);
 
-		// fetch(curl.getUrl(), {
-		//	method: 'POST',
-		//	headers: {'Content-Type': 'application/json'},
-		//	body: JSON.stringify({g_actionid: [this.actionid], eventsource: this.eventsource})
-		// })
-		//	.then((response) => response.json())
-		//	.then((response) => {
-		//		if ('error' in response) {
-		//			throw {error: response.error};
-		//		}
-		//		overlayDialogueDestroy(this.overlay.dialogueid);
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+			body: urlEncodeData({g_actionid: [actionid]})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
 
-		//		this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
-		//	})
-		//	.catch((exception) => {
-		//		for (const element of this.form.parentNode.children) {
-		//			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-		//				element.parentNode.removeChild(element);
-		//			}
-		//		}
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
-		//		let title, messages;
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
+					detail: {
+						success: response.success
+					}
+				}));
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
 
-		//		if (typeof exception === 'object' && 'error' in exception) {
-		//			title = exception.error.title;
-		//			messages = exception.error.messages;
-		//		}
-		//		else {
-		//			messages = [<?//= json_encode(_('Unexpected server error.')) ?>//];
-		//		}
-
-		//		const message_box = makeMessageBox('bad', messages, title)[0];
-
-		//		this.form.parentNode.insertBefore(message_box, this.form);
-		//	})
-		//	.finally(() => {
-		//		this.overlay.unsetLoading();
-		//	});
+	removePopupMessages() {
+		for (const el of this.form.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
 	}
 
 	processTypeOfCalculation() {
-		var show_formula = (this.row_count == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
+		var show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
 			$labels = jQuery('#conditionTable .label');
 
 		jQuery('#evaltype-formfield').toggle(this.row_count > 1);
-		jQuery('#evaltype').toggle(this.row_count > 1);
 		jQuery('#label-evaltype').toggle(this.row_count > 1);
-		jQuery('#formula').toggle(this.row_count > 1);
+		jQuery('#formula').toggle(show_formula).removeAttr("readonly");
 
+		if ($labels.length > 1) {
+			var conditions = [];
 
-		// if (this.row_count > 1) {
-		//	var conditions = [];
+			$labels.each(function (index, label) {
+				$label = jQuery(label);
 
-		//	$labels.each(function(index, label) {
-		//		$label = jQuery(label);
+				conditions.push({
+					id: $label.data('formulaid'),
+					type: $label.data('conditiontype')
+				});
+			});
 
-		//		conditions.push({
-		//			id: $label.data('formulaid'),
-		//			type: $label.data('conditiontype')
-		//		});
-		//	});
-
-		//	jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
-		//}
+			jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
+		}
 	}
 }

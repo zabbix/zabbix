@@ -78,65 +78,6 @@ $condition_table = (new CTable(_('No conditions defined.')))
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
 
-//$i = 0;
-//$row = [];
-
-// if ($data['action']['filter']['conditions']) {
-
-//	$actionConditionStringValues = actionConditionValueToString([$data['action']]);
-
-//	foreach ($data['action']['filter']['conditions'] as $cIdx => $condition) {
-//		if (!isset($condition['conditiontype'])) {
-//			$condition['conditiontype'] = 0;
-//		}
-//		if (!isset($condition['operator'])) {
-//			$condition['operator'] = 0;
-//		}
-//		if (!isset($condition['value'])) {
-//			$condition['value'] = '';
-//		}
-//		if (!array_key_exists('value2', $condition)) {
-//			$condition['value2'] = '';
-
-//		}
-//		if (!str_in_array($condition['conditiontype'], $data['allowedConditions'])) {
-//			continue;
-//		}
-
-//		$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
-
-//		$labelSpan = (new CSpan($label))
-//			->addClass('label')
-//			->setAttribute('data-conditiontype', $condition['conditiontype'])
-//			->setAttribute('data-formulaid', $label);
-
-//		$row = [
-//			getConditionDescription($condition['conditiontype'], $condition['operator'],
-//			$actionConditionStringValues[0][$cIdx], $condition['value2'])
-//		];
-
-//		$condition_table
-//			->addItem([
-//				[
-//					$labelSpan,
-//					(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
-//						$actionConditionStringValues[0][$cIdx], $condition['value2']
-//					)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
-//					(new CCol([
-//						(new CButton('remove', _('Remove')))
-//							->onClick('removeCondition('.$i.');')
-//							->addClass(ZBX_STYLE_BTN_LINK)
-//							->removeId(),
-//						new CVar('conditions['.$i.']', $condition)
-//					]))->addClass(ZBX_STYLE_NOWRAP)
-//				],
-//				null, 'conditions_'.$i
-//			]);
-
-	//	$i++;
-//	}
-//}
-
 $condition_table->setFooter(
 	(new CSimpleButton(_('Add')))
 	->setAttribute('data-eventsource', $data['eventsource'])
@@ -321,18 +262,18 @@ if ($data['actionid'] !== '') {
 		],
 		[
 			'title' => _('Clone'),
-			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-action-clone']),
+			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			//'action' => 'action_edit_popup._clone();'
+			'action' => 'action_edit_popup.clone();'
 		],
 		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete current action?'),
-			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-action-delete']),
+			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			//'action' => 'action_edit_popup._delete();'
+			'action' => 'action_edit_popup.delete('.json_encode($data['actionid']).');'
 		]
 	];
 }

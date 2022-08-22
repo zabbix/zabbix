@@ -54,25 +54,26 @@ class CControllerActionDelete extends CController {
 
 		if ($this->hasInput('g_actionid')) {
 			$actionids = $this->getInput('g_actionid', []);
+
 			$actions_count = count($actionids);
 
 			$result = API::Action()->delete($actionids);
 
 			if ($result) {
-				CMessageHelper::setSuccessTitle(_n('Selected action deleted', 'Selected actions deleted', $actions_count));
+				$output['success']['title'] = (_n('Selected action deleted', 'Selected actions deleted', $actions_count));
+
+				if ($messages = get_and_clear_messages()) {
+					$output['success']['messages'] = array_column($messages, 'message');
+				}
 			}
 			else {
-				CMessageHelper::setErrorTitle(_n('Cannot delete selected action', 'Cannot delete selected actions', $actions_count));
+				$output['error'] = [
+					'title' => (_n('Cannot delete selected action', 'Cannot delete selected actions', $actions_count)),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				];
 			}
 
-			uncheckTableRows($eventsource);
-
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'action.list')
-				->setArgument('eventsource', $eventsource)
-			);
-
-			$this->setResponse($response);
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 	}
 }

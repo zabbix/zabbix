@@ -186,8 +186,14 @@ $actionForm->addItem([
 	new CActionButtonList('action', 'g_actionid', [
 		'action.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected actions?')],
 		'action.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected actions?')],
-		'action.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected actions?')]
-	], $data['eventsource'])
+		'action.delete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->setAttribute('confirm', _('Delete selected actions?'))
+				->addClass('action-delete')
+				->addClass('no-chkbxrange')
+				->removeId()
+		]
+	], 'g_actionid')
 ]);
 
 $widget->addItem($actionForm);
