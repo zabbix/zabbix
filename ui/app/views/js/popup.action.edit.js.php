@@ -111,14 +111,11 @@ window.action_edit_popup = new class {
 		this.row_count = table.rows.length -1;
 	}
 
-	// createHiddenInput(conditiontype, operator, value, value2) { // ????
-	// todo: add hidden input to action edit form???
-	// }
-
 	createLabelCell() {
 		const cell = document.createElement('td');
 
-		cell.append(num2letter(this.row_num));
+		this.label = num2letter(this.row_num)
+		cell.append(this.label);
 		this.row_num ++;
 		return cell;
 	}
@@ -127,6 +124,14 @@ window.action_edit_popup = new class {
 		const cell = document.createElement('tr');
 		const condition_cell = document.createElement('td');
 		const value_cell = document.createElement('em');
+
+		cell.appendChild(this.createHiddenInput('conditiontype',input.conditiontype));
+		cell.appendChild(this.createHiddenInput('operator',input.operator));
+		cell.appendChild(this.createHiddenInput('value',input.value));
+		if (input.value2 !== '') {
+			cell.appendChild(this.createHiddenInput('value2',input.value2));
+		}
+		cell.appendChild(this.createHiddenInput('formulaid',this.label));
 
 		condition_cell.textContent = (
 			this.condition_types[input.conditiontype] + " " +
@@ -138,6 +143,16 @@ window.action_edit_popup = new class {
 		cell.append(value_cell);
 
 		return cell;
+	}
+
+	createHiddenInput(name, value) {
+		const input = document.createElement('input');
+		input.type = 'hidden';
+		input.id = `conditions_${this.row_num-1}_${name}`;
+		input.name = `conditions[${this.row_num-1}][${name}]`;
+		input.value =value;
+
+		return input;
 	}
 
 	createRemoveCell() {

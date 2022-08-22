@@ -38,7 +38,8 @@ class CControllerActionCreate extends CController {
 			'recovery_operations' => 'array',
 			'update_operations' => 'array',
 			'esc_period' => 'string|not_empty',
-			'filter' => 'array'
+			'filter' => 'array',
+			'conditions' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -180,7 +181,6 @@ class CControllerActionCreate extends CController {
 //			$action['filter'] = $filter;
 //		}
 
-
 		$action = [
 			'name' => $this->getInput('name'),
 			'status' => $this->hasInput('status') ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED,
@@ -205,15 +205,9 @@ class CControllerActionCreate extends CController {
 			'recovery_operations' => [],
 			'update_operations' => [],
 			'filter' => [
-				'conditions' => [
-					[
-						'formula' => '',
-						'conditiontype' => '3',
-						'operator' => '2',
-						'value' => 'testdata'
-					]
-				],
-				'evaltype' => '0'
+				'formula' => 'A or (B and C)',
+				'conditions' => $this->getInput('conditions'),
+				'evaltype' => '3'
 			]
 		];
 
