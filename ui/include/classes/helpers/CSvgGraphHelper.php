@@ -557,8 +557,14 @@ class CSvgGraphHelper {
 					'points' => []
 				]);
 
-				$metric['options']['aggregate_interval'] =
-					(int) timeUnitToSeconds($metric['options']['aggregate_interval'], true);
+				$aggregate_interval = timeUnitToSeconds($metric['options']['aggregate_interval'], true);
+
+				if ($aggregate_interval === null || $aggregate_interval < 1
+						|| $aggregate_interval > ZBX_MAX_TIMESHIFT) {
+					continue;
+				}
+
+				$metric['options']['aggregate_interval'] = (int) $aggregate_interval;
 
 				if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_DATASET) {
 					$dataset_metrics[$dataset_num] = $metric_num;
@@ -575,6 +581,10 @@ class CSvgGraphHelper {
 
 		foreach ($metrics as &$metric) {
 			if ($metric['options']['aggregate_function'] == AGGREGATE_NONE) {
+				continue;
+			}
+
+			if (!$metric['items']) {
 				continue;
 			}
 

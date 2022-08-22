@@ -20,7 +20,7 @@
 #ifndef ZABBIX_CONFIGCACHE_H
 #define ZABBIX_CONFIGCACHE_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "dbconfig.h"
 #include "zbxalgo.h"

@@ -3102,18 +3102,8 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	int	ret = SUCCEED;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,pp.error_handler,"
-				"pp.error_handler_params"
-			" from item_preproc pp,items i,hosts h"
-			" where pp.itemid=i.itemid"
-				" and i.hostid=h.hostid"
-				" and (h.proxy_hostid is null"
-					" or i.type in (%d,%d,%d))"
-				" and h.status in (%d,%d)"
-				" and i.flags<>%d",
-			ITEM_TYPE_INTERNAL, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE);
+			"select item_preprocid,itemid,type,params,step,error_handler,error_handler_params"
+			" from item_preproc");
 
 	dbsync_prepare(sync, 7, NULL);
 
@@ -3124,7 +3114,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "pp.item_preprocid", "and",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "item_preprocid", "where",
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_PREPROC)]);
 out:
 	zbx_free(sql);

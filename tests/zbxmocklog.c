@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxcommon.h"
 
 /* make sure that __wrap_*() prototypes match unwrapped counterparts */
 #define __zbx_zabbix_log __wrap___zbx_zabbix_log

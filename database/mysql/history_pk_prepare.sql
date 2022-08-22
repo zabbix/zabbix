@@ -46,3 +46,4 @@ CREATE TABLE `history_text` (
 	`ns` integer DEFAULT '0' NOT NULL,
 	PRIMARY KEY (itemid,clock,ns)
 ) ENGINE=InnoDB;
+
