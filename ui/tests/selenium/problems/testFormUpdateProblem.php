@@ -65,6 +65,7 @@ class testFormUpdateProblem extends CWebTest {
 		return CDBHelper::getHash('SELECT * FROM events') .
 				CDBHelper::getHash('SELECT * FROM problem').
 				CDBHelper::getHash('SELECT * FROM triggers').
+				CDBHelper::getHash('SELECT * FROM acknowledges').
 				CDBHelper::getHash('SELECT * FROM event_suppress');
 	}
 
@@ -341,6 +342,14 @@ class testFormUpdateProblem extends CWebTest {
 			$history_table = $form->getField('History')->asTable();
 			$this->assertEquals(['Time', 'User', 'User action', 'Message'], $history_table->getHeadersText());
 			$this->assertEquals($history, $history_table->getRows()->asText());
+
+			if ($data['problems'] === ['Trigger for unsigned']) {
+				foreach (['Acknowledged', 'Message'] as $icon) {
+					$this->assertTrue($history_table->query('xpath://span[@class='.CXPathHelper::fromClass('icon-action').
+							' and @title='.CXPathHelper::escapeQuotes($icon).']')->exists()
+					);
+				}
+			}
 		}
 
 		// Check fields' default values and attributes.
@@ -384,7 +393,7 @@ class testFormUpdateProblem extends CWebTest {
 			}
 		}
 
-		// Check Suppress and Unsuppress checkboxes editability.
+		// Check Suppress and Unsuppress checkboxes dependency.
 		if (CTestArrayHelper::get($data, 'unsuppress_enabled')) {
 			$suppress_combinations = [
 				['id:suppress_problem', 'id:unsuppress_problem'],
@@ -420,7 +429,6 @@ class testFormUpdateProblem extends CWebTest {
 			$this->assertTrue($form->getField('id:suppress_time_option')->isEnabled());
 			$this->assertTrue($form->getField('id:suppress_until_problem')->isEnabled());
 
-
 			// Check calendar.
 			$calendar = $form->query('xpath:.//button[@id="suppress_until_problem_calendar"]')->one();
 			$calendar->waitUntilClickable()->click();
@@ -448,7 +456,6 @@ class testFormUpdateProblem extends CWebTest {
 		$this->assertTrue($form->query('xpath://label[@class="form-label-asterisk" and '.
 				'text()="At least one update operation or message must exist."]')->exists()
 		);
-
 		$dialog->close();
 	}
 
@@ -564,6 +571,33 @@ class testFormUpdateProblem extends CWebTest {
 			],
 			[
 				[
+					'problems' => ['Trigger for log', 'Trigger for char', 'Trigger for float'],
+					'fields' => [
+						'id:scope_1' => true,
+						'id:change_severity' => true,
+						'id:severity' => 'Information',
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => 'now+2h'
+					],
+					'db_check' => [
+						[
+							'name' => 'Trigger for log',
+							'db_fields' => ['message' => '', 'action' => 40, 'new_severity' => 1, 'suppress_until' => true]
+						],
+						[
+							'name' => 'Trigger for char',
+							'db_fields' => ['message' => '', 'action' => 32, 'new_severity' => 0, 'suppress_until' => true]
+						],
+						[
+							'name' => 'Trigger for float',
+							'db_fields' => ['message' => '', 'action' => 40, 'new_severity' => 1, 'suppress_until' => true]
+						]
+					]
+				]
+			],
+			[
+				[
 					'problems' => ['Trigger for float'],
 					'fields' => [
 						'id:message' => 'test message text',
@@ -572,6 +606,12 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Indefinitely',
 						'Acknowledge' => true
+					],
+					'db_check' => [
+						[
+							'name' => 'Trigger for float',
+							'db_fields' => ['message' => 'test message text', 'action' => 46, 'new_severity' => 2, 'suppress_until' => 0]
+						]
 					]
 				]
 			],
@@ -584,19 +624,16 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => 'now+30s'
-					]
-				]
-			],
-			[
-				[
-					'problems' => ['Trigger for unsigned', 'Trigger for char', 'Trigger for float'],
-					'fields' => [
-						'id:scope_1' => true,
-						'id:change_severity' => true,
-						'id:severity' => 'Information',
-						'id:suppress_problem' => true,
-						'id:suppress_time_option' => 'Until',
-						'id:suppress_until_problem' => 'now+2h'
+					],
+					'db_check' => [
+						[
+							'name' => 'Trigger for text',
+							'db_fields' => ['message' => '', 'action' => 40, 'new_severity' => 0, 'suppress_until' => true]
+						],
+						[
+							'name' => 'Trigger for text',
+							'db_fields' => ['message' => '', 'action' => 40, 'new_severity' => 0, 'suppress_until' => true]
+						]
 					]
 				]
 			],
@@ -609,6 +646,12 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => 'now+3d'
+					],
+					'db_check' => [
+						[
+							'name' => 'Trigger for char',
+							'db_fields' => ['message' => '', 'action' => 40, 'new_severity' => 3, 'suppress_until' => true]
+						]
 					]
 				]
 			],
@@ -621,6 +664,12 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => 'now+15y'
+					],
+					'db_check' => [
+						[
+							'name' => 'Trigger for unsigned',
+							'db_fields' => ['message' => '', 'action' => 40, 'new_severity' => 4, 'suppress_until' => true]
+						]
 					]
 				]
 			],
@@ -633,6 +682,12 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => 'now+18w'
+					],
+					'db_check' => [
+						[
+							'name' => 'Trigger for log',
+							'db_fields' => ['message' => '', 'action' => 40, 'new_severity' => 5, 'suppress_until' => true]
+						]
 					]
 				]
 			],
@@ -643,6 +698,51 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => 'now+9M'
+					],
+					'db_check' => [
+						[
+							'name' => 'Trigger for text',
+							'db_fields' => ['message' => '', 'action' => 32, 'new_severity' => 0, 'suppress_until' => true]
+						],
+						[
+							'name' => 'Trigger for log',
+							'db_fields' => ['message' => '', 'action' => 32, 'new_severity' => 0, 'suppress_until' => true]
+						]
+					]
+				]
+			],
+			[
+				[
+					'problems' => ['Trigger for log', 'Trigger for char', 'Trigger for float', 'Trigger for text', 'Trigger for unsigned'],
+					'fields' => [
+						'id:message' => 'Update all 5 problems',
+						'id:change_severity' => true,
+						'id:severity' => 'High',
+						'id:suppress_problem' => true,
+						'id:suppress_time_option' => 'Until',
+						'id:suppress_until_problem' => 'now+2h'
+					],
+					'db_check' => [
+						[
+							'name' => 'Trigger for log',
+							'db_fields' => ['message' => 'Update all 5 problems', 'action' => 44, 'new_severity' => 4, 'suppress_until' => true]
+						],
+						[
+							'name' => 'Trigger for char',
+							'db_fields' => ['message' => 'Update all 5 problems', 'action' => 44, 'new_severity' => 4, 'suppress_until' => true]
+						],
+						[
+							'name' => 'Trigger for float',
+							'db_fields' => ['message' => 'Update all 5 problems', 'action' => 44, 'new_severity' => 4, 'suppress_until' => true]
+						],
+						[
+							'name' => 'Trigger for text',
+							'db_fields' => ['message' => 'Update all 5 problems', 'action' => 44, 'new_severity' => 4, 'suppress_until' => true]
+						],
+						[
+							'name' => 'Trigger for unsigned',
+							'db_fields' => ['message' => 'Update all 5 problems', 'action' => 36, 'new_severity' => 0, 'suppress_until' => true]
+						]
 					]
 				]
 			],
@@ -651,6 +751,12 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for text'],
 					'fields' => [
 						'id:unsuppress_problem' => true
+					],
+					'db_check' => [
+						[
+							'name' => 'Trigger for text',
+							'db_fields' => ['message' => '', 'action' => 64, 'new_severity' => 0, 'suppress_until' => 0]
+						]
 					]
 				]
 			],
@@ -659,6 +765,12 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for unsigned'],
 					'fields' => [
 						'Unacknowledge' => true
+					],
+					'db_check' => [
+						[
+							'name' => 'Trigger for unsigned',
+							'db_fields' => ['message' => '', 'action' => 16, 'new_severity' => 0, 'suppress_until' => 0]
+						]
 					]
 				]
 			],
@@ -667,6 +779,12 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for char'],
 					'fields' => [
 						'Close problem' => true
+					],
+					'db_check' => [
+						[
+							'name' => 'Trigger for char',
+							'db_fields' => ['message' => '', 'action' => 1, 'new_severity' => 0, 'suppress_until' => 0]
+						]
 					]
 				]
 			]
@@ -714,6 +832,68 @@ class testFormUpdateProblem extends CWebTest {
 
 			$message = ($count > 1) ? 'Events updated' : 'Event updated';
 			$this->assertMessage(TEST_GOOD, $message);
+
+			// Check db change.
+			foreach ($data['db_check'] as $event) {
+				$eventid = CDBHelper::getValue('SELECT eventid FROM events WHERE name='.zbx_dbstr($event['name']));
+				$sql = CDBHelper::getRow(
+						'SELECT message, action, new_severity, suppress_until'.
+						' FROM acknowledges'.
+						' WHERE eventid='.zbx_dbstr($eventid).
+							' ORDER BY acknowledgeid DESC'
+				);
+
+				// Suppress time is always different, so we check only that it is > 0.
+				if ($sql['suppress_until'] > 0) {
+					$sql['suppress_until'] = true;
+				}
+
+				$this->assertEquals($event['db_fields'], $sql);
+			}
 		}
+	}
+
+	public function getCancelData() {
+		return [
+			[
+				[
+					'case' => 'Cancel'
+				]
+			],
+			[
+				[
+					'case' => 'Close'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCancelData
+	 */
+	public function testFormUpdateProblem_Cancel($data) {
+		$old_hash = $this->getHash();
+
+		// Open filtered Problems list.
+		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
+		$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Trigger for unsigned')->getColumn('Ack')
+				->query('tag:a')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->query('id:acknowledge_form')->asForm()->one()->fill([
+				'id:scope_1' => true,
+				'id:change_severity' => true,
+				'id:severity' => 'Disaster',
+				'id:suppress_problem' => true,
+				'id:suppress_time_option' => 'Until',
+				'id:suppress_until_problem' => 'now+2h',
+				'Acknowledge' => true
+		]);
+
+		$dialog->query(($data['case'] === 'Close') ? 'xpath:.//button[@title="Close"]' : 'button:Cancel')->one()
+				->waitUntilClickable()->click();
+
+		$dialog->waitUntilNotPresent();
+		$this->page->assertHeader('Problems');
+		$this->assertEquals($old_hash, $this->getHash());
 	}
 }
