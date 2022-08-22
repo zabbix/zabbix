@@ -359,7 +359,7 @@ class testPageReportsAuditDisplay extends CWebTest {
 	}
 
 	/**
-	 * Get table values from row each column.
+	 * Get table values from first row.
 	 */
 	private function getTableRowValue() {
 		$headers = $this->query('class:list-table')->asTable()->one()->getHeadersText();
