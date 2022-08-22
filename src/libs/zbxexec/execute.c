@@ -465,7 +465,8 @@ close:
 
 #else	/* not _WINDOWS */
 	/* block signals to prevent interruption of statements when runtime control command is issued */
-	sigemptyset(&mask);
+	if (0 > sigemptyset(&mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize signal set: %s", zbx_strerror(errno));
 
 	if (0 > sigaddset(&mask, SIGUSR1))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add SIGUSR1 signal to signal mask: %s", zbx_strerror(errno));
