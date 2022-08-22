@@ -44,6 +44,7 @@ class CControllerActionCreate extends CController {
 					CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
 					CONDITION_EVAL_TYPE_EXPRESSION
 				]),
+			'formula' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -184,7 +185,7 @@ class CControllerActionCreate extends CController {
 		if ($filter['conditions']) {
 			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 				if (count($filter['conditions']) > 1) {
-					$filter['formula'] = getRequest('formula');
+					$filter['formula'] = $this->getInput('formula');
 				}
 				else {
 					// If only one or no conditions are left, reset the evaltype to "and/or".

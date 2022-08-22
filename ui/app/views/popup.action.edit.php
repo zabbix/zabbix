@@ -260,12 +260,38 @@ if ($data['actionid'] !== '') {
 			'isSubmit' => true,
 			'action' => 'action_edit_popup.submit();'
 		],
+//		[
+//			'title' => _('Clone'),
+//			'class' => ZBX_STYLE_BTN_ALT,
+//			'keepOpen' => true,
+//			'isSubmit' => false,
+//			'action' => 'action_edit_popup.clone();'
+//		],
 		[
 			'title' => _('Clone'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'action_edit_popup.clone();'
+			'action' => 'action_edit_popup.clone('.json_encode([
+					'title' => _('New action'),
+					// todo : ask what title should be here
+					// todo: remove id
+					'buttons' => [
+						[
+							'title' => _('Add'),
+							'class' => 'js-add',
+							'keepOpen' => true,
+							'isSubmit' => true,
+							'action' => 'action_edit_popup.submit();'
+						],
+						[
+							'title' => _('Cancel'),
+							'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
+							'cancel' => true,
+							'action' => ''
+						]
+					]
+				]).');'
 		],
 		[
 			'title' => _('Delete'),

@@ -223,14 +223,13 @@ window.action_edit_popup = new class {
 			});
 	}
 
-	clone() {
-		this.overlay.setLoading();
-		const parameters = getFormFields(this.form);
+	clone({title, buttons}) {
+		this.actionid = '';
+		const actionid = document.getElementById('actionid');
+		actionid.parentNode.removeChild(actionid);
 
-		PopUp('popup.action.edit', {parameters}, {
-			dialogueid: 'action-edit',
-			dialogue_class: 'modal-popup-large'
-		});
+		this.overlay.unsetLoading();
+		this.overlay.setProperties({title, buttons});
 	}
 
 	delete(actionid) {
