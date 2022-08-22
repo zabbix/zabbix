@@ -449,7 +449,9 @@ close:
 #else	/* not _WINDOWS */
 	sigaddset(&mask, SIGUSR1);
 	sigaddset(&mask, SIGUSR2);
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the signal");
 
 	zbx_alarm_on(timeout);
 
@@ -521,7 +523,9 @@ close:
 		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
 
 	zbx_alarm_off();
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+
+	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot restore sigprocmask");
 
 #endif	/* _WINDOWS */
 
