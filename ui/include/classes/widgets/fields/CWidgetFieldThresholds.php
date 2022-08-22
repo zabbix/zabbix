@@ -39,7 +39,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 	}
 
 	public function validate($strict = false): array {
-		$errors = parent::validate();
+		$errors = parent::validate($strict);
 
 		if ($errors) {
 			return $errors;
@@ -50,10 +50,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 		$thresholds = [];
 
 		foreach ($this->getValue() as $threshold) {
-			$threshold['threshold'] = trim($threshold['threshold']);
-
-			if ($threshold['threshold'] !== ''
-					&& $number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
+			if ($number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
 				$thresholds[] = $threshold + ['value' => $number_parser->calcValue()];
 			}
 		}
@@ -64,11 +61,21 @@ class CWidgetFieldThresholds extends CWidgetField {
 
 		$this->setValue($thresholds);
 
-		return $errors;
+		return [];
 	}
 
 	public function setValue($value) {
-		return parent::setValue((array) $value);
+		$thresholds = [];
+
+		foreach ($value as $threshold) {
+			$threshold['threshold'] = trim($threshold['threshold']);
+
+			if ($threshold['threshold'] !== '') {
+				$thresholds[] = $threshold;
+			}
+		}
+
+		return parent::setValue($thresholds);
 	}
 
 	/**
