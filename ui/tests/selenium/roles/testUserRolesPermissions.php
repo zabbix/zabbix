@@ -1424,7 +1424,7 @@ class testUserRolesPermissions extends CWebTest {
 							'items' => ['I5-agent-txt', 'I4-trap-log'],
 							'message' => 'Request sent successfully. Some items are filtered due to access permissions or type.'
 						],
-						// Dependet items.
+						// Dependent items.
 						[
 							'expected' => TEST_GOOD,
 							'items' => ['I1-lvl2-dep-log'],
@@ -1449,7 +1449,7 @@ class testUserRolesPermissions extends CWebTest {
 						[
 							'items' => ['I5-agent-txt', 'I4-trap-log']
 						],
-						// Dependet items.
+						// Dependent items.
 						[
 							'items' => ['I1-lvl2-dep-log']
 						],
@@ -1467,7 +1467,7 @@ class testUserRolesPermissions extends CWebTest {
 						[
 							'items' => ['I4-trap-log']
 						],
-						// Dependet items.
+						// Dependent items.
 						[
 							'expected' => TEST_GOOD,
 							'items' => ['I1-lvl2-dep-log', 'I4-trap-log'],

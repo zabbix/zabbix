@@ -264,7 +264,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget that shows only unaknowledged problems.
+			// Create a widget that shows only unacknowledged problems.
 			[
 				[
 					'fields' => [
@@ -455,7 +455,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Create a widget that shows only unaknowledged problems.
+			// Totals: Create a widget that shows only unacknowledged problems.
 			[
 				[
 					'fields' => [
@@ -657,7 +657,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to display only unaknowledged problems and to show latest values.
+			// Update widget to display only unacknowledged problems and to show latest values.
 			[
 				[
 					'widget to update' => 'Reference widget 4',
@@ -1174,7 +1174,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to display only unaknowledged problems and to show latest values without timeline.
+			// Update widget to display only unacknowledged problems and to show latest values without timeline.
 			[
 				[
 					'widget to update' => 'Totals reference widget 2',
