@@ -767,7 +767,8 @@ class CAudit {
 			return false;
 		}
 
-		if ($schema_fields[$field_name]['null'] && $value == 0) {
+		if ($schema_fields[$field_name]['type'] === DB::FIELD_TYPE_INT && $schema_fields[$field_name]['null']
+				&& $value === '0') {
 			return true;
 		}
 
