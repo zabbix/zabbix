@@ -1415,7 +1415,7 @@ class CSvgGraph extends CSvg {
 				]);
 
 				$this->addItem(
-					(new CSvgGraphPercentile(_s('%1$sth percentile: %2$s', $percent, $label), $value, $y_min, $y_max))
+					(new CSvgGraphPercentile(_s('%1$s percentile: %2$s', $percent, $label), $value, $y_min, $y_max))
 						->setPosition($this->canvas_x, $this->canvas_y)
 						->setSize($this->canvas_width, $this->canvas_height)
 						->setColor('#'.$color)
