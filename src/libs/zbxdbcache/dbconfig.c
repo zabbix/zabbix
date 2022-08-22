@@ -5237,8 +5237,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint32_t revision, int t
 			else
 				preprocitem->update_time = timestamp;
 
-			if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-				dc_item_update_revision(item, revision);
+			zbx_vector_ptr_append(&items, preprocitem);
 		}
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
@@ -5257,8 +5256,6 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint32_t revision, int t
 			op->itemid = itemid;
 			zbx_vector_ptr_append(&preprocitem->preproc_ops, op);
 		}
-
-		zbx_vector_ptr_append(&items, preprocitem);
 	}
 
 	/* remove deleted item preprocessing operations */
@@ -5278,9 +5275,6 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint32_t revision, int t
 				zbx_vector_ptr_append(&items, preprocitem);
 			}
 		}
-
-		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &op->itemid)))
-			dc_item_update_revision(item, revision);
 
 		dc_strpool_release(op->params);
 		dc_strpool_release(op->error_handler_params);
@@ -5303,6 +5297,9 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint32_t revision, int t
 		}
 		else
 			zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
+
+		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &preprocitem->itemid)))
+			dc_item_update_revision(item, revision);
 	}
 
 	zbx_vector_ptr_destroy(&items);
