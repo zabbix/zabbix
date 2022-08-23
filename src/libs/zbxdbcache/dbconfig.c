@@ -5852,9 +5852,9 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint32_t revision)
 		{
 			int	delay_new = 0;
 
-			if (0 == found)
+			if (0 == found && 0 < config->revision.config)
 				delay_new = delay > SEC_PER_MIN ? SEC_PER_MIN : delay;
-			else if (delay != httptest->delay || ZBX_LOC_QUEUE != httptest->location)
+			else if (ZBX_LOC_NOWHERE == httptest->location || delay != httptest->delay)
 				delay_new = delay;
 
 			if (0 != delay_new)
@@ -15327,9 +15327,11 @@ int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck
 			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &httptest->hostid)))
 				continue;
 
-			if (HOST_STATUS_MONITORED != dc_host->status ||  0 != dc_host->proxy_hostid ||
-					(HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_status))
+			if (HOST_STATUS_MONITORED != dc_host->status || 0 != dc_host->proxy_hostid)
+				continue;
+
+			if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
+					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_status)
 			{
 				httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
 				dc_httptest_queue(httptest);
