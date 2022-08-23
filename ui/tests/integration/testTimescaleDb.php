@@ -33,7 +33,8 @@ class testTimescaleDb extends CIntegrationTest {
 	const HOSTNAME = 'test_timescale';
 	const TRAPNAME = 'trap_timescale';
 	const TABLENAME = 'history_uint';
-	const HIST_COUNT = 3000;
+	/// const HIST_COUNT = 3000;
+	const HIST_COUNT = 30;
 	/* storing old data deep in the past - 20 days, which is way longer that the minimum 7days, and must be guaranteed to be compressed */
 	const COMPRESSION_OLDER_THAN = 20 * 24 * 3600;
 	static $db_extension = '';
@@ -146,6 +147,17 @@ class testTimescaleDb extends CIntegrationTest {
 	 */
 	public function getHistoryCount() {
 		$res = DBfetch(DBselect('SELECT count(*) FROM '.self::TABLENAME));
+		$res1 = DBselect('SELECT * FROM '.self::TABLENAME);
+
+		print("res\n {");
+		print_r($res);
+		print("}\n");
+
+		print("res2\n {");
+		while ($res2 = DBfetch($res1)) {
+			print_r($res2);
+		}
+		print("}\n");
 
 		if ($res) {
 			return $res['count'];
