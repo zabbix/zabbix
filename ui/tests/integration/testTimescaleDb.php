@@ -188,6 +188,7 @@ class testTimescaleDb extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 
 		$count_start = $this->getHistoryCount();
+		print_r($count_start);
 		$this->assertNotEquals(-1, $count_start);
 
 		$c = time() - self::COMPRESSION_OLDER_THAN;
@@ -201,6 +202,9 @@ class testTimescaleDb extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
 
 		$count_end = $this->getHistoryCount();
+		print("\n");
+		print_r($count_end);
+		print("\n");
 		$this->assertNotEquals(-1, $count_end);
 		$this->assertEquals($count_end - $count_start, self::HIST_COUNT);
 
