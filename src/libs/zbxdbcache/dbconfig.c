@@ -5351,9 +5351,6 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint32_t revision)
 			continue;
 		}
 
-		if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-			dc_item_update_revision(dc_item, revision);
-
 		ZBX_STR2UINT64(item_script_paramid, row[0]);
 		scriptitem_params = (zbx_dc_scriptitem_param_t *)DCfind_id(&config->itemscript_params,
 				item_script_paramid, sizeof(zbx_dc_scriptitem_param_t), &found);
@@ -5389,9 +5386,6 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint32_t revision)
 				zbx_vector_ptr_remove_noorder(&scriptitem->params, index);
 				zbx_vector_ptr_append(&items, scriptitem);
 			}
-
-			if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &scriptitem->itemid)))
-				dc_item_update_revision(dc_item, revision);
 		}
 
 		dc_strpool_release(scriptitem_params->name);
@@ -5415,6 +5409,9 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint32_t revision)
 		}
 		else
 			zbx_vector_ptr_sort(&scriptitem->params, dc_compare_itemscript_param);
+
+		if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &scriptitem->itemid)))
+			dc_item_update_revision(dc_item, revision);
 	}
 
 	zbx_vector_ptr_destroy(&items);
