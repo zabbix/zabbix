@@ -19,6 +19,7 @@
 **/
 
 ?>
+
 window.action_edit_popup = new class {
 
 	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
@@ -35,14 +36,6 @@ window.action_edit_popup = new class {
 		this._initActionButtons();
 		this.createExistingConditionRow(conditions);
 		this.processTypeOfCalculation();
-
-		this.dialogue.addEventListener('condition.dialogue.submit', (e) => {
-		// todo: add multiselect title, not value
-			this.row = document.createElement('tr');
-			this.createRow(this.row, e.detail.inputs);
-			this.processTypeOfCalculation();
-			$('#conditionTable tr:last').before(this.row);
-		});
 	}
 
 	_initActionButtons() {
@@ -72,10 +65,18 @@ window.action_edit_popup = new class {
 			source: this.eventsource
 		};
 
-		return PopUp('popup.condition.actions', parameters, {
+		const overlay =  PopUp('popup.condition.actions', parameters, {
 			dialogueid: 'condition',
 			dialogue_class: 'modal-popup-medium'
 		});
+
+		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
+				// todo: add multiselect title, not value
+				this.row = document.createElement('tr');
+				this.createRow(this.row, e.detail.inputs);
+				this.processTypeOfCalculation();
+				$('#conditionTable tr:last').before(this.row);
+			});
 	}
 
 	openOperationPopup(eventsource, recovery_phase, actionid) {
@@ -90,6 +91,7 @@ window.action_edit_popup = new class {
 			dialogueid: 'condition',
 			dialogue_class: 'modal-popup-medium'
 		});
+
 	}
 
 	createRow(row, input) {
@@ -97,14 +99,15 @@ window.action_edit_popup = new class {
 		row.append(this.createNameCell(input));
 		row.append(this.createRemoveCell());
 
-		const table = document.getElementById('conditionTable');
-		this.row_count = table.rows.length -1;
+		this.table = document.getElementById('conditionTable');
+		this.row_count = this.table.rows.length -1;
 	}
 
 	createLabelCell() {
 		const cell = document.createElement('td');
 
 		this.label = num2letter(this.row_num)
+		cell.setAttribute('data-formulaid', this.label)
 		cell.append(this.label);
 		this.row_num ++;
 		return cell;
@@ -164,6 +167,7 @@ window.action_edit_popup = new class {
 
 				this.label = condition.formulaid;
 				cell.append(this.label)
+				cell.setAttribute('data-formulaid', this.label)
 				row.append(cell)
 				this.row_num ++;
 				row.append(this.createNameCell(condition));
@@ -172,6 +176,8 @@ window.action_edit_popup = new class {
 				$('#conditionTable tr:last').before(row);
 			}
 		)
+		const table = document.getElementById('conditionTable');
+		this.row_count = table.rows.length -2;
 	}
 
 	submit() {
@@ -273,11 +279,11 @@ window.action_edit_popup = new class {
 		var show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
 			$labels = jQuery('#conditionTable .label');
 
-		jQuery('#evaltype-formfield').toggle(this.row_count > 1);
 		jQuery('#label-evaltype').toggle(this.row_count > 1);
+		jQuery('#evaltype-formfield').toggle(this.row_count > 1)
 		jQuery('#formula').toggle(show_formula).removeAttr("readonly");
 
-		if ($labels.length > 1) {
+		if (this.row_count > 1) {
 			var conditions = [];
 
 			$labels.each(function (index, label) {
@@ -289,7 +295,7 @@ window.action_edit_popup = new class {
 				});
 			});
 
-			jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
+			jQuery('#formula').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
 		}
 	}
 }

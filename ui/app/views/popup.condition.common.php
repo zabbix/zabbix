@@ -34,12 +34,11 @@ $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('type', '1')
-	->addVar('source', $data['source'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-// if (array_key_exists('source', $data)) {
-// $form->addVar('source', $data['source']);
-// }
+if (array_key_exists('eventsource', $data)) {
+	$form->addVar('eventsource', $data['eventsource']);
+}
 
 $condition_type = (int) $data['last_type'];
 $form_grid = (new CFormGrid())->cleanItems();
@@ -189,10 +188,10 @@ switch ($data['type']) {
 		$operators_by_condition = [];
 		$action_conditions = [];
 		foreach ($data['allowed_conditions'] as $type) {
-			if ($data['source'] == EVENT_SOURCE_SERVICE && $type == CONDITION_TYPE_EVENT_TAG) {
+			if ($data['eventsource'] == EVENT_SOURCE_SERVICE && $type == CONDITION_TYPE_EVENT_TAG) {
 				$action_conditions[$type] = _('Service tag name');
 			}
-			elseif ($data['source'] == EVENT_SOURCE_SERVICE && $type == CONDITION_TYPE_EVENT_TAG_VALUE) {
+			elseif ($data['eventsource'] == EVENT_SOURCE_SERVICE && $type == CONDITION_TYPE_EVENT_TAG_VALUE) {
 				$action_conditions[$type] = _('Service tag value');
 			}
 			else {

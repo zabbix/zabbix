@@ -38,7 +38,7 @@ class CControllerActionUpdate extends CController {
 			'operations' => 'array',
 			'recovery_operations' => 'array',
 			'update_operations' => 'array',
-			'esc_period' => '',
+			'esc_period' => 'string|not_empty',
 			'filter' => 'array',
 			'conditions' => 'array',
 			'evaltype' => 'in '.implode(',', [

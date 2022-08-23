@@ -150,7 +150,6 @@ if ($data['action']['operations']) {
 	$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], [$data['action']], ACTION_OPERATION);
 }
 
-
 // Recovery operations table.
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 	// Create operation table.
@@ -229,7 +228,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		]);
 }
 
-
 $operations_tab->addItem(
 	new CFormField((new CLabel(_('At least one operation must exist.')))->setAsteriskMark())
 );
@@ -242,14 +240,15 @@ $tabs = (new CTabView())
 $form
 	->addItem($tabs)
 	->addItem(
-		(new CScriptTag('action_edit_popup.init('.json_encode([
+		(new CScriptTag(
+			'action_edit_popup.init('.json_encode([
 				'condition_operators' => condition_operator2str(),
 				'condition_types' => condition_type2str(),
 				'conditions' => $data['action']['filter']['conditions'],
 				'actionid' => $data['actionid'],
 				'eventsource' => $data['eventsource']
-			]).');
-			'))->setOnDocumentReady()
+		]).
+			');'))->setOnDocumentReady()
 	);
 
 if ($data['actionid'] !== '') {

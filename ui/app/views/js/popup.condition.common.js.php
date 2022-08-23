@@ -22,25 +22,15 @@
 window.condition_popup = new class {
 
 	init() {
-		//this.curl = new Curl('zabbix.php', false);
-		//this.curl.setArgument('action', 'popup.action.edit');
-		//this.dialogue = this.overlay.$dialogue[0];
-		//this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		//this.validate(overlay);
-		//this.submit(overlay);
-	}
-
-	submit(overlay) {
-		this.overlay = overlay;
+		this.overlay = overlays_stack.getById('condition');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		const fields = getFormFields(this.form);
+	}
 
-		this.overlay.setLoading();
-
+	submit() {
 		let curl = new Curl('zabbix.php', false);
-
 		//fields.action = 'conditions.validate';
+		const fields = getFormFields(this.form);
 		curl.setArgument('action', 'popup.condition.actions');
 		curl.setArgument('validate', '1');
 		//curl.setArgument('action', 'conditions.validate');
@@ -48,51 +38,49 @@ window.condition_popup = new class {
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			const $action_edit = overlays_stack.getById('action-edit').$dialogue[0];
-			$action_edit.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
+			this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
 		});
 	}
 
-		_post(url, data, success_callback) {
-			fetch(url, {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify(data)
+	_post(url, data, success_callback) {
+		fetch(url, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				return response;
 			})
-				.then((response) => response.json())
-				.then((response) => {
-					if ('error' in response) {
-						throw {error: response.error};
+			.then(success_callback)
+			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
 					}
+				}
 
-					return response;
-				})
-				.then(success_callback)
-				.catch((exception) => {
-					for (const element of this.form.parentNode.children) {
-						if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-							element.parentNode.removeChild(element);
-						}
-					}
+				let title, messages;
 
-					let title, messages;
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
 
-					if (typeof exception === 'object' && 'error' in exception) {
-						title = exception.error.title;
-						messages = exception.error.messages;
-					}
-					else {
-						messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-					}
-
-					const message_box = makeMessageBox('bad', messages, title)[0];
-					this.form.parentNode.insertBefore(message_box, this.form);
-				})
-				.finally(() => {
-					this.overlay.unsetLoading();
-				});
-		}
-
+				const message_box = makeMessageBox('bad', messages, title)[0];
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
 
 	validate(overlay) {
 		if (window.operation_popup && window.operation_popup.overlay.$dialogue.is(':visible')) {
