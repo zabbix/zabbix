@@ -507,7 +507,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		agent_config_revision = 0;
 	}
-	else if (FAIL == is_uint32(tmp, &agent_config_revision))
+	else if (FAIL == is_uint64(tmp, &agent_config_revision))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "\"%s\" is not a valid revision", tmp);
 		goto error;
