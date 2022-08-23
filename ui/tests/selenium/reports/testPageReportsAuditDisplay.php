@@ -357,8 +357,8 @@ class testPageReportsAuditDisplay extends CWebTest {
 				'History clear' => 10,
 			];
 
-			$dbaudit = CDBHelper::getAll('SELECT clock, username, ip, resourcetype, resourceid, recordsetid FROM auditlog WHERE 
-                	(resourceid, action)=('.zbx_dbstr($resourceid).','.zbx_dbstr($action_ids[$action]).') ORDER BY clock DESC LIMIT 1');
+			$dbaudit = CDBHelper::getAll('SELECT clock, username, ip, resourcetype, resourceid, recordsetid FROM auditlog WHERE
+					(resourceid, action)=('.zbx_dbstr($resourceid).','.zbx_dbstr($action_ids[$action]).') ORDER BY clock DESC LIMIT 1');
 			$this->assertEquals([], array_diff($result, $dbaudit[0]));
 
 			// Reset audit filter.
