@@ -387,7 +387,7 @@ ZBX_Notifications.prototype.handlePushedActiveTabid = function(tabid) {
  * Here `tab` is referred as ZBX_Notifications instance and `focus` - whether instance is `active` (not focused).
  *
  * @param {ZBX_BrowseTab} removed_tab  Current tab instance.
- * @param {array} other_tabids  List of alive tab ids (wuthout current tabid).
+ * @param {array} other_tabids  List of alive tab ids (without current tabid).
  */
 ZBX_Notifications.prototype.handleTabBeforeUnload = function(removed_tab, other_tabids) {
 	if (this.active && other_tabids.length) {

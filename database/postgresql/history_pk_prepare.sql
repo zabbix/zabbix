@@ -16,7 +16,6 @@ CREATE TABLE history_uint (
 	PRIMARY KEY (itemid,clock,ns)
 );
 
-
 ALTER TABLE history_str RENAME TO history_str_old;
 CREATE TABLE history_str (
 	itemid                   bigint                                    NOT NULL,
@@ -47,3 +46,4 @@ CREATE TABLE history_text (
 	ns                       integer         DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (itemid,clock,ns)
 );
+
