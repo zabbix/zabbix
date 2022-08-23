@@ -169,6 +169,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
 require_once dirname(__FILE__).'/testSID.php';
+require_once dirname(__FILE__).'/testPageMonitoringHostsGraph.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -327,6 +328,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testSID');
+		$suite->addTestSuite('testPageMonitoringHostsGraph');
 
 		return $suite;
 	}
