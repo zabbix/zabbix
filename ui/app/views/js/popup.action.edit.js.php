@@ -34,32 +34,32 @@ window.action_edit_popup = new class {
 		this.row_num = 0;
 
 		this._initActionButtons();
-		this.createExistingConditionRow(conditions);
-		this.processTypeOfCalculation();
+		this._createExistingConditionRow(conditions);
+		this._processTypeOfCalculation();
 	}
 
 	_initActionButtons() {
 		document.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-condition-create')) {
-				this.openConditionPopup();
+				this._openConditionPopup();
 			}
 			else if (e.target.classList.contains('js-operation-details')) {
-				this.openOperationPopup('0', '0', this.actionid);
+				this._openOperationPopup('0', '0', this.actionid);
 			}
 			else if (e.target.classList.contains('js-recovery-operations-create')) {
-				this.openOperationPopup();
+				this._openOperationPopup();
 			}
 			else if (e.target.classList.contains('js-update-operations-create')) {
-				this.openOperationPopup();
+				this._openOperationPopup();
 			}
 			else if (e.target.classList.contains('element-table-remove')) {
 				this.row_count--;
-				this.processTypeOfCalculation();
+				this._processTypeOfCalculation();
 			}
 		});
 	}
 
-	openConditionPopup() {
+	_openConditionPopup() {
 		const parameters = {
 			type: <?= ZBX_POPUP_CONDITION_TYPE_ACTION ?>,
 			source: this.eventsource
@@ -73,13 +73,13 @@ window.action_edit_popup = new class {
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
 				// todo: add multiselect title, not value
 				this.row = document.createElement('tr');
-				this.createRow(this.row, e.detail.inputs);
-				this.processTypeOfCalculation();
+				this._createRow(this.row, e.detail.inputs);
+				this._processTypeOfCalculation();
 				$('#conditionTable tr:last').before(this.row);
 			});
 	}
 
-	openOperationPopup(eventsource, recovery_phase, actionid) {
+	_openOperationPopup(eventsource, recovery_phase, actionid) {
 		const parameters = {
 			// trigger_element: trigger_element,
 			eventsource: eventsource,
@@ -94,16 +94,16 @@ window.action_edit_popup = new class {
 
 	}
 
-	createRow(row, input) {
-		row.append(this.createLabelCell());
-		row.append(this.createNameCell(input));
-		row.append(this.createRemoveCell());
+	_createRow(row, input) {
+		row.append(this._createLabelCell());
+		row.append(this._createNameCell(input));
+		row.append(this._createRemoveCell());
 
 		this.table = document.getElementById('conditionTable');
 		this.row_count = this.table.rows.length -1;
 	}
 
-	createLabelCell() {
+	_createLabelCell() {
 		const cell = document.createElement('td');
 
 		this.label = num2letter(this.row_num)
@@ -113,18 +113,18 @@ window.action_edit_popup = new class {
 		return cell;
 	}
 
-	createNameCell(input) {
+	_createNameCell(input) {
 		const cell = document.createElement('tr');
 		const condition_cell = document.createElement('td');
 		const value_cell = document.createElement('em');
 
-		cell.appendChild(this.createHiddenInput('conditiontype',input.conditiontype));
-		cell.appendChild(this.createHiddenInput('operator',input.operator));
-		cell.appendChild(this.createHiddenInput('value',input.value));
+		cell.appendChild(this._createHiddenInput('conditiontype',input.conditiontype));
+		cell.appendChild(this._createHiddenInput('operator',input.operator));
+		cell.appendChild(this._createHiddenInput('value',input.value));
 		if (input.value2 !== '') {
-			cell.appendChild(this.createHiddenInput('value2',input.value2));
+			cell.appendChild(this._createHiddenInput('value2',input.value2));
 		}
-		cell.appendChild(this.createHiddenInput('formulaid',this.label));
+		cell.appendChild(this._createHiddenInput('formulaid',this.label));
 
 		condition_cell.textContent = (
 			this.condition_types[input.conditiontype] + " " +
@@ -138,7 +138,7 @@ window.action_edit_popup = new class {
 		return cell;
 	}
 
-	createHiddenInput(name, value) {
+	_createHiddenInput(name, value) {
 		const input = document.createElement('input');
 		input.type = 'hidden';
 		input.id = `conditions_${this.row_num-1}_${name}`;
@@ -148,7 +148,7 @@ window.action_edit_popup = new class {
 		return input;
 	}
 
-	createRemoveCell() {
+	_createRemoveCell() {
 		const cell = document.createElement('td');
 		const btn = document.createElement('button');
 		btn.type = 'button';
@@ -160,7 +160,7 @@ window.action_edit_popup = new class {
 		return cell;
 	}
 
-	createExistingConditionRow(conditions) {
+	_createExistingConditionRow(conditions) {
 		conditions.forEach(condition => {
 				const row = document.createElement('tr');
 				const cell = document.createElement('td');
@@ -170,8 +170,8 @@ window.action_edit_popup = new class {
 				cell.setAttribute('data-formulaid', this.label)
 				row.append(cell)
 				this.row_num ++;
-				row.append(this.createNameCell(condition));
-				row.append(this.createRemoveCell());
+				row.append(this._createNameCell(condition));
+				row.append(this._createRemoveCell());
 
 				$('#conditionTable tr:last').before(row);
 			}
@@ -284,15 +284,7 @@ window.action_edit_popup = new class {
 			});
 	}
 
-	removePopupMessages() {
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
-			}
-		}
-	}
-
-	processTypeOfCalculation() {
+	_processTypeOfCalculation() {
 		var show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
 			$labels = jQuery('#conditionTable .label');
 

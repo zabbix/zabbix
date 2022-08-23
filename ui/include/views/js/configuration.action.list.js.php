@@ -41,13 +41,13 @@
 					this._edit({eventsource: this.eventsource, actionid: e.target.attributes.actionid.nodeValue})
 				}
 				else if (e.target.classList.contains('js-massdelete-action')) {
-					this.massDeleteActions(e.target)
+					this._massDeleteActions(e.target)
 				}
 			})
 		}
 
 		_edit(parameters = {}) {
-			const overlay = this.openActionPopup(parameters);
+			const overlay = this._openActionPopup(parameters);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);
@@ -75,14 +75,14 @@
 			location.href = location.href;
 		}
 
-		openActionPopup(parameters = {}) {
+		_openActionPopup(parameters = {}) {
 			return PopUp('popup.action.edit', parameters, {
 				dialogueid: 'action-edit',
 				dialogue_class: 'modal-popup-large'
 			});
 		}
 
-		massDeleteActions(target) {
+		_massDeleteActions(target) {
 			const confirm_text =<?= json_encode(_('Delete selected actions?')) ?>;
 			if (!confirm(confirm_text)) {
 				return;
