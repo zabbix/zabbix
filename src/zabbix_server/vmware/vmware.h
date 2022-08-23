@@ -92,8 +92,8 @@ zbx_vmware_perf_entity_t;
 
 typedef struct
 {
-	zbx_uint64_t	partitionid;
 	char		*diskname;
+	char		*ds_uuid;
 	char		*operational_state;
 	char		*ssd;
 	char		*local_disk;
@@ -104,6 +104,15 @@ typedef struct
 	char		*vendor;
 	char		*revision;
 	char		*serial_number;
+}
+zbx_vmware_diskinfo_t;
+
+ZBX_PTR_VECTOR_DECL(vmware_diskinfo, zbx_vmware_diskinfo_t *)
+
+typedef struct
+{
+	zbx_uint64_t	partitionid;
+	char		*diskname;
 }
 zbx_vmware_diskextent_t;
 
@@ -276,6 +285,7 @@ typedef struct
 	zbx_vector_ptr_t		vms;
 	zbx_vector_vmware_pnic_t	pnics;
 	zbx_vector_str_t		alarm_ids;
+	zbx_vector_vmware_diskinfo_t	diskinfo;
 }
 zbx_vmware_hv_t;
 

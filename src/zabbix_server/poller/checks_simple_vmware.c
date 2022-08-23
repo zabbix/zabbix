@@ -1477,6 +1477,40 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addarray(&json_data, "tags");
 		vmware_tags_uuid_json(&service->data_tags, hv->uuid, &json_data, NULL);
 		zbx_json_close(&json_data);
+		zbx_json_addarray(&json_data, "diskinfo");
+
+		for (i = 0; i < hv->diskinfo.values_num; i++)
+		{
+			zbx_vmware_diskinfo_t	*di = hv->diskinfo.values[i];
+
+			zbx_json_addobject(&json_data, NULL);
+			zbx_json_addstring(&json_data, "instance", di->diskname,
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "datastore.uuid", ZBX_NULL2EMPTY_STR(di->ds_uuid),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "operational_state", ZBX_NULL2EMPTY_STR(di->operational_state),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "ssd", ZBX_NULL2EMPTY_STR(di->ssd),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "local_disk", ZBX_NULL2EMPTY_STR(di->local_disk),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "lun_type", ZBX_NULL2EMPTY_STR(di->lun_type),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "scsi_disk_type", ZBX_NULL2EMPTY_STR(di->scsi_disk_type),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addint64(&json_data, "queue_depth", di->queue_depth);
+			zbx_json_addstring(&json_data, "model", ZBX_NULL2EMPTY_STR(di->model),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "vendor", ZBX_NULL2EMPTY_STR(di->vendor),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "revision", ZBX_NULL2EMPTY_STR(di->revision),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "serial_number", ZBX_NULL2EMPTY_STR(di->serial_number),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&json_data);
+		}
+
+		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
 
@@ -2337,25 +2371,6 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 			zbx_json_addobject(&json_data, NULL);
 			zbx_json_adduint64(&json_data, "partitionid", ext->partitionid);
 			zbx_json_addstring(&json_data, "instance", ext->diskname,
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "operational_state", ZBX_NULL2EMPTY_STR(ext->operational_state),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "ssd", ZBX_NULL2EMPTY_STR(ext->ssd),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "local_disk", ZBX_NULL2EMPTY_STR(ext->local_disk),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "lun_type", ZBX_NULL2EMPTY_STR(ext->lun_type),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "scsi_disk_type", ZBX_NULL2EMPTY_STR(ext->scsi_disk_type),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addint64(&json_data, "queue_depth", ext->queue_depth);
-			zbx_json_addstring(&json_data, "model", ZBX_NULL2EMPTY_STR(ext->model),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "vendor", ZBX_NULL2EMPTY_STR(ext->vendor),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "revision", ZBX_NULL2EMPTY_STR(ext->revision),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "serial_number", ZBX_NULL2EMPTY_STR(ext->serial_number),
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&json_data);
 		}
@@ -3461,25 +3476,6 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 			zbx_json_addobject(&json_data, NULL);
 			zbx_json_adduint64(&json_data, "partitionid", ext->partitionid);
 			zbx_json_addstring(&json_data, "instance", ext->diskname,
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "operational_state", ZBX_NULL2EMPTY_STR(ext->operational_state),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "ssd", ZBX_NULL2EMPTY_STR(ext->ssd),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "local_disk", ZBX_NULL2EMPTY_STR(ext->local_disk),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "lun_type", ZBX_NULL2EMPTY_STR(ext->lun_type),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "scsi_disk_type", ZBX_NULL2EMPTY_STR(ext->scsi_disk_type),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addint64(&json_data, "queue_depth", ext->queue_depth);
-			zbx_json_addstring(&json_data, "model", ZBX_NULL2EMPTY_STR(ext->model),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "vendor", ZBX_NULL2EMPTY_STR(ext->vendor),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "revision", ZBX_NULL2EMPTY_STR(ext->revision),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "serial_number", ZBX_NULL2EMPTY_STR(ext->serial_number),
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&json_data);
 		}
