@@ -550,10 +550,6 @@ class testFormUpdateProblem extends CWebTest {
 	 * @dataProvider getFormData
 	 */
 	public function testFormUpdateProblem_Form($data) {
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = $this->getHash();
-		}
-
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -574,33 +570,25 @@ class testFormUpdateProblem extends CWebTest {
 		$form->fill($data['fields']);
 		$form->submit();
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertTrue($dialog->isVisible());
-			$this->assertMessage(TEST_BAD, null, $data['error']);
-			$this->assertEquals($old_hash, $this->getHash());
-			$dialog->close();
-		}
-		else {
-			$dialog->ensureNotPresent();
-			$this->page->waitUntilReady();
-			$this->page->assertHeader('Problems');
+		$dialog->ensureNotPresent();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Problems');
 
-			$message = ($count > 1) ? 'Events updated' : 'Event updated';
-			$this->assertMessage(TEST_GOOD, $message);
+		$message = ($count > 1) ? 'Events updated' : 'Event updated';
+		$this->assertMessage(TEST_GOOD, $message);
 
-			// Check db change.
-			foreach ($data['db_check'] as $event) {
-				$sql = CDBHelper::getRow('SELECT message, action, new_severity'.
-						' FROM acknowledges'.
-						' WHERE eventid=('.
-							'SELECT eventid'.
-							' FROM events'.
-							' WHERE name='.zbx_dbstr($event['name']).
-						') ORDER BY acknowledgeid DESC'
-				);
+		// Check db change.
+		foreach ($data['db_check'] as $event) {
+			$sql = CDBHelper::getRow('SELECT message, action, new_severity'.
+					' FROM acknowledges'.
+					' WHERE eventid=('.
+						'SELECT eventid'.
+						' FROM events'.
+						' WHERE name='.zbx_dbstr($event['name']).
+					') ORDER BY acknowledgeid DESC'
+			);
 
-				$this->assertEquals($event['db_fields'], $sql);
-			}
+			$this->assertEquals($event['db_fields'], $sql);
 		}
 	}
 
