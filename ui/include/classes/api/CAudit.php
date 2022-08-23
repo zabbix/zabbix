@@ -251,10 +251,8 @@ class CAudit {
 			'paths' => ['hostprototype.macros.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
-		self::RESOURCE_ITEM => ['paths' => ['item.password', 'item.privatekey', 'item.ssl_key_password']],
-		self::RESOURCE_ITEM_PROTOTYPE => [
-			'paths' => ['itemprototype.password', 'itemprototype.privatekey', 'itemprototype.ssl_key_password']
-		],
+		self::RESOURCE_ITEM => ['paths' => ['item.password', 'item.ssl_key_password']],
+		self::RESOURCE_ITEM_PROTOTYPE => ['paths' => ['itemprototype.password', 'itemprototype.ssl_key_password']],
 		self::RESOURCE_MACRO => [
 			'paths' => ['usermacro.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
