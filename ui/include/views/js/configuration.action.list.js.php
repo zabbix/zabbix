@@ -95,7 +95,14 @@
 			});
 		},
 
-		massDeleteActions() {
+		massDeleteActions(button) {
+			const confirm_text = button.getAttribute('confirm');
+			if (!confirm(confirm_text)) {
+				return;
+			}
+
+			button.classList.add('is-loading');
+
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.delete');
 			curl.setArgument('eventsource', this.eventsource);
