@@ -1496,8 +1496,6 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "lun_type", ZBX_NULL2EMPTY_STR(di->lun_type),
 					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "scsi_disk_type", ZBX_NULL2EMPTY_STR(di->scsi_disk_type),
-					ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(&json_data, "queue_depth", di->queue_depth);
 			zbx_json_addstring(&json_data, "model", ZBX_NULL2EMPTY_STR(di->model),
 					ZBX_JSON_TYPE_STRING);

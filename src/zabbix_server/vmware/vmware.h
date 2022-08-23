@@ -98,7 +98,6 @@ typedef struct
 	char		*ssd;
 	char		*local_disk;
 	char		*lun_type;
-	char		*scsi_disk_type;
 	int		queue_depth;
 	char		*model;
 	char		*vendor;

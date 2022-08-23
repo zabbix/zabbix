@@ -1368,7 +1368,6 @@ static void	vmware_diskinfo_shared_free(zbx_vmware_diskinfo_t *di)
 	vmware_shared_strfree(di->ssd);
 	vmware_shared_strfree(di->local_disk);
 	vmware_shared_strfree(di->lun_type);
-	vmware_shared_strfree(di->scsi_disk_type);
 	vmware_shared_strfree(di->model);
 	vmware_shared_strfree(di->vendor);
 	vmware_shared_strfree(di->revision);
@@ -2022,7 +2021,6 @@ static zbx_vmware_diskinfo_t	*vmware_diskinfo_shared_dup(const zbx_vmware_diskin
 	di->ssd = vmware_shared_strdup(src->ssd);
 	di->local_disk = vmware_shared_strdup(src->local_disk);
 	di->lun_type = vmware_shared_strdup(src->lun_type);
-	di->scsi_disk_type = vmware_shared_strdup(src->scsi_disk_type);
 	di->queue_depth = src->queue_depth;
 	di->model = vmware_shared_strdup(src->model);
 	di->vendor = vmware_shared_strdup(src->vendor);
@@ -2435,7 +2433,6 @@ static void	vmware_diskinfo_free(zbx_vmware_diskinfo_t *di)
 	zbx_free(di->ssd);
 	zbx_free(di->local_disk);
 	zbx_free(di->lun_type);
-	zbx_free(di->scsi_disk_type);
 	zbx_free(di->model);
 	zbx_free(di->vendor);
 	zbx_free(di->revision);
@@ -4926,8 +4923,6 @@ static int	vmware_service_hv_disks_parse_info(xmlDoc *xdoc, zbx_vector_ptr_pair_
 			di->local_disk = zbx_xml_node_read_value(xdoc, node, ZBX_XNN("val"));
 		else if (0 == strcmp(name, "lunType"))
 			di->lun_type = zbx_xml_node_read_value(xdoc, node, ZBX_XNN("val"));
-		else if (0 == strcmp(name, "scsiDiskType"))
-			di->scsi_disk_type = zbx_xml_node_read_value(xdoc, node, ZBX_XNN("val"));
 		else if (0 == strcmp(name, "queueDepth"))
 			zbx_xml_node_read_num(xdoc, node, "number(" ZBX_XNN("val") ")", &di->queue_depth);
 		else if (0 == strcmp(name, "model"))
@@ -4997,7 +4992,6 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].ssd</ns0:pathSet>"			\
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].localDisk</ns0:pathSet>"		\
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].lunType</ns0:pathSet>"		\
-		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].scsiDiskType</ns0:pathSet>"		\
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].queueDepth</ns0:pathSet>"		\
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].model</ns0:pathSet>"			\
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].vendor</ns0:pathSet>"		\
@@ -5025,8 +5019,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 	{
 		scsi_req = zbx_strdcatf(scsi_req , ZBX_POST_SCSI_INFO, scsi_luns.values[i], scsi_luns.values[i],
 				scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i],
-				scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i],
-				scsi_luns.values[i]);
+				scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i]);
 	}
 
 	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
