@@ -33,8 +33,8 @@ class CIntegrationTest extends CAPITest {
 	const WAIT_ITERATIONS			= 60;
 
 	// Default delays (in seconds):
-	const WAIT_ITERATION_DELAY		= 1; // Wait iteration delay.
-	const CACHE_RELOAD_DELAY		= 5; // Configuration cache reload delay.
+	const WAIT_ITERATION_DELAY			= 1; // Wait iteration delay.
+	const CACHE_RELOAD_DELAY			= 5; // Configuration cache reload delay.
 	const HOUSEKEEPER_EXEC_DELAY	= 5; // Housekeeper execution delay.
 	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
 
@@ -812,8 +812,6 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
-	 * Execute housekeeper.
-	 *
 	 * @param string $component    component name or null for active component
 	 */
 	protected function executeHousekeeper($component = null) {

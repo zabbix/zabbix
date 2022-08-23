@@ -34,7 +34,10 @@ class testTimescaleDb extends CIntegrationTest {
 	const TRAPNAME = 'trap_timescale';
 	const TABLENAME = 'history_uint';
 	const HIST_COUNT = 3000;
-	/* storing old data deep in the past - 20 days, which is way longer that the minimum 7days, and must be guaranteed to be compressed */
+	/* 
+		storing old data deep in the past - 20 days, which is way longer that the minimum 7days,
+		and must be guaranteed to be compressed 
+	*/
 	const COMPRESSION_OLDER_THAN = 20 * 24 * 3600;
 	static $db_extension = '';
 	private static $itemid;
@@ -69,7 +72,7 @@ class testTimescaleDb extends CIntegrationTest {
 		}
 	}
 
-		/**
+	/**
 	 * Test TimescaleDb extension.
 	 */
 	public function clearChunks() {
@@ -96,9 +99,6 @@ class testTimescaleDb extends CIntegrationTest {
 	public function prepareData() {
 
 		$this->setExtension();
-		if (self::$db_extension  != ZBX_DB_EXTENSION_TIMESCALEDB) {
-			return true;
-		}
 
 		// Create host "test_timescale"
 		$response = $this->call('host.create', [
@@ -160,7 +160,8 @@ class testTimescaleDb extends CIntegrationTest {
 	 * Check compression of the chunk.
 	 */
 	public function getCheckCompression() {
-		$compress = DBfetch(DBselect('SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')'));
+		$req = DBselect('SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')');
+		$compress = DBfetch($req);
 		$this->assertArrayHasKey('number_compressed_chunks', $compress);
 		if ($compress['number_compressed_chunks'] == 0) {
 
@@ -171,7 +172,8 @@ class testTimescaleDb extends CIntegrationTest {
 			$res_compr = DBfetch(DBselect('SELECT compress_chunk(\''.$chunk.'\')'));
 			$this->assertArrayHasKey('compress_chunk', $res_compr);
 
-			$res2 = DBfetch(DBselect('SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')'));
+			$res2 = DBfetch(DBselect('SELECT number_compressed_chunks 
+				FROM hypertable_compression_stats(\''.self::TABLENAME.'\')'));
 			$this->assertArrayHasKey('number_compressed_chunks', $res2);
 			$this->assertEquals($res2['number_compressed_chunks'], count($res));
 			$res_compr = DBfetch(DBselect('SELECT decompress_chunk(\''.$chunk.'\')'));
@@ -195,7 +197,8 @@ class testTimescaleDb extends CIntegrationTest {
 		$c = time() - self::COMPRESSION_OLDER_THAN;
 		$n = 1;
 		for ($i = 0; $i < self::HIST_COUNT; $i++) {
-			$sender_data[$i] = ['value' => $c, 'clock' => $c, 'ns' => $n, 'host' => self::HOSTNAME, 'key' => self::TRAPNAME];
+			$sender_data[$i] = ['value' => $c, 'clock' => $c, 'ns' => $n, 'host' => self::HOSTNAME,
+				'key' => self::TRAPNAME];
 			$n += 10;
 		}
 		$this->sendDataValues('sender', $sender_data , self::COMPONENT_SERVER);
