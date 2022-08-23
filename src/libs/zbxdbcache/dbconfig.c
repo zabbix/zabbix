@@ -5834,9 +5834,6 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint32_t revision)
 		httptest = (zbx_dc_httptest_t *)DCfind_id(&config->httptests, httptestid, sizeof(zbx_dc_httptest_t),
 				&found);
 
-		if (0 == found)
-			httptest->location = ZBX_LOC_NOWHERE;
-
 		ZBX_STR2UCHAR(httptest->status, row[3]);
 
 		if (0 == found)
