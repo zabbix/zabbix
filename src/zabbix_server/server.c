@@ -1182,7 +1182,7 @@ static void	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
 	struct zbx_json			db_version_json;
-	int				result = SUCCEED;
+	int				db_mandatory, required, result = SUCCEED;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
 	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
@@ -1196,7 +1196,7 @@ static void	zbx_check_db(void)
 #ifdef HAVE_POSTGRESQL
 			SUCCEED != zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
 #endif
-			SUCCEED != DBcheck_version()))
+			SUCCEED != DBcheck_version(&db_mandatory, &required)))
 	{
 		result = FAIL;
 	}

@@ -903,10 +903,10 @@ static void	DBget_version(int *mandatory, int *optional)
 	}
 }
 
-int	DBcheck_version(void)
+int	DBcheck_version(int *db_mandatory, int *required)
 {
 	const char		*dbversion_table_name = "dbversion";
-	int			db_mandatory, db_optional, required, ret = FAIL, i;
+	int			db_optional, ret = FAIL, i;
 	zbx_db_version_t	*dbversion;
 	zbx_dbpatch_t		*patches;
 
@@ -915,7 +915,7 @@ int	DBcheck_version(void)
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	required = ZBX_FIRST_DB_VERSION;
+	*required = ZBX_FIRST_DB_VERSION;
 
 	/* find out the required version number by getting the last mandatory version */
 	/* of the last version patch array                                            */
@@ -927,7 +927,7 @@ int	DBcheck_version(void)
 	for (i = 0; 0 != patches[i].version; i++)
 	{
 		if (0 != patches[i].mandatory)
-			required = patches[i].version;
+			*required = patches[i].version;
 	}
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -950,14 +950,14 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): UNKNOWN."
 				" Required mandatory version: %08d.",
-				get_program_type_string(program_type), required);
+				get_program_type_string(program_type), *required);
 		zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
 
 		goto out;
 #endif
 	}
 
-	DBget_version(&db_mandatory, &db_optional);
+	DBget_version(db_mandatory, &db_optional);
 
 #ifndef HAVE_SQLITE3
 	for (dbversion = dbversions; NULL != (patches = dbversion->patches); dbversion++)
@@ -974,25 +974,25 @@ int	DBcheck_version(void)
 		}
 	}
 
-	if (required < db_mandatory)
+	if (*required < *db_mandatory)
 #else
-	if (required != db_mandatory)
+	if (*required != *db_mandatory)
 #endif
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): %08d/%08d."
 				" Required mandatory version: %08d.",
-				get_program_type_string(program_type), db_mandatory, db_optional, required);
+				get_program_type_string(program_type), *db_mandatory, db_optional, *required);
 #ifdef HAVE_SQLITE3
-		if (required > db_mandatory)
+		if (*required > *db_mandatory)
 			zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
 #endif
 		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "current database version (mandatory/optional): %08d/%08d",
-			db_mandatory, db_optional);
-	zabbix_log(LOG_LEVEL_INFORMATION, "required mandatory version: %08d", required);
+			*db_mandatory, db_optional);
+	zabbix_log(LOG_LEVEL_INFORMATION, "required mandatory version: %08d", *required);
 
 	ret = SUCCEED;
 

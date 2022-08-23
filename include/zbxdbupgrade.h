@@ -20,7 +20,7 @@
 #ifndef ZABBIX_UPGRADE_H
 #define ZABBIX_UPGRADE_H
 
-int	DBcheck_version(void);
+int	DBcheck_version(int *db_mandatory, int *required);
 int	DBcheck_double_type(void);
 
 #endif

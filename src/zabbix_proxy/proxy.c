@@ -1120,16 +1120,68 @@ static void	zbx_check_db(void)
 	zbx_free(db_version_info.friendly_current_version);
 }
 
+static void	proxy_db_init(void)
+{
+	char		*error = NULL;
+	int		db_type, db_mandatory, required;
+#ifdef HAVE_SQLITE3
+	zbx_stat_t	db_stat;
+#endif
+
+	if (SUCCEED != DBinit(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	DBinit_autoincrement_options();
+
+	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
+				CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+	else if (ZBX_DB_PROXY != db_type)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix proxy cannot work with a"
+				" Zabbix server database", CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+
+	DBcheck_character_set();
+	zbx_check_db();
+
+	if (SUCCEED != DBcheck_version(&db_mandatory, &required))
+	{
+#ifdef HAVE_SQLITE3
+		if (db_mandatory > required)
+			exit(EXIT_FAILURE);
+
+		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", CONFIG_DBNAME);
+		DBdeinit();
+
+		if (0 != zbx_stat(CONFIG_DBNAME, &db_stat) || 0 == S_ISREG(db_stat.st_mode) ||
+				0 != unlink(CONFIG_DBNAME))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file: \"%s\", exiting...");
+			exit(EXIT_FAILURE);
+		}
+		proxy_db_init();
+#else
+		exit(EXIT_FAILURE);
+#endif
+	}
+}
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t			listen_sock;
 	char				*error = NULL;
-	int				i, db_type, ret;
+	int				i, ret;
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
-#ifdef HAVE_SQLITE3
-	zbx_stat_t			db_stat;
-#endif
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_poller_args		poller_args = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
@@ -1303,51 +1355,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-#ifdef HAVE_SQLITE3
-dbinit:
-#endif
-	if (SUCCEED != DBinit(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
 
-	DBinit_autoincrement_options();
-
-	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
-				CONFIG_DBNAME);
-		exit(EXIT_FAILURE);
-	}
-	else if (ZBX_DB_PROXY != db_type)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix proxy cannot work with a"
-				" Zabbix server database", CONFIG_DBNAME);
-		exit(EXIT_FAILURE);
-	}
-
-	DBcheck_character_set();
-	zbx_check_db();
-
-	if (SUCCEED != DBcheck_version())
-	{
-#ifdef HAVE_SQLITE3
-		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", CONFIG_DBNAME);
-		DBdeinit();
-
-		if (0 != zbx_stat(CONFIG_DBNAME, &db_stat) || 0 == S_ISREG(db_stat.st_mode) ||
-				0 != unlink(CONFIG_DBNAME))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file: \"%s\", exiting...");
-			exit(EXIT_FAILURE);
-		}
-		goto dbinit;
-#else
-		exit(EXIT_FAILURE);
-#endif
-	}
+	proxy_db_init();
 
 	change_proxy_history_count(proxy_get_history_count());
 
