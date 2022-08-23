@@ -34,6 +34,7 @@ $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('type', '1')
+	->addVar('source', $data['eventsource'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 if (array_key_exists('eventsource', $data)) {

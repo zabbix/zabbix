@@ -188,11 +188,9 @@ $actionForm->addItem([
 		'action.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected actions?')],
 		'action.delete' => [
 			'content' => (new CSimpleButton(_('Delete')))
-				->onClick('view.massDeleteActions(this);')
-				->setAttribute('confirm', _('Delete selected actions?'))
-				->addClass('action-delete')
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-action')
 				->addClass('no-chkbxrange')
-				->removeId()
 		]
 	], 'g_actionid')
 ]);

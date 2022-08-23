@@ -67,8 +67,8 @@
 					overlay.$dialogue[0].addEventListener('dialogue.delete', this.actionDelete, {once: true});
 				}
 
-				else if (e.target.classList.contains('action-delete')) {
-					this.massDeleteActions()
+				else if (e.target.classList.contains('js-massdelete-action')) {
+					this.massDeleteActions(e.target)
 				}
 
 			})
@@ -96,17 +96,17 @@
 			});
 		},
 
-		massDeleteActions(button) {
-			const confirm_text = button.getAttribute('confirm');
+		massDeleteActions(target) {
+			const confirm_text =<?= json_encode(_('Delete selected actions?')) ?>;
 			if (!confirm(confirm_text)) {
 				return;
 			}
 
-			button.classList.add('is-loading');
-
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.delete');
 			curl.setArgument('eventsource', this.eventsource);
+
+			target.classList.add('is-loading');
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

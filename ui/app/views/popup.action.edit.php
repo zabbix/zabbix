@@ -264,23 +264,7 @@ if ($data['actionid'] !== '') {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'action_edit_popup.clone('.json_encode([
-					'title' => _('New action'),
-					'buttons' => [
-						[
-							'title' => _('Add'),
-							'keepOpen' => true,
-							'isSubmit' => true,
-							'action' => 'action_edit_popup.submit();'
-						],
-						[
-							'title' => _('Cancel'),
-							'class' => ZBX_STYLE_BTN_ALT,
-							'cancel' => true,
-							'action' => ''
-						]
-					]
-				]).');'
+			'action' => 'action_edit_popup.clone();'
 		],
 		[
 			'title' => _('Delete'),
@@ -288,7 +272,7 @@ if ($data['actionid'] !== '') {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'action_edit_popup.delete('.json_encode($data['actionid']).');'
+			'action' => 'action_edit_popup.delete();'
 		]
 	];
 }

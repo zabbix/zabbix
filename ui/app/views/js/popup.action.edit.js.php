@@ -229,16 +229,33 @@ window.action_edit_popup = new class {
 			});
 	}
 
-	clone({title, buttons}) {
+	clone() {
 		this.actionid = '';
 		const actionid = document.getElementById('actionid');
 		actionid.parentNode.removeChild(actionid);
+		const title = ('New action');
+
+		const buttons = [
+			{
+				title:  t('Add'),
+				class: '',
+				keepOpen: true,
+				isSubmit: true,
+				action: () => this.submit()
+			},
+			{
+				title: t('Cancel'),
+				class: 'btn-alt',
+				cancel: true,
+				action: () => ''
+			}
+		];
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
 	}
 
-	delete(actionid) {
+	delete() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'action.delete');
 		curl.setArgument('eventsource', this.eventsource);
@@ -246,7 +263,7 @@ window.action_edit_popup = new class {
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData({g_actionid: [actionid]})
+			body: urlEncodeData({g_actionid: [this.actionid]})
 		})
 			.then((response) => response.json())
 			.then((response) => {
