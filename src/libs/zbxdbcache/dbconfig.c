@@ -5566,7 +5566,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint32_t revision)
 		}
 		else
 		{
-			if (proxy_hostid != drule->proxy_hostid &&
+			if (0 != drule->proxy_hostid && proxy_hostid != drule->proxy_hostid &&
 				NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
 						&drule->proxy_hostid)))
 			{
