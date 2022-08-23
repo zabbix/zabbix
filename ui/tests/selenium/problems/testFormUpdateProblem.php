@@ -59,10 +59,10 @@ class testFormUpdateProblem extends CWebTest {
 	}
 
 	/**
-	 * Get all dashboard related tables hash values.
+	 * Get all events related tables hash values.
 	 */
 	public static function getHash() {
-		return CDBHelper::getHash('SELECT * FROM events') .
+		return CDBHelper::getHash('SELECT * FROM events').
 				CDBHelper::getHash('SELECT * FROM problem').
 				CDBHelper::getHash('SELECT * FROM triggers').
 				CDBHelper::getHash('SELECT * FROM acknowledges').
@@ -101,15 +101,6 @@ class testFormUpdateProblem extends CWebTest {
 		$this->assertArrayHasKey('itemids', $items);
 
 		// Create triggers based on items.
-		$triggers_data = [];
-		foreach ($item_names as $i => $item) {
-			$triggers_data[] = [
-				'description' => 'Trigger for '.$item,
-				'expression' => 'last(/Host for Problems Update/'.$item.')=0',
-				'priority' => $i
-			];
-		}
-
 		$triggers = CDataHelper::call('trigger.create', [
 			[
 				'description' => 'Trigger for float',
@@ -156,7 +147,7 @@ class testFormUpdateProblem extends CWebTest {
 				zbx_dbstr(self::$triggerids ['Trigger for unsigned']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for unsigned').', 3)'
 		);
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100554, 0, 0, '.
-		zbx_dbstr(self::$triggerids ['Trigger for text']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for text').', 4)'
+				zbx_dbstr(self::$triggerids ['Trigger for text']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for text').', 4)'
 		);
 
 		// Create problems.
@@ -177,11 +168,10 @@ class testFormUpdateProblem extends CWebTest {
 		);
 
 		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for char'.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for float'));
+		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for float').', '.
+				zbx_dbstr('Trigger for log').', '.zbx_dbstr('Trigger for unsigned').', '.zbx_dbstr('Trigger for text').')'
+		);
 		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.zbx_dbstr('Trigger for char'));
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for log'));
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for unsigned'));
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger for text'));
 
 		// Suppress the problem: 'Trigger for text'.
 		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10050, 100554, NULL, 0)');
@@ -231,7 +221,8 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for unsigned'],
 					// If problem is Aknowledged - label is changed to Unacknowledge.
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
-							'Unsuppress', 'Unacknowledge', 'Close problem', ''],
+							'Unsuppress', 'Unacknowledge', 'Close problem', ''
+					],
 					'message' => 'Acknowledged event',
 					'Unacknowledge' => true,
 					'history' => [' Admin (Zabbix Administrator) Acknowledged event'],
@@ -255,7 +246,8 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for float', 'Trigger for char'],
 					// If more than one problems selected - History label is absent.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-							'Acknowledge', 'Close problem', ''],
+							'Acknowledge', 'Close problem', ''
+					],
 					'close_enabled' => true,
 					'Acknowledge' => true,
 					'hintboxes' => [
@@ -272,7 +264,8 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for float', 'Trigger for char', 'Trigger for log', 'Trigger for unsigned', 'Trigger for text'],
 					// If more than one problems selected - History label is absent.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-							'Acknowledge', 'Unacknowledge', 'Close problem', ''],
+							'Acknowledge', 'Unacknowledge', 'Close problem', ''
+					],
 					'hintboxes' => [
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
 						'Unsuppress' => 'Deactivates manual suppression.',
@@ -311,17 +304,19 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check "Problem" field value.
 		$problem = $count > 1 ? $count.' problems selected.' : $data['problems'][0];
-		$this->assertTrue($form->query('xpath://div[@class="wordbreak" and text()='.CXPathHelper::escapeQuotes($problem).']')->exists());
+		$this->assertTrue($form->query('xpath:.//div[@class="wordbreak" and text()='.
+				CXPathHelper::escapeQuotes($problem).']')->exists()
+		);
 
 		// Check first label in Scope field.
 		$scope_field = $form->getField('Scope');
 		$scope_label_query = $count > 1
 			? 'xpath:.//label[text()="Only selected problems"]/sup[text()='.CXPathHelper::escapeQuotes($count.' events').']'
 			: 'xpath:.//label[text()="Only selected problem"]';
+		$this->assertTrue($scope_field->query($scope_label_query)->exists());
 
 		// Check second label in Scope field.
-		$this->assertTrue($scope_field->query($scope_label_query)->exists());
-		$this->assertTrue($form->getField('Scope')->query("xpath:.//label[text()=".
+		$this->assertTrue($scope_field->query("xpath:.//label[text()=".
 				"\"Selected and all other problems of related triggers\"]/sup[text()=".
 				CXPathHelper::escapeQuotes($count > 1 ? $count.' events' : '1 event')."]")->exists()
 		);
@@ -345,8 +340,8 @@ class testFormUpdateProblem extends CWebTest {
 
 			if ($data['problems'] === ['Trigger for unsigned']) {
 				foreach (['Acknowledged', 'Message'] as $icon) {
-					$this->assertTrue($history_table->query('xpath://span[@class='.CXPathHelper::fromClass('icon-action').
-							' and @title='.CXPathHelper::escapeQuotes($icon).']')->exists()
+					$this->assertTrue($history_table->query("xpath:.//span[@class=".CXPathHelper::fromClass('icon-action').
+							" and @title=".CXPathHelper::escapeQuotes($icon)."]")->exists()
 					);
 				}
 			}
@@ -367,13 +362,8 @@ class testFormUpdateProblem extends CWebTest {
 		];
 
 		foreach ($fields as $field => $attributes) {
-			if (array_key_exists('value', $attributes)) {
-				$this->assertEquals($attributes['value'], $form->getField($field)->getValue());
-			}
-
-			if (array_key_exists('enabled', $attributes)) {
-				$this->assertTrue($form->getField($field)->isEnabled($attributes['enabled']));
-			}
+			$this->assertEquals($attributes['value'], $form->getField($field)->getValue());
+			$this->assertTrue($form->getField($field)->isEnabled($attributes['enabled']));
 
 			if (array_key_exists('maxlength', $attributes)) {
 				$this->assertEquals($attributes['maxlength'], $form->getField($field)->getAttribute('maxlength'));
@@ -410,7 +400,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check other buttons in overlay.
 		$button_queries = [
-			'xpath:.//a[@title="Help"]' => true,
+			// Button ? (help) is covered in testDocumentationLinks.
 			'xpath:.//button[@title="Close"]' => true,
 			'xpath:.//button[@id="suppress_until_problem_calendar"]' => false,
 			'button:Update' => true,
@@ -453,7 +443,7 @@ class testFormUpdateProblem extends CWebTest {
 		}
 
 		// Check asterisk text.
-		$this->assertTrue($form->query('xpath://label[@class="form-label-asterisk" and '.
+		$this->assertTrue($form->query('xpath:.//label[@class="form-label-asterisk" and '.
 				'text()="At least one update operation or message must exist."]')->exists()
 		);
 		$dialog->close();
@@ -488,19 +478,7 @@ class testFormUpdateProblem extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'problems' => ['Trigger for text'],
-					'fields' => [
-						'id:suppress_problem' => true,
-						'id:suppress_time_option' => 'Until',
-						'id:suppress_until_problem' => '2040-08-01 00:00:00'
-					],
-					'error' => 'Incorrect value for field "Suppress": invalid time.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'problems' => ['Trigger for float', 'Trigger for log'],
+					'problems' => ['Trigger for text', 'Trigger for log'],
 					'fields' => [
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
@@ -826,7 +804,7 @@ class testFormUpdateProblem extends CWebTest {
 			$dialog->close();
 		}
 		else {
-			$dialog->waitUntilNotPresent();
+			$dialog->ensureNotPresent();
 			$this->page->waitUntilReady();
 			$this->page->assertHeader('Problems');
 
@@ -835,12 +813,13 @@ class testFormUpdateProblem extends CWebTest {
 
 			// Check db change.
 			foreach ($data['db_check'] as $event) {
-				$eventid = CDBHelper::getValue('SELECT eventid FROM events WHERE name='.zbx_dbstr($event['name']));
-				$sql = CDBHelper::getRow(
-						'SELECT message, action, new_severity, suppress_until'.
+				$sql = CDBHelper::getRow('SELECT message, action, new_severity, suppress_until'.
 						' FROM acknowledges'.
-						' WHERE eventid='.zbx_dbstr($eventid).
-							' ORDER BY acknowledgeid DESC'
+						' WHERE eventid=('.
+							'SELECT eventid'.
+							' FROM events'.
+							' WHERE name='.zbx_dbstr($event['name']).
+						') ORDER BY acknowledgeid DESC'
 				);
 
 				// Suppress time is always different, so we check only that it is > 0.
@@ -892,7 +871,7 @@ class testFormUpdateProblem extends CWebTest {
 		$dialog->query(($data['case'] === 'Close') ? 'xpath:.//button[@title="Close"]' : 'button:Cancel')->one()
 				->waitUntilClickable()->click();
 
-		$dialog->waitUntilNotPresent();
+		$dialog->ensureNotPresent();
 		$this->page->assertHeader('Problems');
 		$this->assertEquals($old_hash, $this->getHash());
 	}
