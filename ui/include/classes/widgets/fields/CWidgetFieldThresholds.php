@@ -21,6 +21,9 @@
 
 class CWidgetFieldThresholds extends CWidgetField {
 
+	public const THRESHOLDS_TABLE_ID = '%s-table';
+	public const THRESHOLDS_ROW_TMPL_ID = '%s-row-tmpl';
+
 	/**
 	 * Create widget field for Thresholds selection.
 	 *
@@ -38,32 +41,6 @@ class CWidgetFieldThresholds extends CWidgetField {
 		$this->setDefault([]);
 	}
 
-	public function validate($strict = false): array {
-		$errors = parent::validate($strict);
-
-		if ($errors) {
-			return $errors;
-		}
-
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
-		$thresholds = [];
-
-		foreach ($this->getValue() as $threshold) {
-			if ($number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
-				$thresholds[] = $threshold + ['value' => $number_parser->calcValue()];
-			}
-		}
-
-		CArrayHelper::sort($thresholds, ['value']);
-
-		$thresholds = array_values($thresholds);
-
-		$this->setValue($thresholds);
-
-		return [];
-	}
-
 	public function setValue($value) {
 		$thresholds = [];
 
@@ -78,17 +55,38 @@ class CWidgetFieldThresholds extends CWidgetField {
 		return parent::setValue($thresholds);
 	}
 
-	/**
-	 * Add dynamic row script.
-	 *
-	 * @return string
-	 */
+	public function validate($strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+
+		$thresholds = [];
+
+		foreach ($this->getValue() as $threshold) {
+			if ($number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
+				$thresholds[] = $threshold + ['threshold_value' => $number_parser->calcValue()];
+			}
+		}
+
+		CArrayHelper::sort($thresholds, ['threshold_value']);
+
+		$thresholds = array_values($thresholds);
+
+		$this->setValue($thresholds);
+
+		return [];
+	}
+
 	public function getJavascript() {
 		return '
-			var thresholds_table = jQuery("#'.$this->getName().'-thresholds-table");
+			var thresholds_table = jQuery("#'.sprintf(self::THRESHOLDS_TABLE_ID, $this->getName()).'");
 
 			thresholds_table
-				.dynamicRows({template: "#'.$this->getName().'-row-tmpl"})
+				.dynamicRows({template: "#'.sprintf(self::THRESHOLDS_ROW_TMPL_ID, $this->getName()).'"})
 				.on("afteradd.dynamicRows", function(opt) {
 					const rows = this.querySelectorAll(".form_row");
 					jQuery(".color-picker input", rows[rows.length - 1])
@@ -100,9 +98,6 @@ class CWidgetFieldThresholds extends CWidgetField {
 		';
 	}
 
-	/**
-	 * @param array $widget_fields   reference to Array of widget fields.
-	 */
 	public function toApi(array &$widget_fields = []) {
 		$value = $this->getValue();
 

@@ -234,7 +234,9 @@ $form_grid->addItem([
 	(new CFormField(CWidgetHelper::getThresholds($fields['thresholds'])))->addClass('js-row-thresholds')
 ]);
 $scripts[] = $fields['thresholds']->getJavascript();
-$jq_templates['thresholds-row-tmpl'] = CWidgetHelper::getThresholdsTemplate($fields['thresholds']->getName())
+
+$thresholds_tmpl_id = sprintf(CWidgetFieldThresholds::THRESHOLDS_ROW_TMPL_ID, $fields['thresholds']->getName());
+$jq_templates[$thresholds_tmpl_id] = CWidgetHelper::getThresholdsTemplate($fields['thresholds']->getName())
 	->toString();
 
 // Dynamic item.

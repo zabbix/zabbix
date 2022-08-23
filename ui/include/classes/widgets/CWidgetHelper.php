@@ -1536,9 +1536,9 @@ class CWidgetHelper {
 		return $names;
 	}
 
-	public static function getThresholds($field) {
+	public static function getThresholds(CWidgetFieldThresholds $field): CDiv {
 		$thresholds_table = (new CTable())
-			->setId($field->getName().'-thresholds-table')
+			->setId(sprintf(CWidgetFieldThresholds::THRESHOLDS_TABLE_ID, $field->getName()))
 			->addClass(ZBX_STYLE_TABLE_FORMS)
 			->setHeader([
 				'',

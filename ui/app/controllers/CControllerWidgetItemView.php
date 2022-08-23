@@ -324,19 +324,13 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 		$bg_color = $fields['bg_color'];
 
-		if (array_key_exists('thresholds', $fields) && $last_value !== null) {
-			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
+		if ($last_value !== null) {
 			foreach ($fields['thresholds'] as $threshold) {
-				if ($number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
-					$threshold['threshold'] = $number_parser->calcValue();
-
-					if ($last_value < $threshold['threshold']) {
-						break;
-					}
-
-					$bg_color = $threshold['color'];
+				if ($threshold['threshold_value'] > $last_value) {
+					break;
 				}
+
+				$bg_color = $threshold['color'];
 			}
 		}
 
