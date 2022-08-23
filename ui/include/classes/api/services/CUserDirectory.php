@@ -392,18 +392,21 @@ class CUserDirectory extends CApiService {
 			}
 
 			if (array_key_exists('provision_groups', $userdirectory)) {
-				foreach ($userdirectory['provision_groups'] as $num => $groups) {
+				$sortorder = 1;
+				foreach ($userdirectory['provision_groups'] as $group) {
 					$userdirectory_idpgroups[] = [
 						'userdirectoryid' => $userdirectory['userdirectoryid'],
-						'sortorder' => ++$num
-					] + $groups;
+						'sortorder' => $group['is_fallback'] == GROUP_MAPPING_FALLBACK
+							? count($userdirectory['provision_groups'])
+							: $sortorder++
+					] + $group;
 				}
 			}
 		}
 		unset($userdirectory);
 
 		if ($userdirectory_idpgroups) {
-			$idpgroupids = DB::insertBatch('userdirectory_idpgroup', $userdirectory_idpgroups);
+			$idpgroupids = DB::insert('userdirectory_idpgroup', $userdirectory_idpgroups);
 
 			foreach ($idpgroupids as $index => $idpgroupid) {
 				foreach ($userdirectory_idpgroups[$index]['user_groups'] as $usrgrp) {
@@ -414,19 +417,19 @@ class CUserDirectory extends CApiService {
 				}
 			}
 
-			$userdirectory_usrgrpids = DB::insertBatch('userdirectory_usrgrp', $userdirectory_usrgrps);
+			$userdirectory_usrgrpids = DB::insert('userdirectory_usrgrp', $userdirectory_usrgrps);
 		}
 
 		if ($create_idps_ldap) {
-			DB::insertBatch('userdirectory_ldap', $create_idps_ldap);
+			DB::insert('userdirectory_ldap', $create_idps_ldap);
 		}
 
 		if ($create_idps_saml) {
-			DB::insertBatch('userdirectory_saml', $create_idps_saml);
+			DB::insert('userdirectory_saml', $create_idps_saml);
 		}
 
 		if ($userdirectory_media) {
-			$userdirectory_mediaids = DB::insertBatch('userdirectory_media', $userdirectory_media);
+			$userdirectory_mediaids = DB::insert('userdirectory_media', $userdirectory_media);
 		}
 
 		// Return IDs for audit log.
@@ -476,6 +479,7 @@ class CUserDirectory extends CApiService {
 
 		self::checkDuplicates($userdirectories);
 		self::checkSamlExists($userdirectories);
+		self::checkFallbackGroup($userdirectories);
 	}
 
 	/**
@@ -483,7 +487,7 @@ class CUserDirectory extends CApiService {
 	 *
 	 * @return void
 	 */
-	private static function checkSamlExists($userdirectories): void {
+	private static function checkSamlExists(array $userdirectories): void {
 		$userdirectories = array_filter($userdirectories, function ($userdirectory) {
 			return $userdirectory['idp_type'] == IDP_TYPE_SAML;
 		});
@@ -502,6 +506,41 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Only one user directory of type "%1$s" can exist.', IDP_TYPE_SAML)
 			);
+		}
+	}
+
+	/**
+	 * Perform all fallback group related checks.
+	 *
+	 * @return void
+	 */
+	private static function checkFallbackGroup(array $userdirectories): void {
+		foreach ($userdirectories as $usrdir_index => $userdirectory) {
+			if (!array_key_exists('provision_groups', $userdirectory)) {
+				continue;
+			}
+
+			$fallback_found = false;
+			foreach ($userdirectory['provision_groups'] as $grp_index => $group) {
+				if ($group['is_fallback'] == GROUP_MAPPING_FALLBACK) {
+					if ($fallback_found) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Exactly one fallback group must exist for each user directory.')
+						);
+					}
+
+					$fallback_found = true;
+				}
+				elseif ($group['fallback_status'] == GROUP_MAPPING_FALLBACK_ON) {
+					$path = '/'.($usrdir_index + 1).'/provision_groups/'.($grp_index + 1);
+
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', $path,
+							_s('unexpected parameter "%1$s"', 'fallback_status')
+						)
+					);
+				}
+			}
 		}
 	}
 
@@ -620,6 +659,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		self::checkDuplicates($userdirectories, $db_userdirectories);
+		self::checkFallbackGroup($userdirectories);
 		self::addAffectedObjects($userdirectories, $db_userdirectories);
 	}
 
@@ -955,7 +995,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($provision_media_insert) {
-			$provision_mediaids = DB::insertBatch('userdirectory_media', $provision_media_insert);
+			$provision_mediaids = DB::insert('userdirectory_media', $provision_media_insert);
 
 			foreach ($userdirectoryids as $userdirectoryid) {
 				foreach ($userdirectories[$userdirectoryid]['provision_media'] as $index => $new_provision_media) {
@@ -1030,7 +1070,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($idpgroups_insert) {
-			$idpgroupids = DB::insertBatch('userdirectory_idpgroup', $idpgroups_insert);
+			$idpgroupids = DB::insert('userdirectory_idpgroup', $idpgroups_insert);
 
 			$user_groups = [];
 			foreach ($idpgroupids as $index => $idpgroupid) {
@@ -1042,7 +1082,7 @@ class CUserDirectory extends CApiService {
 			}
 
 			if ($user_groups) {
-				$user_groupids = DB::insertBatch('userdirectory_usrgrp', $user_groups);
+				$user_groupids = DB::insert('userdirectory_usrgrp', $user_groups);
 			}
 
 			// Set IDs for audit log.
@@ -1191,10 +1231,10 @@ class CUserDirectory extends CApiService {
 				'mediatypeid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
 			]],
-			'provision_groups' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-				'is_fallback' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GROUP_MAPPING_REGULAR, GROUP_MAPPING_FALLBACK])],
-				'fallback_status' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GROUP_MAPPING_FALLBACK_OFF, GROUP_MAPPING_FALLBACK_ON])],
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_idpgroup', 'is_fallback')],
+			'provision_groups' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+				'is_fallback' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_REGULAR, GROUP_MAPPING_FALLBACK]), 'default' => GROUP_MAPPING_REGULAR],
+				'fallback_status' =>	['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_FALLBACK_OFF, GROUP_MAPPING_FALLBACK_ON]), 'default' => GROUP_MAPPING_FALLBACK_OFF],
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_idpgroup', 'name')],
 				'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 					'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
