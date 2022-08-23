@@ -1392,10 +1392,10 @@ abstract class CItemGeneral extends CApiService {
 				else {
 					$ins_tags[] = ['itemid' => $item['itemid']] + $tag;
 				}
-
-				$del_itemtagids = array_merge($del_itemtagids, array_keys($db_tags));
 			}
 			unset($tag);
+
+			$del_itemtagids = array_merge($del_itemtagids, array_keys($db_tags));
 		}
 		unset($item);
 
