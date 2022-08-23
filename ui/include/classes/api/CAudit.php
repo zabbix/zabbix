@@ -237,7 +237,6 @@ class CAudit {
 	 * @var array
 	 */
 	private const MASKED_PATHS = [
-		self::RESOURCE_AUTHENTICATION => ['paths' => ['authentication.ldap_bind_password']],
 		self::RESOURCE_AUTH_TOKEN => ['paths' => ['token.token']],
 		self::RESOURCE_AUTOREGISTRATION => [
 			'paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']
@@ -343,6 +342,9 @@ class CAudit {
 		'templategroup.templates' => 'hosts_groups',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
+		'userdirectory.provision_media' => 'userdirectory_media',
+		'userdirectory.provision_groups' => 'userdirectory_idpgroup',
+		'userdirectory.provision_groups.user_groups' => 'userdirectory_usrgrp',
 		'usergroup.hostgroup_rights' => 'rights',
 		'usergroup.templategroup_rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
@@ -420,6 +422,9 @@ class CAudit {
 		'templategroup.templates' => 'hostgroupid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
+		'userdirectory.provision_media' => 'userdirectory_mediaid',
+		'userdirectory.provision_groups' => 'userdirectory_idpgroupid',
+		'userdirectory.provision_groups.user_groups' => 'userdirectory_usrgrpid',
 		'usergroup.hostgroup_rights' => 'rightid',
 		'usergroup.templategroup_rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',

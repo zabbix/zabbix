@@ -31,7 +31,6 @@ class CUserDirectory extends CApiService {
 
 	protected $tableName = 'userdirectory';
 	protected $tableAlias = 'ud';
-	protected $sortColumns = ['name'];
 
 	/**
 	 * Common UserDirectory properties.
@@ -86,10 +85,7 @@ class CUserDirectory extends CApiService {
 			'group' => []
 		];
 
-		if ($options['userdirectoryids'] !== null) {
-			$sql_parts['where']['userdirectoryid'] = dbConditionInt('ud.userdirectoryid', $options['userdirectoryids']);
-		}
-
+		$sql_parts = $this->applyQueryFilterOptions($this->tableName, $this->tableAlias, $options, $sql_parts);
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 
@@ -306,9 +302,7 @@ class CUserDirectory extends CApiService {
 		unset($row);
 
 		if ($options['selectProvisionGroups'] === API_OUTPUT_EXTEND) {
-			$options['selectProvisionGroups'] = [
-				'is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups', 'sortorder'
-			];
+			$options['selectProvisionGroups'] = ['is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups'];
 		}
 
 		$user_groups_index = array_search('user_groups', $options['selectProvisionGroups']);
@@ -321,6 +315,7 @@ class CUserDirectory extends CApiService {
 			'filter' => [
 				'userdirectoryid' => array_keys($result)
 			],
+			'sortfield' => ['sortorder'],
 			'preservekeys' => true
 		]);
 
@@ -344,7 +339,7 @@ class CUserDirectory extends CApiService {
 			$idpgroup = array_intersect_key($db_provision_idpgroup, array_flip($options['selectProvisionGroups']));
 
 			if ($user_groups_index !== false) {
-				$provision_idpgroupid = $db_provision_idpgroup['userdirectoryid'];
+				$provision_idpgroupid = $db_provision_idpgroup['userdirectory_idpgroupid'];
 				$idpgroup['user_groups'] = array_key_exists($provision_idpgroupid, $provision_usergroups)
 					? $provision_usergroups[$provision_idpgroupid]
 					: [];
@@ -411,19 +406,15 @@ class CUserDirectory extends CApiService {
 			$idpgroupids = DB::insertBatch('userdirectory_idpgroup', $userdirectory_idpgroups);
 
 			foreach ($idpgroupids as $index => $idpgroupid) {
-				if (array_key_exists('user_groups', $userdirectory_idpgroups[$index])) {
-					foreach ($userdirectory_idpgroups[$index]['user_groups'] as $usrgrp) {
-						$userdirectory_usrgrps[] = [
-							'userdirectory_idpgroupid' => $idpgroupid,
-							'usrgrpid' => $usrgrp['usrgrpid']
-						];
-					}
+				foreach ($userdirectory_idpgroups[$index]['user_groups'] as $usrgrp) {
+					$userdirectory_usrgrps[] = [
+						'userdirectory_idpgroupid' => $idpgroupid,
+						'usrgrpid' => $usrgrp['usrgrpid']
+					];
 				}
 			}
 
-			if ($userdirectory_usrgrps) {
-				DB::insertBatch('userdirectory_usrgrp', $userdirectory_usrgrps);
-			}
+			$userdirectory_usrgrpids = DB::insertBatch('userdirectory_usrgrp', $userdirectory_usrgrps);
 		}
 
 		if ($create_idps_ldap) {
@@ -435,14 +426,35 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($userdirectory_media) {
-			DB::insertBatch('userdirectory_media', $userdirectory_media);
+			$userdirectory_mediaids = DB::insertBatch('userdirectory_media', $userdirectory_media);
 		}
 
-		// TODO
-		//self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USERDIRECTORY, $userdirectories);
+		// Return IDs for audit log.
+		foreach ($userdirectories as &$userdirectory) {
+			if (array_key_exists('provision_media', $userdirectory)) {
+				foreach ($userdirectory['provision_media'] as &$media) {
+					$media['userdirectory_mediaid'] = array_shift($userdirectory_mediaids);
+				}
+				unset($media);
+			}
+
+			if (array_key_exists('provision_groups', $userdirectory)) {
+				foreach ($userdirectory['provision_groups'] as &$provision_group) {
+					$provision_group['userdirectory_idpgroupid'] = array_shift($idpgroupids);
+
+					foreach ($provision_group['user_groups'] as &$user_group) {
+						$user_group['userdirectory_usrgrpid'] = array_shift($userdirectory_usrgrpids);
+					}
+					unset($user_group);
+				}
+				unset($provision_group);
+			}
+		}
+		unset($userdirectory);
+
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USERDIRECTORY, $userdirectories);
 
 		if ($db_ldap_idp_count == 0 && $create_idps_ldap) {
-			// TODO: should ↓this↓ be recorded in audit log as well?
 			$idp_ldap = reset($create_idps_ldap);
 			API::Authentication()->update(['ldap_userdirectoryid' => $idp_ldap['userdirectoryid']]);
 		}
@@ -551,13 +563,10 @@ class CUserDirectory extends CApiService {
 		DB::update('userdirectory_ldap', $upd_userdirectories_ldap);
 		DB::update('userdirectory_saml', $upd_userdirectories_saml);
 
-		$this->updateProvisionMedia($userdirectories);
-		$this->updateProvisionGroups($userdirectories);
+		self::updateProvisionMedia($userdirectories, $db_userdirectories);
+		self::updateProvisionGroups($userdirectories, $db_userdirectories);
 
-		// TODO:
-//			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USERDIRECTORY, $userdirectories,
-//				$db_userdirectories
-//			);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USERDIRECTORY, $userdirectories, $db_userdirectories);
 
 		return ['userdirectoryids' => array_column($userdirectories, 'userdirectoryid')];
 	}
@@ -611,6 +620,97 @@ class CUserDirectory extends CApiService {
 		}
 
 		self::checkDuplicates($userdirectories, $db_userdirectories);
+		self::addAffectedObjects($userdirectories, $db_userdirectories);
+	}
+
+	private static function addAffectedObjects(array $userdirectories, array &$db_userdirectories): void {
+		self::addAffectedProvisionMedia($userdirectories, $db_userdirectories);
+		self::addAffectedProvisionGroups($userdirectories, $db_userdirectories);
+	}
+
+	private static function addAffectedProvisionMedia(array $userdirectories, array &$db_userdirectories): void {
+		$affected_userdirectoryids = [];
+		foreach ($userdirectories as $userdirectory) {
+			if (array_key_exists('provision_media', $userdirectory)) {
+				$affected_userdirectoryids[$userdirectory['userdirectoryid']] = true;
+				$db_userdirectories[$userdirectory['userdirectoryid']]['provision_media'] = [];
+			}
+		}
+
+		if (!$affected_userdirectoryids) {
+			return;
+		}
+
+		$db_provision_media = DB::select('userdirectory_media', [
+			'output' => ['userdirectory_mediaid', 'userdirectoryid', 'mediatypeid', 'name', 'attribute'],
+			'filter' => [
+				'userdirectoryid' => array_keys($affected_userdirectoryids)
+			]
+		]);
+
+		foreach ($db_provision_media as $media) {
+			$db_userdirectories[$media['userdirectoryid']]['provision_media'][] = [
+				'userdirectory_mediaid' => $media['userdirectory_mediaid'],
+				'mediatypeid' => $media['mediatypeid'],
+				'name' => $media['name'],
+				'attribute' => $media['attribute']
+			];
+		}
+	}
+
+	private static function addAffectedProvisionGroups(array $userdirectories, array &$db_userdirectories): void {
+		$affected_userdirectoryids = [];
+		foreach ($userdirectories as $userdirectory) {
+			if (array_key_exists('provision_groups', $userdirectory)) {
+				$affected_userdirectoryids[$userdirectory['userdirectoryid']] = true;
+				$db_userdirectories[$userdirectory['userdirectoryid']]['provision_groups'] = [];
+			}
+		}
+
+		if (!$affected_userdirectoryids) {
+			return;
+		}
+
+		$db_provision_groups = DB::select('userdirectory_idpgroup', [
+			'output' => ['userdirectory_idpgroupid', 'userdirectoryid', 'roleid', 'is_fallback', 'fallback_status',
+				'name', 'sortorder'
+			],
+			'filter' => [
+				'userdirectoryid' => array_keys($affected_userdirectoryids)
+			],
+			'preservekeys' => true
+		]);
+
+		$db_provision_usrgrps = DB::select('userdirectory_usrgrp', [
+			'output' => ['userdirectory_usrgrpid', 'userdirectory_idpgroupid', 'usrgrpid'],
+			'filter' => [
+				'userdirectory_idpgroupid' => array_keys($db_provision_groups)
+			]
+		]);
+
+		$db_idpgroup_usergroups = [];
+		foreach ($db_provision_usrgrps as $db_prov_usrgrp) {
+			['userdirectory_idpgroupid' => $prov_groupid, 'userdirectory_usrgrpid' => $prov_usrgrpid] = $db_prov_usrgrp;
+
+			$db_idpgroup_usergroups[$prov_groupid][] = [
+				'usrgrpid' => $db_prov_usrgrp['usrgrpid'],
+				'userdirectory_usrgrpid' => $prov_usrgrpid
+			];
+		}
+
+		foreach ($db_provision_groups as $db_prov_groups) {
+			['userdirectory_idpgroupid' => $prov_groupid, 'userdirectoryid' => $userdirectoryid] = $db_prov_groups;
+
+			$db_userdirectories[$userdirectoryid]['provision_groups'][] = [
+				'userdirectory_idpgroupid' => $prov_groupid,
+				'is_fallback' => $db_prov_groups['is_fallback'],
+				'fallback_status' => $db_prov_groups['fallback_status'],
+				'name' => $db_prov_groups['name'],
+				'roleid' => $db_prov_groups['roleid'],
+				'sortorder' => $db_prov_groups['sortorder'],
+				'user_groups' => $db_idpgroup_usergroups[$prov_groupid]
+			];
+		}
 	}
 
 	/**
@@ -809,35 +909,27 @@ class CUserDirectory extends CApiService {
 	/**
 	 * @param array      $userdirectories
 	 */
-	private function updateProvisionMedia(array $userdirectories): void {
+	private static function updateProvisionMedia(array &$userdirectories, array $db_userdirectories): void {
 		$userdirectories = array_column($userdirectories, null, 'userdirectoryid');
 		$userdirectoryids = array_keys(array_filter($userdirectories, function ($userdirectory) {
 			return array_key_exists('provision_media', $userdirectory);
 		}));
 
-		$db_provision_media = DB::select('userdirectory_media', [
-			'output' => ['userdirectory_mediaid', 'userdirectoryid', 'mediatypeid', 'name', 'attribute'],
-			'filter' => [
-				'userdirectoryid' => $userdirectoryids
-			]
-		]);
-
-		$provision_media_remove = array_fill_keys($userdirectoryids, []);
-		foreach ($db_provision_media as $media) {
-			$provision_media_remove[$media['userdirectoryid']][$media['userdirectory_mediaid']] = [
-				'mediatypeid' => $media['mediatypeid'],
-				'name' => $media['name'],
-				'attribute' => $media['attribute']
-			];
+		$provision_media_remove = [];
+		foreach ($userdirectoryids as $userdirectoryid) {
+			foreach ($db_userdirectories[$userdirectoryid]['provision_media'] as $media) {
+				$provision_media_remove[$userdirectoryid][$media['userdirectory_mediaid']] =
+					array_intersect_key($media, array_flip(['name', 'mediatypeid', 'attribute']));
+			}
 		}
 
 		// Remove unchanged provision media entries.
 		foreach ($userdirectoryids as $userdirectoryid) {
 			$userdirectory = $userdirectories[$userdirectoryid];
-			foreach ($provision_media_remove[$userdirectoryid] as $provision_mediaid => $provision_media_data) {
+			foreach ($provision_media_remove[$userdirectoryid] as $remove_mediaid => $provision_media_data) {
 				foreach ($userdirectory['provision_media'] as $index => $new_provision_media) {
 					if ($provision_media_data == $new_provision_media) {
-						unset($provision_media_remove[$userdirectoryid][$provision_mediaid]);
+						unset($provision_media_remove[$userdirectoryid][$remove_mediaid]);
 						unset($userdirectories[$userdirectoryid]['provision_media'][$index]);
 					}
 				}
@@ -863,48 +955,37 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($provision_media_insert) {
-			DB::insertBatch('userdirectory_media', $provision_media_insert);
+			$provision_mediaids = DB::insertBatch('userdirectory_media', $provision_media_insert);
+
+			foreach ($userdirectoryids as $userdirectoryid) {
+				foreach ($userdirectories[$userdirectoryid]['provision_media'] as $index => $new_provision_media) {
+					if (!array_key_exists('userdirectory_mediaid', $new_provision_media)) {
+						$userdirectories[$userdirectoryid]['provision_media'][$index]['userdirectory_mediaid']
+							= array_shift($provision_mediaids);
+					}
+				}
+			}
 		}
 	}
 
-	private function updateProvisionGroups(array $userdirectories): void {
+	private static function updateProvisionGroups(array &$userdirectories, array $db_userdirectories): void {
 		$userdirectories = array_column($userdirectories, null, 'userdirectoryid');
 		$userdirectoryids = array_keys(array_filter($userdirectories, function ($userdirectory) {
 			return array_key_exists('provision_groups', $userdirectory);
 		}));
 
-		$db_provision_groups = DB::select('userdirectory_idpgroup', [
-			'output' => ['userdirectory_idpgroupid', 'userdirectoryid', 'roleid', 'is_fallback', 'fallback_status',
-				'name', 'sortorder'
-			],
-			'filter' => [
-				'userdirectoryid' => $userdirectoryids
-			],
-			'preservekeys' => true
-		]);
+		$provision_groups_remove = [];
+		foreach ($userdirectoryids as $userdirectoryid) {
+			foreach ($db_userdirectories[$userdirectoryid]['provision_groups'] as $group) {
+				$user_groups = array_column($group['user_groups'], null, 'userdirectory_usrgrpid');
+				$group['user_groups'] = array_map(function ($usrgrp) {
+					return array_intersect_key($usrgrp, array_flip(['usrgrpid']));
+				}, $user_groups);
 
-		$db_provision_usrgrps = DB::select('userdirectory_usrgrp', [
-			'output' => ['userdirectory_idpgroupid', 'usrgrpid'],
-			'filter' => [
-				'userdirectory_idpgroupid' => array_keys($db_provision_groups)
-			]
-		]);
-
-		$db_provision_usergroups = [];
-		foreach ($db_provision_usrgrps as $usrgrps) {
-			$db_provision_usergroups[$usrgrps['userdirectory_idpgroupid']][] = [
-				'usrgrpid' => $usrgrps['usrgrpid']
-			];
-		}
-
-		$provision_groups_remove = array_fill_keys($userdirectoryids, []);
-		foreach ($db_provision_groups as $idpgroupid => $idpgroup) {
-			CArrayHelper::sort($db_provision_usergroups[$idpgroupid], ['usrgrpid']);
-			$provision_groups_remove[$idpgroup['userdirectoryid']][$idpgroupid] = [
-				'user_groups' => array_values($db_provision_usergroups[$idpgroupid])
-			] + array_intersect_key($idpgroup, array_flip([
-				'roleid', 'is_fallback', 'fallback_status', 'name', 'sortorder'
-			]));
+				$provision_groups_remove[$userdirectoryid][$group['userdirectory_idpgroupid']] = array_intersect_key(
+					$group, array_flip(['is_fallback', 'fallback_status', 'name', 'roleid', 'sortorder', 'user_groups'])
+				);
+			}
 		}
 
 		foreach ($userdirectoryids as $userdirectoryid) {
@@ -914,13 +995,16 @@ class CUserDirectory extends CApiService {
 			}
 
 			// Unset provision groups that actually have not been changed.
-			foreach ($provision_groups_remove[$userdirectoryid] as $idpgroup => $idpgroup) {
+			foreach ($provision_groups_remove[$userdirectoryid] as $groupid => $group) {
+				CArrayHelper::sort($group['user_groups'], ['usrgrpid']);
+				$group['user_groups'] = array_values($group['user_groups']);
+
 				foreach ($userdirectories[$userdirectoryid]['provision_groups'] as $index => $new_provision_group) {
 					CArrayHelper::sort($new_provision_group['user_groups'], ['usrgrpid']);
 					$new_provision_group['user_groups'] = array_values($new_provision_group['user_groups']);
 
-					if ($idpgroup == $new_provision_group) {
-						unset($provision_groups_remove[$userdirectoryid][$idpgroup]);
+					if ($group == $new_provision_group) {
+						unset($provision_groups_remove[$userdirectoryid][$groupid]);
 						unset($userdirectories[$userdirectoryid]['provision_groups'][$index]);
 					}
 				}
@@ -940,8 +1024,8 @@ class CUserDirectory extends CApiService {
 		// Record new provision groups.
 		$idpgroups_insert = [];
 		foreach ($userdirectoryids as $userdirectoryid) {
-			foreach ($userdirectories[$userdirectoryid]['provision_groups'] as $groups) {
-				$idpgroups_insert[] = ['userdirectoryid' => $userdirectoryid] + $groups;
+			foreach ($userdirectories[$userdirectoryid]['provision_groups'] as $group) {
+				$idpgroups_insert[] = ['userdirectoryid' => $userdirectoryid] + $group;
 			}
 		}
 
@@ -958,9 +1042,22 @@ class CUserDirectory extends CApiService {
 			}
 
 			if ($user_groups) {
-				DB::insertBatch('userdirectory_usrgrp', $user_groups);
+				$user_groupids = DB::insertBatch('userdirectory_usrgrp', $user_groups);
+			}
+
+			// Set IDs for audit log.
+			foreach ($userdirectoryids as $userdirectoryid) {
+				foreach ($userdirectories[$userdirectoryid]['provision_groups'] as &$group) {
+					$group['userdirectory_idpgroupid'] = array_shift($idpgroupids);
+					$group['user_groups'] = array_map(function ($usrgrp) use (&$user_groupids) {
+						return $usrgrp + ['userdirectory_usrgrpid' => array_shift($user_groupids)];
+					}, $group['user_groups']);
+				}
+				unset($group);
 			}
 		}
+
+		$userdirectories = array_values($userdirectories);
 	}
 
 	private static function getValidationRules(string $method = 'create'): array {
@@ -1089,7 +1186,7 @@ class CUserDirectory extends CApiService {
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'default' => DB::getDefault('userdirectory_saml', 'scim_token')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'provision_media' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+			'provision_media' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
 				'mediatypeid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
