@@ -504,6 +504,7 @@ class testFormUpdateProblem extends CWebTest {
 					'expected' => TEST_BAD,
 					'problems' => ['Trigger for text'],
 					'fields' => [
+						'id:message' => 'not showing message 😾',
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => 'now+16y'
@@ -516,6 +517,7 @@ class testFormUpdateProblem extends CWebTest {
 					'expected' => TEST_BAD,
 					'problems' => ['Trigger for text'],
 					'fields' => [
+						'id:message' => 'not showing message',
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => 'now-1d'
@@ -637,6 +639,7 @@ class testFormUpdateProblem extends CWebTest {
 				[
 					'problems' => ['Trigger for unsigned'],
 					'fields' => [
+						'id:message' => '😻 😻 😻',
 						'id:change_severity' => true,
 						'id:severity' => 'High',
 						'id:suppress_problem' => true,
@@ -646,7 +649,7 @@ class testFormUpdateProblem extends CWebTest {
 					'db_check' => [
 						[
 							'name' => 'Trigger for unsigned',
-							'db_fields' => ['message' => '', 'action' => 40, 'new_severity' => 4, 'suppress_until' => true]
+							'db_fields' => ['message' => '😻 😻 😻', 'action' => 44, 'new_severity' => 4, 'suppress_until' => true]
 						]
 					]
 				]
@@ -855,7 +858,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Trigger for unsigned')->getColumn('Ack')
+		$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Trigger for log')->getColumn('Ack')
 				->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('id:acknowledge_form')->asForm()->one()->fill([
@@ -870,7 +873,6 @@ class testFormUpdateProblem extends CWebTest {
 
 		$dialog->query(($data['case'] === 'Close') ? 'xpath:.//button[@title="Close"]' : 'button:Cancel')->one()
 				->waitUntilClickable()->click();
-
 		$dialog->ensureNotPresent();
 		$this->page->assertHeader('Problems');
 		$this->assertEquals($old_hash, $this->getHash());
