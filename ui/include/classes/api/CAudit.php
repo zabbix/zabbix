@@ -533,17 +533,10 @@ class CAudit {
 						'recordsetid' => $recordsetid,
 						'details' => (count($diff) == 0) ? '' : json_encode($diff)
 					];
-
-					if (count($auditlog) == ZBX_DB_MAX_INSERTS) {
-						DB::insertBatch('auditlog', $auditlog);
-						$auditlog = [];
-					}
 				}
 		}
 
-		if ($auditlog) {
-			DB::insertBatch('auditlog', $auditlog);
-		}
+		DB::insertBatch('auditlog', $auditlog);
 	}
 
 	/**
