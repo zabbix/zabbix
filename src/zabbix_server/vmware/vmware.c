@@ -2095,6 +2095,7 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 	VMWARE_VECTOR_CREATE(&dst->vms, ptr);
 	VMWARE_VECTOR_CREATE(&dst->pnics, vmware_pnic);
 	VMWARE_VECTOR_CREATE(&dst->alarm_ids, str);
+	VMWARE_VECTOR_CREATE(&dst->diskinfo, vmware_diskinfo);
 	zbx_vector_vmware_dsname_reserve(&dst->dsnames, (size_t)src->dsnames.values_num);
 	zbx_vector_ptr_reserve(&dst->vms, (size_t)src->vms.values_num);
 	zbx_vector_vmware_pnic_reserve(&dst->pnics, (size_t)src->pnics.values_num);
@@ -4901,11 +4902,11 @@ static int	vmware_service_hv_disks_parse_info(xmlDoc *xdoc, zbx_vector_ptr_pair_
 
 		if (!(FAIL != j && 0 == strcmp(disks_info->values[j].first, lun_key)) &&
 				FAIL == (j = zbx_vector_ptr_pair_search(disks_info, pr,
-				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+				ZBX_DEFAULT_STR_COMPARE_FUNC)))
 		{
+			lun_key = NULL;
 			pr.second = zbx_malloc(NULL, sizeof(zbx_vmware_diskinfo_t));
-			((zbx_vmware_diskinfo_t *)pr.second)->ds_uuid = NULL;
-			((zbx_vmware_diskinfo_t *)pr.second)->queue_depth = 0;
+			memset(pr.second, 0, sizeof(zbx_vmware_diskinfo_t));
 			zbx_vector_ptr_pair_append(disks_info, pr);
 			j = disks_info->values_num - 1;
 			created++;
@@ -4989,8 +4990,6 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 #	define ZBX_POST_SCSI_INFO									\
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].canonicalName</ns0:pathSet>"		\
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].operationalState</ns0:pathSet>"	\
-		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].ssd</ns0:pathSet>"			\
-		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].localDisk</ns0:pathSet>"		\
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].lunType</ns0:pathSet>"		\
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].queueDepth</ns0:pathSet>"		\
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].model</ns0:pathSet>"			\
@@ -5019,7 +5018,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 	{
 		scsi_req = zbx_strdcatf(scsi_req , ZBX_POST_SCSI_INFO, scsi_luns.values[i], scsi_luns.values[i],
 				scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i],
-				scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i]);
+				scsi_luns.values[i], scsi_luns.values[i]);
 	}
 
 	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
