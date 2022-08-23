@@ -54,7 +54,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		}
 
 		$this->assertEquals('Specify host to see the graphs.',
-			$this->query('xpath://table[@class="list-table"]//td')->one()->getText()
+			$this->query("xpath://table[@class='list-table']//td")->one()->getText()
 		);
 	}
 
