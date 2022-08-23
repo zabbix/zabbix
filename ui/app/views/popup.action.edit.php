@@ -260,13 +260,6 @@ if ($data['actionid'] !== '') {
 			'isSubmit' => true,
 			'action' => 'action_edit_popup.submit();'
 		],
-//		[
-//			'title' => _('Clone'),
-//			'class' => ZBX_STYLE_BTN_ALT,
-//			'keepOpen' => true,
-//			'isSubmit' => false,
-//			'action' => 'action_edit_popup.clone();'
-//		],
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
@@ -274,19 +267,16 @@ if ($data['actionid'] !== '') {
 			'isSubmit' => false,
 			'action' => 'action_edit_popup.clone('.json_encode([
 					'title' => _('New action'),
-					// todo : ask what title should be here
-					// todo: remove id
 					'buttons' => [
 						[
 							'title' => _('Add'),
-							'class' => 'js-add',
 							'keepOpen' => true,
 							'isSubmit' => true,
 							'action' => 'action_edit_popup.submit();'
 						],
 						[
 							'title' => _('Cancel'),
-							'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
+							'class' => ZBX_STYLE_BTN_ALT,
 							'cancel' => true,
 							'action' => ''
 						]
@@ -315,9 +305,11 @@ else {
 	];
 }
 
+// todo: check if this is fine. Add as translatable strings.
+$header = $data['actionid'] !== '' ? _('Action') : _('New action');
 
 $output = [
-	'header' => _('Actions'),
+	'header' => $header,
 	'doc_url' => CDocHelper::getUrl(CDocHelper::CONFIGURATION_ACTION_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,

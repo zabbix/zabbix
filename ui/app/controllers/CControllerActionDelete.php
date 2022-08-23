@@ -49,9 +49,6 @@ class CControllerActionDelete extends CController {
 	}
 
 	protected function doAction(): void {
-
-		$eventsource = $this->getInput('eventsource');
-
 		if ($this->hasInput('g_actionid')) {
 			$actionids = $this->getInput('g_actionid', []);
 
