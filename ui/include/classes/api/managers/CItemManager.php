@@ -254,6 +254,8 @@ class CItemManager {
 			'values' => ['templateid' => 0, 'master_itemid' => 0],
 			'where' => ['itemid' => $del_itemids]
 		]);
+		DB::delete('httptestitem', ['itemid' => $del_itemids]);
+		DB::delete('httpstepitem', ['itemid' => $del_itemids]);
 		DB::delete('items', ['itemid' => $del_itemids]);
 	}
 }

@@ -628,6 +628,7 @@ class CHttpTest extends CApiService {
 
 		$del_httptestids = array_merge($httptestids, $child_httptestids);
 		$del_itemids = [];
+		$del_httpstepids = [];
 
 		$db_httptestitems = DBselect(
 			'SELECT hti.itemid'.
@@ -639,18 +640,24 @@ class CHttpTest extends CApiService {
 		}
 
 		$db_httpstepitems = DBselect(
-			'SELECT hsi.itemid'.
+			'SELECT hsi.itemid, hsi.httpstepid'.
 			' FROM httpstepitem hsi,httpstep hs'.
 			' WHERE hsi.httpstepid=hs.httpstepid'.
 				' AND '.dbConditionInt('hs.httptestid', $del_httptestids)
 		);
+
 		while ($db_httpstepitem = DBfetch($db_httpstepitems)) {
 			$del_itemids[] = $db_httpstepitem['itemid'];
+			$del_httpstepids[] = $db_httpstepitem['httpstepid'];
 		}
 
 		if ($del_itemids) {
 			CItemManager::delete($del_itemids);
 		}
+
+		DB::delete('httpstep_field', ['httpstepid' => $del_httpstepids]);
+
+		DB::delete('httpstep', ['httptestid' => $del_httptestids]);
 
 		DB::delete('httptest', ['httptestid' => $del_httptestids]);
 

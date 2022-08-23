@@ -228,6 +228,8 @@ class CHttpTestManager {
 						$deleteStepItemIds[] = $itemId;
 					}
 
+					DB::delete('httpstep', ['httpstep_field' => $stepidsDelete]);
+
 					DB::delete('httpstep', ['httpstepid' => $stepidsDelete]);
 				}
 			}
