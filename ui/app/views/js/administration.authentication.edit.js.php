@@ -33,15 +33,15 @@
 			this.allow_jit = null;
 		}
 
-		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_groups, saml_media_type_mappings}) {
+		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups, saml_provision_media}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
 			this.allow_jit = document.getElementById('saml_allow_jit');
 
 			this._addEventListeners();
 			this._addLdapServers(ldap_servers, ldap_default_row_index);
-			this._addSamlUserGroups(saml_groups);
-			this._addSamlMediaTypeMapping(saml_media_type_mappings);
+			this._addSamlUserGroups(saml_provision_groups);
+			this._addSamlMediaTypeMapping(saml_provision_media);
 
 			this.toggleScimProvisioning(this.allow_jit.checked);
 			this.initSortable(document.getElementById('saml-group-table'));
@@ -225,21 +225,23 @@
 			}
 		}
 
-		_addSamlUserGroups(saml_groups) {
-			for (const key in saml_groups) {
+		_addSamlUserGroups(saml_provision_groups) {
+			for (const [row_index, saml_provision_group] of Object.entries(saml_provision_groups)) {
+				saml_provision_group.row_index = row_index;
 
 				document
 					.querySelector('#saml-group-table tbody')
-					.appendChild(this._prepareSamlGroupRow(saml_groups[key]));
+					.appendChild(this._prepareSamlGroupRow(saml_provision_group));
 			}
 		}
 
-		_addSamlMediaTypeMapping(saml_media_type_mappings) {
-			for (const key in saml_media_type_mappings) {
+		_addSamlMediaTypeMapping(saml_provision_media) {
+			for (const [row_index, saml_media] of Object.entries(saml_provision_media)) {
+				saml_media.row_index = row_index;
 
 				document
 					.querySelector('#saml-media-type-mapping-table tbody')
-					.appendChild(this._prepareSamlMediaTypeRow(saml_media_type_mappings[key]));
+					.appendChild(this._prepareSamlMediaTypeRow(saml_media));
 			}
 		}
 
@@ -250,10 +252,10 @@
 				const row_index = row.dataset.row_index;
 
 				popup_params = {
-					idp_group_name: row.querySelector(`[name="saml_groups[${row_index}][idp_group_name]"`).value,
-					usrgrpid: row.querySelector(`[name="saml_groups[${row_index}][usrgrpid]"`).value,
-					roleid: row.querySelector(`[name="saml_groups[${row_index}][roleid]"`).value,
-					is_fallback: row.querySelector(`[name="saml_groups[${row_index}][is_fallback]"`).value
+					name: row.querySelector(`[name="saml_provision_groups[${row_index}][name]"`).value,
+					usrgrpid: row.querySelector(`[name="saml_provision_groups[${row_index}][usrgrpid]"`).value,
+					roleid: row.querySelector(`[name="saml_provision_groups[${row_index}][roleid]"`).value,
+					is_fallback: row.querySelector(`[name="saml_provision_groups[${row_index}][is_fallback]"`).value
 				};
 			}
 			else {
@@ -267,15 +269,15 @@
 			const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const saml_group = e.detail;
+				const saml_provision_group = e.detail;
 
 				if (row === null) {
 					document
 						.querySelector('#saml-group-table tbody')
-						.appendChild(this._prepareSamlGroupRow(saml_group));
+						.appendChild(this._prepareSamlGroupRow(saml_provision_group));
 				}
 				else {
-					row.parentNode.insertBefore(this._prepareSamlGroupRow(saml_group), row);
+					row.parentNode.insertBefore(this._prepareSamlGroupRow(saml_provision_group), row);
 					row.remove();
 				}
 			});
@@ -288,10 +290,10 @@
 				const row_index = row.dataset.row_index;
 
 				popup_params = {
-					media_type_mapping_name: row.querySelector(`[name="saml_media_mapping[${row_index}][media_type_mapping_name]"`).value,
-					media_type_name: row.querySelector(`[name="saml_media_mapping[${row_index}][media_type_name]"`).value,
-					media_type_attribute: row.querySelector(`[name="saml_media_mapping[${row_index}][media_type_attribute]"`).value,
-					mediatypeid: row.querySelector(`[name="saml_media_mapping[${row_index}][mediatypeid]"`).value
+					name: row.querySelector(`[name="saml_provision_media[${row_index}][name]"`).value,
+					media_type_name: row.querySelector(`[name="saml_provision_media[${row_index}][media_type_name]"`).value,
+					attribute: row.querySelector(`[name="saml_provision_media[${row_index}][attribute]"`).value,
+					mediatypeid: row.querySelector(`[name="saml_provision_media[${row_index}][mediatypeid]"`).value
 				};
 			}
 			else {
@@ -410,33 +412,33 @@
 			return row;
 		}
 
-		_prepareSamlGroupRow(saml_group) {
+		_prepareSamlGroupRow(saml_provision_group) {
 			const template_saml_group_row = new Template(this._templateSamlGroupRow());
 			const template = document.createElement('template');
-			if (saml_group.is_fallback == true) {
-				if (saml_group.fallback_status == 1) {
-					saml_group.action = t('Enabled');
-					saml_group.action_class = 'js-enabled green';
+			if (saml_provision_group.is_fallback == true) {
+				if (saml_provision_group.fallback_status == 1) {
+					saml_provision_group.action = t('Enabled');
+					saml_provision_group.action_class = 'js-enabled green';
 				}
 				else {
-					saml_group.action = t('Disabled');
-					saml_group.action_class = 'js-disabled red';
+					saml_provision_group.action = t('Disabled');
+					saml_provision_group.action_class = 'js-disabled red';
 				}
 			}
 			else {
-				saml_group.action = t('Remove');
-				saml_group.action_class = 'js-remove';
+				saml_provision_group.action = t('Remove');
+				saml_provision_group.action_class = 'js-remove';
 			}
-			template.innerHTML = template_saml_group_row.evaluate(saml_group).trim();
+			template.innerHTML = template_saml_group_row.evaluate(saml_provision_group).trim();
 
 			return template.content.firstChild;
 		}
 
-		_prepareSamlMediaTypeRow(saml_media_mapping) {
+		_prepareSamlMediaTypeRow(saml_media) {
 			const template_saml_media_mapping_row = new Template(this._templateSamlMediaMappingRow());
 			const template = document.createElement('template');
 
-			template.innerHTML = template_saml_media_mapping_row.evaluate(saml_media_mapping).trim();
+			template.innerHTML = template_saml_media_mapping_row.evaluate(saml_media).trim();
 
 			return template.content.firstChild;
 		}
@@ -477,12 +479,12 @@
 						<div class="drag-icon ui-sortable-handle"></div>
 					</td>
 					<td>
-						<a href="javascript:void(0);" class="wordwrap js-edit">#{idp_group_name}</a>
-						<input type="hidden" name="saml_groups[#{row_index}][idp_group_name]" value="#{idp_group_name}">
-						<input type="hidden" name="saml_groups[#{row_index}][usrgrpid]" value="#{usrgrpid}">
-						<input type="hidden" name="saml_groups[#{row_index}][roleid]" value="#{roleid}">
-						<input type="hidden" name="saml_groups[#{row_index}][is_fallback]" value="#{is_fallback}">
-						<input type="hidden" name="saml_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
+						<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
+						<input type="hidden" name="saml_provision_groups[#{row_index}][name]" value="#{name}">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][usrgrpid]" value="#{usrgrpid}">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][roleid]" value="#{roleid}">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][is_fallback]" value="#{is_fallback}">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
 					</td>
 					<td class="wordbreak">#{user_group_name}</td>
 					<td class="wordbreak">#{role_name}</td>
@@ -497,14 +499,14 @@
 			return `
 				<tr data-row_index="#{row_index}">
 					<td>
-						<a href="javascript:void(0);" class="wordwrap js-edit">#{media_type_mapping_name}</a>
-						<input type="hidden" name="saml_media_mapping[#{row_index}][media_type_mapping_name]" value="#{media_type_mapping_name}">
-						<input type="hidden" name="saml_media_mapping[#{row_index}][media_type_name]" value="#{media_type_name}">
-						<input type="hidden" name="saml_media_mapping[#{row_index}][mediatypeid]" value="#{mediatypeid}">
-						<input type="hidden" name="saml_media_mapping[#{row_index}][media_type_attribute]" value="#{media_type_attribute}">
+						<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
+						<input type="hidden" name="saml_provision_media[#{row_index}][name]" value="#{name}">
+						<input type="hidden" name="saml_provision_media[#{row_index}][media_type_name]" value="#{media_type_name}">
+						<input type="hidden" name="saml_provision_media[#{row_index}][mediatypeid]" value="#{mediatypeid}">
+						<input type="hidden" name="saml_provision_media[#{row_index}][attribute]" value="#{attribute}">
 					</td>
 					<td class="wordbreak">#{media_type_name}</td>
-					<td class="wordbreak">#{media_type_attribute}</td>
+					<td class="wordbreak">#{attribute}</td>
 					<td>
 						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
 					</td>

@@ -234,10 +234,10 @@ $saml_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Enable JIT provisioning'), 'saml_jit_enabled'),
+		new CLabel(_('Enable JIT provisioning'), 'saml_jit_status'),
 		new CFormField(
-			(new CCheckBox('saml_jit_enabled', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
-				->setChecked($data['saml_scim_enabled'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
+			(new CCheckBox('saml_jit_status', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
+				->setChecked($data['saml_jit_status'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
 				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
 				->setEnabled($data['saml_enabled'])
 		)
@@ -246,7 +246,7 @@ $saml_tab = (new CFormGrid())
 		(new CLabel(_('IdP entity ID'), 'saml_idp_entityid'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('saml_idp_entityid', $data['saml_idp_entityid'], false,
-				DB::getFieldLength('config', 'saml_idp_entityid')
+				DB::getFieldLength('userdirectory_saml', 'idp_entityid')
 			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -256,7 +256,9 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('SSO service URL'), 'saml_sso_url'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('saml_sso_url', $data['saml_sso_url'], false, DB::getFieldLength('config', 'saml_sso_url')))
+			(new CTextBox('saml_sso_url', $data['saml_sso_url'], false,
+				DB::getFieldLength('userdirectory_saml', 'sso_url')
+			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired())
@@ -264,7 +266,9 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('SLO service URL'), 'saml_slo_url'),
 		new CFormField(
-			(new CTextBox('saml_slo_url', $data['saml_slo_url'], false, DB::getFieldLength('config', 'saml_slo_url')))
+			(new CTextBox('saml_slo_url', $data['saml_slo_url'], false,
+				DB::getFieldLength('userdirectory_saml', 'slo_url')
+			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
@@ -273,7 +277,7 @@ $saml_tab = (new CFormGrid())
 		(new CLabel(_('Username attribute'), 'saml_username_attribute'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('saml_username_attribute', $data['saml_username_attribute'], false,
-				DB::getFieldLength('config', 'saml_username_attribute')
+				DB::getFieldLength('userdirectory_saml', 'username_attribute')
 			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -284,7 +288,7 @@ $saml_tab = (new CFormGrid())
 		(new CLabel(_('SP entity ID'), 'saml_sp_entityid'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('saml_sp_entityid', $data['saml_sp_entityid'], false,
-				DB::getFieldLength('config', 'saml_sp_entityid')
+				DB::getFieldLength('userdirectory_saml', 'sp_entityid')
 			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -295,7 +299,7 @@ $saml_tab = (new CFormGrid())
 		new CLabel(_('SP name ID format'), 'saml_nameid_format'),
 		new CFormField(
 			(new CTextBox('saml_nameid_format', $data['saml_nameid_format'], false,
-				DB::getFieldLength('config', 'saml_nameid_format')
+				DB::getFieldLength('userdirectory_saml', 'nameid_format')
 			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -374,7 +378,7 @@ $saml_tab = (new CFormGrid())
 			->addClass('saml-allow-scim'),
 		(new CFormField(
 			(new CTextBox('saml_group_name_attribute', $data['saml_group_name_attribute'], false,
-//				DB::getFieldLength('config', 'saml_group_name_attribute')
+				DB::getFieldLength('userdirectory_saml', 'group_name')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -384,7 +388,7 @@ $saml_tab = (new CFormGrid())
 		(new CLabel(_('User name attribute'), 'saml_user_name_attribute'))->addClass('saml-allow-scim'),
 		(new CFormField(
 			(new CTextBox('saml_user_name_attribute', '', false,
-//				DB::getFieldLength('config', 'saml_user_name_attribute')
+				DB::getFieldLength('userdirectory_saml', 'user_username')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass('saml-allow-scim')
@@ -393,7 +397,7 @@ $saml_tab = (new CFormGrid())
 		(new CLabel(_('User lastname attribute'), 'saml_user_lastname_attribute'))->addClass('saml-allow-scim'),
 		(new CFormField(
 			(new CTextBox('saml_user_lastname_attribute', '', false,
-//				DB::getFieldLength('config', 'saml_user_lastname_attribute')
+				DB::getFieldLength('userdirectory_saml', 'user_lastname')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass('saml-allow-scim')
@@ -462,10 +466,10 @@ $saml_tab = (new CFormGrid())
 		))->addClass('saml-allow-scim')
 	])
 	->addItem([
-		(new CLabel(_('Enable SCIM provisioning'), 'saml_scim_enabled'))->addClass('saml-allow-scim'),
+		(new CLabel(_('Enable SCIM provisioning'), 'saml_scim_status'))->addClass('saml-allow-scim'),
 		(new CFormField(
-			(new CCheckBox('saml_scim_enabled', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
-				->setChecked($data['saml_scim_enabled'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
+			(new CCheckBox('saml_scim_status', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
+				->setChecked($data['saml_scim_status'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
 				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
 		))->addClass('saml-allow-scim')
 	])
@@ -474,7 +478,7 @@ $saml_tab = (new CFormGrid())
 			->addClass('saml-allow-scim'),
 		(new CFormField(
 			(new CTextBox('saml_authorization_token', '', false,
-//				DB::getFieldLength('config', 'saml_authorization_token')
+				DB::getFieldLength('userdirectory_saml', 'scim_token')
 			))
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -487,6 +491,7 @@ $saml_tab = (new CFormGrid())
 	->addItem((new CForm())
 		->addVar('action', $data['action_submit'])
 		->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
+		->addVar('saml_userdirectoryid', $data['saml_userdirectoryid'])
 		->setId('authentication-form')
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->disablePasswordAutofill()
@@ -508,8 +513,8 @@ $saml_tab = (new CFormGrid())
 		'ldap_servers' => $data['ldap_servers'],
 		'ldap_default_row_index' => $data['ldap_default_row_index'],
 		'db_authentication_type' => $data['db_authentication_type'],
-		'saml_groups' => $data['saml_groups'],
-		'saml_media_type_mappings' => $data['saml_media_type_mappings']
+		'saml_provision_groups' => $data['saml_provision_groups'],
+		'saml_provision_media' => $data['saml_provision_media']
 	], JSON_FORCE_OBJECT).');'
 ))
 	->setOnDocumentReady()

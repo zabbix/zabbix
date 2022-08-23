@@ -30,7 +30,7 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 			'add_group' =>			'in 1',
 			'usrgrpid' =>			'string',
 			'roleid' =>				'db users.roleid',
-			'idp_group_name' =>		'string',
+			'name' =>				'string',
 			'name_label' =>			'string',
 			'is_fallback' =>		'in 0,1'
 		];
@@ -65,7 +65,7 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 	 */
 	protected function doAction(): void {
 		$data = [
-			'idp_group_name' => $this->getInput('idp_group_name', ''),
+			'name' => $this->getInput('name', ''),
 			'add_group' => $this->getInput('add_group', ''),
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'name_label' => $this->getInput('name_label'),

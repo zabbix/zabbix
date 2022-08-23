@@ -28,9 +28,9 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'add_media_type_mapping' =>		'in 1',
-			'media_type_mapping_name' =>	'string',
+			'name' =>						'string',
 			'media_type_name' =>			'string',
-			'media_type_attribute' =>		'string',
+			'attribute' =>					'string',
 			'mediatypeid' =>				'db media_type.mediatypeid',
 			'db_mediatypes' =>				'array'
 		];
@@ -67,10 +67,10 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 
 		$data = [
 			'add_media_type_mapping' => $this->getInput('add_media_type_mapping', ''),
-			'media_type_mapping_name' => $this->getInput('media_type_mapping_name', ''),
+			'name' => $this->getInput('name', ''),
 			'media_type_name' => $this->getInput('media_type_name', ''),
 			'user' => ['debug_mode' => $this->getDebugMode()],
-			'media_type_attribute' => $this->getInput('media_type_attribute', ''),
+			'attribute' => $this->getInput('attribute', ''),
 			'mediatypeid' => $this->getInput('mediatypeid', ''),
 		];
 

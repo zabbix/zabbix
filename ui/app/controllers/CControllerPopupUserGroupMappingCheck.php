@@ -30,7 +30,7 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'roleid' =>				'required|db users.roleid',
-			'idp_group_name' =>		'required|string',
+			'name' =>				'required|string',
 			'user_groups' =>		'array_id'
 		];
 
@@ -56,7 +56,7 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'idp_group_name' => $this->getInput('idp_group_name')
+			'name' => $this->getInput('name')
 		];
 
 		$user_groups = API::UserGroup()->get([

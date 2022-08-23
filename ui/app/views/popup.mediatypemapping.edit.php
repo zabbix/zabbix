@@ -49,8 +49,8 @@ foreach ($data['db_mediatypes'] as $mediatypeid => $value) {
 $form
 	->addItem((new CFormGrid())
 		->addItem([
-			(new CLabel(_('Name'), 'media_type_mapping_name'))->setAsteriskMark(),
-			new CFormField((new CTextBox('media_type_mapping_name', $data['media_type_mapping_name']))
+			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+			new CFormField((new CTextBox('name', $data['name']))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setId('media-type-mapping-name'))
 		])
@@ -59,10 +59,10 @@ $form
 			$media_type_select
 		])
 		->addItem([
-			(new CLabel(_('Attribute'), 'media_type_attribute'))->setAsteriskMark(),
-			new CFormField((new CTextBox('media_type_attribute', $data['media_type_attribute']))
+			(new CLabel(_('Attribute'), 'attribute'))->setAsteriskMark(),
+			new CFormField((new CTextBox('attribute', $data['attribute']))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setId('media-type-attribute'))
+				->setId('attribute'))
 		]))
 	->addItem(
 		(new CScriptTag('

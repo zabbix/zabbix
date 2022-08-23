@@ -29,9 +29,9 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'mediatypeid' =>					'required|db media_type.mediatypeid',
-			'media_type_mapping_name' =>		'required|string',
-			'media_type_attribute' =>			'required|string'
+			'mediatypeid' =>		'required|db media_type.mediatypeid',
+			'name' =>				'required|string',
+			'attribute' =>			'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -56,8 +56,8 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'media_type_mapping_name' => $this->getInput('media_type_mapping_name'),
-			'media_type_attribute' => $this->getInput('media_type_attribute')
+			'name' => $this->getInput('name'),
+			'attribute' => $this->getInput('attribute')
 		];
 
 		$media_type = API::MediaType()->get([
