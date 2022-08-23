@@ -850,16 +850,19 @@ class CAudit {
 
 			if (self::isValueToMask($resource, $path, $object)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
-			}
-			elseif (self::isDefaultValue($resource, $path, $value)) {
 				continue;
 			}
-			elseif (in_array(self::getAbstractPath($path), self::BLOB_FIELDS)) {
+
+			if (self::isDefaultValue($resource, $path, $value)) {
+				continue;
+			}
+
+			if (in_array(self::getAbstractPath($path), self::BLOB_FIELDS)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD];
+				continue;
 			}
-			else {
-				$result[$path] = [self::DETAILS_ACTION_ADD, $value];
-			}
+
+			$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 		}
 
 		return $result;
@@ -904,40 +907,43 @@ class CAudit {
 
 		foreach ($object as $path => $value) {
 			$db_value = array_key_exists($path, $db_object) ? $db_object[$path] : null;
-			$is_mask_value = self::isValueToMask($resource, $path, $object);
+			$mask_value = self::isValueToMask($resource, $path, $object);
 
 			if ($db_value === null) {
-				if ($is_mask_value) {
+				if ($mask_value) {
 					$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
-				}
-				elseif (self::isDefaultValue($resource, $path, $value)) {
 					continue;
 				}
-				elseif (in_array(self::getAbstractPath($path), self::BLOB_FIELDS)) {
+
+				if (self::isDefaultValue($resource, $path, $value)) {
+					continue;
+				}
+
+				if (in_array(self::getAbstractPath($path), self::BLOB_FIELDS)) {
 					$result[$path] = [self::DETAILS_ACTION_ADD];
+					continue;
 				}
-				else {
-					$result[$path] = [self::DETAILS_ACTION_ADD, $value];
-				}
+
+				$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 			}
 			else {
-				$is_mask_db_value = self::isValueToMask($resource, $path, $db_object);
+				$mask_db_value = self::isValueToMask($resource, $path, $db_object);
 
-				if ($value != $db_value || $is_mask_value || $is_mask_db_value) {
+				if ($value != $db_value || $mask_value || $mask_db_value) {
 					if (self::isNestedObjectProperty($path)) {
 						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
 					}
 
 					if (in_array(self::getAbstractPath($path), self::BLOB_FIELDS)) {
 						$result[$path] = [self::DETAILS_ACTION_UPDATE];
+						continue;
 					}
-					else {
-						$result[$path] = [
-							self::DETAILS_ACTION_UPDATE,
-							$is_mask_value ? ZBX_SECRET_MASK : $value,
-							$is_mask_db_value ? ZBX_SECRET_MASK : $db_value
-						];
-					}
+
+					$result[$path] = [
+						self::DETAILS_ACTION_UPDATE,
+						$mask_value ? ZBX_SECRET_MASK : $value,
+						$mask_db_value ? ZBX_SECRET_MASK : $db_value
+					];
 				}
 			}
 		}
