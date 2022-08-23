@@ -34,9 +34,9 @@ class testTimescaleDb extends CIntegrationTest {
 	const TRAPNAME = 'trap_timescale';
 	const TABLENAME = 'history_uint';
 	const HIST_COUNT = 3000;
-	/* 
+	/*
 		storing old data deep in the past - 20 days, which is way longer that the minimum 7days,
-		and must be guaranteed to be compressed 
+		and must be guaranteed to be compressed
 	*/
 	const COMPRESSION_OLDER_THAN = 20 * 24 * 3600;
 	static $db_extension = '';
@@ -172,8 +172,8 @@ class testTimescaleDb extends CIntegrationTest {
 			$res_compr = DBfetch(DBselect('SELECT compress_chunk(\''.$chunk.'\')'));
 			$this->assertArrayHasKey('compress_chunk', $res_compr);
 
-			$res2 = DBfetch(DBselect('SELECT number_compressed_chunks 
-				FROM hypertable_compression_stats(\''.self::TABLENAME.'\')'));
+			$res2 = DBfetch(DBselect('
+				SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')'));
 			$this->assertArrayHasKey('number_compressed_chunks', $res2);
 			$this->assertEquals($res2['number_compressed_chunks'], count($res));
 			$res_compr = DBfetch(DBselect('SELECT decompress_chunk(\''.$chunk.'\')'));
