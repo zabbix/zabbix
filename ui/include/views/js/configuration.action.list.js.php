@@ -26,53 +26,39 @@
 ?>
 
 <script>
-	const view = {
+	const view = new class {
 		init({eventsource}) {
 			this.eventsource = eventsource;
+			this._initActions();
+		}
 
+		_initActions() {
 			document.addEventListener('click', (e) => {
-
 				if (e.target.classList.contains('js-action-create')) {
-
-					// todo: clean init -> make this edit function
-
-					const overlay = this.openActionPopup({eventsource: eventsource});
-
-					overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-						postMessageOk(e.detail.title);
-
-						if ('messages' in e.detail) {
-							postMessageDetails('success', e.detail.messages);
-						}
-						location.href = location.href;
-					});
+					this._edit({eventsource: this.eventsource})
 				}
 				else if (e.target.classList.contains('js-action-edit')) {
-
-					// todo: clean init -> make this edit function
-
-					const overlay = this.openActionPopup({
-						eventsource: eventsource,
-						actionid: e.target.attributes.actionid.nodeValue
-					});
-					overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-						postMessageOk(e.detail.title);
-
-						if ('messages' in e.detail) {
-							postMessageDetails('success', e.detail.messages);
-						}
-						location.href = location.href;
-					});
-
-					overlay.$dialogue[0].addEventListener('dialogue.delete', this.actionDelete, {once: true});
+					this._edit({eventsource: this.eventsource, actionid: e.target.attributes.actionid.nodeValue})
 				}
-
 				else if (e.target.classList.contains('js-massdelete-action')) {
 					this.massDeleteActions(e.target)
 				}
-
 			})
-		},
+		}
+
+		_edit(parameters = {}) {
+			const overlay = this.openActionPopup(parameters);
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+				location.href = location.href;
+			});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.actionDelete, {once: true});
+		}
 
 		actionDelete(e) {
 			const data = e.detail;
@@ -87,14 +73,14 @@
 
 			uncheckTableRows('actionForm');
 			location.href = location.href;
-		},
+		}
 
 		openActionPopup(parameters = {}) {
 			return PopUp('popup.action.edit', parameters, {
 				dialogueid: 'action-edit',
 				dialogue_class: 'modal-popup-large'
 			});
-		},
+		}
 
 		massDeleteActions(target) {
 			const confirm_text =<?= json_encode(_('Delete selected actions?')) ?>;
@@ -122,7 +108,6 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('g_actionid');
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -131,7 +116,6 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows('g_actionid');
 					}
 
 					location.href = location.href;
@@ -146,6 +130,6 @@
 				.finally(() => {
 					uncheckTableRows('g_actionid');
 				});
-		},
+		}
 	};
 </script>
