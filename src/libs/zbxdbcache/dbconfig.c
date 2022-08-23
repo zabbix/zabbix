@@ -5528,7 +5528,7 @@ static void	dc_drule_dequeue(zbx_dc_drule_t *drule)
 	if (ZBX_LOC_QUEUE == drule->location)
 	{
 		zbx_binary_heap_remove_direct(&config->drule_queue, drule->druleid);
-		drule->location = ZBX_LOC_POLLER;
+		drule->location = ZBX_LOC_NOWHERE;
 	}
 }
 
