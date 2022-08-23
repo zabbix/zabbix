@@ -33,11 +33,11 @@ class testTimescaleDb extends CIntegrationTest {
 	const HOSTNAME = 'test_timescale';
 	const TRAPNAME = 'trap_timescale';
 	const TABLENAME = 'history_uint';
-	/// const HIST_COUNT = 3000;
-	const HIST_COUNT = 30;
+	const HIST_COUNT = 3000;
 	/* storing old data deep in the past - 20 days, which is way longer that the minimum 7days, and must be guaranteed to be compressed */
 	const COMPRESSION_OLDER_THAN = 20 * 24 * 3600;
 	static $db_extension = '';
+	private static $itemid;
 
 	/**
 	 * Component configuration provider.
@@ -130,6 +130,7 @@ class testTimescaleDb extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
+		self::$itemid = $response['result']['itemids'][0];
 
 		$response = $this->call('housekeeping.update',
 			['compression_status' => 0]
@@ -146,18 +147,7 @@ class testTimescaleDb extends CIntegrationTest {
 	 * Get number of records in history_uint table.
 	 */
 	public function getHistoryCount() {
-		$res = DBfetch(DBselect('SELECT count(*) FROM '.self::TABLENAME));
-		$res1 = DBselect('SELECT * FROM '.self::TABLENAME);
-
-		print("res\n {");
-		print_r($res);
-		print("}\n");
-
-		print("res2\n {");
-		while ($res2 = DBfetch($res1)) {
-			print_r($res2);
-		}
-		print("}\n");
+		$res = DBfetch(DBselect('SELECT count(*) FROM '.self::TABLENAME.' WHERE itemid = '.self::$itemid));
 
 		if ($res) {
 			return $res['count'];
@@ -200,7 +190,6 @@ class testTimescaleDb extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 
 		$count_start = $this->getHistoryCount();
-		print_r($count_start);
 		$this->assertNotEquals(-1, $count_start);
 
 		$c = time() - self::COMPRESSION_OLDER_THAN;
@@ -214,9 +203,6 @@ class testTimescaleDb extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
 
 		$count_end = $this->getHistoryCount();
-		print("\n");
-		print_r($count_end);
-		print("\n");
 		$this->assertNotEquals(-1, $count_end);
 		$this->assertEquals($count_end - $count_start, self::HIST_COUNT);
 
