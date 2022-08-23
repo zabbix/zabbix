@@ -769,7 +769,7 @@ class CUserDirectory extends CApiService {
 
 		DB::delete('userdirectory', ['userdirectoryid' => $userdirectoryids]);
 
-		//self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_userdirectories);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_userdirectories);
 
 		return ['userdirectoryids' => $userdirectoryids];
 	}
