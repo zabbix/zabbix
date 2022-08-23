@@ -15416,7 +15416,7 @@ void	zbx_dc_update_received_revision(zbx_uint64_t revision)
  ******************************************************************************/
 void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
-		zbx_vector_uint64_t *httptestids, zbx_uint64_t *discovery_groupid)
+		zbx_vector_uint64_t *httptestids)
 {
 	ZBX_DC_PROXY	*proxy;
 
@@ -15466,8 +15466,6 @@ void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t rev
 			}
 		}
 	}
-
-	*discovery_groupid = config->config->discovery_groupid;
 
 	UNLOCK_CACHE;
 }

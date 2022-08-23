@@ -782,7 +782,7 @@ int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_reques
 	zbx_hashset_t		itemids;
 	zbx_vector_ptr_t	keys_paths;
 	char			token[ZBX_SESSION_TOKEN_LEN + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
-	zbx_uint64_t		proxy_config_revision, discovery_groupid;
+	zbx_uint64_t		proxy_config_revision;
 	zbx_dc_revision_t	dc_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64, __func__, proxy->hostid);
@@ -832,8 +832,11 @@ int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_reques
 	zbx_vector_uint64_create(&httptestids);
 	zbx_vector_ptr_create(&keys_paths);
 
-	zbx_dc_get_proxy_config_updates(proxy->hostid, proxy_config_revision, &hostids, &updated_hostids,
-			&removed_hostids, &httptestids, &discovery_groupid);
+	if (proxy_config_revision < proxy->revision)
+	{
+		zbx_dc_get_proxy_config_updates(proxy->hostid, proxy_config_revision, &hostids, &updated_hostids,
+				&removed_hostids, &httptestids);
+	}
 
 	DBbegin();
 
