@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup ids, media_type, auditlog, config
+ * @backup media_type, auditlog, config
  */
 class testPageReportsAuditDisplay extends CWebTest {
 	use TableTrait;
@@ -48,23 +48,44 @@ class testPageReportsAuditDisplay extends CWebTest {
 	public function testPageReportsAuditDisplay_Layout() {
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 
+		// If the time selector is not visible - enable it.
+		if ($this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]')->exists()) {
+			$this->query('id:ui-id-1')->one()->click();
+		}
+
+		// Check that filter set to display Last hour data.
+		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')
+			->one()->getAttribute('class')
+		);
+
 		// If the filter is not visible - enable it.
 		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
 			$this->query('id:ui-id-2')->one()->click();
 		}
 
-		// Find filter form and check labels.
-		$this->assertEquals(['Users', 'Resource', 'Resource ID', 'Recordset ID', 'Actions'],
-			$this->query('name:zbx_filter')->asForm()->one()->getLabels()->asText());
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->query('class:list-table')->asTable()->one();
+		$filter_actions = ['Add', 'Delete', 'Execute', 'Failed login', 'History clear', 'Login', 'Logout', 'Update'];
 
-		// Find table and check table headers.
-		$this->assertEquals(['Time', 'User', 'IP', 'Resource', 'ID', 'Action', 'Recordset ID', 'Details'],
-			$this->query('class:list-table')->asTable()->one()->getHeadersText());
+		// Check filter buttons.
+		foreach (['Apply', 'Reset'] as $button) {
+			$this->assertTrue($form->query('button', $button)->one()->isPresent());
+		}
+
+		// Check form labels.
+		$this->assertEquals(['Users', 'Resource', 'Resource ID', 'Recordset ID', 'Actions'], $form->getLabels()->asText());
+
+		// Check that resource values set as All by default.
+		$this->assertTrue($form->checkValue(['Resource' => 'All']));
+
+		// Check table headers.
+		$this->assertEquals(['Time', 'User', 'IP', 'Resource', 'ID', 'Action', 'Recordset ID', 'Details'], $table->getHeadersText());
 
 		// Find action checkboxes and check labels.
-		$this->assertEquals(['Add', 'Delete', 'Execute', 'Failed login', 'History clear', 'Login', 'Logout', 'Update'],
-			$this->query('id:filter-actions')->asCheckboxList()->one()->getLabels()->asText()
-		);
+		$this->assertEquals($filter_actions, $this->query('id:filter-actions')->asCheckboxList()->one()->getLabels()->asText());
+
+		// Check that table stats are present.
+		$this->assertTableStats($table->getRows()->count());
 
 		// Resource name with checkboxes that are enabled.
 		$resource_actions =[
@@ -112,31 +133,19 @@ class testPageReportsAuditDisplay extends CWebTest {
 		// Check that actions checkboxes correctly enables/disables switching resources.
 		$errors = [];
 		foreach ($resource_actions as $resource => $actions) {
-			$status = true;
-			$this->query('name:zbx_filter')->asForm()->one()->fill(['Resource' => $resource]);
-			$left_actions = array_values(array_diff(['Add', 'Delete', 'Execute', 'Failed login', 'History clear',
-					'Login', 'Logout', 'Update'], $actions));
+			$form->fill(['Resource' => $resource]);
+			$left_actions = array_values(array_diff($filter_actions, $actions));
 
 			// At first, we need to check that correct checkboxes is enabled. Then we check that all others are disabled.
-			for ($i = 1; $i <= 2; $i++) {
-				if ($i !== 1) {
+			foreach([true, false] as $status) {
+				if (!$status) {
 					$actions = $left_actions;
-					$status = false;
 				}
 
 				foreach ($actions as $action) {
-					try {
-						$this->assertTrue($this->query('xpath:.//label[text()="'.$action.'"]/../input[@type="checkbox"]')->
+					$this->assertTrue($this->query('xpath://label[text()="'.$action.'"]/../input[@type="checkbox"]')->
 							one()->isEnabled($status)
-						);
-					} catch (Throwable $ex) {
-						$ex = 'Incorrect action checkbox status: "'.$resource.'" => "'.$action.'".';
-						$errors[] = $ex;
-					}
-				}
-
-				if ($errors) {
-					$this->fail(implode("\n", $errors));
+					);
 				}
 			}
 		}
@@ -146,14 +155,20 @@ class testPageReportsAuditDisplay extends CWebTest {
 	 * Create media type and check audit page.
 	 */
 	public function testPageReportsAuditDisplay_Add() {
-		$this->page->login()->open('zabbix.php?action=mediatype.edit')->waitUntilReady();
-		$form = $this->query('id:media-type-form')->asForm()->waitUntilReady()->one();
-		$form->fill(['Name' => 'AAA']);
-		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Media type added');
+		$response = CDataHelper::call('mediatype.create', [
+			[
+				'type' => 0,
+				'name' => 'AAA',
+				'smtp_server' => 'mail.example.com',
+				'smtp_helo' => 'example.com',
+				'smtp_email' => 'zabbix@example.com',
+				'content_type' => 1
+			]
+		]);
+		$this->assertArrayHasKey('mediatypeids', $response);
+		self::$id = $response['mediatypeids'][0];
 
 		// Find media type id and check that audit info displayed correctly on frontend.
-		self::$id = CDBHelper::getValue('SELECT mediatypeid FROM media_type WHERE name='.zbx_dbstr('AAA'));
 		$create_audit = "mediatype.mediatypeid: ".self::$id.
 			"\nmediatype.name: AAA".
 			"\nmediatype.smtp_email: zabbix@example.com".
@@ -168,15 +183,17 @@ class testPageReportsAuditDisplay extends CWebTest {
 	 * @depends testPageReportsAuditDisplay_Add
 	 */
 	public function testPageReportsAuditDisplay_Update() {
-		$this->page->login()->open('zabbix.php?action=mediatype.edit&mediatypeid='.self::$id)->waitUntilReady();
-		$form = $this->query('id:media-type-form')->asForm()->waitUntilReady()->one();
-		$form->fill(['Name' => 'AAA_update', 'SMTP helo' => 'updated.com', 'SMTP email' => 'update@email.com']);
-		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Media type updated');
+		CDataHelper::call('mediatype.update', [
+			[
+				'mediatypeid' => self::$id,
+				'name' => 'AAA_update',
+				'smtp_helo' => 'updated.com',
+				'smtp_email' => 'update@email.com'
+			]
+		]);
 
 		// Check that audit info displayed correctly on frontend after update.
 		$update_audit = "mediatype.name: AAA => AAA_update".
-			"\nmediatype.passwd: ****** => ******".
 			"\nmediatype.smtp_email: zabbix@example.com => update@email.com".
 			"\nmediatype.smtp_helo: example.com => updated.com";
 		$this->checkAuditValues('Media type', self::$id, ['Update' => $update_audit]);
@@ -188,10 +205,7 @@ class testPageReportsAuditDisplay extends CWebTest {
 	 * @depends testPageReportsAuditDisplay_Add
 	 */
 	public function testPageReportsAuditDisplay_Delete() {
-		$this->page->login()->open('zabbix.php?action=mediatype.edit&mediatypeid='.self::$id)->waitUntilReady();
-		$this->query('button:Delete')->waitUntilClickable()->one()->click();
-		CElementQuery::getPage()->acceptAlert();
-		$this->assertMessage(TEST_GOOD, 'Media type deleted');
+		CDataHelper::call('mediatype.delete', [self::$id]);
 
 		// Check that audit info displayed correctly on frontend after delete.
 		$delete_audit = 'Description: AAA_update';
@@ -202,10 +216,7 @@ class testPageReportsAuditDisplay extends CWebTest {
 	 * Clear history and trends in item and check audit page.
 	 */
 	public function testPageReportsAuditDisplay_HistoryClear() {
-		$this->page->login()->open('items.php?form=update&hostid=99204&itemid=99106&context=host')->waitUntilReady();
-		$this->query('id:del_history')->waitUntilClickable()->one()->click();
-		CElementQuery::getPage()->acceptAlert();
-		$this->assertMessage(TEST_GOOD, 'History cleared');
+		CDataHelper::call('history.clear', [99106]);
 
 		// Check that audit info displayed correctly on frontend.
 		$clear_audit = 'Description: Dynamic widgets H3I1';
@@ -224,7 +235,8 @@ class testPageReportsAuditDisplay extends CWebTest {
 		// Check that all info displayed correctly in audit.
 		$user_audit = '';
 		$this->checkAuditValues('User', 1, ['Failed login' => $user_audit, 'Login' => $user_audit,
-				'Logout' => $user_audit]);
+				'Logout' => $user_audit]
+		);
 	}
 
 	/**
@@ -248,16 +260,20 @@ class testPageReportsAuditDisplay extends CWebTest {
 			// Check information in audit page that audit is disabled/enabled.
 			$audit_status = (!$status) ? 'settings.auditlog_enabled: 1 => 0' : 'settings.auditlog_enabled: 0 => 1';
 			$this->assertEquals($audit_status, $this->query('class:list-table')->asTable()->one()->getRow(0)->
-					getColumn('Details')->getText());
+					getColumn('Details')->getText()
+			);
 
-			// Add new media type. If audit is disabled - no new data should appear in audit page/database.
-			$this->page->open('zabbix.php?action=mediatype.edit')->waitUntilReady();
+			// Update media type. If audit is disabled - no new data should appear in audit page/database.
 			$name = (!$status) ? 'BBB' : 'CCC';
-			$this->query('id:media-type-form')->asForm()->waitUntilReady()->one()->fill(['Name' => $name])->submit();
-			$this->assertMessage(TEST_GOOD, 'Media type added');
+			CDataHelper::call('mediatype.update', [
+				[
+					'mediatypeid' => 1,
+					'name' => $name
+				]
+			]);
 
 			// Compare audit after disabling/enabling audit and adding media type.
-			$this->page->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
+			$this->page->refresh()->waitUntilReady();
 
 			if (!$status) {
 				$this->assertEquals($audit_values, $this->getTableRowValue());
@@ -278,7 +294,7 @@ class testPageReportsAuditDisplay extends CWebTest {
 	 * @param array $actions			action name as key and audit details as value.
 	 */
 	private function checkAuditValues($resource_name, $resourceid, $actions) {
-		$this->page->open('zabbix.php?action=auditlog.list')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=auditlog.list')->waitUntilReady();
 
 		// If the filter is not visible - enable it.
 		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
@@ -287,9 +303,10 @@ class testPageReportsAuditDisplay extends CWebTest {
 
 		// Find filter form and fill with correct resource values.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		foreach($actions as $action => $audit) {
+
+		foreach ($actions as $action => $audit) {
 			$form->fill(['Resource' => $resource_name, 'Resource ID' => $resourceid]);
-			$form->query('xpath://label[text()="'.$action.'"]/../input[contains(@id, "filter_actions")]')
+			$form->query('xpath:.//label[text()="'.$action.'"]/../input[contains(@id, "filter_actions")]')
 					->asCheckbox()->one()->check();
 			$form->submit()->waitUntilReloaded();
 
@@ -298,21 +315,20 @@ class testPageReportsAuditDisplay extends CWebTest {
 			$this->assertEquals($action, $table->getRow(0)->getColumn('Action')->getText());
 
 			// Check audit details in overlay window or in details column.
-			if ($table->getRow(0)->getColumn('Details')->query('link:Details')->exists()) {
-				$table->getRow(0)->getColumn('Details')->query('link:Details')->one()->click();
-				$details = COverlayDialogElement::find()->waitUntilReady()->one()->getContent()->getText();
-			} else {
-				$details = $table->getRow(0)->getColumn('Details')->getText();
-			}
-			$this->assertEquals($details, $audit);
+			$details_link = $table->getRow(0)->getColumn('Details')->query('link:Details')->one(false);
 
-			// Close overlay if it exists.
-			if (COverlayDialogElement::find()->exists()) {
-				COverlayDialogElement::find()->one()->close();
+			if ($details_link->isValid()) {
+				$details_link->click();
+				$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+				$this->assertEquals($audit, $dialog->getContent()->getText());
+				$dialog->close();
+			}
+			else {
+				$this->assertEquals($audit, $table->getRow(0)->getColumn('Details')->getText());
 			}
 
 			// Values taken from column after filtering audit.
-			$columns = ['Time', 'User', 'IP', 'Recordset ID'];
+			$columns = ['Time', 'User', 'IP', 'Resource', 'ID', 'Recordset ID'];
 			$result = [];
 			foreach ($columns as $column) {
 				$column_value = $table->getRow(0)->getColumn($column)->getText();
@@ -321,36 +337,28 @@ class testPageReportsAuditDisplay extends CWebTest {
 				if ($column === 'Time') {
 					$column_value = strval(strtotime($column_value));
 				}
+
+				// Every resource has its value in database.
+				if ($column === 'Resource') {
+					$column_value = ($column_value === 'User') ? 0 : (($column_value === 'Item') ? 15 : 3);
+				}
+
 				$result[] = $column_value;
 			}
 
 			// Compare values from DB and audit page.
-			switch ($action) {
-				case 'Failed login':
-					$actionid = 9;
-					break;
-				case 'Login':
-					$actionid = 8;
-					break;
-				case 'Logout':
-					$actionid = 4;
-					break;
-				case 'Add':
-					$actionid = 0;
-					break;
-				case 'Update':
-					$actionid = 1;
-					break;
-				case 'Delete':
-					$actionid = 2;
-					break;
-				case 'History clear':
-					$actionid = 10;
-					break;
-			}
+			$action_ids = [
+				'Failed login' => 9,
+				'Login' => 8,
+				'Logout' => 4,
+				'Add' => 0,
+				'Update' => 1,
+				'Delete' => 2,
+				'History clear' => 10,
+			];
 
-			$dbaudit = CDBHelper::getAll('SELECT clock, username, ip, recordsetid FROM auditlog WHERE (resourceid, action)=('
-					.zbx_dbstr($resourceid).','.zbx_dbstr($actionid).') ORDER BY clock DESC LIMIT 1');
+			$dbaudit = CDBHelper::getAll('SELECT clock, username, ip, resourcetype, resourceid, recordsetid FROM auditlog WHERE 
+                	(resourceid, action)=('.zbx_dbstr($resourceid).','.zbx_dbstr($action_ids[$action]).') ORDER BY clock DESC LIMIT 1');
 			$this->assertEquals([], array_diff($result, $dbaudit[0]));
 
 			// Reset audit filter.
@@ -360,12 +368,15 @@ class testPageReportsAuditDisplay extends CWebTest {
 
 	/**
 	 * Get table values from first row.
+	 *
+	 * @return array
 	 */
 	private function getTableRowValue() {
 		$headers = $this->query('class:list-table')->asTable()->one()->getHeadersText();
 		$result = [];
+		$row = $this->query('class:list-table')->asTable()->one()->getRow(0);
 		foreach ($headers as $header) {
-			$result[] = $this->query('class:list-table')->asTable()->one()->getRow(0)->getColumn($header)->getText();
+			$result[] = $row->getColumn($header)->getText();
 		}
 
 		return $result;
