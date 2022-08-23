@@ -5528,7 +5528,7 @@ static void	dc_drule_dequeue(zbx_dc_drule_t *drule)
 	if (ZBX_LOC_QUEUE == drule->location)
 	{
 		zbx_binary_heap_remove_direct(&config->drule_queue, drule->druleid);
-		drule->location = ZBX_LOC_NOWHERE;
+		drule->location = ZBX_LOC_POLLER;
 	}
 }
 
@@ -5589,9 +5589,9 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint32_t revision)
 		{
 			int	delay_new = 0;
 
-			if (0 == found)
+			if (0 == found && 0 < config->revision.config)
 				delay_new = delay > SEC_PER_MIN ? SEC_PER_MIN : delay;
-			else if (delay != drule->delay || ZBX_LOC_QUEUE != drule->location)
+			else if (ZBX_LOC_NOWHERE == drule->location || delay != drule->delay)
 				delay_new = delay;
 
 			if (0 != delay_new)
@@ -15250,7 +15250,6 @@ int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck)
 		if (drule->nextcheck <= now)
 		{
 			zbx_binary_heap_remove_min(&config->drule_queue);
-			drule->location = ZBX_LOC_NOWHERE;
 			*druleid = drule->druleid;
 			drule->location = ZBX_LOC_POLLER;
 			ret = SUCCEED;
