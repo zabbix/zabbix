@@ -338,11 +338,7 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected static function checkAndAddUuid(array &$items): void {
 		foreach ($items as &$item) {
-			if ($item['host_status'] != HOST_STATUS_TEMPLATE) {
-				continue;
-			}
-
-			if (!array_key_exists('uuid', $item)) {
+			if ($item['host_status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
 				$item['uuid'] = generateUuidV4();
 			}
 		}
