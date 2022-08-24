@@ -365,8 +365,6 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * @param array $items
 	 *
-	 * @throws APIException
-	 *
 	 * @return array
 	 */
 	public function create(array $items): array {
@@ -453,8 +451,6 @@ class CItemPrototype extends CItemGeneral {
 
 	/**
 	 * @param array $items
-	 *
-	 * @throws APIException
 	 *
 	 * @return array
 	 */

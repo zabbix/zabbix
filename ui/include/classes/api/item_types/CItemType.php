@@ -467,7 +467,7 @@ abstract class CItemType {
 	 */
 	final public static function getDefaultValidationRules(): array {
 		return [
-			// Common item type fields.
+			// The fields used for multiple item types.
 			'interfaceid' =>		['type' => API_ID, 'in' => '0'],
 			'authtype' =>			['type' => API_INT32, 'in' => DB::getDefault('items', 'authtype')],
 			'username' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'username')],
