@@ -107,6 +107,7 @@ window.action_edit_popup = new class {
 		const cell = document.createElement('td');
 
 		this.label = num2letter(this.row_num)
+		cell.setAttribute('class', 'label')
 		cell.setAttribute('data-formulaid', this.label)
 		cell.append(this.label);
 		this.row_num ++;
@@ -167,6 +168,7 @@ window.action_edit_popup = new class {
 
 				this.label = condition.formulaid;
 				cell.append(this.label)
+				cell.setAttribute('class', 'label')
 				cell.setAttribute('data-formulaid', this.label)
 				row.append(cell)
 				this.row_num ++;
@@ -285,26 +287,34 @@ window.action_edit_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
-		var show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
-			$labels = jQuery('#conditionTable .label');
+		this.show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
+		const labels = jQuery('#conditionTable .label');
 
 		jQuery('#label-evaltype').toggle(this.row_count > 1);
-		jQuery('#evaltype-formfield').toggle(this.row_count > 1)
-		jQuery('#formula').toggle(show_formula).removeAttr("readonly");
+		jQuery('#evaltype-formfield').toggle(this.row_count > 1);
+		jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
 
-		if (this.row_count > 1) {
+		jQuery('#evaltype').change(function() {
+			this.show_formula = (jQuery(this).val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
+			jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
+			jQuery('#expression').toggle(!this.show_formula);
+		});
+
+		// todo : on change!!!
+		// todo : check why conditiontype was needed
+		if (labels.length > 1) {
 			var conditions = [];
 
-			$labels.each(function (index, label) {
-				$label = jQuery(label);
+			labels.each(function(index, label) {
+				var label = jQuery(label);
 
 				conditions.push({
-					id: $label.data('formulaid'),
-					type: $label.data('conditiontype')
+					id: label.data('formulaid'),
+					type: label.data('conditiontype')
 				});
 			});
 
-			jQuery('#formula').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
+			jQuery('#expression').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
 		}
 	}
 }

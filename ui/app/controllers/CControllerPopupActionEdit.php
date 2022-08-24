@@ -103,7 +103,8 @@ class CControllerPopupActionEdit extends CController {
 					'filter' => [
 						'conditions' => []
 					]
-				]
+				],
+				'formula' => $this->getInput('formula', '')
 			];
 		}
 

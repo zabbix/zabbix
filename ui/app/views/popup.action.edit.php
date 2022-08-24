@@ -46,9 +46,7 @@ $action_tab = (new CFormGrid())
 			->setAttribute('autofocus', 'autofocus')
 	]);
 
-$formula = (new CTextBox('formula', $data['action']['filter']['formula'],
-	DB::getFieldLength('actions', 'formula')
-))
+$formula = (new CTextBox('formula', $data['action']['filter']['formula'], DB::getFieldLength('actions', 'formula')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');
@@ -68,9 +66,18 @@ $action_tab
 					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
 				])),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$formula
+			//$formula
+			(new CSpan(''))
+				->addStyle('white-space: normal;')
+				->setId('expression'),
+			(new CTextBox('formula', $data['formula'],
+				DB::getFieldLength('actions', 'formula')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setId('formula')
+				->setAttribute('placeholder', 'A or (B and C) &hellip;')
 		]))->setId('evaltype-formfield')
-	]);
+	])
+	->setId('actionCalculationRow');
 
 // Create condition table.
 $condition_table = (new CTable(_('No conditions defined.')))
