@@ -13696,15 +13696,15 @@ int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **err
  *               FAIL    - proxy not found, 'error' message allocated         *
  *                                                                            *
  * Comments: if there are no proxies, an empty JSON {"data":[]} is returned;  *
- *           if some data were not found in cache, they are missing in the    *
+ *           if some data were not found in cache, it is missing in the       *
  *           output                                                           *
  *                                                                            *
  ******************************************************************************/
-int	DCget_proxy_discovery(struct zbx_json *json, char **error)
+int	zbx_proxy_discovery_get(struct zbx_json *json, char **error)
 {
-	int	i;
+	int				i;
 	zbx_vector_cached_proxy_t	proxies;
-	int ret = SUCCEED;
+	int				ret = SUCCEED;
 
 	WRLOCK_CACHE;
 
@@ -13714,8 +13714,6 @@ int	DCget_proxy_discovery(struct zbx_json *json, char **error)
 
 	zbx_vector_cached_proxy_create(&proxies);
 	zbx_dc_get_all_proxies(&proxies);
-
-	zbx_json_initarray(json, ZBX_JSON_STAT_BUF_LEN);
 
 	RDLOCK_CACHE;
 
@@ -13740,8 +13738,11 @@ int	DCget_proxy_discovery(struct zbx_json *json, char **error)
 
 		if (NULL == dc_host)
 		{
-			*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", proxy->name);
-			ret = FAIL;
+			if (FAIL != ret)
+			{
+				*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", proxy->name);
+				ret = FAIL;
+			}
 		}
 		else
 		{
@@ -13763,12 +13764,12 @@ int	DCget_proxy_discovery(struct zbx_json *json, char **error)
 				zbx_json_addstring(json, "psk", "false", ZBX_JSON_TYPE_INT);
 
 			if (0 < (encryption & ZBX_TCP_SEC_TLS_CERT))
-				zbx_json_addstring(json, "certificate", "true", ZBX_JSON_TYPE_INT);
+				zbx_json_addstring(json, "cert", "true", ZBX_JSON_TYPE_INT);
 			else
-				zbx_json_addstring(json, "certificate", "false", ZBX_JSON_TYPE_INT);
+				zbx_json_addstring(json, "cert", "false", ZBX_JSON_TYPE_INT);
 
-			zbx_json_adduint64(json, "item_count", dc_host->items_active_normal +
-					dc_host->items_active_notsupported + dc_host->items_disabled);
+			zbx_json_adduint64(json, "items", dc_host->items_active_normal +
+					dc_host->items_active_notsupported);
 
 			if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
 					&dc_host->hostid)))
@@ -13795,16 +13796,18 @@ int	DCget_proxy_discovery(struct zbx_json *json, char **error)
 				else
 					zbx_json_addint64(json, "last_seen", -1);
 
-				zbx_json_adduint64(json, "host_count", dc_proxy->hosts_monitored +
-						dc_proxy->hosts_not_monitored);
+				zbx_json_adduint64(json, "hosts", dc_proxy->hosts_monitored);
 
-				zbx_json_addfloat(json, "required_performance_vps", dc_proxy->required_performance);
+				zbx_json_addfloat(json, "requiredperformance", dc_proxy->required_performance);
 			}
 			else
 			{
-				*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.",
+				if (FAIL != ret)
+				{
+					*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.",
 						proxy->name);
-				ret = FAIL;
+					ret = FAIL;
+				}
 			}
 		}
 		zbx_json_close(json);

@@ -1273,9 +1273,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
 
+	zbx_config_args_t		zbx_config = {zbx_config_tls, NULL, 0};
+
 	zbx_thread_args_t		thread_args;
-	zbx_thread_poller_args		poller_args = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_trapper_args		trapper_args = {zbx_config_tls, get_program_type, listen_sock};
+	zbx_thread_poller_args		poller_args = {&zbx_config, get_program_type, ZBX_NO_POLLER};
+	zbx_thread_trapper_args		trapper_args = {&zbx_config, get_program_type, listen_sock};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, get_program_type};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
@@ -1840,7 +1842,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_set_exiting_with_fail();
 	}
 
-	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext);
+	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get);
 	zbx_diag_init(diag_add_section_info);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
