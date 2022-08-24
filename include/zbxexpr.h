@@ -207,7 +207,7 @@ int	zbx_custom_interval_is_scheduling(const zbx_custom_interval_t *custom_interv
 void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
 int	zbx_calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
 		const zbx_custom_interval_t *custom_intervals, time_t now);
-int	zbx_zbx_calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
+int	zbx_calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
 		time_t disable_until);
 
 int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res);

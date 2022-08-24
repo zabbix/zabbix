@@ -404,7 +404,7 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 	if (0 != (flags & ZBX_HOST_UNREACHABLE) && NULL != interface && 0 != (disable_until =
 			DCget_disable_until(item, interface)))
 	{
-		item->nextcheck = zbx_zbx_calculate_item_nextcheck_unreachable(simple_interval,
+		item->nextcheck = zbx_calculate_item_nextcheck_unreachable(simple_interval,
 				custom_intervals, disable_until);
 	}
 	else

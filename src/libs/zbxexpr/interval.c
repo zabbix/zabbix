@@ -1568,7 +1568,7 @@ int	zbx_calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_in
  * Return value: nextcheck value                                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_zbx_calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
+int	zbx_calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
 		time_t disable_until)
 {
 	int	nextcheck = 0;
