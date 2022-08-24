@@ -957,7 +957,7 @@ class testFormUpdateProblem extends CWebTest {
 		// Check Event details page.
 		$row->getColumn('Time')->query('tag:a')->waitUntilClickable()->one()->click();
 		$this->page->assertHeader('Event details');
-		$this->checkHistoryTable($this->query('xpath://div[@id="hat_eventactions_widget"]//table')->asTable()->one(),
+		$this->checkHistoryTable($this->query("xpath://div[@id=\"hat_eventactions_widget\"]//table")->asTable()->one(),
 				'User/Recipient', 'Action'
 		);
 
