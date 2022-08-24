@@ -37,6 +37,11 @@
 /* separator for multipart mixed messages */
 #define ZBX_MULTIPART_MIXED_BOUNDARY	"MULTIPART-MIXED-BOUNDARY"
 
+#define OK_220	"220"
+#define OK_250	"250"
+#define OK_251	"251"
+#define OK_354	"354"
+
 extern char	*CONFIG_SSL_CA_LOCATION;
 
 /******************************************************************************
@@ -433,6 +438,80 @@ out:
 }
 #endif
 
+static char	*smtp_get_helo_from_addr(const char *addr)
+{
+	const char	*domain;
+	char		*helo_addr;
+
+	if (NULL == (domain = strrchr(addr, '@')))
+		return NULL;
+
+	helo_addr = zbx_strdup(NULL, domain + 1);
+	helo_addr[strlen(helo_addr) - 1] = '\0';
+
+	return helo_addr;
+}
+
+static int	send_smtp_helo(const char *addr, const char *helo, zbx_socket_t *s, char **error, size_t max_error_len)
+{
+	char		cmd[MAX_STRING_LEN], *helo_parsed = NULL;
+	const char	*response;
+	int			ret = SUCCEED;
+
+	if ('\0' != *helo)
+	{
+		zbx_snprintf(cmd, sizeof(cmd), "HELO %s\r\n", helo);
+	}
+	else
+	{
+		if (NULL == addr)
+			return SUCCEED;
+
+		if (NULL == (helo_parsed = smtp_get_helo_from_addr(addr)))
+		{
+			zbx_snprintf(*error, max_error_len, "failed to parse domain name for HELO request");
+			ret = FAIL;
+			goto out;
+		}
+		else
+		{
+			zabbix_log(1, "parsed helo = '%s' / %s", helo_parsed, addr);
+			zbx_snprintf(cmd, sizeof(cmd), "HELO %s\r\n", helo_parsed);
+		}
+	}
+
+	zabbix_log(1, "DBG, sending helo '%s'", cmd);
+
+	if (-1 == write(s->socket, cmd, strlen(cmd)))
+	{
+		zbx_snprintf(*error, max_error_len, "error sending HELO to mailserver: %s",
+				zbx_strerror(errno));
+
+		ret = FAIL;
+		goto out;
+	}
+
+	if (FAIL == smtp_readln(s, &response))
+	{
+		zbx_snprintf(*error, max_error_len, "error receiving answer on HELO request: %s",
+				zbx_strerror(errno));
+
+		ret = FAIL;
+		goto out;
+	}
+
+	if (0 != strncmp(response, OK_250, ZBX_CONST_STRLEN(OK_250)))
+	{
+		zbx_snprintf(*error, max_error_len, "wrong answer on HELO \"%s\"", response);
+		ret = FAIL;
+		goto out;
+	}
+	zabbix_log(1, "DBG helo response = '%s'", response);
+out:
+	zbx_free(helo_parsed);
+	return ret;
+}
+
 static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
 		const char *mailsubject, const char *mailbody, unsigned char content_type, int timeout, char *error,
@@ -440,12 +519,8 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 {
 	zbx_socket_t	s;
 	int		err, ret = FAIL, i;
-	char		cmd[MAX_STRING_LEN], *cmdp = NULL;
+	char		cmd[MAX_STRING_LEN], *cmdp = NULL, *helo_addr = NULL;
 
-	const char	*OK_220 = "220";
-	const char	*OK_250 = "250";
-	const char	*OK_251 = "251";
-	const char	*OK_354 = "354";
 	const char	*response;
 
 	zbx_alarm_on(timeout);
@@ -467,38 +542,20 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 		goto close;
 	}
 
-	if (0 != strncmp(response, OK_220, strlen(OK_220)))
+	if (0 != strncmp(response, OK_220, ZBX_CONST_STRLEN(OK_220)))
 	{
 		zbx_snprintf(error, max_error_len, "no welcome message 220* from SMTP server \"%s\"", response);
 		goto close;
 	}
 
 	/* send HELO */
-
-	if ('\0' != *smtp_helo)
+	if (0 != from_mails->values_num)
 	{
-		zbx_snprintf(cmd, sizeof(cmd), "HELO %s\r\n", smtp_helo);
-
-		if (-1 == write(s.socket, cmd, strlen(cmd)))
-		{
-			zbx_snprintf(error, max_error_len, "error sending HELO to mailserver: %s",
-					zbx_strerror(errno));
-			goto close;
-		}
-
-		if (FAIL == smtp_readln(&s, &response))
-		{
-			zbx_snprintf(error, max_error_len, "error receiving answer on HELO request: %s",
-					zbx_strerror(errno));
-			goto close;
-		}
-
-		if (0 != strncmp(response, OK_250, strlen(OK_250)))
-		{
-			zbx_snprintf(error, max_error_len, "wrong answer on HELO \"%s\"", response);
-			goto close;
-		}
+		helo_addr = ((zbx_mailaddr_t *)from_mails->values[0])->addr;
 	}
+
+	if (FAIL == send_smtp_helo(helo_addr, smtp_helo, &s, &error, max_error_len))
+		goto close;
 
 	/* send MAIL FROM */
 
@@ -518,7 +575,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 			goto close;
 		}
 
-		if (0 != strncmp(response, OK_250, strlen(OK_250)))
+		if (0 != strncmp(response, OK_250, ZBX_CONST_STRLEN(OK_250)))
 		{
 			zbx_snprintf(error, max_error_len, "wrong answer on MAIL FROM \"%s\"", response);
 			goto close;
@@ -544,7 +601,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 		}
 
 		/* May return 251 as well: User not local; will forward to <forward-path>. See RFC825. */
-		if (0 != strncmp(response, OK_250, strlen(OK_250)) && 0 != strncmp(response, OK_251, strlen(OK_251)))
+		if (0 != strncmp(response, OK_250, ZBX_CONST_STRLEN(OK_250)) && 0 != strncmp(response, OK_251, ZBX_CONST_STRLEN(OK_251)))
 		{
 			zbx_snprintf(error, max_error_len, "wrong answer on RCPT TO \"%s\"", response);
 			goto close;
@@ -567,7 +624,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 		goto close;
 	}
 
-	if (0 != strncmp(response, OK_354, strlen(OK_354)))
+	if (0 != strncmp(response, OK_354, ZBX_CONST_STRLEN(OK_354)))
 	{
 		zbx_snprintf(error, max_error_len, "wrong answer on DATA \"%s\"", response);
 		goto close;
@@ -600,7 +657,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 		goto close;
 	}
 
-	if (0 != strncmp(response, OK_250, strlen(OK_250)))
+	if (0 != strncmp(response, OK_250, ZBX_CONST_STRLEN(OK_250)))
 	{
 		zbx_snprintf(error, max_error_len, "wrong answer on end of data \"%s\"", response);
 		goto close;
@@ -657,7 +714,24 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "%s:%hu", smtp_server, smtp_port);
 
 	if ('\0' != *smtp_helo)
+	{
 		zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", smtp_helo);
+	}
+	else
+	{
+		char	*helo_parsed;
+
+		if (NULL == (helo_parsed = smtp_get_helo_from_addr(((zbx_mailaddr_t *)from_mails->values[0])->addr)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s() HELO is not specified and failed to parse HELO from email address",
+					__func__);
+		}
+		else
+		{
+			zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", helo_parsed);
+			zbx_free(helo_parsed);
+		}
+	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
 		goto error;
