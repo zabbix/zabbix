@@ -7718,7 +7718,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 			}
 			break;
 		case ITEM_TYPE_DB_MONITOR:
-			if (NULL != (dbitem = (ZBX_DC_DBITEM *)zbx_hashset_search(&config->dbitems, &src_item->itemid)))
+			if (NULL != (dbitem = (ZBX_DC_DBITEM *)zbx_hashset_search(&config->dbitems,
+					&src_item->itemid)))
 			{
 				dst_item->params = zbx_strdup(NULL, dbitem->params);
 				zbx_strscpy(dst_item->username_orig, dbitem->username);

@@ -613,12 +613,13 @@ static int	is_boolean(const char *str, zbx_uint64_t *value)
 		zbx_strscpy(tmp, str);
 		zbx_strlower(tmp);
 
-		if (SUCCEED == (res = zbx_str_in_list("true,t,yes,y,on,up,running,enabled,available,ok,master", tmp, ',')))
+		if (SUCCEED == (res = zbx_str_in_list("true,t,yes,y,on,up,running,enabled,available,ok,master", tmp,
+				',')))
 		{
 			*value = 1;
 		}
-		else if (SUCCEED == (res = zbx_str_in_list("false,f,no,n,off,down,unused,disabled,unavailable,err,slave",
-				tmp, ',')))
+		else if (SUCCEED == (res = zbx_str_in_list(
+				"false,f,no,n,off,down,unused,disabled,unavailable,err,slave", tmp, ',')))
 		{
 			*value = 0;
 		}
