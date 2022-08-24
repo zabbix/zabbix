@@ -108,6 +108,13 @@ static int	DBpatch_6030000(void)
 	return ret;
 }
 
+static int	DBpatch_6030001(void)
+{
+	const ZBX_FIELD field = {"subtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -115,5 +122,6 @@ DBPATCH_START(6030)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(6030000, 0, 1)
+DBPATCH_ADD(6030001, 0, 1)
 
 DBPATCH_END()
