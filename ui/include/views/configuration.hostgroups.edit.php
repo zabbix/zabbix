@@ -46,7 +46,7 @@ if ($data['groupid'] != 0 && $data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREAT
 						->setArgument('context', 'host')
 				));
 		}
-		elseif ($data['allowed_ui_conf_hosts']) {
+		else {
 			$name = new CSpan($data['group']['discoveryRule']['name']);
 		}
 	}
