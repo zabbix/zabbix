@@ -464,8 +464,15 @@ close:
 	zbx_free(wdir);
 
 #else	/* not _WINDOWS */
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
+	/* block signals to prevent interruption of statements when runtime control command is issued */
+	if (0 > sigemptyset(&mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize signal set: %s", zbx_strerror(errno));
+
+	if (0 > sigaddset(&mask, SIGUSR1))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot add SIGUSR1 signal to signal mask: %s", zbx_strerror(errno));
+
+	if (0 > sigaddset(&mask, SIGUSR2))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot add SIGUSR2 signal to signal mask: %s", zbx_strerror(errno));
 
 	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the signal: %s", zbx_strerror(errno));
