@@ -221,6 +221,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, mt.mnt_mountp, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSTYPE, mt.mnt_fstype, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSOPTIONS, mt.mnt_mntopts, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 	}
 
@@ -263,7 +264,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	while (-1 != getmntent(f, &mt))
 	{
 		mpoint = mt.mnt_mountp;
-		if (SYSINFO_RET_OK != get_fs_size_stat(mpoint, &total, &not_used, &used, &pfree, &pused,&error))
+		if (SYSINFO_RET_OK != get_fs_size_stat(mpoint, &total, &not_used, &used, &pfree, &pused, &error))
 		{
 			zbx_free(error);
 			continue;
@@ -288,6 +289,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mntpoint->inodes.not_used = inot_used;
 		mntpoint->inodes.pfree = ipfree;
 		mntpoint->inodes.pused = ipused;
+		mntpoint->options = zbx_strdup(NULL, mt.mnt_mntopts);
 
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 	}
@@ -327,6 +329,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->inodes.pfree);
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->inodes.pused);
 			zbx_json_close(&j);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntpoint->options, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 	}
@@ -344,6 +347,7 @@ out:
 
 	return ret;
 }
+
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_execute_threaded_metric(vfs_fs_get, request, result);

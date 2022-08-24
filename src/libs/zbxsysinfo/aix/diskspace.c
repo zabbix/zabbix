@@ -263,6 +263,8 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 				ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSTYPE, zbx_get_vfs_name_by_type(vm->vmt_gfstype),
 				ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSOPTIONS, (char *)vm + vm->vmt_data[VMT_ARGS].vmt_off,
+				ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 
 		/* go to the next vmount structure */
@@ -294,7 +296,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char 			*error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
-	char 			*mpoint;
+	char 			*mpoint, *mntopts;
 
 	/* check how many bytes to allocate for the mounted filesystems */
 	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
@@ -318,6 +320,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	for (i = 0, vm = vms; i < rc; i++)
 	{
 		mpoint = (char *)vm + vm->vmt_data[VMT_STUB].vmt_off;
+		mntopts = (char *)vm + vm->vmt_data[VMT_ARGS].vmt_off;
 
 		if (SYSINFO_RET_OK != get_fs_size_stat(mpoint, &total, &not_used, &used, &pfree, &pused, &error))
 		{
@@ -344,6 +347,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mntpoint->inodes.not_used = inot_used;
 		mntpoint->inodes.pfree = ipfree;
 		mntpoint->inodes.pused = ipused;
+		mntpoint->options = zbx_strdup(NULL, mntopts);
 
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 
@@ -385,6 +389,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->inodes.pfree);
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->inodes.pused);
 			zbx_json_close(&j);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntpoint->options, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 
