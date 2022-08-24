@@ -245,7 +245,7 @@ function DBselect($query, $limit = null, $offset = 0) {
 				$result = mysqli_query($DB['DB'], $query);
 			}
 			catch (mysqli_sql_exception $e) {
-				error('Error in query ['.$query.'] ['.$e->getMessage().']', 'sql');
+				trigger_error('Error in query ['.$query.'] ['.$e->getMessage().']', E_USER_WARNING);
 			}
 
 			break;
@@ -364,7 +364,7 @@ function DBexecute($query): bool {
 				$result = mysqli_query($DB['DB'], $query);
 			}
 			catch (mysqli_sql_exception $e) {
-				error('Error in query ['.$query.'] ['.$e->getMessage().']', 'sql');
+				trigger_error('Error in query ['.$query.'] ['.$e->getMessage().']', E_USER_WARNING);
 			}
 
 			break;

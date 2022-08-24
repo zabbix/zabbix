@@ -2029,14 +2029,14 @@ function warning($messages): void {
 /*
  * Add an error to global message array.
  *
- * @param string | array $msg	Error message text.
- * @param string		 $src	The source of error message.
+ * @param string|array $msg	                Error message text.
+ * @param bool         $is_technical_error
  */
-function error($msgs, string $src = ''): void {
+function error($msgs, bool $is_technical_error = false): void {
 	$msgs = zbx_toArray($msgs);
 
 	foreach ($msgs as $msg) {
-		CMessageHelper::addError($msg, $src);
+		CMessageHelper::addError($msg, $is_technical_error);
 	}
 }
 
