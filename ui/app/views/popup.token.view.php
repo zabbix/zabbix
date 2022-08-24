@@ -27,7 +27,6 @@
 $token_form = (new CForm())
 	->setId('token_form')
 	->setName('token')
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem(makeMessageBox(ZBX_STYLE_MSG_GOOD, [], $data['message']));
 
 $token_from_grid = (new CFormGrid())
