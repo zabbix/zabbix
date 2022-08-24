@@ -907,10 +907,10 @@ class CAudit {
 
 		foreach ($object as $path => $value) {
 			$db_value = array_key_exists($path, $db_object) ? $db_object[$path] : null;
-			$mask_value = self::isValueToMask($resource, $path, $object);
+			$is_value_to_mask = self::isValueToMask($resource, $path, $object);
 
 			if ($db_value === null) {
-				if ($mask_value) {
+				if ($is_value_to_mask) {
 					$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
 					continue;
 				}
@@ -927,9 +927,9 @@ class CAudit {
 				$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 			}
 			else {
-				$mask_db_value = self::isValueToMask($resource, $path, $db_object);
+				$is_db_value_to_mask = self::isValueToMask($resource, $path, $db_object);
 
-				if ($value != $db_value || $mask_value || $mask_db_value) {
+				if ($value != $db_value || $is_value_to_mask || $is_db_value_to_mask) {
 					if (self::isNestedObjectProperty($path)) {
 						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
 					}
@@ -941,8 +941,8 @@ class CAudit {
 
 					$result[$path] = [
 						self::DETAILS_ACTION_UPDATE,
-						$mask_value ? ZBX_SECRET_MASK : $value,
-						$mask_db_value ? ZBX_SECRET_MASK : $db_value
+						$is_value_to_mask ? ZBX_SECRET_MASK : $value,
+						$is_db_value_to_mask ? ZBX_SECRET_MASK : $db_value
 					];
 				}
 			}
