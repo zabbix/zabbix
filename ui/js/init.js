@@ -88,9 +88,9 @@ jQuery(function($) {
 		});
 	}
 
-	function uncheckedHandler($checkbox) {
+	function uncheckedHandler(checkbox) {
+		$checkbox = $(checkbox);
 		var $hidden = $checkbox.prev('input[type=hidden][name="' + $checkbox.prop('name') + '"]');
-
 		if ($checkbox.is(':checked') || $checkbox.prop('disabled')) {
 			$hidden.remove();
 		}
@@ -102,11 +102,14 @@ jQuery(function($) {
 	}
 
 	$('input[unchecked-value]').each(function() {
-		var $this = $(this);
-
-		uncheckedHandler($this);
-		$this.on('change enable disable', function() {
-			uncheckedHandler($(this));
+		uncheckedHandler(this);
+		this.addEventListener('change', (e) => uncheckedHandler(e.target));
+		const observer = new MutationObserver((mutation) => {
+			uncheckedHandler(mutation[0].target)
+		});
+		observer.observe(this, {
+			attributes: true,
+			attributeFilter: ['disabled']
 		});
 	});
 
