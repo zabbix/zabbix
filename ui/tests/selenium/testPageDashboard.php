@@ -125,7 +125,7 @@ class testPageDashboard extends CLegacyWebTest {
 		}
 	}
 
-	public function testPageDashboard_CheckDasboardPopupLayout() {
+	public function testPageDashboard_CheckDashboardPopupLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&new=1')->waitUntilReady();
 		$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
 		$this->assertEquals('Dashboard properties', $dialog->getTitle());
