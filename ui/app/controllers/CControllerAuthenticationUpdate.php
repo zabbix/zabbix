@@ -50,21 +50,30 @@ class CControllerAuthenticationUpdate extends CController {
 			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>				'db config.http_strip_domains',
+			'saml_userdirectoryid' =>			'db userdirectory_saml.userdirectoryid',
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
-			'saml_idp_entityid' =>				'db config.saml_idp_entityid',
-			'saml_sso_url' =>					'db config.saml_sso_url',
-			'saml_slo_url' =>					'db config.saml_slo_url',
-			'saml_username_attribute' =>		'db config.saml_username_attribute',
-			'saml_sp_entityid' =>				'db config.saml_sp_entityid',
-			'saml_nameid_format' =>				'db config.saml_nameid_format',
-			'saml_sign_messages' =>				'in 0,1',
-			'saml_sign_assertions' =>			'in 0,1',
-			'saml_sign_authn_requests' =>		'in 0,1',
-			'saml_sign_logout_requests' =>		'in 0,1',
-			'saml_sign_logout_responses' =>		'in 0,1',
-			'saml_encrypt_nameid' =>			'in 0,1',
-			'saml_encrypt_assertions' =>		'in 0,1',
+			'saml_jit_enabled' =>				'in '.ZBX_AUTH_SAML_JIT_DISABLED.','.ZBX_AUTH_SAML_JIT_ENABLED,
+			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
+			'sso_url' =>						'db userdirectory_saml.sso_url',
+			'slo_url' =>						'db userdirectory_saml.slo_url',
+			'username_attribute' =>				'db userdirectory_saml.username_attribute',
+			'sp_entityid' =>					'db userdirectory_saml.sp_entityid',
+			'nameid_format' =>					'db userdirectory_saml.nameid_format',
+			'sign_messages' =>					'in 0,1',
+			'sign_assertions' =>				'in 0,1',
+			'sign_authn_requests' =>			'in 0,1',
+			'sign_logout_requests' =>			'in 0,1',
+			'sign_logout_responses' =>			'in 0,1',
+			'encrypt_nameid' =>					'in 0,1',
+			'encrypt_assertions' =>				'in 0,1',
 			'saml_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'saml_group_name' =>				'db userdirectory_saml.group_name',
+			'saml_user_username' =>				'db userdirectory_saml.user_username',
+			'saml_user_lastname' =>				'db userdirectory_saml.user_lastname',
+			'saml_provision_groups' =>			'array',
+			'saml_provision_media' =>			'array',
+			'scim_status' =>					'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
+			'scim_token' =>						'db userdirectory_saml.scim_token',
 			'passwd_min_length' =>				'int32',
 			'passwd_check_rules' =>				'array'
 		];
@@ -152,18 +161,23 @@ class CControllerAuthenticationUpdate extends CController {
 			return false;
 		}
 
-		$saml_fields = ['saml_idp_entityid', 'saml_sso_url', 'saml_sp_entityid', 'saml_username_attribute'];
-		$saml_auth = [
-			'saml_idp_entityid' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_IDP_ENTITYID),
-			'saml_sso_url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SSO_URL),
-			'saml_sp_entityid' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SP_ENTITYID),
-			'saml_username_attribute' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE)
-		];
-		$this->getInputs($saml_auth, $saml_fields);
+		$saml_fields = [];
+		$this->getInputs($saml_fields, [
+			'idp_entityid',
+			'sso_url',
+			'username_attribute',
+			'sp_entityid'
+		]);
 
-		foreach ($saml_fields as $field) {
-			if (trim($saml_auth[$field]) === '') {
-				CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
+		if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_JIT_STATUS) == JIT_PROVISIONING_ENABLED) {
+			$saml_fields['saml_group_name'] = $this->getInput('saml_group_name');
+		}
+
+		foreach ($saml_fields as $field_name => $field_value) {
+			if ($field_value === '') {
+				CMessageHelper::setErrorTitle(
+					_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty'))
+				);
 
 				return false;
 			}
@@ -204,9 +218,9 @@ class CControllerAuthenticationUpdate extends CController {
 	protected function doAction() {
 		$auth_valid = $this->validateDefaultAuth();
 
-		if ($auth_valid && !$this->validateLdap()) {
-			$auth_valid = false;
-		}
+//		if ($auth_valid && !$this->validateLdap()) {
+//			$auth_valid = false;
+//		}
 
 		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
 			if (!$this->validateSamlAuth()) {
@@ -214,12 +228,12 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 		}
 
-		if ($auth_valid) {
-			[$auth_valid, $ldap_userdirectoryid] = $this->processLdapServers(
-				$this->getInput('ldap_servers', []),
-				$this->getInput('ldap_default_row_index', 0)
-			);
-		}
+//		if ($auth_valid) {
+//			[$auth_valid, $ldap_userdirectoryid] = $this->processLdapServers(
+//				$this->getInput('ldap_servers', []),
+//				$this->getInput('ldap_default_row_index', 0)
+//			);
+//		}
 
 		if (!$auth_valid) {
 			if (CMessageHelper::getTitle() === null) {
@@ -241,19 +255,7 @@ class CControllerAuthenticationUpdate extends CController {
 			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
 			CAuthenticationHelper::SAML_AUTH_ENABLED,
-			CAuthenticationHelper::SAML_IDP_ENTITYID,
-			CAuthenticationHelper::SAML_SSO_URL,
-			CAuthenticationHelper::SAML_SLO_URL,
-			CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE,
-			CAuthenticationHelper::SAML_SP_ENTITYID,
-			CAuthenticationHelper::SAML_NAMEID_FORMAT,
-			CAuthenticationHelper::SAML_SIGN_MESSAGES,
-			CAuthenticationHelper::SAML_SIGN_ASSERTIONS,
-			CAuthenticationHelper::SAML_SIGN_AUTHN_REQUESTS,
-			CAuthenticationHelper::SAML_SIGN_LOGOUT_REQUESTS,
-			CAuthenticationHelper::SAML_SIGN_LOGOUT_RESPONSES,
-			CAuthenticationHelper::SAML_ENCRYPT_NAMEID,
-			CAuthenticationHelper::SAML_ENCRYPT_ASSERTIONS,
+			CAuthenticationHelper::SAML_JIT_STATUS,
 			CAuthenticationHelper::SAML_CASE_SENSITIVE,
 			CAuthenticationHelper::PASSWD_MIN_LENGTH,
 			CAuthenticationHelper::PASSWD_CHECK_RULES
@@ -266,7 +268,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
-			'ldap_userdirectoryid' => $ldap_userdirectoryid,
+//			'ldap_userdirectoryid' => $ldap_userdirectoryid,
 			'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
@@ -284,19 +286,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
 			$fields += [
-				'saml_idp_entityid' => '',
-				'saml_sso_url' => '',
-				'saml_slo_url' => '',
-				'saml_username_attribute' => '',
-				'saml_sp_entityid' => '',
-				'saml_nameid_format' => '',
-				'saml_sign_messages' => 0,
-				'saml_sign_assertions' => 0,
-				'saml_sign_authn_requests' => 0,
-				'saml_sign_logout_requests' => 0,
-				'saml_sign_logout_responses' => 0,
-				'saml_encrypt_nameid' => 0,
-				'saml_encrypt_assertions' => 0,
+				'saml_jit_status' => ZBX_AUTH_SAML_JIT_DISABLED,
 				'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE
 			];
 		}
@@ -327,6 +317,70 @@ class CControllerAuthenticationUpdate extends CController {
 
 			if ($del_userdirectoryids) {
 				$result = API::UserDirectory()->delete($del_userdirectoryids);
+			}
+		}
+
+		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
+			$saml_fields = [
+				'saml_userdirectoryid' => '',
+				'idp_entityid' => '',
+				'sso_url' => '',
+				'slo_url' => '',
+				'username_attribute' => '',
+				'sp_entityid' => '',
+				'nameid_format' => '',
+				'sign_messages' => 0,
+				'sign_assertions' => 0,
+				'sign_authn_requests' => 0,
+				'sign_logout_requests' => 0,
+				'sign_logout_responses' => 0,
+				'encrypt_nameid' => 0,
+				'encrypt_assertions' => 0,
+				'saml_group_name' => '',
+				'saml_user_username' => '',
+				'saml_user_lastname' => '',
+				'saml_provision_groups' => [],
+				'saml_provision_media' => [],
+				'scim_status' => 0,
+				'scim_token' => ''
+			];
+
+			$this->getInputs($saml_fields, array_keys($saml_fields));
+			$saml_data = [
+				'idp_type' => IDP_TYPE_SAML,
+				'userdirectoryid' => $saml_fields['saml_userdirectoryid'],
+				'group_name' => $saml_fields['saml_group_name'],
+				'user_username' => $saml_fields['saml_user_username'],
+				'user_lastname' => $saml_fields['saml_user_lastname'],
+				'provision_groups' => $saml_fields['saml_provision_groups'],
+				'provision_media' => $saml_fields['saml_provision_media'],
+			];
+			unset($saml_fields['saml_group_name'], $saml_fields['saml_user_username'],
+				$saml_fields['saml_user_lastname'], $saml_fields['saml_provision_groups'],
+				$saml_fields['saml_provision_media'], $saml_fields['saml_userdirectoryid']
+			);
+			$saml_data += $saml_fields;
+
+			foreach ($saml_data['provision_groups'] as &$provision_group) {
+				if ($provision_group['is_fallback'] == 1) {
+					unset($provision_group['name']);
+				}
+				$provision_group['user_groups'] = [];
+				$usrgrpids = explode(', ', $provision_group['usrgrpid']);
+				unset($provision_group['usrgrpid']);
+
+				foreach ($usrgrpids as $usrgrpid) {
+					$provision_group['user_groups'][] = ['usrgrpid' => $usrgrpid];
+				}
+			}
+			unset($provision_group);
+
+			if ($saml_data['userdirectoryid'] == '') {
+				unset($saml_data['userdirectoryid']);
+				$result = API::UserDirectory()->create($saml_data);
+			}
+			else {
+				$result = API::UserDirectory()->update($saml_data);
 			}
 		}
 

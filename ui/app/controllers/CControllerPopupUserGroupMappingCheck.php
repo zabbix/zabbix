@@ -29,9 +29,12 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
+			'row_index' =>			'required|int32',
 			'roleid' =>				'required|db users.roleid',
 			'name' =>				'required|string',
-			'user_groups' =>		'array_id'
+			'user_groups' =>		'array_id',
+			'is_fallback' =>		'in 0,1',
+			'fallback_status' =>	'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -56,7 +59,10 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'name' => $this->getInput('name')
+			'row_index' => $this->getInput('row_index', 0),
+			'name' => $this->getInput('name'),
+			'is_fallback' => $this->getInput('is_fallback', 0),
+			'fallback_status' => $this->getInput('fallback_status', 0)
 		];
 
 		$user_groups = API::UserGroup()->get([

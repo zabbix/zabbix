@@ -31,6 +31,9 @@ $form_action = (new CUrl('zabbix.php'))
 $form = (new CForm('post', $form_action))
 	->setId('user-group-mapping-edit-form')
 	->setName('user-group-mapping-edit-form')
+	->addVar('is_fallback', $data['is_fallback'])
+	->addVar('fallback_status', $data['fallback_status'])
+	->addVar('row_index', $data['row_index'])
 	->addItem(
 		(new CInput('submit', 'submit'))
 			->addStyle('display: none;')
@@ -76,11 +79,13 @@ $user_role_multiselect = (new CMultiSelect([
 $inline_js .= $user_role_multiselect->getPostJS();
 
 if ($data['is_fallback'] == true) {
-	$name_formfield = $data['name'];
+	$name_formfield = new CDiv($data['name']);
 	$name_hint_icon = makeHelpIcon([
 		_('Use fallback group to define user groups and a role for users not covered by group mapping.'),
 	])
 		->addClass(ZBX_STYLE_LIST_DASHED);
+
+	$form->addVar('name', $data['name']);
 }
 else {
 	$name_formfield = (new CTextBox('name', $data['name']))

@@ -27,12 +27,14 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
+			'row_index' =>			'required|int32',
 			'add_group' =>			'in 1',
 			'usrgrpid' =>			'string',
 			'roleid' =>				'db users.roleid',
 			'name' =>				'string',
 			'name_label' =>			'string',
-			'is_fallback' =>		'in 0,1'
+			'is_fallback' =>		'in 0,1',
+			'fallback_status' =>	'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -65,11 +67,13 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 	 */
 	protected function doAction(): void {
 		$data = [
+			'row_index' => $this->getInput('row_index', 0),
 			'name' => $this->getInput('name', ''),
 			'add_group' => $this->getInput('add_group', ''),
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'name_label' => $this->getInput('name_label'),
-			'is_fallback' => $this->getInput('is_fallback')
+			'is_fallback' => $this->getInput('is_fallback', 0),
+			'fallback_status' => $this->getInput('fallback_status', 0)
 		];
 
 		$user_groups = explode(',', $this->getInput('usrgrpid', ''));

@@ -92,7 +92,7 @@
 
 			if (document.getElementById('saml_auth_enabled') !== null) {
 				document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
-					this.form.querySelectorAll('[name^=saml_]').forEach(field => {
+					this.form.querySelectorAll('.saml-enabled').forEach(field => {
 						if (!field.isSameNode(e.target)) {
 							field.disabled = !e.target.checked;
 						}
@@ -252,6 +252,7 @@
 				const row_index = row.dataset.row_index;
 
 				popup_params = {
+					row_index,
 					name: row.querySelector(`[name="saml_provision_groups[${row_index}][name]"`).value,
 					usrgrpid: row.querySelector(`[name="saml_provision_groups[${row_index}][usrgrpid]"`).value,
 					roleid: row.querySelector(`[name="saml_provision_groups[${row_index}][roleid]"`).value,
@@ -259,7 +260,14 @@
 				};
 			}
 			else {
+				let row_index = 0;
+
+				while (document.querySelector(`#saml-group-table [data-row_index="${row_index}"]`) !== null) {
+					row_index++;
+				}
+
 				popup_params = {
+					row_index,
 					add_group: 1
 				};
 			}
@@ -290,14 +298,21 @@
 				const row_index = row.dataset.row_index;
 
 				popup_params = {
+					row_index,
 					name: row.querySelector(`[name="saml_provision_media[${row_index}][name]"`).value,
-					media_type_name: row.querySelector(`[name="saml_provision_media[${row_index}][media_type_name]"`).value,
 					attribute: row.querySelector(`[name="saml_provision_media[${row_index}][attribute]"`).value,
 					mediatypeid: row.querySelector(`[name="saml_provision_media[${row_index}][mediatypeid]"`).value
 				};
 			}
 			else {
+				let row_index = 0;
+
+				while (document.querySelector(`#saml-media-type-mapping-table [data-row_index="${row_index}"]`) !== null) {
+					row_index++;
+				}
+
 				popup_params = {
+					row_index,
 					add_media_type_mapping: 1
 				};
 			}
@@ -501,7 +516,6 @@
 					<td>
 						<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
 						<input type="hidden" name="saml_provision_media[#{row_index}][name]" value="#{name}">
-						<input type="hidden" name="saml_provision_media[#{row_index}][media_type_name]" value="#{media_type_name}">
 						<input type="hidden" name="saml_provision_media[#{row_index}][mediatypeid]" value="#{mediatypeid}">
 						<input type="hidden" name="saml_provision_media[#{row_index}][attribute]" value="#{attribute}">
 					</td>
@@ -515,7 +529,7 @@
 		}
 
 		toggleScimProvisioning(checked) {
-			for (const element of this.form.querySelectorAll('.saml-allow-scim')) {
+			for (const element of this.form.querySelectorAll('.saml-allow-jit')) {
 				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
 			}
 		}

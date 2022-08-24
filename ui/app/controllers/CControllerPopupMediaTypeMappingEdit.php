@@ -27,9 +27,9 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
+			'row_index' =>					'required|int32',
 			'add_media_type_mapping' =>		'in 1',
 			'name' =>						'string',
-			'media_type_name' =>			'string',
 			'attribute' =>					'string',
 			'mediatypeid' =>				'db media_type.mediatypeid',
 			'db_mediatypes' =>				'array'
@@ -66,13 +66,19 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 	protected function doAction(): void {
 
 		$data = [
+			'row_index' => $this->getInput('row_index', 0),
 			'add_media_type_mapping' => $this->getInput('add_media_type_mapping', ''),
 			'name' => $this->getInput('name', ''),
-			'media_type_name' => $this->getInput('media_type_name', ''),
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'attribute' => $this->getInput('attribute', ''),
 			'mediatypeid' => $this->getInput('mediatypeid', ''),
 		];
+
+		$media_type_name = API::MediaType()->get([
+			'output' => ['name'],
+			'mediatypeid' =>$data['mediatypeid']
+		]);
+		$data['media_type_name'] = $media_type_name[0]['name'];
 
 		$data['db_mediatypes'] = API::MediaType()->get([
 			'output' => ['name', 'mediatypeid'],

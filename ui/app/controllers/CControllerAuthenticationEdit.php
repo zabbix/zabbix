@@ -46,26 +46,28 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_removed_userdirectoryids' =>	'array',
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
-			'saml_scim_enabled' =>				'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
-			'saml_idp_entityid' =>				'db config.saml_idp_entityid',
-			'saml_sso_url' =>					'db config.saml_sso_url',
-			'saml_slo_url' =>					'db config.saml_slo_url',
-			'saml_username_attribute' =>		'db config.saml_username_attribute',
-			'saml_sp_entityid' =>				'db config.saml_sp_entityid',
-			'saml_nameid_format' =>				'db config.saml_nameid_format',
-			'saml_sign_messages' =>				'in 0,1',
-			'saml_sign_assertions' =>			'in 0,1',
-			'saml_sign_authn_requests' =>		'in 0,1',
-			'saml_sign_logout_requests' =>		'in 0,1',
-			'saml_sign_logout_responses' =>		'in 0,1',
-			'saml_encrypt_nameid' =>			'in 0,1',
-			'saml_encrypt_assertions' =>		'in 0,1',
+			'saml_jit_enabled' =>				'in '.ZBX_AUTH_SAML_JIT_DISABLED.','.ZBX_AUTH_SAML_JIT_ENABLED,
+			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
+			'sso_url' =>						'db userdirectory_saml.sso_url',
+			'slo_url' =>						'db userdirectory_saml.slo_url',
+			'username_attribute' =>				'db userdirectory_saml.username_attribute',
+			'sp_entityid' =>					'db userdirectory_saml.sp_entityid',
+			'nameid_format' =>					'db userdirectory_saml.nameid_format',
+			'sign_messages' =>					'in 0,1',
+			'sign_assertions' =>				'in 0,1',
+			'sign_authn_requests' =>			'in 0,1',
+			'sign_logout_requests' =>			'in 0,1',
+			'sign_logout_responses' =>			'in 0,1',
+			'encrypt_nameid' =>					'in 0,1',
+			'encrypt_assertions' =>				'in 0,1',
 			'saml_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'saml_group_name_attribute' =>		'db config.saml_group_name_attribute',
-			'saml_user_name_attribute' =>		'db config.saml_user_name_attribute',
-			'saml_user_lastname_attribute' =>	'db config.saml_user_lastname_attribute',
-			'saml_authorization_token' =>		'db config.saml_authorization_token',
-			'saml_groups' =>					'array',
+			'saml_group_name' =>				'db userdirectory_saml.group_name',
+			'saml_user_username' =>				'db userdirectory_saml.user_username',
+			'saml_user_lastname' =>				'db userdirectory_saml.user_lastname',
+			'saml_provision_groups' =>			'array',
+			'saml_provision_media' =>			'array',
+			'scim_status' =>					'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
+			'scim_token' =>						'db userdirectory_saml.scim_token',
 			'passwd_min_length' =>				'int32',
 			'passwd_check_rules' =>				'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)
 		];
@@ -110,26 +112,11 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::LDAP_CONFIGURED,
 			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
+			CAuthenticationHelper::LDAP_JIT_STATUS,
+			CAuthenticationHelper::JIT_PROVISION_INTERVAL,
 			CAuthenticationHelper::SAML_AUTH_ENABLED,
-			CAuthenticationHelper::SAML_SCIM_ENABLED,
-			CAuthenticationHelper::SAML_IDP_ENTITYID,
-			CAuthenticationHelper::SAML_SSO_URL,
-			CAuthenticationHelper::SAML_SLO_URL,
-			CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE,
-			CAuthenticationHelper::SAML_SP_ENTITYID,
-			CAuthenticationHelper::SAML_NAMEID_FORMAT,
-			CAuthenticationHelper::SAML_SIGN_MESSAGES,
-			CAuthenticationHelper::SAML_SIGN_ASSERTIONS,
-			CAuthenticationHelper::SAML_SIGN_AUTHN_REQUESTS,
-			CAuthenticationHelper::SAML_SIGN_LOGOUT_REQUESTS,
-			CAuthenticationHelper::SAML_SIGN_LOGOUT_RESPONSES,
-			CAuthenticationHelper::SAML_ENCRYPT_NAMEID,
-			CAuthenticationHelper::SAML_ENCRYPT_ASSERTIONS,
+			CAuthenticationHelper::SAML_JIT_STATUS,
 			CAuthenticationHelper::SAML_CASE_SENSITIVE,
-			CAuthenticationHelper::SAML_GROUP_NAME_ATTRIBUTE,
-			CAuthenticationHelper::SAML_USER_NAME_ATTRIBUTE,
-			CAuthenticationHelper::SAML_USER_LASTNAME_ATTRIBUTE,
-			CAuthenticationHelper::SAML_AUTHORIZATION_TOKEN,
 			CAuthenticationHelper::PASSWD_MIN_LENGTH,
 			CAuthenticationHelper::PASSWD_CHECK_RULES
 		];
@@ -149,30 +136,54 @@ class CControllerAuthenticationEdit extends CController {
 				'http_case_sensitive',
 				'ldap_configured',
 				'ldap_case_sensitive',
+				'jit_provision_interval',
+				'ldap_jit_status',
 				'saml_auth_enabled',
-				'saml_scim_enable',
-				'saml_idp_entityid',
-				'saml_sso_url',
-				'saml_slo_url',
-				'saml_username_attribute',
-				'saml_sp_entityid',
-				'saml_nameid_format',
-				'saml_sign_messages',
-				'saml_sign_assertions',
-				'saml_sign_authn_requests',
-				'saml_sign_logout_requests',
-				'saml_sign_logout_responses',
-				'saml_encrypt_nameid',
-				'saml_encrypt_assertions',
+				'saml_jit_enable',
+				'idp_entityid',
+				'sso_url',
+				'slo_url',
+				'username_attribute',
+				'sp_entityid',
+				'nameid_format',
+				'sign_messages',
+				'sign_assertions',
+				'sign_authn_requests',
+				'sign_logout_requests',
+				'sign_logout_responses',
+				'encrypt_nameid',
+				'encrypt_assertions',
 				'saml_case_sensitive',
-				'saml_group_name_attribute',
-				'saml_user_name_attribute',
-				'saml_user_lastname_attribute',
-				'saml_authorization_token',
+				'saml_group_name',
+				'saml_user_username',
+				'saml_user_lastname',
+				'scim_status',
+				'scim_token',
 				'passwd_min_length',
 				'passwd_check_rules'
 			]);
 
+			$data['saml_provision_groups'] = $this->getInput('saml_provision_groups', []);
+
+			if ($data['saml_provision_groups'] != []) {
+				$data['saml_provision_groups'] = $this->getProvisionGroupsToTableFormat($data['saml_provision_groups']);
+			}
+
+
+			$data['saml_provision_media'] = $this->getInput('saml_provision_media', []);
+
+			if ($data['saml_provision_media'] != []) {
+				foreach ($data['saml_provision_media'] as &$saml_media) {
+					$media = API::MediaType()->get([
+						'output' => ['name'],
+						'mediatypeids' => $saml_media['mediatypeid']
+					]);
+					$saml_media['media_type_name'] = $media[0]['name'];
+				}
+				unset($saml_media);
+			}
+
+			$data['saml_userdirectoryid'] = '';
 			$data['ldap_servers'] = $this->getLdapServerUserGroupCount($this->getInput('ldap_servers', []));
 			$data['ldap_default_row_index'] = $this->getInput('ldap_default_row_index', 0);
 			$data['ldap_removed_userdirectoryids'] = $this->getInput('ldap_removed_userdirectoryids', []);
@@ -181,6 +192,121 @@ class CControllerAuthenticationEdit extends CController {
 		}
 		else {
 			$data += $auth;
+
+			$saml_configuration = API::UserDirectory()->get([
+				'output' => 'extend',
+				'filter' => [
+					'idp_type' => IDP_TYPE_SAML
+				],
+				'selectProvisionGroups' => 'extend',
+				'selectProvisionMedia' => 'extend'
+			]);
+			if ($saml_configuration) {
+				$saml_configuration += $saml_configuration[0];
+
+				$data['saml_userdirectoryid'] = $saml_configuration['userdirectoryid'];
+				$data['saml_group_name'] = $saml_configuration['group_name'];
+				$data['saml_user_username'] = $saml_configuration['user_username'];
+				$data['saml_user_lastname'] = $saml_configuration['user_lastname'];
+				$data['saml_provision_groups'] = [];
+				$data['saml_provision_media'] = [];
+
+
+				foreach ($saml_configuration['provision_groups'] as $provision_group) {
+					if ($provision_group['is_fallback'] == 1) {
+						$provision_group['name'] = 'Fallback group';
+					}
+
+					$role = API::Role()->get([
+						'output' => ['name'],
+						'roleids' => $provision_group['roleid']
+					]);
+
+					$user_groups = API::UserGroup()->get([
+						'output' => ['name', 'usrgrpid'],
+						'usrgrpids' => array_column($provision_group['user_groups'], 'usrgrpid')
+					]);
+
+					$user_groups_names = implode(', ',array_column($user_groups, 'name'));
+					$user_groups_ids = implode(', ',array_column($user_groups, 'usrgrpid'));
+
+					$data['saml_provision_groups'][] = $provision_group + [
+							'role_name' => $role[0]['name'],
+							'user_group_name' => $user_groups_names,
+							'usrgrpid' => $user_groups_ids
+						];
+				}
+
+				foreach ($saml_configuration['provision_media'] as $media) {
+					$db_media = API::MediaType()->get([
+						'output' => ['name'],
+						'mediatypeids' => $media['mediatypeid']
+					]);
+
+					$data['saml_provision_media'][] = $media + [
+							'media_type_name' => $db_media[0]['name'],
+						];
+				}
+
+				unset($saml_configuration['userdirectoryid'], $saml_configuration['group_name'],
+					$saml_configuration['user_username'], $saml_configuration['user_lastname'],
+					$saml_configuration['provision_groups'], $saml_configuration['provision_media']);
+
+				$data += $saml_configuration;
+			}
+			else {
+				$saml_settings = [
+					'saml_userdirectoryid' => '',
+					'idp_entityid' => '',
+					'sso_url' => '',
+					'slo_url' => '',
+					'username_attribute' => '',
+					'sp_entityid' => '',
+					'nameid_format' => '',
+					'sign_messages' => '',
+					'sign_assertions' => '',
+					'sign_authn_requests' => '',
+					'sign_logout_requests' => '',
+					'sign_logout_responses' => '',
+					'encrypt_nameid' => '',
+					'encrypt_assertions' => '',
+					'saml_group_name' => '',
+					'saml_user_username' => '',
+					'saml_user_lastname' => '',
+					'scim_status' => '',
+					'scim_token' => ''
+				];
+
+				$saml_settings['saml_provision_media'] = [];
+				$saml_settings['saml_provision_groups'] = [
+					[
+						'is_fallback' => 1,
+						'fallback_status' => 0,
+						'name' => 'Fallback group',
+						'roleid' => 1,
+						'user_groups' => [
+							['usrgrpid' => 8]
+						]
+					]
+				];
+
+				$role = API::Role()->get([
+					'output' => ['name'],
+					'roleids' => $saml_settings['saml_provision_groups'][0]['roleid']
+				]);
+
+				$saml_settings['saml_provision_groups'][0]['role_name'] = $role[0]['name'];
+
+				$user_groups = API::UserGroup()->get([
+					'output' => ['name', 'usrgrpid'],
+					'usrgrpids' => array_column($saml_settings['saml_provision_groups'][0]['user_groups'], 'usrgrpid')
+				]);
+				$user_groups_names = implode(', ',array_column($user_groups, 'name'));
+				$user_groups_ids = implode(', ',array_column($user_groups, 'usrgrpid'));
+				$saml_settings['saml_provision_groups'][0]['user_group_name'] = $user_groups_names;
+				$saml_settings['saml_provision_groups'][0]['usrgrpid'] = $user_groups_ids;
+				$data += $saml_settings;
+			}
 
 			$data['ldap_servers'] = API::UserDirectory()->get([
 				'output' => ['userdirectoryid', 'name', 'description', 'host', 'port', 'base_dn', 'search_attribute',
@@ -197,63 +323,14 @@ class CControllerAuthenticationEdit extends CController {
 			$data['ldap_removed_userdirectoryids'] = [];
 		}
 
+		$data['saml_allow_jit'] = $data['saml_group_name'] !== '';
+
 		unset($data[CAuthenticationHelper::LDAP_USERDIRECTORYID]);
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
 		$data['saml_enabled'] = ($openssl_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED);
 		$data['db_authentication_type'] = CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
-		$data['saml_allow_scim'] = $data['saml_group_name_attribute'] === '';
-
-		$user_groups = [
-			[
-				'name' => 'SAML group',
-				'usrgrpid' => 14
-			],
-			[
-				'name' => '	Zabbix administrators',
-				'usrgrpid' => 7
-			]
-		];
-
-		$user_role = [
-			[
-				'roleid' => 2,
-				'name' => 'Admin role'
-			]
-		];
-
-		$group_name = implode(', ',array_column($user_groups, 'name'));
-		$group_id = implode(', ',array_column($user_groups, 'usrgrpid'));
-
-		$data['saml_groups'] = [
-			[
-				'idp_group_name' => 'Developers',
-				'user_group_name' => 'Zabbix SAML',
-				'user_group_id' => '123',
-				'role_name' => 'Admin role',
-				'roleid' => '2',
-				'is_fallback' => 0
-			],
-			[
-				'idp_group_name' => 'Fallback group',
-				'user_group_name' => $group_name,
-				'role_name' => $user_role[0]['name'],
-				'roleid' => $user_role[0]['roleid'],
-				'usrgrpid' => $group_id,
-				'is_fallback' => 1,
-				'fallback_status' => 0
-			]
-		];
-
-		$data['saml_media_type_mappings'] = [
-			[
-				'media_type_mapping_name' => 'Email media type',
-				'media_type_name' => 'Email',
-				'media_type_attribute' => 'userEmail',
-				'mediatypeid' => 1
-			]
-		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of authentication'));
@@ -266,6 +343,7 @@ class CControllerAuthenticationEdit extends CController {
 		$db_ldap_servers = $ldap_serverids
 			? API::UserDirectory()->get([
 				'output' => ['userdirectoryid'],
+				'idp_type' => IDP_TYPE_LDAP,
 				'selectUsrgrps' => API_OUTPUT_COUNT,
 				'userdirectoryids' => $ldap_serverids,
 				'preservekeys' => true
@@ -283,5 +361,31 @@ class CControllerAuthenticationEdit extends CController {
 		unset($ldap_server);
 
 		return $ldap_servers;
+	}
+
+	private function getProvisionGroupsToTableFormat(array $provision_groups): array {
+		$provision_groups_to_table = [];
+		foreach ($provision_groups as $provision_group) {
+			$role = API::Role()->get([
+				'output' => ['name'],
+				'roleids' => $provision_group['roleid']
+			]);
+
+			$usrgrpids = explode(', ', $provision_group['usrgrpid']);
+
+			$user_groups = API::UserGroup()->get([
+				'output' => ['name', 'usrgrpid'],
+				'usrgrpids' => $usrgrpids
+			]);
+
+			$user_groups_names = implode(', ',array_column($user_groups, 'name'));
+
+			$provision_groups_to_table[] = $provision_group + [
+					'role_name' => $role[0]['name'],
+					'user_group_name' => $user_groups_names,
+				];
+		}
+
+		return $provision_groups_to_table;
 	}
 }

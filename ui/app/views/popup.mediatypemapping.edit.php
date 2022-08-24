@@ -31,6 +31,7 @@ $form_action = (new CUrl('zabbix.php'))
 $form = (new CForm('post', $form_action))
 	->setId('media-type-mapping-edit-form')
 	->setName('media-type-mapping-edit-form')
+	->addVar('row_index', $data['row_index'])
 	->addItem(
 		(new CInput('submit', 'submit'))
 			->addStyle('display: none;')

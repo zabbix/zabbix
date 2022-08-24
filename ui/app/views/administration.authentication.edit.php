@@ -240,68 +240,75 @@ $saml_tab = (new CFormGrid())
 				->setChecked($data['saml_jit_status'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
 				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
 				->setEnabled($data['saml_enabled'])
+				->addClass('saml-enabled')
 		)
 	])
 	->addItem([
-		(new CLabel(_('IdP entity ID'), 'saml_idp_entityid'))->setAsteriskMark(),
+		(new CLabel(_('IdP entity ID'), 'idp_entityid'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('saml_idp_entityid', $data['saml_idp_entityid'], false,
+			(new CTextBox('idp_entityid', $data['idp_entityid'], false,
 				DB::getFieldLength('userdirectory_saml', 'idp_entityid')
 			))
 				->setEnabled($data['saml_enabled'])
+				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		)
 	])
 	->addItem([
-		(new CLabel(_('SSO service URL'), 'saml_sso_url'))->setAsteriskMark(),
+		(new CLabel(_('SSO service URL'), 'sso_url'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('saml_sso_url', $data['saml_sso_url'], false,
+			(new CTextBox('sso_url', $data['sso_url'], false,
 				DB::getFieldLength('userdirectory_saml', 'sso_url')
 			))
 				->setEnabled($data['saml_enabled'])
+				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired())
 	])
 	->addItem([
-		new CLabel(_('SLO service URL'), 'saml_slo_url'),
+		new CLabel(_('SLO service URL'), 'slo_url'),
 		new CFormField(
-			(new CTextBox('saml_slo_url', $data['saml_slo_url'], false,
+			(new CTextBox('slo_url', $data['slo_url'], false,
 				DB::getFieldLength('userdirectory_saml', 'slo_url')
 			))
 				->setEnabled($data['saml_enabled'])
+				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 	])
 	->addItem([
-		(new CLabel(_('Username attribute'), 'saml_username_attribute'))->setAsteriskMark(),
+		(new CLabel(_('Username attribute'), 'username_attribute'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('saml_username_attribute', $data['saml_username_attribute'], false,
+			(new CTextBox('username_attribute', $data['username_attribute'], false,
 				DB::getFieldLength('userdirectory_saml', 'username_attribute')
 			))
 				->setEnabled($data['saml_enabled'])
+				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		)
 	])
 	->addItem([
-		(new CLabel(_('SP entity ID'), 'saml_sp_entityid'))->setAsteriskMark(),
+		(new CLabel(_('SP entity ID'), 'sp_entityid'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('saml_sp_entityid', $data['saml_sp_entityid'], false,
+			(new CTextBox('sp_entityid', $data['sp_entityid'], false,
 				DB::getFieldLength('userdirectory_saml', 'sp_entityid')
 			))
 				->setEnabled($data['saml_enabled'])
+				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		)
 	])
 	->addItem([
-		new CLabel(_('SP name ID format'), 'saml_nameid_format'),
+		new CLabel(_('SP name ID format'), 'nameid_format'),
 		new CFormField(
-			(new CTextBox('saml_nameid_format', $data['saml_nameid_format'], false,
+			(new CTextBox('nameid_format', $data['nameid_format'], false,
 				DB::getFieldLength('userdirectory_saml', 'nameid_format')
 			))
 				->setEnabled($data['saml_enabled'])
+				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('placeholder', 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient')
 		)
@@ -310,31 +317,36 @@ $saml_tab = (new CFormGrid())
 		new CLabel(_('Sign')),
 		new CFormField(
 			(new CList([
-				(new CCheckBox('saml_sign_messages'))
+				(new CCheckBox('sign_messages'))
 					->setLabel(_('Messages'))
-					->setChecked($data['saml_sign_messages'] == 1)
-					->setUncheckedValue(0)
-					->setEnabled($data['saml_enabled']),
-				(new CCheckBox('saml_sign_assertions'))
-					->setLabel(_('Assertions'))
-					->setChecked($data['saml_sign_assertions'] == 1)
-					->setUncheckedValue(0)
-					->setEnabled($data['saml_enabled']),
-				(new CCheckBox('saml_sign_authn_requests'))
-					->setLabel(_('AuthN requests'))
-					->setChecked($data['saml_sign_authn_requests'] == 1)
-					->setUncheckedValue(0)
-					->setEnabled($data['saml_enabled']),
-				(new CCheckBox('saml_sign_logout_requests'))
-					->setLabel(_('Logout requests'))
-					->setChecked($data['saml_sign_logout_requests'] == 1)
-					->setUncheckedValue(0)
-					->setEnabled($data['saml_enabled']),
-				(new CCheckBox('saml_sign_logout_responses'))
-					->setLabel(_('Logout responses'))
-					->setChecked($data['saml_sign_logout_responses'] == 1)
+					->setChecked($data['sign_messages'] == 1)
 					->setUncheckedValue(0)
 					->setEnabled($data['saml_enabled'])
+					->addClass('saml-enabled'),
+				(new CCheckBox('sign_assertions'))
+					->setLabel(_('Assertions'))
+					->setChecked($data['sign_assertions'] == 1)
+					->setUncheckedValue(0)
+					->setEnabled($data['saml_enabled'])
+					->addClass('saml-enabled'),
+				(new CCheckBox('sign_authn_requests'))
+					->setLabel(_('AuthN requests'))
+					->setChecked($data['sign_authn_requests'] == 1)
+					->setUncheckedValue(0)
+					->setEnabled($data['saml_enabled'])
+					->addClass('saml-enabled'),
+				(new CCheckBox('sign_logout_requests'))
+					->setLabel(_('Logout requests'))
+					->setChecked($data['sign_logout_requests'] == 1)
+					->setUncheckedValue(0)
+					->setEnabled($data['saml_enabled'])
+					->addClass('saml-enabled'),
+				(new CCheckBox('sign_logout_responses'))
+					->setLabel(_('Logout responses'))
+					->setChecked($data['sign_logout_responses'] == 1)
+					->setUncheckedValue(0)
+					->setEnabled($data['saml_enabled'])
+					->addClass('saml-enabled')
 			]))->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
 		)
 	])
@@ -342,16 +354,18 @@ $saml_tab = (new CFormGrid())
 		new CLabel(_('Encrypt')),
 		new CFormField(
 			(new CList([
-				(new CCheckBox('saml_encrypt_nameid'))
+				(new CCheckBox('encrypt_nameid'))
 					->setLabel(_('Name ID'))
-					->setChecked($data['saml_encrypt_nameid'] == 1)
-					->setUncheckedValue(0)
-					->setEnabled($data['saml_enabled']),
-				(new CCheckBox('saml_encrypt_assertions'))
-					->setLabel(_('Assertions'))
-					->setChecked($data['saml_encrypt_assertions'] == 1)
+					->setChecked($data['encrypt_nameid'] == 1)
 					->setUncheckedValue(0)
 					->setEnabled($data['saml_enabled'])
+					->addClass('saml-enabled'),
+				(new CCheckBox('encrypt_assertions'))
+					->setLabel(_('Assertions'))
+					->setChecked($data['encrypt_assertions'] == 1)
+					->setUncheckedValue(0)
+					->setEnabled($data['saml_enabled'])
+					->addClass('saml-enabled')
 			]))->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
 		)
 	])
@@ -362,47 +376,49 @@ $saml_tab = (new CFormGrid())
 				->setChecked($data['saml_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 				->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
 				->setEnabled($data['saml_enabled'])
+				->addClass('saml-enabled')
 		)
 	])
 	->addItem([
 		new CLabel(_('Allow JIT provisioning'), 'saml_allow_jit'),
 		new CFormField(
 			(new CCheckBox('saml_allow_jit'))
-				->setChecked($data['saml_allow_scim'])
+				->setChecked($data['saml_allow_jit'])
 				->setEnabled($data['saml_enabled'])
+				->addClass('saml-enabled')
 		)
 	])
 	->addItem([
-		(new CLabel(_('Group name attribute'), 'saml_group_name_attribute'))
+		(new CLabel(_('Group name attribute'), 'saml_group_name'))
 			->setAsteriskMark()
-			->addClass('saml-allow-scim'),
+			->addClass('saml-allow-jit'),
 		(new CFormField(
-			(new CTextBox('saml_group_name_attribute', $data['saml_group_name_attribute'], false,
+			(new CTextBox('saml_group_name', $data['saml_group_name'], false,
 				DB::getFieldLength('userdirectory_saml', 'group_name')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
-		))->addClass('saml-allow-scim')
+		))->addClass('saml-allow-jit')
 	])
 	->addItem([
-		(new CLabel(_('User name attribute'), 'saml_user_name_attribute'))->addClass('saml-allow-scim'),
+		(new CLabel(_('User name attribute'), 'saml_user_username'))->addClass('saml-allow-jit'),
 		(new CFormField(
-			(new CTextBox('saml_user_name_attribute', '', false,
+			(new CTextBox('saml_user_username', $data['saml_user_username'], false,
 				DB::getFieldLength('userdirectory_saml', 'user_username')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass('saml-allow-scim')
+		))->addClass('saml-allow-jit')
 	])
 	->addItem([
-		(new CLabel(_('User lastname attribute'), 'saml_user_lastname_attribute'))->addClass('saml-allow-scim'),
+		(new CLabel(_('User lastname attribute'), 'saml_user_lastname'))->addClass('saml-allow-jit'),
 		(new CFormField(
-			(new CTextBox('saml_user_lastname_attribute', '', false,
+			(new CTextBox('saml_user_lastname', $data['saml_user_lastname'], false,
 				DB::getFieldLength('userdirectory_saml', 'user_lastname')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass('saml-allow-scim')
+		))->addClass('saml-allow-jit')
 	])
-	->addItem([(new CLabel(_('User group mapping')))->addClass('saml-allow-scim'),
+	->addItem([(new CLabel(_('User group mapping')))->addClass('saml-allow-jit'),
 		(new CFormField(
 			(new CDiv(
 				(new CTable())
@@ -410,8 +426,8 @@ $saml_tab = (new CFormGrid())
 					->setAttribute('style', 'width: 100%;')
 					->setHeader((new CRowHeader([
 						'',
-						(new CColHeader(_('SAML group pattern')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
-						(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
+						(new CColHeader(_('SAML group pattern')))->addClass(ZBX_STYLE_LEFT),
+						(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_LEFT),
 						(new CColHeader(_('User role')))->addClass(ZBX_STYLE_LEFT),
 						(new CColHeader(_('Action')))->addClass(ZBX_STYLE_LEFT)
 					]))->addClass(ZBX_STYLE_GREY)
@@ -429,13 +445,13 @@ $saml_tab = (new CFormGrid())
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass('saml-allow-scim')
+		))->addClass('saml-allow-jit')
 	])
 	->addItem([(new CLabel([
 		_('Media type mapping'),
 		makeHelpIcon(
 			_('Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications.')
-		)]))->addClass('saml-allow-scim'),
+		)]))->addClass('saml-allow-jit'),
 		(new CFormField(
 			(new CDiv(
 				(new CTable())
@@ -463,49 +479,54 @@ $saml_tab = (new CFormGrid())
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 
-		))->addClass('saml-allow-scim')
+		))->addClass('saml-allow-jit')
 	])
 	->addItem([
-		(new CLabel(_('Enable SCIM provisioning'), 'saml_scim_status'))->addClass('saml-allow-scim'),
+		(new CLabel(_('Enable SCIM provisioning'), 'scim_status'))->addClass('saml-allow-jit'),
 		(new CFormField(
-			(new CCheckBox('saml_scim_status', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
-				->setChecked($data['saml_scim_status'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
+			(new CCheckBox('scim_status', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
+				->setChecked($data['scim_status'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
 				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
-		))->addClass('saml-allow-scim')
+		))->addClass('saml-allow-jit')
 	])
 	->addItem([
-		(new CLabel(_('Authorization token'), 'saml_authorization_token'))
-			->addClass('saml-allow-scim'),
+		(new CLabel(_('Authorization token'), 'scim_token'))
+			->addClass('saml-allow-jit'),
 		(new CFormField(
-			(new CTextBox('saml_authorization_token', '', false,
+			(new CTextBox('scim_token', $data['scim_token'], false,
 				DB::getFieldLength('userdirectory_saml', 'scim_token')
 			))
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass('saml-allow-scim')
+		))->addClass('saml-allow-jit')
 	]);
+
+$form = (new CForm())
+	->addVar('action', $data['action_submit'])
+	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
+	->setId('authentication-form')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->disablePasswordAutofill()
+	->addItem((new CTabView())
+		->setSelected($data['form_refresh'] ? null : 0)
+		->addTab('auth', _('Authentication'), $auth_tab)
+		->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
+		->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
+		->addTab('saml', _('SAML settings'), $saml_tab, TAB_INDICATOR_AUTH_SAML)
+		->setFooter(makeFormFooter(
+			(new CSubmit('update', _('Update')))
+		))
+		->onTabChange('jQuery("[name=ldap_test]")[(ui.newTab.index() == 2) ? "show" : "hide"]()')
+	);
+
+if ($data['saml_userdirectoryid'] != '') {
+	$form->addVar('saml_userdirectoryid', $data['saml_userdirectoryid']);
+}
 
 (new CWidget())
 	->setTitle(_('Authentication'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTHENTICATION_EDIT))
-	->addItem((new CForm())
-		->addVar('action', $data['action_submit'])
-		->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
-		->addVar('saml_userdirectoryid', $data['saml_userdirectoryid'])
-		->setId('authentication-form')
-		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-		->disablePasswordAutofill()
-		->addItem((new CTabView())
-			->setSelected($data['form_refresh'] ? null : 0)
-			->addTab('auth', _('Authentication'), $auth_tab)
-			->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
-			->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
-			->addTab('saml', _('SAML settings'), $saml_tab, TAB_INDICATOR_AUTH_SAML)
-			->setFooter(makeFormFooter(
-				(new CSubmit('update', _('Update')))
-			))
-			->onTabChange('jQuery("[name=ldap_test]")[(ui.newTab.index() == 2) ? "show" : "hide"]()')
-	))
+	->addItem($form)
 	->show();
 
 (new CScriptTag(
