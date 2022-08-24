@@ -1377,7 +1377,7 @@ abstract class CItemGeneral extends CApiService {
 
 			foreach ($item['tags'] as &$tag) {
 				$db_itemtagid = key(array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
-					return $tag['tag'] == $db_tag['tag']
+					return $tag['tag'] === $db_tag['tag']
 						&& (!array_key_exists('value', $tag) || $tag['value'] === $db_tag['value']);
 				}));
 
