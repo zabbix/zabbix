@@ -29,8 +29,6 @@ class testAuditlogAction extends testAuditlogCommon {
 	public $resourceid;
 
 	public function testAuditlogAction_Create() {
-
-
 		$create = $this->call('action.create', [
 			[
 				'name' => 'Audit action',
@@ -102,8 +100,7 @@ class testAuditlogAction extends testAuditlogCommon {
 			"\"action.operations[".$operationid[0]['operationid']."]\":[\"add\"],".
 			"\"action.operations[".$operationid[0]['operationid']."].esc_period\":[\"add\",\"0s\"],".
 			"\"action.operations[".$operationid[0]['operationid']."].esc_step_to\":[\"add\",\"2\"],".
-			"\"action.operations[".$operationid[0]['operationid']."].opmessage_grp[".$op_group[0]['opmessage_grpid']
-			."]\":[\"add\"],".
+			"\"action.operations[".$operationid[0]['operationid']."].opmessage_grp[".$op_group[0]['opmessage_grpid']."]\":[\"add\"],".
 			"\"action.operations[".$operationid[0]['operationid']."].opmessage_grp[".$op_group[0]['opmessage_grpid'].
 			"].usrgrpid\":[\"add\",\"7\"],".
 			"\"action.operations[".$operationid[0]['operationid']."].opmessage_grp[".$op_group[0]['opmessage_grpid'].
@@ -132,23 +129,6 @@ class testAuditlogAction extends testAuditlogCommon {
 	}
 
 	public function testAuditlogAction_Update() {
-		$updated = "{\"action.operations[3].opmessage_grp[1]\":[\"delete\"],\"action.filter.conditions[99]\":[".
-				"\"add\"],\"action.operations[3].opmessage_grp[98]\":[\"add\"],\"action.name\":[\"update\",".
-				"\"Updated action audit\",\"Report problems to Zabbix administrators\"],\"action.esc_period".
-				"\":[\"update\",\"15m\",\"1h\"],\"action.filter\":[\"update\"],\"action.filter.evaltype\":[".
-				"\"update\",\"2\",\"0\"],\"action.filter.conditions[99].conditiontype\":[\"add\",\"3\"],".
-				"\"action.filter.conditions[99].operator\":[\"add\",\"2\"],\"action.filter.conditions[99].value".
-				"\":[\"add\",\"Trigger name\"],\"action.filter.conditions[99].conditionid\":[\"add\",\"99".
-				"\"],\"action.operations[3]\":[\"update\"],\"action.operations[3].esc_period\":[\"update\",".
-				"\"1000\",\"0\"],\"action.operations[3].esc_step_to\":[\"update\",\"2\",\"1\"],".
-				"\"action.operations[3].evaltype\":[\"update\",\"1\",\"0\"],".
-				"\"action.operations[3].opmessage_grp[98].usrgrpid\":[\"add\",\"9\"],".
-				"\"action.operations[3].opmessage_grp[98].opmessage_grpid\":[\"add\",\"98\"],".
-				"\"action.operations[3].opmessage\":[\"update\"],\"action.operations[3].opmessage.default_msg".
-				"\":[\"update\",\"0\",\"1\"],\"action.operations[3].opmessage.message\":[\"update\",".
-				"\"Updated audit message\",\"\"],\"action.operations[3].opmessage.subject\":[\"update\",".
-				"\"Updated audit message\",\"\"]}";
-
 		$this->call('action.update', [
 			[
 				'actionid' => 3,
@@ -188,6 +168,34 @@ class testAuditlogAction extends testAuditlogCommon {
 				'notify_if_canceled' => 1
 			]
 		]);
+
+		$operationid = CDBHelper::getAll('SELECT operationid FROM operations WHERE (actionid, operationtype)=(3, 0)');
+		$conditiodid = CDBHelper::getAll('SELECT conditionid FROM conditions WHERE actionid=3');
+		$op_group = CDBHelper::getAll('SELECT opmessage_grpid FROM opmessage_grp WHERE operationid='.$operationid[0]['operationid']);
+
+		$updated = "{\"action.operations[".$operationid[0]['operationid']."].opmessage_grp[1]\":[\"delete\"],".
+			"\"action.filter.conditions[".$conditiodid[0]['conditionid']."]\":[\"add\"],".
+			"\"action.operations[".$operationid[0]['operationid']."].opmessage_grp[".$op_group[0]['opmessage_grpid']."]\":[\"add\"],".
+			"\"action.name\":[\"update\",\"Updated action audit\",\"Report problems to Zabbix administrators\"],".
+			"\"action.esc_period\":[\"update\",\"15m\",\"1h\"],".
+			"\"action.filter\":[\"update\"],".
+			"\"action.filter.evaltype\":[\"update\",\"2\",\"0\"],".
+			"\"action.filter.conditions[".$conditiodid[0]['conditionid']."].conditiontype\":[\"add\",\"3\"],".
+			"\"action.filter.conditions[".$conditiodid[0]['conditionid']."].operator\":[\"add\",\"2\"],".
+			"\"action.filter.conditions[".$conditiodid[0]['conditionid']."].value\":[\"add\",\"Trigger name\"],".
+			"\"action.filter.conditions[".$conditiodid[0]['conditionid']."].conditionid\":[\"add\",\"".$conditiodid[0]['conditionid']."\"],".
+			"\"action.operations[".$operationid[0]['operationid']."]\":[\"update\"],".
+			"\"action.operations[".$operationid[0]['operationid']."].esc_period\":[\"update\",\"1000\",\"0\"],".
+			"\"action.operations[".$operationid[0]['operationid']."].esc_step_to\":[\"update\",\"2\",\"1\"],".
+			"\"action.operations[".$operationid[0]['operationid']."].evaltype\":[\"update\",\"1\",\"0\"],".
+			"\"action.operations[".$operationid[0]['operationid']."].opmessage_grp[".$op_group[0]['opmessage_grpid'].
+			"].usrgrpid\":[\"add\",\"9\"],".
+			"\"action.operations[".$operationid[0]['operationid']."].opmessage_grp[".$op_group[0]['opmessage_grpid'].
+			"].opmessage_grpid\":[\"add\",\"".$op_group[0]['opmessage_grpid']."\"],".
+			"\"action.operations[".$operationid[0]['operationid']."].opmessage\":[\"update\"],".
+			"\"action.operations[".$operationid[0]['operationid']."].opmessage.default_msg\":[\"update\",\"0\",\"1\"],".
+			"\"action.operations[".$operationid[0]['operationid']."].opmessage.message\":[\"update\",\"Updated audit message\",\"\"],".
+			"\"action.operations[".$operationid[0]['operationid']."].opmessage.subject\":[\"update\",\"Updated audit message\",\"\"]}";
 
 		$this->sendGetRequest('details', 1, $updated);
 	}
