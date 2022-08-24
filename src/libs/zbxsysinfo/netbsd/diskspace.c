@@ -24,6 +24,43 @@
 #include "zbxalgo.h"
 #include "inodes.h"
 
+static zbx_mntopt_t	mntopts[] = {
+	{MNT_ASYNC,		"asynchronous"},
+#if defined(MNT_AUTOMOUNTED)
+	{MNT_AUTOMOUNTED,	"automounted"},
+#endif
+#if defined(MNT_DISCARD)
+	{MNT_DISCARD,		"discard"},
+#endif
+#if defined(MNT_EXTATTR)
+	{MNT_EXTATTR,		"extattr"},
+#endif
+	{MNT_IGNORE,		"hidden"},
+	{MNT_LOG,		"log"},
+	{MNT_NOATIME,		"noatime"},
+	{MNT_NOCOREDUMP,	"nocoredump"},
+	{MNT_NODEV,		"nodev"},
+	{MNT_NODEVMTIME,	"nodevmtime"},
+	{MNT_NOEXEC,		"noexec"},
+	{MNT_NOSUID,		"nosuid"},
+	{MNT_RDONLY,		"read-only"},
+#if defined(MNT_RELATIME)
+	{MNT_RELATIME,		"relatime"},
+#endif
+	{MNT_SOFTDEP,		"soft dependencies"},
+#if defined(MNT_SYMPERM)
+	{MNT_SYMPERM,		"symperm"},
+#endif
+	{MNT_SYNCHRONOUS,	"synchronous"},
+	{MNT_UNION,		"union"},
+	{MNT_EXPORTED,		"NFS exported"},
+	{MNT_EXNORESPORT,	"non-reserved ports"},
+	{MNT_EXPUBLIC,		"WebNFS exports"},
+	{MNT_LOCAL,		"local"},
+	{MNT_QUOTA,		"with quotas"},
+	{0,			NULL},
+};
+
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
 {
@@ -212,10 +249,15 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	for (i = 0; i < rc; i++)
 	{
+		char	*options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flag & MNT_VISFLAGMASK);
+
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, mntbuf[i].f_mntonname, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSTYPE, mntbuf[i].f_fstypename, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSOPTIONS, options, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
+
+		zbx_free(options);
 	}
 
 	zbx_json_close(&j);
@@ -279,6 +321,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mntpoint->inodes.not_used = inot_used;
 		mntpoint->inodes.pfree = ipfree;
 		mntpoint->inodes.pused = ipused;
+		mntpoint->options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flag & MNT_VISFLAGMASK);
 
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 	}
@@ -315,6 +358,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->inodes.pfree);
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->inodes.pused);
 			zbx_json_close(&j);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntpoint->options, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 	}

@@ -56,7 +56,7 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 		}
 
 		if bytes.Total > 0 && inodes.Total > 0 {
-			fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, nil, bytes, inodes}
+			fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, nil, bytes, inodes, info.FsOptions}
 		}
 	}
 
@@ -82,11 +82,11 @@ func (p *Plugin) readMounts(file io.Reader) (data []*FsInfo, err error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		mnt := strings.Split(line, " ")
-		if len(mnt) < 3 {
+		if len(mnt) < 4 {
 			p.Debugf(`cannot discern the mount in given line: %s`, line)
 			continue
 		}
-		data = append(data, &FsInfo{FsName: &mnt[1], FsType: &mnt[2]})
+		data = append(data, &FsInfo{FsName: &mnt[1], FsType: &mnt[2], FsOptions: &mnt[3]})
 	}
 
 	if err = scanner.Err(); err != nil {
