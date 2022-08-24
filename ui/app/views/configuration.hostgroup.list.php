@@ -126,11 +126,8 @@ foreach ($data['groups'] as $group) {
 						->setArgument('context', 'host')
 				))->addClass(ZBX_STYLE_LINK_ALT);
 			}
-			elseif ($data['allowed_ui_conf_hosts']) {
-				$lld_name = new CSpan($group['discoveryRule']['name']);
-			}
 			else {
-				$lld_name = new CSpan(_('Inaccessible discovery rule'));
+				$lld_name = new CSpan($group['discoveryRule']['name']);
 			}
 
 			$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
