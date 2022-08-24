@@ -127,6 +127,11 @@ class testFormUpdateProblem extends CWebTest {
 				'description' => 'Trigger for text',
 				'expression' => 'last(/Host for Problems Update/text)=0',
 				'priority' => 4
+			],
+			[
+				'description' => 'Trigger for icon test',
+				'expression' => 'last(/Host for Problems Update/log)=0',
+				'priority' => 3
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $triggers);
@@ -149,6 +154,9 @@ class testFormUpdateProblem extends CWebTest {
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100554, 0, 0, '.
 				zbx_dbstr(self::$triggerids ['Trigger for text']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for text').', 4)'
 		);
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100555, 0, 0, '.
+				zbx_dbstr(self::$triggerids ['Trigger for icon test']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for icon test').', 3)'
+		);
 
 		// Create problems.
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100550, 0, 0, '.
@@ -166,10 +174,14 @@ class testFormUpdateProblem extends CWebTest {
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100554, 0, 0, '.
 				zbx_dbstr(self::$triggerids ['Trigger for text']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for text').', 4)'
 		);
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100555, 0, 0, '.
+				zbx_dbstr(self::$triggerids ['Trigger for icon test']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for icon test').', 3)'
+		);
 
 		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for char'.
 		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for float').', '.
-				zbx_dbstr('Trigger for log').', '.zbx_dbstr('Trigger for unsigned').', '.zbx_dbstr('Trigger for text').')'
+				zbx_dbstr('Trigger for log').', '.zbx_dbstr('Trigger for unsigned').', '.zbx_dbstr('Trigger for text').', '.
+				zbx_dbstr('Trigger for icon test').')'
 		);
 		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.zbx_dbstr('Trigger for char'));
 
@@ -876,5 +888,86 @@ class testFormUpdateProblem extends CWebTest {
 		$dialog->ensureNotPresent();
 		$this->page->assertHeader('Problems');
 		$this->assertEquals($old_hash, $this->getHash());
+	}
+
+	public function testFormUpdateProblem_CheckSuppressIcon() {
+		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		$row = $table->findRow('Problem', 'Trigger for icon test');
+		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
+		$form->fill(['id:suppress_problem' => true, 'id:suppress_time_option' => 'Indefinitely']);
+		$form->submit();
+		$dialog->ensureNotPresent();
+		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
+
+		// Check suppressed icon and hint.
+		$this->checkIconAndHint($row, 'icon-action-suppress', "Suppressed till: Indefinitely".
+				"\nManually by: Admin (Zabbix Administrator)"
+		);
+
+		// Suppress the problem in DB: 'Trigger for icon test'.
+		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10051, 100555, NULL, 0)');
+
+		// Assert that eye icon stopped blinking.
+		$this->page->refresh();
+		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[@class="icon-action-suppress"]')->exists());
+
+		// Unsuppress problem.
+		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		$form->fill(['id:unsuppress_problem' => true]);
+		$form->submit();
+		$dialog->ensureNotPresent();
+		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
+
+		// Check unsuppressed icon and hint.
+		$this->checkIconAndHint($row, 'icon-action-unsuppress', 'Unsuppressed by: Admin (Zabbix Administrator)');
+
+		// Unsuppress the problem in DB: 'Trigger for icon test'.
+		DBexecute('DELETE FROM event_suppress WHERE event_suppressid=10051');
+		$this->page->refresh();
+
+		// Check that eye icon disappeared.
+		$this->assertFalse($row->getColumn('Info')->query("xpath:.//button[@class=".
+				CXPathHelper::fromClass('icon-action-unsuppress')."]")->exists()
+		);
+
+
+		// Check Suppress/Unsuppress icon in History table.
+		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		$dialog->waitUntilReady();
+		$form->invalidate();
+		$history_table = $form->getField('History')->asTable();
+		$history = $history_table->getRows()->asText();
+
+		foreach ($history as $i => $history_row) {
+			$history_row = $history_table->getRow($i);
+			$this->assertEquals('Admin (Zabbix Administrator)', $history_row->getColumn('User')->getText());
+			$query = ($i === 0) ? 'xpath:.//span[@title="Unsuppressed"]' : 'xpath:.//button[contains(@class, "icon-action-suppress ")]';
+			$this->assertTrue($history_row->getColumn('User action')->query($query)->one()->isClickable());
+		}
+
+		$dialog->close();
+	}
+
+	private function checkIconAndHint($row, $class, $text) {
+		// Assert blinking icon in Info column.
+		$icon = $row->getColumn('Info')->query("xpath:.//button[@class='".$class." blink']");
+		$this->assertTrue($icon->exists());
+
+		// Check icon hintbox.
+		$icon->one()->waitUntilClickable()->click(true);
+		$hint = $this->query('xpath:.//div[@data-hintboxid]')->one();
+		$this->assertTrue($hint->isVisible());
+		$this->assertEquals($text, $hint->getText());
+		$hint->asOverlayDialog()->close();
+
+		// Assert non-blinking icon in Actions column.
+		$this->assertTrue($row->getColumn('Actions')->query("xpath:.//button[@class='".$class." cursor-pointer']")->exists());
 	}
 }
