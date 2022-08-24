@@ -1,7 +1,7 @@
 ---
 test case: parse file /proc/mounts
 out:
-  json: '[{"{#FSNAME}":"/sys","{#FSTYPE}":"sysfs","{#FSOPTIONS}":"rw,nosuid,nodev,noexec,relatime"},{"{#FSNAME}":"/proc","{#FSTYPE}":"proc","{#FSOPTIONS}":"rw,nosuid,nodev,noexec,relatime"},{"{#FSNAME}":"/dev","{#FSTYPE}":"devtmpfs","{#FSOPTIONS}":"rw,nosuid,relatime,size=3017164k,nr_inodes=754291,mode=755"},{"{#FSNAME}":"/dev/pts","{#FSTYPE}":"devpts","{#FSOPTIONS}":"rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000"},{"{#FSNAME}":"/run","{#FSTYPE}":"tmpfs","{#FSOPTIONS}":"rw,nosuid,noexec,relatime,size=607540k,mode=755"}]'
+  json: '[{"{#FSNAME}":"/sys","{#FSTYPE}":"sysfs"},{"{#FSNAME}":"/proc","{#FSTYPE}":"proc"},{"{#FSNAME}":"/dev","{#FSTYPE}":"devtmpfs"},{"{#FSNAME}":"/dev/pts","{#FSTYPE}":"devpts"},{"{#FSNAME}":"/run","{#FSTYPE}":"tmpfs"}]'
 files:
   /proc/mounts: |
     sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
@@ -12,7 +12,7 @@ files:
 ---
 test case: ignore invalid entries in /proc/mounts
 out:
-  json: '[{"{#FSNAME}":"/sys","{#FSTYPE}":"sysfs","{#FSOPTIONS}":"rw,nosuid,nodev,noexec,relatime"},{"{#FSNAME}":"/dev/pts","{#FSTYPE}":"devpts","{#FSOPTIONS}":"rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000"}]'
+  json: '[{"{#FSNAME}":"/sys","{#FSTYPE}":"sysfs"},{"{#FSNAME}":"/dev/pts","{#FSTYPE}":"devpts"}]'
 files:
   /proc/mounts: |
     sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0

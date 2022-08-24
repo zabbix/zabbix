@@ -129,7 +129,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		line[MAX_STRING_LEN], *p, *mpoint, *mtype, *mntopts;
+	char		line[MAX_STRING_LEN], *p, *mpoint, *mtype;
 	FILE		*f;
 	struct zbx_json	j;
 
@@ -162,17 +162,9 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		*p = '\0';
 
-		mntopts = ++p;
-
-		if (NULL == (p = strchr(mntopts, ' ')))
-			continue;
-
-		*p = '\0';
-
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, mpoint, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSTYPE, mtype, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSOPTIONS, mntopts, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 	}
 
@@ -189,7 +181,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			line[MAX_STRING_LEN], *p, *mpoint, *mtype, *mntops, *error;
+	char			line[MAX_STRING_LEN], *p, *mpoint, *mtype, *error;
 	FILE			*f;
 	zbx_uint64_t		total, not_used, used;
 	zbx_uint64_t		itotal, inot_used, iused;
@@ -229,13 +221,6 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		*p = '\0';
 
-		mntops = ++p;
-
-		if (NULL == (p = strchr(mntops, ' ')))
-			continue;
-
-		*p = '\0';
-
 		if (SYSINFO_RET_OK != get_fs_size_stat(mpoint, &total, &not_used, &used, &pfree, &pused, &error))
 		{
 			zbx_free(error);
@@ -261,7 +246,6 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mntpoint->inodes.not_used = inot_used;
 		mntpoint->inodes.pfree = ipfree;
 		mntpoint->inodes.pused = ipused;
-		mntpoint->options = zbx_strdup(NULL, mntops);
 
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 	}
@@ -307,7 +291,6 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->inodes.pfree);
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->inodes.pused);
 			zbx_json_close(&j);
-			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntpoint->options, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 	}
