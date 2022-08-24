@@ -1355,6 +1355,12 @@ class CHttpTestManager {
 			return true;
 		}
 
+		foreach ($httptests as $i => $httptest) {
+			if (!array_key_exists($httptest['hostid'], $template_hosts)) {
+				unset($httptests[$i]);
+			}
+		}
+
 		self::$parent_itemids = self::getItemIds($httptests);
 		$preparedHttpTests = $this->prepareInheritedHttpTests($httptests, $template_hosts);
 		$inheritedHttpTests = $this->save($preparedHttpTests);
