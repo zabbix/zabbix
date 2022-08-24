@@ -937,24 +937,61 @@ class testFormUpdateProblem extends CWebTest {
 				CXPathHelper::fromClass('icon-action-unsuppress')."]")->exists()
 		);
 
-
 		// Check Suppress/Unsuppress icon in History table.
 		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog->waitUntilReady();
 		$form->invalidate();
-		$history_table = $form->getField('History')->asTable();
-		$history = $history_table->getRows()->asText();
-
-		foreach ($history as $i => $history_row) {
-			$history_row = $history_table->getRow($i);
-			$this->assertEquals('Admin (Zabbix Administrator)', $history_row->getColumn('User')->getText());
-			$query = ($i === 0) ? 'xpath:.//span[@title="Unsuppressed"]' : 'xpath:.//button[contains(@class, "icon-action-suppress ")]';
-			$this->assertTrue($history_row->getColumn('User action')->query($query)->one()->isClickable());
-		}
-
+		$this->checkHistoryTable($form->getField('History')->asTable(), 'User', 'User action');
 		$dialog->close();
+		$this->page->waitUntilReady();
+
+		// Check Actions hint in Problem row.
+		$row->invalidate();
+		$unsuppress_button = 'xpath:.//button[contains(@class, "icon-action-unsuppress")]';
+		$row->getColumn('Actions')->query($unsuppress_button)->waitUntilClickable()->one()->click();
+		$hint = $this->query('xpath://div[@data-hintboxid and @class="overlay-dialogue"]')->asOverlayDialog()
+				->one()->waitUntilReady();
+		$this->checkHistoryTable($hint->query('class:list-table')->asTable()->one(), 'User', 'Action');
+		$hint->close();
+
+		// Check Event details page.
+		$row->getColumn('Time')->query('tag:a')->waitUntilClickable()->one()->click();
+		$this->page->assertHeader('Event details');
+		$this->checkHistoryTable($this->query('xpath://div[@id="hat_eventactions_widget"]//table')->asTable()->one(),
+				'User/Recipient', 'Action'
+		);
+
+		// Check Actions hint in Event list.
+		$event_list_table = $this->query('xpath://div[@id="hat_eventlist_widget"]//table')->asTable()->one();
+		$event_list_table->getRow(0)->getColumn('Actions')->query($unsuppress_button)->waitUntilClickable()->one()->click();
+		$hint->invalidate();
+		$this->checkHistoryTable($hint->query('class:list-table')->asTable()->one(), 'User', 'Action');
+		$hint->close();
 	}
 
+	/**
+	 * Function for testing Suppressed/Unsuppressed icon or button in history tables.
+	 *
+	 * @param CTableElement $table    problem/event history table
+	 * @param string        $user     user table header
+	 * @param string        $action   action table header
+	 */
+	private function checkHistoryTable($table, $user, $action) {
+		// Check last two rows.
+		for($i = 0; $i < 2; ++$i) {
+			$action_row = $table->getRow($i);
+			$this->assertEquals('Admin (Zabbix Administrator)', $action_row->getColumn($user)->getText());
+			$query = ($i === 0) ? 'xpath:.//span[@title="Unsuppressed"]' : 'xpath:.//*[contains(@class, "icon-action-suppress")]';
+			$this->assertTrue($action_row->getColumn($action)->query($query)->exists());
+		}
+	}
+
+	/**
+	 *
+	 * @param CTableRowElement $row      table row where necessary problem is found
+	 * @param string           $class    suppressed or unsuppressed icon class
+	 * @param string           $text     text of suppression/unsuppression info-hint
+	 */
 	private function checkIconAndHint($row, $class, $text) {
 		// Assert blinking icon in Info column.
 		$icon = $row->getColumn('Info')->query("xpath:.//button[@class='".$class." blink']");
