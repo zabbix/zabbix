@@ -363,29 +363,6 @@ abstract class CItemGeneral extends CApiService {
 		}
 	}
 
-	protected function errorInheritFlags($flag, $key, $host) {
-		switch ($flag) {
-			case ZBX_FLAG_DISCOVERY_NORMAL:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item.', $key, $host));
-				break;
-
-			case ZBX_FLAG_DISCOVERY_RULE:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as a discovery rule.', $key, $host));
-				break;
-
-			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item prototype.', $key, $host));
-				break;
-
-			case ZBX_FLAG_DISCOVERY_CREATED:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item created from item prototype.', $key, $host));
-				break;
-
-			default:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as unknown item element.', $key, $host));
-		}
-	}
-
 	/**
 	 * Return first main interface matched from list of preferred types, or NULL.
 	 *
@@ -706,7 +683,6 @@ abstract class CItemGeneral extends CApiService {
 
 			switch ($item['flags']) {
 				case ZBX_FLAG_DISCOVERY_NORMAL:
-				case ZBX_FLAG_DISCOVERY_CREATED:
 					$error = $target_is_host
 						? _('Cannot inherit item with key "%1$s" to host "%2$s", because an item with the same key is already inherited from template "%3$s".')
 						: _('Cannot inherit item with key "%1$s" to template "%2$s", because an item with the same key is already inherited from template "%3$s".');
@@ -1457,7 +1433,6 @@ abstract class CItemGeneral extends CApiService {
 
 			switch ($duplicates[0]['flags']) {
 				case ZBX_FLAG_DISCOVERY_NORMAL:
-				case ZBX_FLAG_DISCOVERY_CREATED:
 					$error = $target_is_template
 						? _('Item key "%1$s" already exists on template "%2$s".')
 						: _('Item key "%1$s" already exists on host "%2$s".');
