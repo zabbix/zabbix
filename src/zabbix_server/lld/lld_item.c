@@ -652,6 +652,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 			continue;
 		}
 
+		item = (zbx_lld_item_t *)items->values[index];
 		item_param = zbx_item_param_create(row[2], row[3]);
 		ZBX_STR2UINT64(item_param->item_parameterid, row[0]);
 		zbx_vector_item_param_ptr_append(&item->item_params, item_param);
