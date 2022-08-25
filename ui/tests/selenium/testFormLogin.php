@@ -164,7 +164,7 @@ class testFormLogin extends CWebTest {
 			$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
 			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
 					->waitUntilVisible()->one()->getText()
-				);
+			);
 			$this->assertEquals($i, CDBHelper::getValue('SELECT attempt_failed FROM users WHERE username='.zbx_dbstr($user)));
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM users WHERE username='.zbx_dbstr($user).' AND attempt_clock>0'));
 			$this->assertEquals(1, CDBHelper::getCount("SELECT NULL FROM users WHERE username=".zbx_dbstr($user)." AND attempt_ip<>''"));
@@ -173,7 +173,7 @@ class testFormLogin extends CWebTest {
 		$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
 		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
 				->waitUntilVisible()->one()->getText()
-			);
+		);
 
 		// Account is blocked, waiting 30 sec and trying to login.
 		sleep(30);
@@ -181,7 +181,7 @@ class testFormLogin extends CWebTest {
 		$this->page->assertHeader('Global view');
 		$this->assertStringContainsString('5 failed login attempts logged.', $this->query('class:msg-bad')
 				->waitUntilVisible()->one()->getText()
-			);
+		);
 	}
 
 	/**
