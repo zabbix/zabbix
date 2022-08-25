@@ -690,6 +690,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		];
 
 		foreach ($new_values as $field_name => $value) {
+			$tag = $this->webDriver->findElement(WebDriverBy::id($field_name))->getTagName();
 			if ($tag === 'z-select') {
 				$this->query('name:'.$field_name)->asDropdown()->one()->select($value);
 			}
