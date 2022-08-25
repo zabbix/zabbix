@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
- * @backup users, users_groups
+ * @backup users
  *
  * @onBefore prepareLdapUserData
  **/
@@ -163,7 +163,8 @@ class testFormLogin extends CWebTest {
 		for ($i = 1; $i < 5; $i++) {
 			$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
 			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
-					->waitUntilVisible()->one()->getText());
+					->waitUntilVisible()->one()->getText()
+				);
 			$this->assertEquals($i, CDBHelper::getValue('SELECT attempt_failed FROM users WHERE username='.zbx_dbstr($user)));
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM users WHERE username='.zbx_dbstr($user).' AND attempt_clock>0'));
 			$this->assertEquals(1, CDBHelper::getCount("SELECT NULL FROM users WHERE username=".zbx_dbstr($user)." AND attempt_ip<>''"));
@@ -171,14 +172,16 @@ class testFormLogin extends CWebTest {
 
 		$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
 		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
-				->waitUntilVisible()->one()->getText());
+				->waitUntilVisible()->one()->getText()
+			);
 
 		// Account is blocked, waiting 30 sec and trying to login.
 		sleep(30);
 		$this->page->userLogin($user, 'zabbix');
 		$this->page->assertHeader('Global view');
 		$this->assertStringContainsString('5 failed login attempts logged.', $this->query('class:msg-bad')
-				->waitUntilVisible()->one()->getText());
+				->waitUntilVisible()->one()->getText()
+			);
 	}
 
 	/**
