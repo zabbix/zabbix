@@ -189,7 +189,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			line[MAX_STRING_LEN], *p, *mpoint, *mtype, *mntops, *error;
+	char			line[MAX_STRING_LEN], *p, *mpoint, *mtype, *mntopts, *error;
 	FILE			*f;
 	zbx_uint64_t		total, not_used, used;
 	zbx_uint64_t		itotal, inot_used, iused;
@@ -229,9 +229,9 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		*p = '\0';
 
-		mntops = ++p;
+		mntopts = ++p;
 
-		if (NULL == (p = strchr(mntops, ' ')))
+		if (NULL == (p = strchr(mntopts, ' ')))
 			continue;
 
 		*p = '\0';
@@ -261,7 +261,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mntpoint->inodes.not_used = inot_used;
 		mntpoint->inodes.pfree = ipfree;
 		mntpoint->inodes.pused = ipused;
-		mntpoint->options = zbx_strdup(NULL, mntops);
+		mntpoint->options = zbx_strdup(NULL, mntopts);
 
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 	}
@@ -331,5 +331,4 @@ out:
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
-
 }

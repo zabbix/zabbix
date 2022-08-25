@@ -293,10 +293,10 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		itotal, inot_used, iused;
 	double			pfree, pused;
 	double			ipfree, ipused;
-	char 			*error;
+	char			*error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
-	char 			*mpoint, *mntopts;
+	char			*mpoint;
 
 	/* check how many bytes to allocate for the mounted filesystems */
 	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
@@ -319,6 +319,8 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	for (i = 0, vm = vms; i < rc; i++)
 	{
+		char	*mntopts;
+
 		mpoint = (char *)vm + vm->vmt_data[VMT_STUB].vmt_off;
 		mntopts = (char *)vm + vm->vmt_data[VMT_ARGS].vmt_off;
 
@@ -415,5 +417,4 @@ out:
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
-
 }
