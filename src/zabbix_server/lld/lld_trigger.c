@@ -1017,8 +1017,8 @@ static char	*lld_eval_expression_expand(zbx_eval_context_t *ctx, const zbx_vecto
 
 		if (ZBX_VARIANT_UI64 != token->value.type)
 		{
-			if (SUCCEED != zbx_is_uint64_n(ctx->expression + token->loc.l + 1, token->loc.r - token->loc.l
-					- 1, &index))
+			if (SUCCEED != zbx_is_uint64_n(ctx->expression + token->loc.l + 1,
+					token->loc.r - token->loc.l - 1, &index))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;

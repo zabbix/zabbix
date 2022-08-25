@@ -1588,6 +1588,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		{
 			continue;
 		}
+
 		for (i = 0; i < HOST_INVENTORY_FIELD_COUNT; i++)
 			dc_strpool_release(host_inventory->values[i]);
 
@@ -1773,7 +1774,7 @@ static void	dc_interface_snmpaddrs_remove(ZBX_DC_INTERFACE *interface)
 		return;
 
 	if (NULL == (ifaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_search(&config->interface_snmpaddrs,
-		&ifaddr_local)))
+			&ifaddr_local)))
 	{
 		return;
 	}
@@ -8909,8 +8910,8 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 	{
 		/* skip items which are not in configuration cache and items without triggers */
 
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])) || NULL ==
-				dc_item->triggers)
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])) ||
+				NULL == dc_item->triggers)
 		{
 			continue;
 		}
