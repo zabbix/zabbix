@@ -185,7 +185,6 @@ class CControllerActionUpdate extends CController {
 		];
 
 		if ($filter['conditions']) {
-
 			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 				if (count($filter['conditions']) > 1) {
 					$filter['formula'] = $this->getInput('formula');
@@ -210,9 +209,15 @@ class CControllerActionUpdate extends CController {
 				}
 			}
 			unset($condition);
-
-			$action['filter'] = $filter;
 		}
+		else {
+			$filter = [
+				'conditions' => [],
+				'evaltype' => $this->getInput('evaltype')
+			];
+		}
+
+		$action['filter'] = $filter;
 
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 			$action['esc_period'] = $this->getInput('esc_period', DB::getDefault('actions', 'esc_period'));
