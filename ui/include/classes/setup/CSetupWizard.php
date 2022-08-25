@@ -928,9 +928,7 @@ class CSetupWizard extends CForm {
 	}
 
 	private function getStep(): int {
-		$step = $this->getConfig('step');
-
-		return array_key_exists($step, $this->stages) ? $step : self::STAGE_WELCOME;
+		return $this->getConfig('step', self::STAGE_WELCOME);
 	}
 
 	private function getList(): CList {
