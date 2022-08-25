@@ -162,7 +162,12 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 
 		// Check Audit record about autoregistration update.
 		$this->page->open('zabbix.php?action=auditlog.list');
+
+		// Reset filter to delete deependencies from previous tests.
+		$this->query('button:Reset')->waitUntilClickable()->one()->cleck();
+		$this->page->waitUntilReady();
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
+
 		// Get first row data.
 		$row = $rows->get(0);
 		foreach ($data['audit'] as $column => $value) {
