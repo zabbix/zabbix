@@ -13710,6 +13710,10 @@ msgstr "Quy tắc phát hiện gốc"
 msgid "Parent graphs"
 msgstr "Các đồ thị gốc"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
 msgid "Parent items"
