@@ -198,6 +198,7 @@ $tags_tab->addRow(
 		renderTagTable([['tag' => '', 'value' => '']])
 			->setHeader([_('Name'), _('Value'), _('Action')])
 			->setId('tags-table')
+			->addClass('tags-table')
 	]))->setId('tags-div')
 );
 
