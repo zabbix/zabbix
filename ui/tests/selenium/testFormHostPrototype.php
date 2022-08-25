@@ -70,12 +70,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Check layout at IPMI tab.
 		$this->zbxTestTabSwitch('IPMI');
-		foreach (['ipmi_authtype', 'ipmi_privilege'] as $id) {
-			$this->zbxTestAssertElementPresentXpath('//z-select[@id="'.$id.'"][@readonly]');
-		}
-		foreach (['ipmi_username', 'ipmi_password'] as $id) {
-			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@readonly]');
-		}
+		$this->zbxTestAssertElementPresentXpath('//z-select[@id="ipmi_authtype"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//z-select[@id="ipmi_privilege"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_username"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_password"][@readonly]');
 
 		// Check layout at Macros tab.
 		$this->zbxTestTabSwitch('Macros');
@@ -710,8 +708,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$prototype_form = $this->query('id:host-prototype-form')->asForm()->one()->waitUntilVisible();
 		$prototype_form->selectTab('IPMI');
 
-		$new_values['ipmi_authtype'] = 1;        // IPMI_AUTHTYPE_MD2
-		$new_values['iipmi_privilege'] = 3;      // IPMI_PRIVILEGE_OPERATOR
+		$new_values['ipmi_authtype'] = 1;	// IPMI_AUTHTYPE_MD2
+		$new_values['ipmi_privilege'] = 3;	// IPMI_PRIVILEGE_OPERATOR
 
 		foreach ($new_values as $field_name => $value) {
 			$this->zbxTestAssertElementValue($field_name, $value);
