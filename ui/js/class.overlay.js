@@ -416,8 +416,6 @@ Overlay.prototype.setProperties = function(obj) {
 
 			case 'content':
 				this.$dialogue.$body.html(obj[key]);
-				this.$dialogue.$body.find('form').attr('aria-labelledby', this.headerid);
-
 				if (this.$dialogue.$debug.html().length) {
 					this.$dialogue.$body.append(this.$dialogue.$debug);
 				}
