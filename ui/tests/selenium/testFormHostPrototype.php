@@ -667,14 +667,14 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Authentication algorithm', 'Privilege level', 'Username', 'Password']);
 
 		$old_values = [
-			['field' => 'ipmi_authtype', 'value' => 'Default'],
-			['field' => 'ipmi_privilege', 'value' => 'User'],
-			['field' => 'ipmi_username', 'value' => ''],
-			['field' => 'ipmi_password', 'value' => '']
+			'ipmi_authtype' => '-1',	// IPMI_AUTHTYPE_DEFAULT
+			'ipmi_privilege' => '2',	// IPMI_PRIVILEGE_USER
+			'ipmi_username' => '',
+			'ipmi_password' => ''
 		];
 
-		foreach ($old_values as $old_value) {
-			$this->zbxTestAssertElementValue($old_value['field'], $old_value['value']);
+		foreach ($old_values as $field_name => $value) {
+			$this->zbxTestAssertElementValue($field_name, $value);
 		}
 
 		// Go to host and change IPMI settings.
@@ -683,18 +683,18 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$form->selectTab('IPMI');
 
 		$new_values = [
-			['field' => 'ipmi_authtype', 'value' => 'MD2'],
-			['field' => 'ipmi_privilege', 'value' => 'Operator'],
-			['field' => 'ipmi_username', 'value' => 'TestUsername'],
-			['field' => 'ipmi_password', 'value' => 'TestPassword']
+			'ipmi_authtype' => 'MD2',
+			'ipmi_privilege' => 'Operator',
+			'ipmi_username' => 'TestUsername',
+			'ipmi_password' => 'TestPassword'
 		];
-		foreach ($new_values as $new_value) {
-			$tag = $this->webDriver->findElement(WebDriverBy::id($new_value['field']))->getTagName();
+
+		foreach ($new_values as $field_name => $value) {
 			if ($tag === 'z-select') {
-				$this->query('name:'.$new_value['field'])->asDropdown()->one()->select($new_value['value']);
+				$this->query('name:'.$field_name)->asDropdown()->one()->select($value);
 			}
 			else {
-				$this->zbxTestInputType($new_value['field'], $new_value['value']);
+				$this->zbxTestInputType($field_name, $value);
 			}
 		}
 		$form->submit();
@@ -706,8 +706,11 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$prototype_form = $this->query('id:host-prototype-form')->asForm()->one()->waitUntilVisible();
 		$prototype_form->selectTab('IPMI');
 
-		foreach ($new_values as $new_value) {
-			$this->zbxTestAssertElementValue($new_value['field'], $new_value['value']);
+		$new_value['ipmi_authtype'] = 1;	// IPMI_AUTHTYPE_MD2
+		$new_value['iipmi_privilege'] = 3;	// IPMI_PRIVILEGE_OPERATOR
+
+		foreach ($new_values as $field_name => $value) {
+			$this->zbxTestAssertElementValue($field_name, $value);
 		}
 	}
 
