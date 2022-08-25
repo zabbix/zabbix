@@ -319,7 +319,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.8rc2
 
 Bug fixes:
-........S. [ZBX-19893] fixed bug introduced when fixing script parameters updates during linking
+........S. [ZBX-19893] fixed bug introduced when fixing script parameters updates during linking (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.8rc1
