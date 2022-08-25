@@ -49,57 +49,81 @@ $widget = (new CWidget())
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormGrid())->addItem([_('Username'),
-				(new CTextBox('filter_username', $data['filter']['username']))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
-			])
-				->addItem([_('Name'),
-					(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			(new CFormGrid())
+				->addItem([
+					new CLabel(_('Username'), 'filter_username'),
+					new CFormField(
+						(new CTextBox('filter_username', $data['filter']['username']))
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+							->setAttribute('autofocus', 'autofocus')
+					)
 				])
-				->addItem([_('Last name'),
-					(new CTextBox('filter_surname', $data['filter']['surname']))
-						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->addItem([
+					new CLabel(_('Name'), 'filter_name'),
+					new CFormField(
+						(new CTextBox('filter_name', $data['filter']['name']))
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					)
+				])
+				->addItem([
+					new CLabel(_('Last name'), 'filter_surname'),
+					new CFormField(
+						(new CTextBox('filter_surname', $data['filter']['surname']))
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					)
 				]),
 			(new CFormGrid())
-				->addItem([(new CLabel(_('User roles'), 'filter_roles__ms')),
-					(new CMultiSelect([
-						'name' => 'filter_roles[]',
-						'object_name' => 'roles',
-						'data' => $data['filter']['roles'],
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'roles',
-								'srcfld1' => 'roleid',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_roles_'
+				->addItem([(
+					new CLabel(_('User roles'), 'filter_roles__ms')),
+					new CFormField(
+						(new CMultiSelect([
+							'name' => 'filter_roles[]',
+							'object_name' => 'roles',
+							'data' => $data['filter']['roles'],
+							'popup' => [
+								'parameters' => [
+									'srctbl' => 'roles',
+									'srcfld1' => 'roleid',
+									'dstfrm' => 'zbx_filter',
+									'dstfld1' => 'filter_roles_'
+								]
 							]
-						]
-					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					)
 				])
-				->addItem([(new CLabel(_('User groups'), 'filter_usrgrpids__ms')),
-					(new CMultiSelect([
-						'name' => 'filter_usrgrpids[]',
-						'object_name' => 'usersGroups',
-						'data' => $data['filter']['usrgrpids'],
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'usrgrp',
-								'srcfld1' => 'usrgrpid',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_usrgrpids_'
+				->addItem([
+					new CLabel(_('User groups'), 'filter_usrgrpids__ms'),
+					new CFormField(
+						(new CMultiSelect([
+							'name' => 'filter_usrgrpids[]',
+							'object_name' => 'usersGroups',
+							'data' => $data['filter']['usrgrpids'],
+							'popup' => [
+								'parameters' => [
+									'srctbl' => 'usrgrp',
+									'srcfld1' => 'usrgrpid',
+									'dstfrm' => 'zbx_filter',
+									'dstfld1' => 'filter_usrgrpids_'
+								]
 							]
-						]
-					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					)
 				])
 				->addItem([
 					new CLabel(_('Source '), 'filter_source'),
-					(new CSelect('filter_source'))
-						->setId('filter-source')
-						->setValue($data['filter']['source'])
-						->setFocusableElementId('filter_source')
-						->addOptions(CSelect::createOptionsFromArray($data['source']))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					new CFormField(
+						(new CSelect('filter_source'))
+							->setId('filter-source')
+							->setValue($data['filter']['source'])
+							->setFocusableElementId('filter_source')
+							->addOptions(CSelect::createOptionsFromArray([
+								CControllerUserList::FILTERS_SOURCE_ALL => _('All'),
+								CControllerUserList::FILTERS_SOURCE_INTERNAL => _('Internal'),
+								CControllerUserList::FILTERS_SOURCE_LDAP => _('LDAP'),
+								CControllerUserList::FILTERS_SOURCE_SAML => _('SAML')
+							]))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					)
 				])
 		])
 		->addVar('action', 'user.list')
@@ -237,15 +261,19 @@ foreach ($data['users'] as $user) {
 		}
 	}
 
-	$data_action = null;
-
-	if ($user['source'] === _('LDAP')) {
-		$data_action = 'ldap';
-	}
-
 	$checkbox = new CCheckBox('userids['.$userid.']', $userid);
-	if ($data_action != null) {
-		$checkbox->setAttribute('data-actions', $data_action);
+
+	if (array_key_exists($user['userdirectoryid'], $data['idp_types'])) {
+		if ($data['idp_types'][$user['userdirectoryid']] == IDP_TYPE_LDAP) {
+			$checkbox->setAttribute('data-actions', 'ldap');
+			$user_source = _('LDAP');
+		}
+		else {
+			$user_source = _('SAML');
+		}
+	}
+	else {
+		$user_source = _('Internal');
 	}
 
 	// Append user to table.
@@ -266,7 +294,7 @@ foreach ($data['users'] as $user) {
 		($user['users_status'] == GROUP_STATUS_DISABLED)
 			? (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED)
 			: (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN),
-		$user['source']
+		$user_source
 	]);
 }
 
@@ -275,8 +303,11 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'userids', [
-		'user.provision' => ['name' => _('Provision now'), 'attributes' => ['data-required' => 'ldap'],
-			'confirm' => _('Provision selected LDAP users?')],
+		'user.provision' => [
+			'name' => _('Provision now'),
+			'attributes' => ['data-required' => 'ldap'],
+			'confirm' => _('Provision selected LDAP users?')
+		],
 		'user.unblock' => ['name' => _('Unblock'), 'confirm' => _('Unblock selected users?')],
 		'user.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected users?')]
 	], 'user')

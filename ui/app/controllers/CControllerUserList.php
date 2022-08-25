@@ -21,6 +21,11 @@
 
 class CControllerUserList extends CController {
 
+	public const FILTERS_SOURCE_ALL = 0;
+	public const FILTERS_SOURCE_INTERNAL = 1;
+	public const FILTERS_SOURCE_LDAP= 2;
+	public const FILTERS_SOURCE_SAML = 3;
+
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -68,7 +73,9 @@ class CControllerUserList extends CController {
 			CProfile::updateArray('web.user.filter_usrgrpids', $this->getInput('filter_usrgrpids', []),
 				PROFILE_TYPE_ID
 			);
-			CProfile::update('web.user.filter_source', $this->getInput('filter_source', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.user.filter_source', $this->getInput('filter_source', self::FILTERS_SOURCE_ALL),
+				PROFILE_TYPE_INT
+			);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.user.filter_username');
@@ -85,7 +92,7 @@ class CControllerUserList extends CController {
 			'surname' => CProfile::get('web.user.filter_surname', ''),
 			'roles' => CProfile::getArray('web.user.filter_roles', []),
 			'usrgrpids' => CProfile::getArray('web.user.filter_usrgrpids', []),
-			'source' => CProfile::get('web.user.filter_source', '')
+			'source' => CProfile::get('web.user.filter_source', self::FILTERS_SOURCE_ALL)
 		];
 
 		$data = [
@@ -113,7 +120,26 @@ class CControllerUserList extends CController {
 			]), ['usrgrpid' => 'id'])
 			: [];
 
-		$data['source'] = [_('All'), _('Internal'), _('LDAP'), _('SAML')];
+		switch ($filter['source']) {
+			case self::FILTERS_SOURCE_INTERNAL:
+				$filter_userdirectoryids = 0;
+				break;
+
+			case self::FILTERS_SOURCE_LDAP:
+			case self::FILTERS_SOURCE_SAML:
+				$filter_userdirectoryids = array_keys(API::UserDirectory()->get([
+					'output' => [],
+					'filter' => [
+						'idp_type' => $filter['source'] == self::FILTERS_SOURCE_LDAP ? IDP_TYPE_LDAP : IDP_TYPE_SAML
+					],
+					'preservekeys' => true
+				]));
+				break;
+
+			default:
+				$filter_userdirectoryids = null;
+				break;
+		}
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['users'] = API::User()->get([
@@ -128,41 +154,24 @@ class CControllerUserList extends CController {
 				'surname' => ($filter['surname'] === '') ? null : $filter['surname']
 			],
 			'filter' => [
-				'roleid' => ($filter['roles'] == -1) ? null : $filter['roles']
+				'roleid' => ($filter['roles'] == -1) ? null : $filter['roles'],
+				'userdirectoryid' => $filter_userdirectoryids
 			],
 			'usrgrpids' => ($filter['usrgrpids'] == []) ? null : $filter['usrgrpids'],
 			'getAccess' => true,
 			'limit' => $limit
 		]);
 
+		$data['idp_types'] = API::UserDirectory()->get([
+			'output' => ['idp_type', 'userdirectoryid'],
+			'userdirectoryids' => array_column($data['users'], 'userdirectoryid')
+		]);
+		$data['idp_types'] = array_column($data['idp_types'], 'idp_type', 'userdirectoryid');
+
 		foreach ($data['users'] as &$user) {
 			$user['role_name'] = $user['role']['name'];
-
-			if ($user['userdirectoryid'] == 0) {
-				$user['source'] = _('Internal');
-			}
-			else {
-				$idp_type = API::UserDirectory()->get([
-					'output' => ['idp_type'],
-					'userdirectoryids' => $user['userdirectoryid']
-				]);
-
-				if ($idp_type[0]['idp_type'] == 1) {
-					$user['source'] = _('LDAP');
-				}
-				else {
-					$user['source'] = _('SAML');
-				}
-			}
 		}
 		unset($user);
-
-		if ($filter['source'] != 0) {
-			$filter_source_name = $data['source'][$filter['source']];
-			$data['users'] = array_filter($data['users'], function ($user) use ($filter_source_name) {
-				return ($user['source'] === $filter_source_name);
-			});
-		}
 
 		// data sort and pager
 		CArrayHelper::sort($data['users'], [['field' => $sortfield, 'order' => $sortorder]]);
