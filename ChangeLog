@@ -448,6 +448,12 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.8rc2
+
+Bug fixes:
+........S. [ZBX-19893] fixed bug introduced when fixing script parameters updates during linking
+
+--------------------------------------------------------------------------------
 Changes for 6.0.8rc1
 
 New features:
