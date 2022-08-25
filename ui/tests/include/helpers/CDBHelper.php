@@ -446,13 +446,13 @@ class CDBHelper {
 	 * Returns comma-delimited list of the fields.
 	 *
 	 * @param string $table_name
-	 * @param array  $exlude_fields
+	 * @param array  $exclude_fields
 	 */
-	public static function getTableFields($table_name, array $exlude_fields = []) {
+	public static function getTableFields($table_name, array $exclude_fields = []) {
 		$field_names = [];
 
 		foreach (DB::getSchema($table_name)['fields'] as $field_name => $field) {
-			if (!in_array($field_name, $exlude_fields, true)) {
+			if (!in_array($field_name, $exclude_fields, true)) {
 				$field_names[] = $field_name;
 			}
 		}

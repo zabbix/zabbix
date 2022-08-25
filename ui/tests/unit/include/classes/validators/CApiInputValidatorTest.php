@@ -2635,7 +2635,7 @@ class CApiInputValidatorTest extends TestCase {
 					['type' => '2', 'value' => '125']
 				],
 				'/',
-				'Incorrect validation rules.'
+				'Incorrect API_MULTIPLE validation rules.'
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
@@ -6161,7 +6161,6 @@ class CApiInputValidatorTest extends TestCase {
 				true,
 				'Parameter "/real_hosts" is deprecated.'
 			],
-
 			[
 				['type' => API_ITEM_KEY],
 				'key',
@@ -6384,7 +6383,6 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/item_key',
 				'Invalid parameter "/1/item_key": incorrect syntax near "+)", \1)}, b, c]".'
 			],
-
 			[
 				['type' => API_ITEM_DELAY],
 				null,
@@ -7767,7 +7765,7 @@ class CApiInputValidatorTest extends TestCase {
 	 * @param array       $rule
 	 * @param mixed       $data
 	 * @param string      $path
-	 * @param mixed       $exprected
+	 * @param mixed       $expected
 	 * @param bool        $float_ieee754
 	 * @param string|null $deprecation_message
 	 */
@@ -7804,7 +7802,7 @@ class CApiInputValidatorTest extends TestCase {
 	 * @param array  $rule
 	 * @param mixed  $data
 	 * @param string $path
-	 * @param mixed  $exprected
+	 * @param mixed  $expected
 	 */
 	public function testApiInputLegacyValidator(array $rule, $data, $path, $expected) {
 		$this->testApiInputValidator($rule, $data, $path, $expected, false);
@@ -8611,8 +8609,8 @@ class CApiInputValidatorTest extends TestCase {
 	 * @param array  $rule
 	 * @param mixed  $data
 	 * @param string $path
-	 * @param bool   $rc_exprected
-	 * @param mixed  $error_exprected
+	 * @param bool   $rc_expected
+	 * @param mixed  $error_expected
 	 */
 	public function testApiUniqueness(array $rule, $data, $path, $rc_expected, $error_expected) {
 		$rc = CApiInputValidator::validateUniqueness($rule, $data, $path, $error);

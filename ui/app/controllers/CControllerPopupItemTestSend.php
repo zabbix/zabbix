@@ -403,7 +403,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 				foreach ($preproc_test_data['steps'] as $i => &$step) {
 					if ($test_failed) {
-						// If test is failed, proceesing steps are skipped from results.
+						// If test is failed, processing steps are skipped from results.
 						unset($preproc_test_data['steps'][$i]);
 						continue;
 					}

@@ -21,14 +21,7 @@
 
 #include "../../../src/zabbix_server/poller/checks_telnet.h"
 
-int	__wrap_telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
-{
-	ZBX_UNUSED(item);
-	ZBX_UNUSED(result);
-	ZBX_UNUSED(encoding);
-
-	return SYSINFO_RET_OK;
-}
+int	__wrap_telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
 
 int	zbx_get_value_telnet_test_run(DC_ITEM *item, char **error)
 {
@@ -47,4 +40,13 @@ int	zbx_get_value_telnet_test_run(DC_ITEM *item, char **error)
 	free_result(&result);
 
 	return ret;
+}
+
+int	__wrap_telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+{
+	ZBX_UNUSED(item);
+	ZBX_UNUSED(result);
+	ZBX_UNUSED(encoding);
+
+	return SYSINFO_RET_OK;
 }

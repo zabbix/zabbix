@@ -532,7 +532,7 @@ class CHttpTest extends CApiService {
 			$db_httptest = $db_httptests[$httptest['httptestid']];
 
 			if (array_key_exists('steps', $httptest)) {
-				// unexpected patameters for templated web scenario steps
+				// unexpected parameters for templated web scenario steps
 				if ($db_httptest['templateid'] != 0) {
 					foreach ($httptest['steps'] as $httpstep) {
 						foreach (['name', 'no'] as $field_name) {

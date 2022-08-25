@@ -728,7 +728,7 @@ class testUserGroup extends CAPITest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'usergroup' => [
 					'usrgrpid' => '13',
-					'name' => 'API user group update as admin user without peremissions'
+					'name' => 'API user group update as admin user without permissions'
 				],
 				'expected_error' => 'No permissions to call "usergroup.update".'
 			],
@@ -749,7 +749,7 @@ class testUserGroup extends CAPITest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'usergroup' => [
 					'usrgrpid' => '13',
-					'name' => 'API user group update as zabbix user without peremissions'
+					'name' => 'API user group update as zabbix user without permissions'
 				],
 				'expected_error' => 'No permissions to call "usergroup.update".'
 			],
