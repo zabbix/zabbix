@@ -33,7 +33,7 @@ class testAuditlogAutoregistration extends testAuditlogCommon {
 				"\"update\",\"******\",\"******\"],\"autoregistration.tls_psk\":[\"update\",\"******\",\"******\"]}";
 
 		$this->call('autoregistration.update', [
-			'tls_accept' => '3',
+			'tls_accept' => 3,
 			'tls_psk_identity' => 'PSK 001',
 			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
 		]);
