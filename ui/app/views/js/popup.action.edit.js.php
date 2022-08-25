@@ -72,9 +72,9 @@ window.action_edit_popup = new class {
 
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
 				// todo: add multiselect title, not value
+
 				this.row = document.createElement('tr');
 				this._createRow(this.row, e.detail.inputs);
-				this._processTypeOfCalculation();
 				$('#conditionTable tr:last').before(this.row);
 			});
 	}
@@ -101,6 +101,7 @@ window.action_edit_popup = new class {
 
 		this.table = document.getElementById('conditionTable');
 		this.row_count = this.table.rows.length -1;
+		this._processTypeOfCalculation();
 	}
 
 	_createLabelCell() {
@@ -287,6 +288,10 @@ window.action_edit_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
+		// todo : check why conditiontype was needed
+		// todo : show/change expression when new condition is added!
+		// todo : check why label is read after new condition is added
+
 		this.show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 		const labels = jQuery('#conditionTable .label');
 
@@ -294,27 +299,39 @@ window.action_edit_popup = new class {
 		jQuery('#evaltype-formfield').toggle(this.row_count > 1);
 		jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
 
+		var conditions = [];
+
+		labels.each(function(index, label) {
+			var label = jQuery(label);
+
+			conditions.push({
+				id: label.data('formulaid'),
+				type: label.data('conditiontype')
+			});
+		});
+
+		jQuery('#expression').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
+
 		jQuery('#evaltype').change(function() {
 			this.show_formula = (jQuery(this).val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 			jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
 			jQuery('#expression').toggle(!this.show_formula);
-		});
+			const labels = jQuery('#conditionTable .label');
 
-		// todo : on change!!!
-		// todo : check why conditiontype was needed
-		if (labels.length > 1) {
-			var conditions = [];
+		//	if (labels.length > 1) {
+				var conditions = [];
 
-			labels.each(function(index, label) {
-				var label = jQuery(label);
+				labels.each(function(index, label) {
+					var label = jQuery(label);
 
-				conditions.push({
-					id: label.data('formulaid'),
-					type: label.data('conditiontype')
+					conditions.push({
+						id: label.data('formulaid'),
+						type: label.data('conditiontype')
+					});
 				});
-			});
 
-			jQuery('#expression').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
-		}
+				jQuery('#expression').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
+		//	}
+		});
 	}
 }

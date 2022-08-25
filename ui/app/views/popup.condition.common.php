@@ -227,6 +227,7 @@ switch ($data['type']) {
 					$operator->addValue($value, $key);
 				}
 
+
 				$trigger_multiselect = $data['trigger_context'] === 'host'
 					? (new CMultiSelect([
 						'name' => 'value[]',
@@ -845,12 +846,10 @@ switch ($data['type']) {
 					'custom_select' => true
 				]))
 					->setId('service-new-condition')
+					->addClass('new-condition')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
-				$inline_js .= $service_multiselect->getPostJS().
-					'$("#service-new-condition")
-						.multiSelect("getSelectButton")
-						.addEventListener("click", selectServices);';
+				$inline_js .= $service_multiselect->getPostJS();
 
 				$form_grid
 					->addItem([
