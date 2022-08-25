@@ -1448,8 +1448,16 @@ class CWidgetHelper {
 					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 					'dataCallback: function(data) {'.
 						'data.color = function(num) {'.
-							'var palette = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE.';'.
-							'return palette[num % palette.length];'.
+							'colorPalette.setThemeColors('.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE.');'.
+							'const colors = jQuery("#widget-dialogue-form")[0]'.
+								'.querySelectorAll(".'.ZBX_STYLE_COLOR_PICKER.' input");'.
+							'const used_colors = [];'.
+							'for (const color of colors) {'.
+								'if (color.value !== "") {'.
+									'used_colors.push(color.value);'.
+								'}'.
+							'}'.
+							'return colorPalette.getNextColor(used_colors);'.
 						'} (data.rowNum);'.
 						'return data;'.
 					'}'.

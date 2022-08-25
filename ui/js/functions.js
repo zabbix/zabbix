@@ -160,40 +160,38 @@ function getUniqueId() {
 /**
  * Color palette object used for getting different colors from color palette.
  */
-var colorPalette = (function() {
+let colorPalette = (function() {
 	'use strict';
 
-	var current_color = 0,
-		palette = [];
+	let palette = [];
 
 	return {
-		incrementNextColor: function() {
-			if (++current_color == palette.length) {
-				current_color = 0;
-			}
-		},
-
 		/**
 		 * Gets next color from palette.
 		 *
-		 * @return string	hexadecimal color code
+		 * @param {array} used_colors  Array of already used hexadecimal color codes.
+		 *
+		 * @return string  Hexadecimal color code.
 		 */
-		getNextColor: function() {
-			var color = palette[current_color];
+		getNextColor: function(used_colors) {
+			const palette_usage = {};
 
-			this.incrementNextColor();
+			for (const color of palette) {
+				palette_usage[color] = used_colors.filter((i) => i === color).length;
+			}
 
-			return color;
+			const min_used_color_count = Math.min(...Object.values(palette_usage));
+
+			return Object.keys(palette_usage).find(color => palette_usage[color] == min_used_color_count);
 		},
 
 		/**
-		 * Set theme specific color palette.
+		 * Set color palette.
 		 *
-		 * @param array colors  Array of hexadecimal color codes.
+		 * @param {array} colors  Array of hexadecimal color codes.
 		 */
 		setThemeColors: function(colors) {
 			palette = colors;
-			current_color = 0;
 		}
 	}
 }());
