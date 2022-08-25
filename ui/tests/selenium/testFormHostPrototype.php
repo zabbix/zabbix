@@ -70,7 +70,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Check layout at IPMI tab.
 		$this->zbxTestTabSwitch('IPMI');
-		foreach (['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password'] as $id) {
+		foreach (['ipmi_authtype', 'ipmi_privilege'] as $id) {
+			$this->zbxTestAssertElementPresentXpath('//z-select[@id="'.$id.'"][@readonly]');
+		}
+		foreach (['ipmi_username', 'ipmi_password'] as $id) {
 			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@readonly]');
 		}
 
