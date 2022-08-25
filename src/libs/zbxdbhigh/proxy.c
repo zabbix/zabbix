@@ -4527,20 +4527,47 @@ int	proxy_get_history_count(void)
  * Parameters:                                                                *
  *     jp      - [IN] JSON with the proxy version                             *
  *                                                                            *
- * Return value: The protocol version.                                        *
+ * Return value: The protocol version in textual representation, for example, *
+ *               "6.4.0alpha1",                                               *
+ *     actual proxy version - if proxy version was successfully extracted     *
+ *     undefined version    - otherwise                                       *
+ *                                                                            *
+ * Comments: allocates memory                                                 *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_get_proxy_protocol_version_str(struct zbx_json_parse *jp)
+{
+	char	value[MAX_STRING_LEN];
+
+	if (NULL != jp && SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value), NULL))
+		return strdup(value);
+	else
+		return strdup(ZBX_VERSION_UNDEFINED_STR);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: converts protocol version fom textual to numeric representation   *
+ *          for verion comparison. The function truncates release candidate   *
+ *          part of the version.                                              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     jp      - [IN] proxy version, for example "6.4.0alpha1".               *
+ *                                                                            *
+ * Return value: The protocol version in numeric representation, for example, *
+ *               060400                                                       *
  *     actual proxy version - if proxy version was successfully extracted     *
  *     proxy version 3.2    - otherwise                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp)
+int	zbx_get_proxy_protocol_version_int(const char *version_str)
 {
-	char	value[MAX_STRING_LEN];
-	int	version;
+	int	version_int;
 
-	if (NULL != jp && SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value), NULL) &&
-			FAIL != (version = zbx_get_component_version(value)))
+	if (0 != strcmp(ZBX_VERSION_UNDEFINED_STR, version_str) &&
+			FAIL != (version_int = zbx_get_component_version(version_str)))
 	{
-		return version;
+		return version_int;
 	}
 	else
 	{
@@ -4924,21 +4951,22 @@ static void	zbx_db_update_proxy_version(DC_PROXY *proxy, zbx_proxy_diff_t *diff)
 {
 	if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION))
 	{
-		if (0 != proxy->version)
+		if (0 != proxy->version_int)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "proxy \"%s\" protocol version updated from %d.%d to %d.%d",
 					proxy->host,
-					ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
-					ZBX_COMPONENT_VERSION_MINOR(proxy->version),
-					ZBX_COMPONENT_VERSION_MAJOR(diff->version),
-					ZBX_COMPONENT_VERSION_MINOR(diff->version));
+					ZBX_COMPONENT_VERSION_MAJOR(proxy->version_int),
+					ZBX_COMPONENT_VERSION_MINOR(proxy->version_int),
+					ZBX_COMPONENT_VERSION_MAJOR(diff->version_int),
+					ZBX_COMPONENT_VERSION_MINOR(diff->version_int));
 		}
 
 		if (ZBX_DB_OK > DBexecute(
 				"update host_rtdata"
 				" set version=%d, compatibility=%d"
 				" where hostid=" ZBX_FS_UI64,
-				ZBX_COMPONENT_VERSION_TO_DEC_FORMAT(diff->version), diff->compatibility, diff->hostid))
+				ZBX_COMPONENT_VERSION_TO_DEC_FORMAT(diff->version_int), diff->compatibility,
+						diff->hostid))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Failed to update proxy version and compatibility with server for"
 					" proxy '%s'.", proxy->host);
@@ -4995,16 +5023,18 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
  * Comments: The proxy parameter properties are also updated.                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress, zbx_uint64_t flags_add)
+void	zbx_update_proxy_data(DC_PROXY *proxy, char *version_str, int version_int, int lastaccess, int compress,
+		zbx_uint64_t flags_add)
 {
 	zbx_proxy_diff_t		diff;
 	zbx_proxy_compatibility_t	compatibility;
 
-	compatibility = zbx_get_proxy_compatibility(version);
+	compatibility = zbx_get_proxy_compatibility(version_int);
 
 	diff.hostid = proxy->hostid;
 	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE | flags_add;
-	diff.version = version;
+	diff.version_str = version_str;
+	diff.version_int = version_int;
 	diff.compatibility = compatibility;
 	diff.lastaccess = lastaccess;
 	diff.compress = compress;
@@ -5013,7 +5043,8 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int com
 
 	zbx_db_update_proxy_version(proxy, &diff);
 
-	proxy->version = version;
+	zbx_strlcpy(proxy->version_str, version_str, sizeof(proxy->version_str));
+	proxy->version_int = version_int;
 	proxy->compatibility = compatibility;
 	proxy->auto_compress = compress;
 	proxy->lastaccess = lastaccess;

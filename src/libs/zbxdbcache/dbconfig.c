@@ -988,6 +988,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	}
 
 	dc_strpool_release(proxy->proxy_address);
+	dc_strpool_release(proxy->version_str);
 	zbx_hashset_remove_direct(&config->proxies, proxy);
 }
 
@@ -1399,7 +1400,8 @@ done:
 			if (0 == found)
 			{
 				proxy->location = ZBX_LOC_NOWHERE;
-				proxy->version = 0;
+				proxy->version_int = ZBX_COMPONENT_VERSION_UNDEFINED;
+				proxy->version_str = dc_strpool_intern(ZBX_VERSION_UNDEFINED_STR);
 				proxy->compatibility = ZBX_PROXY_VERSION_UNDEFINED;
 				proxy->lastaccess = atoi(row[12]);
 				proxy->last_cfg_error_time = 0;
@@ -10607,7 +10609,8 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 	dst_proxy->proxy_data_nextcheck = src_proxy->proxy_data_nextcheck;
 	dst_proxy->proxy_tasks_nextcheck = src_proxy->proxy_tasks_nextcheck;
 	dst_proxy->last_cfg_error_time = src_proxy->last_cfg_error_time;
-	dst_proxy->version = src_proxy->version;
+	zbx_strlcpy(dst_proxy->version_str, src_proxy->version_str, sizeof(dst_proxy->version_str));
+	dst_proxy->version_int = src_proxy->version_int;
 	dst_proxy->compatibility = src_proxy->compatibility;
 	dst_proxy->lastaccess = src_proxy->lastaccess;
 	dst_proxy->auto_compress = src_proxy->auto_compress;
@@ -13215,9 +13218,14 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION))
 		{
-			if (proxy->version != diff->version)
+			if (0 != strcmp(proxy->version_str, diff->version_str))
 			{
-				proxy->version = diff->version;
+				dc_strpool_replace(1, &proxy->version_str, diff->version_str);
+			}
+
+			if (proxy->version_int != diff->version_int)
+			{
+				proxy->version_int = diff->version_int;
 				proxy->compatibility = diff->compatibility;
 			}
 			else
@@ -13779,15 +13787,7 @@ int	zbx_proxy_discovery_get(struct zbx_json *json, char **error)
 				else
 					zbx_json_addstring(json, "compression", "false", ZBX_JSON_TYPE_INT);
 
-				if (FAIL != dc_proxy->version)
-				{
-					zbx_json_addint64(json, "version",
-							ZBX_COMPONENT_VERSION_TO_DEC_FORMAT(dc_proxy->version));
-				}
-				else
-				{
-					zbx_json_addint64(json, "version", FAIL);
-				}
+				zbx_json_addstring(json, "version", dc_proxy->version_str, ZBX_JSON_TYPE_STRING);
 
 				zbx_json_adduint64(json, "compatibility", dc_proxy->compatibility);
 

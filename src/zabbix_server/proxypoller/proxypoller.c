@@ -326,9 +326,13 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 			}
 			else
 			{
-				proxy->version = zbx_get_proxy_protocol_version(&jp);
+				char	*version_str = zbx_get_proxy_protocol_version_str(&jp);
+				int	version_int = zbx_get_proxy_protocol_version_int(version_str);
+				zbx_strlcpy(proxy->version_str, version_str, sizeof(proxy->version_str));
+				proxy->version_int = version_int;
 				proxy->auto_compress = (0 != (s.protocol & ZBX_TCP_COMPRESS) ? 1 : 0);
 				proxy->lastaccess = time(NULL);
+				zbx_free(version_str);
 			}
 		}
 	}
@@ -362,8 +366,8 @@ out:
 static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts, int *more)
 {
 	struct zbx_json_parse	jp;
-	char			*error = NULL;
-	int			ret = FAIL, version;
+	char			*error = NULL, *version_str;
+	int			ret = FAIL, version_int;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -383,14 +387,16 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 		goto out;
 	}
 
-	version = zbx_get_proxy_protocol_version(&jp);
+	version_str = zbx_get_proxy_protocol_version_str(&jp);
+	version_int = zbx_get_proxy_protocol_version_int(version_str);
 
-	if (SUCCEED != zbx_check_protocol_version(proxy, version))
+	if (SUCCEED != zbx_check_protocol_version(proxy, version_int))
 	{
 		goto out;
 	}
 
-	proxy->version = version;
+	zbx_strlcpy(proxy->version_str, version_str, sizeof(proxy->version_str));
+	proxy->version_int = version_int;
 
 	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, HOST_STATUS_PROXY_PASSIVE, more, &error)))
 	{
@@ -400,6 +406,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 
 out:
 	zbx_free(error);
+	zbx_free(version_str);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -434,7 +441,8 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 	/* handle pre 3.4 proxies that did not support proxy data request and active/passive configuration mismatch */
 	if ('\0' == *answer)
 	{
-		proxy->version = ZBX_COMPONENT_VERSION_UNDEFINED;
+		zbx_strlcpy(proxy->version_str, ZBX_VERSION_UNDEFINED_STR, sizeof(proxy->version_str));
+		proxy->version_int = ZBX_COMPONENT_VERSION_UNDEFINED;
 		zbx_free(answer);
 		ret = FAIL;
 		goto out;
@@ -479,7 +487,8 @@ static int	proxy_get_tasks(DC_PROXY *proxy)
 	/* handle pre 3.4 proxies that did not support proxy data request and active/passive configuration mismatch */
 	if ('\0' == *answer)
 	{
-		proxy->version = ZBX_COMPONENT_VERSION_UNDEFINED;
+		zbx_strlcpy(proxy->version_str, ZBX_VERSION_UNDEFINED_STR, sizeof(proxy->version_str));
+		proxy->version_int = ZBX_COMPONENT_VERSION_UNDEFINED;
 		zbx_free(answer);
 		ret = FAIL;
 		goto out;
@@ -587,11 +596,11 @@ static int	process_proxy(void)
 			}
 		}
 error:
-
-		if (proxy_old.version != proxy.version || proxy_old.auto_compress != proxy.auto_compress ||
+		if (0 != strcmp(proxy_old.version_str, proxy.version_str) ||
+				proxy_old.auto_compress != proxy.auto_compress ||
 				proxy_old.lastaccess != proxy.lastaccess)
 		{
-			zbx_update_proxy_data(&proxy_old, proxy.version, proxy.lastaccess, proxy.auto_compress, 0);
+			zbx_update_proxy_data(&proxy_old, proxy.version_str, proxy.version_int, proxy.lastaccess, proxy.auto_compress, 0);
 		}
 
 		DCrequeue_proxy(proxy.hostid, update_nextcheck, ret);

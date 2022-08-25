@@ -25,8 +25,6 @@
  * Purpose: Extracts protocol version from string. All three groups of digits *
  *          are extracted. Alphanumeric release candidate part is ignored.    *
  *                                                                            *
- * Note: Function modifies argument 'value'!                                  *
- *                                                                            *
  * Parameters:                                                                *
  *     value      - [IN] textual representation of version                    *
  *                  Example: "6.4.0alpha1"                                    *
@@ -35,11 +33,17 @@
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_component_version(char *value)
+int	zbx_get_component_version(const char *version_str)
 {
-	char *pmid, *plow;
+	char	*phigh, *pmid, *plow;
+	char	version_buf[ZBX_VERSION_BUF_LEN];
 
-	if (NULL == (pmid = strchr(value, '.')))
+	if (NULL == version_str)
+		return FAIL;
+
+	zbx_strlcpy(version_buf, version_str, sizeof(version_buf));
+
+	if (NULL == (pmid = strchr(version_buf, '.')))
 		return FAIL;
 
 	*pmid++ = '\0';
@@ -49,7 +53,7 @@ int	zbx_get_component_version(char *value)
 
 	*plow++ = '\0';
 
-	return ZBX_COMPONENT_VERSION(atoi(value), atoi(pmid), atoi(plow));
+	return ZBX_COMPONENT_VERSION(atoi(version_buf), atoi(pmid), atoi(plow));
 }
 
 /******************************************************************************
@@ -65,7 +69,7 @@ int	zbx_get_component_version(char *value)
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_component_version_ignore_patch(char *value)
+int	zbx_get_component_version_ignore_patch(const char *value)
 {
 	int ver;
 

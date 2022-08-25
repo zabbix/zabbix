@@ -401,7 +401,8 @@ typedef struct
 	zbx_proxy_suppress_t		nodata_win;
 	int				last_cfg_error_time;	/* time when passive proxy misconfiguration error was */
 								/* seen or 0 if no error */
-	int				version;
+	const char			*version_str;
+	int				version_int;
 	zbx_proxy_compatibility_t	compatibility;
 	unsigned char			location;
 	unsigned char			auto_compress;

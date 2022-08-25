@@ -687,7 +687,8 @@ typedef struct
 {
 	zbx_uint64_t			hostid;
 	unsigned char			compress;
-	int				version;
+	char				*version_str;
+	int				version_int;
 	zbx_proxy_compatibility_t	compatibility;
 	int				lastaccess;
 	int				last_version_error_time;

@@ -29,6 +29,9 @@
 		ZBX_COMPONENT_VERSION_MINOR(version)*100 + ZBX_COMPONENT_VERSION_PATCH(version))
 #define ZBX_COMPONENT_VERSION_UNDEFINED			0
 
+#define ZBX_VERSION_UNDEFINED_STR			"undefined"
+#define ZBX_VERSION_BUF_LEN				20
+
 #define ZBX_STR2(str)	#str
 #define ZBX_STR(str)	ZBX_STR2(str)
 
@@ -50,8 +53,8 @@
 				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
 #define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
 
-int	zbx_get_component_version(char *value);
-int	zbx_get_component_version_ignore_patch(char *value);
+int	zbx_get_component_version(const char *version_str);
+int	zbx_get_component_version_ignore_patch(const char *value);
 
 /* these values are shared with the UI*/
 typedef enum

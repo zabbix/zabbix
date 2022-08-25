@@ -128,8 +128,8 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
  ******************************************************************************/
 void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
-	int			ret = FAIL, upload_status = 0, status, version, responded = 0;
-	char			*error = NULL;
+	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
+	char			*error = NULL, *version_str;
 	DC_PROXY		proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -148,9 +148,10 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
-	version = zbx_get_proxy_protocol_version(jp);
+	version_str = zbx_get_proxy_protocol_version_str(jp);
+	version_int = zbx_get_proxy_protocol_version_int(version_str);
 
-	if (SUCCEED != zbx_check_protocol_version(&proxy, version))
+	if (SUCCEED != zbx_check_protocol_version(&proxy, version_int))
 	{
 		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
 		error = zbx_strdup(error, "current proxy version is not supported by server");
@@ -197,7 +198,7 @@ out:
 		else
 			lastaccess = ts->sec;
 
-		zbx_update_proxy_data(&proxy, version, lastaccess,
+		zbx_update_proxy_data(&proxy, version_str, version_int, lastaccess,
 				(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), 0);
 	}
 
@@ -212,6 +213,7 @@ out:
 	}
 
 	zbx_free(error);
+	zbx_free(version_str);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }

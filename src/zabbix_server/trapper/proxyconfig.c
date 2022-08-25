@@ -35,10 +35,10 @@
  ******************************************************************************/
 void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	char		*error = NULL, *buffer = NULL;
+	char		*error = NULL, *buffer = NULL, *version_str;
 	struct zbx_json	j;
 	DC_PROXY	proxy;
-	int		ret, flags = ZBX_TCP_PROTOCOL;
+	int		ret, flags = ZBX_TCP_PROTOCOL, version_int;
 	size_t		buffer_size, reserved = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -57,8 +57,11 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), (int)time(NULL),
-			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
+	version_str = zbx_get_proxy_protocol_version_str(jp);
+	version_int = zbx_get_proxy_protocol_version_int(version_str);
+
+	zbx_update_proxy_data(&proxy, version_str, version_int, (int)time(NULL),
+				(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
 
 	if (0 != proxy.auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
@@ -123,6 +126,7 @@ clean:
 out:
 	zbx_free(error);
 	zbx_free(buffer);
+	zbx_free(version_str);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
