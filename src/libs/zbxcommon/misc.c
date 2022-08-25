@@ -3546,7 +3546,9 @@ int	zbx_alarm_timed_out(void)
 	return (0 == zbx_timed_out ? FAIL : SUCCEED);
 }
 
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+/* Since 2.26 the GNU C Library will detect when /etc/resolv.conf has been modified and reload the changed */
+/* configuration. For performance reasons manual reloading should be avoided when unnecessary. */
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
 /******************************************************************************
  *                                                                            *
  * Purpose: react to "/etc/resolv.conf" update                                *
@@ -3593,7 +3595,7 @@ void	zbx_update_env(double time_now)
 	{
 		time_update = time_now;
 		zbx_handle_log();
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
 		update_resolver_conf();
 #endif
 	}

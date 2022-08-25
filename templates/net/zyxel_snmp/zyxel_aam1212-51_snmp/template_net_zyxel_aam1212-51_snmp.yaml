@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:38:02Z'
+  date: '2022-08-16T10:57:02Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -15,6 +15,7 @@ zabbix_export:
         
         MIBs used:
         RFC1213-MIB
+        HOST-RESOURCES-MIB
         ADSL-LINE-MIB
         ZYXEL-IESCOMMON-MIB
         IF-MIB
@@ -27,7 +28,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -120,6 +121,37 @@ zabbix_export:
                 -
                   tag: scope
                   value: notice
+        -
+          uuid: 5197238bef51468c80e6a4180babee5b
+          name: 'ZYXEL AAM1212-51 / IES-612: Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.25.1.1.0
+          key: zyxel.aam1212.hw.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized.
+            Note that this is different from sysUpTime in the SNMPv2-MIB
+            [RFC1907] because sysUpTime is the uptime of the
+            network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
         -
           uuid: ea699e392c154a79927a056ff050c59d
           name: 'ZYXEL AAM1212-51 / IES-612: Location'
@@ -236,6 +268,30 @@ zabbix_export:
               tag: component
               value: inventory
         -
+          uuid: 6fe78b9b065243b8bcebf8f6c234f868
+          name: 'ZYXEL AAM1212-51 / IES-612: Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.3.0
+          key: zyxel.aam1212.net.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: RFC1213-MIB
+            The time (in hundredths of a second) since the
+            network management portion of the system was last
+            re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 33df8d594d7f4e4aa148927b117f30df
           name: 'ZYXEL AAM1212-51 / IES-612: Hardware serial number'
           type: SNMP_AGENT
@@ -348,43 +404,6 @@ zabbix_export:
               name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX} alarm'
               priority: AVERAGE
               description: 'The slot reported an error.'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
-          uuid: 6fe78b9b065243b8bcebf8f6c234f868
-          name: 'ZYXEL AAM1212-51 / IES-612: Uptime'
-          type: SNMP_AGENT
-          snmp_oid: .1.3.6.1.2.1.1.3.0
-          key: zyxel.aam1212.uptime
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: RFC1213-MIB
-            The time (in hundredths of a second) since the
-            network management portion of the system was last
-            re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 819190f68248439292fc4622c3eec5a9
-              expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.uptime)<10m'
-              name: 'ZYXEL AAM1212-51 / IES-612: has been restarted'
-              event_name: 'ZYXEL AAM1212-51 / IES-612: has been restarted (uptime < 10m)'
-              priority: INFO
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
               tags:
                 -
                   tag: scope
@@ -1305,3 +1324,16 @@ zabbix_export:
             -
               value: '7'
               newvalue: lowerLayerDown
+  triggers:
+    -
+      uuid: 819190f68248439292fc4622c3eec5a9
+      expression: '(last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.hw.uptime)>0 and last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.hw.uptime)<10m) or (last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.hw.uptime)=0 and last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.uptime)<10m)'
+      name: 'ZYXEL AAM1212-51 / IES-612: Host has been restarted'
+      event_name: 'ZYXEL AAM1212-51 / IES-612: {HOST.NAME} has been restarted (uptime < 10m)'
+      priority: INFO
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice

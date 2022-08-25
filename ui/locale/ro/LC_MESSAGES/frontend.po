@@ -209,6 +209,11 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
+#: include/classes/graph/CSvgGraph.php:1418
+#, c-format
+msgid "%1$s percentile: %2$s"
+msgstr ""
+
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
@@ -14390,6 +14395,10 @@ msgstr "Reguli de detecție părinte"
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "Grafice părinte"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:37:22Z'
+  date: '2022-08-16T11:09:25Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -20,11 +20,12 @@ zabbix_export:
         IF-MIB
         EtherLike-MIB
         SEMI-MIB
+        HOST-RESOURCES-MIB
         SNMPv2-MIB
         ENTITY-MIB
         STATISTICS-MIB
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -289,6 +290,34 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
+          uuid: a0659dadbef14fb1ac9be45d47388aa2
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: ad2dc1149eb546309657928b944c49fb
           name: 'System location'
           type: SNMP_AGENT
@@ -351,6 +380,28 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: 02e67b092ccf478ba13537ba6471f3fd
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 74fd9c1bd546497aa20b9af09b951e98
           name: 'System object ID'
           type: SNMP_AGENT
@@ -372,45 +423,6 @@ zabbix_export:
             -
               tag: component
               value: system
-        -
-          uuid: 02e67b092ccf478ba13537ba6471f3fd
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 1395e02bc63e48daa779b8b685e91868
-              expression: 'last(/HP Enterprise Switch SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/HP Enterprise Switch SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
         -
           uuid: af855c1e75304c26b11a86c2a86f08f2
           name: 'SNMP agent availability'
@@ -2536,6 +2548,23 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: 1395e02bc63e48daa779b8b685e91868
+      expression: '(last(/HP Enterprise Switch SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Enterprise Switch SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Enterprise Switch SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Enterprise Switch SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/HP Enterprise Switch SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: d282b8d685c547a58645c1cc63b00571

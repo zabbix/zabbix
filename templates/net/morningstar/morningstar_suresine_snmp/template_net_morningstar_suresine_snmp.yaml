@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:25Z'
+  date: '2022-08-16T10:54:46Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -14,7 +14,7 @@ zabbix_export:
         MIBs used:
         SURESINE
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -350,14 +350,38 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
-          uuid: cb4a5c3033f84baa8260a8199265e5a9
-          name: 'Status: Uptime'
+          uuid: d1e50f16fab54a8e97372b52cebae18d
+          name: 'Status: Uptime (hardware)'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: status.uptime
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: status.hw.uptime
           history: 7d
           units: uptime
-          description: 'Device uptime in seconds'
+          description: 'The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: status
+        -
+          uuid: cb4a5c3033f84baa8260a8199265e5a9
+          name: 'Status: Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: status.net.uptime
+          history: 7d
+          units: uptime
+          description: 'The time (in hundredths of a second) since the network management portion of the system was last re-initialized.'
           preprocessing:
             -
               type: MULTIPLIER
@@ -369,24 +393,12 @@ zabbix_export:
               value: status
           triggers:
             -
-              uuid: f9404001de4c4c1d8438e0b560977398
-              expression: 'last(/Morningstar SureSine SNMP/status.uptime)<10m'
-              name: 'Status: Device has been restarted'
-              event_name: 'Status: Device has been restarted (uptime < 10m)'
-              priority: INFO
-              description: 'Uptime is less than 10 minutes'
-              manual_close: 'YES'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-            -
               uuid: db5506294fd945659eae945014332a62
-              expression: 'nodata(/Morningstar SureSine SNMP/status.uptime,5m)=1'
+              expression: 'nodata(/Morningstar SureSine SNMP/status.net.uptime,5m)=1'
               name: 'Status: Failed to fetch data'
               event_name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 5 minutes'
+              description: 'Zabbix has not received data for items for the last 5 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -635,6 +647,19 @@ zabbix_export:
             -
               value: '8'
               newvalue: Standby
+  triggers:
+    -
+      uuid: f9404001de4c4c1d8438e0b560977398
+      expression: '(last(/Morningstar SureSine SNMP/status.hw.uptime)>0 and last(/Morningstar SureSine SNMP/status.hw.uptime)<10m) or (last(/Morningstar SureSine SNMP/status.hw.uptime)=0 and last(/Morningstar SureSine SNMP/status.net.uptime)<10m)'
+      name: 'Status: Device has been restarted'
+      event_name: 'Status: Device has been restarted (uptime < 10m)'
+      priority: INFO
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 45df99d33eb0472e946d2f6f7a5a2745

@@ -200,6 +200,11 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s от %2$s елемент в проблемно състояние"
 msgstr[1] "%1$s от %2$s елементи са в проблемно състояние"
 
+#: include/classes/graph/CSvgGraph.php:1418
+#, c-format
+msgid "%1$s percentile: %2$s"
+msgstr ""
+
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
@@ -14285,6 +14290,10 @@ msgstr "Родителски правила за откриване."
 
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
+msgstr ""
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
 msgstr ""
 
 #: include/views/configuration.item.edit.php:57
