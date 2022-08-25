@@ -442,7 +442,7 @@ class CUserDirectory extends CApiService {
 	 * @throws APIException
 	 */
 	protected static function validateTest(array &$userdirectory): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'userdirectoryid' =>	['type' => API_ID, 'default' => 0],
 			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
 			'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
