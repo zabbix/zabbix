@@ -19,12 +19,14 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
  * @backup config_autoreg_tls, config, ids
  */
-class testAuditlogAutoregistration extends CAPITest {
+class testAuditlogAutoregistration extends testAuditlogCommon {
+
+	public $resourceid = 1;
 
 	public function testAuditlogAutoregistration_Update() {
 		$updated = "{\"autoregistration.tls_accept\":[\"update\",\"3\",\"1\"],\"autoregistration.tls_psk_identity\":[".
@@ -36,16 +38,6 @@ class testAuditlogAutoregistration extends CAPITest {
 			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
 		]);
 
-		$get = $this->call('auditlog.get', [
-			'output' => ['details'],
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'filter' => [
-				'resourceid' => 1,
-				'action' => 1
-			]
-		]);
-
-		$this->assertEquals($updated, $get['result'][0]['details']);
+		$this->sendGetRequest('details', 1, $updated);
 	}
 }
