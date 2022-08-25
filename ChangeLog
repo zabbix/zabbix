@@ -1,3 +1,9 @@
+Changes for 6.0.8rc2
+
+Bug fixes:
+........S. [ZBX-19893] fixed bug introduced when fixing script parameters updates during linking (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.8rc1
 
 New features:
