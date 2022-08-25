@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxha.h"
@@ -180,4 +180,3 @@ const char	*zbx_ha_status_str(int ha_status)
 			return "unknown";
 	}
 }
-

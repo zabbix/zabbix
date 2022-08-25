@@ -548,7 +548,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @param array $valuemaps  Array of valuemaps
 	 *
-	 * @throws Exception when non uniquw
+	 * @throws Exception when non unique
 	 */
 	protected function validateValuemapMappings(array $valuemaps) {
 		$i = 0;

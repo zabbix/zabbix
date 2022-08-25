@@ -106,6 +106,7 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 			options.TLSPSKIdentity != "" {
 			return nil, errors.New(tls.SupportedErrMsg())
 		}
+
 		return
 	}
 
@@ -207,7 +208,6 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 			return nil, errors.New("TLSCRLFile configuration parameter set without certificates being used")
 		}
 	}
-
 	return c, nil
 }
 

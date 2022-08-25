@@ -19,7 +19,7 @@
 
 #include "zbxsymbols.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 
 DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD) = NULL;

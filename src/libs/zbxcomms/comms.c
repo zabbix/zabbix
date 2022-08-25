@@ -19,12 +19,16 @@
 
 #include "zbxcomms.h"
 #include "comms.h"
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #include "tls.h"
 #endif
-#include "common.h"
 #include "log.h"
 #include "zbxcompress.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxip.h"
+#include "zbxtime.h"
 
 #ifdef _WINDOWS
 #	ifndef _WIN32_WINNT_WIN7
@@ -52,6 +56,61 @@ extern ZBX_THREAD_LOCAL char	info_buf[256];
 
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
+
+zbx_config_tls_t	*zbx_config_tls_new(void)
+{
+	zbx_config_tls_t	*zbx_config_tls;
+
+	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
+
+	zbx_config_tls->connect_mode		= ZBX_TCP_SEC_UNENCRYPTED;
+	zbx_config_tls->accept_modes		= ZBX_TCP_SEC_UNENCRYPTED;
+
+	zbx_config_tls->connect			= NULL;
+	zbx_config_tls->accept			= NULL;
+	zbx_config_tls->ca_file			= NULL;
+	zbx_config_tls->crl_file		= NULL;
+	zbx_config_tls->server_cert_issuer	= NULL;
+	zbx_config_tls->server_cert_subject	= NULL;
+	zbx_config_tls->cert_file		= NULL;
+	zbx_config_tls->key_file		= NULL;
+	zbx_config_tls->psk_identity		= NULL;
+	zbx_config_tls->psk_file		= NULL;
+	zbx_config_tls->cipher_cert13		= NULL;
+	zbx_config_tls->cipher_cert		= NULL;
+	zbx_config_tls->cipher_psk13		= NULL;
+	zbx_config_tls->cipher_psk		= NULL;
+	zbx_config_tls->cipher_all13		= NULL;
+	zbx_config_tls->cipher_all		= NULL;
+	zbx_config_tls->cipher_cmd13		= NULL;
+	zbx_config_tls->cipher_cmd		= NULL;
+
+	return zbx_config_tls;
+}
+
+void	zbx_config_tls_free(zbx_config_tls_t *zbx_config_tls)
+{
+	zbx_free(zbx_config_tls->connect);
+	zbx_free(zbx_config_tls->accept);
+	zbx_free(zbx_config_tls->ca_file);
+	zbx_free(zbx_config_tls->crl_file);
+	zbx_free(zbx_config_tls->server_cert_issuer);
+	zbx_free(zbx_config_tls->server_cert_subject);
+	zbx_free(zbx_config_tls->cert_file);
+	zbx_free(zbx_config_tls->key_file);
+	zbx_free(zbx_config_tls->psk_identity);
+	zbx_free(zbx_config_tls->psk_file);
+	zbx_free(zbx_config_tls->cipher_cert13);
+	zbx_free(zbx_config_tls->cipher_cert);
+	zbx_free(zbx_config_tls->cipher_psk13);
+	zbx_free(zbx_config_tls->cipher_psk);
+	zbx_free(zbx_config_tls->cipher_all13);
+	zbx_free(zbx_config_tls->cipher_all);
+	zbx_free(zbx_config_tls->cipher_cmd13);
+	zbx_free(zbx_config_tls->cipher_cmd);
+
+	zbx_free(zbx_config_tls);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -691,7 +750,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	{
 		server_name = ip;
 	}
-
 
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
 			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))

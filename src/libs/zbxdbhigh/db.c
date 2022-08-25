@@ -25,19 +25,7 @@
 #include "dbcache.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
-
-#if defined(HAVE_POSTGRESQL)
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
-#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
-#elif defined(HAVE_MYSQL)
-#	define ZBX_DB_STRLIST_DELIM		','
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8,utf8mb3"
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4 	"utf8mb4"
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET		ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 "," ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
-#	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin,utf8mb4_bin"
-#endif
+#include "zbxnum.h"
 
 #ifdef HAVE_ORACLE
 #	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
@@ -48,21 +36,6 @@
 #else
 #	define	ZBX_SQL_EXEC_FROM	0
 #endif
-
-typedef struct
-{
-	zbx_uint64_t	autoreg_hostid;
-	zbx_uint64_t	hostid;
-	char		*host;
-	char		*ip;
-	char		*dns;
-	char		*host_metadata;
-	int		now;
-	unsigned short	port;
-	unsigned short	flag;
-	unsigned int	connection_type;
-}
-zbx_autoreg_host_t;
 
 #if defined(HAVE_POSTGRESQL)
 extern char	ZBX_PG_ESCAPE_BACKSLASH;
@@ -1580,31 +1553,6 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	zbx_vector_ptr_destroy(&autoreg_hosts);
 }
 
-static int	DBregister_host_active(void)
-{
-	DB_RESULT	result;
-	int		ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	result = DBselect(
-			"select null"
-			" from actions"
-			" where eventsource=%d"
-				" and status=%d",
-			EVENT_SOURCE_AUTOREGISTRATION,
-			ACTION_STATUS_ACTIVE);
-
-	if (NULL == DBfetch(result))
-		ret = FAIL;
-
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 static void	autoreg_host_free(zbx_autoreg_host_t *autoreg_host)
 {
 	zbx_free(autoreg_host->host);
@@ -1797,9 +1745,6 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != DBregister_host_active())
-		goto exit;
-
 	process_autoreg_hosts(autoreg_hosts, proxy_hostid);
 
 	for (i = 0; i < autoreg_hosts->values_num; i++)
@@ -1890,7 +1835,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 	zbx_process_events(NULL, NULL);
 	zbx_clean_events();
-exit:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -1907,7 +1852,7 @@ void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts)
  *                                                                            *
  ******************************************************************************/
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		unsigned int connection_type, const char *host_metadata, unsigned short flag)
+		unsigned int connection_type, const char *host_metadata, unsigned short flag, int now)
 {
 	char	*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 
@@ -1920,7 +1865,7 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
 			" (clock,host,listen_ip,listen_dns,listen_port,tls_accepted,host_metadata,flags)"
 			" values"
 			" (%d,'%s','%s','%s',%d,%u,'%s',%d)",
-			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port, connection_type, host_metadata_esc,
+			now, host_esc, ip_esc, dns_esc, (int)port, connection_type, host_metadata_esc,
 			(int)flag);
 
 	zbx_free(host_metadata_esc);
@@ -2474,19 +2419,8 @@ void	DBcheck_character_set(void)
 		char	*char_set = row[0];
 		char	*collation = row[1];
 
-		if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8, char_set, ZBX_DB_STRLIST_DELIM))
-		{
-			zbx_db_set_character_set("utf8mb3");
-		}
-		else if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4, char_set,
-				ZBX_DB_STRLIST_DELIM))
-		{
-			zbx_db_set_character_set("utf8mb4");
-		}
-		else
-		{
+		if (FAIL == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET, char_set, ZBX_DB_STRLIST_DELIM))
 			zbx_warn_char_set(CONFIG_DBNAME, char_set);
-		}
 
 		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{
@@ -3372,7 +3306,7 @@ int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx
  * Return value: SUCCEED - one or more of the specified records were          *
  *                         successfully locked                                *
  *               FAIL    - the table does not contain any of the specified    *
- *                         records                                            *
+ *                         records or 'table' name not found                  *
  *                                                                            *
  ******************************************************************************/
 int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
@@ -3388,7 +3322,13 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 	if (0 == zbx_db_txn_level())
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __func__);
 
-	t = DBget_table(table);
+	if (NULL == (t = DBget_table(table)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, table);
+		THIS_SHOULD_NEVER_HAPPEN;
+		ret = FAIL;
+		goto out;
+	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select null from %s where", table);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, t->recid, ids->values, ids->values_num);
@@ -3403,7 +3343,7 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 		ret = SUCCEED;
 
 	DBfree_result(result);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

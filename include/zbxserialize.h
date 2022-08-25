@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SERIALIZE_H
 #define ZABBIX_SERIALIZE_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #define zbx_serialize_prepare_str(len, str)				\
 	str##_len = (NULL != str ? (zbx_uint32_t)strlen(str) + 1 : 0);	\
@@ -117,7 +117,6 @@
 		value_len + sizeof(zbx_uint32_t)					\
 	)
 #endif
-
 
 /* complex serialization/deserialization functions */
 

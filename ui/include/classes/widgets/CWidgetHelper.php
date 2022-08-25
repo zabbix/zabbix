@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -29,103 +29,80 @@ class CWidgetHelper {
 	 *
 	 * @return CForm
 	 */
-	public static function createForm() {
+	public static function createForm(): CForm {
 		return (new CForm('post'))
 			->cleanItems()
 			->setId('widget-dialogue-form')
-			->setName('widget_dialogue_form');
+			->setName('widget_dialogue_form')
+			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FORM);
 	}
 
 	/**
-	 * Create CFormList for widget configuration form with default fields in it.
+	 * Create CFormGrid for widget configuration form with default fields in it.
 	 *
-	 * @param string  $name
-	 * @param string  $type
-	 * @param int     $view_mode  ZBX_WIDGET_VIEW_MODE_NORMAL | ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
-	 * @param array   $known_widget_types
-	 * @param CWidgetFieldSelect|null  $field_rf_rate
+	 * @param string                  $name
+	 * @param string                  $type
+	 * @param int                     $view_mode  ZBX_WIDGET_VIEW_MODE_NORMAL | ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+	 * @param array                   $known_widget_types
+	 * @param CWidgetFieldSelect|null $field_rf_rate
 	 *
-	 * @return CFormList
+	 * @return CFormGrid
 	 */
-	public static function createFormList($name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
-		$deprecated_types = array_intersect_key(
-			$known_widget_types,
+	public static function createFormGrid(string $name, string $type, int $view_mode, array $known_widget_types,
+			?CWidgetFieldSelect $field_rf_rate): CFormGrid {
+
+		$deprecated_widget_types = array_intersect_key($known_widget_types,
 			array_flip(CWidgetConfig::DEPRECATED_WIDGETS)
 		);
-		$known_widget_types = array_diff_key($known_widget_types, $deprecated_types);
-		$types_select = (new CSelect('type'))
+
+		$widget_types_select = (new CSelect('type'))
 			->setFocusableElementId('label-type')
 			->setId('type')
 			->setValue($type)
 			->setAttribute('autofocus', 'autofocus')
-			->addOptions(CSelect::createOptionsFromArray($known_widget_types));
-
-		if ($deprecated_types) {
-			$types_select->addOptionGroup(
-				(new CSelectOptionGroup(_('Deprecated')))->addOptions(
-					CSelect::createOptionsFromArray($deprecated_types)
-			));
-		}
-
-		if (array_key_exists($type, $deprecated_types)) {
-			$types_select = [$types_select, ' ', makeWarningIcon(_('Widget is deprecated.'))];
-		}
-
-		$form_list = (new CFormList())
-			->addItem((new CListItem([
-					(new CDiv(new CLabel(_('Type'), 'label-type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-					(new CDiv([
-						(new CDiv((new CCheckBox('show_header'))
-							->setLabel(_('Show header'))
-							->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
-							->setId('show_header')
-							->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
-						))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN),
-						$types_select
-					]))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
-				]))->addClass('table-forms-row-with-second-field')
-			)
-			->addRow(_('Name'),
-				(new CTextBox('name', $name))
-					->setAttribute('placeholder', _('default'))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			)
-			->addItem(
-				(new CScriptTag('
-					$("z-select#type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());
-
-					document
-						.getElementById("widget-dialogue-form")
-						.addEventListener("change", (e) => {
-							const is_trimmable = e.target.matches(
-								\'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])\'
-							);
-
-							if (is_trimmable) {
-								e.target.value = e.target.value.trim();
-							}
-						}, {capture: true});
-				'))->setOnDocumentReady()
+			->addOptions(CSelect::createOptionsFromArray(
+				array_diff_key($known_widget_types, $deprecated_widget_types))
 			);
 
-		if ($field_rf_rate !== null) {
-			$form_list->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate));
+		if ($deprecated_widget_types) {
+			$widget_types_select->addOptionGroup(
+				(new CSelectOptionGroup(_('Deprecated')))
+					->addOptions(CSelect::createOptionsFromArray($deprecated_widget_types))
+			);
 		}
 
-		return $form_list;
-	}
-
-	/**
-	* Add Columns and Rows fields to the form of iterator.
-	*
-	* @param CFormList $form_list
-	* @param CWidgetFieldIntegerBox $field_columns
-	* @param CWidgetFieldIntegerBox $field_rows
-	*/
-	public static function addIteratorFields($form_list, $field_columns, $field_rows) {
-		$form_list
-			->addRow(self::getLabel($field_columns), self::getIntegerBox($field_columns))
-			->addRow(self::getLabel($field_rows), self::getIntegerBox($field_rows));
+		return (new CFormGrid())
+			->addItem([
+				new CLabel(_('Type'), 'label-type'),
+				new CFormField(array_key_exists($type, $deprecated_widget_types)
+					? [$widget_types_select, ' ', makeWarningIcon(_('Widget is deprecated.'))]
+					: $widget_types_select
+				)
+			])
+			->addItem(
+				(new CFormField(
+					(new CCheckBox('show_header'))
+						->setLabel(_('Show header'))
+						->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
+						->setId('show_header')
+						->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
+				))->addClass('form-field-show-header')
+			)
+			->addItem([
+				new CLabel(_('Name'), 'name'),
+				new CFormField(
+					(new CTextBox('name', $name))
+						->setAttribute('placeholder', _('default'))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				)
+			])
+			->addItem($field_rf_rate !== null
+				? [
+					self::getLabel($field_rf_rate),
+					new CFormField(self::getSelect($field_rf_rate))
+				]
+				: null
+			);
 	}
 
 	/**
@@ -635,9 +612,7 @@ class CWidgetHelper {
 			))->setColSpan(count($header))
 		);
 
-		return (new CDiv($table))
-			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+		return $table;
 	}
 
 	/**
@@ -654,6 +629,7 @@ class CWidgetHelper {
 
 		$tags_table = (new CTable())
 			->setId('tags_table_'.$field->getName())
+			->addClass('table-tags')
 			->addClass('table-initial-width');
 
 		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
@@ -780,7 +756,7 @@ class CWidgetHelper {
 	public static function getGraphOverrideLayout($field, array $value, $form_name, $row_num) {
 		$inputs = [];
 
-		// Create override optins list.
+		// Create override options list.
 		foreach (CWidgetFieldGraphOverride::getOverrideOptions() as $option) {
 			if (array_key_exists($option, $value)) {
 				$inputs[] = (new CVar($field->getName().'['.$row_num.']['.$option.']', $value[$option]));

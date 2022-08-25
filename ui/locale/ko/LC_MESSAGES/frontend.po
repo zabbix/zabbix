@@ -1075,6 +1075,11 @@ msgstr ""
 msgid "Alert message"
 msgstr "알림 메세지"
 
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CRoleHelper.php:338
+msgid "Alerts"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
 msgstr ""
@@ -4882,6 +4887,11 @@ msgstr "파선"
 #: app/views/popup.tophosts.column.edit.php:58
 #: include/classes/widgets/CWidgetHelper.php:587
 msgid "Data"
+msgstr ""
+
+#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CRoleHelper.php:337
+msgid "Data collection"
 msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
@@ -11341,6 +11351,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "MAC주소A"
@@ -14145,6 +14160,10 @@ msgstr "상위 디스커버리 규칙"
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "상위 그래프"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55

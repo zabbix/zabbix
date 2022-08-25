@@ -21,6 +21,8 @@
 #ifndef PROMETHEUS_TEST_H
 #define PROMETHEUS_TEST_H
 
+#include "zbxexpr.h"
+
 typedef struct
 {
 	char	*key;

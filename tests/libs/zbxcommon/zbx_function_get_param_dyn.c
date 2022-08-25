@@ -20,6 +20,9 @@
 #include "zbxmocktest.h"
 #include "zbxmockutil.h"
 
+#include "zbxstr.h"
+#include "zbxexpr.h"
+
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*params, *param;

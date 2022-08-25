@@ -590,6 +590,8 @@ abstract class CHostGeneral extends CHostBase {
 			ZBX_FLAG_DISCOVERY_RULE => [],
 			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
+		$parent_itemids = [];
+		$item_prototypeids = [];
 
 		$sqlFrom = ' items i1,items i2,hosts h';
 		$sqlWhere = ' i2.itemid=i1.templateid'.
@@ -600,7 +602,7 @@ abstract class CHostGeneral extends CHostBase {
 		if (!is_null($hostids)) {
 			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $hostids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status,i1.type'.
+		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status,i1.type,i1.valuemapid'.
 			' FROM '.$sqlFrom.
 			' WHERE '.$sqlWhere;
 
@@ -615,8 +617,16 @@ abstract class CHostGeneral extends CHostBase {
 				if ($item['host_status'] == HOST_STATUS_TEMPLATE && $item['type'] != ITEM_TYPE_HTTPTEST) {
 					$upd_item['uuid'] = generateUuidV4();
 				}
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$upd_item['valuemapid'] = 0;
+
+				if ($item['valuemapid'] !== '0') {
+					$upd_item['valuemapid'] = '0';
+
+					if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
+						$parent_itemids[] = $item['itemid'];
+					}
+					elseif ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$item_prototypeids[] = $item['itemid'];
+					}
 				}
 
 				$upd_items[$item['flags']][$item['itemid']] = [
@@ -650,6 +660,62 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			else {
 				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+			}
+		}
+
+		if ($parent_itemids) {
+			$child_upd_items = [];
+
+			while ($parent_itemids) {
+				$result = DBselect(
+					'SELECT i.itemid,i.flags,h.status AS host_status'.
+					' FROM items i,hosts h'.
+					' WHERE i.hostid=h.hostid'.
+						' AND '.dbConditionId('i.templateid', $parent_itemids)
+				);
+
+				$parent_itemids = [];
+
+				while ($row = DBfetch($result)) {
+					$parent_itemids[] = $row['itemid'];
+
+					$child_upd_items[] = [
+						'values' => ['valuemapid' => '0'],
+						'where' => ['itemid' => $row['itemid']]
+					];
+
+					if (in_array($row['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+							&& $row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$item_prototypeids[] = $row['itemid'];
+					}
+				}
+			}
+
+			if ($child_upd_items) {
+				DB::update('items', $child_upd_items);
+			}
+		}
+
+		if ($item_prototypeids) {
+			$options = [
+				'output' => ['itemid'],
+				'filter' => ['parent_itemid' => $item_prototypeids],
+				'sortfield' => ['itemid'],
+				'sortorder' => [ZBX_SORT_DOWN]
+			];
+			$result = DBselect(DB::makeSql('item_discovery', $options));
+
+			$upd_discovered_items = [];
+
+			while ($row = DBfetch($result)) {
+				$upd_discovered_items[] = [
+					'values' => ['valuemapid' => '0'],
+					'where' => ['itemid' => $row['itemid']]
+				];
+			}
+
+			if ($upd_discovered_items) {
+				DB::update('items', $upd_discovered_items);
 			}
 		}
 
@@ -1220,6 +1286,7 @@ abstract class CHostGeneral extends CHostBase {
 			ZBX_FLAG_DISCOVERY_RULE => [],
 			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
+		$item_prototypeids = [];
 
 		$sqlFrom = ' items i1,items i2,hosts h';
 		$sqlWhere = ' i2.itemid=i1.templateid'.
@@ -1230,7 +1297,7 @@ abstract class CHostGeneral extends CHostBase {
 		if (!is_null($targetids)) {
 			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status,i1.type'.
+		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status,i1.type,i1.valuemapid'.
 			' FROM '.$sqlFrom.
 			' WHERE '.$sqlWhere;
 
@@ -1245,8 +1312,14 @@ abstract class CHostGeneral extends CHostBase {
 				if ($item['host_status'] == HOST_STATUS_TEMPLATE && $item['type'] != ITEM_TYPE_HTTPTEST) {
 					$upd_item['uuid'] = generateUuidV4();
 				}
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$upd_item['valuemapid'] = 0;
+
+				if ($item['valuemapid'] !== '0') {
+					$upd_item['valuemapid'] = '0';
+
+					if (in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+							&& $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$item_prototypeids[] = $item['itemid'];
+					}
 				}
 
 				$upd_items[$item['flags']][$item['itemid']] = [
@@ -1280,6 +1353,29 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			else {
 				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+
+				if ($item_prototypeids) {
+					$options = [
+						'output' => ['itemid'],
+						'filter' => ['parent_itemid' => $item_prototypeids],
+						'sortfield' => ['itemid'],
+						'sortorder' => [ZBX_SORT_DOWN]
+					];
+					$result = DBselect(DB::makeSql('item_discovery', $options));
+
+					$upd_discovered_items = [];
+
+					while ($row = DBfetch($result)) {
+						$upd_discovered_items[] = [
+							'values' => ['valuemapid' => '0'],
+							'where' => ['itemid' => $row['itemid']]
+						];
+					}
+
+					if ($upd_discovered_items) {
+						DB::update('items', $upd_discovered_items);
+					}
+				}
 			}
 		}
 		/* }}} ITEMS, DISCOVERY RULES */

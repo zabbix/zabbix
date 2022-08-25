@@ -131,7 +131,7 @@
 			});
 
 			dialogue.addEventListener('dialogue.delete', (e) => {
-				this._uncheckTableRows();
+				uncheckTableRows(chkbxRange.prefix);
 
 				postMessageOk(e.detail.title);
 
@@ -173,7 +173,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						this._uncheckTableRows(response.keepids ?? []);
+						uncheckTableRows(chkbxRange.prefix, response.keepids);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -182,7 +182,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						this._uncheckTableRows();
+						uncheckTableRows(chkbxRange.prefix);
 					}
 
 					location.href = location.href;
@@ -197,14 +197,6 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		}
-
-		_uncheckTableRows(keepids) {
-			const page = this.is_filtered
-				? 'service'
-				: 'service_' + this.path.concat(this.serviceid !== null ? [this.serviceid] : []).join('_');
-
-			uncheckTableRows(page, keepids);
 		}
 
 		_pauseRefresh() {

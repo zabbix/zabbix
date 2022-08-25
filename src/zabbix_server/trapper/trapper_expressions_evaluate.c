@@ -20,6 +20,7 @@
 #include "trapper_expressions_evaluate.h"
 
 #include "zbxalgo.h"
+#include "zbxnum.h"
 #include "dbcache.h"
 #include "trapper_auth.h"
 #include "zbxcommshigh.h"

@@ -20,11 +20,12 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
-#include "zbxalgo.h"
-#include "zbxdbhigh.h"
 #include "module.h"
 #include "sysinfo.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxalgo.h"
+#include "zbxdbhigh.h"
 
 static char	*called_key = NULL;
 
