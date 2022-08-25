@@ -69,7 +69,7 @@ class CControllerActionUpdate extends CController {
 
 	protected function doAction(): void {
 		$eventsource = $this->getInput('eventsource');
-		// todo : receive conditions table and operations tables data from form
+		// todo : receive operations tables data from form
 
 //		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
 //			foreach ($action[$operation_group] as &$operation) {
@@ -185,6 +185,7 @@ class CControllerActionUpdate extends CController {
 		];
 
 		if ($filter['conditions']) {
+
 			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 				if (count($filter['conditions']) > 1) {
 					$filter['formula'] = $this->getInput('formula');

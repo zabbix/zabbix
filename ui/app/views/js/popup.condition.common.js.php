@@ -43,6 +43,8 @@ window.condition_popup = new class {
 		curl.setArgument('validate', '1');
 		//curl.setArgument('action', 'conditions.validate');
 
+		//this.validate(this.overlay);
+
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
@@ -90,41 +92,42 @@ window.condition_popup = new class {
 			});
 	}
 
-	validate(overlay) {
-		if (window.operation_popup && window.operation_popup.overlay.$dialogue.is(':visible')) {
-			return window.operation_popup.view.operation_condition.onConditionPopupSubmit(overlay);
-		}
+	// todo : check if I even need the validation function here
+	// validate(overlay) {
+	//	if (window.operation_popup && window.operation_popup.overlay.$dialogue.is(':visible')) {
+	//		return window.operation_popup.view.operation_condition.onConditionPopupSubmit(overlay);
+	//	}
 
-		var $form = overlay.$dialogue.find('form'),
-			url = new Curl($form.attr('action'));
+	//	var $form = overlay.$dialogue.find('form'),
+	//		url = new Curl($form.attr('action'));
 
-		url.setArgument('validate', 1);
+	//	url.setArgument('validate', 1);
 
-		overlay.setLoading();
-		overlay.xhr = jQuery.ajax({
-			url: url.getUrl(),
-			data: $form.serialize(),
-			dataType: 'json',
-			method: 'POST'
-		});
+	//	overlay.setLoading();
+	//	overlay.xhr = jQuery.ajax({
+	//		url: url.getUrl(),
+	//		data: $form.serialize(),
+	//		dataType: 'json',
+	//		method: 'POST'
+	//	});
 
-		overlay.xhr
-			.always(function() {
-				overlay.unsetLoading();
-			})
-			.done(function(response) {
-				overlay.$dialogue.find('.msg-bad').remove();
+	//	overlay.xhr
+	//		.always(function() {
+	//			overlay.unsetLoading();
+	//		})
+	//		.done(function(response) {
+	//			overlay.$dialogue.find('.msg-bad').remove();
 
-				if ('error' in response) {
-					const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
+	//			if ('error' in response) {
+	//				const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
 
-					message_box.insertBefore($form);
-				}
-				// else {
-				//	submit(response, overlay);
-				// }
-			});
-	}
+	//				message_box.insertBefore($form);
+	//			}
+	//			// else {
+	//			//	submit(response, overlay);
+	//			// }
+	//		});
+	//}
 
 	selectServices() {
 		const overlay = PopUp('popup.services', {title: t('Services')}, {dialogueid: 'services'});
