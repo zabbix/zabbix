@@ -19,6 +19,7 @@
 
 #include "version.h"
 #include "zbxtypes.h"
+#include "common.h"
 
 /******************************************************************************
  *                                                                            *
@@ -35,7 +36,7 @@
  ******************************************************************************/
 int	zbx_get_component_version(const char *version_str)
 {
-	char	*phigh, *pmid, *plow;
+	char	*pmid, *plow;
 	char	version_buf[ZBX_VERSION_BUF_LEN];
 
 	if (NULL == version_str)

@@ -4947,13 +4947,13 @@ static void	zbx_db_flush_proxy_lastaccess(void)
  *             diff  - [IN] indicates changes to proxy                        *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_db_update_proxy_version(DC_PROXY *proxy, zbx_proxy_diff_t *diff)
+static void	db_update_proxy_version(DC_PROXY *proxy, zbx_proxy_diff_t *diff)
 {
 	if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION))
 	{
 		if (0 != proxy->version_int)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "proxy \"%s\" protocol version updated from %d.%d to %d.%d",
+			zabbix_log(LOG_LEVEL_DEBUG, "proxy \"%s\" protocol version updated from %u.%u to %u.%u",
 					proxy->host,
 					ZBX_COMPONENT_VERSION_MAJOR(proxy->version_int),
 					ZBX_COMPONENT_VERSION_MINOR(proxy->version_int),
@@ -4963,7 +4963,7 @@ static void	zbx_db_update_proxy_version(DC_PROXY *proxy, zbx_proxy_diff_t *diff)
 
 		if (ZBX_DB_OK > DBexecute(
 				"update host_rtdata"
-				" set version=%d, compatibility=%d"
+				" set version=%u,compatibility=%u"
 				" where hostid=" ZBX_FS_UI64,
 				ZBX_COMPONENT_VERSION_TO_DEC_FORMAT(diff->version_int), diff->compatibility,
 						diff->hostid))
@@ -4987,7 +4987,7 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
 {
 #define SERVER_VERION	ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR, 0)
 
-	if (0 == proxy_version || FAIL == proxy_version)
+	if (0 == proxy_version)
 		return ZBX_PROXY_VERSION_UNDEFINED;
 
 	proxy_version = ZBX_COMPONENT_VERSION_IGNORE_PATCH(proxy_version);
@@ -5041,7 +5041,7 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, char *version_str, int version_int, 
 
 	zbx_dc_update_proxy(&diff);
 
-	zbx_db_update_proxy_version(proxy, &diff);
+	db_update_proxy_version(proxy, &diff);
 
 	zbx_strlcpy(proxy->version_str, version_str, sizeof(proxy->version_str));
 	proxy->version_int = version_int;
@@ -5107,7 +5107,7 @@ int	zbx_check_protocol_version(DC_PROXY *proxy, int version)
 		{
 			if (1 == print_log)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" version %d.%d.%d is not supported by server"
+				zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" version %u.%u.%u is not supported by server"
 						" version %d.%d.%d.", proxy->host,
 						ZBX_COMPONENT_VERSION_MAJOR(version),
 						ZBX_COMPONENT_VERSION_MINOR(version),
@@ -5118,7 +5118,7 @@ int	zbx_check_protocol_version(DC_PROXY *proxy, int version)
 		}
 		else if (ZBX_PROXY_VERSION_OUTDATED == compatibility && 1 == print_log)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" version %d.%d.%d is outdated, only data collection"
+			zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" version %u.%u.%u is outdated, only data collection"
 					" and remote execution is available with server version %d.%d.%d.", proxy->host,
 					ZBX_COMPONENT_VERSION_MAJOR(version), ZBX_COMPONENT_VERSION_MINOR(version),
 					ZBX_COMPONENT_VERSION_PATCH(version), ZABBIX_VERSION_MAJOR,

@@ -25,8 +25,8 @@
 #define ZBX_COMPONENT_VERSION_MINOR(version)		(((zbx_uint32_t)(version) >> 8) & 0xff)
 #define ZBX_COMPONENT_VERSION_PATCH(version)		((zbx_uint32_t)(version) & 0xff)
 #define ZBX_COMPONENT_VERSION_IGNORE_PATCH(version)	((zbx_uint32_t)(version) & ((0xff << 16) | (0xff << 8)))
-#define ZBX_COMPONENT_VERSION_TO_DEC_FORMAT(version)	(ZBX_COMPONENT_VERSION_MAJOR(version)*10000 + \
-		ZBX_COMPONENT_VERSION_MINOR(version)*100 + ZBX_COMPONENT_VERSION_PATCH(version))
+#define ZBX_COMPONENT_VERSION_TO_DEC_FORMAT(version)	(ZBX_COMPONENT_VERSION_MAJOR(version) * 10000 + \
+		ZBX_COMPONENT_VERSION_MINOR(version) * 100 + ZBX_COMPONENT_VERSION_PATCH(version))
 #define ZBX_COMPONENT_VERSION_UNDEFINED			0
 
 #define ZBX_VERSION_UNDEFINED_STR			"undefined"

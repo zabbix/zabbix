@@ -1243,7 +1243,7 @@ static void	zbx_check_db(void)
  * Purpose: save Zabbix server status to database                             *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_db_save_server_status()
+static void	zbx_db_save_server_status(void)
 {
 	struct zbx_json	json;
 
