@@ -429,7 +429,6 @@ if (hasRequest('form')) {
 		'output' => ['hostid', 'proxy_hostid', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 			'ipmi_password', 'tls_accept', 'tls_connect', 'tls_issuer', 'tls_subject'
 		],
-		'selectGroups' => ['groupid', 'name'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'hostids' => $discoveryRule['hostid'],
 		'templated_hosts' => true
