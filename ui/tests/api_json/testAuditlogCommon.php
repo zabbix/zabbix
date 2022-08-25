@@ -23,8 +23,6 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 class testAuditlogCommon extends CAPITest {
 	public function sendGetRequest($output, $action, $result, $resourceid) {
-
-		var_dump($resourceid);
 		$get = $this->call('auditlog.get', [
 			'output' => [$output],
 			'sortfield' => 'clock',

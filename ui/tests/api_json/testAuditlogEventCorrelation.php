@@ -19,24 +19,13 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
  * @backup correlation, ids
  */
-class testAuditlogEventCorrelation extends CAPITest {
-
-	protected static $resourceid;
-
+class testAuditlogEventCorrelation extends testAuditlogCommon {
 	public function testAuditlogEventCorrelation_Create() {
-		$created = "{\"correlation.name\":[\"add\",\"New event correlation for audit\"],\"correlation.filter\":[".
-				"\"add\"],\"correlation.filter.conditions[99004]\":[\"add\"],\"correlation.filter.conditions".
-				"[99004].type\":[\"add\",\"1\"],\"correlation.filter.conditions[99004].tag\":[\"add\",\"ok\"],".
-				"\"correlation.filter.conditions[99004].corr_conditionid\":[\"add\",\"99004\"],\"correlation.".
-				"operations[99004]\":[\"add\"],\"correlation.operations[99004].type\":[\"add\",\"1\"],".
-				"\"correlation.operations[99004].corr_operationid\":[\"add\",\"99004\"],\"correlation.correlationid".
-				"\":[\"add\",\"99004\"]}";
-
 		$create = $this->call('correlation.create', [
 			[
 				'name' => 'New event correlation for audit',
@@ -56,23 +45,26 @@ class testAuditlogEventCorrelation extends CAPITest {
 				]
 			]
 		]);
+		$resourceid = $create['result']['correlationids'][0];
 
-		self::$resourceid = $create['result']['correlationids'][0];
-		$this->sendGetRequest('details', 0, $created);
+		$created = "{\"correlation.name\":[\"add\",\"New event correlation for audit\"],".
+			"\"correlation.filter\":[\"add\"],".
+			"\"correlation.filter.conditions[".$resourceid."]\":[\"add\"],".
+			"\"correlation.filter.conditions[".$resourceid."].type\":[\"add\",\"1\"],".
+			"\"correlation.filter.conditions[".$resourceid."].tag\":[\"add\",\"ok\"],".
+			"\"correlation.filter.conditions[".$resourceid."].corr_conditionid\":[\"add\",\"".$resourceid."\"],".
+			"\"correlation.operations[".$resourceid."]\":[\"add\"],".
+			"\"correlation.operations[".$resourceid."].type\":[\"add\",\"1\"],".
+			"\"correlation.operations[".$resourceid."].corr_operationid\":[\"add\",\"".$resourceid."\"],".
+			"\"correlation.correlationid\":[\"add\",\"".$resourceid."\"]}";
+
+		$this->sendGetRequest('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogEventCorrelation_Update() {
-		$updated = "{\"correlation.filter.conditions[99004]\":[\"delete\"],\"correlation.operations[99004]".
-				"\":[\"delete\"],\"correlation.filter.conditions[99005]\":[\"add\"],\"correlation.operations[99005]".
-				"\":[\"add\"],\"correlation.name\":[\"update\",\"Updated event correlation name\",".
-				"\"New event correlation for audit\"],\"correlation.filter\":[\"update\"],\"correlation.filter.evaltype".
-				"\":[\"update\",\"2\",\"0\"],\"correlation.filter.conditions[99005].tag\":[\"add\",\"not ok\"],".
-				"\"correlation.filter.conditions[99005].corr_conditionid\":[\"add\",\"99005\"],".
-				"\"correlation.operations[99005].corr_operationid\":[\"add\",\"99005\"]}";
-
 		$this->call('correlation.update', [
 			[
-				'correlationid' => self::$resourceid,
+				'correlationid' => 99001,
 				'name' => 'Updated event correlation name',
 				'filter' => [
 					'evaltype' => 2,
@@ -91,25 +83,22 @@ class testAuditlogEventCorrelation extends CAPITest {
 			]
 		]);
 
-		$this->sendGetRequest('details', 1, $updated);
+		$condition = CDBHelper::getAll('SELECT corr_conditionid FROM corr_condition WHERE correlationid = 99001');
+
+		$updated = "{\"correlation.filter.conditions[99001]\":[\"delete\"],".
+			"\"correlation.filter.conditions[".$condition[0]['corr_conditionid']."]\":[\"add\"],".
+			"\"correlation.name\":[\"update\",\"Updated event correlation name\",\"Event correlation for update\"],".
+			"\"correlation.filter\":[\"update\"],".
+			"\"correlation.filter.evaltype\":[\"update\",\"2\",\"0\"],".
+			"\"correlation.filter.conditions[".$condition[0]['corr_conditionid']."].tag\":[\"add\",\"not ok\"],".
+			"\"correlation.filter.conditions[".$condition[0]['corr_conditionid'].
+					"].corr_conditionid\":[\"add\",\"".$condition[0]['corr_conditionid']."\"]}";
+
+		$this->sendGetRequest('details', 1, $updated, 99001);
 	}
 
 	public function testAuditlogEventCorrelation_Delete() {
-		$this->call('correlation.delete', [self::$resourceid]);
-		$this->sendGetRequest('resourcename', 2, 'Updated event correlation name');
-	}
-
-	private function sendGetRequest($output, $action, $result) {
-		$get = $this->call('auditlog.get', [
-			'output' => [$output],
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'filter' => [
-				'resourceid' => self::$resourceid,
-				'action' => $action
-			]
-		]);
-
-		$this->assertEquals($result, $get['result'][0][$output]);
+		$this->call('correlation.delete', [99001]);
+		$this->sendGetRequest('resourcename', 2, 'Updated event correlation name', 99001);
 	}
 }
