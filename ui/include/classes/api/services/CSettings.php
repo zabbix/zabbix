@@ -169,7 +169,7 @@ class CSettings extends CApiService {
 	 * @return array
 	 */
 	protected function validateUpdate(array &$settings): array {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'default_theme' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', array_keys(APP::getThemes()))],
 			'search_limit' =>					['type' => API_INT32, 'in' => '1:999999'],
 			'max_in_table' =>					['type' => API_INT32, 'in' => '1:99999'],
@@ -249,7 +249,7 @@ class CSettings extends CApiService {
 			}
 		}
 
-		if (array_key_exists('alert_usrgrpid', $settings) && $settings['alert_usrgrpid'] !== null) {
+		if (array_key_exists('alert_usrgrpid', $settings)) {
 			$db_usrgrp_exists = API::UserGroup()->get([
 				'countOutput' => true,
 				'usrgrpids' => $settings['alert_usrgrpid']
