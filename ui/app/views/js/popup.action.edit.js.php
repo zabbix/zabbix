@@ -95,7 +95,7 @@ window.action_edit_popup = new class {
 	}
 
 	_createRow(row, input) {
-		row.append(this._createLabelCell());
+		row.append(this._createLabelCell(input));
 		row.append(this._createNameCell(input));
 		row.append(this._createRemoveCell());
 
@@ -104,12 +104,13 @@ window.action_edit_popup = new class {
 		this._processTypeOfCalculation();
 	}
 
-	_createLabelCell() {
+	_createLabelCell(input) {
 		const cell = document.createElement('td');
 
 		this.label = num2letter(this.row_num)
 		cell.setAttribute('class', 'label')
 		cell.setAttribute('data-formulaid', this.label)
+		cell.setAttribute('data-conditiontype', input.conditiontype)
 		cell.append(this.label);
 		this.row_num ++;
 		return cell;
@@ -171,6 +172,7 @@ window.action_edit_popup = new class {
 				cell.append(this.label)
 				cell.setAttribute('class', 'label')
 				cell.setAttribute('data-formulaid', this.label)
+				cell.setAttribute('data-conditiontype', condition.conditiontype)
 				row.append(cell)
 				this.row_num ++;
 				row.append(this._createNameCell(condition));
@@ -288,9 +290,7 @@ window.action_edit_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
-		// todo : check why conditiontype was needed
-		// todo : show/change expression when new condition is added!
-		// todo : check why label is read after new condition is added
+		// todo : show/change expression when new condition is added! -> check why label is read after new condition is added
 
 		this.show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 		const labels = jQuery('#conditionTable .label');
@@ -318,7 +318,6 @@ window.action_edit_popup = new class {
 			jQuery('#expression').toggle(!this.show_formula);
 			const labels = jQuery('#conditionTable .label');
 
-		//	if (labels.length > 1) {
 				var conditions = [];
 
 				labels.each(function(index, label) {
@@ -331,7 +330,7 @@ window.action_edit_popup = new class {
 				});
 
 				jQuery('#expression').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
-		//	}
+
 		});
 	}
 }
