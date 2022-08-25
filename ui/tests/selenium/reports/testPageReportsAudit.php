@@ -21,9 +21,6 @@
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 
-/**
- *  @backupOnce auditlog
- */
 class testPageReportsAudit extends CLegacyWebTest {
 
 	use MacrosTrait;
