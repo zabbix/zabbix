@@ -764,10 +764,6 @@ class CDRule extends CApiService {
 
 			// Update drule if it's modified.
 			if (DB::recordModified('drules', $db_drule, $drule)) {
-				if (array_key_exists('delay', $drule) && $db_drule['delay'] != $drule['delay']) {
-					$drule['nextcheck'] = 0;
-				}
-
 				DB::updateByPk('drules', $drule['druleid'], $drule);
 			}
 

@@ -153,10 +153,6 @@ class CHttpTestManager {
 		foreach ($httptests as $key => $httptest) {
 			$db_httptest = $db_httptests[$httptest['httptestid']];
 
-			if (array_key_exists('delay', $httptest) && $db_httptest['delay'] != $httptest['delay']) {
-				$httptest['nextcheck'] = 0;
-			}
-
 			DB::update('httptest', [
 				'values' => $httptest,
 				'where' => ['httptestid' => $httptest['httptestid']]
@@ -228,7 +224,7 @@ class CHttpTestManager {
 						$deleteStepItemIds[] = $itemId;
 					}
 
-					DB::delete('httpstep', ['httpstep_field' => $stepidsDelete]);
+					DB::delete('httpstep_field', ['httpstepid' => $stepidsDelete]);
 
 					DB::delete('httpstep', ['httpstepid' => $stepidsDelete]);
 				}

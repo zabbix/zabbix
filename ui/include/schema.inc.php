@@ -487,12 +487,6 @@ return [
 				'length' => 255,
 				'default' => '1h'
 			],
-			'nextcheck' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
 			'status' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -615,12 +609,6 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => ''
-			],
-			'nextcheck' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
 			],
 			'delay' => [
 				'null' => false,
@@ -2151,7 +2139,7 @@ return [
 				'default' => '0'
 			],
 			'discovery_groupid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'hstgrp',

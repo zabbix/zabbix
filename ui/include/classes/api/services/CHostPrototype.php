@@ -2243,6 +2243,7 @@ class CHostPrototype extends CHostBase {
 			self::deleteDiscoveredGroups($group_prototypeids);
 		}
 
+		DB::delete('httptest', ['hostid' => $hostids]);
 		DB::delete('interface', ['hostid' => $hostids]);
 		DB::delete('group_prototype', ['group_prototypeid' => array_column($db_host_prototypes, 'group_prototypeid')]);
 		DB::delete('hosts_templates', ['hostid' => $hostids]);
