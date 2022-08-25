@@ -19,27 +19,13 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
  * @backup maintenances, ids
  */
-class testAuditlogMaintenance extends CAPITest {
-
-	protected static $resourceid;
-
+class testAuditlogMaintenance extends testAuditlogCommon {
 	public function testAuditlogMaintenance_Create() {
-		$created = "{\"maintenance.name\":[\"add\",\"audit_maintenance\"],\"maintenance.active_since\":[\"add\",".
-				"\"1358844540\"],\"maintenance.active_till\":[\"add\",\"1390466940\"],\"maintenance.groups[5]\":[".
-				"\"add\"],\"maintenance.groups[5].groupid\":[\"add\",\"2\"],\"maintenance.groups[5].maintenance_groupid".
-				"\":[\"add\",\"5\"],\"maintenance.timeperiods[6]\":[\"add\"],\"maintenance.timeperiods[6].period\":[".
-				"\"add\",\"3600\"],\"maintenance.timeperiods[6].timeperiod_type\":[\"add\",\"3\"],".
-				"\"maintenance.timeperiods[6].start_time\":[\"add\",\"64800\"],\"maintenance.timeperiods[6].dayofweek".
-				"\":[\"add\",\"64\"],\"maintenance.timeperiods[6].timeperiodid\":[\"add\",\"6\"],\"maintenance.tags[1]".
-				"\":[\"add\"],\"maintenance.tags[1].tag\":[\"add\",\"audit\"],\"maintenance.tags[1].operator\":[\"add".
-				"\",\"0\"],\"maintenance.tags[1].value\":[\"add\",\"details\"],\"maintenance.tags[1].maintenancetagid".
-				"\":[\"add\",\"1\"],\"maintenance.maintenanceid\":[\"add\",\"60006\"]}";
-
 		$create = $this->call('maintenance.create', [
 			[
 				'name' => 'audit_maintenance',
@@ -47,7 +33,7 @@ class testAuditlogMaintenance extends CAPITest {
 				'active_till' => 1390466940,
 				'tags_evaltype' => 0,
 				'groups' => [
-					'groupid' => '2'
+					'groupid' => 2
 				],
 				'timeperiods' => [
 					[
@@ -61,39 +47,51 @@ class testAuditlogMaintenance extends CAPITest {
 				'tags' => [
 					[
 						'tag' => 'audit',
-						'operator' => '0',
+						'operator' => 0,
 						'value' => 'details'
 					]
 				]
 			]
 		]);
 
-		self::$resourceid = $create['result']['maintenanceids'][0];
-		$this->sendGetRequest('details', 0, $created);
+		$resourceid = $create['result']['maintenanceids'][0];
+		$groupid = CDBHelper::getRow('SELECT maintenance_groupid FROM maintenances_groups WHERE maintenanceid='.$resourceid);
+		$timeperiod = CDBHelper::getRow('SELECT timeperiodid FROM timeperiods ORDER BY timeperiodid DESC');
+		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.$resourceid);
+
+		$created = "{\"maintenance.name\":[\"add\",\"audit_maintenance\"],".
+				"\"maintenance.active_since\":[\"add\",\"1358844540\"],".
+				"\"maintenance.active_till\":[\"add\",\"1390466940\"],".
+				"\"maintenance.groups[".$groupid['maintenance_groupid']."]\":[\"add\"],".
+				"\"maintenance.groups[".$groupid['maintenance_groupid']."].groupid\":[\"add\",\"2\"],".
+				"\"maintenance.groups[".$groupid['maintenance_groupid']."].maintenance_groupid\":[\"add\",\"".
+						$groupid['maintenance_groupid']."\"],".
+				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."]\":[\"add\"],".
+				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].period\":[\"add\",\"3600\"],".
+				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiod_type\":[\"add\",\"3\"],".
+				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].start_time\":[\"add\",\"64800\"],".
+				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].dayofweek\":[\"add\",\"64\"],".
+				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiodid\":[\"add\",\"".$timeperiod['timeperiodid']."\"],".
+				"\"maintenance.tags[".$tags['maintenancetagid']."]\":[\"add\"],".
+				"\"maintenance.tags[".$tags['maintenancetagid']."].tag\":[\"add\",\"audit\"],".
+				"\"maintenance.tags[".$tags['maintenancetagid']."].operator\":[\"add\",\"0\"],".
+				"\"maintenance.tags[".$tags['maintenancetagid']."].value\":[\"add\",\"details\"],".
+				"\"maintenance.tags[".$tags['maintenancetagid']."].maintenancetagid\":[\"add\",\"".$tags['maintenancetagid']."\"],".
+				"\"maintenance.maintenanceid\":[\"add\",\"".$resourceid."\"]}";
+
+		$this->sendGetRequest('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogMaintenance_Update() {
-		$updated = "{\"maintenance.tags[1]\":[\"delete\"],\"maintenance.timeperiods[6]\":[\"delete\"],".
-				"\"maintenance.timeperiods[7]\":[\"add\"],\"maintenance.tags[2]\":[\"add\"],\"maintenance.name".
-				"\":[\"update\",\"updated_maintenance\",\"audit_maintenance\"],\"maintenance.active_since\":[".
-				"\"update\",\"1458844500\",\"1358844540\"],\"maintenance.active_till\":[\"update\",\"1490466900\",".
-				"\"1390466940\"],\"maintenance.timeperiods[7].period\":[\"add\",\"7200\"],\"maintenance.timeperiods".
-				"[7].timeperiod_type\":[\"add\",\"4\"],\"maintenance.timeperiods[7].start_time\":[\"add\",\"68760\"],".
-				"\"maintenance.timeperiods[7].every\":[\"add\",\"3\"],\"maintenance.timeperiods[7].day\":[\"add\",".
-				"\"4\"],\"maintenance.timeperiods[7].month\":[\"add\",\"5\"],\"maintenance.timeperiods[7].timeperiodid".
-				"\":[\"add\",\"7\"],\"maintenance.tags[2].tag\":[\"add\",\"updated_audit\"],\"maintenance.tags".
-				"[2].operator\":[\"add\",\"0\"],\"maintenance.tags[2].value\":[\"add\",\"updated_details\"],".
-				"\"maintenance.tags[2].maintenancetagid\":[\"add\",\"2\"]}";
-
 		$this->call('maintenance.update', [
 			[
-				'maintenanceid' => self::$resourceid,
+				'maintenanceid' => 60002,
 				'name' => 'updated_maintenance',
 				'active_since' => 1458844540,
 				'active_till' => 1490466940,
 				'tags_evaltype' => 0,
 				'groups' => [
-					'groupid' => '2'
+					'groupid' => 2
 				],
 				'timeperiods' => [
 					[
@@ -108,32 +106,44 @@ class testAuditlogMaintenance extends CAPITest {
 				'tags' => [
 					[
 						'tag' => 'updated_audit',
-						'operator' => '0',
+						'operator' => 0,
 						'value' => 'updated_details'
 					]
 				]
 			]
 		]);
 
-		$this->sendGetRequest('details', 1, $updated);
+		$groupid = CDBHelper::getRow('SELECT maintenance_groupid FROM maintenances_groups WHERE maintenanceid=60002');
+		$timeperiod = CDBHelper::getRow('SELECT timeperiodid FROM timeperiods ORDER BY timeperiodid DESC');
+		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid=60002');
+
+		$updated = "{\"maintenance.groups[1]\":[\"delete\"],".
+			"\"maintenance.timeperiods[2]\":[\"delete\"],".
+			"\"maintenance.groups[".$groupid['maintenance_groupid']."]\":[\"add\"],".
+			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."]\":[\"add\"],".
+			"\"maintenance.tags[".$tags['maintenancetagid']."]\":[\"add\"],".
+			"\"maintenance.name\":[\"update\",\"updated_maintenance\",\"maintenance_has_only_group\"],".
+			"\"maintenance.active_since\":[\"update\",\"1458844500\",\"1539723600\"],".
+			"\"maintenance.active_till\":[\"update\",\"1490466900\",\"1539810000\"],".
+			"\"maintenance.groups[".$groupid['maintenance_groupid']."].groupid\":[\"add\",\"2\"],".
+			"\"maintenance.groups[".$groupid['maintenance_groupid']."].maintenance_groupid\":[\"add\",\"".$groupid['maintenance_groupid']."\"],".
+			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].period\":[\"add\",\"7200\"],".
+			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiod_type\":[\"add\",\"4\"],".
+			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].start_time\":[\"add\",\"68760\"],".
+			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].every\":[\"add\",\"3\"],".
+			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].day\":[\"add\",\"4\"],".
+			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].month\":[\"add\",\"5\"],".
+			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiodid\":[\"add\",\"".$timeperiod['timeperiodid']."\"],".
+			"\"maintenance.tags[".$tags['maintenancetagid']."].tag\":[\"add\",\"updated_audit\"],".
+			"\"maintenance.tags[".$tags['maintenancetagid']."].operator\":[\"add\",\"0\"],".
+			"\"maintenance.tags[".$tags['maintenancetagid']."].value\":[\"add\",\"updated_details\"],".
+			"\"maintenance.tags[".$tags['maintenancetagid']."].maintenancetagid\":[\"add\",\"".$tags['maintenancetagid']."\"]}";
+
+		$this->sendGetRequest('details', 1, $updated, 60002);
 	}
 
 	public function testAuditlogMaintenance_Delete() {
-		$this->call('maintenance.delete', [self::$resourceid]);
-		$this->sendGetRequest('resourcename', 2, 'updated_maintenance');
-	}
-
-	private function sendGetRequest($output, $action, $result) {
-		$get = $this->call('auditlog.get', [
-			'output' => [$output],
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'filter' => [
-				'resourceid' => self::$resourceid,
-				'action' => $action
-			]
-		]);
-
-		$this->assertEquals($result, $get['result'][0][$output]);
+		$this->call('maintenance.delete', [60002]);
+		$this->sendGetRequest('resourcename', 2, 'updated_maintenance', 60002);
 	}
 }
