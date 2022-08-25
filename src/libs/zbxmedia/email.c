@@ -278,7 +278,7 @@ static char	*email_encode_part(const char *data, size_t data_size)
 	char	*base64 = NULL, *part;
 
 	str_base64_encode_dyn(data, &base64, data_size);
-	part = str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE, "\r\n");
+	part = zbx_str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE, "\r\n");
 	zbx_free(base64);
 
 	return part;
@@ -297,11 +297,11 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 
 	/* prepare subject */
 
-	tmp = string_replace(mailsubject, "\r\n", " ");
-	localsubject = string_replace(tmp, "\n", " ");
+	tmp = zbx_string_replace(mailsubject, "\r\n", " ");
+	localsubject = zbx_string_replace(tmp, "\n", " ");
 	zbx_free(tmp);
 
-	if (FAIL == is_ascii_string(localsubject))
+	if (FAIL == zbx_is_ascii_string(localsubject))
 	{
 		/* split subject into multiple RFC 2047 "encoded-words" */
 		str_base64_encode_rfc2047(localsubject, &base64);
@@ -317,8 +317,8 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 	{
 		char	*tmp_body;
 
-		tmp = string_replace(mailbody, "\r\n", "\n");
-		tmp_body = string_replace(tmp, "\n", "\r\n");
+		tmp = zbx_string_replace(mailbody, "\r\n", "\n");
+		tmp_body = zbx_string_replace(tmp, "\n", "\r\n");
 		localbody = email_encode_part(tmp_body, strlen(tmp_body));
 		zbx_free(tmp_body);
 		zbx_free(tmp);
@@ -862,8 +862,8 @@ char	*zbx_email_make_body(const char *message, unsigned char content_type,  cons
 	size_t	body_alloc = 0, body_offset = 0;
 	char	*body = NULL, *localbody, *tmp, *tmp_body, *localattachment;
 
-	tmp = string_replace(message, "\r\n", "\n");
-	tmp_body = string_replace(tmp, "\n", "\r\n");
+	tmp = zbx_string_replace(message, "\r\n", "\n");
+	tmp_body = zbx_string_replace(tmp, "\n", "\r\n");
 	localbody = email_encode_part(tmp_body, strlen(tmp_body));
 	zbx_free(tmp_body);
 	zbx_free(tmp);

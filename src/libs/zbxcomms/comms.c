@@ -177,7 +177,7 @@ static int	zbx_socket_peer_ip_save(zbx_socket_t *s)
 		return FAIL;
 	}
 #else
-	strscpy(s->peer, inet_ntoa(sa.sin_addr));
+	zbx_strscpy(s->peer, inet_ntoa(sa.sin_addr));
 #endif
 	return SUCCEED;
 }
@@ -615,7 +615,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL != ip && SUCCEED != is_ip(ip))
+	if (NULL != ip && SUCCEED != zbx_is_ip(ip))
 	{
 		server_name = ip;
 	}
@@ -746,7 +746,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL != ip && SUCCEED != is_ip(ip))
+	if (NULL != ip && SUCCEED != zbx_is_ip(ip))
 	{
 		server_name = ip;
 	}
@@ -1287,7 +1287,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 		if (NULL != delim)
 			*delim = '\0';
 
-		if (NULL != ip && FAIL == is_ip4(ip))
+		if (NULL != ip && FAIL == zbx_is_ip4(ip))
 		{
 			zbx_set_socket_strerror("incorrect IPv4 address [%s]", ip);
 			goto out;
@@ -2252,11 +2252,11 @@ int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_
 
 int	validate_cidr(const char *ip, const char *cidr, void *value)
 {
-	if (SUCCEED == is_ip4(ip))
-		return is_uint_range(cidr, value, 0, IPV4_MAX_CIDR_PREFIX);
+	if (SUCCEED == zbx_is_ip4(ip))
+		return zbx_is_uint_range(cidr, value, 0, IPV4_MAX_CIDR_PREFIX);
 #ifdef HAVE_IPV6
-	if (SUCCEED == is_ip6(ip))
-		return is_uint_range(cidr, value, 0, IPV6_MAX_CIDR_PREFIX);
+	if (SUCCEED == zbx_is_ip6(ip))
+		return zbx_is_uint_range(cidr, value, 0, IPV6_MAX_CIDR_PREFIX);
 #endif
 	return FAIL;
 }
@@ -2266,7 +2266,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
 	char	*start, *end, *cidr_sep;
 	char	tmp[MAX_STRING_LEN];
 
-	strscpy(tmp, peer_list);
+	zbx_strscpy(tmp, peer_list);
 
 	for (start = tmp; '\0' != *start;)
 	{
@@ -2284,7 +2284,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
 				return FAIL;
 			}
 		}
-		else if (FAIL == is_supported_ip(start) && FAIL == zbx_validate_hostname(start))
+		else if (FAIL == zbx_is_supported_ip(start) && FAIL == zbx_validate_hostname(start))
 		{
 			*error = zbx_dsprintf(NULL, "\"%s\"", start);
 			return FAIL;
@@ -2322,7 +2322,7 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 
 	/* examine list of allowed peers which may include DNS names, IPv4/6 addresses and addresses in CIDR notation */
 
-	strscpy(tmp, peer_list);
+	zbx_strscpy(tmp, peer_list);
 
 	for (start = tmp; '\0' != *start;)
 	{

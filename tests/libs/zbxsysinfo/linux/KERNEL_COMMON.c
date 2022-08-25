@@ -57,8 +57,11 @@ void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
 				zbx_mock_error_string(error));
 	}
 
-	if (FAIL == is_uint64(expected_param_value_string, &expected_param_value) && SYSINFO_RET_OK == expected_result)
+	if (FAIL == zbx_is_uint64(expected_param_value_string, &expected_param_value) &&
+			SYSINFO_RET_OK == expected_result)
+	{
 		fail_msg("Cannot get expected numeric parameter from test case data: %s", expected_param_value_string);
+	}
 
 	init_request(&request);
 	init_result(&param_result);
