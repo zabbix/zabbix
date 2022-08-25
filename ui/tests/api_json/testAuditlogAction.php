@@ -25,9 +25,6 @@ require_once dirname(__FILE__).'/testAuditlogCommon.php';
  * @backup  actions, ids
  */
 class testAuditlogAction extends testAuditlogCommon {
-
-	public $resourceid;
-
 	public function testAuditlogAction_Create() {
 		$create = $this->call('action.create', [
 			[
@@ -85,10 +82,10 @@ class testAuditlogAction extends testAuditlogCommon {
 				'notify_if_canceled' => 0
 			]
 		]);
-		$this->resourceid = $create['result']['actionids'][0];
+		$resourceid = $create['result']['actionids'][0];
 
-		$operationid = CDBHelper::getAll('SELECT operationid FROM operations WHERE actionid='.$this->resourceid.' AND operationtype In (0,11,12)');
-		$conditiodid = CDBHelper::getAll('SELECT conditionid FROM conditions WHERE actionid='.$this->resourceid);
+		$operationid = CDBHelper::getAll('SELECT operationid FROM operations WHERE actionid='.$resourceid.' AND operationtype In (0,11,12)');
+		$conditiodid = CDBHelper::getAll('SELECT conditionid FROM conditions WHERE actionid='.$resourceid);
 		$op_group = CDBHelper::getAll('SELECT opmessage_grpid FROM opmessage_grp WHERE operationid='.$operationid[0]['operationid']);
 
 		$created = "{\"action.name\":[\"add\",\"Audit action\"],\"action.esc_period\":[\"add\",\"2m\"],".
@@ -123,9 +120,9 @@ class testAuditlogAction extends testAuditlogCommon {
 			"\"action.update_operations[".$operationid[2]['operationid']."].operationid\":[\"add\",\"".$operationid[2]['operationid']."\"],".
 			"\"action.pause_suppressed\":[\"add\",\"0\"],".
 			"\"action.notify_if_canceled\":[\"add\",\"0\"],".
-			"\"action.actionid\":[\"add\",\"$this->resourceid\"]}";
+			"\"action.actionid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->sendGetRequest('details', 0, $created);
+		$this->sendGetRequest('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogAction_Update() {
@@ -197,11 +194,11 @@ class testAuditlogAction extends testAuditlogCommon {
 			"\"action.operations[".$operationid[0]['operationid']."].opmessage.message\":[\"update\",\"Updated audit message\",\"\"],".
 			"\"action.operations[".$operationid[0]['operationid']."].opmessage.subject\":[\"update\",\"Updated audit message\",\"\"]}";
 
-		$this->sendGetRequest('details', 1, $updated);
+		$this->sendGetRequest('details', 1, $updated, 3);
 	}
 
 	public function testAuditlogAction_Delete() {
 		$this->call('action.delete', [3]);
-		$this->sendGetRequest('resourcename', 2, 'Updated action audit');
+		$this->sendGetRequest('resourcename', 2, 'Updated action audit', 3);
 	}
 }

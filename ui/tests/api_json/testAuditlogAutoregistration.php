@@ -25,9 +25,6 @@ require_once dirname(__FILE__).'/testAuditlogCommon.php';
  * @backup config_autoreg_tls, config
  */
 class testAuditlogAutoregistration extends testAuditlogCommon {
-
-	public $resourceid = 1;
-
 	public function testAuditlogAutoregistration_Update() {
 		$updated = "{\"autoregistration.tls_accept\":[\"update\",\"3\",\"1\"],\"autoregistration.tls_psk_identity\":[".
 				"\"update\",\"******\",\"******\"],\"autoregistration.tls_psk\":[\"update\",\"******\",\"******\"]}";
@@ -38,6 +35,6 @@ class testAuditlogAutoregistration extends testAuditlogCommon {
 			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
 		]);
 
-		$this->sendGetRequest('details', 1, $updated);
+		$this->sendGetRequest('details', 1, $updated, 1);
 	}
 }

@@ -19,38 +19,13 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup dashboard, ids
+ * @backup  dashboard, ids
  */
-class testAuditlogDashboard extends CAPITest {
-
-	protected static $resourceid;
-
+class testAuditlogDashboard extends testAuditlogCommon {
 	public function testAuditlogDashboard_Create() {
-		$created = "{\"dashboard.name\":[\"add\",\"Audit dashboard\"],\"dashboard.pages[1933].widgets[5309]\":[\"add".
-				"\"],\"dashboard.pages[1933].widgets[5309].type\":[\"add\",\"problems\"],\"dashboard.pages".
-				"[1933].widgets[5309].width\":[\"add\",\"12\"],\"dashboard.pages[1933].widgets[5309].height\":[\"add".
-				"\",\"5\"],\"dashboard.pages[1933].widgets[5309].fields[15708]\":[\"add\"],\"dashboard.pages".
-				"[1933].widgets[5309].fields[15708].type\":[\"add\",\"1\"],\"dashboard.pages[1933].widgets".
-				"[5309].fields[15708].name\":[\"add\",\"tags.tag.0\"],\"dashboard.pages[1933].widgets[5309].fields".
-				"[15708].value\":[\"add\",\"service\"],\"dashboard.pages[1933].widgets[5309].fields".
-				"[15708].widget_fieldid\":[\"add\",\"15708\"],\"dashboard.pages[1933].widgets[5309].fields[15709]".
-				"\":[\"add\"],\"dashboard.pages[1933].widgets[5309].fields[15709].name\":[\"add\",\"tags.operator.0".
-				"\"],\"dashboard.pages[1933].widgets[5309].fields[15709].value\":[\"add\",\"1\"],".
-				"\"dashboard.pages[1933].widgets[5309].fields[15709].widget_fieldid\":[\"add\",\"15709\"],".
-				"\"dashboard.pages[1933].widgets[5309].fields[15710]\":[\"add\"],\"dashboard.pages[1933].widgets".
-				"[5309].fields[15710].type\":[\"add\",\"1\"],\"dashboard.pages[1933].widgets[5309].fields[15710].name".
-				"\":[\"add\",\"tags.value.0\"],\"dashboard.pages[1933].widgets[5309].fields[15710].value\":[\"add".
-				"\",\"zabbix_server\"],\"dashboard.pages[1933].widgets[5309].fields[15710].widget_fieldid\":[\"add".
-				"\",\"15710\"],\"dashboard.pages[1933].widgets[5309].widgetid\":[\"add\",\"5309\"],".
-				"\"dashboard.pages[1933]\":[\"add\"],\"dashboard.pages[1933].dashboard_pageid\":[\"add\",".
-				"\"1933\"],\"dashboard.userGroups[2]\":[\"add\"],\"dashboard.userGroups[2].usrgrpid\":[\"add\",".
-				"\"7\"],\"dashboard.userGroups[2].dashboard_usrgrpid\":[\"add\",\"2\"],\"dashboard.users[1]\":[\"add".
-				"\"],\"dashboard.users[1].userid\":[\"add\",\"1\"],\"dashboard.users[1].dashboard_userid\":[\"add\",".
-				"\"1\"],\"dashboard.userid\":[\"add\",\"1\"],\"dashboard.dashboardid\":[\"add\",\"165\"]}";
-
 		$create = $this->call('dashboard.create', [
 			[
 				'name' => 'Audit dashboard',
@@ -89,38 +64,79 @@ class testAuditlogDashboard extends CAPITest {
 				],
 				'userGroups' => [
 					[
-						'usrgrpid' => '7',
+						'usrgrpid' => 7,
 						'permission' => 2
 					]
 				],
 				'users' => [
 					[
-						'userid' => '1',
+						'userid' => 1,
 						'permission' => 2
 					]
 				]
 			]
 		]);
 
-		self::$resourceid = $create['result']['dashboardids'][0];
-		$this->sendGetRequest('details', 0, $created);
+		$resourceid = $create['result']['dashboardids'][0];
+
+		$pageid = CDBHelper::getAll('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='.$resourceid);
+		$widgetid = CDBHelper::getAll('SELECT widgetid FROM widget WHERE dashboard_pageid='.$pageid[0]['dashboard_pageid']);
+		$fieldid = CDBHelper::getAll('SELECT widget_fieldid FROM widget_field WHERE widgetid ='
+				.$widgetid[0]['widgetid'].' ORDER BY widget_fieldid ASC');
+
+		$created = "{\"dashboard.name\":[\"add\",\"Audit dashboard\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid']."].type\":[\"add\",\"problems\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid']."].width\":[\"add\",\"12\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid']."].height\":[\"add\",\"5\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[0]['widget_fieldid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[0]['widget_fieldid']."].type\":[\"add\",\"1\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[0]['widget_fieldid']."].name\":[\"add\",\"tags.tag.0\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[0]['widget_fieldid']."].value\":[\"add\",\"service\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[0]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[0]['widget_fieldid']."\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[1]['widget_fieldid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[1]['widget_fieldid']."].name\":[\"add\",\"tags.operator.0\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[1]['widget_fieldid']."].value\":[\"add\",\"1\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[1]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[1]['widget_fieldid']."\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[2]['widget_fieldid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[2]['widget_fieldid']."].type\":[\"add\",\"1\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[2]['widget_fieldid']."].name\":[\"add\",\"tags.value.0\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[2]['widget_fieldid']."].value\":[\"add\",\"zabbix_server\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].fields[".$fieldid[2]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[2]['widget_fieldid']."\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].widgetid\":[\"add\",\"".$widgetid[0]['widgetid']."\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].dashboard_pageid\":[\"add\",\"".$pageid[0]['dashboard_pageid']."\"],".
+			"\"dashboard.userGroups[2]\":[\"add\"],".
+			"\"dashboard.userGroups[2].usrgrpid\":[\"add\",\"7\"],".
+			"\"dashboard.userGroups[2].dashboard_usrgrpid\":[\"add\",\"2\"],".
+			"\"dashboard.users[1]\":[\"add\"],".
+			"\"dashboard.users[1].userid\":[\"add\",\"1\"],".
+			"\"dashboard.users[1].dashboard_userid\":[\"add\",\"1\"],".
+			"\"dashboard.userid\":[\"add\",\"1\"],".
+			"\"dashboard.dashboardid\":[\"add\",\"".$resourceid."\"]}";
+
+		$this->sendGetRequest('details', 0, $created, $resourceid);
 	}
 
-	public function testAuditlogIconMap_Update() {
-		$updated = "{\"dashboard.pages[1933]\":[\"delete\"],\"dashboard.pages[1934].widgets[5310]\":[\"add\"],".
-				"\"dashboard.pages[1934]\":[\"add\"],\"dashboard.pages[1935]\":[\"add\"],\"dashboard.name\":[".
-				"\"update\",\"Updated dashboard name\",\"Audit dashboard\"],\"dashboard.display_period\":[\"update".
-				"\",\"60\",\"30\"],\"dashboard.auto_start\":[\"update\",\"0\",\"1\"],\"dashboard.pages[1934].widgets".
-				"[5310].type\":[\"add\",\"clock\"],\"dashboard.pages[1934].widgets[5310].width\":[\"add\",\"4\"],".
-				"\"dashboard.pages[1934].widgets[5310].height\":[\"add\",\"3\"],\"dashboard.pages[1934].widgets".
-				"[5310].widgetid\":[\"add\",\"5310\"],\"dashboard.pages[1934].dashboard_pageid\":[\"add\",\"1934\"],".
-				"\"dashboard.pages[1935].display_period\":[\"add\",\"60\"],\"dashboard.pages[1935].dashboard_pageid".
-				"\":[\"add\",\"1935\"],\"dashboard.userGroups[2]\":[\"update\"],\"dashboard.userGroups[2].permission".
-				"\":[\"update\",\"3\",\"2\"]}";
-
+	public function testAuditlogDashboard_Update() {
 		$this->call('dashboard.update', [
 			[
-				'dashboardid' => self::$resourceid,
+				'dashboardid' => 1,
 				'name' => 'Updated dashboard name',
 				'display_period' => 60,
 				'auto_start' => 0,
@@ -135,39 +151,46 @@ class testAuditlogDashboard extends CAPITest {
 								'height' => 3
 							]
 						]
-					],
-					[
-						'display_period' => 60
 					]
 				],
 				'userGroups' => [
 					[
-						'usrgrpid' => '7',
+						'usrgrpid' => 7,
 						'permission' => 3
 					]
 				]
 			]
 		]);
 
-		$this->sendGetRequest('details', 1, $updated);
+		$pageid = CDBHelper::getAll('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=1');
+		$widgetid = CDBHelper::getAll('SELECT widgetid FROM widget WHERE dashboard_pageid='.$pageid[0]['dashboard_pageid']);
+
+		$updated = "{\"dashboard.pages[1]\":[\"delete\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."]\":[\"add\"],".
+			"\"dashboard.userGroups[3]\":[\"add\"],".
+			"\"dashboard.name\":[\"update\",\"Updated dashboard name\",\"Global view\"],".
+			"\"dashboard.display_period\":[\"update\",\"60\",\"30\"],".
+			"\"dashboard.auto_start\":[\"update\",\"0\",\"1\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].type\":[\"add\",\"clock\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].width\":[\"add\",\"4\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].height\":[\"add\",\"3\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
+					"].widgetid\":[\"add\",\"".$widgetid[0]['widgetid']."\"],".
+			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].dashboard_pageid\":[\"add\",\"".
+					$pageid[0]['dashboard_pageid']."\"],".
+			"\"dashboard.userGroups[3].usrgrpid\":[\"add\",\"7\"],".
+			"\"dashboard.userGroups[3].permission\":[\"add\",\"3\"],".
+			"\"dashboard.userGroups[3].dashboard_usrgrpid\":[\"add\",\"3\"]}";
+
+		$this->sendGetRequest('details', 1, $updated, 1);
 	}
 
-	public function testAuditlogIconMap_Delete() {
-		$this->call('dashboard.delete', [self::$resourceid]);
-		$this->sendGetRequest('resourcename', 2, 'Updated dashboard name');
-	}
-
-	private function sendGetRequest($output, $action, $result) {
-		$get = $this->call('auditlog.get', [
-			'output' => [$output],
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'filter' => [
-				'resourceid' => self::$resourceid,
-				'action' => $action
-			]
-		]);
-
-		$this->assertEquals($result, $get['result'][0][$output]);
+	public function testAuditlogDashboard_Delete() {
+		$this->call('dashboard.delete', [1]);
+		$this->sendGetRequest('resourcename', 2, 'Updated dashboard name', 1);
 	}
 }
