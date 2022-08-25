@@ -46,7 +46,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns, char **error)
 		return SYSINFO_RET_FAIL;
 	}
 
-	strscpy(ps_id.name, if_name);
+	zbx_strscpy(ps_id.name, if_name);
 
 	if (-1 == perfstat_netinterface(&ps_id, &ps_netif, sizeof(ps_netif), 1))
 	{
@@ -226,7 +226,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ps_netif = zbx_malloc(ps_netif, rc * sizeof(perfstat_netinterface_t));
 
 	/* set name to first interface */
-	strscpy(ps_id.name, FIRST_NETINTERFACE);	/* pseudo-name for the first network interface */
+	zbx_strscpy(ps_id.name, FIRST_NETINTERFACE);	/* pseudo-name for the first network interface */
 
 	/* ask to get all the structures available in one call */
 	/* return code is number of structures returned */

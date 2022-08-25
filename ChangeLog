@@ -1,6 +1,7 @@
 Changes for 6.4.0alpha1
 
 New features:
+..F....... [ZBXNEXT-7832] renamed setting "Dynamic item" to "Enable host selection" for URL, Plain text, Graph prototype, Item value, Graph classic widgets (agavriluks)
 .........T [ZBXNEXT-7520] added template for OPNsense (drasihov)
 .D.G...PS. [ZBXNEXT-7852] added incremental active check refresh for active agents (vso)
 .........T [ZBXNEXT-7834] added templates for Microsoft Azure and Azure virtual machines (vkhaliev)
@@ -16,6 +17,7 @@ New features:
 .........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
+.......PS. [ZBX-21454] added blocking of rtc signals during script execution (dgoloscapov)
 ..F....... [ZBX-20920] fixed problem of empty psk fields sent to audit log when any proxy parameter is updated (dpetra)
 ..F....... [ZBX-21342] fixed sessionStorage not being updated when deleting services (rdetlavs)
 ..F....... [ZBX-20809] fixed problem with stuck widget action popovers (dpetra)
@@ -444,6 +446,12 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.8rc2
+
+Bug fixes:
+........S. [ZBX-19893] fixed bug introduced when fixing script parameters updates during linking (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.8rc1

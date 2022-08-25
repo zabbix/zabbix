@@ -392,7 +392,7 @@ class CWidgetFormItem extends CWidgetForm {
 
 		// Dynamic item.
 		if ($templateid === null) {
-			$dynamic_item = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
+			$dynamic_item = (new CWidgetFieldCheckBox('dynamic', _('Enable host selection')))->setDefault(WIDGET_SIMPLE_ITEM);
 
 			if (array_key_exists('dynamic', $this->data)) {
 				$dynamic_item->setValue($this->data['dynamic']);

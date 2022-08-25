@@ -51,7 +51,7 @@ static struct strbuf	ctlbuf =
 
 static void	add_if_name(char **if_list, size_t *if_list_alloc, size_t *if_list_offset, const char *name)
 {
-	if (FAIL == str_in_list(*if_list, name, ZBX_IF_SEP))
+	if (FAIL == zbx_str_in_list(*if_list, name, ZBX_IF_SEP))
 	{
 		if ('\0' != **if_list)
 			zbx_chrcpy_alloc(if_list, if_list_alloc, if_list_offset, ZBX_IF_SEP);

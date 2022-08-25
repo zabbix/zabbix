@@ -118,7 +118,7 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 		total_sec += zbx_time() - sec;
 
 		nextcheck = get_minnextcheck();
-		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
+		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{

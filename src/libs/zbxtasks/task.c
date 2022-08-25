@@ -857,19 +857,19 @@ static zbx_tm_remote_command_t	*tm_json_deserialize_remote_command(const struct 
 	authtype = atoi(value);
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_ALERTID, value, sizeof(value), NULL) ||
-			SUCCEED != is_uint64(value, &alertid))
+			SUCCEED != zbx_is_uint64(value, &alertid))
 	{
 		goto out;
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PARENT_TASKID, value, sizeof(value), NULL) ||
-			SUCCEED != is_uint64(value, &parent_taskid))
+			SUCCEED != zbx_is_uint64(value, &parent_taskid))
 	{
 		goto out;
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, value, sizeof(value), NULL) ||
-			SUCCEED != is_uint64(value, &hostid))
+			SUCCEED != zbx_is_uint64(value, &hostid))
 	{
 		goto out;
 	}
@@ -926,7 +926,7 @@ static zbx_tm_remote_command_result_t	*tm_json_deserialize_remote_command_result
 	status = atoi(value);
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PARENT_TASKID, value, sizeof(value), NULL) ||
-			SUCCEED != is_uint64(value, &parent_taskid))
+			SUCCEED != zbx_is_uint64(value, &parent_taskid))
 	{
 		goto out;
 	}
@@ -957,7 +957,7 @@ static zbx_tm_check_now_t	*tm_json_deserialize_check_now(const struct zbx_json_p
 	zbx_uint64_t	itemid;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_ITEMID, value, sizeof(value), NULL) ||
-			SUCCEED != is_uint64(value, &itemid))
+			SUCCEED != zbx_is_uint64(value, &itemid))
 	{
 		return NULL;
 	}
@@ -987,7 +987,7 @@ static zbx_tm_data_t	*tm_json_deserialize_data(const struct zbx_json_parse *jp)
 		goto out;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PARENT_TASKID, value, sizeof(value), NULL) ||
-			SUCCEED != is_uint64(value, &parent_taskid))
+			SUCCEED != zbx_is_uint64(value, &parent_taskid))
 	{
 		goto out;
 	}
@@ -1030,7 +1030,7 @@ static zbx_tm_data_result_t	*tm_json_deserialize_data_result(const struct zbx_js
 	status = atoi(value);
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PARENT_TASKID, value, sizeof(value), NULL) ||
-			SUCCEED != is_uint64(value, &parent_taskid))
+			SUCCEED != zbx_is_uint64(value, &parent_taskid))
 	{
 		goto out;
 	}

@@ -1664,7 +1664,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 				{
 					unsigned short	port;
 
-					if (FAIL == is_ushort(row[6], &port) || port != autoreg_host->port)
+					if (FAIL == zbx_is_ushort(row[6], &port) || port != autoreg_host->port)
 						break;
 
 					if (ZBX_CONN_IP == autoreg_host->flag && 0 != strcmp(row[4], autoreg_host->ip))
@@ -1982,7 +1982,7 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *
 			continue;
 		}
 
-		if ('_' != *p || FAIL == is_uint64(p + 1, &n))
+		if ('_' != *p || FAIL == zbx_is_uint64(p + 1, &n))
 			continue;
 
 		zbx_vector_uint64_append(&nums, n);
@@ -2419,10 +2419,10 @@ void	DBcheck_character_set(void)
 		char	*char_set = row[0];
 		char	*collation = row[1];
 
-		if (FAIL == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET, char_set, ZBX_DB_STRLIST_DELIM))
+		if (FAIL == zbx_str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET, char_set, ZBX_DB_STRLIST_DELIM))
 			zbx_warn_char_set(CONFIG_DBNAME, char_set);
 
-		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
+		if (SUCCEED != zbx_str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation(s)."
 					" Database \"%s\" has default collation \"%s\"", ZBX_SUPPORTED_DB_COLLATION,
@@ -2546,7 +2546,7 @@ void	DBcheck_character_set(void)
 		goto out;
 	}
 
-	strscpy(oid, *row);
+	zbx_strscpy(oid, *row);
 
 	DBfree_result(result);
 
