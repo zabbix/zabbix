@@ -1433,6 +1433,7 @@ abstract class CItemGeneral extends CApiService {
 
 			switch ($duplicates[0]['flags']) {
 				case ZBX_FLAG_DISCOVERY_NORMAL:
+				case ZBX_FLAG_DISCOVERY_CREATED:
 					$error = $target_is_template
 						? _('Item key "%1$s" already exists on template "%2$s".')
 						: _('Item key "%1$s" already exists on host "%2$s".');
