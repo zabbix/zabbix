@@ -21,16 +21,18 @@
 
 window.condition_popup = new class {
 
-	init() {
+	init(eventlistener) {
 		this.overlay = overlays_stack.getById('condition');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		jQuery('#service-new-condition')
-			.multiSelect('getSelectButton')
-			.addEventListener('click', () => {
-				this.selectServices();
-			});
+		if(eventlistener == <?= EVENT_SOURCE_SERVICE ?>) {
+			jQuery('#service-new-condition')
+				.multiSelect('getSelectButton')
+				.addEventListener('click', () => {
+					this.selectServices();
+				});
+		}
 	}
 
 	submit() {

@@ -111,7 +111,6 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 	}
 
 	protected function getControllerResponseData() {
-
 		return [
 			'title' => _('New condition'),
 			'command' => '',

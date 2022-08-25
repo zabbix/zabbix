@@ -80,7 +80,7 @@ $action_tab
 	->setId('actionCalculationRow');
 
 // Create condition table.
-$condition_table = (new CTable(_('No conditions defined.')))
+$condition_table = (new CTable())
 	->setId('conditionTable')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
@@ -130,7 +130,6 @@ $operations_table->setFooter(
 		->setAttribute('actionid', $data['actionid'])
 		->setAttribute('eventsource', $data['eventsource'])
 		->setAttribute('operation_type', ACTION_OPERATION)
-		// TODO : fix the input to action edit popup open!!!
 		->addClass(ZBX_STYLE_BTN_LINK)
 );
 
