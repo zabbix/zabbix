@@ -303,14 +303,20 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 	// IPMI
 	$ipmi_tab = new CFormList();
 
-	$ipmi_tab->addRow(_('Authentication algorithm'),
-		(new CTextBox(null, ipmiAuthTypes($parent_host['ipmi_authtype']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	$ipmi_tab->addRow(new CLabel(_('Authentication algorithm'), 'label_ipmi_authtype'),
+		(new CSelect())
+			->setValue($parent_host['ipmi_authtype'])
+			->setFocusableElementId('label_ipmi_authtype')
+			->addOptions(CSelect::createOptionsFromArray(ipmiAuthTypes()))
+			->setReadonly()
 			->setId('ipmi_authtype')
 	);
-	$ipmi_tab->addRow(_('Privilege level'),
-		(new CTextBox(null, ipmiPrivileges($parent_host['ipmi_privilege']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	$ipmi_tab->addRow(new CLabel(_('Privilege level'), 'label_ipmi_privilege'),
+		(new CSelect())
+			->setValue($parent_host['ipmi_privilege'])
+			->setFocusableElementId('label_ipmi_privilege')
+			->addOptions(CSelect::createOptionsFromArray(ipmiPrivileges()))
+			->setReadonly()
 			->setId('ipmi_privilege')
 	);
 	$ipmi_tab->addRow(_('Username'),
