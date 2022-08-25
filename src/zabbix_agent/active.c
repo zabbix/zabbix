@@ -296,9 +296,6 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *             port                  - port number on host                    *
  *             config_revision_local - revision of processed configuration    *
  *                                                                            *
- * Return value: returns SUCCEED on successful parsing,                       *
- *               FAIL on an incorrect format of string                        *
- *                                                                            *
  * Comments:                                                                  *
  *    String represented as "ZBX_EOF" termination list                        *
  *    With '\n' delimiter between elements.                                   *
@@ -306,7 +303,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *           <key>:<refresh time>:<last log size>:<modification time>         *
  *                                                                            *
  ******************************************************************************/
-static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
+static void	parse_list_of_checks(char *str, const char *host, unsigned short port,
 		zbx_uint32_t *config_revision_local)
 {
 	const char		*p;
@@ -351,7 +348,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	{
 		config_revision = 0;
 	}
-	else if (FAIL == is_uint32(tmp, &config_revision))
+	else if (FAIL == zbx_is_uint32(tmp, &config_revision))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "\"%s\" is not a valid revision", tmp);
 		goto out;
@@ -403,7 +400,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		delay = atoi(tmp);
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, tmp, sizeof(tmp), NULL) ||
-				SUCCEED != is_uint64(tmp, &lastlogsize))
+				SUCCEED != zbx_is_uint64(tmp, &lastlogsize))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_LASTLOGSIZE);
 			continue;
@@ -532,8 +529,6 @@ out:
 	zbx_free(name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
 }
 
 /*********************************************************************************

@@ -339,7 +339,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			request_type = ZBX_GET_QUEUE_DETAILS;
 
 			if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str),
-					NULL) || FAIL == is_uint31(limit_str, &limit))
+					NULL) || FAIL == zbx_is_uint31(limit_str, &limit))
 			{
 				zbx_send_response(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
 				goto out;
@@ -462,7 +462,7 @@ static int	DBget_template_count(zbx_uint64_t *count)
 	if (NULL == (result = DBselect("select count(*) from hosts where status=%d", HOST_STATUS_TEMPLATE)))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED != is_uint64(row[0], count))
+	if (NULL == (row = DBfetch(result)) || SUCCEED != zbx_is_uint64(row[0], count))
 		goto out;
 
 	ret = SUCCEED;
@@ -482,7 +482,7 @@ static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offl
 	if (NULL == (result = DBselect("select count(*) from users")))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED != is_uint64(row[0], &users_offline))
+	if (NULL == (row = DBfetch(result)) || SUCCEED != zbx_is_uint64(row[0], &users_offline))
 		goto out;
 
 	DBfree_result(result);
@@ -881,7 +881,7 @@ static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_pa
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming stats request: %s",
 				NULL == CONFIG_STATS_ALLOWED_IP ? "StatsAllowedIP not set" : zbx_socket_strerror());
-		strscpy(error, "Permission denied.");
+		zbx_strscpy(error, "Permission denied.");
 		goto out;
 	}
 
@@ -901,22 +901,22 @@ static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_pa
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_FROM, from_str, sizeof(from_str), NULL)
-				&& FAIL == is_time_suffix(from_str, &from, ZBX_LENGTH_UNLIMITED))
+				&& FAIL == zbx_is_time_suffix(from_str, &from, ZBX_LENGTH_UNLIMITED))
 		{
-			strscpy(error, "invalid 'from' parameter");
+			zbx_strscpy(error, "invalid 'from' parameter");
 			goto param_error;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_TO, to_str, sizeof(to_str), NULL) &&
-				FAIL == is_time_suffix(to_str, &to, ZBX_LENGTH_UNLIMITED))
+				FAIL == zbx_is_time_suffix(to_str, &to, ZBX_LENGTH_UNLIMITED))
 		{
-			strscpy(error, "invalid 'to' parameter");
+			zbx_strscpy(error, "invalid 'to' parameter");
 			goto param_error;
 		}
 
 		if (ZBX_QUEUE_TO_INFINITY != to && from > to)
 		{
-			strscpy(error, "parameters represent an invalid interval");
+			zbx_strscpy(error, "parameters represent an invalid interval");
 			goto param_error;
 		}
 
@@ -1245,7 +1245,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 					sizeof(timestamp), source, sizeof(source), severity, sizeof(severity));
 
 			av.value = value_dec;
-			if (SUCCEED != is_uint64(lastlogsize, &av.lastlogsize))
+			if (SUCCEED != zbx_is_uint64(lastlogsize, &av.lastlogsize))
 				av.lastlogsize = 0;
 			av.timestamp = atoi(timestamp);
 			av.source = source;

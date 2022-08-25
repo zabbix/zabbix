@@ -474,7 +474,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 							NULL, 0);
 				}
 
-				if (FAIL == is_ushort(port, &items[i].interface.port))
+				if (FAIL == zbx_is_ushort(port, &items[i].interface.port))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
 								items[i].interface.port_orig));
@@ -1003,7 +1003,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		processed += get_values(poller_type, &nextcheck, poller_args_in->zbx_config);
 		total_sec += zbx_time() - sec;
 
-		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
+		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{

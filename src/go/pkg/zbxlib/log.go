@@ -22,7 +22,7 @@ package zbxlib
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 
 int zbx_log_level = LOG_LEVEL_WARNING;

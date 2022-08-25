@@ -2516,7 +2516,7 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
 
 		if ('?' != mod_macros[i].macro[1] && len != fm_len)
 		{
-			if (SUCCEED != is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
+			if (SUCCEED != zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
 					sizeof(*N_functionid), 1, 9))
 			{
 				continue;
@@ -2525,7 +2525,7 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
 		else if (mod_macros[i].macro[len - 1] != str[fm->macro.l + fm_len - 1])
 			continue;
 
-		if (SUCCEED == str_n_in_list(mod_macros[i].functions, str + fm->func.l, fm->func_param.l - fm->func.l,
+		if (SUCCEED == zbx_str_n_in_list(mod_macros[i].functions, str + fm->func.l, fm->func_param.l - fm->func.l,
 				','))
 		{
 			return mod_macros[i].macro;
@@ -6465,7 +6465,7 @@ static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM
 			exit(EXIT_FAILURE);
 	}
 
-	ret = replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error, maxerrlen);
+	ret = zbx_replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error, maxerrlen);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __func__, zbx_result_string(ret), *data);
 

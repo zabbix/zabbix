@@ -219,7 +219,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 
 		if (NULL != port && '\0' != *port)
 		{
-			if (SUCCEED != is_ushort(port, &port_n))
+			if (SUCCEED != zbx_is_ushort(port, &port_n))
 			{
 				*error = zbx_strdup(*error, "Invalid third parameter.");
 				return SYSINFO_RET_FAIL;
@@ -316,7 +316,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 			{
 				port_str = zbx_dsprintf(NULL, "%.*s", port_len, p + 1);
 
-				if (SUCCEED != is_ushort(port_str, &port_num))
+				if (SUCCEED != zbx_is_ushort(port_str, &port_num))
 					ret = SYSINFO_RET_FAIL;
 				else
 					hostname = zbx_dsprintf(hostname, "%.*s", (int)(p - p_host), p_host);
@@ -362,7 +362,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		{
 			port_num = ZBX_DEFAULT_HTTP_PORT;
 		}
-		else if (FAIL == is_ushort(port, &port_num))
+		else if (FAIL == zbx_is_ushort(port, &port_num))
 		{
 			*error = zbx_strdup(*error, "Invalid third parameter.");
 			ret = SYSINFO_RET_FAIL;
@@ -508,7 +508,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == length_str || '\0' == *length_str)
 		length = ZBX_MAX_UINT31_1;
-	else if (FAIL == is_uint31_1(length_str, &length))
+	else if (FAIL == zbx_is_uint31_1(length_str, &length))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return SYSINFO_RET_FAIL;

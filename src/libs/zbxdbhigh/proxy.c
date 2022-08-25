@@ -819,7 +819,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s t", table->table);
 
-	if (SUCCEED == str_in_list("hosts,interface,host_inventory,hosts_templates,hostmacro", table->table, ','))
+	if (SUCCEED == zbx_str_in_list("hosts,interface,host_inventory,hosts_templates,hostmacro", table->table, ','))
 	{
 		if (0 == hosts->values_num)
 			goto skip_data;
@@ -854,7 +854,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",config r where t.groupid=r.discovery_groupid");
 	}
-	else if (SUCCEED == str_in_list("httptest,httptest_field,httptestitem,httpstep", table->table, ','))
+	else if (SUCCEED == zbx_str_in_list("httptest,httptest_field,httptestitem,httpstep", table->table, ','))
 	{
 		if (0 == httptests->values_num)
 			goto skip_data;
@@ -863,7 +863,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.httptestid",
 				httptests->values, httptests->values_num);
 	}
-	else if (SUCCEED == str_in_list("httpstepitem,httpstep_field", table->table, ','))
+	else if (SUCCEED == zbx_str_in_list("httpstepitem,httpstep_field", table->table, ','))
 	{
 		if (0 == httptests->values_num)
 			goto skip_data;
@@ -2178,7 +2178,7 @@ static int	process_interfaces_availability_contents(struct zbx_json_parse *jp_da
 			goto out;
 		}
 
-		if (SUCCEED != (ret = is_uint64(tmp, &interfaceid)))
+		if (SUCCEED != (ret = zbx_is_uint64(tmp, &interfaceid)))
 		{
 			*error = zbx_strdup(*error, "interfaceid is not a valid numeric");
 			goto out;
@@ -3189,12 +3189,12 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc, NULL))
 	{
-		if (FAIL == is_uint31(tmp, &av->ts.sec))
+		if (FAIL == zbx_is_uint31(tmp, &av->ts.sec))
 			goto out;
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc, NULL))
 		{
-			if (FAIL == is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns),
+			if (FAIL == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns),
 				0LL, 999999999LL))
 			{
 				goto out;
@@ -3228,7 +3228,7 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 		{
 			av->meta = 1;	/* contains meta information */
 
-			is_uint64(tmp, &av->lastlogsize);
+			zbx_is_uint64(tmp, &av->lastlogsize);
 
 			if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc, NULL))
 				av->mtime = atoi(tmp);
@@ -3251,7 +3251,7 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 		av->logeventid = atoi(tmp);
 
 	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_ID, &tmp, &tmp_alloc, NULL) ||
-			SUCCEED != is_uint64(tmp, &av->id))
+			SUCCEED != zbx_is_uint64(tmp, &av->id))
 	{
 		av->id = 0;
 	}
@@ -3281,7 +3281,7 @@ static int	parse_history_data_row_itemid(const struct zbx_json_parse *jp_row, zb
 	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_ITEMID, buffer, sizeof(buffer), NULL))
 		return FAIL;
 
-	if (SUCCEED != is_uint64(buffer, itemid))
+	if (SUCCEED != zbx_is_uint64(buffer, itemid))
 		return FAIL;
 
 	return SUCCEED;
@@ -4205,7 +4205,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip), NULL))
 			goto json_parse_error;
 
-		if (SUCCEED != is_ip(ip))
+		if (SUCCEED != zbx_is_ip(ip))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid IP address", __func__, ip);
 			continue;
@@ -4215,7 +4215,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		{
 			port = 0;
 		}
-		else if (FAIL == is_ushort(tmp, &port))
+		else if (FAIL == zbx_is_ushort(tmp, &port))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid port", __func__, tmp);
 			continue;
@@ -4424,7 +4424,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 			else
 				break;
 		}
-		else if (SUCCEED != is_ip(ip))
+		else if (SUCCEED != zbx_is_ip(ip))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid IP address", __func__, ip);
 			continue;
@@ -4444,7 +4444,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 		{
 			port = ZBX_DEFAULT_AGENT_PORT;
 		}
-		else if (FAIL == is_ushort(tmp, &port))
+		else if (FAIL == zbx_is_ushort(tmp, &port))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid port", __func__, tmp);
 			continue;
@@ -4454,7 +4454,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 		{
 			connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 		}
-		else if (FAIL == is_uint32(tmp, &connection_type) || (ZBX_TCP_SEC_UNENCRYPTED != connection_type &&
+		else if (FAIL == zbx_is_uint32(tmp, &connection_type) || (ZBX_TCP_SEC_UNENCRYPTED != connection_type &&
 				ZBX_TCP_SEC_TLS_PSK != connection_type && ZBX_TCP_SEC_TLS_CERT != connection_type))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid value for \""

@@ -551,9 +551,9 @@ static int	process_proxy(void)
 			proxy.addr = proxy.addr_orig;
 
 			port = zbx_strdup(port, proxy.port_orig);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					&port, MACRO_TYPE_COMMON, NULL, 0);
-			if (FAIL == is_ushort(port, &proxy.port))
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
+			if (FAIL == zbx_is_ushort(port, &proxy.port))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "invalid proxy \"%s\" port: \"%s\"", proxy.host, port);
 				ret = CONFIG_ERROR;
@@ -665,7 +665,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 		total_sec += zbx_time() - sec;
 
 		nextcheck = DCconfig_get_proxypoller_nextcheck();
-		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
+		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{

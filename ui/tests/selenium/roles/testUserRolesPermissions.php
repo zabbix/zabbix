@@ -1357,11 +1357,13 @@ class testUserRolesPermissions extends CWebTest {
 			$form->fill($data['service_list']);
 		}
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'User role updated');
 		$this->page->logout();
 
 		// Login as user that belongs to the updated row and check access to services based on applied configuration.
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=service.list')->waitUntilReady();
+		$this->assertEquals('user_for_role', $this->query('xpath://a[text()="User settings"]')->one()->getAttribute('title'));
 
 		$services_mode = $this->query('id:list_mode')->asSegmentedRadio()->one(false);
 
@@ -1422,7 +1424,7 @@ class testUserRolesPermissions extends CWebTest {
 							'items' => ['I5-agent-txt', 'I4-trap-log'],
 							'message' => 'Request sent successfully. Some items are filtered due to access permissions or type.'
 						],
-						// Dependet items.
+						// Dependent items.
 						[
 							'expected' => TEST_GOOD,
 							'items' => ['I1-lvl2-dep-log'],
@@ -1447,7 +1449,7 @@ class testUserRolesPermissions extends CWebTest {
 						[
 							'items' => ['I5-agent-txt', 'I4-trap-log']
 						],
-						// Dependet items.
+						// Dependent items.
 						[
 							'items' => ['I1-lvl2-dep-log']
 						],
@@ -1465,7 +1467,7 @@ class testUserRolesPermissions extends CWebTest {
 						[
 							'items' => ['I4-trap-log']
 						],
-						// Dependet items.
+						// Dependent items.
 						[
 							'expected' => TEST_GOOD,
 							'items' => ['I1-lvl2-dep-log', 'I4-trap-log'],

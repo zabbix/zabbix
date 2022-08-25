@@ -67,7 +67,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	zbx_alarm_on(CONFIG_TIMEOUT);
 	if (ZBX_CONN_DEFAULT == flag || ZBX_CONN_IP == flag)
 	{
-		if (0 == strncmp("::ffff:", p, 7) && SUCCEED == is_ip4(p + 7))
+		if (0 == strncmp("::ffff:", p, 7) && SUCCEED == zbx_is_ip4(p + 7))
 			p += 7;
 
 		zbx_gethost_by_ip(p, dns, sizeof(dns));
@@ -472,7 +472,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		*interface = '\0';
 	}
-	else if (SUCCEED == is_ip(interface))
+	else if (SUCCEED == zbx_is_ip(interface))
 	{
 		flag = ZBX_CONN_IP;
 	}
@@ -487,9 +487,10 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip), NULL))
-		strscpy(ip, sock->peer);
+		zbx_strscpy(ip, sock->peer);
 
-	if (FAIL == is_ip(ip))	/* check even if 'ip' came from get_ip_by_socket() - it can return not a valid IP */
+	/* check even if 'ip' came from zbx_socket_peer_ip_save() - it can return not a valid IP */
+	if (FAIL == zbx_is_ip(ip))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "\"%s\" is not a valid IP address", ip);
 		goto error;
@@ -499,7 +500,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		port = ZBX_DEFAULT_AGENT_PORT;
 	}
-	else if (FAIL == is_ushort(tmp, &port))
+	else if (FAIL == zbx_is_ushort(tmp, &port))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "\"%s\" is not a valid port", tmp);
 		goto error;
@@ -509,7 +510,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		agent_config_revision = 0;
 	}
-	else if (FAIL == is_uint32(tmp, &agent_config_revision))
+	else if (FAIL == zbx_is_uint32(tmp, &agent_config_revision))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "\"%s\" is not a valid revision", tmp);
 		goto error;
@@ -534,7 +535,6 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		if (zbx_get_token_len() != (token_len = strlen(tmp)))
 		{
 			zbx_snprintf(error, MAX_STRING_LEN, "invalid session token length %d", (int)token_len);
-			ret = FAIL;
 			goto error;
 		}
 
@@ -685,7 +685,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		if (SUCCEED != (ret = zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, sock->protocol,
 				CONFIG_TIMEOUT)))
 		{
-			strscpy(error, zbx_socket_strerror());
+			zbx_strscpy(error, zbx_socket_strerror());
 		}
 	}
 	else
@@ -693,7 +693,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		if (SUCCEED != (ret = zbx_tcp_send_ext(sock, json.buffer, json.buffer_size, 0, sock->protocol,
 				CONFIG_TIMEOUT)))
 		{
-			strscpy(error, zbx_socket_strerror());
+			zbx_strscpy(error, zbx_socket_strerror());
 		}
 	}
 

@@ -79,7 +79,6 @@ static int		db_auto_increment;
 static MYSQL			*conn = NULL;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
-static char			*ZBX_CHARSET = NULL;
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
 
@@ -385,7 +384,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
-	const char	*charset;
 #if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;
 #else
@@ -579,10 +577,17 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
 
-	charset = NULL == ZBX_CHARSET ? "utf8" : ZBX_CHARSET;
-	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
-	if (ZBX_DB_OK == ret && 0 != mysql_set_character_set(conn, charset))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"%s\"", charset);
+	if (ZBX_DB_OK == ret)
+	{
+		/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
+		/* utf8mb3 is deprecated and it's superset utf8mb4 should be used instead if available */
+		if (0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4) &&
+				0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8) &&
+				0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB3))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set");
+		}
+	}
 
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
@@ -2737,9 +2742,9 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	zbx_uint32_t major;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-	ZBX_PG_SVERSION = PQserverVersion(conn);
+	ZBX_PG_SVERSION = (zbx_uint32_t)PQserverVersion(conn);
 
-	major = RIGHT2(ZBX_PG_SVERSION/10000);
+	major = (zbx_uint32_t)RIGHT2(ZBX_PG_SVERSION/10000);
 
 	version_info->database = "PostgreSQL";
 
@@ -2750,12 +2755,13 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 
 	if (10 > major)
 	{
-		version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d", major,
+		version_info->friendly_current_version = zbx_dsprintf(NULL, "%u.%d.%d", (unsigned int)major,
 				RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
 	}
 	else
 	{
-		version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d", major, RIGHT2(ZBX_PG_SVERSION));
+		version_info->friendly_current_version = zbx_dsprintf(NULL, "%u.%d", (unsigned int)major,
+				RIGHT2(ZBX_PG_SVERSION));
 	}
 
 	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY;
@@ -3016,12 +3022,5 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
 int	zbx_tsdb_get_compression_availability(void)
 {
 	return ZBX_TIMESCALE_COMPRESSION_AVAILABLE;
-}
-#endif
-
-#if defined(HAVE_MYSQL)
-void zbx_db_set_character_set(const char *char_set)
-{
-	ZBX_CHARSET = zbx_strdup(ZBX_CHARSET, char_set);
 }
 #endif
