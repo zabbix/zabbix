@@ -1875,7 +1875,7 @@ class CHost extends CHostGeneral {
 	 *
 	 * @param array  $hosts
 	 * @param string $hosts[]['hostid']                    (optional if $db_hosts is null)
-	 * @param int    $hosts[]['tls_connect']               (optionsl)
+	 * @param int    $hosts[]['tls_connect']               (optional)
 	 * @param int    $hosts[]['tls_accept']                (optional)
 	 * @param string $hosts[]['tls_psk_identity']          (optional)
 	 * @param string $hosts[]['tls_psk']                   (optional)

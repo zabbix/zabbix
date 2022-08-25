@@ -756,7 +756,7 @@ class CWidgetHelper {
 	public static function getGraphOverrideLayout($field, array $value, $form_name, $row_num) {
 		$inputs = [];
 
-		// Create override optins list.
+		// Create override options list.
 		foreach (CWidgetFieldGraphOverride::getOverrideOptions() as $option) {
 			if (array_key_exists($option, $value)) {
 				$inputs[] = (new CVar($field->getName().'['.$row_num.']['.$option.']', $value[$option]));

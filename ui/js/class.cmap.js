@@ -2985,7 +2985,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Gets form values for element fields.
 			 *
-			 * @retrurns {Object|Boolean}
+			 * @returns {Object|Boolean}
 			 */
 			getValues: function() {
 				var values = $(':input', '#selementForm')
