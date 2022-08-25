@@ -707,9 +707,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$prototype_form = $this->query('id:host-prototype-form')->asForm()->one()->waitUntilVisible();
 		$prototype_form->selectTab('IPMI');
 
-		$new_value['ipmi_authtype'] = 1;	// IPMI_AUTHTYPE_MD2
-		$new_value['iipmi_privilege'] = 3;	// IPMI_PRIVILEGE_OPERATOR
-
 		foreach ($new_values as $field_name => $value) {
 			$this->zbxTestAssertElementValue($field_name, $value);
 		}
