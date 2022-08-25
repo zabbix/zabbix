@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup config_autoreg_tls, config, ids
+ * @backup config_autoreg_tls, config
  */
 class testAuditlogAutoregistration extends testAuditlogCommon {
 
