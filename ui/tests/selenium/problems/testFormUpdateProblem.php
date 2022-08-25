@@ -978,7 +978,7 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	private function checkHistoryTable($table, $user, $action) {
 		// Check last two rows.
-		for($i = 0; $i < 2; ++$i) {
+		foreach ([0, 1] as $i)  {
 			$action_row = $table->getRow($i);
 			$this->assertEquals('Admin (Zabbix Administrator)', $action_row->getColumn($user)->getText());
 			$query = ($i === 0) ? 'xpath:.//span[@title="Unsuppressed"]' : 'xpath:.//*[contains(@class, "icon-action-suppress")]';
@@ -999,7 +999,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check icon hintbox.
 		$icon->one()->waitUntilClickable()->click(true);
-		$hint = $this->query('xpath:.//div[@data-hintboxid]')->one();
+		$hint = $this->query('xpath://div[@data-hintboxid]')->one();
 		$this->assertTrue($hint->isVisible());
 		$this->assertEquals($text, $hint->getText());
 		$hint->asOverlayDialog()->close();
