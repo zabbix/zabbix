@@ -62,6 +62,8 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 	}
 
 	public function testAuditlogEventCorrelation_Update() {
+		$correlation_name = CDBHelper::getAll('SELECT name FROM correlation WHERE correlationid = 99001');
+
 		$this->call('correlation.update', [
 			[
 				'correlationid' => 99001,
@@ -87,7 +89,7 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 
 		$updated = "{\"correlation.filter.conditions[99001]\":[\"delete\"],".
 			"\"correlation.filter.conditions[".$condition[0]['corr_conditionid']."]\":[\"add\"],".
-			"\"correlation.name\":[\"update\",\"Updated event correlation name\",\"Event correlation for update\"],".
+			"\"correlation.name\":[\"update\",\"Updated event correlation name\",\"".$correlation_name[0]['name']."\"],".
 			"\"correlation.filter\":[\"update\"],".
 			"\"correlation.filter.evaltype\":[\"update\",\"2\",\"0\"],".
 			"\"correlation.filter.conditions[".$condition[0]['corr_conditionid']."].tag\":[\"add\",\"not ok\"],".

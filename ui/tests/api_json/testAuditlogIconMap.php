@@ -19,80 +19,74 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
  * @backup icon_mapping, ids
  */
-class testAuditlogIconMap extends CAPITest {
-
-	protected static $resourceid;
-
+class testAuditlogIconMap extends testAuditlogCommon {
 	public function testAuditlogIconMap_Create() {
-		$created = "{\"iconmap.name\":[\"add\",\"icon_mapping\"],\"iconmap.default_iconid\":[\"add\",\"5\"],".
-				"\"iconmap.mappings[8]\":[\"add\"],\"iconmap.mappings[8].inventory_link\":[\"add\",\"1\"],".
-				"\"iconmap.mappings[8].expression\":[\"add\",\"created_mapping\"],\"iconmap.mappings[8].iconid".
-				"\":[\"add\",\"2\"],\"iconmap.mappings[8].iconmappingid\":[\"add\",\"8\"],\"iconmap.iconmapid\":[\"add\",\"8\"]}";
-
 		$create = $this->call('iconmap.create', [
 			[
 				'name' => 'icon_mapping',
-				'default_iconid' => '5',
+				'default_iconid' => 5,
 				'mappings' => [
 					[
 						'inventory_link' => 1,
 						'expression' => 'created_mapping',
-						'iconid' => '2'
+						'iconid' => 2
 					]
 				]
 			]
 		]);
+		$resourceid = $create['result']['iconmapids'][0];
 
-		self::$resourceid = $create['result']['iconmapids'][0];
-		$this->sendGetRequest('details', 0, $created);
+		$icon_map = CDBHelper::getAll('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.$resourceid);
+
+		$created = "{\"iconmap.name\":[\"add\",\"icon_mapping\"],".
+			"\"iconmap.default_iconid\":[\"add\",\"5\"],".
+			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."]\":[\"add\"],".
+			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].inventory_link\":[\"add\",\"1\"],".
+			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].expression\":[\"add\",\"created_mapping\"],".
+			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].iconid\":[\"add\",\"2\"],".
+			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].iconmappingid\":[\"add\",\"".$icon_map[0]['iconmappingid'].
+					"\"],\"iconmap.iconmapid\":[\"add\",\"".$resourceid."\"]}";
+
+		$this->sendGetRequest('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogIconMap_Update() {
-		$updated = "{\"iconmap.mappings[8]\":[\"delete\"],\"iconmap.mappings[9]\":[\"add\"],\"iconmap.name\":[\"update".
-				"\",\"updated_icon_mapping\",\"icon_mapping\"],\"iconmap.default_iconid\":[\"update\",\"4\",\"5".
-				"\"],\"iconmap.mappings[9].inventory_link\":[\"add\",\"2\"],\"iconmap.mappings[9].expression".
-				"\":[\"add\",\"updated_created_mapping\"],\"iconmap.mappings[9].iconid\":[\"add\",\"3\"],".
-				"\"iconmap.mappings[9].iconmappingid\":[\"add\",\"9\"]}";
-
 		$this->call('iconmap.update', [
 			[
-				'iconmapid' => self::$resourceid,
+				'iconmapid' => 1,
 				'name' => 'updated_icon_mapping',
-				'default_iconid' => '4',
+				'default_iconid' => 4,
 				'mappings' => [
 					[
 						'inventory_link' => 2,
 						'expression' => 'updated_created_mapping',
-						'iconid' => '3'
+						'iconid' => 3
 					]
 				]
 			]
 		]);
 
-		$this->sendGetRequest('details', 1, $updated);
+		$icon_map = CDBHelper::getAll('SELECT iconmappingid FROM icon_mapping WHERE iconmapid=1');
+
+		$updated = "{\"iconmap.mappings[1]\":[\"delete\"],".
+			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."]\":[\"add\"],".
+			"\"iconmap.name\":[\"update\",\"updated_icon_mapping\",\"API icon map\"],".
+			"\"iconmap.default_iconid\":[\"update\",\"4\",\"2\"],".
+			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].inventory_link\":[\"add\",\"2\"],".
+			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].expression\":[\"add\",\"updated_created_mapping\"],".
+			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].iconid\":[\"add\",\"3\"],".
+			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].iconmappingid\":[\"add\",\"".$icon_map[0]['iconmappingid']."\"]}";
+
+		$this->sendGetRequest('details', 1, $updated, 1);
 	}
 
 	public function testAuditlogIconMap_Delete() {
-		$this->call('iconmap.delete', [self::$resourceid]);
-		$this->sendGetRequest('resourcename', 2, 'updated_icon_mapping');
-	}
-
-	private function sendGetRequest($output, $action, $result) {
-		$get = $this->call('auditlog.get', [
-			'output' => [$output],
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'filter' => [
-				'resourceid' => self::$resourceid,
-				'action' => $action
-			]
-		]);
-
-		$this->assertEquals($result, $get['result'][0][$output]);
+		$this->call('iconmap.delete', [1]);
+		$this->sendGetRequest('resourcename', 2, 'updated_icon_mapping', 1);
 	}
 }
