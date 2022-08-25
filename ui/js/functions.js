@@ -160,7 +160,7 @@ function getUniqueId() {
 /**
  * Color palette object used for getting different colors from color palette.
  */
-var colorPalette = (function() {
+let colorPalette = (function() {
 	'use strict';
 
 	let palette = [];
@@ -176,20 +176,8 @@ var colorPalette = (function() {
 		getNextColor: function(used_colors) {
 			const palette_usage = {};
 
-			for (const color of used_colors) {
-				if (palette.includes(color)) {
-					palette_usage[color] = ++palette_usage[color] || 1;
-				}
-			}
-
-			if (!Object.keys(palette_usage).length) {
-				return palette[0] || '';
-			}
-
 			for (const color of palette) {
-				if (!(color in palette_usage)) {
-					palette_usage[color] = 0;
-				}
+				palette_usage[color] = used_colors.filter((i) => i === color).length;
 			}
 
 			const min_used_color_count = Math.min(...Object.values(palette_usage));
