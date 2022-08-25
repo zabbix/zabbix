@@ -117,7 +117,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
-			'db_user' => ['username' => '']
+			'db_user' => ['username' => ''],
+			'userdirectoryid' => 0
 		];
 		$user_groups = [];
 
@@ -140,6 +141,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['url'] = $this->user['url'];
 			$data['medias'] = $this->user['medias'];
 			$data['db_user']['username'] = $this->user['username'];
+			$data['userdirectoryid'] = $this->user['userdirectoryid'];
 
 			if (!$this->getInput('form_refresh', 0)) {
 				$data['roleid'] = $this->user['roleid'];
@@ -248,9 +250,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		]);
 
 		$data['readonly'] = false;
-		$data['userdirectoryid'] = $this->user['userdirectoryid'];
-
-		if ($this->user['userdirectoryid'] != 0) {
+		if ($data['userdirectoryid'] != 0) {
 			$data['readonly'] = true;
 		}
 
