@@ -647,6 +647,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest, int *delay
 	{
 		err_str = zbx_dsprintf(err_str, "update interval \"%s\" is invalid", buffer);
 		lastfailedstep = -1;
+		*delay = ZBX_DEFAULT_INTERVAL;
 		goto httptest_error;
 	}
 
@@ -1115,7 +1116,6 @@ int	process_httptests(int now, time_t *nextcheck)
 			http_process_variables(&httptest, &httptest.variables, NULL, NULL);
 
 			process_httptest(&host, &httptest, &delay);
-
 			zbx_dc_httptest_queue(now, httptestid, delay);
 
 			zbx_free(httptest.httptest.ssl_key_password);

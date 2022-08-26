@@ -789,7 +789,7 @@ static int	process_discovery(time_t *nextcheck)
 				zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid update interval \"%s\"",
 						row[1], delay_str);
 
-				delay = 0;
+				delay = ZBX_DEFAULT_INTERVAL;
 			}
 			else
 			{

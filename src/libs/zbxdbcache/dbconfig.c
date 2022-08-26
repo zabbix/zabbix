@@ -5582,7 +5582,8 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 
 		delay_str = dc_expand_user_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
-		(void)is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED);
+		if (SUCCEED != is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
+			delay = ZBX_DEFAULT_INTERVAL;
 		zbx_free(delay_str);
 
 		if (DRULE_STATUS_MONITORED == drule->status && 0 == drule->proxy_hostid)
@@ -5843,8 +5844,9 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			zbx_vector_dc_httptest_ptr_append(&host->httptests, httptest);
 		}
 
-		delay_str = dc_expand_user_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
-		(void)is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED);
+		delay_str = dc_expand_user_macros_dyn(row[2], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		if (SUCCEED != is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
+			delay = ZBX_DEFAULT_INTERVAL;
 		zbx_free(delay_str);
 
 		if (HTTPTEST_STATUS_MONITORED == httptest->status && HOST_STATUS_MONITORED == host->status &&
