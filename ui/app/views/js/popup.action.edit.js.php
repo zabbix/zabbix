@@ -39,7 +39,7 @@ window.action_edit_popup = new class {
 	}
 
 	_initActionButtons() {
-		document.addEventListener('click', (e) => {
+		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-condition-create')) {
 				this._openConditionPopup();
 			}

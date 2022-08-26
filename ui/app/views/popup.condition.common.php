@@ -28,7 +28,6 @@ $inline_js = getPagePostJs().$this->readJsFile('popup.condition.common.js.php');
 require_once dirname(__FILE__).'/../../include/actions.inc.php';
 
 $form = (new CForm())
-	//->cleanItems()
 	->setId('popup.condition')
 	->setName('popup.condition')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
