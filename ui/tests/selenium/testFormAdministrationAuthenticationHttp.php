@@ -679,11 +679,11 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	/**
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 */
-	public function removeGuestFromDisabledGroup() {
+	public static function removeGuestFromDisabledGroup() {
 		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
 	}
 
-	public static function addGuestToDisabledGroup() {
-		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (151, 9, 2)');
+	public function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (1551, 9, 2)');
 	}
 }

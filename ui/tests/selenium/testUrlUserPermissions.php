@@ -704,6 +704,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 	}
 
 	public function addGuestToDisabledGroup() {
-		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (152, 9, 2)');
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (1552, 9, 2)');
 	}
 }
