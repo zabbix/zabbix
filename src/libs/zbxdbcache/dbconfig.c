@@ -5534,7 +5534,7 @@ static void	dc_drule_dequeue(zbx_dc_drule_t *drule)
 
 static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
-	char			**row;
+	char			**row, *delay_str;
 	zbx_uint64_t		rowid, druleid, proxy_hostid;
 	unsigned char		tag;
 	int 			found, ret, delay = 0;
@@ -5581,8 +5581,9 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				proxy->revision = revision;
 		}
 
-		if (SUCCEED != is_time_suffix(row[2], &delay, ZBX_LENGTH_UNLIMITED))
-			delay = 0;
+		delay_str = dc_expand_user_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
+		(void)is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED);
+		zbx_free(delay_str);
 
 		if (DRULE_STATUS_MONITORED == drule->status && 0 == drule->proxy_hostid)
 		{
@@ -5803,7 +5804,7 @@ static void	dc_httptest_dequeue(zbx_dc_httptest_t *httptest)
  ******************************************************************************/
 static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
-	char			**row;
+	char			**row, *delay_str;
 	zbx_uint64_t		rowid, httptestid, hostid;
 	unsigned char		tag;
 	int 			found, ret, delay;
@@ -5842,8 +5843,9 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			zbx_vector_dc_httptest_ptr_append(&host->httptests, httptest);
 		}
 
-		if (SUCCEED != is_time_suffix(row[2], &delay, ZBX_LENGTH_UNLIMITED))
-			delay = 0;
+		delay_str = dc_expand_user_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
+		(void)is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED);
+		zbx_free(delay_str);
 
 		if (HTTPTEST_STATUS_MONITORED == httptest->status && HOST_STATUS_MONITORED == host->status &&
 				0 == host->proxy_hostid)
