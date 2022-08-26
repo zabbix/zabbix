@@ -684,6 +684,6 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	}
 
 	public static function addGuestToDisabledGroup() {
-		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (151, 9, 2)');
 	}
 }
