@@ -19,39 +19,26 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
  * @backup media_type, media_type_message, media_type_param, ids
  */
-class testAuditlogMediaType extends CAPITest {
-
-	protected static $resourceid;
-
+class testAuditlogMediaType extends testAuditlogCommon {
 	public function testAuditlogMediaType_Create() {
-		$created = "{\"mediatype.name\":[\"add\",\"email_media\"],\"mediatype.smtp_server\":[\"add\",\"test.test.com".
-				"\"],\"mediatype.smtp_helo\":[\"add\",\"test.com\"],\"mediatype.smtp_email\":[\"add\",\"test@test.com".
-				"\"],\"mediatype.smtp_port\":[\"add\",\"587\"],\"mediatype.message_templates[160]\":[\"add\"],".
-				"\"mediatype.message_templates[160].eventsource\":[\"add\",\"0\"],\"mediatype.message_templates".
-				"[160].recovery\":[\"add\",\"0\"],\"mediatype.message_templates[160].subject\":[\"add\",".
-				"\"Subject message\"],\"mediatype.message_templates[160].message\":[\"add\",\"Main message\"],".
-				"\"mediatype.message_templates[160].mediatype_messageid\":[\"add\",\"160\"],\"mediatype.maxsessions".
-				"\":[\"add\",\"50\"],\"mediatype.maxattempts\":[\"add\",\"5\"],\"mediatype.attempt_interval\":[\"add".
-				"\",\"50s\"],\"mediatype.mediatypeid\":[\"add\",\"34\"]}";
-
 		$create = $this->call('mediatype.create', [
 			[
-				'type' => '0',
+				'type' => 0,
 				'name' => 'email_media',
 				'smtp_server' => 'test.test.com',
 				'smtp_helo' => 'test.com',
 				'smtp_email' => 'test@test.com',
-				'smtp_port' => '587',
-				'content_type' => '1',
+				'smtp_port' => 587,
+				'content_type' => 1,
 				'message_templates' => [
 					[
-						'eventsource' => '0',
-						'recovery' => '0',
+						'eventsource' => 0,
+						'recovery' => 0,
 						'subject' => 'Subject message',
 						'message' => 'Main message'
 					]
@@ -61,39 +48,44 @@ class testAuditlogMediaType extends CAPITest {
 				'attempt_interval' => '50s'
 			]
 		]);
+		$resourceid = $create['result']['mediatypeids'][0];
 
-		self::$resourceid = $create['result']['mediatypeids'][0];
-		$this->sendGetRequest('details', 0, $created);
+		$message = CDBHelper::getRow('SELECT mediatype_messageid FROM media_type_message WHERE mediatypeid='.$resourceid);
+
+		$created = "{\"mediatype.name\":[\"add\",\"email_media\"],".
+				"\"mediatype.smtp_server\":[\"add\",\"test.test.com\"],".
+				"\"mediatype.smtp_helo\":[\"add\",\"test.com\"],".
+				"\"mediatype.smtp_email\":[\"add\",\"test@test.com\"],".
+				"\"mediatype.smtp_port\":[\"add\",\"587\"],".
+				"\"mediatype.message_templates[".$message['mediatype_messageid']."]\":[\"add\"],".
+				"\"mediatype.message_templates[".$message['mediatype_messageid']."].eventsource\":[\"add\",\"0\"],".
+				"\"mediatype.message_templates[".$message['mediatype_messageid']."].recovery\":[\"add\",\"0\"],".
+				"\"mediatype.message_templates[".$message['mediatype_messageid']."].subject\":[\"add\",\"Subject message\"],".
+				"\"mediatype.message_templates[".$message['mediatype_messageid']."].message\":[\"add\",\"Main message\"],".
+				"\"mediatype.message_templates[".$message['mediatype_messageid']."].mediatype_messageid\":[\"add\",\"".$message['mediatype_messageid']."\"],".
+				"\"mediatype.maxsessions\":[\"add\",\"50\"],".
+				"\"mediatype.maxattempts\":[\"add\",\"5\"],".
+				"\"mediatype.attempt_interval\":[\"add\",\"50s\"],".
+				"\"mediatype.mediatypeid\":[\"add\",\"".$resourceid."\"]}";
+
+		$this->sendGetRequest('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogMediaType_Update() {
-		$updated = "{\"mediatype.message_templates[160]\":[\"delete\"],\"mediatype.message_templates[161]\":[\"add\"],".
-				"\"mediatype.status\":[\"update\",\"1\",\"0\"],\"mediatype.name\":[\"update\",\"updated_email_media\",".
-				"\"email_media\"],\"mediatype.smtp_server\":[\"update\",\"updated_test.test.com\",\"test.test.com\"],".
-				"\"mediatype.smtp_helo\":[\"update\",\"updated_test.com\",\"test.com\"],\"mediatype.smtp_email\":[".
-				"\"update\",\"updated_test@test.com\",\"test@test.com\"],\"mediatype.smtp_port\":[\"update\",\"589\",".
-				"\"587\"],\"mediatype.content_type\":[\"update\",\"0\",\"1\"],\"mediatype.message_templates".
-				"[161].eventsource\":[\"add\",\"1\"],\"mediatype.message_templates[161].recovery\":[\"add\",\"0\"],".
-				"\"mediatype.message_templates[161].subject\":[\"add\",\"Updated subject message\"],".
-				"\"mediatype.message_templates[161].message\":[\"add\",\"Updated main message\"],".
-				"\"mediatype.message_templates[161].mediatype_messageid\":[\"add\",\"161\"],\"mediatype.maxsessions".
-				"\":[\"update\",\"40\",\"50\"],\"mediatype.maxattempts\":[\"update\",\"10\",\"5\"],".
-				"\"mediatype.attempt_interval\":[\"update\",\"30s\",\"50s\"]}";
-
 		$this->call('mediatype.update', [
 			[
-				'mediatypeid' => self::$resourceid,
+				'mediatypeid' => 1,
 				'status' => 1,
 				'name' => 'updated_email_media',
 				'smtp_server' => 'updated_test.test.com',
 				'smtp_helo' => 'updated_test.com',
 				'smtp_email' => 'updated_test@test.com',
-				'smtp_port' => '589',
-				'content_type' => '0',
+				'smtp_port' => 589,
+				'content_type' => 0,
 				'message_templates' => [
 					[
-						'eventsource' => '1',
-						'recovery' => '0',
+						'eventsource' => 1,
+						'recovery' => 0,
 						'subject' => 'Updated subject message',
 						'message' => 'Updated main message'
 					]
@@ -104,25 +96,34 @@ class testAuditlogMediaType extends CAPITest {
 			]
 		]);
 
-		$this->sendGetRequest('details', 1, $updated);
+		$updated = "{\"mediatype.message_templates[1]\":[\"delete\"],".
+				"\"mediatype.message_templates[2]\":[\"delete\"],".
+				"\"mediatype.message_templates[3]\":[\"delete\"],".
+				"\"mediatype.message_templates[5]\":[\"delete\"],".
+				"\"mediatype.status\":[\"update\",\"1\",\"0\"],".
+				"\"mediatype.name\":[\"update\",\"updated_email_media\",\"Email\"],".
+				"\"mediatype.smtp_server\":[\"update\",\"updated_test.test.com\",\"mail.example.com\"],".
+				"\"mediatype.smtp_helo\":[\"update\",\"updated_test.com\",\"example.com\"],".
+				"\"mediatype.smtp_email\":[\"update\",\"updated_test@test.com\",\"zabbix@example.com\"],".
+				"\"mediatype.smtp_port\":[\"update\",\"589\",\"25\"],".
+				"\"mediatype.message_templates[4]\":[\"update\"],".
+				"\"mediatype.message_templates[4].subject\":[\"update\",\"Updated subject message\",".
+				"\"Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}\"],".
+				"\"mediatype.message_templates[4].message\":[\"update\",\"Updated main message\",".
+				"\"Discovery rule: {DISCOVERY.RULE.NAME}\\r\\n\\r\\nDevice IP: ".
+				"{DISCOVERY.DEVICE.IPADDRESS}\\r\\nDevice DNS: {DISCOVERY.DEVICE.DNS}\\r\\nDevice status: ".
+				"{DISCOVERY.DEVICE.STATUS}\\r\\nDevice uptime: {DISCOVERY.DEVICE.UPTIME}\\r\\n\\r\\nDevice service name: ".
+				"{DISCOVERY.SERVICE.NAME}\\r\\nDevice service port: {DISCOVERY.SERVICE.PORT}\\r\\nDevice service status: ".
+				"{DISCOVERY.SERVICE.STATUS}\\r\\nDevice service uptime: {DISCOVERY.SERVICE.UPTIME}\"],".
+				"\"mediatype.maxsessions\":[\"update\",\"40\",\"1\"],".
+				"\"mediatype.maxattempts\":[\"update\",\"10\",\"3\"],".
+				"\"mediatype.attempt_interval\":[\"update\",\"30s\",\"10s\"]}";
+
+		$this->sendGetRequest('details', 1, $updated, 1);
 	}
 
 	public function testAuditlogMediaType_Delete() {
-		$this->call('mediatype.delete', [self::$resourceid]);
-		$this->sendGetRequest('resourcename', 2, 'updated_email_media');
-	}
-
-	private function sendGetRequest($output, $action, $result) {
-		$get = $this->call('auditlog.get', [
-			'output' => [$output],
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'filter' => [
-				'resourceid' => self::$resourceid,
-				'action' => $action
-			]
-		]);
-
-		$this->assertEquals($result, $get['result'][0][$output]);
+		$this->call('mediatype.delete', [1]);
+		$this->sendGetRequest('resourcename', 2, 'updated_email_media', 1);
 	}
 }
