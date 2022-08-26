@@ -26,17 +26,18 @@ window.condition_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		if(eventsource == <?= EVENT_SOURCE_SERVICE ?>) {
+		this._loadViews();
+	}
+
+	_loadViews() {
+		if($("#condition-type").val() == 27) {
 			jQuery('#service-new-condition')
 				.multiSelect('getSelectButton')
 				.addEventListener('click', () => {
 					this.selectServices();
 				});
 		}
-		this._loadViews();
-	}
 
-	_loadViews() {
 		this.dialogue.addEventListener('click', (e) => {
 			$("#condition-type").change(function() {
 				reloadPopup($(e.target).closest("form").get(0), "popup.condition.actions")
@@ -48,7 +49,7 @@ window.condition_popup = new class {
 	}
 
 	submit() {
-		// this.validate(this.overlay);
+		//this.validate(this.overlay);
 		const fields = getFormFields(this.form);
 		let curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'popup.condition.actions');
@@ -137,7 +138,7 @@ window.condition_popup = new class {
 	//			//	submit(response, overlay);
 	//			// }
 	//		});
-	// }
+	//}
 
 	selectServices() {
 		const overlay = PopUp('popup.services', {title: t('Services')}, {dialogueid: 'services'});
