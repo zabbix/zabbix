@@ -929,7 +929,7 @@ class CHostPrototype extends CHostBase {
 
 		$options = [
 			'output' => ['group_prototypeid', 'hostid', 'name', 'templateid'],
-			'filter' => ['hostid' => $hostids, 'groupid' => '0']
+			'filter' => ['hostid' => $hostids, 'groupid' => 0]
 		];
 		$db_groups = DBselect(DB::makeSql('group_prototype', $options));
 

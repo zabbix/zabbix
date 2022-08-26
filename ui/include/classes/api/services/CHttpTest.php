@@ -1194,7 +1194,7 @@ class CHttpTest extends CApiService {
 			$httptest = [
 				'httptestid' => $row['httptestid'],
 				'name' => $row['name'],
-				'templateid' => '0'
+				'templateid' => 0
 			];
 
 			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {

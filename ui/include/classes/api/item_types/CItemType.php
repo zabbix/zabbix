@@ -229,7 +229,7 @@ abstract class CItemType {
 								]);
 
 								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
-									&& ($non_interface_type || ($opt_interface_type && $db_item['interfaceid'] === '0'));
+									&& ($non_interface_type || ($opt_interface_type && $db_item['interfaceid'] == 0));
 							}, 'type' => API_ID, 'flags' => API_REQUIRED],
 							['if' => static function () use ($db_item): bool {
 								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);

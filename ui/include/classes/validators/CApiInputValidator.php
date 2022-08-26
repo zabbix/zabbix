@@ -1201,7 +1201,7 @@ class CApiInputValidator {
 
 	/**
 	 * @param array  $rule
-	 * @param int    $rule['in'] (optional)
+	 * @param string $rule['in'] (optional)
 	 * @param string $data
 	 * @param string $path
 	 * @param string $error
@@ -1213,13 +1213,13 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if ($rule['in'] !== '0') {
+		if ($rule['in'] != 0) {
 			$error = 'Incorrect validation rules.';
 
 			return false;
 		}
 
-		if ($data !== '0') {
+		if ($data != 0) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('value must be %1$s', '0'));
 
 			return false;

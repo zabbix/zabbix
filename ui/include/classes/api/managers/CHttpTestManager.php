@@ -601,7 +601,7 @@ class CHttpTestManager {
 					'delay' => $httptest['delay'],
 					'templateid' => array_key_exists('templateid', $httptest)
 						? self::$parent_itemids[$httptest['templateid']][$item_key]
-						: '0'
+						: 0
 				] + $type_item;
 			}
 		}
@@ -666,8 +666,8 @@ class CHttpTestManager {
 						&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0) {
 					$item_key = array_key_exists('key_', $item) ? $item['key_'] : $db_item['key_'];
 
-					$item['templateid'] = $httptest['templateid'] === '0'
-						? '0'
+					$item['templateid'] = $httptest['templateid'] == 0
+						? 0
 						: self::$parent_itemids[$httptest['templateid']][$item_key];
 				}
 
@@ -709,8 +709,8 @@ class CHttpTestManager {
 							&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0) {
 						$item_key = array_key_exists('key_', $item) ? $item['key_'] : $db_item['key_'];
 
-						$item['templateid'] = $httptest['templateid'] === '0'
-							? '0'
+						$item['templateid'] = $httptest['templateid'] == 0
+							? 0
 							: self::$parent_itemids[$httptest['templateid']][$item_key];
 					}
 
@@ -1080,7 +1080,7 @@ class CHttpTestManager {
 						'delay' => $httptest['delay'],
 						'templateid' => array_key_exists('templateid', $httptest)
 							? self::$parent_itemids[$httptest['templateid']][$item_key]
-							: '0'
+							: 0
 					] + $type_item;
 				}
 			}
@@ -1479,7 +1479,7 @@ class CHttpTestManager {
 					$exHttpTest = $hostHttpTest['byName'][$httpTest['name']];
 
 					if (bccomp($exHttpTest['templateid'], $httpTestId) == 0
-							|| $exHttpTest['templateid'] !== '0'
+							|| $exHttpTest['templateid'] != 0
 							|| !$this->compareHttpSteps($httpTest, $exHttpTest)) {
 						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
 						throw new Exception(
