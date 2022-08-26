@@ -147,7 +147,7 @@ void	recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls
 		goto out;
 	}
 
-	if (FAIL == (ret = zbx_tcp_recv_ext(sock, CONFIG_TIMEOUT, ZBX_TCP_LARGE)))
+	if (FAIL == (ret = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive proxy configuration data from server at \"%s\": %s",
 				sock->peer, zbx_json_strerror());
