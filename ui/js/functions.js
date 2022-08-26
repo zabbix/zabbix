@@ -174,10 +174,14 @@ let colorPalette = (function() {
 		 * @return string  Hexadecimal color code.
 		 */
 		getNextColor: function(used_colors) {
+			if (!used_colors.length) {
+				return palette[0] || '';
+			}
+
 			const palette_usage = {};
 
 			for (const color of palette) {
-				palette_usage[color] = used_colors.filter((i) => i === color).length;
+				palette_usage[color] = used_colors.filter(used_color => used_color === color).length;
 			}
 
 			const min_used_color_count = Math.min(...Object.values(palette_usage));
