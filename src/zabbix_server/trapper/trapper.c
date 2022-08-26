@@ -170,7 +170,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
  ******************************************************************************/
 static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	char		*error = NULL, *version_str;
+	char		*error = NULL, *version_str = NULL;
 	int		ret, flags = ZBX_TCP_PROTOCOL, version_int;
 	DC_PROXY	proxy;
 

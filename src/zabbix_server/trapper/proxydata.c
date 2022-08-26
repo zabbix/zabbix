@@ -129,7 +129,7 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
 void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
 	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
-	char			*error = NULL, *version_str;
+	char			*error = NULL, *version_str = NULL;
 	DC_PROXY		proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);

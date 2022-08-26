@@ -39,9 +39,6 @@ int	zbx_get_component_version(const char *version_str)
 	char	*pmid, *plow;
 	char	version_buf[ZBX_VERSION_BUF_LEN];
 
-	if (NULL == version_str)
-		return FAIL;
-
 	zbx_strlcpy(version_buf, version_str, sizeof(version_buf));
 
 	if (NULL == (pmid = strchr(version_buf, '.')))

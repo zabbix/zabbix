@@ -35,7 +35,7 @@
  ******************************************************************************/
 void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	char		*error = NULL, *buffer = NULL, *version_str;
+	char		*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json	j;
 	DC_PROXY	proxy;
 	int		ret, flags = ZBX_TCP_PROTOCOL, version_int;
