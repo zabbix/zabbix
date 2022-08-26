@@ -19,75 +19,64 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
  * @backup hosts, ids
  */
-class testAuditlogProxy extends CAPITest {
-
-	protected static $resourceid;
-
+class testAuditlogProxy extends testAuditlogCommon {
 	public function testAuditlogProxy_Create() {
-		$created = "{\"proxy.host\":[\"add\",\"Audit proxy\"],\"proxy.status\":[\"add\",\"5\"],\"proxy.description".
-				"\":[\"add\",\"Proxy audit description\"],\"proxy.tls_accept\":[\"add\",\"2\"],\"proxy.proxy_address".
-				"\":[\"add\",\"localhost\"],\"proxy.tls_psk_identity\":[\"add\",\"******\"],\"proxy.tls_psk\":[".
-				"\"add\",\"******\"],\"proxy.proxyid\":[\"add\",\"131004\"]}";
-
 		$create = $this->call('proxy.create', [
 			[
 				'host' => 'Audit proxy',
-				'status' => '5',
+				'status' => 5,
 				'description' => 'Proxy audit description',
-				'tls_accept' => '2',
+				'tls_accept' => 2,
 				'proxy_address' => 'localhost',
 				'tls_psk_identity' => 'Audit',
 				'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
 			]
 		]);
+		$resourceid = $create['result']['proxyids'][0];
 
-		self::$resourceid = $create['result']['proxyids'][0];
-		$this->sendGetRequest('details', 0, $created);
+		$created = "{\"proxy.host\":[\"add\",\"Audit proxy\"],".
+				"\"proxy.status\":[\"add\",\"5\"],".
+				"\"proxy.description\":[\"add\",\"Proxy audit description\"],".
+				"\"proxy.tls_accept\":[\"add\",\"2\"],".
+				"\"proxy.proxy_address\":[\"add\",\"localhost\"],".
+				"\"proxy.tls_psk_identity\":[\"add\",\"******\"],".
+				"\"proxy.tls_psk\":[\"add\",\"******\"],".
+				"\"proxy.proxyid\":[\"add\",\"".$resourceid."\"]}";
+
+		$this->sendGetRequest('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogProxy_Update() {
-		$updated = "{\"proxy.host\":[\"update\",\"Updated Audit proxy\",\"Audit proxy\"],\"proxy.description\":[".
-				"\"update\",\"Update proxy audit description\",\"Proxy audit description\"],\"proxy.proxy_address".
-				"\":[\"update\",\"updated_address\",\"localhost\"],\"proxy.tls_psk_identity\":[\"update\",\"******\",".
-				"\"******\"],\"proxy.tls_psk\":[\"update\",\"******\",\"******\"]}";
+		$updated = "{\"proxy.host\":[\"update\",\"Updated Audit proxy\",\"Api active proxy for delete0\"],".
+				"\"proxy.description\":[\"update\",\"Update proxy audit description\",\"\"],".
+				"\"proxy.tls_accept\":[\"update\",\"2\",\"1\"],".
+				"\"proxy.proxy_address\":[\"update\",\"updated_address\",\"\"],".
+				"\"proxy.tls_psk_identity\":[\"update\",\"******\",\"******\"],".
+				"\"proxy.tls_psk\":[\"update\",\"******\",\"******\"]}";
 
 		$this->call('proxy.update', [
 			[
-				'proxyid' => self::$resourceid,
+				'proxyid' => 99000,
 				'host' => 'Updated Audit proxy',
-				'status' => '5',
+				'status' => 5,
 				'description' => 'Update proxy audit description',
-				'tls_accept' => '2',
+				'tls_accept' => 2,
 				'proxy_address' => 'updated_address',
 				'tls_psk_identity' => 'Updated_TSK',
 				'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193111'
 			]
 		]);
 
-		$this->sendGetRequest('details', 1, $updated);
+		$this->sendGetRequest('details', 1, $updated, 99000);
 	}
 
 	public function testAuditlogProxy_Delete() {
-		$this->call('proxy.delete', [self::$resourceid]);
-		$this->sendGetRequest('resourcename', 2, 'Updated Audit proxy');
-	}
-
-	private function sendGetRequest($output, $action, $result) {
-		$get = $this->call('auditlog.get', [
-			'output' => [$output],
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'filter' => [
-				'resourceid' => self::$resourceid,
-				'action' => $action
-			]
-		]);
-
-		$this->assertEquals($result, $get['result'][0][$output]);
+		$this->call('proxy.delete', [99000]);
+		$this->sendGetRequest('resourcename', 2, 'Updated Audit proxy', 99000);
 	}
 }
