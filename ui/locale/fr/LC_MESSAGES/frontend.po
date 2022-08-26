@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-07 11:25+0000\n"
+"PO-Revision-Date: 2022-08-22 18:28+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -203,7 +203,7 @@ msgstr[1] "%1$s de %2$s éléments en défaut"
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$s percentile: %2$s"
-msgstr ""
+msgstr "%1$sième centile : %2$s"
 
 #: jsLoader.php:348
 #, c-format
@@ -14281,7 +14281,7 @@ msgstr "Graphique parent"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "Valeur de l'hôte parent"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
