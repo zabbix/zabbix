@@ -29,7 +29,6 @@ class CActionCondValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($condition) {
-		sdff('validate controller');
 		// Build validators.
 		$discoveryCheckTypeValidator = new CLimitedSetValidator([
 			'values' => array_keys(discovery_check_type2str())

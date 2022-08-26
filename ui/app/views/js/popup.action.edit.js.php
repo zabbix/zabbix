@@ -65,14 +65,12 @@ window.action_edit_popup = new class {
 			source: this.eventsource
 		};
 
-		const overlay =  PopUp('popup.condition.actions', parameters, {
+		const overlay =  PopUp('popup.condition.edit', parameters, {
 			dialogueid: 'condition',
 			dialogue_class: 'modal-popup-medium'
 		});
 
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
-				// todo: add multiselect title, not value
-
 				this.row = document.createElement('tr');
 				this._createRow(this.row, e.detail.inputs);
 				$('#conditionTable tr:last').before(this.row);

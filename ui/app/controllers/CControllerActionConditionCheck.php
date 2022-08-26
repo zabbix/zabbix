@@ -22,7 +22,12 @@
 /**
  * Actions new condition popup.
  */
-class CControllerConditionsPopupValidate extends CController {
+class CControllerActionConditionCheck extends CController {
+
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->disableSIDvalidation();
+	}
 
 	protected function checkInput() {
 		$fields =  [

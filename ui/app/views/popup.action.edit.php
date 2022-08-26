@@ -27,7 +27,6 @@
  */
 
 $this->addJsFile('popup.operation.common.js');
-$this->addJsFile('configuration.action.edit.js.php');
 
 $form = (new CForm())
 	->setName('action.edit')

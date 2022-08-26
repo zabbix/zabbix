@@ -57,7 +57,6 @@ abstract class CControllerPopupConditionCommon extends CController {
 	}
 
 	protected function doAction() {
-
 		if ($this->hasInput('validate')) {
 			$this->setResponse(
 				(new CControllerResponseData(

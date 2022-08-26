@@ -25,6 +25,7 @@ window.condition_popup = new class {
 		this.overlay = overlays_stack.getById('condition');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		console.log('here');
 
 		this._loadViews();
 	}
@@ -49,12 +50,9 @@ window.condition_popup = new class {
 	}
 
 	submit() {
-		//this.validate(this.overlay);
 		const fields = getFormFields(this.form);
 		let curl = new Curl('zabbix.php', false);
-		//curl.setArgument('action', 'popup.condition.check');
-		curl.setArgument('action', 'popup.condition.actions');
-		curl.setArgument('validate', '1')
+		curl.setArgument('action', 'popup.condition.check');
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
@@ -78,7 +76,7 @@ window.condition_popup = new class {
 
 				return response;
 			})
-			//.then(success_callback)
+			.then(success_callback)
 			.catch((exception) => {
 				for (const element of this.form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
