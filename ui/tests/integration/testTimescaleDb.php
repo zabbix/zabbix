@@ -56,10 +56,7 @@ class testTimescaleDb extends CIntegrationTest {
 		];
 	}
 
-	/**
-	 * Test TimescaleDb extension.
-	 */
-	public function setExtension() {
+	private function retrieveExtention() {
 		self::$db_extension = '';
 
 		$sql = 'SELECT db_extension'.
@@ -75,7 +72,7 @@ class testTimescaleDb extends CIntegrationTest {
 	/**
 	 * Test TimescaleDb extension.
 	 */
-	public function clearChunks() {
+	private function clearChunks() {
 		$sql = 'SELECT drop_chunks(\''.self::TABLENAME.'\', older_than => '.time().')';
 
 		$res = DBfetch(DBselect($sql));
@@ -94,11 +91,11 @@ class testTimescaleDb extends CIntegrationTest {
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritDoc}
 	 */
 	public function prepareData() {
 
-		$this->setExtension();
+		$this->retrieveExtention();
 
 		// Create host "test_timescale"
 		$response = $this->call('host.create', [
@@ -142,7 +139,6 @@ class testTimescaleDb extends CIntegrationTest {
 		return true;
 	}
 
-
 	/**
 	 * Get number of records in history_uint table.
 	 */
@@ -177,6 +173,7 @@ class testTimescaleDb extends CIntegrationTest {
 			$this->assertArrayHasKey('number_compressed_chunks', $res2);
 			$this->assertEquals($res2['number_compressed_chunks'], count($res));
 			$res_compr = DBfetch(DBselect('SELECT decompress_chunk(\''.$chunk.'\')'));
+			$this->assertArrayHasKey('decompress_chunk', $res_compr);
 		}
 	}
 
@@ -218,7 +215,7 @@ class testTimescaleDb extends CIntegrationTest {
 		$this->executeHousekeeper();
 	}
 
-/**
+	/**
 	 * Test compression TimescaleDb.
 	 *
 	 * @required-components server
