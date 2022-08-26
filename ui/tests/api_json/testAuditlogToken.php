@@ -19,61 +19,55 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
  * @backup token, ids
  */
-class testAuditlogToken extends CAPITest {
-
-	protected static $resourceid;
-
+class testAuditlogToken extends testAuditlogCommon {
 	public function testAuditlogToken_Create() {
-		$created = "{\"token.name\":[\"add\",\"Audit token\"],\"token.userid\":[\"add\",\"54\"],\"token.tokenid".
-				"\":[\"add\",\"24\"]}";
-
 		$create = $this->call('token.create', [
 			[
 				'name' => 'Audit token',
-				'userid' => 54
+				'userid' => 1,
+				'expires_at' => 1611238072,
+				'description' => 'Audit description',
+				'status' => 1
 			]
 		]);
+		$resourceid = $create['result']['tokenids'][0];
 
-		self::$resourceid = $create['result']['tokenids'][0];
-		$this->sendGetRequest('details', 0, $created);
+		$created = "{\"token.name\":[\"add\",\"Audit token\"],".
+				"\"token.userid\":[\"add\",\"1\"],".
+				"\"token.expires_at\":[\"add\",\"1611238072\"],".
+				"\"token.description\":[\"add\",\"Audit description\"],".
+				"\"token.status\":[\"add\",\"1\"],".
+				"\"token.tokenid\":[\"add\",\"".$resourceid."\"]}";
+
+		$this->sendGetRequest('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogToken_Update() {
-		$updated = "{\"token.name\":[\"update\",\"Updated token\",\"Audit token\"],\"token.status\":[".
-				"\"update\",\"1\",\"0\"]}";
-
 		$this->call('token.update', [
 			[
-				'tokenid' => self::$resourceid,
-				'name' => 'Updated token',
+				'tokenid' => 11,
+				'name' => 'Updated audit token',
+				'expires_at' => 1611238090,
+				'description' => 'Updated description',
 				'status' => 1
 			]
 		]);
 
-		$this->sendGetRequest('details', 1, $updated);
+		$updated = "{\"token.name\":[\"update\",\"Updated audit token\",\"test-token\"],".
+				"\"token.expires_at\":[\"update\",\"1611238090\",\"0\"],".
+				"\"token.description\":[\"update\",\"Updated description\",\"\"],".
+				"\"token.status\":[\"update\",\"1\",\"0\"]}";
+
+		$this->sendGetRequest('details', 1, $updated, 11);
 	}
 
 	public function testAuditlogToken_Delete() {
-		$this->call('token.delete', [self::$resourceid]);
-		$this->sendGetRequest('resourcename', 2, 'Updated token');
-	}
-
-	private function sendGetRequest($output, $action, $result) {
-		$get = $this->call('auditlog.get', [
-			'output' => [$output],
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'filter' => [
-				'resourceid' => self::$resourceid,
-				'action' => $action
-			]
-		]);
-
-		$this->assertEquals($result, $get['result'][0][$output]);
+		$this->call('token.delete', [11]);
+		$this->sendGetRequest('resourcename', 2, 'Updated audit token', 11);
 	}
 }
