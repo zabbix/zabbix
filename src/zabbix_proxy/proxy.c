@@ -1123,7 +1123,7 @@ static void	zbx_check_db(void)
 static void	proxy_db_init(void)
 {
 	char		*error = NULL;
-	int		db_type, db_mandatory, required;
+	int		db_type, version_check;
 #ifdef HAVE_SQLITE3
 	zbx_stat_t	db_stat;
 #endif
@@ -1153,10 +1153,10 @@ static void	proxy_db_init(void)
 	DBcheck_character_set();
 	zbx_check_db();
 
-	if (SUCCEED != DBcheck_version(&db_mandatory, &required))
+	if (SUCCEED != (version_check = DBcheck_version()))
 	{
 #ifdef HAVE_SQLITE3
-		if (db_mandatory > required)
+		if (NOTSUPPORTED == version_check)
 			exit(EXIT_FAILURE);
 
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", CONFIG_DBNAME);
@@ -1165,7 +1165,8 @@ static void	proxy_db_init(void)
 		if (0 != zbx_stat(CONFIG_DBNAME, &db_stat) || 0 == S_ISREG(db_stat.st_mode) ||
 				0 != unlink(CONFIG_DBNAME))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file: \"%s\", exiting...");
+			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file: \"%s\", exiting...",
+					CONFIG_DBNAME);
 			exit(EXIT_FAILURE);
 		}
 		proxy_db_init();
