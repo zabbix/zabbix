@@ -193,7 +193,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	DBfree_result(result);
 
 	if (0 != (processed_num = itemids.values_num))
-		zbx_dc_reschedule_items(&itemids, time(NULL), NULL);
+		zbx_dc_reschedule_items(&itemids, (int)time(NULL), NULL);
 
 	if (0 != taskids->values_num)
 	{

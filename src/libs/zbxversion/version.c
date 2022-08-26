@@ -19,6 +19,7 @@
 
 #include "version.h"
 #include "zbxtypes.h"
+#include "zbxcommon.h"
 
 /******************************************************************************
  *                                                                            *
