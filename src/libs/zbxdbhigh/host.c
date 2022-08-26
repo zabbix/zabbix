@@ -5930,11 +5930,8 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 
 	DBexecute("%s", sql);
 
-	if (NULL != hostnames)
-	{
-		for (i = 0; i < hostids->values_num; i++)
-			zbx_audit_host_del(hostids->values[i], hostnames->values[i]);
-	}
+	for (i = 0; i < hostids->values_num; i++)
+		zbx_audit_host_del(hostids->values[i], hostnames->values[i]);
 clean:
 	zbx_free(sql);
 
