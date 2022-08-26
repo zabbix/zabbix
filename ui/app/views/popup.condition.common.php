@@ -25,7 +25,7 @@
  */
 
 $inline_js = getPagePostJs().$this->readJsFile('popup.condition.common.js.php');
-require_once dirname(__FILE__).'/../../include/actions.inc.php';
+require_once __DIR__ .'/../../include/actions.inc.php';
 
 $form = (new CForm())
 	->setId('popup.condition')
@@ -182,7 +182,7 @@ switch ($data['type']) {
 		break;
 
 	case ZBX_POPUP_CONDITION_TYPE_ACTION:
-		require_once dirname(__FILE__).'/../../include/actions.inc.php';
+		require_once __DIR__ .'/../../include/actions.inc.php';
 
 		// Collect all operators options.
 		$operators_by_condition = [];
@@ -215,9 +215,6 @@ switch ($data['type']) {
 			)
 		]);
 
-		$inline_js .= '$(() => $("#condition-type").on("change",'
-			.'(e) => reloadPopup($(e.target).closest("form").get(0), "popup.condition.actions")));';
-
 		switch ($condition_type) {
 			// Trigger form elements.
 			case CONDITION_TYPE_TRIGGER:
@@ -225,7 +222,6 @@ switch ($data['type']) {
 				foreach ($operators_by_condition[CONDITION_TYPE_TRIGGER] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
-
 
 				$trigger_multiselect = $data['trigger_context'] === 'host'
 					? (new CMultiSelect([
@@ -280,8 +276,6 @@ switch ($data['type']) {
 						new CFormField($trigger_multiselect)
 					]);
 
-				$inline_js .= '$(() => $("#trigger_context").on("change",'
-					.'(e) => reloadPopup($(e.target).closest("form").get(0), "popup.condition.actions")));';
 				break;
 
 			// Trigger severity form elements.
@@ -865,7 +859,7 @@ switch ($data['type']) {
 		break;
 
 	case ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION:
-		require_once dirname(__FILE__).'/../../include/actions.inc.php';
+		require_once __DIR__ .'/../../include/actions.inc.php';
 
 		// Collect all options for select.
 		$condition_options = [];
@@ -931,7 +925,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'condition_popup.submit(overlay)'
+			'action' => 'condition_popup.submit()'
 		]
 	]
 ];

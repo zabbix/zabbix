@@ -21,29 +21,39 @@
 
 window.condition_popup = new class {
 
-	init(eventlistener) {
+	init(eventsource) {
 		this.overlay = overlays_stack.getById('condition');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		if(eventlistener == <?= EVENT_SOURCE_SERVICE ?>) {
+		if(eventsource == <?= EVENT_SOURCE_SERVICE ?>) {
 			jQuery('#service-new-condition')
 				.multiSelect('getSelectButton')
 				.addEventListener('click', () => {
 					this.selectServices();
 				});
 		}
+		this._loadViews();
+	}
+
+	_loadViews() {
+		this.dialogue.addEventListener('click', (e) => {
+			$("#condition-type").change(function() {
+				reloadPopup($(e.target).closest("form").get(0), "popup.condition.actions")
+			})
+			$("#trigger_context").change(function() {
+				reloadPopup($(e.target).closest("form").get(0), "popup.condition.actions")
+			})
+		})
 	}
 
 	submit() {
-		let curl = new Curl('zabbix.php', false);
-		//fields.action = 'conditions.validate';
+		// this.validate(this.overlay);
 		const fields = getFormFields(this.form);
+		let curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'popup.condition.actions');
-		curl.setArgument('validate', '1');
-		//curl.setArgument('action', 'conditions.validate');
-
-		//this.validate(this.overlay);
+		// curl.setArgument('action', 'conditions.validate')
+		curl.setArgument('validate', '1')
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
@@ -127,7 +137,7 @@ window.condition_popup = new class {
 	//			//	submit(response, overlay);
 	//			// }
 	//		});
-	//}
+	// }
 
 	selectServices() {
 		const overlay = PopUp('popup.services', {title: t('Services')}, {dialogueid: 'services'});
