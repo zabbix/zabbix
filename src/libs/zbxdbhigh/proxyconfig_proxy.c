@@ -421,7 +421,6 @@ static int	proxyconfig_parse_data(struct zbx_json_parse *jp_data, zbx_vector_tab
 		{
 			*error = zbx_dsprintf(NULL, "invalid table name \"%s\"", buf);
 			goto out;
-			break;
 		}
 
 		if (SUCCEED != proxyconfig_validate_table_fields(td, &jp_table, error) ||
@@ -1177,7 +1176,7 @@ static int	proxyconfig_sync_regexps(zbx_vector_table_data_ptr_t *config_tables, 
 	return proxyconfig_update_rows(expressions, error);
 }
 
-#define ZBX_proxyconfig_GET_TABLE(table)					\
+#define ZBX_PROXYCONFIG_GET_TABLE(table)					\
 	if (NULL == (table = proxyconfig_get_table(config_tables, #table)))	\
 	{									\
 		*error = zbx_strdup(NULL, "cannot find " #table " data");	\
@@ -1213,19 +1212,19 @@ static int	proxyconfig_sync_hosts(zbx_vector_table_data_ptr_t *config_tables, in
 	zbx_vector_table_data_ptr_append(&host_tables, hosts);
 
 	/* host related tables must always be present (even empty) if at least one host is synced */
-	ZBX_proxyconfig_GET_TABLE(host_inventory);
-	ZBX_proxyconfig_GET_TABLE(interface);
-	ZBX_proxyconfig_GET_TABLE(interface_snmp);
-	ZBX_proxyconfig_GET_TABLE(items);
-	ZBX_proxyconfig_GET_TABLE(item_rtdata);
-	ZBX_proxyconfig_GET_TABLE(item_preproc);
-	ZBX_proxyconfig_GET_TABLE(item_parameter);
-	ZBX_proxyconfig_GET_TABLE(httptest);
-	ZBX_proxyconfig_GET_TABLE(httptestitem);
-	ZBX_proxyconfig_GET_TABLE(httptest_field);
-	ZBX_proxyconfig_GET_TABLE(httpstep);
-	ZBX_proxyconfig_GET_TABLE(httpstepitem);
-	ZBX_proxyconfig_GET_TABLE(httpstep_field);
+	ZBX_PROXYCONFIG_GET_TABLE(host_inventory);
+	ZBX_PROXYCONFIG_GET_TABLE(interface);
+	ZBX_PROXYCONFIG_GET_TABLE(interface_snmp);
+	ZBX_PROXYCONFIG_GET_TABLE(items);
+	ZBX_PROXYCONFIG_GET_TABLE(item_rtdata);
+	ZBX_PROXYCONFIG_GET_TABLE(item_preproc);
+	ZBX_PROXYCONFIG_GET_TABLE(item_parameter);
+	ZBX_PROXYCONFIG_GET_TABLE(httptest);
+	ZBX_PROXYCONFIG_GET_TABLE(httptestitem);
+	ZBX_PROXYCONFIG_GET_TABLE(httptest_field);
+	ZBX_PROXYCONFIG_GET_TABLE(httpstep);
+	ZBX_PROXYCONFIG_GET_TABLE(httpstepitem);
+	ZBX_PROXYCONFIG_GET_TABLE(httpstep_field);
 
 	if (0 == full_sync)
 	{
