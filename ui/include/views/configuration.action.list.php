@@ -24,13 +24,8 @@
  * @var array $data
  */
 
-require_once dirname(__FILE__).'/js/configuration.action.list.js.php';
+require_once __DIR__ .'/js/configuration.action.list.js.php';
 $this->addJsFile('popup.condition.common.js');
-
-if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
-	$title = _('Service actions');
-	$doc_url = CDocHelper::CONFIGURATION_SERVICES_ACTION_LIST;
-}
 
 	$submenu_source = [
 		EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
@@ -43,10 +38,6 @@ if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
 	$title = array_key_exists($data['eventsource'], $submenu_source) ? $submenu_source[$data['eventsource']] : null;
 	$submenu = [];
 	$doc_url = CDocHelper::CONFIGURATION_ACTION_LIST;
-
-if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
-	$doc_url = CDocHelper::CONFIGURATION_SERVICES_ACTION_LIST;
-}
 
 	foreach ($submenu_source as $value => $label) {
 		$url = (new CUrl('zabbix.php'))
@@ -78,6 +69,7 @@ $current_url = (new CUrl('zabbix.php'))
 
 $filter = (new CFilter())
 	->setResetUrl($current_url)
+	->addVar('action', 'action.list')
 	->addVar('eventsource', $data['eventsource'])
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
@@ -100,10 +92,6 @@ $filter = (new CFilter())
 			])
 		]
 	);
-
-if (in_array($data['eventsource'], [0,1,2,3])) {
-	$filter->addVar('action', 'action.list');
-}
 
 $widget->addItem($filter);
 $current_url->removeArgument('filter_rst');

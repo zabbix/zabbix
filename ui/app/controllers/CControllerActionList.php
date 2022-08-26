@@ -28,8 +28,7 @@ class CControllerActionList extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource'=> 'in '.implode(',', [
-					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
-					EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
+					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
 					EVENT_SOURCE_SERVICE
 				]),
 			'g_actionid' => 'array_id',

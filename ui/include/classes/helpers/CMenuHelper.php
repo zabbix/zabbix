@@ -79,13 +79,6 @@ class CMenuHelper {
 					->setAction('service.list')
 					->setAliases(['service.list.edit'])
 				: null,
-			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_ACTIONS)
-				? (new CMenuItem(_('Service actions')))
-					->setUrl(
-						(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_SERVICE),
-						'actionconf.php?eventsource='.EVENT_SOURCE_SERVICE
-					)
-				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SLA)
 				? (new CMenuItem(_('SLA')))
 					->setAction('sla.list')
@@ -211,17 +204,22 @@ class CMenuHelper {
 						(new CMenuItem(_('Discovery actions')))
 							->setUrl((new CUrl('zabbix.php'))
 								->setArgument('action', 'action.list')
-								->setArgument('eventsource', EVENT_SOURCE_DISCOVERY),
+								->setArgument('eventsource', EVENT_SOURCE_DISCOVERY)
 							),
 						(new CMenuItem(_('Autoregistration actions')))
 							->setUrl((new CUrl('zabbix.php'))
-								->setArgument('action', 'action.list')
-								->setArgument('eventsource', EVENT_SOURCE_AUTOREGISTRATION),
+							->setArgument('action', 'action.list')
+							->setArgument('eventsource', EVENT_SOURCE_AUTOREGISTRATION)
 							),
 						(new CMenuItem(_('Internal actions')))
 							->setUrl((new CUrl('zabbix.php'))
+							->setArgument('action', 'action.list')
+							->setArgument('eventsource', EVENT_SOURCE_INTERNAL)
+							),
+						(new CMenuItem(_('Service actions')))
+							->setUrl((new CUrl('zabbix.php'))
 								->setArgument('action', 'action.list')
-								->setArgument('eventsource', EVENT_SOURCE_INTERNAL),
+								->setArgument('eventsource', EVENT_SOURCE_SERVICE)
 							)
 					]))
 				: null,
