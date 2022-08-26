@@ -1169,6 +1169,7 @@ static void	proxy_db_init(void)
 					CONFIG_DBNAME);
 			exit(EXIT_FAILURE);
 		}
+
 		proxy_db_init();
 #else
 		exit(EXIT_FAILURE);
