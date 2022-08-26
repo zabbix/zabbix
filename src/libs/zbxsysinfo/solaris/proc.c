@@ -25,6 +25,7 @@
 #include "stats.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxtime.h"
 
 #if !defined(HAVE_ZONE_H) && defined(HAVE_SYS_UTSNAME_H)
 #	include <sys/utsname.h>
