@@ -19,38 +19,31 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
  * @backup users, ids
  */
-class testAuditlogUser extends CAPITest {
-
-	protected static $resourceid;
+class testAuditlogUser extends testAuditlogCommon {
+	private static $resourceid;
+	private static $before_usrgroup;
 
 	public function testAuditlogUser_Create() {
-		$created = "{\"user.username\":[\"add\",\"Audit\"],\"user.passwd\":[\"add\",\"******\"],\"user.name\":[".
-				"\"add\",\"Audit_name\"],\"user.surname\":[\"add\",\"Audit_surname\"],\"user.roleid\":[\"add".
-				"\",\"3\"],\"user.usrgrps[90021]\":[\"add\"],\"user.usrgrps[90021].usrgrpid\":[\"add\",\"7\"],".
-				"\"user.usrgrps[90021].id\":[\"add\",\"90021\"],\"user.medias[1]\":[\"add\"],\"user.medias[1].mediatypeid".
-				"\":[\"add\",\"1\"],\"user.medias[1].sendto\":[\"add\",\"audit@audit.com\"],\"user.medias[1].mediaid".
-				"\":[\"add\",\"1\"],\"user.userid\":[\"add\",\"90001\"]}";
-
 		$create = $this->call('user.create', [
 			[
 				'username' => 'Audit',
 				'passwd' => 'zabbixzabbix',
 				'name' => 'Audit_name',
 				'surname' => 'Audit_surname',
-				'roleid' => '3',
+				'roleid' => 3,
 				'usrgrps' => [
 					[
-						'usrgrpid' => '7'
+						'usrgrpid' => 7
 					]
 				],
 				'medias' => [
 					[
-						'mediatypeid' => '1',
+						'mediatypeid' => 1,
 						'sendto' => [
 							'audit@audit.com'
 						],
@@ -61,44 +54,57 @@ class testAuditlogUser extends CAPITest {
 				]
 			]
 		]);
-
 		self::$resourceid = $create['result']['userids'][0];
-		$this->sendGetRequest('details', 0, $created);
+		self::$before_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.self::$resourceid);
+
+		$created = "{\"user.username\":[\"add\",\"Audit\"],".
+				"\"user.passwd\":[\"add\",\"******\"],".
+				"\"user.name\":[\"add\",\"Audit_name\"],".
+				"\"user.surname\":[\"add\",\"Audit_surname\"],".
+				"\"user.roleid\":[\"add\",\"3\"],".
+				"\"user.usrgrps[".self::$before_usrgroup['id']."]\":[\"add\"],".
+				"\"user.usrgrps[".self::$before_usrgroup['id']."].usrgrpid\":[\"add\",\"7\"],".
+				"\"user.usrgrps[".self::$before_usrgroup['id']."].id\":[\"add\",\"".self::$before_usrgroup['id']."\"],".
+				"\"user.medias[1]\":[\"add\"],".
+				"\"user.medias[1].mediatypeid\":[\"add\",\"1\"],".
+				"\"user.medias[1].sendto\":[\"add\",\"audit@audit.com\"],".
+				"\"user.medias[1].mediaid\":[\"add\",\"1\"],".
+				"\"user.userid\":[\"add\",\"".self::$resourceid."\"]}";
+
+		$this->sendGetRequest('details', 0, $created, self::$resourceid);
 	}
 
-	public function testAuditUser_Login() {
-		$login = "Audit";
-
+	/**
+	 * @depends testAuditlogUser_Create
+	 */
+	public function testAuditlogUser_Login() {
 		$this->authorize('Audit', 'zabbixzabbix');
-		$this->sendGetRequest('username', 8, $login);
+		$this->sendGetRequest('username', 8, 'Audit', self::$resourceid);
 	}
 
-	public function testAuditUser_Logout() {
-		$logout = "Audit";
-
+	/**
+	 * @depends testAuditlogUser_Create
+	 */
+	public function testAuditlogUser_Logout() {
 		$this->authorize('Audit', 'zabbixzabbix');
 		$this->call('user.logout', []);
 		$this->authorize('Admin', 'zabbix');
-		$this->sendGetRequest('username', 4, $logout);
+		$this->sendGetRequest('username', 4, 'Audit', self::$resourceid);
 	}
 
-	public function testAuditUser_FailedLogin() {
-		$failed = "Audit";
-
+	/**
+	 * @depends testAuditlogUser_Create
+	 */
+	public function testAuditlogUser_FailedLogin() {
 		$this->authorize('Audit', 'incorrect_pas');
 		$this->authorize('Admin', 'zabbix');
-		$this->sendGetRequest('username', 9, $failed);
+		$this->sendGetRequest('username', 9, 'Audit', self::$resourceid);
 	}
 
+	/**
+	 * @depends testAuditlogUser_Create
+	 */
 	public function testAuditlogUser_Update() {
-		$updated = "{\"user.usrgrps[90021]\":[\"delete\"],\"user.medias[1]\":[\"delete\"],\"user.usrgrps[90022]".
-				"\":[\"add\"],\"user.medias[2]\":[\"add\"],\"user.username\":[\"update\",\"updated_Audit\",\"Audit\"],".
-				"\"user.passwd\":[\"update\",\"******\",\"******\"],\"user.name\":[\"update\",\"Updated_Audit_name\",".
-				"\"Audit_name\"],\"user.surname\":[\"update\",\"Updated_Audit_surname\",\"Audit_surname\"],".
-				"\"user.usrgrps[90022].usrgrpid\":[\"add\",\"11\"],\"user.usrgrps[90022].id\":[\"add\",\"90022\"],".
-				"\"user.medias[2].mediatypeid\":[\"add\",\"1\"],\"user.medias[2].sendto\":[\"add\",\"update_audit@audit.com".
-				"\"],\"user.medias[2].mediaid\":[\"add\",\"2\"]}";
-
 		$this->authorize('Admin', 'zabbix');
 		$this->call('user.update', [
 			[
@@ -109,12 +115,12 @@ class testAuditlogUser extends CAPITest {
 				'surname' => 'Updated_Audit_surname',
 				'usrgrps' => [
 					[
-						'usrgrpid' => '11'
+						'usrgrpid' => 11
 					]
 				],
 				'medias' => [
 					[
-						'mediatypeid' => '1',
+						'mediatypeid' => 1,
 						'sendto' => [
 							'update_audit@audit.com'
 						],
@@ -125,26 +131,30 @@ class testAuditlogUser extends CAPITest {
 				]
 			]
 		]);
+		$after_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.self::$resourceid);
 
-		$this->sendGetRequest('details', 1, $updated);
+		$updated = "{\"user.usrgrps[".self::$before_usrgroup['id']."]\":[\"delete\"],".
+			"\"user.medias[1]\":[\"delete\"],".
+			"\"user.usrgrps[".$after_usrgroup['id']."]\":[\"add\"],".
+			"\"user.medias[2]\":[\"add\"],".
+			"\"user.username\":[\"update\",\"updated_Audit\",\"Audit\"],".
+			"\"user.passwd\":[\"update\",\"******\",\"******\"],".
+			"\"user.name\":[\"update\",\"Updated_Audit_name\",\"Audit_name\"],".
+			"\"user.surname\":[\"update\",\"Updated_Audit_surname\",\"Audit_surname\"],".
+			"\"user.usrgrps[".$after_usrgroup['id']."].usrgrpid\":[\"add\",\"11\"],".
+			"\"user.usrgrps[".$after_usrgroup['id']."].id\":[\"add\",\"".$after_usrgroup['id']."\"],".
+			"\"user.medias[2].mediatypeid\":[\"add\",\"1\"],".
+			"\"user.medias[2].sendto\":[\"add\",\"update_audit@audit.com\"],".
+			"\"user.medias[2].mediaid\":[\"add\",\"2\"]}";
+
+		$this->sendGetRequest('details', 1, $updated, self::$resourceid);
 	}
 
+	/**
+	 * @depends testAuditlogUser_Create
+	 */
 	public function testAuditlogUser_Delete() {
 		$this->call('user.delete', [self::$resourceid]);
-		$this->sendGetRequest('resourcename', 2, 'updated_Audit');
-	}
-
-	private function sendGetRequest($output, $action, $result) {
-		$get = $this->call('auditlog.get', [
-			'output' => [$output],
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'filter' => [
-				'resourceid' => self::$resourceid,
-				'action' => $action
-			]
-		]);
-
-		$this->assertEquals($result, $get['result'][0][$output]);
+		$this->sendGetRequest('resourcename', 2, 'updated_Audit', self::$resourceid);
 	}
 }
