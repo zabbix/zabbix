@@ -24,6 +24,7 @@
 #include "zbxmutexs.h"
 #include "log.h"
 #include "stats.h"
+#include "zbxstr.h"
 
 extern ZBX_COLLECTOR_DATA	*collector;
 

@@ -915,7 +915,7 @@ static void	lld_eval_expression_index_functions(zbx_eval_context_t *ctx, zbx_vec
 		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
 			continue;
 
-		if (SUCCEED != is_uint64_n(ctx->expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
+		if (SUCCEED != zbx_is_uint64_n(ctx->expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
 				&functionid))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -1017,8 +1017,8 @@ static char	*lld_eval_expression_expand(zbx_eval_context_t *ctx, const zbx_vecto
 
 		if (ZBX_VARIANT_UI64 != token->value.type)
 		{
-			if (SUCCEED != is_uint64_n(ctx->expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
-					&index))
+			if (SUCCEED != zbx_is_uint64_n(ctx->expression + token->loc.l + 1,
+					token->loc.r - token->loc.l - 1, &index))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -2296,7 +2296,7 @@ static int	lld_expression_create(const zbx_lld_trigger_t *trigger, char **expres
 		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
 			continue;
 
-		if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
+		if (SUCCEED != zbx_is_uint64_n(ctx.expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
 				&function_index))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;

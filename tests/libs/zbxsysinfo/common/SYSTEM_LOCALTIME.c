@@ -93,7 +93,7 @@ static void	zbx_mock_time(void)
 	else
 	{
 		/* Fallback to numeric timestamp format */
-		if (FAIL == is_uint32(timestamp, &timespec.sec))
+		if (FAIL == zbx_is_uint32(timestamp, &timespec.sec))
 			fail_msg("Cannot convert 'timestamp' parameter value to numeric: %s", timestamp);
 	}
 
