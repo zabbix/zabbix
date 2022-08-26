@@ -27,6 +27,8 @@
 $inline_js = getPagePostJs().$this->readJsFile('popup.condition.edit.js.php');
 require_once __DIR__ .'/../../include/actions.inc.php';
 
+// todo: check if it is possible to clean this code
+
 $form = (new CForm())
 	->setId('popup.condition')
 	->setName('popup.condition')

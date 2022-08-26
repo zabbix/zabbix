@@ -21,11 +21,10 @@
 
 window.condition_popup = new class {
 
-	init(eventsource) {
+	init() {
 		this.overlay = overlays_stack.getById('condition');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		console.log('here');
 
 		this._loadViews();
 	}
@@ -58,7 +57,6 @@ window.condition_popup = new class {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
-
 		});
 	}
 
@@ -101,43 +99,6 @@ window.condition_popup = new class {
 				this.overlay.unsetLoading();
 			});
 	}
-
-	// todo : check if I even need the validation function here
-	// validate(overlay) {
-	//	if (window.operation_popup && window.operation_popup.overlay.$dialogue.is(':visible')) {
-	//		return window.operation_popup.view.operation_condition.onConditionPopupSubmit(overlay);
-	//	}
-
-	//	var $form = overlay.$dialogue.find('form'),
-	//		url = new Curl($form.attr('action'));
-
-	//	url.setArgument('validate', 1);
-
-	//	overlay.setLoading();
-	//	overlay.xhr = jQuery.ajax({
-	//		url: url.getUrl(),
-	//		data: $form.serialize(),
-	//		dataType: 'json',
-	//		method: 'POST'
-	//	});
-
-	//	overlay.xhr
-	//		.always(function() {
-	//			overlay.unsetLoading();
-	//		})
-	//		.done(function(response) {
-	//			overlay.$dialogue.find('.msg-bad').remove();
-
-	//			if ('error' in response) {
-	//				const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
-
-	//				message_box.insertBefore($form);
-	//			}
-	//			// else {
-	//			//	submit(response, overlay);
-	//			// }
-	//		});
-	//}
 
 	selectServices() {
 		const overlay = PopUp('popup.services', {title: t('Services')}, {dialogueid: 'services'});
