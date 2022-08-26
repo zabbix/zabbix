@@ -1262,26 +1262,7 @@ out:
  ******************************************************************************/
 int	zbx_xml_doc_read_num(xmlDoc *xdoc, const char *xpath, int *num)
 {
-	int		ret = FAIL;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-
-	xpathCtx = xmlXPathNewContext(xdoc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-		goto out;
-
-	if (XPATH_NUMBER == xpathObj->type)
-	{
-		*num = (int)xpathObj->floatval;
-		ret = SUCCEED;
-	}
-
-	xmlXPathFreeObject(xpathObj);
-out:
-	xmlXPathFreeContext(xpathCtx);
-
-	return ret;
+	return zbx_xml_node_read_num(xdoc, NULL, xpath, num);
 }
 
 /******************************************************************************
@@ -1305,7 +1286,8 @@ int	zbx_xml_node_read_num(xmlDoc *xdoc, xmlNode *node, const char *xpath, int *n
 
 	xpathCtx = xmlXPathNewContext(xdoc);
 
-	xpathCtx->node = node;
+	if (NULL != node)
+		xpathCtx->node = node;
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
 		goto out;

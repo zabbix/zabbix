@@ -790,6 +790,13 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 		zbx_json_addarray(&json_data, "tags");
 		vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_CLUSTER, cluster->id, &json_data, NULL);
 		zbx_json_close(&json_data);
+		zbx_json_addstring(&json_data, "{#CLUSTER.VSAN.UUID}", cluster->vsan_uuid, ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&json_data, "datastore.uuid");
+
+		for (j = 0; j < cluster->dss_uuid.values_num; j++)
+			zbx_json_addstring(&json_data, NULL, cluster->dss_uuid.values[j], ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
 
@@ -1406,7 +1413,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		AGENT_RESULT *result)
 {
 	struct zbx_json		json_data;
-	const char		*url, *name;
+	const char		*url;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 	zbx_vmware_hv_t		*hv;
@@ -1433,6 +1440,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 	while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
 	{
 		int			i;
+		const char		*name;
 		zbx_vmware_cluster_t	*cluster = NULL;
 
 		if (NULL == (name = hv->props[ZBX_VMWARE_HVPROP_NAME]))
@@ -1453,6 +1461,8 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addstring(&json_data, "{#PARENT.TYPE}", hv->parent_type, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#HV.NETNAME}",
 				ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NET_NAME]), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#VSAN.UUID}",
+				ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_VSAN_UUID]), ZBX_JSON_TYPE_STRING);
 		zbx_json_addarray(&json_data, "resource_pool");
 
 		for (i = 0; NULL == cluster && i < service->data->resourcepools.values_num; i++)
@@ -1477,35 +1487,95 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addarray(&json_data, "tags");
 		vmware_tags_uuid_json(&service->data_tags, hv->uuid, &json_data, NULL);
 		zbx_json_close(&json_data);
-		zbx_json_addarray(&json_data, "diskinfo");
+		zbx_json_close(&json_data);
+	}
 
-		for (i = 0; i < hv->diskinfo.values_num; i++)
+	zbx_json_close(&json_data);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+
+	zbx_json_free(&json_data);
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_hv_diskinfo_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	struct zbx_json		json_data;
+	const char		*url, *uuid;
+	zbx_vmware_service_t	*service;
+	int			i, ret = SYSINFO_RET_FAIL;
+	zbx_vmware_hv_t		*hv;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+
+	if ('\0' == *uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < hv->diskinfo.values_num; i++)
+	{
+		zbx_vmware_diskinfo_t	*di = hv->diskinfo.values[i];
+
+		zbx_json_addobject(&json_data, NULL);
+		zbx_json_addstring(&json_data, "instance", di->diskname,
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "hv.uuid", hv->uuid, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "datastore.uuid", ZBX_NULL2EMPTY_STR(di->ds_uuid),
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_addraw(&json_data, "operational_state", ZBX_NULL2EMPTY_STR(di->operational_state));
+		zbx_json_addstring(&json_data, "lun_type", ZBX_NULL2EMPTY_STR(di->lun_type),
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_addint64(&json_data, "queue_depth", di->queue_depth);
+		zbx_json_addstring(&json_data, "model", ZBX_NULL2EMPTY_STR(di->model),
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "vendor", ZBX_NULL2EMPTY_STR(di->vendor),
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "revision", ZBX_NULL2EMPTY_STR(di->revision),
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "serial_number", ZBX_NULL2EMPTY_STR(di->serial_number),
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_addobject(&json_data, "vsan");
+
+		if (NULL != di->vsan)
 		{
-			zbx_vmware_diskinfo_t	*di = hv->diskinfo.values[i];
-
-			zbx_json_addobject(&json_data, NULL);
-			zbx_json_addstring(&json_data, "instance", di->diskname,
+			zbx_json_addstring(&json_data, "ssd", ZBX_NULL2EMPTY_STR(di->vsan->ssd),
 					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "datastore.uuid", ZBX_NULL2EMPTY_STR(di->ds_uuid),
+			zbx_json_addstring(&json_data, "local_disk", ZBX_NULL2EMPTY_STR(di->vsan->local_disk),
 					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "operational_state", ZBX_NULL2EMPTY_STR(di->operational_state),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "ssd", ZBX_NULL2EMPTY_STR(di->ssd),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "local_disk", ZBX_NULL2EMPTY_STR(di->local_disk),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "lun_type", ZBX_NULL2EMPTY_STR(di->lun_type),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addint64(&json_data, "queue_depth", di->queue_depth);
-			zbx_json_addstring(&json_data, "model", ZBX_NULL2EMPTY_STR(di->model),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "vendor", ZBX_NULL2EMPTY_STR(di->vendor),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "revision", ZBX_NULL2EMPTY_STR(di->revision),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json_data, "serial_number", ZBX_NULL2EMPTY_STR(di->serial_number),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&json_data);
+			zbx_json_adduint64(&json_data, "block",di->vsan->block);
+			zbx_json_adduint64(&json_data, "block_size",di->vsan->block_size);
 		}
 
 		zbx_json_close(&json_data);

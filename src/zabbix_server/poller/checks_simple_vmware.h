@@ -100,6 +100,8 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 		AGENT_RESULT *result);
 int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_diskinfo_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_hv_fullname(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,

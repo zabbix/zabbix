@@ -92,17 +92,25 @@ zbx_vmware_perf_entity_t;
 
 typedef struct
 {
-	char		*diskname;
-	char		*ds_uuid;
-	char		*operational_state;
 	char		*ssd;
 	char		*local_disk;
-	char		*lun_type;
-	int		queue_depth;
-	char		*model;
-	char		*vendor;
-	char		*revision;
-	char		*serial_number;
+	unsigned int	block_size;
+	unsigned int	block;
+}
+zbx_vmware_vsandiskinfo_t;
+
+typedef struct
+{
+	char				*diskname;
+	char				*ds_uuid;
+	char				*operational_state;
+	char				*lun_type;
+	int				queue_depth;
+	char				*model;
+	char				*vendor;
+	char				*revision;
+	char				*serial_number;
+	zbx_vmware_vsandiskinfo_t	*vsan;
 }
 zbx_vmware_diskinfo_t;
 
@@ -110,8 +118,8 @@ ZBX_PTR_VECTOR_DECL(vmware_diskinfo, zbx_vmware_diskinfo_t *)
 
 typedef struct
 {
-	zbx_uint64_t	partitionid;
 	char		*diskname;
+	zbx_uint64_t	partitionid;
 }
 zbx_vmware_diskextent_t;
 
@@ -302,6 +310,8 @@ typedef struct
 	char			*id;
 	char			*name;
 	char			*status;
+	char			*vsan_uuid;
+	zbx_vector_str_t	dss_uuid;
 	zbx_vector_str_t	alarm_ids;
 }
 zbx_vmware_cluster_t;
@@ -595,8 +605,9 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t 
 #define ZBX_VMWARE_HVPROP_CONNECTIONSTATE		20
 #define ZBX_VMWARE_HVPROP_HW_SERIALNUMBER		21
 #define ZBX_VMWARE_HVPROP_HW_SENSOR			22
+#define ZBX_VMWARE_HVPROP_VSAN_UUID			23
 
-#define ZBX_VMWARE_HVPROPS_NUM				23
+#define ZBX_VMWARE_HVPROPS_NUM				24
 
 /* virtual machine properties */
 #define ZBX_VMWARE_VMPROP_CPU_NUM			0

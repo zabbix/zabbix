@@ -76,6 +76,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.datastore.list", VMCHECK_FUNC(check_vcenter_hv_datastore_list)},
 	{"hv.datastore.multipath", VMCHECK_FUNC(check_vcenter_hv_datastore_multipath)},
 	{"hv.discovery", VMCHECK_FUNC(check_vcenter_hv_discovery)},
+	{"hv.diskinfo.get", VMCHECK_FUNC(check_vcenter_hv_diskinfo_get)},
 	{"hv.fullname", VMCHECK_FUNC(check_vcenter_hv_fullname)},
 	{"hv.hw.cpu.num", VMCHECK_FUNC(check_vcenter_hv_hw_cpu_num)},
 	{"hv.hw.cpu.freq", VMCHECK_FUNC(check_vcenter_hv_hw_cpu_freq)},
