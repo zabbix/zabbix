@@ -6472,6 +6472,14 @@ msgstr "선택한 그룹의 디버그 모드를 활성화하시겠습니까?"
 msgid "Enable host"
 msgstr "호스트를 활성화"
 
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
+
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
 msgstr "호스트를 활성화 하시겠습니까?"
