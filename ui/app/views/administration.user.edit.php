@@ -54,7 +54,9 @@ if ($data['form_refresh'] == 0) {
 }
 
 if ($data['readonly'] == true) {
-	CMessageHelper::addWarning("This user is IdP provisioned, manual changes for provisioned fields are not allowed");
+	CMessageHelper::addWarning(
+		_('This user is IdP provisioned. Manual changes for provisioned fields are not allowed.')
+	);
 	show_messages();
 }
 
@@ -187,7 +189,7 @@ else {
 			->setAttribute('autofocus', 'autofocus')
 			->onClick('submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
-		->setEnabled(!$data['readonly'])
+			->setEnabled(!$data['readonly'])
 	);
 }
 
@@ -310,17 +312,20 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 
 	foreach ($data['medias'] as $index => $media) {
 		if ($media['active'] == MEDIA_STATUS_ACTIVE) {
-			$status = (new CLink(_('Enabled'), '#'))
-				->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);')
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_GREEN);
+			$status_action = 'return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);';
+			$status_label = _('Enabled');
+			$status_class = ZBX_STYLE_GREEN;
 		}
 		else {
-			$status = (new CLink(_('Disabled'), '#'))
-				->onClick('return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);')
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED);
+			$status_action = 'return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);';
+			$status_label = _('Disabled');
+			$status_class = ZBX_STYLE_RED;
 		}
+
+		$status = (new CSimpleButton($status_label))
+			->onClick(!$data['readonly'] ? $status_action : null)
+			->addClass(ZBX_STYLE_BTN_LINK.($data['readonly'] ? '' : ' '.$status_class))
+			->setEnabled(!$data['readonly']);
 
 		$parameters = [
 			'dstfrm' => $user_form->getName(),
@@ -366,10 +371,12 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				(new CCol(
 					new CHorList([
 						(new CButton(null, _('Edit')))
+							->setEnabled(!$data['readonly'])
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->setAttribute('data-parameters', json_encode($parameters))
 							->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters));'),
 						(new CButton(null, _('Remove')))
+							->setEnabled(!$data['readonly'])
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('removeMedia('.$index.');')
 					])
@@ -384,6 +391,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			(new CButton(null, _('Add')))
 				->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
 				->addClass(ZBX_STYLE_BTN_LINK)
+				->setEnabled(!$data['readonly'])
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -396,12 +404,15 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 if ($data['action'] === 'user.edit') {
 	$permissions_form_list = new CFormList('permissionsFormList');
 
+	$role_disabled = $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0;
+	$role_disabled |= $data['readonly'];
+
 	$role_multiselect = (new CMultiSelect([
 		'name' => 'roleid',
 		'object_name' => 'roles',
 		'data' => $data['role'],
 		'multiple' => false,
-		'disabled' => $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0,
+		'disabled' => $role_disabled,
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'roles',
@@ -811,11 +822,6 @@ else {
 		[(new CRedirectButton(_('Cancel'), CMenuHelper::getFirstUrl()))->setId('cancel')]
 	));
 }
-
-if ($data['readonly']) {
-	$tabs->setDisabled([1, 2]);
-}
-
 
 // Append tab to form.
 $user_form->addItem($tabs);
