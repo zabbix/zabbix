@@ -19,13 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
  * @backup config, ids
  */
-class testAuditlogSettings extends CAPITest {
-
+class testAuditlogSettings extends testAuditlogCommon {
 	public function testAuditlogSettings_Update() {
 		$updated = "{\"settings.default_lang\":[\"update\",\"en_GB\",\"en_US\"],\"settings.default_theme\":[\"update".
 				"\",\"dark-theme\",\"blue-theme\"],\"settings.search_limit\":[\"update\",\"500\",\"1000\"],".
@@ -102,16 +101,6 @@ class testAuditlogSettings extends CAPITest {
 			'report_test_timeout' => '50s'
 		]);
 
-		$get = $this->call('auditlog.get', [
-			'output' => ['details'],
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'filter' => [
-				'resourceid' => 1,
-				'action' => 1
-			]
-		]);
-
-		$this->assertEquals($updated, $get['result'][0]['details']);
+		$this->sendGetRequest('details', 1, $updated, 1);
 	}
 }
