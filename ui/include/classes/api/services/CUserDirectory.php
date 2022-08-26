@@ -460,7 +460,7 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ($userdirectory['userdirectoryid'] !== null) {
+		if ($userdirectory['userdirectoryid'] != 0) {
 			$db_userdirectory = DB::select('userdirectory', [
 				'output' => ['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
 					'search_filter'
