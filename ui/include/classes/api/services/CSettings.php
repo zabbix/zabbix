@@ -249,7 +249,7 @@ class CSettings extends CApiService {
 			}
 		}
 
-		if (array_key_exists('alert_usrgrpid', $settings)) {
+		if (array_key_exists('alert_usrgrpid', $settings) && $settings['alert_usrgrpid'] != 0) {
 			$db_usrgrp_exists = API::UserGroup()->get([
 				'countOutput' => true,
 				'usrgrpids' => $settings['alert_usrgrpid']
