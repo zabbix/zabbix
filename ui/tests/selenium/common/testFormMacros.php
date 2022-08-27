@@ -505,7 +505,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param boolean    $is_prototype	defines is it prototype or not
 	 * @param int        $lld_id	    points to LLD rule id where host prototype belongs
 	 */
-	public function checkMacros($data, $host_type, $name = null, $update = false, $is_prototype = false, $lld_id = null) {
+	public function checkMacros($data, $host_type, $name = null, $update = false, $is_prototype = false, $discovered = false, $lld_id = null) {
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
