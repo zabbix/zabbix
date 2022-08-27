@@ -146,7 +146,7 @@ class CAuthentication extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (array_key_exists('ldap_userdirectoryid', $auth)) {
+		if (array_key_exists('ldap_userdirectoryid', $auth) && $auth['ldap_userdirectoryid'] != 0) {
 			$exists = (bool) API::UserDirectory()->get(['userdirectoryids' => $auth['ldap_userdirectoryid']]);
 
 			if (!$exists) {
