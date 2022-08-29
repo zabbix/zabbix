@@ -51,7 +51,7 @@ class testTimescaleDb extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
-				'LogFileSize' => 0,
+				'LogFileSize' => 0
 			]
 		];
 	}
