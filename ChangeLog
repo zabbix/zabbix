@@ -1,3 +1,14 @@
+Changes for 6.0.8
+
+6.0.8rc2 was released as 6.0.8 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.8rc2
+
+Bug fixes:
+........S. [ZBX-19893] fixed bug introduced when fixing script parameters updates during linking (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.8rc1
 
 New features:
@@ -2068,6 +2079,11 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.27
+
+5.0.27rc1 was released as 5.0.27 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.27rc1
