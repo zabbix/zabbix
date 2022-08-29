@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup maintenances, ids
+ * @backup maintenances
  */
 class testAuditlogMaintenance extends testAuditlogCommon {
 	public function testAuditlogMaintenance_Create() {
@@ -53,7 +53,6 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 				]
 			]
 		]);
-
 		$resourceid = $create['result']['maintenanceids'][0];
 		$groupid = CDBHelper::getRow('SELECT maintenance_groupid FROM maintenances_groups WHERE maintenanceid='.$resourceid);
 		$timeperiod = CDBHelper::getRow('SELECT timeperiodid FROM timeperiods ORDER BY timeperiodid DESC');
@@ -65,7 +64,7 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 				"\"maintenance.groups[".$groupid['maintenance_groupid']."]\":[\"add\"],".
 				"\"maintenance.groups[".$groupid['maintenance_groupid']."].groupid\":[\"add\",\"2\"],".
 				"\"maintenance.groups[".$groupid['maintenance_groupid']."].maintenance_groupid\":[\"add\",\"".
-						$groupid['maintenance_groupid']."\"],".
+				$groupid['maintenance_groupid']."\"],".
 				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."]\":[\"add\"],".
 				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].period\":[\"add\",\"3600\"],".
 				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiod_type\":[\"add\",\"3\"],".
@@ -79,7 +78,7 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 				"\"maintenance.tags[".$tags['maintenancetagid']."].maintenancetagid\":[\"add\",\"".$tags['maintenancetagid']."\"],".
 				"\"maintenance.maintenanceid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->sendGetRequest('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogMaintenance_Update() {
@@ -112,7 +111,6 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 				]
 			]
 		]);
-
 		$groupid = CDBHelper::getRow('SELECT maintenance_groupid FROM maintenances_groups WHERE maintenanceid=60002');
 		$timeperiod = CDBHelper::getRow('SELECT timeperiodid FROM timeperiods ORDER BY timeperiodid DESC');
 		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid=60002');
@@ -139,11 +137,11 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			"\"maintenance.tags[".$tags['maintenancetagid']."].value\":[\"add\",\"updated_details\"],".
 			"\"maintenance.tags[".$tags['maintenancetagid']."].maintenancetagid\":[\"add\",\"".$tags['maintenancetagid']."\"]}";
 
-		$this->sendGetRequest('details', 1, $updated, 60002);
+		$this->getAuditDetails('details', 1, $updated, 60002);
 	}
 
 	public function testAuditlogMaintenance_Delete() {
 		$this->call('maintenance.delete', [60002]);
-		$this->sendGetRequest('resourcename', 2, 'updated_maintenance', 60002);
+		$this->getAuditDetails('resourcename', 2, 'updated_maintenance', 60002);
 	}
 }
