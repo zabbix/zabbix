@@ -1287,6 +1287,9 @@ static int	proxyconfig_sync_hosts(zbx_vector_table_data_ptr_t *config_tables, in
 		proxyconfig_prepare_table(httpstep_field, NULL, NULL, NULL);
 	}
 
+	/* item_rtdata must be only inserted/removed and never updated */
+	zbx_vector_table_row_ptr_clear(&item_rtdata->updates);
+
 	/* remove rows in reverse order to avoid depending on cascaded deletes */
 	for (i = host_tables.values_num - 1; 0 <= i; i--)
 	{
