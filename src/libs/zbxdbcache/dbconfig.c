@@ -15413,6 +15413,15 @@ void	zbx_dc_update_received_revision(zbx_uint64_t revision)
  *                                                                            *
  * Purpose: get hosts/httptests for proxy configuration update                *
  *                                                                            *
+ * Parameters: proxy_hostid    - [IN]                                         *
+ *             revision        - [IN] the current proxy configuration revision*
+ *             hostids         - [OUT] the monitored hosts                    *
+ *             updated_hostids - [OUT] the hosts updated since specified      *
+ *                                     configuration revision, sorted         *
+ *             removed_hostids - [OUT] the hosts removed since specified      *
+ *                                     configuration revision, sorted         *
+ *             httptestids     - [OUT] the web scenarios monitored by proxy   *
+ *                                                                            *
  ******************************************************************************/
 void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
@@ -15468,6 +15477,10 @@ void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t rev
 	}
 
 	UNLOCK_CACHE;
+
+	zbx_vector_uint64_sort(updated_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(removed_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(httptestids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, zbx_uint64_t revision,
@@ -15478,6 +15491,12 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, zbx_uint64_t r
 	um_cache_get_macro_updates(config->um_cache, hostids, revision, macro_hostids, global, del_macro_hostids);
 
 	UNLOCK_CACHE;
+
+	if (0 != macro_hostids->values_num)
+		zbx_vector_uint64_sort(macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	if (0 != del_macro_hostids->values_num)
+		zbx_vector_uint64_sort(del_macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vector_uint64_t *hostids,

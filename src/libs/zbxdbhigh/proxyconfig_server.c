@@ -345,7 +345,8 @@ out:
  *             key_ids    - [IN] the key values used to select rows (optional)*
  *             filter     - [IN] custom filter to apply when selecting rows   *
  *                               (optional)                                   *
- *             recids     - [OUT] the selected record identifiers (optional)  *
+ *             recids     - [OUT] the selected record identifiers, sorted     *
+ *                                (optional)                                  *
  *             j          - [OUT] the output json                             *
  *             error      - [OUT] the error message                           *
  *                                                                            *
@@ -419,6 +420,9 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 
 	zbx_json_close(j);
 	zbx_json_close(j);
+
+	if (NULL != recids)
+		zbx_vector_uint64_sort(recids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	ret = SUCCEED;
 out:

@@ -1329,24 +1329,19 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_vector_ui
 	for (i = 0; i < hostids->values_num; i++)
 		um_cache_get_hostids(cache, &hostids->values[i], revision, &hosts);
 
-	for (i = 0; i < hosts.values_num; i++)
+	if (0 != hosts.values_num)
 	{
-		if (0 != hosts.values[i]->macros.values_num || 0 != hosts.values[i]->templateids.values_num)
-			zbx_vector_uint64_append(macro_hostids, hosts.values[i]->hostid);
-		else
-			zbx_vector_uint64_append(del_macro_hostids, hosts.values[i]->hostid);
+		zbx_vector_um_host_sort(&hosts, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		zbx_vector_um_host_uniq(&hosts, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
-		if (0 != macro_hostids->values_num)
+		for (i = 0; i < hosts.values_num; i++)
 		{
-			zbx_vector_uint64_sort(macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_vector_uint64_uniq(macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		}
-
-		/* skip when full sync */
-		if (0 == revision && 0 != del_macro_hostids->values_num)
-		{
-			zbx_vector_uint64_sort(del_macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_vector_uint64_uniq(del_macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			if (0 != hosts.values[i]->macros.values_num || 0 != hosts.values[i]->templateids.values_num)
+			{
+				zbx_vector_uint64_append(macro_hostids, hosts.values[i]->hostid);
+			}
+			else if (0 != revision)		/* skip when full sync */
+				zbx_vector_uint64_append(del_macro_hostids, hosts.values[i]->hostid);
 		}
 	}
 
