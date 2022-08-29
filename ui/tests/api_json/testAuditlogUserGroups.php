@@ -51,7 +51,7 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 				"\"usergroup.users[".$id['id']."].id\":[\"add\",\"".$id['id']."\"],".
 				"\"usergroup.usrgrpid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->sendGetRequest('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogUserGroups_Update() {
@@ -68,11 +68,11 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 				"\"usergroup.debug_mode\":[\"update\",\"1\",\"0\"],".
 				"\"usergroup.name\":[\"update\",\"Updated user group name\",\"No access to the frontend\"]}";
 
-		$this->sendGetRequest('details', 1, $updated, 12);
+		$this->getAuditDetails('details', 1, $updated, 12);
 	}
 
 	public function testAuditlogUserGroups_Delete() {
 		$this->call('usergroup.delete', [12]);
-		$this->sendGetRequest('resourcename', 2, 'Updated user group name', 12);
+		$this->getAuditDetails('resourcename', 2, 'Updated user group name', 12);
 	}
 }
