@@ -150,6 +150,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				: 'hostprototype.massdisable'
 			)
 			->setArgument('context', $data['context'])
+			->setArgumentSID()
 			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
