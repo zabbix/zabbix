@@ -155,6 +155,7 @@ static zbx_dc_um_handle_t	*dc_um_handle = NULL;
  *           | Zabbix internal  | zabbix[host,,items_unsupported]      |      *
  *           | Zabbix internal  | zabbix[host,discovery,interfaces]    |      *
  *           | Zabbix internal  | zabbix[host,,maintenance]            |      *
+ *           | Zabbix internal  | zabbix[proxy,discovery]              |      *
  *           | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess] |      *
  *           | Zabbix internal  | zabbix[proxy,<proxyname>,delay]      |      *
  *           | Zabbix aggregate | *                                    |      *
@@ -180,12 +181,16 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 
 				init_request(&request);
 
-				if (SUCCEED != parse_item_key(key, &request) || 3 != request.nparam)
+				if (SUCCEED != parse_item_key(key, &request) || (2 != request.nparam &&
+						3 != request.nparam))
+				{
 					goto clean;
+				}
 
 				arg1 = get_rparam(&request, 0);
 				arg2 = get_rparam(&request, 1);
-				arg3 = get_rparam(&request, 2);
+				if (3 == request.nparam)
+					arg3 = get_rparam(&request, 2);
 
 				if (0 == strcmp(arg1, "host"))
 				{
@@ -201,8 +206,11 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 						ret = SUCCEED;
 				}
 				else if (0 == strcmp(arg1, "proxy") &&
-						(0 == strcmp(arg3, "lastaccess") || 0 == strcmp(arg3, "delay")))
+						(0 == strcmp(arg2, "discovery") || 0 == strcmp(arg3, "lastaccess") ||
+						0 == strcmp(arg3, "delay")))
+				{
 					ret = SUCCEED;
+				}
 clean:
 				free_request(&request);
 			}
