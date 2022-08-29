@@ -56,6 +56,12 @@ class testPageWeb extends CWebTest {
 			$this->query('xpath://a[@class="filter-trigger ui-tabs-anchor"]')->one()->click();
 		}
 
+		// Check fields maximum length.
+		foreach(['filter_tags[0][tag]', 'filter_tags[0][value]'] as $field) {
+			$this->assertEquals(255, $form->query('xpath:.//input[@name="'.$field.'"]')
+				->one()->getAttribute('maxlength'));
+		}
+
 		// Check if links to Hosts and to Web scenarios are clickable.
 		foreach (['Host', 'Name'] as $field) {
 			$this->assertTrue($table->getRow(0)->getColumn($field)->query('xpath:.//a')->one()->isClickable());
