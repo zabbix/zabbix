@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup  dashboard, ids
+ * @backup  dashboard
  */
 class testAuditlogDashboard extends testAuditlogCommon {
 	public function testAuditlogDashboard_Create() {
@@ -76,61 +76,66 @@ class testAuditlogDashboard extends testAuditlogCommon {
 				]
 			]
 		]);
-
 		$resourceid = $create['result']['dashboardids'][0];
-
-		$pageid = CDBHelper::getAll('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='.$resourceid);
-		$widgetid = CDBHelper::getAll('SELECT widgetid FROM widget WHERE dashboard_pageid='.$pageid[0]['dashboard_pageid']);
+		$pageid = CDBHelper::getRow('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='
+				.zbx_dbstr($resourceid));
+		$widgetid = CDBHelper::getRow('SELECT widgetid FROM widget WHERE dashboard_pageid='
+				.zbx_dbstr($pageid['dashboard_pageid']));
 		$fieldid = CDBHelper::getAll('SELECT widget_fieldid FROM widget_field WHERE widgetid ='
-				.$widgetid[0]['widgetid'].' ORDER BY widget_fieldid ASC');
+				.zbx_dbstr($widgetid['widgetid']).' ORDER BY widget_fieldid ASC');
+		$dashboard_userid = CDBHelper::getRow('SELECT dashboard_userid FROM dashboard_user WHERE dashboardid='
+				.zbx_dbstr($resourceid));
+		$dashboard_usrgrpid = CDBHelper::getRow('SELECT dashboard_usrgrpid FROM dashboard_usrgrp WHERE dashboardid='
+				.zbx_dbstr($resourceid));
 
 		$created = "{\"dashboard.name\":[\"add\",\"Audit dashboard\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid']."]\":[\"add\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid']."].type\":[\"add\",\"problems\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid']."].width\":[\"add\",\"12\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid']."].height\":[\"add\",\"5\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[0]['widget_fieldid']."]\":[\"add\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[0]['widget_fieldid']."].type\":[\"add\",\"1\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[0]['widget_fieldid']."].name\":[\"add\",\"tags.tag.0\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[0]['widget_fieldid']."].value\":[\"add\",\"service\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[0]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[0]['widget_fieldid']."\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[1]['widget_fieldid']."]\":[\"add\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[1]['widget_fieldid']."].name\":[\"add\",\"tags.operator.0\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[1]['widget_fieldid']."].value\":[\"add\",\"1\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[1]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[1]['widget_fieldid']."\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[2]['widget_fieldid']."]\":[\"add\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[2]['widget_fieldid']."].type\":[\"add\",\"1\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[2]['widget_fieldid']."].name\":[\"add\",\"tags.value.0\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[2]['widget_fieldid']."].value\":[\"add\",\"zabbix_server\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].fields[".$fieldid[2]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[2]['widget_fieldid']."\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].widgetid\":[\"add\",\"".$widgetid[0]['widgetid']."\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."]\":[\"add\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].dashboard_pageid\":[\"add\",\"".$pageid[0]['dashboard_pageid']."\"],".
-			"\"dashboard.userGroups[2]\":[\"add\"],".
-			"\"dashboard.userGroups[2].usrgrpid\":[\"add\",\"7\"],".
-			"\"dashboard.userGroups[2].dashboard_usrgrpid\":[\"add\",\"2\"],".
-			"\"dashboard.users[1]\":[\"add\"],".
-			"\"dashboard.users[1].userid\":[\"add\",\"1\"],".
-			"\"dashboard.users[1].dashboard_userid\":[\"add\",\"1\"],".
-			"\"dashboard.userid\":[\"add\",\"1\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."].type\":[\"add\",\"problems\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."].width\":[\"add\",\"12\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."].height\":[\"add\",\"5\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[0]['widget_fieldid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[0]['widget_fieldid']."].type\":[\"add\",\"1\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[0]['widget_fieldid']."].name\":[\"add\",\"tags.tag.0\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[0]['widget_fieldid']."].value\":[\"add\",\"service\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[0]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[0]['widget_fieldid']."\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[1]['widget_fieldid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[1]['widget_fieldid']."].name\":[\"add\",\"tags.operator.0\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[1]['widget_fieldid']."].value\":[\"add\",\"1\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[1]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[1]['widget_fieldid']."\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[2]['widget_fieldid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[2]['widget_fieldid']."].type\":[\"add\",\"1\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[2]['widget_fieldid']."].name\":[\"add\",\"tags.value.0\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[2]['widget_fieldid']."].value\":[\"add\",\"zabbix_server\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].fields[".$fieldid[2]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[2]['widget_fieldid']."\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].widgetid\":[\"add\",\"".$widgetid['widgetid']."\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].dashboard_pageid\":[\"add\",\"".$pageid['dashboard_pageid']."\"],".
+			"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."]\":[\"add\"],".
+			"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."].usrgrpid\":[\"add\",\"7\"],".
+			"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."].dashboard_usrgrpid\":[\"add\",\""
+			.$dashboard_usrgrpid['dashboard_usrgrpid']."\"],".
+			"\"dashboard.users[".$dashboard_userid['dashboard_userid']."]\":[\"add\"],".
+			"\"dashboard.users[".$dashboard_userid['dashboard_userid']."].userid\":[\"add\",\"1\"],".
+			"\"dashboard.users[".$dashboard_userid['dashboard_userid']."].dashboard_userid\":[\"add\",\""
+			.$dashboard_userid['dashboard_userid']."\"],\"dashboard.userid\":[\"add\",\"1\"],".
 			"\"dashboard.dashboardid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->sendGetRequest('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogDashboard_Update() {
@@ -161,36 +166,38 @@ class testAuditlogDashboard extends testAuditlogCommon {
 				]
 			]
 		]);
-
-		$pageid = CDBHelper::getAll('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=1');
-		$widgetid = CDBHelper::getAll('SELECT widgetid FROM widget WHERE dashboard_pageid='.$pageid[0]['dashboard_pageid']);
+		$pageid = CDBHelper::getRow('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=1');
+		$widgetid = CDBHelper::getRow('SELECT widgetid FROM widget WHERE dashboard_pageid='
+				.zbx_dbstr($pageid['dashboard_pageid']));
+		$dashboard_usrgrpid = CDBHelper::getRow('SELECT dashboard_usrgrpid FROM dashboard_usrgrp WHERE dashboardid=1');
 
 		$updated = "{\"dashboard.pages[1]\":[\"delete\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid']."]\":[\"add\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."]\":[\"add\"],".
-			"\"dashboard.userGroups[3]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."]\":[\"add\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."]\":[\"add\"],".
+			"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."]\":[\"add\"],".
 			"\"dashboard.name\":[\"update\",\"Updated dashboard name\",\"Global view\"],".
 			"\"dashboard.display_period\":[\"update\",\"60\",\"30\"],".
 			"\"dashboard.auto_start\":[\"update\",\"0\",\"1\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].type\":[\"add\",\"clock\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].width\":[\"add\",\"4\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].height\":[\"add\",\"3\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].widgets[".$widgetid[0]['widgetid'].
-					"].widgetid\":[\"add\",\"".$widgetid[0]['widgetid']."\"],".
-			"\"dashboard.pages[".$pageid[0]['dashboard_pageid']."].dashboard_pageid\":[\"add\",\"".
-					$pageid[0]['dashboard_pageid']."\"],".
-			"\"dashboard.userGroups[3].usrgrpid\":[\"add\",\"7\"],".
-			"\"dashboard.userGroups[3].permission\":[\"add\",\"3\"],".
-			"\"dashboard.userGroups[3].dashboard_usrgrpid\":[\"add\",\"3\"]}";
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].type\":[\"add\",\"clock\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].width\":[\"add\",\"4\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].height\":[\"add\",\"3\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
+			"].widgetid\":[\"add\",\"".$widgetid['widgetid']."\"],".
+			"\"dashboard.pages[".$pageid['dashboard_pageid']."].dashboard_pageid\":[\"add\",\"".
+			$pageid['dashboard_pageid']."\"],".
+			"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."].usrgrpid\":[\"add\",\"7\"],".
+			"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."].permission\":[\"add\",\"3\"],".
+			"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."].dashboard_usrgrpid\":[\"add\",\""
+			.$dashboard_usrgrpid['dashboard_usrgrpid']."\"]}";
 
-		$this->sendGetRequest('details', 1, $updated, 1);
+		$this->getAuditDetails('details', 1, $updated, 1);
 	}
 
 	public function testAuditlogDashboard_Delete() {
 		$this->call('dashboard.delete', [1]);
-		$this->sendGetRequest('resourcename', 2, 'Updated dashboard name', 1);
+		$this->getAuditDetails('resourcename', 2, 'Updated dashboard name', 1);
 	}
 }
