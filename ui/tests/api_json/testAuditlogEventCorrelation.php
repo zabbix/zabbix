@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup correlation, ids
+ * @backup correlation
  */
 class testAuditlogEventCorrelation extends testAuditlogCommon {
 	public function testAuditlogEventCorrelation_Create() {
@@ -46,23 +46,27 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 			]
 		]);
 		$resourceid = $create['result']['correlationids'][0];
+		$conditionid = CDBHelper::getRow('SELECT corr_conditionid FROM corr_condition WHERE correlationid='
+				.zbx_dbstr($resourceid));
 
 		$created = "{\"correlation.name\":[\"add\",\"New event correlation for audit\"],".
 			"\"correlation.filter\":[\"add\"],".
-			"\"correlation.filter.conditions[".$resourceid."]\":[\"add\"],".
-			"\"correlation.filter.conditions[".$resourceid."].type\":[\"add\",\"1\"],".
-			"\"correlation.filter.conditions[".$resourceid."].tag\":[\"add\",\"ok\"],".
-			"\"correlation.filter.conditions[".$resourceid."].corr_conditionid\":[\"add\",\"".$resourceid."\"],".
+			"\"correlation.filter.conditions[".$conditionid['corr_conditionid']."]\":[\"add\"],".
+			"\"correlation.filter.conditions[".$conditionid['corr_conditionid']."].type\":[\"add\",\"1\"],".
+			"\"correlation.filter.conditions[".$conditionid['corr_conditionid']."].tag\":[\"add\",\"ok\"],".
+			"\"correlation.filter.conditions[".$conditionid['corr_conditionid']."].corr_conditionid\":[\"add\",\""
+			.$conditionid['corr_conditionid']."\"],".
 			"\"correlation.operations[".$resourceid."]\":[\"add\"],".
 			"\"correlation.operations[".$resourceid."].type\":[\"add\",\"1\"],".
 			"\"correlation.operations[".$resourceid."].corr_operationid\":[\"add\",\"".$resourceid."\"],".
 			"\"correlation.correlationid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->sendGetRequest('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogEventCorrelation_Update() {
-		$correlation_name = CDBHelper::getAll('SELECT name FROM correlation WHERE correlationid = 99001');
+		// Correlation name before update
+		$correlation_name = CDBHelper::getRow('SELECT name FROM correlation WHERE correlationid = 99001');
 
 		$this->call('correlation.update', [
 			[
@@ -84,23 +88,22 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 				]
 			]
 		]);
-
-		$condition = CDBHelper::getAll('SELECT corr_conditionid FROM corr_condition WHERE correlationid = 99001');
+		$condition = CDBHelper::getRow('SELECT corr_conditionid FROM corr_condition WHERE correlationid = 99001');
 
 		$updated = "{\"correlation.filter.conditions[99001]\":[\"delete\"],".
-			"\"correlation.filter.conditions[".$condition[0]['corr_conditionid']."]\":[\"add\"],".
-			"\"correlation.name\":[\"update\",\"Updated event correlation name\",\"".$correlation_name[0]['name']."\"],".
+			"\"correlation.filter.conditions[".$condition['corr_conditionid']."]\":[\"add\"],".
+			"\"correlation.name\":[\"update\",\"Updated event correlation name\",\"".$correlation_name['name']."\"],".
 			"\"correlation.filter\":[\"update\"],".
 			"\"correlation.filter.evaltype\":[\"update\",\"2\",\"0\"],".
-			"\"correlation.filter.conditions[".$condition[0]['corr_conditionid']."].tag\":[\"add\",\"not ok\"],".
-			"\"correlation.filter.conditions[".$condition[0]['corr_conditionid'].
-					"].corr_conditionid\":[\"add\",\"".$condition[0]['corr_conditionid']."\"]}";
+			"\"correlation.filter.conditions[".$condition['corr_conditionid']."].tag\":[\"add\",\"not ok\"],".
+			"\"correlation.filter.conditions[".$condition['corr_conditionid'].
+			"].corr_conditionid\":[\"add\",\"".$condition['corr_conditionid']."\"]}";
 
-		$this->sendGetRequest('details', 1, $updated, 99001);
+		$this->getAuditDetails('details', 1, $updated, 99001);
 	}
 
 	public function testAuditlogEventCorrelation_Delete() {
 		$this->call('correlation.delete', [99001]);
-		$this->sendGetRequest('resourcename', 2, 'Updated event correlation name', 99001);
+		$this->getAuditDetails('resourcename', 2, 'Updated event correlation name', 99001);
 	}
 }
