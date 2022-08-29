@@ -38,12 +38,12 @@ window.condition_popup = new class {
 				});
 		}
 
-		this.dialogue.addEventListener('click', (e) => {
+		this.form.addEventListener('click', (e) => {
 			$("#condition-type").change(function() {
-				reloadPopup($(e.target).closest("form").get(0), "popup.condition.actions")
+				reloadPopup(e.target.closest('form'), 'popup.condition.edit')
 			})
 			$("#trigger_context").change(function() {
-				reloadPopup($(e.target).closest("form").get(0), "popup.condition.actions")
+				reloadPopup($(e.target).closest("form"), 'popup.condition.edit')
 			})
 		})
 	}
