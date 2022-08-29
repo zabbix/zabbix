@@ -1108,6 +1108,11 @@ class CScript extends CApiService {
 			$scripts_by_host[$hostid] = [];
 		}
 
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $hostids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		$scripts = $this->get([
 			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
 				'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username', 'password',
@@ -1193,6 +1198,11 @@ class CScript extends CApiService {
 
 		if (!$eventids) {
 			return $scripts_by_events;
+		}
+
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $eventids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		foreach ($eventids as $eventid) {
@@ -1354,6 +1364,9 @@ class CScript extends CApiService {
 						$action_scriptids[] = $scriptid;
 					}
 				}
+
+				// Remove scope from output, since it's not requested.
+				$result = $this->unsetExtraFields($result, ['scope']);
 			}
 
 			if ($action_scriptids) {
