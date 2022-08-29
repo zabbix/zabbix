@@ -22,11 +22,13 @@
 require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup report, ids
+ * @backup report
  */
 class testAuditlogScheduledReport extends testAuditlogCommon {
 
 	protected static $resourceid;
+	protected static $before_usrgrp;
+	protected static $before_user;
 
 	public function testAuditlogScheduledReport_Create() {
 		$create = $this->call('report.create', [
@@ -60,6 +62,10 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 			]
 		]);
 		self::$resourceid = $create['result']['reportids'][0];
+		self::$before_usrgrp = CDBHelper::getRow('SELECT reportusrgrpid FROM report_usrgrp WHERE reportid='
+				.zbx_dbstr(self::$resourceid));
+		self::$before_user = CDBHelper::getRow('SELECT reportuserid FROM report_user WHERE reportid='
+			.zbx_dbstr(self::$resourceid));
 
 		$created = "{\"report.userid\":[\"add\",\"1\"],".
 				"\"report.name\":[\"add\",\"Report for audit\"],".
@@ -74,19 +80,23 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 				"\"report.message\":[\"add\",\"Report accompanying text\"],".
 				"\"report.status\":[\"add\",\"1\"],".
 				"\"report.description\":[\"add\",\"Report description\"],".
-				"\"report.users[1]\":[\"add\"],".
-				"\"report.users[1].userid\":[\"add\",\"1\"],".
-				"\"report.users[1].access_userid\":[\"add\",\"1\"],".
-				"\"report.users[1].reportuserid\":[\"add\",\"1\"],".
-				"\"report.user_groups[1]\":[\"add\"],".
-				"\"report.user_groups[1].usrgrpid\":[\"add\",\"7\"],".
-				"\"report.user_groups[1].access_userid\":[\"add\",\"0\"],".
-				"\"report.user_groups[1].reportusrgrpid\":[\"add\",\"1\"],".
+				"\"report.users[".self::$before_user['reportuserid']."]\":[\"add\"],".
+				"\"report.users[".self::$before_user['reportuserid']."].userid\":[\"add\",\"1\"],".
+				"\"report.users[".self::$before_user['reportuserid']."].access_userid\":[\"add\",\"1\"],".
+				"\"report.users[".self::$before_user['reportuserid']."].reportuserid\":[\"add\",\"".self::$before_user['reportuserid']."\"],".
+				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."]\":[\"add\"],".
+				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."].usrgrpid\":[\"add\",\"7\"],".
+				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."].access_userid\":[\"add\",\"0\"],".
+				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."].reportusrgrpid\":[\"add\",\""
+				.self::$before_usrgrp['reportusrgrpid']."\"],".
 				"\"report.reportid\":[\"add\",\"". self::$resourceid."\"]}";
 
-		$this->sendGetRequest('details', 0, $created, self::$resourceid);
+		$this->getAuditDetails('details', 0, $created, self::$resourceid);
 	}
 
+	/**
+	 * @depends testAuditlogScheduledReport_Create
+	 */
 	public function testAuditlogScheduledReport_Update() {
 		$this->call('report.update', [
 			[
@@ -119,11 +129,15 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 				]
 			]
 		]);
+		$usrgrp = CDBHelper::getRow('SELECT reportusrgrpid FROM report_usrgrp WHERE reportid='
+			.zbx_dbstr(self::$resourceid));
+		$user = CDBHelper::getRow('SELECT reportuserid FROM report_user WHERE reportid='
+			.zbx_dbstr(self::$resourceid));
 
-		$updated = "{\"report.users[1]\":[\"delete\"],".
-				"\"report.user_groups[1]\":[\"delete\"],".
-				"\"report.users[2]\":[\"add\"],".
-				"\"report.user_groups[2]\":[\"add\"],".
+		$updated = "{\"report.users[".self::$before_user['reportuserid']."]\":[\"delete\"],".
+				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."]\":[\"delete\"],".
+				"\"report.users[".$user['reportuserid']."]\":[\"add\"],".
+				"\"report.user_groups[".$usrgrp['reportusrgrpid']."]\":[\"add\"],".
 				"\"report.name\":[\"update\",\"Updated report for audit\",\"Report for audit\"],".
 				"\"report.dashboardid\":[\"update\",\"2\",\"1\"],".
 				"\"report.period\":[\"update\",\"3\",\"1\"],".
@@ -136,19 +150,23 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 				"\"report.message\":[\"update\",\"Updated message\",\"Report accompanying text\"],".
 				"\"report.status\":[\"update\",\"0\",\"1\"],".
 				"\"report.description\":[\"update\",\"Updated description\",\"Report description\"],".
-				"\"report.users[2].userid\":[\"add\",\"2\"],".
-				"\"report.users[2].access_userid\":[\"add\",\"0\"],".
-				"\"report.users[2].exclude\":[\"add\",\"1\"],".
-				"\"report.users[2].reportuserid\":[\"add\",\"2\"],".
-				"\"report.user_groups[2].usrgrpid\":[\"add\",\"8\"],".
-				"\"report.user_groups[2].access_userid\":[\"add\",\"1\"],".
-				"\"report.user_groups[2].reportusrgrpid\":[\"add\",\"2\"]}";
+				"\"report.users[".$user['reportuserid']."].userid\":[\"add\",\"2\"],".
+				"\"report.users[".$user['reportuserid']."].access_userid\":[\"add\",\"0\"],".
+				"\"report.users[".$user['reportuserid']."].exclude\":[\"add\",\"1\"],".
+				"\"report.users[".$user['reportuserid']."].reportuserid\":[\"add\",\"".$user['reportuserid']."\"],".
+				"\"report.user_groups[".$usrgrp['reportusrgrpid']."].usrgrpid\":[\"add\",\"8\"],".
+				"\"report.user_groups[".$usrgrp['reportusrgrpid']."].access_userid\":[\"add\",\"1\"],".
+				"\"report.user_groups[".$usrgrp['reportusrgrpid']."].reportusrgrpid\":[\"add\",\""
+				.$usrgrp['reportusrgrpid']."\"]}";
 
-		$this->sendGetRequest('details', 1, $updated, self::$resourceid);
+		$this->getAuditDetails('details', 1, $updated, self::$resourceid);
 	}
 
+	/**
+	 * @depends testAuditlogScheduledReport_Create
+	 */
 	public function testAuditlogScheduledReport_Delete() {
 		$this->call('report.delete', [self::$resourceid]);
-		$this->sendGetRequest('resourcename', 2, 'Updated report for audit', self::$resourceid);
+		$this->getAuditDetails('resourcename', 2, 'Updated report for audit', self::$resourceid);
 	}
 }
