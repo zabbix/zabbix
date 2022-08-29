@@ -19,70 +19,60 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup usrgrp, ids
+ * @backup usrgrp
  */
-class testAuditlogUserGroups extends CAPITest {
-
-	protected static $resourceid;
-
+class testAuditlogUserGroups extends testAuditlogCommon {
 	public function testAuditlogUserGroups_Create() {
-		$created = "{\"usergroup.name\":[\"add\",\"Audit user groups\"],\"usergroup.rights[90004]\":[\"add\"],".
-				"\"usergroup.rights[90004].id\":[\"add\",\"2\"],\"usergroup.rights[90004].rightid\":[\"add\",".
-				"\"90004\"],\"usergroup.users[90021]\":[\"add\"],\"usergroup.users[90021].userid\":[\"add\",\"2\"],".
-				"\"usergroup.users[90021].id\":[\"add\",\"90021\"],\"usergroup.usrgrpid\":[\"add\",\"90001\"]}";
-
 		$create = $this->call('usergroup.create', [
 			[
 				'name' => 'Audit user groups',
 				'rights' => [
 					'permission' => 0,
-					'id' => '2'
+					'id' => 2
 				],
 				'users' => [
-					'userid' => '2'
+					'userid' => 2
 				]
 			]
 		]);
+		$resourceid = $create['result']['usrgrpids'][0];
+		$rights = CDBHelper::getRow('SELECT rightid FROM rights WHERE groupid='.$resourceid);
+		$id = CDBHelper::getRow('SELECT id FROM users_groups WHERE usrgrpid='.$resourceid);
 
-		self::$resourceid = $create['result']['usrgrpids'][0];
-		$this->sendGetRequest('details', 0, $created);
+		$created = "{\"usergroup.name\":[\"add\",\"Audit user groups\"],".
+				"\"usergroup.rights[".$rights['rightid']."]\":[\"add\"],".
+				"\"usergroup.rights[".$rights['rightid']."].id\":[\"add\",\"2\"],".
+				"\"usergroup.rights[".$rights['rightid']."].rightid\":[\"add\",\"".$rights['rightid']."\"],".
+				"\"usergroup.users[".$id['id']."]\":[\"add\"],".
+				"\"usergroup.users[".$id['id']."].userid\":[\"add\",\"2\"],".
+				"\"usergroup.users[".$id['id']."].id\":[\"add\",\"".$id['id']."\"],".
+				"\"usergroup.usrgrpid\":[\"add\",\"".$resourceid."\"]}";
+
+		$this->sendGetRequest('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogUserGroups_Update() {
-		$updated = "{\"usergroup.users_status\":[\"update\",\"1\",\"0\"],\"usergroup.debug_mode\":[\"update\",".
-				"\"1\",\"0\"],\"usergroup.name\":[\"update\",\"Updated user group name\",\"Audit user groups\"]}";
-
 		$this->call('usergroup.update', [
 			[
-				'usrgrpid' => self::$resourceid,
+				'usrgrpid' => 12,
 				'users_status' => 1,
 				'debug_mode' => 1,
 				'name' => 'Updated user group name'
 			]
 		]);
 
-		$this->sendGetRequest('details', 1, $updated);
+		$updated = "{\"usergroup.users_status\":[\"update\",\"1\",\"0\"],".
+				"\"usergroup.debug_mode\":[\"update\",\"1\",\"0\"],".
+				"\"usergroup.name\":[\"update\",\"Updated user group name\",\"No access to the frontend\"]}";
+
+		$this->sendGetRequest('details', 1, $updated, 12);
 	}
 
 	public function testAuditlogUserGroups_Delete() {
-		$this->call('usergroup.delete', [self::$resourceid]);
-		$this->sendGetRequest('resourcename', 2, 'Updated user group name');
-	}
-
-	private function sendGetRequest($output, $action, $result) {
-		$get = $this->call('auditlog.get', [
-			'output' => [$output],
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'filter' => [
-				'resourceid' => self::$resourceid,
-				'action' => $action
-			]
-		]);
-
-		$this->assertEquals($result, $get['result'][0][$output]);
+		$this->call('usergroup.delete', [12]);
+		$this->sendGetRequest('resourcename', 2, 'Updated user group name', 12);
 	}
 }
