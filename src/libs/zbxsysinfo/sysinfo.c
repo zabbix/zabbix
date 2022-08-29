@@ -2118,7 +2118,7 @@ char	*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags)
 	{
 		for (mntopt = mntopts; 0 != mntopt->flag; mntopt++)
 		{
-			if (0 == (flags & mntopt->flag))
+			if (0 == ((zbx_uint64_t)flags & mntopt->flag))
 				continue;
 
 			if ('\0' != *dst_string)
