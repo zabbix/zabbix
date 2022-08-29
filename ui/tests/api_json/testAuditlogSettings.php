@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup config, ids
+ * @backup config
  */
 class testAuditlogSettings extends testAuditlogCommon {
 	public function testAuditlogSettings_Update() {
@@ -101,6 +101,6 @@ class testAuditlogSettings extends testAuditlogCommon {
 			'report_test_timeout' => '50s'
 		]);
 
-		$this->sendGetRequest('details', 1, $updated, 1);
+		$this->getAuditDetails('details', 1, $updated, 1);
 	}
 }
