@@ -88,4 +88,4 @@ window.user_group_mapping_edit_popup = new class {
 			}
 		}
 	}
-}
+};

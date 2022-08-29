@@ -23,16 +23,14 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 
 	protected function init(): void {
 		$this->disableSIDValidation();
-
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'row_index' =>			'required|int32',
 			'mediatypeid' =>		'required|db media_type.mediatypeid',
-			'name' =>				'required|string',
-			'attribute' =>			'required|string'
+			'name' =>				'required|string|not_empty',
+			'attribute' =>			'required|string|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,7 +39,7 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'title' => _('Invalid media type mapping configuration'),
+						'title' => _('Invalid media type mapping configuration.'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])])
@@ -57,7 +55,6 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'row_index' => $this->getInput('row_index', 0),
 			'name' => $this->getInput('name'),
 			'attribute' => $this->getInput('attribute')
 		];
@@ -67,8 +64,15 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 			'mediatypeids' => $this->getInput('mediatypeid')
 		]);
 
-		$data['media_type_name'] = $media_type[0]['name'];
-		$data['mediatypeid'] =  $media_type[0]['mediatypeid'];
+		if ($media_type) {
+			$data['mediatype_name'] = $media_type[0]['name'];
+			$data['mediatypeid'] = $media_type[0]['mediatypeid'];
+		}
+		else {
+			$data['error'] = [
+				'messages' => [_('No permissions to referred object or it does not exist!')]
+			];
+		}
 
 		if ($this->getDebugMode() == GROUP_DEBUG_MODE_ENABLED) {
 			CProfiler::getInstance()->stop();

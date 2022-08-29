@@ -23,16 +23,15 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'row_index' =>					'required|int32',
 			'add_media_type_mapping' =>		'in 1',
 			'name' =>						'string',
 			'attribute' =>					'string',
-			'mediatypeid' =>				'db media_type.mediatypeid',
-			'db_mediatypes' =>				'array'
+			'mediatypeid' =>				'db media_type.mediatypeid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -42,7 +41,7 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 				(new CControllerResponseData([
 					'main_block' => json_encode([
 						'error' => [
-							'title' => _('Invalid media type mapping configuration'),
+							'title' => _('Invalid media type mapping configuration.'),
 							'messages' => array_column(get_and_clear_messages(), 'message')
 						]
 					])
@@ -64,27 +63,19 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 	 * @throws Exception
 	 */
 	protected function doAction(): void {
-
 		$data = [
-			'row_index' => $this->getInput('row_index', 0),
-			'add_media_type_mapping' => $this->getInput('add_media_type_mapping', ''),
+			'add_media_type_mapping' => $this->getInput('add_media_type_mapping', 0),
 			'name' => $this->getInput('name', ''),
-			'user' => ['debug_mode' => $this->getDebugMode()],
 			'attribute' => $this->getInput('attribute', ''),
-			'mediatypeid' => $this->getInput('mediatypeid', ''),
+			'mediatypeid' => $this->getInput('mediatypeid', 0),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		];
 
-		$media_type_name = API::MediaType()->get([
-			'output' => ['name'],
-			'mediatypeid' =>$data['mediatypeid']
-		]);
-		$data['media_type_name'] = $media_type_name[0]['name'];
-
-		$data['db_mediatypes'] = API::MediaType()->get([
-			'output' => ['name', 'mediatypeid'],
-			'preservekeys' => true
-		]);
+		$data['db_mediatypes'] = API::MediaType()->get(['output' => ['name', 'mediatypeid']]);
 		CArrayHelper::sort($data['db_mediatypes'], ['name']);
+		$data['db_mediatypes'] = array_column($data['db_mediatypes'], 'name', 'mediatypeid');
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

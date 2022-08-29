@@ -27,14 +27,12 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'row_index' =>			'required|int32',
 			'add_group' =>			'in 1',
-			'usrgrpid' =>			'string',
+			'usrgrpid' =>			'array_id',
 			'roleid' =>				'db users.roleid',
 			'name' =>				'string',
-			'name_label' =>			'string',
-			'is_fallback' =>		'in 0,1',
-			'fallback_status' =>	'in 0,1'
+			'is_fallback' =>		'required|in '.GROUP_MAPPING_REGULAR.','.GROUP_MAPPING_FALLBACK,
+			'fallback_status' =>	'in '.GROUP_MAPPING_FALLBACK_OFF.','.GROUP_MAPPING_FALLBACK_ON
 		];
 
 		$ret = $this->validateInput($fields);
@@ -67,34 +65,30 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 	 */
 	protected function doAction(): void {
 		$data = [
-			'row_index' => $this->getInput('row_index', 0),
 			'name' => $this->getInput('name', ''),
-			'add_group' => $this->getInput('add_group', ''),
+			'add_group' => $this->getInput('add_group', 0),
 			'user' => ['debug_mode' => $this->getDebugMode()],
-			'name_label' => $this->getInput('name_label'),
-			'is_fallback' => $this->getInput('is_fallback', 0),
-			'fallback_status' => $this->getInput('fallback_status', 0)
+			'name_label' => _('LDAP group pattern'), // TODO: should be moved to the view.
+			'is_fallback' => $this->getInput('is_fallback'),
+			'fallback_status' => $this->getInput('fallback_status', GROUP_MAPPING_FALLBACK_OFF)
 		];
 
-		$user_groups = explode(',', $this->getInput('usrgrpid', ''));
-
-		$data['user_groups'] = $user_groups
+		$data['user_groups'] = $this->hasInput('usrgrpid')
 			? API::UserGroup()->get([
 				'output' => ['usrgrpid', 'name'],
-				'usrgrpids' => $user_groups
+				'usrgrpids' => $this->getInput('usrgrpid')
 			])
 			: [];
 
 		$data['user_groups'] = CArrayHelper::renameObjectsKeys($data['user_groups'], ['usrgrpid' => 'id']);
 
-		$user_role = $this->getInput('roleid', '');
-
-		$data['user_role'] = $user_role
+		$data['user_role'] = $this->hasInput('roleid')
 			? API::Role()->get([
 				'output' => ['roleid', 'name'],
-				'roleids' => [$user_role]
+				'roleids' => [$this->getInput('roleid')]
 			])
 			: [];
+
 		$data['user_role'] = CArrayHelper::renameObjectsKeys($data['user_role'], ['roleid' => 'id']);
 
 		$this->setResponse(new CControllerResponseData($data));

@@ -23,18 +23,16 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 
 	protected function init(): void {
 		$this->disableSIDValidation();
-
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'row_index' =>			'required|int32',
 			'roleid' =>				'required|db users.roleid',
-			'name' =>				'required|string',
-			'user_groups' =>		'array_id',
-			'is_fallback' =>		'in 0,1',
-			'fallback_status' =>	'in 0,1'
+			'name' =>				'required|string|not_empty',
+			'user_groups' =>		'required|array_id',
+			'is_fallback' =>		'required|in '.GROUP_MAPPING_REGULAR.','.GROUP_MAPPING_FALLBACK,
+			'fallback_status' =>	'required|in '.GROUP_MAPPING_FALLBACK_OFF.','.GROUP_MAPPING_FALLBACK_ON
 		];
 
 		$ret = $this->validateInput($fields);
@@ -43,7 +41,7 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'title' => _('Invalid user group mapping configuration'),
+						'title' => _('Invalid user group mapping configuration.'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])])
@@ -59,27 +57,31 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'row_index' => $this->getInput('row_index', 0),
 			'name' => $this->getInput('name'),
-			'is_fallback' => $this->getInput('is_fallback', 0),
-			'fallback_status' => $this->getInput('fallback_status', 0)
+			'is_fallback' => $this->getInput('is_fallback'),
+			'fallback_status' => $this->getInput('fallback_status')
 		];
 
 		$user_groups = API::UserGroup()->get([
 			'output' => ['usrgrpid', 'name'],
-			'usrgrpids' => $this->getInput('user_groups', '')
+			'usrgrpids' => $this->getInput('user_groups')
 		]);
 
-		$data['usrgrpid'] = implode(', ',array_column($user_groups, 'usrgrpid'));
-		$data['user_group_name'] = implode(', ',array_column($user_groups, 'name'));
-
 		$user_role = API::Role()->get([
-				'output' => ['name', 'roleid'],
-				'roleids' => $this->getInput('roleid')
-			]);
+			'output' => ['name', 'roleid'],
+			'roleids' => $this->getInput('roleid')
+		]);
 
-		$data['role_name'] = $user_role[0]['name'];
-		$data['roleid'] = $user_role[0]['roleid'];
+		if ($user_role && count($user_groups) == count($this->getInput('user_groups'))) {
+			$data['role_name'] = $user_role[0]['name'];
+			$data['roleid'] = $user_role[0]['roleid'];
+			$data['user_groups'] = $user_groups;
+		}
+		else {
+			$data['error'] = [
+				'messages' => [_('No permissions to referred object or it does not exist!')]
+			];
+		}
 
 		if ($this->getDebugMode() == GROUP_DEBUG_MODE_ENABLED) {
 			CProfiler::getInstance()->stop();

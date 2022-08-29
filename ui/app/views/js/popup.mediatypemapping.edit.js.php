@@ -88,4 +88,4 @@ window.media_type_mapping_edit_popup = new class {
 			}
 		}
 	}
-}
+};

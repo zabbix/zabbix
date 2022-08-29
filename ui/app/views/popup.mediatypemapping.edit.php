@@ -31,7 +31,6 @@ $form_action = (new CUrl('zabbix.php'))
 $form = (new CForm('post', $form_action))
 	->setId('media-type-mapping-edit-form')
 	->setName('media-type-mapping-edit-form')
-	->addVar('row_index', $data['row_index'])
 	->addItem(
 		(new CInput('submit', 'submit'))
 			->addStyle('display: none;')
@@ -41,11 +40,8 @@ $form = (new CForm('post', $form_action))
 $media_type_select = (new CSelect('mediatypeid'))
 	->setId('mediatypeid')
 	->setFocusableElementId('label-mediatypeid')
+	->addOptions(CSelect::createOptionsFromArray($data['db_mediatypes']))
 	->setValue($data['mediatypeid']);
-
-foreach ($data['db_mediatypes'] as $mediatypeid => $value) {
-	$media_type_select->addOption((new CSelectOption($mediatypeid, $value['name'])));
-}
 
 $form
 	->addItem((new CFormGrid())
@@ -63,8 +59,10 @@ $form
 			(new CLabel(_('Attribute'), 'attribute'))->setAsteriskMark(),
 			new CFormField((new CTextBox('attribute', $data['attribute']))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setId('attribute'))
-		]))
+				->setId('attribute')
+			)
+		])
+	)
 	->addItem(
 		(new CScriptTag('
 			media_type_mapping_edit_popup.init();

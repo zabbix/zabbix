@@ -33,7 +33,6 @@ $form = (new CForm('post', $form_action))
 	->setName('user-group-mapping-edit-form')
 	->addVar('is_fallback', $data['is_fallback'])
 	->addVar('fallback_status', $data['fallback_status'])
-	->addVar('row_index', $data['row_index'])
 	->addItem(
 		(new CInput('submit', 'submit'))
 			->addStyle('display: none;')
@@ -51,8 +50,7 @@ $usergroup_multiselect = (new CMultiSelect([
 			'srcfld1' => 'usrgrpid',
 			'srcfld2' => 'name',
 			'dstfrm' => $form->getName(),
-			'dstfld1' => 'user_groups',
-			'editable' => true
+			'dstfld1' => 'user_groups'
 		]
 	]
 ]))
@@ -78,8 +76,7 @@ $user_role_multiselect = (new CMultiSelect([
 	->setId('roleid');
 $inline_js .= $user_role_multiselect->getPostJS();
 
-if ($data['is_fallback'] == true) {
-	$name_formfield = new CDiv($data['name']);
+if ($data['is_fallback'] == GROUP_MAPPING_FALLBACK) {
 	$name_hint_icon = makeHelpIcon([
 		_('Use fallback group to define user groups and a role for users not covered by group mapping.'),
 	])
@@ -88,9 +85,6 @@ if ($data['is_fallback'] == true) {
 	$form->addVar('name', $data['name']);
 }
 else {
-	$name_formfield = (new CTextBox('name', $data['name']))
-		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		->setId('idp_group_name');
 	$name_hint_icon = makeHelpIcon([
 		_('Naming requirements:'),
 		(new CList([
@@ -105,7 +99,13 @@ $form
 	->addItem((new CFormGrid())
 		->addItem([
 			(new CLabel([$data['name_label'], $name_hint_icon], 'name'))->setAsteriskMark(),
-			new CFormField($name_formfield)
+			new CFormField($data['is_fallback'] == GROUP_MAPPING_REGULAR
+				? (new CTextBox('name', $data['name']))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+					->setAriaRequired()
+				: $data['name']
+			)
 		])
 		->addItem([
 			(new CLabel(_('User groups'), 'user_groups__ms'))->setAsteriskMark(),
@@ -114,7 +114,8 @@ $form
 		->addItem([
 			(new CLabel(_('User role'), 'roleid_ms'))->setAsteriskMark(),
 			new CFormField($user_role_multiselect)
-		]))
+		])
+	)
 	->addItem(
 		(new CScriptTag('
 			user_group_mapping_edit_popup.init();
