@@ -256,16 +256,9 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	}
 
 	if ($error) {
-		if ($flags & P_SYS) {
-			error($message);
+		error($message);
 
-			return ZBX_VALID_ERROR;
-		}
-		else {
-			info($message);
-
-			return ZBX_VALID_WARNING;
-		}
+		return ZBX_VALID_ERROR;
 	}
 
 	return ZBX_VALID_OK;

@@ -266,6 +266,10 @@ class CProfile {
 			self::init();
 		}
 
+		if (is_array($value)) {
+			return;
+		}
+
 		if (!self::checkValueType($value, $type)) {
 			return;
 		}
