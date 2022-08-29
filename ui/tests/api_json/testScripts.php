@@ -3928,23 +3928,6 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/output/1": value must be one of "scriptid", "name", "command", "host_access", "usrgrpid", "groupid", "description", "confirmation", "type", "execute_on", "timeout", "parameters", "scope", "port", "authtype", "username", "password", "publickey", "privatekey", "menu_path", "url", "new_window".'
 			],
 
-			// Check "selectGroups" option (deprecated).
-			'Test script.get invalid deprecated parameter "selectGroups" (string)' => [
-				'request' => [
-					'selectGroups' => 'abc'
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/selectGroups": value must be "'.API_OUTPUT_EXTEND.'".'
-			],
-			'Test script.get invalid deprecated parameter "selectGroups"' => [
-				'request' => [
-					'selectGroups' => ['abc']
-				],
-				'expected_results' => [],
-				'expected_error' =>
-					'Invalid parameter "/selectGroups/1": value must be one of "groupid", "name", "flags", "uuid".'
-			],
-
 			// Check "selectHostGroups" option.
 			'Test script.get invalid parameter "selectHostGroups" (string)' => [
 				'request' => [
