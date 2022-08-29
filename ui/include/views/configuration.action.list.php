@@ -116,6 +116,7 @@ $actionTable = (new CTableInfo())
 
 if ($this->data['actions']) {
 	$actionConditionStringValues = actionConditionValueToString($this->data['actions']);
+
 	$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], $data['actions'],
 		ACTION_OPERATION
 	);

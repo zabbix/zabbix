@@ -62,7 +62,8 @@ window.action_edit_popup = new class {
 	_openConditionPopup() {
 		const parameters = {
 			type: <?= ZBX_POPUP_CONDITION_TYPE_ACTION ?>,
-			source: this.eventsource
+			source: this.eventsource,
+			actionid: this.actionid
 		};
 
 		const overlay =  PopUp('popup.condition.edit', parameters, {
@@ -71,6 +72,7 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
+			console.log(e.detail.name)
 				this.row = document.createElement('tr');
 				this._createRow(this.row, e.detail);
 				$('#conditionTable tr:last').before(this.row);
@@ -117,7 +119,9 @@ window.action_edit_popup = new class {
 	_createNameCell(input) {
 		const cell = document.createElement('tr');
 		const condition_cell = document.createElement('td');
+		const operator_cell = document.createElement('td');
 		const value_cell = document.createElement('em');
+		const value2_cell = document.createElement('em');
 
 		cell.appendChild(this._createHiddenInput('conditiontype',input.conditiontype));
 		cell.appendChild(this._createHiddenInput('operator',input.operator));
@@ -127,14 +131,44 @@ window.action_edit_popup = new class {
 		}
 		cell.appendChild(this._createHiddenInput('formulaid',this.label));
 
-		condition_cell.textContent = (
-			this.condition_types[input.conditiontype] + " " +
-			this.condition_operators[input.operator] + " "
-		);
-		value_cell.textContent = input.value;
+		if (input.conditiontype == <?= CONDITION_TYPE_EVENT_TAG_VALUE ?>) {
+			condition_cell.textContent = ('Value of tag ');
+			operator_cell.textContent = (this.condition_operators[input.operator] + ' ')
+			value_cell.textContent = (input.value);
+			value2_cell.textContent = (input.value2);
 
-		cell.append(condition_cell);
-		cell.append(value_cell);
+			cell.append(condition_cell);
+			cell.append(value2_cell);
+			cell.append(operator_cell);
+			cell.append(value_cell);
+		}
+		else if (input.conditiontype == <?= CONDITION_TYPE_SUPPRESSED ?>) {
+			if (input.operator == <?= CONDITION_OPERATOR_YES ?>) {
+				cell.append('Problem is suppressed');
+			}
+			else {
+				cell.append('Problem is not suppressed');
+			}
+		}
+		else if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
+			if (input.value) {
+				cell.append('Event is acknowledged');
+			}
+			else {
+				cell.append('Event is not acknowledged');
+			}
+		}
+		else {
+			condition_cell.textContent = (
+				this.condition_types[input.conditiontype] + " " +
+				this.condition_operators[input.operator]
+			);
+			value_cell.textContent = input.name;
+
+			cell.append(condition_cell);
+			cell.append(operator_cell);
+			cell.append(value_cell);
+		}
 
 		return cell;
 	}
@@ -288,8 +322,6 @@ window.action_edit_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
-		// todo : show/change expression when new condition is added! -> check why label is read after new condition is added
-
 		this.show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 
 		jQuery('#label-evaltype').toggle(this.row_count > 1);

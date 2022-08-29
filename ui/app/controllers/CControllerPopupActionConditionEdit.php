@@ -24,12 +24,12 @@ require_once __DIR__ . '/../../include/actions.inc.php';
 class CControllerPopupActionConditionEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
+			'actionid' => 'string',
 			'type' => 'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION,
 			'source' => 'required|in '.implode(',', [
 					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
 					EVENT_SOURCE_SERVICE
 				]),
-			'validate' => 'in 1',
 			'condition_type' => 'in '.implode(',', [
 					CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_TEMPLATE, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER,
 					CONDITION_TYPE_TRIGGER_NAME, CONDITION_TYPE_TRIGGER_SEVERITY, CONDITION_TYPE_TIME_PERIOD,
@@ -101,7 +101,8 @@ class CControllerPopupActionConditionEdit extends CController {
 				'trigger_context' => $this->getInput('trigger_context', 'host'),
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
-				]
+				],
+				'actionid' => $this->getInput('actionid')
 			];
 
 		$response = new CControllerResponseData($data);

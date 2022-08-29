@@ -74,6 +74,8 @@ class CControllerPopupActionEdit extends CController {
 	}
 
 	protected function doAction(): void {
+		// todo : add functions for creating correct condition name
+
 		$eventsource = $this->getInput('eventsource', EVENT_SOURCE_TRIGGERS);
 
 		if ($this->action !== null) {

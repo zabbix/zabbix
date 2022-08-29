@@ -34,9 +34,10 @@ $form = (new CForm())
 	->setName('popup.condition')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
-	->addVar('type', '1')
+	->addVar('type', ZBX_POPUP_CONDITION_TYPE_ACTION)
 	->addVar('source', $data['eventsource'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+
 
 $condition_type = (int) $data['last_type'];
 $form_grid = (new CFormGrid())->cleanItems();

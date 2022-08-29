@@ -43,7 +43,7 @@ window.condition_popup = new class {
 				reloadPopup(e.target.closest('form'), 'popup.condition.edit')
 			})
 			$("#trigger_context").change(function() {
-				reloadPopup($(e.target).closest("form"), 'popup.condition.edit')
+				reloadPopup(e.target.closest("form"), 'popup.condition.edit')
 			})
 		})
 	}
