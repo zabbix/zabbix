@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup icon_mapping, ids
+ * @backup icon_mapping
  */
 class testAuditlogIconMap extends testAuditlogCommon {
 	public function testAuditlogIconMap_Create() {
@@ -40,19 +40,18 @@ class testAuditlogIconMap extends testAuditlogCommon {
 			]
 		]);
 		$resourceid = $create['result']['iconmapids'][0];
-
-		$icon_map = CDBHelper::getAll('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.$resourceid);
+		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.$resourceid);
 
 		$created = "{\"iconmap.name\":[\"add\",\"icon_mapping\"],".
-			"\"iconmap.default_iconid\":[\"add\",\"5\"],".
-			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."]\":[\"add\"],".
-			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].inventory_link\":[\"add\",\"1\"],".
-			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].expression\":[\"add\",\"created_mapping\"],".
-			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].iconid\":[\"add\",\"2\"],".
-			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].iconmappingid\":[\"add\",\"".$icon_map[0]['iconmappingid'].
-					"\"],\"iconmap.iconmapid\":[\"add\",\"".$resourceid."\"]}";
+				"\"iconmap.default_iconid\":[\"add\",\"5\"],".
+				"\"iconmap.mappings[".$icon_map['iconmappingid']."]\":[\"add\"],".
+				"\"iconmap.mappings[".$icon_map['iconmappingid']."].inventory_link\":[\"add\",\"1\"],".
+				"\"iconmap.mappings[".$icon_map['iconmappingid']."].expression\":[\"add\",\"created_mapping\"],".
+				"\"iconmap.mappings[".$icon_map['iconmappingid']."].iconid\":[\"add\",\"2\"],".
+				"\"iconmap.mappings[".$icon_map['iconmappingid']."].iconmappingid\":[\"add\",\"".$icon_map['iconmappingid'].
+				"\"],\"iconmap.iconmapid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->sendGetRequest('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogIconMap_Update() {
@@ -70,23 +69,22 @@ class testAuditlogIconMap extends testAuditlogCommon {
 				]
 			]
 		]);
-
-		$icon_map = CDBHelper::getAll('SELECT iconmappingid FROM icon_mapping WHERE iconmapid=1');
+		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid=1');
 
 		$updated = "{\"iconmap.mappings[1]\":[\"delete\"],".
-			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."]\":[\"add\"],".
-			"\"iconmap.name\":[\"update\",\"updated_icon_mapping\",\"API icon map\"],".
-			"\"iconmap.default_iconid\":[\"update\",\"4\",\"2\"],".
-			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].inventory_link\":[\"add\",\"2\"],".
-			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].expression\":[\"add\",\"updated_created_mapping\"],".
-			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].iconid\":[\"add\",\"3\"],".
-			"\"iconmap.mappings[".$icon_map[0]['iconmappingid']."].iconmappingid\":[\"add\",\"".$icon_map[0]['iconmappingid']."\"]}";
+				"\"iconmap.mappings[".$icon_map['iconmappingid']."]\":[\"add\"],".
+				"\"iconmap.name\":[\"update\",\"updated_icon_mapping\",\"API icon map\"],".
+				"\"iconmap.default_iconid\":[\"update\",\"4\",\"2\"],".
+				"\"iconmap.mappings[".$icon_map['iconmappingid']."].inventory_link\":[\"add\",\"2\"],".
+				"\"iconmap.mappings[".$icon_map['iconmappingid']."].expression\":[\"add\",\"updated_created_mapping\"],".
+				"\"iconmap.mappings[".$icon_map['iconmappingid']."].iconid\":[\"add\",\"3\"],".
+				"\"iconmap.mappings[".$icon_map['iconmappingid']."].iconmappingid\":[\"add\",\"".$icon_map['iconmappingid']."\"]}";
 
-		$this->sendGetRequest('details', 1, $updated, 1);
+		$this->getAuditDetails('details', 1, $updated, 1);
 	}
 
 	public function testAuditlogIconMap_Delete() {
 		$this->call('iconmap.delete', [1]);
-		$this->sendGetRequest('resourcename', 2, 'updated_icon_mapping', 1);
+		$this->getAuditDetails('resourcename', 2, 'updated_icon_mapping', 1);
 	}
 }
