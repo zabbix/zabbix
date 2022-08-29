@@ -201,9 +201,7 @@ class testTimescaleDb extends CIntegrationTest {
 		$this->sendDataValues('sender', $sender_data , self::COMPONENT_SERVER);
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
-
-		sleep(10);
-		$this->reloadConfigurationCache();
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of process_client_history_data():SUCCEED', true, 5);
 
 		$count_end = $this->getHistoryCount();
 		$this->assertNotEquals(-1, $count_end);
