@@ -9,7 +9,8 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50012, 'API Host for read permissions', 'API Host for read permissions', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, 'API disabled host', 'API disabled host', 1, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'API Host for deny permissions', 'API Host for deny permissions', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (90020,'90020','90020',0,'');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (90020, '90020', '90020', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (90021, '90021', '90021', 0, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50023,50012,1,1,1,'127.0.0.1','','10050');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50024,50013,1,1,1,'127.0.0.1','','10050');
@@ -23,15 +24,16 @@ INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (50013,1,'df60e37bb99849a9817
 INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (50016,0,'2e684a6d9f22417d8d2ef286c9f86e97','API group with read permissions');
 INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (50017,0,'1d53a0938db34c5f8e5116487e620477','API group with deny permissions');
 INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (90020,0,'96258844beaf4c1f9528ca96b32f24de','90000Eur');
+INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (90021,0,'53f820730464462ea00d258d71359947','90000Eur/LV');
 INSERT INTO usrgrp (usrgrpid,name) VALUES (90000,'90000 Eur group write except one');
 INSERT INTO users (userid,username,passwd,roleid) VALUES (90000,'90000','$2a$10$Hr7Z1FX/x9OPhdUu9.5CL.XyL9IKPiVcoxJgGbtIHc3.Svk/awB5q',2);
 INSERT INTO users_groups (id,usrgrpid,userid) VALUES (90000,90000,90000);
-INSERT INTO rights (rightid,groupid,permission,id) VALUES (90000,90000,3,90020);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 50012);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50011, 50010, 50013);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50012, 50012, 50016);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50014, 50014, 50017);
 INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90020,90020,90020);
+INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90021,90021,90021);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 50009, 50010);
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (400660, 50009, 50022, 0, 2,'API discovery rule','vfs.fs.discovery',30,90,0,'','',1,'','');
 INSERT INTO hstgrp (groupid,type,uuid,name) VALUES (50005,0,'c5ed6d1365b145c5b4f522832909b22e','API host group for update');
@@ -97,7 +99,7 @@ INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) 
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (31, 16, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (31, 0, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (21, 31, 20);
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (4, 'API script to test host group delete', 'test', 2, 21, NULL, 'api script description', '', 0, 2, '30s', 1, '', 0, '', '', '', '', '');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation, type, execute_on, timeout, scope, port, authtype, username, password, publickey, privatekey, menu_path) VALUES (4, 'API script', 'test', 2, 21, NULL, 'api script description', '', 0, 2, '30s', 1, '', 0, '', '', '', '', '');
 UPDATE config SET alert_usrgrpid = 22 WHERE configid = 1;
 
 -- users
