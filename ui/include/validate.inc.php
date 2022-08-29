@@ -181,10 +181,6 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	if (!is_array($var) && $has_array_flag) {
 		$error = true;
 		$message = _s('Field "%1$s" is not array.', $caption);
-
-		if ($is_td_array_flag) {
-			$message = _s('Field "%1$s" is not two-dimensional array.', $caption);
-		}
 	}
 	elseif ($type == T_ZBX_INT) {
 		if (!zbx_is_int($var)) {
