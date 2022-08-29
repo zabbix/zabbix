@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup token, ids
+ * @backup token
  */
 class testAuditlogToken extends testAuditlogCommon {
 	public function testAuditlogToken_Create() {
@@ -44,7 +44,7 @@ class testAuditlogToken extends testAuditlogCommon {
 				"\"token.status\":[\"add\",\"1\"],".
 				"\"token.tokenid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->sendGetRequest('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogToken_Update() {
@@ -63,11 +63,11 @@ class testAuditlogToken extends testAuditlogCommon {
 				"\"token.description\":[\"update\",\"Updated description\",\"\"],".
 				"\"token.status\":[\"update\",\"1\",\"0\"]}";
 
-		$this->sendGetRequest('details', 1, $updated, 11);
+		$this->getAuditDetails('details', 1, $updated, 11);
 	}
 
 	public function testAuditlogToken_Delete() {
 		$this->call('token.delete', [11]);
-		$this->sendGetRequest('resourcename', 2, 'Updated audit token', 11);
+		$this->getAuditDetails('resourcename', 2, 'Updated audit token', 11);
 	}
 }
