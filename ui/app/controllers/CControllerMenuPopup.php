@@ -214,6 +214,18 @@ class CControllerMenuPopup extends CController {
 				];
 			}
 
+			if (array_key_exists('urls', $menu_data)) {
+				foreach ($menu_data['urls'] as &$url) {
+					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
+						$url['url'] = 'javascript: alert(\''.
+							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
+						'\');';
+						unset($url['target'], $url['rel']);
+					}
+				}
+				unset($url);
+			}
+
 			if (array_key_exists('tags', $data)) {
 				$menu_data['tags'] = $data['tags'];
 				$menu_data['evaltype'] = $data['evaltype'];
