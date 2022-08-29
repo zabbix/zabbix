@@ -22,6 +22,8 @@
 #include "zbxmutexs.h"
 #include "zbxthreads.h"
 #include "cfg.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "zbxwinservice.h"
@@ -161,7 +163,7 @@ static void	rotate_log(const char *filename)
 	{
 		char	filename_old[MAX_STRING_LEN];
 
-		strscpy(filename_old, filename);
+		zbx_strscpy(filename_old, filename);
 		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
 		remove(filename_old);
 #ifdef _WINDOWS
@@ -325,7 +327,7 @@ int	zabbix_open_log(int type, int level, const char *filename, char **error)
 			return FAIL;
 		}
 
-		strscpy(log_filename, filename);
+		zbx_strscpy(log_filename, filename);
 		zbx_fclose(log_file);
 	}
 	else if (LOG_TYPE_CONSOLE == type || LOG_TYPE_UNDEFINED == type)

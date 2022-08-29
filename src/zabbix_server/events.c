@@ -18,13 +18,15 @@
 **/
 
 #include "events.h"
+#include "zbxserver.h"
 
 #include "db_lengths.h"
 #include "log.h"
 #include "actions.h"
-#include "zbxserver.h"
 #include "zbxexport.h"
 #include "zbxservice.h"
+#include "zbxnum.h"
+#include "zbxexpr.h"
 
 /* event recovery data */
 typedef struct
@@ -808,7 +810,7 @@ static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlatio
 
 		loc = &token.data.objectid.name;
 
-		if (SUCCEED != is_uint64_n(expression + loc->l, loc->r - loc->l + 1, &conditionid))
+		if (SUCCEED != zbx_is_uint64_n(expression + loc->l, loc->r - loc->l + 1, &conditionid))
 			continue;
 
 		if (NULL == (condition = (zbx_corr_condition_t *)zbx_hashset_search(&correlation_rules.conditions,
@@ -1042,7 +1044,7 @@ static int	correlation_add_event_filter(char **sql, size_t *sql_alloc, size_t *s
 
 		loc = &token.data.objectid.name;
 
-		if (SUCCEED != is_uint64_n(expression + loc->l, loc->r - loc->l + 1, &conditionid))
+		if (SUCCEED != zbx_is_uint64_n(expression + loc->l, loc->r - loc->l + 1, &conditionid))
 			continue;
 
 		if (NULL == (condition = (zbx_corr_condition_t *)zbx_hashset_search(&correlation_rules.conditions, &conditionid)))

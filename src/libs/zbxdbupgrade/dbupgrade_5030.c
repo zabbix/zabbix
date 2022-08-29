@@ -28,6 +28,9 @@
 #include "zbxjson.h"
 #include "sysinfo.h"
 #include "zbxcrypto.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
 
 /*
  * 5.4 development database patches
@@ -949,7 +952,7 @@ static int	is_valid_opcommand_type(const char *type_str, const char *scriptid)
 #define ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT	4	/* not used after upgrade */
 	unsigned int	type;
 
-	if (SUCCEED != is_uint31(type_str, &type))
+	if (SUCCEED != zbx_is_uint31(type_str, &type))
 		return FAIL;
 
 	switch (type)
@@ -1099,13 +1102,13 @@ static char	*zbx_rename_host_macros(const char *command)
 {
 	char	*p1, *p2, *p3, *p4, *p5, *p6, *p7;
 
-	p1 = string_replace(command, "{HOST.CONN}", "{HOST.TARGET.CONN}");
-	p2 = string_replace(p1, "{HOST.DNS}", "{HOST.TARGET.DNS}");
-	p3 = string_replace(p2, "{HOST.HOST}", "{HOST.TARGET.HOST}");
-	p4 = string_replace(p3, "{HOST.IP}", "{HOST.TARGET.IP}");
-	p5 = string_replace(p4, "{HOST.NAME}", "{HOST.TARGET.NAME}");
-	p6 = string_replace(p5, "{HOSTNAME}", "{HOST.TARGET.NAME}");
-	p7 = string_replace(p6, "{IPADDRESS}", "{HOST.TARGET.IP}");
+	p1 = zbx_string_replace(command, "{HOST.CONN}", "{HOST.TARGET.CONN}");
+	p2 = zbx_string_replace(p1, "{HOST.DNS}", "{HOST.TARGET.DNS}");
+	p3 = zbx_string_replace(p2, "{HOST.HOST}", "{HOST.TARGET.HOST}");
+	p4 = zbx_string_replace(p3, "{HOST.IP}", "{HOST.TARGET.IP}");
+	p5 = zbx_string_replace(p4, "{HOST.NAME}", "{HOST.TARGET.NAME}");
+	p6 = zbx_string_replace(p5, "{HOSTNAME}", "{HOST.TARGET.NAME}");
+	p7 = zbx_string_replace(p6, "{IPADDRESS}", "{HOST.TARGET.IP}");
 
 	zbx_free(p1);
 	zbx_free(p2);
@@ -3253,7 +3256,7 @@ static int	DBpatch_delay_routine(const char *screen_delay, int *dashboard_delay)
 	int	delays[] = {10, 30, 60, 120, 600, 1800, 3600};
 	int	i, imax, tmp;
 
-	if (FAIL == is_time_suffix(screen_delay, &tmp, ZBX_LENGTH_UNLIMITED))
+	if (FAIL == zbx_is_time_suffix(screen_delay, &tmp, ZBX_LENGTH_UNLIMITED))
 		return FAIL;
 
 	imax = (int)ARRSIZE(delays);
@@ -4536,7 +4539,7 @@ static int	dbpatch_update_expression(char **expression, zbx_uint64_t functionid,
 		switch (token.type)
 		{
 			case ZBX_TOKEN_OBJECTID:
-				if (SUCCEED == is_uint64_n(*expression + token.data.objectid.name.l,
+				if (SUCCEED == zbx_is_uint64_n(*expression + token.data.objectid.name.l,
 						token.data.objectid.name.r - token.data.objectid.name.l + 1, &id) &&
 						functionid == id)
 				{
@@ -4604,7 +4607,7 @@ static int	dbpatch_find_function(const char *expression, zbx_uint64_t functionid
 		switch (token.type)
 		{
 			case ZBX_TOKEN_OBJECTID:
-				if (SUCCEED == is_uint64_n(expression + token.data.objectid.name.l,
+				if (SUCCEED == zbx_is_uint64_n(expression + token.data.objectid.name.l,
 						token.data.objectid.name.r - token.data.objectid.name.l + 1, &id) &&
 						functionid == id)
 				{
@@ -5268,7 +5271,7 @@ static int	DBpatch_5030168(void)
 			switch (token.type)
 			{
 				case ZBX_TOKEN_OBJECTID:
-					if (SUCCEED == is_uint64_n(expression + token.loc.l + 1,
+					if (SUCCEED == zbx_is_uint64_n(expression + token.loc.l + 1,
 							token.loc.r - token.loc.l - 1, &index) &&
 							(int)index < functions.values_num)
 					{
@@ -5389,11 +5392,11 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 		char				*group;
 		zbx_request_parameter_type_t	type;
 
-		groups_num = num_param(request->params[0]);
+		groups_num = zbx_num_param(request->params[0]);
 
 		for (i = 1; i <= groups_num; i++)
 		{
-			if (NULL == (group = get_param_dyn(request->params[0], i, &type)))
+			if (NULL == (group = zbx_get_param_dyn(request->params[0], i, &type)))
 				continue;
 
 			if ('[' != (*str)[*str_offset - 1])
@@ -5751,7 +5754,7 @@ static char	*update_template_name(char *old)
 		ptr = zbx_strdup(ptr, new);
 	}
 
-	ptr_snmp = string_replace(ptr, "SNMPv2", "SNMP");
+	ptr_snmp = zbx_string_replace(ptr, "SNMPv2", "SNMP");
 	zbx_free(ptr);
 
 	return ptr_snmp;
@@ -5938,11 +5941,11 @@ static int	DBpatch_5030192(void)
 				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
 					continue;
 
-				if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1,
+				if (SUCCEED != zbx_is_uint64_n(ctx.expression + token->loc.l + 1,
 						token->loc.r - token->loc.l - 1, &functionid))
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
-							" is_uint64_n error", __func__, row[0]);
+							" zbx_is_uint64_n error", __func__, row[0]);
 					DBfree_result(result);
 					return FAIL;
 				}
@@ -6382,11 +6385,11 @@ static int	DBpatch_5030199(void)
 				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
 					continue;
 
-				if (SUCCEED != is_uint64_n(ctx.expression + token->loc.l + 1,
+				if (SUCCEED != zbx_is_uint64_n(ctx.expression + token->loc.l + 1,
 						token->loc.r - token->loc.l - 1, &functionid))
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
-							" is_uint64_n error", __func__, row[0]);
+							" zbx_is_uint64_n error", __func__, row[0]);
 					DBfree_result(result);
 					return FAIL;
 				}

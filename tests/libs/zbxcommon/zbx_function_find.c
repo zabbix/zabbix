@@ -20,7 +20,9 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxexpr.h"
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -68,7 +70,7 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Cannot get expected 'func_pos' parameter from test case data: %s",
 				zbx_mock_error_string(error));
 		}
-		else if (SUCCEED != is_uint32(tmp, &num))
+		else if (SUCCEED != zbx_is_uint32(tmp, &num))
 		{
 			fail_msg("func_pos parameter \"%s\" is not numeric.", tmp);
 		}
@@ -81,7 +83,7 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Cannot get expected 'par_l' parameter from test case data: %s",
 					zbx_mock_error_string(error));
 		}
-		else if (SUCCEED != is_uint32(tmp, &num))
+		else if (SUCCEED != zbx_is_uint32(tmp, &num))
 		{
 			fail_msg("par_l parameter \"%s\" is not numeric.", tmp);
 		}
@@ -94,7 +96,7 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Cannot get expected 'par_r' parameter from test case data: %s",
 					zbx_mock_error_string(error));
 		}
-		else if (SUCCEED != is_uint32(tmp, &num))
+		else if (SUCCEED != zbx_is_uint32(tmp, &num))
 		{
 			fail_msg("par_r parameter \"%s\" is not numeric.", tmp);
 		}

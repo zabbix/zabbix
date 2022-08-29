@@ -17,7 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxip.h"
+
+#include "zbxnum.h"
 
 /******************************************************************************
  *                                                                            *
@@ -137,7 +139,7 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint_n_range(end + 1, len - (end + 1 - address), &bits, sizeof(bits), 0, 30))
+		if (FAIL == zbx_is_uint_n_range(end + 1, len - (end + 1 - address), &bits, sizeof(bits), 0, 30))
 			return FAIL;
 
 		iprange->mask = 1;
@@ -168,7 +170,7 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 		len = (NULL == dash ? ptr : dash) - address;
 
 		/* extract the range start value */
-		if (FAIL == is_uint_n_range(address, len, &iprange->range[index].from,
+		if (FAIL == zbx_is_uint_n_range(address, len, &iprange->range[index].from,
 				sizeof(iprange->range[index].from), 0, 255))
 		{
 			return FAIL;
@@ -178,7 +180,7 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 		if (NULL != dash)
 		{
 			dash++;
-			if (FAIL == is_uint_n_range(dash, ptr - dash, &iprange->range[index].to,
+			if (FAIL == zbx_is_uint_n_range(dash, ptr - dash, &iprange->range[index].to,
 					sizeof(iprange->range[index].to), 0, 255))
 			{
 				return FAIL;
@@ -229,7 +231,7 @@ static int	iprangev6_parse(zbx_iprange_t *iprange, const char *address)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint_n_range(end + 1, len - (end + 1 - address), &bits, sizeof(bits), 0, 128))
+		if (FAIL == zbx_is_uint_n_range(end + 1, len - (end + 1 - address), &bits, sizeof(bits), 0, 128))
 			return FAIL;
 
 		iprange->mask = 1;
@@ -269,14 +271,14 @@ static int	iprangev6_parse(zbx_iprange_t *iprange, const char *address)
 		len = (NULL == dash ? ptr : dash) - address;
 
 		/* extract the range start value */
-		if (FAIL == is_hex_n_range(address, len, &iprange->range[index].from, 4, 0, (1 << 16) - 1))
+		if (FAIL == zbx_is_hex_n_range(address, len, &iprange->range[index].from, 4, 0, (1 << 16) - 1))
 			return FAIL;
 
 		/* if range is specified, extract the end value, otherwise set end value equal to the start value */
 		if (NULL != dash)
 		{
 			dash++;
-			if (FAIL == is_hex_n_range(dash, ptr - dash, &iprange->range[index].to, 4, 0, (1 << 16) - 1))
+			if (FAIL == zbx_is_hex_n_range(dash, ptr - dash, &iprange->range[index].to, 4, 0, (1 << 16) - 1))
 				return FAIL;
 
 			if (iprange->range[index].to < iprange->range[index].from)
@@ -350,7 +352,7 @@ check_fill:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	iprange_parse(zbx_iprange_t *iprange, const char *address)
+int	zbx_iprange_parse(zbx_iprange_t *iprange, const char *address)
 {
 	/* ignore leading whitespace characters */
 	while (SUCCEED == iprange_is_whitespace_character(*address))
@@ -373,7 +375,7 @@ int	iprange_parse(zbx_iprange_t *iprange, const char *address)
  * Comments: The IP address is returned as a number array.                    *
  *                                                                            *
  ******************************************************************************/
-void	iprange_first(const zbx_iprange_t *iprange, int *address)
+void	zbx_iprange_first(const zbx_iprange_t *iprange, int *address)
 {
 	int	i, groups;
 
@@ -402,7 +404,7 @@ void	iprange_first(const zbx_iprange_t *iprange, int *address)
  * Comments: The IP address is returned as a number array.                    *
  *                                                                            *
  ******************************************************************************/
-int	iprange_next(const zbx_iprange_t *iprange, int *address)
+int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address)
 {
 	int	i, groups;
 
@@ -448,7 +450,7 @@ int	iprange_next(const zbx_iprange_t *iprange, int *address)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	iprange_validate(const zbx_iprange_t *iprange, const int *address)
+int	zbx_iprange_validate(const zbx_iprange_t *iprange, const int *address)
 {
 	int	i, groups;
 
@@ -474,7 +476,7 @@ int	iprange_validate(const zbx_iprange_t *iprange, const int *address)
  *               integer.                                                     *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	iprange_volume(const zbx_iprange_t *iprange)
+zbx_uint64_t	zbx_iprange_volume(const zbx_iprange_t *iprange)
 {
 	int		i, groups;
 	zbx_uint64_t	n, volume = 1;

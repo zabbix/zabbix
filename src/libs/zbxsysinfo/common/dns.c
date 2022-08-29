@@ -18,9 +18,10 @@
 **/
 
 #include "dns.h"
-
-#include "common.h"
 #include "sysinfo.h"
+
+#include "zbxstr.h"
+#include "zbxnum.h"
 #include "zbxcomms.h"
 #include "log.h"
 #include "zbxalgo.h"
@@ -247,9 +248,9 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		freeaddrinfo(hres);
 #endif
 	if (NULL == zone_str || '\0' == *zone_str)
-		strscpy(zone, "zabbix.com");
+		zbx_strscpy(zone, "zabbix.com");
 	else
-		strscpy(zone, zone_str);
+		zbx_strscpy(zone, zone_str);
 
 	param = get_rparam(request, 2);
 
@@ -277,7 +278,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (NULL == param || '\0' == *param)
 		retrans = 1;
-	else if (SUCCEED != is_uint31(param, &retrans) || 0 == retrans)
+	else if (SUCCEED != zbx_is_uint31(param, &retrans) || 0 == retrans)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		return SYSINFO_RET_FAIL;
@@ -287,7 +288,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (NULL == param || '\0' == *param)
 		retry = 2;
-	else if (SUCCEED != is_uint31(param, &retry) || 0 == retry)
+	else if (SUCCEED != zbx_is_uint31(param, &retry) || 0 == retry)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return SYSINFO_RET_FAIL;

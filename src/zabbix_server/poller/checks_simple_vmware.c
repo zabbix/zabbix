@@ -1684,7 +1684,7 @@ int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 		if (NULL == (value_str = vm->props[ZBX_VMWARE_VMPROP_MEMORY_SIZE_BALLOONED]))
 			continue;
 
-		if (SUCCEED != is_uint64(value_str, &mem))
+		if (SUCCEED != zbx_is_uint64(value_str, &mem))
 			continue;
 
 		value += mem;

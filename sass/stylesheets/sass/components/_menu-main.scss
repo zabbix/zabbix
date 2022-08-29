@@ -4,14 +4,18 @@ $menu-main-arrow-bg-position: -606px -434px !default;
 $menu-main-arrow-hover-bg-position: -606px -434px !default;
 
 $menu-main-icons: (
-		dashboard: -540px -664px,
-		problems: -540px -688px,
-		monitoring: -540px -712px,
-		services: -540px -832px,
-		inventory: -540px -736px,
-		reports: -540px -760px,
-		configuration: -540px -784px,
-		administration: -540px -808px
+	dashboards: -540px -856px,
+	dashboard: -540px -664px,
+	problems: -540px -688px,
+	monitoring: -540px -712px,
+	services: -540px -832px,
+	inventory: -540px -736px,
+	reports: -540px -760px,
+	data-collection: -540px -784px,
+	alerts: -540px -879px,
+	configuration: -540px -784px,
+	users: -540px -904px,
+	administration: -540px -808px
 ) !default;
 
 %menu-main-icon-common {
@@ -28,13 +32,17 @@ $menu-main-icons: (
 }
 
 // Dynamically generated classes for icons:
+//  .icon-dashboards
 //  .icon-dashboard
 //  .icon-problems
 //  .icon-monitoring
 //  .icon-services
 //  .icon-inventory
 //  .icon-reports
+//  .icon-data-collection
+//  .icon-alerts
 //  .icon-configuration
+//  .icon-users
 //  .icon-administration
 @each $class, $bg-position in $menu-main-icons {
 	.icon-#{$class} {

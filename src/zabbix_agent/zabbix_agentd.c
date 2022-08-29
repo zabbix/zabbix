@@ -22,6 +22,8 @@
 #include "zbxgetopt.h"
 #include "zbxcomms.h"
 #include "modbtype.h"
+#include "zbxstr.h"
+#include "zbxip.h"
 
 static char	*CONFIG_PID_FILE = NULL;
 
@@ -39,7 +41,7 @@ int	CONFIG_ENABLE_REMOTE_COMMANDS	= 1;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
-int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
+int	CONFIG_REFRESH_ACTIVE_CHECKS	= 5;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
@@ -68,28 +70,7 @@ char	*CONFIG_SSL_CA_LOCATION;
 char	*CONFIG_SSL_CERT_LOCATION;
 char	*CONFIG_SSL_KEY_LOCATION;
 
-/* TLS parameters */
-unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
-unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
-
-char	*CONFIG_TLS_CONNECT		= NULL;
-char	*CONFIG_TLS_ACCEPT		= NULL;
-char	*CONFIG_TLS_CA_FILE		= NULL;
-char	*CONFIG_TLS_CRL_FILE		= NULL;
-char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
-char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
-char	*CONFIG_TLS_CERT_FILE		= NULL;
-char	*CONFIG_TLS_KEY_FILE		= NULL;
-char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
-char	*CONFIG_TLS_PSK_FILE		= NULL;
-char	*CONFIG_TLS_CIPHER_CERT13	= NULL;
-char	*CONFIG_TLS_CIPHER_CERT		= NULL;
-char	*CONFIG_TLS_CIPHER_PSK13	= NULL;
-char	*CONFIG_TLS_CIPHER_PSK		= NULL;
-char	*CONFIG_TLS_CIPHER_ALL13	= NULL;
-char	*CONFIG_TLS_CIPHER_ALL		= NULL;
-char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/* not used in agent, defined for linking with tls.c */
-char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/* not used in agent, defined for linking with tls.c */
+static zbx_config_tls_t	*zbx_config_tls = NULL;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
@@ -252,13 +233,18 @@ int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
 static int		*threads_flags;
 
-unsigned char	program_type = ZBX_PROGRAM_TYPE_AGENTD;
+unsigned char  program_type = ZBX_PROGRAM_TYPE_AGENTD;
+
+static unsigned char	get_program_type(void)
+{
+	return program_type;
+}
 
 ZBX_THREAD_LOCAL unsigned char	process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 ZBX_THREAD_LOCAL int		process_num;
 ZBX_THREAD_LOCAL int		server_num	= 0;
 
-static ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
+static zbx_thread_activechk_args	*config_active_args = NULL;
 
 int	CONFIG_ALERTER_FORKS		= 0;
 int	CONFIG_DISCOVERER_FORKS		= 0;
@@ -689,7 +675,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (NULL != CONFIG_SOURCE_IP && SUCCEED != is_supported_ip(CONFIG_SOURCE_IP))
+	if (NULL != CONFIG_SOURCE_IP && SUCCEED != zbx_is_supported_ip(CONFIG_SOURCE_IP))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
 		err = 1;
@@ -699,26 +685,35 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSConnect", CONFIG_TLS_CONNECT, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSAccept", CONFIG_TLS_ACCEPT, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCAFile", CONFIG_TLS_CA_FILE, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", CONFIG_TLS_CRL_FILE, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSServerCertIssuer", CONFIG_TLS_SERVER_CERT_ISSUER, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSServerCertSubject", CONFIG_TLS_SERVER_CERT_SUBJECT, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCertFile", CONFIG_TLS_CERT_FILE, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", CONFIG_TLS_KEY_FILE, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", CONFIG_TLS_PSK_IDENTITY, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", CONFIG_TLS_PSK_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSConnect", zbx_config_tls->connect, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSAccept", zbx_config_tls->accept, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCAFile", zbx_config_tls->ca_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertIssuer", zbx_config_tls->server_cert_issuer,
+			"TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertSubject", zbx_config_tls->server_cert_subject,
+			"TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", zbx_config_tls->psk_identity,
+			"TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", zbx_config_tls->psk_file, "TLS support"));
 #endif
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", CONFIG_TLS_CIPHER_CERT, "GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", CONFIG_TLS_CIPHER_PSK, "GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", CONFIG_TLS_CIPHER_ALL, "GnuTLS or OpenSSL"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
+			"GnuTLS or OpenSSL"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
+			"GnuTLS or OpenSSL"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
+			"GnuTLS or OpenSSL"));
 #endif
 #if !defined(HAVE_OPENSSL)
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", CONFIG_TLS_CIPHER_CERT13, "OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", CONFIG_TLS_CIPHER_PSK13, "OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", CONFIG_TLS_CIPHER_ALL13, "OpenSSL 1.1.1 or newer"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
+			"OpenSSL 1.1.1 or newer"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", zbx_config_tls->cipher_psk13,
+			"OpenSSL 1.1.1 or newer"));
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", zbx_config_tls->cipher_all13,
+			"OpenSSL 1.1.1 or newer"));
 #endif
 
 	if (0 != err)
@@ -737,16 +732,18 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 
 	forks = CONFIG_ACTIVE_FORKS;
 	CONFIG_ACTIVE_FORKS += new_forks;
-	CONFIG_ACTIVE_ARGS = (ZBX_THREAD_ACTIVECHK_ARGS *)zbx_realloc(CONFIG_ACTIVE_ARGS,
-			sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * (size_t)CONFIG_ACTIVE_FORKS);
+	config_active_args = (zbx_thread_activechk_args *)zbx_realloc(config_active_args,
+			sizeof(zbx_thread_activechk_args) * (size_t)CONFIG_ACTIVE_FORKS);
 
 	for (i = 0; i < new_forks; i++, forks++)
 	{
-		zbx_vector_ptr_create(&CONFIG_ACTIVE_ARGS[forks].addrs);
-		zbx_addr_copy(&CONFIG_ACTIVE_ARGS[forks].addrs, addrs);
+		zbx_vector_ptr_create(&config_active_args[forks].addrs);
+		zbx_addr_copy(&config_active_args[forks].addrs, addrs);
 
-		CONFIG_ACTIVE_ARGS[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
+		config_active_args[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
 				hostnames->values[i] : "");
+		config_active_args[forks].zbx_config_tls = zbx_config_tls;
+		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
 	}
 
 	return SUCCEED;
@@ -822,6 +819,8 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
  ******************************************************************************/
 static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 {
+#define MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY	1
+#define MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY	SEC_PER_DAY
 	static char			*active_hosts;
 	zbx_vector_str_t		hostnames;
 	cfg_custom_parameter_parser_t	parser_load_enable_remove_commands, parser_load_key_access_rule;
@@ -873,7 +872,8 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"StartAgents",			&CONFIG_PASSIVE_FORKS,			TYPE_INT,
 			PARM_OPT,	0,			100},
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,
-			PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
+			PARM_OPT,	MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY,
+			MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY},
 		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
 			PARM_OPT,	1,			1000},
 		{"EnableRemoteCommands",	&parser_load_enable_remove_commands,	TYPE_CUSTOM,
@@ -904,37 +904,37 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"PerfCounterEn",		&CONFIG_PERF_COUNTERS_EN,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 #endif
-		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
+		{"TLSConnect",			&(zbx_config_tls->connect),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSAccept",			&CONFIG_TLS_ACCEPT,			TYPE_STRING_LIST,
+		{"TLSAccept",			&(zbx_config_tls->accept),		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+		{"TLSCAFile",			&(zbx_config_tls->ca_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
+		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSServerCertIssuer",		&CONFIG_TLS_SERVER_CERT_ISSUER,		TYPE_STRING,
+		{"TLSServerCertIssuer",		&(zbx_config_tls->server_cert_issuer),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSServerCertSubject",	&CONFIG_TLS_SERVER_CERT_SUBJECT,	TYPE_STRING,
+		{"TLSServerCertSubject",	&(zbx_config_tls->server_cert_subject),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
+		{"TLSCertFile",			&(zbx_config_tls->cert_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
+		{"TLSKeyFile",			&(zbx_config_tls->key_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
+		{"TLSPSKIdentity",		&(zbx_config_tls->psk_identity),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
+		{"TLSPSKFile",			&(zbx_config_tls->psk_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&CONFIG_TLS_CIPHER_CERT13,		TYPE_STRING,
+		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&CONFIG_TLS_CIPHER_CERT,		TYPE_STRING,
+		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&CONFIG_TLS_CIPHER_PSK13,		TYPE_STRING,
+		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&CONFIG_TLS_CIPHER_PSK,			TYPE_STRING,
+		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll13",		&CONFIG_TLS_CIPHER_ALL13,		TYPE_STRING,
+		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll",		&CONFIG_TLS_CIPHER_ALL,			TYPE_STRING,
+		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"AllowKey",			&parser_load_key_access_rule,		TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
@@ -990,12 +990,14 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		zbx_validate_config_hostnames(&hostnames);
 		zbx_validate_config(task);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config();
+		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, get_program_type);
 #endif
 	}
 
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
+#undef MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY
+#undef MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY
 }
 
 /******************************************************************************
@@ -1066,6 +1068,7 @@ static void	zbx_on_exit(int ret)
 	zbx_tls_free();
 	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
 #endif
+	zbx_config_tls_free(zbx_config_tls);
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();
 #endif
@@ -1084,7 +1087,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef _WINDOWS
 	DWORD		res;
 #endif
-
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		printf("Starting Zabbix Agent [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
@@ -1189,7 +1191,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_free_config();
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_parent();
+	zbx_tls_init_parent(get_program_type);
 #endif
 	/* --- START THREADS ---*/
 
@@ -1212,7 +1214,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	for (i = 0; i < threads_num; i++)
 	{
-		zbx_thread_args_t	*thread_args;
+		zbx_thread_args_t		*thread_args;
+		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 
@@ -1231,11 +1234,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(collector_thread, thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LISTENER:
-				thread_args->args = &listen_sock;
+				thread_args->args = &listener_args;
 				zbx_thread_start(listener_thread, thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
-				thread_args->args = &CONFIG_ACTIVE_ARGS[j++];
+				thread_args->args = &config_active_args[j++];
 				zbx_thread_start(active_checks_thread, thread_args, &threads[i]);
 				break;
 		}
@@ -1343,6 +1346,7 @@ int	main(int argc, char **argv)
 	/* Instead, the system sends the error to the calling process.*/
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
+	zbx_config_tls = zbx_config_tls_new();
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif

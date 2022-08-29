@@ -1,6 +1,13 @@
 Changes for 6.4.0alpha1
 
 New features:
+..F....... [ZBXNEXT-7832] renamed setting "Dynamic item" to "Enable host selection" for URL, Plain text, Graph prototype, Item value, Graph classic widgets (agavriluks)
+.........T [ZBXNEXT-7520] added template for OPNsense (drasihov)
+.D.G...PS. [ZBXNEXT-7852] added incremental active check refresh for active agents (vso)
+.........T [ZBXNEXT-7834] added templates for Microsoft Azure and Azure virtual machines (vkhaliev)
+..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
+.........T [ZBXNEXT-7792] added template AWS RDS instance by HTTP (ychukina)
+.........T [ZBXNEXT-7819] added template AWS S3 bucket by HTTP (ychukina)
 .......PS. [ZBXNEXT-2878] added new vmware.*.property items (MVekslers)
 .......PS. [ZBXNEXT-7814] updated max supported mariadb version to 10.8 (yurii)
 .......PS. [ZBXNEXT-5229] added support vmware tags for hv, vm, ds, cl and dc (MVekslers)
@@ -10,6 +17,40 @@ New features:
 .........T [ZBXNEXT-6300] added checksum failure triggers to PostgreSQL by Zabbix agent 2 template (drasihov)
 
 Bug fixes:
+.......PS. [ZBX-21454] added blocking of rtc signals during script execution (dgoloscapov)
+..F....... [ZBX-20920] fixed problem of empty psk fields sent to audit log when any proxy parameter is updated (dpetra)
+..F....... [ZBX-21342] fixed sessionStorage not being updated when deleting services (rdetlavs)
+..F....... [ZBX-20809] fixed problem with stuck widget action popovers (dpetra)
+A......... [ZBX-19747] fixed inability to delete a template containing an item prototype with a valuemap, if the template is linked to a host and the discovered item was created (vmaksimovs)
+...G...... [ZBX-21328] fixed Zabbix agent 2 log and eventlog items behavior to match Zabbix agent when key has been updated (vso)
+...G...PS. [ZBX-21445] improved performance by only calling res_init() on changed resolv.conf if glibc lower than 2.26 is used (vso)
+...G...... [ZBX-21234] fixed net.dns to return 0 when server is unreachable in Zabbix agent 2 (esneiders)
+.......PS. [ZBX-21440] fixed setting of character set for MySQL and MariaDB when utf8 is missing while utf8mb4 is present (vso)
+........S. [ZBX-21436] fixed preprocessing not working after unassigning host from proxy (wiper)
+.......PS. [ZBX-21430] fixed item rescheduling after reenabling host or unassigning host from proxy (wiper)
+.........T [ZBX-21455] fixed trigger for uptime in "Proxmox VE by HTTP" template (egordymov)
+.........T [ZBX-15984] added hardware uptime in SNMP templates (drasihov)
+..F....... [ZBX-21322] fixed runtime error in Graph widget (rdetlavs)
+...G...... [ZBX-20260] fixed system.cpu.util unable to get usage data of cores on second NUMA node (mprihodko)
+..F....... [ZBX-20975] fixed PHP TypeError in inaccessible dashboard view (miks)
+A......... [ZBX-19769] fixed performance when Host API is filtering records by severity or suppressed problems (miks)
+..F....... [ZBX-19176] fixed multiple performance issues in map navigation tree widget and map (miks)
+..F....... [ZBX-21041] fixed broken layout of inherited macros table and added missing column name (dpetra)
+..F....... [ZBXNEXT-7830] implemented better menu structure (dpetra)
+........S. [ZBX-19893] fixed script parameters updates during linking (arimdjonoks)
+...G...... [ZBX-21295] changed system.cpu.load[percpu] to split based on online cpus in Zabbix agent 2 (esneiders)
+...G...... [ZBX-18573] improved performance of directory scanning by Agent on Windows (dgoloscapov)
+..F....... [ZBX-20889] fixed special characters in item-tags breaking the subfilter in the latest data and graphs (acikuns)
+..F....... [ZBX-21355] fixed default regular expression issues when php8.1 is used (acikuns)
+..F....... [ZBX-19399] fixed browser error when editing a map navigation widget which hasn't yet been fully loaded (dpetra)
+..F....... [ZBX-21315] fixed latest data page freezing in kiosk mode (rdetlavs)
+..F....... [ZBX-21165] fixed max length and trim function for field Remove domain name (dpetra)
+..F....... [ZBX-21311] fixed runtime error for host and host prototype graph preview tabs (dpetra)
+..F....... [ZBX-21327] fixed acknowledge link is clickable without any permission to update the problem (rdetlavs)
+.........T [ZBX-20901] changed host macro in MySQL by Zabbix agent template to use TCP/IP connection method explicitly (drasihov)
+..F....... [ZBX-20931] fixed automatic type selection in item form (kkuzmina)
+.........T [ZBX-21344] changed JS preprocessing in Apache by HTTP/Zabbix agent templates to use ServerActive field from status page primarily (drasihov)
+...G...... [ZBX-21135] added fix to prevent agent from stopping in case of broken windows performance counters (asestakovs)
 .........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
 .........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
 .......PS. [ZBX-20770] fixed secret macro being resolved in wrong locations (vso)
@@ -87,23 +128,66 @@ A.F....... [ZBX-20233] fixed handling of empty configuration parameters $ZBX_SER
 ..F....... [ZBX-20496] fixed delete missing import option for templated dashboards (rlataria)
 ..F....... [ZBX-20534] fixed popup layout for importing when horizontal scroll was not visible (rlataria)
 ..F....... [ZBX-20591] fixed draggable block position in preprocessing (rlataria)
+..F.....S. [ZBX-21333] fixed housekeeper table usage with disabled housekeeping (rdetlavs, wiper)
+
+--------------------------------------------------------------------------------
+Changes for 6.2.2
+
+6.2.2rc1 was released as 6.2.2 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.2.2rc1
 
 New features:
+.........T [ZBXNEXT-7520] added template for OPNsense (drasihov)
+.........T [ZBXNEXT-7834] added templates for Microsoft Azure and Azure virtual machines (vkhaliev)
+.........T [ZBXNEXT-7792] added template AWS RDS instance by HTTP (ychukina)
+.........T [ZBXNEXT-7819] added template AWS S3 bucket by HTTP (ychukina)
 
 Bug fixes:
+..F....... [ZBX-20920] fixed problem of empty PSK fields sent to audit log when any proxy parameter is updated (dpetra)
+..F....... [ZBX-21342] fixed sessionStorage not being updated when deleting services (rdetlavs)
+..F....... [ZBX-20809] fixed problem with stuck widget action popovers (dpetra)
+A......... [ZBX-19747] fixed inability to delete a template containing an item prototype with a value map, if the template is linked to a host and the discovered item was created (vmaksimovs)
+...G...... [ZBX-21328] fixed Zabbix agent 2 log and eventlog items behavior to match Zabbix agent when key has been updated (vso)
+...G...PS. [ZBX-21445] improved performance by only calling res_init() on changed resolv.conf if glibc lower than 2.26 is used (vso)
+...G...... [ZBX-21234] fixed net.dns to return 0 when server is unreachable in Zabbix agent 2 (esneiders)
+.......PS. [ZBX-21440] fixed setting of character set for MySQL and MariaDB when utf8 is missing while utf8mb4 is present (vso)
+........S. [ZBX-21436] fixed preprocessing not working after unassigning host from proxy (wiper)
+.......PS. [ZBX-21430] fixed item rescheduling after reenabling host or unassigning host from proxy (wiper)
+.........T [ZBX-21455] fixed trigger for uptime in "Proxmox VE by HTTP" template (egordymov)
+.........T [ZBX-15984] added hardware uptime in SNMP templates (drasihov)
+..F....... [ZBX-21322] fixed runtime error in Graph widget (rdetlavs)
+...G...... [ZBX-20260] fixed system.cpu.util unable to get usage data of cores on second NUMA node (mprihodko)
+........S. [ZBX-21419] fixed crash appearing during session retrieval (arimdjonoks)
+..F....... [ZBX-20975] fixed PHP TypeError in inaccessible dashboard view (miks)
+A......... [ZBX-19769] fixed performance when Host API is filtering records by severity or suppressed problems (miks)
+..F....... [ZBX-19176] fixed multiple performance issues in map navigation tree widget and map (miks)
+..F....... [ZBX-21041] fixed broken layout of inherited macros table and added missing column name (dpetra)
+...G...... [ZBX-21295] changed system.cpu.load[percpu] to split based on online CPUs in Zabbix agent 2 (esneiders)
+...G...... [ZBX-18573] improved performance of directory scanning by Zabbix agent on Windows (dgoloscapov)
+..F....... [ZBX-20889] fixed special characters in item tags breaking the subfilter in the latest data and graphs (acikuns)
+..F....... [ZBX-21355] fixed default regular expression issues when PHP 8.1 is used (acikuns)
+..F....... [ZBX-19399] fixed browser error when editing a map navigation widget which hasn't yet been fully loaded (dpetra)
+..F....... [ZBX-21315] fixed latest data page freezing in kiosk mode (rdetlavs)
+..F....... [ZBX-21165] fixed max length and trim function for the field Remove domain name (dpetra)
+..F....... [ZBX-21311] fixed runtime error for host and host prototype graph preview tabs (dpetra)
+..F....... [ZBX-21327] fixed acknowledge link is clickable without any permission to update the problem (rdetlavs)
+.........T [ZBX-20901] changed host macro in MySQL by Zabbix agent template to use TCP/IP connection method explicitly (drasihov)
+..F....... [ZBX-20931] fixed automatic type selection in item form (kkuzmina)
+.........T [ZBX-21344] changed JS preprocessing in Apache by HTTP/Zabbix agent templates to use ServerActive field from status page primarily (drasihov)
+...G...... [ZBX-21135] added fix to prevent agent from stopping in case of broken Windows performance counters (asestakovs)
 .........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
 .........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
 .......PS. [ZBX-20770] fixed secret macro being resolved in wrong locations (vso)
-...G...... [ZBX-21300] fixed high cpu usage when using net.tcp.socket.count key (vso)
+...G...... [ZBX-21300] fixed high CPU usage when using net.tcp.socket.count key (vso)
 ........S. [ZBX-20419] fixed database deadlocks and MySQL error number calculation to be consistent between logging and recoverability detection logic (akozlovs)
 ..F....... [ZBX-21043] fixed z-select error when labels have specials chars (rlataria)
 ........S. [ZBX-20656] updated active proxy throttling to allow task transfer (wiper)
-.......PS. [ZBX-21153] fixed info collection about access to vmware DS for HV with large number of connected DS (MVekslers)
+.......PS. [ZBX-21153] fixed info collection about access to VMware DS for HV with large number of connected DS (MVekslers)
 ........S. [ZBX-19821] fixed host prototype interface update when linking templates (wiper)
 ..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+..F....... [ZBX-21333] fixed housekeeper table usage with disabled housekeeping (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.1
@@ -370,20 +454,61 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.8
+
+6.0.8rc2 was released as 6.0.8 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.8rc2
+
+Bug fixes:
+........S. [ZBX-19893] fixed bug introduced when fixing script parameters updates during linking (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.8rc1
 
 New features:
+.........T [ZBXNEXT-7520] added template for OPNsense (drasihov)
 
 Bug fixes:
+..F....... [ZBX-20920] fixed problem of empty PSK fields sent to audit log when any proxy parameter is updated (dpetra)
+..F....... [ZBX-20809] fixed problem with stuck widget action popovers (dpetra)
+A......... [ZBX-19747] fixed inability to delete a template containing an item prototype with a value map, if the template is linked to a host and the discovered item was created (vmaksimovs)
+...G...... [ZBX-21328] fixed Zabbix agent 2 log and eventlog items behavior to match Zabbix agent when key has been updated (vso)
+...G...... [ZBX-21234] fixed net.dns to return 0 when server is unreachable in Zabbix agent 2 (esneiders)
+...G...PS. [ZBX-21445] improved performance by only calling res_init() on changed resolv.conf if glibc lower than 2.26 is used (vso)
+.......PS. [ZBX-21440] fixed setting of character set for MySQL and MariaDB when utf8 is missing while utf8mb4 is present (vso)
+..F....... [ZBX-21342] fixed sessionStorage not being updated when deleting services (rdetlavs)
+.........T [ZBX-21455] fixed trigger for uptime in "Proxmox VE by HTTP" template (egordymov)
+.........T [ZBX-15984] added hardware uptime in SNMP templates (drasihov)
+........S. [ZBX-19893] fixed script parameters updates during linking (arimdjonoks)
+...G...... [ZBX-20260] fixed system.cpu.util unable to get usage data of cores on second NUMA node (mprihodko)
+..F....... [ZBX-20975] fixed PHP TypeError in inaccessible dashboard view (miks)
+A......... [ZBX-19769] fixed performance when Host API is filtering records by severity or suppressed problems (miks)
+..F....... [ZBX-19176] fixed multiple performance issues in map navigation tree widget and map (miks)
+..F....... [ZBX-21041] fixed broken layout of inherited macros table and added missing column name (dpetra)
+...G...... [ZBX-21295] changed system.cpu.load[percpu] to split based on online CPUs in Zabbix agent 2 (esneiders)
+...G...... [ZBX-18573] improved performance of directory scanning by Zabbix agent on Windows (dgoloscapov)
+..F....... [ZBX-20889] fixed special characters in item tags breaking the subfilter in the latest data and graphs (acikuns)
+..F....... [ZBX-21355] fixed default regular expression issues when PHP 8.1 is used (acikuns)
+..F....... [ZBX-19399] fixed browser error when editing a map navigation widget which hasn't yet been fully loaded (dpetra)
+..F....... [ZBX-21315] fixed latest data page freezing in kiosk mode (rdetlavs)
+..F....... [ZBX-21165] fixed max length and trim function for the field Remove domain name (dpetra)
+..F....... [ZBX-21311] fixed runtime error for host and host prototype graph preview tabs (dpetra)
+.........T [ZBX-20901] changed host macro in MySQL by Zabbix agent template to use TCP/IP connection method explicitly (drasihov)
+..F....... [ZBX-20931] fixed automatic type selection in item form (kkuzmina)
+.........T [ZBX-21344] changed JS preprocessing in Apache by HTTP/Zabbix agent templates to use ServerActive field from status page primarily (drasihov)
+...G...... [ZBX-21135] added fix to prevent agent from stopping in case of broken Windows performance counters (asestakovs)
 .........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
 .........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
-...G...... [ZBX-21300] fixed high cpu usage when using net.tcp.socket.count key (vso)
+...G...... [ZBX-21300] fixed high CPU usage when using net.tcp.socket.count key (vso)
 ........S. [ZBX-20419] fixed database deadlocks and MySQL error number calculation to be consistent between logging and recoverability detection logic (akozlovs)
 ..F....... [ZBX-21043] fixed z-select error when labels have specials chars (rlataria)
 ........S. [ZBX-20656] updated active proxy throttling to allow task transfer (wiper)
-.......PS. [ZBX-21153] fixed info collection about access to vmware DS for HV with large number of connected DS (MVekslers)
+.......PS. [ZBX-21153] fixed info collection about access to VMware DS for HV with large number of connected DS (MVekslers)
 ........S. [ZBX-19821] fixed host prototype interface update when linking templates (wiper)
 ..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+..F....... [ZBX-21333] fixed housekeeper table usage with disabled housekeeping (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.7
@@ -2412,17 +2537,36 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.27
+
+5.0.27rc1 was released as 5.0.27 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.27rc1
 
 New features:
+.........T [ZBXNEXT-7520] added template for OPNsense (drasihov)
 
 Bug fixes:
+...G...... [ZBX-21328] fixed Zabbix agent 2 log and eventlog items behavior to match Zabbix agent when key has been updated (vso)
+...G...... [ZBX-21234] fixed net.dns to return 0 when server is unreachable in Zabbix agent 2 (esneiders)
+...G...PS. [ZBX-21445] improved performance by only calling res_init() on changed resolv.conf if glibc lower than 2.26 is used (vso)
+.......PS. [ZBX-21385] fixed setting of character set for MySQL and MariaDB when utf8mb3 is missing while utf8 is present (vso)
+..F....... [ZBX-20975] fixed PHP TypeError in inaccessible dashboard view (miks)
+A......... [ZBX-19769] fixed performance when Host API is filtering records by severity or suppressed problems (miks)
+..F....... [ZBX-19176] fixed multiple performance issues in map navigation tree widget and map (miks)
+...G...... [ZBX-21295] changed system.cpu.load[percpu] to split based on online CPUs in Zabbix agent 2 (esneiders)
+...G...... [ZBX-18573] improved performance of directory scanning by Zabbix agent on Windows (dgoloscapov)
+........S. [ZBX-21138] blocked housekeeper history/trends record creation on item removal when history/trends housekeeping is disabled (wiper)
+.........T [ZBX-20901] changed host macro in MySQL by Zabbix agent template to use TCP/IP connection method explicitly (drasihov)
+.........T [ZBX-21344] changed JS preprocessing in Apache by HTTP/Zabbix agent templates to use ServerActive field from status page primarily (drasihov)
 .........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
 .........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
 ........S. [ZBX-20419] fixed database deadlocks and MySQL error number calculation to be consistent between logging and recoverability detection logic (akozlovs)
 ........S. [ZBX-20656] updated active proxy throttling to allow task transfer (wiper)
-.......PS. [ZBX-21153] fixed info collection about access to vmware DS for HV with large number of connected DS (MVekslers)
+.......PS. [ZBX-21153] fixed info collection about access to VMware DS for HV with large number of connected DS (MVekslers)
 ..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+..F....... [ZBX-21333] fixed housekeeper table usage with disabled housekeeping (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.26

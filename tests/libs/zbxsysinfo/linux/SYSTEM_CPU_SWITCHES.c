@@ -20,8 +20,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
 #include "sysinfo.h"
+#include "zbxnum.h"
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -67,7 +67,7 @@ void	zbx_mock_test_entry(void **state)
 					zbx_mock_error_string(mock_ret_code));
 		}
 
-		if (SUCCEED != is_uint64(expected_context_switches_str, &expected_context_switches_count))
+		if (SUCCEED != zbx_is_uint64(expected_context_switches_str, &expected_context_switches_count))
 			fail_msg("Invalid \"ctxt\" parameter in test case data: %s", expected_context_switches_str);
 	}
 	else	/* SYSINFO_RET_FAIL */

@@ -17,18 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "valuecache.h"
 #include "zbxserver.h"
-
+#include "valuecache.h"
 #include "mocks/valuecache/valuecache_mock.h"
-
 #include "../../../src/libs/zbxserver/anomalystl.h"
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
@@ -148,7 +144,7 @@ void	zbx_mock_test_entry(void **state)
 					remainder_values_expected;
 
 	/*ZBX_DOUBLE_EPSILON = 0.000001; results into output that is different from python test case output */
-	ZBX_DOUBLE_EPSILON = 0.0001;
+	zbx_update_epsilon_to_python_compatible_precision();
 
 	zbx_history_record_vector_create(&values_in);
 	zbx_history_record_vector_create(&trend_values_received);

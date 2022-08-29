@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXHTTP_H
 #define ZABBIX_ZBXHTTP_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 int	zbx_http_punycode_encode_url(char **url);
 void	zbx_http_url_encode(const char *source, char **result);

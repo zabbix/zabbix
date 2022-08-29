@@ -398,6 +398,36 @@ final class CItemData {
 	];
 
 	/**
+	 * Generates an array used to generate item type lookups in the form: item_type => [key_names].
+	 *
+	 * @return array
+	 */
+	public static function getKeysByItemType(): array {
+		$keys_by_type = self::KEYS_BY_TYPE;
+		$keys_by_type_shortened = [];
+
+		foreach ($keys_by_type as $item_type => $available_keys) {
+			$available_keys_shortened = [];
+
+			foreach ($available_keys as $key) {
+				$param_start_pos = strpos($key, '[');
+
+				if ($param_start_pos !== false) {
+					$key = substr($key, 0, $param_start_pos);
+				}
+
+				if (!array_key_exists($key, $available_keys_shortened)) {
+					$available_keys_shortened[] = $key;
+				}
+			}
+
+			$keys_by_type_shortened[$item_type] = $available_keys_shortened;
+		}
+
+		return $keys_by_type_shortened;
+	}
+
+	/**
 	 * Returns items available for the given item type as an array of key => details.
 	 *
 	 * @param int $type  ITEM_TYPE_ZABBIX, ITEM_TYPE_INTERNAL, etc.
@@ -409,12 +439,12 @@ final class CItemData {
 	}
 
 	/**
-	 * Generate an array used for item type lookups in the form: key_name => value_type.
+	 * Generates an array used to generate item type of information lookups in the form: key_name => value_type.
 	 * Value type set to null if key return type varies based on parameters.
 	 *
 	 * @return array
 	 */
-	public static function getTypeSuggestionsByKey(): array {
+	public static function getValueTypeByKey(): array {
 		$type_suggestions = [];
 		$keys = self::get();
 
