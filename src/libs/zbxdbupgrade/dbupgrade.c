@@ -986,7 +986,7 @@ int	DBcheck_version(void)
 				get_program_type_string(program_type), db_mandatory, db_optional, required);
 #ifdef HAVE_SQLITE3
 		if (required > db_mandatory)
-			zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
+			zabbix_log(LOG_LEVEL_WARNING, "Zabbix does not support SQLite3 database upgrade.");
 		else
 			ret = NOTSUPPORTED;
 #endif
