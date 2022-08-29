@@ -22,7 +22,16 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 class testAuditlogCommon extends CAPITest {
-	public function sendGetRequest($output, $action, $result, $resourceid) {
+
+	/**
+	 * Send auditlog.get request and check returned values.
+	 *
+	 * @param $output string		what parameter need to be checked in audit
+	 * @param $action integer		action id
+	 * @param $result string		what should be returned in request
+	 * @param $resourceid integer	resource id
+	 */
+	public function getAuditDetails($output, $action, $result, $resourceid) {
 		$get = $this->call('auditlog.get', [
 			'output' => [$output],
 			'sortfield' => 'clock',

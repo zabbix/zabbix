@@ -22,11 +22,12 @@
 require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup users, ids
+ * @backup users
  */
 class testAuditlogUser extends testAuditlogCommon {
 	private static $resourceid;
 	private static $before_usrgroup;
+	private static $before_media;
 
 	public function testAuditlogUser_Create() {
 		$create = $this->call('user.create', [
@@ -56,6 +57,7 @@ class testAuditlogUser extends testAuditlogCommon {
 		]);
 		self::$resourceid = $create['result']['userids'][0];
 		self::$before_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.self::$resourceid);
+		self::$before_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.self::$resourceid);
 
 		$created = "{\"user.username\":[\"add\",\"Audit\"],".
 				"\"user.passwd\":[\"add\",\"******\"],".
@@ -65,10 +67,10 @@ class testAuditlogUser extends testAuditlogCommon {
 				"\"user.usrgrps[".self::$before_usrgroup['id']."]\":[\"add\"],".
 				"\"user.usrgrps[".self::$before_usrgroup['id']."].usrgrpid\":[\"add\",\"7\"],".
 				"\"user.usrgrps[".self::$before_usrgroup['id']."].id\":[\"add\",\"".self::$before_usrgroup['id']."\"],".
-				"\"user.medias[1]\":[\"add\"],".
-				"\"user.medias[1].mediatypeid\":[\"add\",\"1\"],".
-				"\"user.medias[1].sendto\":[\"add\",\"audit@audit.com\"],".
-				"\"user.medias[1].mediaid\":[\"add\",\"1\"],".
+				"\"user.medias[".self::$before_media['mediaid']."]\":[\"add\"],".
+				"\"user.medias[".self::$before_media['mediaid']."].mediatypeid\":[\"add\",\"1\"],".
+				"\"user.medias[".self::$before_media['mediaid']."].sendto\":[\"add\",\"audit@audit.com\"],".
+				"\"user.medias[".self::$before_media['mediaid']."].mediaid\":[\"add\",\"".self::$before_media['mediaid']."\"],".
 				"\"user.userid\":[\"add\",\"".self::$resourceid."\"]}";
 
 		$this->sendGetRequest('details', 0, $created, self::$resourceid);
@@ -132,20 +134,21 @@ class testAuditlogUser extends testAuditlogCommon {
 			]
 		]);
 		$after_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.self::$resourceid);
+		$after_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.self::$resourceid);
 
 		$updated = "{\"user.usrgrps[".self::$before_usrgroup['id']."]\":[\"delete\"],".
-			"\"user.medias[1]\":[\"delete\"],".
+			"\"user.medias[".self::$before_media['mediaid']."]\":[\"delete\"],".
 			"\"user.usrgrps[".$after_usrgroup['id']."]\":[\"add\"],".
-			"\"user.medias[2]\":[\"add\"],".
+			"\"user.medias[".$after_media['mediaid']."]\":[\"add\"],".
 			"\"user.username\":[\"update\",\"updated_Audit\",\"Audit\"],".
 			"\"user.passwd\":[\"update\",\"******\",\"******\"],".
 			"\"user.name\":[\"update\",\"Updated_Audit_name\",\"Audit_name\"],".
 			"\"user.surname\":[\"update\",\"Updated_Audit_surname\",\"Audit_surname\"],".
 			"\"user.usrgrps[".$after_usrgroup['id']."].usrgrpid\":[\"add\",\"11\"],".
 			"\"user.usrgrps[".$after_usrgroup['id']."].id\":[\"add\",\"".$after_usrgroup['id']."\"],".
-			"\"user.medias[2].mediatypeid\":[\"add\",\"1\"],".
-			"\"user.medias[2].sendto\":[\"add\",\"update_audit@audit.com\"],".
-			"\"user.medias[2].mediaid\":[\"add\",\"2\"]}";
+			"\"user.medias[".$after_media['mediaid']."].mediatypeid\":[\"add\",\"1\"],".
+			"\"user.medias[".$after_media['mediaid']."].sendto\":[\"add\",\"update_audit@audit.com\"],".
+			"\"user.medias[".$after_media['mediaid']."].mediaid\":[\"add\",\"".$after_media['mediaid']."\"]}";
 
 		$this->sendGetRequest('details', 1, $updated, self::$resourceid);
 	}
