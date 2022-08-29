@@ -413,7 +413,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 
 typedef struct
 {
-	int		flag;
+	zbx_uint64_t	flag;
 	const char	*name;
 }
 zbx_mntopt_t;
