@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup media_type, media_type_message, media_type_param, ids
+ * @backup media_type, media_type_message, media_type_param
  */
 class testAuditlogMediaType extends testAuditlogCommon {
 	public function testAuditlogMediaType_Create() {
@@ -49,7 +49,6 @@ class testAuditlogMediaType extends testAuditlogCommon {
 			]
 		]);
 		$resourceid = $create['result']['mediatypeids'][0];
-
 		$message = CDBHelper::getRow('SELECT mediatype_messageid FROM media_type_message WHERE mediatypeid='.$resourceid);
 
 		$created = "{\"mediatype.name\":[\"add\",\"email_media\"],".
@@ -68,7 +67,7 @@ class testAuditlogMediaType extends testAuditlogCommon {
 				"\"mediatype.attempt_interval\":[\"add\",\"50s\"],".
 				"\"mediatype.mediatypeid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->sendGetRequest('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogMediaType_Update() {
@@ -119,11 +118,11 @@ class testAuditlogMediaType extends testAuditlogCommon {
 				"\"mediatype.maxattempts\":[\"update\",\"10\",\"3\"],".
 				"\"mediatype.attempt_interval\":[\"update\",\"30s\",\"10s\"]}";
 
-		$this->sendGetRequest('details', 1, $updated, 1);
+		$this->getAuditDetails('details', 1, $updated, 1);
 	}
 
 	public function testAuditlogMediaType_Delete() {
 		$this->call('mediatype.delete', [1]);
-		$this->sendGetRequest('resourcename', 2, 'updated_email_media', 1);
+		$this->getAuditDetails('resourcename', 2, 'updated_email_media', 1);
 	}
 }
