@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/testAuditlogCommon.php';
 
 /**
- * @backup hosts, ids
+ * @backup hosts
  */
 class testAuditlogProxy extends testAuditlogCommon {
 	public function testAuditlogProxy_Create() {
@@ -48,7 +48,7 @@ class testAuditlogProxy extends testAuditlogCommon {
 				"\"proxy.tls_psk\":[\"add\",\"******\"],".
 				"\"proxy.proxyid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->sendGetRequest('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', 0, $created, $resourceid);
 	}
 
 	public function testAuditlogProxy_Update() {
@@ -72,11 +72,11 @@ class testAuditlogProxy extends testAuditlogCommon {
 			]
 		]);
 
-		$this->sendGetRequest('details', 1, $updated, 99000);
+		$this->getAuditDetails('details', 1, $updated, 99000);
 	}
 
 	public function testAuditlogProxy_Delete() {
 		$this->call('proxy.delete', [99000]);
-		$this->sendGetRequest('resourcename', 2, 'Updated Audit proxy', 99000);
+		$this->getAuditDetails('resourcename', 2, 'Updated Audit proxy', 99000);
 	}
 }
