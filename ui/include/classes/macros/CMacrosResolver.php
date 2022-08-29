@@ -2675,7 +2675,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'usermacros' => true
 		];
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'event' => [], 'user_data' => []];
+		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'event' => [], 'user_data' => [],
+			'host_n' => [], 'interface_n' => [], 'inventory_n' => []
+		];
 		$usermacros = [];
 
 		foreach ($data as $eventid => $script) {
