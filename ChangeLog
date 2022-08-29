@@ -128,6 +128,7 @@ A.F....... [ZBX-20233] fixed handling of empty configuration parameters $ZBX_SER
 ..F....... [ZBX-20496] fixed delete missing import option for templated dashboards (rlataria)
 ..F....... [ZBX-20534] fixed popup layout for importing when horizontal scroll was not visible (rlataria)
 ..F....... [ZBX-20591] fixed draggable block position in preprocessing (rlataria)
+..F.....S. [ZBX-21333] fixed housekeeper table usage with disabled housekeeping (rdetlavs, wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.2
