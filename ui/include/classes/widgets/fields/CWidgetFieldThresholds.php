@@ -35,7 +35,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
-			'color'		=> ['type' => API_COLOR, 'flags' => API_REQUIRED],
+			'color'		=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY,],
 			'threshold'	=> ['type' => API_NUMERIC, 'flags' => API_REQUIRED]
 		]]);
 		$this->setDefault([]);

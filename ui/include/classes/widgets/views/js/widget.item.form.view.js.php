@@ -38,7 +38,7 @@ window.widget_item_form = new class {
 		for (const colorpicker of this.form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
 				appendTo: ".overlay-dialogue-body",
-				use_default: true,
+				use_default: !colorpicker.name.includes('thresholds'),
 				onUpdate: ['up_color', 'down_color', 'updown_color'].includes(colorpicker.name)
 					? (color) => this.setIndicatorColor(colorpicker.name, color)
 					: null
