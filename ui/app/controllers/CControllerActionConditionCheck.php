@@ -31,12 +31,12 @@ class CControllerActionConditionCheck extends CController {
 
 	protected function checkInput() {
 		$fields =  [
-			'type' =>				'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION,
-			'source' =>				'required|in '.implode(',', [
+			'type' => 'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION,
+			'source' => 'required|in '.implode(',', [
 				EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 				EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 			]),
-			'condition_type' =>		'in '.implode(',', [
+			'condition_type' => 'in '.implode(',', [
 				CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_TEMPLATE, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER,
 				CONDITION_TYPE_TRIGGER_NAME, CONDITION_TYPE_TRIGGER_SEVERITY, CONDITION_TYPE_TIME_PERIOD,
 				CONDITION_TYPE_SUPPRESSED, CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK, CONDITION_TYPE_DOBJECT,
@@ -46,15 +46,16 @@ class CControllerActionConditionCheck extends CController {
 				CONDITION_TYPE_HOST_METADATA, CONDITION_TYPE_EVENT_TAG, CONDITION_TYPE_EVENT_TAG_VALUE,
 				CONDITION_TYPE_SERVICE, CONDITION_TYPE_SERVICE_NAME
 			]),
-			'trigger_context' =>	'in '.implode(',', ['host', 'template']),
-			'operator' =>			'in '.implode(',', [
+			'trigger_context' => 'in '.implode(',', ['host', 'template']),
+			'operator' => 'in '.implode(',', [
 				CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
 				CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_IN, CONDITION_OPERATOR_MORE_EQUAL,
 				CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_NOT_IN, CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO,
 				CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
 				]),
-			'value' =>				'',
-			'value2' =>				''
+			'value' => '',
+			'value2' => ''
+			// todo : write legit validation rules for value and value2
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateCondition();
@@ -70,17 +71,10 @@ class CControllerActionConditionCheck extends CController {
 		}
 
 		return $ret;
-//		$ret = $this->validateInput($fields);
-
-//		if (!$ret) {
-//			$this->setResponse(new CControllerResponseFatal());
-//		}
-
-		//return true;
 	}
 
 	protected function checkPermissions() {
-		return true;
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
 	}
 
 	protected function validateCondition() {
@@ -100,7 +94,25 @@ class CControllerActionConditionCheck extends CController {
 	}
 
 	protected function doAction() {
-
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
+		$data = [
+			'title' => _('New condition'),
+			'command' => '',
+			'message' => '',
+			'errors' => null,
+			'action' => $this->getAction(),
+			'type' => $this->getInput('type'),
+			'conditiontype' => $this->getInput('condition_type'),
+			'value' => $this->getInput('value'),
+			'value2' => $this->hasInput('value2') ? $this->getInput('value2') : null,
+			'operator' => $this->getInput('operator'),
+			//'last_type' => $this->getConditionLastType(),
+			'eventsource' => $this->getInput('source'),
+			'allowed_conditions' => get_conditions_by_eventsource($this->getInput('source')),
+			'trigger_context' => $this->getInput('trigger_context', 'host'),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		];
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 }

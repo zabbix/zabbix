@@ -53,14 +53,10 @@ window.condition_popup = new class {
 		let curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'popup.condition.check');
 
-		this._post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
-		});
+		this._post(curl.getUrl(), fields);
 	}
 
-	_post(url, data, success_callback) {
+	_post(url, data) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -71,10 +67,10 @@ window.condition_popup = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				return response;
+				this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
 			})
-			.then(success_callback)
 			.catch((exception) => {
 				for (const element of this.form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
@@ -101,6 +97,7 @@ window.condition_popup = new class {
 	}
 
 	selectServices() {
+		console.log('services');
 		const overlay = PopUp('popup.services', {title: t('Services')}, {dialogueid: 'services'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {

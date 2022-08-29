@@ -21,11 +21,8 @@ declare(strict_types=0);
 
 require_once __DIR__ . '/../../include/actions.inc.php';
 
-class CControllerPopupActionConditionEdit extends CController
-{
-
-	protected function checkInput(): bool
-	{
+class CControllerPopupActionConditionEdit extends CController {
+	protected function checkInput(): bool {
 		$fields = [
 			'type' => 'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION,
 			'source' => 'required|in '.implode(',', [
@@ -63,8 +60,7 @@ class CControllerPopupActionConditionEdit extends CController
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool
-	{
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS)) {
 			return false;
 		}
@@ -95,8 +91,7 @@ class CControllerPopupActionConditionEdit extends CController
 		return $last_type;
 	}
 
-	protected function doAction(): void
-	{
+	protected function doAction(): void {
 			$data = [
 				'title' => _('New condition'),
 				'command' => '',

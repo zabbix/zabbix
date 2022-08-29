@@ -72,7 +72,7 @@ window.action_edit_popup = new class {
 
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
 				this.row = document.createElement('tr');
-				this._createRow(this.row, e.detail.inputs);
+				this._createRow(this.row, e.detail);
 				$('#conditionTable tr:last').before(this.row);
 				this._processTypeOfCalculation();
 			});

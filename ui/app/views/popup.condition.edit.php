@@ -35,7 +35,7 @@ $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('type', '1')
-	->addVar('source', 0)
+	->addVar('source', $data['eventsource'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 if (array_key_exists('eventsource', $data)) {
@@ -919,7 +919,7 @@ $form->addItem([
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $inline_js . 'condition_popup.init('.$data['eventsource'].');',
+	'script_inline' => $inline_js . 'condition_popup.init();',
 	'body' => $form->toString(),
 	'buttons' => [
 		[
@@ -927,14 +927,9 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			//'action' => 'condition_popup.submit()'
+			'action' => 'condition_popup.submit()'
 		]
 	]
 ];
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
 
 echo json_encode($output);
