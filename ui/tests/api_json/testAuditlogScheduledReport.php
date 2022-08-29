@@ -26,8 +26,19 @@ require_once dirname(__FILE__).'/testAuditlogCommon.php';
  */
 class testAuditlogScheduledReport extends testAuditlogCommon {
 
+	/**
+	 * Created scheduled report id
+	 */
 	protected static $resourceid;
+
+	/**
+	 * Created scheduled reports user group id (before update)
+	 */
 	protected static $before_usrgrp;
+
+	/**
+	 * Created scheduled reports user id (before update)
+	 */
 	protected static $before_user;
 
 	public function testAuditlogScheduledReport_Create() {
@@ -62,10 +73,10 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 			]
 		]);
 		self::$resourceid = $create['result']['reportids'][0];
-		self::$before_usrgrp = CDBHelper::getRow('SELECT reportusrgrpid FROM report_usrgrp WHERE reportid='
-				.zbx_dbstr(self::$resourceid));
-		self::$before_user = CDBHelper::getRow('SELECT reportuserid FROM report_user WHERE reportid='
-			.zbx_dbstr(self::$resourceid));
+		self::$before_usrgrp = CDBHelper::getRow('SELECT reportusrgrpid FROM report_usrgrp WHERE reportid='.
+				zbx_dbstr(self::$resourceid));
+		self::$before_user = CDBHelper::getRow('SELECT reportuserid FROM report_user WHERE reportid='.
+				zbx_dbstr(self::$resourceid));
 
 		$created = "{\"report.userid\":[\"add\",\"1\"],".
 				"\"report.name\":[\"add\",\"Report for audit\"],".
@@ -129,10 +140,10 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 				]
 			]
 		]);
-		$usrgrp = CDBHelper::getRow('SELECT reportusrgrpid FROM report_usrgrp WHERE reportid='
-			.zbx_dbstr(self::$resourceid));
-		$user = CDBHelper::getRow('SELECT reportuserid FROM report_user WHERE reportid='
-			.zbx_dbstr(self::$resourceid));
+		$usrgrp = CDBHelper::getRow('SELECT reportusrgrpid FROM report_usrgrp WHERE reportid='.
+				zbx_dbstr(self::$resourceid));
+		$user = CDBHelper::getRow('SELECT reportuserid FROM report_user WHERE reportid='.
+				zbx_dbstr(self::$resourceid));
 
 		$updated = "{\"report.users[".self::$before_user['reportuserid']."]\":[\"delete\"],".
 				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."]\":[\"delete\"],".

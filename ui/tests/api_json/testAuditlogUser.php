@@ -25,8 +25,20 @@ require_once dirname(__FILE__).'/testAuditlogCommon.php';
  * @backup users
  */
 class testAuditlogUser extends testAuditlogCommon {
+
+	/**
+	 * Created user id
+	 */
 	private static $resourceid;
+
+	/**
+	 * Created users user group id (before update)
+	 */
 	private static $before_usrgroup;
+
+	/**
+	 * Created users media id (before update)
+	 */
 	private static $before_media;
 
 	public function testAuditlogUser_Create() {
@@ -56,8 +68,10 @@ class testAuditlogUser extends testAuditlogCommon {
 			]
 		]);
 		self::$resourceid = $create['result']['userids'][0];
-		self::$before_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.self::$resourceid);
-		self::$before_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.self::$resourceid);
+		self::$before_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.
+				zbx_dbstr(self::$resourceid));
+		self::$before_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.
+				zbx_dbstr(self::$resourceid));
 
 		$created = "{\"user.username\":[\"add\",\"Audit\"],".
 				"\"user.passwd\":[\"add\",\"******\"],".
@@ -79,35 +93,7 @@ class testAuditlogUser extends testAuditlogCommon {
 	/**
 	 * @depends testAuditlogUser_Create
 	 */
-	public function testAuditlogUser_Login() {
-		$this->authorize('Audit', 'zabbixzabbix');
-		$this->getAuditDetails('username', 8, 'Audit', self::$resourceid);
-	}
-
-	/**
-	 * @depends testAuditlogUser_Create
-	 */
-	public function testAuditlogUser_Logout() {
-		$this->authorize('Audit', 'zabbixzabbix');
-		$this->call('user.logout', []);
-		$this->authorize('Admin', 'zabbix');
-		$this->getAuditDetails('username', 4, 'Audit', self::$resourceid);
-	}
-
-	/**
-	 * @depends testAuditlogUser_Create
-	 */
-	public function testAuditlogUser_FailedLogin() {
-		$this->authorize('Audit', 'incorrect_pas');
-		$this->authorize('Admin', 'zabbix');
-		$this->getAuditDetails('username', 9, 'Audit', self::$resourceid);
-	}
-
-	/**
-	 * @depends testAuditlogUser_Create
-	 */
 	public function testAuditlogUser_Update() {
-		$this->authorize('Admin', 'zabbix');
 		$this->call('user.update', [
 			[
 				'userid' => self::$resourceid,
@@ -133,8 +119,10 @@ class testAuditlogUser extends testAuditlogCommon {
 				]
 			]
 		]);
-		$after_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.self::$resourceid);
-		$after_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.self::$resourceid);
+		$after_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.
+				zbx_dbstr(self::$resourceid));
+		$after_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.
+				zbx_dbstr(self::$resourceid));
 
 		$updated = "{\"user.usrgrps[".self::$before_usrgroup['id']."]\":[\"delete\"],".
 				"\"user.medias[".self::$before_media['mediaid']."]\":[\"delete\"],".
@@ -154,7 +142,34 @@ class testAuditlogUser extends testAuditlogCommon {
 	}
 
 	/**
-	 * @depends testAuditlogUser_Create
+	 * @depends testAuditlogUser_Update
+	 */
+	public function testAuditlogUser_Login() {
+		$this->authorize('updated_Audit', 'updatezabbix');
+		$this->getAuditDetails('username', 8, 'updated_Audit', self::$resourceid);
+	}
+
+	/**
+	 * @depends testAuditlogUser_Update
+	 */
+	public function testAuditlogUser_Logout() {
+		$this->authorize('updated_Audit', 'updatezabbix');
+		$this->call('user.logout', []);
+		$this->authorize('Admin', 'zabbix');
+		$this->getAuditDetails('username', 4, 'updated_Audit', self::$resourceid);
+	}
+
+	/**
+	 * @depends testAuditlogUser_Update
+	 */
+	public function testAuditlogUser_FailedLogin() {
+		$this->authorize('updated_Audit', 'incorrect_pas');
+		$this->authorize('Admin', 'zabbix');
+		$this->getAuditDetails('username', 9, 'updated_Audit', self::$resourceid);
+	}
+
+	/**
+	 * @depends testAuditlogUser_Update
 	 */
 	public function testAuditlogUser_Delete() {
 		$this->call('user.delete', [self::$resourceid]);

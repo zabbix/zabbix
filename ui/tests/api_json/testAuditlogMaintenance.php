@@ -54,9 +54,11 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			]
 		]);
 		$resourceid = $create['result']['maintenanceids'][0];
-		$groupid = CDBHelper::getRow('SELECT maintenance_groupid FROM maintenances_groups WHERE maintenanceid='.$resourceid);
+		$groupid = CDBHelper::getRow('SELECT maintenance_groupid FROM maintenances_groups WHERE maintenanceid='.
+				zbx_dbstr($resourceid));
 		$timeperiod = CDBHelper::getRow('SELECT timeperiodid FROM timeperiods ORDER BY timeperiodid DESC');
-		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.$resourceid);
+		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.
+				zbx_dbstr($resourceid));
 
 		$created = "{\"maintenance.name\":[\"add\",\"audit_maintenance\"],".
 				"\"maintenance.active_since\":[\"add\",\"1358844540\"],".

@@ -40,7 +40,8 @@ class testAuditlogIconMap extends testAuditlogCommon {
 			]
 		]);
 		$resourceid = $create['result']['iconmapids'][0];
-		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.$resourceid);
+		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.
+				zbx_dbstr($resourceid));
 
 		$created = "{\"iconmap.name\":[\"add\",\"icon_mapping\"],".
 				"\"iconmap.default_iconid\":[\"add\",\"5\"],".

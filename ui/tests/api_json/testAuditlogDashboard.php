@@ -77,16 +77,16 @@ class testAuditlogDashboard extends testAuditlogCommon {
 			]
 		]);
 		$resourceid = $create['result']['dashboardids'][0];
-		$pageid = CDBHelper::getRow('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='
-				.zbx_dbstr($resourceid));
-		$widgetid = CDBHelper::getRow('SELECT widgetid FROM widget WHERE dashboard_pageid='
-				.zbx_dbstr($pageid['dashboard_pageid']));
-		$fieldid = CDBHelper::getAll('SELECT widget_fieldid FROM widget_field WHERE widgetid ='
-				.zbx_dbstr($widgetid['widgetid']).' ORDER BY widget_fieldid ASC');
-		$dashboard_userid = CDBHelper::getRow('SELECT dashboard_userid FROM dashboard_user WHERE dashboardid='
-				.zbx_dbstr($resourceid));
-		$dashboard_usrgrpid = CDBHelper::getRow('SELECT dashboard_usrgrpid FROM dashboard_usrgrp WHERE dashboardid='
-				.zbx_dbstr($resourceid));
+		$pageid = CDBHelper::getRow('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='.
+				zbx_dbstr($resourceid));
+		$widgetid = CDBHelper::getRow('SELECT widgetid FROM widget WHERE dashboard_pageid='.
+				zbx_dbstr($pageid['dashboard_pageid']));
+		$fieldid = CDBHelper::getAll('SELECT widget_fieldid FROM widget_field WHERE widgetid ='.
+				zbx_dbstr($widgetid['widgetid']).' ORDER BY widget_fieldid ASC');
+		$dashboard_userid = CDBHelper::getRow('SELECT dashboard_userid FROM dashboard_user WHERE dashboardid='.
+				zbx_dbstr($resourceid));
+		$dashboard_usrgrpid = CDBHelper::getRow('SELECT dashboard_usrgrpid FROM dashboard_usrgrp WHERE dashboardid='.
+				zbx_dbstr($resourceid));
 
 		$created = "{\"dashboard.name\":[\"add\",\"Audit dashboard\"],".
 				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."]\":[\"add\"],".
@@ -167,8 +167,8 @@ class testAuditlogDashboard extends testAuditlogCommon {
 			]
 		]);
 		$pageid = CDBHelper::getRow('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=1');
-		$widgetid = CDBHelper::getRow('SELECT widgetid FROM widget WHERE dashboard_pageid='
-				.zbx_dbstr($pageid['dashboard_pageid']));
+		$widgetid = CDBHelper::getRow('SELECT widgetid FROM widget WHERE dashboard_pageid='.
+				zbx_dbstr($pageid['dashboard_pageid']));
 		$dashboard_usrgrpid = CDBHelper::getRow('SELECT dashboard_usrgrpid FROM dashboard_usrgrp WHERE dashboardid=1');
 
 		$updated = "{\"dashboard.pages[1]\":[\"delete\"],".

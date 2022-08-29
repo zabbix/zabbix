@@ -83,12 +83,12 @@ class testAuditlogAction extends testAuditlogCommon {
 			]
 		]);
 		$resourceid = $create['result']['actionids'][0];
-		$operationid = CDBHelper::getAll('SELECT operationid FROM operations WHERE actionid='
-				.zbx_dbstr($resourceid).' AND operationtype In (0,11,12)');
-		$conditiodid = CDBHelper::getRow('SELECT conditionid FROM conditions WHERE actionid='
-				.zbx_dbstr($resourceid));
-		$op_group = CDBHelper::getRow('SELECT opmessage_grpid FROM opmessage_grp WHERE operationid='
-				.zbx_dbstr($operationid[0]['operationid']));
+		$operationid = CDBHelper::getAll('SELECT operationid FROM operations WHERE actionid='.
+				zbx_dbstr($resourceid).' AND operationtype In (0,11,12)');
+		$conditiodid = CDBHelper::getRow('SELECT conditionid FROM conditions WHERE actionid='.
+				zbx_dbstr($resourceid));
+		$op_group = CDBHelper::getRow('SELECT opmessage_grpid FROM opmessage_grp WHERE operationid='.
+				zbx_dbstr($operationid[0]['operationid']));
 
 		$created = "{\"action.name\":[\"add\",\"Audit action\"],\"action.esc_period\":[\"add\",\"2m\"],".
 				"\"action.filter\":[\"add\"],".
@@ -169,8 +169,8 @@ class testAuditlogAction extends testAuditlogCommon {
 		]);
 		$operationid = CDBHelper::getRow('SELECT operationid FROM operations WHERE (actionid, operationtype)=(3, 0)');
 		$conditiodid = CDBHelper::getRow('SELECT conditionid FROM conditions WHERE actionid=3');
-		$op_group = CDBHelper::getRow('SELECT opmessage_grpid FROM opmessage_grp WHERE operationid='
-				.zbx_dbstr($operationid['operationid']));
+		$op_group = CDBHelper::getRow('SELECT opmessage_grpid FROM opmessage_grp WHERE operationid='.
+				zbx_dbstr($operationid['operationid']));
 
 		$updated = "{\"action.operations[".$operationid['operationid']."].opmessage_grp[1]\":[\"delete\"],".
 				"\"action.filter.conditions[".$conditiodid['conditionid']."]\":[\"add\"],".

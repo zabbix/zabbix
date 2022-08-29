@@ -39,8 +39,10 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 			]
 		]);
 		$resourceid = $create['result']['usrgrpids'][0];
-		$rights = CDBHelper::getRow('SELECT rightid FROM rights WHERE groupid='.$resourceid);
-		$id = CDBHelper::getRow('SELECT id FROM users_groups WHERE usrgrpid='.$resourceid);
+		$rights = CDBHelper::getRow('SELECT rightid FROM rights WHERE groupid='.
+				zbx_dbstr($resourceid));
+		$id = CDBHelper::getRow('SELECT id FROM users_groups WHERE usrgrpid='.
+				zbx_dbstr($resourceid));
 
 		$created = "{\"usergroup.name\":[\"add\",\"Audit user groups\"],".
 				"\"usergroup.rights[".$rights['rightid']."]\":[\"add\"],".

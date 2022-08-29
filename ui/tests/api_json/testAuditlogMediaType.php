@@ -49,7 +49,8 @@ class testAuditlogMediaType extends testAuditlogCommon {
 			]
 		]);
 		$resourceid = $create['result']['mediatypeids'][0];
-		$message = CDBHelper::getRow('SELECT mediatype_messageid FROM media_type_message WHERE mediatypeid='.$resourceid);
+		$message = CDBHelper::getRow('SELECT mediatype_messageid FROM media_type_message WHERE mediatypeid='.
+				zbx_dbstr($resourceid));
 
 		$created = "{\"mediatype.name\":[\"add\",\"email_media\"],".
 				"\"mediatype.smtp_server\":[\"add\",\"test.test.com\"],".

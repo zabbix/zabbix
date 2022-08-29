@@ -46,8 +46,8 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 			]
 		]);
 		$resourceid = $create['result']['correlationids'][0];
-		$conditionid = CDBHelper::getRow('SELECT corr_conditionid FROM corr_condition WHERE correlationid='
-				.zbx_dbstr($resourceid));
+		$conditionid = CDBHelper::getRow('SELECT corr_conditionid FROM corr_condition WHERE correlationid='.
+				zbx_dbstr($resourceid));
 
 		$created = "{\"correlation.name\":[\"add\",\"New event correlation for audit\"],".
 				"\"correlation.filter\":[\"add\"],".
