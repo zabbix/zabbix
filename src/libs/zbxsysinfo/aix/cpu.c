@@ -207,6 +207,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(request);
 #ifdef HAVE_LIBPERFSTAT
 	perfstat_cpu_total_t	ps_cpu_total;
 
@@ -227,6 +228,7 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(request);
 #ifdef HAVE_LIBPERFSTAT
 	perfstat_cpu_total_t	ps_cpu_total;
 

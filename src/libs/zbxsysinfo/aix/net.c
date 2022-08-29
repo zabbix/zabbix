@@ -202,6 +202,7 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(request);
 #if defined(HAVE_LIBPERFSTAT)
 	int			rc, i, ret = SYSINFO_RET_FAIL;
 	perfstat_id_t		ps_id;

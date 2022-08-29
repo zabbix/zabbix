@@ -25,6 +25,7 @@ static long	hertz = 0;
 
 int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(request);
 #if defined(HAVE_LIBPERFSTAT)
 	perfstat_cpu_total_t	ps_cpu_total;
 
