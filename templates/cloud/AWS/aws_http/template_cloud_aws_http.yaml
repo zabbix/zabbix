@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-08T05:08:47Z'
+  date: '2022-08-29T03:55:47Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -135,17 +135,25 @@ zabbix_export:
                     if (!Array.isArray(instance))
                         instance = [instance];
                     instance.forEach(function (item, index, instance_array) {
+                        if (typeof item !== 'object'
+                            || typeof item.instancesSet !== 'object'
+                            || typeof item.instancesSet.item !== 'object'
+                            || item.instancesSet.item.hasOwnProperty('instanceId') === false)
+                            throw 'Failed response parse. Check debug log for more information.';
                         var instanceName = item.instancesSet.item.instanceId
+                        if (typeof item.instancesSet.item.tagSet !== 'object'
+                            || typeof item.instancesSet.item.tagSet.item !== 'object')
+                            throw 'Failed response parse. Check debug log for more information.';
                         if (Array.isArray(item.instancesSet.item.tagSet.item)) {
                             item.instancesSet.item.tagSet.item.forEach(
                                 function (tag) {
-                                    if (tag.key === 'Name') {
+                                    if (tag.hasOwnProperty('key') && tag.key === 'Name') {
                                         instanceName = tag.value;
                                     }
                                 }
                             )
                         } else {
-                            if (item.instancesSet.item.tagSet.item.key === 'Name')
+                            if (item.instancesSet.item.tagSet.item.hasOwnProperty('key') && item.instancesSet.item.tagSet.item.key === 'Name')
                                 instanceName = item.instancesSet.item.tagSet.item.value
                         }
             
@@ -167,7 +175,7 @@ zabbix_export:
                         || typeof result.DescribeInstancesResponse !== 'object'
                         || typeof result.DescribeInstancesResponse.reservationSet !== 'object'
                         || typeof result.DescribeInstancesResponse.reservationSet.item !== 'object') {
-                        throw 'Cannot get DB instance list from AWS RDS API. Check debug log for more information.';
+                        throw 'Cannot get EC2 instance list from AWS API. Check debug log for more information.';
                     }
             
                     return AwsEC2.tagToNameInstances(result.DescribeInstancesResponse.reservationSet.item);
@@ -326,6 +334,13 @@ zabbix_export:
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
             
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from AWS API. Check debug log for more information.';
+                    }
+            
                     return response;
                 },
             
@@ -336,13 +351,6 @@ zabbix_export:
                         payload['Version'] = '2014-10-31'
             
                     result = AwsRDS.request('POST', AwsRDS.params.region, 'rds', 'rds.' + AwsRDS.params.region + '.amazonaws.com', AwsRDS.prepareParams(payload), '', '');
-            
-                    try {
-                        result = JSON.parse(result);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-                    }
             
                     if (typeof result !== 'object'
                         || typeof result.DescribeDBInstancesResponse !== 'object'
@@ -543,13 +551,20 @@ zabbix_export:
                         result = AwsS3.request('GET', 'us-east-1', 's3', 's3.us-east-1.amazonaws.com', AwsS3.prepareParams(payload), '', '');
                     if (typeof result !== 'object'
                         || typeof result.ListAllMyBucketsResult !== 'object'
-                        || typeof result.ListAllMyBucketsResult.Buckets !== 'object') {
+                        || typeof result.ListAllMyBucketsResult.Buckets !== 'object'
+                        || typeof result.ListAllMyBucketsResult.Buckets.Bucket !== 'object') {
                         throw 'Cannot get buckets list from AWS S3 API. Check debug log for more information.';
                     }
             
-                    var buckets = result.ListAllMyBucketsResult.Buckets.Bucket
+                    var buckets = []
+                    if (!Array.isArray(result.ListAllMyBucketsResult.Buckets.Bucket))
+                        buckets = [result.ListAllMyBucketsResult.Buckets.Bucket]
+                    else
+                        buckets = result.ListAllMyBucketsResult.Buckets.Bucket
                     buckets.forEach(
                         function (bucket, index, buckets_array) {
+                            if (!bucket.hasOwnProperty('Name'))
+                                throw 'Cannot get location for bucket. Check debug log for more information.';
                             buckets_array[index]['location'] = AwsS3.getBucketLocation(bucket['Name']);
                         });
             
