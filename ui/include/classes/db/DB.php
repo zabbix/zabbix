@@ -147,7 +147,7 @@ class DB {
 	 * Refresh id record for given table.
 	 * Record is deleted and then created again with value of maximum id from table or minimum allowed.
 	 *
-	 * @throw APIException
+	 * @throws APIException
 	 *
 	 * @static
 	 *
@@ -156,7 +156,7 @@ class DB {
 	 *
 	 * @return string
 	 */
-	private static function refreshIds($table, $count) {
+	public static function refreshIds($table, $count) {
 		$tableSchema = self::getSchema($table);
 		$id_name = $tableSchema['key'];
 
