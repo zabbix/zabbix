@@ -322,6 +322,7 @@ typedef struct
 	int		last_version_error_time;
 
 	zbx_uint64_t	revision;
+	zbx_uint64_t	macro_revision;
 }
 DC_PROXY;
 

@@ -11552,11 +11552,12 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 	dst_proxy->proxy_data_nextcheck = src_proxy->proxy_data_nextcheck;
 	dst_proxy->proxy_tasks_nextcheck = src_proxy->proxy_tasks_nextcheck;
 	dst_proxy->last_cfg_error_time = src_proxy->last_cfg_error_time;
-	dst_proxy->version = src_proxy->version;
 	dst_proxy->lastaccess = src_proxy->lastaccess;
 	dst_proxy->auto_compress = src_proxy->auto_compress;
 	dst_proxy->last_version_error_time = src_proxy->last_version_error_time;
+
 	dst_proxy->revision = src_proxy->revision;
+	dst_proxy->macro_revision = config->um_cache->revision;
 
 	if (NULL != (host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
 	{
@@ -15460,10 +15461,7 @@ void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t rev
 				if (proxy->removed_hosts.values[i].revision > revision)
 				{
 					zbx_vector_uint64_append(removed_hostids, proxy->removed_hosts.values[i].hostid);
-					i++;
-				}
-				else
-				{
+
 					/* this operation can be done with read lock:                  */
 					/*   - removal from vector does not allocate/free memory       */
 					/*   - two configuration requests for the same proxy cannot be */
@@ -15472,6 +15470,8 @@ void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t rev
 					/*     removed hosts on proxy                                  */
 					zbx_vector_host_rev_remove_noorder(&proxy->removed_hosts, i);
 				}
+				else
+					i++;
 			}
 		}
 	}
