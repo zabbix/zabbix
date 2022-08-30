@@ -90,7 +90,7 @@ $filter = (new CFilter())
 
 $widget = (new CWidget())
 	->setTitle(_('SLA report'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::SLAREPORT_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SLAREPORT_LIST))
 	->addItem($filter);
 
 $report = new CTableInfo();

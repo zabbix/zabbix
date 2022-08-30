@@ -62,7 +62,7 @@ $current_url = (new CUrl('actionconf.php'))->setArgument('eventsource', $data['e
 $widget = (new CWidget())
 	->setTitle($title)
 	->setTitleSubmenu(['main_section' => ['items' => $submenu]])
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ACTION_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_LIST))
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()
