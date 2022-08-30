@@ -925,7 +925,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 
 	ret = SUCCEED;
 out:
-	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
+	if (NOTSUPPORTED == ret && !ZBX_ISSET_MSG(result))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Internal check is not supported."));
 
 	free_request(&request);

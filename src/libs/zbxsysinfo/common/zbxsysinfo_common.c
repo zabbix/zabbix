@@ -164,7 +164,7 @@ int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	UNSET_RESULT_EXCLUDING(result, AR_DOUBLE);
+	ZBX_UNSET_RESULT_EXCLUDING(result, AR_DOUBLE);
 
 	return SYSINFO_RET_OK;
 }
@@ -181,7 +181,7 @@ int	EXECUTE_INT(const char *command, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	UNSET_RESULT_EXCLUDING(result, AR_UINT64);
+	ZBX_UNSET_RESULT_EXCLUDING(result, AR_UINT64);
 
 	return SYSINFO_RET_OK;
 }

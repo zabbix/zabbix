@@ -80,11 +80,11 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 
 	if (SUCCEED != (ret = get_value_agent(&item, &agent_result)))
 	{
-		if (ISSET_MSG(&agent_result))
+		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
 		ret = FAIL;
 	}
-	else if (NULL != result && ISSET_TEXT(&agent_result))
+	else if (NULL != result && ZBX_ISSET_TEXT(&agent_result))
 		*result = zbx_strdup(*result, agent_result.text);
 
 	zbx_alarm_off();
@@ -172,11 +172,11 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 
 	if (SUCCEED != (ret = function(&item, &agent_result)))
 	{
-		if (ISSET_MSG(&agent_result))
+		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
 		ret = FAIL;
 	}
-	else if (NULL != result && ISSET_TEXT(&agent_result))
+	else if (NULL != result && ZBX_ISSET_TEXT(&agent_result))
 		*result = zbx_strdup(*result, agent_result.text);
 
 	zbx_alarm_off();

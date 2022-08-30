@@ -838,7 +838,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (!ISSET_UI64(result))
+	if (!ZBX_ISSET_UI64(result))
 		SET_UI64_RESULT(result, 0);
 clean:
 	zbx_free(pTcpTable);

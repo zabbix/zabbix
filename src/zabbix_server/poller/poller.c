@@ -353,7 +353,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 
 	if (SUCCEED != res)
 	{
-		if (!ISSET_MSG(result))
+		if (!ZBX_ISSET_MSG(result))
 			SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED_MSG));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
@@ -888,7 +888,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				{
 					AGENT_RESULT	*add_result = (AGENT_RESULT *)add_results.values[j];
 
-					if (ISSET_MSG(add_result))
+					if (ZBX_ISSET_MSG(add_result))
 					{
 						items[i].state = ITEM_STATE_NOTSUPPORTED;
 						zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid,

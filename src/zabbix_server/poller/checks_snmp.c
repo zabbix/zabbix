@@ -1232,7 +1232,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result, &val_type))
 				{
-					if (ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
+					if (ZBX_ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
 						zbx_remove_chars(snmp_result.text, "\r\n");
 
 					str_res = GET_STR_RESULT(&snmp_result);
@@ -1423,7 +1423,7 @@ retry:
 			else
 				errcodes[j] = zbx_snmp_set_result(var, &results[j], &val_type);
 
-			if (ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
+			if (ZBX_ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
 				zbx_remove_chars(results[j].text, "\r\n");
 		}
 

@@ -25,19 +25,19 @@
 
 /* CHECK RESULT */
 
-#define ISSET_UI64(res)	((res)->type & AR_UINT64)
-#define ISSET_DBL(res)	((res)->type & AR_DOUBLE)
-#define ISSET_STR(res)	((res)->type & AR_STRING)
-#define ISSET_TEXT(res)	((res)->type & AR_TEXT)
-#define ISSET_LOG(res)	((res)->type & AR_LOG)
-#define ISSET_MSG(res)	((res)->type & AR_MESSAGE)
-#define ISSET_META(res)	((res)->type & AR_META)
+#define ZBX_ISSET_UI64(res)	((res)->type & AR_UINT64)
+#define ZBX_ISSET_DBL(res)	((res)->type & AR_DOUBLE)
+#define ZBX_ISSET_STR(res)	((res)->type & AR_STRING)
+#define ZBX_ISSET_TEXT(res)	((res)->type & AR_TEXT)
+#define ZBX_ISSET_LOG(res)	((res)->type & AR_LOG)
+#define ZBX_ISSET_MSG(res)	((res)->type & AR_MESSAGE)
+#define ZBX_ISSET_META(res)	((res)->type & AR_META)
 
-#define ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG))
+#define ZBX_ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG))
 
 /* UNSET RESULT */
 
-#define UNSET_UI64_RESULT(res)						\
+#define ZBX_UNSET_UI64_RESULT(res)						\
 									\
 do									\
 {									\
@@ -46,7 +46,7 @@ do									\
 }									\
 while (0)
 
-#define UNSET_DBL_RESULT(res)						\
+#define ZBX_UNSET_DBL_RESULT(res)						\
 									\
 do									\
 {									\
@@ -55,7 +55,7 @@ do									\
 }									\
 while (0)
 
-#define UNSET_STR_RESULT(res)						\
+#define ZBX_UNSET_STR_RESULT(res)						\
 									\
 do									\
 {									\
@@ -67,7 +67,7 @@ do									\
 }									\
 while (0)
 
-#define UNSET_TEXT_RESULT(res)						\
+#define ZBX_UNSET_TEXT_RESULT(res)						\
 									\
 do									\
 {									\
@@ -79,7 +79,7 @@ do									\
 }									\
 while (0)
 
-#define UNSET_LOG_RESULT(res)						\
+#define ZBX_UNSET_LOG_RESULT(res)						\
 									\
 do									\
 {									\
@@ -92,7 +92,7 @@ do									\
 }									\
 while (0)
 
-#define UNSET_MSG_RESULT(res)						\
+#define ZBX_UNSET_MSG_RESULT(res)						\
 									\
 do									\
 {									\
@@ -105,16 +105,16 @@ do									\
 while (0)
 
 /* AR_META is always excluded */
-#define UNSET_RESULT_EXCLUDING(res, exc_type) 					\
+#define ZBX_UNSET_RESULT_EXCLUDING(res, exc_type) 					\
 										\
 do										\
 {										\
-	if (!(exc_type & AR_UINT64))	UNSET_UI64_RESULT(res);			\
-	if (!(exc_type & AR_DOUBLE))	UNSET_DBL_RESULT(res);			\
-	if (!(exc_type & AR_STRING))	UNSET_STR_RESULT(res);			\
-	if (!(exc_type & AR_TEXT))	UNSET_TEXT_RESULT(res);			\
-	if (!(exc_type & AR_LOG))	UNSET_LOG_RESULT(res);			\
-	if (!(exc_type & AR_MESSAGE))	UNSET_MSG_RESULT(res);			\
+	if (!(exc_type & AR_UINT64))	ZBX_UNSET_UI64_RESULT(res);			\
+	if (!(exc_type & AR_DOUBLE))	ZBX_UNSET_DBL_RESULT(res);			\
+	if (!(exc_type & AR_STRING))	ZBX_UNSET_STR_RESULT(res);			\
+	if (!(exc_type & AR_TEXT))	ZBX_UNSET_TEXT_RESULT(res);			\
+	if (!(exc_type & AR_LOG))	ZBX_UNSET_LOG_RESULT(res);			\
+	if (!(exc_type & AR_MESSAGE))	ZBX_UNSET_MSG_RESULT(res);			\
 }										\
 while (0)
 

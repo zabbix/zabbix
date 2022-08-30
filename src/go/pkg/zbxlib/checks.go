@@ -46,7 +46,7 @@ static int execute_check(const char *key, zbx_agent_check_t check_func, char **v
 	}
 	if (SYSINFO_RET_OK != check_func(&request, &result))
 	{
-		if (0 != ISSET_MSG(&result))
+		if (0 != ZBX_ISSET_MSG(&result))
 		{
 			*error = zbx_strdup(NULL, result.msg);
 		}

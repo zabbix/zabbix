@@ -817,12 +817,12 @@ void	zbx_log_free(zbx_log_t *log)
 
 void	free_result(AGENT_RESULT *result)
 {
-	UNSET_UI64_RESULT(result);
-	UNSET_DBL_RESULT(result);
-	UNSET_STR_RESULT(result);
-	UNSET_TEXT_RESULT(result);
-	UNSET_LOG_RESULT(result);
-	UNSET_MSG_RESULT(result);
+	ZBX_UNSET_UI64_RESULT(result);
+	ZBX_UNSET_DBL_RESULT(result);
+	ZBX_UNSET_STR_RESULT(result);
+	ZBX_UNSET_TEXT_RESULT(result);
+	ZBX_UNSET_LOG_RESULT(result);
+	ZBX_UNSET_MSG_RESULT(result);
 }
 
 /******************************************************************************
@@ -951,24 +951,24 @@ void	test_parameter(const char *key)
 	{
 		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
-		if (0 != ISSET_UI64(&result))
+		if (0 != ZBX_ISSET_UI64(&result))
 			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
 
-		if (0 != ISSET_DBL(&result))
+		if (0 != ZBX_ISSET_DBL(&result))
 			printf(" [d|%s]", zbx_print_double(buffer, sizeof(buffer), result.dbl));
 
-		if (0 != ISSET_STR(&result))
+		if (0 != ZBX_ISSET_STR(&result))
 			printf(" [s|%s]", result.str);
 
-		if (0 != ISSET_TEXT(&result))
+		if (0 != ZBX_ISSET_TEXT(&result))
 			printf(" [t|%s]", result.text);
 
-		if (0 != ISSET_MSG(&result))
+		if (0 != ZBX_ISSET_MSG(&result))
 			printf(" [m|%s]", result.msg);
 	}
 	else
 	{
-		if (0 != ISSET_MSG(&result))
+		if (0 != ZBX_ISSET_MSG(&result))
 			printf(" [m|" ZBX_NOTSUPPORTED "] [%s]", result.msg);
 		else
 			printf(" [m|" ZBX_NOTSUPPORTED "]");
@@ -1211,7 +1211,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	{
 		/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
 		/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
-		if (0 != (command->flags & CF_MODULE) && 0 == ISSET_MSG(result))
+		if (0 != (command->flags & CF_MODULE) && 0 == ZBX_ISSET_MSG(result))
 			SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED_MSG));
 
 		goto notsupported;
@@ -1298,15 +1298,15 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 
 	assert(result);
 
-	if (0 != ISSET_UI64(result))
+	if (0 != ZBX_ISSET_UI64(result))
 	{
 		/* nothing to do */
 	}
-	else if (0 != ISSET_DBL(result))
+	else if (0 != ZBX_ISSET_DBL(result))
 	{
 		SET_UI64_RESULT(result, result->dbl);
 	}
-	else if (0 != ISSET_STR(result))
+	else if (0 != ZBX_ISSET_STR(result))
 	{
 		zbx_trim_integer(result->str);
 		zbx_del_zeros(result->str);
@@ -1316,7 +1316,7 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, value);
 	}
-	else if (0 != ISSET_TEXT(result))
+	else if (0 != ZBX_ISSET_TEXT(result))
 	{
 		zbx_trim_integer(result->text);
 		zbx_del_zeros(result->text);
@@ -1328,7 +1328,7 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 	}
 	/* skip AR_MESSAGE - it is information field */
 
-	if (0 != ISSET_UI64(result))
+	if (0 != ZBX_ISSET_UI64(result))
 		return &result->ui64;
 
 	return NULL;
@@ -1340,15 +1340,15 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 
 	assert(result);
 
-	if (0 != ISSET_DBL(result))
+	if (0 != ZBX_ISSET_DBL(result))
 	{
 		/* nothing to do */
 	}
-	else if (0 != ISSET_UI64(result))
+	else if (0 != ZBX_ISSET_UI64(result))
 	{
 		SET_DBL_RESULT(result, result->ui64);
 	}
-	else if (0 != ISSET_STR(result))
+	else if (0 != ZBX_ISSET_STR(result))
 	{
 		zbx_trim_float(result->str);
 
@@ -1357,7 +1357,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 
 		SET_DBL_RESULT(result, value);
 	}
-	else if (0 != ISSET_TEXT(result))
+	else if (0 != ZBX_ISSET_TEXT(result))
 	{
 		zbx_trim_float(result->text);
 
@@ -1368,7 +1368,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	}
 	/* skip AR_MESSAGE - it is information field */
 
-	if (0 != ISSET_DBL(result))
+	if (0 != ZBX_ISSET_DBL(result))
 		return &result->dbl;
 
 	return NULL;
@@ -1380,11 +1380,11 @@ static char	**get_result_str_value(AGENT_RESULT *result)
 
 	assert(result);
 
-	if (0 != ISSET_STR(result))
+	if (0 != ZBX_ISSET_STR(result))
 	{
 		/* nothing to do */
 	}
-	else if (0 != ISSET_TEXT(result))
+	else if (0 != ZBX_ISSET_TEXT(result))
 	{
 		/* NOTE: copy only line */
 		for (p = result->text; '\0' != *p && '\r' != *p && '\n' != *p; p++);
@@ -1393,17 +1393,17 @@ static char	**get_result_str_value(AGENT_RESULT *result)
 		SET_STR_RESULT(result, zbx_strdup(NULL, result->text)); /* copy line */
 		*p = tmp; /* restore result->text character */
 	}
-	else if (0 != ISSET_UI64(result))
+	else if (0 != ZBX_ISSET_UI64(result))
 	{
 		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64));
 	}
-	else if (0 != ISSET_DBL(result))
+	else if (0 != ZBX_ISSET_DBL(result))
 	{
 		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl));
 	}
 	/* skip AR_MESSAGE - it is information field */
 
-	if (0 != ISSET_STR(result))
+	if (0 != ZBX_ISSET_STR(result))
 		return &result->str;
 
 	return NULL;
@@ -1413,25 +1413,25 @@ static char	**get_result_text_value(AGENT_RESULT *result)
 {
 	assert(result);
 
-	if (0 != ISSET_TEXT(result))
+	if (0 != ZBX_ISSET_TEXT(result))
 	{
 		/* nothing to do */
 	}
-	else if (0 != ISSET_STR(result))
+	else if (0 != ZBX_ISSET_STR(result))
 	{
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, result->str));
 	}
-	else if (0 != ISSET_UI64(result))
+	else if (0 != ZBX_ISSET_UI64(result))
 	{
 		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64));
 	}
-	else if (0 != ISSET_DBL(result))
+	else if (0 != ZBX_ISSET_DBL(result))
 	{
 		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl));
 	}
 	/* skip AR_MESSAGE - it is information field */
 
-	if (0 != ISSET_TEXT(result))
+	if (0 != ZBX_ISSET_TEXT(result))
 		return &result->text;
 
 	return NULL;
@@ -1439,22 +1439,22 @@ static char	**get_result_text_value(AGENT_RESULT *result)
 
 static zbx_log_t	*get_result_log_value(AGENT_RESULT *result)
 {
-	if (0 != ISSET_LOG(result))
+	if (0 != ZBX_ISSET_LOG(result))
 		return result->log;
 
-	if (0 != ISSET_VALUE(result))
+	if (0 != ZBX_ISSET_VALUE(result))
 	{
 		result->log = (zbx_log_t *)zbx_malloc(result->log, sizeof(zbx_log_t));
 
 		zbx_log_init(result->log);
 
-		if (0 != ISSET_STR(result))
+		if (0 != ZBX_ISSET_STR(result))
 			result->log->value = zbx_strdup(result->log->value, result->str);
-		else if (0 != ISSET_TEXT(result))
+		else if (0 != ZBX_ISSET_TEXT(result))
 			result->log->value = zbx_strdup(result->log->value, result->text);
-		else if (0 != ISSET_UI64(result))
+		else if (0 != ZBX_ISSET_UI64(result))
 			result->log->value = zbx_dsprintf(result->log->value, ZBX_FS_UI64, result->ui64);
-		else if (0 != ISSET_DBL(result))
+		else if (0 != ZBX_ISSET_DBL(result))
 			result->log->value = zbx_dsprintf(result->log->value, ZBX_FS_DBL, result->dbl);
 
 		result->type |= AR_LOG;
@@ -1501,7 +1501,7 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 		case AR_LOG:
 			return (void *)get_result_log_value(result);
 		case AR_MESSAGE:
-			if (0 != ISSET_MSG(result))
+			if (0 != ZBX_ISSET_MSG(result))
 				return (void *)(&result->msg);
 			break;
 		default:
@@ -1641,15 +1641,15 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 
 	if (SYSINFO_RET_OK == agent_ret)
 	{
-		if (ISSET_TEXT(result))
+		if (ZBX_ISSET_TEXT(result))
 			result_type = 't';
-		else if (ISSET_STR(result))
+		else if (ZBX_ISSET_STR(result))
 			result_type = 's';
-		else if (ISSET_UI64(result))
+		else if (ZBX_ISSET_UI64(result))
 			result_type = 'u';
-		else if (ISSET_DBL(result))
+		else if (ZBX_ISSET_DBL(result))
 			result_type = 'd';
-		else if (ISSET_MSG(result))
+		else if (ZBX_ISSET_MSG(result))
 			result_type = 'm';
 		else
 			result_type = '-';
@@ -1883,7 +1883,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	zbx_free(data);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __func__, zbx_sysinfo_ret_string(ret),
-			ISSET_MSG(result) ? result->msg : "");
+			ZBX_ISSET_MSG(result) ? result->msg : "");
 	return ret;
 }
 #endif
@@ -2026,7 +2026,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	CloseHandle(metric_args.timeout_event);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __func__,
-			zbx_sysinfo_ret_string(metric_args.agent_ret), ISSET_MSG(result) ? result->msg : "");
+			zbx_sysinfo_ret_string(metric_args.agent_ret), ZBX_ISSET_MSG(result) ? result->msg : "");
 
 	return WAIT_OBJECT_0 == rc ? metric_args.agent_ret : SYSINFO_RET_FAIL;
 }

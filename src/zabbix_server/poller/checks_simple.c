@@ -257,7 +257,7 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			ret = SUCCEED;
 	}
 
-	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
+	if (NOTSUPPORTED == ret && !ZBX_ISSET_MSG(result))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported."));
 
 out:

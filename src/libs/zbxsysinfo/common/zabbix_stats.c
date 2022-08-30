@@ -140,7 +140,7 @@ int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESUL
 
 	zbx_json_free(&json);
 
-	return 0 == ISSET_MSG(result) ? SUCCEED : FAIL;
+	return 0 == ZBX_ISSET_MSG(result) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -179,7 +179,7 @@ int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const
 
 	zbx_json_free(&json);
 
-	return 0 == ISSET_MSG(result) ? SUCCEED : FAIL;
+	return 0 == ZBX_ISSET_MSG(result) ? SUCCEED : FAIL;
 }
 
 int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)

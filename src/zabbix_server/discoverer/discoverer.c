@@ -313,7 +313,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 					ret = FAIL;
 #endif	/* HAVE_NETSNMP */
 
-				if (FAIL == ret && ISSET_MSG(&result))
+				if (FAIL == ret && ZBX_ISSET_MSG(&result))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "discovery: item [%s] error: %s",
 							item.key, result.msg);

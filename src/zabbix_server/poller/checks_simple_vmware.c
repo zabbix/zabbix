@@ -57,7 +57,7 @@ static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 		else
 			ret = SYSINFO_RET_FAIL;
 
-		UNSET_STR_RESULT(result);
+		ZBX_UNSET_STR_RESULT(result);
 	}
 
 	return ret;
@@ -1807,7 +1807,7 @@ int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *use
 		else
 			ret = SYSINFO_RET_FAIL;
 
-		UNSET_STR_RESULT(result);
+		ZBX_UNSET_STR_RESULT(result);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -1837,7 +1837,7 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 		else
 			ret = SYSINFO_RET_FAIL;
 
-		UNSET_STR_RESULT(result);
+		ZBX_UNSET_STR_RESULT(result);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -1861,7 +1861,7 @@ int	check_vcenter_hv_maintenance(AGENT_REQUEST *request, const char *username, c
 		else
 			SET_UI64_RESULT(result, 1);
 
-		UNSET_STR_RESULT(result);
+		ZBX_UNSET_STR_RESULT(result);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -2603,14 +2603,14 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 			err = zbx_dsprintf(NULL, "Counter %s for datastore %s is not available for hypervisor %s: %s",
 					perfcounter, datastore->name,
 					ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NAME]), msg);
-			UNSET_MSG_RESULT(result);
+			ZBX_UNSET_MSG_RESULT(result);
 			SET_MSG_RESULT(result, err);
 			goto unlock;
 		}
 
 		ds_count++;
 
-		if (0 == ISSET_VALUE(result))
+		if (0 == ZBX_ISSET_VALUE(result))
 			continue;
 
 		if (DATASTORE_METRIC_MODE_MAX_LATENCY != metric_mode)
@@ -2621,7 +2621,7 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 		else if (value < *GET_UI64_RESULT(result))
 			value = *GET_UI64_RESULT(result);
 
-		UNSET_UI64_RESULT(result);
+		ZBX_UNSET_UI64_RESULT(result);
 	}
 
 	if (0 == ds_count)
@@ -2841,7 +2841,7 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 			goto unlock;
 
 		disk_provisioned = *GET_UI64_RESULT(result);
-		UNSET_UI64_RESULT(result);
+		ZBX_UNSET_UI64_RESULT(result);
 	}
 
 	if (0 != (flags & ZBX_DATASTORE_COUNTER_USED))
@@ -2853,7 +2853,7 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 			goto unlock;
 
 		disk_used = *GET_UI64_RESULT(result);
-		UNSET_UI64_RESULT(result);
+		ZBX_UNSET_UI64_RESULT(result);
 	}
 
 	if (0 != (flags & ZBX_DATASTORE_COUNTER_CAPACITY))
@@ -2865,7 +2865,7 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 			goto unlock;
 
 		disk_capacity = *GET_UI64_RESULT(result);
-		UNSET_UI64_RESULT(result);
+		ZBX_UNSET_UI64_RESULT(result);
 	}
 
 	switch (mode)

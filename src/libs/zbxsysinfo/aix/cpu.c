@@ -129,7 +129,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (SYSINFO_RET_FAIL == res)
 	{
-		if (!ISSET_MSG(result))
+		if (!ZBX_ISSET_MSG(result))
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain CPU information."));
 
 		return SYSINFO_RET_FAIL;
