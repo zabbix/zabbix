@@ -34,20 +34,21 @@ zbx_keys_path_t;
 
 static int	keys_path_compare(const void *d1, const void *d2)
 {
-	const zbx_keys_path_t	*ptr1 = *((const zbx_keys_path_t **)d1);
-	const zbx_keys_path_t	*ptr2 = *((const zbx_keys_path_t **)d2);
+	const zbx_keys_path_t	*ptr1 = *((const zbx_keys_path_t * const *)d1);
+	const zbx_keys_path_t	*ptr2 = *((const zbx_keys_path_t * const *)d2);
 
 	return strcmp(ptr1->path, ptr2->path);
 }
 
 static zbx_hash_t	keys_hash(const void *data)
 {
-	return ZBX_DEFAULT_STRING_HASH_ALGO(*(const char **)data, strlen(*(const char **)data), ZBX_DEFAULT_HASH_SEED);
+	return ZBX_DEFAULT_STRING_HASH_ALGO(*(const char * const *)data, strlen(*(const char * const *)data),
+			ZBX_DEFAULT_HASH_SEED);
 }
 
 static int	keys_compare(const void *d1, const void *d2)
 {
-	return strcmp(*(const char **)d1, *(const char **)d2);
+	return strcmp(*(const char * const *)d1, *(const char * const *)d2);
 }
 
 static void	key_path_free(void *data)

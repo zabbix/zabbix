@@ -573,12 +573,12 @@ static ZBX_DC_HOST	*DCfind_proxy(const char *host)
 
 static zbx_hash_t	__config_strpool_hash(const void *data)
 {
-	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
+	return ZBX_DEFAULT_STRING_HASH_FUNC((const char *)data + REFCOUNT_FIELD_SIZE);
 }
 
 static int	__config_strpool_compare(const void *d1, const void *d2)
 {
-	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
+	return strcmp((const char *)d1 + REFCOUNT_FIELD_SIZE, (const char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
 const char	*dc_strpool_intern(const char *str)
@@ -5492,14 +5492,14 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
  * Return value: nextcheck value                                              *
  *                                                                            *
  ******************************************************************************/
-static time_t	dc_calculate_nextcheck(zbx_uint64_t seed, unsigned int delay, time_t now)
+static time_t	dc_calculate_nextcheck(zbx_uint64_t seed, int delay, time_t now)
 {
 	time_t	nextcheck;
 
 	if (0 == delay)
 		return ZBX_JAN_2038;
 
-	nextcheck = delay * (now / delay) + (unsigned int)(seed % delay);
+	nextcheck = delay * (now / delay) + (unsigned int)(seed % (unsigned int)delay);
 
 	while (nextcheck <= now)
 		nextcheck += delay;
