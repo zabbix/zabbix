@@ -957,24 +957,30 @@ class CUserDirectory extends CApiService {
 		}));
 
 		$provision_media_remove = array_fill_keys($userdirectoryids, []);
-		$provision_media_insert = [];
+		$provision_media_insert = array_fill_keys($userdirectoryids, []);
 
 		foreach ($userdirectoryids as $userdirectoryid) {
 			foreach ($db_userdirectories[$userdirectoryid]['provision_media'] as $media) {
-				$provision_media_remove[$userdirectoryid][$media['userdirectory_mediaid']] =
-					array_intersect_key($media, array_flip(['name', 'mediatypeid', 'attribute']));
+				$provision_media_remove[$userdirectoryid][$media['userdirectory_mediaid']] = [
+					'userdirectoryid' => $userdirectoryid
+				] + array_intersect_key($media, array_flip(['name', 'mediatypeid', 'attribute']));
 			}
+
+			foreach ($userdirectories[$userdirectoryid]['provision_media'] as $index => &$media) {
+				$provision_media_insert[$userdirectoryid][$index] = ['userdirectoryid' => $userdirectoryid] + $media;
+			}
+			unset($media);
 		}
 
 		foreach ($userdirectoryids as $userdirectoryid) {
-			foreach ($userdirectories[$userdirectoryid]['provision_media'] as &$new_media) {
+			foreach ($provision_media_insert[$userdirectoryid] as $index => &$new_media) {
 				foreach ($provision_media_remove[$userdirectoryid] as $db_mediaid => $db_media) {
 					if ($db_media == $new_media) {
 						unset($provision_media_remove[$userdirectoryid][$db_mediaid]);
-						$new_media['userdirectory_mediaid'] = $db_mediaid;
-					}
-					else {
-						$provision_media_insert[] = ['userdirectoryid' => $userdirectoryid] + $new_media;
+						unset($provision_media_insert[$userdirectoryid][$index]);
+
+						$userdirectories[$userdirectoryid]['provision_media'][$index]['userdirectory_mediaid']
+							= $db_mediaid;
 					}
 				}
 			}
@@ -992,8 +998,13 @@ class CUserDirectory extends CApiService {
 		}
 
 		// Record new provision media records.
-		if ($provision_media_insert) {
-			$new_provision_mediaids = DB::insert('userdirectory_media', $provision_media_insert);
+		$provision_media_insert_rows = [];
+		foreach ($provision_media_insert as $userdirectory_media) {
+			$provision_media_insert_rows = array_merge($provision_media_insert_rows, $userdirectory_media);
+		}
+
+		if ($provision_media_insert_rows) {
+			$new_provision_mediaids = DB::insert('userdirectory_media', $provision_media_insert_rows);
 
 			foreach ($userdirectoryids as $userdirectoryid) {
 				foreach ($userdirectories[$userdirectoryid]['provision_media'] as &$new_media) {
