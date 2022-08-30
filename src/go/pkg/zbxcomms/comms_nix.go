@@ -1,4 +1,6 @@
-<?php
+//go:build !windows
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -18,24 +20,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+package zbxcomms
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+import (
+	"fmt"
+	"net"
 
-class testAPIInfo extends CAPITest {
-	public function testAPIInfo_VersionWithAuth() {
-		$error = [
-			'code' => -32602,
-			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
-		];
+	"zabbix.com/pkg/tls"
+)
 
-		$this->call('apiinfo.version', [], $error);
+func Listen(address string, args ...interface{}) (c *Listener, err error) {
+	var tlsconfig *tls.Config
+
+	if len(args) > 0 {
+		var ok bool
+		if tlsconfig, ok = args[0].(*tls.Config); !ok {
+			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
+		}
 	}
-
-	public function testAPIInfo_VersionWithoutAuth() {
-		$this->disableAuthorization();
-		$result = $this->call('apiinfo.version', []);
-
-		$this->assertSame('5.0.28', $result['result']);
+	l, tmperr := net.Listen("tcp", address)
+	if tmperr != nil {
+		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
 	}
+	c = &Listener{listener: l.(*net.TCPListener), tlsconfig: tlsconfig}
+
+	return
 }
