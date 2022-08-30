@@ -838,6 +838,10 @@ int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_reques
 
 	if (proxy_config_revision < proxy->revision || proxy_config_revision < proxy->macro_revision)
 	{
+		zbx_vector_uint64_reserve(&hostids, 1000);
+		zbx_vector_uint64_reserve(&updated_hostids, 1000);
+		zbx_vector_uint64_reserve(&removed_hostids, 100);
+		zbx_vector_uint64_reserve(&httptestids, 100);
 		zbx_dc_get_proxy_config_updates(proxy->hostid, proxy_config_revision, &hostids, &updated_hostids,
 				&removed_hostids, &httptestids);
 	}
