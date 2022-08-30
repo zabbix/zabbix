@@ -1474,12 +1474,12 @@ static zbx_log_t	*get_result_log_value(AGENT_RESULT *result)
  *         NULL - if value is missing or can't be converted                   *
  *                                                                            *
  * Comments:  better use definitions                                          *
- *                GET_UI64_RESULT                                             *
- *                GET_DBL_RESULT                                              *
- *                GET_STR_RESULT                                              *
- *                GET_TEXT_RESULT                                             *
- *                GET_LOG_RESULT                                              *
- *                GET_MSG_RESULT                                              *
+ *                ZBX_GET_UI64_RESULT                                             *
+ *                ZBX_GET_DBL_RESULT                                              *
+ *                ZBX_GET_STR_RESULT                                              *
+ *                ZBX_GET_TEXT_RESULT                                             *
+ *                ZBX_GET_LOG_RESULT                                              *
+ *                ZBX_GET_MSG_RESULT                                              *
  *                                                                            *
  *    AR_MESSAGE - skipped in conversion                                      *
  *                                                                            *
@@ -1663,10 +1663,10 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 		case 's':
 		case 'u':
 		case 'd':
-			pvalue = GET_TEXT_RESULT(result);
+			pvalue = ZBX_GET_TEXT_RESULT(result);
 			break;
 		case 'm':
-			pvalue = GET_MSG_RESULT(result);
+			pvalue = ZBX_GET_MSG_RESULT(result);
 			break;
 		default:
 			pvalue = NULL;
@@ -1916,7 +1916,7 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
 
 	if (SYSINFO_RET_FAIL == (args->agent_ret = args->func(args->request, args->result, args->timeout_event)))
 	{
-		if (NULL == GET_MSG_RESULT(args->result))
+		if (NULL == ZBX_GET_MSG_RESULT(args->result))
 			SET_MSG_RESULT(args->result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
 	}
 

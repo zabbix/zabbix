@@ -562,7 +562,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 	init_result(&result);
 
 	if (SUCCEED == process(config, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
-			NULL != (value = GET_STR_RESULT(&result)) && NULL != *value)
+			NULL != (value = ZBX_GET_STR_RESULT(&result)) && NULL != *value)
 	{
 		if (SUCCEED != zbx_is_utf8(*value))
 		{
@@ -1163,12 +1163,12 @@ static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metr
 
 	if (SUCCEED != (ret = process(metric->key, 0, &result)))
 	{
-		if (NULL != (pvalue = GET_MSG_RESULT(&result)))
+		if (NULL != (pvalue = ZBX_GET_MSG_RESULT(&result)))
 			*error = zbx_strdup(*error, *pvalue);
 		goto out;
 	}
 
-	if (NULL != (pvalue = GET_TEXT_RESULT(&result)))
+	if (NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 

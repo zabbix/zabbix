@@ -156,9 +156,9 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	if (SYSINFO_RET_OK == expected_result)
-		value = (NULL != GET_TEXT_RESULT(&param_result)) ? *GET_TEXT_RESULT(&param_result) : NULL;
+		value = (NULL != ZBX_GET_TEXT_RESULT(&param_result)) ? *ZBX_GET_TEXT_RESULT(&param_result) : NULL;
 	else
-		value = (NULL != GET_MSG_RESULT(&param_result)) ? *GET_MSG_RESULT(&param_result) : NULL;
+		value = (NULL != ZBX_GET_MSG_RESULT(&param_result)) ? *ZBX_GET_MSG_RESULT(&param_result) : NULL;
 
 	if (NULL == value || 0 != strcmp(expected_value_string, value))
 	{

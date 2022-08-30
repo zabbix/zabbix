@@ -75,7 +75,7 @@ static int	AGENT_HOSTMETADATA(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (NULL != CONFIG_HOST_METADATA_ITEM)
 	{
 		if (SUCCEED != process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, result) ||
-				NULL == GET_STR_RESULT(result))
+				NULL == ZBX_GET_STR_RESULT(result))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get host metadata using item \"%s\"",
 					CONFIG_HOST_METADATA_ITEM));

@@ -231,8 +231,8 @@ void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGEN
 
 	if (NULL != result)
 	{
-		if (NULL != GET_TEXT_RESULT(result))
-			value = *(GET_TEXT_RESULT(result));
+		if (NULL != ZBX_GET_TEXT_RESULT(result))
+			value = *(ZBX_GET_TEXT_RESULT(result));
 
 		if (0 != ZBX_ISSET_META(result))
 		{

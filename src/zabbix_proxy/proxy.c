@@ -452,7 +452,7 @@ static void	zbx_set_defaults(void)
 		init_result(&result);
 
 		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
-				NULL != (value = GET_STR_RESULT(&result)))
+				NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
 

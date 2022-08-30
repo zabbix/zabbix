@@ -3847,7 +3847,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 	{
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_flags))
 		{
-			if (NULL == GET_TEXT_RESULT(result))
+			if (NULL == ZBX_GET_TEXT_RESULT(result))
 				return;
 
 			/* proxy stores low-level discovery (lld) values in db */

@@ -1225,7 +1225,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 			case ITEM_VALUE_TYPE_LOG:
 				if (ZBX_ISSET_LOG(request->value.result))
 				{
-					log = GET_LOG_RESULT(request->value.result);
+					log = ZBX_GET_LOG_RESULT(request->value.result);
 					zbx_free(log->value);
 				}
 				else

@@ -47,7 +47,7 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	/* result must be integer to correctly interpret it in frontend (uptime) */
-	if (!GET_UI64_RESULT(result))
+	if (!ZBX_GET_UI64_RESULT(result))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Unsigned integer is expected."));
 		return SYSINFO_RET_FAIL;

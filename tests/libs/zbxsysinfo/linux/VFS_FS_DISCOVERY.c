@@ -78,9 +78,9 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	if (SYSINFO_RET_OK == actual_result)
-		p_result = GET_STR_RESULT(&result);
+		p_result = ZBX_GET_STR_RESULT(&result);
 	else
-		p_result = GET_MSG_RESULT(&result);
+		p_result = ZBX_GET_MSG_RESULT(&result);
 
 	if (NULL == p_result)
 		fail_msg("NULL result in AGENT_RESULT while expected \"%s\"", expected_string);

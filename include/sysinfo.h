@@ -120,12 +120,12 @@ while (0)
 
 /* RETRIEVE RESULT VALUE */
 
-#define GET_UI64_RESULT(res)	((zbx_uint64_t *)get_result_value_by_type(res, AR_UINT64))
-#define GET_DBL_RESULT(res)	((double *)get_result_value_by_type(res, AR_DOUBLE))
-#define GET_STR_RESULT(res)	((char **)get_result_value_by_type(res, AR_STRING))
-#define GET_TEXT_RESULT(res)	((char **)get_result_value_by_type(res, AR_TEXT))
-#define GET_LOG_RESULT(res)	((zbx_log_t *)get_result_value_by_type(res, AR_LOG))
-#define GET_MSG_RESULT(res)	((char **)get_result_value_by_type(res, AR_MESSAGE))
+#define ZBX_GET_UI64_RESULT(res)	((zbx_uint64_t *)get_result_value_by_type(res, AR_UINT64))
+#define ZBX_GET_DBL_RESULT(res)	((double *)get_result_value_by_type(res, AR_DOUBLE))
+#define ZBX_GET_STR_RESULT(res)	((char **)get_result_value_by_type(res, AR_STRING))
+#define ZBX_GET_TEXT_RESULT(res)	((char **)get_result_value_by_type(res, AR_TEXT))
+#define ZBX_GET_LOG_RESULT(res)	((zbx_log_t *)get_result_value_by_type(res, AR_LOG))
+#define ZBX_GET_MSG_RESULT(res)	((char **)get_result_value_by_type(res, AR_MESSAGE))
 
 void	*get_result_value_by_type(AGENT_RESULT *result, int require_type);
 

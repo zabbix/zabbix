@@ -157,7 +157,7 @@ int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == GET_DBL_RESULT(result))
+	if (NULL == ZBX_GET_DBL_RESULT(result))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not double", command);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Double is expected."));
@@ -174,7 +174,7 @@ int	EXECUTE_INT(const char *command, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == GET_UI64_RESULT(result))
+	if (NULL == ZBX_GET_UI64_RESULT(result))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not unsigned integer", command);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Unsigned integer is expected."));
