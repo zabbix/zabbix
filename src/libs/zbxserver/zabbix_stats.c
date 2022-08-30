@@ -24,6 +24,7 @@
 #include "zbxself.h"
 #include "../../zabbix_server/vmware/vmware.h"
 #include "preproc.h"
+#include "zbxcomms.h"
 
 extern unsigned char	program_type;
 extern int	CONFIG_SERVER_STARTUP_TIME;
@@ -46,7 +47,8 @@ void	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get_func_t cb)
  *                                                                            *
  * Purpose: collects all metrics required for Zabbix stats request            *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json       - [OUT] the json data                               *
+ *             zbx_config - [IN] Zabbix server/proxy config                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_args_t *zbx_config)

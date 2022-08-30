@@ -26,6 +26,7 @@
 #include "log.h"
 #include "zbxtrends.h"
 #include "zbxha.h"
+#include "zbxcomms.h"
 
 /******************************************************************************
  *                                                                            *

@@ -58,7 +58,7 @@
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
 #include "../zabbix_server/availability/avail_manager.h"
-#include "zbxserver.h"
+#include "zbxstats.h"
 #include "stats/zabbix_stats.h"
 #include "zbxip.h"
 

@@ -37,6 +37,7 @@
 #include "dbcache.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "version.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -1085,11 +1086,11 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 				if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 				{
 					zbx_tm_task_t	*task;
-					const char	*error = "Remote commands are disabled at unsupported proxies.";
+					const char	*error = "Remote commands are disabled on unsupported proxies.";
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT,
-							ZBX_TM_STATUS_NEW, (int)time(NULL), 0, 0);
+							ZBX_TM_STATUS_NEW, zbx_time(), 0, 0);
 					task->data = zbx_tm_remote_command_result_create(taskid, FAIL, error);
 					zbx_tm_save_task(task);
 					zbx_tm_task_free(task);
@@ -1115,7 +1116,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 
 				if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "Execute now task is disabled at unsupported"
+					zabbix_log(LOG_LEVEL_WARNING, "Execute now task is disabled on unsupported"
 							" proxies.");
 				}
 
@@ -1134,13 +1135,13 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 							ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 					{
 						zbx_tm_task_t	*task;
-						const char	*error = "The requested task is disabled. Proxy major version"
-								" does not match server major verion.";
+						const char	*error = "The requested task is disabled. Proxy major"
+								" version does not match server major version.";
 
 						zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 						task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
-								(int)time(NULL), 0, 0);
-						task->data= zbx_tm_data_result_create(taskid, FAIL, error);
+								zbx_time(), 0, 0);
+						task->data = zbx_tm_data_result_create(taskid, FAIL, error);
 						zbx_tm_save_task(task);
 						zbx_tm_task_free(task);
 

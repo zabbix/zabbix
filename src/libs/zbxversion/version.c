@@ -27,8 +27,8 @@
  *          are extracted. Alphanumeric release candidate part is ignored.    *
  *                                                                            *
  * Parameters:                                                                *
- *     value      - [IN] textual representation of version                    *
- *                  Example: "6.4.0alpha1"                                    *
+ *     version_str - [IN] textual representation of version                   *
+ *                   Example: "6.4.0alpha1"                                   *
  *                                                                            *
  * Return value: The protocol version if it was successfully extracted,       *
  *               otherwise FAIL                                               *
@@ -69,7 +69,7 @@ int	zbx_get_component_version(const char *version_str)
  ******************************************************************************/
 int	zbx_get_component_version_ignore_patch(const char *value)
 {
-	int ver;
+	int	ver;
 
 	if (FAIL == (ver = zbx_get_component_version(value)))
 		return FAIL;

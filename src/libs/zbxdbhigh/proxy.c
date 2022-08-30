@@ -37,6 +37,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
+#include "version.h"
 
 extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;
@@ -4548,11 +4549,11 @@ char	*zbx_get_proxy_protocol_version_str(struct zbx_json_parse *jp)
 /******************************************************************************
  *                                                                            *
  * Purpose: converts protocol version fom textual to numeric representation   *
- *          for verion comparison. The function truncates release candidate   *
+ *          for version comparison. The function truncates release candidate  *
  *          part of the version.                                              *
  *                                                                            *
  * Parameters:                                                                *
- *     jp      - [IN] proxy version, for example "6.4.0alpha1".               *
+ *     version_str - [IN] proxy version, for example "6.4.0alpha1".           *
  *                                                                            *
  * Return value: The protocol version in numeric representation, for example, *
  *               060400                                                       *
@@ -4943,8 +4944,8 @@ static void	zbx_db_flush_proxy_lastaccess(void)
  *                                                                            *
  * Purpose: updates proxy version and compatibility with server in database   *
  *                                                                            *
- * Parameters: proxy - [IN] the proxy                                         *
- *             diff  - [IN] indicates changes to proxy                        *
+ * Parameters: proxy - [IN] the proxy to update version for                   *
+ *             diff  - [IN] indicates changes to the proxy                    *
  *                                                                            *
  ******************************************************************************/
 static void	db_update_proxy_version(DC_PROXY *proxy, zbx_proxy_diff_t *diff)
@@ -4985,17 +4986,17 @@ static void	db_update_proxy_version(DC_PROXY *proxy, zbx_proxy_diff_t *diff)
  ******************************************************************************/
 static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
 {
-#define SERVER_VERION	ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR, 0)
+#define SERVER_VERSION	ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR, 0)
 
 	if (0 == proxy_version)
 		return ZBX_PROXY_VERSION_UNDEFINED;
 
 	proxy_version = ZBX_COMPONENT_VERSION_IGNORE_PATCH(proxy_version);
 
-	if (SERVER_VERION == proxy_version)
+	if (SERVER_VERSION == proxy_version)
 		return ZBX_PROXY_VERSION_CURRENT;
 
-	if (SERVER_VERION < proxy_version)
+	if (SERVER_VERSION < proxy_version)
 		return ZBX_PROXY_VERSION_UNSUPPORTED;
 #if (ZABBIX_VERSION_MINOR == 0)
 	if (ZABBIX_VERSION_MAJOR == 1 + ZBX_COMPONENT_VERSION_MAJOR(proxy_version))
@@ -5006,19 +5007,20 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
 #endif
 	return ZBX_PROXY_VERSION_UNSUPPORTED;
 
-#undef SERVER_VERION
+#undef SERVER_VERSION
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: updates proxy runtime properties in cache and database.           *
  *                                                                            *
- * Parameters: proxy      - [IN/OUT] the proxy                                *
- *             version    - [IN] the proxy version                            *
- *             lastaccess - [IN] the last proxy access time                   *
- *             compress   - [IN] 1 if proxy is using data compression,        *
- *                               0 otherwise                                  *
- *             flags_add  - [IN] additional flags for update proxy            *
+ * Parameters: proxy       - [IN/OUT] the proxy                               *
+ *             version_str - [IN] the proxy version as string                 *
+ *             version_int - [IN] the proxy version in numeric representation *
+ *             lastaccess  - [IN] the last proxy access time                  *
+ *             compress    - [IN] 1 if proxy is using data compression,       *
+ *                                0 otherwise                                 *
+ *             flags_add   - [IN] additional flags for update proxy           *
  *                                                                            *
  * Comments: The proxy parameter properties are also updated.                 *
  *                                                                            *
@@ -5093,8 +5095,7 @@ int	zbx_check_protocol_version(DC_PROXY *proxy, int version)
 	/* warn if another proxy version is used and proceed with compatibility rules*/
 	if (ZBX_PROXY_VERSION_CURRENT != compatibility)
 	{
-		int	now = (int)time(NULL);
-		int	print_log = 0;
+		int	now = zbx_time(), print_log = 0;
 
 		if (proxy->last_version_error_time <= now)
 		{

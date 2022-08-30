@@ -26,6 +26,7 @@
 #include "zbxshmem.h"
 #include "zbxeval.h"
 #include "zbxavailability.h"
+#include "version.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1

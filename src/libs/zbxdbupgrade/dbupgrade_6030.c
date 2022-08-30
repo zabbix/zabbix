@@ -20,6 +20,7 @@
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
+#include "zbxdbschema.h"
 
 extern unsigned char	program_type;
 

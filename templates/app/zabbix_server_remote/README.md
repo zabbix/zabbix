@@ -19,7 +19,7 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$ADDRESS} |<p>-</p> |`` |
 |{$PORT} |<p>-</p> |`` |
-|{$PROXY.LAST_SEEN.MAX} |<p>The maximum number of seconds that the Zabbix proxy is not seen</p> |`600` |
+|{$PROXY.LAST_SEEN.MAX} |<p>The maximum number of seconds the Zabbix proxy is not seen</p> |`600` |
 
 ## Template links
 

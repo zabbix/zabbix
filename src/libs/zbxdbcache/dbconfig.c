@@ -13874,9 +13874,8 @@ int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **err
  ******************************************************************************/
 int	zbx_proxy_discovery_get(struct zbx_json *json, char **error)
 {
-	int				i;
+	int				i, ret = SUCCEED;
 	zbx_vector_cached_proxy_t	proxies;
-	int				ret = SUCCEED;
 
 	WRLOCK_CACHE;
 
@@ -13912,7 +13911,8 @@ int	zbx_proxy_discovery_get(struct zbx_json *json, char **error)
 		{
 			if (FAIL != ret)
 			{
-				*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", proxy->name);
+				*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.",
+						proxy->name);
 				ret = FAIL;
 			}
 		}

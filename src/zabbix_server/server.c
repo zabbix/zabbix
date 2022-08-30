@@ -19,8 +19,6 @@
 
 #include "config.h"
 
-#include "zbxserver.h"
-
 #ifdef HAVE_SQLITE3
 #	error SQLite is not supported as a main Zabbix database backend.
 #endif
@@ -75,6 +73,7 @@
 #include "ha/ha.h"
 #include "zbxrtc.h"
 #include "zbxha.h"
+#include "zbxstats.h"
 #include "stats/zabbix_stats.h"
 #include "zbxdiag.h"
 #include "diag/diag_server.h"

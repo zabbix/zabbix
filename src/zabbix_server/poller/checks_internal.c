@@ -172,7 +172,9 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
  *                                                                            *
  * Purpose: retrieve data from Zabbix server (internally supported items)     *
  *                                                                            *
- * Parameters: item - item we are interested in                               *
+ * Parameters: item       - [IN] item we are interested in                    *
+ *             result     - [OUT] value of the requested item                 *
+ *             zbx_config - [IN] Zabbix server/proxy config                   *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *

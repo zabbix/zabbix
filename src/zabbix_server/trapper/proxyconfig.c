@@ -24,6 +24,7 @@
 #include "proxy.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
+#include "version.h"
 
 #include "zbxcompress.h"
 
@@ -38,7 +39,7 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	char		*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json	j;
 	DC_PROXY	proxy;
-	int		ret, flags = ZBX_TCP_PROTOCOL, version_int;
+	int		ret, flags = ZBX_TCP_PROTOCOL, version_int, unused;
 	size_t		buffer_size, reserved = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -69,8 +70,9 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (ZBX_PROXY_VERSION_CURRENT != proxy.compatibility)
 	{
 		error = zbx_strdup(error, "proxy and server major versions do not match");
-		zbx_send_response_ext(sock, NOTSUPPORTED, error, ZABBIX_VERSION, flags, CONFIG_TIMEOUT);
-		zabbix_log(LOG_LEVEL_DEBUG, "configuration update is disabled for this version of proxy \"%s\" at"
+		unused = zbx_send_response_ext(sock, NOTSUPPORTED, error, ZABBIX_VERSION, flags, CONFIG_TIMEOUT);
+		ZBX_UNUSED(unused);
+		zabbix_log(LOG_LEVEL_WARNING, "configuration update is disabled for this version of proxy \"%s\" at"
 				" \"%s\": %s", proxy.host, sock->peer, error);
 		goto out;
 	}
@@ -79,7 +81,8 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	if (SUCCEED != get_proxyconfig_data(proxy.hostid, &j, &error))
 	{
-		zbx_send_response_ext(sock, FAIL, error, NULL, flags, CONFIG_TIMEOUT);
+		unused = zbx_send_response_ext(sock, FAIL, error, NULL, flags, CONFIG_TIMEOUT);
+		ZBX_UNUSED(unused);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, error);
 		goto clean;

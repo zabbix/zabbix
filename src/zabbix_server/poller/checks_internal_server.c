@@ -22,6 +22,7 @@
 #include "zbxlld.h"
 #include "dbcache.h"
 #include "zbxha.h"
+#include "zbxjson.h"
 
 #include "checks_internal.h"
 
@@ -99,7 +100,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		}
 		else
 		{
-			const char *param3 = get_rparam(request, 2);
+			const char	*param3 = get_rparam(request, 2);
 
 			if (0 == strcmp(param3, "lastaccess"))
 			{
@@ -109,11 +110,13 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			{
 				int	lastaccess;
 
-				if (SUCCEED == (res = DCget_proxy_delay_by_name(get_rparam(request, 1), &value, &error)) &&
-						SUCCEED == (res = DCget_proxy_lastaccess_by_name(get_rparam(request, 1),
-						&lastaccess, &error)))
+				param2 = get_rparam(request, 1);
+
+				if (SUCCEED == (res = DCget_proxy_delay_by_name(param2, &value, &error)) &&
+						SUCCEED == (res = DCget_proxy_lastaccess_by_name(param2, &lastaccess,
+						&error)))
 				{
-					value += (int)time(NULL) - lastaccess;
+					value += zbx_time() - lastaccess;
 				}
 			}
 			else
