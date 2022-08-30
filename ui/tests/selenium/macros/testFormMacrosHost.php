@@ -275,33 +275,39 @@ class testFormMacrosHost extends testFormMacros {
 		return [
 			[
 				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 2,
-					'macro' => '{$SECRET_HOST_MACRO_UPDATE}',
-					'value' => [
-						'text' => 'Updated secret value'
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => 2,
+						'macro' => '{$SECRET_HOST_MACRO_UPDATE}',
+						'value' => [
+							'text' => 'Updated secret value'
+						]
 					]
 				]
 			],
 			[
 				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 3,
-					'macro' => '{$SECRET_HOST_MACRO_UPDATE_2_TEXT}',
-					'value' => [
-						'text' => 'New text value',
-						'type' => 'Text'
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => 3,
+						'macro' => '{$SECRET_HOST_MACRO_UPDATE_2_TEXT}',
+						'value' => [
+							'text' => 'New text value',
+							'type' => 'Text'
+						]
 					]
 				]
 			],
 			[
 				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 4,
-					'macro' => '{$TEXT_HOST_MACRO_2_SECRET}',
-					'value' => [
-						'text' => 'New secret value',
-						'type' => 'Secret text'
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => 4,
+						'macro' => '{$TEXT_HOST_MACRO_2_SECRET}',
+						'value' => [
+							'text' => 'New secret value',
+							'type' => 'Secret text'
+						]
 					]
 				]
 			]
