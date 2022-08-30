@@ -187,7 +187,7 @@ window.ldap_edit_popup = new class {
 			search_attribute: fields.search_attribute
 		};
 
-		const optional_fields = ['userdirectoryid', 'bind_password', 'start_tls', 'search_filter'];//?
+		const optional_fields = ['userdirectoryid', 'bind_password', 'start_tls', 'search_filter'];// TODO - update list
 
 		for (const field of optional_fields) {
 			if (fields[field] !== undefined) {
@@ -304,13 +304,13 @@ window.ldap_edit_popup = new class {
 		}
 		else {
 			row_index = row.dataset.row_index;
-			const user_groups = row.querySelectorAll(`[name="provision_groups[${row_index}][user_groups][]"`);
+			const user_groups = row.querySelectorAll('[name="provision_groups[' + row_index + '][user_groups][]"]');
 
 			popup_params = {
-				name: row.querySelector(`[name="provision_groups[${row_index}][name]"`).value,
-				roleid: row.querySelector(`[name="provision_groups[${row_index}][roleid]"`).value,
-				is_fallback: row.querySelector(`[name="provision_groups[${row_index}][is_fallback]"`).value,
-				fallback_status: row.querySelector(`[name="provision_groups[${row_index}][fallback_status]"`).value,
+				name: row.querySelector('[name="provision_groups[' + row_index + '][name]"]').value,
+				roleid: row.querySelector('[name="provision_groups[' + row_index + '][roleid]"]').value,
+				is_fallback: row.querySelector('[name="provision_groups[' + row_index + '][is_fallback]"]').value,
+				fallback_status: row.querySelector('[name="provision_groups[' + row_index + '][fallback_status]"]').value,
 				usrgrpid: [...user_groups].map(usrgrp => usrgrp.value)
 			};
 		}
@@ -353,9 +353,9 @@ window.ldap_edit_popup = new class {
 			row_index = row.dataset.row_index;
 
 			popup_params = {
-				name: row.querySelector(`[name="provision_media[${row_index}][name]"`).value,
-				attribute: row.querySelector(`[name="provision_media[${row_index}][attribute]"`).value,
-				mediatypeid: row.querySelector(`[name="provision_media[${row_index}][mediatypeid]"`).value
+				name: row.querySelector('[name="provision_media[' + row_index + '][name]"]').value,
+				attribute: row.querySelector('[name="provision_media[' + row_index + '][attribute]"]').value,
+				mediatypeid: row.querySelector('[name="provision_media[' + row_index + '][mediatypeid]"]').value
 			};
 		}
 
@@ -384,53 +384,58 @@ window.ldap_edit_popup = new class {
 	}
 
 	_renderProvisionGroupRow(group) {
-		const {row_index, name, roleid, is_fallback, fallback_status, role_name, user_groups} = group;
-		const user_group_names = Object.values(user_groups).map(user_group => user_group.name).join(', ');
-		const template = document.createElement('template');
+		const attributes = {
+			user_group_names: Object.values(group.user_groups).map(user_group => user_group.name).join(', '),
+			action_label: '<?= _('Remove') ?>',
+			action_class: 'js-remove',
+			drag_icon_class: ''
+		};
 
-		let action_label;
-		let action_class;
-		let drag_icon_class = '';
-		if (is_fallback == <?= GROUP_MAPPING_FALLBACK ?>) {
-			drag_icon_class = '<?= ZBX_STYLE_DISABLED ?>';
-			if (fallback_status == <?= GROUP_MAPPING_FALLBACK_ON ?>) {
-				action_label = '<?= _('Enabled') ?>';
-				action_class = 'js-enabled <?= ZBX_STYLE_GREEN ?>';
+		if (group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?>) {
+			if (group.fallback_status == <?= GROUP_MAPPING_FALLBACK_ON ?>) {
+				attributes.action_label = '<?= _('Enabled') ?>';
+				attributes.action_class = 'js-enabled <?= ZBX_STYLE_GREEN ?>';
 			}
 			else {
-				action_label = '<?= _('Disabled') ?>';
-				action_class = 'js-disabled <?= ZBX_STYLE_RED ?>';
+				attributes.action_label = '<?= _('Disabled') ?>';
+				attributes.action_class = 'js-disabled <?= ZBX_STYLE_RED ?>';
 			}
-		}
-		else {
-			action_label = '<?= _('Remove') ?>';
-			action_class = 'js-remove';
+			attributes.drag_icon_class = '<?= ZBX_STYLE_DISABLED ?>';
 		}
 
-		const html = `
-			<tr data-row_index="${row_index}" data-row_fallback="${is_fallback}" class="sortable">
+		const provision_group_row_tmpl = new Template(`
+			<tr data-row_index="#{row_index}" data-row_fallback="#{is_fallback}" class="sortable">
 				<td class="td-drag-icon">
-					<div class="drag-icon ui-sortable-handle ${drag_icon_class}"></div>
+					<div class="drag-icon ui-sortable-handle #{drag_icon_class}"></div>
 				</td>
 				<td>
-					<a href="javascript:void(0);" class="wordwrap js-edit">${name}</a>
-					<input type="hidden" name="provision_groups[${row_index}][name]" value="${name}">
-					${ Object.values(user_groups).map(user_group => {
-						return `<input type="hidden" name="provision_groups[${row_index}][user_groups][]" value="${user_group.usrgrpid}">`;
-					}).join('') }
-					<input type="hidden" name="provision_groups[${row_index}][roleid]" value="${roleid}">
-					<input type="hidden" name="provision_groups[${row_index}][is_fallback]" value="${is_fallback}">
-					<input type="hidden" name="provision_groups[${row_index}][fallback_status]" value="${fallback_status}">
+					<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
+					<input type="hidden" name="provision_groups[#{row_index}][name]" value="#{name}">
+					<input type="hidden" name="provision_groups[#{row_index}][roleid]" value="#{roleid}">
+					<input type="hidden" name="provision_groups[#{row_index}][is_fallback]" value="#{is_fallback}">
+					<input type="hidden" name="provision_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
 				</td>
-				<td class="wordbreak">${user_group_names}</td>
-				<td class="wordbreak">${role_name}</td>
+				<td class="wordbreak">#{user_group_names}</td>
+				<td class="wordbreak">#{role_name}</td>
 				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> ${action_class}">${action_label}</button>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> #{action_class}">#{action_label}</button>
 				</td>
-			</tr>`;
+			</tr>`);
 
-		template.innerHTML = html.trim();
-		return template.content.firstChild;
+		const template = document.createElement('template');
+		template.innerHTML = provision_group_row_tmpl.evaluate({...group, ...attributes}).trim();
+		const row = template.content.firstChild;
+
+		for (const user of Object.values(group.user_groups)) {
+			const input = document.createElement('input');
+			input.name = 'provision_groups[' + group.row_index + '][user_groups][]';
+			input.value = user.usrgrpid;
+			input.type = 'hidden';
+
+			row.appendChild(input);
+		}
+
+		return row;
 	}
 
 	_renderProvisionMedia(provision_media) {
