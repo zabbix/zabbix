@@ -96,8 +96,8 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 //	 */
 //	protected static $hostid_remove_inherited;
 
-	public $macro_resolve = '{$X_SECRET_HOST_MACRO_2_RESOLVE}';
-	public $macro_resolve_hostid = 99135;
+//	public $macro_resolve = '{$X_SECRET_HOST_MACRO_2_RESOLVE}';
+//	public $macro_resolve_hostid = 99135;
 
 	public $vault_object = 'host';
 	public $hashi_error_field = '/1/macros/3/value';
@@ -1019,9 +1019,11 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 
 	/**
 	 * @dataProvider getRevertSecretMacrosData
+	 *
+	 * @backupOnce hosts
 	 */
 	public function testFormMacrosDiscoveredHost_RevertSecretMacroChanges($data) {
-		$this->revertSecretMacroChanges($data, 'zabbix.php?action=host.view', 'hosts', self::DISCOVERED_HOST_SECRET_REVERT);
+		$this->revertSecretMacroChanges($data, 'zabbix.php?action=host.view', 'hosts', self::DISCOVERED_HOST_SECRET_REVERT, true);
 	}
 
 	public function getUpdateSecretMacrosData() {

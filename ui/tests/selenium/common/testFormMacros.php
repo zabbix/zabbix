@@ -1573,7 +1573,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
 	 */
-	public function revertSecretMacroChanges($data, $url, $source, $name = null) {
+	public function revertSecretMacroChanges($data, $url, $source, $name = null, $discovered = false) {
 		$form = $this->openMacrosTab($url, $source, true, $name);
 
 		$sql = 'SELECT * FROM hostmacro WHERE macro='.CDBHelper::escape($data['macro_fields']['macro']);
@@ -1585,7 +1585,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->assertEquals('******', $value_field->getValue());
 
 		// Click "Change" button for every macros row in first case for discovered host form.
-		if (CTestArrayHelper::get($data, 'first_case')) {
+		if ($discovered && CTestArrayHelper::get($data, 'first_case')) {
 			for($i = 0; $i < count($this->getMacros()); $i++)  {
 				$form->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
 			}
