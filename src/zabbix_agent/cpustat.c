@@ -175,7 +175,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 			if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
 				goto clean;
 
-			if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+			if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, ZBX_MAX_COLLECTOR_PERIOD,
 					PERF_COUNTER_LANG_DEFAULT, &error)))
 			{
 				goto clean;
@@ -223,7 +223,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 					goto clean;
 
 				if (NULL == (pcpus->cpu_counter[gidx * cpus_per_group + idx] =
-						add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+						add_perf_counter(NULL, counterPath, ZBX_MAX_COLLECTOR_PERIOD,
 								PERF_COUNTER_LANG_DEFAULT, &error)))
 				{
 					goto clean;
@@ -239,7 +239,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
 		goto clean;
 
-	if (NULL == (pcpus->queue_counter = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+	if (NULL == (pcpus->queue_counter = add_perf_counter(NULL, counterPath, ZBX_MAX_COLLECTOR_PERIOD,
 			PERF_COUNTER_LANG_DEFAULT, &error)))
 	{
 		goto clean;
@@ -363,12 +363,12 @@ static void	update_cpu_counters(ZBX_SINGLE_CPU_STAT_DATA *cpu, zbx_uint64_t *cou
 
 	LOCK_CPUSTATS;
 
-	if (MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count))
-		index -= MAX_COLLECTOR_HISTORY;
+	if (ZBX_MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count))
+		index -= ZBX_MAX_COLLECTOR_HISTORY;
 
-	if (MAX_COLLECTOR_HISTORY > cpu->h_count)
+	if (ZBX_MAX_COLLECTOR_HISTORY > cpu->h_count)
 		cpu->h_count++;
-	else if (MAX_COLLECTOR_HISTORY == ++cpu->h_first)
+	else if (ZBX_MAX_COLLECTOR_HISTORY == ++cpu->h_first)
 		cpu->h_first = 0;
 
 	if (NULL != counter)
@@ -628,8 +628,8 @@ read_again:
 				/* only collector can write into cpu history, so for reading */
 				/* collector itself can access it without locking            */
 
-				if (MAX_COLLECTOR_HISTORY <= (index = pcpus->cpu[idx].h_first + pcpus->cpu[idx].h_count - 1))
-					index -= MAX_COLLECTOR_HISTORY;
+				if (ZBX_MAX_COLLECTOR_HISTORY <= (index = pcpus->cpu[idx].h_first + pcpus->cpu[idx].h_count - 1))
+					index -= ZBX_MAX_COLLECTOR_HISTORY;
 
 				last_idle = pcpus->cpu[idx].h_counter[ZBX_CPU_STATE_IDLE][index];
 				last_user = pcpus->cpu[idx].h_counter[ZBX_CPU_STATE_USER][index];
@@ -1137,8 +1137,8 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 
 	LOCK_CPUSTATS;
 
-	if (MAX_COLLECTOR_HISTORY <= (idx_curr = (cpu->h_first + cpu->h_count - 1)))
-		idx_curr -= MAX_COLLECTOR_HISTORY;
+	if (ZBX_MAX_COLLECTOR_HISTORY <= (idx_curr = (cpu->h_first + cpu->h_count - 1)))
+		idx_curr -= ZBX_MAX_COLLECTOR_HISTORY;
 
 	if (SYSINFO_RET_FAIL == cpu->h_status[idx_curr])
 	{
@@ -1156,11 +1156,11 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	else
 	{
 		if (0 > (idx_base = idx_curr - MIN(cpu->h_count - 1, time)))
-			idx_base += MAX_COLLECTOR_HISTORY;
+			idx_base += ZBX_MAX_COLLECTOR_HISTORY;
 
 		while (SYSINFO_RET_OK != cpu->h_status[idx_base])
-			if (MAX_COLLECTOR_HISTORY == ++idx_base)
-				idx_base -= MAX_COLLECTOR_HISTORY;
+			if (ZBX_MAX_COLLECTOR_HISTORY == ++idx_base)
+				idx_base -= ZBX_MAX_COLLECTOR_HISTORY;
 
 		for (i = 0; i < ZBX_CPU_STATE_COUNT; i++)
 		{
@@ -1356,8 +1356,8 @@ int	get_cpus(zbx_vector_uint64_pair_t *vector)
 
 		cpu = &pcpus->cpu[idx];
 
-		if (MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count - 1))
-			index -= MAX_COLLECTOR_HISTORY;
+		if (ZBX_MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count - 1))
+			index -= ZBX_MAX_COLLECTOR_HISTORY;
 
 		pair.first = cpu->cpu_num;
 		pair.second = get_cpu_status(cpu->h_status[index]);

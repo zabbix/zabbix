@@ -556,7 +556,7 @@ static void	set_defaults(void)
 
 		init_result(&result);
 
-		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
+		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, &result) &&
 				NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);

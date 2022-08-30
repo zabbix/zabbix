@@ -192,7 +192,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 
 			period = atoi(interval);
 
-			if (1 > period || MAX_COLLECTOR_PERIOD < period)
+			if (1 > period || ZBX_MAX_COLLECTOR_PERIOD < period)
 			{
 				error = zbx_strdup(NULL, "Interval out of range.");
 				goto pc_fail;

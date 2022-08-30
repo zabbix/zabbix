@@ -947,7 +947,7 @@ void	test_parameter(const char *key)
 
 	init_result(&result);
 
-	if (SUCCEED == process(key, PROCESS_WITH_ALIAS, &result))
+	if (SUCCEED == process(key, ZBX_PROCESS_WITH_ALIAS, &result))
 	{
 		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
@@ -1106,9 +1106,9 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, char **o
  * Purpose: execute agent check                                               *
  *                                                                            *
  * Parameters: in_command - item key                                          *
- *             flags - PROCESS_LOCAL_COMMAND, allow execution of system.run   *
- *                     PROCESS_MODULE_COMMAND, execute item from a module     *
- *                     PROCESS_WITH_ALIAS, substitute agent Alias             *
+ *             flags - ZBX_PROCESS_LOCAL_COMMAND, allow execution of system.run   *
+ *                     ZBX_PROCESS_MODULE_COMMAND, execute item from a module     *
+ *                     ZBX_PROCESS_WITH_ALIAS, substitute agent Alias             *
  *                                                                            *
  * Return value: SUCCEED - successful execution                               *
  *               NOTSUPPORTED - item key is not supported or other error      *
@@ -1123,14 +1123,14 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 	init_request(&request);
 
-	if (SUCCEED != parse_item_key((0 == (flags & PROCESS_WITH_ALIAS) ? in_command : zbx_alias_get(in_command)),
+	if (SUCCEED != parse_item_key((0 == (flags & ZBX_PROCESS_WITH_ALIAS) ? in_command : zbx_alias_get(in_command)),
 			&request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto notsupported;
 	}
 
-	if (0 == (flags & PROCESS_LOCAL_COMMAND) && ZBX_KEY_ACCESS_ALLOW != check_request_access_rules(&request))
+	if (0 == (flags & ZBX_PROCESS_LOCAL_COMMAND) && ZBX_KEY_ACCESS_ALLOW != check_request_access_rules(&request))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Key access denied: \"%s\"", in_command);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));
@@ -1138,14 +1138,14 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	}
 
 	/* system.run is not allowed by default except for getting hostname for daemons */
-	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND) &&
+	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & ZBX_PROCESS_LOCAL_COMMAND) &&
 			0 == strcmp(request.key, "system.run"))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Remote commands are not enabled."));
 		goto notsupported;
 	}
 
-	if (0 != (flags & PROCESS_LOCAL_COMMAND))
+	if (0 != (flags & ZBX_PROCESS_LOCAL_COMMAND))
 	{
 		for (command = commands_local; NULL != command->key; command++)
 		{
@@ -1171,7 +1171,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	}
 
 	/* expected item from a module */
-	if (0 != (flags & PROCESS_MODULE_COMMAND) && 0 == (command->flags & CF_MODULE))
+	if (0 != (flags & ZBX_PROCESS_MODULE_COMMAND) && 0 == (command->flags & CF_MODULE))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));
 		goto notsupported;

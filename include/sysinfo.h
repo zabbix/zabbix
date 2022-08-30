@@ -136,14 +136,14 @@ extern int	CONFIG_LOG_REMOTE_COMMANDS;
 extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 
 /* collector */
-#define MAX_COLLECTOR_HISTORY	(15 * SEC_PER_MIN + 1)
+#define ZBX_MAX_COLLECTOR_HISTORY	(15 * SEC_PER_MIN + 1)
 #define ZBX_AVG1		0
 #define ZBX_AVG5		1
 #define ZBX_AVG15		2
 #define ZBX_AVG_COUNT		3
 
 #if defined(_WINDOWS)
-#	define MAX_COLLECTOR_PERIOD	(15 * SEC_PER_MIN)
+#	define ZBX_MAX_COLLECTOR_PERIOD	(15 * SEC_PER_MIN)
 #endif
 
 #define ZBX_CPU_STATE_USER	0
@@ -193,9 +193,9 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 
 /* flags for process */
-#define PROCESS_LOCAL_COMMAND	0x1
-#define PROCESS_MODULE_COMMAND	0x2
-#define PROCESS_WITH_ALIAS	0x4
+#define ZBX_PROCESS_LOCAL_COMMAND	0x1
+#define ZBX_PROCESS_MODULE_COMMAND	0x2
+#define ZBX_PROCESS_WITH_ALIAS	0x4
 
 typedef enum
 {

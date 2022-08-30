@@ -561,7 +561,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 
 	init_result(&result);
 
-	if (SUCCEED == process(config, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
+	if (SUCCEED == process(config, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, &result) &&
 			NULL != (value = ZBX_GET_STR_RESULT(&result)) && NULL != *value)
 	{
 		if (SUCCEED != zbx_is_utf8(*value))

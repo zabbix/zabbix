@@ -96,7 +96,7 @@ static int perf_counter_ex(const char *function, AGENT_REQUEST *request, AGENT_R
 		goto out;
 	}
 
-	if (1 > interval || MAX_COLLECTOR_PERIOD < interval)
+	if (1 > interval || ZBX_MAX_COLLECTOR_PERIOD < interval)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Interval out of range."));
 		goto out;
