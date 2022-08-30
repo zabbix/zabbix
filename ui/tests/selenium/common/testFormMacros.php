@@ -1410,6 +1410,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param array		$data		given data provider
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
+	 * @param string	$name		name of the host where macros are removed
 	 */
 	public function createSecretMacros($data, $url, $source, $name = null) {
 		$form = $this->openMacrosTab($url, $source, true, $name);
@@ -1486,7 +1487,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param array		$data		given data provider
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
-	 * @param string	$name
+	 * @param string	$name		name of the host where macros to be updated
+	 * @param boolean	$discovered true if object is discovered host, false - if normal
 	 */
 	public function updateSecretMacros($data, $url, $source, $name = null, $discovered = false) {
 		$form = $this->openMacrosTab($url, $source, true, $name);
@@ -1572,6 +1574,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param array		$data		given data provider
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
+	 * @param string	$name		name of the host where macros to be updated
+	 * @param boolean	$discovered true if object is discovered host, false - if normal
 	 */
 	public function revertSecretMacroChanges($data, $url, $source, $name = null, $discovered = false) {
 		$form = $this->openMacrosTab($url, $source, true, $name);
@@ -2030,7 +2034,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param string $source	source type - host/template/host prototype
 	 * @param string $name		source name
 	 */
-	public function createVaultMacros($data, $url, $source, $name = null, $discovered = false) {
+	public function createVaultMacros($data, $url, $source, $name = null) {
 		$this->selectVault($data['vault']);
 		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data['macro_fields']]);
