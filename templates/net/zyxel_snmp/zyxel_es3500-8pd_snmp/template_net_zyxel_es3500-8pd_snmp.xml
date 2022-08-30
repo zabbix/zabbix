@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-07-23T11:06:19Z</date>
+   <date>2021-12-23T18:32:15Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -27,7 +27,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Network devices</name>
@@ -62,7 +62,6 @@ Template tooling version used: 0.38</description>
                <type>INTERNAL</type>
                <key>zabbix[host,snmp,available]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Status</name>
@@ -95,7 +94,6 @@ Template tooling version used: 0.38</description>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: RFC1213-MIB&#13;
 The textual identification of the contact person&#13;
@@ -120,7 +118,6 @@ on how to contact this person.</description>
                <snmp_oid>.1.3.6.1.4.1.890.1.5.8.72.12.7.0</snmp_oid>
                <key>zyxel.3500_8pd.cpuusage</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
@@ -149,7 +146,6 @@ getting the values.</description>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: ZYXEL-ES3500-8PD-MIB</description>
                <inventory_link>SOFTWARE_FULL</inventory_link>
@@ -196,7 +192,6 @@ return strOut;
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: RFC1213-MIB&#13;
 The physical location of this node (e.g.,&#13;
@@ -222,7 +217,6 @@ The physical location of this node (e.g.,&#13;
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: IF-MIB&#13;
 The interface's address at the protocol layer&#13;
@@ -251,7 +245,6 @@ should contain an octet string of zero length.</description>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: RFC1213-MIB&#13;
 A textual description of the entity.  This value&#13;
@@ -289,7 +282,6 @@ printable ASCII characters.</description>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: RFC1213-MIB&#13;
 An administratively-assigned name for this&#13;
@@ -316,7 +308,6 @@ fully-qualified domain name.</description>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
 Serial number</description>
@@ -350,7 +341,6 @@ Serial number</description>
                <delay>30s</delay>
                <history>2w</history>
                <trends>0d</trends>
-               <status>ENABLED</status>
                <units>uptime</units>
                <description>MIB: RFC1213-MIB&#13;
 The time (in hundredths of a second) since the&#13;
@@ -392,7 +382,6 @@ re-initialized.</description>
                      <snmp_oid>.1.3.6.1.4.1.890.1.5.8.72.124.1.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.memory[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>%</units>
                      <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
 Utilization of memory pool in %.</description>
@@ -417,7 +406,6 @@ Utilization of memory pool in %.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Interface discovery</name>
@@ -459,7 +447,6 @@ Utilization of memory pool in %.</description>
                      <snmp_oid>.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.adminstatus[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The desired state of the interface.  The&#13;
 testing(3) state indicates that no operational&#13;
@@ -486,7 +473,6 @@ packets can be passed.</description>
                      <key>zyxel.3500_8pd.net.if.descr[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: IF-MIB&#13;
 A textual string containing information about the interface</description>
@@ -508,7 +494,6 @@ A textual string containing information about the interface</description>
                      <snmp_oid>.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
 An estimate of the interface's current bandwidth in bits per second</description>
@@ -534,7 +519,6 @@ An estimate of the interface's current bandwidth in bits per second</description
                      <snmp_oid>.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.in.broadcastpkts[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>packets/s</units>
                      <description>MIB: IF-MIB&#13;
 The number of packets, delivered by this sub-layer to a&#13;
@@ -558,7 +542,6 @@ address at this sub-layer.</description>
                      <snmp_oid>.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.in.multicastpkts[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>packets/s</units>
                      <description>MIB: IF-MIB&#13;
 The number of packets, delivered by this sub-layer to a&#13;
@@ -583,7 +566,6 @@ includes both Group and Functional addresses.</description>
                      <snmp_oid>.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.in.traffic[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
 The total number of octets received on the interface,&#13;
@@ -610,7 +592,6 @@ including framing characters.</description>
                      <snmp_oid>.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.in.ucastpkts[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>packets/s</units>
                      <description>MIB: IF-MIB&#13;
 The number of packets, delivered by this sub-layer to a&#13;
@@ -633,7 +614,6 @@ or broadcast address at this sub-layer</description>
                      <type>CALCULATED</type>
                      <key>zyxel.3500_8pd.net.if.in.util[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <params>last(zyxel.3500_8pd.net.if.in.traffic[{#SNMPINDEX}]) * (last(zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) &lt;&gt; 0) / 
@@ -664,7 +644,6 @@ or broadcast address at this sub-layer</description>
                      <snmp_oid>.1.3.6.1.4.1.890.1.5.8.72.24.1.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.link_type[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB:  ZYXEL-ES3500-8PD-MIB&#13;
 Physical connection type</description>
                      <application_prototypes>
@@ -689,7 +668,6 @@ Physical connection type</description>
                      <key>zyxel.3500_8pd.net.if.name[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB:  ZYXEL-ES3500-8PD-MIB&#13;
 A textual string containing information about the interface</description>
@@ -711,7 +689,6 @@ A textual string containing information about the interface</description>
                      <snmp_oid>.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The current operational state of the interface.&#13;
 The testing(3) state indicates that no operational&#13;
@@ -753,7 +730,6 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <snmp_oid>.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.out.broadcastpkts[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>packets/s</units>
                      <description>MIB: IF-MIB&#13;
 The total number of packets that higher-level protocols&#13;
@@ -778,7 +754,6 @@ were discarded or not sent.</description>
                      <snmp_oid>.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.out.multicastpkts[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>packets/s</units>
                      <description>MIB: IF-MIB&#13;
 The total number of packets that higher-level protocols&#13;
@@ -804,7 +779,6 @@ includes both Group and Functional addresses.</description>
                      <snmp_oid>.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.out.traffic[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
 The total number of octets transmitted out of the&#13;
@@ -832,7 +806,6 @@ interface, including framing characters.  This object is a&#13;
                      <snmp_oid>.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.out.ucastpkts[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>packets/s</units>
                      <description>MIB: IF-MIB&#13;
 The total number of packets that higher-level protocols&#13;
@@ -856,7 +829,6 @@ those that were discarded or not sent.</description>
                      <type>CALCULATED</type>
                      <key>zyxel.3500_8pd.net.if.out.util[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <params>last(zyxel.3500_8pd.net.if.out.traffic[{#SNMPINDEX}]) * (last(zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) &lt;&gt; 0) / 
@@ -887,7 +859,6 @@ those that were discarded or not sent.</description>
                      <snmp_oid>.1.3.6.1.4.1.890.1.5.8.72.24.1.1.1.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.net.if.speed_duplex[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB:  ZYXEL-ES3500-8PD-MIB&#13;
 Transmission mode</description>
                      <application_prototypes>
@@ -906,7 +877,6 @@ Transmission mode</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Packets traffic</name>
@@ -1060,7 +1030,6 @@ Transmission mode</description>
                      <key>zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]</key>
                      <delay>{$ZYXEL.LLD.SFP.UPDATE}</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!{#ZYXEL.SFP.UNIT}</units>
                      <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
@@ -1096,7 +1065,6 @@ Transceiver module DDM data ({#ZYXEL.SFP.DESCRIPTION}).</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}</name>
@@ -1167,7 +1135,6 @@ return JSON.stringify(outArr);
                      <delay>{$ZYXEL.LLD.SFP.UPDATE}</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
 Transceiver module vendor's manufacturing date code.</description>
@@ -1191,7 +1158,6 @@ Transceiver module vendor's manufacturing date code.</description>
                      <delay>{$ZYXEL.LLD.SFP.UPDATE}</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
 Part number provided by transceiver module vendor.</description>
@@ -1215,7 +1181,6 @@ Part number provided by transceiver module vendor.</description>
                      <delay>{$ZYXEL.LLD.SFP.UPDATE}</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
 Revision level for part number provided by transceiver module vendor.</description>
@@ -1239,7 +1204,6 @@ Revision level for part number provided by transceiver module vendor.</descripti
                      <delay>{$ZYXEL.LLD.SFP.UPDATE}</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
 Serial number provided by transceiver module vendor.</description>
@@ -1271,7 +1235,6 @@ Serial number provided by transceiver module vendor.</description>
                      <key>zyxel.3500_8pd.sfp.status[{#SNMPINDEX}]</key>
                      <delay>{$ZYXEL.LLD.SFP.UPDATE}</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
 Transceiver module status.</description>
                      <application_prototypes>
@@ -1297,7 +1260,6 @@ Transceiver module status.</description>
                      <delay>{$ZYXEL.LLD.SFP.UPDATE}</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
 Transceiver module type names.</description>
@@ -1321,7 +1283,6 @@ Transceiver module type names.</description>
                      <delay>{$ZYXEL.LLD.SFP.UPDATE}</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
 Transceiver module vendor name.</description>
@@ -1338,7 +1299,6 @@ Transceiver module vendor name.</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature discovery</name>
@@ -1355,7 +1315,6 @@ Index of temperature unit. 1:MAC, 2:CPU, 3:PHY</description>
                      <snmp_oid>.1.3.6.1.4.1.890.1.5.8.72.9.2.1.2.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.temp[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>°C</units>
                      <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
 The current temperature measured at this sensor</description>
@@ -1381,7 +1340,6 @@ The current temperature measured at this sensor</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ZYXEL ES3500-8PD: Temperature "{#ZYXEL.TEMP.ID}"</name>
@@ -1425,7 +1383,6 @@ return JSON.stringify(outArr);
                      <snmp_oid>.1.3.6.1.4.1.890.1.5.8.72.9.3.1.2.{#SNMPINDEX}</snmp_oid>
                      <key>zyxel.3500_8pd.volt[{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>V</units>
                      <description>MIB: ZYXEL-ES3500-8PD-MIB&#13;
@@ -1456,7 +1413,6 @@ The current voltage reading.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ZYXEL ES3500-8PD: Nominal "{#ZYXEL.VOLT.NOMINAL}"</name>
@@ -1596,6 +1552,23 @@ return JSON.stringify(outArr);
          </mappings>
       </value_map>
       <value_map>
+         <name>ZYXEL ES3500-8PD operational mode port link up type</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Cooper</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Fiber</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>ZYXEL ES3500-8PD operational mode port speed duplex</name>
          <mappings>
             <mapping>
@@ -1621,23 +1594,6 @@ return JSON.stringify(outArr);
             <mapping>
                <value>5</value>
                <newvalue>1G full</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>ZYXEL ES3500-8PD operational mode port link up type</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Cooper</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Fiber</newvalue>
             </mapping>
          </mappings>
       </value_map>

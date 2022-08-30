@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-11T13:53:06Z</date>
+   <date>2021-12-24T06:24:30Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -20,7 +20,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420659-discussion-thread-for-official-zabbix-template-db-mongodb&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -41,7 +41,6 @@ Template tooling version used: 0.38</description>
                <key>mongodb.config_server_heartbeat</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>s</units>
                <description>Difference between the latest optime of the CSRS primary that the mongos has seen and cluster time.</description>
                <applications>
@@ -67,7 +66,6 @@ return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTim
                <key>mongodb.connection_pool.available</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total number of available outgoing connections from the current mongos instance to other members of the sharded cluster.</description>
                <applications>
                   <application>
@@ -90,7 +88,6 @@ return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTim
                <key>mongodb.connection_pool.client</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The number of active and stored outgoing synchronous connections from the current mongos instance to other members of the sharded cluster.</description>
                <applications>
                   <application>
@@ -113,7 +110,6 @@ return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTim
                <key>mongodb.connection_pool.created.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>The total number of outgoing connections created per second by the current mongos instance to other members of the sharded cluster.</description>
                <applications>
@@ -141,7 +137,6 @@ return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTim
                <key>mongodb.connection_pool.in_use</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Reports the total number of outgoing connections from the current mongos instance to other members of the sharded cluster set that are currently in use.</description>
                <applications>
                   <application>
@@ -164,7 +159,6 @@ return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTim
                <key>mongodb.connection_pool.refreshing</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Reports the total number of outgoing connections from the current mongos instance to other members of the sharded cluster that are currently being refreshed.</description>
                <applications>
                   <application>
@@ -187,7 +181,6 @@ return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTim
                <key>mongodb.connection_pool.scoped</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of active and stored outgoing scoped synchronous connections from the current mongos instance to other members of the sharded cluster.</description>
                <applications>
                   <application>
@@ -210,7 +203,6 @@ return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTim
                <key>mongodb.connections.active</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>"The number of active client connections to the server. &#13;
 Active client connections refers to client connections that currently have operations in progress.&#13;
 Available starting in  4.0.7, 0 for older versions."</description>
@@ -237,7 +229,6 @@ Available starting in  4.0.7, 0 for older versions."</description>
                <key>mongodb.connections.available</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>"The number of unused incoming connections available."</description>
                <applications>
                   <application>
@@ -269,7 +260,6 @@ Consider this value in combination with the value of connections current to unde
                <key>mongodb.connections.current</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>"The number of incoming connections from clients to the database server. &#13;
 This number includes the current shell session"</description>
                <applications>
@@ -293,7 +283,6 @@ This number includes the current shell session"</description>
                <key>mongodb.connections.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>"Rate of all incoming connections created to the server."</description>
                <applications>
@@ -320,7 +309,6 @@ This number includes the current shell session"</description>
                <key>mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Returns current info about connpool.stats.</description>
                <applications>
@@ -335,7 +323,6 @@ This number includes the current shell session"</description>
                <key>mongodb.cursor.open.pinned</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of pinned open cursors.</description>
                <applications>
                   <application>
@@ -358,7 +345,6 @@ This number includes the current shell session"</description>
                <key>mongodb.cursor.open.total</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of cursors that MongoDB is maintaining for clients.</description>
                <applications>
                   <application>
@@ -388,7 +374,6 @@ This number includes the current shell session"</description>
                <key>mongodb.cursor.timed_out.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of cursors that time out, per second.</description>
                <applications>
@@ -421,7 +406,6 @@ This number includes the current shell session"</description>
                <name>MongoDB cluster: Jumbo chunks</name>
                <key>mongodb.jumbo_chunks.count["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Total number of 'jumbo' chunks in the mongo cluster.</description>
                <applications>
                   <application>
@@ -435,7 +419,6 @@ This number includes the current shell session"</description>
                <key>mongodb.last_seen_config_server</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>unixtime</units>
                <description>The latest optime of the CSRS primary that the mongos has seen.</description>
                <applications>
@@ -461,7 +444,6 @@ return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
                <key>mongodb.mem.bits</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>bit</units>
                <description>A number, either 64 or 32, that indicates whether the MongoDB instance is compiled for 64-bit or 32-bit architecture.</description>
                <applications>
@@ -489,7 +471,6 @@ return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
                <key>mongodb.mem.resident</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>Amount of memory currently used by the database process.</description>
                <applications>
@@ -517,7 +498,6 @@ return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
                <key>mongodb.mem.virtual</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>Amount of virtual memory used by the mongos process.</description>
                <applications>
@@ -545,7 +525,6 @@ return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
                <key>mongodb.metrics.cursor.open.no_timeout</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of open cursors with the option DBQuery.Option.noTimeout set to prevent timeout after a period of inactivity.</description>
                <applications>
                   <application>
@@ -568,7 +547,6 @@ return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
                <key>mongodb.network.bytes_in.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>The total number of bytes that the server has received over network connections initiated by clients or other mongod/mongos instances per second.</description>
                <applications>
@@ -596,7 +574,6 @@ return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
                <key>mongodb.network.bytes_out.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>The total number of bytes that the server has sent over network connections initiated by clients or other mongod/mongos instances per second.</description>
@@ -625,7 +602,6 @@ return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
                <key>mongodb.network.numRequests.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>!Rps</units>
                <description>Number of distinct requests that the server has received per second</description>
@@ -654,7 +630,6 @@ return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
                <key>mongodb.opcounters.command.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>"The number of commands issued to the database per second.&#13;
 Counts all commands except the write commands: insert, update, and delete."</description>
@@ -683,7 +658,6 @@ Counts all commands except the write commands: insert, update, and delete."</des
                <key>mongodb.opcounters.delete.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>"The number of delete operations the mongos instance per second."</description>
                <applications>
@@ -711,7 +685,6 @@ Counts all commands except the write commands: insert, update, and delete."</des
                <key>mongodb.opcounters.getmore.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>"The number of “getmore” operations the mongos per second. This counter can be high even if the query count is low.&#13;
 Secondary nodes send getMore operations as part of the replication process."</description>
@@ -740,7 +713,6 @@ Secondary nodes send getMore operations as part of the replication process."</de
                <key>mongodb.opcounters.insert.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>"The number of insert operations received the mongos instance per second."</description>
                <applications>
@@ -768,7 +740,6 @@ Secondary nodes send getMore operations as part of the replication process."</de
                <key>mongodb.opcounters.query.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>"The number of queries received the mongos instance per second."</description>
                <applications>
@@ -796,7 +767,6 @@ Secondary nodes send getMore operations as part of the replication process."</de
                <key>mongodb.opcounters.update.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>"The number of update operations the mongos instance per second."</description>
                <applications>
@@ -823,7 +793,6 @@ Secondary nodes send getMore operations as part of the replication process."</de
                <key>mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]</key>
                <delay>30s</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Test if a connection is alive or not.</description>
                <applications>
                   <application>
@@ -853,7 +822,6 @@ Secondary nodes send getMore operations as part of the replication process."</de
                <key>mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>The mongos statistic</description>
                <applications>
@@ -868,7 +836,6 @@ Secondary nodes send getMore operations as part of the replication process."</de
                <key>mongodb.uptime</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>s</units>
                <description>Number of seconds since Mongos server start</description>
                <applications>
@@ -887,13 +854,6 @@ Secondary nodes send getMore operations as part of the replication process."</de
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{last()}&lt;10m</expression>
-                     <name>MongoDB cluster: has been restarted (uptime &lt; 10m)</name>
-                     <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
-                     <manual_close>YES</manual_close>
-                  </trigger>
-                  <trigger>
                      <expression>{nodata(10m)}=1</expression>
                      <name>MongoDB cluster: Failed to fetch info data (or no data for 10m)</name>
                      <priority>WARNING</priority>
@@ -906,6 +866,13 @@ Secondary nodes send getMore operations as part of the replication process."</de
                         </dependency>
                      </dependencies>
                   </trigger>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>MongoDB cluster: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
                </triggers>
             </item>
             <item>
@@ -915,7 +882,6 @@ Secondary nodes send getMore operations as part of the replication process."</de
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>Version of the Mongos server</description>
                <applications>
@@ -950,7 +916,6 @@ Secondary nodes send getMore operations as part of the replication process."</de
          <discovery_rules>
             <discovery_rule>
                <name>Config servers discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>mongodb.cfg.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]</key>
                <delay>30m</delay>
                <description>Discovery shared cluster config servers.</description>
@@ -989,7 +954,6 @@ Secondary nodes send getMore operations as part of the replication process."</de
             </discovery_rule>
             <discovery_rule>
                <name>Collection discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>mongodb.collections.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]</key>
                <delay>30m</delay>
                <filter>
@@ -1028,7 +992,6 @@ Note, depending on the number of DBs and collections this discovery operation ma
                      <key>mongodb.collection.avg_obj_size["{#DBNAME}","{#COLLECTION}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <description>The size of the average object in the collection in bytes.</description>
@@ -1055,7 +1018,6 @@ Note, depending on the number of DBs and collections this discovery operation ma
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Whether or not the collection is capped.</description>
                      <application_prototypes>
@@ -1090,7 +1052,6 @@ Note, depending on the number of DBs and collections this discovery operation ma
                      <key>mongodb.collection.count["{#DBNAME}","{#COLLECTION}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Total number of objects in the collection.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1113,7 +1074,6 @@ Note, depending on the number of DBs and collections this discovery operation ma
                      <key>mongodb.collection.max_size["{#DBNAME}","{#COLLECTION}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Maximum size of a capped collection in bytes.</description>
                      <application_prototypes>
@@ -1138,7 +1098,6 @@ Note, depending on the number of DBs and collections this discovery operation ma
                      <key>mongodb.collection.max["{#DBNAME}","{#COLLECTION}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Maximum number of documents in a capped collection.</description>
                      <application_prototypes>
@@ -1163,7 +1122,6 @@ Note, depending on the number of DBs and collections this discovery operation ma
                      <key>mongodb.collection.nindexes["{#DBNAME}","{#COLLECTION}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Total number of indices on the collection.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1186,7 +1144,6 @@ Note, depending on the number of DBs and collections this discovery operation ma
                      <key>mongodb.collection.size["{#DBNAME}","{#COLLECTION}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>The total size in bytes of the data in the collection plus the size of every indexes on the mongodb.collection.</description>
                      <application_prototypes>
@@ -1209,7 +1166,6 @@ Note, depending on the number of DBs and collections this discovery operation ma
                      <key>mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]</key>
                      <history>0</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>Returns a variety of storage statistics for a given collection.</description>
                      <applications>
@@ -1224,7 +1180,6 @@ Note, depending on the number of DBs and collections this discovery operation ma
                      <key>mongodb.collection.storage_size["{#DBNAME}","{#COLLECTION}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Total storage space allocated to this collection for document storage.</description>
                      <application_prototypes>
@@ -1243,11 +1198,9 @@ Note, depending on the number of DBs and collections this discovery operation ma
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Database discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>mongodb.db.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]</key>
                <delay>30m</delay>
                <filter>
@@ -1275,7 +1228,6 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      <key>mongodb.db.data_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Total size of the data held in this database including the padding factor.</description>
                      <application_prototypes>
@@ -1299,7 +1251,6 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      <key>mongodb.db.extents["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Contains a count of the number of extents in the database across all collections.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1323,7 +1274,6 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      <key>mongodb.db.file_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Total size of the data held in this database including the padding factor (only available with the mmapv1 storage engine).</description>
                      <application_prototypes>
@@ -1348,7 +1298,6 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      <key>mongodb.db.index_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Total size of all indexes created on this database.</description>
                      <application_prototypes>
@@ -1372,7 +1321,6 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      <key>mongodb.db.objects["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Number of objects (documents) in the database across all collections.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1395,7 +1343,6 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      <key>mongodb.db.size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <description>The average size of each document in bytes.</description>
@@ -1419,9 +1366,8 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      <key>mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]</key>
                      <history>0</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
-                     <description>Returns statistics reflecting the database system’s state.</description>
+                     <description>Returns statistics reflecting the database system's state.</description>
                      <applications>
                         <application>
                            <name>Zabbix raw items</name>
@@ -1434,7 +1380,6 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      <key>mongodb.db.storage_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Total amount of space allocated to collections in this database for document storage.</description>
                      <application_prototypes>
@@ -1453,7 +1398,6 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>MongoDB {#DBNAME}: Disk usage</name>
@@ -1495,7 +1439,6 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
             </discovery_rule>
             <discovery_rule>
                <name>Shards discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>mongodb.sh.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]</key>
                <delay>30m</delay>
                <description>Discovery shared cluster hosts.</description>
@@ -1777,19 +1720,6 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
    </graphs>
    <value_maps>
       <value_map>
-         <name>Service state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>MongoDB flag</name>
          <mappings>
             <mapping>
@@ -1799,6 +1729,19 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
             <mapping>
                <value>1</value>
                <newvalue>True</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

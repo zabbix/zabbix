@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T11:01:52Z</date>
+   <date>2021-12-23T18:24:13Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -17,7 +17,7 @@ MIBs used:&#13;
 FASTPATH-SWITCHING-MIB&#13;
 FASTPATH-BOXSERVICES-PRIVATE-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -265,7 +265,6 @@ The status of fan</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -304,7 +303,6 @@ The status of power supply</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -360,7 +358,6 @@ The temperature value reported by sensor</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Net Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
@@ -493,7 +490,7 @@ or&#13;
    </graphs>
    <value_maps>
       <value_map>
-         <name>FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState</name>
+         <name>FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState</name>
          <mappings>
             <mapping>
                <value>1</value>
@@ -518,7 +515,7 @@ or&#13;
          </mappings>
       </value_map>
       <value_map>
-         <name>FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState</name>
+         <name>FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState</name>
          <mappings>
             <mapping>
                <value>1</value>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1325,7 +1325,7 @@ class CDiscoveryRule extends CItemGeneral {
 							// If same "lld_macro" is found in DB, update only "path" if necessary.
 
 							if (array_key_exists('path', $lld_macro_path)
-									&& $lld_macro_path['path'] !== $lld_macro_path['path']) {
+									&& $lld_macro_path['path'] !== $db_lld_macro_path['path']) {
 								$fields_to_update['path'] = $lld_macro_path['path'];
 							}
 						}

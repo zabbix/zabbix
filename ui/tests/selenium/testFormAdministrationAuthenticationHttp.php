@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
@@ -526,7 +527,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					$message = CMessageElement::find()->one();
 					$this->assertEquals('msg-bad msg-global', $message->getAttribute('class'));
 					$message_title= $message->getText();
-					$this->assertContains($check['error'], $message_title);
+					$this->assertStringContainsString($check['error'], $message_title);
 				}
 
 				continue;
@@ -681,11 +682,11 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	/**
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 */
-	public static function removeGuestFromDisabledGroup() {
+	public function removeGuestFromDisabledGroup() {
 		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
 	}
 
-	public function addGuestToDisabledGroup() {
+	public static function addGuestToDisabledGroup() {
 		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 }

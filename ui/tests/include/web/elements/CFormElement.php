@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -142,7 +142,7 @@ class CFormElement extends CElement {
 			}
 
 			if ($labels->count() > 1) {
-				CTest::addWarning('Form label "'.$name.'" is not unique.');
+				CTest::zbxAddWarning('Form label "'.$name.'" is not unique.');
 			}
 		}
 
@@ -340,6 +340,11 @@ class CFormElement extends CElement {
 
 			return $this;
 		}
+		elseif ($values instanceof \Closure) {
+			$values($this, $field, $element);
+
+			return $this;
+		}
 
 		if ($this->filter !== null && !$this->filter->match($element)) {
 			return $this;
@@ -440,5 +445,21 @@ class CFormElement extends CElement {
 		}
 
 		return $element->checkValue($values, $raise_exception);
+	}
+
+	/**
+	 * Wait for form reload after form element select.
+	 *
+	 * @param string $value		text to be written into the field
+	 *
+	 * @return Closure
+	 */
+	public static function RELOADABLE_FILL($value) {
+		return function ($form, $field, $element) use ($value) {
+			if (!($element instanceof CDropdownElement) || $element->getText() !== $value) {
+				$element->fill($value);
+				$form->waitUntilReloaded();
+			}
+		};
 	}
 }

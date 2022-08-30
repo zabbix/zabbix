@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,6 +60,10 @@ const (
 	startupTypeDisabled
 	startupTypeUnknown
 	startupTypeTrigger
+)
+
+const (
+	ZBX_NON_EXISTING_SRV = 255
 )
 
 func startupName(startup int) string {
@@ -159,9 +163,7 @@ func openServiceEx(m *mgr.Mgr, name string) (s *mgr.Service, err error) {
 	if err == nil {
 		return
 	}
-	if err.(syscall.Errno) != windows.ERROR_SERVICE_DOES_NOT_EXIST {
-		return
-	}
+
 	wname, err := win32.GetServiceKeyName(syscall.Handle(m.Handle), name)
 	if err != nil {
 		return
@@ -278,7 +280,11 @@ func (p *Plugin) exportServiceInfo(params []string) (result interface{}, err err
 	defer m.Disconnect()
 
 	service, err := openServiceEx(m, params[0])
+
 	if err != nil {
+		if err.(syscall.Errno) == windows.ERROR_SERVICE_DOES_NOT_EXIST {
+			return ZBX_NON_EXISTING_SRV, nil
+		}
 		return
 	}
 	defer service.Close()

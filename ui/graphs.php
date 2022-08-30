@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ $fields = [
 	'name' =>				[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'width' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Width')],
 	'height' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Height')],
-	'graphtype' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),	'isset({add}) || isset({update})'],
+	'graphtype' =>			[T_ZBX_INT, O_OPT, P_SYS,		IN('0,1,2,3'),	'isset({add}) || isset({update})'],
 	'show_3d' =>			[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null],
 	'show_legend' =>		[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null],
 	'ymin_type' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null],
@@ -80,7 +80,7 @@ $fields = [
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name","discover"'),					null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-$percentVisible = getRequest('visible');
+$percentVisible = getRequest('visible', []);
 if (!isset($percentVisible['percent_left'])) {
 	unset($_REQUEST['percent_left']);
 }
@@ -96,8 +96,14 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 check_fields($fields);
 
 $gitems = [];
-foreach (getRequest('items', []) as $gitem) {
-	$gitems[] = json_decode($gitem, true);
+foreach (getRequest('items', []) as $item) {
+	$gitem = json_decode($item, true);
+
+	if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
+			&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+			&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+		$gitems[] = $gitem;
+	}
 }
 
 $_REQUEST['items'] = $gitems;
@@ -496,9 +502,9 @@ elseif (isset($_REQUEST['form'])) {
 
 	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
 		$options = [
-			'graphids' => $data['graphid'],
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid']
+			'selectHosts' => ['hostid'],
+			'graphids' => $data['graphid']
 		];
 
 		if ($data['parent_discoveryid'] === null) {
@@ -586,10 +592,9 @@ elseif (isset($_REQUEST['form'])) {
 		$data['show_triggers'] = getRequest('show_triggers', 0);
 		$data['show_legend'] = getRequest('show_legend', 0);
 		$data['show_3d'] = getRequest('show_3d', 0);
-		$data['visible'] = getRequest('visible');
+		$data['visible'] = getRequest('visible', []);
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
-		$data['visible'] = getRequest('visible');
 		$data['items'] = $gitems;
 		$data['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
 		$data['templates'] = [];
@@ -608,12 +613,32 @@ elseif (isset($_REQUEST['form'])) {
 		$data['show_triggers'] = $_REQUEST['show_triggers'] = 1;
 	}
 
+	if ($data['ymax_itemid'] || $data['ymin_itemid']) {
+		$options = [
+			'output' => ['itemid', 'hostid', 'name', 'key_'],
+			'selectHosts' => ['name'],
+			'itemids' => [$data['ymax_itemid'], $data['ymin_itemid']],
+			'webitems' => true,
+			'preservekeys' => true
+		];
+
+		$items = API::Item()->get($options);
+
+		if ($data['parent_discoveryid'] !== null) {
+			$items = $items + API::ItemPrototype()->get($options);
+		}
+
+		$data['yaxis_items'] = CMacrosResolverHelper::resolveItemNames($items);
+
+		unset($items);
+	}
+
 	// items
 	if ($data['items']) {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'flags'],
 			'selectHosts' => ['hostid', 'name'],
-			'itemids' => zbx_objectValues($data['items'], 'itemid'),
+			'itemids' => array_column($data['items'], 'itemid'),
 			'filter' => [
 				'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
 			],
@@ -621,18 +646,20 @@ elseif (isset($_REQUEST['form'])) {
 			'preservekeys' => true
 		]);
 
-		foreach ($data['items'] as &$item) {
-			$host = reset($items[$item['itemid']]['hosts']);
+		if ($items) {
+			foreach ($data['items'] as &$item) {
+				$host = reset($items[$item['itemid']]['hosts']);
 
-			$item['host'] = $host['name'];
-			$item['hostid'] = $items[$item['itemid']]['hostid'];
-			$item['name'] = $items[$item['itemid']]['name'];
-			$item['key_'] = $items[$item['itemid']]['key_'];
-			$item['flags'] = $items[$item['itemid']]['flags'];
+				$item['host'] = $host['name'];
+				$item['hostid'] = $items[$item['itemid']]['hostid'];
+				$item['name'] = $items[$item['itemid']]['name'];
+				$item['key_'] = $items[$item['itemid']]['key_'];
+				$item['flags'] = $items[$item['itemid']]['flags'];
+			}
+			unset($item);
+
+			$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 		}
-		unset($item);
-
-		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 	}
 
 	$data['items'] = array_values($data['items']);

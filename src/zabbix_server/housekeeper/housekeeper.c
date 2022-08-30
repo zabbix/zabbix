@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -711,7 +711,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	{
 		char			buffer[MAX_STRING_LEN];
 		char			*sql = NULL;
-		size_t			sql_alloc = 0, sql_offset = 0;
+		size_t			sql_alloc = 0, sql_offset;
 		zbx_vector_uint64_t	ids;
 		int			ret;
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -868,6 +868,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				break;
 			case CONFIG_ERROR:
 				/* nothing to do */
+				break;
+			case SIG_ERROR:
+				/* nothing to do, execution was forcibly interrupted by signal */
 				break;
 			default:
 				zbx_error("unknown response code returned: %d", errcodes[i]);

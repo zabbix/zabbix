@@ -24,10 +24,6 @@
                     <value>{ALERT.SENDTO}</value>
                 </parameter>
                 <parameter>
-                    <name>channel_id</name>
-                    <value>{EVENT.TAGS.__channel_id}</value>
-                </parameter>
-                <parameter>
                     <name>discovery_host_dns</name>
                     <value>{DISCOVERY.DEVICE.DNS}</value>
                 </parameter>
@@ -69,7 +65,7 @@
                 </parameter>
                 <parameter>
                     <name>event_tags</name>
-                    <value>{EVENT.TAGS}</value>
+                    <value>{EVENT.TAGSJSON}</value>
                 </parameter>
                 <parameter>
                     <name>event_time</name>
@@ -98,10 +94,6 @@
                 <parameter>
                     <name>host_name</name>
                     <value>{HOST.NAME}</value>
-                </parameter>
-                <parameter>
-                    <name>message_ts</name>
-                    <value>{EVENT.TAGS.__message_ts}</value>
                 </parameter>
                 <parameter>
                     <name>slack_as_user</name>
@@ -228,13 +220,29 @@ function handlerAlarm(params) {&#13;
             throw resp.error;&#13;
         }&#13;
 &#13;
-        result.tags.__message_ts = resp.ts;&#13;
-        result.tags.__channel_id = resp.channel;&#13;
-        result.tags.__channel_name = params.channel;&#13;
-        result.tags.__message_link = getPermalink(resp.channel, resp.ts);&#13;
+        result.tags = {&#13;
+            ['__message_ts_' + params.channel]: resp.ts,&#13;
+            ['__channel_id_' + params.channel]: resp.channel,&#13;
+            ['__message_link_' + params.channel]: getPermalink(resp.channel, resp.ts),&#13;
+        };&#13;
+&#13;
     }&#13;
     else if (isEventUpdate(params)) {&#13;
-        fields.thread_ts = params.message_ts;&#13;
+        try {&#13;
+            var channel_event_tags = JSON.parse(params.event_tags);&#13;
+        } catch (error) {&#13;
+            throw 'Cannot process event tags: ' + error;&#13;
+        }&#13;
+&#13;
+        if (Array.isArray(channel_event_tags)) {&#13;
+            for (i in channel_event_tags) {&#13;
+                if (channel_event_tags[i].tag.includes('__message_ts_' + params.channel)) {&#13;
+                    fields.thread_ts = channel_event_tags[i].value;&#13;
+                    break;&#13;
+                }&#13;
+            }&#13;
+        }&#13;
+&#13;
         fields.attachments = [&#13;
             createMessage(&#13;
                 SEVERITY_COLORS[params.event_nseverity] || 0,&#13;
@@ -252,9 +260,26 @@ function handlerAlarm(params) {&#13;
 &#13;
     }&#13;
     else if (isEventResolve(params)) {&#13;
-        fields.channel = params.channel_id;&#13;
         fields.text = '';&#13;
-        fields.ts = params.message_ts;&#13;
+&#13;
+        try {&#13;
+            var channel_event_tags = JSON.parse(params.event_tags);&#13;
+        } catch (error) {&#13;
+            throw 'Cannot process event tags: ' + error;&#13;
+        }&#13;
+&#13;
+        if (Array.isArray(channel_event_tags)) {&#13;
+            for (i in channel_event_tags) {&#13;
+                if (channel_event_tags[i].tag.includes('__channel_id_' + params.channel)) {&#13;
+                    fields.channel = channel_event_tags[i].value;&#13;
+                    continue;&#13;
+                }&#13;
+                if (channel_event_tags[i].tag.includes('__message_ts_' + params.channel)) {&#13;
+                    fields.ts = channel_event_tags[i].value;&#13;
+                }&#13;
+            }&#13;
+        }&#13;
+&#13;
         fields.attachments = [&#13;
             createMessage(&#13;
                 RESOLVE_COLOR,&#13;
@@ -293,8 +318,9 @@ function handlerEvent(params) {&#13;
             throw resp.error;&#13;
         }&#13;
 &#13;
-        result.tags.__channel_name = params.channel;&#13;
-        result.tags.__message_link = getPermalink(resp.channel, resp.ts);&#13;
+        result.tags = {&#13;
+            ['__message_link_' + params.channel]: getPermalink(resp.channel, resp.ts)&#13;
+        }&#13;
 &#13;
     }&#13;
     else if (isEventUpdate(params)) {&#13;
@@ -389,7 +415,7 @@ function createMessage(&#13;
         message.fields.push(&#13;
             {&#13;
                 title: 'Event tags',&#13;
-                value: params.event_tags.replace(/__.+?:(.+?,|.+)/g, '') || 'None',&#13;
+                value: JSON.parse(params.event_tags).filter(function (e) { return !e.tag.includes('__') }).map(function (e) { return e.tag + ': ' + e.value }).join('\n') || 'None',&#13;
                 short: true&#13;
             },&#13;
             {&#13;
@@ -533,9 +559,6 @@ catch (error) {&#13;
     throw 'Slack notification failed : ' + error;&#13;
 }</script>
             <process_tags>YES</process_tags>
-            <show_event_menu>YES</show_event_menu>
-            <event_menu_url>{EVENT.TAGS.__message_link}</event_menu_url>
-            <event_menu_name>Open in Slack: {EVENT.TAGS.__channel_name}</event_menu_name>
             <message_templates>
                 <message_template>
                     <event_source>TRIGGERS</event_source>

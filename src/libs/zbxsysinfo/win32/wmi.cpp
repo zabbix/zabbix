@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,6 +112,44 @@ extern "C" void	zbx_co_uninitialize()
 		CoUninitialize();
 }
 
+extern "C" static void	get_error_code_text(HRESULT hres, char **error)
+{
+	IWbemStatusCodeText	*pStatus = NULL;
+	SCODE			sc;
+
+	sc = CoCreateInstance(CLSID_WbemStatusCodeText, 0, CLSCTX_INPROC_SERVER, IID_IWbemStatusCodeText,
+			(LPVOID *) &pStatus);
+
+	if(S_OK == sc)
+	{
+		BSTR	bstr = 0;
+
+		sc = pStatus->GetErrorCodeText(hres, 0, 0, &bstr);
+		if (S_OK == sc)
+		{
+			*error = zbx_unicode_to_utf8((wchar_t *)bstr);
+			zbx_rtrim(*error, "\n\r");
+			SysFreeString(bstr);
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "error code:" ZBX_FS_I64, hres);
+			zabbix_log(LOG_LEVEL_DEBUG, "GetErrorCodeText() failed with code:" ZBX_FS_I64 " when retrieving error"
+					" code for " ZBX_FS_I64, sc, hres);
+		}
+		pStatus->Release();
+	}
+	else
+	{
+		*error = zbx_dsprintf(*error, "error code:" ZBX_FS_I64, hres);
+		zabbix_log(LOG_LEVEL_DEBUG, "CoCreateInstance() failed with code:" ZBX_FS_I64 " when retrieving error code"
+				" for:" ZBX_FS_I64, sc, hres);
+	}
+
+	if (NULL != pStatus)
+		pStatus->Release();
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: parse_first_first                                                *
@@ -146,18 +184,24 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	if (WBEM_S_TIMEDOUT == hres)
 	{
 		*error = zbx_strdup(*error, "WMI query timeout.");
-		goto out;
+		goto out2;
 	}
 
-	if (FAILED(hres) || 0 == uReturn)
-		goto out;
+	if (FAILED(hres))
+	{
+		get_error_code_text(hres, error);
+		goto out2;
+	}
+
+	if (0 == uReturn)
+		goto out2;
 
 	hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
 	if (FAILED(hres))
 	{
 		*error = zbx_strdup(*error, "Cannot start WMI query result enumeration.");
-		goto out;
+		goto out1;
 	}
 
 	vtProp = (VARIANT*) zbx_malloc(NULL, sizeof(VARIANT));
@@ -168,7 +212,7 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	{
 		*error = zbx_strdup(*error, "Cannot parse WMI result field.");
 		zbx_free(vtProp);
-		goto out;
+		goto out1;
 	}
 
 	pclsObj->EndEnumeration();
@@ -176,7 +220,7 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	if (hres == WBEM_S_NO_MORE_DATA || VT_EMPTY == V_VT(vtProp) || VT_NULL == V_VT(vtProp))
 	{
 		zbx_free(vtProp);
-		goto out;
+		goto out1;
 	}
 	else
 		ret = SYSINFO_RET_OK;
@@ -187,10 +231,9 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	zbx_vector_wmi_prop_create(inst_val);
 	zbx_vector_wmi_prop_append(inst_val, prop);
 	zbx_vector_wmi_instance_append(wmi_values, inst_val);
-out:
-	if (0 != pclsObj)
-		pclsObj->Release();
-
+out1:
+	pclsObj->Release();
+out2:	
 	return ret;
 }
 
@@ -234,7 +277,13 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 		if (WBEM_S_FALSE == hres && 0 == uReturn)
 			return SYSINFO_RET_OK;
 
-		if (FAILED(hres) || 0 == uReturn)
+		if (FAILED(hres))
+		{
+			get_error_code_text(hres, error);
+			return ret;
+		}
+
+		if (0 == uReturn)
 			return ret;
 
 		hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);

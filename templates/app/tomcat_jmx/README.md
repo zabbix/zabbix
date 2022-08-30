@@ -47,7 +47,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Global request processors discovery |<p>Discovery for GlobalRequesProcessor</p> |JMX |jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]<p>**Filter**:</p>AND <p>- A: {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}`</p><p>- B: {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}`</p> |
+|Global request processors discovery |<p>Discovery for GlobalRequestProcessor</p> |JMX |jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]<p>**Filter**:</p>AND <p>- A: {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequestProcessor"}`</p><p>- B: {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequestProcessor"}`</p> |
 |Protocol handlers discovery |<p>Discovery for ProtocolHandler</p> |JMX |jmx.discovery[attributes,"Catalina:type=ProtocolHandler,port=*"]<p>**Filter**:</p>AND <p>- A: {#JMXATTR} MATCHES_REGEX `^name$`</p> |
 |Thread pools discovery |<p>Discovery for ThreadPool</p> |JMX |jmx.discovery[beans,"Catalina:type=ThreadPool,name=*"]<p>**Filter**:</p>AND <p>- A: {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"ThreadPool"}`</p><p>- B: {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"ThreadPool"}`</p> |
 |Contexts discovery |<p>Discovery for contexts</p> |JMX |jmx.discovery[beans,"Catalina:type=Manager,host=*,context=*"]<p>**Filter**:</p>AND <p>- A: {#JMXHOST} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"Manager"}`</p><p>- B: {#JMXHOST} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"Manager"}`</p> |
@@ -78,7 +78,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Tomcat: Version has been changed |<p>Tomcat version has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["Catalina:type=Server",serverInfo].diff()}=1 and {TEMPLATE_NAME:jmx["Catalina:type=Server",serverInfo].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |{#JMXVALUE}: Gzip compression is disabled |<p>gzip compression is disabled for connector {#JMXVALUE}.</p> |`{TEMPLATE_NAME:jmx[{#JMXOBJ},compression].str(off)} = 1` |INFO |<p>Manual close: YES</p> |
-|{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"} |<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p> |`{TEMPLATE_NAME:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}>{Template App Apache Tomcat JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100` |HIGH | |
+|{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"} |<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p> |`{TEMPLATE_NAME:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}>{TEMPLATE_NAME:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100` |HIGH | |
 
 ## Feedback
 

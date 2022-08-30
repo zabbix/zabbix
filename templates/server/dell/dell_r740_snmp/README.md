@@ -1,5 +1,5 @@
 
-# DELL PowerEdge R740 SNMP
+# Template Server DELL PowerEdge R740 SNMP
 
 ## Overview
 

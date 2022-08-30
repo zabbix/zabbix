@@ -1,36 +1,32 @@
 
-# IIS by Zabbix agent
+# Template App IIS by Zabbix agent
 
 ## Overview
 
 For Zabbix version: 5.0 and higher  
-The template to monitor IIS (Internet Information Services) by Zabbix that works without any external scripts.<br>
-Your server must have the following roles:
-```text
-Web Server
-IIS Management Scripts and Tools
-```
+The template to monitor IIS (Internet Information Services) by Zabbix that works without any external scripts.
 
 
 This template was tested on:
 
 - Windows Server, version 2012R2
-- Zabbix, version 5.0
 
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
-1\. [Import](https://www.zabbix.com/documentation/5.0/manual/xml_export_import/templates) the template ([template_app_iis_agent.xml](template_app_iis_agent.xml) or [template_app_iis_agent_active.xml](template_app_iis_agent_active.xml)) into Zabbix.
+You have to enable the following Windows Features (Control Panel > Programs and Features > Turn Windows features on or off) on your server
+```text
+Web Server (IIS)
+Web Server (IIS)\Management Tools\IIS Management Scripts and Tools
+```
 
-2\. [Link](https://www.zabbix.com/documentation/5.0/manual/config/templates/linking) the imported template to a host with IIS.
-
-3\. Optionally, it is possible to customize the template:
-  - Set value for the macro {$IIS.QUEUE.MAX.WARN}, if you want to receive alerts when a number of requests in the application pool queue exceeds the threshold.
-  - If you use a non-standard port for the IIS, don't forget to update the macros {$IIS.SERVICE} and {$IIS.PORT}.
-  - Change the value of macro {$IIS.APPPOOL.MONITORED} to "0", if you want to disable all notifications about application pools state.<br>
-  You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>} for excluding specific application pools from monitoring.
-  - Change regexp in the marcos {$IIS.APPPOOL.MATCHES} and {$IIS.APPPOOL.NOT_MATCHES} used for filtering application pools discovery results.
+Optionally, it is possible to customize the template:
+- Set value for the macro {$IIS.QUEUE.MAX.WARN}, if you want to receive alerts when a number of requests in the application pool queue exceeds the threshold.
+- If you use a non-standard port for the IIS, don't forget to update the macros {$IIS.SERVICE} and {$IIS.PORT}.
+- Change the value of macro {$IIS.APPPOOL.MONITORED} to "0", if you want to disable all notifications about application pools state.<br>
+You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>} for excluding specific application pools from monitoring.
+- Change regexp in the macros {$IIS.APPPOOL.MATCHES} and {$IIS.APPPOOL.NOT_MATCHES} used for filtering application pools discovery results.
 
 
 ## Zabbix configuration
@@ -63,8 +59,8 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|IIS |IIS: World Wide Web Publishing Service (W3SVC) state |<p>The World Wide Web Publishing Service (W3SVC) provides web connectivity and administration of websites through the IIS snap-in. If the World Wide Web Publishing Service stops, the operating system cannot serve any form of web request. This service was dependent on "Windows Process Activation Service".</p> |ZABBIX_PASSIVE |service_state[W3SVC]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
-|IIS |IIS: Windows Process Activation Service (WAS) state |<p>Windows Process Activation Service (WAS) is a tool for managing worker processes that contain applications that host Windows Communication Foundation (WCF) services. Worker processes handle requests that are sent to a Web Server for specific application pools. Each application pool sets boundaries for the applications it contains.</p> |ZABBIX_PASSIVE |service_state[WAS]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: World Wide Web Publishing Service (W3SVC) state |<p>The World Wide Web Publishing Service (W3SVC) provides web connectivity and administration of websites through the IIS snap-in. If the World Wide Web Publishing Service stops, the operating system cannot serve any form of web request. This service was dependent on "Windows Process Activation Service".</p> |ZABBIX_PASSIVE |service.info[W3SVC]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: Windows Process Activation Service (WAS) state |<p>Windows Process Activation Service (WAS) is a tool for managing worker processes that contain applications that host Windows Communication Foundation (WCF) services. Worker processes handle requests that are sent to a Web Server for specific application pools. Each application pool sets boundaries for the applications it contains.</p> |ZABBIX_PASSIVE |service.info[WAS]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |IIS |IIS: {$IIS.PORT} port ping |<p>-</p> |SIMPLE |net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |IIS |IIS: Uptime |<p>Service uptime in seconds.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Service Uptime"] |
 |IIS |IIS: Bytes Received per second |<p>The average rate per minute at which data bytes are received by the service at the Application Layer. Does not include protocol headers or control bytes.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Bytes Received/sec", 60] |
@@ -75,7 +71,7 @@ There are no template links in this template.
 |IIS |IIS: Connection attempts per second |<p>The average rate per minute that connections using the Web service are being attempted. The count is the average for all Web sites combined.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Connection Attempts/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |IIS |IIS: Anonymous users per second |<p>The number of requests from users over an anonymous connection per second. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Anonymous Users/sec", 60] |
 |IIS |IIS: NonAnonymous users per second |<p>The number of requests from users over a non-anonymous connection per second. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\NonAnonymous Users/sec", 60] |
-|IIS |IIS: Method Method GET requests per second |<p>The rate of HTTP requests made using the GET method. GET requests are generally used for basic file retrievals or image maps, though they can be used with forms. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: Method GET requests per second |<p>The rate of HTTP requests made using the GET method. GET requests are generally used for basic file retrievals or image maps, though they can be used with forms. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |IIS |IIS: Method COPY requests per second |<p>The rate of HTTP requests made using the COPY method. Copy requests are used for copying files and directories. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Copy Requests/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |IIS |IIS: Method CGI requests per second |<p>The rate of CGI requests that are simultaneously being processed by the Web service. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\CGI Requests/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |IIS |IIS: Method DELETE requests per second |<p>The rate of HTTP requests using the DELETE method made. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Delete Requests/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
@@ -109,11 +105,11 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|IIS: The World Wide Web Publishing Service (W3SVC) is not running |<p>The World Wide Web Publishing Service (W3SVC) is not in running state. IIS cannot start.</p> |`{TEMPLATE_NAME:service_state[W3SVC].last()}<>0` |HIGH |<p>**Depends on**:</p><p>- IIS: Windows process Activation Service (WAS) is not the running</p> |
-|IIS: Windows process Activation Service (WAS) is not the running |<p>Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.</p> |`{TEMPLATE_NAME:service_state[WAS].last()}<>0` |HIGH | |
+|IIS: The World Wide Web Publishing Service (W3SVC) is not running |<p>The World Wide Web Publishing Service (W3SVC) is not in the running state. IIS cannot start.</p> |`{TEMPLATE_NAME:service.info[W3SVC].last()}<>0` |HIGH |<p>**Depends on**:</p><p>- IIS: Windows process Activation Service (WAS) is not running</p> |
+|IIS: Windows process Activation Service (WAS) is not running |<p>Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.</p> |`{TEMPLATE_NAME:service.info[WAS].last()}<>0` |HIGH | |
 |IIS: Port {$IIS.PORT} is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}].last()}=0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- IIS: The World Wide Web Publishing Service (W3SVC) is not running</p> |
-|IIS: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:perf_counter_en["\Web Service(_Total)\Service Uptime"].last()}<10m` |INFO |<p>Manual close: YES</p> |
-|IIS: {#APPPOOL} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"].last()}<10m` |INFO |<p>Manual close: YES</p> |
+|IIS: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:perf_counter_en["\Web Service(_Total)\Service Uptime"].last()}<10m` |INFO |<p>Manual close: YES</p> |
+|IIS: {#APPPOOL} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"].last()}<10m` |INFO |<p>Manual close: YES</p> |
 |IIS: Application pool {#APPPOOL} is not in Running state |<p>-</p> |`{TEMPLATE_NAME:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"].last()}<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1` |HIGH | |
 |IIS: Application pool {#APPPOOL} has been recycled |<p>-</p> |`{TEMPLATE_NAME:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"].diff()}=1 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1` |INFO | |
 |IIS: Request queue of {#APPPOOL} is too large (over {$IIS.QUEUE.MAX.WARN}) |<p>-</p> |`{TEMPLATE_NAME:perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"].min({$IIS.QUEUE.MAX.TIME})}>{$IIS.QUEUE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- IIS: Application pool {#APPPOOL} is not in Running state</p> |

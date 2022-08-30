@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-08-18T09:47:39Z</date>
+   <date>2021-12-23T11:51:54Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -20,7 +20,7 @@ CPQNIC-MIB&#13;
 CPQSINFO-MIB&#13;
 CPQIDA-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Server hardware</name>
@@ -67,7 +67,6 @@ Template tooling version used: 0.38</description>
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</description>
@@ -92,7 +91,6 @@ The textual identification of the contact person for this managed node, together
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 A textual description of the entity. This value should&#13;
@@ -115,10 +113,8 @@ networking software.</description>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.232.2.2.4.2.0</snmp_oid>
                <key>hp.server.hw.model[cpqSiProductName]</key>
-               <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: CPQSINFO-MIB&#13;
 The machine product name. The name of the machine used in this system.</description>
@@ -140,10 +136,8 @@ The machine product name. The name of the machine used in this system.</descript
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.232.2.2.2.1.0</snmp_oid>
                <key>hp.server.hw.serialnumber[cpqSiSysSerialNum]</key>
-               <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: CPQSINFO-MIB&#13;
 The serial number of the physical system unit. The string will be empty if the system does not report the serial number function.</description>
@@ -174,10 +168,9 @@ The serial number of the physical system unit. The string will be empty if the s
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.6.0</snmp_oid>
                <key>hp.server.location[sysLocation]</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</description>
@@ -199,10 +192,9 @@ The physical location of this node (e.g., `telephone closet, 3rd floor').  If th
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.5.0</snmp_oid>
                <key>hp.server.name[sysName]</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</description>
@@ -236,7 +228,6 @@ An administratively-assigned name for this managed node.By convention, this is t
                <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</description>
@@ -259,7 +250,6 @@ The vendor's authoritative identification of the network management subsystem co
                <key>hp.server.sensor.temp.status[cpqHeThermalCondition]</key>
                <history>7d</history>
                <trends>0d</trends>
-               <status>ENABLED</status>
                <description>MIB: CPQHLTH-MIB&#13;
 This value specifies the overall condition of the system's thermal environment.&#13;
 This value will be one of the following:&#13;
@@ -289,7 +279,6 @@ failed(4)  The temperature sensor detects a condition that could  permanently da
                <key>hp.server.status[cpqHeMibCondition]</key>
                <history>7d</history>
                <trends>0d</trends>
-               <status>ENABLED</status>
                <description>MIB: CPQHLTH-MIB&#13;
 The overall condition. This object represents the overall status of the server information represented by this MIB.</description>
                <applications>
@@ -336,7 +325,6 @@ The overall condition. This object represents the overall status of the server i
                <key>hp.server.uptime[sysUpTime]</key>
                <history>2w</history>
                <trends>0d</trends>
-               <status>ENABLED</status>
                <units>uptime</units>
                <description>MIB: SNMPv2-MIB&#13;
 The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</description>
@@ -367,7 +355,6 @@ The time (in hundredths of a second) since the network management portion of the
                <key>snmptrap.fallback</key>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>LOG</value_type>
                <description>The item is used to collect all SNMP traps unmatched by other snmptrap items</description>
                <applications>
@@ -382,7 +369,6 @@ The time (in hundredths of a second) since the network management portion of the
                <type>INTERNAL</type>
                <key>zabbix[host,snmp,available]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Status</name>
@@ -424,7 +410,6 @@ The time (in hundredths of a second) since the network management portion of the
                      <key>hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Cache Module Board Backup Power Status. This monitors the status of each backup power source on the board.&#13;
 The backup power source can only recharge when the system has power applied. The type of backup power source used is indicated by cpqDaAccelBackupPowerSource.&#13;
@@ -490,7 +475,6 @@ Capacitor Failed (7)  The flash backed cache module capacitor is below the suffi
                      <key>hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Cache Module/Operations Status. This describes the status of the cache module and/or cache operations.&#13;
 &#13;
@@ -575,7 +559,6 @@ Read Cache Could Not Be Mapped (9)&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -598,7 +581,6 @@ Read Cache Could Not Be Mapped (9)&#13;
                      <key>hp.server.hw.diskarray.model[cpqDaCntlrModel.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Array Controller Model. The type of controller card.</description>
                      <applications>
@@ -623,7 +605,6 @@ Array Controller Model. The type of controller card.</description>
                      <key>hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 This value represents the overall condition of this controller,&#13;
 and any associated logical drives, physical drives, and array accelerators.</description>
@@ -665,7 +646,6 @@ and any associated logical drives, physical drives, and array accelerators.</des
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -688,7 +668,6 @@ and any associated logical drives, physical drives, and array accelerators.</des
                      <key>hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The condition of the fan.&#13;
 This value will be one of the following:&#13;
@@ -734,7 +713,6 @@ failed(4)  A non-redundant fan is not operating properly.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -756,7 +734,6 @@ failed(4)  A non-redundant fan is not operating properly.</description>
                      <snmp_oid>1.3.6.1.4.1.232.18.2.3.1.1.14.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: CPQNIC-MIB&#13;
 The physical adapter status. The following values are valid:&#13;
 unknown(1)&#13;
@@ -805,7 +782,6 @@ linkFailure(4)&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -828,10 +804,9 @@ linkFailure(4)&#13;
                      <key>hp.server.hw.physicaldisk.media_type[cpqDaPhyDrvMediaType.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Drive Array Physical Drive Media Type. The following values are defined:&#13;
-other(1)  The instrument agent is unable to determine the physical drive’s media type.&#13;
+other(1)  The instrument agent is unable to determine the physical drive's media type.&#13;
 rotatingPlatters(2)  The physical drive media is composed of rotating platters.&#13;
 solidState(3)  The physical drive media is composed of solid state electronics.</description>
                      <applications>
@@ -856,7 +831,6 @@ solidState(3)  The physical drive media is composed of solid state electronics.<
                      <key>hp.server.hw.physicaldisk.model[cpqDaPhyDrvModel.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: CPQIDA-MIB&#13;
 Physical Drive Model. This is a text description of the physical drive.&#13;
@@ -882,7 +856,6 @@ If a model number is not present, you may not have properly initialized the driv
                      <key>hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: CPQIDA-MIB&#13;
 Physical Drive Serial Number.&#13;
@@ -917,7 +890,6 @@ but may have been modified due to space limitations.  This can be used for ident
                      <key>hp.server.hw.physicaldisk.size[cpqDaPhyDrvMediaType.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>MIB: CPQIDA-MIB&#13;
 Physical Drive Size in MB.&#13;
@@ -950,7 +922,6 @@ or if the controller does not support SCSI drives.</description>
                      <key>hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Physical Drive S.M.A.R.T Status. The following values are defined:&#13;
 other(1)  The agent is unable to determine if the status of S.M.A.R.T  predictive failure monitoring for this drive.&#13;
@@ -993,7 +964,6 @@ replaceDrive(3)  Indicates that the drive has a S.M.A.R.T predictive failure  er
                      <key>hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Physical Drive Status. This shows the status of the physical drive. The following values are valid for the physical drive status:&#13;
 other (1)  Indicates that the instrument agent does not recognize  the drive.&#13;
@@ -1039,7 +1009,6 @@ predictiveFailure(4)  Indicates that the drive has a predictive failure error an
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1062,7 +1031,6 @@ predictiveFailure(4)  Indicates that the drive has a predictive failure error an
                      <key>hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The condition of the power supply. This value will be one of the following:&#13;
 other(1)  The status could not be determined or not present.&#13;
@@ -1107,7 +1075,6 @@ failed(4)  A power supply component detects a condition that could  permanently 
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1145,7 +1112,6 @@ CPQHLTH-MIB::cpqHeTemperatureTable with ambient(11) and 0.1 index filter</descri
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1182,16 +1148,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>Ambient: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>Ambient: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>Ambient: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1201,7 +1167,6 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1219,7 +1184,6 @@ Temperature readings of testpoint: Ambient</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1252,7 +1216,6 @@ CPQHLTH-MIB::cpqHeTemperatureTable with cpu(6) filter</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1289,16 +1252,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1308,7 +1271,6 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1326,7 +1288,6 @@ Temperature readings of testpoint: CPU-{#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1359,7 +1320,6 @@ CPQHLTH-MIB::cpqHeTemperatureTable</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1396,16 +1356,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1415,7 +1375,6 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.locale[cpqHeTemperatureLocale.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 This specifies the location of the temperature sensor present in the system.</description>
                      <applications>
@@ -1439,7 +1398,6 @@ This specifies the location of the temperature sensor present in the system.</de
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1457,7 +1415,6 @@ Temperature readings of testpoint: {#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1490,7 +1447,6 @@ CPQHLTH-MIB::cpqHeTemperatureTable with ioBoard(5) filter</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1527,16 +1483,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1546,7 +1502,6 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1564,7 +1519,6 @@ Temperature readings of testpoint: I/O-{#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1597,7 +1551,6 @@ CPQHLTH-MIB::cpqHeTemperatureTable with memory(7) filter</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1634,16 +1587,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1653,7 +1606,6 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1671,7 +1623,6 @@ Temperature readings of testpoint: Memory-{#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1704,7 +1655,6 @@ CPQHLTH-MIB::cpqHeTemperatureTable with powerSupply(10) filter</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1741,16 +1691,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1760,7 +1710,6 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1778,7 +1727,6 @@ Temperature readings of testpoint: PSU-{#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1811,7 +1759,6 @@ CPQHLTH-MIB::cpqHeTemperatureTable with system(3) filter</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1848,16 +1795,16 @@ The system will automatically shutdown if the failed(4) condition results, so it
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{last()} = 3</expression>
-                           <name>System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
-                           <priority>WARNING</priority>
-                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()} = 4</expression>
                            <name>System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.</name>
                            <priority>HIGH</priority>
                            <description>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()} = 3</expression>
+                           <name>System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range</name>
+                           <priority>WARNING</priority>
+                           <description>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1867,7 +1814,6 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1885,7 +1831,6 @@ Temperature readings of testpoint: System-{#SNMPINDEX}</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1907,7 +1852,6 @@ Temperature readings of testpoint: System-{#SNMPINDEX}</description>
                      <snmp_oid>1.3.6.1.4.1.232.3.2.3.1.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.hw.virtualdisk.layout[cpqDaLogDrvFaultTol.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Logical Drive Fault Tolerance.&#13;
 This shows the fault tolerance mode of the logical drive.</description>
                      <applications>
@@ -1932,7 +1876,6 @@ This shows the fault tolerance mode of the logical drive.</description>
                      <key>hp.server.hw.virtualdisk.size[cpqDaLogDrvSize.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Logical Drive Size.&#13;
 This is the size of the logical drive in megabytes.  This value&#13;
@@ -1962,7 +1905,6 @@ differ from the advertised size of a drive.</description>
                      <snmp_oid>1.3.6.1.4.1.232.3.2.3.1.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Logical Drive Status.</description>
                      <applications>
                         <application>
@@ -2002,7 +1944,6 @@ differ from the advertised size of a drive.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -2142,28 +2083,7 @@ differ from the advertised size of a drive.</description>
    </templates>
    <value_maps>
       <value_map>
-         <name>CPQNIC-MIB::cpqNicIfPhysAdapterStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>generalFailure</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>linkFailure</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CPQSINFO-MIB::status</name>
+         <name>CPQHLTH-MIB::cpqHeTemperatureCondition</name>
          <mappings>
             <mapping>
                <value>1</value>
@@ -2241,7 +2161,40 @@ differ from the advertised size of a drive.</description>
          </mappings>
       </value_map>
       <value_map>
-         <name>CPQHLTH-MIB::cpqHeTemperatureCondition</name>
+         <name>CPQIDA-MIB::cpqDaAccelBattery</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Recharging</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Degraded</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>Not Present</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Capacitor failed</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaAccelStatus</name>
          <mappings>
             <mapping>
                <value>1</value>
@@ -2249,15 +2202,35 @@ differ from the advertised size of a drive.</description>
             </mapping>
             <mapping>
                <value>2</value>
-               <newvalue>ok</newvalue>
+               <newvalue>invalid</newvalue>
             </mapping>
             <mapping>
                <value>3</value>
-               <newvalue>degraded</newvalue>
+               <newvalue>enabled</newvalue>
             </mapping>
             <mapping>
                <value>4</value>
-               <newvalue>failed</newvalue>
+               <newvalue>tmpDisabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>permDisabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>cacheModFlashMemNotAttached</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>cacheModDegradedFailsafeSpeed</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>cacheModCriticalFailure</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>cacheReadCacheNotMapped</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -2679,139 +2652,6 @@ differ from the advertised size of a drive.</description>
          </mappings>
       </value_map>
       <value_map>
-         <name>CPQIDA-MIB::cpqDaPhyDrvStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>failed</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>predictiveFailure</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CPQIDA-MIB::cpqDaPhyDrvSmartStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>replaceDrive</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>replaceDriveSSDWearOut</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CPQIDA-MIB::cpqDaAccelStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>invalid</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>enabled</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>tmpDisabled</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>permDisabled</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>cacheModFlashMemNotAttached</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>cacheModDegradedFailsafeSpeed</newvalue>
-            </mapping>
-            <mapping>
-               <value>8</value>
-               <newvalue>cacheModCriticalFailure</newvalue>
-            </mapping>
-            <mapping>
-               <value>9</value>
-               <newvalue>cacheReadCacheNotMapped</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CPQIDA-MIB::cpqDaAccelBattery</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Recharging</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Failed</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>Degraded</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>Not Present</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>Capacitor failed</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CPQIDA-MIB::cpqDaPhyDrvMediaType</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>rotatingPlatters</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>solidState</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>CPQIDA-MIB::cpqDaLogDrvFaultTol</name>
          <mappings>
             <mapping>
@@ -2958,6 +2798,107 @@ differ from the advertised size of a drive.</description>
             <mapping>
                <value>25</value>
                <newvalue>newLogDrvKeyRekeyRequestReceived</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaPhyDrvMediaType</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>rotatingPlatters</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>solidState</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaPhyDrvSmartStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>replaceDrive</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>replaceDriveSSDWearOut</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaPhyDrvStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>predictiveFailure</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQNIC-MIB::cpqNicIfPhysAdapterStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>generalFailure</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>linkFailure</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQSINFO-MIB::status</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>degraded</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>failed</newvalue>
             </mapping>
          </mappings>
       </value_map>

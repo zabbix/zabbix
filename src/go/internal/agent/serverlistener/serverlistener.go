@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,13 +74,14 @@ func (sl *ServerListener) run() {
 		if err == nil {
 			if !sl.allowedPeers.CheckPeer(net.ParseIP(conn.RemoteIP())) {
 				conn.Close()
-				log.Warningf("cannot accept incoming connection for peer: %s", conn.RemoteIP())
+				log.Warningf("failed to accept an incoming connection: connection from \"%s\" rejected, allowed hosts: \"%s\"",
+					conn.RemoteIP(), sl.options.Server)
 			} else if err := sl.processConnection(conn); err != nil {
-				log.Warningf("cannot process incoming connection: %s", err.Error())
+				log.Warningf("failed to process an incoming connection from %s: %s", conn.RemoteIP(), err.Error())
 			}
 		} else {
 			if nerr, ok := err.(net.Error); ok && nerr.Temporary() {
-				log.Errf("cannot accept incoming connection: %s", err.Error())
+				log.Errf("failed to accept an incoming connection: %s", err.Error())
 				continue
 			}
 			break

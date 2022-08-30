@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-08-09T13:53:25Z</date>
+   <date>2021-12-21T18:00:05Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -44,7 +44,6 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Array for LLD rules.</description>
                <applications>
@@ -72,7 +71,6 @@ Template tooling version used: 0.39</description>
                <key>haproxy.uptime</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <applications>
@@ -112,7 +110,6 @@ catch (error) {
                <delay>0</delay>
                <history>90d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -149,7 +146,6 @@ catch (error) {
                <name>HAProxy: Service response time</name>
                <key>net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <applications>
@@ -176,7 +172,6 @@ catch (error) {
                <name>HAProxy: Service status</name>
                <key>net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>HAProxy</name>
@@ -205,7 +200,6 @@ catch (error) {
                <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>HAProxy Statistics Report in CSV format</description>
                <applications>
@@ -232,7 +226,6 @@ catch (error) {
                <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>HAProxy Statistics Report HTML</description>
                <applications>
@@ -271,7 +264,6 @@ catch (error) {
                      <key>haproxy.backend.act[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Number of active servers.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -298,7 +290,6 @@ catch (error) {
                      <key>haproxy.backend.bck[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Number of backup servers.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -325,7 +316,6 @@ catch (error) {
                      <key>haproxy.backend.bin.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>bps</units>
                      <description>Number of bits received by the backend</description>
@@ -358,7 +348,6 @@ catch (error) {
                      <key>haproxy.backend.bout.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>bps</units>
                      <description>Number of bits sent by the backend</description>
@@ -391,7 +380,6 @@ catch (error) {
                      <key>haproxy.backend.dresp.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Responses denied due to security concerns (ACL-restricted).</description>
                      <application_prototypes>
@@ -419,7 +407,6 @@ catch (error) {
                      <key>haproxy.backend.econ.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of requests that encountered an error attempting to connect to a backend server.</description>
                      <application_prototypes>
@@ -447,7 +434,6 @@ catch (error) {
                      <key>haproxy.backend.eresp.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of requests whose responses yielded an error</description>
                      <application_prototypes>
@@ -483,7 +469,6 @@ catch (error) {
                      <key>haproxy.backend.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of informational HTTP responses per second.</description>
                      <application_prototypes>
@@ -511,7 +496,6 @@ catch (error) {
                      <key>haproxy.backend.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of successful HTTP responses per second.</description>
                      <application_prototypes>
@@ -539,7 +523,6 @@ catch (error) {
                      <key>haproxy.backend.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of HTTP redirections per second.</description>
                      <application_prototypes>
@@ -567,7 +550,6 @@ catch (error) {
                      <key>haproxy.backend.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of HTTP client errors per second.</description>
                      <application_prototypes>
@@ -595,7 +577,6 @@ catch (error) {
                      <key>haproxy.backend.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of HTTP server errors per second.</description>
                      <application_prototypes>
@@ -623,7 +604,6 @@ catch (error) {
                      <key>haproxy.backend.qcur[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Current number of requests unassigned in queue.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -654,7 +634,6 @@ catch (error) {
                      <key>haproxy.backend.qtime[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>s</units>
                      <description>Average time spent in queue (in ms) for the last 1,024 requests</description>
@@ -691,7 +670,6 @@ catch (error) {
                      <key>haproxy.backend.rtime[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>s</units>
                      <description>Average backend response time (in ms) for the last 1,024 requests</description>
@@ -729,7 +707,6 @@ catch (error) {
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Possible values:&#13;
 UP - The server is reporting as healthy.&#13;
@@ -772,7 +749,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.backend.stot.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Cumulative number of sessions (end-to-end connections) per second.</description>
                      <application_prototypes>
@@ -800,7 +776,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.backend.weight[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Total effective weight.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -827,7 +802,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.backend.wredis.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of times a request was redispatched to a different backend.</description>
                      <application_prototypes>
@@ -855,7 +829,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.backend.wretr.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of times a connection was retried.</description>
                      <application_prototypes>
@@ -878,7 +851,6 @@ no check - Health checks are not enabled for this server.</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: Backend {#PXNAME} In/Out traffic</name>
@@ -995,7 +967,6 @@ no check - Health checks are not enabled for this server.</description>
                               <macro>{#MODE}</macro>
                               <value>tcp</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -1039,7 +1010,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.bin.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>bps</units>
                      <description>Number of bits received by the frontend</description>
@@ -1072,7 +1042,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.bout.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>bps</units>
                      <description>Number of bits sent by the frontend</description>
@@ -1105,7 +1074,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.dreq.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Requests denied due to security concerns (ACL-restricted) per second.</description>
                      <application_prototypes>
@@ -1141,7 +1109,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.ereq.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of request errors per second.</description>
                      <application_prototypes>
@@ -1177,7 +1144,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of informational HTTP responses per second.</description>
                      <application_prototypes>
@@ -1205,7 +1171,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of successful HTTP responses per second.</description>
                      <application_prototypes>
@@ -1233,7 +1198,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of HTTP redirections per second.</description>
                      <application_prototypes>
@@ -1261,7 +1225,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of HTTP client errors per second.</description>
                      <application_prototypes>
@@ -1289,7 +1252,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of HTTP server errors per second.</description>
                      <application_prototypes>
@@ -1317,7 +1279,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Number of sessions created per second</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1340,7 +1301,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.req_rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>HTTP requests per second</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1363,7 +1323,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.scur[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The current number of established sessions.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1386,7 +1345,6 @@ no check - Health checks are not enabled for this server.</description>
                      <key>haproxy.frontend.slim[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The most simultaneous sessions that are allowed, as defined by the maxconn setting in the frontend.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1414,7 +1372,6 @@ no check - Health checks are not enabled for this server.</description>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Possible values: OPEN, STOP.&#13;
 When Status is OPEN, the frontend is operating normally and ready to receive traffic.</description>
@@ -1442,7 +1399,6 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                      <type>CALCULATED</type>
                      <key>haproxy.frontend.sutil[{#PXNAME},{#SVNAME}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <params>last("haproxy.frontend.scur[{#PXNAME},{#SVNAME}]") / last("haproxy.frontend.slim[{#PXNAME},{#SVNAME}]") * 100</params>
@@ -1457,12 +1413,11 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <expression>{min(5m)}&gt;{$HAPROXY.FRONT_SUTIL.MAX.WARN}</expression>
                            <name>HAProxy frontend {#PXNAME}: Session utilization is more than {$HAPROXY.FRONT_SUTIL.MAX.WARN}% for 5m</name>
                            <priority>WARNING</priority>
-                           <description>Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy’s configuration to allow more sessions, or migrate your HAProxy server to a bigger box.</description>
+                           <description>Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy's configuration to allow more sessions, or migrate your HAProxy server to a bigger box.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: Frontend {#PXNAME} Errors and denials per second</name>
@@ -1599,7 +1554,6 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                               <macro>{#MODE}</macro>
                               <value>tcp</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -1644,7 +1598,6 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                      <key>haproxy.server.act[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Shows whether the server is active (marked with a Y) or a backup (marked with a -).</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1674,7 +1627,6 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                      <key>haproxy.server.bck[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Shows whether the server is a backup (marked with a Y) or active (marked with a -).</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1704,7 +1656,6 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                      <key>haproxy.server.bin.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>bps</units>
                      <description>Number of bits received by the backend</description>
@@ -1737,7 +1688,6 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                      <key>haproxy.server.bout.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>bps</units>
                      <description>Number of bits sent by the backend</description>
@@ -1771,7 +1721,6 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Status of last health check, one of:&#13;
 UNK     -&gt; unknown&#13;
@@ -1829,7 +1778,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.dresp.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Responses denied due to security concerns (ACL-restricted).</description>
                      <application_prototypes>
@@ -1857,7 +1805,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.econ.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of requests that encountered an error attempting to connect to a backend server.</description>
                      <application_prototypes>
@@ -1885,7 +1832,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.eresp.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of requests whose responses yielded an error.</description>
                      <application_prototypes>
@@ -1921,7 +1867,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of informational HTTP responses per second.</description>
                      <application_prototypes>
@@ -1949,7 +1894,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of successful HTTP responses per second.</description>
                      <application_prototypes>
@@ -1977,7 +1921,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of HTTP redirections per second.</description>
                      <application_prototypes>
@@ -2005,7 +1948,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of HTTP client errors per second.</description>
                      <application_prototypes>
@@ -2033,7 +1975,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of HTTP server errors per second.</description>
                      <application_prototypes>
@@ -2061,7 +2002,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.lbtot.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of times that server was selected.</description>
                      <application_prototypes>
@@ -2089,7 +2029,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.qcur[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Current number of requests unassigned in queue.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2120,7 +2059,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.qlimit[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Configured maxqueue for the server, or nothing in the value is 0 (default, meaning no limit).</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2153,7 +2091,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.qtime[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>s</units>
                      <description>Average time spent in queue (in ms) for the last 1,024 requests.</description>
@@ -2190,7 +2127,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.rtime[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>s</units>
                      <description>Average server response time (in ms) for the last 1,024 requests.</description>
@@ -2228,7 +2164,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -2264,7 +2199,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.stot.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Cumulative number of sessions (end-to-end connections) per second.</description>
                      <application_prototypes>
@@ -2292,7 +2226,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.weight[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Effective weight.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2319,7 +2252,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.wredis.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of times a request was redispatched to a different backend.</description>
                      <application_prototypes>
@@ -2347,7 +2279,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      <key>haproxy.server.wretr.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of times a connection was retried.</description>
                      <application_prototypes>
@@ -2370,7 +2301,6 @@ Notice: If a check is currently running, the last known status will be reported,
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: {#PXNAME} {#SVNAME} In/Out traffic</name>
@@ -2487,7 +2417,6 @@ Notice: If a check is currently running, the last known status will be reported,
                               <macro>{#MODE}</macro>
                               <value>tcp</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -2828,19 +2757,6 @@ Notice: If a check is currently running, the last known status will be reported,
    </templates>
    <value_maps>
       <value_map>
-         <name>Service state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>Server mode</name>
          <mappings>
             <mapping>
@@ -2850,6 +2766,19 @@ Notice: If a check is currently running, the last known status will be reported,
             <mapping>
                <value>1</value>
                <newvalue>Y</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

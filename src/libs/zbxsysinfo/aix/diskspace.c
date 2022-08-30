@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -220,6 +220,9 @@ static const char	*zbx_get_vfs_name_by_type(int type)
 		memset(vfs_names + vfs_names_alloc, 0, sizeof(char *) * (num - vfs_names_alloc));
 		vfs_names_alloc = num;
 	}
+
+	if (NULL == vfs_names)
+		return "unknown";
 
 	if (NULL == vfs_names[type] && NULL != (vfs = getvfsbytype(type)))
 		vfs_names[type] = zbx_strdup(vfs_names[type], vfs->vfsent_name);

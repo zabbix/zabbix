@@ -1,54 +1,11 @@
 
-# VMware macros
-
-## Overview
-
-For Zabbix version: 5.0 and higher  
-
-## Setup
-
-Refer to the vendor documentation.
-
-## Zabbix configuration
-
-No specific Zabbix configuration is required.
-
-### Macros used
-
-|Name|Description|Default|
-|----|-----------|-------|
-|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
-|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
-|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
-
-## Template links
-
-There are no template links in this template.
-
-## Discovery rules
-
-
-## Items collected
-
-|Group|Name|Description|Type|Key and additional info|
-|-----|----|-----------|----|---------------------|
-
-## Triggers
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----|----|----|
-
-## Feedback
-
-Please report any issues with the template at https://support.zabbix.com
-
-# VMware
+# Template VM VMware
 
 ## Overview
 
 For Zabbix version: 5.0 and higher  
 The template to monitor VMware vCenter and ESX hypervisor.
-The "Template VM VMware Hypervisor" and "Template VM VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
+The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
 For additional information please check https://www.zabbix.com/documentation/5.0/manual/vm_monitoring
 
 
@@ -110,7 +67,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 
-# VMware Guest
+# Template VM VMware Guest
 
 ## Overview
 
@@ -179,13 +136,13 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|VMware: {HOST.HOST} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.vm.uptime[{$VMWARE.URL},{HOST.HOST}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: {HOST.HOST} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:vmware.vm.uptime[{$VMWARE.URL},{HOST.HOST}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-# VMware Hypervisor
+# Template VM VMware Hypervisor
 
 ## Overview
 
@@ -211,11 +168,13 @@ No specific Zabbix configuration is required.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Datastore discovery |<p>-</p> |SIMPLE |vmware.hv.datastore.discovery[{$VMWARE.URL},{HOST.HOST}] |
+|Healthcheck discovery |<p>VMware Rollup Health State sensor discovery</p> |DEPENDENT |vmware.hv.healthcheck.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")]`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
+|VMware |VMware: Hypervisor ping |<p>Checks if the hypervisor is running and accepting ICMP pings.</p> |SIMPLE |icmpping[]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |VMware |VMware: Cluster name |<p>Cluster name of the guest VM.</p> |SIMPLE |vmware.hv.cluster.name[{$VMWARE.URL},{HOST.HOST}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: CPU usage |<p>Aggregated CPU usage across all cores on the host in Hz. This is only available if the host is connected.</p> |SIMPLE |vmware.hv.cpu.usage[{$VMWARE.URL},{HOST.HOST}] |
 |VMware |VMware: Datacenter name |<p>Datacenter name of the hypervisor.</p> |SIMPLE |vmware.hv.datacenter.name[{$VMWARE.URL},{HOST.HOST}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
@@ -232,7 +191,6 @@ No specific Zabbix configuration is required.
 |VMware |VMware: Used memory |<p>Physical memory usage on the host.</p> |SIMPLE |vmware.hv.memory.used[{$VMWARE.URL},{HOST.HOST}] |
 |VMware |VMware: Number of bytes received |<p>VMware hypervisor network input statistics (bytes per second).</p> |SIMPLE |vmware.hv.network.in[{$VMWARE.URL},{HOST.HOST},bps] |
 |VMware |VMware: Number of bytes transmitted |<p>VMware hypervisor network output statistics (bytes per second).</p> |SIMPLE |vmware.hv.network.out[{$VMWARE.URL},{HOST.HOST},bps] |
-|VMware |VMware: Health state rollup |<p>The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</p> |SIMPLE |vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}] |
 |VMware |VMware: Overall status |<p>The overall alarm status of the host: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</p> |SIMPLE |vmware.hv.status[{$VMWARE.URL},{HOST.HOST}] |
 |VMware |VMware: Uptime |<p>System uptime.</p> |SIMPLE |vmware.hv.uptime[{$VMWARE.URL},{HOST.HOST}] |
 |VMware |VMware: Version |<p>Dot-separated version string.</p> |SIMPLE |vmware.hv.version[{$VMWARE.URL},{HOST.HOST}] |
@@ -241,16 +199,62 @@ No specific Zabbix configuration is required.
 |VMware |VMware: Free space on datastore {#DATASTORE} (percentage) |<p>VMware datastore space in percentage from total.</p> |SIMPLE |vmware.hv.datastore.size[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},pfree] |
 |VMware |VMware: Total size of datastore {#DATASTORE} |<p>VMware datastore space in bytes.</p> |SIMPLE |vmware.hv.datastore.size[{$VMWARE.URL},{HOST.HOST},{#DATASTORE}] |
 |VMware |VMware: Average write latency of the datastore {#DATASTORE} |<p>Average amount of time for a write operation to the datastore (milliseconds).</p> |SIMPLE |vmware.hv.datastore.write[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency] |
+|VMware |VMware: Health state rollup |<p>The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</p> |DEPENDENT |vmware.hv.sensor.health.state[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")].healthState.label.first()`</p> |
+|Zabbix_raw_items |VMware: Get sensors |<p>Master item for sensors data.</p> |SIMPLE |vmware.hv.sensors.get[{$VMWARE.URL},{HOST.HOST}] |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|VMware: The {HOST.HOST} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}].last()}=3` |HIGH |<p>**Depends on**:</p><p>- VMware: The {HOST.HOST} health is Red</p> |
-|VMware: The {HOST.HOST} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}].last()}=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {HOST.HOST} health is Red</p><p>- VMware: The {HOST.HOST} health is Red</p><p>- VMware: The {HOST.HOST} health is Yellow</p> |
+|VMware: Hypervisor is down |<p>The service is unavailable or does not accept ICMP ping.</p> |`{TEMPLATE_NAME:icmpping[].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |VMware: The {HOST.HOST} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3` |HIGH | |
 |VMware: The {HOST.HOST} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {HOST.HOST} health is Red</p> |
-|VMware: {HOST.HOST} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.hv.uptime[{$VMWARE.URL},{HOST.HOST}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: Hypervisor has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.hv.uptime[{$VMWARE.URL},{HOST.HOST}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: The {HOST.HOST} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.sensor.health.state[{#SINGLETON}].str("Red")}=1` |HIGH | |
+|VMware: The {HOST.HOST} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.sensor.health.state[{#SINGLETON}].str("Yellow")}=1` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {HOST.HOST} health is Red</p> |
+
+## Feedback
+
+Please report any issues with the template at https://support.zabbix.com
+
+# Template VM VMware macros
+
+## Overview
+
+For Zabbix version: 5.0 and higher  
+
+## Setup
+
+Refer to the vendor documentation.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
+|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
+|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
+
+## Template links
+
+There are no template links in this template.
+
+## Discovery rules
+
+
+## Items collected
+
+|Group|Name|Description|Type|Key and additional info|
+|-----|----|-----------|----|---------------------|
+
+## Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----|----|----|
 
 ## Feedback
 

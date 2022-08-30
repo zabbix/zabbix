@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -465,10 +465,7 @@ if (hasRequest('preprocessing')) {
  */
 $result = false;
 if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
-	$result = false;
-	if ($item = get_item_by_itemid($_REQUEST['itemid'])) {
-		$result = API::Item()->delete([getRequest('itemid')]);
-	}
+	$result = API::Item()->delete([getRequest('itemid')]);
 
 	if ($result) {
 		uncheckTableRows(getRequest('checkbox_hash'));

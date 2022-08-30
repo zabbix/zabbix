@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T11:03:57Z</date>
+   <date>2022-07-22T07:52:06Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -18,7 +18,7 @@ EXTREME-SOFTWARE-MONITOR-MIB&#13;
 EXTREME-SYSTEM-MIB&#13;
 ENTITY-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -129,7 +129,7 @@ or&#13;
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>MIB: EXTREME-SOFTWARE-MONITOR-MIB&#13;
-Total CPU utlization (percentage) as of last sampling.</description>
+Total CPU utilization (percentage) as of last sampling.</description>
                <applications>
                   <application>
                      <name>CPU</name>
@@ -341,7 +341,6 @@ Operational status of a cooling fan.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Memory Discovery</name>
@@ -400,7 +399,7 @@ Total amount of DRAM in Kbytes in the system.</description>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <params>(last("vm.memory.total[extremeMemoryMonitorSystemTotal.{#SNMPINDEX}]") - last("vm.memory.available[extremeMemoryMonitorSystemFree.{#SNMPINDEX}]")) / last("vm.memory.total[extremeMemoryMonitorSystemTotal.{#SNMPINDEX}]") * 100</params>
-                     <description>Memory utilization in %</description>
+                     <description>Memory utilization in %.</description>
                      <applications>
                         <application>
                            <name>Memory</name>
@@ -416,7 +415,6 @@ Total amount of DRAM in Kbytes in the system.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPVALUE}: Memory usage</name>
@@ -495,7 +493,6 @@ Status of the power supply {#SNMPVALUE}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -566,19 +563,6 @@ or&#13;
    </graphs>
    <value_maps>
       <value_map>
-         <name>TruthValue</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>true</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>false</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>EXTREME-SYSTEM-MIB::extremeFanOperational</name>
          <mappings>
             <mapping>
@@ -622,6 +606,19 @@ or&#13;
             <mapping>
                <value>4</value>
                <newvalue>presentPowerOff</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>TruthValue</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>true</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>false</newvalue>
             </mapping>
          </mappings>
       </value_map>

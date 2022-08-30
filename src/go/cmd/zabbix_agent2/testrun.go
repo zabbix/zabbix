@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,9 @@ import (
 )
 
 func checkMetric(s scheduler.Scheduler, metric string) {
-	value, err := s.PerformTask(metric, time.Duration(agent.Options.Timeout)*time.Second, agent.TestrunClientID)
+	const timeoutForTestrunChecks = time.Minute
+
+	value, err := s.PerformTask(metric, timeoutForTestrunChecks, agent.TestrunClientID)
 	if err != nil {
 		fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", metric, err.Error())
 	} else {

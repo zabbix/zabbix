@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 	// SQL query to get media_type and media_type_param tables to compare hash values.
-	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid';
+	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid'.
+			' ORDER BY mt.mediatypeid, mtp.mediatype_paramid, mtp.name';
 
 	public function getValidationWebhookData() {
 		return [
@@ -38,7 +39,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Type' => 'Webhook',
 						'Script' => ' '
 					],
-					'error_message' => 'Invalid parameter "/2/script": cannot be empty.'
+					'error_message' => 'Invalid parameter "/1/script": cannot be empty.'
 				]
 			],
 			// Attepmt to add a webhook media type with a name that is already taken.
@@ -77,7 +78,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 							'Value' => '{BLANK.NAME}'
 						]
 					],
-					'error_message' => 'Invalid parameter "/2/parameters/6/name": cannot be empty.'
+					'error_message' => 'Invalid parameter "/1/parameters/6/name": cannot be empty.'
 				]
 			],
 			// Attempt to add a webhook without specifying the script field.
@@ -87,7 +88,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Name' => 'Webhook with empty script field',
 						'Type' => 'Webhook'
 					],
-					'error_message' => 'Invalid parameter "/2/script": cannot be empty.'
+					'error_message' => 'Invalid parameter "/1/script": cannot be empty.'
 				]
 			],
 			// Attempt to add a webhook with timeout equal to zero.
@@ -99,7 +100,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'Zero timeout',
 						'Timeout' => '0'
 					],
-					'error_message' => 'Invalid parameter "/2/timeout": value must be one of 1-60.'
+					'error_message' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
 				]
 			],
 			// Attempt to add a webhook with too large timeout.
@@ -111,7 +112,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'Large timeout',
 						'Timeout' => '61s'
 					],
-					'error_message' => 'Invalid parameter "/2/timeout": value must be one of 1-60.'
+					'error_message' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
 				]
 			],
 			// Attempt to add a webhook with too large timeout #2.
@@ -123,7 +124,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'Large timeout',
 						'Timeout' => '2m'
 					],
-					'error_message' => 'Invalid parameter "/2/timeout": value must be one of 1-60.'
+					'error_message' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
 				]
 			],
 			// Attempt to add a webhook with a string in the timeout field.
@@ -135,7 +136,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'String in timeout',
 						'Timeout' => '30seconds'
 					],
-					'error_message' => 'Invalid parameter "/2/timeout": a time unit is expected.'
+					'error_message' => 'Invalid parameter "/1/timeout": a time unit is expected.'
 				]
 			],
 			// Attempt to add a webhook with empty menu entry name.

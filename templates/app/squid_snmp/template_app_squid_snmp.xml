@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-18T06:36:02Z</date>
+   <date>2022-01-10T14:11:41Z</date>
    <groups>
       <group>
-         <name>Templates/Modules</name>
+         <name>Templates/Applications</name>
       </group>
    </groups>
    <templates>
@@ -15,10 +15,10 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/409339-discussion-thread-for-official-zabbix-template-squid&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
-               <name>Templates/Modules</name>
+               <name>Templates/Applications</name>
             </group>
          </groups>
          <applications>
@@ -32,7 +32,6 @@ Template tooling version used: 0.38</description>
                <type>SIMPLE</type>
                <key>net.tcp.service[tcp,,{$SQUID.HTTP.PORT}]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Squid</name>
@@ -62,7 +61,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.1.5.0</snmp_oid>
                <key>squid[cacheCpuUsage]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The percentage use of the CPU</description>
@@ -78,7 +76,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.1.12.0</snmp_oid>
                <key>squid[cacheCurrentFileDescrCnt]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of file descriptors in use</description>
                <applications>
@@ -93,7 +90,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.1.13.0</snmp_oid>
                <key>squid[cacheCurrentFileDescrMax]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Highest number of file descriptors in use</description>
                <applications>
@@ -108,7 +104,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.1.8.0</snmp_oid>
                <key>squid[cacheCurrentLRUExpiration]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>Storage LRU Expiration Age</description>
@@ -130,7 +125,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.1.11.0</snmp_oid>
                <key>squid[cacheCurrentResFileDescrCnt]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Reserved number of file descriptors</description>
                <applications>
@@ -145,7 +139,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.14.0</snmp_oid>
                <key>squid[cacheCurrentSwapSize]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>B</units>
                <description>Storage Swap Size</description>
@@ -161,7 +154,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.1.9.0</snmp_oid>
                <key>squid[cacheCurrentUnlinkRequests]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Requests given to unlinkd</description>
                <applications>
@@ -176,7 +168,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.1.10.0</snmp_oid>
                <key>squid[cacheCurrentUnusedFDescrCnt]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Available number of file descriptors</description>
                <applications>
@@ -198,7 +189,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.4.3.2.0</snmp_oid>
                <key>squid[cacheDnsReplies]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of external dns server replies</description>
                <applications>
@@ -219,7 +209,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.4.3.1.0</snmp_oid>
                <key>squid[cacheDnsRequests]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of external dns server requests</description>
                <applications>
@@ -240,7 +229,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.8.5</snmp_oid>
                <key>squid[cacheDnsSvcTime.5]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>DNS service time per 5 minutes</description>
@@ -262,7 +250,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.8.60</snmp_oid>
                <key>squid[cacheDnsSvcTime.60]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>DNS service time per hour</description>
@@ -284,7 +271,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.4.2.3.0</snmp_oid>
                <key>squid[cacheFqdnHits]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of FQDN Cache hits</description>
                <applications>
@@ -305,7 +291,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.4.2.6.0</snmp_oid>
                <key>squid[cacheFqdnMisses]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of FQDN Cache misses</description>
                <applications>
@@ -326,7 +311,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.4.2.2.0</snmp_oid>
                <key>squid[cacheFqdnRequests]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of FQDN Cache requests</description>
                <applications>
@@ -347,7 +331,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.2.5</snmp_oid>
                <key>squid[cacheHttpAllSvcTime.5]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>HTTP all service time per 5 minutes</description>
@@ -369,7 +352,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.2.60</snmp_oid>
                <key>squid[cacheHttpAllSvcTime.60]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>HTTP all service time per hour</description>
@@ -391,7 +373,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.3.0</snmp_oid>
                <key>squid[cacheHttpErrors]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of HTTP Errors sent to clients</description>
                <applications>
@@ -412,7 +393,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.2.0</snmp_oid>
                <key>squid[cacheHttpHits]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of HTTP Hits sent to clients from cache</description>
                <applications>
@@ -433,7 +413,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.5.5</snmp_oid>
                <key>squid[cacheHttpHitSvcTime.5]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>HTTP hit service time per 5 minutes</description>
@@ -455,7 +434,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.5.60</snmp_oid>
                <key>squid[cacheHttpHitSvcTime.60]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>HTTP hit service time per hour</description>
@@ -477,7 +455,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.4.0</snmp_oid>
                <key>squid[cacheHttpInKb]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>Number of HTTP traffic received from clients</description>
@@ -503,7 +480,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.3.5</snmp_oid>
                <key>squid[cacheHttpMissSvcTime.5]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>HTTP miss service time per 5 minutes</description>
@@ -525,7 +501,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.3.60</snmp_oid>
                <key>squid[cacheHttpMissSvcTime.60]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>HTTP miss service time per hour</description>
@@ -547,7 +522,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.5.0</snmp_oid>
                <key>squid[cacheHttpOutKb]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>Number of HTTP traffic sent to clients</description>
@@ -573,7 +547,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.9.0</snmp_oid>
                <key>squid[cacheIcpKbRecv]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>Number of ICP traffic received</description>
@@ -599,7 +572,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.8.0</snmp_oid>
                <key>squid[cacheIcpKbSent]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>Number of ICP traffic transmitted</description>
@@ -625,7 +597,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.7.0</snmp_oid>
                <key>squid[cacheIcpPktsRecv]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of ICP messages received</description>
                <applications>
@@ -646,7 +617,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.6.0</snmp_oid>
                <key>squid[cacheIcpPktsSent]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of ICP messages sent</description>
                <applications>
@@ -667,7 +637,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.6.5</snmp_oid>
                <key>squid[cacheIcpQuerySvcTime.5]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>ICP query service time per 5 minutes</description>
@@ -689,7 +658,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.6.60</snmp_oid>
                <key>squid[cacheIcpQuerySvcTime.60]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>ICP query service time per hour</description>
@@ -711,7 +679,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.7.5</snmp_oid>
                <key>squid[cacheIcpReplySvcTime.5]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>ICP reply service time per 5 minutes</description>
@@ -733,7 +700,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.7.60</snmp_oid>
                <key>squid[cacheIcpReplySvcTime.60]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>ICP reply service time per hour</description>
@@ -755,7 +721,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.4.1.3.0</snmp_oid>
                <key>squid[cacheIpHits]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of IP Cache hits</description>
                <applications>
@@ -776,7 +741,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.4.1.6.0</snmp_oid>
                <key>squid[cacheIpMisses]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of IP Cache misses</description>
                <applications>
@@ -797,7 +761,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.4.1.2.0</snmp_oid>
                <key>squid[cacheIpRequests]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of IP Cache requests</description>
                <applications>
@@ -818,7 +781,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.1.6.0</snmp_oid>
                <key>squid[cacheMaxResSize]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>B</units>
                <description>Maximum Resident Size</description>
@@ -840,7 +802,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.2.5.1.0</snmp_oid>
                <key>squid[cacheMemMaxSize]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>B</units>
                <description>The value of the cache_mem parameter</description>
@@ -862,7 +823,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.1.3.0</snmp_oid>
                <key>squid[cacheMemUsage]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>B</units>
                <description>Total accounted memory</description>
@@ -884,7 +844,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.1.7.0</snmp_oid>
                <key>squid[cacheNumObjCount]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of objects stored by the cache</description>
                <applications>
@@ -899,7 +858,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.1.0</snmp_oid>
                <key>squid[cacheProtoClientHttpRequests]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of HTTP requests received</description>
                <applications>
@@ -920,7 +878,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.10.1</snmp_oid>
                <key>squid[cacheRequestByteRatio.1]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Byte Hit Ratios</description>
                <applications>
@@ -935,7 +892,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.10.5</snmp_oid>
                <key>squid[cacheRequestByteRatio.5]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Byte Hit Ratios</description>
                <applications>
@@ -950,7 +906,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.10.60</snmp_oid>
                <key>squid[cacheRequestByteRatio.60]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Byte Hit Ratios</description>
                <applications>
@@ -965,7 +920,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.9.1</snmp_oid>
                <key>squid[cacheRequestHitRatio.1]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Byte Hit Ratios</description>
                <applications>
@@ -980,7 +934,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.9.5</snmp_oid>
                <key>squid[cacheRequestHitRatio.5]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Byte Hit Ratios</description>
                <applications>
@@ -995,7 +948,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.9.60</snmp_oid>
                <key>squid[cacheRequestHitRatio.60]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Byte Hit Ratios</description>
                <applications>
@@ -1010,7 +962,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.2.5.3.0</snmp_oid>
                <key>squid[cacheSwapHighWM]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Cache Swap High Water Mark</description>
@@ -1026,7 +977,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.2.5.4.0</snmp_oid>
                <key>squid[cacheSwapLowWM]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Cache Swap Low Water Mark</description>
@@ -1042,7 +992,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.2.5.2.0</snmp_oid>
                <key>squid[cacheSwapMaxSize]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>B</units>
                <description>The total of the cache_dir space allocated</description>
@@ -1064,7 +1013,6 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.1.1.0</snmp_oid>
                <key>squid[cacheSysPageFaults]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Page faults with physical I/O</description>
                <applications>
@@ -1086,7 +1034,6 @@ Template tooling version used: 0.38</description>
                <key>squid[cacheUptime]</key>
                <delay>5m</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>s</units>
                <description>The Uptime of the cache in timeticks (in hundredths of a second) with preprocessing</description>
                <applications>
@@ -1117,7 +1064,6 @@ Template tooling version used: 0.38</description>
                <key>squid[cacheVersionId]</key>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Cache Software Version</description>
                <applications>
@@ -1212,7 +1158,7 @@ Template tooling version used: 0.38</description>
          </graph_items>
       </graph>
       <graph>
-         <name>Squid: Domain name (FQDN) cache ctatistics</name>
+         <name>Squid: Domain name (FQDN) cache statistics</name>
          <graph_items>
             <graph_item>
                <color>1A7C11</color>

@@ -1,7 +1,7 @@
 <?php
 /*
  ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -205,6 +205,16 @@ class CArrayHelper {
 			}
 		}
 		return 0;
+	}
+
+	/**
+	 * Sort array by keys in ascending order.
+	 * Performs case-insensitive string comparisons using a "natural order" algorithm.
+	 *
+	 * @param array $array
+	 */
+	public static function ksort(array &$array): void {
+		uksort($array, 'strnatcasecmp');
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-18T08:20:57Z</date>
+   <date>2021-12-23T06:23:15Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -19,7 +19,7 @@ SNMPv2-MIB&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Server hardware</name>
@@ -63,7 +63,6 @@ Template tooling version used: 0.38</description>
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.</description>
@@ -88,7 +87,6 @@ The textual identification of the contact person for this managed node, together
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 A textual description of the entity. This value should&#13;
@@ -114,7 +112,6 @@ networking software.</description>
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: IDRAC-MIB-SMIv2&#13;
 This attribute defines the firmware version of a remote access card.</description>
@@ -147,7 +144,6 @@ This attribute defines the firmware version of a remote access card.</descriptio
                <key>dell.server.hw.model[systemModelName]</key>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: IDRAC-MIB-SMIv2&#13;
 This attribute defines the model name of the system.</description>
@@ -171,7 +167,6 @@ This attribute defines the model name of the system.</description>
                <key>dell.server.hw.serialnumber[systemServiceTag]</key>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: IDRAC-MIB-SMIv2&#13;
 This attribute defines the service tag of the system.</description>
@@ -205,7 +200,6 @@ This attribute defines the service tag of the system.</description>
                <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The physical location of this node (e.g., 'telephone closet, 3rd floor'). If the location is unknown, the value is the zero-length string.</description>
@@ -230,7 +224,6 @@ The physical location of this node (e.g., 'telephone closet, 3rd floor'). If the
                <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.</description>
@@ -264,7 +257,6 @@ An administratively-assigned name for this managed node. By convention, this is 
                <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.</description>
@@ -287,7 +279,6 @@ The vendor's authoritative identification of the network management subsystem co
                <key>dell.server.status[globalSystemStatus]</key>
                <history>7d</history>
                <trends>0d</trends>
-               <status>ENABLED</status>
                <description>MIB: IDRAC-MIB-SMIv2&#13;
 This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.</description>
                <applications>
@@ -342,7 +333,6 @@ This attribute defines the overall rollup status of all components in the system
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: IDRAC-MIB-SMIv2&#13;
 This attribute defines the name of the operating system that the host is running.</description>
@@ -375,7 +365,6 @@ This attribute defines the name of the operating system that the host is running
                <key>dell.server.uptime[sysUpTime]</key>
                <history>2w</history>
                <trends>0d</trends>
-               <status>ENABLED</status>
                <units>uptime</units>
                <description>MIB: SNMPv2-MIB&#13;
 The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</description>
@@ -406,7 +395,6 @@ The time (in hundredths of a second) since the network management portion of the
                <key>snmptrap.fallback</key>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>LOG</value_type>
                <description>The item is used to collect all SNMP traps unmatched by other snmptrap items</description>
                <applications>
@@ -421,7 +409,6 @@ The time (in hundredths of a second) since the network management portion of the
                <type>INTERNAL</type>
                <key>zabbix[host,snmp,available]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Status</name>
@@ -463,7 +450,6 @@ The time (in hundredths of a second) since the network management portion of the
                      <key>dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 Current state of battery.&#13;
 Possible values:&#13;
@@ -529,7 +515,6 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -552,7 +537,6 @@ Possible values:&#13;
                      <key>dell.server.hw.diskarray.model[controllerName.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The controller's name as represented in Storage Management.</description>
@@ -575,7 +559,6 @@ The controller's name as represented in Storage Management.</description>
                      <key>dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The status of the controller itself without the propagation of any contained component status.&#13;
 Possible values:&#13;
@@ -601,13 +584,6 @@ Possible values:&#13;
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}={$DISK.ARRAY.STATUS.FAIL}</expression>
-                           <name>Dell R720: {#CNTLR_NAME} is in unrecoverable state</name>
-                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
-                           <priority>DISASTER</priority>
-                           <description>Please check the device for faults.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()}={$DISK.ARRAY.STATUS.CRIT}</expression>
                            <name>Dell R720: {#CNTLR_NAME} is in critical state</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
@@ -619,6 +595,13 @@ Possible values:&#13;
                                  <expression>{Template Server DELL PowerEdge R720 SNMP:dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].last()}={$DISK.ARRAY.STATUS.FAIL}</expression>
                               </dependency>
                            </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}={$DISK.ARRAY.STATUS.FAIL}</expression>
+                           <name>Dell R720: {#CNTLR_NAME} is in unrecoverable state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>DISASTER</priority>
+                           <description>Please check the device for faults.</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}={$DISK.ARRAY.STATUS.WARN}</expression>
@@ -640,7 +623,6 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -672,7 +654,6 @@ Possible values:&#13;
                      <snmp_oid>1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>dell.server.sensor.fan.speed[coolingDeviceReading.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>rpm</units>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 This attribute defines the reading for a cooling device&#13;
@@ -694,7 +675,6 @@ coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.</des
                      <key>dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 This attribute defines the probe status of the cooling device.</description>
                      <applications>
@@ -735,7 +715,6 @@ This attribute defines the probe status of the cooling device.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -758,7 +737,6 @@ This attribute defines the probe status of the cooling device.</description>
                      <key>dell.server.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The media type of the physical disk. Possible Values:&#13;
 1: The media type could not be determined.&#13;
@@ -786,7 +764,6 @@ The media type of the physical disk. Possible Values:&#13;
                      <key>dell.server.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The model number of the physical disk.</description>
@@ -809,7 +786,6 @@ The model number of the physical disk.</description>
                      <key>dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The physical disk's unique identification number from the manufacturer.</description>
@@ -841,7 +817,6 @@ The physical disk's unique identification number from the manufacturer.</descrip
                      <key>dell.server.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The size of the physical disk in megabytes.</description>
@@ -868,7 +843,6 @@ The size of the physical disk in megabytes.</description>
                      <key>dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 Indicates whether the physical disk has received a predictive failure alert.</description>
                      <applications>
@@ -908,7 +882,6 @@ Indicates whether the physical disk has received a predictive failure alert.</de
                      <key>dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The status of the physical disk itself without the propagation of any contained component status.&#13;
 Possible values:&#13;
@@ -956,7 +929,6 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -979,7 +951,6 @@ Possible values:&#13;
                      <key>dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 0600.0012.0001.0005 This attribute defines the status of the power supply.</description>
                      <applications>
@@ -1020,7 +991,6 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1043,7 +1013,6 @@ Possible values:&#13;
                      <key>dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 This attribute defines the probe status of the temperature probe.&#13;
@@ -1119,7 +1088,6 @@ failed(10)              -- probe is not functional</description>
                      <snmp_oid>1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
@@ -1141,7 +1109,6 @@ This attribute defines the reading for a temperature probe of type other than te
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1163,7 +1130,6 @@ This attribute defines the reading for a temperature probe of type other than te
                      <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.13.{#SNMPINDEX}</snmp_oid>
                      <key>dell.server.hw.virtualdisk.layout[virtualDiskLayout.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The virtual disk's RAID type.&#13;
 Possible values:&#13;
@@ -1199,7 +1165,6 @@ Possible values:&#13;
                      <key>dell.server.hw.virtualdisk.readpolicy[virtualDiskReadPolicy.{#SNMPINDEX}]</key>
                      <delay>1h</delay>
                      <history>2w</history>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The read policy used by the controller for read operations on this virtual disk.&#13;
 Possible values:&#13;
@@ -1222,7 +1187,6 @@ Possible values:&#13;
                      <key>dell.server.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The size of the virtual disk in megabytes.</description>
@@ -1249,7 +1213,6 @@ The size of the virtual disk in megabytes.</description>
                      <key>dell.server.hw.virtualdisk.state[virtualDiskOperationalState.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>2w</history>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The state of the virtual disk when there are progressive operations ongoing.&#13;
 Possible values:&#13;
@@ -1273,7 +1236,6 @@ Possible values:&#13;
                      <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The current state of this virtual disk (which includes any member physical disks.)&#13;
 Possible states:&#13;
@@ -1326,7 +1288,6 @@ The data on the virtual disk might no longer be fault tolerant.</description>
                      <key>dell.server.hw.virtualdisk.writepolicy[virtualDiskWritePolicy.{#SNMPINDEX}]</key>
                      <delay>1h</delay>
                      <history>2w</history>
-                     <status>ENABLED</status>
                      <description>MIB: IDRAC-MIB-SMIv2&#13;
 The write policy used by the controller for write operations on this virtual disk.&#13;
 Possible values:&#13;
@@ -1343,7 +1304,6 @@ Possible values:&#13;
                      </valuemap>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1523,6 +1483,52 @@ Possible values:&#13;
    </templates>
    <value_maps>
       <value_map>
+         <name>IDRAC-MIB-SMIv2::batteryState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Ready</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Degraded</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Missing</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>Charging</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Below threshold</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::BooleanType</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
          <mappings>
             <mapping>
@@ -1548,6 +1554,52 @@ Possible values:&#13;
             <mapping>
                <value>6</value>
                <newvalue>nonRecoverable</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::physicalDiskComponentStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>nonCritical</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>critical</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>nonRecoverable</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::physicalDiskMediaType</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>HDD</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>SSD</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -1593,98 +1645,6 @@ Possible values:&#13;
             <mapping>
                <value>10</value>
                <newvalue>failed</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::physicalDiskComponentStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>nonCritical</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>critical</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>nonRecoverable</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::BooleanType</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>failed</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::physicalDiskMediaType</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>HDD</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>SSD</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::batteryState</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Ready</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Failed</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Degraded</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>Missing</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>Charging</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>Below threshold</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -1759,23 +1719,6 @@ Possible values:&#13;
          </mappings>
       </value_map>
       <value_map>
-         <name>IDRAC-MIB-SMIv2::virtualDiskWritePolicy</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Write Through</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Write Back</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Force Write Back</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>IDRAC-MIB-SMIv2::virtualDiskReadPolicy</name>
          <mappings>
             <mapping>
@@ -1810,6 +1753,23 @@ Possible values:&#13;
             <mapping>
                <value>4</value>
                <newvalue>Degraded</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskWritePolicy</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Write Through</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Write Back</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Force Write Back</newvalue>
             </mapping>
          </mappings>
       </value_map>

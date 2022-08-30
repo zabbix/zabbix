@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -552,7 +552,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			sleep(1);
 			$this->query($xpath.$entry['name'].'"]')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
-			$this->assertContains('zabbix.php?action='.$entry['action'], $this->page->getCurrentURL());
+			$this->assertStringContainsString('zabbix.php?action='.$entry['action'], $this->page->getCurrentURL());
 			$this->assertEquals($entry['message'], $this->query('tag:h1')->waitUntilVisible()->one()->getText());
 		}
 		// Get back to modules list to enable or disable the next module.
@@ -582,7 +582,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			if (CTestArrayHelper::get($entry, 'check_disabled', true)) {
 				$this->page->open('zabbix.php?action='.$entry['action'])->waitUntilReady();
 				$message = CMessageElement::find()->one();
-				$this->assertContains('Class not found for action '.$entry['action'], $message->getText());
+				$this->assertStringContainsString('Class not found for action '.$entry['action'], $message->getText());
 				$this->page->open('zabbix.php?action=module.list');
 			}
 		}

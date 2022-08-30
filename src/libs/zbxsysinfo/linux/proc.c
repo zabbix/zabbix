@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1066,7 +1066,7 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 
 				break;
 			case 20:
-				if (FAIL == (offset = proc_read_value(ptr, &procutil->starttime)))
+				if (FAIL == proc_read_value(ptr, &procutil->starttime))
 				{
 					ret = -EINVAL;
 					goto out;

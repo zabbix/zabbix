@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1963,22 +1963,34 @@ class CImportDataAdapterTest extends TestCase {
 				'smtp_server' => 'mail.example.com',
 				'smtp_helo' => 'example.com',
 				'smtp_email' => 'zabbix@example.com',
-				'parameters' => ''
+				'parameters' => []
 			] + $defaults,
 			[
-				'name' => 'Script',
+				'name' => 'Script without parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SCRIPT,
 				'exec_path' => 'script.sh',
 				'exec_params' => ''
 			] + $defaults,
 			[
+				'name' => 'Script with parameters',
+				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SCRIPT,
+				'exec_path' => 'script.sh',
+				'exec_params' => "100\n200\n300\n"
+			] + $defaults,
+			[
 				'name' => 'SMS',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SMS,
 				'gsm_modem' => '/dev/ttyS0',
-				'parameters' => ''
+				'parameters' => []
 			] + $defaults,
 			[
-				'name' => 'Webhook',
+				'name' => 'Webhook without parameters',
+				'type' => (string) CXmlConstantValue::MEDIA_TYPE_WEBHOOK,
+				'parameters' => [],
+				'script' => 'return true;'
+			] + $defaults,
+			[
+				'name' => 'Webhook with parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_WEBHOOK,
 				'parameters' => [
 					[
@@ -2046,9 +2058,7 @@ class CImportDataAdapterTest extends TestCase {
 					],
 					'templates' => [],
 					'tags' => [],
-					'proxy' => [
-						'name' => '0'
-					],
+					'proxy' => [],
 					'description' => '',
 					'name' => 'host',
 					'tls_connect' => '1',
@@ -2158,9 +2168,7 @@ class CImportDataAdapterTest extends TestCase {
 						'description' => 'Free disk space on / in %',
 						'inventory_link' => '0',
 						'preprocessing' => [],
-						'valuemap' => [
-							'name' => '0'
-						]
+						'valuemap' => []
 					]
 				],
 				'Template_Simple' => [
@@ -2213,9 +2221,7 @@ class CImportDataAdapterTest extends TestCase {
 						'description' => 'FTP check',
 						'inventory_link' => '0',
 						'preprocessing' => [],
-						'valuemap' => [
-							'name' => '0'
-						]
+						'valuemap' => []
 					],
 					'net.tcp.service[ftp,,{$PORT.FTP}]' => [
 						'type' => '3',
@@ -2266,9 +2272,7 @@ class CImportDataAdapterTest extends TestCase {
 						'description' => 'FTP check with macro',
 						'inventory_link' => '0',
 						'preprocessing' => [],
-						'valuemap' => [
-							'name' => '0'
-						]
+						'valuemap' => []
 					]
 				]
 			]
@@ -2513,10 +2517,7 @@ class CImportDataAdapterTest extends TestCase {
 							'details' => []
 						]
 					],
-					'proxy' =>
-					[
-						'name' => '0'
-					],
+					'proxy' => [],
 					'tls_connect' => '1',
 					'tls_accept' => '1',
 					'inventory_mode' => '-1',
@@ -2561,7 +2562,7 @@ class CImportDataAdapterTest extends TestCase {
 							],
 							'sort_triggers' => '',
 							'application' => '',
-							'max_columns' => ''
+							'max_columns' => '3'
 						]
 					]
 				]
@@ -2645,9 +2646,7 @@ class CImportDataAdapterTest extends TestCase {
 						'units' => '',
 						'url' => '',
 						'username' => '',
-						'valuemap' => [
-							'name' => '0'
-						],
+						'valuemap' => [],
 						'key_' => 'net.tcp.service[ftp,,21]',
 						'trapper_hosts' => ''
 					],
@@ -2698,9 +2697,7 @@ class CImportDataAdapterTest extends TestCase {
 						'units' => '',
 						'url' => '',
 						'username' => '',
-						'valuemap' => [
-							'name' => '0'
-						],
+						'valuemap' => [],
 						'key_' => 'net.tcp.service[ftp,,{$PORT.FTP}]',
 						'trapper_hosts' => ''
 					]

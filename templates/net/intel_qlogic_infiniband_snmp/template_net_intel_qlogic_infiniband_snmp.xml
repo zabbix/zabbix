@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:16Z</date>
+   <date>2021-12-23T14:12:44Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -16,7 +16,7 @@
 MIBs used:&#13;
 ICS-CHASSIS-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -418,31 +418,6 @@ The serial number of the FRU.  If not available, this value is a zero-length str
          </mappings>
       </value_map>
       <value_map>
-         <name>ICS-CHASSIS-MIB::icsChassisSensorSlotOperStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>invalid</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>bad</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>warning</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>good</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>disabled</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>ICS-CHASSIS-MIB::icsChassisPowerSupplyOperStatus</name>
          <mappings>
             <mapping>
@@ -476,6 +451,31 @@ The serial number of the FRU.  If not available, this value is a zero-length str
             <mapping>
                <value>8</value>
                <newvalue>notPresent</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>ICS-CHASSIS-MIB::icsChassisSensorSlotOperStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>invalid</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>bad</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>warning</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>good</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>disabled</newvalue>
             </mapping>
          </mappings>
       </value_map>

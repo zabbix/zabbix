@@ -31,12 +31,12 @@ INSERT INTO application_template (application_templateid,applicationid,templatei
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (40066, 50009, 50022, 0, 2,'API discovery rule','vfs.fs.discovery',30,90,0,'','',1,'','');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (40067, 50009, 50022, 0, 2,'API discovery item','vfs.fs.size[{#FSNAME},free]',30,90,0,'','',2,'','');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (40068, 50009, 50022, 0, 2,'API discovery item','vfs.fs.size[/,free]',30,90,0,'','',4,'','');
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15085,40067,40066,'vfs.fs.size[{#FSNAME},free]');
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15086,40068,40067,'vfs.fs.size[{#FSNAME},free]');
+INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (14999,40067,40066,'vfs.fs.size[{#FSNAME},free]');
+INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15000,40068,40067,'vfs.fs.size[{#FSNAME},free]');
 INSERT INTO applications (applicationid,hostid,name,flags) VALUES (375,50009,'API discovery application',4);
 INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (900,40066,'API discovery application');
 INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (101,375,900,'API discovery application');
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375,40068);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (10,375,40068);
 INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (9000,900,40067);
 
 -- valuemap
@@ -249,33 +249,33 @@ INSERT INTO applications (applicationid,hostid,name,flags) VALUES (15016,50009,'
 INSERT INTO httptest (httptestid, name, delay, agent, hostid, applicationid) VALUES (15015, 'Webtest key_name', 60, 'Zabbix', 50009, 15015);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15015, 15015, 'Webstep name 1', 1, 'http://api.com', '');
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15016, 15015, 'Webstep name 2', 2, 'http://api.com', '');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150151, 50009, 1, 9, 0,'Download speed for scenario "$1".','web.test.in[Webtest key_name,,bps]','2m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150152, 50009, 1, 9, 3,'Failed step of scenario "$1".','web.test.fail[Webtest key_name]','2m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150153, 50009, 1, 9, 1,'Last error message of scenario "$1".','web.test.error[Webtest key_name]','2m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150154, 50009, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 1,bps]','1m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150155, 50009, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 1,resp]','1m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150156, 50009, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 1]','1m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150157, 50009, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 2,bps]','1m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150158, 50009, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 2,resp]','1m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150159, 50009, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 2]','1m','30d',0,'','',0,'','');
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150151, 15015, 150151, 2);
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150152, 15015, 150152, 3);
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15015, 150153, 4);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15015, 150154, 2);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150155, 15015, 150155, 1);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150156, 15015, 150156, 0);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150157, 15016, 150157, 2);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150158, 15016, 150158, 1);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150159, 15016, 150159, 0);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150151,15015,150151);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150152,15015,150152);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150153,15015,150153);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150154,15015,150154);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150155,15015,150155);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150156,15015,150156);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150157,15015,150157);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150158,15015,150158);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150159,15015,150159);
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (160151, 50009, 1, 9, 0,'Download speed for scenario "$1".','web.test.in[Webtest key_name,,bps]','2m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (160152, 50009, 1, 9, 3,'Failed step of scenario "$1".','web.test.fail[Webtest key_name]','2m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (160153, 50009, 1, 9, 1,'Last error message of scenario "$1".','web.test.error[Webtest key_name]','2m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (160154, 50009, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 1,bps]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (160155, 50009, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 1,resp]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (160156, 50009, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 1]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (160157, 50009, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 2,bps]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (160158, 50009, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 2,resp]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (160159, 50009, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 2]','1m','30d',0,'','',0,'','');
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (160151, 15015, 160151, 2);
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (160152, 15015, 160152, 3);
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (160153, 15015, 160153, 4);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (160154, 15015, 160154, 2);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (160155, 15015, 160155, 1);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (160156, 15015, 160156, 0);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (160157, 15016, 160157, 2);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (160158, 15016, 160158, 1);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (160159, 15016, 160159, 0);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (1,15015,160151);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (2,15015,160152);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (3,15015,160153);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (4,15015,160154);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (5,15015,160155);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6,15015,160156);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (7,15015,160157);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (8,15015,160158);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (9,15015,160159);
 
 -- proxy
 INSERT INTO hosts (hostid, host, status, description) VALUES (99000, 'Api active proxy for delete0', 5, '');
@@ -480,22 +480,22 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1132, 1002, 'dependent.item.proto.1.2.2.2'  , 18, 'dependent.item.proto.1.2.2.2'  , 1, '90d', 0, 1124, 1032, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1133, 1002, 'item.proto.1'                  ,  2, 'item.proto.1'                  , 1, '90d', 0, NULL, 1033, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status, master_itemid, templateid, params, description, posts, headers, lifetime, flags) VALUES (1134, 1002, 'dependent.discovery.rule.1.1'  , 18, 'dependent.discovery.rule.1.1'  , 4,        0, 1101, NULL, '', '', '', '', '30d', 1);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5101, 1117, 1118);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5102, 1117, 1119);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5103, 1117, 1120);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5104, 1117, 1121);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5105, 1117, 1122);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5106, 1117, 1123);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5107, 1117, 1124);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5108, 1117, 1125);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5109, 1117, 1126);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5110, 1117, 1127);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5111, 1117, 1128);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5112, 1117, 1129);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5113, 1117, 1130);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5114, 1117, 1131);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5115, 1117, 1132);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5116, 1117, 1133);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15017, 1117, 1118);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15018, 1117, 1119);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15019, 1117, 1120);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15020, 1117, 1121);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15021, 1117, 1122);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15022, 1117, 1123);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15023, 1117, 1124);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15024, 1117, 1125);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15025, 1117, 1126);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15026, 1117, 1127);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15027, 1117, 1128);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15028, 1117, 1129);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15029, 1117, 1130);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15030, 1117, 1131);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15031, 1117, 1132);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15032, 1117, 1133);
 
 -- dependent items: dependent.items.template.1.2
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1003, 'dependent.items.template.1.2', 'dependent.items.template.1.2', 3, '');
@@ -535,22 +535,22 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1232, 1003, 'dependent.item.proto.1.2.2.2'  , 18, 'dependent.item.proto.1.2.2.2'  , 1, '90d', 0, 1224, 1032, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1233, 1003, 'item.proto.1'                  ,  2, 'item.proto.1'                  , 1, '90d', 0, NULL, 1033, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status, master_itemid, templateid, params, description, posts, headers, lifetime, flags) VALUES (1234, 1003, 'dependent.discovery.rule.1.1'  , 18, 'dependent.discovery.rule.1.1'  , 4,        0, 1201, NULL, '', '', '', '', '30d', 1);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5201, 1217, 1218);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5202, 1217, 1219);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5203, 1217, 1220);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5204, 1217, 1221);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5205, 1217, 1222);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5206, 1217, 1223);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5207, 1217, 1224);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5208, 1217, 1225);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5209, 1217, 1226);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5210, 1217, 1227);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5211, 1217, 1228);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5212, 1217, 1229);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5213, 1217, 1230);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5214, 1217, 1231);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5215, 1217, 1232);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5216, 1217, 1233);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15033, 1217, 1218);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15034, 1217, 1219);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15035, 1217, 1220);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15036, 1217, 1221);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15037, 1217, 1222);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15038, 1217, 1223);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15039, 1217, 1224);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15040, 1217, 1225);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15041, 1217, 1226);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15042, 1217, 1227);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15043, 1217, 1228);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15044, 1217, 1229);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15045, 1217, 1230);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15046, 1217, 1231);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15047, 1217, 1232);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15048, 1217, 1233);
 
 -- dependent items: dependent.items.host.1
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1004, 'dependent.items.host.1', 'dependent.items.host.1', 0, '');
@@ -591,22 +591,22 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1332, 1004, 'dependent.item.proto.1.2.2.2'  , 18, 'dependent.item.proto.1.2.2.2'  , 1, '90d', 0, 1324, 1132, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1333, 1004, 'item.proto.1'                  ,  2, 'item.proto.1'                  , 1, '90d', 0, NULL, 1133, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status, master_itemid, templateid, params, description, posts, headers, lifetime, flags) VALUES (1334, 1004, 'dependent.discovery.rule.1.1'  , 18, 'dependent.discovery.rule.1.1'  , 4,        0, 1301, NULL, '', '', '', '', '30d', 1);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5301, 1317, 1318);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5302, 1317, 1319);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5303, 1317, 1320);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5304, 1317, 1321);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5305, 1317, 1322);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5306, 1317, 1323);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5307, 1317, 1324);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5308, 1317, 1325);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5309, 1317, 1326);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5310, 1317, 1327);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5311, 1317, 1328);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5312, 1317, 1329);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5313, 1317, 1330);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5314, 1317, 1331);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5315, 1317, 1332);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5316, 1317, 1333);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15049, 1317, 1318);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15050, 1317, 1319);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15051, 1317, 1320);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15052, 1317, 1321);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15053, 1317, 1322);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15054, 1317, 1323);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15055, 1317, 1324);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15056, 1317, 1325);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15057, 1317, 1326);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15058, 1317, 1327);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15059, 1317, 1328);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15060, 1317, 1329);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15061, 1317, 1330);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15062, 1317, 1331);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15063, 1317, 1332);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15064, 1317, 1333);
 
 -- dependent items: dependent.items.template.2
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1005, 'dependent.items.template.2', 'dependent.items.template.2', 3, '');
@@ -632,9 +632,9 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1603, 1007, 'dependent.item.proto.1.1.1'    , 18, 'dependent.item.proto.1.1.1'    , 1, '90d', 0, 1601, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1604, 1007, 'dependent.item.proto.1.1.1.1'  , 18, 'dependent.item.proto.1.1.1.1'  , 1, '90d', 0, 1603, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1605, 1007, 'dependent.item.proto.1.1.1.1.1', 18, 'dependent.item.proto.1.1.1.1.1', 1, '90d', 0, 1604, NULL, '', '', '', '',        2);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5601, 1602, 1603);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5602, 1602, 1604);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5603, 1602, 1605);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15065, 1602, 1603);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15066, 1602, 1604);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15067, 1602, 1605);
 
 -- dependent items: dependent.items.template.4
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1008, 'dependent.items.template.4', 'dependent.items.template.4', 3, '');
@@ -670,9 +670,9 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2004, 1011, 'item.proto.3'                  , 18, 'item.proto.3'                  , 1, '90d', 0, 2002, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2005, 1011, 'item.proto.4'                  , 18, 'item.proto.4'                  , 1, '90d', 0, 2004, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2006, 1011, 'item.proto.5'                  , 18, 'item.proto.5'                  , 1, '90d', 0, 2005, NULL, '', '', '', '',        2);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6001, 2003, 2004);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6002, 2003, 2005);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6003, 2003, 2006);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15068, 2003, 2004);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15069, 2003, 2005);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15070, 2003, 2006);
 
 -- dependent items: dependent.items.template.6
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1012, 'dependent.items.template.6', 'dependent.items.template.6', 3, '');
@@ -680,8 +680,8 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (1012, 1012, 1002
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status,                templateid, params, description, posts, headers, lifetime, flags) VALUES (2101, 1012, 'discovery.rule.1'              ,  2, 'discovery.rule.1'              , 4,        0,       NULL, '', '', '', '', '30d', 1);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2102, 1012, 'item.proto.1'                  ,  2, 'item.proto.1'                  , 1, '90d', 0, NULL, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2103, 1012, 'item.proto.2'                  ,  2, 'item.proto.2'                  , 1, '90d', 0, NULL, NULL, '', '', '', '',        2);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6101, 2101, 2102);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6102, 2101, 2103);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15071, 2101, 2102);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15072, 2101, 2103);
 
 -- dependent items: dependent.items.host.6
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1013, 'dependent.items.host.6', 'dependent.items.host.6', 0, '');
@@ -694,11 +694,11 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2204, 1013, 'item.proto.3'                  , 18, 'item.proto.3'                  , 1, '90d', 0, 2203, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2205, 1013, 'item.proto.4'                  , 18, 'item.proto.4'                  , 1, '90d', 0, 2204, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2206, 1013, 'item.proto.5'                  , 18, 'item.proto.5'                  , 1, '90d', 0, 2205, NULL, '', '', '', '',        2);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6201, 2201, 2202);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6202, 2201, 2203);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6203, 2201, 2204);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6204, 2201, 2205);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6205, 2201, 2206);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15073, 2201, 2202);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15074, 2201, 2203);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15075, 2201, 2204);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15076, 2201, 2205);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15077, 2201, 2206);
 
 -- dependent items: dependent.items.host.7
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1014, 'dependent.items.host.7', 'dependent.items.host.7', 0, '');
@@ -709,10 +709,10 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2303, 1014, 'net.if.in[{$IFNAME}]'          , 18, 'net.ifi.in[{#IFNAME}]'         , 1, '90d', 0, 2302, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2304, 1014, 'net.if[eth0]'                  ,  2, 'net.if[eth0]'                  , 1, '90d', 0, NULL, NULL, '', '', '', '',        4);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2305, 1014, 'net.if.in[eth0]'               , 18, 'net.ifi.in[eth0]'              , 1, '90d', 0, 2304, NULL, '', '', '', '',        4);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6301, 2301, 2302);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6302, 2301, 2303);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6303, 2302, 2304);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6304, 2303, 2305);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15078, 2301, 2302);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15079, 2301, 2303);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15080, 2302, 2304);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15081, 2303, 2305);
 
 -- dependent items: dependent.items.host.8
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1015, 'dependent.items.host.8', 'dependent.items.host.8', 0, '');
@@ -727,10 +727,10 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2407, 1015, 'master.item.proto.2'           ,  2, 'master.item.proto.2'           , 1, '90d', 0, NULL, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2408, 1015, 'dependent.item.proto.2.1'      , 18, 'dependent.item.proto.2.1'      , 1, '90d', 0, 2407, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status, master_itemid, templateid, params, description, posts, headers, lifetime, flags) VALUES (2409, 1015, 'dependent.discovery.rule.1.1'  , 18, 'dependent.discovery.rule.1.1'  , 4,        0, 2401, NULL, '', '', '', '', '30d', 1);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6401, 2403, 2404);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6402, 2403, 2405);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6403, 2406, 2407);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6404, 2406, 2408);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15082, 2403, 2404);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15083, 2403, 2405);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15084, 2406, 2407);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15085, 2406, 2408);
 
 -- dependent items: dependent.items.host.9
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1016, 'dependent.items.host.9', 'dependent.items.host.9', 0, '');
@@ -741,8 +741,8 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status,                templateid, params, description, posts, headers, lifetime, flags) VALUES (2503, 1016, 'discovery.rule.1'              ,  2, 'discovery.rule.1'              , 4,        0,       NULL, '', '', '', '', '30d', 1);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2504, 1016, 'master.item.proto.1'           ,  2, 'master.item.proto.1'           , 1, '90d', 0, NULL, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2505, 1016, 'dependent.item.proto.1.1'      , 18, 'dependent.item.proto.1.1'      , 1, '90d', 0, 2504, NULL, '', '', '', '',        2);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6501, 2503, 2504);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6502, 2503, 2505);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15086, 2503, 2504);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15087, 2503, 2505);
 -- dependent items: END
 
 -- testTaskCreate
@@ -803,10 +803,10 @@ INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfa
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags) VALUES (40071, 2, 120004, 'Item {#NAME}', '', 'item[{#NAME}]', '0', NULL, '', '', '', '', '', '', 3, 2);
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments) VALUES (30001,'{99000}>0','Trigger {#NAME}', 2, 2, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99000, 40071, 30001, 'last', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14045, 40071, 40070, '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (15088, 40071, 40070, '');
 
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags) VALUES (40072, 2, 120004,' Item eth0', '', 'item[eth0]', '0', NULL, '', '', '', '', '', '', 3, 4);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14046, 40072, 40071, 'item[{#NAME}]');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (15089, 40072, 40071, 'item[{#NAME}]');
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (30002,'{99001}>0','Trigger eth0', 2, 4, '', 1);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99001, 40072, 30002, 'last', '');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30002, 30001);
@@ -814,10 +814,10 @@ INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30002, 30001
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags, master_itemid) VALUES (40073, 18, 120004, 'Item_child {#NAME}', '', 'item_child[{#NAME}]', '0', NULL, '', '', '', '', '', '', 3, 2, 40071);
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments) VALUES (30003,'{99002}>0','Trigger {#NAME}', 2, 2, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99002, 40073, 30003, 'last', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14047, 40073, 40070, '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (15090, 40073, 40070, '');
 
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags, master_itemid) VALUES (40074, 18, 120004,' Item_child eth0', '', 'item_child[eth0]', '0', NULL, '', '', '', '', '', '', 3, 4, 40072);
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14048, 40074, 40073, 'item[{#NAME}]');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (15091, 40074, 40073, 'item[{#NAME}]');
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (30004,'{99003}>0','Trigger eth0', 2, 4, '', 1);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99003, 40074, 30004, 'last', '');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30004, 30003);
@@ -894,8 +894,8 @@ insert into items (itemid,hostid,type,name,key_,flags,params,description,posts,h
 insert into items (itemid,hostid,type,name,key_,flags,params,description,posts,headers) values (132003,131000,2,'triggerstesteritemlldtmpl','triggerstesteritemlldtmpl',1,'','','','');
 insert into items (itemid,hostid,type,name,key_,flags,params,description,posts,headers) values (132004,130000,2,'triggerstesteritemproto[{#T}]','triggerstesteritemproto[{#T}]',2,'','','','');
 insert into items (itemid,hostid,type,name,key_,flags,params,description,posts,headers) values (132005,131000,2,'triggerstesteritemprototmpl[{#T}]','triggerstesteritemprototmpl[{#T}]',2,'','','','');
-insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values (138000,132004,132002,'triggerstesteritemproto[{#T}]');
-insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values (138001,132005,132003,'triggerstesteritemprototmpl[{#T}]');
+insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values (15092,132004,132002,'triggerstesteritemproto[{#T}]');
+insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values (15093,132005,132003,'triggerstesteritemprototmpl[{#T}]');
 
 insert into triggers (triggerid,expression,description,priority,comments) values (134000,'{135000}=0','triggerstester_t0',0,'');
 insert into functions (functionid,itemid,triggerid,name,parameter) values (135000,132000,134000,'now','0');
@@ -917,7 +917,7 @@ INSERT INTO items (itemid,hostid,type,name,key_,flags,params,description,posts,h
 INSERT INTO triggers (triggerid,expression,description,priority,flags,comments) VALUES (134118,'{135118}=0','TriggersTesterLLDTmpl_T0[res1]',0,4,'');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (135118,132006,134118,'now','0');
 INSERT INTO trigger_discovery (triggerid,parent_triggerid) VALUES (134118,134106);
-insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values (138002,132006,132004,'triggerstesteritemprototmpl[{#T}]');
+insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values (15094,132006,132004,'triggerstesteritemprototmpl[{#T}]');
 -- T4 depends on T5 depends on T0 (LLD discovered version)
 INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up) VALUES (138888,134004,134005);
 INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up) VALUES (138889,134005,134118);
@@ -1008,115 +1008,115 @@ INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, ol
 
 -- LLD with overrides to delete
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133763,2,'',50009,'Overrides (delete)','overrides.delete','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1001,133763,'override',1,3,'{1001} or {1002} or {1003}',1);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1002,133763,'override 2',2,0,'',1);
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1001,1001,8,'{#MACRO1}','d{3}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1002,1001,8,'{#MACRO2}','d{2}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1003,1001,8,'{#MACRO3}','d{1}$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1001,1001,0,3,'8');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1002,1001,0,1,'wW');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1003,1001,1,8,'^c+$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1004,1001,2,2,'123');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1005,1001,3,0,'');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1006,1002,0,0,'');
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1002,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1003,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1004,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1005,1);
-INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (1002,'92d');
-INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (1005,1);
-INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (1002,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
-INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (1003,3);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1001,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1002,0);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1003,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1005,1);
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (1001,1003,'tag1','value1');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (1002,1003,'tag2','value2');
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (1001,1005,10264);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (1002,1005,10265);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (1003,1005,50010);
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1002,'36d');
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1006,'5d');
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10001,133763,'override',1,3,'{10001} or {10002} or {10003}',1);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10002,133763,'override 2',2,0,'',1);
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10001,10001,8,'{#MACRO1}','d{3}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10002,10001,8,'{#MACRO2}','d{2}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10003,10001,8,'{#MACRO3}','d{1}$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10001,10001,0,3,'8');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10002,10001,0,1,'wW');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10003,10001,1,8,'^c+$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10004,10001,2,2,'123');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10005,10001,3,0,'');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10006,10002,0,0,'');
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10002,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10003,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10004,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10005,1);
+INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (10002,'92d');
+INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (10005,1);
+INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (10002,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
+INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (10003,3);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10001,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10002,0);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10003,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10005,1);
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (10001,10003,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (10002,10003,'tag2','value2');
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10001,10005,10264);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10002,10005,10265);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10003,10005,50010);
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10002,'36d');
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10006,'5d');
 
 -- LLD with overrides to copy
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133764,2,'',50009,'Overrides (copy)','overrides.copy','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1003,133764,'override',1,3,'{1004} or {1005} or {1006}',1);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1004,133764,'override 2',2,0,'',1);
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1004,1003,8,'{#MACRO1}','d{3}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1005,1003,8,'{#MACRO2}','d{2}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1006,1003,8,'{#MACRO3}','d{1}$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1007,1003,0,3,'8');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1008,1003,0,1,'wW');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1009,1003,1,8,'^c+$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1010,1003,2,2,'123');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1011,1003,3,0,'');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1012,1004,0,0,'');
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1008,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1009,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1010,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1011,1);
-INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (1008,'92d');
-INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (1011,1);
-INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (1008,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
-INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (1009,3);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1007,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1008,0);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1009,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1011,1);
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (3,1009,'tag1','value1');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (4,1009,'tag2','value2');
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (4,1011,10264);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (5,1011,10265);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (6,1011,50010);
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1008,'36d');
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1012,'5d');
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10003,133764,'override',1,3,'{10004} or {10005} or {10006}',1);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10004,133764,'override 2',2,0,'',1);
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10004,10003,8,'{#MACRO1}','d{3}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10005,10003,8,'{#MACRO2}','d{2}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10006,10003,8,'{#MACRO3}','d{1}$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10007,10003,0,3,'8');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10008,10003,0,1,'wW');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10009,10003,1,8,'^c+$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10010,10003,2,2,'123');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10011,10003,3,0,'');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10012,10004,0,0,'');
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10008,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10009,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10010,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10011,1);
+INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (10008,'92d');
+INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (10011,1);
+INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (10008,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
+INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (10009,3);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10007,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10008,0);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10009,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10011,1);
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (3,10009,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (4,10009,'tag2','value2');
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (4,10011,10264);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (5,10011,10265);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (6,10011,50010);
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10008,'36d');
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10012,'5d');
 
 -- LLD with overrides to update
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133765,2,'',50009,'Overrides (update)','overrides.update','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1005,133765,'override',1,3,'{1007} or {1008} or {1009}',1);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1006,133765,'override 2',2,0,'',1);
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1007,1005,8,'{#MACRO1}','d{3}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1008,1005,8,'{#MACRO2}','d{2}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1009,1005,8,'{#MACRO3}','d{1}$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1013,1005,0,3,'8');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1014,1005,0,1,'wW');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1015,1005,1,8,'^c+$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1016,1005,2,2,'123');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1017,1005,3,0,'');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1018,1006,0,0,'');
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1014,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1015,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1016,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1017,1);
-INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (1014,'92d');
-INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (1017,1);
-INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (1014,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
-INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (1015,3);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1013,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1014,0);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1015,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1017,1);
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (5,1015,'tag1','value1');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (6,1015,'tag2','value2');
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (7,1017,10264);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (8,1017,10265);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (9,1017,50010);
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1014,'36d');
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1018,'5d');
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10005,133765,'override',1,3,'{10007} or {10008} or {10009}',1);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10006,133765,'override 2',2,0,'',1);
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10007,10005,8,'{#MACRO1}','d{3}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10008,10005,8,'{#MACRO2}','d{2}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10009,10005,8,'{#MACRO3}','d{1}$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10013,10005,0,3,'8');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10014,10005,0,1,'wW');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10015,10005,1,8,'^c+$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10016,10005,2,2,'123');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10017,10005,3,0,'');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10018,10006,0,0,'');
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10014,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10015,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10016,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (10017,1);
+INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (10014,'92d');
+INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (10017,1);
+INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (10014,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
+INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (10015,3);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10013,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10014,0);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10015,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (10017,1);
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (5,10015,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (6,10015,'tag2','value2');
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (7,10017,10264);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (8,10017,10265);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (9,10017,50010);
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10014,'36d');
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10018,'5d');
 
 -- LLD with overrides and template constraint
 INSERT INTO hosts (hostid,proxy_hostid,host,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,discover) VALUES (131001,NULL,'Overrides template constraint',3,0,'',0,0,0,-1,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','',0,0,0,'','Overrides template constaint',0,NULL,'',1,1,'','','','','',1,0);
 INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (139001,'Overrides',0,0);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139201,131001,139001);
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133766,0,'',50009,'Overrides (template constraint)','overrides.template.constraint','1m','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,50022,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1007,133766,'Only template operation',1,0,'',0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1008,133766,'Not only template operation',2,0,'',0);
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1019,1007,3,0,'');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1020,1008,3,0,'');
-INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (1020,0);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10,1019,131001);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (11,1020,131001);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10007,133766,'Only template operation',1,0,'',0);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10008,133766,'Not only template operation',2,0,'',0);
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10019,10007,3,0,'');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10020,10008,3,0,'');
+INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (10020,0);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10,10019,131001);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (11,10020,131001);
 
 -- graph portotype
 INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (139002,'test_graph_prototype',0,0);
@@ -1127,7 +1127,7 @@ INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139202,131002,1390
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133767,2,'',131003,'rule','a','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133768,2,'',131003,'prototype','a[{#A}]','0','90d','365d',0,3,'','','','',NULL,NULL,'','',0,'','','','',2,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133769,2,'',131002,'item','a','0','90d','365d',0,3,'','','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (138003,133768,133767,'',0,0);
+INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (15095,133768,133767,'',0,0);
 INSERT INTO graphs (graphid, name, flags) VALUES (1, 'graph_prototype', 2);
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (1, 1, 133768, 0, 0, '1A7C11', 0, 2, 0);
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (2, 1, 133769, 0, 1, 'F63100', 0, 2, 0);

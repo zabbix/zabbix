@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		list($this->dashboard, $error) = $this->getDashboard();
 
 		if ($error !== null) {
-			$this->setResponse(new CControllerResponseData(['error' => $error]));
+			$response = new CControllerResponseData(['error' => $error]);
+			$response->setTitle(_('Dashboard'));
+			$this->setResponse($response);
 
 			return;
 		}

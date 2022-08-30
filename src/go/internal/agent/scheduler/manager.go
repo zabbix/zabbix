@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 		for deactivate := true; deactivate; {
 			deactivate = false
 			for _, t := range p.tasks {
-				if t.isRecurring() {
+				if t.isActive() && t.isRecurring() {
 					t.deactivate()
 					// deactivation can change tasks ordering, so repeat the iteration if task was deactivated
 					deactivate = true

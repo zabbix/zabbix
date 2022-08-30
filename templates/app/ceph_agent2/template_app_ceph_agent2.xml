@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-26T11:34:34Z</date>
+   <date>2021-12-21T18:00:04Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -13,7 +13,7 @@
          <name>Template App Ceph by Zabbix Agent2</name>
          <description>You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410059-discussion-thread-for-official-zabbix-template-ceph&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -1242,7 +1242,6 @@ Template tooling version used: 0.38</description>
          <discovery_rules>
             <discovery_rule>
                <name>OSD</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>ceph.osd.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]</key>
                <delay>1h</delay>
                <item_prototypes>
@@ -1271,11 +1270,6 @@ Template tooling version used: 0.38</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(15m)} &gt; {Template App Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100</expression>
-                           <name>Ceph: OSD osd.{#OSDNAME} is full</name>
-                           <priority>AVERAGE</priority>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{min(15m)} &gt; {Template App Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100</expression>
                            <name>Ceph: Ceph OSD osd.{#OSDNAME} is near full</name>
                            <priority>WARNING</priority>
@@ -1285,6 +1279,11 @@ Template tooling version used: 0.38</description>
                                  <expression>{Template App Ceph by Zabbix Agent2:ceph.osd[{#OSDNAME},fill].min(15m)} &gt; {Template App Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100</expression>
                               </dependency>
                            </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(15m)} &gt; {Template App Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100</expression>
+                           <name>Ceph: OSD osd.{#OSDNAME} is full</name>
+                           <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1420,7 +1419,6 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Ceph: [osd.{#OSDNAME}] OSD latency</name>
@@ -1446,7 +1444,6 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
             </discovery_rule>
             <discovery_rule>
                <name>Pool</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>ceph.pool.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]</key>
                <delay>1h</delay>
                <item_prototypes>
@@ -1677,7 +1674,6 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool bandwidth</name>
@@ -1916,19 +1912,6 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
    </graphs>
    <value_maps>
       <value_map>
-         <name>Service state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>Ceph cluster status</name>
          <mappings>
             <mapping>
@@ -1942,6 +1925,19 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
             <mapping>
                <value>2</value>
                <newvalue>HEALTH_ERR</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

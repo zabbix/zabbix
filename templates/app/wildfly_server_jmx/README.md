@@ -1,5 +1,5 @@
 
-# WildFly Server by JMX
+# Template APP WildFly Server by JMX
 
 ## Overview
 
@@ -112,7 +112,7 @@ There are no template links in this template.
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Prepare time, avg |<p>The average time for a XAResource prepare invocation.</p> |JMX |jmx["{#JMXOBJ}",XAPrepareAverageTime] |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Prepare, rate |<p>The number of XAResource prepare invocations per second.</p> |JMX |jmx["{#JMXOBJ}",XAPrepareCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Recover time, avg |<p>The average time for a XAResource recover invocation.</p> |JMX |jmx["{#JMXOBJ}",XARecoverAverageTime] |
-|WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Recover, rate |<p>The number of XAResource recover invocationsper second.</p> |JMX |jmx["{#JMXOBJ}",XARecoverCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Recover, rate |<p>The number of XAResource recover invocations per second.</p> |JMX |jmx["{#JMXOBJ}",XARecoverCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Rollback time, avg |<p>The average time for a XAResource rollback invocation.</p> |JMX |jmx["{#JMXOBJ}",XARollbackAverageTime] |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Rollback, rate |<p>The number of XAResource rollback invocations per second.</p> |JMX |jmx["{#JMXOBJ}",XARollbackCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: XA: Start time, avg |<p>The average time for a XAResource start invocation.</p> |JMX |jmx["{#JMXOBJ}",XAStartAverageTime] |
@@ -134,7 +134,7 @@ There are no template links in this template.
 |WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed (new status: {ITEM.VALUE}) |<p>Deployment status has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",status].diff()}=1 and {TEMPLATE_NAME:jmx["{#JMXOBJ}",status].strlen()}>0` |WARNING |<p>Manual close: YES</p> |
 |WildFly {#JMX_DATA_SOURCE}: JDBC monitoring statistic is not enabled |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",statisticsEnabled].last()}=0` |INFO | |
 |WildFly {#JMX_DATA_SOURCE}: There are no active connections for 5m |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",ActiveCount].max(5m)}=0` |WARNING | |
-|WildFly {#JMX_DATA_SOURCE}: Connection usage is too high (over {$WILDFLY.CONN.USAGE.WARN.MAX} in 5m) |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",InUseCount].min(5m)}/{WildFly Server by JMX:jmx["{#JMXOBJ}",AvailableCount].last()}*100>{$WILDFLY.CONN.USAGE.WARN.MAX}` |HIGH | |
+|WildFly {#JMX_DATA_SOURCE}: Connection usage is too high (over {$WILDFLY.CONN.USAGE.WARN.MAX} in 5m) |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",InUseCount].min(5m)}/{TEMPLATE_NAME:jmx["{#JMXOBJ}",AvailableCount].last()}*100>{$WILDFLY.CONN.USAGE.WARN.MAX}` |HIGH | |
 |WildFly {#JMX_DATA_SOURCE}: Pools monitoring statistic is not enabled |<p>Zabbix has not received data for items for the last 15 minutes</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",statisticsEnabled].last()}=0` |INFO | |
 |WildFly {#JMX_DATA_SOURCE}: There are timeout  connections |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",TimedOut].last()}>0` |WARNING | |
 |WildFly {#JMX_DATA_SOURCE}: Too many waiting connections (over {$WILDFLY.CONN.WAIT.MAX.WARN} for 5m) |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",WaitCount].min(5m)}>{$WILDFLY.CONN.WAIT.MAX.WARN}` |WARNING | |

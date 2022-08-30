@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:30:19Z</date>
+   <date>2021-12-23T17:53:48Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -35,7 +35,7 @@ Known Issues:&#13;
   Version: all above&#13;
   Device: NanoStation, UAP-LR&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>

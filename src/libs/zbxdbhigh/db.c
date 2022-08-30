@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,17 +26,6 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 #include "cfg.h"
-
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-#define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
-#endif
-#if defined(HAVE_ORACLE)
-#define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
-#define ZBX_ORACLE_CESU8_CHARSET "UTF8"
-#endif
-#if defined(HAVE_MYSQL)
-#define ZBX_SUPPORTED_DB_COLLATION	"utf8_bin"
-#endif
 
 typedef struct
 {
@@ -849,51 +838,97 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 	return DBget_nextid(tablename, num);
 }
 
+#ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
- * Function: DBcheck_capabilities                                             *
+ * Function: zbx_db_check_tsdb_capabilities                                        *
  *                                                                            *
- * Purpose: checks DBMS for optional features and adjusting configuration     *
+ * Purpose: checks TimescaleDB for compression availability                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcheck_capabilities(void)
+void	zbx_db_check_tsdb_capabilities(void)
 {
-#ifdef HAVE_POSTGRESQL
-	int	compression_available = OFF;
+#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
+#define ZBX_TIMESCALE_MIN_VERSION				10500
+#define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
+#define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
+	int		major, minor, patch, version;
+	int		compression_available = OFF;
+	char		*tsdb_lic = NULL;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
-	if (100002 <= zbx_dbms_get_version())
+	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 and newer */
+	/* in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition.    */
+	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0.  */
+	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > zbx_dbms_get_version())
+		goto out;
+
+	if (NULL == (result = DBselect("select db_extension from config")))
+		goto out;
+
+	if (NULL == (row = DBfetch(result)))
+		goto clean;
+
+	if (0 != zbx_strcmp_null((const char *)row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+		goto clean;
+
+	DBfree_result(result);
+
+	if (NULL == (result = DBselect("select extversion from pg_extension where extname='timescaledb'")))
+		goto out;
+
+	if (NULL == (row = DBfetch(result)))
+		goto clean;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char *)row[0]);
+
+	sscanf((const char *)row[0], "%d.%d.%d", &major, &minor, &patch);
+	version = major * 10000;
+	version += minor * 100;
+	version += patch;
+
+	if (ZBX_TIMESCALE_MIN_VERSION > version)
+		goto clean;
+
+	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT > version)
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
-		int		major, minor, patch, version;
-
-		if (NULL == (result = DBselect("select extversion from pg_extension where extname = 'timescaledb'")))
-			goto out;
-
-		if (NULL == (row = DBfetch(result)))
-			goto clean;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char*)row[0]);
-
-		sscanf((const char*)row[0], "%d.%d.%d", &major, &minor, &patch);
-		version = major * 10000;
-		version += minor * 100;
-		version += patch;
-
-		if (10500 <= version)
-			compression_available = ON;
-clean:
-		DBfree_result(result);
+		zabbix_log(LOG_LEVEL_WARNING, "Current TimescaleDB version is %d. TimescaleDB license and compression"
+				" availability detection is possible starting from TimescaleDB 2.0.", version);
+		compression_available = ON;
+		goto clean;
 	}
+
+	DBfree_result(result);
+
+	if (NULL != (result = DBselect("show timescaledb.license")) && NULL != (row = DBfetch(result)))
+		tsdb_lic = row[0];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB license: [%s]", ZBX_NULL2EMPTY_STR(tsdb_lic));
+
+	if (0 != zbx_strcmp_null(tsdb_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Detected license [%s] does not support compression. Compression is"
+				" supported in TimescaleDB Community Edition.", ZBX_NULL2EMPTY_STR(tsdb_lic));
+		goto clean;
+	}
+
+	compression_available = ON;
+clean:
+	DBfree_result(result);
 out:
-	DBexecute("update config set compression_availability=%d", compression_available);
+	if (ZBX_DB_OK > DBexecute("update config set compression_availability=%d", compression_available))
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set database compression availability");
 
 	DBclose();
-#endif
+#undef ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB
+#undef ZBX_TIMESCALE_MIN_VERSION
+#undef ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT
+#undef ZBX_TIMESCALE_LICENSE_COMMUNITY
 }
+#endif
 
 #define MAX_EXPRESSIONS	950
 
@@ -2078,9 +2113,8 @@ int	DBtable_exists(const char *table_name)
 #elif defined(HAVE_ORACLE)
 	result = DBselect(
 			"select 1"
-			" from tab"
-			" where tabtype='TABLE'"
-				" and lower(tname)='%s'",
+			" from all_tables"
+			" where lower(table_name)='%s'",
 			table_name_esc);
 #elif defined(HAVE_POSTGRESQL)
 	result = DBselect(
@@ -2300,7 +2334,7 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 static void	zbx_warn_char_set(const char *db_name, const char *char_set)
 {
-	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"" ZBX_SUPPORTED_DB_CHARACTER_SET "\" character set."
+	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"" ZBX_SUPPORTED_DB_CHARACTER_SET "\" character set(s)."
 			" Database \"%s\" has default character set \"%s\"", db_name, char_set);
 }
 #endif
@@ -2312,10 +2346,29 @@ static void	zbx_warn_no_charset_info(const char *db_name)
 }
 #endif
 
+#if defined(HAVE_MYSQL)
+static char	*db_strlist_quote(const char *strlist, char delimiter)
+{
+	const char	*delim;
+	char		*str = NULL;
+	size_t		str_alloc = 0, str_offset = 0;
+
+	while (NULL != (delim = strchr(strlist, delimiter)))
+	{
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "'%.*s',", (int)(delim - strlist), strlist);
+		strlist = delim + 1;
+	}
+
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "'%s'", strlist);
+
+	return str;
+}
+#endif
+
 void	DBcheck_character_set(void)
 {
 #if defined(HAVE_MYSQL)
-	char		*database_name_esc;
+	char		*database_name_esc, *charset_list, *collation_list;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -2336,12 +2389,12 @@ void	DBcheck_character_set(void)
 		char	*char_set = row[0];
 		char	*collation = row[1];
 
-		if (0 != strcasecmp(char_set, ZBX_SUPPORTED_DB_CHARACTER_SET))
+		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET, char_set, ZBX_DB_STRLIST_DELIM))
 			zbx_warn_char_set(CONFIG_DBNAME, char_set);
 
-		if (0 != zbx_strncasecmp(collation, ZBX_SUPPORTED_DB_COLLATION, sizeof(ZBX_SUPPORTED_DB_COLLATION)))
+		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation."
+			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation(s)."
 					" Database \"%s\" has default collation \"%s\"", ZBX_SUPPORTED_DB_COLLATION,
 					CONFIG_DBNAME, collation);
 		}
@@ -2349,13 +2402,19 @@ void	DBcheck_character_set(void)
 
 	DBfree_result(result);
 
+	charset_list = db_strlist_quote(ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_DB_STRLIST_DELIM);
+	collation_list = db_strlist_quote(ZBX_SUPPORTED_DB_COLLATION, ZBX_DB_STRLIST_DELIM);
+
 	result = DBselect(
 			"select count(*)"
 			" from information_schema.`COLUMNS`"
 			" where table_schema='%s'"
 				" and data_type in ('text','varchar','longtext')"
-				" and (character_set_name<>'%s' or collation_name<>'%s')",
-			database_name_esc, ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
+				" and (character_set_name not in (%s) or collation_name not in (%s))",
+			database_name_esc, charset_list, collation_list);
+
+	zbx_free(collation_list);
+	zbx_free(charset_list);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
 	{
@@ -2365,8 +2424,9 @@ void	DBcheck_character_set(void)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "character set name or collation name that is not supported by Zabbix"
 				" found in %s column(s) of database \"%s\"", row[0], CONFIG_DBNAME);
-		zabbix_log(LOG_LEVEL_WARNING, "only character set \"%s\" and collation \"%s\" should be used in "
-				"database", ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
+		zabbix_log(LOG_LEVEL_WARNING, "only character set(s) \"%s\" and corresponding collation(s) \"%s\""
+				" should be used in database", ZBX_SUPPORTED_DB_CHARACTER_SET,
+				ZBX_SUPPORTED_DB_COLLATION);
 	}
 
 	DBfree_result(result);
@@ -3126,7 +3186,6 @@ int	zbx_db_get_database_type(void)
 {
 	const char	*result_string;
 	DB_RESULT	result;
-	DB_ROW		row;
 	int		ret = ZBX_DB_UNKNOWN;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3139,7 +3198,7 @@ int	zbx_db_get_database_type(void)
 		goto out;
 	}
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "there is at least 1 record in \"users\" table");
 		ret = ZBX_DB_SERVER;

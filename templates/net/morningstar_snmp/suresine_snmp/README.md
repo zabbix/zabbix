@@ -1,5 +1,5 @@
 
-# Morningstar SureSine SNMP
+# Template Net Morningstar SureSine SNMP
 
 ## Overview
 
@@ -43,7 +43,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Battery voltage discovery |<p>Discovery for battery voltage triggers</p> |DEPENDENT |battery.voltage.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Battery voltage discovery |<p>Discovery for battery voltage triggers</p> |DEPENDENT |battery.voltage.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Items collected
 
@@ -53,8 +53,8 @@ There are no template links in this template.
 |Load |Load: State |<p>MIB: SURESINE</p><p>Description:Load State</p><p>Modbus address:0x000B</p><p> 0: Start</p><p>1: LoadOn</p><p>2: LvdWarning</p><p>3: LowVoltageDisconnect</p><p>4: Fault</p><p>5: Disconnect</p><p>6: NormalOff</p><p>7: UnknownState</p><p>8: Standby</p> |SNMP |load.state[loadState.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Load |Load: A/C Current |<p>MIB: SURESINE</p><p>Description:AC Output Current</p><p>Scaling Factor:0.0001953125</p><p>Units:A</p><p>Range:[0.0, 17]</p><p>Modbus address:0x0005</p> |SNMP |load.ac_current[acCurrent.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1.953125E-4`</p><p>- REGEX: `^(\d+)(\.\d{1,2})? \1\2`</p> |
 |Status |Status: Uptime |<p>Device uptime in seconds</p> |SNMP |status.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
-|Status |Status: Faults |<p>MIB: SURESINE</p><p>Description:Faults</p><p>Modbus address:0x0007</p> |SNMP |status.faults[faults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Status |Status: Alarms |<p>MIB: SURESINE</p><p>Description:Faults</p><p>Modbus address:0x0007</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Status |Status: Faults |<p>MIB: SURESINE</p><p>Description:Faults</p><p>Modbus address:0x0007</p> |SNMP |status.faults[faults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Status |Status: Alarms |<p>MIB: SURESINE</p><p>Description:Faults</p><p>Modbus address:0x0007</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Temperature |Temperature: Heatsink |<p>MIB: SURESINE</p><p>Description:Heatsink Temperature</p><p>Scaling Factor:1</p><p>Units:C</p><p>Range:[-128, 127]</p><p>Modbus address:0x0006</p> |SNMP |temp.heatsink[heatsinkTemperature.0] |
 |Zabbix_raw_items |Battery: Battery Voltage discovery |<p>MIB: SURESINE</p> |SNMP |battery.voltage.discovery[batteryVoltageSlow.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `2.581787109375E-4`</p><p>- REGEX: `^(\d+)(\.\d{1,2})? \1\2`</p> |
 

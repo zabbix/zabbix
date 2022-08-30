@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -445,7 +445,6 @@ static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64
 		char *error, size_t max_error_len)
 {
 	DB_RESULT	result;
-	DB_ROW		row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 512, sql_offset;
 	int		ret = SUCCEED;
@@ -468,7 +467,7 @@ static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64
 
 	result = DBselectN(sql, 1);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		ret = FAIL;
 		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
@@ -503,7 +502,7 @@ static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64
 
 	result = DBselectN(sql, 1);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		ret = FAIL;
 		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
@@ -999,7 +998,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, const char **tables_hk, int count)
+static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, const char * const *tables_hk, int count)
 {
 	int		i, j;
 	zbx_uint64_t	housekeeperid;
@@ -1343,10 +1342,10 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	zbx_vector_uint64_t	screen_itemids, profileids;
 	int			num;
 	zbx_uint64_t		resource_types[] = {SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_SIMPLE_GRAPH};
-	const char		*history_tables[] = {"history", "history_str", "history_uint", "history_log",
-				"history_text", "trends", "trends_uint"};
 	const char		*event_tables[] = {"events"};
 	const char		*profile_idx = "web.favorite.graphids";
+	unsigned char		history_mode, trends_mode;
+	zbx_vector_str_t	hk_history;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
 
@@ -1373,7 +1372,29 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBdelete_graphs_by_itemids(itemids);
 	DBdelete_triggers_by_itemids(itemids);
 
-	DBadd_to_housekeeper(itemids, "itemid", history_tables, ARRSIZE(history_tables));
+	zbx_config_get_hk_mode(&history_mode, &trends_mode);
+
+	zbx_vector_str_create(&hk_history);
+
+	if (ZBX_HK_MODE_REGULAR == history_mode)
+	{
+		zbx_vector_str_append(&hk_history, "history");
+		zbx_vector_str_append(&hk_history, "history_str");
+		zbx_vector_str_append(&hk_history, "history_uint");
+		zbx_vector_str_append(&hk_history, "history_log");
+		zbx_vector_str_append(&hk_history, "history_text");
+	}
+
+	if (ZBX_HK_MODE_REGULAR == trends_mode)
+	{
+		zbx_vector_str_append(&hk_history, "trends");
+		zbx_vector_str_append(&hk_history, "trends_uint");
+	}
+
+	if (0 != hk_history.values_num)
+		DBadd_to_housekeeper(itemids, "itemid", (const char * const *)hk_history.values, hk_history.values_num);
+
+	zbx_vector_str_destroy(&hk_history);
 
 	/* add housekeeper task to delete problems associated with item, this allows old events to be deleted */
 	DBadd_to_housekeeper(itemids, "itemid", event_tables, ARRSIZE(event_tables));

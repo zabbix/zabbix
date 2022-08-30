@@ -1,5 +1,5 @@
 
-# Apache Kafka by JMX
+# Template APP Apache Kafka by JMX
 
 ## Overview
 
@@ -108,7 +108,7 @@ There are no template links in this template.
 |Kafka |Kafka: Partition count |<p>The number of partitions in the broker.</p> |JMX |jmx["kafka.server:type=ReplicaManager,name=PartitionCount","Value"] |
 |Kafka |Kafka: Number of reassigning partitions |<p>The number of reassigning leader partitions on a broker.</p> |JMX |jmx["kafka.server:type=ReplicaManager,name=ReassigningPartitions","Value"] |
 |Kafka |Kafka: Request queue size |<p>The size of the delay queue.</p> |JMX |jmx["kafka.server:type=Request","queue-size"] |
-|Kafka |Kafka: Version |<p>Current version of brocker.</p> |JMX |jmx["kafka.server:type=app-info","version"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Kafka |Kafka: Version |<p>Current version of broker.</p> |JMX |jmx["kafka.server:type=app-info","version"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Kafka |Kafka: Uptime |<p>Service uptime in seconds.</p> |JMX |jmx["kafka.server:type=app-info","start-time-ms"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return (Math.floor((Date.now()-Number(value))/1000))`</p> |
 |Kafka |Kafka: ZooKeeper client request latency |<p>Latency in milliseconds for ZooKeeper requests from broker.</p> |JMX |jmx["kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs","Count"] |
 |Kafka |Kafka: ZooKeeper connection status |<p>Connection status of broker's ZooKeeper session.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
@@ -126,7 +126,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Kafka: Unclean leader election detected |<p>Unclean leader elections occur when there is no qualified partition leader among Kafka brokers. If Kafka is configured to allow an unclean leader election, a leader is chosen from the out-of-sync replicas, and any messages that were not synced prior to the loss of the former leader are lost forever. Essentially, unclean leader elections sacrifice consistency for availability.</p> |`{TEMPLATE_NAME:jmx["kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec","Count"].last()}>0` |AVERAGE | |
-|Kafka: There are offline log directories |<p>The offline log directory count metric indicate the number of log directories which are offline (due to an hardware failure for example) so that the broker cannot store incoming messages anymore.</p> |`{TEMPLATE_NAME:jmx["kafka.log:type=LogManager,name=OfflineLogDirectoryCount","Value"].last()} > 0` |WARNING | |
+|Kafka: There are offline log directories |<p>The offline log directory count metric indicate the number of log directories which are offline (due to a hardware failure for example) so that the broker cannot store incoming messages anymore.</p> |`{TEMPLATE_NAME:jmx["kafka.log:type=LogManager,name=OfflineLogDirectoryCount","Value"].last()} > 0` |WARNING | |
 |Kafka: One or more partitions have no leader |<p>Any partition without an active leader will be completely inaccessible, and both consumers and producers of that partition will be blocked until a leader becomes available.</p> |`{TEMPLATE_NAME:jmx["kafka.controller:type=KafkaController,name=OfflinePartitionsCount","Value"].last()} > 0` |WARNING | |
 |Kafka: Request handler average idle percent is too low (under {$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN} for 15m) |<p>The request handler idle ratio metric indicates the percentage of time the request handlers are not in use. The lower this number, the more loaded the broker is.</p> |`{TEMPLATE_NAME:jmx["kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent","OneMinuteRate"].max(15m)}<{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN}` |AVERAGE | |
 |Kafka: Network processor average idle percent is too low (under {$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} for 15m) |<p>The network processor idle ratio metric indicates the percentage of time the network processor are not in use. The lower this number, the more loaded the broker is.</p> |`{TEMPLATE_NAME:jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"].max(15m)}<{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}` |AVERAGE | |

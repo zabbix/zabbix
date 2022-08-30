@@ -1,5 +1,5 @@
 
-# D-Link DES_DGS Switch SNMP
+# Template Net D-Link DES_DGS Switch SNMP
 
 ## Overview
 

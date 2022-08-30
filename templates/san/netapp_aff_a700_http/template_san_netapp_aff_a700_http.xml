@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-02-12T15:39:19Z</date>
+   <date>2021-12-23T13:21:29Z</date>
    <groups>
       <group>
          <name>Templates/SAN</name>
@@ -15,7 +15,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/SAN</name>
@@ -884,7 +884,6 @@ return JSON.stringify(result);
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -950,7 +949,6 @@ return JSON.stringify(result);
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1011,7 +1009,6 @@ return JSON.stringify(result);
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>netapp.frus.get</key>
                </master_item>
@@ -1177,7 +1174,6 @@ return JSON.stringify(result);
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1350,7 +1346,7 @@ down - Node has stopped or is dumping core.&#13;
 taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.&#13;
 waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.&#13;
 degraded - Node has one or more critical services offline.&#13;
-unknown - Node or its HA partner cannot be contacted and there is no information on the node’s state.</description>
+unknown - Node or its HA partner cannot be contacted and there is no information on the node's state.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Node "{#NODENAME}"</name>
@@ -1380,7 +1376,7 @@ down - Node has stopped or is dumping core.&#13;
 taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.&#13;
 waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.&#13;
 degraded - Node has one or more critical services offline.&#13;
-unknown - Node or its HA partner cannot be contacted and there is no information on the node’s state.</description>
+unknown - Node or its HA partner cannot be contacted and there is no information on the node's state.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1417,7 +1413,6 @@ unknown - Node or its HA partner cannot be contacted and there is no information
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1483,7 +1478,6 @@ return JSON.stringify(result);
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1584,7 +1578,6 @@ node_offline - The state information for the port cannot be retrieved. The node 
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1678,7 +1671,6 @@ return JSON.stringify(result);
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1821,7 +1813,7 @@ return JSON.stringify(result);
                      <history>7d</history>
                      <trends>0</trends>
                      <value_type>CHAR</value_type>
-                     <description>Volume state. A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ‘mixed’ state applies to FlexGroup volumes only and cannot be specified as a target state. An ‘error’ state implies that the volume is not in a state to serve data.</description>
+                     <description>Volume state. A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The 'mixed' state applies to FlexGroup volumes only and cannot be specified as a target state. An 'error' state implies that the volume is not in a state to serve data.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Volume "{#VOLUMENAME}"</name>
@@ -1847,7 +1839,7 @@ return JSON.stringify(result);
                            <recovery_expression>({diff()}=1 and {last()}="online")</recovery_expression>
                            <name>{#VOLUMENAME}: Volume state is abnormal</name>
                            <priority>AVERAGE</priority>
-                           <description>A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ‘mixed’ state applies to FlexGroup volumes only and cannot be specified as a target state. An ‘error’ state implies that the volume is not in a state to serve data.</description>
+                           <description>A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The 'mixed' state applies to FlexGroup volumes only and cannot be specified as a target state. An 'error' state implies that the volume is not in a state to serve data.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -2365,9 +2357,9 @@ return JSON.stringify(result);
                      <trends>0</trends>
                      <value_type>CHAR</value_type>
                      <description>Type of the volume.&#13;
-rw ‐ read-write volume.&#13;
-dp ‐ data-protection volume.&#13;
-ls ‐ load-sharing dp volume.</description>
+rw - read-write volume.&#13;
+dp - data-protection volume.&#13;
+ls - load-sharing dp volume.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Volume "{#VOLUMENAME}"</name>
@@ -2388,7 +2380,6 @@ ls ‐ load-sharing dp volume.</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#VOLUMENAME}: Volume latency</name>

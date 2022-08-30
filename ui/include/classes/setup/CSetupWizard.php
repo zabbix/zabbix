@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -485,7 +485,7 @@ class CSetupWizard extends CForm {
 			$message = [
 				(new CTag('h1', true, _('Congratulations! You have successfully installed Zabbix frontend.')))
 					->addClass(ZBX_STYLE_GREEN),
-				new CTag('p', true, _s('Configuration file "%1$s" created.', $config_file_name))
+				new CTag('p', true, _s('Configuration file "%1$s" created.', ltrim(CConfigFile::CONFIG_FILE_PATH, '/')))
 			];
 		}
 

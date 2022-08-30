@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 		log->source = zbx_strdup(NULL, zbx_mock_get_object_member_string(hvalue, "source"));
 
 		data = zbx_mock_get_object_member_string(hvalue, "logeventid");
-		if (FAIL == is_uint64(data, &log->logeventid))
+		if (FAIL == is_uint32(data, &log->logeventid))
 			fail_msg("Invalid log logeventid value \"%s\"", data);
 
 		data = zbx_mock_get_object_member_string(hvalue, "severity");

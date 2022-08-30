@@ -1,5 +1,5 @@
 
-# Zabbix agent
+# Template Module Zabbix agent
 
 ## Overview
 
@@ -46,7 +46,7 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Zabbix agent active
+# Template Module Zabbix agent active
 
 ## Overview
 

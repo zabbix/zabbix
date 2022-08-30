@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -605,6 +605,8 @@ static int tls_close(tls_t *tls)
 
 static void tls_free(tls_t *tls)
 {
+	if (NULL == tls)
+		return;
 	if (NULL != tls->ssl)
 		SSL_free(tls->ssl);
 	if (NULL != tls->err)
@@ -1041,6 +1043,10 @@ func (c *tlsConn) SetWriteDeadline(t time.Time) error {
 func (c *tlsConn) Close() (err error) {
 	cr := C.tls_close((*C.tls_t)(c.tls))
 	c.conn.Close()
+
+	C.tls_free((*C.tls_t)(c.tls))
+	c.tls = nil
+
 	if cr < 0 {
 		return c.Error()
 	}

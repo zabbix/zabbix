@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ class testFormHostGroup extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Group name']);
 
 		$this->zbxTestAssertElementPresentId('name');
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
 
 		$this->zbxTestAssertElementPresentXpath("//button[@id='add' and @type='submit']");

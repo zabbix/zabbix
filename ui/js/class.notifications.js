@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -382,7 +382,7 @@ ZBX_Notifications.prototype.handlePushedActiveTabid = function(tabid) {
  * When active tab is unloaded, any sibling tab is set to become active. If single session, then we drop LS (privacy).
  * We cannot know if this unload will happen because of navigation, scripted reload or a tab was just closed.
  * Latter is always assumed, so when navigating active tab, focus is deligated onto to any tab if possible,
- * then this tab might reclaim focus again at construction if during during that time document has focus.
+ * then this tab might reclaim focus again at construction if during that time document has focus.
  * At slow connection during page navigation there will be another active tab polling for notifications (if multitab).
  * Here `tab` is referred as ZBX_Notifications instance and `focus` - whether instance is `active` (not focused).
  *

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ require_once dirname(__FILE__) .'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 
 /**
  * Test the mass update of items and item prototypes.
@@ -1233,7 +1234,7 @@ class testMassUpdateItems extends CWebTest{
 				case 'Show value':
 				case 'Authentication method':
 				case 'Create enabled':
-					$form->query('id', $value['id'])->asZDropdown()->one()->select($value['value']);
+					$form->query('id', $value['id'])->asDropdown()->one()->select($value['value']);
 					break;
 
 				case 'Units':
@@ -1742,7 +1743,13 @@ class testMassUpdateItems extends CWebTest{
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
 				$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
-				$table->query('link', $name)->one()->waitUntilClickable()->click();
+				// TODO: not stable test testPageMassUpdateItems_ChangePreprocessing#8 on Jenkins, failed to properly waitUntilReady for page
+				try {
+					$table->query('link', $name)->one()->waitUntilClickable()->click();
+				}
+				catch (ElementClickInterceptedException $e) {
+					$table->query('link', $name)->one()->waitUntilClickable()->click();
+				}
 				$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 				$form->selectTab('Preprocessing');
 				$this->assertPreprocessingSteps($data['Preprocessing steps']);

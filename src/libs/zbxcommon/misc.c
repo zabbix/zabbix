@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -923,7 +923,7 @@ static int	time_period_parse(zbx_time_period_t *period, const char *text, int le
 	if (period->start_time >= period->end_time)
 		return FAIL;
 
-	if (0 != (len -= parsed_len))
+	if (0 != (len - parsed_len))
 		return FAIL;
 
 	return SUCCEED;
@@ -2210,7 +2210,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 	}
 	else
 	{
-		int	current_delay = 0, attempt = 0;
+		int	current_delay, attempt = 0;
 		time_t	next_interval, t, tmax, scheduled_check = 0;
 
 		/* first try to parse out and calculate scheduled intervals */
@@ -3388,6 +3388,47 @@ double	str2double(const char *str)
 
 /******************************************************************************
  *                                                                            *
+ * Function: str2uint64whole                                                  *
+ *                                                                            *
+ * Purpose: convert string containing number, whole number in decimal         *
+ *          notation or whole number in scientific notation to 64bit unsigned *
+ *          integer                                                           *
+ *                                                                            *
+ * Parameters: str   - string to convert                                      *
+ *             value - a pointer to converted value                           *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned integer                    *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Comments: the function automatically processes suffixes                    *
+ *                                                                            *
+ ******************************************************************************/
+int	str2uint64whole(const char *str, zbx_uint64_t *value)
+{
+	double	value_dbl;
+
+	if (SUCCEED == str2uint64(str, ZBX_UNIT_SYMBOLS, value))
+		return SUCCEED;
+
+	if ('-' == *str)
+		return FAIL;
+
+	if (FAIL == is_double_suffix(str, ZBX_FLAG_DOUBLE_SUFFIX))
+		return FAIL;
+
+	value_dbl = str2double(str);
+
+	if (floor(value_dbl) == value_dbl)
+	{
+		*value = value_dbl;
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: is_hostname_char                                                 *
  *                                                                            *
  * Return value:  SUCCEED - the char is allowed in the host name              *
@@ -3768,8 +3809,9 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	return token;
 }
 
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+/* Since 2.26 the GNU C Library will detect when /etc/resolv.conf has been modified and reload the changed */
+/* configuration. For performance reasons manual reloading should be avoided when unnecessary. */
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
 /******************************************************************************
  *                                                                            *
  * Function: update_resolver_conf                                             *
@@ -3820,7 +3862,7 @@ void	zbx_update_env(double time_now)
 	{
 		time_update = time_now;
 		zbx_handle_log();
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
 		update_resolver_conf();
 #endif
 	}
@@ -3830,7 +3872,7 @@ void	zbx_update_env(double time_now)
  *                                                                            *
  * Function: zbx_dc_get_agent_item_nextcheck                                  *
  *                                                                            *
- * Purpose: calculate item nextcheck for zabix agent type items               *
+ * Purpose: calculate item nextcheck for Zabbix agent type items              *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
@@ -3858,3 +3900,81 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigne
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_md5buf2str                                                   *
+ *                                                                            *
+ * Purpose: get a textual representation of md5 sum                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *          md5 - [IN] buffer with md5 sum                                    *
+ *          str - [OUT] preallocated string with a text representation of MD5 *
+ *                     sum. String size must be at least                      *
+ *                     ZBX_MD5_PRINT_BUF_LEN bytes.                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str)
+{
+	const char	*hex = "0123456789abcdef";
+	char		*p = str;
+	int		i;
+
+	for (i = 0; i < MD5_DIGEST_SIZE; i++)
+	{
+		*p++ = hex[md5[i] >> 4];
+		*p++ = hex[md5[i] & 15];
+	}
+
+	*p = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hex2bin                                                      *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     convert ASCII hex digit string to a binary representation (byte        *
+ *     string)                                                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     p_hex   - [IN] null-terminated input string                            *
+ *     buf     - [OUT] output buffer                                          *
+ *     buf_len - [IN] output buffer size                                      *
+ *                                                                            *
+ * Return value:                                                              *
+ *     Number of bytes written into 'buf' on successful conversion.           *
+ *     -1 - an error occurred.                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     In case of error incomplete useless data may be written into 'buf'.    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
+{
+	unsigned char	*q = buf;
+	int		len = 0;
+
+	while ('\0' != *p_hex)
+	{
+		if (0 != isxdigit(*p_hex) && 0 != isxdigit(*(p_hex + 1)) && buf_len > len)
+		{
+			unsigned char	hi = *p_hex & 0x0f;
+			unsigned char	lo;
+
+			if ('9' < *p_hex++)
+				hi = (unsigned char)(hi + 9u);
+
+			lo = *p_hex & 0x0f;
+
+			if ('9' < *p_hex++)
+				lo = (unsigned char)(lo + 9u);
+
+			*q++ = (unsigned char)(hi << 4 | lo);
+			len++;
+		}
+		else
+			return -1;
+	}
+
+	return len;
+}

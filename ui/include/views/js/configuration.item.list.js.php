@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,10 @@
 				->addStyle('top: 0px;'),
 			(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
 		]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-		(new CDiv('#{expression}'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+		(new CDiv('#{expression}'))
+			->addStyle('max-width:'.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+			->setHint('#{expression}'),
 		new CDiv('#{type_label}'),
 		(new CCol([
 			(new CVar('expressions[][value]', '#{expression}')),
@@ -58,7 +61,10 @@
 <script type="text/x-jquery-tmpl" id="tmpl_expressions_part_list_row">
 <?=
 	(new CRow([
-		(new CDiv('#{keyword}'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+		(new CDiv('#{keyword}'))
+			->addStyle('max-width:'.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+			->setHint('#{keyword}'),
 		new CDiv('#{type_label}'),
 		(new CCol([
 			(new CVar('keys[][value]', '#{keyword}')),

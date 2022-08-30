@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-22T15:31:40Z</date>
+   <date>2022-08-01T08:00:24Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -16,7 +16,7 @@ https://httpd.apache.org/docs/current/mod/mod_status.html&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -37,7 +37,6 @@ Template tooling version used: 0.38</description>
                <key>apache.bytes</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>B</units>
                <description>Total bytes served</description>
@@ -66,7 +65,6 @@ Template tooling version used: 0.38</description>
                <key>apache.bytes.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>Calculated as change rate for 'Total bytes' stat.&#13;
@@ -100,7 +98,6 @@ BytesPerSec is not used, as it counts average since last Apache server start.</d
                <key>apache.requests</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>A total number of accesses</description>
                <applications>
                   <application>
@@ -123,7 +120,6 @@ BytesPerSec is not used, as it counts average since last Apache server start.</d
                <key>apache.requests.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Calculated as change rate for 'Total requests' stat.&#13;
 ReqPerSec is not used, as it counts average since last Apache server start.</description>
@@ -152,7 +148,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.uptime</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>uptime</units>
                <description>Service uptime in seconds</description>
                <applications>
@@ -174,7 +169,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                      <expression>{last()}&lt;10m</expression>
                      <name>Apache: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -186,7 +181,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>Service version</description>
                <applications>
@@ -223,7 +217,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers_total.busy</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Total number of busy worker threads/processes</description>
                <applications>
                   <application>
@@ -246,7 +239,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers_total.idle</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Total number of idle worker threads/processes</description>
                <applications>
                   <application>
@@ -269,7 +261,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers.cleanup</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of workers in cleanup state</description>
                <applications>
                   <application>
@@ -292,7 +283,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers.closing</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of workers in closing state</description>
                <applications>
                   <application>
@@ -315,7 +305,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers.dnslookup</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of workers in dnslookup state</description>
                <applications>
                   <application>
@@ -338,7 +327,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers.finishing</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of workers in finishing state</description>
                <applications>
                   <application>
@@ -361,7 +349,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers.keepalive</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of workers in keepalive state</description>
                <applications>
                   <application>
@@ -384,7 +371,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers.logging</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of workers in logging state</description>
                <applications>
                   <application>
@@ -407,7 +393,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers.reading</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of workers in reading state</description>
                <applications>
                   <application>
@@ -430,7 +415,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers.sending</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of workers in sending state</description>
                <applications>
                   <application>
@@ -453,7 +437,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers.slot</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of slots with no current process</description>
                <applications>
                   <application>
@@ -476,7 +459,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers.starting</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of workers in starting state</description>
                <applications>
                   <application>
@@ -499,7 +481,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>apache.workers.waiting</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of workers in waiting state</description>
                <applications>
                   <application>
@@ -520,7 +501,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <name>Apache: Service response time</name>
                <key>net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <applications>
@@ -551,7 +531,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <name>Apache: Service ping</name>
                <key>net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Apache</name>
@@ -585,7 +564,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <name>Apache: CPU utilization</name>
                <key>proc.cpu.util["{$APACHE.PROCESS_NAME}"]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Process CPU utilization percentage.</description>
@@ -599,7 +577,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <name>Apache: Memory usage (rss)</name>
                <key>proc.mem["{$APACHE.PROCESS_NAME}",,,,rss]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>Resident set size memory used by process in bytes.</description>
                <applications>
@@ -612,7 +589,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <name>Apache: Memory usage (vsize)</name>
                <key>proc.mem["{$APACHE.PROCESS_NAME}",,,,vsize]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>Virtual memory size used by process in bytes.</description>
                <applications>
@@ -625,7 +601,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <name>Apache: Number of processes running</name>
                <key>proc.num["{$APACHE.PROCESS_NAME}"]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Apache</name>
@@ -644,7 +619,6 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                <history>1h</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Getting data from a machine-readable version of the Apache status page.&#13;
 https://httpd.apache.org/docs/current/mod/mod_status.html</description>
@@ -676,7 +650,7 @@ for (var i = 0; i &lt; lines.length; i++) {
 
 // Multiversion metrics
 output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime;
-output.ServerVersion = output.Server || output.ServerVersion;
+output.ServerVersion = output.ServerVersion || output.Server;
 
 // Parse "Scoreboard" to get worker count.
 if (typeof output.Scoreboard === 'string') {
@@ -735,7 +709,6 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <key>apache.bytes[per_request{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <description>Average number of client requests per second</description>
@@ -760,7 +733,6 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <key>apache.connections[async_closing{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Number of async connections in closing state (only applicable to event MPM)</description>
                      <applications>
                         <application>
@@ -783,7 +755,6 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <key>apache.connections[async_keep_alive{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Number of async connections in keep-alive state (only applicable to event MPM)</description>
                      <applications>
                         <application>
@@ -806,7 +777,6 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <key>apache.connections[async_writing{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Number of async connections in writing state (only applicable to event MPM)</description>
                      <applications>
                         <application>
@@ -829,7 +799,6 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <key>apache.connections[total{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Number of total connections</description>
                      <applications>
                         <application>
@@ -852,7 +821,6 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <key>apache.process[num{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Number of async processes</description>
                      <applications>
                         <application>
@@ -870,7 +838,6 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Apache: Current async connections{#SINGLETON}</name>

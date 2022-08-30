@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,6 +41,19 @@
 #elif 0 != ZBX_MAX_OVERFLOW_SQL_SIZE && \
 		(1024 > ZBX_MAX_OVERFLOW_SQL_SIZE || ZBX_MAX_OVERFLOW_SQL_SIZE > ZBX_MAX_SQL_SIZE)
 #error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
+#endif
+
+#if defined(HAVE_POSTGRESQL)
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
+#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_DB_STRLIST_DELIM		','
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB3	"utf8mb3"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET		"utf8,utf8mb3"
+#	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin"
 #endif
 
 #define ZBX_DB_TLS_CONNECT_REQUIRED_TXT		"required"

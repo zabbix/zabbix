@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 4.2\n"
+"Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-20 19:52+0300\n"
+"POT-Creation-Date: 2022-04-01 16:26+0300\n"
 "PO-Revision-Date: 2020-09-14 08:12+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -31,7 +31,7 @@ msgstr "\"%1$s\" thay vì \"%2$s\""
 #: include/classes/import/validators/C40XmlValidator.php:1278
 #: include/classes/import/validators/C42XmlValidator.php:1336
 #: include/classes/import/validators/C44XmlValidator.php:1741
-#: include/classes/import/validators/C50XmlValidator.php:1884
+#: include/classes/import/validators/C50XmlValidator.php:1891
 #, c-format
 msgid "\"%1$s\" is expected"
 msgstr "\"%1$s\" được dự đoán trước"
@@ -76,7 +76,7 @@ msgid "%1$d day"
 msgid_plural "%1$d days"
 msgstr[0] "%1$d ngày%1$d ngày"
 
-#: jsLoader.php:275
+#: jsLoader.php:258
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
@@ -123,6 +123,16 @@ msgid "%1$s action"
 msgid_plural "%1$s actions"
 msgstr[0] "%1$s hành động%1$s hành động"
 
+#: jsLoader.php:239
+#, c-format
+msgid "%1$s characters"
+msgstr ""
+
+#: jsLoader.php:240
+#, c-format
+msgid "%1$s characters remaining"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:59
 #: app/views/popup.acknowledge.edit.php:64
 #, c-format
@@ -153,8 +163,8 @@ msgstr[0] "%1$s thông điệp"
 #: include/classes/widgets/CWidgetConfig.php:162
 #: include/classes/widgets/CWidgetConfig.php:163
 #: include/classes/widgets/CWidgetConfig.php:164
-#: include/classes/widgets/CWidgetConfig.php:165 jsLoader.php:318
-#: jsLoader.php:319 jsLoader.php:320 jsLoader.php:321
+#: include/classes/widgets/CWidgetConfig.php:165 jsLoader.php:301
+#: jsLoader.php:302 jsLoader.php:303 jsLoader.php:304
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -166,7 +176,7 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s of %2$s yếu tố có vấn đề"
 
-#: jsLoader.php:276
+#: jsLoader.php:259
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
@@ -195,17 +205,12 @@ msgstr[0] "còn %1$s lần thử"
 
 #: app/views/administration.user.edit.php:387
 #: include/classes/widgets/CWidgetConfig.php:160
-#: include/classes/widgets/CWidgetConfig.php:161 jsLoader.php:316
-#: jsLoader.php:317
+#: include/classes/widgets/CWidgetConfig.php:161 jsLoader.php:299
+#: jsLoader.php:300
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
 msgstr[0] "%1$s giây"
-
-#: jsLoader.php:257
-#, c-format
-msgid "%1$s symbols remaining"
-msgstr "%1$s biểu tượng còn lại"
 
 #: include/maps.inc.php:363 include/maps.inc.php:366 include/maps.inc.php:373
 #: include/maps.inc.php:378
@@ -227,13 +232,13 @@ msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
 msgstr "%1$s, Chặt chẽ, %2$s"
 
-#: jsLoader.php:270
+#: jsLoader.php:253
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr "%1$s, chỉ đọc"
 
-#: jsLoader.php:322
+#: jsLoader.php:305
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -367,8 +372,8 @@ msgid "Access denied!"
 msgstr "Truy cập bị từ chối!"
 
 #: app/views/hintbox.eventlist.php:76
-#: app/views/monitoring.widget.problems.view.php:64
-#: include/actions.inc.php:157 include/blocks.inc.php:763
+#: app/views/monitoring.widget.problems.view.php:64 include/actions.inc.php:157
+#: include/blocks.inc.php:763
 #: include/classes/screens/CScreenHostTriggers.php:230
 #: include/classes/screens/CScreenProblem.php:874
 #: include/classes/screens/CScreenProblem.php:899
@@ -376,7 +381,7 @@ msgstr "Truy cập bị từ chối!"
 msgid "Ack"
 msgstr "Ghi nhận"
 
-#: app/views/popup.acknowledge.edit.php:82 jsLoader.php:280
+#: app/views/popup.acknowledge.edit.php:82 jsLoader.php:263
 msgid "Acknowledge"
 msgstr "Ghi nhận"
 
@@ -435,7 +440,7 @@ msgstr " Sự kiện được ghi nhận giải quyết"
 #: include/views/configuration.item.prototype.massupdate.php:254
 #: include/views/configuration.maintenance.edit.php:81
 #: include/views/configuration.services.edit.php:125
-#: include/views/configuration.services.edit.php:178
+#: include/views/configuration.services.edit.php:179
 #: include/views/configuration.template.edit.php:126
 #: include/views/configuration.template.massupdate.php:150
 #: include/views/configuration.trigger.prototype.edit.php:187
@@ -482,7 +487,7 @@ msgstr "Hành động \"%1$s\" không có thao tác được định nghĩa."
 msgid "Action added"
 msgstr "Action được thêm vào"
 
-#: include/classes/core/ZBase.php:463
+#: include/classes/core/ZBase.php:433
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr "Lớp hành động %1$s phải mở rộng lớp %2$s."
@@ -520,12 +525,12 @@ msgstr "Hành động đã cập nhật"
 #: include/classes/screens/CScreenProblem.php:900
 #: include/classes/screens/CScreenProblem.php:1147
 #: include/classes/screens/CScreenProblem.php:1208 include/events.inc.php:251
-#: include/forms.inc.php:1229 include/menu.inc.php:116
-#: include/menu.inc.php:146 include/views/configuration.action.edit.php:28
+#: include/forms.inc.php:1229 include/menu.inc.php:116 include/menu.inc.php:146
+#: include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:77
 #: include/views/monitoring.screen.list.php:89
 #: include/views/monitoring.slideconf.list.php:75
-#: include/views/monitoring.sysmap.list.php:67 jsLoader.php:279
+#: include/views/monitoring.sysmap.list.php:67 jsLoader.php:262
 #: tr_events.php:180
 msgid "Actions"
 msgstr "Hành động"
@@ -650,9 +655,9 @@ msgstr "Kích hoạt"
 #: include/views/configuration.maintenance.edit.php:121
 #: include/views/configuration.maintenance.edit.php:197
 #: include/views/configuration.maintenance.edit.php:268
-#: include/views/configuration.services.edit.php:163
-#: include/views/configuration.services.edit.php:338
-#: include/views/configuration.services.edit.php:375
+#: include/views/configuration.services.edit.php:164
+#: include/views/configuration.services.edit.php:339
+#: include/views/configuration.services.edit.php:376
 #: include/views/configuration.template.edit.php:238
 #: include/views/configuration.template.list.php:67
 #: include/views/configuration.template.massupdate.php:55
@@ -697,8 +702,8 @@ msgstr "Kích hoạt"
 #: include/views/monitoring.sysmap.edit.php:303
 #: include/views/monitoring.sysmap.edit.php:323
 #: include/views/monitoring.sysmap.edit.php:359
-#: include/views/monitoring.sysmap.edit.php:427 jsLoader.php:138
-#: jsLoader.php:340
+#: include/views/monitoring.sysmap.edit.php:427 jsLoader.php:120
+#: jsLoader.php:323
 msgid "Add"
 msgstr "Thêm"
 
@@ -706,7 +711,7 @@ msgstr "Thêm"
 msgid "Add (message type limit reached)"
 msgstr "Thêm (kiểu tin nhắn đã đạt giới hạn)"
 
-#: jsLoader.php:146
+#: jsLoader.php:128
 msgid "Add a new widget"
 msgstr "Thêm một ô điều khiển mới"
 
@@ -714,7 +719,7 @@ msgstr "Thêm một ô điều khiển mới"
 msgid "Add child"
 msgstr "Thêm phần tử con"
 
-#: jsLoader.php:342
+#: jsLoader.php:325
 msgid "Add child element"
 msgstr "Thêm phần tử con"
 
@@ -726,7 +731,7 @@ msgstr "Thêm host"
 msgid "Add missing"
 msgstr "Thêm các mục thiếu"
 
-#: jsLoader.php:343
+#: jsLoader.php:326
 msgid "Add multiple maps"
 msgstr "Thêm nhiều bản đồ"
 
@@ -764,11 +769,11 @@ msgstr "Thêm vào nhóm host"
 msgid "Add to host groups"
 msgstr "Thêm vào nhóm host"
 
-#: app/views/monitoring.dashboard.view.php:108 jsLoader.php:133
+#: app/views/monitoring.dashboard.view.php:108 jsLoader.php:115
 msgid "Add widget"
 msgstr "Thêm ô điều khiển"
 
-#: jsLoader.php:268
+#: jsLoader.php:251
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
@@ -809,7 +814,7 @@ msgid "Agent"
 msgstr "Agent"
 
 #: include/classes/items/CHelpItems.php:69
-#: include/classes/items/CHelpItems.php:395
+#: include/classes/items/CHelpItems.php:399
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "Kiểm tra tính sẵn sàng của agent. Trả về 0 - không sẵn sàng; 1 - sẵn sàng"
 
@@ -818,13 +823,18 @@ msgid "Agent encryption"
 msgstr "Mã hóa agent"
 
 #: include/classes/items/CHelpItems.php:65
-#: include/classes/items/CHelpItems.php:391
+#: include/classes/items/CHelpItems.php:395
 msgid "Agent host name. Returns string"
 msgstr "Tên máy chủ agent. Trả về kiểu string"
 
 #: include/views/inventory.host.view.php:62
 msgid "Agent interfaces"
 msgstr "Giao diện agent"
+
+#: include/classes/items/CHelpItems.php:73
+#: include/classes/items/CHelpItems.php:403
+msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
+msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:1150
 msgid "Aggregate"
@@ -862,7 +872,7 @@ msgstr "Sắp xếp phần tử sơ đồ"
 #: app/views/administration.script.list.php:112
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:260 jsLoader.php:356
+#: include/views/monitoring.sysmap.edit.php:260 jsLoader.php:339
 msgid "All"
 msgstr "Tất cả"
 
@@ -880,7 +890,7 @@ msgstr "Tất cả nhóm"
 msgid "All hosts"
 msgstr "Tất cả máy chủ"
 
-#: jsLoader.php:224
+#: jsLoader.php:206
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "Tất cả các đường dẫn phải có \"Tên\" và \"URL\""
 
@@ -947,8 +957,7 @@ msgid "And"
 msgstr "Và"
 
 #: app/partials/popup.operations.php:378 app/views/monitoring.host.view.php:52
-#: app/views/monitoring.problem.view.php:242
-#: app/views/popup.lldoverride.php:67
+#: app/views/monitoring.problem.view.php:242 app/views/popup.lldoverride.php:67
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:80
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:80
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
@@ -971,8 +980,7 @@ msgstr "Và/Hoặc"
 #: app/views/administration.user.list.php:74
 #: app/views/monitoring.host.view.php:141
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:34
-#: include/triggers.inc.php:1829
-#: include/views/configuration.action.list.php:70
+#: include/triggers.inc.php:1829 include/views/configuration.action.list.php:70
 #: include/views/configuration.correlation.list.php:48
 #: include/views/configuration.discovery.list.php:48
 #: include/views/configuration.host.list.php:147
@@ -980,8 +988,7 @@ msgstr "Và/Hoặc"
 msgid "Any"
 msgstr "Bất cứ gì"
 
-#: app/views/js/administration.regex.edit.js.php:163
-#: include/regexp.inc.php:223
+#: app/views/js/administration.regex.edit.js.php:163 include/regexp.inc.php:223
 msgid "Any character string included"
 msgstr "Chuỗi ký tự bất kỳ bao gồm"
 
@@ -1046,8 +1053,7 @@ msgstr "Ứng dụng với id \"%1$s\" không tồn tại."
 #: app/controllers/CControllerPopupGeneric.php:176 app/views/search.php:38
 #: app/views/search.php:60 app/views/search.php:64 app/views/search.php:228
 #: app/views/search.php:246 app/views/search.php:250 include/forms.inc.php:674
-#: include/html.inc.php:346
-#: include/views/configuration.application.edit.php:27
+#: include/html.inc.php:346 include/views/configuration.application.edit.php:27
 #: include/views/configuration.application.list.php:157
 #: include/views/configuration.host.list.php:184
 #: include/views/configuration.host.list.php:400
@@ -1070,8 +1076,8 @@ msgstr "Ứng dụng"
 #: include/views/js/monitoring.sysmaps.js.php:464
 #: include/views/js/monitoring.sysmaps.js.php:588
 #: include/views/js/monitoring.sysmaps.js.php:693
-#: include/views/js/monitoring.sysmaps.js.php:799 jsLoader.php:137
-#: jsLoader.php:259 jsLoader.php:339
+#: include/views/js/monitoring.sysmaps.js.php:799 jsLoader.php:119
+#: jsLoader.php:242 jsLoader.php:322
 msgid "Apply"
 msgstr "Áp dụng"
 
@@ -1089,7 +1095,7 @@ msgstr "Đang tiếp cận"
 msgid "Apr"
 msgstr "Tháng Tư"
 
-#: include/func.inc.php:122 include/func.inc.php:259 jsLoader.php:176
+#: include/func.inc.php:122 include/func.inc.php:259 jsLoader.php:158
 msgid "April"
 msgstr "Tháng tư"
 
@@ -1101,7 +1107,7 @@ msgstr "Bạn có chắc muốn thực hiện hành động này?"
 msgid "Are you sure you want to delete"
 msgstr "Bạn có chắc muốn xóa"
 
-#: jsLoader.php:143
+#: jsLoader.php:125
 msgid "Are you sure, you want to leave this page?"
 msgstr "Bạn có chắc chắn muốn rời khỏi trang?"
 
@@ -1235,7 +1241,7 @@ msgstr "Kiểm tra log"
 msgid "Aug"
 msgstr "Th8"
 
-#: include/func.inc.php:126 include/func.inc.php:263 jsLoader.php:180
+#: include/func.inc.php:126 include/func.inc.php:263 jsLoader.php:162
 msgid "August"
 msgstr "Tháng 8"
 
@@ -1286,6 +1292,7 @@ msgid "Authentication protocol"
 msgstr "Giao thức xác thực"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:313
+#: app/controllers/CControllerAuthenticationUpdate.php:322
 msgid "Authentication settings updated"
 msgstr "Cài đặt xác thưc đã được cập nhật"
 
@@ -1486,11 +1493,11 @@ msgstr "Cả hai mật khẩu phải bằng nhau."
 msgid "Bottom"
 msgstr "Dưới"
 
-#: jsLoader.php:216
+#: jsLoader.php:198
 msgid "Bring forward"
 msgstr "Đưa ra phía trước"
 
-#: jsLoader.php:215
+#: jsLoader.php:197
 msgid "Bring to front"
 msgstr "Đặt phía trước"
 
@@ -1516,25 +1523,25 @@ msgstr "CERT"
 
 #: app/views/hintbox.eventlist.php:110
 #: app/views/monitoring.widget.problems.view.php:95
-#: include/classes/graph/CSvgGraph.php:1080
+#: include/classes/graph/CSvgGraph.php:1086
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:969
 #: include/classes/screens/CScreenProblem.php:1169 include/events.inc.php:335
 msgid "CLOSING"
 msgstr "ĐÓNG"
 
-#: include/classes/items/CHelpItems.php:225
-#: include/classes/items/CHelpItems.php:571
+#: include/classes/items/CHelpItems.php:229
+#: include/classes/items/CHelpItems.php:579
 msgid "CPU information. Returns string or integer"
 msgstr "Thông tin SPU. Trả về kiểu string hoặc integer"
 
-#: include/classes/items/CHelpItems.php:201
-#: include/classes/items/CHelpItems.php:547
+#: include/classes/items/CHelpItems.php:205
+#: include/classes/items/CHelpItems.php:555
 msgid "CPU load. Returns float"
 msgstr "CPU load. Trả về kiều float"
 
-#: include/classes/items/CHelpItems.php:213
-#: include/classes/items/CHelpItems.php:559
+#: include/classes/items/CHelpItems.php:217
+#: include/classes/items/CHelpItems.php:567
 msgid "CPU utilisation percentage. Returns float"
 msgstr "Tỉ lệ sử dụng CPU. Trả về kiểu float"
 
@@ -1555,23 +1562,23 @@ msgstr "Tính SLA, SLA được chấp nhận (%)"
 msgid "Calculated"
 msgstr "Tính toán"
 
-#: include/classes/items/CHelpItems.php:733
+#: include/classes/items/CHelpItems.php:741
 msgid "Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
 msgstr "Tính giá trị trung bình, dựa trên nhiều tham số. Máy chủ thu thập giá trị qua truy vấn trực tiếp database."
 
-#: include/classes/items/CHelpItems.php:741
+#: include/classes/items/CHelpItems.php:749
 msgid "Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
 msgstr "Tính giá trị cực đại, dựa trên các thông số. Máy chủ thu thập giá trị qua truy vấn trực tiếp database."
 
-#: include/classes/items/CHelpItems.php:737
+#: include/classes/items/CHelpItems.php:745
 msgid "Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
 msgstr "Tính giá trị cực tiêu, dựa trên các thông số. Máy chủ thu thập giá trị qua truy vấn trực tiếp database."
 
-#: include/classes/items/CHelpItems.php:745
+#: include/classes/items/CHelpItems.php:753
 msgid "Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
 msgstr "Tính tổng, dựa trên các thông số. Máy chủ thu thập giá trị qua truy vấn trực tiếp database."
 
-#: jsLoader.php:172
+#: jsLoader.php:154
 msgid "Calendar"
 msgstr "Lịch"
 
@@ -1579,7 +1586,7 @@ msgstr "Lịch"
 msgid "Callback"
 msgstr "Gọi lại"
 
-#: jsLoader.php:271
+#: jsLoader.php:254
 msgctxt "screen reader"
 msgid "Can not be removed"
 msgstr "Không thể xóa"
@@ -1603,10 +1610,10 @@ msgstr "Không thể xóa"
 #: app/views/js/administration.trigseverity.edit.js.php:37
 #: app/views/monitoring.dashboard.view.php:114
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:114
-#: include/views/conf.import.php:131 include/views/js/conf.import.js.php:42
-#: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:140
-#: jsLoader.php:157 jsLoader.php:260 jsLoader.php:341 jsLoader.php:353
+#: include/classes/setup/CSetupWizard.php:114 include/views/conf.import.php:131
+#: include/views/js/conf.import.js.php:42
+#: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:122
+#: jsLoader.php:139 jsLoader.php:243 jsLoader.php:324 jsLoader.php:336
 msgid "Cancel"
 msgstr "Hủy bỏ"
 
@@ -1646,7 +1653,7 @@ msgid "Cannot add correlation condition"
 msgstr "Không thể thêm điều kiện liên kết"
 
 #: include/classes/api/services/CTrigger.php:970
-#: include/classes/api/services/CTriggerPrototype.php:780
+#: include/classes/api/services/CTriggerPrototype.php:795
 msgid "Cannot add dependency from a host to a template."
 msgstr "Không thể thêm quan hệ phụ thuộc từ một máy chủ đến một mẫu."
 
@@ -1804,11 +1811,11 @@ msgstr "Không thể thêm giá trị sơ đồ"
 msgid "Cannot add web scenario"
 msgstr "Không thể thêm web scenario"
 
-#: jsLoader.php:154
+#: jsLoader.php:136
 msgid "Cannot add widget: not enough free space on the dashboard."
 msgstr "Không thể thêm widget: không đủ không gian."
 
-#: jsLoader.php:144
+#: jsLoader.php:126
 msgid "Cannot add widgets in kiosk mode"
 msgstr "Không thể thêm ô điều khiển trong chế độ kiosk"
 
@@ -1893,7 +1900,7 @@ msgid "Cannot create another database connection."
 msgstr "Không thể tạo sự kết nối cơ sở dữ liệu khác."
 
 #: include/classes/api/services/CTrigger.php:1004
-#: include/classes/api/services/CTriggerPrototype.php:811
+#: include/classes/api/services/CTriggerPrototype.php:826
 msgid "Cannot create circular dependencies."
 msgstr "Không thể tạo quan hệ phụ thuộc vòng tròn."
 
@@ -1901,7 +1908,7 @@ msgstr "Không thể tạo quan hệ phụ thuộc vòng tròn."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Không thể tạo quan hệ phụ thuộc trên bản thân trigger."
 
-#: include/classes/api/services/CTriggerPrototype.php:750
+#: include/classes/api/services/CTriggerPrototype.php:765
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "Không thể tạo quan hệ phụ thuộc trên một trigger."
 
@@ -2116,7 +2123,7 @@ msgstr "Không thể xóa kiểu đồ thị mẫu."
 msgid "Cannot delete templated graph."
 msgstr "Không thể xóa đồ thị mẫu."
 
-#: include/classes/api/services/CHostPrototype.php:1159
+#: include/classes/api/services/CHostPrototype.php:1161
 msgid "Cannot delete templated host prototype."
 msgstr "Không thể xóa kiểu host mẫu."
 
@@ -2292,7 +2299,7 @@ msgstr "Không thể đánh giá biểu thức"
 msgid "Cannot execute script"
 msgstr "Không thể thực hiện tiến trình"
 
-#: jsLoader.php:227
+#: jsLoader.php:209
 msgid "Cannot expand macros."
 msgstr "Không thể mở rộng bộ lệnh."
 
@@ -2467,7 +2474,7 @@ msgid "Cannot link template."
 msgstr "Không thể kết nối mẫu."
 
 #: app/controllers/CControllerModuleEdit.php:106
-#: include/classes/core/ZBase.php:637
+#: include/classes/core/ZBase.php:607
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
@@ -2609,7 +2616,7 @@ msgstr "Không thể đặt lại các trường inventory khi vô hiệu h
 msgid "Cannot set resource ID for screen element."
 msgstr "Không thể đặt ID nguồn cho phần tử screen."
 
-#: jsLoader.php:235
+#: jsLoader.php:217
 msgid "Cannot support notification audio for this device."
 msgstr "Không thể hỗ trợ âm thanh thông báo cho thiết bị này."
 
@@ -2980,11 +2987,11 @@ msgstr "Đăng nhập phân biệt chữ hoa/thường"
 msgid "Catalan (ca_ES)"
 msgstr "Catalan (ca_ES)"
 
-#: include/classes/items/CHelpItems.php:1057
+#: include/classes/items/CHelpItems.php:1073
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Chọn tất cả các trap SNMP phù hợp với regex. Nếu regrexp không được chỉ định, chọn bất kỳ trap nào."
 
-#: include/classes/items/CHelpItems.php:1053
+#: include/classes/items/CHelpItems.php:1069
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Chọn tất cả các trap SNMP không bị chọn bởi bất kỳ item snmptrap [] nào."
 
@@ -3051,13 +3058,11 @@ msgstr "Thay đổi loại"
 msgid "Character"
 msgstr "Ký tự"
 
-#: app/views/js/administration.regex.edit.js.php:159
-#: include/regexp.inc.php:222
+#: app/views/js/administration.regex.edit.js.php:159 include/regexp.inc.php:222
 msgid "Character string included"
 msgstr "Chuỗi ký tự bao gồm"
 
-#: app/views/js/administration.regex.edit.js.php:167
-#: include/regexp.inc.php:224
+#: app/views/js/administration.regex.edit.js.php:167 include/regexp.inc.php:224
 msgid "Character string not included"
 msgstr "Chuỗi ký tự không bao gồm"
 
@@ -3065,8 +3070,8 @@ msgstr "Chuỗi ký tự không bao gồm"
 msgid "Chassis"
 msgstr "Khung"
 
-#: include/classes/items/CHelpItems.php:221
-#: include/classes/items/CHelpItems.php:567
+#: include/classes/items/CHelpItems.php:225
+#: include/classes/items/CHelpItems.php:575
 msgid "Chassis information. Returns string"
 msgstr "Thông tin Chassis. Trả về kiểu string"
 
@@ -3111,56 +3116,56 @@ msgstr "Kiểu kiểm tra"
 msgid "Checks"
 msgstr "Kiểm tra"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:431
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:439
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
 msgstr "Kiểm tra nếu máy chủ DNS bật. Trả về 0 - DNS tắt (Máy chủ không trả lời hoặc độ phân giải DNS lỗi);1 - DNS bật"
 
-#: include/classes/items/CHelpItems.php:313
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:317
+#: include/classes/items/CHelpItems.php:667
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:759
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:467
+#: include/classes/items/CHelpItems.php:125
+#: include/classes/items/CHelpItems.php:475
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
 msgstr "Kiểm tra nếu có thể thực hiện kết nối TCP đến cổng được chỉ định. Trả về 0 - không thể kết nối; 1 - có thể kết nối"
 
-#: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:471
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:129
+#: include/classes/items/CHelpItems.php:479
+#: include/classes/items/CHelpItems.php:771
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
 msgstr "Kiểm tra nếu dịch vụ đang chạy và chấp nhận kết nối TCP. Trả về 0 - dịch vụ không chạy; 1 - dịch vụ đang chạy"
 
-#: include/classes/items/CHelpItems.php:137
-#: include/classes/items/CHelpItems.php:483
-#: include/classes/items/CHelpItems.php:771
+#: include/classes/items/CHelpItems.php:141
+#: include/classes/items/CHelpItems.php:491
+#: include/classes/items/CHelpItems.php:779
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
 msgstr "Kiểm tra nếu dịch vụ đang chạy và đáp ứng yêu cầu đến UDP. Trả về 0 - dịch vụ không chạy; 1 - dịch vụ đang chạy"
 
-#: include/classes/items/CHelpItems.php:117
-#: include/classes/items/CHelpItems.php:463
+#: include/classes/items/CHelpItems.php:121
+#: include/classes/items/CHelpItems.php:471
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "Kiểm tra nếu cổng TCP này là trong trạng thái LISTEN. Trả về 0 - nó không ở trạng thái LISTEN; 1 - nó không ở trạng thái LISTEN"
 
-#: include/classes/items/CHelpItems.php:133
-#: include/classes/items/CHelpItems.php:479
+#: include/classes/items/CHelpItems.php:137
+#: include/classes/items/CHelpItems.php:487
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "Kiểm tra nếu cổng UDP này là trong trạng thái LISTEN. Trả về 0 - nó không ở trạng thái LISTEN; 1 - nó ở trạng thái LISTEN"
 
-#: include/classes/items/CHelpItems.php:129
-#: include/classes/items/CHelpItems.php:475
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:133
+#: include/classes/items/CHelpItems.php:483
+#: include/classes/items/CHelpItems.php:775
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
 msgstr "Kiểm tra performance của dịch vụ TCP. Trả về 0 - dịch vụ không chạy; giây - số giây đã sử dụng trong khi kết nối với dịch vụ"
 
-#: include/classes/items/CHelpItems.php:141
-#: include/classes/items/CHelpItems.php:487
-#: include/classes/items/CHelpItems.php:775
+#: include/classes/items/CHelpItems.php:145
+#: include/classes/items/CHelpItems.php:495
+#: include/classes/items/CHelpItems.php:783
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "Kiểm tra performance của dịch vụ UDP. Trả về 0 - Dịch vụ không chạy; giây - số giây dành để chờ phản hồi từ dịch vụ"
 
@@ -3185,7 +3190,7 @@ msgstr "Thông tư tham khảo cho các template: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Liên kết cho tham chiếu dạng hình tròn không được cho phép."
 
-#: include/classes/core/ZBase.php:457
+#: include/classes/core/ZBase.php:427
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr "Lớp %1$s không tìm thấy cho hoạt động %2$s."
@@ -3206,11 +3211,11 @@ msgstr "Xóa lịch sử và phương hướng"
 msgid "Clear when unlinking"
 msgstr "Xóa khi không liên kết"
 
-#: jsLoader.php:148
+#: jsLoader.php:130
 msgid "Click and drag to desired size."
 msgstr "Nhấp và kéo đến kích thước mong muốn."
 
-#: jsLoader.php:258
+#: jsLoader.php:241
 msgid "Click to view or edit"
 msgstr "Kích để xem hoạt sửa"
 
@@ -3242,7 +3247,7 @@ msgstr "Đồng hồ"
 #: include/views/configuration.triggers.edit.php:627
 #: include/views/monitoring.screen.edit.php:226
 #: include/views/monitoring.slideconf.edit.php:279
-#: include/views/monitoring.sysmap.edit.php:418 jsLoader.php:282
+#: include/views/monitoring.sysmap.edit.php:418 jsLoader.php:265
 msgid "Clone"
 msgstr "Tạo bản sao"
 
@@ -3250,8 +3255,8 @@ msgstr "Tạo bản sao"
 #: include/views/js/monitoring.sysmaps.js.php:471
 #: include/views/js/monitoring.sysmaps.js.php:595
 #: include/views/js/monitoring.sysmaps.js.php:700
-#: include/views/js/monitoring.sysmaps.js.php:803 jsLoader.php:158
-#: jsLoader.php:237 jsLoader.php:254 jsLoader.php:346
+#: include/views/js/monitoring.sysmaps.js.php:803 jsLoader.php:140
+#: jsLoader.php:219 jsLoader.php:236 jsLoader.php:329
 msgid "Close"
 msgstr "Đóng"
 
@@ -3277,8 +3282,8 @@ msgid "Close problem"
 msgstr "Đóng vấn đề"
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:984 jsLoader.php:248
-#: jsLoader.php:253
+#: include/classes/widgets/CWidgetHelper.php:984 jsLoader.php:230
+#: jsLoader.php:235
 msgid "Collapse"
 msgstr "Thu hẹp"
 
@@ -3295,7 +3300,7 @@ msgstr "Thu gọn thanh bên"
 msgid "Colour"
 msgstr "Màu sắc"
 
-#: include/classes/validators/CColorValidator.php:32 jsLoader.php:229
+#: include/classes/validators/CColorValidator.php:32 jsLoader.php:211
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Màu \"%1$s\" là không đúng: phải là mã màu thập lục phân (6 ký tự)."
@@ -3436,11 +3441,11 @@ msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "Điều kiện trùng lặp cho tương quan \"%1$s\"."
 
 #: include/menu.inc.php:97 include/menu.inc.php:144
-#: include/views/inventory.host.view.php:211 jsLoader.php:281
+#: include/views/inventory.host.view.php:211 jsLoader.php:264
 msgid "Configuration"
 msgstr "Cấu hình"
 
-#: include/classes/items/CHelpItems.php:1147
+#: include/classes/items/CHelpItems.php:1163
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Cấu hình thống kê cache. Cache - buffer (chế độ: pfree, total, used, free)."
 
@@ -3759,8 +3764,7 @@ msgstr "Chứa"
 #: app/views/monitoring.dashboard.view.php:118
 #: app/views/monitoring.discovery.view.php:41
 #: app/views/monitoring.host.view.php:39
-#: app/views/monitoring.latest.view.php:39
-#: app/views/monitoring.map.view.php:71
+#: app/views/monitoring.latest.view.php:39 app/views/monitoring.map.view.php:71
 #: app/views/monitoring.problem.view.php:368
 #: app/views/monitoring.web.view.php:40 app/views/report.services.php:76
 #: httpdetails.php:192 include/classes/html/widget/CWidget.php:102
@@ -3828,8 +3832,8 @@ msgstr "Tọa độ"
 #: include/views/configuration.copy.elements.php:77
 #: include/views/configuration.graph.list.php:223
 #: include/views/configuration.item.list.php:260
-#: include/views/configuration.triggers.list.php:340 jsLoader.php:135
-#: jsLoader.php:221
+#: include/views/configuration.triggers.list.php:340 jsLoader.php:117
+#: jsLoader.php:203
 msgid "Copy"
 msgstr "Sao chép"
 
@@ -3887,29 +3891,29 @@ msgstr "Không thể lưu trữ hình ảnh!"
 msgid "Count"
 msgstr "Đếm"
 
-#: include/classes/items/CHelpItems.php:209
-#: include/classes/items/CHelpItems.php:555
+#: include/classes/items/CHelpItems.php:213
+#: include/classes/items/CHelpItems.php:563
 msgid "Count of context switches. Returns integer"
 msgstr "Đếm bởi chuyển ngữ cảnh. Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:297
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:301
+#: include/classes/items/CHelpItems.php:651
 msgid "Count of directory entries, recursively. Returns integer"
 msgstr "Đếm các mục trong thư mục, đệ quy. Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:427
+#: include/classes/items/CHelpItems.php:435
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
 msgstr "Đếm các dòng khớp nhau trong giám sát tệp nhật ký với hỗ trợ xoay vòng nhật ký. Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:419
+#: include/classes/items/CHelpItems.php:427
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Đếm các dòng khớp nhau trong giám sát tệp nhật ký. Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:1123
+#: include/classes/items/CHelpItems.php:1139
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1127
+#: include/classes/items/CHelpItems.php:1143
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr ""
 
@@ -3937,11 +3941,11 @@ msgstr "Tạo liên kết"
 msgid "Create dashboard"
 msgstr "Tạo bảng điều khiển"
 
-#: jsLoader.php:286
+#: jsLoader.php:269
 msgid "Create dependent discovery rule"
 msgstr "Tạo quy định dò tìm phụ thuộc"
 
-#: jsLoader.php:285
+#: jsLoader.php:268
 msgid "Create dependent item"
 msgstr "Tạo item phụ thuộc"
 
@@ -4047,7 +4051,7 @@ msgstr "Tạo bản đồ"
 msgid "Create media type"
 msgstr "Tạo media type"
 
-#: include/views/conf.import.php:29 jsLoader.php:283
+#: include/views/conf.import.php:29 jsLoader.php:266
 msgid "Create new"
 msgstr "Tạo mới"
 
@@ -4071,7 +4075,7 @@ msgstr "Tạo slide show"
 msgid "Create template"
 msgstr "Tạo template"
 
-#: include/views/configuration.triggers.list.php:168 jsLoader.php:284
+#: include/views/configuration.triggers.list.php:168 jsLoader.php:267
 msgid "Create trigger"
 msgstr "Tạo trigger"
 
@@ -4283,7 +4287,7 @@ msgstr "Bảng điều khiển"
 msgid "Dashed line"
 msgstr "Đường đứt nét"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2215
+#: include/classes/graphdraw/CLineGraphDraw.php:2224
 #: include/classes/graphdraw/CPieGraphDraw.php:773
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4440,7 +4444,7 @@ msgstr "Ngày trong tuần"
 msgid "Days"
 msgstr "Các ngày"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:169 jsLoader.php:326
+#: app/controllers/CControllerPopupMediatypeTestSend.php:169 jsLoader.php:309
 msgid "Debug"
 msgstr "Gỡ lỗi"
 
@@ -4454,7 +4458,7 @@ msgstr "Chế độ gỡ lỗi"
 msgid "Dec"
 msgstr "Dec"
 
-#: include/func.inc.php:130 include/func.inc.php:267 jsLoader.php:184
+#: include/func.inc.php:130 include/func.inc.php:267 jsLoader.php:166
 msgid "December"
 msgstr "Tháng 12"
 
@@ -4464,7 +4468,7 @@ msgstr "Tháng 12"
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:145
 #: include/views/js/monitoring.sysmaps.js.php:247
-#: include/views/js/monitoring.sysmaps.js.php:643 jsLoader.php:210
+#: include/views/js/monitoring.sysmaps.js.php:643 jsLoader.php:192
 msgid "Default"
 msgstr "Mặc định"
 
@@ -4552,8 +4556,8 @@ msgstr "Trễ bởi"
 #: include/views/configuration.triggers.list.php:342
 #: include/views/monitoring.screen.list.php:134
 #: include/views/monitoring.slideconf.list.php:106
-#: include/views/monitoring.sysmap.list.php:105 jsLoader.php:141
-#: jsLoader.php:287
+#: include/views/monitoring.sysmap.list.php:105 jsLoader.php:123
+#: jsLoader.php:270
 msgid "Delete"
 msgstr "Xóa"
 
@@ -4586,7 +4590,7 @@ msgstr "Xóa hành động hiện tại?"
 msgid "Delete current correlation?"
 msgstr "Xóa sự liên kết hiện tại?"
 
-#: jsLoader.php:288
+#: jsLoader.php:271
 msgid "Delete dashboard?"
 msgstr "Xóa bảng điều khiển?"
 
@@ -4630,7 +4634,7 @@ msgstr "Xóa kiểu item?"
 msgid "Delete item?"
 msgstr "Xóa item?"
 
-#: jsLoader.php:226
+#: jsLoader.php:208
 msgid "Delete links between selected elements?"
 msgstr "Xóa liên kết giữa các phần tử được chọn?"
 
@@ -4683,7 +4687,7 @@ msgstr "Xóa bảng điều khiển đã chọn?"
 msgid "Delete selected discovery rules?"
 msgstr "Xóa các quy tắc phát hiện được chọn?"
 
-#: jsLoader.php:213
+#: jsLoader.php:195
 msgid "Delete selected elements?"
 msgstr "Xóa các phần tử được chọn?"
 
@@ -4768,7 +4772,7 @@ msgstr "Xóa screen được chọn?"
 msgid "Delete selected scripts?"
 msgstr "Xóa các script được chọn?"
 
-#: jsLoader.php:214
+#: jsLoader.php:196
 msgid "Delete selected shapes?"
 msgstr "Xóa hình đã chọn?"
 
@@ -4844,7 +4848,7 @@ msgstr "Xóa web scanario?"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Đã xóa: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1027
+#: include/classes/api/services/CHostPrototype.php:1029
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Đã xóa: Kiểu host \"%1$s\" trên \"%2$s\"."
@@ -4864,7 +4868,7 @@ msgstr "Bộ giới hạn"
 msgid "Deny"
 msgstr "Từ chối"
 
-#: include/views/configuration.services.edit.php:355
+#: include/views/configuration.services.edit.php:356
 #: include/views/configuration.trigger.prototype.edit.php:585
 #: include/views/configuration.trigger.prototype.edit.php:619
 #: include/views/configuration.trigger.prototype.massupdate.php:185
@@ -4883,7 +4887,7 @@ msgid "Dependent item"
 msgstr "Item phụ thuộc"
 
 #: app/views/popup.generic.php:313 include/triggers.inc.php:2554
-#: include/views/configuration.services.edit.php:160
+#: include/views/configuration.services.edit.php:161
 #: include/views/configuration.trigger.prototype.list.php:87
 #: include/views/configuration.triggers.list.php:241
 msgid "Depends on"
@@ -4901,8 +4905,7 @@ msgstr "Trạng thái triển khai"
 #: app/views/administration.module.list.php:76
 #: app/views/administration.proxy.edit.php:82
 #: app/views/administration.script.edit.php:73
-#: app/views/popup.triggerwizard.php:131
-#: app/views/reports.auditlog.list.php:92
+#: app/views/popup.triggerwizard.php:131 app/views/reports.auditlog.list.php:92
 #: include/classes/screens/CScreenEvents.php:32 include/events.inc.php:235
 #: include/views/configuration.correlation.edit.php:132
 #: include/views/configuration.host.discovery.edit.php:553
@@ -4940,8 +4943,8 @@ msgstr "Chi tiết của web scenario"
 msgid "Device"
 msgstr "Thiết bị"
 
-#: include/classes/items/CHelpItems.php:197
-#: include/classes/items/CHelpItems.php:543
+#: include/classes/items/CHelpItems.php:201
+#: include/classes/items/CHelpItems.php:551
 msgid "Device interrupts. Returns integer"
 msgstr "Thiết bị ngắt. Trả về kiểu integer"
 
@@ -4957,8 +4960,8 @@ msgstr "Kích thước (cột x hàng)"
 msgid "Directory"
 msgstr "Thư mục"
 
-#: include/classes/items/CHelpItems.php:301
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:305
+#: include/classes/items/CHelpItems.php:655
 msgid "Directory size (in bytes). Returns integer"
 msgstr "Kích thước thư mục (byte). Trả về integer"
 
@@ -5174,39 +5177,38 @@ msgstr "Danh sách phát hiện"
 msgid "Discovery object"
 msgstr "Đối tượng phát hiện"
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:795
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:839
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:859
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1031
+#: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1043
+#: include/classes/items/CHelpItems.php:1059
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:955
+#: include/classes/items/CHelpItems.php:971
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:207
 #: app/views/monitoring.discovery.view.php:49
-#: app/views/monitoring.widget.discovery.view.php:32
-#: include/actions.inc.php:52 include/forms.inc.php:959
-#: include/views/configuration.discovery.edit.php:137
+#: app/views/monitoring.widget.discovery.view.php:32 include/actions.inc.php:52
+#: include/forms.inc.php:959 include/views/configuration.discovery.edit.php:137
 msgid "Discovery rule"
 msgstr "Quy tắc phát hiện"
 
@@ -5280,18 +5282,18 @@ msgstr "Các quy tắc phát hiện đã xóa"
 msgid "Discovery status"
 msgstr "Trạng thái phát hiện"
 
-#: include/classes/items/CHelpItems.php:289
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:293
+#: include/classes/items/CHelpItems.php:643
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Đĩa đọc số liệu thống kê. Trả về kiểu integer với kiểu trong mảng, thao tác, bytes; float với kiểu sps, ops, bps"
 
-#: include/classes/items/CHelpItems.php:349
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:353
+#: include/classes/items/CHelpItems.php:703
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Dung lượng đĩa tính theo byte hoặc theo tỉ lệ phần trăm trên tổng số. Trả về kiểu integer hoặc byte; float cho tỉ lệ phần trăm"
 
-#: include/classes/items/CHelpItems.php:293
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:297
+#: include/classes/items/CHelpItems.php:647
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Thống kê đĩa ghi. Trả về kiểu integer với loại trong các ngành, hoạt động, byte; float với loại trong sps, ops, bps"
 
@@ -5311,10 +5313,10 @@ msgstr "Hiển thị vấn đề"
 msgid "Display stacked graph"
 msgstr "Hiển thị sơ đồ xếp chồng"
 
-#: app/controllers/CControllerHintboxActionlist.php:94
-#: app/views/search.php:154 app/views/search.php:223 app/views/search.php:308
+#: app/controllers/CControllerHintboxActionlist.php:94 app/views/search.php:154
+#: app/views/search.php:223 app/views/search.php:308
 #: include/actions.inc.php:1749 include/actions.inc.php:1822
-#: include/classes/helpers/CPagerHelper.php:148 jsLoader.php:349 queue.php:309
+#: include/classes/helpers/CPagerHelper.php:148 jsLoader.php:332 queue.php:309
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Hiển thị %1$s của %2$s đã tìm được"
@@ -5348,7 +5350,7 @@ msgstr "Không giữ lịch sử"
 msgid "Do not keep trends"
 msgstr "Không giữ những cái gần nhất"
 
-#: jsLoader.php:166 jsLoader.php:289
+#: jsLoader.php:148 jsLoader.php:272
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Bạn có muốn thay thế biểu thức điều kiện không?"
 
@@ -5371,7 +5373,7 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "Down"
 
-#: jsLoader.php:323
+#: jsLoader.php:306
 msgid "Download image"
 msgstr "Tải xuống hình ảnh"
 
@@ -5382,8 +5384,8 @@ msgstr "Tải xuống tệp tin cấu hình"
 #: app/views/report.services.php:80 app/views/report.services.php:81
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/classes/screens/CScreenDiscovery.php:120
-#: include/views/configuration.services.edit.php:191
-#: include/views/configuration.services.edit.php:243
+#: include/views/configuration.services.edit.php:192
+#: include/views/configuration.services.edit.php:244
 msgid "Downtime"
 msgstr "Thời gian down"
 
@@ -5434,7 +5436,7 @@ msgstr "Tạo bản sao \"tên\" giá trị \"%1$s\" cho screen."
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Bản sao quan hệ phụ thuộc trong trigger \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:981
+#: include/classes/api/services/CTriggerPrototype.php:996
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Tạo bản sao quan hệ phụ thuộc trong kiểu trigger \"%1$s\"."
@@ -5504,7 +5506,7 @@ msgstr "Item động"
 msgid "Dynamic items"
 msgstr "Item động"
 
-#: jsLoader.php:225
+#: jsLoader.php:207
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Mỗi URL cần có một tên duy nhất. Xin chắc chắn chỉ có một URl có tên"
 
@@ -5526,8 +5528,8 @@ msgstr "Mỗi mục"
 #: include/views/js/configuration.discovery.edit.js.php:33
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:110
 #: include/views/js/monitoring.sysmaps.js.php:820
-#: include/views/js/monitoring.sysmaps.js.php:835 jsLoader.php:139
-#: jsLoader.php:335
+#: include/views/js/monitoring.sysmaps.js.php:835 jsLoader.php:121
+#: jsLoader.php:318
 msgid "Edit"
 msgstr "Chỉnh sửa"
 
@@ -5551,15 +5553,15 @@ msgstr "Chỉnh sửa screen"
 msgid "Edit slide show"
 msgstr "Chỉnh sửa slide show"
 
-#: jsLoader.php:338
+#: jsLoader.php:321
 msgid "Edit tree element"
 msgstr "Chỉnh sửa phần tử cây"
 
-#: jsLoader.php:290
+#: jsLoader.php:273
 msgid "Edit trigger"
 msgstr "Chỉnh sửa trigger"
 
-#: jsLoader.php:132
+#: jsLoader.php:114
 msgid "Edit widget"
 msgstr "Chỉnh sử ô điều khiển"
 
@@ -5660,7 +5662,7 @@ msgstr "Loại điều kiện lọc trống cho hành động \"%1$s\"."
 #: include/classes/api/services/CHost.php:855
 #: include/classes/api/services/CHost.php:1427
 #: include/classes/api/services/CHost.php:1963
-#: include/classes/api/services/CHostPrototype.php:955
+#: include/classes/api/services/CHostPrototype.php:957
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
 #: include/classes/api/services/CMaintenance.php:535
@@ -5668,7 +5670,7 @@ msgstr "Loại điều kiện lọc trống cho hành động \"%1$s\"."
 #: include/classes/api/services/CMap.php:581
 #: include/classes/api/services/CMap.php:1022
 #: include/classes/api/services/CMediatype.php:175
-#: include/classes/api/services/CMediatype.php:441
+#: include/classes/api/services/CMediatype.php:439
 #: include/classes/api/services/CScreenItem.php:140
 #: include/classes/api/services/CScreenItem.php:271
 #: include/classes/api/services/CScreen.php:417
@@ -5694,7 +5696,7 @@ msgstr "Không có các tham số đầu vào."
 msgid "Empty map ID."
 msgstr "ID sơ đồ trống."
 
-#: include/classes/api/services/CMediatype.php:447
+#: include/classes/api/services/CMediatype.php:445
 msgid "Empty media type ID."
 msgstr "ID loại phương tiện trống."
 
@@ -5941,7 +5943,7 @@ msgstr "Lỗi"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Lỗi trong yêu cầu tìm kiếm cho bảng \"%1$s\"."
 
-#: include/func.inc.php:1655 jsLoader.php:168
+#: include/func.inc.php:1655 jsLoader.php:150
 msgid "Error message"
 msgstr "Tin nhắn lỗi"
 
@@ -5992,7 +5994,7 @@ msgstr "Sự kiện không được thừa nhận"
 msgid "Event list [previous 20]"
 msgstr "Danh sách sự kiện [20 trở lại]"
 
-#: include/classes/items/CHelpItems.php:403
+#: include/classes/items/CHelpItems.php:411
 msgid "Event log monitoring. Returns log"
 msgstr "Theo dõi log sự kiện. Trả về log"
 
@@ -6036,7 +6038,7 @@ msgstr "Loại trừ"
 msgid "Exclude host groups"
 msgstr "Loại trừ các nhóm máy chủ"
 
-#: app/controllers/CControllerAuditLogList.php:174 jsLoader.php:159
+#: app/controllers/CControllerAuditLogList.php:174 jsLoader.php:141
 msgid "Execute"
 msgstr "Thực hiện"
 
@@ -6045,12 +6047,12 @@ msgstr "Thực hiện"
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "Thực hiện lỗi SQL [%1$s] trong [%2$s]."
 
-#: include/classes/items/CHelpItems.php:377
+#: include/classes/items/CHelpItems.php:381
 msgid "Execute WMI query and return the JSON document with all selected objects"
 msgstr "Thực hiện truy vấn WMI và trả về tài liệu JSON với tất cả các đối tượng được chọn"
 
-#: include/classes/items/CHelpItems.php:373
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:377
+#: include/classes/items/CHelpItems.php:727
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "Thực hiện truy vấn WMI và trả về đối tượng được trả về đầu tiên. Trả về kiểu integer, float, string hoặc text (tùy theo yêu cầu)"
 
@@ -6080,13 +6082,13 @@ msgstr "Thực thi"
 msgid "Executed script"
 msgstr "Câu lệnh đã thực hiện"
 
-#: jsLoader.php:160
+#: jsLoader.php:142
 msgid "Execution confirmation"
 msgstr "Thực hiện xá nhận"
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:984 jsLoader.php:249
-#: jsLoader.php:252
+#: include/classes/widgets/CWidgetHelper.php:984 jsLoader.php:231
+#: jsLoader.php:234
 msgid "Expand"
 msgstr "Mở rộng"
 
@@ -6184,7 +6186,7 @@ msgstr "Các biểu thức"
 msgid "External check"
 msgstr "Kiểm tra bên ngoài"
 
-#: jsLoader.php:196
+#: jsLoader.php:178
 msgctxt "Friday short"
 msgid "F"
 msgstr "F"
@@ -6248,7 +6250,7 @@ msgstr "Screen ưa thích"
 msgid "Feb"
 msgstr "Tháng 2"
 
-#: include/func.inc.php:120 include/func.inc.php:257 jsLoader.php:174
+#: include/func.inc.php:120 include/func.inc.php:257 jsLoader.php:156
 msgid "February"
 msgstr "Tháng 2"
 
@@ -6282,8 +6284,8 @@ msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Trường \"%1$s\" thiếu giá trị cho sơ đồ \"%2$s\"."
 
 #: include/classes/api/services/CMediatype.php:197
-#: include/classes/api/services/CMediatype.php:539
-#: include/classes/api/services/CMediatype.php:1198
+#: include/classes/api/services/CMediatype.php:537
+#: include/classes/api/services/CMediatype.php:1196
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
 msgstr "Trường \"%1$s\" thiếu giá trị cho phương tiện \"%2$s\"."
@@ -6311,7 +6313,7 @@ msgstr "Trường \"%1$s\" không phải là số nguyên."
 msgid "Field \"%1$s\" is not string."
 msgstr "Trường \"%1$s\" không phải là chuỗi."
 
-#: include/classes/api/services/CMediatype.php:1192
+#: include/classes/api/services/CMediatype.php:1190
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
 msgstr "Trường \"%1$s\" được chuẩn bị cho loại phương tiện \"%2$s\"."
@@ -6325,8 +6327,8 @@ msgstr "Trường \"%1$s\" phải bị lỗi."
 msgid "Field \"host\" is mandatory."
 msgstr "Trường \"máy chủ\" là bắt buộc."
 
-#: include/classes/items/CHelpItems.php:305
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:309
+#: include/classes/items/CHelpItems.php:659
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "Tổng kiểm tra tệp, được tính toán bằng thuật toán cksum UNIX. Trả về kiểu integer"
 
@@ -6339,13 +6341,13 @@ msgstr "Định dạng tập tin không được hỗ trợ."
 msgid "File is too big, max upload size is %1$s bytes."
 msgstr "Tập tin quá lớn, kích thước tải lên tối đa là %1$s byte."
 
-#: include/classes/items/CHelpItems.php:329
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:333
+#: include/classes/items/CHelpItems.php:683
 msgid "File size (in bytes). Returns integer"
 msgstr "Kích cỡ tệp tin (byte). Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:333
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:337
+#: include/classes/items/CHelpItems.php:687
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Thông tin thời gian tập tin. Trả về kiểu integer (dấu thời gian Unix)"
 
@@ -6384,8 +6386,7 @@ msgstr "Khu vực được tô kín"
 #: app/views/monitoring.web.view.php:46 app/views/reports.auditlog.list.php:81
 #: hostinventoriesoverview.php:153 include/classes/html/CFilter.php:394
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
-#: include/forms.inc.php:728
-#: include/views/administration.auditacts.list.php:53
+#: include/forms.inc.php:728 include/views/administration.auditacts.list.php:53
 #: include/views/configuration.action.list.php:62
 #: include/views/configuration.application.list.php:28
 #: include/views/configuration.correlation.list.php:40
@@ -6414,18 +6415,18 @@ msgstr "Lọc"
 msgid "Filters"
 msgstr "Bộ lọc"
 
-#: include/classes/items/CHelpItems.php:325
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:329
+#: include/classes/items/CHelpItems.php:679
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
 msgstr "Tìm chuỗi trong một tệp tin. Trả về 0 - không tìm thấy; 1 - tìm thấy"
 
-#: include/classes/items/CHelpItems.php:321
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:325
+#: include/classes/items/CHelpItems.php:675
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
 msgstr "Tìm chuỗi trong một tập tin. Trả về dòng chứa chuỗi khớp hoặc theo chỉ định của tham số đầu ra tùy chọn"
 
-#: include/classes/items/CHelpItems.php:369
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:373
+#: include/classes/items/CHelpItems.php:723
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Tìm chuỗi trên một trang web. Trả về chuỗi khớp hoặc theo chỉ định của tham số đầu ra tùy chọn"
 
@@ -6522,14 +6523,14 @@ msgstr "French(fr_FR)"
 msgid "Fri"
 msgstr "Thứ sáu"
 
-#: include/func.inc.php:142 include/func.inc.php:232 jsLoader.php:189
+#: include/func.inc.php:142 include/func.inc.php:232 jsLoader.php:171
 msgid "Friday"
 msgstr "Thứ sáu"
 
 #: app/views/report.services.php:82 include/classes/html/CFilter.php:282
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:79
-#: include/views/configuration.services.edit.php:257
-#: include/views/configuration.services.edit.php:305
+#: include/views/configuration.services.edit.php:258
+#: include/views/configuration.services.edit.php:306
 #: include/views/js/monitoring.sysmaps.js.php:732 report4.php:191
 #: services.php:47 services.php:182
 msgid "From"
@@ -6602,8 +6603,8 @@ msgstr "Georgian (ka_GE)"
 msgid "German (de_DE)"
 msgstr "German (de_DE)"
 
-#: include/classes/items/CHelpItems.php:361
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:365
+#: include/classes/items/CHelpItems.php:715
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Nội dung của trang web. Trả về nguồn trang web dưới dạng văn bản"
 
@@ -6611,7 +6612,7 @@ msgstr "Nội dung của trang web. Trả về nguồn trang web dưới dạng 
 msgid "Get value"
 msgstr "Lấy giá trị"
 
-#: app/views/js/popup.itemtestedit.view.js.php:485
+#: app/views/js/popup.itemtestedit.view.js.php:483
 #: app/views/popup.itemtestedit.view.php:311
 msgid "Get value and test"
 msgstr "Nhận giá trị và kiểm tra"
@@ -6647,7 +6648,7 @@ msgstr "Giá trị toàn cục"
 msgid "Go back to %1$s"
 msgstr "Quay trở về %1$s"
 
-#: jsLoader.php:295
+#: jsLoader.php:278
 msgid "Go to"
 msgstr "Đi tới"
 
@@ -6887,7 +6888,7 @@ msgstr "Đồ thị với tên giống nhau nhưng kiểu khác nhau tồn
 #: include/views/configuration.template.list.php:262
 #: include/views/conf.import.php:41 include/views/inventory.host.view.php:153
 #: include/views/inventory.host.view.php:186
-#: include/views/inventory.host.view.php:206 jsLoader.php:296
+#: include/views/inventory.host.view.php:206 jsLoader.php:279
 msgid "Graphs"
 msgstr "Đồ thị"
 
@@ -6960,7 +6961,7 @@ msgstr "Nhóm cho các host được phát hiện \"%1$s\"."
 msgid "Group name"
 msgstr "Tên nhóm"
 
-#: include/classes/api/services/CHostPrototype.php:1117
+#: include/classes/api/services/CHostPrototype.php:1119
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Kiểu nhóm không thể dựa trên một nhóm host được phát hiện \"%1$s\"."
@@ -7051,8 +7052,8 @@ msgstr "Phần cứng"
 msgid "Hardware (Full details)"
 msgstr "Phần cứng (đầy đủ các chi tiết)"
 
-#: include/classes/items/CHelpItems.php:177
-#: include/classes/items/CHelpItems.php:523
+#: include/classes/items/CHelpItems.php:181
+#: include/classes/items/CHelpItems.php:531
 msgid "Hardware sensor reading. Returns float"
 msgstr "Đọc cảm biến phần cứng. Trả về kiểu float"
 
@@ -7079,8 +7080,7 @@ msgstr "Hebrew (he_IL)"
 #: include/views/js/monitoring.sysmaps.js.php:453
 #: include/views/monitoring.screen.constructor.edit.php:818
 #: include/views/monitoring.sysmap.edit.php:104
-#: include/views/monitoring.sysmap.list.php:66 screenedit.php:68
-#: sysmaps.php:42
+#: include/views/monitoring.sysmap.list.php:66 screenedit.php:68 sysmaps.php:42
 msgid "Height"
 msgstr "Độ cao"
 
@@ -7093,11 +7093,11 @@ msgstr "Trợ giúp"
 msgid "Hexadecimal to decimal"
 msgstr "Thập lục phân đến thập phân"
 
-#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:203
+#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:185
 msgid "Hidden"
 msgstr "Ẩn"
 
-#: jsLoader.php:327
+#: jsLoader.php:310
 msgid "Hide debug"
 msgstr "Ẩn gỡ lỗi"
 
@@ -7150,7 +7150,7 @@ msgstr "Làm nổi bật toàn bộ hàng"
 #: include/forms.inc.php:275 include/forms.inc.php:714
 #: include/views/configuration.item.list.php:70
 #: include/views/configuration.item.prototype.list.php:59 items.php:261
-#: jsLoader.php:297
+#: jsLoader.php:280
 msgid "History"
 msgstr "Lịch sử"
 
@@ -7250,7 +7250,7 @@ msgstr "Sắp xếp theo chiều ngang"
 #: include/views/monitoring.screen.php:64
 #: include/views/monitoring.slides.php:76
 #: include/views/reports.toptriggers.php:83 items.php:899 items.php:1324
-#: jsLoader.php:205 jsLoader.php:298 queue.php:221 report2.php:506
+#: jsLoader.php:187 jsLoader.php:281 queue.php:221 report2.php:506
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Thiết bị"
@@ -7340,7 +7340,7 @@ msgstr[0] "Thiết bị đã được kích hoạt"
 #: include/views/configuration.hostgroups.edit.php:51
 #: include/views/js/monitoring.sysmaps.js.php:95
 #: include/views/js/monitoring.sysmaps.js.php:102
-#: include/views/js/monitoring.sysmaps.js.php:152 jsLoader.php:208
+#: include/views/js/monitoring.sysmaps.js.php:152 jsLoader.php:190
 #: report2.php:399
 msgid "Host group"
 msgstr "Nhóm host"
@@ -7376,7 +7376,7 @@ msgstr "Kiểu nhãn nhóm host"
 
 #: include/classes/api/services/CDashboard.php:696
 #: include/classes/api/services/CScript.php:459
-#: include/classes/api/services/CUserGroup.php:445
+#: include/classes/api/services/CUserGroup.php:438
 #, c-format
 msgid "Host group with ID \"%1$s\" is not available."
 msgstr "Nhóm máy chủ với ID \"%1$s\" không sẵn sàng."
@@ -7385,8 +7385,7 @@ msgstr "Nhóm máy chủ với ID \"%1$s\" không sẵn sàng."
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/partials/common.filter.trigger.php:50
-#: app/partials/popup.operations.php:338
-#: app/views/monitoring.host.view.php:106
+#: app/partials/popup.operations.php:338 app/views/monitoring.host.view.php:106
 #: app/views/monitoring.latest.view.php:49
 #: app/views/monitoring.problem.view.php:103
 #: app/views/monitoring.web.view.php:48
@@ -7484,12 +7483,12 @@ msgstr "Các mạng host"
 msgid "Host prototype"
 msgstr "Kiểu máy"
 
-#: include/classes/api/services/CHostPrototype.php:835
+#: include/classes/api/services/CHostPrototype.php:837
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Kiểu host \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ các template khác."
 
-#: include/classes/api/services/CHostPrototype.php:823
+#: include/classes/api/services/CHostPrototype.php:825
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Kiểu host \"%1$s\" đã tồn tại trên \"%2$s\"."
@@ -7577,7 +7576,7 @@ msgstr "Host với cùng một tên \"%1$s\" đã tồn tại."
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Host với cùng một tên hiển thị \"%1$s\" đã tồn tại."
 
-#: app/controllers/CControllerHostView.php:200
+#: app/controllers/CControllerHostView.php:204
 #: app/controllers/CControllerPopupGeneric.php:116
 #: app/controllers/CControllerPopupGeneric.php:140
 #: app/partials/common.filter.trigger.php:68
@@ -7727,7 +7726,7 @@ msgstr "Các tiến trình IPMI chỉ có thể được thực thi bởi máy c
 msgid "IPMI sensor"
 msgstr "IPMI sensor"
 
-#: include/classes/items/CHelpItems.php:1229
+#: include/classes/items/CHelpItems.php:1245
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr "ID cảm biến IPMI và các thông số liên quan đến cảm biến khác. Trả về JSON."
 
@@ -7818,8 +7817,8 @@ msgstr "Các hành động giống hệt nhau được sử dụng bởi các m�
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
 msgstr "Namespace giống hệt (%1$s) được sử dụng bởi các mô-đun đặt tại %2$s."
 
-#: include/classes/items/CHelpItems.php:273
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:277
+#: include/classes/items/CHelpItems.php:627
 msgid "Identification of the system. Returns string"
 msgstr "Nhận dạng hệ thống. Trả về kiểu string"
 
@@ -7836,7 +7835,7 @@ msgstr "Nếu bạn nghĩ rằng tin nhắn này là sai, xin vui lòng t
 #: app/views/administration.image.edit.php:66 image.php:26
 #: include/classes/helpers/CMapHelper.php:224 include/maps.inc.php:28
 #: include/maps.inc.php:302 include/views/js/monitoring.sysmaps.js.php:96
-#: jsLoader.php:209
+#: jsLoader.php:191
 msgid "Image"
 msgstr "Hình ảnh"
 
@@ -8005,8 +8004,8 @@ msgstr "Bao gồm menu sự kiện"
 msgid "Include subgroups"
 msgstr "Bao gồm các nhóm nhỏ"
 
-#: include/classes/items/CHelpItems.php:101
-#: include/classes/items/CHelpItems.php:447
+#: include/classes/items/CHelpItems.php:105
+#: include/classes/items/CHelpItems.php:455
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "Thống kê lưu lượng truy cập đến interface mạng. Trả về kiểu trigger"
 
@@ -8285,7 +8284,7 @@ msgstr "Đối số không chính xác được thông qua hàm"
 #: include/classes/api/services/CMap.php:1228
 #: include/classes/api/services/CMap.php:1448
 #: include/classes/api/services/CMediatype.php:182
-#: include/classes/api/services/CMediatype.php:478
+#: include/classes/api/services/CMediatype.php:476
 #: include/classes/api/services/CScreen.php:497
 #: include/classes/api/services/CScreen.php:571
 #: include/classes/api/services/CScreen.php:762
@@ -8575,7 +8574,7 @@ msgstr "ID sơ đồ không chính xác."
 msgid "Incorrect max columns provided for screen element."
 msgstr "Giá trị cột lớn nhất được cung cấp không chính xác cho phần tử screen."
 
-#: include/classes/api/services/CMediatype.php:448
+#: include/classes/api/services/CMediatype.php:446
 msgid "Incorrect media type ID."
 msgstr "ID loại phương tiện không chính xác."
 
@@ -8875,21 +8874,21 @@ msgstr "Giá trị \"%1$s\" không chính xác đối với trường unsi
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for correlation \"%3$s\"."
 msgstr "Giá trị không chính xác \"%1$s\" trong trường \"%2$s\" cho liên kết \"%3$s\"."
 
-#: include/classes/api/services/CMediatype.php:238
-#: include/classes/api/services/CMediatype.php:249
-#: include/classes/api/services/CMediatype.php:268
-#: include/classes/api/services/CMediatype.php:284
-#: include/classes/api/services/CMediatype.php:300
-#: include/classes/api/services/CMediatype.php:319
-#: include/classes/api/services/CMediatype.php:359
-#: include/classes/api/services/CMediatype.php:559
-#: include/classes/api/services/CMediatype.php:572
-#: include/classes/api/services/CMediatype.php:591
-#: include/classes/api/services/CMediatype.php:608
-#: include/classes/api/services/CMediatype.php:625
-#: include/classes/api/services/CMediatype.php:645
-#: include/classes/api/services/CMediatype.php:685
-#: include/classes/api/services/CMediatype.php:1174
+#: include/classes/api/services/CMediatype.php:236
+#: include/classes/api/services/CMediatype.php:247
+#: include/classes/api/services/CMediatype.php:266
+#: include/classes/api/services/CMediatype.php:282
+#: include/classes/api/services/CMediatype.php:298
+#: include/classes/api/services/CMediatype.php:317
+#: include/classes/api/services/CMediatype.php:357
+#: include/classes/api/services/CMediatype.php:557
+#: include/classes/api/services/CMediatype.php:570
+#: include/classes/api/services/CMediatype.php:589
+#: include/classes/api/services/CMediatype.php:606
+#: include/classes/api/services/CMediatype.php:623
+#: include/classes/api/services/CMediatype.php:643
+#: include/classes/api/services/CMediatype.php:683
+#: include/classes/api/services/CMediatype.php:1172
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
 msgstr "Giá trị \"%1$s\" không chính xác trong trường \"%2$s\" cho loại phương tiện \"%3$s\"."
@@ -9051,24 +9050,24 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/api/services/CMap.php:680
 #: include/classes/api/services/CMap.php:1139
 #: include/classes/api/services/CMap.php:1145
-#: include/classes/api/services/CMediatype.php:370
-#: include/classes/api/services/CMediatype.php:380
-#: include/classes/api/services/CMediatype.php:389
-#: include/classes/api/services/CMediatype.php:396
-#: include/classes/api/services/CMediatype.php:405
-#: include/classes/api/services/CMediatype.php:414
-#: include/classes/api/services/CMediatype.php:420
-#: include/classes/api/services/CMediatype.php:482
-#: include/classes/api/services/CMediatype.php:697
-#: include/classes/api/services/CMediatype.php:707
-#: include/classes/api/services/CMediatype.php:714
-#: include/classes/api/services/CMediatype.php:723
-#: include/classes/api/services/CMediatype.php:730
-#: include/classes/api/services/CMediatype.php:740
-#: include/classes/api/services/CMediatype.php:749
-#: include/classes/api/services/CMediatype.php:755
-#: include/classes/api/services/CMediatype.php:786
-#: include/classes/api/services/CMediatype.php:793
+#: include/classes/api/services/CMediatype.php:368
+#: include/classes/api/services/CMediatype.php:378
+#: include/classes/api/services/CMediatype.php:387
+#: include/classes/api/services/CMediatype.php:394
+#: include/classes/api/services/CMediatype.php:403
+#: include/classes/api/services/CMediatype.php:412
+#: include/classes/api/services/CMediatype.php:418
+#: include/classes/api/services/CMediatype.php:480
+#: include/classes/api/services/CMediatype.php:695
+#: include/classes/api/services/CMediatype.php:705
+#: include/classes/api/services/CMediatype.php:712
+#: include/classes/api/services/CMediatype.php:721
+#: include/classes/api/services/CMediatype.php:728
+#: include/classes/api/services/CMediatype.php:738
+#: include/classes/api/services/CMediatype.php:747
+#: include/classes/api/services/CMediatype.php:753
+#: include/classes/api/services/CMediatype.php:784
+#: include/classes/api/services/CMediatype.php:791
 #: include/classes/api/services/CProxy.php:558
 #: include/classes/api/services/CProxy.php:565
 #: include/classes/api/services/CProxy.php:578
@@ -9085,7 +9084,7 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:729
 #: include/classes/api/services/CTriggerGeneral.php:736
 #: include/classes/api/services/CTriggerGeneral.php:742
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:115
 #: include/classes/graphdraw/CLineGraphDraw.php:241
@@ -9193,8 +9192,8 @@ msgstr "Thông tin"
 msgid "Information"
 msgstr "Thông tin"
 
-#: include/classes/items/CHelpItems.php:181
-#: include/classes/items/CHelpItems.php:527
+#: include/classes/items/CHelpItems.php:185
+#: include/classes/items/CHelpItems.php:535
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "Thông tin về một dịch vụ. Trả về số nguyên với tham số là trạng thái, khởi động; string - với tham số là tên hiển thị, đường dẫn, người dùng; text - với tham số như mô tả; Cụ thể cho trạng thái: 0 - đang chạy, 1 - tạm dừng, 2 - bắt đầu chờ xử lý, 3 - tạm dừng chờ xử lý, 4 - tiếp tục chờ xử lý, 5 - dừng chờ xử lý, 6 - dừng, 7 - không xác định, 255 - không có dịch vụ; Cụ thể khởi động: 0 - tự động, 1 - tự động bị trì hoãn, 2 - thủ công, 3 - bị vô hiệu hóa, 4 - không xác định"
 
@@ -9227,7 +9226,7 @@ msgid "Insert"
 msgstr "Chèn"
 
 #: include/views/configuration.trigger.prototype.edit.php:124
-#: include/views/configuration.triggers.edit.php:149 jsLoader.php:291
+#: include/views/configuration.triggers.edit.php:149 jsLoader.php:274
 msgid "Insert expression"
 msgstr "Chèn biểu thức"
 
@@ -9349,7 +9348,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.prototype.edit.php:563
 #: include/views/configuration.item.prototype.list.php:58
 #: include/views/configuration.item.prototype.massupdate.php:252
-#: include/views/configuration.services.edit.php:178
+#: include/views/configuration.services.edit.php:179
 msgid "Interval"
 msgstr "Khoảng thời gian"
 
@@ -9439,12 +9438,11 @@ msgstr "Chu kì lưu trữ dữ liệu nội bộ không chính xác: %1$s."
 
 #: app/controllers/CControllerPopupLldOperation.php:177
 #: app/controllers/CControllerPopupLldOperation.php:182
-#: app/controllers/CControllerPopupLldOperation.php:195
-#: disc_prototypes.php:370 disc_prototypes.php:375 disc_prototypes.php:388
-#: disc_prototypes.php:715 disc_prototypes.php:720 disc_prototypes.php:733
-#: host_discovery.php:429 host_discovery.php:435 host_discovery.php:448
-#: items.php:528 items.php:533 items.php:546 items.php:933 items.php:938
-#: items.php:951
+#: app/controllers/CControllerPopupLldOperation.php:195 disc_prototypes.php:370
+#: disc_prototypes.php:375 disc_prototypes.php:388 disc_prototypes.php:715
+#: disc_prototypes.php:720 disc_prototypes.php:733 host_discovery.php:429
+#: host_discovery.php:435 host_discovery.php:448 items.php:528 items.php:533
+#: items.php:546 items.php:933 items.php:938 items.php:951
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr "Khoảng thời gian \"%1$s\" không hợp lệ."
@@ -9657,18 +9655,16 @@ msgstr "Tham số thứ hai không hợp lệ."
 #: include/classes/import/validators/C42XmlValidator.php:1336
 #: include/classes/import/validators/C44XmlValidator.php:1741
 #: include/classes/import/validators/C44XmlValidator.php:2023
-#: include/classes/import/validators/C44XmlValidator.php:2133
-#: include/classes/import/validators/C44XmlValidator.php:2153
-#: include/classes/import/validators/C44XmlValidator.php:2177
-#: include/classes/import/validators/C44XmlValidator.php:2219
-#: include/classes/import/validators/C44XmlValidator.php:2280
-#: include/classes/import/validators/C50XmlValidator.php:1884
-#: include/classes/import/validators/C50XmlValidator.php:2166
-#: include/classes/import/validators/C50XmlValidator.php:2276
-#: include/classes/import/validators/C50XmlValidator.php:2296
-#: include/classes/import/validators/C50XmlValidator.php:2320
-#: include/classes/import/validators/C50XmlValidator.php:2362
-#: include/classes/import/validators/C50XmlValidator.php:2423
+#: include/classes/import/validators/C44XmlValidator.php:2135
+#: include/classes/import/validators/C44XmlValidator.php:2155
+#: include/classes/import/validators/C44XmlValidator.php:2179
+#: include/classes/import/validators/C44XmlValidator.php:2221
+#: include/classes/import/validators/C50XmlValidator.php:1891
+#: include/classes/import/validators/C50XmlValidator.php:2173
+#: include/classes/import/validators/C50XmlValidator.php:2285
+#: include/classes/import/validators/C50XmlValidator.php:2305
+#: include/classes/import/validators/C50XmlValidator.php:2329
+#: include/classes/import/validators/C50XmlValidator.php:2371
 #: include/classes/import/validators/CXmlValidatorGeneral.php:133
 #: include/classes/import/validators/CXmlValidatorGeneral.php:152
 #: include/classes/import/validators/CXmlValidatorGeneral.php:171
@@ -9711,7 +9707,7 @@ msgstr "Thời gian lưu trữ dữ liệu phiên người dùng không hợp l�
 
 #: include/menu.inc.php:59 include/views/configuration.host.edit.php:444
 #: include/views/configuration.host.massupdate.php:332
-#: include/views/configuration.host.prototype.edit.php:327 jsLoader.php:299
+#: include/views/configuration.host.prototype.edit.php:327 jsLoader.php:282
 msgid "Inventory"
 msgstr "Kiểm kê"
 
@@ -9772,7 +9768,7 @@ msgstr "Italian (it_IT)"
 msgid "Item"
 msgstr "Item"
 
-#: include/classes/api/services/CHostPrototype.php:1061
+#: include/classes/api/services/CHostPrototype.php:1063
 #: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -9912,7 +9908,7 @@ msgstr "Các kiểu item đã bị xóa"
 msgid "Item prototypes updated"
 msgstr "Các mục nguyên mẫu được cập nhật"
 
-#: jsLoader.php:332
+#: jsLoader.php:315
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -9984,8 +9980,7 @@ msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\"."
 #: app/views/search.php:67 app/views/search.php:71 app/views/search.php:228
 #: app/views/search.php:253 app/views/search.php:257
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
-#: include/html.inc.php:360
-#: include/views/configuration.application.list.php:85
+#: include/html.inc.php:360 include/views/configuration.application.list.php:85
 #: include/views/configuration.application.list.php:129
 #: include/views/configuration.graph.edit.php:458
 #: include/views/configuration.host.discovery.list.php:186
@@ -10072,7 +10067,7 @@ msgstr "JSONPath"
 msgid "Jan"
 msgstr "Tháng 1"
 
-#: include/func.inc.php:119 include/func.inc.php:256 jsLoader.php:173
+#: include/func.inc.php:119 include/func.inc.php:256 jsLoader.php:155
 msgid "January"
 msgstr "Tháng 1"
 
@@ -10089,7 +10084,7 @@ msgstr "JavaScript"
 msgid "Jul"
 msgstr "Tháng 7"
 
-#: include/func.inc.php:125 include/func.inc.php:262 jsLoader.php:179
+#: include/func.inc.php:125 include/func.inc.php:262 jsLoader.php:161
 msgid "July"
 msgstr "Tháng 7"
 
@@ -10097,7 +10092,7 @@ msgstr "Tháng 7"
 msgid "Jun"
 msgstr "Tháng 6"
 
-#: include/func.inc.php:124 include/func.inc.php:261 jsLoader.php:178
+#: include/func.inc.php:124 include/func.inc.php:261 jsLoader.php:160
 msgid "June"
 msgstr "Tháng 6"
 
@@ -10283,11 +10278,11 @@ msgstr "Lần thay đổi cuối cùng (giảm dần)"
 msgid "Last check"
 msgstr "Lần kiểm tra cuối cùng"
 
-#: jsLoader.php:303
+#: jsLoader.php:286
 msgid "Last hour graph"
 msgstr "Đồ thị giờ cuối cùng"
 
-#: jsLoader.php:304
+#: jsLoader.php:287
 msgid "Last month graph"
 msgstr "Đồ thị tháng cuối cùng"
 
@@ -10312,7 +10307,7 @@ msgstr "Nhìn thấy lần cuối cùng (thời kỳ)"
 msgid "Last value"
 msgstr "Giá trị cuối cùng"
 
-#: jsLoader.php:305
+#: jsLoader.php:288
 msgid "Last week graph"
 msgstr "Đồ thị tuần cuối cùng"
 
@@ -10322,11 +10317,11 @@ msgstr "Đồ thị tuần cuối cùng"
 #: app/views/monitoring.latest.view.php:35 app/views/search.php:33
 #: app/views/search.php:116 app/views/search.php:160 app/views/search.php:195
 #: include/menu.inc.php:44 include/views/inventory.host.view.php:140
-#: jsLoader.php:301
+#: jsLoader.php:284
 msgid "Latest data"
 msgstr "Dữ liệu gần đây nhất"
 
-#: jsLoader.php:302
+#: jsLoader.php:285
 msgid "Latest values"
 msgstr "Các giá trị gần đây nhất"
 
@@ -10473,38 +10468,38 @@ msgstr "Liên kết"
 msgid "List is empty"
 msgstr "Danh sách rỗng"
 
-#: include/classes/items/CHelpItems.php:285
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:289
+#: include/classes/items/CHelpItems.php:639
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:193
-#: include/classes/items/CHelpItems.php:539
+#: include/classes/items/CHelpItems.php:197
+#: include/classes/items/CHelpItems.php:547
 msgid "List of detected CPUs/CPU cores. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:337
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:341
+#: include/classes/items/CHelpItems.php:691
 msgid "List of mounted filesystems and their types. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:341
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:345
+#: include/classes/items/CHelpItems.php:695
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:97
-#: include/classes/items/CHelpItems.php:443
+#: include/classes/items/CHelpItems.php:101
+#: include/classes/items/CHelpItems.php:451
 msgid "List of network interfaces. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:149
-#: include/classes/items/CHelpItems.php:495
+#: include/classes/items/CHelpItems.php:153
+#: include/classes/items/CHelpItems.php:503
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:145
-#: include/classes/items/CHelpItems.php:491
+#: include/classes/items/CHelpItems.php:149
+#: include/classes/items/CHelpItems.php:499
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr ""
 
@@ -10522,23 +10517,23 @@ msgstr "Danh sách chia sẻ nhóm người dùng"
 msgid "List of user shares"
 msgstr "Danh sách chia sẻ người dùng"
 
-#: include/classes/items/CHelpItems.php:233
-#: include/classes/items/CHelpItems.php:579
+#: include/classes/items/CHelpItems.php:237
+#: include/classes/items/CHelpItems.php:587
 msgid "Listing of MAC addresses. Returns string"
 msgstr "Danh sách địa chỉ MAC. Trả về kiểu string"
 
-#: include/classes/items/CHelpItems.php:229
-#: include/classes/items/CHelpItems.php:575
+#: include/classes/items/CHelpItems.php:233
+#: include/classes/items/CHelpItems.php:583
 msgid "Listing of PCI or USB devices. Returns text"
 msgstr "Danh sách các thiết bị PCI hoặc USB. Trả về kiểu text"
 
-#: include/classes/items/CHelpItems.php:257
-#: include/classes/items/CHelpItems.php:603
+#: include/classes/items/CHelpItems.php:261
+#: include/classes/items/CHelpItems.php:611
 msgid "Listing of installed packages. Returns text"
 msgstr "Danh sách các gói được cài đặt. Trả về kiểu text"
 
-#: include/classes/items/CHelpItems.php:185
-#: include/classes/items/CHelpItems.php:531
+#: include/classes/items/CHelpItems.php:189
+#: include/classes/items/CHelpItems.php:539
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr "Danh sách dịch vụ. Trả về 0 - nếu trống; text - danh sách các dịch vụ được phân tách bởi một dòng mới"
 
@@ -10546,8 +10541,8 @@ msgstr "Danh sách dịch vụ. Trả về 0 - nếu trống; text - danh sách 
 msgid "Lithuanian (lt_LT)"
 msgstr "Lithuanian (lt_LT)"
 
-#: include/classes/items/CHelpItems.php:365
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:369
+#: include/classes/items/CHelpItems.php:719
 msgid "Loading time of full web page (in seconds). Returns float"
 msgstr "Thời gian tải của trang web đầy đủ (tính bằng giây). Trả về kiểu float"
 
@@ -10583,11 +10578,11 @@ msgstr "Vị trí kinh độ"
 msgid "Log"
 msgstr "Log"
 
-#: include/classes/items/CHelpItems.php:423
+#: include/classes/items/CHelpItems.php:431
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Giám sát tệp tin log với hỗ trợ quay vòng log. Trả về log"
 
-#: include/classes/items/CHelpItems.php:415
+#: include/classes/items/CHelpItems.php:423
 msgid "Log file monitoring. Returns log"
 msgstr "Giám sát tệp tin log. Trả về kiểu log"
 
@@ -10641,10 +10636,15 @@ msgstr "Quy tắc phát hiện mức độ thấp ở trạng thái \"kh
 msgid "M"
 msgstr "M"
 
-#: jsLoader.php:192
+#: jsLoader.php:174
 msgctxt "Monday short"
 msgid "M"
 msgstr "M"
+
+#: include/func.inc.php:597 jsLoader.php:144
+msgctxt "month short"
+msgid "M"
+msgstr ""
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:90
 msgid "MAC address A"
@@ -10663,8 +10663,8 @@ msgstr "MD2"
 msgid "MD5"
 msgstr "MD5"
 
-#: include/classes/items/CHelpItems.php:317
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:321
+#: include/classes/items/CHelpItems.php:671
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "Tổng kiểm tra MD5 của tập tin. Trả về chuỗi ký tự (MD5 của tệp)"
 
@@ -10790,7 +10790,7 @@ msgstr "Bảo trì với tập hợp dữ liệu"
 msgid "Maintenance without data collection"
 msgstr "Bảo trì mà không thu thập dữ liệu"
 
-#: include/html.inc.php:987
+#: include/html.inc.php:985
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Báo trì: %1$s"
@@ -10819,7 +10819,7 @@ msgstr "Hướng dẫn bị đóng"
 #: include/screens.inc.php:34 include/views/js/monitoring.sysmaps.js.php:93
 #: include/views/js/monitoring.sysmaps.js.php:208
 #: include/views/monitoring.screen.constructor.edit.php:377
-#: include/views/monitoring.sysmap.edit.php:316 jsLoader.php:206 map.php:25
+#: include/views/monitoring.sysmap.edit.php:316 jsLoader.php:188 map.php:25
 msgid "Map"
 msgstr "Bản đồ"
 
@@ -10913,7 +10913,7 @@ msgstr "Các bản đồ"
 msgid "Mar"
 msgstr "Tháng 3"
 
-#: include/func.inc.php:121 include/func.inc.php:258 jsLoader.php:175
+#: include/func.inc.php:121 include/func.inc.php:258 jsLoader.php:157
 msgid "March"
 msgstr "Tháng 3"
 
@@ -10987,13 +10987,13 @@ msgstr "Đếm tối đã các phần tử hiển thị bên trong ô cu�
 msgid "Max count of elements to show inside table cell \"%1$s\"."
 msgstr "Đếm tối đã các phần tử hiển thị bên trong ô của bảng \"%1$s\"."
 
-#: include/classes/items/CHelpItems.php:77
-#: include/classes/items/CHelpItems.php:407
+#: include/classes/items/CHelpItems.php:81
+#: include/classes/items/CHelpItems.php:415
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Số lượng tệp mở tối đa được hỗ trợ bởi HĐH. Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:81
-#: include/classes/items/CHelpItems.php:411
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:419
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Số lượng tiến trình tối thiểu được hỗ trợ bởi HĐH. Trả về kiểu integer"
 
@@ -11011,7 +11011,7 @@ msgstr[0] "Thời gian cực đại hiển thị là %1$s ngày."
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "Tổng chiều dài tối đa của địa chỉ email vượt quá đối với loại phương tiện có ID \"%1$s\"."
 
-#: include/func.inc.php:123 include/func.inc.php:260 jsLoader.php:177
+#: include/func.inc.php:123 include/func.inc.php:260 jsLoader.php:159
 msgid "May"
 msgstr "Tháng 5"
 
@@ -11032,9 +11032,9 @@ msgid "Media type"
 msgstr "Loại phương tiện"
 
 #: include/classes/api/services/CMediatype.php:207
-#: include/classes/api/services/CMediatype.php:223
-#: include/classes/api/services/CMediatype.php:502
-#: include/classes/api/services/CMediatype.php:514
+#: include/classes/api/services/CMediatype.php:221
+#: include/classes/api/services/CMediatype.php:500
+#: include/classes/api/services/CMediatype.php:512
 #, c-format
 msgid "Media type \"%1$s\" already exists."
 msgstr "Loại phương tiện \"%1$s\" đã tồn tại."
@@ -11091,7 +11091,7 @@ msgstr "Kiểu phương tiện với ID \"%1$s\" là không sẵn sàng."
 msgid "Media types"
 msgstr "Các loại phương tiện"
 
-#: include/classes/api/services/CMediatype.php:1142
+#: include/classes/api/services/CMediatype.php:1140
 #, c-format
 msgid "Media types used by action \"%1$s\"."
 msgstr "Các loại phương tiện được sử dụng bởi hành động \"%1$s\"."
@@ -11106,13 +11106,13 @@ msgstr "Thành viên"
 msgid "Memory limit: %1$s"
 msgstr "Giới hạn bộ nhớ: %1$s"
 
-#: include/classes/items/CHelpItems.php:353
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:357
+#: include/classes/items/CHelpItems.php:707
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Kích thước bộ nhớ theo byte hoặc theo tỷ lệ phần trăm từ tổng số. Trả về kiểu integer cho byte; kiểu float tỷ lệ phần trăm"
 
-#: include/classes/items/CHelpItems.php:165
-#: include/classes/items/CHelpItems.php:511
+#: include/classes/items/CHelpItems.php:169
+#: include/classes/items/CHelpItems.php:519
 msgid "Memory used by process in bytes. Returns integer"
 msgstr "Bộ nhớ đã sử dụng bởi tiến trình theo byte. Trả về kiểu integer"
 
@@ -11349,7 +11349,7 @@ msgstr "Các mô đun đã được cập nhật"
 msgid "Mon"
 msgstr "Thứ 2"
 
-#: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:185
+#: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:167
 msgid "Monday"
 msgstr "Thứ 2"
 
@@ -11386,11 +11386,11 @@ msgstr "Tháng"
 msgid "Monthly"
 msgstr "Hàng tháng"
 
-#: include/classes/html/CMultiSelect.php:83 jsLoader.php:264
+#: include/classes/html/CMultiSelect.php:83 jsLoader.php:247
 msgid "More matches found..."
 msgstr "Tìm thấy nhiều kết quả phù hợp hơn..."
 
-#: jsLoader.php:274
+#: jsLoader.php:257
 #, c-format
 msgctxt "screen reader"
 msgid "More than %1$d matches for %2$s found"
@@ -11418,7 +11418,7 @@ msgstr "Nhiều"
 msgid "Multiple PROBLEM events"
 msgstr "Những sự kiện có nhiều vấn đề"
 
-#: jsLoader.php:234
+#: jsLoader.php:216
 msgid "Mute"
 msgstr "Tắt tiếng"
 
@@ -11613,8 +11613,8 @@ msgstr "Chu kì lưu trữ dữ liệu dò tìm mạng"
 msgid "Network discovery event and alert data storage period \"%1$s\"."
 msgstr "Sự kiện dò tìm mạng và chu kỳ cảnh báo lưu trữ dữ liệu \"%1$s\"."
 
-#: include/classes/items/CHelpItems.php:105
-#: include/classes/items/CHelpItems.php:451
+#: include/classes/items/CHelpItems.php:109
+#: include/classes/items/CHelpItems.php:459
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr "Danh sách interface (bao gồm loại interface, trạng thái, địa chỉ IPv4, mô tả). Trả về kiểu text"
 
@@ -11660,7 +11660,7 @@ msgstr "Điều kiện mới"
 msgid "New dashboard"
 msgstr "Bảng điều khiển mới"
 
-#: jsLoader.php:220
+#: jsLoader.php:202
 msgid "New element"
 msgstr "Phần tử mới"
 
@@ -11684,7 +11684,7 @@ msgstr "Hoạt động mới"
 msgid "New regular expression"
 msgstr "Biểu thức chính quy mới"
 
-#: include/views/configuration.services.edit.php:335
+#: include/views/configuration.services.edit.php:336
 msgid "New service time"
 msgstr "Thời gian dịch vụ mới"
 
@@ -11696,7 +11696,7 @@ msgstr "Tên thẻ mới"
 msgid "New triggers"
 msgstr "Trigger mới"
 
-#: jsLoader.php:150
+#: jsLoader.php:132
 msgid "Next page"
 msgstr "Trang tiếp theo"
 
@@ -11710,16 +11710,15 @@ msgstr "Bước tiếp theo"
 #: app/views/administration.user.list.php:130
 #: app/views/hintbox.eventlist.php:161
 #: app/views/monitoring.widget.problems.view.php:243
-#: app/views/popup.condition.common.php:662
-#: app/views/popup.lldoperation.php:85 app/views/popup.lldoperation.php:97
-#: include/actions.inc.php:33 include/blocks.inc.php:619
-#: include/blocks.inc.php:697 include/blocks.inc.php:864
+#: app/views/popup.condition.common.php:662 app/views/popup.lldoperation.php:85
+#: app/views/popup.lldoperation.php:97 include/actions.inc.php:33
+#: include/blocks.inc.php:619 include/blocks.inc.php:697
+#: include/blocks.inc.php:864
 #: include/classes/screens/CScreenHostTriggers.php:271
 #: include/classes/screens/CScreenProblem.php:1091
 #: include/classes/screens/CScreenProblem.php:1229 include/events.inc.php:173
 #: include/events.inc.php:354 include/triggers.inc.php:1224
-#: include/triggers.inc.php:1229
-#: include/views/configuration.graph.list.php:192
+#: include/triggers.inc.php:1229 include/views/configuration.graph.list.php:192
 #: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.host.prototype.list.php:144
 #: include/views/configuration.httpconf.list.php:166
@@ -11776,7 +11775,7 @@ msgstr "Không có \"%1$s\" được đưa ra cho đồ thị."
 msgid "No \"%1$s\" given for map."
 msgstr "Không có \"%1$s\" cho sơ đồ."
 
-#: include/classes/api/services/CMediatype.php:446
+#: include/classes/api/services/CMediatype.php:444
 #, c-format
 msgid "No \"%1$s\" given for media type."
 msgstr "Không có \"%1$s\" cho phương tiện."
@@ -11973,7 +11972,7 @@ msgstr "Không có hình ảnh"
 #: include/views/configuration.item.massupdate.php:66
 #: include/views/configuration.item.prototype.edit.php:442
 #: include/views/configuration.item.prototype.massupdate.php:62
-#: jsLoader.php:331
+#: jsLoader.php:314
 msgid "No interface found"
 msgstr "Không tìm thấy giao diện"
 
@@ -12028,7 +12027,7 @@ msgstr "Map ID không được cung cấp cho phần tử screen."
 msgid "No maps added."
 msgstr "Bản đồ không được thêm vào."
 
-#: include/classes/html/CMultiSelect.php:82 jsLoader.php:263
+#: include/classes/html/CMultiSelect.php:82 jsLoader.php:246
 msgid "No matches found"
 msgstr "Không khớp với kết quả nào"
 
@@ -12074,8 +12073,7 @@ msgstr "Không có quyền truy cập hệ thống."
 #: app/controllers/CControllerWidgetPlainTextView.php:78
 #: app/views/monitoring.widget.graph.view.php:27 disc_prototypes.php:1201
 #: disc_prototypes.php:1431 host_discovery.php:766
-#: hostinventoriesoverview.php:74
-#: include/classes/api/services/CAction.php:1590
+#: hostinventoriesoverview.php:74 include/classes/api/services/CAction.php:1590
 #: include/classes/api/services/CAction.php:1969
 #: include/classes/api/services/CAction.php:2984
 #: include/classes/api/services/CApplication.php:304
@@ -12132,9 +12130,9 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
-#: include/classes/api/services/CHostPrototype.php:1086
-#: include/classes/api/services/CHostPrototype.php:1108
-#: include/classes/api/services/CHostPrototype.php:1142
+#: include/classes/api/services/CHostPrototype.php:1088
+#: include/classes/api/services/CHostPrototype.php:1110
+#: include/classes/api/services/CHostPrototype.php:1144
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626
@@ -12165,7 +12163,7 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CMap.php:1561
 #: include/classes/api/services/CMap.php:1999
 #: include/classes/api/services/CMap.php:2061
-#: include/classes/api/services/CMediatype.php:471
+#: include/classes/api/services/CMediatype.php:469
 #: include/classes/api/services/CModule.php:224
 #: include/classes/api/services/CProxy.php:163
 #: include/classes/api/services/CProxy.php:253
@@ -12196,10 +12194,11 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CTrigger.php:734
 #: include/classes/api/services/CTrigger.php:827
 #: include/classes/api/services/CTriggerPrototype.php:522
-#: include/classes/api/services/CTriggerPrototype.php:700
-#: include/classes/api/services/CTriggerPrototype.php:718
-#: include/classes/api/services/CUserGroup.php:329
-#: include/classes/api/services/CUserGroup.php:877
+#: include/classes/api/services/CTriggerPrototype.php:708
+#: include/classes/api/services/CTriggerPrototype.php:716
+#: include/classes/api/services/CTriggerPrototype.php:731
+#: include/classes/api/services/CUserGroup.php:322
+#: include/classes/api/services/CUserGroup.php:870
 #: include/classes/api/services/CUserMacro.php:377
 #: include/classes/api/services/CUserMacro.php:464
 #: include/classes/api/services/CUserMacro.php:820
@@ -12241,7 +12240,7 @@ msgstr "Không quy định được khóa tập tin công khai."
 msgid "No recipients for action operation message."
 msgstr "Không có người nhận khi gửi nhắn tin."
 
-#: include/classes/widgets/CWidgetConfig.php:159 jsLoader.php:315
+#: include/classes/widgets/CWidgetConfig.php:159 jsLoader.php:298
 msgid "No refresh"
 msgstr "Không làm mới"
 
@@ -12341,7 +12340,7 @@ msgid "Not all results are displayed. Please provide more specific search criter
 msgstr "Không phải tất cả các kết quả được hiển thị. Vui lòng cung cấp các tiêu chí tìm kiếm cụ thể hơn."
 
 #: include/classes/api/services/CTrigger.php:1049
-#: include/classes/api/services/CTriggerPrototype.php:859
+#: include/classes/api/services/CTriggerPrototype.php:874
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr "Không phải tất cả các mẫu được liên kết đến \"%1$s\"."
@@ -12374,8 +12373,8 @@ msgid "Not supported"
 msgstr "Không được hỗ trợ"
 
 #: app/views/popup.services.php:71
-#: include/views/configuration.services.edit.php:178
-#: include/views/configuration.services.edit.php:251
+#: include/views/configuration.services.edit.php:179
+#: include/views/configuration.services.edit.php:252
 msgid "Note"
 msgstr "Ghi chú"
 
@@ -12408,16 +12407,16 @@ msgstr "Thống báo tất cả các vấn đề"
 msgid "Nov"
 msgstr "Tháng 11"
 
-#: include/func.inc.php:129 include/func.inc.php:266 jsLoader.php:183
+#: include/func.inc.php:129 include/func.inc.php:266 jsLoader.php:165
 msgid "November"
 msgstr "Tháng 11"
 
-#: include/classes/items/CHelpItems.php:205
-#: include/classes/items/CHelpItems.php:551
+#: include/classes/items/CHelpItems.php:209
+#: include/classes/items/CHelpItems.php:559
 msgid "Number of CPUs. Returns integer"
 msgstr "Số lượng CPU. Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:1087
+#: include/classes/items/CHelpItems.php:1103
 msgid "Number of enabled items on the host."
 msgstr "Số lượng item kích hoạt trên máy chủ."
 
@@ -12429,30 +12428,30 @@ msgstr "Số lượng thiết bị (kích hoạt/vô hiệu)"
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Số lượng item (kích hoạt/vô hiệu hóa/không hỗ trợ)"
 
-#: include/classes/items/CHelpItems.php:1111
+#: include/classes/items/CHelpItems.php:1127
 msgid "Number of items in Zabbix database."
 msgstr "Số lượng item trong cơ sở dữ liệu Zabbix."
 
-#: include/classes/items/CHelpItems.php:1139
+#: include/classes/items/CHelpItems.php:1155
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Số lượng itrm trong lịch sử proxy mà chưa được gửi đến máy chủ"
 
-#: include/classes/items/CHelpItems.php:1143
+#: include/classes/items/CHelpItems.php:1159
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Số lượng item trong hàng đợi mà đang bị trễ từ giây thứ, bao gồm."
 
-#: include/classes/items/CHelpItems.php:385
-#: include/classes/items/CHelpItems.php:727
-#: include/classes/items/CHelpItems.php:1159
+#: include/classes/items/CHelpItems.php:389
+#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:1175
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr "Số lượng các mục trong hàng đợi bị trì hoãn trong máy chủ Zabbix hoặc proxy bằng cách \"từ\" đến \"đến\" giây, bao gồm."
 
-#: include/classes/items/CHelpItems.php:1107
+#: include/classes/items/CHelpItems.php:1123
 msgid "Number of monitored hosts"
 msgstr "Số lượng host được giám sát"
 
-#: include/classes/items/CHelpItems.php:93
-#: include/classes/items/CHelpItems.php:439
+#: include/classes/items/CHelpItems.php:97
+#: include/classes/items/CHelpItems.php:447
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "Số xung đột ngoài window. Trả về kiểu integer"
 
@@ -12464,15 +12463,15 @@ msgstr "Số lượng vấn đề"
 msgid "Number of problems and expand most critical one"
 msgstr "Số lượng vấn đề và mở rộng nghiêm trọng nhất"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:875
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Số lượng lõi bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:879
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Số lượng nhánh bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:939
+#: include/classes/items/CHelpItems.php:955
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Số lượng bộ xử lý trên máy ảo VMware, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
@@ -12501,15 +12500,15 @@ msgstr "Số lượng mẫu"
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Số lượng kích hoạt (cho phép/vô hiệu hóa [problem/ok])"
 
-#: include/classes/items/CHelpItems.php:1171
+#: include/classes/items/CHelpItems.php:1187
 msgid "Number of triggers in Zabbix database."
 msgstr "Số lượng trigger trong cơ sở dữ liệu Zabbix."
 
-#: include/classes/items/CHelpItems.php:1115
+#: include/classes/items/CHelpItems.php:1131
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Số lượng item không được hỗ trợ trong cơ sở dữ liệu Zabbix."
 
-#: include/classes/items/CHelpItems.php:1091
+#: include/classes/items/CHelpItems.php:1107
 msgid "Number of unsupported items on the host."
 msgstr "Số lượng item không được hỗ trợ trên máy chủ."
 
@@ -12517,45 +12516,45 @@ msgstr "Số lượng item không được hỗ trợ trên máy chủ."
 msgid "Number of users (online)"
 msgstr "Số lượng người dùng (trực tuyến)"
 
-#: include/classes/items/CHelpItems.php:281
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:285
+#: include/classes/items/CHelpItems.php:635
 msgid "Number of users logged in. Returns integer"
 msgstr "Số lượng người dùng đăng nhập được. Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:1067
+#: include/classes/items/CHelpItems.php:1083
 msgid "Number of values stored in table HISTORY."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY."
 
-#: include/classes/items/CHelpItems.php:1071
+#: include/classes/items/CHelpItems.php:1087
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:1075
+#: include/classes/items/CHelpItems.php:1091
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:1079
+#: include/classes/items/CHelpItems.php:1095
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:1083
+#: include/classes/items/CHelpItems.php:1099
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_UNIT."
 
-#: include/classes/items/CHelpItems.php:1163
+#: include/classes/items/CHelpItems.php:1179
 msgid "Number of values stored in table TRENDS."
 msgstr "Số lượng giá trị được lưu trữ trong bảng TRENDS."
 
-#: include/classes/items/CHelpItems.php:1167
+#: include/classes/items/CHelpItems.php:1183
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Số lượng giá trị được lưu trữ trong bảng TRENDS_UNIT."
 
-#: include/classes/items/CHelpItems.php:927
+#: include/classes/items/CHelpItems.php:943
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Số lượng máy ảo trên VMware hypervisor, <url> - dịch vụ VMware URl, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:345
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:349
+#: include/classes/items/CHelpItems.php:699
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "Số lượng hoặc tỷ lệ phần trăm của các nút. Trả về integer cho số; foat cho tỷ lệ phần trăm"
 
@@ -12648,23 +12647,22 @@ msgstr "Tháng 10"
 msgid "Octal to decimal"
 msgstr "Bát phân đến thập phân"
 
-#: include/func.inc.php:128 include/func.inc.php:265 jsLoader.php:182
+#: include/func.inc.php:128 include/func.inc.php:265 jsLoader.php:164
 msgid "October"
 msgstr "Tháng 10"
 
 #: app/views/administration.proxy.list.php:153
 #: include/views/monitoring.sysmap.constructor.php:52
-#: include/views/monitoring.sysmap.constructor.php:62 jsLoader.php:202
+#: include/views/monitoring.sysmap.constructor.php:62 jsLoader.php:184
 msgid "Off"
 msgstr "Off"
 
 #: app/partials/js/massupdate.macros.tab.js.php:148
 #: app/views/administration.user.list.php:138
 #: app/views/js/popup.mediatypetest.edit.js.php:115
-#: app/views/monitoring.widget.web.view.php:30
-#: app/views/report.services.php:80 app/views/report.services.php:81
-#: app/views/report.services.php:82 app/views/report.services.php:83
-#: include/classes/html/CTriggersInfo.php:76
+#: app/views/monitoring.widget.web.view.php:30 app/views/report.services.php:80
+#: app/views/report.services.php:81 app/views/report.services.php:82
+#: app/views/report.services.php:83 include/classes/html/CTriggersInfo.php:76
 #: include/views/configuration.triggers.list.php:85
 #: include/views/js/common.item.edit.js.php:317
 #: include/views/js/configuration.httpconf.edit.js.php:103
@@ -12686,7 +12684,7 @@ msgstr "Tên thẻ cũ"
 
 #: app/views/administration.proxy.list.php:152
 #: include/views/monitoring.sysmap.constructor.php:52
-#: include/views/monitoring.sysmap.constructor.php:62 jsLoader.php:201
+#: include/views/monitoring.sysmap.constructor.php:62 jsLoader.php:183
 msgid "On"
 msgstr "On"
 
@@ -12710,8 +12708,8 @@ msgstr "Một trong các đối tượng rời khỏi một nhóm host."
 msgid "One time only"
 msgstr "Một lần duy nhất"
 
-#: include/views/configuration.services.edit.php:197
-#: include/views/configuration.services.edit.php:244
+#: include/views/configuration.services.edit.php:198
+#: include/views/configuration.services.edit.php:245
 msgid "One-time downtime"
 msgstr "Một lần downtime"
 
@@ -12723,23 +12721,23 @@ msgstr "Chỉ các Super Admin mới có thể tạo các nhóm host."
 msgid "Only Super Admins can create media types."
 msgstr "Chỉ các Super Admin mới có thể tạo các media type."
 
-#: include/classes/api/services/CUserGroup.php:205
+#: include/classes/api/services/CUserGroup.php:198
 msgid "Only Super Admins can create user groups."
 msgstr "Chỉ Siêu Admin mới có thể tạo nhóm người dùng."
 
-#: include/classes/api/services/CMediatype.php:1132
+#: include/classes/api/services/CMediatype.php:1130
 msgid "Only Super Admins can delete media types."
 msgstr "Chỉ các Super Admin mới có thể xóa các media type."
 
-#: include/classes/api/services/CUserGroup.php:857
+#: include/classes/api/services/CUserGroup.php:850
 msgid "Only Super Admins can delete user groups."
 msgstr "Chỉ các Super Admin mới có thể xóa các nhóm người dùng."
 
-#: include/classes/api/services/CMediatype.php:437
+#: include/classes/api/services/CMediatype.php:435
 msgid "Only Super Admins can edit media types."
 msgstr "Chỉ các Super Admin mới có thể chỉnh sửa các media type."
 
-#: include/classes/api/services/CUserGroup.php:292
+#: include/classes/api/services/CUserGroup.php:285
 msgid "Only Super Admins can update user groups."
 msgstr "Chỉ Siêu Admin mới có thể cập nhật nhóm người dùng."
 
@@ -12824,8 +12822,8 @@ msgstr "Chỉ các trigger được gán đến các host đã kích hoa�
 msgid "Opera"
 msgstr "Opera"
 
-#: include/classes/items/CHelpItems.php:253
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:257
+#: include/classes/items/CHelpItems.php:607
 msgid "Operating system information. Returns string"
 msgstr "Thông tin hệ điều hành. Trả về kiểu string"
 
@@ -12838,7 +12836,7 @@ msgstr "Thao tác \"%1$s\" đã tồn tại."
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Thao tác không thể được thực hiện do yêu cầu không được cho phép."
 
-#: jsLoader.php:129
+#: jsLoader.php:111
 msgid "Operation details"
 msgstr "Chie tiết thao tác"
 
@@ -12908,8 +12906,7 @@ msgid "Options"
 msgstr "Tùy chọn"
 
 #: app/partials/popup.operations.php:380 app/views/monitoring.host.view.php:53
-#: app/views/monitoring.problem.view.php:243
-#: app/views/popup.lldoverride.php:69
+#: app/views/monitoring.problem.view.php:243 app/views/popup.lldoverride.php:69
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:81
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:81
 #: include/classes/widgets/forms/CWidgetFormProblems.php:96
@@ -13035,8 +13032,8 @@ msgstr "Các tham số khác"
 msgid "Others"
 msgstr "Khác"
 
-#: include/classes/items/CHelpItems.php:109
-#: include/classes/items/CHelpItems.php:455
+#: include/classes/items/CHelpItems.php:113
+#: include/classes/items/CHelpItems.php:463
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "Thống kê lưu lượng truy cập đi trên interface. Trả về kiểu integer"
 
@@ -13251,7 +13248,7 @@ msgstr "POP"
 
 #: app/views/hintbox.eventlist.php:110
 #: app/views/monitoring.widget.problems.view.php:95 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:1075
+#: include/classes/graph/CSvgGraph.php:1081
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:969
 #: include/classes/screens/CScreenProblem.php:1169 include/events.inc.php:335
@@ -13419,15 +13416,15 @@ msgstr "Mật khẩu (nhập lại một lần nữa)"
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "Mật khẩu không bắt buộc đối với loại xác thực không nội bộ."
 
-#: jsLoader.php:136 jsLoader.php:222
+#: jsLoader.php:118 jsLoader.php:204
 msgid "Paste"
 msgstr "Dán"
 
-#: app/views/monitoring.dashboard.view.php:110 jsLoader.php:134
+#: app/views/monitoring.dashboard.view.php:110 jsLoader.php:116
 msgid "Paste widget"
 msgstr "Dán widget"
 
-#: jsLoader.php:223
+#: jsLoader.php:205
 msgid "Paste without external links"
 msgstr "Dán mà không cần liên kết bên ngoài"
 
@@ -13456,8 +13453,8 @@ msgstr "Đường phần trăm (trái)"
 msgid "Percentile line (right)"
 msgstr "Đường phần trăm (phải)"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:435
+#: include/classes/items/CHelpItems.php:93
+#: include/classes/items/CHelpItems.php:443
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "Thực hiện một truy vấn DNS. Trả về chuỗi ký tự với loại thông tin cần thiết"
 
@@ -13474,7 +13471,7 @@ msgstr "Chu kỳ"
 
 #: app/views/popup.maintenance.period.php:69
 #: include/views/configuration.maintenance.edit.php:81
-#: include/views/configuration.services.edit.php:236
+#: include/views/configuration.services.edit.php:237
 msgid "Period type"
 msgstr "Loại chu kỳ"
 
@@ -13549,7 +13546,7 @@ msgstr "Vui lòng tạo cơ sở dữ liệu theo cách thủ công và đặt c
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Vui lòng nhập tên máy chủ hoặc địa chỉ IP máy chủ và số cổng của máy chủ Zabbix, cũng như tên cài đặt (tùy chọn)."
 
-#: jsLoader.php:211
+#: jsLoader.php:193
 msgid "Please select two elements"
 msgstr "Xin vui lòng lựa chọn 2 phần tử"
 
@@ -13662,7 +13659,7 @@ msgstr "Xem trước"
 msgid "Previous month"
 msgstr "Tháng trước"
 
-#: jsLoader.php:149
+#: jsLoader.php:131
 msgid "Previous page"
 msgstr "Trang trước"
 
@@ -13789,7 +13786,7 @@ msgstr "Vấn đề không được triệt tiêu"
 msgid "Problem is suppressed"
 msgstr "Vấn đề được triệt tiêu"
 
-#: jsLoader.php:232
+#: jsLoader.php:214
 msgid "Problem on"
 msgstr "Vấn đề"
 
@@ -13834,7 +13831,7 @@ msgstr "Vấn đề, nếu ít nhất một phần tử con có vấn 
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
 #: include/classes/widgets/views/widget.svggraph.form.view.php:293
 #: include/menu.inc.php:34 include/views/inventory.host.view.php:147
-#: jsLoader.php:306 report2.php:506
+#: jsLoader.php:289 report2.php:506
 msgid "Problems"
 msgstr "Các vấn đề"
 
@@ -13843,8 +13840,8 @@ msgstr "Các vấn đề"
 msgid "Problems by severity"
 msgstr "Vấn đề nghiêm trọng"
 
-#: include/classes/items/CHelpItems.php:161
-#: include/classes/items/CHelpItems.php:507
+#: include/classes/items/CHelpItems.php:165
+#: include/classes/items/CHelpItems.php:515
 msgid "Process CPU utilisation percentage. Returns float"
 msgstr "Xử lý phần trăm sử dụng CPU. Trả về kiểu float"
 
@@ -13873,8 +13870,7 @@ msgstr "Thuộc tính"
 #: app/controllers/CControllerMenuPopup.php:332
 #: app/controllers/CControllerMenuPopup.php:611
 #: app/controllers/CControllerWidgetUrlView.php:56
-#: app/views/hintbox.eventlist.php:44
-#: include/classes/screens/CScreenUrl.php:70
+#: app/views/hintbox.eventlist.php:44 include/classes/screens/CScreenUrl.php:70
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "URL \"%1$s\" được cung cấp không hợp lệ."
@@ -14001,7 +13997,7 @@ msgstr "Tổng quan về hàng đợi bằng proxy"
 
 #: app/views/hintbox.eventlist.php:96
 #: app/views/monitoring.widget.problems.view.php:81
-#: include/classes/graph/CSvgGraph.php:1071
+#: include/classes/graph/CSvgGraph.php:1077
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:955
 #: include/classes/screens/CScreenProblem.php:1157 include/events.inc.php:340
@@ -14140,11 +14136,11 @@ msgid "Refresh"
 msgstr "Làm mới"
 
 #: include/classes/widgets/forms/CWidgetForm.php:53 include/html.inc.php:182
-#: jsLoader.php:307
+#: jsLoader.php:290
 msgid "Refresh interval"
 msgstr "Làm mới thời gian"
 
-#: jsLoader.php:308
+#: jsLoader.php:291
 msgid "Refresh interval multiplier"
 msgstr "Làm mới hệ số nhân thời gian"
 
@@ -14202,7 +14198,7 @@ msgstr "Các biểu thức chính quy"
 msgid "Regular items"
 msgstr "Item chính quy"
 
-#: jsLoader.php:147
+#: jsLoader.php:129
 msgid "Release to create a widget."
 msgstr "Phát hành để tạo một widget."
 
@@ -14283,7 +14279,7 @@ msgstr "Lệnh từ xa"
 #: include/views/configuration.maintenance.edit.php:166
 #: include/views/configuration.maintenance.edit.php:186
 #: include/views/configuration.services.edit.php:142
-#: include/views/configuration.services.edit.php:216
+#: include/views/configuration.services.edit.php:217
 #: include/views/configuration.template.list.php:57
 #: include/views/configuration.template.massupdate.php:57
 #: include/views/configuration.template.massupdate.php:146
@@ -14322,8 +14318,8 @@ msgstr "Lệnh từ xa"
 #: include/views/js/configuration.host.prototype.edit.js.php:33
 #: include/views/js/configuration.httpconf.edit.js.php:52
 #: include/views/js/configuration.httpconf.edit.js.php:77
-#: include/views/js/configuration.item.list.js.php:51
-#: include/views/js/configuration.item.list.js.php:66
+#: include/views/js/configuration.item.list.js.php:54
+#: include/views/js/configuration.item.list.js.php:72
 #: include/views/js/configuration.item.massupdate.js.php:51
 #: include/views/js/configuration.maintenance.edit.js.php:40
 #: include/views/js/configuration.services.edit.js.php:112
@@ -14350,8 +14346,8 @@ msgstr "Lệnh từ xa"
 #: include/views/monitoring.sysmap.constructor.php:35
 #: include/views/monitoring.sysmap.constructor.php:41
 #: include/views/monitoring.sysmap.constructor.php:47
-#: include/views/monitoring.sysmap.edit.php:291 jsLoader.php:219
-#: jsLoader.php:336
+#: include/views/monitoring.sysmap.edit.php:291 jsLoader.php:201
+#: jsLoader.php:319
 msgid "Remove"
 msgstr "Gỡ bỏ"
 
@@ -14387,7 +14383,7 @@ msgctxt "screen reader"
 msgid "Remove, %1$s"
 msgstr "Xóa, %1$s"
 
-#: jsLoader.php:269
+#: jsLoader.php:252
 #, c-format
 msgctxt "screen reader"
 msgid "Removed, %1$s"
@@ -14460,7 +14456,7 @@ msgstr "Quyền truy cập host được yêu cầu"
 msgid "Required performance (vps)"
 msgstr "Hiệu năng cần thiết (vps)"
 
-#: include/classes/items/CHelpItems.php:1151
+#: include/classes/items/CHelpItems.php:1167
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Hiệu năng cần thiết của máy chủ Zabbix, trong các giá trị mới được dự tính trên mỗi giây."
 
@@ -14504,7 +14500,7 @@ msgstr "Phục hồi xác nhận"
 msgid "Reset defaults"
 msgstr "Phục hồi mặc định"
 
-#: jsLoader.php:233
+#: jsLoader.php:215
 msgid "Resolved"
 msgstr "Đã giải quyết"
 
@@ -14585,13 +14581,11 @@ msgstr "Kết quả"
 msgid "Result converted to %1$s"
 msgstr "Kết quả được chuyển thành %1$s"
 
-#: app/views/js/administration.regex.edit.js.php:175
-#: include/regexp.inc.php:226
+#: app/views/js/administration.regex.edit.js.php:175 include/regexp.inc.php:226
 msgid "Result is FALSE"
 msgstr "Kết quả là FALSE"
 
-#: app/views/js/administration.regex.edit.js.php:171
-#: include/regexp.inc.php:225
+#: app/views/js/administration.regex.edit.js.php:171 include/regexp.inc.php:225
 msgid "Result is TRUE"
 msgstr "Kết quả là TRUE"
 
@@ -14610,8 +14604,8 @@ msgstr "Kết quả với bản đồ giá trị được áp dụng"
 msgid "Retrieve mode"
 msgstr "Lấy lại chế độ"
 
-#: include/classes/items/CHelpItems.php:309
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:313
+#: include/classes/items/CHelpItems.php:663
 msgid "Retrieving contents of a file. Returns text"
 msgstr "Chỉ lấy nội dùng 1 tệp tin. Trả về kiểu text"
 
@@ -14619,49 +14613,49 @@ msgstr "Chỉ lấy nội dùng 1 tệp tin. Trả về kiểu text"
 msgid "Retry"
 msgstr "Thử lại"
 
-#: include/classes/items/CHelpItems.php:1219
+#: include/classes/items/CHelpItems.php:1235
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr "Trả về một mảng JSON với các macro LLD mô tả các đối tượng MBean hoặc các thuộc tính của chúng. Có thể được sử dụng cho LLD."
 
-#: include/classes/items/CHelpItems.php:1223
+#: include/classes/items/CHelpItems.php:1239
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr "Trả về một mảng JSON với các đối tượng MBean hoặc các thuộc tính của chúng. So với jmx.discovery nó không định nghĩa các macro LLD. Có thể được sử dụng cho LLD."
 
-#: include/classes/items/CHelpItems.php:1201
+#: include/classes/items/CHelpItems.php:1217
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Trả về cột đầu tiên của hàng đầu tiên của kết quả truy vấn SQL."
 
-#: include/classes/items/CHelpItems.php:1215
+#: include/classes/items/CHelpItems.php:1231
 msgid "Return value of an attribute of MBean object."
 msgstr "Trả về giá trị của một thuộc tính của đối tượng MBean."
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:767
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Trả về thời gian đáp ứng ICMP ping trong vài giây. Ví dụ: 0.02"
 
-#: include/classes/items/CHelpItems.php:1099
+#: include/classes/items/CHelpItems.php:1115
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr "Trả về một mảng JSON mô tả các giao diện mạng máy chủ được cấu hình trong Zabbix. Có thể được sử dụng cho LLD."
 
-#: include/classes/items/CHelpItems.php:381
-#: include/classes/items/CHelpItems.php:723
-#: include/classes/items/CHelpItems.php:1155
+#: include/classes/items/CHelpItems.php:385
+#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:1171
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr "Trả về một đối tượng JSON chứa máy chủ Zabbix hoặc số liệu nội bộ proxy."
 
-#: include/classes/items/CHelpItems.php:1103
+#: include/classes/items/CHelpItems.php:1119
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Trả về tính sẵn sàng của một loại hình cụ thể của kiểm tra trên máy chủ. Giá trị của item này tương ứng với các biểu tượng có sẵn trên danh sách host. Các loại hợp lệ là: agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:1095
+#: include/classes/items/CHelpItems.php:1111
 msgid "Returns current maintenance status of the host."
 msgstr "Trả về trạng thái bảo trì hiện tại của máy chủ."
 
-#: include/classes/items/CHelpItems.php:1119
+#: include/classes/items/CHelpItems.php:1135
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Trả về thông tin liên quan đến Zabbiz Java gateway. Các tham số hợp lệ là: ping, version."
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:763
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Trả về tỉ lệ mất gói tin ping ICMP."
 
@@ -14760,8 +14754,8 @@ msgstr "Thực hiện lệnh từ xa trên các nhóm host"
 msgid "Run remote commands on hosts"
 msgstr "Thực hiện lệnh từ xa trên các host"
 
-#: include/classes/items/CHelpItems.php:241
-#: include/classes/items/CHelpItems.php:587
+#: include/classes/items/CHelpItems.php:245
+#: include/classes/items/CHelpItems.php:595
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr "Chạy lệnh được chỉ định trên máy chủ. Trả về kết quả văn bản của lệnh; 1 - với chế độ như bây giờ (bất kể kết quả lệnh)"
 
@@ -14769,12 +14763,12 @@ msgstr "Chạy lệnh được chỉ định trên máy chủ. Trả về kết 
 msgid "Russian (ru_RU)"
 msgstr "Russian (ru_RU)"
 
-#: jsLoader.php:197
+#: jsLoader.php:179
 msgctxt "Saturday short"
 msgid "S"
 msgstr "S"
 
-#: jsLoader.php:198
+#: jsLoader.php:180
 msgctxt "Sunday short"
 msgid "S"
 msgstr "S"
@@ -14990,7 +14984,7 @@ msgstr "Sans-Serif"
 msgid "Sat"
 msgstr "Thứ bảy"
 
-#: include/func.inc.php:143 include/func.inc.php:233 jsLoader.php:190
+#: include/func.inc.php:143 include/func.inc.php:233 jsLoader.php:172
 msgid "Saturday"
 msgstr "Thứ bảy"
 
@@ -15125,7 +15119,7 @@ msgstr "Screen đã được cập nhật"
 #: include/views/monitoring.screen.php:34
 #: include/views/monitoring.screen.php:38
 #: include/views/monitoring.slideconf.list.php:31
-#: include/views/monitoring.slides.php:36 jsLoader.php:300
+#: include/views/monitoring.slides.php:36 jsLoader.php:283
 msgid "Screens"
 msgstr "Screens"
 
@@ -15171,8 +15165,8 @@ msgstr "Tên script \"%1$s\" đã được sử dụng trong danh sách đư
 msgid "Script parameters"
 msgstr "Tiến trình tham số"
 
-#: include/classes/api/services/CMediatype.php:334
-#: include/classes/api/services/CMediatype.php:660
+#: include/classes/api/services/CMediatype.php:332
+#: include/classes/api/services/CMediatype.php:658
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
 msgstr "Tiến trình tham số \"%1$s\" đang thiếu nguồn cấp dữ liệu dòng mới cuối cùng cho loại phương tiện \"%2$s\"."
@@ -15188,7 +15182,7 @@ msgstr "Script đã được cập nhật"
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:30
 #: app/views/administration.script.list.php:31 include/menu.inc.php:178
-#: jsLoader.php:309
+#: jsLoader.php:292
 msgid "Scripts"
 msgstr "Các Script"
 
@@ -15274,7 +15268,7 @@ msgstr "Tên bảo mật"
 #: include/views/monitoring.screen.constructor.edit.php:307
 #: include/views/monitoring.screen.constructor.edit.php:324
 #: include/views/monitoring.screen.constructor.edit.php:382
-#: include/views/monitoring.screen.constructor.edit.php:649 jsLoader.php:267
+#: include/views/monitoring.screen.constructor.edit.php:649 jsLoader.php:250
 msgid "Select"
 msgstr "Lựa chọn"
 
@@ -15315,19 +15309,19 @@ msgstr "Các phần tử đã chọn"
 msgid "Selected items only"
 msgstr "Chỉ item được chọn"
 
-#: jsLoader.php:272
+#: jsLoader.php:255
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s in position %2$d of %3$d"
 msgstr "Đã chọn, %1$s ở vị trí %2$d của %3$d"
 
-#: jsLoader.php:273
+#: jsLoader.php:256
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr "Đã chọn, %1$s, chỉ đọc, ở vị trí %2$d của %3$d"
 
-#: jsLoader.php:217
+#: jsLoader.php:199
 msgid "Send backward"
 msgstr "Gửi trở lại"
 
@@ -15352,7 +15346,7 @@ msgstr "Chỉ gửi đến"
 msgid "Send to"
 msgstr "Gửi tới"
 
-#: jsLoader.php:218
+#: jsLoader.php:200
 msgid "Send to back"
 msgstr "Gửi lại"
 
@@ -15385,7 +15379,7 @@ msgstr "Bị ngăn cách"
 msgid "Separately"
 msgstr "Riêng biệt"
 
-#: include/func.inc.php:127 include/func.inc.php:264 jsLoader.php:181
+#: include/func.inc.php:127 include/func.inc.php:264 jsLoader.php:163
 msgid "September"
 msgstr "Tháng 9"
 
@@ -15419,7 +15413,7 @@ msgstr "Thời gian máy chủ"
 
 #: app/controllers/CControllerAuditLogList.php:203
 #: app/views/popup.services.php:46 include/actions.inc.php:76
-#: include/views/configuration.services.edit.php:354 services.php:352
+#: include/views/configuration.services.edit.php:355 services.php:352
 #: srv_status.php:144
 msgid "Service"
 msgstr "Dịch vụ"
@@ -15482,7 +15476,7 @@ msgstr "Cổng dịch vụ"
 msgid "Service start time must be less than end time."
 msgstr "Thời gian bắt đầu dịch vụ phải ít hơn so với thời gian kết thúc."
 
-#: include/views/configuration.services.edit.php:227
+#: include/views/configuration.services.edit.php:228
 msgid "Service times"
 msgstr "Thời gian dịch vụ"
 
@@ -15526,7 +15520,7 @@ msgstr "Đặt lỗi thành"
 msgid "Set host inventory mode"
 msgstr "Đặt chế độ kiểm kê máy chủ"
 
-#: include/classes/html/CInputSecret.php:79 jsLoader.php:359
+#: include/classes/html/CInputSecret.php:79 jsLoader.php:342
 msgid "Set new value"
 msgstr "Thiết lập giá trị mới"
 
@@ -15588,8 +15582,7 @@ msgctxt "screen reader"
 msgid "Severity changed"
 msgstr "Mức độ nghiêm trọng đã thay đổi"
 
-#: include/actions.inc.php:1780
-#: include/classes/screens/CScreenProblem.php:1205
+#: include/actions.inc.php:1780 include/classes/screens/CScreenProblem.php:1205
 msgid "Severity changes"
 msgstr "Mức độ nghiêm trọng thay đổi"
 
@@ -15615,7 +15608,7 @@ msgstr "Chia sẽ"
 
 #: include/views/monitoring.screen.edit.php:219
 #: include/views/monitoring.slideconf.edit.php:272
-#: include/views/monitoring.sysmap.edit.php:411 jsLoader.php:292
+#: include/views/monitoring.sysmap.edit.php:411 jsLoader.php:275
 msgid "Sharing"
 msgstr "Chia sẻ"
 
@@ -15766,7 +15759,7 @@ msgstr "Hiển thị cảnh báo nếu máy chủ Zabbix không hoạt đô�
 msgid "Show working time"
 msgstr "Hiển thị thời gian làm việc"
 
-#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:204
+#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:186
 msgid "Shown"
 msgstr "Đã hiển thị"
 
@@ -15929,7 +15922,7 @@ msgstr "Các slide"
 msgid "Slovak (sk_SK)"
 msgstr "Slovak (sk_SK)"
 
-#: jsLoader.php:238
+#: jsLoader.php:220
 msgid "Snooze"
 msgstr "Snooze"
 
@@ -15965,8 +15958,8 @@ msgstr "Phần mềm ứng dụng D"
 msgid "Software application E"
 msgstr "Phần mềm ứng dụng E"
 
-#: include/classes/items/CHelpItems.php:249
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:253
+#: include/classes/items/CHelpItems.php:603
 msgid "Software architecture information. Returns string"
 msgstr "Thông tin kiến trúc phần mềm. Trả về kiểu string"
 
@@ -16046,7 +16039,7 @@ msgstr "Bắt đầu"
 msgid "Starting TLS failed."
 msgstr "TLS Bắt đầu thất bại."
 
-#: include/classes/items/CHelpItems.php:1063
+#: include/classes/items/CHelpItems.php:1079
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Thời gian bắt đầu khởi động của máy chủ Zabbix, Unix timestamp."
 
@@ -16064,7 +16057,7 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "Tĩnh"
 
-#: include/classes/items/CHelpItems.php:1195
+#: include/classes/items/CHelpItems.php:1211
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr ""
 
@@ -16092,8 +16085,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:247 include/forms.inc.php:243
-#: include/forms.inc.php:689
-#: include/views/administration.auditacts.list.php:67
+#: include/forms.inc.php:689 include/views/administration.auditacts.list.php:67
 #: include/views/configuration.action.list.php:68
 #: include/views/configuration.action.list.php:91
 #: include/views/configuration.correlation.list.php:46
@@ -16252,7 +16244,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Chủ đề"
 
-#: jsLoader.php:310
+#: jsLoader.php:293
 msgid "Submap"
 msgstr "Submap"
 
@@ -16260,12 +16252,12 @@ msgstr "Submap"
 msgid "Success Audit"
 msgstr "Kiểm nghiệm thành công"
 
-#: include/func.inc.php:1654 jsLoader.php:167
+#: include/func.inc.php:1654 jsLoader.php:149
 msgid "Success message"
 msgstr "Tin chắn thành công"
 
-#: include/classes/items/CHelpItems.php:113
-#: include/classes/items/CHelpItems.php:459
+#: include/classes/items/CHelpItems.php:117
+#: include/classes/items/CHelpItems.php:467
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
 msgstr "Tổng số thống kê lưu lượng đến và đi trên interface. Trả về kiểu integer"
 
@@ -16273,7 +16265,7 @@ msgstr "Tổng số thống kê lưu lượng đến và đi trên interface. Tr
 msgid "Sun"
 msgstr "Chủ nhật"
 
-#: include/func.inc.php:145 include/func.inc.php:227 jsLoader.php:191
+#: include/func.inc.php:145 include/func.inc.php:227 jsLoader.php:173
 msgid "Sunday"
 msgstr "Chủ nhật"
 
@@ -16281,7 +16273,7 @@ msgstr "Chủ nhật"
 msgid "Support"
 msgstr "Hỗ trợ"
 
-#: include/html.inc.php:982
+#: include/html.inc.php:980
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr "Bị nén cho đến khi: %1$s"
@@ -16293,18 +16285,18 @@ msgstr "Bị nén cho đến khi: %1$s"
 msgid "Surname"
 msgstr "Họ"
 
-#: include/classes/items/CHelpItems.php:261
-#: include/classes/items/CHelpItems.php:607
+#: include/classes/items/CHelpItems.php:265
+#: include/classes/items/CHelpItems.php:615
 msgid "Swap in (from device into memory) statistics. Returns integer"
 msgstr "Trao đổi thống kê (từ thiết bị vào bộ nhớ). Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:265
-#: include/classes/items/CHelpItems.php:611
+#: include/classes/items/CHelpItems.php:269
+#: include/classes/items/CHelpItems.php:619
 msgid "Swap out (from memory onto device) statistics. Returns integer"
 msgstr "Trao đổi thống kê (từ bộ nhớ vào thiết bị). Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:269
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:273
+#: include/classes/items/CHelpItems.php:623
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Hoán đổi kích thước không gian theo byte hoặc theo tỷ lệ phần trăm từ tổng số. Trả về kiểu integer cho byte; float cho tỷ lệ phần trăm"
 
@@ -16316,8 +16308,8 @@ msgstr "Swedish (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Chuyển đổi phương pháp xác nhận sẽ thiết laoapj lại tất cả ngoại trừ phiến này! Tiếp tục?"
 
-#: include/classes/items/CHelpItems.php:189
-#: include/classes/items/CHelpItems.php:535
+#: include/classes/items/CHelpItems.php:193
+#: include/classes/items/CHelpItems.php:543
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "Thời gian khởi động hệ thống. Trả về kiểu integer (đơn vị dấu thời gian)"
 
@@ -16333,8 +16325,8 @@ msgstr "Xảy ra lỗi hệ thống. Vui lòng liên hệ với quản trị vi�
 msgid "System error."
 msgstr "Lỗi hệ thống."
 
-#: include/classes/items/CHelpItems.php:217
-#: include/classes/items/CHelpItems.php:563
+#: include/classes/items/CHelpItems.php:221
+#: include/classes/items/CHelpItems.php:571
 msgid "System host name. Returns string"
 msgstr "Tên máy chủ hệ thống. Trả về kiểu string"
 
@@ -16346,27 +16338,27 @@ msgstr "Tên máy chủ hệ thống. Trả về kiểu string"
 msgid "System information"
 msgstr "Thông tin hệ thống"
 
-#: include/classes/items/CHelpItems.php:245
-#: include/classes/items/CHelpItems.php:591
+#: include/classes/items/CHelpItems.php:249
+#: include/classes/items/CHelpItems.php:599
 msgid "System statistics. Returns integer or float"
 msgstr "Thống kê hệ thống. Trả về kiểu integer hoặc float"
 
-#: include/classes/items/CHelpItems.php:237
-#: include/classes/items/CHelpItems.php:583
+#: include/classes/items/CHelpItems.php:241
+#: include/classes/items/CHelpItems.php:591
 msgid "System time. Returns integer with type as utc; string - with type as local"
 msgstr "Thời gian hệ thống. Trả về kiểu integer với kiểu như utc; string- với kiểu là cục bộ"
 
-#: include/classes/items/CHelpItems.php:277
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:281
+#: include/classes/items/CHelpItems.php:631
 msgid "System uptime in seconds. Returns integer"
 msgstr "Thời gian chạy hệ thống tính bằng giây. Trả về kiểu integer"
 
-#: jsLoader.php:195
+#: jsLoader.php:177
 msgctxt "Thursday short"
 msgid "T"
 msgstr "T"
 
-#: jsLoader.php:193
+#: jsLoader.php:175
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "T"
@@ -16620,7 +16612,7 @@ msgstr "Các mẫu đã được cập nhật"
 #: app/views/administration.authentication.edit.php:269
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:140
-#: app/views/js/popup.itemtestedit.view.js.php:508
+#: app/views/js/popup.itemtestedit.view.js.php:506
 #: app/views/popup.itemtestedit.view.php:311
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1455
@@ -16784,8 +16776,8 @@ msgstr "Item không được phát hiện nữa và sẽ bị xóa trong %
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Item này không được dò tìm nữa và sẽ bị xóa trong lần xử lý dò tìm tiếp theo."
 
-#: include/classes/items/CHelpItems.php:169
-#: include/classes/items/CHelpItems.php:515
+#: include/classes/items/CHelpItems.php:173
+#: include/classes/items/CHelpItems.php:523
 msgid "The number of processes. Returns integer"
 msgstr "Số lượng các tiến trình. Trả về kiểu integer"
 
@@ -16876,13 +16868,13 @@ msgstr "Điều tiết"
 msgid "Thu"
 msgstr "Thứ 5"
 
-#: include/func.inc.php:141 include/func.inc.php:231 jsLoader.php:188
+#: include/func.inc.php:141 include/func.inc.php:231 jsLoader.php:170
 msgid "Thursday"
 msgstr "Thứ năm"
 
 #: app/views/report.services.php:82
-#: include/views/configuration.services.edit.php:264
-#: include/views/configuration.services.edit.php:319 report4.php:191
+#: include/views/configuration.services.edit.php:265
+#: include/views/configuration.services.edit.php:320 report4.php:191
 #: services.php:48 services.php:191
 msgid "Till"
 msgstr "Cho tới"
@@ -16907,9 +16899,9 @@ msgstr "Cho tới"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/events.inc.php:168 include/events.inc.php:245
 #: include/views/administration.auditacts.list.php:62
-#: include/views/configuration.services.edit.php:309
-#: include/views/configuration.services.edit.php:323
-#: include/views/configuration.services.edit.php:356
+#: include/views/configuration.services.edit.php:310
+#: include/views/configuration.services.edit.php:324
+#: include/views/configuration.services.edit.php:357
 msgid "Time"
 msgstr "Thời gian"
 
@@ -16921,7 +16913,7 @@ msgstr "Thời gian (tăng dần)"
 msgid "Time (descending)"
 msgstr "Thời gian (giảm dần)"
 
-#: include/classes/items/CHelpItems.php:1131
+#: include/classes/items/CHelpItems.php:1147
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Thời gian một quy trình Zabbix cụ thể hoặc một nhóm các quy trình (được xác định bởi <type> và <mode>) được chi tiêu theo <state> theo tỷ lệ phần trăm."
 
@@ -16929,7 +16921,7 @@ msgstr "Thời gian một quy trình Zabbix cụ thể hoặc một nhóm các q
 msgid "Time elapsed:"
 msgstr "Thời gian trôi qua:"
 
-#: include/classes/items/CHelpItems.php:1135
+#: include/classes/items/CHelpItems.php:1151
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
 msgstr "Thời gian truy cập proxy cuối cùng. Tên - tên proxy. Các thông số hợp lệ là: Lần truy cập cuối- Dấu thời gian Unix, độ trễ - giây."
 
@@ -16985,7 +16977,7 @@ msgstr "Nhãn thời gian"
 msgid "To"
 msgstr "Đến"
 
-#: jsLoader.php:330
+#: jsLoader.php:313
 msgid "To set a host interface select a single item type for all items"
 msgstr "Để thiết lập một host interface chọn một kiểu item duy nhất cho tất cả các item"
 
@@ -17047,11 +17039,11 @@ msgstr "Truy tìm"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Giao dịch chưa được đóng lại. Đang hủy bỏ..."
 
-#: include/classes/items/CHelpItems.php:1205
+#: include/classes/items/CHelpItems.php:1221
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr "Chuyển đổi kết quả truy vấn SQL thành một mảng JSON để dò tìm mức độ thấp."
 
-#: include/classes/items/CHelpItems.php:1209
+#: include/classes/items/CHelpItems.php:1225
 msgid "Transform SQL query result into a JSON array."
 msgstr "Chuyển đổi kết quả truy vấn SQL thành một mảng JSON."
 
@@ -17117,7 +17109,7 @@ msgstr "Các khuynh hướng"
 #: include/views/configuration.triggers.massupdate.php:163
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:776
-#: include/views/reports.toptriggers.php:83 jsLoader.php:207 jsLoader.php:311
+#: include/views/reports.toptriggers.php:83 jsLoader.php:189 jsLoader.php:294
 #: services.php:355
 msgid "Trigger"
 msgstr "Kích hoạt"
@@ -17261,7 +17253,7 @@ msgstr "Kiểu trigger \"%1$s\" phải chứa ít nhất một kiểu item
 msgid "Trigger prototype added"
 msgstr "Kiểu trigger đã được thêm vào"
 
-#: include/classes/api/services/CTriggerPrototype.php:916
+#: include/classes/api/services/CTriggerPrototype.php:931
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "Kiểu trigger không thể phụ thuộc vào một trigger được kế thừa từ nó."
 
@@ -17299,11 +17291,11 @@ msgstr "Mức độ quan trọng của trigger"
 msgid "Trigger severity"
 msgstr "Mức độ quan trọng của trigger"
 
-#: jsLoader.php:293
+#: jsLoader.php:276
 msgid "Trigger status \"OK\""
 msgstr "Trạng thái trigger \"OK\""
 
-#: jsLoader.php:294
+#: jsLoader.php:277
 msgid "Trigger status \"Problem\""
 msgstr "Trạng thái Trigger \"Problem\""
 
@@ -17354,7 +17346,7 @@ msgstr "Cắt"
 msgid "Tue"
 msgstr "Thứ ba"
 
-#: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:186
+#: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:168
 msgid "Tuesday"
 msgstr "Thứ ba"
 
@@ -17367,7 +17359,7 @@ msgstr "Turkish (tr_TR)"
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Hai item (\"%1$s\" và \"%2$s\") không thể gắn vào một trường host còn lại \"%3$s\", điều này sẽ dẫn đến một cuộc xung đột."
 
-#: jsLoader.php:212
+#: jsLoader.php:194
 msgid "Two map elements should be selected"
 msgstr "Hai phần tử sơ đồ nên được chọn"
 
@@ -17412,7 +17404,7 @@ msgstr "Hai phần tử sơ đồ nên được chọn"
 #: include/views/configuration.item.prototype.massupdate.php:41
 #: include/views/configuration.item.prototype.massupdate.php:251
 #: include/views/configuration.maintenance.list.php:83
-#: include/views/configuration.services.edit.php:178
+#: include/views/configuration.services.edit.php:179
 #: include/views/inventory.host.list.php:86
 #: include/views/js/monitoring.sysmaps.js.php:88
 #: include/views/js/monitoring.sysmaps.js.php:397
@@ -17484,7 +17476,7 @@ msgstr "UNKNOWN"
 #: include/views/configuration.triggers.edit.php:544
 #: include/views/js/monitoring.sysmaps.js.php:298
 #: include/views/monitoring.screen.constructor.edit.php:798
-#: include/views/monitoring.sysmap.edit.php:277 items.php:163 jsLoader.php:312
+#: include/views/monitoring.sysmap.edit.php:277 items.php:163 jsLoader.php:295
 msgid "URL"
 msgstr "URL"
 
@@ -17530,7 +17522,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "URL phải có cả trường \"tên\" và \"url\" cho sơ đồ \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:295
-#: include/views/monitoring.sysmap.edit.php:310 jsLoader.php:313
+#: include/views/monitoring.sysmap.edit.php:310 jsLoader.php:296
 msgid "URLs"
 msgstr "URLs"
 
@@ -17595,7 +17587,7 @@ msgstr "Bỏ chặn"
 msgid "Unblock selected users?"
 msgstr "Bỏ chặn các người dùng được lựa chọn?"
 
-#: include/classes/core/ZBase.php:552
+#: include/classes/core/ZBase.php:522
 #, c-format
 msgid "Unexpected response for action %1$s."
 msgstr "Phản ứng bất ngờ cho hành động %1$s."
@@ -17614,8 +17606,7 @@ msgstr "Đơn vị"
 #: app/views/monitoring.widget.hostavail.view.php:66
 #: app/views/monitoring.widget.hostavail.view.php:104
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:118
-#: include/actions.inc.php:1075
-#: include/classes/screens/CScreenHostsInfo.php:89
+#: include/actions.inc.php:1075 include/classes/screens/CScreenHostsInfo.php:89
 #: include/classes/screens/CScreenHttpTestDetails.php:116
 #: include/correlation.inc.php:127 include/discovery.inc.php:115
 #: include/discovery.inc.php:151 include/events.inc.php:44
@@ -17734,7 +17725,7 @@ msgstr "Hủy liên kết: Kiểu item \"%1$s\" trên \"%2$s\"."
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Hủy liên kết: Web scenario \"%1$s\" trên \"%2$s\"."
 
-#: jsLoader.php:236
+#: jsLoader.php:218
 msgid "Unmute"
 msgstr "Bật tiếng"
 
@@ -17833,7 +17824,7 @@ msgstr "Up"
 #: include/views/configuration.item.prototype.edit.php:743
 #: include/views/configuration.item.prototype.massupdate.php:543
 #: include/views/configuration.maintenance.edit.php:258
-#: include/views/configuration.services.edit.php:369
+#: include/views/configuration.services.edit.php:370
 #: include/views/configuration.template.edit.php:221
 #: include/views/configuration.template.massupdate.php:176
 #: include/views/configuration.trigger.prototype.edit.php:632
@@ -17906,12 +17897,12 @@ msgid "Upper level maps"
 msgstr "Các bản đồ ở mức cao hơn"
 
 #: include/classes/screens/CScreenDiscovery.php:120
-#: include/views/configuration.services.edit.php:185
-#: include/views/configuration.services.edit.php:242
+#: include/views/configuration.services.edit.php:186
+#: include/views/configuration.services.edit.php:243
 msgid "Uptime"
 msgstr "Thời gian chạy"
 
-#: include/classes/items/CHelpItems.php:1175
+#: include/classes/items/CHelpItems.php:1191
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Thời gian hoạt động của tiến trình máy chủ Zabbix trong vài giây."
 
@@ -17949,7 +17940,7 @@ msgstr "Các mục đã được sử dụng"
 msgid "User"
 msgstr "Người dùng"
 
-#: include/classes/api/services/CUserGroup.php:611
+#: include/classes/api/services/CUserGroup.php:604
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "Người dùng \"%1$s\" không thể không có nhóm người dùng."
@@ -17995,7 +17986,7 @@ msgstr "Chuỗi người dùng agent"
 msgid "User can't change type for himself"
 msgstr "Người dùng không thể thay đổi kiểu cho chính mình"
 
-#: include/classes/api/services/CUserGroup.php:536
+#: include/classes/api/services/CUserGroup.php:529
 #: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Người dùng không thể thêm chính mình vào một nhóm đã bị vô hiệu hóa hoặc một nhóm tiếp cận với giao diện người dùng."
@@ -18018,22 +18009,22 @@ msgstr[0] "Người dùng đã được xóa"
 msgid "User group"
 msgstr "Nhóm người dùng"
 
-#: include/classes/api/services/CUserGroup.php:365
+#: include/classes/api/services/CUserGroup.php:358
 #, c-format
 msgid "User group \"%1$s\" already exists."
 msgstr "Nhóm người dùng \"%1$s\" đã tồn tại."
 
-#: include/classes/api/services/CUserGroup.php:898
+#: include/classes/api/services/CUserGroup.php:891
 #, c-format
 msgid "User group \"%1$s\" is used in \"%2$s\" action."
 msgstr "Nhóm người dùng \"%1$s\" sử dùn trong hoạt động \"%2$s\"."
 
-#: include/classes/api/services/CUserGroup.php:921
+#: include/classes/api/services/CUserGroup.php:914
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
 msgstr "Nhóm người dùng \"%1$s\" được sử dụng trong cấu hình cho cơ sở dữ liệu tin nhắn không hoạt động."
 
-#: include/classes/api/services/CUserGroup.php:911
+#: include/classes/api/services/CUserGroup.php:904
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "Nhóm người dùng \"%1$s\" được sử dụng trong tập lệnh \"%2$s\"."
@@ -18171,7 +18162,7 @@ msgstr "Người dùng được cập nhật"
 
 #: app/controllers/CControllerDashboardPropertiesCheck.php:73
 #: include/classes/api/services/CDashboard.php:491
-#: include/classes/api/services/CUserGroup.php:402
+#: include/classes/api/services/CUserGroup.php:395
 #, c-format
 msgid "User with ID \"%1$s\" is not available."
 msgstr "Người dùng có ID \"%1$s\" không khả dụng."
@@ -18214,228 +18205,236 @@ msgstr "Thuộc tính tài khoản"
 msgid "Users"
 msgstr "Các người dùng"
 
-#: include/classes/items/CHelpItems.php:1191
+#: include/classes/items/CHelpItems.php:1207
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Thống kê bộ nhớ VMware. Các chế độ hợp lệ: total, free, pfree, used và pused."
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Trạng thái VMware cluster, <url> - Dịch vụ VMware URL, <name> - Tên VMware cluster"
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:815
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr "VMware datacenters và IDs. Trả về JSON"
 
-#: include/classes/items/CHelpItems.php:799
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:851
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Thống kê dung lượng kho dữ liệu VMware theo byte hoặc theo tỷ lệ phần trăm trên tổng số. Trả về kiểu integer cho byte; float cho tỷ lệ phần trăm"
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Danh sách các kho lưu trữ dữ liệu của VMware, <url> -URL dịch vụ VMware, <datastore> -tên kho dữ liệu"
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:803
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "Kho dữ liệu VMware đọc số liệu thống kê, <url> - URL dịch vụ VMware,  <datastore> - tên kho dữ liệu, <mode> - độ trễ / tối đa - trung bình hoặc tối đa"
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "Kho dữ liệu VMware ghi số liệu thống kê, <url> - URL dịch vụ VMware, <datastore> - tên kho dữ liệu,<mode> - độ trễ / tối đa - trung bình hoặc tối đa"
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:819
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr "Log sự kiện VMware, <url> - URL dịch vụ VMware, <mode> - tất cả (mặc định), bỏ qua - bỏ qua xử lý dữ liệu cũ hơn"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:891
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor BIOS uuid, <url> - Dịch vụ VMwareURL, <uuid> - Tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:923
+msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Kích thước bộ nhớ VMware hypervisor thừa ra, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên VMware hypervisor cluster, <url> - Dịch vụ VMware hypervisor cluster VMware URL, <uuid> - Tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:847
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Kho dữ liệu đọc số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên host VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Kho dữ liệu ghi số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên host VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Danh sách kho dữ liệu của VMware hypervisor, <url> - URL dịch vụ VMware, <uuid> - tên máy chủ VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:911
+#: include/classes/items/CHelpItems.php:927
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:899
+msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Mô hình VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:863
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:915
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:907
+#: include/classes/items/CHelpItems.php:919
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Theo dõi hiệu suất VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor , <path> - đường dẫn theo dõi hiệu suất, <instance> - đếm số lần hiệu suất"
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:867
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tần số bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:871
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Mô hình bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:831
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Cách sử dụng bộ xử lý VMware hypervisor đơn vị là Hz, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:931
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Trạng thái VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:883
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Kích thước bộ nhớ tổng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:919
+#: include/classes/items/CHelpItems.php:935
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Thời gian chạy VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:907
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Kích thước bộ nhớ đã sử dụng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:895
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên nhà sản xuất VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:923
+#: include/classes/items/CHelpItems.php:939
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Phiên bản VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:823
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Tên đầy đủ của dịch vụ VMware, <url> - dịch vụ VMware URL"
 
-#: include/classes/items/CHelpItems.php:931
+#: include/classes/items/CHelpItems.php:947
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Phiên bản dịch vụ VMware, <url> - dịch vụ VMware URL"
 
-#: include/classes/items/CHelpItems.php:967
+#: include/classes/items/CHelpItems.php:983
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware bị thừa ra, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:1015
+#: include/classes/items/CHelpItems.php:1031
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:971
+#: include/classes/items/CHelpItems.php:987
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware được nén lại, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:951
+#: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1035
+#: include/classes/items/CHelpItems.php:1051
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Thiết bị đĩa máy ảo VMware đọc số liệu thống kê, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/số lần thao tác trên giây"
 
-#: include/classes/items/CHelpItems.php:1039
+#: include/classes/items/CHelpItems.php:1055
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Thiết bị đĩa máy ảo VMware ghi số liệu thống kê, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/số lần thao tác trên giây"
 
-#: include/classes/items/CHelpItems.php:1047
+#: include/classes/items/CHelpItems.php:1063
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Hệ thống tập tin máy ảo thống kê VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <fsname> - tên hệ thống tập tin, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:987
+#: include/classes/items/CHelpItems.php:1003
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ nhớ máy ảo VMware của khách, <url> - dịch vụ VMware URL, <uuid> - Tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:991
+#: include/classes/items/CHelpItems.php:1007
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ nhớ máy ảo VMware của host, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:959
+#: include/classes/items/CHelpItems.php:975
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tên máy ảo VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:935
+#: include/classes/items/CHelpItems.php:951
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tên máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:999
+#: include/classes/items/CHelpItems.php:1015
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Thống kê interface mạng đầu vào máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
 
-#: include/classes/items/CHelpItems.php:1003
+#: include/classes/items/CHelpItems.php:1019
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Thống kê interface mạng đầu ra máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy áo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
 
-#: include/classes/items/CHelpItems.php:1007
+#: include/classes/items/CHelpItems.php:1023
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Hiệu suất truy cập máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <path> - đường dẫn hiệu suất truy cập, <instance> - Số lượng hiệu suất truy cập"
 
-#: include/classes/items/CHelpItems.php:1011
+#: include/classes/items/CHelpItems.php:1027
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tình trạng nguồn của máy ảo VMware, <url> - dich vụ VMware URL, <uuid> - Tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:975
+#: include/classes/items/CHelpItems.php:991
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ riêng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:943
+#: include/classes/items/CHelpItems.php:959
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Bộ xử lý máy ảo VMware thời gian sẵn sàng ms, <url> - URL dịch vụ VMware, <uuid> - Tên máy chủ máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:947
+#: include/classes/items/CHelpItems.php:963
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ xử lý máy ảo VMware đơn vị Hz, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:979
+#: include/classes/items/CHelpItems.php:995
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ chia sẻ của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:983
+#: include/classes/items/CHelpItems.php:999
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware được trao đổi, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:963
+#: include/classes/items/CHelpItems.php:979
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ tổng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:1019
+#: include/classes/items/CHelpItems.php:1035
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware không được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:1023
+#: include/classes/items/CHelpItems.php:1039
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware không được chia sẻ, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:1027
+#: include/classes/items/CHelpItems.php:1043
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Thời gian hoạt động của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
@@ -18514,11 +18513,11 @@ msgstr "Giá trị \"%1$s\" là không hợp lệ đối với tham số 
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Giá trị \"%1$s\" là quá dài đối với trường \"%2$s\" - %3$d ký tự. Chiều dài cho phép là %4$d ký tự."
 
-#: include/classes/items/CHelpItems.php:1183
+#: include/classes/items/CHelpItems.php:1199
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Hiệu quả của bộ đệm giá trị. Các tham số hợp lệ là: requests, hits và misses."
 
-#: include/classes/items/CHelpItems.php:1179
+#: include/classes/items/CHelpItems.php:1195
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Thống kê giá trị của cache. Các chế độ hợp lệ là: total, free, pfree, used and pused."
 
@@ -18559,13 +18558,13 @@ msgstr "Giá trị sơ đồ"
 msgid "Value mappings for value maps will be updated!"
 msgstr "Ánh xạ giá trị cho bản đồ giá trị sẽ được cập nhật!"
 
-#: include/classes/items/CHelpItems.php:157
-#: include/classes/items/CHelpItems.php:503
+#: include/classes/items/CHelpItems.php:161
+#: include/classes/items/CHelpItems.php:511
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:153
-#: include/classes/items/CHelpItems.php:499
+#: include/classes/items/CHelpItems.php:157
+#: include/classes/items/CHelpItems.php:507
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
 msgstr "Giá trị của bất kỳ bộ đếm hiệu suất Windows. Trả về integer, float, string hoặc text (tùy theo yêu cầu)"
 
@@ -18599,8 +18598,8 @@ msgstr "Các giá trị không có tên không được cho phép trong các tr�
 msgid "Variables"
 msgstr "Biến"
 
-#: include/classes/items/CHelpItems.php:173
-#: include/classes/items/CHelpItems.php:519
+#: include/classes/items/CHelpItems.php:177
+#: include/classes/items/CHelpItems.php:527
 msgid "Various information about specific process(es). Returns float"
 msgstr "Thông tin khác nhau về quá trình cụ thể. Trả về kiểu float"
 
@@ -18622,12 +18621,12 @@ msgstr ""
 msgid "Version"
 msgstr "Phiên bản"
 
-#: include/classes/items/CHelpItems.php:73
-#: include/classes/items/CHelpItems.php:399
+#: include/classes/items/CHelpItems.php:77
+#: include/classes/items/CHelpItems.php:407
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Phiên bản của Zabbix agent. Trả về kiểu string"
 
-#: include/classes/items/CHelpItems.php:1187
+#: include/classes/items/CHelpItems.php:1203
 msgid "Version of Zabbix server or proxy"
 msgstr "Phiên bản của máy chủ hoặc proxy Zabbix"
 
@@ -18656,8 +18655,8 @@ msgstr "Xem"
 msgid "View as"
 msgstr "Xem"
 
-#: include/classes/items/CHelpItems.php:357
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:361
+#: include/classes/items/CHelpItems.php:711
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Kích thước không gian ảo tính bằng byte hoặc theo tỷ lệ phần trăm từ tổng số. Trả về integer cho byte; float cho tỷ lệ phần trăm"
 
@@ -18673,7 +18672,7 @@ msgstr "Tên hiển thị"
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Tên hiển thị không thể bị trống nếu tên host bị lỗi."
 
-#: jsLoader.php:194
+#: jsLoader.php:176
 msgctxt "Wednesday short"
 msgid "W"
 msgstr "W"
@@ -18690,11 +18689,11 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Cảnh báo"
 
-#: include/func.inc.php:1656 jsLoader.php:169
+#: include/func.inc.php:1656 jsLoader.php:151
 msgid "Warning message"
 msgstr "Tin nhắn cảnh báo"
 
-#: jsLoader.php:241
+#: jsLoader.php:223
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Chúng tôi xin lỗi, số lượng tối đa có thể của các phần tử để ghi nhớ đã đạt tới giới hạn."
 
@@ -18710,7 +18709,7 @@ msgstr "Chúng tôi xin lỗi, số lượng tối đa có thể của ca
 #: include/views/configuration.template.list.php:282
 #: include/views/inventory.host.view.php:135
 #: include/views/inventory.host.view.php:196
-#: include/views/inventory.host.view.php:208 jsLoader.php:314
+#: include/views/inventory.host.view.php:208 jsLoader.php:297
 msgid "Web"
 msgstr "Web"
 
@@ -18781,7 +18780,7 @@ msgstr "Webhook không có tham số."
 msgid "Wed"
 msgstr "Thứ 4"
 
-#: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:187
+#: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:169
 msgid "Wednesday"
 msgstr "Thứ tư"
 
@@ -18802,7 +18801,7 @@ msgstr "Chào mừng đến với"
 msgid "When active"
 msgstr "Khi hoạt động"
 
-#: jsLoader.php:152
+#: jsLoader.php:134
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Widget quá nhỏ so với số lượng cột và hàng được chỉ định."
 
@@ -18826,8 +18825,7 @@ msgstr "Widget quá nhỏ so với số lượng cột và hàng được chỉ 
 #: include/views/js/monitoring.sysmaps.js.php:444
 #: include/views/monitoring.screen.constructor.edit.php:815
 #: include/views/monitoring.sysmap.edit.php:99
-#: include/views/monitoring.sysmap.list.php:65 screenedit.php:67
-#: sysmaps.php:41
+#: include/views/monitoring.sysmap.list.php:65 screenedit.php:67 sysmaps.php:41
 msgid "Width"
 msgstr "Chiều rộng"
 
@@ -18988,7 +18986,7 @@ msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr "Giá trị lớn nhất của trục Y phải lớn hơn giá trị nhỏ nhất của trục Y"
 
 #: include/classes/api/services/CGraphGeneral.php:314
-#: include/classes/graphdraw/CLineGraphDraw.php:1873
+#: include/classes/graphdraw/CLineGraphDraw.php:1882
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Giá trị cực đại của trục Y phải lớn hơn giá trị cực tiểu trục Y."
 
@@ -19019,6 +19017,10 @@ msgstr "Y-m-d H:i"
 msgid "Y-m-d H:i:s"
 msgstr "Y-m-d H:i:s"
 
+#: include/translateDefines.inc.php:37
+msgid "Y-n-d"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:430
 msgid "Y1"
 msgstr "Y1"
@@ -19030,8 +19032,8 @@ msgstr "Y2"
 #: app/views/popup.maintenance.period.php:150
 #: include/views/configuration.maintenance.edit.php:61
 #: include/views/configuration.maintenance.edit.php:67
-#: include/views/configuration.services.edit.php:260
-#: include/views/configuration.services.edit.php:267
+#: include/views/configuration.services.edit.php:261
+#: include/views/configuration.services.edit.php:268
 msgid "YYYY-MM-DD hh:mm"
 msgstr "YYYY-MM-DD hh:mm"
 
@@ -19042,7 +19044,7 @@ msgstr "YYYY-MM-DD hh:mm"
 #: include/classes/import/validators/C40XmlValidator.php:1278
 #: include/classes/import/validators/C42XmlValidator.php:1336
 #: include/classes/import/validators/C44XmlValidator.php:1741
-#: include/classes/import/validators/C50XmlValidator.php:1884
+#: include/classes/import/validators/C50XmlValidator.php:1891
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
@@ -19060,16 +19062,14 @@ msgstr "Hàng năm"
 #: app/views/administration.valuemap.list.php:82
 #: app/views/hintbox.eventlist.php:161
 #: app/views/monitoring.widget.problems.view.php:243
-#: app/views/popup.condition.common.php:663
-#: app/views/popup.lldoperation.php:84 app/views/popup.lldoperation.php:96
-#: include/actions.inc.php:32 include/blocks.inc.php:619
-#: include/blocks.inc.php:864
+#: app/views/popup.condition.common.php:663 app/views/popup.lldoperation.php:84
+#: app/views/popup.lldoperation.php:96 include/actions.inc.php:32
+#: include/blocks.inc.php:619 include/blocks.inc.php:864
 #: include/classes/screens/CScreenHostTriggers.php:271
 #: include/classes/screens/CScreenProblem.php:1091
 #: include/classes/screens/CScreenProblem.php:1229 include/events.inc.php:173
 #: include/events.inc.php:354 include/triggers.inc.php:1223
-#: include/triggers.inc.php:1228
-#: include/views/configuration.graph.list.php:192
+#: include/triggers.inc.php:1228 include/views/configuration.graph.list.php:192
 #: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.host.prototype.list.php:144
 #: include/views/configuration.httpconf.list.php:166
@@ -19151,7 +19151,7 @@ msgstr "Bạn không có quyền để thực hiện các thao tác này
 msgid "You do not have permissions to create users."
 msgstr "Bạn không có quyền để tạo các người dùng."
 
-#: jsLoader.php:145
+#: jsLoader.php:127
 msgid "You do not have permissions to edit dashboard"
 msgstr "Bạn không có quyền chỉnh sửa bảng điều khiển"
 
@@ -19159,7 +19159,7 @@ msgstr "Bạn không có quyền chỉnh sửa bảng điều khiển"
 msgid "You have no permissions to access this page."
 msgstr "Bạn không có quyền truy cập trang này."
 
-#: jsLoader.php:142
+#: jsLoader.php:124
 msgid "You have unsaved changes."
 msgstr "Bạn có các thay đổi chưa lưu."
 
@@ -19433,12 +19433,10 @@ msgstr "tất cả media"
 #: include/classes/api/services/CItemGeneral.php:2276
 #: include/classes/api/services/CItemGeneral.php:2298
 #: include/classes/api/services/CModule.php:291
-#: include/classes/import/validators/C44XmlValidator.php:2133
-#: include/classes/import/validators/C44XmlValidator.php:2153
-#: include/classes/import/validators/C44XmlValidator.php:2280
-#: include/classes/import/validators/C50XmlValidator.php:2276
-#: include/classes/import/validators/C50XmlValidator.php:2296
-#: include/classes/import/validators/C50XmlValidator.php:2423
+#: include/classes/import/validators/C44XmlValidator.php:2135
+#: include/classes/import/validators/C44XmlValidator.php:2155
+#: include/classes/import/validators/C50XmlValidator.php:2285
+#: include/classes/import/validators/C50XmlValidator.php:2305
 #: include/classes/import/validators/CXmlValidatorGeneral.php:252
 #: include/classes/validators/CApiInputValidator.php:441
 #: include/classes/validators/CApiInputValidator.php:573
@@ -19610,19 +19608,19 @@ msgstr "không thể thay đổi"
 #: include/classes/api/services/CMapElement.php:106
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
-#: include/classes/api/services/CMediatype.php:371
-#: include/classes/api/services/CMediatype.php:390
-#: include/classes/api/services/CMediatype.php:406
-#: include/classes/api/services/CMediatype.php:482
-#: include/classes/api/services/CMediatype.php:698
-#: include/classes/api/services/CMediatype.php:724
-#: include/classes/api/services/CMediatype.php:741
-#: include/classes/api/services/CMediatype.php:793
+#: include/classes/api/services/CMediatype.php:369
+#: include/classes/api/services/CMediatype.php:388
+#: include/classes/api/services/CMediatype.php:404
+#: include/classes/api/services/CMediatype.php:480
+#: include/classes/api/services/CMediatype.php:696
+#: include/classes/api/services/CMediatype.php:722
+#: include/classes/api/services/CMediatype.php:739
+#: include/classes/api/services/CMediatype.php:791
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
 #: include/classes/api/services/CTriggerGeneral.php:703
 #: include/classes/api/services/CTriggerGeneral.php:736
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/api/services/CUser.php:535
 #: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:786
@@ -19657,8 +19655,7 @@ msgstr "không thể thay đổi"
 #: include/classes/validators/CEventCorrCondValidator.php:80
 #: include/classes/validators/CEventCorrCondValidator.php:87
 #: include/classes/validators/CEventCorrCondValidator.php:96
-#: include/classes/validators/CNewValidator.php:97
-#: include/validate.inc.php:332
+#: include/classes/validators/CNewValidator.php:97 include/validate.inc.php:332
 msgid "cannot be empty"
 msgstr "không thể để trống"
 
@@ -19692,7 +19689,7 @@ msgstr "vòng phụ thuộc thì không được phép"
 msgid "circular item dependency is not allowed"
 msgstr "phụ thuộc item không được phép"
 
-#: jsLoader.php:244
+#: jsLoader.php:226
 msgid "colour"
 msgstr "màu sắc"
 
@@ -19719,7 +19716,7 @@ msgstr "đếm"
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr "count() - Số lượng giá trị được truy xuất thành công V (đáp ứng toán tử O) cho giai đoạn T"
 
-#: include/func.inc.php:598 jsLoader.php:163
+#: include/func.inc.php:598 jsLoader.php:145
 msgctxt "day short"
 msgid "d"
 msgstr "d"
@@ -19886,13 +19883,13 @@ msgstr "thiết lập dọn dẹp toàn bộ"
 msgid "graph pattern"
 msgstr "mô hình đồ thị"
 
-#: include/func.inc.php:599 jsLoader.php:164
+#: include/func.inc.php:599 jsLoader.php:146
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
 
-#: include/views/configuration.services.edit.php:286
-#: include/views/configuration.services.edit.php:296
+#: include/views/configuration.services.edit.php:287
+#: include/views/configuration.services.edit.php:297
 msgid "hh"
 msgstr "hh"
 
@@ -20096,12 +20093,12 @@ msgstr "logsource() - Nguồn log của tham số khớp bản log cuối cùng 
 msgid "low-level discovery rule"
 msgstr "quy tắc dò tìm mức thấp"
 
-#: include/func.inc.php:600 jsLoader.php:126 jsLoader.php:165 jsLoader.php:350
+#: include/func.inc.php:600 jsLoader.php:108 jsLoader.php:147 jsLoader.php:333
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:597 jsLoader.php:162
+#: include/func.inc.php:597 jsLoader.php:144
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -20188,8 +20185,8 @@ msgstr "min() - Giá trị tối thiểu cho giai đoạn T"
 msgid "minimum length is %1$s characters"
 msgstr "độ dài tối thiểu là ký tự %1$s"
 
-#: include/views/configuration.services.edit.php:291
-#: include/views/configuration.services.edit.php:301
+#: include/views/configuration.services.edit.php:292
+#: include/views/configuration.services.edit.php:302
 msgid "mm"
 msgstr "mm"
 
@@ -20202,15 +20199,15 @@ msgstr "ms"
 msgid "must be a valid LDAP user"
 msgstr "phải là một người dùng LDAP hợp lệ"
 
-#: include/classes/api/services/CMediatype.php:381
-#: include/classes/api/services/CMediatype.php:397
-#: include/classes/api/services/CMediatype.php:415
-#: include/classes/api/services/CMediatype.php:421
-#: include/classes/api/services/CMediatype.php:708
-#: include/classes/api/services/CMediatype.php:715
-#: include/classes/api/services/CMediatype.php:731
-#: include/classes/api/services/CMediatype.php:750
-#: include/classes/api/services/CMediatype.php:756
+#: include/classes/api/services/CMediatype.php:379
+#: include/classes/api/services/CMediatype.php:395
+#: include/classes/api/services/CMediatype.php:413
+#: include/classes/api/services/CMediatype.php:419
+#: include/classes/api/services/CMediatype.php:706
+#: include/classes/api/services/CMediatype.php:713
+#: include/classes/api/services/CMediatype.php:729
+#: include/classes/api/services/CMediatype.php:748
+#: include/classes/api/services/CMediatype.php:754
 #: include/classes/api/services/CScreen.php:401
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
@@ -20220,6 +20217,14 @@ msgstr "phải nằm trong khoảng \"%1$s\" và \"%2$s\""
 #: include/classes/validators/CApiInputValidator.php:1253
 msgid "must contain at least one low-level discovery macro"
 msgstr "phải chứa ít nhất một macro dò tìm cấp thấp"
+
+#: include/translateDefines.inc.php:38
+msgid "n-d"
+msgstr ""
+
+#: include/translateDefines.inc.php:36
+msgid "n-d H:i"
+msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:221
@@ -20231,7 +20236,7 @@ msgstr "phải chứa ít nhất một macro dò tìm cấp thấp"
 msgid "name"
 msgstr "tên"
 
-#: include/classes/html/CMultiSelect.php:85 jsLoader.php:266
+#: include/classes/html/CMultiSelect.php:85 jsLoader.php:249
 msgid "new"
 msgstr "mới"
 
@@ -20386,7 +20391,7 @@ msgstr "bên phải"
 #: app/views/popup.services.php:59 app/views/popup.services.php:62
 #: app/views/popup.services.php:64 app/views/popup.services.php:65
 #: include/services.inc.php:72 include/services.inc.php:75
-#: include/services.inc.php:163 jsLoader.php:337
+#: include/services.inc.php:163 jsLoader.php:320
 msgid "root"
 msgstr "root"
 
@@ -20426,7 +20431,7 @@ msgstr "giây"
 msgid "selected"
 msgstr "chọn"
 
-#: include/views/configuration.services.edit.php:254
+#: include/views/configuration.services.edit.php:255
 msgid "short description"
 msgstr "mô tả ngắn"
 
@@ -20446,7 +20451,7 @@ msgstr "mô tả ngắn"
 #: include/classes/api/services/CItemGeneral.php:2262
 #: include/classes/api/services/CMaintenance.php:495
 #: include/classes/api/services/CMaintenance.php:717
-#: include/classes/api/services/CMediatype.php:786
+#: include/classes/api/services/CMediatype.php:784
 #: include/classes/api/services/CProxy.php:664
 #: include/classes/api/services/CProxy.php:790
 #: include/classes/api/services/CTriggerGeneral.php:709
@@ -20496,7 +20501,7 @@ msgstr "thông tin được cung cấp không phải là duy nhất"
 #: app/views/js/monitoring.problem.view.js.php:46
 #: app/views/monitoring.host.view.php:62
 #: app/views/monitoring.problem.view.php:252
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/widgets/CWidgetHelper.php:489
 #: include/classes/widgets/CWidgetHelper.php:536 include/forms.inc.php:1984
 #: include/views/configuration.host.list.php:63
@@ -20549,7 +20554,7 @@ msgstr "Không tìm thấy bảng \"%1$s\""
 
 #: include/classes/export/CConfigurationExportBuilder.php:77
 #: include/classes/import/validators/C44XmlValidator.php:2023
-#: include/classes/import/validators/C50XmlValidator.php:2166
+#: include/classes/import/validators/C50XmlValidator.php:2173
 #: include/classes/import/validators/CXmlValidatorGeneral.php:153
 #: include/classes/import/validators/CXmlValidatorGeneral.php:172
 #, c-format
@@ -20564,7 +20569,7 @@ msgstr "thứ ba"
 msgid "third parameter is expected"
 msgstr "tham số thứ ba được mong đợi"
 
-#: jsLoader.php:245
+#: jsLoader.php:227
 msgid "time shift"
 msgstr "thay đổi thời gian"
 
@@ -20599,7 +20604,7 @@ msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "trigger với các liên kết không thể được chuyển đến một mẫu hoặc máy chủ khác"
 
 #: app/partials/layout.htmlpage.aside.php:76
-#: include/classes/html/CMultiSelect.php:84 jsLoader.php:265
+#: include/classes/html/CMultiSelect.php:84 jsLoader.php:248
 msgid "type here to search"
 msgstr "kiểu cần tìm kiếm"
 
@@ -20607,8 +20612,8 @@ msgstr "kiểu cần tìm kiếm"
 msgid "unacceptable URL"
 msgstr "không được chấp nhận URL"
 
-#: include/classes/import/validators/C44XmlValidator.php:2220
-#: include/classes/import/validators/C50XmlValidator.php:2363
+#: include/classes/import/validators/C44XmlValidator.php:2222
+#: include/classes/import/validators/C50XmlValidator.php:2372
 #: include/classes/import/validators/CXmlValidatorGeneral.php:267
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -20616,8 +20621,8 @@ msgstr "hằng số không được kỳ vọng \"%1$s\""
 
 #: include/classes/export/CConfigurationExportBuilder.php:105
 #: include/classes/import/converters/CConstantImportConverter.php:60
-#: include/classes/import/validators/C44XmlValidator.php:2178
-#: include/classes/import/validators/C50XmlValidator.php:2321
+#: include/classes/import/validators/C44XmlValidator.php:2180
+#: include/classes/import/validators/C50XmlValidator.php:2330
 #, c-format
 msgid "unexpected constant value \"%1$s\""
 msgstr "giá trị hằng số không kỳ vọng \"%1$s\""
@@ -20687,7 +20692,7 @@ msgstr "số phiên bản không được hỗ trợ"
 #: app/views/js/monitoring.host.view.js.php:36
 #: app/views/js/monitoring.problem.view.js.php:53
 #: app/views/js/popup.itemtestedit.view.js.php:437
-#: app/views/js/popup.itemtestedit.view.js.php:448
+#: app/views/js/popup.itemtestedit.view.js.php:447
 #: app/views/monitoring.host.view.php:69
 #: app/views/monitoring.problem.view.php:259
 #: app/views/popup.itemtestedit.view.php:82
@@ -20809,7 +20814,7 @@ msgstr "phát hiện sai loại quy tắc"
 msgid "wrong item type"
 msgstr "loại item sai"
 
-#: include/func.inc.php:596 jsLoader.php:161
+#: include/func.inc.php:596 jsLoader.php:143
 msgctxt "year short"
 msgid "y"
 msgstr "y"
