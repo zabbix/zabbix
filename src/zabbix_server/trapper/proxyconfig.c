@@ -73,8 +73,6 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto clean;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", j.buffer);
-
 	if (0 != proxy.auto_compress)
 	{
 		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
