@@ -273,7 +273,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateVaultMacrosData
+	 * @dataProvider getUpdateVaultMacrosNormalData
+	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosTemplate_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'templates.php?form=update&templateid=99014', 'templates');

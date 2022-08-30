@@ -296,7 +296,6 @@ class testFormMacrosHost extends testFormMacros {
 			],
 			[
 				[
-
 					'action' => USER_ACTION_UPDATE,
 					'index' => 4,
 					'macro' => '{$TEXT_HOST_MACRO_2_SECRET}',
@@ -335,7 +334,6 @@ class testFormMacrosHost extends testFormMacros {
 
 	/**
 	 * @dataProvider getCreateVaultMacrosData
-	 *
 	 */
 	public function testFormMacrosHost_CreateVaultMacros($data) {
 		$host = ($data['vault'] === 'Hashicorp') ? 'Host 1 from first group' : 'Empty host';
@@ -343,7 +341,8 @@ class testFormMacrosHost extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateVaultMacrosData
+	 * @dataProvider getUpdateVaultMacrosNormalData
+	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosHost_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Host for suppression');

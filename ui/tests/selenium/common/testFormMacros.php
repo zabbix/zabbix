@@ -2030,7 +2030,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param string $source	source type - host/template/host prototype
 	 * @param string $name		source name
 	 */
-	public function createVaultMacros($data, $url, $source, $name = null) {
+	public function createVaultMacros($data, $url, $source, $name = null, $discovered = false) {
 		$this->selectVault($data['vault']);
 		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data['macro_fields']]);
@@ -2047,7 +2047,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->assertMessage($data['expected'], $data['title']);
 			$sql = 'SELECT value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
 			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], ZBX_MACRO_TYPE_VAULT],
-					array_values(CDBHelper::getRow($sql)));
+					array_values(CDBHelper::getRow($sql))
+			);
 			$this->openMacrosTab($url, $source, false, $name);
 			$value_field = $this->getValueField($data['macro_fields']['macro']);
 			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
@@ -2059,7 +2060,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 	}
 
-	public function getUpdateVaultMacrosData() {
+	public function getUpdateVaultMacrosNormalData() {
 		return [
 			[
 				[
@@ -2074,7 +2075,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'vault' => 'Hashicorp'
 				]
-			],
+			]
+		];
+	}
+
+	public function getUpdateVaultMacrosCommonData() {
+		return [
 			[
 				[
 					'fields' => [
@@ -2159,6 +2165,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 	public function updateVaultMacros($data, $url, $source, $name = null) {
 		$this->selectVault($data['vault']);
 		$form = $this->openMacrosTab($url, $source, true, $name);
+
+		// Click "Change" button for every macros row in first case for discovered host form.
+		if (CTestArrayHelper::get($data, 'expected_macros')) {
+			$form->query('id:macros_'.$data['fields']['index'].'_change_state')->one()->waitUntilClickable()->click();
+		}
+
 		$this->fillMacros([$data['fields']]);
 		$form->submit();
 
@@ -2174,9 +2186,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')->one()->getText();
 		}
 
+		if (CTestArrayHelper::get($data, 'expected_macros')) {
+			$data = $data['expected_macros'];
+		}
+
 		$this->assertEquals([$data['fields']['macro'], $data['fields']['value']['text'], $data['fields']['description']], $result);
 		array_push($result, ZBX_MACRO_TYPE_VAULT);
-		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['fields']['macro']);
+		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['fields']['macro']).' ORDER BY hostmacroid DESC';
 		$this->assertEquals($result, array_values(CDBHelper::getRow($sql)));
 
 		if ($source === 'hosts') {
@@ -2205,7 +2221,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param string $source    type of entity that is being checked (host, hostPrototype, template)
 	 * @param type $name		name of a host where macros are updated
 	 */
-	public function checkVaultValidation($url, $source, $name = null) {
+	public function checkVaultValidation($url, $source, $name = null, $discovered = false) {
 		$cyberark = [
 			'fields' =>
 				[
@@ -2220,6 +2236,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			],
 			'error' => 'Invalid parameter "/1/macros/1/value": incorrect syntax near "AppID=zabbix:key".'
 		];
+
 		$hashicorp = [
 			'fields' =>
 				[
@@ -2237,7 +2254,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$this->page->login();
 
-		for ($i=0; $i<=1; $i++) {
+		for ($i = 0; $i <= 1; $i++) {
 			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 
 			// Check in setting what Vault is enabled.
@@ -2247,6 +2264,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 			// Try to create macros with Vault type different from settings.
 			$form = $this->openMacrosTab($url, $source, false, $name);
 			$vault_values = ($vault === 'CyberArk Vault') ? $hashicorp : $cyberark;
+
+			// Click "Change" button for discovered host form in the first case.
+			if ($discovered && $i === 0) {
+				$form->query('id:macros_0_change_state')->one()->waitUntilClickable()->click();
+			}
+
 			$this->fillMacros([$vault_values['fields']]);
 			$form->submit();
 			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object, $vault_values['error']);
@@ -2264,11 +2287,26 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 			// Check simple update.
 			$this->openMacrosTab($url, $source, false, $name);
+
+			if ($discovered && $i === 0) {
+				$form->query('id:macros_0_change_state')->one()->waitUntilClickable()->click();
+			}
+
 			$form->submit();
 			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object);
 
 			// Create macros with correct value.
 			$this->fillMacros([$vault_values['fields']]);
+
+			// For discovered host macro becomes editable only after marco is redefined first.
+			if ($discovered && $i === 0) {
+				$form->submit();
+				$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
+				$this->openMacrosTab($url, $source, false, $name);
+				$form->invalidate();
+				$this->fillMacros([$vault_values['fields']]);
+			}
+
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
 		}

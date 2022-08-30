@@ -74,6 +74,21 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	const DISCOVERED_INHERIT_INTERFACEID = 90000096;
 	const DISCOVERED_INHERIT_HOST_GROUPID = 90000097;
 
+	const DISCOVERED_HOST_VAULT_VALIDATION = 'Discovered host for vault validation 0';
+	const DISCOVERED_VAULT_VALIDATION_HOSTID = 90000098;
+	const DISCOVERED_VAULT_VALIDATION_INTERFACEID = 90000099;
+	const DISCOVERED_VAULT_VALIDATION_HOST_GROUPID = 90000100;
+
+	const DISCOVERED_HOST_EMPTY = 'Empty discovered host 1';
+	const DISCOVERED_EMPTY_HOSTID = 90000101;
+	const DISCOVERED_EMPTY_INTERFACEID = 90000102;
+	const DISCOVERED_EMPTY_HOST_GROUPID = 90000103;
+
+	const DISCOVERED_HOST_VAULT_CREATE = 'Discovered host for vault create 2';
+	const DISCOVERED_VAULT_CREATE_HOSTID = 90000104;
+	const DISCOVERED_VAULT_CREATE_INTERFACEID = 90000105;
+	const DISCOVERED_VAULT_CREATE_HOST_GROUPID = 90000106;
+
 //	/**
 //	 * The id of the host for removing inherited macros.
 //	 *
@@ -357,6 +372,36 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 //						'type' => 2
 //					]
 				]
+			],
+			[
+				'host' => 'Discovered host for vault validation {#KEY}',
+				'ruleid' => $lldid,
+				'groupLinks' => [['groupid' => 4]],
+				'macros' => [
+					[
+						'macro' => '{$NEWMACROS}',
+						'value' => 'something/value:key',
+						'type' => 2
+					]
+				]
+			],
+			[
+				'host' => 'Empty discovered host {#KEY}',
+				'ruleid' => $lldid,
+				'groupLinks' => [['groupid' => 4]]
+			],
+			[
+				'host' => 'Discovered host for vault create {#KEY}',
+				'ruleid' => $lldid,
+				'groupLinks' => [['groupid' => 4]],
+//				'macros' => [
+//					[
+//						'macro' => '{$VAULT_MACRO}',
+//						'value' => 'secret/path:key',
+//						'description' => 'vault description',
+//						'type' => 2
+//					]
+//				]
 			]
 		]);
 
@@ -366,6 +411,9 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 		$host_prototype_revert_secret_id = $host_prototypes['hostids'][3];
 		$host_prototype_create_secret_id = $host_prototypes['hostids'][4];
 		$host_prototype_inherit_id = $host_prototypes['hostids'][5];
+		$host_prototype_vault_validation_id = $host_prototypes['hostids'][6];
+		$host_prototype_empty_id = $host_prototypes['hostids'][7];
+		$host_prototype_vault_create_id = $host_prototypes['hostids'][8];
 
 		// Emulate host discovery in DB.
 		// 'Discovered host with macros {#KEY} for update'.
@@ -489,7 +537,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 				", ".zbx_dbstr(self::DISCOVERED_SECRET_CREATE_HOSTID).", 4)"
 		);
 
-		// {#KEY} Discovered host for macros inheritance'.
+		// '{#KEY} Discovered host for macros inheritance'.
 		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).
 				",".zbx_dbstr(self::DISCOVERED_HOST_INHERIT).",".zbx_dbstr(self::DISCOVERED_HOST_INHERIT).", 0, 4, '')"
 		);
@@ -521,6 +569,53 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$SNMP_COMMUNITY\}', 'redefined value', 'redefined description', 1)"
 		);
 
+		// 'Discovered host vault validation 0'.
+		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOSTID).
+				",".zbx_dbstr(self::DISCOVERED_HOST_VAULT_VALIDATION).",".zbx_dbstr(self::DISCOVERED_HOST_VAULT_VALIDATION).", 0, 4, '')"
+		);
+		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOSTID).", ".
+				zbx_dbstr($host_prototype_vault_validation_id).")"
+		);
+		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
+				zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
+		);
+		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOST_GROUPID).
+				", ".zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOSTID).", 4)"
+		);
+		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990123, "
+				.zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOSTID).", '\{\$NEWMACROS\}', 'something/value:key', '', 2, 1)"
+		);
+
+		// 'Empty discovered host 1'.
+		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_EMPTY_HOSTID).
+				",".zbx_dbstr(self::DISCOVERED_HOST_EMPTY).",".zbx_dbstr(self::DISCOVERED_HOST_EMPTY).", 0, 4, '')"
+		);
+		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_EMPTY_HOSTID).", ".
+				zbx_dbstr($host_prototype_empty_id).")"
+		);
+		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
+				zbx_dbstr(self::DISCOVERED_EMPTY_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_EMPTY_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
+		);
+		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_EMPTY_HOST_GROUPID).
+				", ".zbx_dbstr(self::DISCOVERED_EMPTY_HOSTID).", 4)"
+		);
+
+		// 'Discovered host for vault create 2'.
+		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOSTID).
+				",".zbx_dbstr(self::DISCOVERED_HOST_VAULT_CREATE).",".zbx_dbstr(self::DISCOVERED_HOST_VAULT_CREATE).", 0, 4, '')"
+		);
+		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOSTID).", ".
+				zbx_dbstr($host_prototype_vault_create_id).")"
+		);
+		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
+				zbx_dbstr(self::DISCOVERED_VAULT_CREATE_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
+		);
+		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOST_GROUPID).
+				", ".zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOSTID).", 4)"
+		);
+//		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990124, "
+//				.zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOSTID).", '\{\$VAULT_MACRO\}', 'secret/path:key', '', 2, 1)"
+//		);
 
 //		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990108, "
 //				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$HOST_MACRO\}', 'host_macro_value', '', 1)"
@@ -529,7 +624,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 //				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$HOST_SECRET\}', 'host_macro_secret', '', 1, 1)"
 //		);
 //		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic, type) VALUES (990110, "
-//				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$HOST_VAULT\}', 'host_macro_vault', '', 1, 2)"
+//				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$HOST_VAULT_VALIDATION\}', 'host_macro_vault', '', 1, 2)"
 //		);
 //		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990111, "
 //				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$PROTO_MACRO\}', 'proto_macro_value', '', 1)"
@@ -538,7 +633,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 //				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$PROTO_SECRET\}', 'proto_macro_secret', '', 1, 1)"
 //		);
 //		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic, type) VALUES (990113, "
-//				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$PROTO_VAULT\}', 'proto_macro_vault', '', 1, 2)"
+//				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$PROTO_VAULT_VALIDATION\}', 'proto_macro_vault', '', 1, 2)"
 //		);
 	}
 
@@ -1000,22 +1095,49 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 * Check Vault macros validation.
 	 */
 	public function testFormMacrosDiscoveredHost_checkVaultValidation() {
-		$this->checkVaultValidation('zabbix.php?action=host.view', 'hosts', 'Host for different items types');
+		$this->checkVaultValidation('zabbix.php?action=host.view', 'hosts', self::DISCOVERED_HOST_VAULT_VALIDATION, true);
 	}
 
 	/**
 	 * @dataProvider getCreateVaultMacrosData
-	 *
 	 */
 	public function testFormMacrosDiscoveredHost_CreateVaultMacros($data) {
-		$host = ($data['vault'] === 'Hashicorp') ? 'Host 1 from first group' : 'Empty host';
-		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', $host);
+		$host = ($data['vault'] === 'Hashicorp') ? self::DISCOVERED_HOST_VAULT_CREATE : self::DISCOVERED_HOST_EMPTY;
+		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', $host, true);
 	}
 
+	public function getUpdateVaultMacrosDiscoveredData() {
+		return [
+			[
+				[
+					'fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => $this->vault_macro_index,
+//						'macro' => $this->update_vault_macro,
+						'value' => [
+							'text' => 'secret/path:key'
+						],
+						'description' => ''
+					],
+					'vault' => 'Hashicorp',
+					'expected_macros' => [
+						'fields' => [
+							'macro' => '{$VAULT_HOST_MACRO3}',
+							'value' => [
+								'text' => 'secret/path:key'
+							],
+							'description' => ''
+						]
+					]
+				]
+			]
+		];
+	}
 	/**
-	 * @dataProvider getUpdateVaultMacrosData
+	 * @dataProvider getUpdateVaultMacrosDiscoveredData
+	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosDiscoveredHost_UpdateVaultMacros($data) {
-		$this->updateVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Host for suppression');
+		$this->updateVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', self::DISCOVERED_HOST_SECRET_LAYOUT);
 	}
 }

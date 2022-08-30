@@ -285,7 +285,8 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateVaultMacrosData
+	 * @dataProvider getUpdateVaultMacrosNormalData
+	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosHostPrototype_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90003&hostid=90008',
