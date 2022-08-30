@@ -885,7 +885,8 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 	/**
 	 * @onBeforeOnce prepareUpdateData
 	 *
-	 * @dataProvider getUpdateVaultMacrosData
+	 * @dataProvider getUpdateVaultMacrosNormalData
+	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosAdministrationGeneral_UpdateVaultMacros($data) {
 		$this->selectVault($data['vault']);
