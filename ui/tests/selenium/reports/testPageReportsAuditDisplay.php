@@ -86,7 +86,15 @@ class testPageReportsAuditDisplay extends CWebTest {
 		$this->assertEquals($filter_actions, $this->query('id:filter-actions')->asCheckboxList()->one()->getLabels()->asText());
 
 		// Check that table stats are present.
-		$this->assertTableStats($table->getRows()->count());
+		if ($this->query('xpath://a[@class="paging-selected"]')->exists()) {
+			$audit_count = CDBHelper::getCount('SELECT * FROM auditlog');
+			$table_stats = ($audit_count > 1000) ? 'Displaying 1 to 100 of 1000+ found'
+					: 'Displaying 1 to 100 of '.$audit_count.' found';
+			$this->assertEquals($table_stats, $this->query('xpath://div[@class="table-stats"]')->one()->getText());
+		}
+		else {
+			$this->assertTableStats($table->getRows()->count());
+		}
 
 		// Resource name with checkboxes that are enabled.
 		$resource_actions =[
