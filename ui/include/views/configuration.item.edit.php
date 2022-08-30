@@ -26,7 +26,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Items'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ITEM_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_EDIT));
 
 $host = $data['host'];
 

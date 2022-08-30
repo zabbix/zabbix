@@ -337,7 +337,7 @@ $saml_tab = (new CFormGrid())
 
 (new CWidget())
 	->setTitle(_('Authentication'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTHENTICATION_EDIT))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_AUTHENTICATION_EDIT))
 	->addItem((new CForm())
 		->addVar('action', $data['action_submit'])
 		->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])

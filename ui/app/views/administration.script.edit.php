@@ -29,7 +29,7 @@ $this->includeJsFile('administration.script.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Scripts'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_SCRIPT_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_EDIT));
 
 $row_template = (new CTag('script', true))
 	->setId('parameters-row')
