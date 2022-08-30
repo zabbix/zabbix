@@ -61,7 +61,7 @@ $filter = (new CFilter())
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_serviceid',
-						'object_name' => 'service',
+						'object_name' => 'services',
 						'data' => $data['service'] !== null
 							? [CArrayHelper::renameKeys($data['service'], ['serviceid' => 'id'])]
 							: [],
