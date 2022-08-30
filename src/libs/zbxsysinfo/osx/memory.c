@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
 
 static vm_size_t	pagesize = 0;

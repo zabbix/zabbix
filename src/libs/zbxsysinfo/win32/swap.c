@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxsymbols.h"
 
 int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)

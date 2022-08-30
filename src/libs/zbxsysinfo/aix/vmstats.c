@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "stats.h"
 
 #define ZBX_MAX_WAIT_VMSTAT	2	/* maximum seconds to wait for vmstat data on the first call */

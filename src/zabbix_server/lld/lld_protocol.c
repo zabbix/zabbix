@@ -23,7 +23,7 @@
 #include "log.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t itemid, zbx_uint64_t hostid,
 		const char *value, const zbx_timespec_t *ts, unsigned char meta, zbx_uint64_t lastlogsize, int mtime,

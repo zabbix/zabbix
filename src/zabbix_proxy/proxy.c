@@ -26,7 +26,7 @@
 #include "zbxgetopt.h"
 #include "zbxmutexs.h"
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxmodules.h"
 
 #include "zbxnix.h"

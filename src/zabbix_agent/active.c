@@ -21,7 +21,7 @@
 
 #include "zbxconf.h"
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "logfiles/logfiles.h"
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"

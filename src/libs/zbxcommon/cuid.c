@@ -18,7 +18,7 @@
 **/
 
 #include "string.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include <time.h>
 #include <stdlib.h>
 

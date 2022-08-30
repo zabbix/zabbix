@@ -19,7 +19,7 @@
 
 #include "zbxcommon.h"
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #define CHECKED_SYSCONF_SYSCALL(sysconf_name)									\
 	errno = 0;												\

@@ -18,7 +18,7 @@
 **/
 
 #include "zbxsysinfo_common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #include "log.h"
 #include "file.h"

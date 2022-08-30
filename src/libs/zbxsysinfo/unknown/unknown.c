@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION	TEST PARAMETERS */

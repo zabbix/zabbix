@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {

@@ -18,7 +18,8 @@
 **/
 
 #include "proc.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxregexp.h"

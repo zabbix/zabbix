@@ -20,7 +20,7 @@
 #include "zbxcommon.h"
 
 #include "perfmon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

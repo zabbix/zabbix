@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "../common/zbxsysinfo_common.h"
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)

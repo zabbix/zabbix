@@ -18,7 +18,7 @@
 **/
 
 #include "zabbix_stats.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxnum.h"

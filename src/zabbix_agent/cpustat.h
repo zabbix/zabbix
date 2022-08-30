@@ -20,7 +20,7 @@
 #ifndef ZABBIX_CPUSTAT_H
 #define ZABBIX_CPUSTAT_H
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxalgo.h"
 
 #ifdef _WINDOWS

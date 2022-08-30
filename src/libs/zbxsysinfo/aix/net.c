@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxjson.h"
 #include "log.h"
 #include "zbxstr.h"

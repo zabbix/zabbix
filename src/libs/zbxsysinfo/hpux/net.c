@@ -24,7 +24,7 @@
 #include <sys/mib.h>
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxjson.h"
 
 #define PPA(n) (*(dl_hp_ppa_info_t *)(ppa_data_buf + n * sizeof(dl_hp_ppa_info_t)))

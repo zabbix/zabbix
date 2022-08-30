@@ -18,7 +18,7 @@
 **/
 
 #include "hardware.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "../common/zbxsysinfo_common.h"
 
 #include <sys/mman.h>

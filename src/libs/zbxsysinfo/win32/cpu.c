@@ -19,7 +19,7 @@
 
 #include "zbxcommon.h"
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "stats.h"
 #include "perfstat.h"
 

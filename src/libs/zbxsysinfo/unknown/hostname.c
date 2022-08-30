@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */

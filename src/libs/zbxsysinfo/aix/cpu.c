@@ -18,7 +18,7 @@
 **/
 
 #include <sys/dr.h>
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "stats.h"
 
 #include "log.h"

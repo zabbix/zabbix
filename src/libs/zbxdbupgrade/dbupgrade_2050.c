@@ -20,7 +20,7 @@
 #include "dbupgrade.h"
 
 #include "zbxdbhigh.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
 
 /*

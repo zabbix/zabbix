@@ -24,7 +24,7 @@
 #	error "This module allowed only for Unix OS"
 #endif
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #define	MAX_DISKDEVICES	1024
 

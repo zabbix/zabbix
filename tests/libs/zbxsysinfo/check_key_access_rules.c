@@ -25,7 +25,7 @@
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "module.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 
 extern zbx_vector_ptr_t	key_access_rules;

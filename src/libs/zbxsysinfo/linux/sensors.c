@@ -16,8 +16,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#include "zbxcommon.h"
-#include "sysinfo.h"
+
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "zbxregexp.h"
 
 #ifdef KERNEL_2_4

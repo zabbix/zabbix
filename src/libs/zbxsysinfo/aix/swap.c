@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
 
 #define ZBX_PERFSTAT_PAGE_SHIFT	12	/* 4 KB */

@@ -20,7 +20,7 @@
 #include "listener.h"
 
 #include "zbxconf.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
 #include "zbxstr.h"
 #include "zbxtime.h"

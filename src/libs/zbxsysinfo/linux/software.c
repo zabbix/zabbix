@@ -18,7 +18,7 @@
 **/
 
 #include "software.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #include "zbxalgo.h"
 #include "zbxexec.h"

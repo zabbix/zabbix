@@ -24,7 +24,9 @@
 #	define _PSTAT64
 #endif
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include <sys/pstat.h>
 #include "zbxregexp.h"
 #include "log.h"

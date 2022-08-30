@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SYSINFO_H
-#define ZABBIX_SYSINFO_H
+#ifndef ZABBIX_ZBXSYSINFO_H
+#define ZABBIX_ZBXSYSINFO_H
 
 #include "zbxcommon.h"
 #include "module.h"
@@ -157,23 +157,6 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 #define ZBX_CPU_STATE_GCPU	8
 #define ZBX_CPU_STATE_GNICE	9
 #define ZBX_CPU_STATE_COUNT	10
-
-#define ZBX_PROC_STAT_ALL	0
-#define ZBX_PROC_STAT_RUN	1
-#define ZBX_PROC_STAT_SLEEP	2
-#define ZBX_PROC_STAT_ZOMB	3
-#define ZBX_PROC_STAT_DISK	4
-#define ZBX_PROC_STAT_TRACE	5
-
-#define ZBX_PROC_MODE_PROCESS	0
-#define ZBX_PROC_MODE_THREAD	1
-#define ZBX_PROC_MODE_SUMMARY	2
-
-#define ZBX_DO_SUM		0
-#define ZBX_DO_MAX		1
-#define ZBX_DO_MIN		2
-#define ZBX_DO_AVG		3
-#define ZBX_DO_ONE		4
 
 #define ZBX_DSTAT_TYPE_SECT	0
 #define ZBX_DSTAT_TYPE_OPER	1
@@ -354,39 +337,6 @@ typedef struct
 }
 zbx_mpoint_t;
 
-#define ZBX_LLD_MACRO_FSNAME		"{#FSNAME}"
-#define ZBX_LLD_MACRO_FSTYPE		"{#FSTYPE}"
-#define ZBX_LLD_MACRO_FSLABEL		"{#FSLABEL}"
-#define ZBX_LLD_MACRO_FSDRIVETYPE	"{#FSDRIVETYPE}"
-
-#define ZBX_SYSINFO_TAG_FSNAME			"fsname"
-#define ZBX_SYSINFO_TAG_FSTYPE			"fstype"
-#define ZBX_SYSINFO_TAG_FSLABEL			"fslabel"
-#define ZBX_SYSINFO_TAG_FSDRIVETYPE		"fsdrivetype"
-#define ZBX_SYSINFO_TAG_BYTES			"bytes"
-#define ZBX_SYSINFO_TAG_INODES			"inodes"
-#define ZBX_SYSINFO_TAG_TOTAL			"total"
-#define ZBX_SYSINFO_TAG_FREE			"free"
-#define ZBX_SYSINFO_TAG_USED			"used"
-#define ZBX_SYSINFO_TAG_PFREE			"pfree"
-#define ZBX_SYSINFO_TAG_PUSED			"pused"
-
-#define ZBX_SYSINFO_FILE_TAG_TYPE		"type"
-#define ZBX_SYSINFO_FILE_TAG_BASENAME		"basename"
-#define ZBX_SYSINFO_FILE_TAG_PATHNAME		"pathname"
-#define ZBX_SYSINFO_FILE_TAG_DIRNAME		"dirname"
-#define ZBX_SYSINFO_FILE_TAG_USER		"user"
-#define ZBX_SYSINFO_FILE_TAG_GROUP		"group"
-#define ZBX_SYSINFO_FILE_TAG_PERMISSIONS	"permissions"
-#define ZBX_SYSINFO_FILE_TAG_SID		"SID"
-#define ZBX_SYSINFO_FILE_TAG_UID		"uid"
-#define ZBX_SYSINFO_FILE_TAG_GID		"gid"
-#define ZBX_SYSINFO_FILE_TAG_SIZE		"size"
-#define ZBX_SYSINFO_FILE_TAG_TIME		"time"
-#define ZBX_SYSINFO_FILE_TAG_TIMESTAMP		"timestamp"
-#define ZBX_SYSINFO_FILE_TAG_TIME_ACCESS	"access"
-#define ZBX_SYSINFO_FILE_TAG_TIME_MODIFY	"modify"
-#define ZBX_SYSINFO_FILE_TAG_TIME_CHANGE	"change"
 
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
 void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
@@ -413,4 +363,4 @@ void		zbx_add_alias(const char *name, const char *value);
 void		zbx_alias_list_free(void);
 const char	*zbx_alias_get(const char *orig);
 
-#endif
+#endif /* ZABBIX_ZBXSYSINFO_H */

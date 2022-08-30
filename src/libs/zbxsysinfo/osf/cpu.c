@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "../common/zbxsysinfo_common.h"
 
 int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)

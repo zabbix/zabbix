@@ -20,7 +20,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxnum.h"
 #include "../../../../src/libs/zbxsysinfo/common/system.h"
 

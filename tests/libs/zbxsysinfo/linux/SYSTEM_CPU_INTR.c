@@ -5,7 +5,7 @@
 
 #include "zbxcommon.h"
 #include "module.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 static int	read_yaml_ret(void)
 {

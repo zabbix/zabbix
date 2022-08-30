@@ -21,7 +21,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxnum.h"
 
 void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)

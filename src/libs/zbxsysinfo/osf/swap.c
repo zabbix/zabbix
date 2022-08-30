@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 /* Solaris. */
 #if !defined(HAVE_SYSINFO_FREESWAP)
