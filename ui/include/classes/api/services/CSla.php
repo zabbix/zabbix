@@ -1141,10 +1141,6 @@ class CSla extends CApiService {
 		if ($options['period_from'] !== null) {
 			$period_from = (new DateTime('@'.$options['period_from']))->setTimezone($timezone);
 			self::alignDateToPeriodStart($period_from, (int) $sla['period']);
-
-			if ($period_from->getTimestamp() < 0) {
-				$period_from->add($interval);
-			}
 		}
 		else {
 			$period_from = null;
@@ -1154,10 +1150,6 @@ class CSla extends CApiService {
 			$period_to = (new DateTime('@'.$options['period_to']))->setTimezone($timezone);
 			self::alignDateToPeriodStart($period_to, (int) $sla['period']);
 			$period_to->add($interval);
-
-			if ($period_to->getTimestamp() > ZBX_MAX_DATE) {
-				$period_to->sub($interval);
-			}
 		}
 		elseif ($period_from === null) {
 			$period_to = $effective_max;
