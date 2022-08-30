@@ -597,7 +597,8 @@ abstract class CHostGeneral extends CHostBase {
 		$sqlWhere = ' i2.itemid=i1.templateid'.
 			' AND '.dbConditionInt('i2.hostid', $templateids).
 			' AND '.dbConditionInt('i1.flags', $flags).
-			' AND h.hostid=i1.hostid';
+			' AND h.hostid=i1.hostid'.
+			' AND i1.type <> '.ITEM_TYPE_HTTPTEST;
 
 		if (!is_null($hostids)) {
 			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $hostids);
@@ -1292,7 +1293,8 @@ abstract class CHostGeneral extends CHostBase {
 		$sqlWhere = ' i2.itemid=i1.templateid'.
 			' AND '.dbConditionInt('i2.hostid', $templateids).
 			' AND '.dbConditionInt('i1.flags', $flags).
-			' AND h.hostid=i1.hostid';
+			' AND h.hostid=i1.hostid'.
+			' AND i1.type <> '.ITEM_TYPE_HTTPTEST;
 
 		if (!is_null($targetids)) {
 			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $targetids);

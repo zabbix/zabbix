@@ -224,6 +224,8 @@ class CHttpTestManager {
 						$deleteStepItemIds[] = $itemId;
 					}
 
+					DB::delete('httpstepitem', ['httpstepid' => $stepidsDelete]);
+
 					DB::delete('httpstep_field', ['httpstepid' => $stepidsDelete]);
 
 					DB::delete('httpstep', ['httpstepid' => $stepidsDelete]);
@@ -233,7 +235,7 @@ class CHttpTestManager {
 
 		// Old items must be deleted prior to createStepsReal() since identical items cannot be created in DB.
 		if ($deleteStepItemIds) {
-			CItemManager::delete($deleteStepItemIds);
+			DB::delete('httpstepitem', ['itemid' => $deleteStepItemIds]);
 		}
 
 		foreach ($httptests as $key => $httptest) {

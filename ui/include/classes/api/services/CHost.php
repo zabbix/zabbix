@@ -1569,8 +1569,6 @@ class CHost extends CHostGeneral {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('httptest', ['hostid' => $hostids]);
-
 		DB::delete('operations', [
 			'operationid' => $delOperationids
 		]);
