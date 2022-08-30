@@ -102,7 +102,6 @@ class CDocHelper {
 	const MONITORING_HISTORY =									'web_interface/frontend_sections/monitoring/latest_data#graphs';
 	const MONITORING_LATEST_VIEW =								'web_interface/frontend_sections/monitoring/latest_data';
 	const MONITORING_PROBLEMS_VIEW =							'web_interface/frontend_sections/monitoring/problems';
-	const MONITORING_PROBLEMS_TR_EVENTS =						'web_interface/frontend_sections/monitoring/problems#viewing-details';
 	const MONITORING_SYSMAP_EDIT =								'config/visualization/maps/map#creating-a-map';
 	const MONITORING_SYSMAP_LIST =								'web_interface/frontend_sections/monitoring/maps';
 	const MONITORING_MAP_VIEW =									'web_interface/frontend_sections/monitoring/maps#viewing-maps';
@@ -142,6 +141,7 @@ class CDocHelper {
 	const SERVICES_SERVICE_EDIT =								'web_interface/frontend_sections/services/service#editing-services';
 	const SERVICES_SLA_LIST =									'web_interface/frontend_sections/services/sla#overview';
 	const SERVICES_SLAREPORT_LIST =								'web_interface/frontend_sections/services/sla_report#overview';
+	const TR_EVENTS =											'web_interface/frontend_sections/monitoring/problems#viewing-details';
 	const USERS_AUTHENTICATION_EDIT =							'web_interface/frontend_sections/users/authentication';
 	const USERS_TOKEN_LIST =									'web_interface/frontend_sections/users/api_tokens';
 	const USERS_USER_EDIT =										'config/users_and_usergroups/user';
