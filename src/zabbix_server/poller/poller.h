@@ -22,6 +22,7 @@
 
 #include "zbxthreads.h"
 #include "dbcache.h"
+#include "zbxcomms.h"
 
 typedef struct
 {

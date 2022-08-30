@@ -23,6 +23,7 @@
 #include "dbcache.h"
 #include "zbxha.h"
 #include "zbxjson.h"
+#include "zbxtime.h"
 
 #include "checks_internal.h"
 

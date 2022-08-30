@@ -20,6 +20,7 @@
 #include "zbxtasks.h"
 #include "zbxnum.h"
 #include "zbxdbhigh.h"
+#include "version.h"
 
 /******************************************************************************
  *                                                                            *
