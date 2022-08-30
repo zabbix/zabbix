@@ -1943,15 +1943,16 @@ static void	host_index_free(zbx_host_index_t *index)
 }
 
 /******************************************************************************
- *                                                                            *
- * Purpose: resolve expression macro empty and macro host references          *
- *          (// , {HOST.HOST}, {HOST.HOST<N>}, {ITEM.KEY}, {ITEM.KEY<N>})     *
- *          to host names and item keys                                       *
- *                                                                            *
- * Parameters: eval    - [IN] the evaluation data                             *
- *             trigger - [IN] the calculated item                             *
- *                                                                            *
- ******************************************************************************/
+*                                                                             *
+* Purpose: resolve expression with an empty host macro (default host)         *
+*          and macro host references, like:                                   *
+*          (two forward slashes, {HOST.HOST}, {HOST.HOST<N>},                 *
+*          {ITEM.KEY} and {ITEM.KEY<N>}) to host names and item keys          *
+*                                                                             *
+* Parameters: eval    - [IN/OUT] the evaluation expression                    *
+*             trigger - [IN] trigger which defines the evaluation expression  *
+*                                                                             *
+*******************************************************************************/
 void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const DB_TRIGGER *trigger)
 {
 	int			i, func_num, index;
