@@ -43,7 +43,7 @@ window.ldap_edit_popup = new class {
 		this._addEventListeners();
 		this._renderProvisionGroups(provision_groups);
 		this._renderProvisionMedia(provision_media);
-		this.initSortable(document.getElementById('ldap-user-groups-table'));
+		this._initSortable(document.getElementById('ldap-user-groups-table'));
 
 		if (document.getElementById('bind-password-btn') !== null) {
 			document.getElementById('bind-password-btn').addEventListener('click', this.showPasswordField);
@@ -124,12 +124,10 @@ window.ldap_edit_popup = new class {
 		}
 	}
 
-	initSortable(element) {
-		const is_disabled = element.querySelectorAll('tr.sortable').length < 2;
-
+	_initSortable(element) {
 		$(element).sortable({
-			disabled: is_disabled,
 			items: 'tbody tr.sortable',
+			cancel: '[data-row_fallback="<?= GROUP_MAPPING_FALLBACK ?>"]',
 			axis: 'y',
 			containment: 'parent',
 			cursor: 'grabbing',
@@ -151,6 +149,10 @@ window.ldap_edit_popup = new class {
 				return ui;
 			},
 			stop: function(e, ui) {
+				if ($(ui.item).prev('[data-row_fallback="<?= GROUP_MAPPING_FALLBACK ?>"]').length) {
+					return false;
+				}
+
 				ui.item.find('>td').removeAttr('width');
 				ui.item.removeAttr('style');
 			},
@@ -158,10 +160,6 @@ window.ldap_edit_popup = new class {
 				$(ui.placeholder).height($(ui.helper).height());
 			}
 		});
-
-		for (const drag_icon of element.querySelectorAll('div.<?= ZBX_STYLE_DRAG_ICON ?>')) {
-			drag_icon.classList.toggle('<?= ZBX_STYLE_DISABLED ?>', is_disabled);
-		}
 	}
 
 	showPasswordField(e) {
@@ -392,7 +390,9 @@ window.ldap_edit_popup = new class {
 
 		let action_label;
 		let action_class;
+		let drag_icon_class = '';
 		if (is_fallback == <?= GROUP_MAPPING_FALLBACK ?>) {
+			drag_icon_class = '<?= ZBX_STYLE_DISABLED ?>';
 			if (fallback_status == <?= GROUP_MAPPING_FALLBACK_ON ?>) {
 				action_label = '<?= _('Enabled') ?>';
 				action_class = 'js-enabled <?= ZBX_STYLE_GREEN ?>';
@@ -410,7 +410,7 @@ window.ldap_edit_popup = new class {
 		const html = `
 			<tr data-row_index="${row_index}" data-row_fallback="${is_fallback}" class="sortable">
 				<td class="td-drag-icon">
-					<div class="drag-icon ui-sortable-handle"></div>
+					<div class="drag-icon ui-sortable-handle ${drag_icon_class}"></div>
 				</td>
 				<td>
 					<a href="javascript:void(0);" class="wordwrap js-edit">${name}</a>
