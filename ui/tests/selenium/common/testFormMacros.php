@@ -1491,23 +1491,25 @@ abstract class testFormMacros extends CLegacyWebTest {
 	public function updateSecretMacros($data, $url, $source, $name = null, $discovered = false) {
 		$form = $this->openMacrosTab($url, $source, true, $name);
 
-		// Click "Change" button for every macros row in first case for discovered host form.
 		if ($discovered) {
-			$unset_macro = $data['fields']['macro'];
-			$form->query('id:macros_'.$data['fields']['index'].'_change_state')->one()->waitUntilClickable()->click();
-			unset($data['fields']['macro']);
+			$fields = $data['fields'];
+			$expected = $data['expected'];
+			$data = $fields;
+
+			// Click "Change" button for every macros row in first case for discovered host form.
+			$form->query('id:macros_'.$data['index'].'_change_state')->one()->waitUntilClickable()->click();
 		}
 
-		$this->fillMacros([$data['fields']]);
+		$this->fillMacros([$data]);
 
 		if ($discovered) {
-			$data['fields']['macro'] = $unset_macro;
+			$data = $expected;
 		}
 
 		// Check that new values are correct in Inherited and host prototype macros tab before saving the values.
-		$secret = (CTestArrayHelper::get($data['fields']['value'], 'type', CInputGroupElement::TYPE_SECRET) ===
+		$secret = (CTestArrayHelper::get($data['value'], 'type', CInputGroupElement::TYPE_SECRET) ===
 				CInputGroupElement::TYPE_SECRET) ? true : false;
-		$this->checkInheritedTab($data['fields'], $secret);
+		$this->checkInheritedTab($data, $secret);
 
 		$form->invalidate();
 		$form->submit();
@@ -1518,22 +1520,22 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$this->assertMessage(TEST_GOOD);
 		$this->openMacrosTab($url, $source, false, $name);
-		$value_field = $this->getValueField($data['fields']['macro']);
+		$value_field = $this->getValueField($data['macro']);
 
-		if (CTestArrayHelper::get($data['fields']['value'], 'type', CInputGroupElement::TYPE_SECRET) === CInputGroupElement::TYPE_SECRET) {
+		if (CTestArrayHelper::get($data['value'], 'type', CInputGroupElement::TYPE_SECRET) === CInputGroupElement::TYPE_SECRET) {
 			$this->assertEquals(CInputGroupElement::TYPE_SECRET, $value_field->getInputType());
 			$this->assertEquals('******', $value_field->getValue());
-			$this->checkInheritedTab($data['fields'], true, false);
+			$this->checkInheritedTab($data, true, false);
 		}
 		else {
 			$this->assertEquals(CInputGroupElement::TYPE_TEXT, $value_field->getInputType());
-			$this->assertEquals($data['fields']['value']['text'], $value_field->getValue());
-			$this->checkInheritedTab($data['fields'], false);
+			$this->assertEquals($data['value']['text'], $value_field->getValue());
+			$this->checkInheritedTab($data, false);
 		}
 
 		// Check in DB that values of the updated macros are correct.
-		$sql = 'SELECT value FROM hostmacro WHERE macro='.zbx_dbstr($data['fields']['macro']).' ORDER BY hostmacroid DESC';
-		$this->assertEquals($data['fields']['value']['text'], CDBHelper::getValue($sql));
+		$sql = 'SELECT value FROM hostmacro WHERE macro='.zbx_dbstr($data['macro']).' ORDER BY hostmacroid DESC';
+		$this->assertEquals($data['value']['text'], CDBHelper::getValue($sql));
 
 		if ($source === 'hosts') {
 			COverlayDialogElement::find()->one()->close();

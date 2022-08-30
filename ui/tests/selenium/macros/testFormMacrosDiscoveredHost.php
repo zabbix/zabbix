@@ -936,6 +936,11 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 					'fields' => [
 						'action' => USER_ACTION_UPDATE,
 						'index' => 2,
+						'value' => [
+							'text' => 'Updated secret value'
+						]
+					],
+					'expected' => [
 						'macro' => '{$SECRET_HOST_MACRO_UPDATE}',
 						'value' => [
 							'text' => 'Updated secret value'
@@ -948,6 +953,12 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 					'fields' => [
 						'action' => USER_ACTION_UPDATE,
 						'index' => 3,
+						'value' => [
+							'text' => 'New text value',
+							'type' => 'Text'
+						]
+					],
+					'expected' => [
 						'macro' => '{$SECRET_HOST_MACRO_UPDATE_2_TEXT}',
 						'value' => [
 							'text' => 'New text value',
@@ -961,6 +972,12 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 					'fields' => [
 						'action' => USER_ACTION_UPDATE,
 						'index' => 4,
+						'value' => [
+							'text' => 'New secret value',
+							'type' => 'Secret text'
+						]
+					],
+					'expected' => [
 						'macro' => '{$TEXT_HOST_MACRO_2_SECRET}',
 						'value' => [
 							'text' => 'New secret value',
