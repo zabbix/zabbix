@@ -39,6 +39,10 @@ Note, that this step is required only for notifications about internal events; f
 
 For more information, please see [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [Opsgenie](https://docs.opsgenie.com/docs/alert-api) documentation.
 
+## Known issue:
+
+When recovery & update operations both defined in action and problem is closed manually in frontend: First is sent close alert and after it is closed in OPSGenie, update of it fails.
+
 ## Supported Versions
 
 Zabbix 5.0, Opsgenie Alert API.
