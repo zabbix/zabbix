@@ -33,7 +33,7 @@ $widget = (new CWidget())
 $form = (new CForm())
 	->setId('userrole-form')
 	->setName('user_role_form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['roleid'] !== null) {
 	$form->addVar('roleid', $data['roleid']);
