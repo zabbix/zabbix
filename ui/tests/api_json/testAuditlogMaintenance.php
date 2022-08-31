@@ -19,12 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/testAuditlogCommon.php';
+require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
  * @backup maintenances
  */
 class testAuditlogMaintenance extends testAuditlogCommon {
+
+	/**
+	 * Existing Maintenance ID.
+	 */
+	private const MAINTENANCEID = 60002;
+
 	public function testAuditlogMaintenance_Create() {
 		$create = $this->call('maintenance.create', [
 			[
@@ -53,12 +59,15 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 				]
 			]
 		]);
+
 		$resourceid = $create['result']['maintenanceids'][0];
 		$groupid = CDBHelper::getRow('SELECT maintenance_groupid FROM maintenances_groups WHERE maintenanceid='.
-				zbx_dbstr($resourceid));
+				zbx_dbstr($resourceid)
+		);
 		$timeperiod = CDBHelper::getRow('SELECT timeperiodid FROM timeperiods ORDER BY timeperiodid DESC');
 		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.
-				zbx_dbstr($resourceid));
+				zbx_dbstr($resourceid)
+		);
 
 		$created = "{\"maintenance.name\":[\"add\",\"audit_maintenance\"],".
 				"\"maintenance.active_since\":[\"add\",\"1358844540\"],".
@@ -80,13 +89,13 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 				"\"maintenance.tags[".$tags['maintenancetagid']."].maintenancetagid\":[\"add\",\"".$tags['maintenancetagid']."\"],".
 				"\"maintenance.maintenanceid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->getAuditDetails('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
 
 	public function testAuditlogMaintenance_Update() {
 		$this->call('maintenance.update', [
 			[
-				'maintenanceid' => 60002,
+				'maintenanceid' => self::MAINTENANCEID,
 				'name' => 'updated_maintenance',
 				'active_since' => 1458844540,
 				'active_till' => 1490466940,
@@ -113,9 +122,14 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 				]
 			]
 		]);
-		$groupid = CDBHelper::getRow('SELECT maintenance_groupid FROM maintenances_groups WHERE maintenanceid=60002');
+
+		$groupid = CDBHelper::getRow('SELECT maintenance_groupid FROM maintenances_groups WHERE maintenanceid='.
+				zbx_dbstr(self::MAINTENANCEID)
+		);
 		$timeperiod = CDBHelper::getRow('SELECT timeperiodid FROM timeperiods ORDER BY timeperiodid DESC');
-		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid=60002');
+		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.
+				zbx_dbstr(self::MAINTENANCEID)
+		);
 
 		$updated = "{\"maintenance.groups[1]\":[\"delete\"],".
 			"\"maintenance.timeperiods[2]\":[\"delete\"],".
@@ -139,11 +153,13 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			"\"maintenance.tags[".$tags['maintenancetagid']."].value\":[\"add\",\"updated_details\"],".
 			"\"maintenance.tags[".$tags['maintenancetagid']."].maintenancetagid\":[\"add\",\"".$tags['maintenancetagid']."\"]}";
 
-		$this->getAuditDetails('details', 1, $updated, 60002);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::MAINTENANCEID);
 	}
 
 	public function testAuditlogMaintenance_Delete() {
-		$this->call('maintenance.delete', [60002]);
-		$this->getAuditDetails('resourcename', 2, 'updated_maintenance', 60002);
+		$this->call('maintenance.delete', [self::MAINTENANCEID]);
+		$this->getAuditDetails('resourcename', $this->delete_actionid,
+				'updated_maintenance', self::MAINTENANCEID
+		);
 	}
 }

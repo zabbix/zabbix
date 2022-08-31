@@ -19,12 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/testAuditlogCommon.php';
+require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
  * @backup correlation
  */
 class testAuditlogEventCorrelation extends testAuditlogCommon {
+
+	/**
+	 * Existing Event correlation ID.
+	 */
+	private const CORRELATIONID = 99001;
+
 	public function testAuditlogEventCorrelation_Create() {
 		$create = $this->call('correlation.create', [
 			[
@@ -45,9 +51,11 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 				]
 			]
 		]);
+
 		$resourceid = $create['result']['correlationids'][0];
 		$conditionid = CDBHelper::getRow('SELECT corr_conditionid FROM corr_condition WHERE correlationid='.
-				zbx_dbstr($resourceid));
+				zbx_dbstr($resourceid)
+		);
 
 		$created = "{\"correlation.name\":[\"add\",\"New event correlation for audit\"],".
 				"\"correlation.filter\":[\"add\"],".
@@ -61,16 +69,18 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 				"\"correlation.operations[".$resourceid."].corr_operationid\":[\"add\",\"".$resourceid."\"],".
 				"\"correlation.correlationid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->getAuditDetails('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
 
 	public function testAuditlogEventCorrelation_Update() {
 		// Correlation name before update
-		$correlation_name = CDBHelper::getRow('SELECT name FROM correlation WHERE correlationid = 99001');
+		$correlation_name = CDBHelper::getRow('SELECT name FROM correlation WHERE correlationid ='.
+				zbx_dbstr(self::CORRELATIONID)
+		);
 
 		$this->call('correlation.update', [
 			[
-				'correlationid' => 99001,
+				'correlationid' => self::CORRELATIONID,
 				'name' => 'Updated event correlation name',
 				'filter' => [
 					'evaltype' => 2,
@@ -88,7 +98,10 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 				]
 			]
 		]);
-		$condition = CDBHelper::getRow('SELECT corr_conditionid FROM corr_condition WHERE correlationid = 99001');
+
+		$condition = CDBHelper::getRow('SELECT corr_conditionid FROM corr_condition WHERE correlationid ='.
+				zbx_dbstr(self::CORRELATIONID)
+		);
 
 		$updated = "{\"correlation.filter.conditions[99001]\":[\"delete\"],".
 				"\"correlation.filter.conditions[".$condition['corr_conditionid']."]\":[\"add\"],".
@@ -99,11 +112,13 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 				"\"correlation.filter.conditions[".$condition['corr_conditionid'].
 				"].corr_conditionid\":[\"add\",\"".$condition['corr_conditionid']."\"]}";
 
-		$this->getAuditDetails('details', 1, $updated, 99001);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::CORRELATIONID);
 	}
 
 	public function testAuditlogEventCorrelation_Delete() {
-		$this->call('correlation.delete', [99001]);
-		$this->getAuditDetails('resourcename', 2, 'Updated event correlation name', 99001);
+		$this->call('correlation.delete', [self::CORRELATIONID]);
+		$this->getAuditDetails('resourcename', $this->delete_actionid,
+				'Updated event correlation name', self::CORRELATIONID
+		);
 	}
 }

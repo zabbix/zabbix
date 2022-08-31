@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/testAuditlogCommon.php';
+require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
  * @backup report
@@ -72,11 +72,14 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 				]
 			]
 		]);
+
 		self::$resourceid = $create['result']['reportids'][0];
 		self::$before_usrgrp = CDBHelper::getRow('SELECT reportusrgrpid FROM report_usrgrp WHERE reportid='.
-				zbx_dbstr(self::$resourceid));
+				zbx_dbstr(self::$resourceid)
+		);
 		self::$before_user = CDBHelper::getRow('SELECT reportuserid FROM report_user WHERE reportid='.
-				zbx_dbstr(self::$resourceid));
+				zbx_dbstr(self::$resourceid)
+		);
 
 		$created = "{\"report.userid\":[\"add\",\"1\"],".
 				"\"report.name\":[\"add\",\"Report for audit\"],".
@@ -102,7 +105,7 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 				.self::$before_usrgrp['reportusrgrpid']."\"],".
 				"\"report.reportid\":[\"add\",\"". self::$resourceid."\"]}";
 
-		$this->getAuditDetails('details', 0, $created, self::$resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid);
 	}
 
 	/**
@@ -140,10 +143,13 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 				]
 			]
 		]);
+
 		$usrgrp = CDBHelper::getRow('SELECT reportusrgrpid FROM report_usrgrp WHERE reportid='.
-				zbx_dbstr(self::$resourceid));
+				zbx_dbstr(self::$resourceid)
+		);
 		$user = CDBHelper::getRow('SELECT reportuserid FROM report_user WHERE reportid='.
-				zbx_dbstr(self::$resourceid));
+				zbx_dbstr(self::$resourceid)
+		);
 
 		$updated = "{\"report.users[".self::$before_user['reportuserid']."]\":[\"delete\"],".
 				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."]\":[\"delete\"],".
@@ -170,7 +176,7 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 				"\"report.user_groups[".$usrgrp['reportusrgrpid']."].reportusrgrpid\":[\"add\",\""
 				.$usrgrp['reportusrgrpid']."\"]}";
 
-		$this->getAuditDetails('details', 1, $updated, self::$resourceid);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid);
 	}
 
 	/**
@@ -178,6 +184,8 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 	 */
 	public function testAuditlogScheduledReport_Delete() {
 		$this->call('report.delete', [self::$resourceid]);
-		$this->getAuditDetails('resourcename', 2, 'Updated report for audit', self::$resourceid);
+		$this->getAuditDetails('resourcename', $this->delete_actionid,
+				'Updated report for audit', self::$resourceid
+		);
 	}
 }

@@ -19,12 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/testAuditlogCommon.php';
+require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
  * @backup icon_mapping
  */
 class testAuditlogIconMap extends testAuditlogCommon {
+
+	/**
+	 * Existing Icon map ID.
+	 */
+	private const ICONMAPID = 1;
+
 	public function testAuditlogIconMap_Create() {
 		$create = $this->call('iconmap.create', [
 			[
@@ -39,9 +45,11 @@ class testAuditlogIconMap extends testAuditlogCommon {
 				]
 			]
 		]);
+
 		$resourceid = $create['result']['iconmapids'][0];
 		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.
-				zbx_dbstr($resourceid));
+				zbx_dbstr($resourceid)
+		);
 
 		$created = "{\"iconmap.name\":[\"add\",\"icon_mapping\"],".
 				"\"iconmap.default_iconid\":[\"add\",\"5\"],".
@@ -52,13 +60,13 @@ class testAuditlogIconMap extends testAuditlogCommon {
 				"\"iconmap.mappings[".$icon_map['iconmappingid']."].iconmappingid\":[\"add\",\"".$icon_map['iconmappingid'].
 				"\"],\"iconmap.iconmapid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->getAuditDetails('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
 
 	public function testAuditlogIconMap_Update() {
 		$this->call('iconmap.update', [
 			[
-				'iconmapid' => 1,
+				'iconmapid' => self::ICONMAPID,
 				'name' => 'updated_icon_mapping',
 				'default_iconid' => 4,
 				'mappings' => [
@@ -70,7 +78,10 @@ class testAuditlogIconMap extends testAuditlogCommon {
 				]
 			]
 		]);
-		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid=1');
+
+		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.
+				zbx_dbstr(self::ICONMAPID)
+		);
 
 		$updated = "{\"iconmap.mappings[1]\":[\"delete\"],".
 				"\"iconmap.mappings[".$icon_map['iconmappingid']."]\":[\"add\"],".
@@ -81,11 +92,13 @@ class testAuditlogIconMap extends testAuditlogCommon {
 				"\"iconmap.mappings[".$icon_map['iconmappingid']."].iconid\":[\"add\",\"3\"],".
 				"\"iconmap.mappings[".$icon_map['iconmappingid']."].iconmappingid\":[\"add\",\"".$icon_map['iconmappingid']."\"]}";
 
-		$this->getAuditDetails('details', 1, $updated, 1);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::ICONMAPID);
 	}
 
 	public function testAuditlogIconMap_Delete() {
-		$this->call('iconmap.delete', [1]);
-		$this->getAuditDetails('resourcename', 2, 'updated_icon_mapping', 1);
+		$this->call('iconmap.delete', [self::ICONMAPID]);
+		$this->getAuditDetails('resourcename', $this->delete_actionid,
+				'updated_icon_mapping', self::ICONMAPID
+		);
 	}
 }

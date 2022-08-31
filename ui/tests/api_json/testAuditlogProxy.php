@@ -19,12 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/testAuditlogCommon.php';
+require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
  * @backup hosts
  */
 class testAuditlogProxy extends testAuditlogCommon {
+
+	/**
+	 * Existing Proxy ID.
+	 */
+	private const PROXYID = 99000;
+
 	public function testAuditlogProxy_Create() {
 		$create = $this->call('proxy.create', [
 			[
@@ -37,6 +43,7 @@ class testAuditlogProxy extends testAuditlogCommon {
 				'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
 			]
 		]);
+
 		$resourceid = $create['result']['proxyids'][0];
 
 		$created = "{\"proxy.host\":[\"add\",\"Audit proxy\"],".
@@ -48,7 +55,7 @@ class testAuditlogProxy extends testAuditlogCommon {
 				"\"proxy.tls_psk\":[\"add\",\"******\"],".
 				"\"proxy.proxyid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->getAuditDetails('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
 
 	public function testAuditlogProxy_Update() {
@@ -61,7 +68,7 @@ class testAuditlogProxy extends testAuditlogCommon {
 
 		$this->call('proxy.update', [
 			[
-				'proxyid' => 99000,
+				'proxyid' => self::PROXYID,
 				'host' => 'Updated Audit proxy',
 				'status' => 5,
 				'description' => 'Update proxy audit description',
@@ -72,11 +79,13 @@ class testAuditlogProxy extends testAuditlogCommon {
 			]
 		]);
 
-		$this->getAuditDetails('details', 1, $updated, 99000);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::PROXYID);
 	}
 
 	public function testAuditlogProxy_Delete() {
-		$this->call('proxy.delete', [99000]);
-		$this->getAuditDetails('resourcename', 2, 'Updated Audit proxy', 99000);
+		$this->call('proxy.delete', [self::PROXYID]);
+		$this->getAuditDetails('resourcename', $this->delete_actionid,
+				'Updated Audit proxy', self::PROXYID
+		);
 	}
 }

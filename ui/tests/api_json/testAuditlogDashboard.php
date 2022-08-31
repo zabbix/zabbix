@@ -19,12 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/testAuditlogCommon.php';
+require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
- * @backup  dashboard
+ * @backup dashboard
  */
 class testAuditlogDashboard extends testAuditlogCommon {
+
+	/**
+	 * Existing Dashboard ID.
+	 */
+	private const DASHBOARDID = 1;
+
 	public function testAuditlogDashboard_Create() {
 		$create = $this->call('dashboard.create', [
 			[
@@ -76,17 +82,23 @@ class testAuditlogDashboard extends testAuditlogCommon {
 				]
 			]
 		]);
+
 		$resourceid = $create['result']['dashboardids'][0];
 		$pageid = CDBHelper::getRow('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='.
-				zbx_dbstr($resourceid));
+				zbx_dbstr($resourceid)
+		);
 		$widgetid = CDBHelper::getRow('SELECT widgetid FROM widget WHERE dashboard_pageid='.
-				zbx_dbstr($pageid['dashboard_pageid']));
+				zbx_dbstr($pageid['dashboard_pageid'])
+		);
 		$fieldid = CDBHelper::getAll('SELECT widget_fieldid FROM widget_field WHERE widgetid ='.
-				zbx_dbstr($widgetid['widgetid']).' ORDER BY widget_fieldid ASC');
+				zbx_dbstr($widgetid['widgetid']).' ORDER BY widget_fieldid ASC'
+		);
 		$dashboard_userid = CDBHelper::getRow('SELECT dashboard_userid FROM dashboard_user WHERE dashboardid='.
-				zbx_dbstr($resourceid));
+				zbx_dbstr($resourceid)
+		);
 		$dashboard_usrgrpid = CDBHelper::getRow('SELECT dashboard_usrgrpid FROM dashboard_usrgrp WHERE dashboardid='.
-				zbx_dbstr($resourceid));
+				zbx_dbstr($resourceid)
+		);
 
 		$created = "{\"dashboard.name\":[\"add\",\"Audit dashboard\"],".
 				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."]\":[\"add\"],".
@@ -135,13 +147,13 @@ class testAuditlogDashboard extends testAuditlogCommon {
 				.$dashboard_userid['dashboard_userid']."\"],\"dashboard.userid\":[\"add\",\"1\"],".
 				"\"dashboard.dashboardid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->getAuditDetails('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
 
 	public function testAuditlogDashboard_Update() {
 		$this->call('dashboard.update', [
 			[
-				'dashboardid' => 1,
+				'dashboardid' => self::DASHBOARDID,
 				'name' => 'Updated dashboard name',
 				'display_period' => 60,
 				'auto_start' => 0,
@@ -166,10 +178,16 @@ class testAuditlogDashboard extends testAuditlogCommon {
 				]
 			]
 		]);
-		$pageid = CDBHelper::getRow('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=1');
+
+		$pageid = CDBHelper::getRow('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='.
+				zbx_dbstr(self::DASHBOARDID)
+		);
 		$widgetid = CDBHelper::getRow('SELECT widgetid FROM widget WHERE dashboard_pageid='.
-				zbx_dbstr($pageid['dashboard_pageid']));
-		$dashboard_usrgrpid = CDBHelper::getRow('SELECT dashboard_usrgrpid FROM dashboard_usrgrp WHERE dashboardid=1');
+				zbx_dbstr($pageid['dashboard_pageid'])
+		);
+		$dashboard_usrgrpid = CDBHelper::getRow('SELECT dashboard_usrgrpid FROM dashboard_usrgrp WHERE dashboardid='.
+				zbx_dbstr(self::DASHBOARDID)
+		);
 
 		$updated = "{\"dashboard.pages[1]\":[\"delete\"],".
 				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."]\":[\"add\"],".
@@ -193,11 +211,13 @@ class testAuditlogDashboard extends testAuditlogCommon {
 				"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."].dashboard_usrgrpid\":[\"add\",\""
 				.$dashboard_usrgrpid['dashboard_usrgrpid']."\"]}";
 
-		$this->getAuditDetails('details', 1, $updated, 1);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::DASHBOARDID);
 	}
 
 	public function testAuditlogDashboard_Delete() {
-		$this->call('dashboard.delete', [1]);
-		$this->getAuditDetails('resourcename', 2, 'Updated dashboard name', 1);
+		$this->call('dashboard.delete', [self::DASHBOARDID]);
+		$this->getAuditDetails('resourcename', $this->delete_actionid,
+				'Updated dashboard name', self::DASHBOARDID
+		);
 	}
 }

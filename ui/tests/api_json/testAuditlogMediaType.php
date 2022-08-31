@@ -19,12 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/testAuditlogCommon.php';
+require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
- * @backup media_type, media_type_message, media_type_param
+ * @backup media_type
  */
 class testAuditlogMediaType extends testAuditlogCommon {
+
+	/**
+	 * Existing Media type ID.
+	 */
+	private const MEDIATYPEID = 1;
+
 	public function testAuditlogMediaType_Create() {
 		$create = $this->call('mediatype.create', [
 			[
@@ -48,9 +54,11 @@ class testAuditlogMediaType extends testAuditlogCommon {
 				'attempt_interval' => '50s'
 			]
 		]);
+
 		$resourceid = $create['result']['mediatypeids'][0];
 		$message = CDBHelper::getRow('SELECT mediatype_messageid FROM media_type_message WHERE mediatypeid='.
-				zbx_dbstr($resourceid));
+				zbx_dbstr($resourceid)
+		);
 
 		$created = "{\"mediatype.name\":[\"add\",\"email_media\"],".
 				"\"mediatype.smtp_server\":[\"add\",\"test.test.com\"],".
@@ -68,13 +76,13 @@ class testAuditlogMediaType extends testAuditlogCommon {
 				"\"mediatype.attempt_interval\":[\"add\",\"50s\"],".
 				"\"mediatype.mediatypeid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->getAuditDetails('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
 
 	public function testAuditlogMediaType_Update() {
 		$this->call('mediatype.update', [
 			[
-				'mediatypeid' => 1,
+				'mediatypeid' => self::MEDIATYPEID,
 				'status' => 1,
 				'name' => 'updated_email_media',
 				'smtp_server' => 'updated_test.test.com',
@@ -119,11 +127,13 @@ class testAuditlogMediaType extends testAuditlogCommon {
 				"\"mediatype.maxattempts\":[\"update\",\"10\",\"3\"],".
 				"\"mediatype.attempt_interval\":[\"update\",\"30s\",\"10s\"]}";
 
-		$this->getAuditDetails('details', 1, $updated, 1);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::MEDIATYPEID);
 	}
 
 	public function testAuditlogMediaType_Delete() {
-		$this->call('mediatype.delete', [1]);
-		$this->getAuditDetails('resourcename', 2, 'updated_email_media', 1);
+		$this->call('mediatype.delete', [self::MEDIATYPEID]);
+		$this->getAuditDetails('resourcename', $this->delete_actionid,
+				'updated_email_media', self::MEDIATYPEID
+		);
 	}
 }

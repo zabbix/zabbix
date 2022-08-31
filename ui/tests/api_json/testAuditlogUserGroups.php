@@ -19,12 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/testAuditlogCommon.php';
+require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
  * @backup usrgrp
  */
 class testAuditlogUserGroups extends testAuditlogCommon {
+
+	/**
+	 * Existing User group ID.
+	 */
+	private const USRGRPID = 12;
+
 	public function testAuditlogUserGroups_Create() {
 		$create = $this->call('usergroup.create', [
 			[
@@ -38,11 +44,14 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 				]
 			]
 		]);
+
 		$resourceid = $create['result']['usrgrpids'][0];
 		$rights = CDBHelper::getRow('SELECT rightid FROM rights WHERE groupid='.
-				zbx_dbstr($resourceid));
+				zbx_dbstr($resourceid)
+		);
 		$id = CDBHelper::getRow('SELECT id FROM users_groups WHERE usrgrpid='.
-				zbx_dbstr($resourceid));
+				zbx_dbstr($resourceid)
+		);
 
 		$created = "{\"usergroup.name\":[\"add\",\"Audit user groups\"],".
 				"\"usergroup.rights[".$rights['rightid']."]\":[\"add\"],".
@@ -53,13 +62,13 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 				"\"usergroup.users[".$id['id']."].id\":[\"add\",\"".$id['id']."\"],".
 				"\"usergroup.usrgrpid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->getAuditDetails('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
 
 	public function testAuditlogUserGroups_Update() {
 		$this->call('usergroup.update', [
 			[
-				'usrgrpid' => 12,
+				'usrgrpid' => self::USRGRPID,
 				'users_status' => 1,
 				'debug_mode' => 1,
 				'name' => 'Updated user group name'
@@ -70,11 +79,13 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 				"\"usergroup.debug_mode\":[\"update\",\"1\",\"0\"],".
 				"\"usergroup.name\":[\"update\",\"Updated user group name\",\"No access to the frontend\"]}";
 
-		$this->getAuditDetails('details', 1, $updated, 12);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::USRGRPID);
 	}
 
 	public function testAuditlogUserGroups_Delete() {
-		$this->call('usergroup.delete', [12]);
-		$this->getAuditDetails('resourcename', 2, 'Updated user group name', 12);
+		$this->call('usergroup.delete', [self::USRGRPID]);
+		$this->getAuditDetails('resourcename', $this->delete_actionid,
+				'Updated user group name', self::USRGRPID
+		);
 	}
 }

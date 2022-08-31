@@ -19,12 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/testAuditlogCommon.php';
+require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
  * @backup token
  */
 class testAuditlogToken extends testAuditlogCommon {
+
+	/**
+	 * Existing Token ID.
+	 */
+	private const TOKENID = 11;
+
 	public function testAuditlogToken_Create() {
 		$create = $this->call('token.create', [
 			[
@@ -35,6 +41,7 @@ class testAuditlogToken extends testAuditlogCommon {
 				'status' => 1
 			]
 		]);
+
 		$resourceid = $create['result']['tokenids'][0];
 
 		$created = "{\"token.name\":[\"add\",\"Audit token\"],".
@@ -44,13 +51,13 @@ class testAuditlogToken extends testAuditlogCommon {
 				"\"token.status\":[\"add\",\"1\"],".
 				"\"token.tokenid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->getAuditDetails('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
 
 	public function testAuditlogToken_Update() {
 		$this->call('token.update', [
 			[
-				'tokenid' => 11,
+				'tokenid' => self::TOKENID,
 				'name' => 'Updated audit token',
 				'expires_at' => 1611238090,
 				'description' => 'Updated description',
@@ -63,11 +70,13 @@ class testAuditlogToken extends testAuditlogCommon {
 				"\"token.description\":[\"update\",\"Updated description\",\"\"],".
 				"\"token.status\":[\"update\",\"1\",\"0\"]}";
 
-		$this->getAuditDetails('details', 1, $updated, 11);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::TOKENID);
 	}
 
 	public function testAuditlogToken_Delete() {
-		$this->call('token.delete', [11]);
-		$this->getAuditDetails('resourcename', 2, 'Updated audit token', 11);
+		$this->call('token.delete', [self::TOKENID]);
+		$this->getAuditDetails('resourcename', $this->delete_actionid,
+				'Updated audit token', self::TOKENID
+		);
 	}
 }

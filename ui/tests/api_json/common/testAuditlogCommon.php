@@ -19,29 +19,59 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../../include/CAPITest.php';
 
 class testAuditlogCommon extends CAPITest {
 
 	/**
+	 * Audit log Add action id.
+	 */
+	public $add_actionid = 0;
+
+	/**
+	 * Audit log Update action id.
+	 */
+	public $update_actionid = 1;
+
+	/**
+	 * Audit log Delete action id.
+	 */
+	public $delete_actionid = 2;
+
+	/**
+	 * Audit log Logout action id.
+	 */
+	public $logout_actionid = 4;
+
+	/**
+	 * Audit log Login action id.
+	 */
+	public $login_actionid = 8;
+
+	/**
+	 * Audit log Failed Login action id.
+	 */
+	public $failedlogin_actionid = 9;
+
+	/**
 	 * Send auditlog.get request and check returned values.
 	 *
-	 * @param $output string		what parameter need to be checked in audit
-	 * @param $action integer		action id
-	 * @param $result string		what should be returned in request
-	 * @param $resourceid integer	resource id
+	 * @param string $output 		what parameter need to be checked in audit
+	 * @param integer $action 		action id
+	 * @param string $result 		what should be returned in request
+	 * @param integer $resourceid 	resource id
 	 */
-	public function getAuditDetails($output, $action, $result, $resourceid) {
+	public function getAuditDetails($parameter, $actionid, $expected, $resourceid) {
 		$get = $this->call('auditlog.get', [
-			'output' => [$output],
+			'output' => [$parameter],
 			'sortfield' => 'clock',
 			'sortorder' => 'DESC',
 			'filter' => [
 				'resourceid' => $resourceid,
-				'action' => $action
+				'action' => $actionid
 			]
 		]);
 
-		$this->assertEquals($result, $get['result'][0][$output]);
+		$this->assertEquals($expected, $get['result'][0][$parameter]);
 	}
 }

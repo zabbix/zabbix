@@ -19,12 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/testAuditlogCommon.php';
+require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
- * @backup  actions
+ * @backup actions
  */
 class testAuditlogAction extends testAuditlogCommon {
+
+	/**
+	 * Existing Action ID.
+	 */
+	private const ACTIONID = 3;
+
 	public function testAuditlogAction_Create() {
 		$create = $this->call('action.create', [
 			[
@@ -82,13 +88,16 @@ class testAuditlogAction extends testAuditlogCommon {
 				'notify_if_canceled' => 0
 			]
 		]);
+
 		$resourceid = $create['result']['actionids'][0];
 		$operationid = CDBHelper::getAll('SELECT operationid FROM operations WHERE actionid='.
 				zbx_dbstr($resourceid).' AND operationtype In (0,11,12)');
 		$conditiodid = CDBHelper::getRow('SELECT conditionid FROM conditions WHERE actionid='.
-				zbx_dbstr($resourceid));
+				zbx_dbstr($resourceid)
+		);
 		$op_group = CDBHelper::getRow('SELECT opmessage_grpid FROM opmessage_grp WHERE operationid='.
-				zbx_dbstr($operationid[0]['operationid']));
+				zbx_dbstr($operationid[0]['operationid'])
+		);
 
 		$created = "{\"action.name\":[\"add\",\"Audit action\"],\"action.esc_period\":[\"add\",\"2m\"],".
 				"\"action.filter\":[\"add\"],".
@@ -124,13 +133,13 @@ class testAuditlogAction extends testAuditlogCommon {
 				"\"action.notify_if_canceled\":[\"add\",\"0\"],".
 				"\"action.actionid\":[\"add\",\"".$resourceid."\"]}";
 
-		$this->getAuditDetails('details', 0, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
 
 	public function testAuditlogAction_Update() {
 		$this->call('action.update', [
 			[
-				'actionid' => 3,
+				'actionid' => self::ACTIONID,
 				'name' => 'Updated action audit',
 				'status' => 1,
 				'esc_period' => '15m',
@@ -167,10 +176,16 @@ class testAuditlogAction extends testAuditlogCommon {
 				'notify_if_canceled' => 1
 			]
 		]);
-		$operationid = CDBHelper::getRow('SELECT operationid FROM operations WHERE (actionid, operationtype)=(3, 0)');
-		$conditiodid = CDBHelper::getRow('SELECT conditionid FROM conditions WHERE actionid=3');
+
+		$operationid = CDBHelper::getRow('SELECT operationid FROM operations WHERE (actionid, operationtype)=('
+				.zbx_dbstr(self::ACTIONID).', 0)'
+		);
+		$conditiodid = CDBHelper::getRow('SELECT conditionid FROM conditions WHERE actionid='
+				.zbx_dbstr(self::ACTIONID)
+		);
 		$op_group = CDBHelper::getRow('SELECT opmessage_grpid FROM opmessage_grp WHERE operationid='.
-				zbx_dbstr($operationid['operationid']));
+				zbx_dbstr($operationid['operationid'])
+		);
 
 		$updated = "{\"action.operations[".$operationid['operationid']."].opmessage_grp[1]\":[\"delete\"],".
 				"\"action.filter.conditions[".$conditiodid['conditionid']."]\":[\"add\"],".
@@ -196,11 +211,13 @@ class testAuditlogAction extends testAuditlogCommon {
 				"\"action.operations[".$operationid['operationid']."].opmessage.message\":[\"update\",\"Updated audit message\",\"\"],".
 				"\"action.operations[".$operationid['operationid']."].opmessage.subject\":[\"update\",\"Updated audit message\",\"\"]}";
 
-		$this->getAuditDetails('details', 1, $updated, 3);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::ACTIONID);
 	}
 
 	public function testAuditlogAction_Delete() {
-		$this->call('action.delete', [3]);
-		$this->getAuditDetails('resourcename', 2, 'Updated action audit', 3);
+		$this->call('action.delete', [self::ACTIONID]);
+		$this->getAuditDetails('resourcename', $this->delete_actionid,
+				'Updated action audit', self::ACTIONID
+		);
 	}
 }
