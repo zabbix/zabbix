@@ -201,7 +201,7 @@ int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_PROXY_LOCAL_BUFFER	= 0;
 int	CONFIG_PROXY_OFFLINE_BUFFER	= 1;
 
-int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
+int	CONFIG_HEARTBEAT_FREQUENCY	= -1;
 
 /* how often active Zabbix proxy requests configuration data from server, in seconds */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_MIN * 5;
@@ -515,6 +515,12 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_VAULTURL)
 		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
+
+	if (-1 != CONFIG_HEARTBEAT_FREQUENCY)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "HeartbeatFrequency parameter is deprecated,"
+					" and has no effect");
+	}
 
 	if (0 == CONFIG_SERVER_PORT)
 	{
