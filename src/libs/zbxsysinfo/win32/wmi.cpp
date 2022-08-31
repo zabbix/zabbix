@@ -21,8 +21,8 @@
 
 extern "C"
 {
+#	include "../sysinfo.h"
 #	include "zbxstr.h"
-#	include "sysinfo.h"
 #	include "log.h"
 #	include "zbxalgo.h"
 #	include "zbxjson.h"
