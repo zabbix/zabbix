@@ -6640,6 +6640,14 @@ msgstr "Iespējot atkļūdošanas režīmu iezīmētajās grupās?"
 msgid "Enable host"
 msgstr ""
 
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
+
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
 msgstr ""
