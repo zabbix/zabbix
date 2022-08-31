@@ -85,6 +85,12 @@ class CTrend extends CApiService {
 						break;
 
 					default:
+						if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 1) {
+							$options['time_from'] = max($options['time_from'],
+								time() - timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS))
+							);
+						}
+
 						$data = $this->getFromSql($options);
 				}
 

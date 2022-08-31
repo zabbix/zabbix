@@ -97,8 +97,8 @@ class CHistory extends CApiService {
 			'history' =>				['type' => API_INT32, 'in' => implode(',', $value_types), 'default' => ITEM_VALUE_TYPE_UINT64],
 			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'itemids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'time_from' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'time_till' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'time_from' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_DATE, 'default' => null],
+			'time_till' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_DATE, 'default' => null],
 			'filter' =>					['type' => API_MULTIPLE, 'default' => null, 'rules' => [
 											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
 					'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -178,6 +178,12 @@ class CHistory extends CApiService {
 				return $this->getFromElasticsearch($options);
 
 			default:
+				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
+					$options['time_from'] = max($options['time_from'],
+						time() - timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY))
+					);
+				}
+
 				return $this->getFromSql($options);
 		}
 	}
