@@ -15508,7 +15508,7 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vect
 	RDLOCK_CACHE;
 
 	/* check revision of global macro 'host' (hostid 0) */
-	um_cache_get_macro_updates(config->um_cache, &globalhostid, 1, revision, &globalids, NULL);
+	um_cache_get_macro_updates(config->um_cache, &globalhostid, 1, revision, &globalids, del_macro_hostids);
 
 	if (0 != hostids_tmp.values_num)
 	{
