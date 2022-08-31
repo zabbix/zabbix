@@ -1162,11 +1162,10 @@ static void	proxy_db_init(void)
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", CONFIG_DBNAME);
 		DBdeinit();
 
-		if (0 != zbx_stat(CONFIG_DBNAME, &db_stat) || 0 == S_ISREG(db_stat.st_mode) ||
-				0 != unlink(CONFIG_DBNAME))
+		if (0 != unlink(CONFIG_DBNAME))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file: \"%s\", exiting...",
-					CONFIG_DBNAME);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file \"%s\": %s, exiting...",
+					CONFIG_DBNAME, zbx_strerror(errno));
 			exit(EXIT_FAILURE);
 		}
 
