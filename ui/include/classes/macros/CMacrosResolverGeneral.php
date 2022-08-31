@@ -790,23 +790,16 @@ class CMacrosResolverGeneral {
 		$hist_function_parser = new CHistFunctionParser(['usermacros' => true, 'lldmacros' => true]);
 
 		if ($hist_function_parser->parse($function) == CParser::PARSE_SUCCESS) {
-			foreach (array_reverse($hist_function_parser->getParameters()) as $parameter) {
-				$param = $parameter['match'];
-				$forced = false;
-
-				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED) {
-					$param = CHistFunctionParser::unquoteParam($param);
-					$forced = true;
-				}
-
+			foreach (array_reverse($hist_function_parser->getParameters(), true) as $i => $parameter) {
+				$param = $hist_function_parser->getParam($i);
 				$matched_macros = $this->getMacroPositions($param, $types);
 
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 					$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
 				}
 
-				if ($parameter['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
-					$param = quoteFunctionParam($param, $forced);
+				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED || $parameter['type'] == CHistFunctionParser::PARAM_TYPE_UNQUOTED) {
+					$param = CExpressionParser::quoteString($param, true, true);
 				}
 
 				$function = substr_replace($function, $param, $parameter['pos'], $parameter['length']);
