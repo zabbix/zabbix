@@ -20,13 +20,14 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include <procfs.h>
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+
+#include <procfs.h>
 
 #if !defined(HAVE_ZONE_H) && defined(HAVE_SYS_UTSNAME_H)
 #	include <sys/utsname.h>
@@ -108,7 +109,6 @@ static int	zbx_detect_zone_support(void)
 #define ZBX_ZONE_SUPPORT_UNKNOWN	0
 #define ZBX_ZONE_SUPPORT_YES		1
 #define ZBX_ZONE_SUPPORT_NO		2
-
 	static int	zone_support = ZBX_ZONE_SUPPORT_UNKNOWN;
 	unsigned int	major, minor;
 
@@ -133,6 +133,9 @@ static int	zbx_detect_zone_support(void)
 				return FAIL;
 			}
 	}
+#undef ZBX_ZONE_SUPPORT_UNKNOWN
+#undef ZBX_ZONE_SUPPORT_YES
+#undef ZBX_ZONE_SUPPORT_NO
 }
 #endif
 
@@ -508,8 +511,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 			else
 			{
-				/* % of system memory used by process, measured in 16-bit binary fractions in the range */
-				/* 0.0 - 1.0 with the binary point to the right of the most significant bit. 1.0 == 0x8000 */
+				/* % of system memory used by process, measured in 16-bit binary fractions in */
+				/* the range 0.0 - 1.0 with the binary point to the right of the most         */
+				/* significant bit. 1.0 == 0x8000                                             */
 				pct_value = (double)((int)psinfo.pr_pctmem * 100) / 32768.0;
 
 				if (0 != proccount++)

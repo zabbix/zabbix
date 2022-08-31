@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+
 #include "log.h"
 
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -44,6 +45,7 @@ int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for \"kern.boottime\" system"
 			" parameter."));
+
 	return SYSINFO_RET_FAIL;
 #endif
 }

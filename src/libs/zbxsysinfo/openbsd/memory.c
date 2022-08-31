@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+
 #include "log.h"
 
 static int		mib[] = {CTL_VM, VM_UVMEXP};
@@ -107,7 +108,8 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 {
 	ZBX_SYSCTL(uvm);
 
-	SET_UI64_RESULT(result, (zbx_uint64_t)(uvm.inactive + uvm.free + uvm.vnodepages + uvm.vtextpages) * uvm.pagesize);
+	SET_UI64_RESULT(result, (zbx_uint64_t)(uvm.inactive + uvm.free + uvm.vnodepages + uvm.vtextpages) *
+			uvm.pagesize);
 
 	return SYSINFO_RET_OK;
 }
@@ -122,7 +124,8 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_DBL_RESULT(result, (zbx_uint64_t)(uvm.inactive + uvm.free + uvm.vnodepages + uvm.vtextpages) / (double)uvm.npages * 100);
+	SET_DBL_RESULT(result, (zbx_uint64_t)(uvm.inactive + uvm.free + uvm.vnodepages + uvm.vtextpages) /
+			(double)uvm.npages * 100);
 
 	return SYSINFO_RET_OK;
 }

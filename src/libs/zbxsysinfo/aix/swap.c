@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+
 #include "log.h"
 
 #define ZBX_PERFSTAT_PAGE_SHIFT	12	/* 4 KB */
@@ -78,6 +79,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
+
 	return SYSINFO_RET_FAIL;
 #endif
 }

@@ -68,7 +68,8 @@ static void	count_sensor(int do_task, const struct sensor *sensor, double *aggr,
 	}
 }
 
-static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sensordev, const char *name, double *aggr, int *cnt)
+static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sensordev, const char *name,
+		double *aggr, int *cnt)
 {
 	if (ZBX_DO_ONE == do_task)
 	{
@@ -220,6 +221,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for \"sensordev\" structure."));
+
 	return SYSINFO_RET_FAIL;
 }
 

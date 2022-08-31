@@ -30,7 +30,6 @@
 #endif
 
 #if (__FreeBSD_version) < 500000
-#	define ZBX_COMMLEN		MAXCOMLEN
 #	define ZBX_PROC_PID		kp_proc.p_pid
 #	define ZBX_PROC_PPID		kp_eproc.e_ppid
 #	define ZBX_PROC_COMM		kp_proc.p_comm
@@ -52,7 +51,6 @@
 #	define ZBX_PROC_UID		kp_proc.p_ruid
 #	define ZBX_PROC_GID		kp_proc.p_rgid
 #else
-#	define ZBX_COMMLEN		COMMLEN
 #	define ZBX_PROC_PID		ki_pid
 #	define ZBX_PROC_PPID		ki_ppid
 #	define ZBX_PROC_JID		ki_jid
@@ -197,7 +195,6 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_TSIZE	5
 #define ZBX_DSIZE	6
 #define ZBX_SSIZE	7
-
 	char		*procname, *proccomm, *param, *args, *mem_type = NULL;
 	int		do_task, pagesize, count, i, proccount = 0, invalid_user = 0, mem_type_code, mib[4];
 	unsigned int	mibs;
@@ -444,7 +441,6 @@ out:
 	}
 
 	return SYSINFO_RET_OK;
-
 #undef ZBX_SIZE
 #undef ZBX_RSS
 #undef ZBX_VSIZE

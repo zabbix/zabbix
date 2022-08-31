@@ -37,7 +37,7 @@
 
 /* UNSET RESULT */
 
-#define ZBX_UNSET_UI64_RESULT(res)						\
+#define ZBX_UNSET_UI64_RESULT(res)					\
 									\
 do									\
 {									\
@@ -46,7 +46,7 @@ do									\
 }									\
 while (0)
 
-#define ZBX_UNSET_DBL_RESULT(res)						\
+#define ZBX_UNSET_DBL_RESULT(res)					\
 									\
 do									\
 {									\
@@ -55,7 +55,7 @@ do									\
 }									\
 while (0)
 
-#define ZBX_UNSET_STR_RESULT(res)						\
+#define ZBX_UNSET_STR_RESULT(res)					\
 									\
 do									\
 {									\
@@ -67,7 +67,7 @@ do									\
 }									\
 while (0)
 
-#define ZBX_UNSET_TEXT_RESULT(res)						\
+#define ZBX_UNSET_TEXT_RESULT(res)					\
 									\
 do									\
 {									\
@@ -79,7 +79,7 @@ do									\
 }									\
 while (0)
 
-#define ZBX_UNSET_LOG_RESULT(res)						\
+#define ZBX_UNSET_LOG_RESULT(res)					\
 									\
 do									\
 {									\
@@ -92,7 +92,7 @@ do									\
 }									\
 while (0)
 
-#define ZBX_UNSET_MSG_RESULT(res)						\
+#define ZBX_UNSET_MSG_RESULT(res)					\
 									\
 do									\
 {									\
@@ -105,27 +105,27 @@ do									\
 while (0)
 
 /* AR_META is always excluded */
-#define ZBX_UNSET_RESULT_EXCLUDING(res, exc_type) 					\
+#define ZBX_UNSET_RESULT_EXCLUDING(res, exc_type) 				\
 										\
 do										\
 {										\
-	if (!(exc_type & AR_UINT64))	ZBX_UNSET_UI64_RESULT(res);			\
-	if (!(exc_type & AR_DOUBLE))	ZBX_UNSET_DBL_RESULT(res);			\
-	if (!(exc_type & AR_STRING))	ZBX_UNSET_STR_RESULT(res);			\
-	if (!(exc_type & AR_TEXT))	ZBX_UNSET_TEXT_RESULT(res);			\
-	if (!(exc_type & AR_LOG))	ZBX_UNSET_LOG_RESULT(res);			\
-	if (!(exc_type & AR_MESSAGE))	ZBX_UNSET_MSG_RESULT(res);			\
+	if (!(exc_type & AR_UINT64))	ZBX_UNSET_UI64_RESULT(res);		\
+	if (!(exc_type & AR_DOUBLE))	ZBX_UNSET_DBL_RESULT(res);		\
+	if (!(exc_type & AR_STRING))	ZBX_UNSET_STR_RESULT(res);		\
+	if (!(exc_type & AR_TEXT))	ZBX_UNSET_TEXT_RESULT(res);		\
+	if (!(exc_type & AR_LOG))	ZBX_UNSET_LOG_RESULT(res);		\
+	if (!(exc_type & AR_MESSAGE))	ZBX_UNSET_MSG_RESULT(res);		\
 }										\
 while (0)
 
 /* RETRIEVE RESULT VALUE */
 
 #define ZBX_GET_UI64_RESULT(res)	((zbx_uint64_t *)get_result_value_by_type(res, AR_UINT64))
-#define ZBX_GET_DBL_RESULT(res)	((double *)get_result_value_by_type(res, AR_DOUBLE))
-#define ZBX_GET_STR_RESULT(res)	((char **)get_result_value_by_type(res, AR_STRING))
+#define ZBX_GET_DBL_RESULT(res)		((double *)get_result_value_by_type(res, AR_DOUBLE))
+#define ZBX_GET_STR_RESULT(res)		((char **)get_result_value_by_type(res, AR_STRING))
 #define ZBX_GET_TEXT_RESULT(res)	((char **)get_result_value_by_type(res, AR_TEXT))
-#define ZBX_GET_LOG_RESULT(res)	((zbx_log_t *)get_result_value_by_type(res, AR_LOG))
-#define ZBX_GET_MSG_RESULT(res)	((char **)get_result_value_by_type(res, AR_MESSAGE))
+#define ZBX_GET_LOG_RESULT(res)		((zbx_log_t *)get_result_value_by_type(res, AR_LOG))
+#define ZBX_GET_MSG_RESULT(res)		((char **)get_result_value_by_type(res, AR_MESSAGE))
 
 void	*get_result_value_by_type(AGENT_RESULT *result, int require_type);
 
@@ -176,7 +176,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 /* flags for process */
 #define ZBX_PROCESS_LOCAL_COMMAND	0x1
 #define ZBX_PROCESS_MODULE_COMMAND	0x2
-#define ZBX_PROCESS_WITH_ALIAS	0x4
+#define ZBX_PROCESS_WITH_ALIAS		0x4
 
 typedef enum
 {

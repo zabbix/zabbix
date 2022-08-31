@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+
 #include "log.h"
 
 static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -104,6 +105,8 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	return SYSINFO_RET_OK;
+#undef ZBX_STATFS
+#undef ZBX_FFREE
 }
 
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)

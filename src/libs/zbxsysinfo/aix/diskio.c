@@ -22,8 +22,6 @@
 #include "log.h"
 #include "zbxstr.h"
 
-#define ZBX_DEV_PFX	"/dev/"
-
 typedef struct
 {
 	zbx_uint64_t	nread;
@@ -151,6 +149,8 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+#define ZBX_DEV_PFX	"/dev/"
+
 int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*devname, *type;
@@ -216,3 +216,4 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return ret;
 }
+#undef ZBX_DEV_PFX

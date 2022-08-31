@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+
 #include "log.h"
 
 int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)

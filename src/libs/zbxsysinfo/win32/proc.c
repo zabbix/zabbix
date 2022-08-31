@@ -20,16 +20,15 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include <tlhelp32.h>
-#include "sddl.h"
-
 #include "zbxsymbols.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
 
-#define MAX_PROCESSES	4096
+#include <tlhelp32.h>
+#include "sddl.h"
+
 #define MAX_NAME	256
 
 typedef struct

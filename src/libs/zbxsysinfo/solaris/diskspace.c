@@ -20,10 +20,11 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
+#include "inodes.h"
+
 #include "zbxjson.h"
 #include "log.h"
 #include "zbxalgo.h"
-#include "inodes.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
@@ -79,6 +80,8 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 	}
 
 	return SYSINFO_RET_OK;
+#undef ZBX_BSIZE
+#undef ZBX_STATFS
 }
 
 static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)

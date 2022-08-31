@@ -24,7 +24,6 @@
 #include "log.h"
 #include "zbxjson.h"
 
-#define ZBX_GUID_LEN	38
 
 /* __stdcall calling convention is used for GetIfEntry2(). In order to declare a */
 /* pointer to GetIfEntry2() we have to expand NETIOPAPI_API macro manually since */
@@ -390,11 +389,12 @@ static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 					strerror_from_system(dwRetVal));
 			continue;
 		}
-
+#define ZBX_GUID_LEN	38
 		if (ZBX_GUID_LEN == strlen(if_name) && '{' == if_name[0] && '}' == if_name[ZBX_GUID_LEN - 1])
 			utf8_descr = zbx_ifrow_get_guid_str(ifrow);
 		else
 			utf8_descr = zbx_ifrow_get_utf8_description(ifrow);
+#undef ZBX_GUID_LEN
 
 		if (NULL != utf8_descr && 0 == strcmp(if_name, utf8_descr))
 			ret = SUCCEED;

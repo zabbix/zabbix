@@ -75,6 +75,8 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 	}
 
 	return SYSINFO_RET_OK;
+#undef ZBX_STATFS
+#undef ZBX_BSIZE
 }
 
 static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
@@ -336,5 +338,4 @@ out:
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
-
 }

@@ -18,8 +18,8 @@
 **/
 
 #include "inodes.h"
-
 #include "zbxsysinfo.h"
+
 #include "log.h"
 
 int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree, zbx_uint64_t *iused, double *pfree,
@@ -67,7 +67,10 @@ int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree,
 		*error = zbx_strdup(NULL, "Cannot calculate percentage because total is zero.");
 		return SYSINFO_RET_FAIL;
 	}
+
 	return SYSINFO_RET_OK;
+#undef ZBX_STATFS
+#undef ZBX_FFREE
 }
 
 static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)

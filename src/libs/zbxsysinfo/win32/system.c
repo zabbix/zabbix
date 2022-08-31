@@ -20,9 +20,10 @@
 #include "zbxsysinfo.h"
 
 #include "log.h"
-#include "perfmon.h"
 #include "cfg.h"
 #include "zbxtime.h"
+
+#include "perfmon.h"
 
 #pragma comment(lib, "user32.lib")
 
@@ -53,13 +54,12 @@ static wchar_t	*read_registry_value(HKEY hKey, LPCTSTR name)
  ******************************************************************************/
 const OSVERSIONINFOEX		*zbx_win_getversion(void)
 {
-#	define ZBX_REGKEY_VERSION		"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
-#	define ZBX_REGVALUE_CURRENTVERSION	"CurrentVersion"
-#	define ZBX_REGVALUE_CURRENTBUILDNUMBER	"CurrentBuildNumber"
-#	define ZBX_REGVALUE_CSDVERSION		"CSDVersion"
-
-#	define ZBX_REGKEY_PRODUCT		"System\\CurrentControlSet\\Control\\ProductOptions"
-#	define ZBX_REGVALUE_PRODUCTTYPE		"ProductType"
+#define ZBX_REGKEY_VERSION		"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+#define ZBX_REGVALUE_CURRENTVERSION	"CurrentVersion"
+#define ZBX_REGVALUE_CURRENTBUILDNUMBER	"CurrentBuildNumber"
+#define ZBX_REGVALUE_CSDVERSION		"CSDVersion"
+#define ZBX_REGKEY_PRODUCT		"System\\CurrentControlSet\\Control\\ProductOptions"
+#define ZBX_REGVALUE_PRODUCTTYPE		"ProductType"
 
 	static OSVERSIONINFOEX	vi = {sizeof(OSVERSIONINFOEX)};
 
@@ -149,6 +149,12 @@ out:
 		RegCloseKey(h_key_registry);
 
 	return pvi;
+#undef ZBX_REGKEY_VERSION
+#undef ZBX_REGVALUE_CURRENTVERSION
+#undef ZBX_REGVALUE_CURRENTBUILDNUMBER
+#undef ZBX_REGVALUE_CSDVERSION
+#undef ZBX_REGKEY_PRODUCT
+#undef ZBX_REGVALUE_PRODUCTTYPE
 }
 
 static void	get_wmi_check_timeout(const char *wmi_namespace, const char *query, char **var,

@@ -27,8 +27,6 @@
 
 #include <sys/sysctl.h>
 
-#define ARGS_START_SIZE 64
-
 /* in OpenBSD 5.1 KERN_PROC2 became KERN_PROC and structure kinfo_proc2 became kinfo_proc */
 #if OpenBSD >= 201205		/* OpenBSD 5.1 version as year and month */
 #	ifndef KERN_PROC2
@@ -145,6 +143,8 @@ static void	proc_data_free(proc_data_t *proc_data)
 	zbx_free(proc_data);
 }
 
+#define ARGS_START_SIZE 64
+
 static int	proc_argv(pid_t pid, char ***argv, size_t *argv_alloc, int *argc)
 {
 	size_t	sz;
@@ -200,6 +200,8 @@ static void	collect_args(char **argv, int argc, char **args, size_t *args_alloc)
 		args_offset--; /* ' ' */
 	(*args)[args_offset] = '\0';
 }
+
+#undef ARGS_START_SIZE
 
 int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -1010,5 +1012,5 @@ out:
 	zbx_json_free(&j);
 
 	return SYSINFO_RET_OK;
-#undef SUM_PROC_VALUE_DBL
+#undef SUM_PROC_VALUE
 }

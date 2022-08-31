@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+
 #include "zbxsymbols.h"
 
 int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -67,6 +68,7 @@ int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
+
 	return SYSINFO_RET_OK;
 }
 

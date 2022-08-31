@@ -863,7 +863,6 @@ out:
 	}
 
 	return SYSINFO_RET_OK;
-
 #undef ZBX_SIZE
 #undef ZBX_RSS
 #undef ZBX_VSIZE

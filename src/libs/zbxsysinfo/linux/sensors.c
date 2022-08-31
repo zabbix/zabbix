@@ -29,7 +29,6 @@
 static const char	*locations[] = {"", "/device", NULL};
 #endif
 
-#define ATTR_MAX	128
 
 static void	count_sensor(int do_task, const char *filename, double *aggr, int *cnt)
 {
@@ -92,6 +91,7 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
  *********************************************************************************/
 static const char	*sysfs_read_attr(const char *device, char **attribute)
 {
+#define ATTR_MAX	128
 	const char	**location;
 	char		path[MAX_STRING_LEN], buf[ATTR_MAX], *p;
 	FILE		*f;
@@ -119,9 +119,11 @@ static const char	*sysfs_read_attr(const char *device, char **attribute)
 	}
 
 	return NULL;
+#undef ATTR_MAX
 }
 
-static int	get_device_info(const char *dev_path, const char *dev_name, char *device_info, const char **name_subfolder)
+static int	get_device_info(const char *dev_path, const char *dev_name, char *device_info,
+		const char **name_subfolder)
 {
 	int		ret = FAIL;
 	unsigned int	addr;

@@ -928,6 +928,7 @@ extern "C" int	convert_wmi_json(zbx_vector_wmi_instance_t *wmi_values, char **js
 	}
 
 	zbx_json_free(&j);
+
 	return ret;
 }
 

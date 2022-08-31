@@ -21,10 +21,11 @@
 
 #include "zbxstr.h"
 #include "zbxthreads.h"
-#include "perfstat.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "log.h"
+
+#include "perfstat.h"
 
 int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

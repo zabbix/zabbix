@@ -17,16 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxsysinfo.h"
+
+#include "zbxjson.h"
+
 #include <unistd.h>
 #include <stropts.h>
 #include <sys/dlpi.h>
 #include <sys/dlpi_ext.h>
 #include <sys/mib.h>
-
-#include "zbxsysinfo.h"
-#include "zbxjson.h"
-
-#define PPA(n) (*(dl_hp_ppa_info_t *)(ppa_data_buf + n * sizeof(dl_hp_ppa_info_t)))
 
 static char	buf_ctl[1024];
 
@@ -101,7 +100,8 @@ static int	get_if_names(char **if_list, size_t *if_list_alloc, size_t *if_list_o
 		add_if_name(if_list, if_list_alloc, if_list_offset, ifr->ifr_name);
 
 #ifdef _SOCKADDR_LEN
-		ifr = (struct ifreq *)((char *)ifr + sizeof(*ifr) + (from->sa_len > sizeof(*from) ? from->sa_len - sizeof(*from) : 0));
+		ifr = (struct ifreq *)((char *)ifr + sizeof(*ifr) + (from->sa_len > sizeof(*from) ? from->sa_len -
+				sizeof(*from) : 0));
 #else
 		ifr++;
 #endif
@@ -364,8 +364,9 @@ static int get_ppa(int fd, const char *if_name, int *ppa)
 
 		for (i = 0; i < dlp->dl_count; i++)
 		{
+#define PPA(n) (*(dl_hp_ppa_info_t *)(ppa_data_buf + n * sizeof(dl_hp_ppa_info_t)))
 			zbx_snprintf(buf, if_name_sz, "%s%d", PPA(i).dl_module_id_1, PPA(i).dl_ppa);
-
+#undef PPA
 			if (0 == strcmp(if_name, buf))
 			{
 				*ppa = PPA(i).dl_ppa;

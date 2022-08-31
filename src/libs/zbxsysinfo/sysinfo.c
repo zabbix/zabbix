@@ -936,11 +936,13 @@ out:
 
 	return ret;
 }
+#undef ZBX_COMMAND_ERROR
+#undef ZBX_COMMAND_WITHOUT_PARAMS
+#undef ZBX_COMMAND_WITH_PARAMS
 
 void	test_parameter(const char *key)
 {
 #define ZBX_KEY_COLUMN_WIDTH	45
-
 	AGENT_RESULT	result;
 
 	printf("%-*s", ZBX_KEY_COLUMN_WIDTH, key);
@@ -979,7 +981,6 @@ void	test_parameter(const char *key)
 	printf("\n");
 
 	fflush(stdout);
-
 #undef ZBX_KEY_COLUMN_WIDTH
 }
 
@@ -1101,20 +1102,20 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, char **o
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: execute agent check                                               *
- *                                                                            *
- * Parameters: in_command - item key                                          *
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: execute agent check                                                   *
+ *                                                                                *
+ * Parameters: in_command - item key                                              *
  *             flags - ZBX_PROCESS_LOCAL_COMMAND, allow execution of system.run   *
  *                     ZBX_PROCESS_MODULE_COMMAND, execute item from a module     *
  *                     ZBX_PROCESS_WITH_ALIAS, substitute agent Alias             *
- *                                                                            *
- * Return value: SUCCEED - successful execution                               *
- *               NOTSUPPORTED - item key is not supported or other error      *
- *               result - contains item value or error message                *
- *                                                                            *
- ******************************************************************************/
+ *                                                                                *
+ * Return value: SUCCEED - successful execution                                   *
+ *               NOTSUPPORTED - item key is not supported or other error          *
+ *               result - contains item value or error message                    *
+ *                                                                                *
+ **********************************************************************************/
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
 	int		ret = NOTSUPPORTED;
@@ -1218,7 +1219,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	}
 
 	ret = SUCCEED;
-
 notsupported:
 	free_request(&request);
 
@@ -1474,12 +1474,12 @@ static zbx_log_t	*get_result_log_value(AGENT_RESULT *result)
  *         NULL - if value is missing or can't be converted                   *
  *                                                                            *
  * Comments:  better use definitions                                          *
- *                ZBX_GET_UI64_RESULT                                             *
- *                ZBX_GET_DBL_RESULT                                              *
- *                ZBX_GET_STR_RESULT                                              *
- *                ZBX_GET_TEXT_RESULT                                             *
- *                ZBX_GET_LOG_RESULT                                              *
- *                ZBX_GET_MSG_RESULT                                              *
+ *                ZBX_GET_UI64_RESULT                                         *
+ *                ZBX_GET_DBL_RESULT                                          *
+ *                ZBX_GET_STR_RESULT                                          *
+ *                ZBX_GET_TEXT_RESULT                                         *
+ *                ZBX_GET_LOG_RESULT                                          *
+ *                ZBX_GET_MSG_RESULT                                          *
  *                                                                            *
  *    AR_MESSAGE - skipped in conversion                                      *
  *                                                                            *
@@ -1617,22 +1617,22 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	return metric_func(request, result);
 }
 #else
-/******************************************************************************
- *                                                                            *
- * Purpose: serialize agent result to transfer over pipe/socket               *
- *                                                                            *
- * Parameters: data        - [IN/OUT] the data buffer                         *
- *             data_alloc  - [IN/OUT] the data buffer allocated size          *
- *             data_offset - [IN/OUT] the data buffer data size               *
- *             agent_ret   - [IN] the agent result return code                *
- *             result      - [IN] the agent result                            *
- *                                                                            *
- * Comments: The agent result is serialized as [rc][type][data] where:        *
- *             [rc] the agent result return code, 4 bytes                     *
- *             [type] the agent result data type, 1 byte                      *
- *             [data] the agent result data, null terminated string (optional)*
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: serialize agent result to transfer over pipe/socket                *
+ *                                                                             *
+ * Parameters: data        - [IN/OUT] the data buffer                          *
+ *             data_alloc  - [IN/OUT] the data buffer allocated size           *
+ *             data_offset - [IN/OUT] the data buffer data size                *
+ *             agent_ret   - [IN] the agent result return code                 *
+ *             result      - [IN] the agent result                             *
+ *                                                                             *
+ * Comments: The agent result is serialized as [rc][type][data] where:         *
+ *             [rc] the agent result return code, 4 bytes                      *
+ *             [type] the agent result data type, 1 byte                       *
+ *             [data] the agent result data, null terminated string (optional) *
+ *                                                                             *
+ *******************************************************************************/
 static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data_offset, int agent_ret,
 		AGENT_RESULT *result)
 {
@@ -2037,8 +2037,6 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
  * Purpose: frees previously allocated mount-point structure                  *
  *                                                                            *
  * Parameters: mpoint - [IN] pointer to structure from vector                 *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_mpoints_free(zbx_mpoint_t *mpoint)

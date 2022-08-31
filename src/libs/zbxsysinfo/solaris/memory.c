@@ -18,6 +18,7 @@
 **/
 
 #include "log.h"
+
 #include "zbxsysinfo.h"
 
 #define CHECKED_SYSCONF_SYSCALL(sysconf_name)									\
@@ -48,6 +49,7 @@ static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 	ret = SYSINFO_RET_OK;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
 	return ret;
 }
 

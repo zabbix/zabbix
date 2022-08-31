@@ -81,6 +81,8 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 	}
 
 	return SYSINFO_RET_OK;
+#undef ZBX_STATFS
+#undef ZBX_BSIZE
 }
 
 static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)

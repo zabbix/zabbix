@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+
 #include "log.h"
 
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -64,7 +65,8 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(mode, "pused"))
 	{
-		SET_DBL_RESULT(result, 0 != info.totalswap ? 100.0 - 100.0 * (info.freeswap / (double)info.totalswap) : 0.0);
+		SET_DBL_RESULT(result, 0 != info.totalswap ? 100.0 - 100.0 * (info.freeswap / (double)info.totalswap) :
+				0.0);
 	}
 	else
 	{

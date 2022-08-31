@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxsysinfo.h"
 
 #include "perfmon.h"
-#include "zbxsysinfo.h"
 
 int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

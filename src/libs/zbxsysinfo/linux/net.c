@@ -55,9 +55,6 @@ typedef struct
 }
 net_count_info_t;
 
-#define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
-#define IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
-
 #define NET_CONN_TYPE_TCP	0
 #define NET_CONN_TYPE_UDP	1
 
@@ -1031,7 +1028,8 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 		*error = zbx_dsprintf(*error, "IP is not supported: \"%s\"", addr_in);
 		goto err;
 	}
-
+#define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
+#define IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
 #ifdef HAVE_IPV6
 	if (info->ai->ai_family == AF_INET6)
 	{
@@ -1058,7 +1056,8 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 		if (NULL != service)
 			info->port = ntohs(((struct sockaddr_in*)info->ai->ai_addr)->sin_port);
 	}
-
+#undef IPV4_MAX_CIDR_PREFIX
+#undef IPV6_MAX_CIDR_PREFIX
 	if (NULL == addr)
 	{
 		freeaddrinfo(info->ai);

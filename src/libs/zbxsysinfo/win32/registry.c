@@ -18,26 +18,14 @@
 **/
 
 #include "zbxsysinfo.h"
+
 #include "base64.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
+
 #include <locale.h>
 #include <winreg.h>
-
-#define ZBX_SYSINFO_REGISTRY_TAG_FULLKEY	"fullkey"
-#define ZBX_SYSINFO_REGISTRY_TAG_LASTKEY	"lastsubkey"
-#define ZBX_SYSINFO_REGISTRY_TAG_NAME		"name"
-#define ZBX_SYSINFO_REGISTRY_TAG_DATA		"data"
-#define ZBX_SYSINFO_REGISTRY_TAG_TYPE		"type"
-
-#define MAX_KEY_LENGTH			255
-#define MAX_DATA_LENGTH			65534
-#define MAX_VALUE_NAME			16383
-#define MAX_FULLKEY_LENGTH		4096
-
-#define REGISTRY_DISCOVERY_MODE_KEYS	0
-#define REGISTRY_DISCOVERY_MODE_VALUES	1
 
 static HKEY	get_hkey_from_fullkey(char *fullkey)
 {
@@ -55,7 +43,6 @@ static HKEY	get_hkey_from_fullkey(char *fullkey)
 		return HKEY_PERFORMANCE_DATA;
 	else if (0 == strcmp("HKEY_PERFORMANCE_NLSTEXT", fullkey) || 0 == strcmp("HKPN", fullkey))
 		return HKEY_PERFORMANCE_NLSTEXT;
-	else if (0 == strcmp("HKEY_PERFORMANCE_TEXT", fullkey) || 0 == strcmp("HKPT", fullkey))
 		return HKEY_PERFORMANCE_TEXT;
 	else if (0 == strcmp("HKEY_USERS", fullkey) || 0 == strcmp("HKU", fullkey))
 		return HKEY_USERS;
@@ -143,6 +130,14 @@ ZBX_PTR_VECTOR_IMPL(wchar_ptr, wchar_t *)
 static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, struct zbx_json *j, int mode,
 		wchar_t *root, const char *regexp)
 {
+#define ZBX_SYSINFO_REGISTRY_TAG_FULLKEY	"fullkey"
+#define ZBX_SYSINFO_REGISTRY_TAG_LASTKEY	"lastsubkey"
+#define ZBX_SYSINFO_REGISTRY_TAG_NAME		"name"
+#define ZBX_SYSINFO_REGISTRY_TAG_DATA		"data"
+#define ZBX_SYSINFO_REGISTRY_TAG_TYPE		"type"
+#define MAX_VALUE_NAME				16383
+#define REGISTRY_DISCOVERY_MODE_KEYS		0
+#define REGISTRY_DISCOVERY_MODE_VALUES		1
 	wchar_t			achClass[MAX_PATH] = TEXT(""), achValue[MAX_VALUE_NAME];
 	DWORD			cchClassName = MAX_PATH, cSubKeys=0, cValues, cbName, i, retCode,
 				cchValue = MAX_VALUE_NAME;
@@ -173,7 +168,9 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 
 	for (i = 0; i < cSubKeys; i++)
 	{
+#define MAX_KEY_LENGTH			255
 		cbName = MAX_KEY_LENGTH;
+#undef MAX_KEY_LENGTH
 		retCode = RegEnumKeyEx(hKey, i, achClass, &cbName, NULL, NULL, NULL, NULL);
 
 		if (ERROR_SUCCESS == retCode)
@@ -182,7 +179,9 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 
 	for (i = 0; i < (DWORD)wsubkeys.values_num; i++)
 	{
+#define MAX_FULLKEY_LENGTH		4096
 		HKEY	hSubkey;
+
 		wchar_t	wnew_root[MAX_FULLKEY_LENGTH];
 		wchar_t	*wsubkey;
 
@@ -197,6 +196,7 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 			discovery_get_regkey_values(hSubkey, wsubkey, j, mode, wnew_root, regexp);
 
 		RegCloseKey(hSubkey);
+#undef MAX_FULLKEY_LENGTH
 	}
 
 	zbx_vector_wchar_ptr_clear_ext(&wsubkeys, zbx_ptr_free);
@@ -224,7 +224,8 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 				buffer_alloc = value_len;
 
 				cchValue = MAX_VALUE_NAME;
-				retCode = RegEnumValue(hKey, i, achValue, &cchValue, NULL, &valueType, buffer, &value_len);
+				retCode = RegEnumValue(hKey, i, achValue, &cchValue, NULL, &valueType, buffer,
+						&value_len);
 			}
 
 			if (ERROR_SUCCESS != retCode)
@@ -284,6 +285,14 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 
 	zbx_free(uroot);
 	zbx_free(usubkey);
+#undef ZBX_SYSINFO_REGISTRY_TAG_FULLKEY
+#undef ZBX_SYSINFO_REGISTRY_TAG_LASTKEY
+#undef ZBX_SYSINFO_REGISTRY_TAG_NAME
+#undef ZBX_SYSINFO_REGISTRY_TAG_DATA
+#undef ZBX_SYSINFO_REGISTRY_TAG_TYPE
+#undef MAX_VALUE_NAME
+#undef REGISTRY_DISCOVERY_MODE_KEYS
+#undef REGISTRY_DISCOVERY_MODE_VALUES
 }
 
 static int	split_fullkey(char **fullkey, HKEY *hive_handle, char **hive_str)

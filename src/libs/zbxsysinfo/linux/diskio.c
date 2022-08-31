@@ -407,7 +407,6 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&j);
 
 	return SYSINFO_RET_OK;
-
 #undef DEVTYPE_STR
 #undef DEVTYPE_STR_LEN
 }

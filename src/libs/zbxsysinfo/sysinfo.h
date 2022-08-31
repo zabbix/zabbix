@@ -21,7 +21,6 @@
 #ifndef ZABBIX_SYSINFO_H
 #define ZABBIX_SYSINFO_H
 
-
 #define ZBX_PROC_STAT_ALL	0
 #define ZBX_PROC_STAT_RUN	1
 #define ZBX_PROC_STAT_SLEEP	2
@@ -58,7 +57,6 @@
 #define ZBX_SYSINFO_TAG_USED			"used"
 #define ZBX_SYSINFO_TAG_PFREE			"pfree"
 #define ZBX_SYSINFO_TAG_PUSED			"pused"
-
 
 #define ZBX_SYSINFO_FILE_TAG_TYPE		"type"
 #define ZBX_SYSINFO_FILE_TAG_BASENAME		"basename"

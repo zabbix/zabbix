@@ -18,12 +18,22 @@
 **/
 
 #include "inodes.h"
-
 #include "zbxsysinfo.h"
+
 #include "log.h"
 
-#define get_string(field)	#field
+int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree, zbx_uint64_t *iused, double *pfree,
+		double *pused, const char *mode, char **error)
+{
+#ifdef HAVE_SYS_STATVFS_H
+#	define ZBX_STATFS	statvfs
+#	define ZBX_FFREE	f_favail
+#else
+#	define ZBX_STATFS	statfs
+#	define ZBX_FFREE	f_ffree
+#endif
 
+#define get_string(field)	#field
 #define validate(error, structure, field)								\
 													\
 do													\
@@ -36,17 +46,6 @@ do													\
 	}												\
 }													\
 while(0)
-
-int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree, zbx_uint64_t *iused, double *pfree,
-		double *pused, const char *mode, char **error)
-{
-#ifdef HAVE_SYS_STATVFS_H
-#	define ZBX_STATFS	statvfs
-#	define ZBX_FFREE	f_favail
-#else
-#	define ZBX_STATFS	statfs
-#	define ZBX_FFREE	f_ffree
-#endif
 	zbx_uint64_t		total;
 	struct ZBX_STATFS	s;
 
@@ -81,6 +80,10 @@ int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree,
 		return SYSINFO_RET_FAIL;
 	}
 	return SYSINFO_RET_OK;
+#undef ZBX_STATFS
+#undef ZBX_FFREE
+#undef get_string
+#undef validate
 }
 
 static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)

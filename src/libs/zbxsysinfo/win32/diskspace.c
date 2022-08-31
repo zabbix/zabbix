@@ -39,7 +39,6 @@ typedef struct
 }
 zbx_wmpoint_t;
 
-#define zbx_wcsdup(old, str)		zbx_wcsdup2(__FILE__, __LINE__, old, str)
 
 static wchar_t	*zbx_wcsdup2(const char *filename, int line, wchar_t *old, const wchar_t *str)
 {
@@ -260,6 +259,7 @@ static void	zbx_wmpoints_free(zbx_wmpoint_t *mpoint)
 
 static int	get_mount_paths(zbx_vector_ptr_t *mount_paths, char **error)
 {
+#define zbx_wcsdup(old, str)		zbx_wcsdup2(__FILE__, __LINE__, old, str)
 	wchar_t	*buffer = NULL, volume_name[MAX_PATH + 1], *p;
 	DWORD	size_dw, last_error;
 	HANDLE	volume = INVALID_HANDLE_VALUE;
@@ -329,7 +329,9 @@ out:
 		FindVolumeClose(volume);
 
 	zbx_free(buffer);
+
 	return ret;
+#define zbx_wcsdup
 }
 
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
