@@ -31,7 +31,7 @@ $parent_host = $data['parent_host'];
 
 $widget = (new CWidget())
 	->setTitle(_('Host prototypes'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_PROTOTYPE_EDIT))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_PROTOTYPE_EDIT))
 	->setNavigation(getHostNavigation('hosts', $data['discovery_rule']['hostid'], $data['discovery_rule']['itemid']));
 
 $tabs = new CTabView();
@@ -48,7 +48,7 @@ $url = (new CUrl('host_prototypes.php'))
 $form = (new CForm('post', $url))
 	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', getRequest('form', 1))
 	->addVar('parent_discoveryid', $data['discovery_rule']['itemid'])
 	->addVar('tls_accept', $parent_host['tls_accept'])
