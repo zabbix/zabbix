@@ -22,7 +22,7 @@
 #include "log.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
-#       include <sys/utsname.h>
+#	include <sys/utsname.h>
 #endif
 
 int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)

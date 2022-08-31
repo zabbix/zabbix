@@ -21,11 +21,10 @@
 
 #include "log.h"
 
-#define ZBX_PERFSTAT_PAGE_SHIFT	12	/* 4 KB */
-
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBPERFSTAT
+#define ZBX_PERFSTAT_PAGE_SHIFT	12	/* 4 KB */
 	perfstat_memory_total_t	mem;
 	char			*swapdev, *mode;
 
@@ -68,7 +67,8 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(mode, "pused"))
 	{
-		SET_DBL_RESULT(result, 0 != mem.pgsp_total ? 100.0 - 100.0 * (mem.pgsp_free / (double)mem.pgsp_total) : 0.0);
+		SET_DBL_RESULT(result, 0 != mem.pgsp_total ? 100.0 - 100.0 * (mem.pgsp_free / (double)mem.pgsp_total) :
+			0.0);
 	}
 	else
 	{
@@ -77,6 +77,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	return SYSINFO_RET_OK;
+#undef ZBX_PERFSTAT_PAGE_SHIFT
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
 

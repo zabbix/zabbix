@@ -195,8 +195,10 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				break;
 			case ZBX_RSS:
 				/* try to be compatible with "ps -o rssize" */
-				byte_value = ((zbx_uint64_t)procentry.pi_drss << ZBX_L2PSIZE(procentry.pi_data_l2psize)) +
-						((zbx_uint64_t)procentry.pi_trss << ZBX_L2PSIZE(procentry.pi_text_l2psize));
+				byte_value = ((zbx_uint64_t)procentry.pi_drss <<
+						ZBX_L2PSIZE(procentry.pi_data_l2psize)) +
+						((zbx_uint64_t)procentry.pi_trss <<
+						ZBX_L2PSIZE(procentry.pi_text_l2psize));
 				break;
 			case ZBX_PMEM:
 				/* try to be compatible with "ps -o pmem" */

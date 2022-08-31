@@ -41,7 +41,7 @@ static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
 	/* total real memory in pages */
-	SET_UI64_RESULT(result, m.real_total << ZBX_PERFSTAT_PAGE_SHIFT);	
+	SET_UI64_RESULT(result, m.real_total << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
@@ -61,7 +61,7 @@ static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
 	/* free real memory in pages */
-	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SHIFT);	
+	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
@@ -71,7 +71,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
 	/* real memory which is in use in pages */
-	SET_UI64_RESULT(result, m.real_inuse << ZBX_PERFSTAT_PAGE_SHIFT);	
+	SET_UI64_RESULT(result, m.real_inuse << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }

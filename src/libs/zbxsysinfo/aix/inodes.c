@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "inodes.h"
 #include "zbxsysinfo.h"
+
+#include "inodes.h"
 
 #include "log.h"
 
@@ -77,7 +78,7 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*fsname, *mode, *error;
 	zbx_uint64_t		total, free, used;
-	double 			pfree, pused;
+	double			pfree, pused;
 
 	if (2 < request->nparam)
 	{

@@ -441,7 +441,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 				for (i = 0; i < (int)(pDnsRecord->Data.TXT.dwStringCount); i++)
 					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s ",
 							zbx_unicode_to_utf8_static(pDnsRecord->Data.TXT.pStringArray[i],
-							 tmp, sizeof(tmp)));
+							tmp, sizeof(tmp)));
 
 				if (0 < i)
 					offset -= 1;	/* remove the trailing space */
