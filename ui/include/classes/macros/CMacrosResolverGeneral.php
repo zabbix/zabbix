@@ -798,8 +798,11 @@ class CMacrosResolverGeneral {
 					$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
 				}
 
-				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED || $parameter['type'] == CHistFunctionParser::PARAM_TYPE_UNQUOTED) {
-					$param = CExpressionParser::quoteString($param, true, true);
+				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
+						|| $parameter['type'] == CHistFunctionParser::PARAM_TYPE_UNQUOTED) {
+					$param = CExpressionParser::quoteString($param, true,
+						($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED)
+					);
 				}
 
 				$function = substr_replace($function, $param, $parameter['pos'], $parameter['length']);

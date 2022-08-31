@@ -117,7 +117,7 @@ class CMacrosResolverTest extends TestCase {
 					]
 				]
 			],
-			'no double quotes for qouted macro' => [
+			'no double quotes for quoted macro' => [
 				'functions' => [
 					30896 => [
 						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 1d, "string", "{$CITY}"',
@@ -148,7 +148,23 @@ class CMacrosResolverTest extends TestCase {
 						'hostid'	=> 10084
 					]
 				]
-			]
+			],
+			'only quoted parameters stay quoted' => [
+				'functions' => [
+					30896 => [
+						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 100h:now/h-10h, 100h, 2h, 2.1, "mad"',
+						'function'	=> 'func',
+						'hostid'	=> 10084
+					]
+				],
+				'expected' => [
+					30896 => [
+						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 100h:now/h-10h, 100h, 2h, 2.1, "mad"',
+						'function'	=> 'func',
+						'hostid'	=> 10084
+					]
+				]
+			],
 		];
 	}
 
