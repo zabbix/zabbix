@@ -190,17 +190,10 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), time(NULL),
-			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT);
-
-	if (0 != proxy.auto_compress)
-		flags |= ZBX_TCP_COMPRESS;
+	zabbix_log(LOG_LEVEL_DEBUG, "ignoring heartbeat from active proxy \"%s\" at \"%s\":"
+				" heartbeats are deprecated",
+				proxy.host, sock->peer);
 out:
-	if (FAIL == ret && 0 != (sock->protocol & ZBX_TCP_COMPRESS))
-		flags |= ZBX_TCP_COMPRESS;
-
-	zbx_send_response_ext(sock, ret, error, NULL, flags, CONFIG_TIMEOUT);
-
 	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
