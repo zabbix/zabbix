@@ -15497,8 +15497,11 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vect
 	/* were already synced)                                                       */
 
 	zbx_vector_uint64_create(&hostids_tmp);
-	zbx_vector_uint64_append_array(&hostids_tmp, hostids->values, hostids->values_num);
-	zbx_vector_uint64_setdiff(&hostids_tmp, updated_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	if (0 != hostids->values_num)
+	{
+		zbx_vector_uint64_append_array(&hostids_tmp, hostids->values, hostids->values_num);
+		zbx_vector_uint64_setdiff(&hostids_tmp, updated_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
 
 	zbx_vector_uint64_create(&globalids);
 
