@@ -1,0 +1,1 @@
+........S. [ZBX-21530] fixed polling of items that must be processed by server despite host being monitored by proxy (wiper)
