@@ -313,7 +313,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 		// Create discovery rules.
 		$llds = [
 			'Test discovered hosts' => ['hostid' => self::$hostid, 'interface' => $interfaceid],
-			'Test discovered macros inheritance' => ['hostid' => self::$inherit_hostid, 'interface' => $inherit_interfaceid],
+			'Test discovered macros inheritance' => ['hostid' => self::$inherit_hostid, 'interface' => $inherit_interfaceid]
 		];
 
 		$lld_data = [];
@@ -349,7 +349,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 			$prototypes_data[] = [
 				'host' => self::$hosts[$l]['prototype_name'],
 				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
+				'groupLinks' => [['groupid' => 4]]
 			];
 		}
 
@@ -409,7 +409,6 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 				$j++;
 			}
 		}
-
 	}
 
 	public static function getDiscoveredHostUpdateMacrosData() {

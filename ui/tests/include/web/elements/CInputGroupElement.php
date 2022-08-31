@@ -29,7 +29,7 @@ class CInputGroupElement extends CElement {
 
 	const TYPE_SECRET = 'Secret text';
 	const TYPE_TEXT = 'Text';
-	const TYPE_VAULT= 'Vault';
+	const TYPE_VAULT = 'Vault';
 
 	/**
 	 * Get value of InputGroup element.
