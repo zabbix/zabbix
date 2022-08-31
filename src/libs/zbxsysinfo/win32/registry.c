@@ -27,6 +27,9 @@
 #include <locale.h>
 #include <winreg.h>
 
+#define REGISTRY_DISCOVERY_MODE_KEYS	0
+#define REGISTRY_DISCOVERY_MODE_VALUES	1
+
 static HKEY	get_hkey_from_fullkey(char *fullkey)
 {
 	if (0 == strcmp("HKEY_CLASSES_ROOT", fullkey) || 0 == strcmp("HKCR", fullkey))
@@ -136,8 +139,6 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 #define ZBX_SYSINFO_REGISTRY_TAG_DATA		"data"
 #define ZBX_SYSINFO_REGISTRY_TAG_TYPE		"type"
 #define MAX_VALUE_NAME				16383
-#define REGISTRY_DISCOVERY_MODE_KEYS		0
-#define REGISTRY_DISCOVERY_MODE_VALUES		1
 	wchar_t			achClass[MAX_PATH] = TEXT(""), achValue[MAX_VALUE_NAME];
 	DWORD			cchClassName = MAX_PATH, cSubKeys=0, cValues, cbName, i, retCode,
 				cchValue = MAX_VALUE_NAME;
@@ -291,8 +292,6 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 #undef ZBX_SYSINFO_REGISTRY_TAG_DATA
 #undef ZBX_SYSINFO_REGISTRY_TAG_TYPE
 #undef MAX_VALUE_NAME
-#undef REGISTRY_DISCOVERY_MODE_KEYS
-#undef REGISTRY_DISCOVERY_MODE_VALUES
 }
 
 static int	split_fullkey(char **fullkey, HKEY *hive_handle, char **hive_str)
