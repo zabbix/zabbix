@@ -319,8 +319,8 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 			}
 		}
 next:
-			zbx_free(key);
-			zbx_free(path);
+		zbx_free(key);
+		zbx_free(path);
 	}
 	DBfree_result(result);
 end:
