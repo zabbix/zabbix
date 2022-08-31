@@ -52,7 +52,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'http_strip_domains' =>				'db config.http_strip_domains',
 			'saml_userdirectoryid' =>			'db userdirectory_saml.userdirectoryid',
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
-			'saml_jit_enabled' =>				'in '.ZBX_AUTH_SAML_JIT_DISABLED.','.ZBX_AUTH_SAML_JIT_ENABLED,
+			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
 			'sso_url' =>						'db userdirectory_saml.sso_url',
 			'slo_url' =>						'db userdirectory_saml.slo_url',
@@ -85,7 +85,32 @@ class CControllerAuthenticationUpdate extends CController {
 			$this->setResponse($this->response);
 		}
 
-		return $ret;
+		$auth_valid = $this->validateDefaultAuth();
+
+//		if ($auth_valid && !$this->validateLdap()) {
+//			$auth_valid = false;
+//		}
+
+		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
+			$auth_valid = $this->validateSamlAuth();
+		}
+
+//		if ($auth_valid) {
+//			[$auth_valid, $this->ldap_userdirectoryid] = $this->processLdapServers(
+//				$this->getInput('ldap_servers', []),
+//				$this->getInput('ldap_default_row_index', 0)
+//			);
+//		}
+
+		if (!$auth_valid) {
+			if (CMessageHelper::getTitle() === null) {
+				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
+			}
+			$this->response->setFormData($this->getInputAll());
+			$this->setResponse($this->response);
+		}
+
+		return $auth_valid;
 	}
 
 	/**
@@ -216,35 +241,6 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$auth_valid = $this->validateDefaultAuth();
-
-//		if ($auth_valid && !$this->validateLdap()) {
-//			$auth_valid = false;
-//		}
-
-		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
-			if (!$this->validateSamlAuth()) {
-				$auth_valid = false;
-			}
-		}
-
-//		if ($auth_valid) {
-//			[$auth_valid, $ldap_userdirectoryid] = $this->processLdapServers(
-//				$this->getInput('ldap_servers', []),
-//				$this->getInput('ldap_default_row_index', 0)
-//			);
-//		}
-
-		if (!$auth_valid) {
-			if (CMessageHelper::getTitle() === null) {
-				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
-			}
-			$this->response->setFormData($this->getInputAll());
-			$this->setResponse($this->response);
-
-			return;
-		}
-
 		$auth_params = [
 			CAuthenticationHelper::AUTHENTICATION_TYPE,
 			CAuthenticationHelper::HTTP_AUTH_ENABLED,
@@ -268,7 +264,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
-//			'ldap_userdirectoryid' => $ldap_userdirectoryid,
+//			'ldap_userdirectoryid' => $this->ldap_userdirectoryid,
 			'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
@@ -286,7 +282,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
 			$fields += [
-				'saml_jit_status' => ZBX_AUTH_SAML_JIT_DISABLED,
+				'saml_jit_status' => JIT_PROVISIONING_DISABLED,
 				'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE
 			];
 		}
@@ -362,16 +358,18 @@ class CControllerAuthenticationUpdate extends CController {
 			$saml_data += $saml_fields;
 
 			foreach ($saml_data['provision_groups'] as &$provision_group) {
-				if ($provision_group['is_fallback'] == 1) {
+				if ($provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK_ON) {
 					unset($provision_group['name']);
 				}
-				$provision_group['user_groups'] = [];
-				$usrgrpids = explode(', ', $provision_group['usrgrpid']);
-				unset($provision_group['usrgrpid']);
-
-				foreach ($usrgrpids as $usrgrpid) {
-					$provision_group['user_groups'][] = ['usrgrpid' => $usrgrpid];
+				else {
+					unset($provision_group['fallback_status']);
 				}
+
+				$user_groups = [];
+				foreach ($provision_group['user_groups'] as $usrgrpid) {
+					$user_groups[] = ['usrgrpid' => $usrgrpid];
+				}
+				$provision_group['user_groups'] = $user_groups;
 			}
 			unset($provision_group);
 

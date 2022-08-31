@@ -46,7 +46,7 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_removed_userdirectoryids' =>	'array',
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
-			'saml_jit_enabled' =>				'in '.ZBX_AUTH_SAML_JIT_DISABLED.','.ZBX_AUTH_SAML_JIT_ENABLED,
+			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
 			'sso_url' =>						'db userdirectory_saml.sso_url',
 			'slo_url' =>						'db userdirectory_saml.slo_url',
@@ -164,11 +164,11 @@ class CControllerAuthenticationEdit extends CController {
 			]);
 
 			$data['saml_provision_groups'] = $this->getInput('saml_provision_groups', []);
-
+sdii($data['saml_provision_groups']);
 			if ($data['saml_provision_groups'] != []) {
-				$data['saml_provision_groups'] = $this->getProvisionGroupsToTableFormat($data['saml_provision_groups']);
+				$data['saml_provision_groups'] = $this->extendProvisionGroups($data['saml_provision_groups']);
 			}
-
+			sdii($data['saml_provision_groups']);
 
 			$data['saml_provision_media'] = $this->getInput('saml_provision_media', []);
 
@@ -178,7 +178,7 @@ class CControllerAuthenticationEdit extends CController {
 						'output' => ['name'],
 						'mediatypeids' => $saml_media['mediatypeid']
 					]);
-					$saml_media['media_type_name'] = $media[0]['name'];
+					$saml_media['mediatype_name'] = $media[0]['name'];
 				}
 				unset($saml_media);
 			}
@@ -208,34 +208,8 @@ class CControllerAuthenticationEdit extends CController {
 				$data['saml_group_name'] = $saml_configuration['group_name'];
 				$data['saml_user_username'] = $saml_configuration['user_username'];
 				$data['saml_user_lastname'] = $saml_configuration['user_lastname'];
-				$data['saml_provision_groups'] = [];
+				$data['saml_provision_groups'] = $this->extendProvisionGroups($saml_configuration['provision_groups']);
 				$data['saml_provision_media'] = [];
-
-
-				foreach ($saml_configuration['provision_groups'] as $provision_group) {
-					if ($provision_group['is_fallback'] == 1) {
-						$provision_group['name'] = 'Fallback group';
-					}
-
-					$role = API::Role()->get([
-						'output' => ['name'],
-						'roleids' => $provision_group['roleid']
-					]);
-
-					$user_groups = API::UserGroup()->get([
-						'output' => ['name', 'usrgrpid'],
-						'usrgrpids' => array_column($provision_group['user_groups'], 'usrgrpid')
-					]);
-
-					$user_groups_names = implode(', ',array_column($user_groups, 'name'));
-					$user_groups_ids = implode(', ',array_column($user_groups, 'usrgrpid'));
-
-					$data['saml_provision_groups'][] = $provision_group + [
-							'role_name' => $role[0]['name'],
-							'user_group_name' => $user_groups_names,
-							'usrgrpid' => $user_groups_ids
-						];
-				}
 
 				foreach ($saml_configuration['provision_media'] as $media) {
 					$db_media = API::MediaType()->get([
@@ -244,7 +218,7 @@ class CControllerAuthenticationEdit extends CController {
 					]);
 
 					$data['saml_provision_media'][] = $media + [
-							'media_type_name' => $db_media[0]['name'],
+							'mediatype_name' => $db_media[0]['name'],
 						];
 				}
 
@@ -277,34 +251,21 @@ class CControllerAuthenticationEdit extends CController {
 					'scim_token' => ''
 				];
 
-				$saml_settings['saml_provision_media'] = [];
-				$saml_settings['saml_provision_groups'] = [
+				$default_group = [
 					[
-						'is_fallback' => 1,
-						'fallback_status' => 0,
+						'is_fallback' => GROUP_MAPPING_FALLBACK,
+						'fallback_status' => GROUP_MAPPING_FALLBACK_OFF,
 						'name' => 'Fallback group',
 						'roleid' => 1,
 						'user_groups' => [
+							['usrgrpid' => 7],
 							['usrgrpid' => 8]
 						]
 					]
 				];
+				$saml_settings['saml_provision_groups'] = $this->extendProvisionGroups($default_group);
+				$saml_settings['saml_provision_media'] = [];
 
-				$role = API::Role()->get([
-					'output' => ['name'],
-					'roleids' => $saml_settings['saml_provision_groups'][0]['roleid']
-				]);
-
-				$saml_settings['saml_provision_groups'][0]['role_name'] = $role[0]['name'];
-
-				$user_groups = API::UserGroup()->get([
-					'output' => ['name', 'usrgrpid'],
-					'usrgrpids' => array_column($saml_settings['saml_provision_groups'][0]['user_groups'], 'usrgrpid')
-				]);
-				$user_groups_names = implode(', ',array_column($user_groups, 'name'));
-				$user_groups_ids = implode(', ',array_column($user_groups, 'usrgrpid'));
-				$saml_settings['saml_provision_groups'][0]['user_group_name'] = $user_groups_names;
-				$saml_settings['saml_provision_groups'][0]['usrgrpid'] = $user_groups_ids;
 				$data += $saml_settings;
 			}
 
@@ -312,14 +273,22 @@ class CControllerAuthenticationEdit extends CController {
 				'output' => ['userdirectoryid', 'name', 'description', 'host', 'port', 'base_dn', 'search_attribute',
 					'search_filter', 'start_tls', 'bind_dn'
 				],
+				'filter' => [
+					'idp_type' => IDP_TYPE_LDAP
+				],
 				'selectUsrgrps' => API_OUTPUT_COUNT,
 				'sortfield' => ['name'],
 				'sortorder' => ZBX_SORT_UP
 			]);
 
-			$data['ldap_default_row_index'] = array_search($data[CAuthenticationHelper::LDAP_USERDIRECTORYID],
-				array_column($data['ldap_servers'], 'userdirectoryid')
-			);
+			$data['ldap_default_row_index'] = '';
+
+			if ($data['ldap_servers']) {
+				$data['ldap_default_row_index'] = array_search($data[CAuthenticationHelper::LDAP_USERDIRECTORYID],
+					array_column($data['ldap_servers'], 'userdirectoryid')
+				);
+			}
+
 			$data['ldap_removed_userdirectoryids'] = [];
 		}
 
@@ -363,29 +332,38 @@ class CControllerAuthenticationEdit extends CController {
 		return $ldap_servers;
 	}
 
-	private function getProvisionGroupsToTableFormat(array $provision_groups): array {
-		$provision_groups_to_table = [];
+	private function extendProvisionGroups(array $provision_groups): array {
+		$extended_provision_groups = [];
+
 		foreach ($provision_groups as $provision_group) {
+			if ($provision_group['is_fallback'] == 1) {
+				$provision_group['name'] = 'Fallback group';
+			}
+
 			$role = API::Role()->get([
 				'output' => ['name'],
 				'roleids' => $provision_group['roleid']
 			]);
 
-			$usrgrpids = explode(', ', $provision_group['usrgrpid']);
+			if (!array_column($provision_group['user_groups'], 'usrgrpid')) {
+				$user_groups = [];
+				foreach ($provision_group['user_groups'] as $usrgrpid) {
+					$user_groups[]= ['usrgrpid' => $usrgrpid];
+				}
+				$provision_group['user_groups'] = $user_groups;
+			}
 
 			$user_groups = API::UserGroup()->get([
 				'output' => ['name', 'usrgrpid'],
-				'usrgrpids' => $usrgrpids
+				'usrgrpids' => array_column($provision_group['user_groups'], 'usrgrpid')
 			]);
 
-			$user_groups_names = implode(', ',array_column($user_groups, 'name'));
-
-			$provision_groups_to_table[] = $provision_group + [
-					'role_name' => $role[0]['name'],
-					'user_group_name' => $user_groups_names,
-				];
+			$extended_provision_groups[] = array_merge($provision_group, [
+				'role_name' => $role[0]['name'],
+				'user_groups' => $user_groups
+			]);
 		}
 
-		return $provision_groups_to_table;
+		return $extended_provision_groups;
 	}
 }

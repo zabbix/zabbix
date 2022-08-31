@@ -196,6 +196,10 @@
 					$(ui.placeholder).height($(ui.helper).height());
 				}
 			});
+
+			//for (const drag_icon of element.querySelectorAll('div.<?//= ZBX_STYLE_DRAG_ICON ?>//')) {
+			//	drag_icon.classList.toggle('<?//= ZBX_STYLE_DISABLED ?>//', is_disabled);
+			//}
 		}
 
 		_authFormSubmit() {
