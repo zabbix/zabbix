@@ -448,8 +448,8 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 			{
 				check_time = zbx_time() - check_time;
 
-				if (ZBX_FLOAT_PRECISION > check_time)
-					check_time = ZBX_FLOAT_PRECISION;
+				if (zbx_get_float_epsilon() > check_time)
+					check_time = zbx_get_float_epsilon();
 
 				SET_DBL_RESULT(result, check_time);
 			}
