@@ -11552,6 +11552,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 	dst_proxy->proxy_data_nextcheck = src_proxy->proxy_data_nextcheck;
 	dst_proxy->proxy_tasks_nextcheck = src_proxy->proxy_tasks_nextcheck;
 	dst_proxy->last_cfg_error_time = src_proxy->last_cfg_error_time;
+	dst_proxy->version = src_proxy->version;
 	dst_proxy->lastaccess = src_proxy->lastaccess;
 	dst_proxy->auto_compress = src_proxy->auto_compress;
 	dst_proxy->last_version_error_time = src_proxy->last_version_error_time;
