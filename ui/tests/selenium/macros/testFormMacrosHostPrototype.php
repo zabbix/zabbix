@@ -89,7 +89,8 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateMacrosData
+	 * @dataProvider getUpdateMacrosNormalData
+	 * @dataProvider getUpdateMacrosCommonData
 	 */
 	public function testFormMacrosHostPrototype_Update($data) {
 		$this->checkMacros($data, 'host prototype', $this->host_name_update, true, self::IS_PROTOTYPE, self::LLD_ID);

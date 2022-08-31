@@ -246,7 +246,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		];
 	}
 
-	public static function getUpdateMacrosData() {
+	public static function getUpdateMacrosNormalData() {
 		return [
 			[
 				[
@@ -268,7 +268,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 						]
 					]
 				]
-			],
+			]
+		];
+	}
+
+	public static function getUpdateMacrosCommonData() {
+		return [
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1316,6 +1321,44 @@ abstract class testFormMacros extends CLegacyWebTest {
 		return $this->sortMacros($macros_frontend);
 	}
 
+	public function getSecretMacrosLayoutData() {
+		return [
+			[
+				[
+					'macro' => '{$SECRET_HOST_MACRO}',
+					'type' => 'Secret text'
+				]
+			],
+			[
+				[
+					'macro' => '{$SECRET_HOST_MACRO}',
+					'type' => 'Secret text',
+					'chenge_type' => true
+				]
+			],
+			[
+				[
+					'macro' => '{$TEXT_HOST_MACRO}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_TEXT_2_SECRET}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_SECRET_2_SECRET}',
+					'type' => 'Secret text'
+				]
+			]
+		];
+	}
+
 	/**
 	 * Check content of macro value InputGroup element for macros.
 	 *
@@ -1401,6 +1444,51 @@ abstract class testFormMacros extends CLegacyWebTest {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
+	}
+
+	public function getCreateSecretMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => 0,
+						'macro' => '{$SECRET_MACRO}',
+						'value' => [
+							'text' => 'host secret value',
+							'type' => 'Secret text'
+						],
+						'description' => 'secret description'
+					],
+					'check_default_type' => true
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$TEXT_MACRO}',
+						'value' => [
+							'text' => 'host plain text value',
+							'type' => 'Secret text'
+						],
+						'description' => 'plain text description'
+					],
+					'back_to_text' => true
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$SECRET_EMPTY_MACRO}',
+						'value' => [
+							'text' => '',
+							'type' => 'Secret text'
+						],
+						'description' => 'secret empty value'
+					]
+				]
+			]
+		];
 	}
 
 	/**

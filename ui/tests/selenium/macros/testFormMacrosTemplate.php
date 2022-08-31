@@ -85,7 +85,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateMacrosData
+	 * @dataProvider getUpdateMacrosNormalData
+	 * @dataProvider getUpdateMacrosCommonData
 	 */
 	public function testFormMacrosTemplate_Update($data) {
 		$this->checkMacros($data, 'template', $this->template_name_update, true);

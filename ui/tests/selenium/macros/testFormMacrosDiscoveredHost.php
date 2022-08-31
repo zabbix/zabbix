@@ -353,6 +353,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 			];
 		}
 
+		// Create host prototype with macros for inheritance test.
 		$prototypes_data[] = [
 			'host' => self::$hosts[8]['prototype_name'],
 			'ruleid' => $inherit_lldid,
@@ -385,13 +386,13 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 		// Emulate host discoveries in DB.
 		foreach (self::$hosts as $host) {
 			DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr($host['hostid']).
-				",".zbx_dbstr($host['name']).",".zbx_dbstr($host['name']).", 0, 4, '')"
+					",".zbx_dbstr($host['name']).",".zbx_dbstr($host['name']).", 0, 4, '')"
 			);
 			DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr($host['hostid']).", ".
 					zbx_dbstr($prototypeids[$host['prototype_name']]).")"
 			);
 			DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
-				zbx_dbstr($host['interfaceid']).",".zbx_dbstr($host['hostid']).", 1, 1, 1, '127.0.0.1', '', '10050')"
+					zbx_dbstr($host['interfaceid']).",".zbx_dbstr($host['hostid']).", 1, 1, 1, '127.0.0.1', '', '10050')"
 			);
 			DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr($host['host_groupid']).
 					", ".zbx_dbstr($host['hostid']).", 4)"
@@ -416,7 +417,6 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'discovered_first_case' => true,
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -431,237 +431,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 							'description' => 'Updated description 2'
 						]
 					],
-					'expected_macros' => [
-						[
-							'macro' => '{$MACRO1}'
-						],
-						[
-							'macro' => '{$MACRO2}'
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$UPDATED_MACRO1}',
-							'value' => '',
-							'description' => ''
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$UPDATED_MACRO2}',
-							'value' => 'Updated Value 2',
-							'description' => ''
-						],
-						[
-							'macro' => '{$UPDATED_MACRO3}',
-							'value' => '',
-							'description' => 'Updated Description 3'
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO:A}',
-							'value' => '{$MACRO:B}',
-							'description' => '{$MACRO:C}'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$UPDATED_MACRO_1}',
-							'value' => '',
-							'description' => 'DESCRIPTION'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'macro' => '{$UPDATED_MACRO_2}',
-							'value' => 'Значение',
-							'description' => 'Описание'
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$lowercase}',
-							'value' => 'lowercase_value',
-							'description' => 'UPPERCASE DESCRIPTION'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$MACRO:regex:"^[a-z]"}',
-							'value' => 'regex',
-							'description' => ''
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'macro' => '{$MACRO:regex:^[0-9a-z]}',
-							'value' => '',
-							'description' => 'DESCRIPTION'
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Without dollar in Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{MACRO}'
-						]
-					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With empty Macro',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '',
-							'value' => 'Macro_Value',
-							'description' => 'Macro Description'
-						]
-					],
-					'error'  => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With two dollars in MACROS',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$$MACRO}'
-						]
-					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "$MACRO}'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With wrong symbols in MACROS',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MAC%^}'
-						]
-					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "%^}".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With LLD macro in MACROS',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{#LLD_MACRO}'
-						]
-					],
-					'error'  => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With repeated Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With repeated regex Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$M:regex:"[a-z]"}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$M:regex:"[a-z]"}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With repeated regex Macros and quotes',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$MACRO:regex:^[0-9].*$}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:^[0-9].*$}) already exists.'
+					'expected_macros' => [['macro' => '{$MACRO1}'], ['macro' => '{$MACRO2}']]
 				]
 			]
 		];
@@ -669,6 +439,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 
 	/**
 	 * @dataProvider getDiscoveredHostUpdateMacrosData
+	 * @dataProvider getUpdateMacrosCommonData
 	 */
 	public function testFormMacrosDiscoveredHost_Update($data) {
 		$this->checkMacros($data, 'host', self::$hosts[0]['name'], true, false, null, true);
@@ -688,94 +459,11 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 		$this->checkRemoveInheritedMacros($data, 'host', self::$hosts[1]['hostid'], false, null, self::$hosts[1]['name']);
 	}
 
-	public function getSecretMacrosLayoutData() {
-		return [
-			[
-				[
-					'macro' => '{$SECRET_HOST_MACRO}',
-					'type' => 'Secret text'
-				]
-			],
-			[
-				[
-					'macro' => '{$SECRET_HOST_MACRO}',
-					'type' => 'Secret text',
-					'chenge_type' => true
-				]
-			],
-			[
-				[
-					'macro' => '{$TEXT_HOST_MACRO}',
-					'type' => 'Text'
-				]
-			],
-			[
-				[
-					'global' => true,
-					'macro' => '{$X_TEXT_2_SECRET}',
-					'type' => 'Text'
-				]
-			],
-			[
-				[
-					'global' => true,
-					'macro' => '{$X_SECRET_2_SECRET}',
-					'type' => 'Secret text'
-				]
-			]
-		];
-	}
-
 	/**
 	 * @dataProvider getSecretMacrosLayoutData
 	 */
 	public function testFormMacrosDiscoveredHost_CheckSecretMacrosLayout($data) {
 		$this->checkSecretMacrosLayout($data, 'zabbix.php?action=host.view', 'hosts', self::$hosts[2]['name'], true);
-	}
-
-	public function getCreateSecretMacrosData() {
-		return [
-			[
-				[
-					'macro_fields' => [
-						'action' => USER_ACTION_UPDATE,
-						'index' => 0,
-						'macro' => '{$SECRET_MACRO}',
-						'value' => [
-							'text' => 'host secret value',
-							'type' => 'Secret text'
-						],
-						'description' => 'secret description'
-					],
-					'check_default_type' => true
-				]
-			],
-			[
-				[
-					'macro_fields' => [
-						'macro' => '{$TEXT_MACRO}',
-						'value' => [
-							'text' => 'host plain text value',
-							'type' => 'Secret text'
-						],
-						'description' => 'plain text description'
-					],
-					'back_to_text' => true
-				]
-			],
-			[
-				[
-					'macro_fields' => [
-						'macro' => '{$SECRET_EMPTY_MACRO}',
-						'value' => [
-							'text' => '',
-							'type' => 'Secret text'
-						],
-						'description' => 'secret empty value'
-					]
-				]
-			]
-		];
 	}
 
 	/**
@@ -911,6 +599,9 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 		$this->updateVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', self::$hosts[2]['name']);
 	}
 
+	/**
+	 * Check discovered host macros which are inherited from both  host and prototype.
+	 */
 	public function testFormMacrosDiscoveredHost_CheckInheritedMacros() {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 		$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()
