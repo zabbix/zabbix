@@ -1744,6 +1744,35 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: delete all global macros                                          *
+ *                                                                            *
+ * Return value: SUCCEED - the global macros were deleted successfully        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxyconfig_delete_globalmacros(char **error)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (ZBX_DB_OK > DBexecute("delete from globalmacro"))
+	{
+		*error = zbx_strdup(NULL, "cannot delete global macros");
+		ret = FAIL;
+	}
+	else
+		ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
+}
+
 #define proxyconfig_ZBX_TABLE_NUM	24
 
 /******************************************************************************
@@ -1754,7 +1783,7 @@ out:
 int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 {
 	zbx_vector_table_data_ptr_t	config_tables;
-	int			ret = SUCCEED, full_sync = 0;
+	int			ret = SUCCEED, full_sync = 0, delete_globalmacros = 0;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1];
 	struct zbx_json_parse	jp_data, jp_del_hostids;
 	zbx_uint64_t		config_revision;
@@ -1820,7 +1849,13 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 		for (p = 0; NULL != (p = zbx_json_next_value(&jp_del_hostids, p, tmp, sizeof(tmp), NULL));)
 		{
 			if (SUCCEED == is_uint64(tmp, &hostid))
-				zbx_vector_uint64_append(&del_macro_hostids, hostid);
+			{
+				if (0 != hostid)
+					zbx_vector_uint64_append(&del_macro_hostids, hostid);
+				else
+					delete_globalmacros = 1;
+
+			}
 		}
 	}
 
@@ -1830,10 +1865,13 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 		ret = proxyconfig_sync_data(&config_tables, full_sync, error);
 
 	if (SUCCEED == ret && 0 != del_hostids.values_num)
-		proxyconfig_delete_hosts(&del_hostids, error);
+		ret = proxyconfig_delete_hosts(&del_hostids, error);
 
 	if (SUCCEED == ret && 0 != del_macro_hostids.values_num)
-		proxyconfig_delete_hostmacros(&del_macro_hostids, error);
+		ret = proxyconfig_delete_hostmacros(&del_macro_hostids, error);
+
+	if (SUCCEED == ret && 0 != delete_globalmacros)
+		ret = proxyconfig_delete_globalmacros(error);
 
 	if (SUCCEED == ret)
 	{
