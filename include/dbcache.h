@@ -1181,8 +1181,9 @@ void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t rev
 		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
 		zbx_vector_uint64_t *httptestids);
 
-void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, zbx_uint64_t revision,
-		zbx_vector_uint64_t *macro_hostids, int *global, zbx_vector_uint64_t *del_macro_hostids);
+void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vector_uint64_t *updated_hostids,
+		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global,
+		zbx_vector_uint64_t *del_macro_hostids);
 void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *templateids);
 

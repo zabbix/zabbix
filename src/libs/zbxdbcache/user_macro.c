@@ -1271,7 +1271,7 @@ int	um_cache_get_host_revision(const zbx_um_cache_t *cache, zbx_uint64_t hostid,
 	return SUCCEED;
 }
 
-static void	um_cache_get_hostids(const zbx_um_cache_t *cache, const zbx_uint64_t *phostid, zbx_uint64_t revision,
+static void	um_cache_get_hosts(const zbx_um_cache_t *cache, const zbx_uint64_t *phostid, zbx_uint64_t revision,
 		zbx_vector_um_host_t *hosts)
 {
 	zbx_um_host_t	**phost;
@@ -1288,7 +1288,7 @@ static void	um_cache_get_hostids(const zbx_um_cache_t *cache, const zbx_uint64_t
 		zbx_vector_um_host_append(hosts, *phost);
 
 	for (i = 0; i < (*phost)->templateids.values_num; i++)
-		um_cache_get_hostids(cache, &(*phost)->templateids.values[i], revision, hosts);
+		um_cache_get_hosts(cache, &(*phost)->templateids.values[i], revision, hosts);
 }
 
 /*********************************************************************************
@@ -1298,36 +1298,24 @@ static void	um_cache_get_hostids(const zbx_um_cache_t *cache, const zbx_uint64_t
  *                                                                               *
  * Parameters: cache             - [IN] the user macro cache                     *
  *             hostids           - [IN] identifiers of the hosts to check        *
+ *             hostids_num       - [IN] the number of hosts to check             *
  *             revision          - [IN] the revision                             *
  *             macro_hostids     - [OUT] the identifiers of updated host objects *
- *             global            - [OUT] SUCCEED - if global macros were updated,*
- *                                   FAIL otherwise                              *
  *             del_macro_hostids - [OUT] the identifiers of cleared host objects *
- *                                  (without macros or linked templates)         *
+ *                                  (without macros or linked templates),        *
+ *                                  optional                                     *
  *                                                                               *
  *********************************************************************************/
-void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_vector_uint64_t *hostids,
-		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global,
-		zbx_vector_uint64_t *del_macro_hostids)
+void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
+		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, zbx_vector_uint64_t *del_macro_hostids)
 {
 	int			i;
-	zbx_um_host_t		**phost;
-	zbx_uint64_t		hostid = 0, *phostid = &hostid;
 	zbx_vector_um_host_t	hosts;
 
 	zbx_vector_um_host_create(&hosts);
 
-	/* check revision of global macro 'host' (hostid 0) */
-	if (NULL != (phost = (zbx_um_host_t **)zbx_hashset_search(&cache->hosts, &phostid)) &&
-			(*phost)->macro_revision > revision)
-	{
-		*global = SUCCEED;
-	}
-	else
-		*global = FAIL;
-
-	for (i = 0; i < hostids->values_num; i++)
-		um_cache_get_hostids(cache, &hostids->values[i], revision, &hosts);
+	for (i = 0; i < hostids_num; i++)
+		um_cache_get_hosts(cache, &hostids[i], revision, &hosts);
 
 	if (0 != hosts.values_num)
 	{
@@ -1338,7 +1326,7 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_vector_ui
 		{
 			if (0 != hosts.values[i]->macros.values_num || 0 != hosts.values[i]->templateids.values_num)
 				zbx_vector_uint64_append(macro_hostids, hosts.values[i]->hostid);
-			else if (0 != revision)		/* skip when full sync */
+			else if (0 != revision && NULL != del_macro_hostids)		/* skip when full sync */
 				zbx_vector_uint64_append(del_macro_hostids, hosts.values[i]->hostid);
 		}
 	}

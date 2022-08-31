@@ -452,8 +452,9 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	proxyconfig_get_macro_data(const zbx_vector_uint64_t *hostids, zbx_uint64_t revision,
-		zbx_vector_ptr_t *keys_paths, struct zbx_json *j, zbx_vector_uint64_t *del_macro_hostids, char **error)
+static int	proxyconfig_get_macro_data(const zbx_vector_uint64_t *hostids,
+		const zbx_vector_uint64_t *updated_hostids, zbx_uint64_t revision, zbx_vector_ptr_t *keys_paths,
+		struct zbx_json *j, zbx_vector_uint64_t *del_macro_hostids, char **error)
 {
 	zbx_vector_uint64_t	macro_hostids;
 	int			global_macros, ret = FAIL;
@@ -462,7 +463,7 @@ static int	proxyconfig_get_macro_data(const zbx_vector_uint64_t *hostids, zbx_ui
 
 	zbx_vector_uint64_create(&macro_hostids);
 
-	zbx_dc_get_macro_updates(hostids, revision, &macro_hostids, &global_macros, del_macro_hostids);
+	zbx_dc_get_macro_updates(hostids, updated_hostids, revision, &macro_hostids, &global_macros, del_macro_hostids);
 
 	if (0 == revision || SUCCEED == global_macros)
 	{
@@ -857,8 +858,8 @@ int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_reques
 			goto clean;
 	}
 
-	if (SUCCEED != proxyconfig_get_macro_data(&hostids, proxy_config_revision, &keys_paths, j, &del_macro_hostids,
-			error))
+	if (SUCCEED != proxyconfig_get_macro_data(&hostids, &updated_hostids, proxy_config_revision, &keys_paths, j,
+			&del_macro_hostids, error))
 	{
 		goto clean;
 	}

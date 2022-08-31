@@ -15479,25 +15479,58 @@ void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t rev
 
 	UNLOCK_CACHE;
 
+	zbx_vector_uint64_sort(hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_sort(updated_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_sort(removed_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_sort(httptestids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, zbx_uint64_t revision,
-		zbx_vector_uint64_t *macro_hostids, int *global, zbx_vector_uint64_t *del_macro_hostids)
+void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vector_uint64_t *updated_hostids,
+		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global,
+		zbx_vector_uint64_t *del_macro_hostids)
 {
+	zbx_vector_uint64_t	hostids_tmp, globalids;
+	zbx_uint64_t		globalhostid = 0;
+
+	/* force full sync for updated hosts (in the case host was assigned to proxy) */
+	/* and revision based sync for the monitored hosts (except updated hosts that */
+	/* were already synced)                                                       */
+
+	zbx_vector_uint64_create(&hostids_tmp);
+	zbx_vector_uint64_append_array(&hostids_tmp, hostids->values, hostids->values_num);
+	zbx_vector_uint64_setdiff(&hostids_tmp, updated_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_uint64_create(&globalids);
+
 	RDLOCK_CACHE;
 
-	um_cache_get_macro_updates(config->um_cache, hostids, revision, macro_hostids, global, del_macro_hostids);
+	/* check revision of global macro 'host' (hostid 0) */
+	um_cache_get_macro_updates(config->um_cache, &globalhostid, 1, revision, &globalids, NULL);
+
+	if (0 != hostids_tmp.values_num)
+	{
+		um_cache_get_macro_updates(config->um_cache, hostids_tmp.values, hostids_tmp.values_num, revision,
+				macro_hostids, del_macro_hostids);
+	}
+
+	if (0 != updated_hostids->values_num)
+	{
+		um_cache_get_macro_updates(config->um_cache, updated_hostids->values, updated_hostids->values_num, 0,
+				macro_hostids, del_macro_hostids);
+	}
 
 	UNLOCK_CACHE;
+
+	*global = (0 < globalids.values_num ? SUCCEED : FAIL);
 
 	if (0 != macro_hostids->values_num)
 		zbx_vector_uint64_sort(macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 != del_macro_hostids->values_num)
 		zbx_vector_uint64_sort(del_macro_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_uint64_destroy(&globalids);
+	zbx_vector_uint64_destroy(&hostids_tmp);
 }
 
 void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vector_uint64_t *hostids,
