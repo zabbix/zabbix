@@ -23,6 +23,7 @@
 #include "simple.h"
 #include "log.h"
 #include "zbxself.h"
+#include "zbxsysinfo.h"
 
 typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);
 

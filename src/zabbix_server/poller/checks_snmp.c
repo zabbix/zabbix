@@ -30,6 +30,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "zbxparam.h"
+#include "zbxsysinfo.h"
 
 /*
  * SNMP Dynamic Index Cache

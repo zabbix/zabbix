@@ -25,6 +25,7 @@
 
 #include"../vmware/vmware.h"
 #include "zbxxml.h"
+#include "zbxsysinfo.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
 #define ZBX_VMWARE_DATASTORE_SIZE_FREE		1

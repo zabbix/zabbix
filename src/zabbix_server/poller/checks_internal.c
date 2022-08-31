@@ -28,6 +28,7 @@
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 #include "zbxavailability.h"
 #include "zbxnum.h"
+#include "zbxsysinfo.h"
 
 extern unsigned char	program_type;
 

@@ -28,7 +28,7 @@
 #include "../ipmi/ipmi.h"
 #endif
 #include "zbxnum.h"
-
+#include "zbxsysinfo.h"
 #include "trapper_auth.h"
 
 static void	dump_item(const DC_ITEM *item)

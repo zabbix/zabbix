@@ -39,6 +39,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
+#include "zbxsysinfo.h"
 
 int	sync_in_progress = 0;
 
