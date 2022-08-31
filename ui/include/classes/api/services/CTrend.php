@@ -81,6 +81,13 @@ class CTrend extends CApiService {
 						break;
 
 					default:
+						$config = select_config();
+						if ($config['hk_trends_global'] == 1) {
+							$options['time_from'] = max($options['time_from'],
+								time() - timeUnitToSeconds($config['hk_trends'])
+							);
+						}
+
 						$data = $this->getFromSql($options);
 				}
 
