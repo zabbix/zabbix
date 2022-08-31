@@ -24,7 +24,6 @@ package zbxlib
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include
 
-#include "zbxcommon.h"
 #include "zbxsysinfo.h"
 #include "module.h"
 

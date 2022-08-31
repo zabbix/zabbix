@@ -19,7 +19,6 @@
 
 #include "zbxwinservice.h"
 
-#include "zbxcommon.h"
 #include "zbxsysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =

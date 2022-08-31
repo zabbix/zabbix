@@ -19,7 +19,6 @@
 
 #include "inodes.h"
 
-#include "zbxcommon.h"
 #include "zbxsysinfo.h"
 #include "log.h"
 

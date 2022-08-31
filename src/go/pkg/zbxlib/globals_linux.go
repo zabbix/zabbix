@@ -51,7 +51,6 @@ package zbxlib
 #cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
 #cgo LDFLAGS: -Wl,--end-group
 
-#include "zbxcommon.h"
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "log.h"
