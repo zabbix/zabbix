@@ -164,23 +164,15 @@ class CControllerAuthenticationEdit extends CController {
 			]);
 
 			$data['saml_provision_groups'] = $this->getInput('saml_provision_groups', []);
-sdii($data['saml_provision_groups']);
+
 			if ($data['saml_provision_groups'] != []) {
 				$data['saml_provision_groups'] = $this->extendProvisionGroups($data['saml_provision_groups']);
 			}
-			sdii($data['saml_provision_groups']);
 
 			$data['saml_provision_media'] = $this->getInput('saml_provision_media', []);
 
 			if ($data['saml_provision_media'] != []) {
-				foreach ($data['saml_provision_media'] as &$saml_media) {
-					$media = API::MediaType()->get([
-						'output' => ['name'],
-						'mediatypeids' => $saml_media['mediatypeid']
-					]);
-					$saml_media['mediatype_name'] = $media[0]['name'];
-				}
-				unset($saml_media);
+				$data['saml_provision_media'] = $this->extendProvisionMedia($data['saml_provision_media']);
 			}
 
 			$data['saml_userdirectoryid'] = '';
@@ -209,18 +201,7 @@ sdii($data['saml_provision_groups']);
 				$data['saml_user_username'] = $saml_configuration['user_username'];
 				$data['saml_user_lastname'] = $saml_configuration['user_lastname'];
 				$data['saml_provision_groups'] = $this->extendProvisionGroups($saml_configuration['provision_groups']);
-				$data['saml_provision_media'] = [];
-
-				foreach ($saml_configuration['provision_media'] as $media) {
-					$db_media = API::MediaType()->get([
-						'output' => ['name'],
-						'mediatypeids' => $media['mediatypeid']
-					]);
-
-					$data['saml_provision_media'][] = $media + [
-							'mediatype_name' => $db_media[0]['name'],
-						];
-				}
+				$data['saml_provision_media'] = $this->extendProvisionMedia($saml_configuration['provision_media']);
 
 				unset($saml_configuration['userdirectoryid'], $saml_configuration['group_name'],
 					$saml_configuration['user_username'], $saml_configuration['user_lastname'],
@@ -332,6 +313,13 @@ sdii($data['saml_provision_groups']);
 		return $ldap_servers;
 	}
 
+	/**
+	 * Adds missing information that is necessary for provision group rendering in the view.
+	 *
+	 * @param array $provision_groups
+	 *
+	 * @return array
+	 */
 	private function extendProvisionGroups(array $provision_groups): array {
 		$extended_provision_groups = [];
 
@@ -365,5 +353,28 @@ sdii($data['saml_provision_groups']);
 		}
 
 		return $extended_provision_groups;
+	}
+
+	/**
+	 * Adds missing information that is necessary for provision media rendering in the view.
+	 *
+	 * @param array $provision_media
+	 *
+	 * @return array
+	 */
+	private function extendProvisionMedia(array $provision_media): array {
+		$extended_provision_media = [];
+
+		foreach ($provision_media as $media) {
+			$db_media = API::MediaType()->get([
+				'output' => ['name'],
+				'mediatypeids' => $media['mediatypeid']
+			]);
+			$extended_provision_media[] = $media + [
+				'mediatype_name' => $db_media[0]['name']
+			];
+		}
+
+		return $extended_provision_media;
 	}
 }

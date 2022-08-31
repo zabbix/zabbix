@@ -357,21 +357,7 @@ class CControllerAuthenticationUpdate extends CController {
 			);
 			$saml_data += $saml_fields;
 
-			foreach ($saml_data['provision_groups'] as &$provision_group) {
-				if ($provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK_ON) {
-					unset($provision_group['name']);
-				}
-				else {
-					unset($provision_group['fallback_status']);
-				}
-
-				$user_groups = [];
-				foreach ($provision_group['user_groups'] as $usrgrpid) {
-					$user_groups[] = ['usrgrpid' => $usrgrpid];
-				}
-				$provision_group['user_groups'] = $user_groups;
-			}
-			unset($provision_group);
+			$this->extendProvisionGroups($saml_data['provision_groups']);
 
 			if ($saml_data['userdirectoryid'] == '') {
 				unset($saml_data['userdirectoryid']);
@@ -482,5 +468,30 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Prepares provision groups data for API.
+	 *
+	 * @param array $provision_groups
+	 *
+	 * @return void
+	 */
+	private function extendProvisionGroups(array &$provision_groups): void {
+		foreach ($provision_groups as &$provision_group) {
+			if ($provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK_ON) {
+				unset($provision_group['name']);
+			}
+			else {
+				unset($provision_group['fallback_status']);
+			}
+
+			$user_groups = [];
+			foreach ($provision_group['user_groups'] as $usrgrpid) {
+				$user_groups[] = ['usrgrpid' => $usrgrpid];
+			}
+			$provision_group['user_groups'] = $user_groups;
+		}
+		unset($provision_group);
 	}
 }

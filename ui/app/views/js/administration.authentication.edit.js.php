@@ -323,7 +323,7 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const saml_media_type_mapping = {...e.detail, ...{row_index: row_index}};
-console.log(saml_media_type_mapping);
+
 				if (row === null) {
 					document
 						.querySelector('#saml-media-type-mapping-table tbody')
