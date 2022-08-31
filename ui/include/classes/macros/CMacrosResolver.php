@@ -2605,13 +2605,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		foreach ($data as $hostid => &$scripts) {
-			foreach ($scripts as &$fields) {
-				foreach ($fields as &$value) {
-					$value = strtr($value, $macro_values[$hostid]);
+			if (array_key_exists($hostid, $macro_values)) {
+				foreach ($scripts as &$fields) {
+					foreach ($fields as &$value) {
+						$value = strtr($value, $macro_values[$hostid]);
+					}
+					unset($value);
 				}
-				unset($value);
+				unset($fields);
 			}
-			unset($fields);
 		}
 		unset($scripts);
 
