@@ -1284,7 +1284,7 @@ static void	um_cache_get_hostids(const zbx_um_cache_t *cache, const zbx_uint64_t
 	if ((*phost)->link_revision > revision)
 		revision = 0;
 
-	if ((*phost)->macro_revision > revision)
+	if ((*phost)->macro_revision > revision || (*phost)->link_revision > revision)
 		zbx_vector_um_host_append(hosts, *phost);
 
 	for (i = 0; i < (*phost)->templateids.values_num; i++)
@@ -1337,9 +1337,7 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_vector_ui
 		for (i = 0; i < hosts.values_num; i++)
 		{
 			if (0 != hosts.values[i]->macros.values_num || 0 != hosts.values[i]->templateids.values_num)
-			{
 				zbx_vector_uint64_append(macro_hostids, hosts.values[i]->hostid);
-			}
 			else if (0 != revision)		/* skip when full sync */
 				zbx_vector_uint64_append(del_macro_hostids, hosts.values[i]->hostid);
 		}
@@ -1366,11 +1364,11 @@ static void	um_cache_check_used_templates(const zbx_um_cache_t *cache, zbx_uint6
 	zbx_uint64_t	*phostid = &hostid;
 	int		i;
 
-	if (NULL == (phost = (zbx_um_host_t **)zbx_hashset_search(&cache->hosts, &phostid)))
-		return;
-
 	if (NULL != (data = zbx_hashset_search(templates, &hostid)))
 		zbx_hashset_remove_direct(templates, data);
+
+	if (NULL == (phost = (zbx_um_host_t **)zbx_hashset_search(&cache->hosts, &phostid)))
+		return;
 
 	for (i = 0; i < (*phost)->templateids.values_num; i++)
 		um_cache_check_used_templates(cache, (*phost)->templateids.values[i], templates);
