@@ -513,7 +513,6 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_HOUSEKEEPER		14
 #define ZBX_PROCESS_TYPE_DATASENDER		15
 #define ZBX_PROCESS_TYPE_CONFSYNCER		16
-#define ZBX_PROCESS_TYPE_HEARTBEAT		17
 #define ZBX_PROCESS_TYPE_SELFMON		18
 #define ZBX_PROCESS_TYPE_VMWARE			19
 #define ZBX_PROCESS_TYPE_COLLECTOR		20
@@ -534,7 +533,7 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
 #define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	36
 #define ZBX_PROCESS_TYPE_ODBCPOLLER		37
-#define ZBX_PROCESS_TYPE_COUNT			38	/* number of process types */
+#define ZBX_PROCESS_TYPE_COUNT			37	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126

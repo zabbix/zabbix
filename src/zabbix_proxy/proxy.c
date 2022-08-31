@@ -103,9 +103,9 @@ const char	*help_message[] = {
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
 	"                                 (configuration syncer, data sender, discoverer,",
-	"                                 heartbeat sender, history syncer, housekeeper,",
-	"                                 http poller, icmp pinger, ipmi manager,",
-	"                                 ipmi poller, java poller, poller,",
+	"                                 history syncer, housekeeper, http poller,",
+	"                                 icmp pinger, ipmi manager, ipmi poller,",
+	"                                 java poller, poller,",
 	"                                 self-monitoring, snmp trapper, task manager,",
 	"                                 trapper, unreachable poller, vmware collector,"
 	"                                 availability manager, odbc poller)",
@@ -175,7 +175,6 @@ int	CONFIG_PROXYPOLLER_FORKS	= 0;
 int	CONFIG_ESCALATOR_FORKS		= 0;
 int	CONFIG_ALERTER_FORKS		= 0;
 int	CONFIG_TIMER_FORKS		= 0;
-int	CONFIG_HEARTBEAT_FORKS		= 1;
 int	CONFIG_COLLECTOR_FORKS		= 0;
 int	CONFIG_PASSIVE_FORKS		= 0;
 int	CONFIG_ACTIVE_FORKS		= 0;
@@ -335,11 +334,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		/* data collection processes might utilize CPU fully, start manager and worker processes beforehand */
 		*local_process_type = ZBX_PROCESS_TYPE_PREPROCESSOR;
 		*local_process_num = local_server_num - server_count + CONFIG_PREPROCESSOR_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_HEARTBEAT_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_HEARTBEAT;
-		*local_process_num = local_server_num - server_count + CONFIG_HEARTBEAT_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_DATASENDER_FORKS))
 	{
@@ -504,9 +498,6 @@ static void	zbx_set_defaults(void)
 	if (NULL == CONFIG_SSL_KEY_LOCATION)
 		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DEFAULT_SSL_KEY_LOCATION);
 #endif
-	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
-		CONFIG_HEARTBEAT_FORKS = 0;
-
 	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
 	{
 		CONFIG_DATASENDER_FORKS = 0;
@@ -1130,7 +1121,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_poller_args		poller_args = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_heart_args		heart_args = {zbx_config_tls, get_program_type};
 	zbx_thread_proxyconfig_args	proxyconfig_args = {zbx_config_tls, get_program_type};
 	zbx_thread_datasender_args	datasender_args = {zbx_config_tls, get_program_type};
 	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_tls, get_program_type};
@@ -1331,7 +1321,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	change_proxy_history_count(proxy_get_history_count());
 
-	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
+	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS
@@ -1381,10 +1371,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &trapper_args;
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
-				break;
-			case ZBX_PROCESS_TYPE_HEARTBEAT:
-				thread_args.args = &heart_args;
-				zbx_thread_start(heart_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
 				thread_args.args = &datasender_args;

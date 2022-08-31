@@ -462,7 +462,6 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
-			case ZBX_PROCESS_TYPE_HEARTBEAT:
 				if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
