@@ -43,7 +43,6 @@
 #include "../zabbix_server/snmptrapper/snmptrapper.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
-#include "heart/heart.h"
 #include "taskmanager/taskmanager.h"
 #include "../zabbix_server/selfmon/selfmon.h"
 #include "../zabbix_server/vmware/vmware.h"
