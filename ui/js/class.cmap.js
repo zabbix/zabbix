@@ -752,7 +752,7 @@ ZABBIX.apps.map = (function($) {
 						using: (pos, data) => {
 							let max_left = (data.horizontal === 'left')
 								? document.getElementById(containerId).clientWidth
-								: document.getElementById(containerId) - data.element.width;
+								: document.getElementById(containerId).clientWidth - data.element.width;
 
 							pos.top = Math.max(0, pos.top);
 							pos.left = Math.max(0, Math.min(max_left, pos.left));
