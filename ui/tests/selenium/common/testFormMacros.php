@@ -509,7 +509,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
-
 		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 		if ($update) {
 			if ($host_type === 'host') {

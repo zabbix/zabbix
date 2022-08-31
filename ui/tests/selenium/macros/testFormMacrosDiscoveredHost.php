@@ -44,60 +44,12 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 */
 	protected static $inherit_hostid;
 
-	const DISCOVERED_HOST_UPDATE = 'Discovered host with macros 1 for update';
-	const DISCOVERED_UPDATE_HOSTID = 90000080;
-	const DISCOVERED_UPDATE_INTERFACEID = 90000081;
-	const DISCOVERED_UPDATE_HOST_GROUPID = 90000082;
-
-	const DISCOVERED_HOST_REMOVE = 'Discovered host with macros 2 for remove';
-	const DISCOVERED_REMOVE_HOSTID = 90000083;
-	const DISCOVERED_REMOVE_INTERFACEID = 90000084;
-	const DISCOVERED_REMOVE_HOST_GROUPID = 90000085;
-
-	const DISCOVERED_HOST_SECRET_LAYOUT = 'Discovered host with macros 3 for secret macros layout';
-	const DISCOVERED_SECRET_LAYOUT_HOSTID = 90000086;
-	const DISCOVERED_SECRET_LAYOUT_INTERFACEID = 90000087;
-	const DISCOVERED_SECRET_LAYOUT_HOST_GROUPID = 90000088;
-
-	const DISCOVERED_HOST_SECRET_CREATE = 'Discovered host with macros 4 for secret macros create';
-	const DISCOVERED_SECRET_CREATE_HOSTID = 90000089;
-	const DISCOVERED_SECRET_CREATE_INTERFACEID = 90000090;
-	const DISCOVERED_SECRET_CREATE_HOST_GROUPID = 90000091;
-
-	const DISCOVERED_HOST_SECRET_REVERT = 'Discovered host with macros 5 for secret macros revert';
-	const DISCOVERED_SECRET_REVERT_HOSTID = 90000092;
-	const DISCOVERED_SECRET_REVERT_INTERFACEID = 90000093;
-	const DISCOVERED_SECRET_REVERT_HOST_GROUPID = 90000094;
-
-	const DISCOVERED_HOST_INHERIT = 'key Discovered host for macros inheritance';
-	const DISCOVERED_INHERIT_HOSTID = 90000095;
-	const DISCOVERED_INHERIT_INTERFACEID = 90000096;
-	const DISCOVERED_INHERIT_HOST_GROUPID = 90000097;
-
-	const DISCOVERED_HOST_VAULT_VALIDATION = 'Discovered host for vault validation 0';
-	const DISCOVERED_VAULT_VALIDATION_HOSTID = 90000098;
-	const DISCOVERED_VAULT_VALIDATION_INTERFACEID = 90000099;
-	const DISCOVERED_VAULT_VALIDATION_HOST_GROUPID = 90000100;
-
-	const DISCOVERED_HOST_EMPTY = 'Empty discovered host 1';
-	const DISCOVERED_EMPTY_HOSTID = 90000101;
-	const DISCOVERED_EMPTY_INTERFACEID = 90000102;
-	const DISCOVERED_EMPTY_HOST_GROUPID = 90000103;
-
-	const DISCOVERED_HOST_VAULT_CREATE = 'Discovered host for vault create 2';
-	const DISCOVERED_VAULT_CREATE_HOSTID = 90000104;
-	const DISCOVERED_VAULT_CREATE_INTERFACEID = 90000105;
-	const DISCOVERED_VAULT_CREATE_HOST_GROUPID = 90000106;
-
-//	/**
-//	 * The id of the host for removing inherited macros.
-//	 *
-//	 * @var integer
-//	 */
-//	protected static $hostid_remove_inherited;
-
-//	public $macro_resolve = '{$X_SECRET_HOST_MACRO_2_RESOLVE}';
-//	public $macro_resolve_hostid = 99135;
+	/**
+	 * Names and ids for discovered hosts.
+	 *
+	 * @var array
+	 */
+	protected static $hosts = [];
 
 	public $vault_object = 'host';
 	public $hashi_error_field = '/1/macros/3/value';
@@ -110,152 +62,95 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	public $revert_macro_object = 'host';
 
 	/**
-	 * Create new macros for host.
+	 * Create new hosts for discovery rules and prototypes with macros.
 	 */
 	public function prepareDiscoveredHostMacrosData() {
-		$hosts = CDataHelper::call('host.create', [
+		$cases = [
+			0 => 'macros_update',
+			1 => 'macros_remove',
+			2 => 'secret_macros_layout',
+			3 => 'secret_macros_create',
+			4 => 'secret_macros_revert',
+			5 => 'vault_validation',
+			6 => 'empty',
+			7 => 'vault_create',
+			8 => 'macros_inheritance'
+		];
+
+		// Create prototypes and discovered host names and ids.
+		for ($i = 0; $i < count($cases); $i++) {
+			self::$hosts[$i]['prototype_name'] = '{#KEY} Discovered host '.$cases[$i];
+			self::$hosts[$i]['name'] = $i.' Discovered host '.$cases[$i];
+			self::$hosts[$i]['hostid'] = $i + 700000;
+			self::$hosts[$i]['interfaceid'] = $i + 800000;
+			self::$hosts[$i]['host_groupid'] = $i + 900000;
+		}
+
+		// Define macros for each discovered host.
+		$host_macros = [
+			// '0 Discovered host macros_update'.
 			[
-				'host' => 'Parent host for discovered hosts macros',
-				'groups' => [
-					['groupid' => 4]
-				],
+				'hostid' => self::$hosts[0]['hostid'],
 				'macros' => [
 					[
 						'macro' => '{$MACRO1}',
-						'value' => '1'
+						'value' => '',
+						'description' => '',
+						'type' => 0
 					],
 					[
 						'macro' => '{$MACRO2}',
-						'value' => '2'
-					]
-				],
-				'interfaces' => [
-					'type'=> 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => 10050
-				]
-			],
-			[
-				'host' => 'Parent host for macros inheritance',
-				'groups' => [
-					['groupid' => 4]
-				],
-				'macros' => [
-//					[
-//						'macro' => '{$HOST_MACRO}',
-//						'value' => 'host_macro_value'
-//					],
-//					[
-//						'macro' => '{$HOST_SECRET}',
-//						'value' => 'host_secret_value',
-//						'type' => 1
-//					],
-//					[
-//						'macro' => '{$HOST_VAULT}',
-//						'value' => 'host/vault:key',
-//						'type' => 2
-//					]
-				],
-				'interfaces' => [
-					'type'=> 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => 10050
-				]
-			]
-		]);
-
-		self::$hostid = $hosts['hostids'][0];
-		self::$inherit_hostid = $hosts['hostids'][1];
-
-		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.zbx_dbstr(self::$hostid));
-		$inherit_interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.zbx_dbstr(self::$inherit_hostid));
-
-		// Create discovery rules.
-		$llds = CDataHelper::call('discoveryrule.create', [
-			[
-				'name' => 'LLD for Discovered host macros tests',
-				'key_' => 'vfs.fs.discovery',
-				'hostid' => self::$hostid,
-				'type' => ITEM_TYPE_ZABBIX,
-				'interfaceid' => $interfaceid,
-				'delay' => 30
-			],
-			[
-				'name' => 'LLD for Discovered host inherited macros tests',
-				'key_' => 'vfs.fs.discovery',
-				'hostid' => self::$inherit_hostid,
-				'type' => ITEM_TYPE_ZABBIX,
-				'interfaceid' => $inherit_interfaceid,
-				'delay' => 30
-			]
-		]);
-		$lldid = $llds['itemids'][0];
-		$inherit_lldid = $llds['itemids'][1];
-
-		// Create host prototype.
-		$host_prototypes = CDataHelper::call('hostprototype.create', [
-			[
-				'host' => 'Discovered host with macros {#KEY} for update',
-				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
-				'macros' => [
-					[
-						'macro' => '{$MACRO1}',
-						'value' => ''
-					],
-					[
-						'macro' => '{$MACRO2}',
-						'value' => ''
+						'value' => '',
+						'description' => '',
+						'type' => 0
 					]
 				]
 			],
+			// '1 Discovered host macros_remove'.
 			[
-				'host' => 'Discovered host with macros {#KEY} for remove',
-				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
+				'hostid' => self::$hosts[1]['hostid'],
 				'macros' => [
 					[
 						'macro' => '{$TEST_MACRO123}',
 						'value' => 'test123',
-						'description' => 'description 123'
+						'description' => 'description 123',
+						'type' => 0
 					],
 					[
 						'macro' => '{$MACRO_FOR_DELETE_HOST1}',
 						'value' => 'test1',
-						'description' => 'description 1'
+						'description' => 'description 1',
+						'type' => 0
 					],
 					[
 						'macro' => '{$MACRO_FOR_DELETE_HOST2}',
 						'value' => 'test2',
-						'description' => 'description 2'
+						'description' => 'description 2',
+						'type' => 0
 					],
 					[
 						'macro' => '{$MACRO_FOR_DELETE_GLOBAL1}',
 						'value' => 'test global 1',
-						'description' => 'global description 1'
+						'description' => 'global description 1',
+						'type' => 0
 					],
 					[
 						'macro' => '{$MACRO_FOR_DELETE_GLOBAL2}',
 						'value' => 'test global 2',
-						'description' => 'global description 2'
+						'description' => 'global description 2',
+						'type' => 0
 					],
 					[
 						'macro' => '{$SNMP_COMMUNITY}',
 						'value' => 'redefined value',
-						'description' => 'redefined description'
+						'description' => 'redefined description',
+						'type' => 0
 					]
 				]
 			],
+			// '2 Discovered host macros_layout'.
 			[
-				'host' => 'Discovered host with macros {#KEY} for secret macros layout',
-				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
+				'hostid' => self::$hosts[2]['hostid'],
 				'macros' => [
 					[
 						'macro' => '{$SECRET_HOST_MACRO}',
@@ -266,7 +161,8 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 					[
 						'macro' => '{$TEXT_HOST_MACRO}',
 						'value' => 'some text value',
-						'description' => ''
+						'description' => '',
+						'type' => 0
 					],
 					[
 						'macro' => '{$VAULT_HOST_MACRO3}',
@@ -276,15 +172,9 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 					]
 				]
 			],
+			// '4 Discovered host macros_revert'.
 			[
-				'host' => 'Discovered host with macros {#KEY} for secret macros create',
-				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
-			],
-			[
-				'host' => 'Discovered host with macros {#KEY} for secret macros revert',
-				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
+				'hostid' => self::$hosts[4]['hostid'],
 				'macros' => [
 					[
 						'macro' => '{$SECRET_HOST_MACRO_2_TEXT_REVERT}',
@@ -313,328 +203,213 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 					[
 						'macro' => '{$TEXT_HOST_MACRO_2_SECRET}',
 						'value' => 'Text host macro value',
-						'description' => 'Text host macro that is going to become secret'
+						'description' => 'Text host macro that is going to become secret',
+						'type' => 0
 					],
 					[
 						'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
 						'value' => 'Value 2 B resolved',
-						'description' => 'Host macro to be resolved'
+						'description' => 'Host macro to be resolved',
+						'type' => 0
 					]
 				]
 			],
+			// '5 Discovered host vault_validation'.
 			[
-				'host' => '{#KEY} Discovered host for macros inheritance',
-				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
-				'macros' => [
-					[
-						'macro' => '{$TEST_MACRO123}',
-						'value' => 'test123',
-						'description' => 'description 123'
-					],
-					[
-						'macro' => '{$MACRO_FOR_DELETE_HOST1}',
-						'value' => 'test1',
-						'description' => 'description 1'
-					],
-					[
-						'macro' => '{$MACRO_FOR_DELETE_HOST2}',
-						'value' => 'test2',
-						'description' => 'description 2'
-					],
-					[
-						'macro' => '{$MACRO_FOR_DELETE_GLOBAL1}',
-						'value' => 'test global 1',
-						'description' => 'global description 1'
-					],
-					[
-						'macro' => '{$MACRO_FOR_DELETE_GLOBAL2}',
-						'value' => 'test global 2',
-						'description' => 'global description 2'
-					],
-					[
-						'macro' => '{$SNMP_COMMUNITY}',
-						'value' => 'redefined value',
-						'description' => 'redefined description'
-					]
-//					[
-//						'macro' => '{$PROTO_MACRO}',
-//						'value' => 'proto_macro_value'
-//					],
-//					[
-//						'macro' => '{$PROTO_SECRET}',
-//						'value' => 'proto_secret_value',
-//						'type' => 1
-//					],
-//					[
-//						'macro' => '{$PROTO_VAULT}',
-//						'value' => 'proto/vault:key',
-//						'type' => 2
-//					]
-				]
-			],
-			[
-				'host' => 'Discovered host for vault validation {#KEY}',
-				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
+				'hostid' => self::$hosts[5]['hostid'],
 				'macros' => [
 					[
 						'macro' => '{$NEWMACROS}',
 						'value' => 'something/value:key',
+						'description' => '',
 						'type' => 2
 					]
 				]
 			],
+			// '8 Discovered host macros_inheritance'.
 			[
-				'host' => 'Empty discovered host {#KEY}',
-				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]]
+				'hostid' => self::$hosts[8]['hostid'],
+				'macros' => [
+					[
+						'macro' => '{$HOST_MACRO}',
+						'value' => 'host_macro_value',
+						'description' => '',
+						'type' => 0
+					],
+					[
+						'macro' => '{$HOST_SECRET}',
+						'value' => 'host_secret_value',
+						'description' => 'secret value inherited from host',
+						'type' => 1
+					],
+					[
+						'macro' => '{$HOST_VAULT}',
+						'value' => 'host/vault:key',
+						'description' => 'host vault macro',
+						'type' => 2
+					],
+					[
+						'macro' => '{$PROTO_MACRO}',
+						'value' => 'proto_macro_value',
+						'description' => 'prototype macro',
+						'type' => 0
+					],
+					[
+						'macro' => '{$PROTO_SECRET}',
+						'value' => 'proto_secret_value',
+						'description' => 'prototype secret macro',
+						'type' => 1
+					],
+					[
+						'macro' => '{$PROTO_VAULT}',
+						'value' => 'proto/vault:key',
+						'description' => '',
+						'type' => 2
+					]
+				]
+			]
+		];
+
+		// Create parent hosts for discoveries and prototypes.
+		$hosts = CDataHelper::call('host.create', [
+			[
+				'host' => 'Parent host for discovered hosts macros',
+				'groups' => [['groupid' => 4]],
+				'interfaces' => ['type'=> 1, 'main' => 1, 'useip' => 1, 'ip' => '127.0.0.1', 'dns' => '', 'port' => 10050]
 			],
 			[
-				'host' => 'Discovered host for vault create {#KEY}',
-				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
-//				'macros' => [
-//					[
-//						'macro' => '{$VAULT_MACRO}',
-//						'value' => 'secret/path:key',
-//						'description' => 'vault description',
-//						'type' => 2
-//					]
-//				]
+				'host' => 'Parent host for macros inheritance',
+				'groups' => [['groupid' => 4]],
+				'interfaces' => ['type'=> 1, 'main' => 1, 'useip' => 1, 'ip' => '127.0.0.1', 'dns' => '', 'port' => 10050],
+				'macros' => [
+					[
+						'macro' => '{$HOST_MACRO}',
+						'value' => 'host_macro_value',
+						'description' => '',
+						'type' => 0
+					],
+					[
+						'macro' => '{$HOST_SECRET}',
+						'value' => 'host_secret_value',
+						'description' => 'secret value inherited from host',
+						'type' => 1
+					],
+					[
+						'macro' => '{$HOST_VAULT}',
+						'value' => 'host/vault:key',
+						'description' => 'host vault macro',
+						'type' => 2
+					]
+				]
 			]
 		]);
 
-		$host_prototype_update_id = $host_prototypes['hostids'][0];
-		$host_prototype_remove_id = $host_prototypes['hostids'][1];
-		$host_prototype_layout_secret_id = $host_prototypes['hostids'][2];
-		$host_prototype_revert_secret_id = $host_prototypes['hostids'][3];
-		$host_prototype_create_secret_id = $host_prototypes['hostids'][4];
-		$host_prototype_inherit_id = $host_prototypes['hostids'][5];
-		$host_prototype_vault_validation_id = $host_prototypes['hostids'][6];
-		$host_prototype_empty_id = $host_prototypes['hostids'][7];
-		$host_prototype_vault_create_id = $host_prototypes['hostids'][8];
+		self::$hostid = $hosts['hostids'][0];
+		self::$inherit_hostid = $hosts['hostids'][1];
 
-		// Emulate host discovery in DB.
-		// 'Discovered host with macros {#KEY} for update'.
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_UPDATE_HOSTID).
-				",".zbx_dbstr(self::DISCOVERED_HOST_UPDATE).",".zbx_dbstr(self::DISCOVERED_HOST_UPDATE).", 0, 4, '')"
-		);
-		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_UPDATE_HOSTID).", ".
-				zbx_dbstr($host_prototype_update_id).")"
-		);
-		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
-				zbx_dbstr(self::DISCOVERED_UPDATE_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_UPDATE_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
-		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_UPDATE_HOST_GROUPID).
-				", ".zbx_dbstr(self::DISCOVERED_UPDATE_HOSTID).", 4)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990100, ".
-				zbx_dbstr(self::DISCOVERED_UPDATE_HOSTID).", '\{\$MACRO1\}', '', '', 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990101, ".
-				zbx_dbstr(self::DISCOVERED_UPDATE_HOSTID).", '\{\$MACRO2\}', '', '', 1)"
-		);
+		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.zbx_dbstr(self::$hostid));
+		$inherit_interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.zbx_dbstr(self::$inherit_hostid));
 
-		// 'Discovered host with macros {#KEY} for remove'.
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_REMOVE_HOSTID).
-				",".zbx_dbstr(self::DISCOVERED_HOST_REMOVE).",".zbx_dbstr(self::DISCOVERED_HOST_REMOVE).", 0, 4, '')"
-		);
-		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_REMOVE_HOSTID).", ".
-				zbx_dbstr($host_prototype_remove_id).")"
-		);
-		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
-				zbx_dbstr(self::DISCOVERED_REMOVE_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_REMOVE_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
-		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_REMOVE_HOST_GROUPID).
-				", ".zbx_dbstr(self::DISCOVERED_REMOVE_HOSTID).", 4)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990102, ".
-				zbx_dbstr(self::DISCOVERED_REMOVE_HOSTID).", '\{\$TEST_MACRO123\}', 'test123', 'description 123', 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990103, ".
-				zbx_dbstr(self::DISCOVERED_REMOVE_HOSTID).", '\{\$MACRO_FOR_DELETE_HOST1\}', 'test1', 'description 1', 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990104, ".
-				zbx_dbstr(self::DISCOVERED_REMOVE_HOSTID).", '\{\$MACRO_FOR_DELETE_HOST2\}', 'test2', 'description 2', 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990105, ".
-				zbx_dbstr(self::DISCOVERED_REMOVE_HOSTID).", '\{\$MACRO_FOR_DELETE_GLOBAL1\}', 'test global 1', 'global description 1', 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990106, ".
-				zbx_dbstr(self::DISCOVERED_REMOVE_HOSTID).", '\{\$MACRO_FOR_DELETE_GLOBAL2\}', 'test global 2', 'global description 2', 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990107, ".
-				zbx_dbstr(self::DISCOVERED_REMOVE_HOSTID).", '\{\$SNMP_COMMUNITY\}', 'redefined value', 'redefined description', 1)"
-		);
+		// Create discovery rules.
+		$llds = [
+			'Test discovered hosts' => ['hostid' => self::$hostid, 'interface' => $interfaceid],
+			'Test discovered macros inheritance' => ['hostid' => self::$inherit_hostid, 'interface' => $inherit_interfaceid],
+		];
 
-		// 'Discovered host with macros {#KEY} for secret macros layout'.
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_SECRET_LAYOUT_HOSTID).
-				",".zbx_dbstr(self::DISCOVERED_HOST_SECRET_LAYOUT).",".zbx_dbstr(self::DISCOVERED_HOST_SECRET_LAYOUT).", 0, 4, '')"
-		);
-		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_SECRET_LAYOUT_HOSTID).", ".
-				zbx_dbstr($host_prototype_layout_secret_id).")"
-		);
-		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".zbx_dbstr(self::DISCOVERED_SECRET_LAYOUT_INTERFACEID).
-				",".zbx_dbstr(self::DISCOVERED_SECRET_LAYOUT_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
-		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_SECRET_LAYOUT_HOST_GROUPID).
-				", ".zbx_dbstr(self::DISCOVERED_SECRET_LAYOUT_HOSTID).", 4)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990108, ".
-				zbx_dbstr(self::DISCOVERED_SECRET_LAYOUT_HOSTID).", '\{\$SECRET_HOST_MACRO\}', 'some secret value', '', 1, 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990109, ".
-				zbx_dbstr(self::DISCOVERED_SECRET_LAYOUT_HOSTID).", '\{\$TEXT_HOST_MACRO\}', 'some text value', '', 0, 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990110, ".
-				zbx_dbstr(self::DISCOVERED_SECRET_LAYOUT_HOSTID).", '\{\$VAULT_HOST_MACRO3\}', 'secret/path:key', 'Change name, value, description', 2, 1)"
-		);
+		$lld_data = [];
+		foreach ($llds as $name => $params) {
+			$lld_data[] = [
+				'name' => $name,
+				'key_' => 'vfs.fs.discovery',
+				'hostid' => $params['hostid'],
+				'type' => ITEM_TYPE_ZABBIX,
+				'interfaceid' => $params['interface'],
+				'delay' => 30
+			];
+		}
 
-		// 'Discovered host with macros {#KEY} for secret macros revert'.
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_SECRET_REVERT_HOSTID).
-				",".zbx_dbstr(self::DISCOVERED_HOST_SECRET_REVERT).",".zbx_dbstr(self::DISCOVERED_HOST_SECRET_REVERT).", 0, 4, '')"
-		);
-		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_SECRET_REVERT_HOSTID).", ".
-				zbx_dbstr($host_prototype_revert_secret_id).")"
-		);
-		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".zbx_dbstr(self::DISCOVERED_SECRET_REVERT_INTERFACEID).
-				",".zbx_dbstr(self::DISCOVERED_SECRET_REVERT_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
-		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_SECRET_REVERT_HOST_GROUPID).
-				", ".zbx_dbstr(self::DISCOVERED_SECRET_REVERT_HOSTID).", 4)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (99011, ".
-				zbx_dbstr(self::DISCOVERED_SECRET_REVERT_HOSTID).", '\{\$SECRET_HOST_MACRO_2_TEXT_REVERT\}', 'Secret host value 2 text', 'Secret host macro that will be changed to text', 1, 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990112, ".
-				zbx_dbstr(self::DISCOVERED_SECRET_REVERT_HOSTID).", '\{\$SECRET_HOST_MACRO_REVERT\}', 'Secret host value', 'Secret host macro description', 1, 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990113, ".
-				zbx_dbstr(self::DISCOVERED_SECRET_REVERT_HOSTID).", '\{\$SECRET_HOST_MACRO_UPDATE\}', 'Secret host macro value', 'Secret host macro that is going to stay secret', 1, 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990114, ".
-				zbx_dbstr(self::DISCOVERED_SECRET_REVERT_HOSTID).", '\{\$SECRET_HOST_MACRO_UPDATE_2_TEXT\}', 'Secret host value 2 B updated', 'Secret host macro that is going to be updated', 1, 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990115, ".
-				zbx_dbstr(self::DISCOVERED_SECRET_REVERT_HOSTID).", '\{\$TEXT_HOST_MACRO_2_SECRET\}', 'Text host macro value', 'Text host macro that is going to become secret', 0, 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990116, ".
-				zbx_dbstr(self::DISCOVERED_SECRET_REVERT_HOSTID).", '\{\$X_SECRET_HOST_MACRO_2_RESOLVE\}', 'Value 2 B resolved', 'Host macro to be resolved', 0, 1)"
-		);
+		$lld_result = CDataHelper::call('discoveryrule.create', $lld_data);
+		$lldid = $lld_result['itemids'][0];
+		$inherit_lldid = $lld_result['itemids'][1];
 
-		// 'Discovered host with macros {#KEY} for secret macros create'.
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_SECRET_CREATE_HOSTID).
-				",".zbx_dbstr(self::DISCOVERED_HOST_SECRET_CREATE).",".zbx_dbstr(self::DISCOVERED_HOST_SECRET_CREATE).", 0, 4, '')"
-		);
-		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_SECRET_CREATE_HOSTID).", ".
-				zbx_dbstr($host_prototype_create_secret_id).")"
-		);
-		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".zbx_dbstr(self::DISCOVERED_SECRET_CREATE_INTERFACEID).
-				",".zbx_dbstr(self::DISCOVERED_SECRET_CREATE_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
-		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_SECRET_CREATE_HOST_GROUPID).
-				", ".zbx_dbstr(self::DISCOVERED_SECRET_CREATE_HOSTID).", 4)"
-		);
+		$prototypes_data = [];
 
-		// '{#KEY} Discovered host for macros inheritance'.
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).
-				",".zbx_dbstr(self::DISCOVERED_HOST_INHERIT).",".zbx_dbstr(self::DISCOVERED_HOST_INHERIT).", 0, 4, '')"
-		);
-		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", ".
-				zbx_dbstr($host_prototype_inherit_id).")"
-		);
-		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
-				zbx_dbstr(self::DISCOVERED_INHERIT_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
-		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_INHERIT_HOST_GROUPID).
-				", ".zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", 4)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990117, "
-				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$TEST_MACRO123\}', 'test123', 'description 123', 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990118, "
-				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$MACRO_FOR_DELETE_HOST1\}', 'test1', 'description 1', 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990119, "
-				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$MACRO_FOR_DELETE_HOST2\}', 'test2', 'description 2', 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990120, "
-				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$MACRO_FOR_DELETE_GLOBAL1\}', 'test global 1', 'global description 1', 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990121, "
-				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$MACRO_FOR_DELETE_GLOBAL2\}', 'test global 2', 'global description 2', 1)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990122, "
-				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$SNMP_COMMUNITY\}', 'redefined value', 'redefined description', 1)"
-		);
+		// Create host prototypes with macros.
+		foreach ([0, 1, 2, 4, 5] as $k) {
+			$prototypes_data[] = [
+				'host' => self::$hosts[$k]['prototype_name'],
+				'ruleid' => $lldid,
+				'groupLinks' => [['groupid' => 4]],
+				'macros' => $host_macros[$k]['macros']
+			];
+		}
 
-		// 'Discovered host vault validation 0'.
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOSTID).
-				",".zbx_dbstr(self::DISCOVERED_HOST_VAULT_VALIDATION).",".zbx_dbstr(self::DISCOVERED_HOST_VAULT_VALIDATION).", 0, 4, '')"
-		);
-		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOSTID).", ".
-				zbx_dbstr($host_prototype_vault_validation_id).")"
-		);
-		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
-				zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
-		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOST_GROUPID).
-				", ".zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOSTID).", 4)"
-		);
-		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990123, "
-				.zbx_dbstr(self::DISCOVERED_VAULT_VALIDATION_HOSTID).", '\{\$NEWMACROS\}', 'something/value:key', '', 2, 1)"
-		);
+		// Create host prototypes without macros.
+		foreach ([3, 6, 7] as $l) {
+			$prototypes_data[] = [
+				'host' => self::$hosts[$l]['prototype_name'],
+				'ruleid' => $lldid,
+				'groupLinks' => [['groupid' => 4]],
+			];
+		}
 
-		// 'Empty discovered host 1'.
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_EMPTY_HOSTID).
-				",".zbx_dbstr(self::DISCOVERED_HOST_EMPTY).",".zbx_dbstr(self::DISCOVERED_HOST_EMPTY).", 0, 4, '')"
-		);
-		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_EMPTY_HOSTID).", ".
-				zbx_dbstr($host_prototype_empty_id).")"
-		);
-		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
-				zbx_dbstr(self::DISCOVERED_EMPTY_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_EMPTY_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
-		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_EMPTY_HOST_GROUPID).
-				", ".zbx_dbstr(self::DISCOVERED_EMPTY_HOSTID).", 4)"
-		);
+		$prototypes_data[] = [
+			'host' => self::$hosts[8]['prototype_name'],
+			'ruleid' => $inherit_lldid,
+			'groupLinks' => [['groupid' => 4]],
+			'macros' => [
+				[
+					'macro' => '{$PROTO_MACRO}',
+					'value' => 'proto_macro_value',
+					'description' => 'prototype macro',
+					'type' => 0
+				],
+				[
+					'macro' => '{$PROTO_SECRET}',
+					'value' => 'proto_secret_value',
+					'description' => 'prototype secret macro',
+					'type' => 1
+				],
+				[
+					'macro' => '{$PROTO_VAULT}',
+					'value' => 'proto/vault:key',
+					'description' => '',
+					'type' => 2
+				]
+			]
+		];
 
-		// 'Discovered host for vault create 2'.
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOSTID).
-				",".zbx_dbstr(self::DISCOVERED_HOST_VAULT_CREATE).",".zbx_dbstr(self::DISCOVERED_HOST_VAULT_CREATE).", 0, 4, '')"
-		);
-		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOSTID).", ".
-				zbx_dbstr($host_prototype_vault_create_id).")"
-		);
-		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
-				zbx_dbstr(self::DISCOVERED_VAULT_CREATE_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
-		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOST_GROUPID).
-				", ".zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOSTID).", 4)"
-		);
-//		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (990124, "
-//				.zbx_dbstr(self::DISCOVERED_VAULT_CREATE_HOSTID).", '\{\$VAULT_MACRO\}', 'secret/path:key', '', 2, 1)"
-//		);
+		CDataHelper::call('hostprototype.create', $prototypes_data);
+		$prototypeids = CDataHelper::getIds('host');
 
-//		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990108, "
-//				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$HOST_MACRO\}', 'host_macro_value', '', 1)"
-//		);
-//		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic, type) VALUES (990109, "
-//				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$HOST_SECRET\}', 'host_macro_secret', '', 1, 1)"
-//		);
-//		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic, type) VALUES (990110, "
-//				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$HOST_VAULT_VALIDATION\}', 'host_macro_vault', '', 1, 2)"
-//		);
-//		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (990111, "
-//				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$PROTO_MACRO\}', 'proto_macro_value', '', 1)"
-//		);
-//		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic, type) VALUES (990112, "
-//				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$PROTO_SECRET\}', 'proto_macro_secret', '', 1, 1)"
-//		);
-//		DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic, type) VALUES (990113, "
-//				.zbx_dbstr(self::DISCOVERED_INHERIT_HOSTID).", '\{\$PROTO_VAULT_VALIDATION\}', 'proto_macro_vault', '', 1, 2)"
-//		);
+		// Emulate host discoveries in DB.
+		foreach (self::$hosts as $host) {
+			DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr($host['hostid']).
+				",".zbx_dbstr($host['name']).",".zbx_dbstr($host['name']).", 0, 4, '')"
+			);
+			DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr($host['hostid']).", ".
+					zbx_dbstr($prototypeids[$host['prototype_name']]).")"
+			);
+			DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
+				zbx_dbstr($host['interfaceid']).",".zbx_dbstr($host['hostid']).", 1, 1, 1, '127.0.0.1', '', '10050')"
+			);
+			DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr($host['host_groupid']).
+					", ".zbx_dbstr($host['hostid']).", 4)"
+			);
+		}
+
+		// Write macros to discovered hosts.
+		$j = 0;
+		foreach ($host_macros  as $hostmacro) {
+			foreach ($hostmacro['macros'] as $macro) {
+				DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (".
+						(9000000 + $j).", ".zbx_dbstr($hostmacro['hostid']).", ".zbx_dbstr($macro['macro']).", ".
+						zbx_dbstr($macro['value']).", ".zbx_dbstr($macro['description']).", ".zbx_dbstr($macro['type']).", 1)"
+				);
+				$j++;
+			}
+		}
+
 	}
 
 	public static function getDiscoveredHostUpdateMacrosData() {
@@ -897,27 +672,21 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 * @dataProvider getDiscoveredHostUpdateMacrosData
 	 */
 	public function testFormMacrosDiscoveredHost_Update($data) {
-		$this->checkMacros($data, 'host', self::DISCOVERED_HOST_UPDATE, true, false, null, true);
+		$this->checkMacros($data, 'host', self::$hosts[0]['name'], true, false, null, true);
 	}
 
+	/**
+	 * @backupOnce hosts
+	 */
 	public function testFormMacrosDiscoveredHost_RemoveAll() {
-		$this->checkRemoveAll(self::DISCOVERED_HOST_REMOVE, 'host');
+		$this->checkRemoveAll(self::$hosts[1]['name'], 'host');
 	}
-
-//	/**
-//	 * @dataProvider getCheckInheritedMacrosData
-//	 */
-//	public function testFormMacrosDiscoveredHost_ChangeInheritedMacro($data) {
-//		$this->checkChangeInheritedMacros($data, 'host');
-//	}
 
 	/**
 	 * @dataProvider getRemoveInheritedMacrosData
 	 */
 	public function testFormMacrosDiscoveredHost_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, 'host', self::DISCOVERED_INHERIT_HOSTID, false, null,
-				self::DISCOVERED_HOST_INHERIT
-		);
+		$this->checkRemoveInheritedMacros($data, 'host', self::$hosts[1]['hostid'], false, null, self::$hosts[1]['name']);
 	}
 
 	public function getSecretMacrosLayoutData() {
@@ -962,7 +731,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 * @dataProvider getSecretMacrosLayoutData
 	 */
 	public function testFormMacrosDiscoveredHost_CheckSecretMacrosLayout($data) {
-		$this->checkSecretMacrosLayout($data, 'zabbix.php?action=host.view', 'hosts', self::DISCOVERED_HOST_SECRET_LAYOUT, true);
+		$this->checkSecretMacrosLayout($data, 'zabbix.php?action=host.view', 'hosts', self::$hosts[2]['name'], true);
 	}
 
 	public function getCreateSecretMacrosData() {
@@ -1014,7 +783,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 * @dataProvider getCreateSecretMacrosData
 	 */
 	public function testFormMacrosDiscoveredHost_CreateSecretMacros($data) {
-		$this->createSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', self::DISCOVERED_HOST_SECRET_CREATE);
+		$this->createSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', self::$hosts[3]['name']);
 	}
 
 	/**
@@ -1023,7 +792,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 * @backupOnce hosts
 	 */
 	public function testFormMacrosDiscoveredHost_RevertSecretMacroChanges($data) {
-		$this->revertSecretMacroChanges($data, 'zabbix.php?action=host.view', 'hosts', self::DISCOVERED_HOST_SECRET_REVERT, true);
+		$this->revertSecretMacroChanges($data, 'zabbix.php?action=host.view', 'hosts', self::$hosts[4]['name'], true);
 	}
 
 	public function getUpdateSecretMacrosData() {
@@ -1090,21 +859,21 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
 	public function testFormMacrosDiscoveredHost_UpdateSecretMacros($data) {
-		$this->updateSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', self::DISCOVERED_HOST_SECRET_REVERT, true);
+		$this->updateSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', self::$hosts[4]['name'], true);
 	}
 
 	/**
 	 * Check Vault macros validation.
 	 */
 	public function testFormMacrosDiscoveredHost_checkVaultValidation() {
-		$this->checkVaultValidation('zabbix.php?action=host.view', 'hosts', self::DISCOVERED_HOST_VAULT_VALIDATION, true);
+		$this->checkVaultValidation('zabbix.php?action=host.view', 'hosts', self::$hosts[5]['name'], true);
 	}
 
 	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 */
 	public function testFormMacrosDiscoveredHost_CreateVaultMacros($data) {
-		$host = ($data['vault'] === 'Hashicorp') ? self::DISCOVERED_HOST_VAULT_CREATE : self::DISCOVERED_HOST_EMPTY;
+		$host = ($data['vault'] === 'Hashicorp') ? self::$hosts[7]['name'] : self::$hosts[6]['name'];
 		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', $host, true);
 	}
 
@@ -1115,7 +884,6 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 					'fields' => [
 						'action' => USER_ACTION_UPDATE,
 						'index' => $this->vault_macro_index,
-//						'macro' => $this->update_vault_macro,
 						'value' => [
 							'text' => 'secret/path:key'
 						],
@@ -1135,11 +903,81 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 			]
 		];
 	}
+
 	/**
 	 * @dataProvider getUpdateVaultMacrosDiscoveredData
 	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosDiscoveredHost_UpdateVaultMacros($data) {
-		$this->updateVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', self::DISCOVERED_HOST_SECRET_LAYOUT);
+		$this->updateVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', self::$hosts[2]['name']);
+	}
+
+	public function testFormMacrosDiscoveredHost_CheckInheritedMacros() {
+		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
+		$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()
+				->findRow('Name', self::$hosts[8]['name'])->getColumn('Name');
+		$column->query('link', self::$hosts[8]['name'])->asPopupButton()->one()->select('Configuration');
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+		$form->selectTab('Macros');
+
+		$expected_macros = [
+			[
+				'macro' => '{$HOST_MACRO}',
+				'value' => 'host_macro_value',
+				'description' => '',
+				'type' => 0
+			],
+			[
+				'macro' => '{$HOST_SECRET}',
+				'value' => '******',
+				'description' => 'secret value inherited from host',
+				'type' => 1
+			],
+			[
+				'macro' => '{$HOST_VAULT}',
+				'value' => 'host/vault:key',
+				'description' => 'host vault macro',
+				'type' => 2
+			],
+			[
+				'macro' => '{$PROTO_MACRO}',
+				'value' => 'proto_macro_value',
+				'description' => 'prototype macro',
+				'type' => 0
+			],
+			[
+				'macro' => '{$PROTO_SECRET}',
+				'value' => '******',
+				'description' => 'prototype secret macro',
+				'type' => 1
+			],
+			[
+				'macro' => '{$PROTO_VAULT}',
+				'value' => 'proto/vault:key',
+				'description' => '',
+				'type' => 2
+			]
+		];
+
+		$this->assertEquals($expected_macros, $this->getMacros(true));
+
+		for($i = 0; $i < count($this->getMacros()); $i++)  {
+			// Check that all macros fields are disabled.
+			foreach (['macro', 'value', 'description'] as $field) {
+				$this->assertFalse($form->query('id:macros_'.$i.'_'.$field)->one()->isEnabled());
+			}
+
+			// Check that Change and Remove buttons are clickable for each row.
+			foreach (['change_state', 'remove'] as $button) {
+				$this->assertTrue($form->query('id:macros_'.$i.'_'.$button)->one()->isClickable());
+			}
+
+			// Check info text presents for each row.
+			$this->assertTrue($form->query("xpath:.//button[@id=\"macros_".$i.
+					"_remove\"]/../..//span[text()=\"(created by host discovery)\"]")->one()->isVisible()
+			);
+		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 }
