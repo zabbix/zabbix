@@ -164,7 +164,7 @@ class CMacrosResolverTest extends TestCase {
 						'hostid'	=> 10084
 					]
 				]
-			],
+			]
 		];
 	}
 
