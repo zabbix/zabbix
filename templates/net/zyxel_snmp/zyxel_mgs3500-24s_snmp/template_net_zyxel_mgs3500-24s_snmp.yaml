@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:38:09Z'
+  date: '2022-08-16T10:57:11Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -14,12 +14,13 @@ zabbix_export:
         ZYXEL MES3500-24S
         
         MIBs used:
+        ZYXEL-TRANSCEIVER-MIB
+        IF-MIB
         RFC1213-MIB
+        HOST-RESOURCES-MIB
         ZYXEL-HW-MONITOR-MIB
         ZYXEL-PORT-MIB
         ZYXEL-ES-COMMON
-        ZYXEL-TRANSCEIVER-MIB
-        IF-MIB
         
         Known Issues:
         
@@ -29,7 +30,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -152,6 +153,37 @@ zabbix_export:
                 -
                   tag: scope
                   value: notice
+        -
+          uuid: feff31efc5b04b14bf19ec256a6660fb
+          name: 'ZYXEL ES3500-8PD: Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.25.1.1.0
+          key: zyxel.3500_24s.hw.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized.
+            Note that this is different from sysUpTime in the SNMPv2-MIB
+            [RFC1907] because sysUpTime is the uptime of the
+            network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
         -
           uuid: a2ee7e4d0dbc463aa9fc997f14740d0b
           name: 'ZYXEL MES3500-24S: Location'
@@ -297,6 +329,30 @@ zabbix_export:
               tag: component
               value: inventory
         -
+          uuid: b3f7ffa22b174e2c8ed8bf0deeb62b42
+          name: 'ZYXEL ES3500-8PD: Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.3.0
+          key: zyxel.3500_24s.net.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: RFC1213-MIB
+            The time (in hundredths of a second) since the
+            network management portion of the system was last
+            re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: a9e8c7ae033b4f7e95aadd663f3656d9
           name: 'ZYXEL MES3500-24S: Hardware serial number'
           type: SNMP_AGENT
@@ -327,43 +383,6 @@ zabbix_export:
               event_name: 'ZYXEL MES3500-24S: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
-              manual_close: 'YES'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
-          uuid: b3f7ffa22b174e2c8ed8bf0deeb62b42
-          name: 'ZYXEL MES3500-24S: Uptime'
-          type: SNMP_AGENT
-          snmp_oid: .1.3.6.1.2.1.1.3.0
-          key: zyxel.3500_24s.uptime
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: RFC1213-MIB
-            The time (in hundredths of a second) since the
-            network management portion of the system was last
-            re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 6c8fce36fd9c49569be0ba2bfb70f478
-              expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.uptime)<10m'
-              name: 'ZYXEL MES3500-24S: has been restarted'
-              event_name: 'ZYXEL MES3500-24S: has been restarted (uptime < 10m)'
-              priority: INFO
-              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1719,6 +1738,19 @@ zabbix_export:
             -
               value: '3'
               newvalue: nonoperational
+  triggers:
+    -
+      uuid: 6c8fce36fd9c49569be0ba2bfb70f478
+      expression: '(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.hw.uptime)>0 and last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.hw.uptime)<10m) or (last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.hw.uptime)=0 and last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.uptime)<10m)'
+      name: 'ZYXEL ES3500-8PD: Host has been restarted'
+      event_name: 'ZYXEL ES3500-8PD: {HOST.NAME} has been restarted (uptime < 10m)'
+      priority: INFO
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 055310b8a5c94d94aeeaf75ff5d2de55

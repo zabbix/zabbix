@@ -138,7 +138,9 @@ $http_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Remove domain name'), 'http_strip_domains'),
 		new CFormField(
-			(new CTextBox('http_strip_domains', $data['http_strip_domains']))
+			(new CTextBox('http_strip_domains', $data['http_strip_domains'], false,
+				DB::getFieldLength('config', 'http_strip_domains')
+			))
 				->setEnabled($data['http_auth_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
@@ -340,7 +342,7 @@ $saml_tab = (new CFormGrid())
 		->addVar('action', $data['action_submit'])
 		->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
 		->setId('authentication-form')
-		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+		->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 		->disablePasswordAutofill()
 		->addItem((new CTabView())
 			->setSelected($data['form_refresh'] ? null : 0)

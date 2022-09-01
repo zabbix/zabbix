@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-22 13:16+0000\n"
+"PO-Revision-Date: 2022-08-22 18:28+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -199,6 +199,11 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s de %2$s élément en défaut"
 msgstr[1] "%1$s de %2$s éléments en défaut"
+
+#: include/classes/graph/CSvgGraph.php:1418
+#, c-format
+msgid "%1$s percentile: %2$s"
+msgstr "%1$sième centile : %2$s"
 
 #: jsLoader.php:348
 #, c-format
@@ -2294,11 +2299,10 @@ msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr "Impossible de supprimer le rôle utilisateur attribué \"%1$s\"."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
-#, fuzzy
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
 msgstr[0] "Impossible de supprimer la corrélation"
-msgstr[1] "Impossible de supprimer la corrélation"
+msgstr[1] "Impossible de supprimer les corrélations"
 
 #: app/controllers/CControllerDashboardDelete.php:63
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
@@ -2317,11 +2321,10 @@ msgid "Cannot delete dependency"
 msgstr "Impossible de supprimer la dépendance"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Impossible de supprimer la règle de découverte"
-msgstr[1] "Impossible de supprimer la règle de découverte"
+msgstr[1] "Impossible de supprimer les règles de découverte"
 
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
@@ -2479,11 +2482,10 @@ msgid "Cannot delete selected actions"
 msgstr "Impossible de supprimer les actions sélectionnées"
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Impossible de supprimer le service"
-msgstr[1] "Impossible de supprimer le service"
+msgstr[1] "Impossible de supprimer les services"
 
 #: include/classes/api/services/CService.php:455
 #: include/classes/api/services/CService.php:470
@@ -4446,11 +4448,10 @@ msgid "Correlation added"
 msgstr "Corrélation ajoutée"
 
 #: app/controllers/CControllerCorrelationDelete.php:65
-#, fuzzy
 msgid "Correlation deleted"
 msgid_plural "Correlations deleted"
 msgstr[0] "Corrélation supprimée"
-msgstr[1] "Corrélation supprimée"
+msgstr[1] "Corrélations supprimées"
 
 #: app/controllers/CControllerCorrelationDisable.php:72
 msgid "Correlation disabled"
@@ -6092,11 +6093,10 @@ msgid "Discovery rule created"
 msgstr "Règle de découverte créée"
 
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:416
-#, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] "Règle de découverte supprimée"
-msgstr[1] "Règle de découverte supprimée"
+msgstr[1] "Règles de découverte supprimées"
 
 #: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:767
 msgid "Discovery rule disabled"
@@ -11462,7 +11462,7 @@ msgstr "L"
 #: include/func.inc.php:592 jsLoader.php:226
 msgctxt "month short"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
@@ -14279,6 +14279,10 @@ msgstr "Règles de découverte parentes"
 msgid "Parent graphs"
 msgstr "Graphique parent"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr "Valeur de l'hôte parent"
+
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
 msgid "Parent items"
@@ -16683,11 +16687,10 @@ msgid "Service data storage period"
 msgstr "Période de stockage des données de service"
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Service supprimé"
-msgstr[1] "Service supprimé"
+msgstr[1] "Services supprimés"
 
 #: app/views/administration.userrole.edit.php:146
 #: app/views/administration.userrole.edit.php:187

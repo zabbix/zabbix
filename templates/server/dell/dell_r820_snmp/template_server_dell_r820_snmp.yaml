@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:33:15Z'
+  date: '2022-08-16T10:50:31Z'
   template_groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -14,12 +14,13 @@ zabbix_export:
         Template for DELL PowerEdge R820 servers with iDRAC version 7 and later.
         
         MIBs used:
+        HOST-RESOURCES-MIB
         IDRAC-MIB-SMIv2
         SNMPv2-MIB
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Server hardware'
@@ -164,6 +165,33 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
+          uuid: c6bd338df31b428c8994664654ddb384
+          name: 'Dell R820: Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'dell.server.hw.uptime[hrSystemUptime]'
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 6f4584e8a6c844c8aeae104acd7bd183
           name: 'Dell R820: System location'
           type: SNMP_AGENT
@@ -222,6 +250,27 @@ zabbix_export:
                 -
                   tag: scope
                   value: notice
+        -
+          uuid: 090f33ba9d0740f9a2c1709d6a4c2a75
+          name: 'Dell R820: Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'dell.server.net.uptime[sysUpTime]'
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
         -
           uuid: 0261571f73a04d9497414e5f0426cf40
           name: 'Dell R820: System object ID'
@@ -337,40 +386,6 @@ zabbix_export:
               name: 'Dell R820: Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possibly, the system has been updated or replaced. Ack to close.'
-              manual_close: 'YES'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
-          uuid: 090f33ba9d0740f9a2c1709d6a4c2a75
-          name: 'Dell R820: Uptime'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'dell.server.uptime[sysUpTime]'
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 97c232039b0e441997642bb39cc7bf2b
-              expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.uptime[sysUpTime])<10m'
-              name: 'Dell R820: has been restarted'
-              event_name: 'Dell R820: {HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1718,3 +1733,16 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: 97c232039b0e441997642bb39cc7bf2b
+      expression: '(last(/DELL PowerEdge R820 SNMP/dell.server.hw.uptime[hrSystemUptime])>0 and last(/DELL PowerEdge R820 SNMP/dell.server.hw.uptime[hrSystemUptime])<10m) or (last(/DELL PowerEdge R820 SNMP/dell.server.hw.uptime[hrSystemUptime])=0 and last(/DELL PowerEdge R820 SNMP/dell.server.net.uptime[sysUpTime])<10m)'
+      name: 'Dell R820: Host has been restarted'
+      event_name: 'Dell R820: {HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice

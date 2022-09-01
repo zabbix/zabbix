@@ -2523,7 +2523,8 @@ class CHost extends CHostGeneral {
 				'hostids' => zbx_objectValues($hosts, 'hostid'),
 				'skipDependent' => true,
 				'status' => TRIGGER_STATUS_ENABLED,
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nopermissions' => true
 			]);
 
 			$problems = API::Problem()->get([
@@ -2532,7 +2533,8 @@ class CHost extends CHostGeneral {
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
 				'suppressed' => $options['withProblemsSuppressed'],
-				'severities' => $options['severities']
+				'severities' => $options['severities'],
+				'nopermissions' => true
 			]);
 
 			if (!$problems) {
