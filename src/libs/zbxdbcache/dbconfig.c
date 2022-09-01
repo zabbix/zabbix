@@ -227,8 +227,8 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 	switch (type)
 	{
 		case ITEM_TYPE_SIMPLE:
-			if (SUCCEED == cmp_key_id(key, SERVER_ICMPPING_KEY) ||
-					SUCCEED == cmp_key_id(key, SERVER_ICMPPINGSEC_KEY) ||
+			if (SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPING_KEY) ||
+					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGSEC_KEY) ||
 					SUCCEED == cmp_key_id(key, SERVER_ICMPPINGLOSS_KEY))
 			{
 				if (0 == CONFIG_PINGER_FORKS)
@@ -337,8 +337,8 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 
 	if (ITEM_TYPE_SIMPLE == type)
 	{
-		if (SUCCEED == cmp_key_id(key, SERVER_ICMPPING_KEY) ||
-				SUCCEED == cmp_key_id(key, SERVER_ICMPPINGSEC_KEY) ||
+		if (SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPING_KEY) ||
+				SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGSEC_KEY) ||
 				SUCCEED == cmp_key_id(key, SERVER_ICMPPINGLOSS_KEY))
 		{
 			return interfaceid;
@@ -4203,7 +4203,7 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 			zbx_vector_ptr_append(&action->conditions, condition);
 		}
 
-		if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+		if (ZBX_ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 			zbx_vector_ptr_append(&actions, action);
 	}
 
@@ -4223,7 +4223,7 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 			{
 				zbx_vector_ptr_remove_noorder(&action->conditions, index);
 
-				if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+				if (ZBX_ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 					zbx_vector_ptr_append(&actions, action);
 			}
 		}
@@ -4243,7 +4243,7 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 	{
 		action = (zbx_dc_action_t *)actions.values[i];
 
-		if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+		if (ZBX_ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 			zbx_vector_ptr_sort(&action->conditions, dc_compare_action_conditions_by_type);
 	}
 
@@ -4510,7 +4510,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 			zbx_vector_ptr_append(&correlation->conditions, condition);
 
 		/* sort the conditions later */
-		if (CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+		if (ZBX_ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
 			zbx_vector_ptr_append(&correlations, correlation);
 	}
 
@@ -4532,7 +4532,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
 				/* sort the conditions later */
-				if (CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+				if (ZBX_ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
 					zbx_vector_ptr_append(&correlations, correlation);
 
 				zbx_vector_ptr_remove_noorder(&correlation->conditions, index);
@@ -7677,7 +7677,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 				*dst_item->snmp_community_orig = '\0';
 				*dst_item->snmp_oid_orig = '\0';
 				*dst_item->snmpv3_securityname_orig = '\0';
-				dst_item->snmpv3_securitylevel = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
+				dst_item->snmpv3_securitylevel = ZBX_ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
 				*dst_item->snmpv3_authpassphrase_orig = '\0';
 				*dst_item->snmpv3_privpassphrase_orig = '\0';
 				dst_item->snmpv3_authprotocol = 0;
@@ -12372,17 +12372,17 @@ static char	*dc_correlation_formula_dup(const zbx_dc_correlation_t *dc_correlati
 	const zbx_dc_corr_condition_t	*dc_condition;
 	zbx_uint64_t			last_id;
 
-	if (CONDITION_EVAL_TYPE_EXPRESSION == dc_correlation->evaltype || 0 == dc_correlation->conditions.values_num)
+	if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == dc_correlation->evaltype || 0 == dc_correlation->conditions.values_num)
 		return zbx_strdup(NULL, dc_correlation->formula);
 
 	dc_condition = (const zbx_dc_corr_condition_t *)dc_correlation->conditions.values[0];
 
 	switch (dc_correlation->evaltype)
 	{
-		case CONDITION_EVAL_TYPE_OR:
+		case ZBX_CONDITION_EVAL_TYPE_OR:
 			op = " or";
 			break;
-		case CONDITION_EVAL_TYPE_AND:
+		case ZBX_CONDITION_EVAL_TYPE_AND:
 			op = " and";
 			break;
 	}

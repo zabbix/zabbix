@@ -289,11 +289,6 @@ typedef enum
 }
 zbx_dservice_type_t;
 
-
-
-
-
-
 typedef enum
 {
 	SYSMAP_ELEMENT_TYPE_HOST = 0,

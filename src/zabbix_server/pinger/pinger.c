@@ -195,7 +195,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 		goto out;
 	}
 
-	if (0 == strcmp(get_rkey(&request), SERVER_ICMPPING_KEY))
+	if (0 == strcmp(get_rkey(&request), ZBX_SERVER_ICMPPING_KEY))
 	{
 		*icmpping = ICMPPING;
 	}
@@ -203,7 +203,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	{
 		*icmpping = ICMPPINGLOSS;
 	}
-	else if (0 == strcmp(get_rkey(&request), SERVER_ICMPPINGSEC_KEY))
+	else if (0 == strcmp(get_rkey(&request), ZBX_SERVER_ICMPPINGSEC_KEY))
 	{
 		*icmpping = ICMPPINGSEC;
 	}

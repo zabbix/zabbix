@@ -1154,9 +1154,9 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 
 
 /* item snmpv3 security levels */
-#define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
-#define ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV	1
-#define ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV	2
+#define ZBX_ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
+#define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV	1
+#define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV	2
 
 
 /* maintenance tag operators */
@@ -1165,13 +1165,13 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 
 /* maintenance tag evaluation types */
 /* SYNC WITH PHP!                   */
-#define MAINTENANCE_TAG_EVAL_TYPE_AND_OR	0
-#define MAINTENANCE_TAG_EVAL_TYPE_OR	2
+#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR	0
+#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR	2
 
 /* special item key used for ICMP pings */
-#define SERVER_ICMPPING_KEY	"icmpping"
+#define ZBX_SERVER_ICMPPING_KEY	"icmpping"
 /* special item key used for ICMP ping latency */
-#define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
+#define ZBX_SERVER_ICMPPINGSEC_KEY	"icmppingsec"
 /* special item key used for ICMP ping loss packages */
 #define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 

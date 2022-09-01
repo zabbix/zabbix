@@ -225,7 +225,6 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 		const char *tz);
 /* interval END */
 
-
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0
 #define CONDITION_OPERATOR_NOT_EQUAL		1
@@ -243,5 +242,3 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 #define CONDITION_OPERATOR_NOT_EXIST		13
 
 #endif /* ZABBIX_EXPR_H */
-
-

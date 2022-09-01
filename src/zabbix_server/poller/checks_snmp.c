@@ -553,10 +553,10 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 		/* set the security level to authenticated, but not encrypted */
 		switch (item->snmpv3_securitylevel)
 		{
-			case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
+			case ZBX_ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
 				session.securityLevel = SNMP_SEC_LEVEL_NOAUTH;
 				break;
-			case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+			case ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
 				session.securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
 
 				if (FAIL == zbx_snmpv3_set_auth_protocol(item, &session))
@@ -578,7 +578,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 					goto end;
 				}
 				break;
-			case ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:
+			case ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:
 				session.securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
 
 				if (FAIL == zbx_snmpv3_set_auth_protocol(item, &session))

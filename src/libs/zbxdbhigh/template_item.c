@@ -722,7 +722,7 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
 	{
 		zbx_template_item_t	*item = (zbx_template_item_t *)items->values[i];
 
-		if (0 == (ZBX_FLAG_DISCOVERY_RULE & item->flags) || CONDITION_EVAL_TYPE_EXPRESSION != item->evaltype)
+		if (0 == (ZBX_FLAG_DISCOVERY_RULE & item->flags) || ZBX_CONDITION_EVAL_TYPE_EXPRESSION != item->evaltype)
 			continue;
 
 		index = zbx_vector_ptr_bsearch(rules, &item->templateid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -2292,7 +2292,7 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 				override_conditionid, (int)override_condition->operator, override_condition->macro,
 				override_condition->value);
 
-			if (CONDITION_EVAL_TYPE_EXPRESSION == override->evaltype)
+			if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == override->evaltype)
 			{
 				update_template_lld_formula(&override->formula,
 						override_condition->override_conditionid, override_conditionid);

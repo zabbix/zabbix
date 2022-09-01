@@ -838,10 +838,10 @@ int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
 
 /* condition evaluation types */
-#define CONDITION_EVAL_TYPE_AND_OR		0
-#define CONDITION_EVAL_TYPE_AND			1
-#define CONDITION_EVAL_TYPE_OR			2
-#define CONDITION_EVAL_TYPE_EXPRESSION		3
+#define ZBX_ZBX_CONDITION_EVAL_TYPE_AND_OR		0
+#define ZBX_CONDITION_EVAL_TYPE_AND			1
+#define ZBX_CONDITION_EVAL_TYPE_OR			2
+#define ZBX_CONDITION_EVAL_TYPE_EXPRESSION		3
 
 /* condition types */
 #define CONDITION_TYPE_HOST_GROUP		0
