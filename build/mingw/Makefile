@@ -23,6 +23,9 @@ OBJS = \
 	$(OUTPUTDIR)\misc.o \
 	$(OUTPUTDIR)\time.o \
 	$(OUTPUTDIR)\expr.o \
+	$(OUTPUTDIR)\host.o \
+	$(OUTPUTDIR)\macro.o \
+	$(OUTPUTDIR)\function.o \
 	$(OUTPUTDIR)\token.o \
 	$(OUTPUTDIR)\fatal.o \
 	$(OUTPUTDIR)\disk.o \
