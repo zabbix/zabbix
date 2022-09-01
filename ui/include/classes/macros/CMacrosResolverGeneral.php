@@ -1825,8 +1825,6 @@ class CMacrosResolverGeneral {
 	/**
 	 * Function returns array holding of inventory macros as a keys and corresponding database fields as value.
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	protected static function getSupportedHostInventoryMacrosMap(): array {
@@ -2716,8 +2714,6 @@ class CMacrosResolverGeneral {
 	 *         )
 	 *     )
 	 *
-	 * @static
-	 *
 	 * @param array $macro_values  Array of macros to be replaced.
 	 *
 	 * @return array
@@ -2764,8 +2760,6 @@ class CMacrosResolverGeneral {
 	/**
 	 * Get macro value refer by type.
 	 *
-	 * @static
-	 *
 	 * @param array $macro
 	 *
 	 * @return string
@@ -2798,8 +2792,6 @@ class CMacrosResolverGeneral {
 	/**
 	 * Sorting global macros.
 	 *
-	 * @static
-	 *
 	 * @param array $global_macros
 	 *
 	 * @return array
@@ -2815,8 +2807,6 @@ class CMacrosResolverGeneral {
 
 	/**
 	 * Sort regex.
-	 *
-	 * @static
 	 *
 	 * @param array $macros
 	 *

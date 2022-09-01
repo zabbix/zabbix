@@ -151,8 +151,6 @@ class testScripts extends CAPITest {
 	];
 
 	/**
-	 * @static
-	 *
 	 * @var bool true if "ids" table should clear event IDs.
 	 */
 	private static $clear_ids = false;
@@ -1170,8 +1168,6 @@ class testScripts extends CAPITest {
 
 	/**
 	 * Data provider for script.create. Array contains invalid scripts.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -2623,8 +2619,6 @@ class testScripts extends CAPITest {
 	/**
 	 * Data provider for script.create. Array contains valid scripts.
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	public static function getScriptCreateDataValid() {
@@ -3177,8 +3171,6 @@ class testScripts extends CAPITest {
 	/**
 	 * Data provider for script.get to check inherited groups and hosts.
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	public static function getScriptGetInheritance() {
@@ -3456,8 +3448,6 @@ class testScripts extends CAPITest {
 
 	/**
 	 * Data provider for script.get. Array contains invalid script parameters.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -4047,8 +4037,6 @@ class testScripts extends CAPITest {
 	/**
 	 * Data provider for script.get. Array contains valid script parameters.
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	public static function getScriptGetValid() {
@@ -4210,8 +4198,6 @@ class testScripts extends CAPITest {
 
 	/**
 	 * Data provider for script.update. Array contains invalid script parameters.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -5113,8 +5099,6 @@ class testScripts extends CAPITest {
 
 	/**
 	 * Data provider for script.update. Array contains valid script parameters.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -6602,8 +6586,6 @@ class testScripts extends CAPITest {
 	/**
 	 * Data provider for script.delete. Array contains invalid scripts that are not possible to delete.
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	public static function getScriptDeleteInvalid() {
@@ -6632,8 +6614,6 @@ class testScripts extends CAPITest {
 
 	/**
 	 * Data provider for host.delete. Array contains valid scripts.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -6706,8 +6686,6 @@ class testScripts extends CAPITest {
 
 	/**
 	 * Data provider for script.execute. Array contains invalid scripts that are not possible to execute.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -6826,8 +6804,6 @@ class testScripts extends CAPITest {
 	/**
 	 * Data provider for script.execute, script.create, script.update, script.delete. Array contains invalid scripts.
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	public static function getScriptPermissions() {
@@ -6935,8 +6911,6 @@ class testScripts extends CAPITest {
 	/**
 	 * Data provider for script.getScriptsByHosts. Array contains invalid data.
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	public static function getScriptsByHostsDataInvalid() {
@@ -6962,8 +6936,6 @@ class testScripts extends CAPITest {
 	 * Data provider for script.getScriptsByHosts. Array contains valid data. Checks if result contains cetrain scripts
 	 * and those scripts contain fields with resolved macros. Some macros cannot be resolved. They either resolve to
 	 * *UNKNOWN* or do not resolve at all. Each host and request can have different macros.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -8153,8 +8125,6 @@ class testScripts extends CAPITest {
 	/**
 	 * Data provider for script.getScriptsByEvents. Array contains invalid data.
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	public static function getScriptsByEventsDataInvalid() {
@@ -8180,8 +8150,6 @@ class testScripts extends CAPITest {
 	 * Data provider for script.getScriptsByEvents. Array contains valid data. Checks if result contains cetrain scripts
 	 * and those scripts contain fields with resolved macros. Some macros cannot be resolved. They either resolve to
 	 * *UNKNOWN* or do not resolve at all. Each event and request can have different macros.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -9522,8 +9490,6 @@ class testScripts extends CAPITest {
 
 	/**
 	 * Delete all created data after test.
-	 *
-	 * @static
 	 */
 	public static function clearData() {
 		// Delete actions.
@@ -9560,8 +9526,6 @@ class testScripts extends CAPITest {
 
 	/**
 	 * Helper function to convert placeholders to real IDs.
-	 *
-	 * @static
 	 *
 	 * @param array $request
 	 *
@@ -9615,8 +9579,6 @@ class testScripts extends CAPITest {
 	/**
 	 * Helper function to convert placeholder for host and event macro IDs to real IDs.
 	 *
-	 * @static
-	 *
 	 * @param array $request
 	 *
 	 * @return array
@@ -9650,8 +9612,6 @@ class testScripts extends CAPITest {
 
 	/**
 	 * Helper function to resolve complex IDs. Processes, for example, "has.scriptid" or "!has.scriptid:hostid" keys.
-	 *
-	 * @static
 	 *
 	 * @param array $request
 	 *

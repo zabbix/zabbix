@@ -947,7 +947,7 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * @static
+	 * Validates parameters for script.delete method.
 	 *
 	 * @param array      $scriptids
 	 * @param array|null $db_scripts
@@ -1598,8 +1598,6 @@ class CScript extends CApiService {
 	/**
 	 * Check for unique script names.
 	 *
-	 * @static
-	 *
 	 * @param array      $scripts
 	 * @param array|null $db_scripts
 	 *
@@ -1635,8 +1633,6 @@ class CScript extends CApiService {
 
 	/**
 	 * Update "script_param" table and populate script.parameters by "script_paramid" property.
-	 *
-	 * @static
 	 *
 	 * @param array      $scripts
 	 * @param string     $method
@@ -1710,8 +1706,6 @@ class CScript extends CApiService {
 
 	/**
 	 * Add the existing parameters to $db_scripts whether these are affected by the update.
-	 *
-	 * @static
 	 *
 	 * @param array $scripts
 	 * @param array $db_scripts

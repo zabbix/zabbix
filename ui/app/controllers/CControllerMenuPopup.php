@@ -49,8 +49,6 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Prepare data for history context menu popup.
 	 *
-	 * @static
-	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
 	 *
@@ -81,8 +79,6 @@ class CControllerMenuPopup extends CController {
 
 	/**
 	 * Prepare data for host context menu popup.
-	 *
-	 * @static
 	 *
 	 * @param array  $data
 	 * @param string $data['hostid']
@@ -242,8 +238,6 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Prepare data for item latest data context menu popup.
 	 *
-	 * @static
-	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
 	 *
@@ -301,8 +295,6 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Prepare data for item configuration context menu popup.
 	 *
-	 * @static
-	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
 	 * @param string $data['backurl']
@@ -356,8 +348,6 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Prepare data for item prototype configuration context menu popup.
 	 *
-	 * @static
-	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
 	 * @param string $data['backurl']
@@ -408,8 +398,6 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Combines map URLs with element's URLs and performs other modifications with the URLs.
 	 *
-	 * @static
-	 *
 	 * @param array  $selement
 	 * @param array  $map_urls
 	 *
@@ -454,8 +442,6 @@ class CControllerMenuPopup extends CController {
 
 	/**
 	 * Prepare data for map element context menu popup.
-	 *
-	 * @static
 	 *
 	 * @param array   $data
 	 * @param string  $data['sysmapid']
@@ -600,8 +586,6 @@ class CControllerMenuPopup extends CController {
 
 	/**
 	 * Prepare data for trigger context menu popup.
-	 *
-	 * @static
 	 *
 	 * @param array  $data
 	 * @param string $data['triggerid']
@@ -815,8 +799,6 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Process menu path and sort scripts or URLs according to it.
 	 *
-	 * @static
-	 *
 	 * @param array  $entities                 Scripts and URLs.
 	 * @param string $entities[]['name']       Name of the ccript or URL.
 	 * @param string $entities[]['menu_path']  Menu path of the ccript or URL.
@@ -866,8 +848,6 @@ class CControllerMenuPopup extends CController {
 
 	/**
 	 * Prepare data for trigger macro context menu popup.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
