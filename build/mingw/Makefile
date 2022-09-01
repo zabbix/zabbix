@@ -19,7 +19,6 @@ OBJS = \
 	$(OUTPUTDIR)\str.o \
 	$(OUTPUTDIR)\common_str.o \
 	$(OUTPUTDIR)\components_strings_representations.o \
-	$(OUTPUTDIR)\param.o \
 	$(OUTPUTDIR)\misc.o \
 	$(OUTPUTDIR)\time.o \
 	$(OUTPUTDIR)\expr.o \
@@ -28,6 +27,7 @@ OBJS = \
 	$(OUTPUTDIR)\function.o \
 	$(OUTPUTDIR)\token.o \
 	$(OUTPUTDIR)\fatal.o \
+	$(OUTPUTDIR)\param.o \
 	$(OUTPUTDIR)\disk.o \
 	$(OUTPUTDIR)\iprange.o \
 	$(OUTPUTDIR)\zbxhash.o \
