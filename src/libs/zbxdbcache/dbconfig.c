@@ -1348,13 +1348,10 @@ done:
 
 			/* gather hosts that must restart monitoring either by being re-enabled or */
 			/* assigned from proxy to server                                           */
-			if (0 == proxy_hostid)
+			if ((HOST_STATUS_MONITORED == status && HOST_STATUS_MONITORED != host->status) ||
+					(0 == proxy_hostid && 0 != host->proxy_hostid))
 			{
-				if ((HOST_STATUS_MONITORED == status && HOST_STATUS_MONITORED != host->status) ||
-						0 != host->proxy_hostid)
-				{
-					zbx_hashset_insert(activated_hosts, &host->hostid, sizeof(host->hostid));
-				}
+				zbx_hashset_insert(activated_hosts, &host->hostid, sizeof(host->hostid));
 			}
 		}
 
@@ -9721,8 +9718,11 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 
 		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
 
-		if (HOST_STATUS_MONITORED != dc_host->status || 0 != dc_host->proxy_hostid)
+		if (HOST_STATUS_MONITORED != dc_host->status || (0 != dc_host->proxy_hostid &&
+				SUCCEED != is_item_processed_by_server(dc_item->type, dc_item->key)))
+		{
 			continue;
+		}
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
@@ -14148,7 +14148,7 @@ static void	dc_check_item_activation(ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
 	if (ZBX_LOC_NOWHERE != item->location)
 		return;
 
-	if (0 != host->proxy_hostid)
+	if (0 != host->proxy_hostid && SUCCEED != is_item_processed_by_server(item->type, item->key))
 		return;
 
 	if (NULL == zbx_hashset_search(activated_hosts, &host->hostid))

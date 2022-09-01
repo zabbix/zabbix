@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_TRIGGERS_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TRIGGERS_EDIT));
 
 // Append host summary to widget header.
 if ($data['hostid'] != 0) {
@@ -42,7 +42,7 @@ $url = (new CUrl('triggers.php'))
 $triggersForm = (new CForm('post', $url))
 	->setid('triggers-form')
 	->setName('triggersForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('expression_constructor', $data['expression_constructor'])
