@@ -389,13 +389,13 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 	version_str = zbx_get_proxy_protocol_version_str(&jp);
 	version_int = zbx_get_proxy_protocol_version_int(version_str);
 
+	zbx_strlcpy(proxy->version_str, version_str, sizeof(proxy->version_str));
+	proxy->version_int = version_int;
+
 	if (SUCCEED != zbx_check_protocol_version(proxy, version_int))
 	{
 		goto out;
 	}
-
-	zbx_strlcpy(proxy->version_str, version_str, sizeof(proxy->version_str));
-	proxy->version_int = version_int;
 
 	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, HOST_STATUS_PROXY_PASSIVE, more, &error)))
 	{
