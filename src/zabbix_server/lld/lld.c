@@ -224,30 +224,30 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 
 	if (SUCCEED == (ret = zbx_lld_macro_value_by_name(jp_row, lld_macro_paths, condition->macro, &value)))
 	{
-		if (CONDITION_OPERATOR_NOT_EXIST == condition->op)
+		if (ZBX_CONDITION_OPERATOR_NOT_EXIST == condition->op)
 		{
 			ret = FAIL;
 		}
-		else if (CONDITION_OPERATOR_EXIST != condition->op)
+		else if (ZBX_CONDITION_OPERATOR_EXIST != condition->op)
 		{
 			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 			{
 				case ZBX_REGEXP_MATCH:
-					ret = (CONDITION_OPERATOR_REGEXP == condition->op ? SUCCEED : FAIL);
+					ret = (ZBX_CONDITION_OPERATOR_REGEXP == condition->op ? SUCCEED : FAIL);
 					break;
 				case ZBX_REGEXP_NO_MATCH:
-					ret = (CONDITION_OPERATOR_NOT_REGEXP == condition->op ? SUCCEED : FAIL);
+					ret = (ZBX_CONDITION_OPERATOR_NOT_REGEXP == condition->op ? SUCCEED : FAIL);
 					break;
 				default:
 					ret = FAIL;
 			}
 		}
 	}
-	else if (CONDITION_OPERATOR_NOT_EXIST == condition->op)
+	else if (ZBX_CONDITION_OPERATOR_NOT_EXIST == condition->op)
 	{
 		ret = SUCCEED;
 	}
-	else if (CONDITION_OPERATOR_EXIST != condition->op)
+	else if (ZBX_CONDITION_OPERATOR_EXIST != condition->op)
 	{
 		*info = zbx_strdcatf(*info,
 				"Cannot accurately apply filter: no value received for macro \"%s\".\n",
@@ -686,11 +686,11 @@ static int	regexp_strmatch_condition(const char *value, const char *pattern, uns
 {
 	switch (op)
 	{
-		case CONDITION_OPERATOR_REGEXP:
+		case ZBX_CONDITION_OPERATOR_REGEXP:
 			if (NULL != zbx_regexp_match(value, pattern, NULL))
 				return SUCCEED;
 			break;
-		case CONDITION_OPERATOR_NOT_REGEXP:
+		case ZBX_CONDITION_OPERATOR_NOT_REGEXP:
 			if (NULL == zbx_regexp_match(value, pattern, NULL))
 				return SUCCEED;
 			break;

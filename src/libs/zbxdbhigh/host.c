@@ -1020,7 +1020,7 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	}
 
 	for (i = 0; i < triggerids->values_num; i++)
-		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
+		DBdelete_action_conditions(ZBX_CONDITION_TYPE_TRIGGER, triggerids->values[i]);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from trigger_tag where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
@@ -5871,7 +5871,7 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 
 	/* delete action conditions */
 	for (i = 0; i < hostids->values_num; i++)
-		DBdelete_action_conditions(CONDITION_TYPE_HOST, hostids->values[i]);
+		DBdelete_action_conditions(ZBX_CONDITION_TYPE_HOST, hostids->values[i]);
 
 	/* delete host tags */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
@@ -6375,7 +6375,7 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 		goto out;
 
 	for (i = 0; i < groupids->values_num; i++)
-		DBdelete_action_conditions(CONDITION_TYPE_HOST_GROUP, groupids->values[i]);
+		DBdelete_action_conditions(ZBX_CONDITION_TYPE_HOST_GROUP, groupids->values[i]);
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 

@@ -40,7 +40,6 @@
 #define	ZBX_POLLER_TYPE_ODBC		6
 #define	ZBX_POLLER_TYPE_COUNT		7	/* number of poller types */
 
-
 typedef enum
 {
 	ZBX_SESSION_TYPE_DATA = 0,

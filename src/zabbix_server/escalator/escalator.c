@@ -250,7 +250,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	DBfree_result(result);
 
 	if (0 < tag_filters.values_num)
-		condition.op = CONDITION_OPERATOR_EQUAL;
+		condition.op = ZBX_CONDITION_OPERATOR_EQUAL;
 	else
 		ret = SUCCEED;
 
@@ -270,13 +270,13 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 			if (NULL != tag_filter->value && 0 != strlen(tag_filter->value))
 			{
-				condition.conditiontype = CONDITION_TYPE_EVENT_TAG_VALUE;
+				condition.conditiontype = ZBX_CONDITION_TYPE_EVENT_TAG_VALUE;
 				condition.value2 = tag_filter->tag;
 				condition.value = tag_filter->value;
 			}
 			else
 			{
-				condition.conditiontype = CONDITION_TYPE_EVENT_TAG;
+				condition.conditiontype = ZBX_CONDITION_TYPE_EVENT_TAG;
 				condition.value = tag_filter->tag;
 			}
 

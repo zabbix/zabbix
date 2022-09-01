@@ -255,19 +255,19 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 	switch (op)
 	{
-		case CONDITION_OPERATOR_EQUAL:
+		case ZBX_CONDITION_OPERATOR_EQUAL:
 			if (0 == strcmp(value, pattern))
 				ret = SUCCEED;
 			break;
-		case CONDITION_OPERATOR_NOT_EQUAL:
+		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
 			if (0 != strcmp(value, pattern))
 				ret = SUCCEED;
 			break;
-		case CONDITION_OPERATOR_LIKE:
+		case ZBX_CONDITION_OPERATOR_LIKE:
 			if (NULL != strstr(value, pattern))
 				ret = SUCCEED;
 			break;
-		case CONDITION_OPERATOR_NOT_LIKE:
+		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
 			if (NULL == strstr(value, pattern))
 				ret = SUCCEED;
 			break;

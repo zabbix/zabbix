@@ -42,7 +42,6 @@ int	zbx_is_macro_char(unsigned char c)
 	return FAIL;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if the name is a valid discovery macro                     *
@@ -69,7 +68,6 @@ int	zbx_is_discovery_macro(const char *name)
 	return SUCCEED;
 }
 
-
 #define ZBX_MACRO_REGEX_PREFIX		"regex:"
 
 /******************************************************************************
@@ -88,8 +86,8 @@ int	zbx_is_discovery_macro(const char *name)
  *                       character before the ending '}' character)           *
  *                       0 if macro does not have context specified.          *
  *     context_op - [OUT] the context matching operator (optional):           *
- *                          CONDITION_OPERATOR_EQUAL                          *
- *                          CONDITION_OPERATOR_REGEXP                         *
+ *                          ZBX_CONDITION_OPERATOR_EQUAL                          *
+ *                          ZBX_CONDITION_OPERATOR_REGEXP                         *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - the macro was parsed successfully.                           *
@@ -118,7 +116,7 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 		*context_r = 0;
 
 		if (NULL != context_op)
-			*context_op = CONDITION_OPERATOR_EQUAL;
+			*context_op = ZBX_CONDITION_OPERATOR_EQUAL;
 
 		return SUCCEED;
 	}
@@ -132,11 +130,11 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 	{
 		if (0 == strncmp(macro + i, ZBX_MACRO_REGEX_PREFIX, ZBX_CONST_STRLEN(ZBX_MACRO_REGEX_PREFIX)))
 		{
-			*context_op = CONDITION_OPERATOR_REGEXP;
+			*context_op = ZBX_CONDITION_OPERATOR_REGEXP;
 			i += ZBX_CONST_STRLEN(ZBX_MACRO_REGEX_PREFIX);
 		}
 		else
-			*context_op = CONDITION_OPERATOR_EQUAL;
+			*context_op = ZBX_CONDITION_OPERATOR_EQUAL;
 	}
 
 	/* skip the whitespace after macro context separator */
@@ -197,8 +195,8 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
  *                     context                                                *
  *     length  - [OUT] the length of parsed macro (optional)                  *
  *     context_op - [OUT] the context matching operator (optional):           *
- *                          CONDITION_OPERATOR_EQUAL                          *
- *                          CONDITION_OPERATOR_REGEXP                         *
+ *                          ZBX_CONDITION_OPERATOR_EQUAL                          *
+ *                          ZBX_CONDITION_OPERATOR_REGEXP                         *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - the macro was parsed successfully                            *
@@ -225,7 +223,7 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 			;
 
 		/* remove regex: prefix from macro name for regex contexts */
-		if (NULL != context_op && CONDITION_OPERATOR_REGEXP == *context_op)
+		if (NULL != context_op && ZBX_CONDITION_OPERATOR_REGEXP == *context_op)
 			ptr -= ZBX_CONST_STRLEN(ZBX_MACRO_REGEX_PREFIX);
 
 		/* extract the macro name and close with '}' character */

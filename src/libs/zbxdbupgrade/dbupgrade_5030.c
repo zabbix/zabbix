@@ -3858,18 +3858,18 @@ static int	DBpatch_5030123(void)
 
 static int	DBpatch_5030127(void)
 {
-#define CONDITION_TYPE_APPLICATION	15
+#define ZBX_CONDITION_TYPE_APPLICATION	15
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d,value2='Application' where conditiontype=%d",
-			CONDITION_TYPE_EVENT_TAG_VALUE, CONDITION_TYPE_APPLICATION))
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_APPLICATION))
 	{
 		return FAIL;
 	}
 
 	return SUCCEED;
-#undef CONDITION_TYPE_APPLICATION
+#undef ZBX_CONDITION_TYPE_APPLICATION
 }
 
 static int	DBpatch_5030128(void)

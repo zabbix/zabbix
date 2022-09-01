@@ -478,7 +478,7 @@ static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsourc
 		/* eventsource: 0 - EVENT_SOURCE_TRIGGERS, 3 - EVENT_SOURCE_INTERNAL  */
 		if (0 == eventsource)
 		{
-			/* conditiontype: 5 - CONDITION_TYPE_TRIGGER_VALUE */
+			/* conditiontype: 5 - ZBX_CONDITION_TYPE_TRIGGER_VALUE */
 			if (5 != conditiontype)
 				continue;
 
@@ -510,7 +510,7 @@ static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsourc
 		}
 		else if (3 == eventsource)
 		{
-			/* conditiontype: 23 -  CONDITION_TYPE_EVENT_TYPE */
+			/* conditiontype: 23 -  ZBX_CONDITION_TYPE_EVENT_TYPE */
 			if (23 != conditiontype)
 				continue;
 
@@ -695,7 +695,7 @@ static void	DBpatch_3010026_get_conditionids(zbx_uint64_t actionid, const char *
 	/* eventsource: 0 - EVENT_SOURCE_TRIGGERS, 3 - EVENT_SOURCE_INTERNAL  */
 	if (0 == eventsource)
 	{
-		/* conditiontype: 5 - CONDITION_TYPE_TRIGGER_VALUE */
+		/* conditiontype: 5 - ZBX_CONDITION_TYPE_TRIGGER_VALUE */
 		result = DBselect("select conditionid,value from conditions"
 				" where actionid=" ZBX_FS_UI64
 					" and conditiontype=5",
@@ -703,7 +703,7 @@ static void	DBpatch_3010026_get_conditionids(zbx_uint64_t actionid, const char *
 	}
 	else if (3 == eventsource)
 	{
-		/* conditiontype: 23 -  CONDITION_TYPE_EVENT_TYPE */
+		/* conditiontype: 23 -  ZBX_CONDITION_TYPE_EVENT_TYPE */
 		result = DBselect("select conditionid,value from conditions"
 				" where actionid=" ZBX_FS_UI64
 					" and conditiontype=23"

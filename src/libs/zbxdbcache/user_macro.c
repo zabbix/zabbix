@@ -76,7 +76,7 @@ static int	um_macro_compare_by_name_context(const void *d1, const void *d2)
 	if (0 != (ret = strcmp(m1->name, m2->name)))
 		return ret;
 
-	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
+	/* ZBX_CONDITION_OPERATOR_EQUAL (0) has higher priority than ZBX_CONDITION_OPERATOR_REGEXP (8) */
 	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
 
 	return zbx_strcmp_null(m1->context, m2->context);
@@ -887,11 +887,11 @@ static int	um_macro_match(const zbx_um_macro_t *macro, const char *name, const c
 	{
 		switch (macro->context_op)
 		{
-			case CONDITION_OPERATOR_EQUAL:
+			case ZBX_CONDITION_OPERATOR_EQUAL:
 				if (0 == strcmp(macro->context, context))
 					return ZBX_UM_MATCH_FULL;
 				break;
-			case CONDITION_OPERATOR_REGEXP:
+			case ZBX_CONDITION_OPERATOR_REGEXP:
 				if (NULL != zbx_regexp_match(context, macro->context, NULL))
 					return ZBX_UM_MATCH_FULL;
 				break;

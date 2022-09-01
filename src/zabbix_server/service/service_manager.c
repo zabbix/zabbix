@@ -957,13 +957,13 @@ static int	condition_type_compare(const void *d1, const void *d2)
 
 static void	update_action_formula(zbx_service_action_t *action)
 {
-#define CONDITION_TYPE_NONE	255
+#define ZBX_CONDITION_TYPE_NONE	255
 
 	char				*formula = NULL;
 	size_t				formula_alloc = 0, formula_offset = 0;
 	int				i;
 	zbx_service_action_condition_t	*condition;
-	unsigned char			last_type = CONDITION_TYPE_NONE;
+	unsigned char			last_type = ZBX_CONDITION_TYPE_NONE;
 	char				*ops[] = {NULL, "and", "or"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __func__, action->actionid);
@@ -979,7 +979,7 @@ static void	update_action_formula(zbx_service_action_t *action)
 		{
 			if (last_type != condition->conditiontype)
 			{
-				if (CONDITION_TYPE_NONE != last_type)
+				if (ZBX_CONDITION_TYPE_NONE != last_type)
 					zbx_strcpy_alloc(&formula, &formula_alloc, &formula_offset, ") and ");
 
 				zbx_chrcpy_alloc(&formula, &formula_alloc, &formula_offset, '(');
@@ -989,7 +989,7 @@ static void	update_action_formula(zbx_service_action_t *action)
 		}
 		else
 		{
-			if (CONDITION_TYPE_NONE != last_type)
+			if (ZBX_CONDITION_TYPE_NONE != last_type)
 			{
 				zbx_chrcpy_alloc(&formula, &formula_alloc, &formula_offset, ' ');
 				zbx_strcpy_alloc(&formula, &formula_alloc, &formula_offset, ops[action->evaltype]);
@@ -1010,7 +1010,7 @@ static void	update_action_formula(zbx_service_action_t *action)
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() formula:%s", __func__, action->formula);
 
-#undef CONDITION_TYPE_NONE
+#undef ZBX_CONDITION_TYPE_NONE
 }
 
 static void	sync_action_conditions(zbx_service_manager_t *service_manager, int revision)
