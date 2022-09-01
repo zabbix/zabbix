@@ -261,7 +261,11 @@ static int	proxyconfig_parse_table_rows(zbx_table_data_t *td, struct zbx_json_pa
 			goto out;
 		}
 
-		ZBX_STR2UINT64(row_local.recid, buf);
+		if (SUCCEED != is_uint64(buf, &row_local.recid))
+		{
+			*error = zbx_dsprintf(*error, "invalid record identifier: \"%s\"", buf);
+			goto out;
+		}
 		row = (zbx_table_row_t *)zbx_hashset_insert(&td->rows, &row_local, sizeof(row_local));
 		row->columns = jp_row;
 		zbx_flags128_init(&row->flags);
