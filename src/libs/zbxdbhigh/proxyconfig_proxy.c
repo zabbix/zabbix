@@ -768,7 +768,7 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 	for (i = 0; i < td->updates.values_num; i++)
 	{
 		char		delim = ' ';
-		const char	*pf;
+		const char	*pf, *ptr;
 		zbx_table_row_t	*row = td->updates.values[i];
 		zbx_json_type_t	type;
 
@@ -780,6 +780,9 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 		{
 			const ZBX_FIELD	*field = td->fields.values[j].field;
 			char		*value_esc;
+			zbx_uint64_t	value_ui64;
+			double		value_dbl;
+			zbx_uint32_t	value_int;
 
 			if (SUCCEED != zbx_flags128_isset(&row->flags, j))
 				continue;
@@ -796,9 +799,34 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 			switch (field->type)
 			{
 				case ZBX_TYPE_ID:
-				case ZBX_TYPE_INT:
 				case ZBX_TYPE_UINT:
+					if (SUCCEED != is_uint64(buf, &value_ui64))
+					{
+						*error = zbx_dsprintf(*error, "invalid field \"%s.%s\" value \"%s\"",
+								td->table->table, field->name, buf);
+						goto out;
+					}
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buf);
+					break;
 				case ZBX_TYPE_FLOAT:
+					if (SUCCEED != zbx_is_double(buf, &value_dbl))
+					{
+						*error = zbx_dsprintf(*error, "invalid field \"%s.%s\" value \"%s\"",
+								td->table->table, field->name, buf);
+						goto out;
+					}
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buf);
+					break;
+				case ZBX_TYPE_INT:
+					if ('-' == *(ptr = buf))
+						ptr++;
+
+					if (SUCCEED != is_uint31(ptr, &value_int))
+					{
+						*error = zbx_dsprintf(*error, "invalid field \"%s.%s\" value \"%s\"",
+								td->table->table, field->name, buf);
+						goto out;
+					}
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buf);
 					break;
 				case ZBX_TYPE_CHAR:
