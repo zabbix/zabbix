@@ -12372,8 +12372,11 @@ static char	*dc_correlation_formula_dup(const zbx_dc_correlation_t *dc_correlati
 	const zbx_dc_corr_condition_t	*dc_condition;
 	zbx_uint64_t			last_id;
 
-	if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == dc_correlation->evaltype || 0 == dc_correlation->conditions.values_num)
+	if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == dc_correlation->evaltype || 0 ==
+			dc_correlation->conditions.values_num)
+	{
 		return zbx_strdup(NULL, dc_correlation->formula);
+	}
 
 	dc_condition = (const zbx_dc_corr_condition_t *)dc_correlation->conditions.values[0];
 

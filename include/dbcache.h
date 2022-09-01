@@ -1151,12 +1151,10 @@ void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies);
 
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
 
-
 /* item snmpv3 security levels */
 #define ZBX_ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
 #define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV	1
 #define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV	2
-
 
 /* maintenance tag operators */
 #define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
