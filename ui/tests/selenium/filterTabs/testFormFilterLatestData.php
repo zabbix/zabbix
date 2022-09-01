@@ -222,6 +222,37 @@ class testFormFilterLatestData extends testFormFilter {
 		$this->checkFilters($data, $this->getTableSelector());
 	}
 
+	public static function getCheckRememberedFilterData() {
+		return [
+			[
+				[
+					'Host groups' => ['Zabbix servers'],
+					'Hosts' => ['ЗАББИКС Сервер'],
+					'Name' => 'Free',
+					'Show tags' => '1'
+				]
+			],
+			[
+				[
+					'Name' => 'Total',
+					'Tag display priority' => 'Alfa, Beta',
+					'id:tag_name_format_0' => 'Shortened',
+					'Show details' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * Create and remember new filters.
+	 *
+	 * @dataProvider getCheckRememberedFilterData
+	 */
+	public function testFormFilterLatestData_CheckRememberedFilter($data) {
+		$this->checkRememberedFilters($data, $this->getTableSelector());
+	}
+
+
 	/**
 	 * Delete created filter.
 	 */

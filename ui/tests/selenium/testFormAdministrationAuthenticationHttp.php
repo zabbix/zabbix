@@ -683,7 +683,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
 	}
 
-	public function addGuestToDisabledGroup() {
+	public static function addGuestToDisabledGroup() {
 		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (1551, 9, 2)');
 	}
 }
