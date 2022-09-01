@@ -287,22 +287,6 @@ func (c *Connection) RemoteIP() string {
 	return addr
 }
 
-func Listen(address string, args ...interface{}) (c *Listener, err error) {
-	var tlsconfig *tls.Config
-	if len(args) > 0 {
-		var ok bool
-		if tlsconfig, ok = args[0].(*tls.Config); !ok {
-			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
-		}
-	}
-	l, tmperr := net.Listen("tcp", address)
-	if tmperr != nil {
-		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
-	}
-	c = &Listener{listener: l.(*net.TCPListener), tlsconfig: tlsconfig}
-	return
-}
-
 func (l *Listener) Accept(timeout time.Duration, timeoutMode int) (c *Connection, err error) {
 	var conn net.Conn
 	if conn, err = l.listener.Accept(); err != nil {

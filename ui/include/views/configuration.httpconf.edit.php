@@ -25,7 +25,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Web monitoring'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HTTPCONF_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HTTPCONF_EDIT));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
@@ -40,7 +40,7 @@ $url = (new CUrl('httpconf.php'))
 $http_form = (new CForm('post', $url))
 	->setId('http-form')
 	->setName('httpForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('templated', $this->data['templated']);
