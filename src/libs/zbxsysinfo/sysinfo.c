@@ -30,6 +30,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxparam.h"
+#include "zbxexpr.h"
 
 extern int	CONFIG_TIMEOUT;
 
@@ -75,7 +76,7 @@ zbx_vector_ptr_t	key_access_rules;
 #define ZBX_COMMAND_WITH_PARAMS		2
 
 static int	compare_key_access_rules(const void *rule_a, const void *rule_b);
-static int	parse_key_access_rule(char *pattern, zbx_key_access_rule_t *rule);
+static int	zbx_parse_key_access_rule(char *pattern, zbx_key_access_rule_t *rule);
 
 /******************************************************************************
  *                                                                            *
@@ -92,7 +93,7 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
 	size_t		cmd_alloc = 0, param_alloc = 0,
 			cmd_offset = 0, param_offset = 0;
 
-	for (pl = command; SUCCEED == is_key_char(*pl); pl++)
+	for (pl = command; SUCCEED == zbx_is_key_char(*pl); pl++)
 		;
 
 	if (pl == command)
@@ -411,7 +412,7 @@ static zbx_key_access_rule_t	*zbx_key_access_rule_create(char *pattern, zbx_key_
 	rule->pattern = zbx_strdup(NULL, pattern);
 	zbx_vector_str_create(&rule->elements);
 
-	if (SUCCEED != parse_key_access_rule(pattern, rule))
+	if (SUCCEED != zbx_parse_key_access_rule(pattern, rule))
 	{
 		zbx_key_access_rule_free(rule);
 		rule = NULL;
@@ -525,13 +526,13 @@ void	finalize_key_access_rules_configuration(void)
  *               FAIL    - pattern parsing failed                             *
  *                                                                            *
  ******************************************************************************/
-static int	parse_key_access_rule(char *pattern, zbx_key_access_rule_t *rule)
+static int	zbx_parse_key_access_rule(char *pattern, zbx_key_access_rule_t *rule)
 {
 	char		*pl, *pr = NULL, *param;
 	size_t		alloc = 0, offset = 0;
 	int		i, size;
 
-	for (pl = pattern; SUCCEED == is_key_char(*pl) || '*' == *pl; pl++);
+	for (pl = pattern; SUCCEED == zbx_is_key_char(*pl) || '*' == *pl; pl++);
 
 	if (pl == pattern)
 		return FAIL; /* empty key */

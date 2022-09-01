@@ -1002,7 +1002,7 @@ static int	parse_function(char **exp, char **func, char **params)
 
 	for (p = *exp, s = *exp, state_fn = 0; '\0' != *p; p++)	/* check for function */
 	{
-		if (SUCCEED == is_function_char(*p))
+		if (SUCCEED == zbx_is_function_char(*p))
 		{
 			state_fn = 1;
 			continue;

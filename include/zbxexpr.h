@@ -22,6 +22,16 @@
 
 #include "zbxcommon.h"
 
+int	zbx_is_hostname_char(unsigned char c);
+int	zbx_is_key_char(unsigned char c);
+int	zbx_is_function_char(unsigned char c);
+int	zbx_is_macro_char(unsigned char c);
+int	zbx_is_discovery_macro(const char *name);
+int	zbx_parse_key(const char **exp);
+int	zbx_parse_host_key(char *exp, char **host, char **key);
+void	zbx_make_hostname(char *host);
+int	zbx_check_hostname(const char *hostname, char **error);
+
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
 int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r,

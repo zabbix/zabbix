@@ -46,7 +46,7 @@ void	load_aliases(char **lines)
 		char		*c;
 		const char	*r = *pline;
 
-		if (SUCCEED != parse_key(&r) || ':' != *r)
+		if (SUCCEED != zbx_parse_key(&r) || ':' != *r)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add alias \"%s\": invalid character at position %d",
 					*pline, (int)((r - *pline) + 1));
@@ -55,7 +55,7 @@ void	load_aliases(char **lines)
 
 		c = (char *)r++;
 
-		if (SUCCEED != parse_key(&r) || '\0' != *r)
+		if (SUCCEED != zbx_parse_key(&r) || '\0' != *r)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add alias \"%s\": invalid character at position %d",
 					*pline, (int)((r - *pline) + 1));

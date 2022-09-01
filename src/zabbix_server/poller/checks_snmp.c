@@ -1695,7 +1695,7 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 
 	for (i = 0; i < data->request.nparam; i += 2)
 	{
-		if (SUCCEED != is_discovery_macro(data->request.params[i]))
+		if (SUCCEED != zbx_is_discovery_macro(data->request.params[i]))
 		{
 			zbx_snprintf(error, max_error_len, "Invalid SNMP OID: macro \"%s\" is invalid",
 					data->request.params[i]);

@@ -180,7 +180,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr, int *count,
+static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr, int *count,
 		int *interval, int *size, int *timeout, icmppingsec_type_t *type, char *error, int max_error_len)
 {
 	const char	*tmp;
@@ -410,7 +410,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 		if (SUCCEED == rc)
 		{
-			rc = parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
+			rc = zbx_parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
 					&interval, &size, &timeout, &type, error, sizeof(error));
 		}
 

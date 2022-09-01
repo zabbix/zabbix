@@ -1153,16 +1153,6 @@ zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 zbx_uint32_t	zbx_letoh_uint32(zbx_uint32_t data);
 zbx_uint32_t	zbx_htole_uint32(zbx_uint32_t data);
 
-int	is_hostname_char(unsigned char c);
-int	is_key_char(unsigned char c);
-int	is_function_char(unsigned char c);
-int	is_macro_char(unsigned char c);
-int	is_discovery_macro(const char *name);
-int	parse_key(const char **exp);
-int	parse_host_key(char *exp, char **host, char **key);
-void	make_hostname(char *host);
-int	zbx_check_hostname(const char *hostname, char **error);
-
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
 #define ZBX_SESSION_ACTIVE		0

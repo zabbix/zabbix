@@ -5168,7 +5168,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 						ZBX_FS_UI64 "\" formula host:key parameter at %s", itemid, ptr);
 			}
 
-			ret = parse_host_key(arg0, &host, &key);
+			ret = zbx_parse_host_key(arg0, &host, &key);
 			zbx_free(arg0);
 
 			if (FAIL == ret)
