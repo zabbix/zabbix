@@ -111,7 +111,6 @@ class testFormFilter extends CWebTest {
 
 		$result_table = $this->query($table_selector)->asTable()->waitUntilPresent()->one();
 		$this->query('name:filter_apply')->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
 		$result_table->waitUntilReloaded();
 		$filter_result = $result_table->getRows()->asText();
 
@@ -122,8 +121,7 @@ class testFormFilter extends CWebTest {
 		$this->page->open($this->url)->waitUntilReady();
 
 		// Check that filter form fields and table result match.
-		$home_form->invalidate();
-		$home_form->checkValue($data);
+		$home_form->invalidate()->checkValue($data);
 		$this->assertEquals($filter_result, $result_table->getRows()->asText());
 
 		// Reset filter not to interfere next tests.
