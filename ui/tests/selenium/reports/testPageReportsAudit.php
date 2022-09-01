@@ -512,7 +512,7 @@ class testPageReportsAudit extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 
-		// Get recordset ID and check how much rows with same ID.
+		// Get recordset ID and check how much rows displayed in Audit page.
 		$recordsetid = CDBHelper::getRow('SELECT recordsetid FROM auditlog ORDER BY clock DESC');
 		$recordsetid_count = CDBHelper::getCount('SELECT * FROM auditlog WHERE recordsetid='.
 				zbx_dbstr($recordsetid['recordsetid'])
