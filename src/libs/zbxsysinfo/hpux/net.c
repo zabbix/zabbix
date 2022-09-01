@@ -364,7 +364,7 @@ static int get_ppa(int fd, const char *if_name, int *ppa)
 
 		for (i = 0; i < dlp->dl_count; i++)
 		{
-#define PPA(n) (*(dl_hp_ppa_info_t *)(ppa_data_buf + n * sizeof(dl_hp_ppa_info_t)))
+#define PPA(n)	(*(dl_hp_ppa_info_t *)(ppa_data_buf + n * sizeof(dl_hp_ppa_info_t)))
 			zbx_snprintf(buf, if_name_sz, "%s%d", PPA(i).dl_module_id_1, PPA(i).dl_ppa);
 #undef PPA
 			if (0 == strcmp(if_name, buf))

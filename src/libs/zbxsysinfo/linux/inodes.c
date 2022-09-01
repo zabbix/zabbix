@@ -40,7 +40,7 @@ do													\
 {													\
 	if (__UINT64_C(0xffffffffffffffff) == structure.field)						\
 	{												\
-		error =  zbx_strdup(NULL, "Cannot obtain filesystem information: value of " 		\
+		error =  zbx_strdup(NULL, "Cannot obtain filesystem information: value of "		\
 				get_string(field) " is unknown.");					\
 		return SYSINFO_RET_FAIL;								\
 	}												\
@@ -89,8 +89,8 @@ while(0)
 static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*fsname, *mode, *error;
-	zbx_uint64_t 		total, free, used;
-	double 			pfree, pused;
+	zbx_uint64_t		total, free, used;
+	double			pfree, pused;
 
 	if (2 < request->nparam)
 	{
