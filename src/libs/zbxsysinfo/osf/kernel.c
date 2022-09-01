@@ -38,7 +38,7 @@ int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-     	SET_UI64_RESULT(result, maxfiles);
+	SET_UI64_RESULT(result, maxfiles);
 
 	return SYSINFO_RET_OK;
 #else
@@ -66,7 +66,7 @@ int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-     	SET_UI64_RESULT(result, maxproc);
+	SET_UI64_RESULT(result, maxproc);
 
 	return SYSINFO_RET_OK;
 #else

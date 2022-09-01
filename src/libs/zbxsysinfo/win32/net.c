@@ -24,7 +24,6 @@
 #include "log.h"
 #include "zbxjson.h"
 
-
 /* __stdcall calling convention is used for GetIfEntry2(). In order to declare a */
 /* pointer to GetIfEntry2() we have to expand NETIOPAPI_API macro manually since */
 /* part of it must be together with the pointer name in the parentheses.         */

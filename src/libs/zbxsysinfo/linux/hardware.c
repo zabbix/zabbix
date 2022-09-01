@@ -30,17 +30,17 @@
 #include <setjmp.h>
 #include <signal.h>
 
-static ZBX_THREAD_LOCAL volatile char sigbus_handler_set;
-static ZBX_THREAD_LOCAL sigjmp_buf sigbus_jmp_buf;
+static ZBX_THREAD_LOCAL volatile char	sigbus_handler_set;
+static ZBX_THREAD_LOCAL sigjmp_buf	sigbus_jmp_buf;
 
-static void sigbus_handler(int signal)
+static void	sigbus_handler(int signal)
 {
 	siglongjmp(sigbus_jmp_buf, signal);
 }
 
-static void install_sigbus_handler(void)
+static void	install_sigbus_handler(void)
 {
-	struct sigaction act;
+	struct sigaction	act;
 
 	if (0 == sigbus_handler_set)
 	{
@@ -52,7 +52,7 @@ static void install_sigbus_handler(void)
 	}
 }
 
-static void remove_sigbus_handler(void)
+static void	remove_sigbus_handler(void)
 {
 	struct sigaction act;
 
@@ -391,7 +391,7 @@ static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_uin
 	return offset;
 }
 
-int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL, filter, cpu, cur_cpu = -1, offset = 0;
 	zbx_uint64_t	maxfreq = ZBX_MAX_UINT64, curfreq = ZBX_MAX_UINT64;
@@ -538,7 +538,7 @@ int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 }
 
-int     SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	size_t			offset;
 	int			s, i, show_names;

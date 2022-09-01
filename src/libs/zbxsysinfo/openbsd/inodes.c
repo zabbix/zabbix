@@ -18,8 +18,8 @@
 **/
 
 #include "inodes.h"
-
 #include "zbxsysinfo.h"
+
 #include "log.h"
 
 int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree, zbx_uint64_t *iused, double *pfree,
@@ -69,7 +69,7 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*fsname, *mode, *error;
 	zbx_uint64_t		total, free, used;
-	double 			pfree, pused;
+	double			pfree, pused;
 
 	if (2 < request->nparam)
 	{

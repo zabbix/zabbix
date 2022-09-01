@@ -46,6 +46,7 @@ static HKEY	get_hkey_from_fullkey(char *fullkey)
 		return HKEY_PERFORMANCE_DATA;
 	else if (0 == strcmp("HKEY_PERFORMANCE_NLSTEXT", fullkey) || 0 == strcmp("HKPN", fullkey))
 		return HKEY_PERFORMANCE_NLSTEXT;
+	else if (0 == strcmp("HKEY_PERFORMANCE_TEXT", fullkey) || 0 == strcmp("HKPT", fullkey))
 		return HKEY_PERFORMANCE_TEXT;
 	else if (0 == strcmp("HKEY_USERS", fullkey) || 0 == strcmp("HKU", fullkey))
 		return HKEY_USERS;

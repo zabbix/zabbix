@@ -129,7 +129,7 @@ static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_FREESWAP
-	struct sysinfo info;
+	struct sysinfo	info;
 
 	if (0 == sysinfo(&info))
 	{
@@ -168,7 +168,7 @@ static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 static int	SYSTEM_SWAP_TOTAL(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_TOTALSWAP
-	struct sysinfo info;
+	struct sysinfo	info;
 
 	if (0 == sysinfo(&info))
 	{

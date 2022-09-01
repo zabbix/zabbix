@@ -24,8 +24,8 @@
 #ifdef _WINDOWS
 #	include "perfstat.h"
 /* defined in sysinfo lib */
-extern int get_cpu_group_num_win32(void);
-extern int get_numa_node_num_win32(void);
+extern int	get_cpu_group_num_win32(void);
+extern int	get_numa_node_num_win32(void);
 #endif
 #include "zbxmutexs.h"
 #include "log.h"
@@ -175,8 +175,8 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 			if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
 				goto clean;
 
-			if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, ZBX_MAX_COLLECTOR_PERIOD,
-					PERF_COUNTER_LANG_DEFAULT, &error)))
+			if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath,
+					ZBX_MAX_COLLECTOR_PERIOD, PERF_COUNTER_LANG_DEFAULT, &error)))
 			{
 				goto clean;
 			}
@@ -628,8 +628,11 @@ read_again:
 				/* only collector can write into cpu history, so for reading */
 				/* collector itself can access it without locking            */
 
-				if (ZBX_MAX_COLLECTOR_HISTORY <= (index = pcpus->cpu[idx].h_first + pcpus->cpu[idx].h_count - 1))
+				if (ZBX_MAX_COLLECTOR_HISTORY <= (index = pcpus->cpu[idx].h_first +
+						pcpus->cpu[idx].h_count - 1))
+				{
 					index -= ZBX_MAX_COLLECTOR_HISTORY;
+				}
 
 				last_idle = pcpus->cpu[idx].h_counter[ZBX_CPU_STATE_IDLE][index];
 				last_user = pcpus->cpu[idx].h_counter[ZBX_CPU_STATE_USER][index];

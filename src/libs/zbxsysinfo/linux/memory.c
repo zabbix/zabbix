@@ -20,6 +20,7 @@
 #include "zbxsysinfo.h"
 
 #include "proc.h"
+
 #include "log.h"
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)

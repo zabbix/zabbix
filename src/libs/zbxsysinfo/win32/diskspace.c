@@ -70,7 +70,7 @@ static int	wmpoint_compare_func(const void *d1, const void *d2)
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *not_used,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
 {
-	wchar_t 	*wpath;
+	wchar_t	*wpath;
 	ULARGE_INTEGER	freeBytes, totalBytes;
 
 	wpath = zbx_utf8_to_unicode(fs);
@@ -337,7 +337,7 @@ out:
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct zbx_json		j;
-	int 			i, ret = SYSINFO_RET_FAIL;
+	int			i, ret = SYSINFO_RET_FAIL;
 	zbx_vector_ptr_t	mount_paths;
 	char			*error = NULL, *fsname, *fstype, *fslabel, *fsdrivetype;
 
@@ -379,14 +379,14 @@ out:
 	return ret;
 }
 
-static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result,  HANDLE timeout_event)
+static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	size_t			sz;
 	struct zbx_json		j;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_wmpoint_t		*mpoint;
 	int			i, ret = SYSINFO_RET_FAIL;
-	char 			*error = NULL;
+	char			*error = NULL;
 	zbx_vector_ptr_t	mount_paths;
 
 	zbx_vector_ptr_create(&mount_paths);

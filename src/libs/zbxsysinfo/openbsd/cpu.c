@@ -19,9 +19,10 @@
 
 #include "zbxsysinfo.h"
 
-#include "stats.h"
 #include "log.h"
 #include "zbxnum.h"
+
+#include "stats.h"
 
 static int	get_cpu_num()
 {
@@ -186,7 +187,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		mib[] = {CTL_VM, VM_UVMEXP};
 	size_t		len;
@@ -205,7 +206,7 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		mib[] = {CTL_VM, VM_UVMEXP};
 	size_t		len;

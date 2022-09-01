@@ -20,10 +20,11 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
+#include "inodes.h"
+
 #include "zbxjson.h"
 #include "log.h"
 #include "zbxalgo.h"
-#include "inodes.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
@@ -306,7 +307,6 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_free(&j);
 	ret = SYSINFO_RET_OK;
-
 out:
 	zbx_vector_ptr_clear_ext(&mntpoints, (zbx_clean_func_t)zbx_mpoints_free);
 	zbx_vector_ptr_destroy(&mntpoints);

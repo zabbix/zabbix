@@ -19,10 +19,11 @@
 
 #include "zbxsysinfo.h"
 
-#include "stats.h"
-#include "diskdevices.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+
+#include "stats.h"
+#include "diskdevices.h"
 
 #define ZBX_DEV_PFX		"/dev/"
 #define ZBX_DEV_READ		0
@@ -31,7 +32,7 @@
 
 #if defined(KERNEL_2_4)
 #	define INFO_FILE_NAME	"/proc/partitions"
-#	define PARSE(line)	if (sscanf(line, ZBX_FS_UI64 ZBX_FS_UI64 " %*d %s " 		\
+#	define PARSE(line)	if (sscanf(line, ZBX_FS_UI64 ZBX_FS_UI64 " %*d %s "		\
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d "			\
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d",	\
 				&rdev_major,							\
@@ -77,7 +78,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN], dev_path[MAX_STRING_LEN];
 	int		i, ret = FAIL, dev_exists = FAIL;
 	zbx_uint64_t	ds[ZBX_DSTAT_MAX], rdev_major, rdev_minor;
-	zbx_stat_t 	dev_st;
+	zbx_stat_t	dev_st;
 	int		found = 0;
 
 	for (i = 0; i < ZBX_DSTAT_MAX; i++)

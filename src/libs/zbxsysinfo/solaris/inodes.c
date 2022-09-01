@@ -69,7 +69,7 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*fsname, *mode, *error;
 	zbx_uint64_t		total, free, used;
-	double 			pfree, pused;
+	double			pfree, pused;
 
 	if (2 < request->nparam)
 	{

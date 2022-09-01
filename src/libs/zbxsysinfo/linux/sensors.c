@@ -29,7 +29,6 @@
 static const char	*locations[] = {"", "/device", NULL};
 #endif
 
-
 static void	count_sensor(int do_task, const char *filename, double *aggr, int *cnt)
 {
 	FILE	*f;

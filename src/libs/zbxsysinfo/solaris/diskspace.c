@@ -248,11 +248,11 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		itotal, inot_used, iused;
 	double			pfree, pused;
 	double			ipfree, ipused;
-	char 			*error;
+	char			*error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
 	int			ret = SYSINFO_RET_FAIL;
-	char 			*mpoint;
+	char			*mpoint;
 
 	/* opening the mounted filesystems file */
 	if (NULL == (f = fopen("/etc/mnttab", "r")))

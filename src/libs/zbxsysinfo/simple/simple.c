@@ -98,7 +98,8 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 
 	if (NULL == (attr = ldap_first_attribute(ldap, msg, &ber)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - empty first entry result. [%s] [%s]", host, ldap_err2string(ldapErr));
+		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - empty first entry result. [%s] [%s]", host,
+				ldap_err2string(ldapErr));
 		goto lbl_ret;
 	}
 
