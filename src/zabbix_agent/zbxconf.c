@@ -23,6 +23,7 @@
 #include "sysinfo.h"
 #include "zbxstr.h"
 #include "zbxparam.h"
+#include "zbxexpr.h"
 
 #ifdef _WINDOWS
 #	include "perfstat.h"

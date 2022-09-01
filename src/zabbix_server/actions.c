@@ -2020,6 +2020,14 @@ static int	is_supported_event_object(const ZBX_DB_EVENT *event)
  ******************************************************************************/
 static int	check_intern_event_type_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
+/* event type action condition values */
+/* SYNC WITH PHP!                     */
+#define EVENT_TYPE_ITEM_NOTSUPPORTED		0
+/* #define EVENT_TYPE_ITEM_NORMAL		1	 deprecated */
+#define EVENT_TYPE_LLDRULE_NOTSUPPORTED		2
+/* #define EVENT_TYPE_LLDRULE_NORMAL		3	 deprecated */
+#define EVENT_TYPE_TRIGGER_UNKNOWN		4
+/* #define EVENT_TYPE_TRIGGER_NORMAL		5	 deprecated */
 	int		i;
 	zbx_uint64_t	condition_value;
 
@@ -2056,6 +2064,9 @@ static int	check_intern_event_type_condition(const zbx_vector_ptr_t *esc_events,
 	}
 
 	return SUCCEED;
+#undef EVENT_TYPE_ITEM_NOTSUPPORTED
+#undef EVENT_TYPE_LLDRULE_NOTSUPPORTED
+#undef EVENT_TYPE_TRIGGER_UNKNOWN
 }
 
 /******************************************************************************

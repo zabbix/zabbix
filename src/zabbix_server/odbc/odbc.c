@@ -23,13 +23,14 @@
 
 #include "odbc.h"
 
-#include <sql.h>
-#include <sqlext.h>
-
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
+#include "zbxexpr.h"
+
+#include <sql.h>
+#include <sqlext.h>
 
 struct zbx_odbc_data_source
 {

@@ -224,4 +224,24 @@ int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *
 int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
 		const char *tz);
 /* interval END */
+
+
+/* condition operators */
+#define CONDITION_OPERATOR_EQUAL		0
+#define CONDITION_OPERATOR_NOT_EQUAL		1
+#define CONDITION_OPERATOR_LIKE			2
+#define CONDITION_OPERATOR_NOT_LIKE		3
+#define CONDITION_OPERATOR_IN			4
+#define CONDITION_OPERATOR_MORE_EQUAL		5
+#define CONDITION_OPERATOR_LESS_EQUAL		6
+#define CONDITION_OPERATOR_NOT_IN		7
+#define CONDITION_OPERATOR_REGEXP		8
+#define CONDITION_OPERATOR_NOT_REGEXP		9
+#define CONDITION_OPERATOR_YES			10
+#define CONDITION_OPERATOR_NO			11
+#define CONDITION_OPERATOR_EXIST		12
+#define CONDITION_OPERATOR_NOT_EXIST		13
+
 #endif /* ZABBIX_EXPR_H */
+
+
