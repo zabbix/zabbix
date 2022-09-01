@@ -4133,7 +4133,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			// Check script peremissions for host group. Host belongs to the host group that hasn't permission to execute current script
+			// Check script permissions for host group. Host belongs to the host group that hasn't permission to execute current script
 			[
 				'script' => [
 					'scriptid' => '4',

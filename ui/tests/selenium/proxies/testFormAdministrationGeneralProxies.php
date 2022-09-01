@@ -1003,7 +1003,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 			[
 				[
 					'proxy_fields' => [
-						'Proxy name' => 'Special symbos in encryption fields',
+						'Proxy name' => 'Special symbols in encryption fields',
 						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [

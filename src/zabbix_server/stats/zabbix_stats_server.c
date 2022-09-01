@@ -19,7 +19,7 @@
 
 #include "zabbix_stats.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "dbcache.h"
 #include "valuecache.h"
 #include "zbxlld.h"

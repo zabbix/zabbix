@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-20 15:08+0000\n"
+"PO-Revision-Date: 2022-08-19 14:42+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -523,7 +523,7 @@ msgstr "מוכר"
 #: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr ""
+msgstr "מוכר"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -1096,6 +1096,11 @@ msgstr "משך צבירה"
 #: include/actions.inc.php:2106
 msgid "Alert message"
 msgstr "הודעת אזהרה"
+
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CRoleHelper.php:338
+msgid "Alerts"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -4975,6 +4980,11 @@ msgstr "קו מרוסק"
 msgid "Data"
 msgstr "נתונים"
 
+#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CRoleHelper.php:337
+msgid "Data collection"
+msgstr "איסוף נתונים"
+
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
 #, c-format
@@ -5725,7 +5735,7 @@ msgstr "פרטי תרחיש רשת"
 
 #: app/views/administration.housekeeping.edit.php:195
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "רישיון ה־TimescaleDB שהתגלה לא תומך בדחיסה. דחיסה נתמכת במהדורה הקהילתית של TimescaleDB."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -6554,6 +6564,14 @@ msgstr "להפעיל מצב ניפוי שגיאות בקבוצות הנבחרו�
 msgid "Enable host"
 msgstr "הפעלת מארח"
 
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
+
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
 msgstr "להפעיל מארח?"
@@ -6803,7 +6821,7 @@ msgstr "שגיאה! לא ניתן להפעיל את שרת ה־Zabbix עקב ג�
 #: app/partials/administration.system.info.php:159
 #: app/partials/administration.system.info.php:172
 msgid "Error! Unable to start Zabbix server."
-msgstr ""
+msgstr "שגיאה! לא ניתן להפעיל את שרת ה־Zabbix."
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -7143,7 +7161,7 @@ msgstr "נכשל"
 #: app/views/monitoring.widget.web.view.php:34
 msgctxt "compact table header"
 msgid "Failed"
-msgstr ""
+msgstr "נכשל"
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
@@ -14273,6 +14291,10 @@ msgstr "כללי גילוי הורה"
 msgid "Parent graphs"
 msgstr "תרשימי הורה"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr "ערך מארח הורה"
+
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
 msgid "Parent items"
@@ -15149,7 +15171,7 @@ msgstr "מען"
 #: app/views/monitoring.widget.actionlog.view.php:43
 msgctxt "compact table header"
 msgid "Recipient"
-msgstr ""
+msgstr "מען"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
@@ -19398,22 +19420,22 @@ msgstr "ביטול השתקה"
 #: app/partials/administration.system.info.php:160
 #, c-format
 msgid "Unsupported %1$s database server version. Must be at least %2$s."
-msgstr ""
+msgstr "גרסת שרת מסד נתונים %1$s אינה נתמכת. אמורה להיות %2$s לפחות."
 
 #: app/partials/administration.system.info.php:173
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
-msgstr ""
+msgstr "גרסת שרת מסד נתונים %1$s אינה נתמכת. אמורה להיות לא גדולה מ־%2$s."
 
 #: app/views/administration.housekeeping.edit.php:179
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
-msgstr ""
+msgstr "גרסת TimescaleDB לא נתמכת. אמורה להיות %1$s לפחות."
 
 #: app/views/administration.housekeeping.edit.php:189
 #, c-format
 msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
-msgstr ""
+msgstr "גרסת TimescaleDB לא נתמכת. אמורה להיות מעל %1$s."
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -20003,7 +20025,7 @@ msgstr "סטטיסטיקת זיכרון מטמון של VMware. המצבים ה�
 
 #: include/classes/data/CItemData.php:1252
 msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "מצב נתוני התראות בקלאסטר VMware,‏ מחזירה JSON,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה קלאסטר VMware"
 
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
@@ -20011,7 +20033,7 @@ msgstr "מודד ביצועי קלאסטר VMware,‏ <url> - כתובת שיר�
 
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
-msgstr ""
+msgstr "עדיפות קלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה קלאסטר VMware,‏ <prop> - נתיב מאפיין"
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -20288,7 +20310,7 @@ msgstr "ניצולת מעבד במכונה וירטואלית של VMWare בהר
 
 #: include/classes/data/CItemData.php:1644
 msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
-msgstr ""
+msgstr "מאפיין מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - מכונה וירטואלית ב־VMware,‏ <prop> - נתיב המאפיין"
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20308,7 +20330,7 @@ msgstr "גודל זיכרון החלפה במכונה וירטואלית של VM
 
 #: include/classes/data/CItemData.php:1664
 msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "מערך תגיות של מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - מכונה וירטואלית ב־VMware. מחזירה JSON"
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
@@ -20673,12 +20695,12 @@ msgstr "הודעת אזהרה"
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
-msgstr ""
+msgstr "אזהרה! לא ניתן לקבל את גרסת מסד הנתונים."
 
 #: app/partials/administration.system.info.php:166
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
-msgstr ""
+msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת. עליה להיות %2$s לפחות."
 
 #: app/partials/administration.system.info.php:167
 #, c-format
@@ -20688,7 +20710,7 @@ msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת
 #: app/partials/administration.system.info.php:179
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
-msgstr ""
+msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת. עליה להיות גדולה מ־%2$s."
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."

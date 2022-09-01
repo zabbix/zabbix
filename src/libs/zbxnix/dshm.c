@@ -19,7 +19,7 @@
 
 #include "zbxnix.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 
 extern char	*CONFIG_FILE;

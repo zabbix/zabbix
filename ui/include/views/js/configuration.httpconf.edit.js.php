@@ -209,7 +209,7 @@
 	});
 
 	/**
-	 * Implementation of jQuery.val for radio buttons. Use this methon within scoped jQuery object;
+	 * Implementation of jQuery.val for radio buttons. Use this method within scoped jQuery object;
 	 * Use with jQuery collection of input nodes.
 	 *
 	 * @param {string} value  Check button by value. Read value if no param is given.

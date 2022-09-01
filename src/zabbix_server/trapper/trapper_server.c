@@ -112,7 +112,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_MEDIATYPEID, tmp, sizeof(tmp), NULL) ||
-			SUCCEED != is_uint64(tmp, &mediatypeid))
+			SUCCEED != zbx_is_uint64(tmp, &mediatypeid))
 	{
 		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MEDIATYPEID);
 		goto fail;
@@ -147,7 +147,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 		goto fail;
 	}
 
-	if (FAIL == is_ushort(row[8], &smtp_port))
+	if (FAIL == zbx_is_ushort(row[8], &smtp_port))
 	{
 		DBfree_result(result);
 		error = zbx_dsprintf(NULL, "Invalid port value.");
