@@ -131,6 +131,12 @@ $(OUTPUTDIR)\time.o: $(TOPDIR)\src\libs\zbxtime\time.c
 $(OUTPUTDIR)\expr.o: $(TOPDIR)\src\libs\zbxexpr\expr.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
+$(OUTPUTDIR)\host.o: $(TOPDIR)\src\libs\zbxexpr\host.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\macro.o: $(TOPDIR)\src\libs\zbxexpr\macro.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
 $(OUTPUTDIR)\interval.o: $(TOPDIR)\src\libs\zbxexpr\interval.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
