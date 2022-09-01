@@ -137,6 +137,9 @@ $(OUTPUTDIR)\host.o: $(TOPDIR)\src\libs\zbxexpr\host.c
 $(OUTPUTDIR)\macro.o: $(TOPDIR)\src\libs\zbxexpr\macro.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
+$(OUTPUTDIR)\function.o: $(TOPDIR)\src\libs\zbxexpr\function.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
 $(OUTPUTDIR)\interval.o: $(TOPDIR)\src\libs\zbxexpr\interval.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
