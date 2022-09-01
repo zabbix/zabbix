@@ -26,5 +26,26 @@
  * @var array $data
  */
 
-(new CWidgetFormView($data))
+$form = (new CWidgetFormView($data))
+	->addFieldVar($data['fields'][CWidgetFieldReference::FIELD_NAME]);
+
+// Add dynamically created fields navtree.name.<N>, navtree.parent.<N>, navtree.order.<N> and navtree.sysmapid.<N>.
+foreach ($data['fields']['navtree']->getValue() as $i => $navtree_item) {
+	$form->addVar($data['fields']['navtree']->getName().'.name.'.$i, $navtree_item['name']);
+
+	if ($navtree_item['order'] != 1) {
+		$form->addVar($data['fields']['navtree']->getName().'.order.'.$i, $navtree_item['order']);
+	}
+
+	if ($navtree_item['parent'] != 0) {
+		$form->addVar($data['fields']['navtree']->getName().'.parent.'.$i, $navtree_item['parent']);
+	}
+
+	if (array_key_exists('sysmapid', $navtree_item)) {
+		$form->addVar($data['fields']['navtree']->getName().'.sysmapid.'.$i, $navtree_item['sysmapid']);
+	}
+}
+
+$form
+	->addField(new CWidgetFieldCheckBoxView($data['fields']['show_unavailable']))
 	->show();

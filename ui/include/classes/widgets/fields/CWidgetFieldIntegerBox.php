@@ -21,7 +21,6 @@
 
 class CWidgetFieldIntegerBox extends CWidgetField {
 
-	private int $min;
 	private int $max;
 
 	/**
@@ -31,12 +30,11 @@ class CWidgetFieldIntegerBox extends CWidgetField {
 	public function __construct(string $name, string $label = null, int $min = 0, int $max = ZBX_MAX_INT32) {
 		parent::__construct($name, $label);
 
-		$this->min = $min;
 		$this->max = $max;
 
 		$this
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32)
-			->setExValidationRules(['in' => $this->min.':'.$this->max]);
+			->setExValidationRules(['in' => $min.':'.$this->max]);
 	}
 
 	public function setValue($value): self {

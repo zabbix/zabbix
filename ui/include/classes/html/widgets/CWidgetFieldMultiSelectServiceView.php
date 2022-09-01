@@ -15,28 +15,19 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
-/**
- * Discovery status widget form view.
- *
- * @var CView $this
- * @var array $data
- */
+class CWidgetFieldMultiSelectServiceView extends CWidgetFieldMultiSelectView {
 
-$fields = $data['dialogue']['fields'];
+	public function __construct(CWidgetFieldMultiSelectService $field, array $data) {
+		parent::__construct($field, $data);
 
-$form = CWidgetHelper::createForm();
+		$this->custom_select = true;
+	}
 
-$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'],
-	$data['templateid'] === null ? $fields['rf_rate'] : null
-);
-
-$form->addItem($form_grid);
-
-return [
-	'form' => $form
-];
+	protected function getObjectName(): string {
+		return 'services';
+	}
+}

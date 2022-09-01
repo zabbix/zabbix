@@ -27,4 +27,64 @@
  */
 
 (new CWidgetFormView($data))
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['show'])
+	)
+	->addField(
+		new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['ms']['groups']['groupids'])
+	)
+	->addField(
+		new CWidgetFieldMultiSelectGroupView($data['fields']['exclude_groupids'],
+			$data['captions']['ms']['groups']['exclude_groupids']
+		)
+	)
+	->addField(
+		new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids'])
+	)
+	->addField(
+		new CWidgetFieldTextBoxView($data['fields']['problem'])
+	)
+	->addField(
+		new CWidgetFieldSeveritiesView($data['fields']['severities'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
+	)
+	->addField(
+		new CWidgetFieldTagsView($data['fields']['tags'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['show_tags'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['tag_name_format'])
+	)
+	->addField(
+		(new CWidgetFieldTextBoxView($data['fields']['tag_priority']))->setPlaceholder(_('comma-separated list'))
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['show_opdata'])
+	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
+	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['unacknowledged'])
+	)
+	->addField(
+		new CWidgetFieldSelectView($data['fields']['sort_triggers'])
+	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['show_timeline'])
+	)
+	->addField(
+		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
+	)
+	->includeJsFile('js/monitoring.widget.problems.edit.js.php')
+	->addJavaScript('widget_problems_form.init('.json_encode([
+		'sort_with_enabled_show_timeline' => [
+			SCREEN_SORT_TRIGGERS_TIME_DESC => true,
+			SCREEN_SORT_TRIGGERS_TIME_ASC => true
+		]
+	]).');')
 	->show();

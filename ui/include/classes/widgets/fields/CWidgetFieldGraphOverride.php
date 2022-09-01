@@ -24,11 +24,13 @@
  */
 class CWidgetFieldGraphOverride extends CWidgetField {
 
+	public const DEFAULT_VALUE = [];
+
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this
-			->setDefault([])
+			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 				'hosts'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
@@ -45,7 +47,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 			]]);
 	}
 
-	public static function getOverrideOptions(): array {
+	public function getOverrideOptions(): array {
 		return ['color', 'width', 'type', 'transparency', 'fill', 'pointsize', 'missingdatafunc', 'axisy', 'timeshift'];
 	}
 
@@ -92,7 +94,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		// Validate options.
 		if (!$errors && $strict) {
 			foreach ($value as $index => $overrides) {
-				if (!array_intersect(self::getOverrideOptions(), array_keys($overrides))) {
+				if (!array_intersect($this->getOverrideOptions(), array_keys($overrides))) {
 					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $label.'/'.($index + 1),
 						_('at least one override option must be specified')
 					);
@@ -124,7 +126,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 				];
 			}
 
-			foreach (self::getOverrideOptions() as $opt) {
+			foreach ($this->getOverrideOptions() as $opt) {
 				if (array_key_exists($opt, $val)) {
 					$widget_fields[] = [
 						'type' => ($opt === 'color' || $opt === 'timeshift')

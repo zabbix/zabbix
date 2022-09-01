@@ -22,8 +22,9 @@
 
 window.widget_tophosts_form = new class {
 
-	init(options) {
-		this._form = document.getElementById(options.form_id);
+	init() {
+		this._form = document.getElementById('widget-dialogue-form');
+
 		this._list_columns = document.getElementById('list_columns');
 		this.initSortable(this._list_columns);
 

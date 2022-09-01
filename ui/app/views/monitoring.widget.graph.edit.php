@@ -27,4 +27,22 @@
  */
 
 (new CWidgetFormView($data))
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
+	)
+	->addField(array_key_exists('graphid', $data['fields'])
+		? new CWidgetFieldMultiSelectGraphView($data['fields']['graphid'], $data['captions']['ms']['graphs']['graphid'])
+		: null
+	)
+	->addField(array_key_exists('itemid', $data['fields'])
+		? new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['ms']['items']['itemid'])
+		: null
+	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['show_legend'])
+	)
+	->addField(array_key_exists('dynamic', $data['fields'])
+		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+		: null
+	)
 	->show();

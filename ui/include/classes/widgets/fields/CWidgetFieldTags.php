@@ -21,11 +21,14 @@
 
 class CWidgetFieldTags extends CWidgetField {
 
+	public const DEFAULT_VALUE = [];
+	public const DEFAULT_TAG = ['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''];
+
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this
-			->setDefault([])
+			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
@@ -53,27 +56,6 @@ class CWidgetFieldTags extends CWidgetField {
 		$this->value = (array) $value;
 
 		return $this;
-	}
-
-	/**
-	 * Add dynamic row script and fix the distance between AND/OR buttons and tag inputs below them.
-	 *
-	 * @return string
-	 */
-	public function getJavaScript(): string {
-		return '
-			jQuery("#tags_table_'.$this->getName().'")
-				.dynamicRows({template: "#tag-row-tmpl"})
-				.on("afteradd.dynamicRows", function() {
-					const rows = this.querySelectorAll(".form_row");
-					new CTagFilterItem(rows[rows.length - 1]);
-				});
-
-			// Init existing fields once loaded.
-			document.querySelectorAll("#tags_table_'.$this->getName().' .form_row").forEach(row => {
-				new CTagFilterItem(row);
-			});
-		';
 	}
 
 	public function toApi(array &$widget_fields = []): void {

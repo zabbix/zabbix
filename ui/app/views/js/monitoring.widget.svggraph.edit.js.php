@@ -26,12 +26,12 @@ window.widget_svggraph_form = new class {
 		this._dataset_index = 0;
 	}
 
-	init({form_id, form_tabs_id, color_palette}) {
+	init({form_tabs_id, color_palette}) {
 		colorPalette.setThemeColors(color_palette);
 
 		this._$overlay_body = jQuery('.overlay-dialogue-body');
-		this._form = document.getElementById(form_id);
-		this._form_id = form_id;
+		this._form = document.getElementById('widget-dialogue-form');
+
 
 		this._dataset_wrapper = document.getElementById('data_sets');
 
@@ -119,8 +119,8 @@ window.widget_svggraph_form = new class {
 				}
 
 				if (e.target.classList.contains('js-click-expend')
-						|| e.target.classList.contains('color-picker-preview')
-						|| e.target.classList.contains('<?= ZBX_STYLE_BTN_GREY ?>')) {
+					|| e.target.classList.contains('color-picker-preview')
+					|| e.target.classList.contains('<?= ZBX_STYLE_BTN_GREY ?>')) {
 					jQuery('#data_sets').zbx_vertical_accordion('expandNth',
 						jQuery(e.target).closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').index()
 					);
@@ -131,7 +131,7 @@ window.widget_svggraph_form = new class {
 				jQuery(window).trigger('resize');
 				const dataset = data.section[0];
 
-				if (dataset.dataset.type == '<?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>') {
+				if (dataset.dataset.type == '<?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
 					const message_block = dataset.querySelector('.no-items-message');
 
 					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
@@ -143,7 +143,7 @@ window.widget_svggraph_form = new class {
 				jQuery(window).trigger('resize');
 				const dataset = data.section[0];
 
-				if (dataset.dataset.type == '<?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>') {
+				if (dataset.dataset.type == '<?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
 					const message_block = dataset.querySelector('.no-items-message');
 
 					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
@@ -193,7 +193,7 @@ window.widget_svggraph_form = new class {
 		document
 			.getElementById('dataset-add')
 			.addEventListener('click', () => {
-				this._addDataset(<?= CWidgetHelper::DATASET_TYPE_PATTERN_ITEM ?>);
+				this._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
 			});
 
 		document
@@ -276,13 +276,13 @@ window.widget_svggraph_form = new class {
 					{
 						label: <?= json_encode(_('Item pattern')) ?>,
 						clickCallback: () => {
-							widget_svggraph_form._addDataset(<?= CWidgetHelper::DATASET_TYPE_PATTERN_ITEM ?>);
+							widget_svggraph_form._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
 						}
 					},
 					{
 						label: <?= json_encode(_('Item list')) ?>,
 						clickCallback: () => {
-							widget_svggraph_form._addDataset(<?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>);
+							widget_svggraph_form._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>);
 						}
 					}
 				]
@@ -313,13 +313,13 @@ window.widget_svggraph_form = new class {
 	_addDataset(type) {
 		jQuery(this._dataset_wrapper).zbx_vertical_accordion('collapseAll');
 
-		const template = type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>
+		const template = type == <?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>
 			? new Template(jQuery('#dataset-single-item-tmpl').html())
 			: new Template(jQuery('#dataset-pattern-item-tmpl').html());
 
 		this._dataset_wrapper.insertAdjacentHTML('beforeend', template.evaluate({
 			rowNum: this._dataset_index++,
-			color: (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>) ? '' : colorPalette.getNextColor()
+			color: (type == <?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>) ? '' : colorPalette.getNextColor()
 		}));
 
 		const dataset = this._getOpenedDataset();
@@ -351,7 +351,7 @@ window.widget_svggraph_form = new class {
 
 		const cloned_dataset = this._getOpenedDataset();
 
-		if (dataset.dataset.type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>) {
+		if (dataset.dataset.type == <?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>) {
 			for (const row of dataset.querySelectorAll('.single-item-table-row')) {
 				this._addSingleItem(
 					row.querySelector(`[name^='ds[${dataset.getAttribute('data-set')}][itemids]`).value,
@@ -448,7 +448,7 @@ window.widget_svggraph_form = new class {
 			srctbl: 'items',
 			srcfld1: 'itemid',
 			srcfld2: 'name',
-			dstfrm: this._form_id,
+			dstfrm: this._form.id,
 			numeric: 1,
 			writeonly: 1,
 			multiselect: 1,
@@ -555,7 +555,7 @@ window.widget_svggraph_form = new class {
 						srctbl: 'items',
 						srcfld1: 'itemid',
 						srcfld2: 'name',
-						dstfrm: widget_svggraph_form._form_id,
+						dstfrm: widget_svggraph_form._form.id,
 						dstfld1: `items_${dataset_index}_${i}_input`,
 						dstfld2: `items_${dataset_index}_${i}_name`,
 						numeric: 1,

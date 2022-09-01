@@ -45,18 +45,17 @@ class CWidgetFormMap extends CWidgetForm {
 			);
 
 		if (array_key_exists('source_type', $this->values)
-				&& $this->values['source_type'] == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
+				&& $this->values['source_type'] == WIDGET_SYSMAP_SOURCETYPE_MAP) {
 
 			$this->addField(
-				(new CWidgetFieldWidgetSelect('filter_widget_reference', _('Filter'),
-					WIDGET_NAV_TREE
-				))->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+				(new CWidgetFieldSelectResource('sysmapid', _('Map')))
+					->setResourceType(WIDGET_FIELD_SELECT_RES_SYSMAP)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			);
 		}
 		else {
 			$this->addField(
-				(new CWidgetFieldSelectResource('sysmapid', _('Map')))
-					->setResourceType(WIDGET_FIELD_SELECT_RES_SYSMAP)
+				(new CWidgetFieldWidgetSelect('filter_widget_reference', _('Filter'), WIDGET_NAV_TREE))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			);
 		}

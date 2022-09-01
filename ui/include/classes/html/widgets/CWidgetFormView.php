@@ -24,6 +24,7 @@ class CWidgetFormView {
 	private array $data;
 	private string $name;
 
+	private array $vars = [];
 	private array $javascript = [];
 	private array $templates = [];
 
@@ -39,12 +40,21 @@ class CWidgetFormView {
 			->addJavaScript('widget_form.init();');
 	}
 
-	public function addFieldGroup(?string $label, array $field_views, string $row_class = null): self {
-		$items = [];
-
-		foreach ($field_views as $field_view) {
-			$items[] = $this->makeField($field_view);
+	// TODO AS: phpdoc
+	/**
+	 * @param array|string|null $label
+	 * @param array             $items
+	 * @param string|null       $row_class
+	 *
+	 * @return $this
+	 */
+	public function addFieldsGroup($label, array $items, string $row_class = null): self {
+		foreach ($items as &$item) {
+			if ($item instanceof CWidgetFieldView) {
+				$item = $this->makeField($item);
+			}
 		}
+		unset($item);
 
 		$this->form_grid->addItem([
 			$label !== null
@@ -60,12 +70,22 @@ class CWidgetFormView {
 		return $this;
 	}
 
+	// TODO AS: phpdoc
 	public function addField(?CWidgetFieldView $field_view, string $row_class = null, bool $show_label = true): self {
 		if ($field_view !== null) {
+			$this->registerFieldView($field_view);
+
 			$this->addItem($this->makeField($field_view, $row_class, $show_label));
 		}
 
 		return $this;
+	}
+
+	// TODO AS: phpdoc
+	public function makeCustomField(CWidgetFieldView $field_view, array $items = [], string $row_class = null): array {
+		$this->registerFieldView($field_view);
+
+		return $items ?: $this->makeField($field_view, $row_class);
 	}
 
 	public function addItem($value): self {
@@ -74,9 +94,15 @@ class CWidgetFormView {
 		return $this;
 	}
 
-	public function addTemplate(?CTemplateTag $template): self {
-		if ($template !== null) {
-			$this->templates[] = $template;
+	public function addVar(string $name, string $value): self {
+		$this->vars[] = (new CVar($name, $value))->removeId();
+
+		return $this;
+	}
+
+	public function addFieldVar(?CWidgetField $field): self {
+		if ($field !== null) {
+			$this->vars[] = new CVar($field->getName(), $field->getValue());
 		}
 
 		return $this;
@@ -102,6 +128,14 @@ class CWidgetFormView {
 		return $this;
 	}
 
+	public function addTemplate(?CTemplateTag $template): self {
+		if ($template !== null) {
+			$this->templates[$template->getId()] = $template;
+		}
+
+		return $this;
+	}
+
 	/**
 	 * @throws JsonException
 	 */
@@ -115,6 +149,7 @@ class CWidgetFormView {
 					->setName($this->name)
 					->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FORM)
 					->addClass('dashboard-widget-'.$this->data['type'])
+					->addItem($this->vars)
 					->addItem($this->form_grid)
 					// Submit button is needed to enable submit event on Enter on inputs.
 					->addItem((new CInput('submit', 'dashboard_widget_config_submit'))->addStyle('display: none;')),
@@ -152,6 +187,16 @@ class CWidgetFormView {
 		}
 
 		echo json_encode($output, JSON_THROW_ON_ERROR);
+	}
+
+	private function registerFieldView(CWidgetFieldView $field_view): void {
+		$field_view->setFormName($this->name);
+
+		$this->addJavaScript($field_view->getJavaScript());
+
+		foreach ($field_view->getTemplates() as $template) {
+			$this->addTemplate($template);
+		}
 	}
 
 	private function makeFormGrid(): self {
@@ -203,15 +248,7 @@ class CWidgetFormView {
 	}
 
 	private function makeField(CWidgetFieldView $field_view, string $row_class = null, bool $show_label = true): array {
-		$field_view->setFormName($this->name);
-
 		$label = $show_label ? $field_view->getLabel() : null;
-
-		$this->addJavaScript($field_view->getJavaScript());
-
-		foreach ($field_view->getTemplates() as $template) {
-			$this->addTemplate($template);
-		}
 
 		return [
 			$label !== null

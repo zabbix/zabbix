@@ -27,4 +27,16 @@
  */
 
 (new CWidgetFormView($data))
+	->addField(
+		new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['ms']['groups']['groupids'])
+	)
+	->addField(
+		new CWidgetFieldCheckBoxListView($data['fields']['interface_type'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['layout'])
+	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
+	)
 	->show();

@@ -86,7 +86,12 @@ class CWidgetFormItem extends CWidgetForm {
 					->setMultiple(false)
 			)
 			->addField(
-				(new CWidgetFieldCheckBoxList('show', _('Show')))
+				(new CWidgetFieldCheckBoxList('show', _('Show'), [
+					WIDGET_ITEM_SHOW_DESCRIPTION => _('Description'),
+					WIDGET_ITEM_SHOW_VALUE => _('Value'),
+					WIDGET_ITEM_SHOW_TIME => _('Time'),
+					WIDGET_ITEM_SHOW_CHANGE_INDICATOR => _('Change indicator')
+				]))
 					->setDefault([WIDGET_ITEM_SHOW_DESCRIPTION, WIDGET_ITEM_SHOW_VALUE, WIDGET_ITEM_SHOW_TIME,
 						WIDGET_ITEM_SHOW_CHANGE_INDICATOR
 					])
@@ -99,7 +104,6 @@ class CWidgetFormItem extends CWidgetForm {
 				(new CWidgetFieldTextArea('description', _('Description')))
 					->setDefault('{ITEM.NAME}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-					->setWidth(ZBX_TEXTAREA_BIG_WIDTH - 38)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('desc_h_pos', _('Horizontal position'), [

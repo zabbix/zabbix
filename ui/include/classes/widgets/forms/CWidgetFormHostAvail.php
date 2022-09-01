@@ -36,7 +36,12 @@ class CWidgetFormHostAvail extends CWidgetForm {
 				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
 			->addField(
-				new CWidgetFieldCheckBoxList('interface_type', _('Interface type'))
+				new CWidgetFieldCheckBoxList('interface_type', _('Interface type'), [
+					INTERFACE_TYPE_AGENT => _('Zabbix agent'),
+					INTERFACE_TYPE_SNMP => _('SNMP'),
+					INTERFACE_TYPE_JMX => _('JMX'),
+					INTERFACE_TYPE_IPMI => _('IPMI')
+				])
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('layout', _('Layout'), [

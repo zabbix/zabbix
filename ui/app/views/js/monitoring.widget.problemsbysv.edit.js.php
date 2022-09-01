@@ -15,28 +15,28 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+?>
 
 
-/**
- * Favorite graphs widget form view.
- *
- * @var CView $this
- * @var array $data
- */
+window.widget_problemsbysv_form = new class {
 
-$fields = $data['dialogue']['fields'];
+	init() {
+		this._show_type = document.getElementById('show_type');
+		this._show_type.addEventListener('change', () => this.updateForm());
 
-$form = CWidgetHelper::createForm();
+		this.updateForm();
+	}
 
-$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'],
-	$data['templateid'] === null ? $fields['rf_rate'] : null
-);
+	updateForm() {
+		const show_type_totals = this._show_type
+			.querySelector('input:checked').value == <?= WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS ?>;
 
-$form->addItem($form_grid);
+		document.getElementById('hide_empty_groups').disabled = !show_type_totals;
 
-return [
-	'form' => $form
-];
+		for (const radio of document.querySelectorAll('#layout input')) {
+			radio.disabled = !show_type_totals;
+		}
+	}
+};

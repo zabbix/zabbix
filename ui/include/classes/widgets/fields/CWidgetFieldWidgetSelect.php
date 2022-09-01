@@ -23,7 +23,7 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 
 	public const DEFAULT_VALUE = -1;
 
-	private $search_by_value;
+	private string $search_by_value;
 
 	/**
 	 * Field that creates a selection of widgets in current dashboard, filtered by given key of widget array.
@@ -40,6 +40,10 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
+	public function getSearchByValue(): string {
+		return $this->search_by_value;
+	}
+
 	public function setFlags(int $flags): self {
 		parent::setFlags($flags);
 
@@ -53,29 +57,6 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 		}
 
 		return $this;
-	}
-
-	/**
-	 * JS code, that should be executed, to fill the select element with values and select current one.
-	 *
-	 * @return string
-	 */
-	public function getJavaScript() {
-		return '
-			var filter_select = document.getElementById("'.$this->getName().'");
-
-			filter_select.addOption('.json_encode(['label' => _('Select widget'), 'value' => '-1']).');
-			filter_select.selectedIndex = 0;
-
-			ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
-				if (widget.getType() === "'.$this->search_by_value.'") {
-					filter_select.addOption({label: widget.getHeaderName(), value: widget.getFields().reference});
-					if (widget.getFields().reference === "'.$this->getValue().'") {
-						filter_select.value = "'.$this->getValue().'";
-					}
-				}
-			});
-		';
 	}
 
 	public function setValue($value): self {

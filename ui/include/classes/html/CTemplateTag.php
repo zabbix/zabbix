@@ -26,7 +26,9 @@ class CTemplateTag extends CTag {
 
 	public function __construct($id, $value = null) {
 		parent::__construct('template', true);
-		$this->setId($id);
-		$this->addItem($value);
+
+		$this
+			->setId($id)
+			->addItem($value);
 	}
 }

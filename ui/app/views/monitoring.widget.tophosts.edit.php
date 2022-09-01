@@ -27,4 +27,49 @@
  */
 
 (new CWidgetFormView($data))
+	->addField(
+		new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['ms']['groups']['groupids'])
+	)
+	->addField(
+		new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
+	)
+	->addField(
+		new CWidgetFieldTagsView($data['fields']['tags'])
+	)
+	->addItem(
+		getColumnsField($data['fields']['columns'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['order'])
+	)
+	->addItem(
+		getColumnField($data['fields']['column'])
+	)
+	->addField(
+		new CWidgetFieldIntegerBoxView($data['fields']['count'])
+	)
+	->includeJsFile('js/monitoring.widget.tophosts.edit.js.php')
+	->addJavaScript('widget_tophosts_form.init();')
 	->show();
+
+function getColumnsField(CWidgetFieldColumnsList $field): array {
+	$columns = new CWidgetFieldColumnsListView($field);
+
+	return [
+		$columns->getLabel(),
+		(new CFormField($columns->getView()))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	];
+}
+
+function getColumnField(CWidgetFieldSelect $field): array {
+	$column = new CWidgetFieldSelectView($field);
+
+	return [
+		$column->getLabel(),
+		(new CFormField($field->getValues() ? $column->getView() : _('Add item column')))
+			->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
+	];
+}

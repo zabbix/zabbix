@@ -27,4 +27,20 @@
  */
 
 (new CWidgetFormView($data))
+	->addField(
+		new CWidgetFieldMultiSelectItemView($data['fields']['itemids'], $data['captions']['ms']['items']['itemids'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['style'])
+	)
+	->addField(
+		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
+	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['show_as_html'])
+	)
+	->addField(array_key_exists('dynamic', $data['fields'])
+		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+		: null
+	)
 	->show();

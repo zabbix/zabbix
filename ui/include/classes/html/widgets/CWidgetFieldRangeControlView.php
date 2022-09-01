@@ -17,37 +17,34 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
 
 
-window.widget_slareport_form = new class {
+class CWidgetFieldRangeControlView extends CWidgetFieldView {
 
-	init({serviceid_field_id}) {
-		this.$service = jQuery(`#${serviceid_field_id}`);
-		this.$service.multiSelect('getSelectButton').addEventListener('click', () => this.selectService());
+	protected ?CRangeControl $range_control = null;
+
+	public function __construct(CWidgetFieldRangeControl $field) {
+		$this->field = $field;
 	}
 
-	selectService() {
-		const exclude_serviceids = [];
+	public function getView(): CRangeControl {
+		return $this->getRangeControl();
+	}
 
-		for (const service of this.$service.multiSelect('getData')) {
-			exclude_serviceids.push(service.id);
+	public function getJavaScript(): string {
+		return $this->getRangeControl()->getPostJS();
+	}
+
+	private function getRangeControl(): CRangeControl {
+		if ($this->range_control === null) {
+			$this->range_control = (new CRangeControl($this->field->getName(), (int) $this->field->getValue()))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setStep($this->field->getStep())
+				->setMin($this->field->getMin())
+				->setMax($this->field->getMax())
+				->setEnabled(!$this->isDisabled());
 		}
 
-		const overlay = PopUp('popup.services', {
-			title: <?= json_encode(_('Service')) ?>,
-			exclude_serviceids,
-			multiple: 0
-		}, {dialogueid: 'services'});
-
-		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			const data = [];
-
-			for (const service of e.detail) {
-				data.push({id: service.serviceid, name: service.name});
-			}
-
-			this.$service.multiSelect('addData', data);
-		});
+		return $this->range_control;
 	}
-};
+}

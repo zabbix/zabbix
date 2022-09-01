@@ -21,45 +21,84 @@
 
 abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 
-	protected CMultiSelect $multiselect;
+	protected const OBJECT_NAME = '';
+
+	protected ?CMultiSelect $multiselect = null;
 
 	protected array $data;
+
+	protected bool $custom_select = false;
+
+	public function __construct(CWidgetFieldMultiSelect $field, array $data) {
+		$this->field = $field;
+		$this->data = $data;
+	}
 
 	public function getLabel(): ?CLabel {
 		$label = parent::getLabel();
 
 		return $label !== null
-			? $label->setForId($this->getForId())
+			? $label->setFor($this->getId().'_ms')
 			: null;
 	}
 
-	public function getJavaScript(): string {
-		return $this->multiselect->getPostJS();
+	public function getView(): CMultiSelect {
+		return $this->getMultiselect();
 	}
 
-	protected function getMultiselect($object_name, $popup_parameters, $filter_preselect_fields = []): CMultiSelect {
-		$options = [
-			'name' => $this->getForId(),
-			'object_name' => $object_name,
-			'multiple' => $this->field->isMultiple(),
-			'data' => $this->data,
-			'popup' => [
-				'parameters' => [
-					'dstfrm' => $this->form_name,
-					'dstfld1' => zbx_formatDomId($this->getForId())
-				] + $popup_parameters
-			] + $filter_preselect_fields,
-			'add_post_js' => false
-		];
+	public function getJavaScript(): string {
+		return $this->getMultiselect()->getPostJS();
+	}
 
-		$this->multiselect = (new CMultiSelect($options))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired($this->isRequired());
+	protected function getObjectName(): string {
+		return '';
+	}
+
+	protected function getPopupParameters(): array {
+		return [];
+	}
+
+	protected function getFilterPreselectFields(): array {
+		return [];
+	}
+
+	private function getId(): string {
+		return $this->field->getName().($this->field->isMultiple() ? '[]' : '');
+	}
+
+	private function getMultiselect(): CMultiSelect {
+		if ($this->multiselect === null) {
+			$options = [
+				'name' => $this->getId(),
+				'object_name' => $this->getObjectName(),
+				'multiple' => $this->field->isMultiple(),
+				'data' => $this->data,
+				'add_post_js' => false
+			];
+
+			if ($this->custom_select) {
+				$options['custom_select'] = true;
+			}
+			else {
+				$options['popup'] = [
+					'parameters' => [
+						'dstfrm' => $this->form_name,
+						'dstfld1' => zbx_formatDomId($this->getId())
+					] + $this->getPopupParameters() + $this->field->getFilterParameters()
+				];
+
+				$filter_preselect_fields = $this->getFilterPreselectFields();
+
+				if ($filter_preselect_fields) {
+					$options['popup']['filter_preselect_fields'] = $filter_preselect_fields;
+				}
+			}
+
+			$this->multiselect = (new CMultiSelect($options))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired($this->isRequired());
+		}
 
 		return $this->multiselect;
-	}
-
-	private function getForId(): string {
-		return $this->field->getName().($this->field->isMultiple() ? '[]' : '').'_ms';
 	}
 }

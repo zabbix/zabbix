@@ -60,13 +60,7 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 				(new CWidgetFieldRadioButtonList('show_type', _('Show'), [
 					WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS => _('Host groups'),
 					WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS => _('Totals')
-				]))
-					->setDefault(WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS)
-					->setAction('var disabled = jQuery(this).filter("[value=\''.WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS.'\']")'. // TODO: AS Move to widget js
-						'.is(":checked");'.
-						'jQuery("#hide_empty_groups").prop("disabled", !disabled);'.
-						'jQuery("#layout input").prop("disabled", disabled)'
-					)
+				]))->setDefault(WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('layout', _('Layout'), [
@@ -75,8 +69,8 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 				]))
 					->setDefault(STYLE_HORIZONTAL)
 					->setFlags(
-						array_key_exists('show_type', $this->values)
-							&& $this->values['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS
+						!array_key_exists('show_type', $this->values)
+							|| !$this->values['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS
 						? CWidgetField::FLAG_DISABLED
 						: 0x00
 					)

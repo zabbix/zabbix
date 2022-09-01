@@ -17,17 +17,22 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
 
 
-window.widget_problems_form = new class {
+class CWidgetFieldMultiSelectItemPrototypeView extends CWidgetFieldMultiSelectView {
 
-	init({sort_with_enabled_show_timeline}) {
-		document.getElementById('sort_triggers').addEventListener('change', (e) => {
-			const show_timeline = document.getElementById('show_timeline');
-
-			show_timeline.disabled = !sort_with_enabled_show_timeline[e.target.value];
-			show_timeline.checked = !show_timeline.disabled;
-		});
+	public function __construct(CWidgetFieldMultiSelectItemPrototype $field, array $data) {
+		parent::__construct($field, $data);
 	}
-};
+
+	protected function getObjectName(): string {
+		return 'item_prototypes';
+	}
+
+	protected function getPopupParameters(): array {
+		return [
+			'srctbl' => 'item_prototypes',
+			'srcfld1' => 'itemid'
+		];
+	}
+}

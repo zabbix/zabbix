@@ -279,7 +279,7 @@ class testSID extends CWebTest {
 
 			// Template dashboard widget edit.
 			[[
-				'link' => 'zabbix.php?action=dashboard.widget.edit&templateid=10076', // TODO: AS - need fix
+				'link' => 'zabbix.php?action=dashboard.widget.edit&templateid=10076', // TODO AS: - need fix
 				'json_output' => true
 			]],
 

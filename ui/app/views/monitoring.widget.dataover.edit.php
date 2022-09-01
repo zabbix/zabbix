@@ -27,4 +27,22 @@
  */
 
 (new CWidgetFormView($data))
+	->addField(
+		new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['ms']['groups']['groupids'])
+	)
+	->addField(
+		new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
+	)
+	->addField(
+		new CWidgetFieldTagsView($data['fields']['tags'])
+	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['style'])
+	)
 	->show();

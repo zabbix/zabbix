@@ -27,4 +27,7 @@
  */
 
 (new CWidgetFormView($data))
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['info_type'])
+	)
 	->show();

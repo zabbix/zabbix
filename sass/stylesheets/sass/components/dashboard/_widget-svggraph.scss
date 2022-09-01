@@ -1,6 +1,11 @@
 // Widget configuration.
 
 form.dashboard-widget-svggraph {
+	.svg-graph-preview,
+	.graph-widget-config-tabs {
+		grid-column: 1 / -1;
+	}
+
 	.graph-widget-config-tabs {
 		padding: 10px 0;
 

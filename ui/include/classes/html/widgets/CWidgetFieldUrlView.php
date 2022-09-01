@@ -15,34 +15,19 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
-/**
- * System information widget form view.
- *
- * @var CView $this
- * @var array $data
- */
+class CWidgetFieldUrlView extends CWidgetFieldView {
 
-$fields = $data['fields'];
+	public function __construct(CWidgetFieldUrl $field) {
+		$this->field = $field;
+	}
 
-$form = CWidgetHelper::createForm();
-
-$form_grid = CWidgetHelper::createFormGrid($data['name'], $data['type'],
-	$data['view_mode'], $data['known_types'],
-	$data['templateid'] === null ? $fields['rf_rate'] : null
-);
-
-// Show.
-$form_grid->addItem([
-	CWidgetHelper::getLabel($fields['info_type']),
-	new CFormField(CWidgetHelper::getRadioButtonList($fields['info_type']))
-]);
-
-$form->addItem($form_grid);
-
-return [
-	'form' => $form
-];
+	public function getView(): CTextBox {
+		return (new CTextBox($this->field->getName(), $this->field->getValue()))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired($this->isRequired());
+	}
+}

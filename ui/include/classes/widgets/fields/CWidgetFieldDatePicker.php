@@ -21,6 +21,8 @@
 
 class CWidgetFieldDatePicker extends CWidgetField {
 
+	public const DEFAULT_VALUE = '';
+
 	private bool $is_date_only;
 
 	public function __construct(string $name, string $label = null, bool $is_date_only = false) {
@@ -29,7 +31,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		$this->is_date_only = $is_date_only;
 
 		$this
-			->setDefault('')
+			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules([
 				'type' => API_STRING_UTF8,

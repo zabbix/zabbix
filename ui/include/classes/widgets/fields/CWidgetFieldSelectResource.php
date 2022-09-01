@@ -21,6 +21,8 @@
 
 class CWidgetFieldSelectResource extends CWidgetField {
 
+	public const DEFAULT_VALUE = '0';
+
 	private string $resource_type;
 
 	private array $popup_options = [
@@ -44,7 +46,7 @@ class CWidgetFieldSelectResource extends CWidgetField {
 			'dstfld2' => $this->name.'_caption'
 		]);
 
-		$this->setDefault('0');
+		$this->setDefault(self::DEFAULT_VALUE);
 	}
 
 	public function getResourceType(): int {

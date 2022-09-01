@@ -83,7 +83,7 @@ class CWidgetFormClock extends CWidgetForm {
 				new CWidgetFieldCheckBox('date_bold', _('Bold'))
 			)
 			->addField(
-				new CWidgetFieldColor('date_color', _('Color'))
+				(new CWidgetFieldColor('date_color', _('Color')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('time_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
@@ -93,7 +93,7 @@ class CWidgetFormClock extends CWidgetForm {
 				new CWidgetFieldCheckBox('time_bold', _('Bold'))
 			)
 			->addField(
-				new CWidgetFieldColor('time_color', _('Color'))
+				(new CWidgetFieldColor('time_color', _('Color')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('time_sec', _('Seconds')))->setDefault(1)
@@ -112,7 +112,7 @@ class CWidgetFormClock extends CWidgetForm {
 				new CWidgetFieldCheckBox('tzone_bold', _('Bold'))
 			)
 			->addField(
-				new CWidgetFieldColor('tzone_color', _('Color'))
+				(new CWidgetFieldColor('tzone_color', _('Color')))->allowInherited()
 			)
 			->addField(
 				(new CWidgetFieldTimeZone('tzone_timezone', _('Time zone')))

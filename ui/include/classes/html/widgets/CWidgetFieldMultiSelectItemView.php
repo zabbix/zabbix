@@ -22,14 +22,17 @@
 class CWidgetFieldMultiSelectItemView extends CWidgetFieldMultiSelectView {
 
 	public function __construct(CWidgetFieldMultiSelectItem $field, array $data) {
-		$this->field = $field;
-		$this->data = $data;
+		parent::__construct($field, $data);
 	}
 
-	public function getView(): CMultiSelect {
-		return $this->getMultiselect('items', [
+	protected function getObjectName(): string {
+		return 'items';
+	}
+
+	protected function getPopupParameters(): array {
+		return [
 			'srctbl' => 'items',
 			'srcfld1' => 'itemid'
-		] + $this->field->getFilterParameters());
+		];
 	}
 }

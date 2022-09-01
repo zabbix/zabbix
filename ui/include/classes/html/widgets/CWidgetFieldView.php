@@ -22,7 +22,10 @@
 abstract class CWidgetFieldView {
 
 	protected CWidgetField $field;
+
 	protected string $form_name = '';
+
+	protected string $help_hint = '';
 
 	public function setFormName($form_name): self {
 		$this->form_name = $form_name;
@@ -30,10 +33,22 @@ abstract class CWidgetFieldView {
 		return $this;
 	}
 
+	public function setHelpHint(string $help_hint): self {
+		$this->help_hint = $help_hint;
+
+		return $this;
+	}
+
 	public function getLabel(): ?CLabel {
 		$label = $this->field->getLabel();
 
-		return $label !== null ? new CLabel($label) : null;
+		if ($label === null) {
+			return null;
+		}
+
+		$help_hint = $this->help_hint !== '' ? makeHelpIcon($this->help_hint) : null;
+
+		return new CLabel([$label, $help_hint]);
 	}
 
 	/**

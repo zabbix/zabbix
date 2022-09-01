@@ -21,9 +21,7 @@
 
 class CWidgetFieldNumericBox extends CWidgetField {
 
-	private int $width = ZBX_TEXTAREA_NUMERIC_BIG_WIDTH;
-
-	private string $placeholder = '';
+	public const DEFAULT_VALUE = '';
 
 	/**
 	 * A numeric box widget field.
@@ -32,28 +30,9 @@ class CWidgetFieldNumericBox extends CWidgetField {
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' => API_NUMERIC, 'length' => 255]);
-		$this->setDefault('');
-	}
-
-	public function getPlaceholder(): string {
-		return $this->placeholder;
-	}
-
-	public function setPlaceholder(string $placeholder): self {
-		$this->placeholder = $placeholder;
-
-		return $this;
-	}
-
-	public function getWidth(): int {
-		return $this->width;
-	}
-
-	public function setWidth(int $width): self {
-		$this->width = $width;
-
-		return $this;
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
+			->setValidationRules(['type' => API_NUMERIC, 'length' => 255]);
 	}
 }

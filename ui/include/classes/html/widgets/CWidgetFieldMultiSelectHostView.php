@@ -22,17 +22,23 @@
 class CWidgetFieldMultiSelectHostView extends CWidgetFieldMultiSelectView {
 
 	public function __construct(CWidgetFieldMultiSelectHost $field, array $data) {
-		$this->field = $field;
-		$this->data = $data;
+		parent::__construct($field, $data);
 	}
 
-	public function getView(): CMultiSelect {
-		return $this->getMultiselect('hosts', [
+	protected function getObjectName(): string {
+		return 'hosts';
+	}
+
+	protected function getPopupParameters(): array {
+		return [
 			'srctbl' => 'hosts',
 			'srcfld1' => 'hostid'
-		] + $this->field->getFilterParameters(),
-		[
+		];
+	}
+
+	protected function getFilterPreselectFields(): array {
+		return [
 			'hostgroups' => 'groupids_'
-		]);
+		];
 	}
 }

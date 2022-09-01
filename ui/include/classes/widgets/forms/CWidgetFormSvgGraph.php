@@ -244,8 +244,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldTextBox('percentile_left_value', null))
-					->setPlaceholder(_('value'))
-					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					->setFlags(!$this->percentile_left_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -253,8 +251,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldTextBox('percentile_right_value', null))
-					->setPlaceholder(_('value'))
-					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					->setFlags(!$this->percentile_right_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			);
 	}
@@ -289,13 +285,11 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('lefty_min', _('Min')))
-					->setPlaceholder(_('calculated'))
 					->setFullName(_('Left Y').'/'._('Min'))
 					->setFlags(!$this->lefty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('lefty_max', _('Max')))
-					->setPlaceholder(_('calculated'))
 					->setFullName(_('Left Y').'/'._('Max'))
 					->setFlags(!$this->lefty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
@@ -309,8 +303,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldTextBox('lefty_static_units'))
-					->setPlaceholder(_('value'))
-					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					->setFlags(!$this->lefty_on || !$this->lefty_units_static ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -318,13 +310,11 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('righty_min', _('Min')))
-					->setPlaceholder(_('calculated'))
 					->setFullName(_('Right Y').'/'._('Min'))
 					->setFlags(!$this->righty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('righty_max', _('Max')))
-					->setPlaceholder(_('calculated'))
 					->setFullName(_('Right Y').'/'._('Max'))
 					->setFlags(!$this->righty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
@@ -338,8 +328,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldTextBox('righty_static_units', null))
-					->setPlaceholder(_('value'))
-					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					->setFlags(!$this->righty_on || !$this->righty_units_static ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -384,7 +372,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldHostPatternSelect('problemhosts', _('Problem hosts')))
-					->setPlaceholder(_('host pattern'))
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -393,7 +380,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldTextBox('problem_name', _('Problem')))
-					->setPlaceholder(_('problem pattern'))
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(

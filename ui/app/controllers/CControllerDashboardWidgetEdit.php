@@ -101,8 +101,7 @@ class CControllerDashboardWidgetEdit extends CController {
 			'captions' => $this->getCaptions($form),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-//			'templateid' => $templateid, // TODO: AS - really needs templateid?
+			]
 		]));
 	}
 

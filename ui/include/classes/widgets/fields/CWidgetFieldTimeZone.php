@@ -19,50 +19,29 @@
 **/
 
 
-class CWidgetFieldTimeZone extends CWidgetField {
+class CWidgetFieldTimeZone extends CWidgetFieldSelect {
 
-	private array $values;
+	public const DEFAULT_VALUE = '';
 
 	public function __construct(string $name, string $label = null, array $values = null) {
-		parent::__construct($name, $label);
-
-		if ($values === null) {
-			$this->values = $this->generateValues();
-		}
+		parent::__construct($name, $label, $values === null
+			? [
+				ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(),
+					_('System default')
+				),
+				TIMEZONE_DEFAULT_LOCAL => _('Local default')
+			] + CTimezoneHelper::getList()
+			: null
+		);
 
 		$this
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
-			->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
-	public function getValues(): array {
-		return $this->values;
-	}
+	public function setValue($value): self {
+		$this->value = $value;
 
-	public function getJavaScript(): string {
-		return '
-			var timezone_select = document.getElementById("'.$this->getName().'");
-			var timezone_from_list = timezone_select.getOptionByValue(Intl.DateTimeFormat().resolvedOptions().timeZone);
-			var local_list_item = timezone_select.getOptionByValue("'.TIMEZONE_DEFAULT_LOCAL.'");
-
-			if (timezone_from_list && local_list_item) {
-				const title = `${local_list_item.label}: ${timezone_from_list.label}`;
-				local_list_item.label = title;
-				local_list_item._node.innerText = title;
-
-				if (timezone_select.selectedIndex === local_list_item._index) {
-					timezone_select._preselect(timezone_select.selectedIndex);
-				}
-			}
-		';
-	}
-
-	private function generateValues(): array {
-		return [
-			ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(),
-				_('System default')
-			),
-			TIMEZONE_DEFAULT_LOCAL => _('Local default')
-		] + CTimezoneHelper::getList();
+		return $this;
 	}
 }

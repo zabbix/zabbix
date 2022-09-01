@@ -21,13 +21,13 @@
 
 class CWidgetFieldTextArea extends CWidgetField {
 
-	private int $width = ZBX_TEXTAREA_STANDARD_WIDTH;
+	public const DEFAULT_VALUE = '';
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this
-			->setDefault('')
+			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
@@ -42,16 +42,6 @@ class CWidgetFieldTextArea extends CWidgetField {
 		else {
 			$this->setStrictValidationRules();
 		}
-
-		return $this;
-	}
-
-	public function getWidth(): int {
-		return $this->width;
-	}
-
-	public function setWidth(int $width): self {
-		$this->width = $width;
 
 		return $this;
 	}

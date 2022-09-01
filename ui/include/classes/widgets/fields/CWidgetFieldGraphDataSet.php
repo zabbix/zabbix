@@ -24,6 +24,11 @@
  */
 class CWidgetFieldGraphDataSet extends CWidgetField {
 
+	public const DEFAULT_VALUE = [];
+
+	public const DATASET_TYPE_SINGLE_ITEM = 0;
+	public const DATASET_TYPE_PATTERN_ITEM = 1;
+
 	// Predefined colors for data-sets in JSON format. Each next data set takes next sequential value from palette.
 	public const DEFAULT_COLOR_PALETTE = [
 		'FF465C', 'B0AF07', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D',
@@ -37,10 +42,10 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		parent::__construct($name, $label);
 
 		$this
-			->setDefault([])
+			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-				'dataset_type'			=> ['type' => API_INT32, 'in' => implode(',', [CWidgetHelper::DATASET_TYPE_SINGLE_ITEM, CWidgetHelper::DATASET_TYPE_PATTERN_ITEM])],
+				'dataset_type'			=> ['type' => API_INT32, 'in' => implode(',', [self::DATASET_TYPE_SINGLE_ITEM, self::DATASET_TYPE_PATTERN_ITEM])],
 				'hosts'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
 				'items'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
 				'itemids'				=> ['type' => API_IDS, 'flags' => null],
@@ -91,7 +96,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 
 	public static function getDefaults(): array {
 		return [
-			'dataset_type' => CWidgetHelper::DATASET_TYPE_PATTERN_ITEM,
+			'dataset_type' => self::DATASET_TYPE_PATTERN_ITEM,
 			'hosts' => [],
 			'items' => [],
 			'itemids' => [],
@@ -110,6 +115,29 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'aggregate_grouping'=> GRAPH_AGGREGATE_BY_ITEM,
 			'approximation' => APPROXIMATION_AVG
 		];
+	}
+
+	public static function getItemNames(array $itemids): array {
+		$names = [];
+
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name'],
+			'selectHosts' => ['hostid', 'name'],
+			'webitems' => true,
+			'itemids' => $itemids,
+			'preservekeys' => true
+		]);
+
+		if (!$items) {
+			return $names;
+		}
+
+		foreach ($items as $item) {
+			$hosts = array_column($item['hosts'], 'name', 'hostid');
+			$names[$item['itemid']] = $hosts[$item['hostid']].NAME_DELIMITER.$item['name'];
+		}
+
+		return $names;
 	}
 
 	public function validate(bool $strict = false): array {
@@ -141,7 +169,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			foreach ($value as $i => $data) {
 				$validation_rules_by_type = $validation_rules;
 
-				if ($data['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
+				if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
 					$validation_rules_by_type['fields']['itemids']['flags'] |= API_REQUIRED;
 					$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
 
@@ -215,8 +243,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					'value' => $itemid
 				];
 			}
-			// Field "color" stored as array for dataset type CWidgetHelper::DATASET_TYPE_SINGLE_ITEM (0)
-			if ($val['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
+			// Field "color" stored as array for dataset type DATASET_TYPE_SINGLE_ITEM (0)
+			if ($val['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
 				foreach ($val['color'] as $num => $color) {
 					$widget_fields[] = [
 						'type' => ZBX_WIDGET_FIELD_TYPE_STR,

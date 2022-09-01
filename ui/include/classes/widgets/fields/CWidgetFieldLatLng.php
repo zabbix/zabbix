@@ -21,8 +21,7 @@
 
 class CWidgetFieldLatLng extends CWidgetField {
 
-	private string $placeholder = '40.6892494,-74.0466891';
-	private int $width = ZBX_TEXTAREA_MEDIUM_WIDTH;
+	public const DEFAULT_VALUE = '';
 
 	/**
 	 * Latitude, longitude and zoom level input text box widget field.
@@ -31,16 +30,8 @@ class CWidgetFieldLatLng extends CWidgetField {
 		parent::__construct($name, $label);
 
 		$this
-			->setDefault('')
+			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_LAT_LNG_ZOOM, 'length' => 255]);
-	}
-
-	public function getPlaceholder(): string {
-		return $this->placeholder;
-	}
-
-	public function getWidth(): int {
-		return $this->width;
 	}
 }

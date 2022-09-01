@@ -24,8 +24,20 @@
  */
 class CWidgetFormProblems extends CWidgetForm {
 
+	private bool $show_tags = false;
+
 	public function __construct(array $values, ?string $templateid) {
 		parent::__construct(WIDGET_PROBLEMS, $values, $templateid);
+	}
+
+	protected function normalizeValues(array $values): array {
+		$values = self::convertDottedKeys($values);
+
+		if (array_key_exists('show_tags', $values)) {
+			$this->show_tags = $values['show_tags'] !== SHOW_TAGS_NONE;
+		}
+
+		return $values;
 	}
 
 	protected function addFields(): self {
@@ -69,22 +81,20 @@ class CWidgetFormProblems extends CWidgetForm {
 					SHOW_TAGS_1 => SHOW_TAGS_1,
 					SHOW_TAGS_2 => SHOW_TAGS_2,
 					SHOW_TAGS_3 => SHOW_TAGS_3
-				]))
-					->setDefault(SHOW_TAGS_NONE)
-					->setAction('var disabled = jQuery(this).filter("[value=\''.SHOW_TAGS_NONE.'\']").is(":checked");'. // TODO: AS move to widget js
-						'jQuery("#tag_priority").prop("disabled", disabled);'.
-						'jQuery("#tag_name_format input").prop("disabled", disabled)'
-					)
+				]))->setDefault(SHOW_TAGS_NONE)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('tag_name_format', _('Tag name'), [
 					TAG_NAME_FULL => _('Full'),
 					TAG_NAME_SHORTENED => _('Shortened'),
 					TAG_NAME_NONE => _('None')
-				]))->setDefault(TAG_NAME_FULL)
+				]))
+					->setDefault(TAG_NAME_FULL)
+					->setFlags($this->show_tags ? 0x00 : CWidgetField::FLAG_DISABLED)
 			)
 			->addField(
-				new CWidgetFieldTextBox('tag_priority', _('Tag display priority'))
+				(new CWidgetFieldTextBox('tag_priority', _('Tag display priority')))
+					->setFlags($this->show_tags ? 0x00 : CWidgetField::FLAG_DISABLED)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('show_opdata', _('Show operational data'), [

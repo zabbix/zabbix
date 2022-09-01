@@ -27,4 +27,50 @@
  */
 
 (new CWidgetFormView($data))
+	->addField(
+		new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['ms']['groups']['groupids'])
+	)
+	->addField(
+		new CWidgetFieldMultiSelectGroupView($data['fields']['exclude_groupids'],
+			$data['captions']['ms']['groups']['exclude_groupids']
+		)
+	)
+	->addField(
+		new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids'])
+	)
+	->addField(
+		new CWidgetFieldTextBoxView($data['fields']['problem'])
+	)
+	->addField(
+		new CWidgetFieldSeveritiesView($data['fields']['severities'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
+	)
+	->addField(
+		new CWidgetFieldTagsView($data['fields']['tags'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['show_type'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['layout'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['show_opdata'])
+	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
+	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['hide_empty_groups'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['ext_ack'])
+	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['show_timeline'])
+	)
+	->includeJsFile('js/monitoring.widget.problemsbysv.edit.js.php')
+	->addJavaScript('widget_problemsbysv_form.init();')
 	->show();

@@ -21,11 +21,13 @@
 
 class CWidgetFieldNavTree extends CWidgetField {
 
+	public const DEFAULT_VALUE = [];
+
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this
-			->setDefault([])
+			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_OBJECTS, 'flags' => API_PRESERVE_KEYS, 'fields' => [
 				'name'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],

@@ -27,4 +27,11 @@
  */
 
 (new CWidgetFormView($data))
+	->addField(
+		new CWidgetFieldUrlView($data['fields']['url'])
+	)
+	->addField(array_key_exists('dynamic', $data['fields'])
+		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+		: null
+	)
 	->show();

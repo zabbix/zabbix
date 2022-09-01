@@ -29,12 +29,11 @@ form.dashboard-widget-clock {
 		}
 
 		&.fields-group-tzone {
-			.field-format {
-				grid-column: 2 / -1;
-			}
-
-			.field-timezone {
-				grid-column: 2 / -1;
+			.form-field {
+				&.field-tzone-timezone,
+				&.field-tzone-format {
+					grid-column: 2 / -1;
+				}
 			}
 		}
 	}

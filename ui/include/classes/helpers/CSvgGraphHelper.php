@@ -109,7 +109,7 @@ class CSvgGraphHelper {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM) {
 				continue;
 			}
 
@@ -179,7 +179,7 @@ class CSvgGraphHelper {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetHelper::DATASET_TYPE_PATTERN_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
 				continue;
 			}
 
