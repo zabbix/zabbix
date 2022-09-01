@@ -40,7 +40,7 @@ if (!hasRequest('form_refresh')) {
 $form = (new CForm())
 	->setId('templates-form')
 	->setName('templatesForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['templateid'] != 0) {
@@ -142,7 +142,7 @@ $templates_field_items[] = (new CMultiSelect([
 
 $template_tab
 	->addRow(
-		new CLabel(_('Templates')),
+		new CLabel(_('Templates'), 'add_templates__ms'),
 		(count($templates_field_items) > 1)
 			? (new CDiv($templates_field_items))->addClass('linked-templates')
 			: $templates_field_items

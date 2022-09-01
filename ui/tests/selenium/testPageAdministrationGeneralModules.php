@@ -582,7 +582,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			if (CTestArrayHelper::get($entry, 'check_disabled', true)) {
 				$this->page->open('zabbix.php?action='.$entry['action'])->waitUntilReady();
 				$message = CMessageElement::find()->one();
-				$this->assertStringContainsString('Class not found for action '.$entry['action'], $message->getText());
+				$this->assertStringContainsString('Class not found', $message->getText());
 				$this->page->open('zabbix.php?action=module.list');
 			}
 		}

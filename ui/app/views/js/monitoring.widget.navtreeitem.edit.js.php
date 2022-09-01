@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,20 +18,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package mongodb
 
-import (
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-	"gopkg.in/mgo.v2/bson"
-)
+/**
+ * @var CView $this
+ */
+?>
 
-// jumboChunksHandler
-// https://docs.mongodb.com/manual/core/sharding-data-partitioning/#indivisible-jumbo-chunks
-func jumboChunksHandler(s Session, _ map[string]string) (interface{}, error) {
-	jumboChunks, err := s.DB("config").C("chunks").Find(bson.M{"jumbo": true}).Count()
-	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+window.navtreeitem_edit_popup = new class {
+	init() {
+		jQuery('#sysmapname').on('change', (e) => {
+			const name_input = document.getElementById('name');
+
+			if (name_input.value === '') {
+				name_input.value = e.target.value;
+			}
+		});
+
+		document.getElementById('select').addEventListener('click', () => {
+			return PopUp('popup.generic', {
+				srctbl: 'sysmaps',
+				srcfld1: 'sysmapid',
+				srcfld2: 'name',
+				dstfrm: 'widget_dialogue_form',
+				dstfld1: 'sysmapid',
+				dstfld2: 'sysmapname'
+			}, {dialogue_class: 'modal-popup-generic'});
+		});
 	}
-
-	return jumboChunks, nil
-}
+};

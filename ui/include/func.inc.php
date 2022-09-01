@@ -202,7 +202,7 @@ function zbx_date2str($format, $time = null, string $timezone = null) {
 	}
 	else {
 		$prefix = '';
-		$datetime = new DateTime('@'.$time);
+		$datetime = new DateTime('@'.(int) $time);
 	}
 
 	$datetime->setTimezone(new DateTimeZone($timezone ?? date_default_timezone_get()));
@@ -589,7 +589,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 
 	$units = [
 		'years' => _x('y', 'year short'),
-		'months' => _x('m', 'month short'),
+		'months' => _x('M', 'month short'),
 		'days' => _x('d', 'day short'),
 		'hours' => _x('h', 'hour short'),
 		'minutes' => _x('m', 'minute short'),
@@ -2159,11 +2159,11 @@ function hasErrorMessages() {
 /**
  * Clears table rows selection's cookies.
  *
- * @param string $parentid  parent ID, is used as sessionStorage suffix
- * @param array  $keepids   checked rows ids
+ * @param string $name     entity name, used as sessionStorage suffix
+ * @param array  $keepids  checked rows ids
  */
-function uncheckTableRows($parentid = null, $keepids = []) {
-	$key = implode('_', array_filter(['cb', basename($_SERVER['SCRIPT_NAME'], '.php'), $parentid]));
+function uncheckTableRows($name = null, $keepids = []) {
+	$key = 'cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').($name !== null ? '_'.$name : '');
 
 	if ($keepids) {
 		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.
@@ -2231,19 +2231,14 @@ function splitPath($path) {
  * @param string   $color  a hexadecimal color identifier like "1F2C33"
  * @param int      $alpha
  *
- * @return int|false
+ * @return int
  */
 function get_color($image, $color, $alpha = 0) {
 	$red = hexdec('0x'.substr($color, 0, 2));
 	$green = hexdec('0x'.substr($color, 2, 2));
 	$blue = hexdec('0x'.substr($color, 4, 2));
 
-	if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
-			&& @imagecreatetruecolor(1, 1)) {
-		return imagecolorexactalpha($image, $red, $green, $blue, $alpha);
-	}
-
-	return imagecolorallocate($image, $red, $green, $blue);
+	return imagecolorexactalpha($image, $red, $green, $blue, $alpha);
 }
 
 /**

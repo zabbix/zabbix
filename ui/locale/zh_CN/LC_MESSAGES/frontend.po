@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-04-10 07:21+0000\n"
+"PO-Revision-Date: 2022-03-02 20:03+0000\n"
 "Last-Translator: Yanan <wangyanan@grandage.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -2174,7 +2174,6 @@ msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
-#, fuzzy
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
 msgstr[0] "无法删除关联"
@@ -2191,7 +2190,6 @@ msgid "Cannot delete dependency"
 msgstr "无法删除依赖关系"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "无法删除自动发现规则"
@@ -2328,7 +2326,6 @@ msgid "Cannot delete selected actions"
 msgstr "无法删除所选的动作"
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "无法删除服务"
@@ -3558,6 +3555,10 @@ msgstr "不允许环形模板链接."
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
 
+#: include/classes/core/ZBase.php:494
+msgid "Class not found."
+msgstr ""
+
 #: include/views/configuration.httpconf.list.php:217
 #: include/views/configuration.item.list.php:297
 msgid "Clear history"
@@ -3735,6 +3736,13 @@ msgstr ""
 #: app/views/administration.proxy.list.php:79
 msgid "Compression"
 msgstr "压缩"
+
+#: app/views/administration.housekeeping.edit.php:163
+#: app/views/administration.housekeeping.edit.php:168
+#: app/views/administration.housekeeping.edit.php:173
+#: app/views/administration.housekeeping.edit.php:183
+msgid "Compression is not supported."
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:319
 msgid "Concurrent sessions"
@@ -4171,7 +4179,6 @@ msgid "Correlation added"
 msgstr "关联项添加"
 
 #: app/controllers/CControllerCorrelationDelete.php:65
-#, fuzzy
 msgid "Correlation deleted"
 msgid_plural "Correlations deleted"
 msgstr[0] "删除关联项"
@@ -5402,6 +5409,10 @@ msgstr "细节"
 msgid "Details of web scenario"
 msgstr "网络方案详细信息"
 
+#: app/views/administration.housekeeping.edit.php:194
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr ""
@@ -5745,7 +5756,6 @@ msgid "Discovery rule created"
 msgstr "自动发现规则已创建"
 
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:416
-#, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] "自动发现规则已删除"
@@ -6432,6 +6442,13 @@ msgstr "错误信息"
 #: app/partials/administration.system.info.php:161
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
 msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
@@ -7124,7 +7141,6 @@ msgstr "前端信息中"
 #: app/partials/monitoring.latest.filter.php:153
 #: app/partials/monitoring.problem.filter.php:221
 #: include/classes/widgets/forms/CWidgetFormProblems.php:138
-#, fuzzy
 msgid "Full"
 msgstr "填满"
 
@@ -7656,7 +7672,6 @@ msgid "Hide sidebar"
 msgstr ""
 
 #: include/classes/html/CBreadcrumbs.php:40
-#, fuzzy
 msgctxt "screen reader"
 msgid "Hierarchy"
 msgstr "阶"
@@ -10672,7 +10687,6 @@ msgid "Left trim"
 msgstr "修整左边"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:308
-#, fuzzy
 msgid "Legend"
 msgstr "图例"
 
@@ -10935,6 +10949,11 @@ msgstr "M"
 msgctxt "Monday short"
 msgid "M"
 msgstr "M"
+
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr ""
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
@@ -11530,6 +11549,11 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:106
 #, c-format
 msgid "Minimum required PHP version is %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:174
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:193
@@ -12816,6 +12840,10 @@ msgstr "Zabbix 数据库中的监控项数量"
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "系统代理程序历史数据中未发送给服务端的监控项数量"
 
+#: include/classes/data/CItemData.php:1668
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "队列中延时秒数的项目的数量，包括."
@@ -13680,6 +13708,10 @@ msgstr "上层探索规则"
 msgid "Parent graphs"
 msgstr "父图表"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
 msgid "Parent items"
@@ -13798,7 +13830,6 @@ msgid "Pattern"
 msgstr ""
 
 #: actionconf.php:82 include/views/configuration.action.edit.php:475
-#, fuzzy
 msgid "Pause operations for suppressed problems"
 msgstr "暂停操作以制止问题"
 
@@ -13994,6 +14025,10 @@ msgstr "葡萄牙语 (pt_PT)"
 msgid "Position"
 msgstr ""
 
+#: include/classes/widgets/views/widget.item.form.view.php:142
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "发布字段"
@@ -14001,6 +14036,10 @@ msgstr "发布字段"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "发布类型"
+
+#: app/views/administration.housekeeping.edit.php:164
+msgid "PostgreSQL database server version is too old."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -14899,7 +14938,6 @@ msgstr "报表"
 #: include/views/configuration.host.discovery.edit.php:307
 #: include/views/configuration.item.edit.php:363
 #: include/views/configuration.item.prototype.edit.php:349
-#, fuzzy
 msgid "Request body"
 msgstr "请求正文"
 
@@ -14907,7 +14945,6 @@ msgstr "请求正文"
 #: include/views/configuration.host.discovery.edit.php:296
 #: include/views/configuration.item.edit.php:352
 #: include/views/configuration.item.prototype.edit.php:338
-#, fuzzy
 msgid "Request body type"
 msgstr "请求 body 类型"
 
@@ -15180,7 +15217,6 @@ msgstr "右"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:199
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:214
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:505
-#, fuzzy
 msgid "Right Y"
 msgstr "Right Y"
 
@@ -15963,7 +15999,6 @@ msgid "Service data storage period"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "服务已删除"
@@ -17254,6 +17289,10 @@ msgstr "模板"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "模板\"%1$s\"自主机\"%2$s\"断连."
 
+#: app/partials/configuration.host.edit.html.php:215
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr ""
@@ -17595,7 +17634,6 @@ msgid "Time"
 msgstr "时间"
 
 #: include/classes/data/CItemData.php:1673
-#, fuzzy
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "乘以一个特定的 Zabbix 进程或一组进程（由 <type> 和 <mode> 标识）花费在 <state> 中的百分比。"
 
@@ -18361,6 +18399,14 @@ msgstr ""
 msgid "Unable to overwrite the existing configuration file."
 msgstr "无法覆盖已经存在的配置文件。"
 
+#: app/views/administration.housekeeping.edit.php:159
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr ""
@@ -18533,6 +18579,26 @@ msgstr "自模板断开链接"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "取消静音"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:188
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -18719,6 +18785,10 @@ msgstr ""
 
 #: jsLoader.php:402
 msgid "Use default"
+msgstr ""
+
+#: app/partials/configuration.host.edit.html.php:216
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
 msgstr ""
 
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
@@ -19615,9 +19685,23 @@ msgstr "设置"
 msgid "Warning message"
 msgstr ""
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
 msgstr ""
 
 #: jsLoader.php:301

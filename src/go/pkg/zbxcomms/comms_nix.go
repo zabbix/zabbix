@@ -1,3 +1,6 @@
+//go:build !windows
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,19 +20,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package mongodb
+package zbxcomms
 
-const (
-	pingFailed = 0
-	pingOk     = 1
+import (
+	"fmt"
+	"net"
+
+	"zabbix.com/pkg/tls"
 )
 
-// pingHandler executes 'ping' command and returns pingOk if a connection is alive or pingFailed otherwise.
-// https://docs.mongodb.com/manual/reference/command/ping/index.html
-func pingHandler(s Session, _ map[string]string) (interface{}, error) {
-	if err := s.Ping(); err != nil {
-		return pingFailed, nil
-	}
+func Listen(address string, args ...interface{}) (c *Listener, err error) {
+	var tlsconfig *tls.Config
 
-	return pingOk, nil
+	if len(args) > 0 {
+		var ok bool
+		if tlsconfig, ok = args[0].(*tls.Config); !ok {
+			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
+		}
+	}
+	l, tmperr := net.Listen("tcp", address)
+	if tmperr != nil {
+		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
+	}
+	c = &Listener{listener: l.(*net.TCPListener), tlsconfig: tlsconfig}
+
+	return
 }

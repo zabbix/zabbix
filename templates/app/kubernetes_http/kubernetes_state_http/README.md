@@ -9,7 +9,7 @@ It works without external scripts and uses the script item to make HTTP requests
 
 Template `Kubernetes cluster state by HTTP` — collects metrics by HTTP agent from kube-state-metrics endpoint and Kubernetes API.
 
-Don't forget change macros {$KUBE.API.ENDPOINT.URL} and {$KUBE.API.TOKEN}.
+Don't forget change macros {$KUBE.API.URL} and {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
 
@@ -22,10 +22,20 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
+Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.0) in your Kubernetes cluster.
 Internal service metrics are collected from kube-state-metrics endpoint.
+
 Template needs to use Authorization via API token.
 
-Don't forget change macros {$KUBE.API.ENDPOINT.URL} and {$KUBE.API.TOKEN}.
+Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
+
+Get the generated service account token using the command
+
+`kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
+
+Then set it to the macro `{$KUBE.API.TOKEN}`.  
+Set `{$KUBE.STATE.ENDPOINT.NAME}` with Kube state metrics endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-kube-state-metrics`.
+
 Also, see the Macros section for a list of macros used to set trigger values.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
 
@@ -146,7 +156,7 @@ There are no template links in this template.
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas updated |<p>The number of updated replicas per deployment.</p> |DEPENDENT |kube.deployment.replicas_updated[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_deployment_status_replicas_updated{namespace="{#NAMESPACE}", deployment="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Endpoint [{#NAME}]: Address available |<p>Number of addresses available in endpoint.</p> |DEPENDENT |kube.endpoint.address_available[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_endpoint_address_available{namespace="{#NAMESPACE}", endpoint="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Endpoint [{#NAME}]: Address not ready |<p>Number of addresses not ready in endpoint.</p> |DEPENDENT |kube.endpoint.address_not_ready[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_endpoint_address_not_ready{namespace="{#NAMESPACE}", endpoint="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Endpoint [{#NAME}]: Age |<p>Endpoint age (number of secods since creation).</p> |DEPENDENT |kube.endpoint.age[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_endpoint_created{namespace="{#NAMESPACE}", endpoint="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return (Math.floor(Date.now()/1000)-Number(value))`</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Endpoint [{#NAME}]: Age |<p>Endpoint age (number of seconds since creation).</p> |DEPENDENT |kube.endpoint.age[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_endpoint_created{namespace="{#NAMESPACE}", endpoint="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return (Math.floor(Date.now()/1000)-Number(value))`</p> |
 |Kubernetes |Kubernetes: Node [{#NAME}]: CPU allocatable |<p>The CPU resources of a node that are available for scheduling.</p> |DEPENDENT |kube.node.cpu_allocatable[{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_node_status_allocatable{node="{#NAME}", resource="cpu"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Node [{#NAME}]: Memory allocatable |<p>The Memory resources of a node that are available for scheduling.</p> |DEPENDENT |kube.node.memory_allocatable[{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_node_status_allocatable{node="{#NAME}", resource="memory"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Node [{#NAME}]: Pods allocatable |<p>The Pods resources of a node that are available for scheduling.</p> |DEPENDENT |kube.node.pods_allocatable[{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_node_status_allocatable{node="{#NAME}", resource="pods"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
@@ -198,8 +208,8 @@ There are no template links in this template.
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Completion succeeded |<p>Number of job has completed its execution.</p> |DEPENDENT |kube.job.completion.succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_job_complete{namespace="{#NAMESPACE}", job_name="{#NAME}", condition="true"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Completion failed |<p>Number of job has failed its execution.</p> |DEPENDENT |kube.job.completion.failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_job_failed{namespace="{#NAMESPACE}", job_name="{#NAME}", condition="true"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Component [{#NAME}]: Healthy |<p>Cluster component healthy.</p> |DEPENDENT |kube.componentstatuses.healthy[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items.[?(@.metadata.name == "{#NAME}")].conditions[?(@.type == "Healthy")].status.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Readyz [{#NAME}]: Healthcheck |<p>Result of readyz helthcheck for component.</p> |DEPENDENT |kube.readyz.helthcheck[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name == "{#NAME}")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Livez [{#NAME}]: Healthcheck |<p>Result of livez helthcheck for component.</p> |DEPENDENT |kube.livez.helthcheck[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name == "{#NAME}")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: Readyz [{#NAME}]: Healthcheck |<p>Result of readyz healthcheck for component.</p> |DEPENDENT |kube.readyz.healthcheck[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name == "{#NAME}")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: Livez [{#NAME}]: Healthcheck |<p>Result of livez healthcheck for component.</p> |DEPENDENT |kube.livez.healthcheck[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name == "{#NAME}")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ## Triggers
 
@@ -213,8 +223,8 @@ There are no template links in this template.
 |Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatfulSet is down |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1` |HIGH | |
 |Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: Statefulset replicas mismatch |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]))<>0` |WARNING | |
 |Kubernetes: Component [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#3,,"True")<2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0` |WARNING | |
-|Kubernetes: Readyz [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}]))>0` |WARNING | |
-|Kubernetes: Livez [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}]))>0` |WARNING | |
+|Kubernetes: Readyz [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0` |WARNING | |
+|Kubernetes: Livez [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0` |WARNING | |
 
 ## Feedback
 

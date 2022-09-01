@@ -38,7 +38,7 @@ $url = (new CUrl('trigger_prototypes.php'))
 $triggersForm = (new CForm('post', $url))
 	->setId('triggers-prototype-form')
 	->setName('triggersForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addItem((new CVar('parent_discoveryid', $data['parent_discoveryid']))->removeId())
 	->addVar('expression_constructor', $data['expression_constructor'])
@@ -652,7 +652,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
 $cancelButton = $data['backurl'] !== null
-	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+	? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
 	: new CButtonCancel(url_params(['parent_discoveryid', 'context']));
 
 // append buttons to form

@@ -3637,6 +3637,10 @@ msgstr "Κυκλική σύνδεση σχεδιότυπου μη επιτρεπ
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
 
+#: include/classes/core/ZBase.php:494
+msgid "Class not found."
+msgstr ""
+
 #: include/views/configuration.httpconf.list.php:217
 #: include/views/configuration.item.list.php:297
 msgid "Clear history"
@@ -3813,6 +3817,13 @@ msgstr ""
 
 #: app/views/administration.proxy.list.php:79
 msgid "Compression"
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:163
+#: app/views/administration.housekeeping.edit.php:168
+#: app/views/administration.housekeeping.edit.php:173
+#: app/views/administration.housekeeping.edit.php:183
+msgid "Compression is not supported."
 msgstr ""
 
 #: app/views/administration.mediatype.edit.php:319
@@ -5484,6 +5495,10 @@ msgstr "Λεπτομέρειες"
 msgid "Details of web scenario"
 msgstr ""
 
+#: app/views/administration.housekeeping.edit.php:194
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr ""
@@ -6517,6 +6532,13 @@ msgstr ""
 #: app/partials/administration.system.info.php:161
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
 msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
@@ -11039,6 +11061,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "Δ"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "MAC διεύθυνση A"
@@ -11638,6 +11665,11 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:106
 #, c-format
 msgid "Minimum required PHP version is %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:174
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:193
@@ -12929,6 +12961,10 @@ msgstr "Αριθμός συλλεκτών βάσεως δεδομένων Zabbix
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Αριθμός συλλεκτών στο ιστορικό διαμεσολαβητή οι οποίοι ακόμη δεν απεστάλησαν στον εξυπηρετητή"
 
+#: include/classes/data/CItemData.php:1668
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Αριθμός συλλεκτών στην ουρά οι οποίοι καθυστερούν από έως σε δευτερόλεπτα, χωρίς αποκλεισμούς."
@@ -13794,6 +13830,10 @@ msgstr "Γονικοί κανόνες εντοπισμού"
 msgid "Parent graphs"
 msgstr "Γονικά γραφήματα"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
 msgid "Parent items"
@@ -14107,12 +14147,20 @@ msgstr "Πορτογαλικά (pt_PT)"
 msgid "Position"
 msgstr ""
 
+#: include/classes/widgets/views/widget.item.form.view.php:142
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr ""
 
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:164
+msgid "PostgreSQL database server version is too old."
 msgstr ""
 
 #: include/classes/data/CItemData.php:1377
@@ -17377,6 +17425,10 @@ msgstr "Σχεδιότυπα"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Σχεδιότυπα \"%1$s\" αποσυνδεδεμένα απο ξενιστές \"%2$s\"."
 
+#: app/partials/configuration.host.edit.html.php:215
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr ""
@@ -18490,6 +18542,14 @@ msgstr ""
 msgid "Unable to overwrite the existing configuration file."
 msgstr ""
 
+#: app/views/administration.housekeeping.edit.php:159
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr ""
@@ -18662,6 +18722,26 @@ msgstr "Αποσύνδεση από σχεδιότυπα"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Αναίρεση σίγασης"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:188
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -18849,6 +18929,10 @@ msgstr ""
 
 #: jsLoader.php:402
 msgid "Use default"
+msgstr ""
+
+#: app/partials/configuration.host.edit.html.php:216
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
 msgstr ""
 
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
@@ -19750,9 +19834,23 @@ msgstr "Προσοχή"
 msgid "Warning message"
 msgstr ""
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
 msgstr ""
 
 #: jsLoader.php:301

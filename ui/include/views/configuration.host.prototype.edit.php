@@ -47,7 +47,7 @@ $url = (new CUrl('host_prototypes.php'))
 $form = (new CForm('post', $url))
 	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', getRequest('form', 1))
 	->addVar('parent_discoveryid', $data['discovery_rule']['itemid'])
 	->addVar('tls_accept', $parent_host['tls_accept'])
@@ -174,7 +174,7 @@ else {
 }
 
 $host_tab
-	->addRow(_('Templates'),
+	->addRow(new CLabel(_('Templates'), 'add_templates__ms'),
 		(count($templates_field_items) > 1)
 			? (new CDiv($templates_field_items))->addClass('linked-templates')
 			: $templates_field_items
@@ -206,7 +206,7 @@ $host_tab->addRow(
 
 // New group prototypes.
 $host_tab->addRow(
-	_('Group prototypes'),
+	new CLabel(_('Group prototypes'), 'group_prototypes'),
 	(new CDiv(
 		(new CTable())
 			->setId('tbl_group_prototypes')
@@ -253,7 +253,8 @@ $host_tab->addRow(
 			->setModern(true)
 			->setReadonly($host_prototype['templateid'] != 0),
 		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
-			->setId('interfaces-table'),
+			->setId('interfaces-table')
+			->addClass(ZBX_STYLE_HOST_INTERFACES),
 		new CDiv(
 			(new CButton('interface-add', _('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)
@@ -302,32 +303,46 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 	// IPMI
 	$ipmi_tab = new CFormList();
 
-	$ipmi_tab->addRow(_('Authentication algorithm'),
-		(new CTextBox('ipmi_authtype', ipmiAuthTypes($parent_host['ipmi_authtype']), true))
+	$ipmi_tab->addRow(new CLabel(_('Authentication algorithm'), 'label_ipmi_authtype'),
+		(new CSelect())
+			->setValue($parent_host['ipmi_authtype'])
+			->setFocusableElementId('label_ipmi_authtype')
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->addOptions(CSelect::createOptionsFromArray(ipmiAuthTypes()))
+			->setReadonly()
+			->setId('ipmi_authtype')
 	);
-	$ipmi_tab->addRow(_('Privilege level'),
-		(new CTextBox('ipmi_privilege', ipmiPrivileges($parent_host['ipmi_privilege']), true))
+	$ipmi_tab->addRow(new CLabel(_('Privilege level'), 'label_ipmi_privilege'),
+		(new CSelect())
+			->setValue($parent_host['ipmi_privilege'])
+			->setFocusableElementId('label_ipmi_privilege')
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->addOptions(CSelect::createOptionsFromArray(ipmiPrivileges()))
+			->setReadonly()
+			->setId('ipmi_privilege')
 	);
 	$ipmi_tab->addRow(_('Username'),
-		(new CTextBox('ipmi_username', $parent_host['ipmi_username'], true))
+		(new CTextBox(null, $parent_host['ipmi_username'], true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setId('ipmi_username')
 	);
 	$ipmi_tab->addRow(_('Password'),
-		(new CTextBox('ipmi_password', $parent_host['ipmi_password'], true))
+		(new CTextBox(null, $parent_host['ipmi_password'], true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setId('ipmi_password')
 	);
 
-	$tabs->addTab('ipmiTab', _('IPMI'), $ipmi_tab);
+	$tabs->addTab('ipmi-tab', _('IPMI'), $ipmi_tab, TAB_INDICATOR_IPMI);
 }
 
-$tabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+$tabs->addTab('tags-tab', _('Tags'),
+	new CPartial('configuration.tags.tab', [
 		'source' => 'host_prototype',
 		'tags' => $data['tags'],
 		'readonly' => $data['readonly'],
 		'tabs_id' => 'tabs'
-	]), TAB_INDICATOR_TAGS
+	]),
+	TAB_INDICATOR_TAGS
 );
 
 $tabs->addTab('macroTab', _('Macros'),

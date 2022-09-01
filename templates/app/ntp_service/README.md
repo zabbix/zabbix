@@ -25,13 +25,13 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Services |NTP service is running |<p>-</p> |SIMPLE |net.tcp.service[ntp] |
+|Services |NTP service is running |<p>-</p> |SIMPLE |net.udp.service[ntp] |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|NTP service is down on {HOST.NAME} |<p>-</p> |`max(/NTP Service/net.tcp.service[ntp],#3)=0` |AVERAGE | |
+|NTP service is down on {HOST.NAME} |<p>-</p> |`max(/NTP Service/net.udp.service[ntp],#3)=0` |AVERAGE | |
 
 ## Feedback
 

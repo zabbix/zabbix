@@ -56,6 +56,7 @@ require_once dirname(__FILE__).'/CastableTrait.php';
 
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\WebDriverException;
 
 /**
  * Element selection query.
@@ -348,25 +349,35 @@ class CElementQuery implements IWaitable {
 		$class = $this->class;
 		$parent = ($this->context !== static::getDriver()) ? $this->context : null;
 
-		try {
-			if (!$this->reverse_order) {
-				$element = $this->context->findElement($this->by);
-			}
-			else {
-				$elements = $this->context->findElements($this->by);
-				if (!$elements) {
-					throw new NoSuchElementException(null);
+		for ($i = 0; $i < 2; $i++) {
+			try {
+				if (!$this->reverse_order) {
+					$element = $this->context->findElement($this->by);
+				}
+				else {
+					$elements = $this->context->findElements($this->by);
+					if (!$elements) {
+						throw new NoSuchElementException(null);
+					}
+
+					$element = end($elements);
 				}
 
-				$element = end($elements);
+				break;
 			}
-		}
-		catch (NoSuchElementException $exception) {
-			if (!$should_exist) {
-				return new CNullElement(array_merge($this->options, ['parent' => $parent, 'by' => $this->by]));
-			}
+			catch (NoSuchElementException $exception) {
+				if (!$should_exist) {
+					return new CNullElement(array_merge($this->options, ['parent' => $parent, 'by' => $this->by]));
+				}
 
-			throw $exception;
+				throw $exception;
+			}
+			// Workaround for communication errors present on Jenkins
+			catch (WebDriverException $exception) {
+				if (strpos($exception->getMessage(), 'START_MAP') === false) {
+					throw $exception;
+				}
+			}
 		}
 
 		return call_user_func([$class, 'createInstance'], $element, array_merge($this->options, [
@@ -383,7 +394,18 @@ class CElementQuery implements IWaitable {
 	public function all() {
 		$class = $this->class;
 
-		$elements = $this->context->findElements($this->by);
+		try {
+			$elements = $this->context->findElements($this->by);
+		}
+		// Workaround for communication errors present on Jenkins
+		catch (WebDriverException $exception) {
+			if (strpos($exception->getMessage(), 'START_MAP') === false) {
+				throw $exception;
+			}
+
+			$elements = $this->context->findElements($this->by);
+		}
+
 		if ($this->reverse_order) {
 			$elements = array_reverse($elements);
 		}

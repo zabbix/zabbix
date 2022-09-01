@@ -53,7 +53,7 @@ if ($data['form_refresh'] == 0) {
 $user_form = (new CForm())
 	->setId('user-form')
 	->setName('user_form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);
 
@@ -409,7 +409,7 @@ if ($data['action'] === 'user.edit') {
 		);
 	}
 	else {
-		$permissions_form_list->addRow((new CLabel(_('Role')))->setAsteriskMark(), $role_multiselect);
+		$permissions_form_list->addRow((new CLabel(_('Role'), 'roleid_ms'))->setAsteriskMark(), $role_multiselect);
 	}
 
 	if ($data['roleid']) {

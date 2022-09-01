@@ -53,7 +53,7 @@ $widget->addItem($row_template);
 $form = (new CForm())
 	->setId('script-form')
 	->setName('scripts')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 
