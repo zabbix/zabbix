@@ -213,7 +213,7 @@ $ldap_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Provisioning period'), 'provisioning_period'),
 		new CFormField(
-			(new CTextBox('provisioning_period', '8h'))
+			(new CTextBox('provisioning_period', $data['jit_provision_interval']))
 				->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
 		)
 	]);
@@ -536,7 +536,7 @@ if ($data['saml_userdirectoryid'] != '') {
 		'db_authentication_type' => $data['db_authentication_type'],
 		'saml_provision_groups' => $data['saml_provision_groups'],
 		'saml_provision_media' => $data['saml_provision_media']
-	], JSON_FORCE_OBJECT).');'
+	]).');'
 ))
 	->setOnDocumentReady()
 	->show();

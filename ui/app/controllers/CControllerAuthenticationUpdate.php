@@ -87,20 +87,20 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$auth_valid = $this->validateDefaultAuth();
 
-//		if ($auth_valid && !$this->validateLdap()) {
-//			$auth_valid = false;
-//		}
+		if ($auth_valid && !$this->validateLdap()) {
+			$auth_valid = false;
+		}
 
 		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
 			$auth_valid = $this->validateSamlAuth();
 		}
 
-//		if ($auth_valid) {
-//			[$auth_valid, $this->ldap_userdirectoryid] = $this->processLdapServers(
-//				$this->getInput('ldap_servers', []),
-//				$this->getInput('ldap_default_row_index', 0)
-//			);
-//		}
+		if ($auth_valid) {
+			[$auth_valid, $this->ldap_userdirectoryid] = $this->processLdapServers(
+				$this->getInput('ldap_servers', []),
+				$this->getInput('ldap_default_row_index', 0)
+			);
+		}
 
 		if (!$auth_valid) {
 			if (CMessageHelper::getTitle() === null) {
@@ -208,6 +208,10 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 		}
 
+		if (!$this->validateProvisionGroups() || !$this->validateProvisionMedia()) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -264,7 +268,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
-//			'ldap_userdirectoryid' => $this->ldap_userdirectoryid,
+			'ldap_userdirectoryid' => $this->ldap_userdirectoryid,
 			'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
@@ -395,6 +399,8 @@ class CControllerAuthenticationUpdate extends CController {
 		$default_ldap_mapping_index = null;
 
 		foreach ($ldap_servers as $row_index => $ldap_server) {
+			$this->extendProvisionGroups($ldap_server['provision_groups']);
+
 			if (array_key_exists('userdirectoryid', $ldap_server)) {
 				$upd_ldap_servers[] = $ldap_server;
 
@@ -403,6 +409,7 @@ class CControllerAuthenticationUpdate extends CController {
 				}
 			}
 			else {
+				$ldap_server['idp_type'] = IDP_TYPE_LDAP;
 				$ins_ldap_servers[] = $ldap_server;
 
 				if ($default_row_index == $row_index) {
@@ -493,5 +500,46 @@ class CControllerAuthenticationUpdate extends CController {
 			$provision_group['user_groups'] = $user_groups;
 		}
 		unset($provision_group);
+	}
+
+	private function validateProvisionGroups(): bool {
+		if (!$this->hasInput('provision_groups')) {
+			return true;
+		}
+
+		foreach ($this->getInput('provision_groups') as $group) {
+			if (!is_array($group)
+				|| !array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === ''
+				|| !array_key_exists('is_fallback', $group)
+				|| ($group['is_fallback'] != GROUP_MAPPING_REGULAR
+					&& $group['is_fallback'] != GROUP_MAPPING_FALLBACK)
+				|| !array_key_exists('fallback_status', $group)
+				|| ($group['fallback_status'] != GROUP_MAPPING_FALLBACK_OFF
+					&& $group['fallback_status'] != GROUP_MAPPING_FALLBACK_ON)
+				|| !array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
+				|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private function validateProvisionMedia(): bool {
+		if (!$this->hasInput('provision_media')) {
+			return true;
+		}
+
+		foreach ($this->getInput('provision_media') as $media) {
+			if (!is_array($media)
+				|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
+				|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])
+				|| $media['attribute'] === ''
+				|| !array_key_exists('mediatypeid', $media) || !ctype_digit($media['mediatypeid'])) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

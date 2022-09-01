@@ -112,6 +112,10 @@ class CControllerPopupLdapEdit extends CController {
 			$data['bind_password'] = $this->getInput('bind_password');
 		}
 
+		if ($data['group_basedn'] != '') {
+			$data['provision_status'] = JIT_PROVISIONING_ENABLED;
+		}
+
 		$data['advanced_configuration'] = $data['start_tls'] != ZBX_AUTH_START_TLS_OFF || $data['search_filter'] !== '';
 
 		if (!$data['provision_groups']) {
@@ -126,10 +130,8 @@ class CControllerPopupLdapEdit extends CController {
 					'name' => _('Fallback group'),
 					'is_fallback' => GROUP_MAPPING_FALLBACK,
 					'fallback_status' => GROUP_MAPPING_FALLBACK_OFF,
-					'user_groups' => [
+					'user_groups' => [ 7, 8
 						// TODO: define default user group.
-						['usrgrpid' => 7],
-						['usrgrpid' => 8]
 					],
 					'roleid' => $default_role[0]['roleid']
 				]]
@@ -168,7 +170,8 @@ class CControllerPopupLdapEdit extends CController {
 		foreach ($provision_groups as $group) {
 			$roleids[$group['roleid']] = $group['roleid'];
 			foreach ($group['user_groups'] as $user_group) {
-				$usrgrpids[$user_group['usrgrpid']] = $user_group['usrgrpid'];
+				$usrgrpids[$user_group] = $user_group;
+//				$usrgrpids[$user_group['usrgrpid']] = $user_group['usrgrpid'];
 			}
 		}
 
@@ -192,7 +195,11 @@ class CControllerPopupLdapEdit extends CController {
 			$provision_group['role_name'] = $roles[$provision_group['roleid']]['name'];
 
 			foreach ($provision_group['user_groups'] as &$user_group) {
-				$user_group['name'] = $user_groups[$user_group['usrgrpid']]['name'];
+//				$user_group['name'] = $user_groups[$user_group['usrgrpid']]['name'];
+				$user_group = [
+					'name' => $user_groups[$user_group]['name'],
+					'usrgrpid' => $user_group
+				];
 			}
 			unset($user_group);
 		}
@@ -245,7 +252,7 @@ class CControllerPopupLdapEdit extends CController {
 					|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
 					|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])
 						|| $media['attribute'] === ''
-					|| !array_key_exists('mediatypeid', $group) || !ctype_digit($group['mediatypeid'])) {
+					|| !array_key_exists('mediatypeid', $media) || !ctype_digit($media['mediatypeid'])) {
 				return false;
 			}
 		}

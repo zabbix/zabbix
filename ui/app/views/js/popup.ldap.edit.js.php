@@ -270,8 +270,11 @@ window.ldap_edit_popup = new class {
 			delete fields.provision_media;
 		}
 
+		if (fields.userdirectoryid == null) {
+			delete fields.userdirectoryid;
+		}
+
 		delete fields.advanced_configuration;
-		delete fields.provision_status;
 
 		return fields;
 	}
@@ -296,7 +299,7 @@ window.ldap_edit_popup = new class {
 		if (row === null) {
 			const rows = this.dialogue.querySelectorAll('#ldap-user-groups-table [data-row_index]');
 			row_index = Math.max([...rows].map(row => row.dataset.row_index)) + 1;
-console.log(rows);
+
 			popup_params = {
 				add_group: 1,
 				is_fallback: <?= GROUP_MAPPING_REGULAR ?>

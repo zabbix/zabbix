@@ -251,7 +251,7 @@
 
 			if (row != null) {
 				row_index = row.dataset.row_index;
-				const user_groups = row.querySelectorAll(`[name="saml_provision_groups[${row_index}][user_groups][]"`)
+				const user_groups = row.querySelectorAll(`[name="saml_provision_groups[${row_index}][user_groups][]"`);
 
 				popup_params = {
 					name: row.querySelector(`[name="saml_provision_groups[${row_index}][name]"`).value,
@@ -337,9 +337,42 @@
 
 		editLdapServer(row = null) {
 			let popup_params;
+			let row_index;
 
 			if (row !== null) {
-				const row_index = row.dataset.row_index;
+				row_index = row.dataset.row_index;
+				const provision_groups_count = row.querySelectorAll(`[name^="ldap_servers[${row_index}][provision_groups]"][name$="[is_fallback]"]`).length
+				const provision_groups = [];
+
+				for (let i = 0; i < provision_groups_count; i++) {
+					let user_groups = row.querySelectorAll(`[name="ldap_servers[${row_index}][provision_groups][${i}][user_groups][]"`);
+					let provision_group = {
+						is_fallback: row.querySelector(`[name="ldap_servers[${row_index}][provision_groups][${i}][is_fallback]"`).value,
+						fallback_status: row.querySelector(`[name="ldap_servers[${row_index}][provision_groups][${i}][fallback_status]"`).value,
+						name: row.querySelector(`[name="ldap_servers[${row_index}][provision_groups][${i}][name]"`).value,
+						roleid: row.querySelector(`[name="ldap_servers[${row_index}][provision_groups][${i}][roleid]"`).value,
+						user_groups: [...user_groups].map(usrgrp => usrgrp.value)
+					}
+
+					if (provision_group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?> && provision_group.name == '') {
+						provision_group.name = '<?= _('Fallback group') ?>';
+					}
+
+					provision_groups.push(provision_group);
+				}
+
+				const provision_media_count = row.querySelectorAll(`[name^="ldap_servers[${row_index}][provision_media]"][name$="[name]"]`).length
+				const provision_media = [];
+
+				for (let i = 0; i < provision_media_count; i++) {
+					let media = {
+						name: row.querySelector(`[name="ldap_servers[${row_index}][provision_media][${i}][name]"`).value,
+						mediatypeid: row.querySelector(`[name="ldap_servers[${row_index}][provision_media][${i}][mediatypeid]"`).value,
+						attribute: row.querySelector(`[name="ldap_servers[${row_index}][provision_media][${i}][attribute]"`).value,
+					}
+
+					provision_media.push(media);
+				}
 
 				popup_params = {
 					row_index,
@@ -352,7 +385,16 @@
 					search_filter: row.querySelector(`[name="ldap_servers[${row_index}][search_filter]"`).value,
 					start_tls: row.querySelector(`[name="ldap_servers[${row_index}][start_tls]"`).value,
 					bind_dn: row.querySelector(`[name="ldap_servers[${row_index}][bind_dn]"`).value,
-					description: row.querySelector(`[name="ldap_servers[${row_index}][description]"`).value
+					description: row.querySelector(`[name="ldap_servers[${row_index}][description]"`).value,
+					group_basedn: row.querySelector(`[name="ldap_servers[${row_index}][group_basedn]"`).value,
+					group_name: row.querySelector(`[name="ldap_servers[${row_index}][group_name]"`).value,
+					group_member: row.querySelector(`[name="ldap_servers[${row_index}][group_member]"`).value,
+					group_filter: row.querySelector(`[name="ldap_servers[${row_index}][group_filter]"`).value,
+					group_membership: row.querySelector(`[name="ldap_servers[${row_index}][group_membership]"`).value,
+					user_username: row.querySelector(`[name="ldap_servers[${row_index}][user_username]"`).value,
+					user_lastname: row.querySelector(`[name="ldap_servers[${row_index}][user_lastname]"`).value,
+					provision_groups,
+					provision_media
 				};
 
 				const userdirectoryid_input = row.querySelector(`[name="ldap_servers[${row_index}][userdirectoryid]"`);
@@ -367,7 +409,7 @@
 				}
 			}
 			else {
-				let row_index = 0;
+				row_index = 0;
 
 				while (document.querySelector(`#ldap-servers [data-row_index="${row_index}"]`) !== null) {
 					row_index++;
@@ -382,7 +424,7 @@
 			const overlay = PopUp('popup.ldap.edit', popup_params, {dialogueid: 'ldap_edit'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const ldap = e.detail;
+				const ldap = {...e.detail, ...{row_index: row_index}};
 
 				if (row === null) {
 					ldap.is_default = document.getElementById('ldap-servers')
@@ -412,6 +454,44 @@
 			const template = document.createElement('template');
 			template.innerHTML = template_ldap_server_row.evaluate(ldap).trim();
 			const row = template.content.firstChild;
+
+			if ('provision_groups' in ldap) {
+				for (const [group_index, provision_group] of Object.entries(ldap.provision_groups)) {
+					for (const [name, value] of Object.entries(provision_group)) {
+						if (name === 'user_groups') {
+							for (const usrgrpid of value.values()) {
+								const input = document.createElement('input');
+								input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][user_groups][]';
+								input.value = usrgrpid;
+								input.type = 'hidden';
+								row.appendChild(input);
+							}
+						}
+						else {
+							const input = document.createElement('input');
+							input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][' + name + ']';
+							input.value = value;
+							input.type = 'hidden';
+							row.appendChild(input);
+						}
+					}
+				}
+			}
+
+			if ('provision_media' in ldap) {
+				for (const [group_index, media] of ldap.provision_media.entries()) {
+					for (const [name, value] of Object.entries(media)) {
+						if (name === 'mediatype_name') {
+							continue;
+						}
+						const input = document.createElement('input');
+						input.name = 'ldap_servers[' + ldap.row_index + '][provision_media][' + group_index + '][' + name + ']';
+						input.value = value;
+						input.type = 'hidden';
+						row.appendChild(input);
+					}
+				}
+			}
 
 			const optional_fields = ['userdirectoryid', 'bind_password', 'start_tls', 'search_filter'];
 
@@ -451,20 +531,18 @@
 			}
 
 			template.innerHTML = template_saml_group_row.evaluate(saml_provision_group).trim();
-			template = template.content.firstChild;
+			const row = template.content.firstChild;
 
 			for (const user_group of Object.values(saml_provision_group.user_groups)) {
-				let usergroupid_element = document.createElement('template');
-				let usergroupid_template = new Template(
-					`<input type="hidden" name="saml_provision_groups[${saml_provision_group.row_index}][user_groups][]" value="${user_group.usrgrpid}">`
-				);
-				usergroupid_element.innerHTML = usergroupid_template.evaluate(user_group).trim();
+				const input = document.createElement('input');
+				input.name = 'saml_provision_groups[' + saml_provision_group.row_index + '][user_groups][]';
+				input.value = user_group.usrgrpid;
+				input.type = 'hidden';
 
-				let parent_element = template.querySelector('a').parentNode;
-				parent_element.appendChild(usergroupid_element.content.firstChild);
+				row.appendChild(input);
 			}
 
-			return template;
+			return row;
 		}
 
 		_renderProvisionMediaRow(saml_media) {
@@ -492,6 +570,13 @@
 						<input type="hidden" name="ldap_servers[#{row_index}][bind_dn]" value="#{bind_dn}">
 						<input type="hidden" name="ldap_servers[#{row_index}][bind_password]" value="#{bind_password}">
 						<input type="hidden" name="ldap_servers[#{row_index}][description]" value="#{description}">
+						<input type="hidden" name="ldap_servers[#{row_index}][group_basedn]" value="#{group_basedn}">
+						<input type="hidden" name="ldap_servers[#{row_index}][group_name]" value="#{group_name}">
+						<input type="hidden" name="ldap_servers[#{row_index}][group_member]" value="#{group_member}">
+						<input type="hidden" name="ldap_servers[#{row_index}][group_filter]" value="#{group_filter}">
+						<input type="hidden" name="ldap_servers[#{row_index}][group_membership]" value="#{group_membership}">
+						<input type="hidden" name="ldap_servers[#{row_index}][user_username]" value="#{user_username}">
+						<input type="hidden" name="ldap_servers[#{row_index}][user_lastname]" value="#{user_lastname}">
 					</td>
 					<td class="wordbreak">#{host}</td>
 					<td class="js-ldap-usergroups">#{usrgrps}</td>

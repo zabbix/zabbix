@@ -39,10 +39,34 @@ class CControllerPopupLdapCheck extends CController {
 			'search_attribute' =>	'required|db userdirectory_ldap.search_attribute|not_empty',
 			'start_tls' =>			'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
 			'search_filter' =>		'db userdirectory_ldap.search_filter',
-			'description' =>		'db userdirectory.description'
+			'description' =>		'db userdirectory.description',
+			'group_basedn' =>		'db userdirectory_ldap.group_basedn',
+			'group_name' =>			'db userdirectory_ldap.group_name',
+			'group_member' =>		'db userdirectory_ldap.group_member',
+			'group_filter' =>		'db userdirectory_ldap.group_filter',
+			'group_membership' =>	'db userdirectory_ldap.group_membership',
+			'user_username' =>		'db userdirectory_ldap.user_username',
+			'user_lastname' =>		'db userdirectory_ldap.user_lastname',
+			'add_ldap_server' =>	'in 0,1',
+			'provision_status' =>	'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
+			'provision_groups' =>	'array',
+			'provision_media' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret && $this->getInput('provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
+			$provisioning_fields = [
+				'group_basedn' =>		'required|db userdirectory_ldap.group_basedn|not_empty',
+				'group_member' =>		'required|db userdirectory_ldap.group_member|not_empty',
+				'group_filter' =>		'required|db userdirectory_ldap.group_filter|not_empty',
+				'group_membership' =>	'required|db userdirectory_ldap.group_membership|not_empty'
+			] + $fields;
+
+			$ret &= $this->validateInput($provisioning_fields);
+			$ret &= $this->validateProvisionGroups();
+			$ret &= $this->validateProvisionMedia();
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -73,7 +97,18 @@ class CControllerPopupLdapCheck extends CController {
 				'start_tls' => $this->getInput('start_tls', ZBX_AUTH_START_TLS_OFF),
 				'bind_dn' => $this->getInput('bind_dn', ''),
 				'description' => $this->getInput('description', ''),
-				'search_filter' => $this->getInput('search_filter', '')
+				'search_filter' => $this->getInput('search_filter', ''),
+				'group_basedn' => $this->getInput('group_basedn', ''),
+				'group_name' => $this->getInput('group_name', ''),
+				'group_member' => $this->getInput('group_member', ''),
+				'group_filter' => $this->getInput('group_filter', ''),
+				'group_membership' => $this->getInput('group_membership', ''),
+				'user_username' => $this->getInput('user_username', ''),
+				'user_lastname' => $this->getInput('user_lastname', ''),
+				'provision_status' => $this->getInput('provision_status', JIT_PROVISIONING_DISABLED),
+				'add_ldap_server' => $this->getInput('add_ldap_server', 1),
+				'provision_groups' => $this->getInput('provision_groups', []),
+				'provision_media' => $this->getInput('provision_media', [])
 			]
 		];
 
@@ -91,5 +126,46 @@ class CControllerPopupLdapCheck extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+	}
+
+	private function validateProvisionGroups(): bool {
+		if (!$this->hasInput('provision_groups')) {
+			return true;
+		}
+
+		foreach ($this->getInput('provision_groups') as $group) {
+			if (!is_array($group)
+				|| !array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === ''
+				|| !array_key_exists('is_fallback', $group)
+				|| ($group['is_fallback'] != GROUP_MAPPING_REGULAR
+					&& $group['is_fallback'] != GROUP_MAPPING_FALLBACK)
+				|| !array_key_exists('fallback_status', $group)
+				|| ($group['fallback_status'] != GROUP_MAPPING_FALLBACK_OFF
+					&& $group['fallback_status'] != GROUP_MAPPING_FALLBACK_ON)
+				|| !array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
+				|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private function validateProvisionMedia(): bool {
+		if (!$this->hasInput('provision_media')) {
+			return true;
+		}
+
+		foreach ($this->getInput('provision_media') as $media) {
+			if (!is_array($media)
+				|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
+				|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])
+				|| $media['attribute'] === ''
+				|| !array_key_exists('mediatypeid', $media) || !ctype_digit($media['mediatypeid'])) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

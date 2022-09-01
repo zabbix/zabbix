@@ -45,6 +45,7 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_default_row_index' =>			'int32',
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_removed_userdirectoryids' =>	'array',
+			'provisioning_period' =>			'db config.jit_provision_interval',
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
@@ -185,17 +186,25 @@ class CControllerAuthenticationEdit extends CController {
 		else {
 			$data += $auth;
 
-			$saml_configuration = API::UserDirectory()->get([
+			$userdirectories = API::UserDirectory()->get([
 				'output' => 'extend',
-				'filter' => [
-					'idp_type' => IDP_TYPE_SAML
-				],
 				'selectProvisionGroups' => 'extend',
-				'selectProvisionMedia' => 'extend'
+				'selectProvisionMedia' => 'extend',
+				'selectUsrgrps' => API_OUTPUT_COUNT
 			]);
-			if ($saml_configuration) {
-				$saml_configuration += $saml_configuration[0];
+			$saml_configuration = [];
+			$ldap_configuration = [];
 
+			foreach ($userdirectories as $userdirectory) {
+				if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
+					$saml_configuration = $userdirectory;
+				}
+				else {
+					$ldap_configuration[] = $userdirectory;
+				}
+			}
+
+			if ($saml_configuration) {
 				$data['saml_userdirectoryid'] = $saml_configuration['userdirectoryid'];
 				$data['saml_group_name'] = $saml_configuration['group_name'];
 				$data['saml_user_username'] = $saml_configuration['user_username'];
@@ -250,17 +259,17 @@ class CControllerAuthenticationEdit extends CController {
 				$data += $saml_settings;
 			}
 
-			$data['ldap_servers'] = API::UserDirectory()->get([
-				'output' => ['userdirectoryid', 'name', 'description', 'host', 'port', 'base_dn', 'search_attribute',
-					'search_filter', 'start_tls', 'bind_dn'
-				],
-				'filter' => [
-					'idp_type' => IDP_TYPE_LDAP
-				],
-				'selectUsrgrps' => API_OUTPUT_COUNT,
-				'sortfield' => ['name'],
-				'sortorder' => ZBX_SORT_UP
-			]);
+			$data['ldap_servers'] = $ldap_configuration;
+
+			foreach ($data['ldap_servers'] as &$ldap_server) {
+				foreach ($ldap_server['provision_groups'] as &$provision_groups) {
+					$changed_user_group = [];
+					foreach ($provision_groups['user_groups'] as $user_group) {
+						$changed_user_group[] = $user_group['usrgrpid'];
+					}
+					$provision_groups['user_groups'] = $changed_user_group;
+				}
+			}
 
 			$data['ldap_default_row_index'] = '';
 
@@ -293,7 +302,9 @@ class CControllerAuthenticationEdit extends CController {
 		$db_ldap_servers = $ldap_serverids
 			? API::UserDirectory()->get([
 				'output' => ['userdirectoryid'],
-				'idp_type' => IDP_TYPE_LDAP,
+				'filter' => [
+					'idp_type' => IDP_TYPE_LDAP
+				],
 				'selectUsrgrps' => API_OUTPUT_COUNT,
 				'userdirectoryids' => $ldap_serverids,
 				'preservekeys' => true
