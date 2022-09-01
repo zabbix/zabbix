@@ -470,7 +470,8 @@ class testPageReportsAudit extends CWebTest {
 	}
 
 	/**
-	 * Check audit filter.
+	 * Check audit filter. This checks can be runned only after all other scenarios completed.
+	 * There are used values and data that was created before in this autotest.
 	 *
 	 * @dataProvider getCheckFilterData
 	 */
