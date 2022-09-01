@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:36Z'
+  date: '2022-09-01T14:41:10Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,11 +13,31 @@ zabbix_export:
       description: |
         Get PHP-FPM metrics using Zabbix agent running on Linux.
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
       items:
+        -
+          uuid: f55a5ef29f864d0a8c1af25df2372f7c
+          name: 'PHP-FPM: Memory usage (rss)'
+          type: DEPENDENT
+          key: php-fmp.proc.rss
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Summary resident set size memory used by processes in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $..rss.first()
+          master_item:
+            key: 'proc.get["{$PHP_FPM.PROCESS_NAME}",,,summary]'
+          tags:
+            -
+              tag: component
+              value: memory
         -
           uuid: 9ae9e2a8003a48a7a482ef6d6ae9886c
           name: 'PHP-FPM: Accepted connections per second'
@@ -206,11 +226,80 @@ zabbix_export:
               dependencies:
                 -
                   name: 'PHP-FPM: Process is not running'
-                  expression: 'last(/PHP-FPM by Zabbix agent/proc.num["{$PHP_FPM.PROCESS_NAME}"])=0'
+                  expression: 'last(/PHP-FPM by Zabbix agent/php-fpm.proc.count)=0'
               tags:
                 -
                   tag: scope
                   value: availability
+        -
+          uuid: ab8dc0d1ce344fe8ae6a22716a168fbd
+          name: 'PHP-FPM: Number of processes running'
+          type: DEPENDENT
+          key: php-fpm.proc.count
+          delay: '0'
+          history: 7d
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $..processes.first()
+          master_item:
+            key: 'proc.get["{$PHP_FPM.PROCESS_NAME}",,,summary]'
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: 21a03d0ada634602ae9089a2cf3b4d70
+              expression: 'last(/PHP-FPM by Zabbix agent/php-fpm.proc.count)=0'
+              name: 'PHP-FPM: Process is not running'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: ef771994ec9e482babf872d9f867d500
+          name: 'PHP-FPM: Memory usage, %'
+          type: DEPENDENT
+          key: php-fpm.proc.pmem
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Memory used percentage relative to total memory available.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $..pmem.first()
+          master_item:
+            key: 'proc.get["{$PHP_FPM.PROCESS_NAME}",,,summary]'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 4efc6da713264e629f987106b8252355
+          name: 'PHP-FPM: Memory usage (vsize)'
+          type: DEPENDENT
+          key: php-fpm.proc.vmem
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Summary virtual memory size used by processes in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $..vsize.first()
+          master_item:
+            key: 'proc.get["{$PHP_FPM.PROCESS_NAME}",,,summary]'
+          tags:
+            -
+              tag: component
+              value: memory
         -
           uuid: 8ebee5fc8c854a96b34ed743e3dd0154
           name: 'PHP-FPM: Processes, active'
@@ -411,7 +500,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'PHP-FPM: Process is not running'
-                  expression: 'last(/PHP-FPM by Zabbix agent/proc.num["{$PHP_FPM.PROCESS_NAME}"])=0'
+                  expression: 'last(/PHP-FPM by Zabbix agent/php-fpm.proc.count)=0'
               tags:
                 -
                   tag: scope
@@ -419,8 +508,8 @@ zabbix_export:
             -
               uuid: c6966a6c3ff0452ab4fd112c9299e624
               expression: 'last(/PHP-FPM by Zabbix agent/php-fpm.uptime)<10m'
-              name: 'PHP-FPM: has been restarted'
-              event_name: 'PHP-FPM: has been restarted (uptime < 10m)'
+              name: 'PHP-FPM: Host has been restarted'
+              event_name: 'PHP-FPM: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -481,47 +570,16 @@ zabbix_export:
               tag: component
               value: cpu
         -
-          uuid: ef771994ec9e482babf872d9f867d500
-          name: 'PHP-FPM: Memory usage, %'
-          key: 'proc.mem["{$PHP_FPM.PROCESS_NAME}",,,,pmem]'
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          description: 'Memory used percentage relative to total memory available.'
+          uuid: 71ea0957d99a4d48b18e73a21494c849
+          name: 'PHP-FPM: Get process summary'
+          key: 'proc.get["{$PHP_FPM.PROCESS_NAME}",,,summary]'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
           tags:
             -
               tag: component
-              value: memory
-        -
-          uuid: f55a5ef29f864d0a8c1af25df2372f7c
-          name: 'PHP-FPM: Memory usage (rss)'
-          key: 'proc.mem["{$PHP_FPM.PROCESS_NAME}",,,,rss]'
-          history: 7d
-          units: B
-          description: 'Resident set size memory used by process in bytes.'
-          tags:
-            -
-              tag: component
-              value: memory
-        -
-          uuid: ab8dc0d1ce344fe8ae6a22716a168fbd
-          name: 'PHP-FPM: Number of processes running'
-          key: 'proc.num["{$PHP_FPM.PROCESS_NAME}"]'
-          history: 7d
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 21a03d0ada634602ae9089a2cf3b4d70
-              expression: 'last(/PHP-FPM by Zabbix agent/proc.num["{$PHP_FPM.PROCESS_NAME}"])=0'
-              name: 'PHP-FPM: Process is not running'
-              priority: HIGH
-              tags:
-                -
-                  tag: scope
-                  value: availability
+              value: raw
         -
           uuid: c0c438492c63453496e83938745ffffc
           name: 'PHP-FPM: php-fpm_ping'

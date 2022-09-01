@@ -220,9 +220,10 @@ There are no template links in this template.
 |RabbitMQ |RabbitMQ: Memory alarm |<p>Does the host has memory alarm</p> |DEPENDENT |rabbitmq.node.mem_alarm<p>**Preprocessing**:</p><p>- JSONPATH: `$.mem_alarm`</p><p>- BOOL_TO_DECIMAL</p> |
 |RabbitMQ |RabbitMQ: Disk free alarm |<p>Does the node have disk alarm</p> |DEPENDENT |rabbitmq.node.disk_free_alarm<p>**Preprocessing**:</p><p>- JSONPATH: `$.disk_free_alarm`</p><p>- BOOL_TO_DECIMAL</p> |
 |RabbitMQ |RabbitMQ: Uptime |<p>Uptime in milliseconds</p> |DEPENDENT |rabbitmq.node.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.uptime`</p><p>- MULTIPLIER: `0.001`</p> |
-|RabbitMQ |RabbitMQ: Number of processes running |<p>-</p> |ZABBIX_PASSIVE |proc.num["{$RABBITMQ.PROCESS_NAME}"] |
-|RabbitMQ |RabbitMQ: Memory usage (rss) |<p>Resident set size memory used by process in bytes.</p> |ZABBIX_PASSIVE |proc.mem["{$RABBITMQ.PROCESS_NAME}",,,,rss] |
-|RabbitMQ |RabbitMQ: Memory usage (vsize) |<p>Virtual memory size used by process in bytes.</p> |ZABBIX_PASSIVE |proc.mem["{$RABBITMQ.PROCESS_NAME}",,,,vsize] |
+|RabbitMQ |RabbitMQ: Get process summary |<p>-</p> |ZABBIX_PASSIVE |proc.get["{$RABBITMQ.PROCESS_NAME}",,,summary] |
+|RabbitMQ |RabbitMQ: Number of processes running |<p>-</p> |DEPENDENT |rabbitmq.proc.count<p>**Preprocessing**:</p><p>- JSONPATH: `$..processes.first()`</p> |
+|RabbitMQ |RabbitMQ: Memory usage (rss) |<p>Resident set size memory used by process in bytes.</p> |DEPENDENT |rabbitmq.proc.rss<p>**Preprocessing**:</p><p>- JSONPATH: `$..rss.first()`</p> |
+|RabbitMQ |RabbitMQ: Memory usage (vsize) |<p>Virtual memory size used by process in bytes.</p> |DEPENDENT |rabbitmq.proc.vmem<p>**Preprocessing**:</p><p>- JSONPATH: `$..vsize.first()`</p> |
 |RabbitMQ |RabbitMQ: CPU utilization |<p>Process CPU utilization percentage.</p> |ZABBIX_PASSIVE |proc.cpu.util["{$RABBITMQ.PROCESS_NAME}"] |
 |RabbitMQ |RabbitMQ: Service ping |<p>-</p> |ZABBIX_PASSIVE |net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |RabbitMQ |RabbitMQ: Service response time |<p>-</p> |ZABBIX_PASSIVE |net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"] |
@@ -263,8 +264,8 @@ There are no template links in this template.
 |RabbitMQ: Node is not running |<p>RabbitMQ node is not running</p> |`max(/RabbitMQ node by Zabbix agent/rabbitmq.node.running,5m)=0` |AVERAGE |<p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p> |
 |RabbitMQ: Memory alarm |<p>https://www.rabbitmq.com/memory.html</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.mem_alarm)=1` |AVERAGE | |
 |RabbitMQ: Free disk space alarm |<p>https://www.rabbitmq.com/disk-alarms.html</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.disk_free_alarm)=1` |AVERAGE | |
-|RabbitMQ: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|RabbitMQ: Process is not running |<p>-</p> |`last(/RabbitMQ node by Zabbix agent/proc.num["{$RABBITMQ.PROCESS_NAME}"])=0` |HIGH | |
+|RabbitMQ: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|RabbitMQ: Process is not running |<p>-</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.count)=0` |HIGH | |
 |RabbitMQ: Service is down |<p>-</p> |`last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p> |
 |RabbitMQ: Service response time is too high |<p>-</p> |`min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p> |
 |RabbitMQ: There are active alarms in the node |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"])=0` |AVERAGE | |

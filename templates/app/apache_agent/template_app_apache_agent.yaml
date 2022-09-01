@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-01T08:19:45Z'
+  date: '2022-09-01T14:57:51Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -78,6 +78,74 @@ zabbix_export:
               tag: component
               value: network
         -
+          uuid: 233b5466014640e4b990ffd81fa19fa1
+          name: 'Apache: Number of processes running'
+          type: DEPENDENT
+          key: apache.proc.count
+          delay: '0'
+          history: 7d
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $..processes.first()
+          master_item:
+            key: 'proc.get["{$APACHE.PROCESS_NAME}",,,summary]'
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: b62f49b09d6b4c6ca01ff60cd9dd2209
+              expression: 'last(/Apache by Zabbix agent/apache.proc.count)=0'
+              name: 'Apache: Process is not running'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 384bf197e6a241b3b63bb89d009bba6b
+          name: 'Apache: Memory usage (rss)'
+          type: DEPENDENT
+          key: apache.proc.rss
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Resident set size memory used by process in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $..rss.first()
+          master_item:
+            key: 'proc.get["{$APACHE.PROCESS_NAME}",,,summary]'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: f20b7a01ff134a128c54ea83af8557e2
+          name: 'Apache: Memory usage (vsize)'
+          type: DEPENDENT
+          key: apache.proc.vmem
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Virtual memory size used by process in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $..vsize.first()
+          master_item:
+            key: 'proc.get["{$APACHE.PROCESS_NAME}",,,summary]'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
           uuid: 5919f29c692b468fb5642e83f408c2e5
           name: 'Apache: Total requests'
           type: DEPENDENT
@@ -146,8 +214,8 @@ zabbix_export:
             -
               uuid: 7872d9665c234f45941ca26206e0255c
               expression: 'last(/Apache by Zabbix agent/apache.uptime)<10m'
-              name: 'Apache: has been restarted'
-              event_name: 'Apache: has been restarted (uptime < 10m)'
+              name: 'Apache: Host has been restarted'
+              event_name: 'Apache: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -465,7 +533,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Apache: Process is not running'
-                  expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
+                  expression: 'last(/Apache by Zabbix agent/apache.proc.count)=0'
                 -
                   name: 'Apache: Service is down'
                   expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
@@ -502,7 +570,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Apache: Process is not running'
-                  expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
+                  expression: 'last(/Apache by Zabbix agent/apache.proc.count)=0'
               tags:
                 -
                   tag: scope
@@ -520,46 +588,16 @@ zabbix_export:
               tag: component
               value: cpu
         -
-          uuid: 384bf197e6a241b3b63bb89d009bba6b
-          name: 'Apache: Memory usage (rss)'
-          key: 'proc.mem["{$APACHE.PROCESS_NAME}",,,,rss]'
-          history: 7d
-          units: B
-          description: 'Resident set size memory used by process in bytes.'
+          uuid: 99b1a38ed45b4212974b0bea72b076d2
+          name: 'Apache: Get process summary'
+          key: 'proc.get["{$APACHE.PROCESS_NAME}",,,summary]'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
           tags:
             -
               tag: component
-              value: memory
-        -
-          uuid: f20b7a01ff134a128c54ea83af8557e2
-          name: 'Apache: Memory usage (vsize)'
-          key: 'proc.mem["{$APACHE.PROCESS_NAME}",,,,vsize]'
-          history: 7d
-          units: B
-          description: 'Virtual memory size used by process in bytes.'
-          tags:
-            -
-              tag: component
-              value: memory
-        -
-          uuid: 233b5466014640e4b990ffd81fa19fa1
-          name: 'Apache: Number of processes running'
-          key: 'proc.num["{$APACHE.PROCESS_NAME}"]'
-          history: 7d
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: b62f49b09d6b4c6ca01ff60cd9dd2209
-              expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
-              name: 'Apache: Process is not running'
-              priority: HIGH
-              tags:
-                -
-                  tag: scope
-                  value: availability
+              value: raw
         -
           uuid: 115413a0f5ab4caba418ab841ad81eba
           name: 'Apache: Get status'
@@ -632,7 +670,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Apache: Process is not running'
-                  expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
+                  expression: 'last(/Apache by Zabbix agent/apache.proc.count)=0'
                 -
                   name: 'Apache: Service is down'
                   expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
@@ -974,13 +1012,13 @@ zabbix_export:
           color: 1A7C11
           item:
             host: 'Apache by Zabbix agent'
-            key: 'proc.mem["{$APACHE.PROCESS_NAME}",,,,vsize]'
+            key: apache.proc.vmem
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Apache by Zabbix agent'
-            key: 'proc.mem["{$APACHE.PROCESS_NAME}",,,,rss]'
+            key: apache.proc.rss
     -
       uuid: dfc5334e77ce45d286145cc08d036f38
       name: 'Apache: Requests per second'
