@@ -301,34 +301,46 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 	// IPMI
 	$ipmi_tab = new CFormList();
 
-	$ipmi_tab->addRow(_('Authentication algorithm'), [
-		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($parent_host['ipmi_authtype']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		new CVar('ipmi_authtype', $parent_host['ipmi_authtype'])
-	]);
-	$ipmi_tab->addRow(_('Privilege level'), [
-		(new CTextBox('ipmi_privilege_name', ipmiPrivileges($parent_host['ipmi_privilege']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		new CVar('ipmi_privilege', $parent_host['ipmi_privilege'])
-	]);
-	$ipmi_tab->addRow(_('Username'),
-		(new CTextBox('ipmi_username', $parent_host['ipmi_username'], true))
+	$ipmi_tab->addRow(new CLabel(_('Authentication algorithm'), 'label_ipmi_authtype'),
+		(new CSelect())
+			->setValue($parent_host['ipmi_authtype'])
+			->setFocusableElementId('label_ipmi_authtype')
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->addOptions(CSelect::createOptionsFromArray(ipmiAuthTypes()))
+			->setReadonly()
+			->setId('ipmi_authtype')
+	);
+	$ipmi_tab->addRow(new CLabel(_('Privilege level'), 'label_ipmi_privilege'),
+		(new CSelect())
+			->setValue($parent_host['ipmi_privilege'])
+			->setFocusableElementId('label_ipmi_privilege')
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->addOptions(CSelect::createOptionsFromArray(ipmiPrivileges()))
+			->setReadonly()
+			->setId('ipmi_privilege')
+	);
+	$ipmi_tab->addRow(_('Username'),
+		(new CTextBox(null, $parent_host['ipmi_username'], true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setId('ipmi_username')
 	);
 	$ipmi_tab->addRow(_('Password'),
-		(new CTextBox('ipmi_password', $parent_host['ipmi_password'], true))
+		(new CTextBox(null, $parent_host['ipmi_password'], true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setId('ipmi_password')
 	);
 
 	$tabs->addTab('ipmi-tab', _('IPMI'), $ipmi_tab, TAB_INDICATOR_IPMI);
 }
 
-$tabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+$tabs->addTab('tags-tab', _('Tags'),
+	new CPartial('configuration.tags.tab', [
 		'source' => 'host_prototype',
 		'tags' => $data['tags'],
 		'readonly' => $data['readonly'],
 		'tabs_id' => 'tabs'
-	]), TAB_INDICATOR_TAGS
+	]),
+	TAB_INDICATOR_TAGS
 );
 
 $tabs->addTab('macroTab', _('Macros'),
