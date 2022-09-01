@@ -6573,6 +6573,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != config->kvs_paths.values_num &&
 			ZBX_DBSYNC_INIT == mode)
 	{
+		dberr = ZBX_DB_OK;
 		goto out;
 	}
 
