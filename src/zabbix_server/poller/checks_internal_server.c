@@ -79,16 +79,12 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 			if (0 == strcmp(param2, "discovery"))
 			{
-				struct zbx_json	json;
+				char	*data;
 
-				zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
-
-				if (SUCCEED == (res = zbx_proxy_discovery_get(&json, &error)))
-					SET_STR_RESULT(result, zbx_strdup(NULL, json.buffer));
+				if (SUCCEED == (res = zbx_proxy_discovery_get(&data, &error)))
+					SET_STR_RESULT(result, data);
 				else
 					SET_MSG_RESULT(result, error);
-
-				zbx_json_free(&json);
 
 				if (SUCCEED != res)
 					goto out;

@@ -115,14 +115,20 @@ void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_args_t *zb
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot get HA node data: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get HA node data: %s", error);
 		zbx_free(error);
 	}
 
-	zbx_json_addarray(json, "proxy");
-	if (SUCCEED != zbx_proxy_discovery_get(json, &error))
-		zabbix_log(LOG_LEVEL_WARNING, "proxy data is missing, the first error is: %s", error);
-	zbx_free(error);
+	if (SUCCEED == zbx_proxy_discovery_get(&value, &error))
+	{
+		zbx_json_addraw(json, "proxy", value);
+		zbx_free(value);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy data: %s", error);
+		zbx_free(error);
+	}
 
 	zbx_json_close(json);
 }

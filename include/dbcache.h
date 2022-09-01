@@ -887,7 +887,7 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
 int	DCget_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
 int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error);
 int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **error);
-int	zbx_proxy_discovery_get(struct zbx_json *json, char **error);
+int	zbx_proxy_discovery_get(char **data, char **error);
 
 unsigned int	DCget_internal_action_count(void);
 unsigned int	DCget_auto_registration_action_count(void);

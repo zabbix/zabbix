@@ -13861,21 +13861,21 @@ int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **err
  * Purpose: get data of all proxies from configuration cache and pack into    *
  *          JSON for LLD                                                      *
  *                                                                            *
- * Parameter: json   - [OUT] JSON with proxy data                             *
+ * Parameter: data   - [OUT] JSON with proxy data                             *
  *            error  - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - interface data in JSON                             *
- *               FAIL    - proxy not found, 'error' message allocated         *
+ * Return value: SUCCEED - interface data in JSON, 'data' is allocated        *
+ *               FAIL    - proxy not found, 'error' message is allocated      *
  *                                                                            *
- * Comments: if there are no proxies, an empty JSON {"data":[]} is returned;  *
- *           if some data were not found in cache, it is missing in the       *
- *           output                                                           *
+ * Comments: Allocates memory.                                                *
+ *           If there are no proxies, an empty JSON {"data":[]} is returned.  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_proxy_discovery_get(struct zbx_json *json, char **error)
+int	zbx_proxy_discovery_get(char **data, char **error)
 {
 	int				i, ret = SUCCEED;
 	zbx_vector_cached_proxy_t	proxies;
+	struct zbx_json			json;
 
 	WRLOCK_CACHE;
 
@@ -13883,6 +13883,7 @@ int	zbx_proxy_discovery_get(struct zbx_json *json, char **error)
 
 	UNLOCK_CACHE;
 
+	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_vector_cached_proxy_create(&proxies);
 	zbx_dc_get_all_proxies(&proxies);
 
@@ -13896,25 +13897,22 @@ int	zbx_proxy_discovery_get(struct zbx_json *json, char **error)
 
 		proxy = proxies.values[i];
 
-		zbx_json_addobject(json, NULL);
+		zbx_json_addobject(&json, NULL);
 
-		zbx_json_addstring(json, "name", proxy->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "name", proxy->name, ZBX_JSON_TYPE_STRING);
 
 		if (HOST_STATUS_PROXY_PASSIVE == proxy->status)
-			zbx_json_addstring(json, "passive", "true", ZBX_JSON_TYPE_INT);
+			zbx_json_addstring(&json, "passive", "true", ZBX_JSON_TYPE_INT);
 		else
-			zbx_json_addstring(json, "passive", "false", ZBX_JSON_TYPE_INT);
+			zbx_json_addstring(&json, "passive", "false", ZBX_JSON_TYPE_INT);
 
 		dc_host = DCfind_proxy(proxy->name);
 
 		if (NULL == dc_host)
 		{
-			if (FAIL != ret)
-			{
-				*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.",
-						proxy->name);
-				ret = FAIL;
-			}
+			*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", proxy->name);
+			ret = FAIL;
+			goto clean;
 		}
 		else
 		{
@@ -13926,61 +13924,64 @@ int	zbx_proxy_discovery_get(struct zbx_json *json, char **error)
 				encryption = dc_host->tls_accept;
 
 			if (0 < (encryption & ZBX_TCP_SEC_UNENCRYPTED))
-				zbx_json_addstring(json, "unencrypted", "true", ZBX_JSON_TYPE_INT);
+				zbx_json_addstring(&json, "unencrypted", "true", ZBX_JSON_TYPE_INT);
 			else
-				zbx_json_addstring(json, "unencrypted", "false", ZBX_JSON_TYPE_INT);
+				zbx_json_addstring(&json, "unencrypted", "false", ZBX_JSON_TYPE_INT);
 
 			if (0 < (encryption & ZBX_TCP_SEC_TLS_PSK))
-				zbx_json_addstring(json, "psk", "true", ZBX_JSON_TYPE_INT);
+				zbx_json_addstring(&json, "psk", "true", ZBX_JSON_TYPE_INT);
 			else
-				zbx_json_addstring(json, "psk", "false", ZBX_JSON_TYPE_INT);
+				zbx_json_addstring(&json, "psk", "false", ZBX_JSON_TYPE_INT);
 
 			if (0 < (encryption & ZBX_TCP_SEC_TLS_CERT))
-				zbx_json_addstring(json, "cert", "true", ZBX_JSON_TYPE_INT);
+				zbx_json_addstring(&json, "cert", "true", ZBX_JSON_TYPE_INT);
 			else
-				zbx_json_addstring(json, "cert", "false", ZBX_JSON_TYPE_INT);
+				zbx_json_addstring(&json, "cert", "false", ZBX_JSON_TYPE_INT);
 
-			zbx_json_adduint64(json, "items", dc_host->items_active_normal +
+			zbx_json_adduint64(&json, "items", dc_host->items_active_normal +
 					dc_host->items_active_notsupported);
 
 			if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
 					&dc_host->hostid)))
 			{
 				if (1 == dc_proxy->auto_compress)
-					zbx_json_addstring(json, "compression", "true", ZBX_JSON_TYPE_INT);
+					zbx_json_addstring(&json, "compression", "true", ZBX_JSON_TYPE_INT);
 				else
-					zbx_json_addstring(json, "compression", "false", ZBX_JSON_TYPE_INT);
+					zbx_json_addstring(&json, "compression", "false", ZBX_JSON_TYPE_INT);
 
-				zbx_json_addstring(json, "version", dc_proxy->version_str, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, "version", dc_proxy->version_str, ZBX_JSON_TYPE_STRING);
 
-				zbx_json_adduint64(json, "compatibility", dc_proxy->compatibility);
+				zbx_json_adduint64(&json, "compatibility", dc_proxy->compatibility);
 
 				if (0 < dc_proxy->lastaccess)
-					zbx_json_addint64(json, "last_seen", time(NULL) - dc_proxy->lastaccess);
+					zbx_json_addint64(&json, "last_seen", time(NULL) - dc_proxy->lastaccess);
 				else
-					zbx_json_addint64(json, "last_seen", -1);
+					zbx_json_addint64(&json, "last_seen", -1);
 
-				zbx_json_adduint64(json, "hosts", dc_proxy->hosts_monitored);
+				zbx_json_adduint64(&json, "hosts", dc_proxy->hosts_monitored);
 
-				zbx_json_addfloat(json, "requiredperformance", dc_proxy->required_performance);
+				zbx_json_addfloat(&json, "requiredperformance", dc_proxy->required_performance);
 			}
 			else
 			{
-				if (FAIL != ret)
-				{
-					*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.",
-						proxy->name);
-					ret = FAIL;
-				}
+				*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.",
+					proxy->name);
+				ret = FAIL;
+				goto clean;
 			}
 		}
-		zbx_json_close(json);
+		zbx_json_close(&json);
 	}
-
+clean:
 	UNLOCK_CACHE;
 
-	zbx_json_close(json);
+	if (SUCCEED == ret)
+	{
+		zbx_json_close(&json);
+		*data = zbx_strdup(NULL, json.buffer);
+	}
 
+	zbx_json_free(&json);
 	zbx_vector_cached_proxy_clear_ext(&proxies, zbx_cached_proxy_free);
 	zbx_vector_cached_proxy_destroy(&proxies);
 
