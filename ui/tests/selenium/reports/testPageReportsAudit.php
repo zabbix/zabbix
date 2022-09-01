@@ -449,6 +449,23 @@ class testPageReportsAudit extends CWebTest {
 					'expected' => TEST_BAD
 				]
 			]
+			// TODO: uncomment after ZBX-21097 fix
+//			[
+//				[
+//					'fields' => [
+//						'Resource ID' => 'aaaaaaaa'
+//					],
+//					'expected' => TEST_BAD
+//				]
+//			],
+//			[
+//				[
+//					'fields' => [
+//						'Recordset ID' => 'aaaaaaaa'
+//					],
+//					'expected' => TEST_BAD
+//				]
+//			]
 		];
 	}
 
