@@ -26,7 +26,6 @@
 // Create form.
 $form = (new CForm())
 	->setId('massupdate-form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'popup.massupdate.template')
 	->addVar('update', '1')
 	->addVar('ids', $data['ids'])

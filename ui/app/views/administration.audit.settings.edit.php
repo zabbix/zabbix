@@ -36,7 +36,7 @@ $form = (new CForm())
 			->setArgument('action', 'audit.settings.update')
 			->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 $audit_settings_tab = (new CFormGrid())
 	->addItem([
