@@ -167,7 +167,6 @@ class CControllerPopupLdapEdit extends CController {
 			$roleids[$group['roleid']] = $group['roleid'];
 			foreach ($group['user_groups'] as $user_group) {
 				$usrgrpids[$user_group] = $user_group;
-//				$usrgrpids[$user_group['usrgrpid']] = $user_group['usrgrpid'];
 			}
 		}
 
