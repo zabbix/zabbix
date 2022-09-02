@@ -211,6 +211,8 @@ abstract class CControllerHost extends CController {
 			// Count number of dashboards for each host.
 			$host['dashboards'] = count(getHostDashboards($host['hostid']));
 
+			var_dump(getHostDashboards($host['hostid']));die;
+
 			CArrayHelper::sort($host['interfaces'], [['field' => 'main', 'order' => ZBX_SORT_DOWN]]);
 
 			if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
