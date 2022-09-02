@@ -1037,7 +1037,6 @@ class CApiInputValidator {
 	 * Identifier validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL, API_NOT_EMPTY
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1045,8 +1044,6 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateId($rule, &$data, $path, &$error) {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
 		if (!is_scalar($data) || is_bool($data) || is_double($data) || !ctype_digit(strval($data))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
 			return false;
