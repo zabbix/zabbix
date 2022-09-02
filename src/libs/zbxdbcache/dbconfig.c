@@ -6570,15 +6570,14 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	DCsync_host_tags(&host_tag_sync);
 	host_tag_sec2 = zbx_time() - sec;
 
+	FINISH_SYNC;
+
 	/* postpone configuration sync until macro secrets are received from Zabbix server */
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != config->kvs_paths.values_num &&
 			ZBX_DBSYNC_INIT == mode)
 	{
-		dberr = ZBX_DB_OK;
-		goto out;
+		goto clean;
 	}
-
-	FINISH_SYNC;
 
 	/* sync host data to support host lookups when resolving macros during configuration sync */
 
@@ -7280,7 +7279,7 @@ out:
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reschedule : " ZBX_FS_DBL " sec.", __func__, queues_sec);
 
 	}
-
+clean:
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&autoreg_config_sync);
 	zbx_dbsync_clear(&autoreg_host_sync);
@@ -14020,7 +14019,7 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
  * Purpose: reschedules items that are processed by the target daemon         *
  *                                                                            *
  * Parameter: itemids       - [IN] the item identifiers                       *
- *            nextcheck     - [IN] the schedueld time                         *
+ *            nextcheck     - [IN] the scheduled time                         *
  *            proxy_hostids - [OUT] the proxy_hostids of the given itemids    *
  *                                  (optional, can be NULL)                   *
  *                                                                            *
