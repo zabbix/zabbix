@@ -92,8 +92,8 @@ static int	zbx_flags128_isclear(zbx_flags128_t *flags)
 }
 
 /* bit defines for proxyconfig row flags, lower bits are reserved for field update flags */
-#define proxyconfig_ZBX_ROW_UPDATE	126
-#define proxyconfig_ZBX_ROW_EXISTS	127
+#define ZBX_PROXYCONFIG_ROW_UPDATE	126
+#define ZBX_PROXYCONFIG_ROW_EXISTS	127
 
 ZBX_PTR_VECTOR_DECL(table_row_ptr, struct zbx_table_row *)
 
@@ -570,11 +570,11 @@ static int	proxyconfig_compare_row(zbx_table_row_t *row, DB_ROW dbrow, char **bu
 
 	if (SUCCEED != zbx_flags128_isclear(&row->flags))
 	{
-		zbx_flags128_set(&row->flags, proxyconfig_ZBX_ROW_UPDATE);
+		zbx_flags128_set(&row->flags, ZBX_PROXYCONFIG_ROW_UPDATE);
 		ret = FAIL;
 	}
 
-	zbx_flags128_set(&row->flags, proxyconfig_ZBX_ROW_EXISTS);
+	zbx_flags128_set(&row->flags, ZBX_PROXYCONFIG_ROW_EXISTS);
 
 	return ret;
 }
@@ -743,6 +743,75 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: convert text value to the database value according to its field   *
+ *          type                                                              *
+ *                                                                            *
+ * Parameters: table - [IN] the table                                         *
+ *             field - [IN] the field                                         *
+ *             buf   - [IN] the value to convert                              *
+ *             type  - [IN] the json value type                               *
+ *             value - [OUT] the converted value (optional)                   *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - the operation was successfull                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: This function can be used to validate buffer by using NULL       *
+ *           output value.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxyconfig_convert_value(const ZBX_TABLE *table, const ZBX_FIELD *field, const char *buf,
+		zbx_json_type_t type, zbx_db_value_t **value, char **error)
+{
+	zbx_db_value_t	value_local;
+	int		ret;
+
+	switch (field->type)
+	{
+		case ZBX_TYPE_INT:
+			ret = zbx_is_int(buf, &value_local.i32);
+			break;
+		case ZBX_TYPE_UINT:
+			ret = is_uint64(buf, &value_local.ui64);
+			break;
+		case ZBX_TYPE_ID:
+			if (ZBX_JSON_TYPE_NULL == type)
+				value_local.ui64 = 0;
+			else
+				ret = is_uint64(buf, &value_local.ui64);
+			break;
+		case ZBX_TYPE_FLOAT:
+			ret = zbx_is_double(buf, &value_local.dbl);
+			break;
+		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_SHORTTEXT:
+		case ZBX_TYPE_LONGTEXT:
+			if (NULL != value)
+				value_local.str = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(buf));
+			ret = SUCCEED;
+			break;
+		default:
+			*error = zbx_dsprintf(*error, "unsupported field type %d in \"%s.%s\"",
+					field->type, table->table, field->name);
+			return FAIL;
+	}
+
+	if (SUCCEED != ret)
+	{
+		*error = zbx_dsprintf(*error, "invalid field \"%s.%s\" value \"%s\"",
+				table->table, field->name, buf);
+		return FAIL;
+	}
+
+	*value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
+	**value = value_local;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: update existing rows with new field values                        *
  *                                                                            *
  * Parameters: td    - [IN] the table data object                             *
@@ -796,37 +865,15 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 				continue;
 			}
 
+			if (SUCCEED != proxyconfig_convert_value(td->table, field, buf, type, NULL, error))
+				goto out;
+
 			switch (field->type)
 			{
 				case ZBX_TYPE_ID:
 				case ZBX_TYPE_UINT:
-					if (SUCCEED != is_uint64(buf, &value_ui64))
-					{
-						*error = zbx_dsprintf(*error, "invalid field \"%s.%s\" value \"%s\"",
-								td->table->table, field->name, buf);
-						goto out;
-					}
-					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buf);
-					break;
 				case ZBX_TYPE_FLOAT:
-					if (SUCCEED != zbx_is_double(buf, &value_dbl))
-					{
-						*error = zbx_dsprintf(*error, "invalid field \"%s.%s\" value \"%s\"",
-								td->table->table, field->name, buf);
-						goto out;
-					}
-					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buf);
-					break;
 				case ZBX_TYPE_INT:
-					if ('-' == *(ptr = buf))
-						ptr++;
-
-					if (SUCCEED != is_uint31(ptr, &value_int))
-					{
-						*error = zbx_dsprintf(*error, "invalid field \"%s.%s\" value \"%s\"",
-								td->table->table, field->name, buf);
-						goto out;
-					}
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buf);
 					break;
 				case ZBX_TYPE_CHAR:
@@ -888,7 +935,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 	zbx_vector_table_row_ptr_t	rows;
 	zbx_table_row_t			*row;
 
-	/* invalid reset_index would have resulted in earlier error during row preparation */
+	/* invalid reset_index would have generated error during row preparation */
 	if (NULL != td->reset_field)
 		reset_index = table_data_get_field_index(td, td->reset_field);
 
@@ -897,7 +944,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 	zbx_hashset_iter_reset(&td->rows, &iter);
 	while (NULL != (row = (zbx_table_row_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (SUCCEED != zbx_flags128_isset(&row->flags, proxyconfig_ZBX_ROW_EXISTS))
+		if (SUCCEED != zbx_flags128_isset(&row->flags, ZBX_PROXYCONFIG_ROW_EXISTS))
 			zbx_vector_table_row_ptr_append(&rows, row);
 	}
 
@@ -907,7 +954,6 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 		zbx_db_insert_t			db_insert;
 		const ZBX_FIELD			*fields[ZBX_MAX_FIELDS];
 		int				i, j;
-		zbx_db_value_t			*value;
 		char				*buf;
 		size_t				buf_alloc = ZBX_KIBIBYTE;
 
@@ -930,49 +976,33 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 			for (j = 0; NULL != (pf = zbx_json_next_value_dyn(&row->columns, pf, &buf, &buf_alloc, &type));
 					j++)
 			{
-				value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
+				zbx_db_value_t	*value;
 
-				switch (fields[j]->type)
+				if (j == reset_index)
 				{
-					case ZBX_TYPE_INT:
-						value->i32 = atoi(buf);
-						break;
-					case ZBX_TYPE_UINT:
-						ZBX_STR2UINT64(value->ui64, buf);
-						break;
-					case ZBX_TYPE_ID:
-						if (ZBX_JSON_TYPE_NULL != type)
-						{
-							if (j == reset_index)
-							{
-								/* insert null ID and add this row to updates, */
-								/* so the correct ID will be updated later     */
-								zbx_flags128_set(&row->flags, proxyconfig_ZBX_ROW_EXISTS);
-								zbx_flags128_set(&row->flags, j);
-								zbx_vector_table_row_ptr_append(&td->updates, row);
-								value->ui64 = 0;
-							}
-							else
-								ZBX_STR2UINT64(value->ui64, buf);
-						}
-						else
-							value->ui64 = 0;
-						break;
-					case ZBX_TYPE_FLOAT:
-						value->dbl = atof(buf);
-						break;
-					case ZBX_TYPE_CHAR:
-					case ZBX_TYPE_TEXT:
-					case ZBX_TYPE_SHORTTEXT:
-					case ZBX_TYPE_LONGTEXT:
-						value->str = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(buf));
-						break;
-					default:
-						*error = zbx_dsprintf(*error, "unsupported field type %d in \"%s.%s\"",
-								(int)fields[j]->type, td->table->table, fields[j]->name);
-						zbx_free(value);
-						ret = FAIL;
+					if (ZBX_TYPE_ID != fields[j]->type)
+					{
+						/* only ID fields can be used as foreign keys for now */
+						THIS_SHOULD_NEVER_HAPPEN;
+						exit(EXIT_FAILURE);
+					}
+
+					/* insert null ID and add this row to updates, */
+					/* so the correct ID will be updated later     */
+					zbx_flags128_set(&row->flags, ZBX_PROXYCONFIG_ROW_EXISTS);
+					zbx_flags128_set(&row->flags, j);
+					zbx_vector_table_row_ptr_append(&td->updates, row);
+
+					value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
+					value->ui64 = 0;
+				}
+				else
+				{
+					if (SUCCEED != (ret = proxyconfig_convert_value(td->table, fields[j], buf, type,
+							&value, error)))
+					{
 						goto clean;
+					}
 				}
 
 				zbx_vector_db_value_ptr_append(&values, value);
@@ -1786,8 +1816,6 @@ out:
  ******************************************************************************/
 static int	proxyconfig_delete_globalmacros(char **error)
 {
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
