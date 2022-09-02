@@ -1536,6 +1536,47 @@ class CWidgetHelper {
 		return $names;
 	}
 
+	public static function getThresholds(CWidgetFieldThresholds $field): CDiv {
+		$thresholds_table = (new CTable())
+			->setId(sprintf(CWidgetFieldThresholds::THRESHOLDS_TABLE_ID, $field->getName()))
+			->addClass(ZBX_STYLE_TABLE_FORMS)
+			->setHeader([
+				'',
+				(new CColHeader(_('Threshold')))->setWidth('100%'),
+				_('Action')
+			])
+			->setFooter(new CRow(
+				new CCol(
+					(new CSimpleButton(_('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-add')
+				)
+			));
+
+		foreach ($field->getValue() as $i => $threshold) {
+			$thresholds_table->addRow(
+				self::getThresholdsTemplate($field->getName(), $i, $threshold['color'], $threshold['threshold'])
+			);
+		}
+
+		return (new CDiv($thresholds_table))
+			->addClass('table-forms-separator')
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	}
+
+	public static function getThresholdsTemplate($name, $index = '#{rowNum}', $color = '#{color}',
+			$threshold = '#{threshold}'): CRow {
+		return (new CRow([
+			(new CColor($name.'['.$index.'][color]', $color))->appendColorPickerJs(false),
+			(new CTextBox($name.'['.$index.'][threshold]', $threshold, false))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired(),
+			(new CButton($name.'['.$index.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		]))->addClass('form_row');
+	}
+
 	/**
 	 * @param CWidgetField $field
 	 *
