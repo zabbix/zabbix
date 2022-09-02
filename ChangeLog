@@ -4684,6 +4684,7 @@ Changes for 4.0.44rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.43
