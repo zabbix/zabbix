@@ -236,7 +236,7 @@ class testFormHost extends CWebTest {
 						'type' => '1'
 					]
 				]
-			],
+			]
 		]);
 
 		self::$hostids = $result['hostids'];
