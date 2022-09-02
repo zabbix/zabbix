@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-06-18 21:15+0000\n"
+"PO-Revision-Date: 2022-07-07 10:14+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -1348,7 +1348,7 @@ msgstr "Pelo menos um elemento de UI deve ser habilitado para a função de util
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "Pelo menos uma ação é obrigatória."
 
 #: include/classes/api/services/CUser.php:614
 #: include/classes/api/services/CUser.php:1286
@@ -1468,7 +1468,7 @@ msgstr "Algoritmo de autenticação"
 #: include/classes/api/services/CUser.php:2047
 #, c-format
 msgid "Authentication failed: %1$s."
-msgstr ""
+msgstr "Autenticação falhou: %1$s."
 
 #: app/views/administration.script.edit.php:129
 #: app/views/popup.massupdate.item.php:169
@@ -1964,8 +1964,8 @@ msgstr "Não foi possível adicionar tipo de média"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível adicionar o módulo: %1$s."
+msgstr[1] "Não é possível adicionar os módulos: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -1993,7 +1993,7 @@ msgstr "Não foi possível adicionar expressão regular"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "Não é possível adicionar o relatório programado"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -2024,7 +2024,7 @@ msgstr "Não foi possível adicionar utilizador"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Não é possível adicionar o grupo de utilizador"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
@@ -2037,15 +2037,15 @@ msgstr ""
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Não pode ser removido"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "Não é possível vincular anonimamente ao servidor LDAP."
 
 #: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "Não é possível vincular ao servidor LDAP."
 
 #: include/forms.inc.php:1932 include/forms.inc.php:1939
 #: include/forms.inc.php:1949 include/forms.inc.php:1983
@@ -2056,7 +2056,7 @@ msgstr ""
 
 #: include/classes/api/services/CRole.php:792
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "Não é possível alterar o tipo de utilizador da própria função."
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
@@ -2083,7 +2083,7 @@ msgstr "Não foi possível terminar o problema: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "Não é possível conectar ao servidor LDAP."
 
 #: include/classes/setup/CSetupWizard.php:593
 msgid "Cannot connect to the database."
@@ -2091,7 +2091,7 @@ msgstr "Não foi possível a ligação à base de dados."
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "Não é possível converter dados POST:"
 
 #: graphs.php:390
 msgid "Cannot copy graph"
@@ -2154,13 +2154,13 @@ msgstr "Não foi possível criar o mapa de ícones"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "Não é possível criar o relatório programado"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Não é possível criar o serviço \"%1$s\": %2$s."
 
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Cannot create the configuration file."
@@ -2169,19 +2169,19 @@ msgstr "Não foi possível criar o arquivo de configuração."
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
-msgstr ""
+msgstr "Não é possível criar a função de utilizador"
 
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível eliminar o token da API"
+msgstr[1] "Não é possível eliminar os tokens da API"
 
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível eliminar o SLA"
+msgstr[1] "Não é possível eliminar os SLA"
 
 #: include/classes/api/services/CUser.php:1257
 #, c-format
@@ -2195,7 +2195,7 @@ msgstr "Não foi possível eliminar acção"
 #: include/classes/api/services/CRole.php:375
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "Não é possível eliminar a função de utilizador atribuída \"%1$s\"."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2432,19 +2432,19 @@ msgstr "Não foi possível eliminar triggers"
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "Não foi possível eliminar o utilizador"
-msgstr[1] ""
+msgstr[1] "Não foi possível eliminar os utilizadores"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível eliminar o grupo de utilizadores"
+msgstr[1] "Não é possível eliminar os grupos de utilizadores"
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
 msgid_plural "Cannot delete user roles"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível eliminar a função de utilizador"
+msgstr[1] "Não é possível eliminar as funções de utilizadores"
 
 #: httpconf.php:177 httpconf.php:442
 msgid "Cannot delete web scenario"
@@ -2453,14 +2453,14 @@ msgstr "Não foi possível eliminar o cenário web"
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível desativar o token da API"
+msgstr[1] "Não é possível desativar os tokens da API"
 
 #: app/controllers/CControllerSlaDisable.php:88
 msgid "Cannot disable SLA"
 msgid_plural "Cannot disable SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível desativar o SLA"
+msgstr[1] "Não é possível desativar os SLA"
 
 #: actionconf.php:499
 msgid "Cannot disable action"
@@ -2503,14 +2503,14 @@ msgstr[1] "Não foi possível desactivar tipo de média"
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível desativar o módulo: %1$s."
+msgstr[1] "Não é possível desativar os módulos: %1$s."
 
 #: app/controllers/CControllerScheduledReportDisable.php:78
 msgid "Cannot disable scheduled report"
 msgid_plural "Cannot disable scheduled reports"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível desativar o relatório programado"
+msgstr[1] "Não é possível desativar os relatórios programados"
 
 #: triggers.php:490
 msgid "Cannot disable trigger"
@@ -3807,6 +3807,13 @@ msgstr ""
 
 #: app/views/administration.proxy.list.php:79
 msgid "Compression"
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:163
+#: app/views/administration.housekeeping.edit.php:168
+#: app/views/administration.housekeeping.edit.php:173
+#: app/views/administration.housekeeping.edit.php:183
+msgid "Compression is not supported."
 msgstr ""
 
 #: app/views/administration.mediatype.edit.php:319
@@ -5478,6 +5485,10 @@ msgstr "Detalhes"
 #: httpdetails.php:27 httpdetails.php:185
 msgid "Details of web scenario"
 msgstr "Detalhes do cenário web"
+
+#: app/views/administration.housekeeping.edit.php:194
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -11038,6 +11049,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "Endereço MAC A"
@@ -11636,6 +11652,11 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:106
 #, c-format
 msgid "Minimum required PHP version is %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:174
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:193
@@ -13796,6 +13817,10 @@ msgstr "Regras de descoberta pai"
 msgid "Parent graphs"
 msgstr "Gráficos herdados"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
 msgid "Parent items"
@@ -14120,6 +14145,10 @@ msgstr "Campos de publicação"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "Tipo do publicação"
+
+#: app/views/administration.housekeeping.edit.php:164
+msgid "PostgreSQL database server version is too old."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -18495,6 +18524,14 @@ msgstr ""
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Não foi possível sobrescrever o arquivo de configuração existente."
 
+#: app/views/administration.housekeeping.edit.php:159
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr ""
@@ -18676,6 +18713,16 @@ msgstr ""
 #: app/partials/administration.system.info.php:173
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:188
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
 msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99

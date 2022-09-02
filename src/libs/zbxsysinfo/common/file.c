@@ -26,6 +26,7 @@
 #include "log.h"
 #include "dir.h"
 #include "sha256crypt.h"
+#include "zbxalgo.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"
@@ -1269,6 +1270,69 @@ static char	*get_print_time(time_t st_raw)
 #	define ZBX_DIR_DELIMITER	"\\"
 #else
 #	define ZBX_DIR_DELIMITER	"/"
+
+static char	*canonicalize_path(const char *fullname)
+{
+	int			i, up_level = 0;
+	char			*name;
+	const char		*p_start = &fullname[1], *p_to_delimiter;
+	size_t			name_alloc = 0, name_offset = 0;
+	zbx_vector_str_t	names;
+
+	zbx_vector_str_create(&names);
+
+	do
+	{
+		if (NULL != (p_to_delimiter = strchr(p_start, '/')))
+		{
+			name = zbx_dsprintf(NULL, "%.*s", (int)(p_to_delimiter - p_start), p_start);
+			p_start = p_to_delimiter + 1;
+		}
+		else
+			name = zbx_strdup(NULL, p_start);
+
+		zbx_vector_str_append(&names, name);
+	}
+	while (NULL != p_to_delimiter);
+
+	name = NULL;
+
+	for (i = names.values_num - 1; 0 <= i; i--)
+	{
+		char *ptr = names.values[i];
+
+		if (0 == strcmp(ptr, ".") || 0 == strlen(ptr))
+		{
+			zbx_free(ptr);
+			zbx_vector_str_remove(&names, i);
+		}
+		else if (0 == strcmp(ptr, ".."))
+		{
+			zbx_free(ptr);
+			zbx_vector_str_remove(&names, i);
+			up_level++;
+		}
+		else if (0 < up_level)
+		{
+			zbx_free(ptr);
+			zbx_vector_str_remove(&names, i);
+			up_level--;
+		}
+	}
+
+	if (0 < names.values_num)
+	{
+		for (i = 0; i < names.values_num; i++)
+			zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "/%s", names.values[i]);
+	}
+	else
+		zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "/");
+
+	zbx_vector_str_clear_ext(&names, zbx_str_free);
+	zbx_vector_str_destroy(&names);
+
+	return name;
+}
 #endif
 
 static int	get_dir_names(const char *filename, char **basename, char **dirname, char **pathname)
@@ -1279,16 +1343,36 @@ static int	get_dir_names(const char *filename, char **basename, char **dirname, 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	if (NULL == (*pathname = _fullpath(NULL, filename, 0)))
 		return FAIL;
-#elif defined(__hpux)
-	char resolved_path[PATH_MAX + 1];
-
-	if (NULL == (*pathname = realpath(filename, resolved_path)))
-		return FAIL;
-
-	*pathname = zbx_strdup(NULL, *pathname);
 #else
-	if (NULL == (*pathname = realpath(filename, NULL)))
-		return FAIL;
+	if ( '/' != filename[0])
+	{
+#ifdef PATH_MAX
+#	define MAX_PATH_BUFFER	PATH_MAX
+#else
+#	define MAX_PATH_BUFFER	4096
+#endif
+		char	resolved_path[MAX_PATH_BUFFER + 1], *name = NULL;
+		size_t	name_alloc = 0, name_offset = 0;
+
+#define ZBX_UNREACHABLE_STR		"(unreachable)"
+#define ZBX_UNREACHABLE_STR_LEN		ZBX_CONST_STRLEN(ZBX_UNREACHABLE_STR)
+
+		if (NULL == getcwd(resolved_path, MAX_PATH_BUFFER) || 0 == strncmp(ZBX_UNREACHABLE_STR, resolved_path,
+				ZBX_UNREACHABLE_STR_LEN))
+		{
+			return FAIL;
+		}
+
+		zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "%s/%s", resolved_path, filename);
+
+		*pathname = canonicalize_path(name);
+		zbx_free(name);
+#undef ZBX_UNREACHABLE_STR_LEN
+#undef ZBX_UNREACHABLE_STR
+#undef MAX_PATH_BUFFER
+	}
+	else
+		*pathname = canonicalize_path(filename);
 #endif
 
 	ptr1 = *pathname;

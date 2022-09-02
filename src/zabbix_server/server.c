@@ -1094,9 +1094,18 @@ static void	zbx_check_db(void)
 	struct zbx_json			db_version_json;
 	int				result = SUCCEED;
 
-	result = DBcheck_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
+	memset(&db_version_info, 0, sizeof(db_version_info));
+	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
 
-	if(SUCCEED == result && (SUCCEED != DBcheck_capabilities(db_version_info.current_version) ||
+	if (SUCCEED == result)
+	{
+		zbx_db_extract_dbextension_info(&db_version_info);
+	}
+
+	if (SUCCEED == result && (
+#ifdef HAVE_POSTGRESQL
+			SUCCEED != zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
+#endif
 			SUCCEED != DBcheck_version()))
 	{
 		result = FAIL;
@@ -1104,7 +1113,7 @@ static void	zbx_check_db(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if(SUCCEED == DBfield_exists("config", "dbversion_status"))
+	if (SUCCEED == DBfield_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -1123,12 +1132,15 @@ static void	zbx_check_db(void)
 		if (SUCCEED == result)
 			zbx_history_check_version(&db_version_json, &result);
 
-		DBflush_version_requirements(db_version_json.buffer);
+		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
 	}
 
 	DBclose();
 	zbx_free(db_version_info.friendly_current_version);
+	zbx_free(db_version_info.extension);
+	zbx_free(db_version_info.ext_friendly_current_version);
+	zbx_free(db_version_info.ext_lic);
 
 	if(SUCCEED != result)
 	{

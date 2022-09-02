@@ -34,7 +34,7 @@ class CSelect extends CTag {
 	/**
 	 * @param string $name  Input field name.
 	 */
-	public function __construct(string $name) {
+	public function __construct(string $name = null) {
 		parent::__construct('z-select', true);
 
 		$this->name = $name;
@@ -253,6 +253,18 @@ class CSelect extends CTag {
 		}
 
 		return $options;
+	}
+
+	protected function startToString() {
+		$attributes = '';
+
+		foreach ($this->attributes as $key => $value) {
+			if ($value !== null) {
+				$attributes .= ' '.$key.'="'.$this->encode($value, $this->attrEncStrategy).'"';
+			}
+		}
+
+		return '<'.$this->tagname.$attributes.'>';
 	}
 
 	public function toString($destroy = true) {
