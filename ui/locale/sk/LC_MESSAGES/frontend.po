@@ -1,32 +1,33 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2013-08-25 22:42+0300\n"
-"Last-Translator: Jan <jan.garaj@gmail.com>\n"
+"PO-Revision-Date: 2022-09-02 11:38+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1377463363.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "Dátum „%1$s“ musí byť menší ako dátum „%2$s“."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "„%1$s“ namiesto „%2$s“"
 
 # "%1$s" je očakávanáX
 #: include/classes/import/validators/C10XmlValidator.php:323
@@ -51,12 +52,12 @@ msgstr "\"%1$s\" je očakávaná"
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "„%1$s“ musí byť prázdny reťazec alebo musí byť väčší ako „%2$s“."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "Hodnota „%1$s“ musí byť menšia alebo rovná hodnote „%2$s“."
 
 #: include/classes/import/validators/C10XmlValidator.php:360
 #: include/classes/import/validators/C10XmlValidator.php:383
@@ -66,23 +67,23 @@ msgstr "\"host:key\" dvojica je očakávaná"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr ""
+msgstr "host id závisleho itemu a hlavného by sa mali zhodovať"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"ruleid\" závisleho itemu a hlavného by sa mali zhodovať"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:901
 #: include/views/js/configuration.host.discovery.edit.js.php:86
 #: include/views/js/item.preprocessing.js.php:171
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.cesta.k.uzlu ($.path.to.node)"
 
 #: include/classes/api/services/CDRule.php:556
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr ""
+msgstr "%1$d znakov prekračuje maximálnu dĺžku %2$d znakov"
 
 #: include/func.inc.php:488
 #, c-format
@@ -96,20 +97,20 @@ msgstr[2] "%1$d dní"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "nájdené %1$d zhody pre %2$s "
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d z %3$d%2$s problému zobrazených"
+msgstr[1] "%1$d z %3$d%2$s problémov zobrazených"
+msgstr[2] "%1$d z %3$d%2$s problémov zobrazených  "
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "počet vybratých problémov: %1$d."
 
 #: chart4.php:94
 #, c-format
@@ -119,7 +120,7 @@ msgstr "%1$s (rok %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s – vyvolané modulom umiestneným na %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -132,19 +133,19 @@ msgstr "%1$s [Riadok: %2$s | Stĺpec: %3$s]"
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "akcia %1$s"
+msgstr[1] "akcie %1$s"
+msgstr[2] "akcie %1$s "
 
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s znakov"
 
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "Zostáva %1$s znakov"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -159,17 +160,17 @@ msgstr[2] "%1$s udalostí"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s host v údržbe"
+msgstr[1] "%1$s hostov v údržbe"
+msgstr[2] "%1$s hostov v údržbe "
 
 #: include/func.inc.php:2549
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s hodina"
+msgstr[1] "%1$s hodín"
+msgstr[2] "%1$s hodín "
 
 #: app/controllers/CControllerWidgetPlainTextView.php:126
 #: app/controllers/CControllerWidgetPlainTextView.php:127
@@ -186,9 +187,9 @@ msgstr[2] "%1$s položiek"
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s správa"
+msgstr[1] "%1$s správy"
+msgstr[2] "%1$s správy "
 
 #: include/classes/widgets/CWidgetConfig.php:308
 #: include/classes/widgets/CWidgetConfig.php:309
@@ -206,32 +207,32 @@ msgstr[2] "%1$s minút"
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s z %2$s prvku v problémovom stave"
+msgstr[1] "%1$s z %2$s prvkov v problémovom stave"
+msgstr[2] "%1$s z %2$s prvkov v problémovom stave "
 
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s predvolené, použi klávesy nadol, nahor a enter pre výber"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "problém %1$s"
+msgstr[1] "problémy %1$s"
+msgstr[2] "problémy %1$s "
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "celkom %1$s problém"
+msgstr[1] "celkom %1$s problémov"
+msgstr[2] "celkom %1$s problémov  "
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2172
@@ -259,33 +260,33 @@ msgstr[2] "%1$s sekúnd"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s nepotvrdený problém"
+msgstr[1] "%1$s nepotvrdené problémy"
+msgstr[2] "%1$s nepotvrdené problémy "
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, severita, %2$s"
 
 #: jsLoader.php:342
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, len na čítanie"
 
 #: jsLoader.php:388
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, vybraté"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$stý percentil: %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -315,7 +316,7 @@ msgstr "(0 - nekonečne)"
 
 #: app/partials/popup.operations.php:67
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 – použiť predvolenú akciu)"
 
 #: include/views/configuration.hostgroups.list.php:37
 msgid "(Only super admins can create groups)"
@@ -325,7 +326,7 @@ msgstr "(Skupiny môžu vytvárať iba super administrátori)"
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(vytvorené discovery hostom)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
@@ -1398,12 +1399,16 @@ msgstr "Inventárne číslo"
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
 msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:50
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
 msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:112
 #, c-format
@@ -2349,12 +2354,11 @@ msgid "Cannot delete dependency"
 msgstr "Nie je možné zmazať závislosť"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
-msgstr[0] "Nie je možné zmazať zisťovacie pravidlo"
-msgstr[1] "Nie je možné zmazať zisťovacie pravidlo"
-msgstr[2] "Nie je možné zmazať zisťovacie pravidlo"
+msgstr[0] "Nie je možné zmazať discovery pravidlo"
+msgstr[1] "Nie je možné zmazať discovery pravidlá"
+msgstr[2] "  "
 
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
@@ -2522,12 +2526,11 @@ msgid "Cannot delete selected actions"
 msgstr "Nie je možné zmazať označené akcie"
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Nie je možné zmazať službu"
-msgstr[1] "Nie je možné zmazať službu"
-msgstr[2] "Nie je možné zmazať službu"
+msgstr[1] "Nie je možné zmazať služby"
+msgstr[2] " "
 
 #: include/classes/api/services/CService.php:455
 #: include/classes/api/services/CService.php:470
@@ -3446,12 +3449,11 @@ msgid "Cannot update host group"
 msgstr ""
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:341
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Nie je možné aktualizovať prototyp hosta"
-msgstr[1] "Nie je možné aktualizovať prototyp hosta"
-msgstr[2] "Nie je možné aktualizovať prototyp hosta"
+msgstr[1] "Nie je možné aktualizovať prototyp hostov"
+msgstr[2] " "
 
 #: app/controllers/CControllerPopupMassupdateHost.php:465
 msgid "Cannot update hosts"
@@ -3477,12 +3479,11 @@ msgid "Cannot update item"
 msgstr "Nie je možné aktualizovať prototyp položky"
 
 #: disc_prototypes.php:556 disc_prototypes.php:583 disc_prototypes.php:617
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
-msgstr[0] "Nie je možné aktualizovať prototyp položky"
-msgstr[1] "Nie je možné aktualizovať prototyp položky"
-msgstr[2] "Nie je možné aktualizovať prototyp položky"
+msgstr[0] "Nie je možné aktualizovať prototyp itemov"
+msgstr[1] "Nemožno aktualizovať prototypy itemu"
+msgstr[2] " "
 
 #: app/controllers/CControllerPopupMassupdateItem.php:316
 msgid "Cannot update item prototypes"
@@ -3598,12 +3599,11 @@ msgstr ""
 
 #: trigger_prototypes.php:365 trigger_prototypes.php:440
 #: trigger_prototypes.php:488
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
-msgstr[0] "Nie je možné aktualizovať prototyp spúšťača"
-msgstr[1] "Nie je možné aktualizovať prototyp spúšťača"
-msgstr[2] "Nie je možné aktualizovať prototyp spúšťača"
+msgstr[0] "Nie je možné aktualizovať prototyp triggra"
+msgstr[1] "Nie je možné aktualizovať prototypy triggrov"
+msgstr[2] " "
 
 #: include/classes/api/services/CTriggerGeneral.php:1721
 #, c-format
@@ -6172,12 +6172,11 @@ msgid "Discovery rule created"
 msgstr "Zisťovacie pravidlo vytvorené"
 
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:416
-#, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
-msgstr[0] "Zisťovacie pravidlo vymazané"
-msgstr[1] "Zisťovacie pravidlo vymazané"
-msgstr[2] "Zisťovacie pravidlo vymazané"
+msgstr[0] "Discovery pravidlo vymazané"
+msgstr[1] "Discovery pravidlá vymazané"
+msgstr[2] " "
 
 #: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:767
 msgid "Discovery rule disabled"
@@ -8569,12 +8568,11 @@ msgid "Host prototype macros"
 msgstr ""
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:340
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Prototyp hosta aktualizovaný"
-msgstr[1] "Prototyp hosta aktualizovaný"
-msgstr[2] "Prototyp hosta aktualizovaný"
+msgstr[1] "Prototypy hostov bol aktualizovaný"
+msgstr[2] " "
 
 #: include/classes/api/services/CHostPrototype.php:999
 #, c-format
@@ -10761,12 +10759,11 @@ msgid "Item prototype deleted"
 msgstr "Prototyp položky zmazaný"
 
 #: disc_prototypes.php:556 disc_prototypes.php:582 disc_prototypes.php:616
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
-msgstr[0] "Prototyp položky aktualizovaný"
-msgstr[1] "Prototyp položky aktualizovaný"
-msgstr[2] "Prototyp položky aktualizovaný"
+msgstr[0] "Prototyp itemu bol aktualizovaný"
+msgstr[1] "Prototypy itemov boli aktualizované"
+msgstr[2] " "
 
 #: include/classes/api/services/CDashboardGeneral.php:474
 #: include/classes/api/services/CDashboardGeneral.php:482
@@ -16819,12 +16816,11 @@ msgid "Service data storage period"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Služba zmazaná"
-msgstr[1] "Služba zmazaná"
-msgstr[2] "Služba zmazaná"
+msgstr[1] "Služby zmazané"
+msgstr[2] " "
 
 #: app/views/administration.userrole.edit.php:146
 #: app/views/administration.userrole.edit.php:187
@@ -18466,6 +18462,10 @@ msgstr "Tento mesiac"
 msgid "This month so far"
 msgstr ""
 
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
@@ -19047,12 +19047,11 @@ msgstr "Prototyp spúšťača zmazaný"
 
 #: trigger_prototypes.php:362 trigger_prototypes.php:439
 #: trigger_prototypes.php:487
-#, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
-msgstr[0] "Prototyp spúšťača aktualizovaný"
-msgstr[1] "Prototyp spúšťača aktualizovaný"
-msgstr[2] "Prototyp spúšťača aktualizovaný"
+msgstr[0] "Prototyp triggra aktualizovaný"
+msgstr[1] "Prototyp triggrov aktualizovaný"
+msgstr[2] " "
 
 #: app/controllers/CControllerPopupGeneric.php:183
 #: app/controllers/CControllerPopupImportCompare.php:174
