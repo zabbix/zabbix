@@ -1191,7 +1191,8 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 	let items = [];
 
 	if (objectSize(tree) > 0) {
-		jQuery.each(tree, function(key, data) {
+		Object.keys(tree).map(function(key) {
+			const data = tree[key];
 			const item = {label: data.name};
 
 			if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
@@ -1229,7 +1230,8 @@ function getMenuPopupScriptItems(tree, trigger_elm) {
 	let items = [];
 
 	if (objectSize(tree) > 0) {
-		jQuery.each(tree, function(key, data) {
+		Object.keys(tree).map(function(key) {
+			const data = tree[key];
 			const item = {label: data.name};
 
 			if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
