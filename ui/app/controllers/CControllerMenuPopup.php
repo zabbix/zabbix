@@ -41,7 +41,7 @@ class CControllerMenuPopup extends CController {
 		return $ret;
 	}
 
-	private function validateInputData(): bool {
+	protected function validateInputData(): bool {
 		$type = $this->getInput('type');
 
 		switch ($type) {
@@ -90,7 +90,9 @@ class CControllerMenuPopup extends CController {
 				break;
 		}
 
-		$validator = new CNewValidator($this->getInput('data', []), $rules);
+		$this->input['data'] = array_intersect_key($this->getInput('data', []), $rules);
+
+		$validator = new CNewValidator($this->input['data'], $rules);
 		array_map('error', $validator->getAllErrors());
 
 		return !$validator->isError() && !$validator->isErrorFatal();
@@ -841,7 +843,7 @@ class CControllerMenuPopup extends CController {
 				break;
 
 			case 'host':
-				$menu_data = self::getMenuDataHost(array_intersect_key($data, array_flip(['hostid', 'has_goto'])));
+				$menu_data = self::getMenuDataHost($data);
 				break;
 
 			case 'item':
