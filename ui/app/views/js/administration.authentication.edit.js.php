@@ -117,10 +117,10 @@
 						e.target.closest('tr').remove()
 					}
 					else if (e.target.classList.contains('js-enabled')) {
-						this.toggleFallbackStatus('off', e.target.closest('td'));
+						this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_OFF ?>);
 					}
 					else if (e.target.classList.contains('js-disabled')) {
-						this.toggleFallbackStatus('on', e.target.closest('td'));
+						this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_ON ?>);
 					}
 				});
 
@@ -145,22 +145,25 @@
 			});
 		}
 
-		toggleFallbackStatus(action, target) {
-			const new_action = document.createElement('td');
-			if (action === 'on') {
-				new_action.innerHTML = '<button type="button" class="<?= ZBX_STYLE_BTN_LINK . ' ' . ZBX_STYLE_GREEN?> js-enabled"><?= _('Enabled') ?></button>';
-				new_action.innerHTML += '<input type="hidden" name="saml_groups[#{row_index}][fallback_status]" value="1">';
+		toggleFallbackStatus(status) {
+			const row = document.querySelector('[data-row_fallback="<?= GROUP_MAPPING_FALLBACK ?>"]');
+			const btn = row.querySelector('.btn-link');
+
+			if (status == <?= GROUP_MAPPING_FALLBACK_ON ?>) {
+				row.querySelector('[name$="[fallback_status]"]').value = status;
+				btn.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN?>');
+				btn.classList.replace('js-disabled', 'js-enabled');
+				btn.innerText = '<?= _('Enabled') ?>';
 			}
-			else if (action === 'off') {
-				new_action.innerHTML = '<button type="button" class="<?= ZBX_STYLE_BTN_LINK . ' ' . ZBX_STYLE_RED?> js-disabled"><?= _('Disabled') ?></button>';
-				new_action.innerHTML += '<input type="hidden" name="saml_groups[#{row_index}][fallback_status]" value="0">';
+			else {
+				row.querySelector('[name$="[fallback_status]"]').value = status;
+				btn.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED?>');
+				btn.classList.replace('js-enabled', 'js-disabled');
+				btn.innerText = '<?= _('Disabled') ?>';
 			}
-			target.replaceWith(new_action);
 		}
 
 		_initSortable(element) {
-			// const is_disabled = element.querySelectorAll('tr.sortable').length < 2;
-
 			$(element).sortable({
 				// disabled: is_disabled,
 				items: 'tbody tr.sortable',
