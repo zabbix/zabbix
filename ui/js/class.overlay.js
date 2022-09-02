@@ -43,7 +43,7 @@ function Overlay(type, dialogueid) {
 		'data-dialogueid': this.dialogueid,
 		'role': 'dialog',
 		'aria-modal': 'true',
-		'aria-labeledby': this.headerid
+		'aria-labelledby': this.headerid
 	});
 
 	this.$dialogue.$header = jQuery('<h4>', {id: this.headerid});

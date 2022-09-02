@@ -1878,7 +1878,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 		if (SUCCEED != errcodes[i])
 			continue;
 
-		if (3 != num_key_param(items[i].snmp_oid))
+		if (3 != zbx_num_key_param(items[i].snmp_oid))
 		{
 			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 					items[i].snmp_oid));
@@ -1886,9 +1886,9 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 			continue;
 		}
 
-		get_key_param(items[i].snmp_oid, 1, method, sizeof(method));
-		get_key_param(items[i].snmp_oid, 2, index_oids[i], sizeof(index_oids[i]));
-		get_key_param(items[i].snmp_oid, 3, index_values[i], sizeof(index_values[i]));
+		zbx_get_key_param(items[i].snmp_oid, 1, method, sizeof(method));
+		zbx_get_key_param(items[i].snmp_oid, 2, index_oids[i], sizeof(index_oids[i]));
+		zbx_get_key_param(items[i].snmp_oid, 3, index_values[i], sizeof(index_values[i]));
 
 		if (0 != strcmp("index", method))
 		{
@@ -2066,7 +2066,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *ite
 		if (SUCCEED != errcodes[i])
 			continue;
 
-		if (0 != num_key_param(items[i].snmp_oid))
+		if (0 != zbx_num_key_param(items[i].snmp_oid))
 		{
 			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 					items[i].snmp_oid));

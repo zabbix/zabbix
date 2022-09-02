@@ -48,7 +48,7 @@ static int	get_perfstat_io(const char *devname, zbx_perfstat_t *zp, char **error
 		perfstat_id_t	name;
 		perfstat_disk_t	data;
 
-		strscpy(name.name, devname);
+		zbx_strscpy(name.name, devname);
 
 		if (0 < (err = perfstat_disk(&name, &data, sizeof(data), 1)))
 		{

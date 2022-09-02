@@ -866,11 +866,11 @@ static int	compare_triggers(zbx_trigger_copy_t * template_trigger, zbx_target_ho
 					zbx_snprintf(replace, sizeof(replace), "{%s}", functionid);
 
 					old_expr = expr;
-					expr = string_replace(expr, search, replace);
+					expr = zbx_string_replace(expr, search, replace);
 					zbx_free(old_expr);
 
 					old_expr = rexpr;
-					rexpr = string_replace(rexpr, search, replace);
+					rexpr = zbx_string_replace(rexpr, search, replace);
 					zbx_free(old_expr);
 				}
 			}

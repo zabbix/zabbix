@@ -25,6 +25,7 @@
 #include "stats.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxtime.h"
 
 #if !defined(HAVE_ZONE_H) && defined(HAVE_SYS_UTSNAME_H)
 #	include <sys/utsname.h>
@@ -227,7 +228,7 @@ static int	proc_get_process_info(const char *pid, unsigned int flags, zbx_sysinf
 
 	/* skip entries not containing pids */
 	memset(proc, 0, sizeof(zbx_sysinfo_proc_t));
-	if (FAIL == is_uint32(pid, &proc->pid))
+	if (FAIL == zbx_is_uint32(pid, &proc->pid))
 		return FAIL;
 
 	zbx_snprintf(path, sizeof(path), "/proc/%s/psinfo", pid);

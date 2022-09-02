@@ -640,7 +640,7 @@ static void	replace_sid_to_account(PSID sidVal, char **out_message)
 		zbx_strlcpy(buffer, userName, sizeof(buffer));	/* NULL SID */
 
 	tmp = *out_message;
-	*out_message = string_replace(*out_message, sidName, buffer);
+	*out_message = zbx_string_replace(*out_message, sidName, buffer);
 
 	LocalFree(sid);
 	zbx_free(tmp);

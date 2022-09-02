@@ -35,11 +35,11 @@ static void	zbx_vc_test_check_result(zbx_uint64_t cache_hits, zbx_uint64_t cache
 {
 	zbx_uint64_t	expected_hits, expected_misses;
 
-	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.hits"), &expected_hits))
+	if (FAIL == zbx_is_uint64(zbx_mock_get_parameter_string("out.cache.hits"), &expected_hits))
 		fail_msg("Invalid out.cache.hits value");
 	zbx_mock_assert_uint64_eq("cache.hits", expected_hits, cache_hits);
 
-	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.misses"), &expected_misses))
+	if (FAIL == zbx_is_uint64(zbx_mock_get_parameter_string("out.cache.misses"), &expected_misses))
 		fail_msg("Invalid out.cache.misses value");
 	zbx_mock_assert_uint64_eq("cache.misses", expected_misses, cache_misses);
 }
@@ -120,7 +120,7 @@ void	zbx_vc_common_test_func(
 			fail_msg("out.cache.items parameter is not a vector");
 
 		data = zbx_mock_get_object_member_string(hitem, "itemid");
-		if (SUCCEED != is_uint64(data, &itemid))
+		if (SUCCEED != zbx_is_uint64(data, &itemid))
 			fail_msg("Invalid itemid \"%s\"", data);
 
 		err = zbx_vc_get_item_state(itemid, &item_status, &item_active_range, &item_values_total,
