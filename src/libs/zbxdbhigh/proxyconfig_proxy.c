@@ -982,9 +982,17 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 				{
 					if (ZBX_TYPE_ID != fields[j]->type)
 					{
-						/* only ID fields can be used as foreign keys for now */
+						/* Field resetting is used to avoid foreign key conflicts in self */
+						/* referenced tables during inserts. Such fields are inserted as  */
+						/* nulls and then updated to correct values.                      */
+						/* For now only ID fields can be used in foreign keys.            */
 						THIS_SHOULD_NEVER_HAPPEN;
-						exit(EXIT_FAILURE);
+
+						*error = zbx_dsprintf(NULL, "cannot reset field \"%s.%s\" of type %d "
+								"to NULL value",
+								td->table->table, fields[j]->name, fields[j]->type);
+						ret = FAIL;
+						goto clean;
 					}
 
 					/* insert null ID and add this row to updates, */
