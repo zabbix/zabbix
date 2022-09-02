@@ -29,7 +29,7 @@ if ($data['uncheck']) {
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Event correlation'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_CORRELATION_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())

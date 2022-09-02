@@ -101,8 +101,8 @@
 		}
 
 		_authFormSubmit() {
-			const fields_to_trim = ['#saml_idp_entityid', '#saml_sso_url', '#saml_slo_url', '#saml_username_attribute',
-				'#saml_sp_entityid', '#saml_nameid_format'
+			const fields_to_trim = ['#http_strip_domains', '#saml_idp_entityid', '#saml_sso_url', '#saml_slo_url',
+				'#saml_username_attribute', '#saml_sp_entityid', '#saml_nameid_format'
 			];
 			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
 				elem.value = elem.value.trim();

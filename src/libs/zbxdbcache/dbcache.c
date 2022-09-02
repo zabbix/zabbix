@@ -19,7 +19,6 @@
 
 #include "dbcache.h"
 
-#include "common.h"
 #include "log.h"
 #include "zbxmutexs.h"
 #include "zbxserver.h"
@@ -32,6 +31,7 @@
 #include "zbxnix.h"
 #include "zbxavailability.h"
 #include "zbxtrends.h"
+#include "zbxnum.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;
@@ -1661,7 +1661,7 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const DC_I
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			strscpy(value, h->value.str);
+			zbx_strscpy(value, h->value.str);
 			break;
 		default:
 			return;

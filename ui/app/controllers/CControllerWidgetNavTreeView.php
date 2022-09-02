@@ -138,6 +138,20 @@ class CControllerWidgetNavTreeView extends CControllerDashboardWidgetView {
 				}
 			}
 
+			// Drop all inaccessible triggers.
+			if ($problems_per_trigger) {
+				$triggers = API::Trigger()->get([
+					'output' => [],
+					'triggerids' => array_keys($problems_per_trigger),
+					'monitored' => true,
+					'preservekeys' => true
+				]);
+
+				$problems_per_trigger = array_intersect_key($problems_per_trigger, $triggers);
+
+				unset($triggers);
+			}
+
 			// Select lowest severity to reduce amount of data returned by API.
 			$severity_min = min(zbx_objectValues($sysmaps, 'severity_min'));
 
@@ -147,7 +161,6 @@ class CControllerWidgetNavTreeView extends CControllerDashboardWidgetView {
 					'output' => ['triggerid'],
 					'selectHostGroups' => ['groupid'],
 					'groupids' => array_keys($host_groups),
-					'skipDependent' => true,
 					'preservekeys' => true
 				]);
 
@@ -167,7 +180,6 @@ class CControllerWidgetNavTreeView extends CControllerDashboardWidgetView {
 					'output' => ['triggerid'],
 					'selectHosts' => ['hostid'],
 					'hostids' => array_keys($hosts),
-					'skipDependent' => true,
 					'preservekeys' => true,
 					'monitored' => true
 				]);
@@ -184,19 +196,11 @@ class CControllerWidgetNavTreeView extends CControllerDashboardWidgetView {
 
 			// Count problems per trigger.
 			if ($problems_per_trigger) {
-				$triggers = API::Trigger()->get([
-					'output' => [],
-					'triggerids' => array_keys($problems_per_trigger),
-					'skipDependent' => true,
-					'preservekeys' => true,
-					'monitored' => true
-				]);
-
 				$problems = API::Problem()->get([
 					'output' => ['objectid', 'severity'],
 					'source' => EVENT_SOURCE_TRIGGERS,
 					'object' => EVENT_OBJECT_TRIGGER,
-					'objectids' => array_keys($triggers),
+					'objectids' => array_keys($problems_per_trigger),
 					'severities' => range($severity_min, TRIGGER_SEVERITY_COUNT - 1),
 					'preservekeys' => true
 				]);

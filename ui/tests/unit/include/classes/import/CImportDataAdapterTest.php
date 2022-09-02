@@ -2448,7 +2448,7 @@ class CImportDataAdapterTest extends TestCase {
 		$this->getAdapter($xml);
 	}
 
-	public function test10SchemaTranformationToLatest() {
+	public function test10SchemaTransformationToLatest() {
 		$adapter = $this->getAdapter($this->get10Xml());
 
 		$this->assertEquals($adapter->getHosts(), [

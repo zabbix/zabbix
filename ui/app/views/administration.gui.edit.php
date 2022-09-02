@@ -149,7 +149,7 @@ $gui_view = (new CTabView())
 	));
 
 $form = (new CForm())
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'gui.update')
 		->getUrl()

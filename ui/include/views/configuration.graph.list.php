@@ -29,8 +29,8 @@ if (!empty($this->data['parent_discoveryid'])) {
 	$html_page = (new CHtmlPage())
 		->setTitle(_('Graph prototypes'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-			? CDocHelper::CONFIGURATION_HOST_GRAPH_PROTOTYPE_LIST
-			: CDocHelper::CONFIGURATION_TEMPLATES_GRAPH_PROTOTYPE_LIST
+			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_PROTOTYPE_LIST
+			: CDocHelper::DATA_COLLECTION_TEMPLATES_GRAPH_PROTOTYPE_LIST
 		))
 		->setControls(
 			(new CTag('nav', true,
@@ -51,8 +51,8 @@ else {
 	$html_page = (new CHtmlPage())
 		->setTitle(_('Graphs'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-			? CDocHelper::CONFIGURATION_HOST_GRAPH_LIST
-			: CDocHelper::CONFIGURATION_TEMPLATE_GRAPH_LIST
+			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_LIST
+			: CDocHelper::DATA_COLLECTION_TEMPLATE_GRAPH_LIST
 		))
 		->setControls(
 			(new CTag('nav', true,

@@ -19,6 +19,10 @@
 
 #include "taskmanager.h"
 
+#include "../../zabbix_server/scripts/scripts.h"
+#include "../../zabbix_server/trapper/trapper_item_test.h"
+#include "../../zabbix_server/poller/checks_snmp.h"
+
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
@@ -26,12 +30,9 @@
 #include "zbxdiag.h"
 #include "zbxrtc.h"
 #include "proxy.h"
-#include "zbxcomms.h"
 #include "dbcache.h"
-
-#include "../../zabbix_server/scripts/scripts.h"
-#include "../../zabbix_server/trapper/trapper_item_test.h"
-#include "../../zabbix_server/poller/checks_snmp.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -421,23 +422,26 @@ static void	force_config_sync(void)
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
-	static int	cleanup_time = 0;
+	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
+							(((zbx_thread_args_t *)args)->args);
+	static int			cleanup_time = 0;
 
-	double			sec1, sec2;
-	int			tasks_num, sleeptime, nextcheck;
-	zbx_ipc_async_socket_t	rtc;
+	double				sec1, sec2;
+	int				tasks_num, sleeptime, nextcheck;
+	zbx_ipc_async_socket_t		rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(taskmanager_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(taskmanager_args_in->zbx_config_tls, taskmanager_args_in->zbx_get_program_type_cb_arg);
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);

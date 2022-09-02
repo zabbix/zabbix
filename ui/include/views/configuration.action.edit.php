@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Actions'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ACTION_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_EDIT));
 
 // create form
 $actionForm = (new CForm())
@@ -37,7 +37,7 @@ $actionForm = (new CForm())
 		->setArgument('eventsource', $data['eventsource'])
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form']);
 
 if ($data['actionid']) {

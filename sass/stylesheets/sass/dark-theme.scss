@@ -59,13 +59,17 @@ $menu-main-submenu-next-level-bg: #454545 !default;
 $menu-main-submenu-next-level-shadow: rgba(#2b2b2b, .35) !default;
 
 $menu-main-icons: (
+	dashboards: -570px -856px,
 	dashboard: -570px -664px,
 	problems: -570px -688px,
 	monitoring: -570px -712px,
 	services: -570px -832px,
 	inventory: -570px -736px,
 	reports: -570px -760px,
+	data-collection: -570px -784px,
+	alerts: -570px -879px,
 	configuration: -570px -784px,
+	users: -570px -904px,
 	administration: -570px -808px
 );
 

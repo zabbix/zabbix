@@ -29,7 +29,7 @@ $this->includeJsFile('administration.script.edit.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Scripts'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_SCRIPT_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_EDIT));
 
 $row_template = (new CTag('script', true))
 	->setId('parameters-row')
@@ -55,7 +55,7 @@ $html_page->addItem($row_template);
 $form = (new CForm())
 	->setId('script-form')
 	->setName('scripts')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 

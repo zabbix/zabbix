@@ -189,7 +189,7 @@ $form = (new CForm())
 		->setArgument('action', 'miscconfig.update')
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem(
 		(new CTabView())
 			->addTab('other', _('Other parameters'), $from_list)

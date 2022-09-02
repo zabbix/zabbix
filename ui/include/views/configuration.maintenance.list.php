@@ -25,7 +25,7 @@
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Maintenance periods'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_MAINTENANCE_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())

@@ -18,9 +18,10 @@
 **/
 
 #include "service_actions.h"
-
-#include "log.h"
 #include "zbxserver.h"
+
+#include "zbxnum.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -32,7 +33,7 @@ static int	condition_match_service(const zbx_service_action_condition_t *conditi
 {
 	zbx_uint64_t	serviceid;
 
-	if (SUCCEED != is_uint64(condition->value, &serviceid) || serviceid != update->service->serviceid)
+	if (SUCCEED != zbx_is_uint64(condition->value, &serviceid) || serviceid != update->service->serviceid)
 		return FAIL;
 
 	return SUCCEED;
@@ -179,7 +180,7 @@ static int	service_update_match_action(const zbx_service_update_t *update, const
 		switch (token.type)
 		{
 			case ZBX_TOKEN_OBJECTID:
-				if (SUCCEED == is_uint64_n(action->formula + token.data.objectid.name.l,
+				if (SUCCEED == zbx_is_uint64_n(action->formula + token.data.objectid.name.l,
 						token.data.objectid.name.r - token.data.objectid.name.l + 1, &id))
 				{
 					zbx_strncpy_alloc(&expr, &expr_alloc, &expr_offset,

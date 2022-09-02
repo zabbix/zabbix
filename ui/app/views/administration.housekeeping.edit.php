@@ -27,7 +27,6 @@ $this->includeJsFile('administration.housekeeping.edit.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Housekeeping'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_HOUSEKEEPING_EDIT));
 
 $form = (new CForm())
@@ -36,7 +35,7 @@ $form = (new CForm())
 		->setArgument('action', 'housekeeping.update')
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $house_keeper_tab = (new CFormList())
 	->addRow((new CTag('h4', true, _('Events and alerts')))->addClass('input-section-header'))
@@ -226,10 +225,14 @@ $house_keeper_tab = (new CFormList())
 			);
 	}
 
-$house_keeper_tab
-	->addRow((new CTag('h4', true, _('Audit')))->addClass('input-section-header'))
-	->addRow(new CLink(_('Audit settings'), (new CUrl('zabbix.php'))->setArgument('action', 'audit.settings.edit'))
-);
+if (CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_AUDIT_LOG)) {
+	$house_keeper_tab
+		->addRow((new CTag('h4', true, _('Audit log')))->addClass('input-section-header'))
+		->addRow(
+			new CLink(_('Audit settings'),
+			(new CUrl('zabbix.php'))->setArgument('action', 'audit.settings.edit'))
+		);
+}
 
 $form->addItem(
 	(new CTabView())

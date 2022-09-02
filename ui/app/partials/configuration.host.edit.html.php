@@ -270,32 +270,30 @@ $host_tab
 		)
 	]);
 
-// IPMI tab.
-if ($host_is_discovered) {
-	$ipmi_authtype_select = [
-		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['host']['ipmi_authtype']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		new CVar('ipmi_authtype', $data['host']['ipmi_authtype'])
-	];
-	$ipmi_privilege_select = [
-		(new CTextBox('ipmi_privilege_name', ipmiPrivileges($data['host']['ipmi_privilege']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		new CVar('ipmi_privilege', $data['host']['ipmi_privilege'])
-	];
-}
-else {
-	$ipmi_authtype_select = new CListBox('ipmi_authtype', $data['host']['ipmi_authtype'], 7, ipmiAuthTypes());
-	$ipmi_privilege_select = new CListBox('ipmi_privilege', $data['host']['ipmi_privilege'], 5, ipmiPrivileges());
-}
-
 $ipmi_tab = (new CFormGrid())
 	->addItem([
-		new CLabel(_('Authentication algorithm'), 'ipmi_authtype'),
-		new CFormField($ipmi_authtype_select)
+		new CLabel(_('Authentication algorithm'), 'label_ipmi_authtype'),
+		new CFormField(
+			(new CSelect('ipmi_authtype'))
+				->setValue($data['host']['ipmi_authtype'])
+				->setFocusableElementId('label_ipmi_authtype')
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->addOptions(CSelect::createOptionsFromArray(ipmiAuthTypes()))
+				->setReadonly($host_is_discovered)
+				->setId('ipmi_authtype')
+		)
 	])
 	->addItem([
-		new CLabel(_('Privilege level'), 'ipmi_privilege'),
-		new CFormField($ipmi_privilege_select)
+		new CLabel(_('Privilege level'), 'label_ipmi_privilege'),
+		new CFormField(
+			(new CSelect('ipmi_privilege'))
+				->setValue($data['host']['ipmi_privilege'])
+				->setFocusableElementId('label_ipmi_privilege')
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->addOptions(CSelect::createOptionsFromArray(ipmiPrivileges()))
+				->setReadonly($host_is_discovered)
+				->setId('ipmi_privilege')
+		)
 	])
 	->addItem([
 		new CLabel(_('Username'), 'ipmi_username'),
@@ -508,7 +506,7 @@ if (!$host_is_discovered) {
 $tabs = (new CTabView(['id' => 'host-tabs']))
 	->setSelected(0)
 	->addTab('host-tab', _('Host'), $host_tab)
-	->addTab('ipmi-tab', _('IPMI'), $ipmi_tab)
+	->addTab('ipmi-tab', _('IPMI'), $ipmi_tab, TAB_INDICATOR_IPMI)
 	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('macros-tab', _('Macros'), $macros_tab, TAB_INDICATOR_MACROS)
 	->addTab('inventory-tab', _('Inventory'), $inventory_tab, TAB_INDICATOR_INVENTORY)

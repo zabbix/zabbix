@@ -19,7 +19,8 @@
 
 #include "zbxvariant.h"
 
-#include "common.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
 #include "log.h"
 
 ZBX_VECTOR_IMPL(var, zbx_variant_t)
@@ -199,7 +200,7 @@ static int	variant_to_dbl(zbx_variant_t *value)
 	zbx_rtrim(buffer, "\n\r"); /* trim newline for historical reasons / backwards compatibility */
 	zbx_trim_float(buffer);
 
-	if (SUCCEED != is_double(buffer, &value_dbl))
+	if (SUCCEED != zbx_is_double(buffer, &value_dbl))
 		return FAIL;
 
 	zbx_variant_clear(value);
@@ -226,7 +227,7 @@ static int	variant_to_ui64(zbx_variant_t *value)
 			if (ZBX_MAX_UINT64 <= value->data.dbl)
 				return FAIL;
 
-			zbx_variant_set_ui64(value, value->data.dbl);
+			zbx_variant_set_ui64(value, (zbx_uint64_t)(value->data.dbl));
 			return SUCCEED;
 		case ZBX_VARIANT_STR:
 			zbx_strlcpy(buffer, value->data.str, sizeof(buffer));
@@ -237,9 +238,9 @@ static int	variant_to_ui64(zbx_variant_t *value)
 
 	zbx_rtrim(buffer, "\n\r"); /* trim newline for historical reasons / backwards compatibility */
 	zbx_trim_integer(buffer);
-	del_zeros(buffer);
+	zbx_del_zeros(buffer);
 
-	if (SUCCEED != is_uint64(buffer, &value_ui64))
+	if (SUCCEED != zbx_is_uint64(buffer, &value_ui64))
 		return FAIL;
 
 	zbx_variant_clear(value);
@@ -258,7 +259,7 @@ static int	variant_to_str(zbx_variant_t *value)
 			return SUCCEED;
 		case ZBX_VARIANT_DBL:
 			value_str = zbx_strdup(NULL, zbx_print_double(buffer, sizeof(buffer), value->data.dbl));
-			del_zeros(value_str);
+			zbx_del_zeros(value_str);
 			break;
 		case ZBX_VARIANT_UI64:
 			value_str = zbx_dsprintf(NULL, ZBX_FS_UI64, value->data.ui64);
@@ -301,7 +302,7 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 
 	zbx_rtrim(buffer, "\n\r"); /* trim newline for historical reasons / backwards compatibility */
 	zbx_trim_integer(buffer);
-	del_zeros(buffer);
+	zbx_del_zeros(buffer);
 
 	if ('+' == buffer[0])
 	{
@@ -309,13 +310,13 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 		return FAIL;
 	}
 
-	if (SUCCEED == is_uint64(buffer, &value_ui64))
+	if (SUCCEED == zbx_is_uint64(buffer, &value_ui64))
 	{
 		zbx_variant_set_ui64(value, value_ui64);
 		return SUCCEED;
 	}
 
-	if (SUCCEED == is_double(buffer, &dbl_tmp))
+	if (SUCCEED == zbx_is_double(buffer, &dbl_tmp))
 	{
 		zbx_variant_set_dbl(value, dbl_tmp);
 		return SUCCEED;
@@ -333,7 +334,7 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 	{
 		case ZBX_VARIANT_DBL:
 			zbx_print_double(buffer, sizeof(buffer), value->data.dbl);
-			del_zeros(buffer);
+			zbx_del_zeros(buffer);
 			return buffer;
 		case ZBX_VARIANT_UI64:
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, value->data.ui64);
@@ -394,17 +395,6 @@ const char	*zbx_get_variant_type_desc(unsigned char type)
 const char	*zbx_variant_type_desc(const zbx_variant_t *value)
 {
 	return zbx_get_variant_type_desc(value->type);
-}
-
-int	zbx_validate_value_dbl(double value, int dbl_precision)
-{
-	if ((ZBX_DB_DBL_PRECISION_ENABLED == dbl_precision && (value < -1e+308 || value > 1e+308)) ||
-			(ZBX_DB_DBL_PRECISION_ENABLED != dbl_precision && (value <= -1e12 || value >= 1e12)))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -622,8 +612,8 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 	if (ZBX_VARIANT_UI64 == value1->type && ZBX_VARIANT_UI64 == value2->type)
 		return  variant_compare_ui64(value1, value2);
 
-	if ((ZBX_VARIANT_STR != value1->type || SUCCEED == is_double(value1->data.str, NULL)) &&
-			(ZBX_VARIANT_STR != value2->type || SUCCEED == is_double(value2->data.str, NULL)))
+	if ((ZBX_VARIANT_STR != value1->type || SUCCEED == zbx_is_double(value1->data.str, NULL)) &&
+			(ZBX_VARIANT_STR != value2->type || SUCCEED == zbx_is_double(value2->data.str, NULL)))
 	{
 		return variant_compare_dbl(value1, value2);
 	}

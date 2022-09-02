@@ -93,7 +93,7 @@ if ($data['action'] === 'problem.view') {
 	$html_page = (new CHtmlPage())
 		->setTitle(_('Problems'))
 		->setWebLayoutMode($web_layout_mode)
-		->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_PROBLEM_VIEW))
+		->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_PROBLEMS_VIEW))
 		->setControls(
 			(new CTag('nav', true,
 				(new CList())

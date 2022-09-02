@@ -37,7 +37,7 @@ $autoreg_form = (new CForm())
 		->setArgument('action', 'autoreg.edit')
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('tls_accept', $data['tls_accept']);
 
 $autoreg_tab = (new CFormList())

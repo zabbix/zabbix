@@ -39,7 +39,7 @@ if ($data['regexid'] != 0) {
 $form = (new CForm())
 	->setId('regex')
 	->setAction($action->getUrl())
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $table = (new CTable())
 	->setId('tbl_expr')

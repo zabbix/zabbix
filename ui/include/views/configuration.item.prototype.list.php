@@ -28,8 +28,8 @@ require_once dirname(__FILE__).'/js/configuration.item.prototype.list.js.php';
 $html_page = (new CHtmlPage())
 	->setTitle(_('Item prototypes'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_ITEM_PROTOTYPE_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_ITEM_PROTOTYPE_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_ITEM_PROTOTYPE_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_ITEM_PROTOTYPE_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,

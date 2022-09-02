@@ -33,7 +33,7 @@ $html_page = new CHtmlPage();
 
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
-	$doc_url = CDocHelper::ADMINISTRATION_USER_EDIT;
+	$doc_url = CDocHelper::USERS_USER_EDIT;
 }
 else {
 	$widget_name = _('User profile').NAME_DELIMITER;
@@ -41,7 +41,7 @@ else {
 		? $data['name'].' '.$data['surname']
 		: $data['username'];
 	$html_page->setTitleSubmenu(getUserSettingsSubmenu());
-	$doc_url = CDocHelper::ADMINISTRATION_USERPROFILE_EDIT;
+	$doc_url = CDocHelper::USERS_USERPROFILE_EDIT;
 }
 
 $html_page
@@ -58,7 +58,7 @@ if ($data['form_refresh'] == 0) {
 $user_form = (new CForm())
 	->setId('user-form')
 	->setName('user_form')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);
 

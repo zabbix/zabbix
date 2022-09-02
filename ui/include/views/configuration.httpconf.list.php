@@ -90,8 +90,8 @@ $filter = (new CFilter())
 $html_page = (new CHtmlPage())
 	->setTitle(_('Web monitoring'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_HTTPCONF_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_HTTPCONF_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_HTTPCONF_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_HTTPCONF_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,

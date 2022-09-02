@@ -37,7 +37,7 @@ class CWidgetFormUrl extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField($this->templateid === null
-				? new CWidgetFieldCheckBox('dynamic', _('Dynamic item'))
+				? new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
 				: null
 			);
 	}

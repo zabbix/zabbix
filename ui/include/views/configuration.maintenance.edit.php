@@ -27,12 +27,12 @@ require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Maintenance periods'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_MAINTENANCE_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_EDIT));
 
 $maintenance_form = (new CForm())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form']);
 
 if (array_key_exists('maintenanceid', $data) && $data['maintenanceid']) {

@@ -27,13 +27,13 @@ require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Discovery rules'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DISCOVERY_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_DISCOVERY_EDIT));
 
 // Create form.
 $discoveryForm = (new CForm())
 	->setId('discoveryForm')
 	->setName('discoveryForm')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if (!empty($this->data['druleid'])) {
 	$discoveryForm->addVar('druleid', $this->data['druleid']);

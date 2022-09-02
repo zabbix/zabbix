@@ -18,11 +18,12 @@
 **/
 
 #include "zabbix_stats.h"
+#include "sysinfo.h"
 
+#include "zbxstr.h"
+#include "zbxnum.h"
 #include "zbxcomms.h"
 #include "zbxjson.h"
-#include "sysinfo.h"
-#include "common.h"
 
 /******************************************************************************
  *                                                                            *
@@ -199,7 +200,7 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		port_number = ZBX_DEFAULT_SERVER_PORT;
 	}
-	else if (SUCCEED != is_ushort(port_str, &port_number))
+	else if (SUCCEED != zbx_is_ushort(port_str, &port_number))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;

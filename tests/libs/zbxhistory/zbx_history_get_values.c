@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 #include "zbxmockdb.h"
 
-#include "common.h"
+#include "zbxnum.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "zbxdb.h"
@@ -149,7 +149,7 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 				value->str = zbx_strdup(NULL, data);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				if (FAIL == is_uint64(data, &value->ui64))
+				if (FAIL == zbx_is_uint64(data, &value->ui64))
 					fail_msg("Invalid uint64 value \"%s\"", data);
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
@@ -166,15 +166,15 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 		log->source = zbx_strdup(NULL, zbx_mock_get_object_member_string(hvalue, "source"));
 
 		data = zbx_mock_get_object_member_string(hvalue, "logeventid");
-		if (FAIL == is_uint32(data, &log->logeventid))
+		if (FAIL == zbx_is_uint32(data, &log->logeventid))
 			fail_msg("Invalid log logeventid value \"%s\"", data);
 
 		data = zbx_mock_get_object_member_string(hvalue, "severity");
-		if (FAIL == is_uint32(data, &log->severity))
+		if (FAIL == zbx_is_uint32(data, &log->severity))
 			fail_msg("Invalid log severity value \"%s\"", data);
 
 		data = zbx_mock_get_object_member_string(hvalue, "timestamp");
-		if (FAIL == is_uint32(data, &log->timestamp))
+		if (FAIL == zbx_is_uint32(data, &log->timestamp))
 			fail_msg("Invalid log timestamp value \"%s\"", data);
 
 		value->log = log;
@@ -301,7 +301,7 @@ void	zbx_mock_test_entry(void **state)
 	err = zbx_history_init(&error);
 	zbx_mock_assert_result_eq("zbx_history_init()", SUCCEED, err);
 
-	if (FAIL == is_uint64(zbx_mock_get_parameter_string("in.itemid"), &itemid))
+	if (FAIL == zbx_is_uint64(zbx_mock_get_parameter_string("in.itemid"), &itemid))
 		fail_msg("Invalid itemid value");
 
 	zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.end"), &ts);

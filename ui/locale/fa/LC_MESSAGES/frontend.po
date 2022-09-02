@@ -1074,6 +1074,11 @@ msgstr ""
 msgid "Alert message"
 msgstr ""
 
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CRoleHelper.php:338
+msgid "Alerts"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
 msgstr ""
@@ -4884,6 +4889,11 @@ msgstr "خط تیره"
 msgid "Data"
 msgstr ""
 
+#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CRoleHelper.php:337
+msgid "Data collection"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
 #, c-format
@@ -6459,6 +6469,14 @@ msgstr ""
 #: include/actions.inc.php:694 include/actions.inc.php:1031
 msgid "Enable host"
 msgstr "فعال‌سازی هاست"
+
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -11341,6 +11359,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr ""
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr ""
@@ -14144,6 +14167,10 @@ msgstr ""
 
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
+msgstr ""
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
 msgstr ""
 
 #: include/views/configuration.item.edit.php:57

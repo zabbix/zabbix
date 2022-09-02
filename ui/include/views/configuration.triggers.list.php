@@ -148,8 +148,8 @@ $filter = (new CFilter())
 $html_page = (new CHtmlPage())
 	->setTitle(_('Triggers'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_TRIGGERS_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATE_TRIGGERS_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_TRIGGERS_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATE_TRIGGERS_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,

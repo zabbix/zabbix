@@ -72,7 +72,7 @@ $form->addItem([
 
 (new CHtmlPage())
 	->setTitle(_('Dashboards'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DASHBOARD_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DASHBOARDS_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())

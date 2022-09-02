@@ -266,7 +266,7 @@ $web_layout_mode = CViewHelper::loadLayoutMode();
 	->setControls((new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode])))
 	->addItem(
 		(new CForm())
-			->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+			->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 			->addItem($hostInventoriesTab)
 	)
 	->show();

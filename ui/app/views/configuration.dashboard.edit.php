@@ -48,7 +48,7 @@ $this->includeJsFile('configuration.dashboard.edit.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Dashboards'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DASHBOARD_EDIT))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DASHBOARDS_EDIT))
 	->setControls(
 		(new CList())
 			->setId('dashboard-control')

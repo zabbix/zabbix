@@ -40,6 +40,6 @@
 		new CWidgetFieldTagsView($data['fields']['tags'])
 	)
 	->addField(
-		(new CWidgetFieldLatLngView($data['fields']['default_view']))->setPlaceholder('40.6892494,-74.0466891');
+		(new CWidgetFieldLatLngView($data['fields']['default_view']))->setPlaceholder('40.6892494,-74.0466891')
 	)
 	->show();

@@ -27,8 +27,7 @@ $this->includeJsFile('administration.audit.settings.edit.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Audit log'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu())
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUDIT_SETTINGS_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUDITLOG_EDIT));
 
 $form = (new CForm())
 	->setId('audit-settings')
@@ -37,7 +36,7 @@ $form = (new CForm())
 			->setArgument('action', 'audit.settings.update')
 			->getUrl()
 	)
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $audit_settings_tab = (new CFormGrid())
 	->addItem([

@@ -25,6 +25,8 @@
 #include "zbxnix.h"
 #include "log.h"
 #include "zbxdiag.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
 
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
@@ -98,7 +100,7 @@ static void	rtc_process_loglevel(int code, const char *data, char **result)
 	{
 		zbx_uint64_t	pid;
 
-		if (SUCCEED != is_uint64(buf, &pid) || 0 == pid)
+		if (SUCCEED != zbx_is_uint64(buf, &pid) || 0 == pid)
 		{
 			*result = zbx_dsprintf(NULL, "Invalid pid value \"%s\"\n", buf);
 			return;

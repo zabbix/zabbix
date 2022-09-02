@@ -29,7 +29,7 @@ if ($data['uncheck']) {
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('User roles'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USERROLE_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERROLE_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())

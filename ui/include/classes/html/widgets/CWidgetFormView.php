@@ -128,14 +128,6 @@ class CWidgetFormView {
 		return $this;
 	}
 
-	public function addTemplate(?CTemplateTag $template): self {
-		if ($template !== null) {
-			$this->templates[$template->getId()] = $template;
-		}
-
-		return $this;
-	}
-
 	/**
 	 * @throws JsonException
 	 */
@@ -165,7 +157,7 @@ class CWidgetFormView {
 					'action' => 'ZABBIX.Dashboard.applyWidgetProperties();'
 				]
 			],
-			'doc_url' => CDocHelper::getUrl(CDocHelper::MONITORING_DASHBOARD_WIDGET_EDIT),
+			'doc_url' => CDocHelper::getUrl(CDocHelper::DASHBOARDS_WIDGET_EDIT),
 			'data' => [
 				'original_properties' => [
 					'type' => $this->data['type'],
@@ -187,6 +179,12 @@ class CWidgetFormView {
 		}
 
 		echo json_encode($output, JSON_THROW_ON_ERROR);
+	}
+
+	private function addTemplate(?CTemplateTag $template): void {
+		if ($template !== null) {
+			$this->templates[$template->getId()] = $template;
+		}
 	}
 
 	private function registerFieldView(CWidgetFieldView $field_view): void {

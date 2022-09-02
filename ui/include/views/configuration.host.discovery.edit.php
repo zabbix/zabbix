@@ -26,7 +26,7 @@
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Discovery rules'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_DISCOVERY_EDIT))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_DISCOVERY_EDIT))
 	->setNavigation(getHostNavigation('discoveries', $data['hostid'],
 		array_key_exists('itemid', $data) ? $data['itemid'] : 0
 	));
@@ -38,7 +38,7 @@ $url = (new CUrl('host_discovery.php'))
 $form = (new CForm('post', $url))
 	->setId('host-discovery-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('backurl', $data['backurl']);

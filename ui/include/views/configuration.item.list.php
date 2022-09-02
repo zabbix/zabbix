@@ -28,8 +28,8 @@ require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 $html_page = (new CHtmlPage())
 	->setTitle(_('Items'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_ITEM_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATE_ITEM_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_ITEM_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATE_ITEM_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,

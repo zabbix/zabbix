@@ -42,7 +42,9 @@ $form_tabs = (new CTabView())
 	->addTab('time_period', _('Time period'), getTimePeriodTab($form, $data['fields']),
 		TAB_INDICATOR_GRAPH_TIME
 	)
-	->addTab('axes', _('Axes'), getAxesTab($form, $data['fields']))
+	->addTab('axes', _('Axes'), getAxesTab($form, $data['fields']),
+		TAB_INDICATOR_GRAPH_AXES
+	)
 	->addTab('legend_tab', _('Legend'), getLegendTab($form, $data['fields']),
 		TAB_INDICATOR_GRAPH_LEGEND
 	)

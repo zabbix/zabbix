@@ -98,13 +98,17 @@ $menu-user-arrow-hover-bg-position: -579px -434px;
 $sidebar-server-name-color: #787878;
 
 $menu-main-icons: (
+	dashboards: -600px -856px,
 	dashboard: -600px -664px,
 	problems: -600px -688px,
 	monitoring: -600px -712px,
 	services: -600px -832px,
 	inventory: -600px -736px,
 	reports: -600px -760px,
+	data-collection: -600px -784px,
+	alerts: -600px -879px,
 	configuration: -600px -784px,
+	users: -600px -904px,
 	administration: -600px -808px
 );
 

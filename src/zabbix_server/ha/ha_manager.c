@@ -28,6 +28,9 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_ha.h"
 #include "audit/zbxaudit_settings.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxip.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
@@ -374,7 +377,7 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		if (SUCCEED != is_time_suffix(row[0], &info->failover_delay, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != zbx_is_time_suffix(row[0], &info->failover_delay, ZBX_LENGTH_UNLIMITED))
 			THIS_SHOULD_NEVER_HAPPEN;
 
 		info->auditlog = atoi(row[1]);
@@ -418,7 +421,7 @@ static int	ha_db_get_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int
 		node->lastaccess = atoi(row[3]);
 		node->address = zbx_strdup(NULL, row[4]);
 
-		if (SUCCEED != is_ushort(row[5], &node->port))
+		if (SUCCEED != zbx_is_ushort(row[5], &node->port))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "node \"%s\" has invalid port value \"%s\"", row[1], row[5]);
 			node->port = 0;
@@ -458,7 +461,7 @@ static zbx_ha_node_t	*ha_find_node_by_name(zbx_vector_ha_node_t *nodes, const ch
  ******************************************************************************/
 static void	ha_get_external_address(char **address, unsigned short *port)
 {
-	(void)parse_serveractive_element(CONFIG_NODE_ADDRESS, address, port, 10051);
+	(void)zbx_parse_serveractive_element(CONFIG_NODE_ADDRESS, address, port, 10051);
 }
 
 /******************************************************************************
@@ -737,7 +740,6 @@ static int	ha_db_check_unavailable_nodes(zbx_ha_info_t *info, zbx_vector_ha_node
 		{
 			continue;
 		}
-
 
 		if (db_time >= nodes->values[i]->lastaccess + info->failover_delay)
 		{
@@ -1297,7 +1299,6 @@ static void	ha_remove_node(zbx_ha_info_t *info, zbx_ipc_client_t *client, const 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: reply to ha_status request                                        *
@@ -1327,7 +1328,6 @@ static void	ha_send_status(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 }
-
 
 /******************************************************************************
  *                                                                            *

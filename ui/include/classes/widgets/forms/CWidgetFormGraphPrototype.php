@@ -72,7 +72,7 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 				(new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1)
 			)
 			->addField($this->templateid === null
-				? new CWidgetFieldCheckBox('dynamic', _('Dynamic item'))
+				? new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
 				: null
 			)
 			->addField(

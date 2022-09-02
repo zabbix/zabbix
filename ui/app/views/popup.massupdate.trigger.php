@@ -27,7 +27,6 @@
 // Create form.
 $form = (new CForm())
 	->setId('massupdate-form')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['prototype'] ? 'popup.massupdate.triggerprototype' : 'popup.massupdate.trigger')
 	->addVar('ids', $data['ids'])
 	->addVar('update', '1')

@@ -37,7 +37,7 @@ $form = (new CForm())
 		->setArgument('moduleids[]', $data['moduleid'])
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 // create module tab
 $module_tab = (new CFormList())

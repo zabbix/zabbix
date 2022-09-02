@@ -1238,7 +1238,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve {HOST.HOST<1-9} and empty plaseholders in the expression macros.
+	 * Resolve {HOST.HOST<1-9} and empty placeholders in the expression macros.
 	 *   For example:
 	 *     {$last(/ /key)} => {$last(/Zabbix server/key)}
 	 *     {$last(/MySQL server/key)} => {$last(/MySQL server/key)}

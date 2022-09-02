@@ -103,7 +103,7 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 $html_page = (new CHtmlPage())
 	->setTitle($data['dashboard']['name'])
 	->setWebLayoutMode($web_layout_mode)
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_DASHBOARD_VIEW))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DASHBOARDS_VIEW))
 	->setControls(
 		(new CList())
 			->setId('dashboard-control')

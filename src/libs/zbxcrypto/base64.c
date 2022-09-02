@@ -20,7 +20,7 @@
 #include "base64.h"
 
 #include <assert.h>
-#include "common.h"
+#include "zbxcommon.h"
 
 /******************************************************************************
  *                                                                            *

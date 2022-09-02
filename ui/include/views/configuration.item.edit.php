@@ -26,7 +26,7 @@
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Items'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ITEM_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_EDIT));
 
 $host = $data['host'];
 
@@ -42,7 +42,7 @@ $url = (new CUrl('items.php'))
 $form = (new CForm('post', $url))
 	->setId('item-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 
@@ -602,7 +602,7 @@ if ($data['display_interfaces']) {
 			$form->addVar('selectedInterfaceId', $data['interfaceid']);
 			$item_tab->addItem([
 				(new CLabel(_('Host interface'), 'interface'))
-					->setAsteriskMark()
+					->setAsteriskMark(itemTypeInterface($data['item']['type']) != INTERFACE_TYPE_OPT)
 					->setId('js-item-interface-label'),
 				(new CFormField((new CTextBox('interface', getHostInterface($interface), true))->setAriaRequired()))
 					->setId('js-item-interface-field')
@@ -1111,7 +1111,8 @@ $html_page->show();
 (new CScriptTag('
 	item_form.init('.json_encode([
 		'interfaces' => $data['interfaces'],
-		'key_type_suggestions' => CItemData::getTypeSuggestionsByKey(),
+		'value_type_by_keys' => CItemData::getValueTypeByKey(),
+		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
 		'interface_types' => itemTypeInterface()

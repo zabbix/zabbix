@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
+
 #include "log.h"
+#include "zbxstr.h"
 
 #define ZBX_DEV_PFX	"/dev/"
 
@@ -47,7 +48,7 @@ static int	get_perfstat_io(const char *devname, zbx_perfstat_t *zp, char **error
 		perfstat_id_t	name;
 		perfstat_disk_t	data;
 
-		strscpy(name.name, devname);
+		zbx_strscpy(name.name, devname);
 
 		if (0 < (err = perfstat_disk(&name, &data, sizeof(data), 1)))
 		{

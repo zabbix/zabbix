@@ -51,11 +51,15 @@ build/win32/project/messages.rc
 build/win32/project/resource.res
 database/mysql/data.sql
 database/mysql/schema.sql
+database/mysql/history_pk_prepare.sql
 database/oracle/data.sql
 database/oracle/schema.sql
+database/oracle/history_pk_prepare.sql
 database/postgresql/data.sql
 database/postgresql/schema.sql
 database/postgresql/timescaledb.sql
+database/postgresql/history_pk_prepare.sql
+database/postgresql/tsdb_history_pk_upgrade_*
 database/sqlite3/data.sql
 database/sqlite3/schema.sql
 etc/agent.conf
@@ -217,6 +221,7 @@ tests/libs/zbxsysinfo/linux/SYSTEM_HW_CHASSIS
 tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
+tests/libs/zbxsysinfo/check_service_test
 tests/libs/zbxcommon/zbx_tm_add
 tests/libs/zbxcommon/zbx_tm_sub
 tests/libs/zbxcommon/zbx_tm_round_up
@@ -224,6 +229,8 @@ tests/libs/zbxcommon/zbx_tm_round_down
 tests/libs/zbxtrends/zbx_baseline_get_data
 tests/libs/zbxtrends/zbx_trends_parse_range
 tests/libs/zbxsysinfo/process_http
+tests/zabbix_server/pinger/zbx_pinger_test
+tests/zabbix_server/poller/zbx_poller_test
 tests/zabbix_server/preprocessor/item_preproc_csv_to_json
 tests/zabbix_server/preprocessor/item_preproc_xpath
 tests/zabbix_server/preprocessor/zbx_item_preproc

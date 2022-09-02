@@ -221,7 +221,7 @@ class CWidgetFormItem extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField($this->templateid === null
-				? new CWidgetFieldCheckBox('dynamic', _('Dynamic item'))
+				? new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
 				: null
 			);
 	}

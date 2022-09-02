@@ -48,7 +48,7 @@ if ($data['hostid'] != 0) {
 // create form
 $form = (new CForm('post', (new CUrl())->getUrl()))
 	->setName('elements_form')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar($data['elements_field'], $data['elements'])
 	->addVar('hostid', $data['hostid']);

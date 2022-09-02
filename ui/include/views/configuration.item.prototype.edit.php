@@ -26,7 +26,7 @@
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Item prototypes'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ITEM_PROTOTYPE_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_PROTOTYPE_EDIT));
 
 if (!empty($data['hostid'])) {
 	$html_page->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
@@ -40,7 +40,7 @@ $url = (new CUrl('disc_prototypes.php'))
 $form = (new CForm('post', $url))
 	->setId('item-prototype-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
@@ -948,7 +948,8 @@ $html_page->show();
 (new CScriptTag('
 	item_form.init('.json_encode([
 		'interfaces' => $data['interfaces'],
-		'key_type_suggestions' => CItemData::getTypeSuggestionsByKey(),
+		'value_type_by_keys' => CItemData::getValueTypeByKey(),
+		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
 		'interface_types' => itemTypeInterface()

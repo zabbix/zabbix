@@ -29,7 +29,7 @@ $this->includeJsFile('administration.mediatype.edit.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Media types'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MEDIATYPE_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_EDIT));
 
 $tabs = new CTabView();
 
@@ -44,7 +44,7 @@ $mediaTypeForm = (new CForm())
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->disablePasswordAutofill()
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 // Create form list.
 $mediatype_formlist = (new CFormList())
@@ -344,7 +344,7 @@ $mediaOptionsForm = (new CFormList('options'))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	);
-$tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm);
+$tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm, TAB_INDICATOR_MEDIATYPE_OPTIONS);
 
 // append buttons to form
 $cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
