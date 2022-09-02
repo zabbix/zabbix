@@ -2226,7 +2226,7 @@ static int	jsonpath_apply_function(const zbx_vector_json_t *objects, zbx_jsonpat
 		zbx_set_json_strerror("invalid function result: %s", *output);
 		goto out;
 	}
-	del_zeros(*output);
+	zbx_del_zeros(*output);
 	ret = SUCCEED;
 out:
 	zbx_vector_json_clear_ext(&objects_tmp);

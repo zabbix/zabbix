@@ -209,7 +209,7 @@ static int	time_parse(int *time, const char *text, int len, int *parsed_len)
 	for (ptr = text; 0 < len && 0 != isdigit(*ptr) && 2 >= ptr - text; len--, ptr++)
 		;
 
-	if (SUCCEED != is_uint_n_range(text, ptr - text, &hours, sizeof(hours), 0, 24))
+	if (SUCCEED != zbx_is_uint_n_range(text, ptr - text, &hours, sizeof(hours), 0, 24))
 		return FAIL;
 
 	if (0 >= len-- || ':' != *ptr++)
@@ -221,7 +221,7 @@ static int	time_parse(int *time, const char *text, int len, int *parsed_len)
 	if (2 != ptr - text)
 		return FAIL;
 
-	if (SUCCEED != is_uint_n_range(text, 2, &minutes, sizeof(minutes), 0, 59))
+	if (SUCCEED != zbx_is_uint_n_range(text, 2, &minutes, sizeof(minutes), 0, 59))
 		return FAIL;
 
 	if (24 == hours && 0 != minutes)
@@ -336,7 +336,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 		if (pend - pstart > var_len)
 			return FAIL;
 
-		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &start, sizeof(start), min, max))
+		if (SUCCEED != zbx_is_uint_n_range(pstart, pend - pstart, &start, sizeof(start), min, max))
 			return FAIL;
 
 		if ('-' == *pend)
@@ -354,7 +354,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 			if (pend == pstart || pend - pstart > var_len)
 				return FAIL;
 
-			if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &end, sizeof(end), min, max))
+			if (SUCCEED != zbx_is_uint_n_range(pstart, pend - pstart, &end, sizeof(end), min, max))
 				return FAIL;
 
 			if (end < start)
@@ -390,7 +390,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 		if (pend == pstart || pend - pstart > var_len)
 			return FAIL;
 
-		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &step, sizeof(step), 1, end - start))
+		if (SUCCEED != zbx_is_uint_n_range(pstart, pend - pstart, &step, sizeof(step), 1, end - start))
 			return FAIL;
 	}
 	else
@@ -604,7 +604,7 @@ static int	flexible_interval_parse(zbx_flexible_interval_t *interval, const char
 	for (ptr = text; 0 < len && '\0' != *ptr && '/' != *ptr; len--, ptr++)
 		;
 
-	if (SUCCEED != is_time_suffix(text, &interval->delay, (int)(ptr - text)))
+	if (SUCCEED != zbx_is_time_suffix(text, &interval->delay, (int)(ptr - text)))
 		return FAIL;
 
 	if (0 >= len-- || '/' != *ptr++)
@@ -655,7 +655,7 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 	zbx_scheduler_interval_t	*scheduling = NULL;
 	const char			*delim, *interval_type;
 
-	if (SUCCEED != is_time_suffix(interval_str, simple_interval,
+	if (SUCCEED != zbx_is_time_suffix(interval_str, simple_interval,
 			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str)))
 	{
 		interval_type = "update";
@@ -752,7 +752,7 @@ static int	parse_simple_interval(const char *str, int *len, char sep, int *value
 {
 	const char	*delim;
 
-	if (SUCCEED != is_time_suffix(str, value,
+	if (SUCCEED != zbx_is_time_suffix(str, value,
 			(int)(NULL == (delim = strchr(str, sep)) ? ZBX_LENGTH_UNLIMITED : delim - str)))
 	{
 		return FAIL;
@@ -1478,7 +1478,7 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
  *           New one: preserve period, if delay==5, nextcheck = 0,5,10,15,... *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
+int	zbx_calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
 		const zbx_custom_interval_t *custom_intervals, time_t now)
 {
 	int	nextcheck = 0;
@@ -1568,7 +1568,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
  * Return value: nextcheck value                                              *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
+int	zbx_calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
 		time_t disable_until)
 {
 	int	nextcheck = 0;
@@ -1676,7 +1676,7 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
 	else
 		*scheduling = FAIL;
 
-	*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, simple_interval, custom_intervals, now);
+	*nextcheck = zbx_calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, simple_interval, custom_intervals, now);
 	zbx_custom_interval_free(custom_intervals);
 
 	return SUCCEED;

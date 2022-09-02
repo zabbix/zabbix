@@ -210,7 +210,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 			case SVC_SNMPv3:
 				memset(&item, 0, sizeof(DC_ITEM));
 
-				strscpy(item.key_orig, dcheck->key_);
+				zbx_strscpy(item.key_orig, dcheck->key_);
 				item.key = item.key_orig;
 
 				item.interface.useip = 1;
@@ -523,14 +523,14 @@ static void	process_rule(ZBX_DB_DRULE *drule)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() range:'%s'", __func__, start);
 
-		if (SUCCEED != iprange_parse(&iprange, start))
+		if (SUCCEED != zbx_iprange_parse(&iprange, start))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": wrong format of IP range \"%s\"",
 					drule->name, start);
 			goto next;
 		}
 
-		if (ZBX_DISCOVERER_IPRANGE_LIMIT < iprange_volume(&iprange))
+		if (ZBX_DISCOVERER_IPRANGE_LIMIT < zbx_iprange_volume(&iprange))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": IP range \"%s\" exceeds %d address limit",
 					drule->name, start, ZBX_DISCOVERER_IPRANGE_LIMIT);
@@ -544,7 +544,7 @@ static void	process_rule(ZBX_DB_DRULE *drule)
 			goto next;
 		}
 #endif
-		iprange_first(&iprange, ipaddress);
+		zbx_iprange_first(&iprange, ipaddress);
 
 		do
 		{
@@ -617,7 +617,7 @@ static void	process_rule(ZBX_DB_DRULE *drule)
 
 			DBcommit();
 		}
-		while (SUCCEED == iprange_next(&iprange, ipaddress));
+		while (SUCCEED == zbx_iprange_next(&iprange, ipaddress));
 next:
 		if (NULL != comma)
 		{
@@ -681,7 +681,7 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 		{
 			zbx_vector_uint64_append(&del_dhostids, dhostid);
 		}
-		else if (SUCCEED != ip_in_list(iprange, row[2]))
+		else if (SUCCEED != zbx_ip_in_list(iprange, row[2]))
 		{
 			ZBX_STR2UINT64(dserviceid, row[1]);
 
@@ -785,7 +785,7 @@ static int	process_discovery(void)
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&delay_str, MACRO_TYPE_COMMON, NULL, 0);
 
-		if (SUCCEED != is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != zbx_is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid update interval \"%s\"",
 					row[2], delay_str);
@@ -920,7 +920,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				nextcheck = time(NULL) + DISCOVERER_DELAY;
 		}
 
-		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
+		sleeptime = zbx_calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{

@@ -326,7 +326,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #else
 		if (NULL != CONFIG_SOURCE_IP)
 		{
-			if (FAIL == is_ip4(CONFIG_SOURCE_IP)) /* we do not have IPv4 family address in CONFIG_SOURCE_IP */
+			if (FAIL == zbx_is_ip4(CONFIG_SOURCE_IP)) /* we do not have IPv4 family address in CONFIG_SOURCE_IP */
 			{
 				zbx_snprintf(error, max_error_len,
 					"You should enable IPv6 support to use IPv6 family address for SourceIP '%s'.", CONFIG_SOURCE_IP);
@@ -360,7 +360,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -t%d", timeout);
 
 #ifdef HAVE_IPV6
-	strscpy(params6, params);
+	zbx_strscpy(params6, params);
 	offset6 = offset;
 
 	if (0 != (fping_existence & FPING_EXISTS) && 0 != hosts_count)

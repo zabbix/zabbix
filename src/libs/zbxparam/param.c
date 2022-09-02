@@ -41,7 +41,7 @@
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type)
+int	zbx_get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type)
 {
 #define ZBX_ASSIGN_PARAM				\
 {							\
@@ -205,7 +205,7 @@ int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_par
  *            and 1 is returned.                                              *
  *                                                                            *
  ******************************************************************************/
-int	num_param(const char *p)
+int	zbx_num_param(const char *p)
 {
 /* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
 	int	ret = 1, state, array;
@@ -431,7 +431,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type)
+char	*zbx_get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type)
 {
 	char	*buf = NULL;
 	size_t	sz;
@@ -441,7 +441,7 @@ char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type)
 
 	buf = (char *)zbx_malloc(buf, sz + 1);
 
-	if (0 != get_param(p, num, buf, sz + 1, type))
+	if (0 != zbx_get_param(p, num, buf, sz + 1, type))
 		zbx_free(buf);
 
 	return buf;
@@ -452,11 +452,11 @@ char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type)
  * Purpose: replaces an item key, SNMP OID or their parameters when callback  *
  *          function returns a new string                                     *
  *                                                                            *
- * Comments: auxiliary function for replace_key_params_dyn()                  *
+ * Comments: auxiliary function for zbx_replace_key_params_dyn()              *
  *                                                                            *
  ******************************************************************************/
 static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
-		replace_key_param_f cb, void *cb_data)
+		zbx_replace_key_param_f cb, void *cb_data)
 {
 	char	c = (*data)[*r], *param = NULL;
 	int	ret;
@@ -494,7 +494,7 @@ static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int
  *               FAIL - otherwise, error will contain error message           *
  *                                                                            *
  ******************************************************************************/
-int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
+int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_f cb, void *cb_data, char *error,
 		size_t maxerrlen)
 {
 	typedef enum
@@ -658,7 +658,7 @@ clean:
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_key_param(char *param, int num, char *buf, size_t max_len)
+int	zbx_get_key_param(char *param, int num, char *buf, size_t max_len)
 {
 	int	ret;
 	char	*pl, *pr;
@@ -670,7 +670,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
 		return 1;
 
 	*pr = '\0';
-	ret = get_param(pl + 1, num, buf, max_len, NULL);
+	ret = zbx_get_param(pl + 1, num, buf, max_len, NULL);
 	*pr = ']';
 
 	return ret;
@@ -689,7 +689,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	num_key_param(char *param)
+int	zbx_num_key_param(char *param)
 {
 	int	ret;
 	char	*pl, *pr;
@@ -704,7 +704,7 @@ int	num_key_param(char *param)
 		return 0;
 
 	*pr = '\0';
-	ret = num_param(pl + 1);
+	ret = zbx_num_param(pl + 1);
 	*pr = ']';
 
 	return ret;
