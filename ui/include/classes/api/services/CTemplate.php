@@ -99,12 +99,6 @@ class CTemplate extends CHostGeneral {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
-
-
-			var_dump($userGroups);
-
-
-
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM hosts_groups hgg'.
@@ -259,11 +253,6 @@ class CTemplate extends CHostGeneral {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-
-
-
-
-
 		while ($template = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {

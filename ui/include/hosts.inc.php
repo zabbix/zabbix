@@ -1245,9 +1245,6 @@ function getHostDashboards(string $hostid, array $dashboard_fields = []): array 
 
 	$templateids = CApiHostHelper::getParentTemplates([$hostid])[1];
 
-
-//	var_dump($templateids);die;
-
 	return API::TemplateDashboard()->get([
 		'output' => $dashboard_fields,
 		'templateids' => $templateids,
