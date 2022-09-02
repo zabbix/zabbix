@@ -805,7 +805,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @return array
 	 */
-	private static function sortEntitiesByMenuPath(array $entities) {
+	private static function sortEntitiesByMenuPath(array $entities): array {
 		if ($entities) {
 			foreach ($entities as &$entity) {
 				$entity['menu_path'] = trimPath($entity['menu_path']);
