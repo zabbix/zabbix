@@ -841,7 +841,7 @@ class CControllerMenuPopup extends CController {
 				break;
 
 			case 'host':
-				$menu_data = self::getMenuDataHost($data);
+				$menu_data = self::getMenuDataHost(array_intersect_key($data, array_flip(['hostid', 'has_goto'])));
 				break;
 
 			case 'item':
