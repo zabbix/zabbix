@@ -115,6 +115,13 @@ static int	DBpatch_6030001(void)
 	return DBadd_field("media_type", &field);
 }
 
+static int	DBpatch_6030002(void)
+{
+	const ZBX_FIELD field = {"status", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("media_type", &field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -123,5 +130,6 @@ DBPATCH_START(6030)
 
 DBPATCH_ADD(6030000, 0, 1)
 DBPATCH_ADD(6030001, 0, 1)
+DBPATCH_ADD(6030002, 0, 1)
 
 DBPATCH_END()
