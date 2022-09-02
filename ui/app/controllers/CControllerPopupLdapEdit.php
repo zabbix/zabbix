@@ -112,10 +112,6 @@ class CControllerPopupLdapEdit extends CController {
 			$data['bind_password'] = $this->getInput('bind_password');
 		}
 
-		if ($data['group_basedn'] != '') {
-			$data['provision_status'] = JIT_PROVISIONING_ENABLED;
-		}
-
 		$data['advanced_configuration'] = $data['start_tls'] != ZBX_AUTH_START_TLS_OFF || $data['search_filter'] !== '';
 
 		if (!$data['provision_groups']) {

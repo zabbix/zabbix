@@ -67,6 +67,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'encrypt_nameid' =>					'in 0,1',
 			'encrypt_assertions' =>				'in 0,1',
 			'saml_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'saml_provision_status' =>			'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'saml_group_name' =>				'db userdirectory_saml.group_name',
 			'saml_user_username' =>				'db userdirectory_saml.user_username',
 			'saml_user_lastname' =>				'db userdirectory_saml.user_lastname',
@@ -93,13 +94,6 @@ class CControllerAuthenticationUpdate extends CController {
 
 		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
 			$auth_valid = $this->validateSamlAuth();
-		}
-
-		if ($auth_valid) {
-			[$auth_valid, $this->ldap_userdirectoryid] = $this->processLdapServers(
-				$this->getInput('ldap_servers', []),
-				$this->getInput('ldap_default_row_index', 0)
-			);
 		}
 
 		if (!$auth_valid) {
@@ -245,6 +239,24 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	protected function doAction() {
+		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
+			$saml_auth_valid = $this->processSamlConfiguration();
+		}
+
+		[$ldap_auth_valid, $ldap_userdirectoryid] = $this->processLdapServers(
+			$this->getInput('ldap_servers', []), $this->getInput('ldap_default_row_index', 0)
+		);
+
+		if (!$saml_auth_valid || !$ldap_auth_valid) {
+			if (CMessageHelper::getTitle() === null) {
+				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
+			}
+			$this->response->setFormData($this->getInputAll());
+			$this->setResponse($this->response);
+
+			return;
+		}
+
 		$auth_params = [
 			CAuthenticationHelper::AUTHENTICATION_TYPE,
 			CAuthenticationHelper::HTTP_AUTH_ENABLED,
@@ -268,7 +280,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
-			'ldap_userdirectoryid' => $this->ldap_userdirectoryid,
+			'ldap_userdirectoryid' => $ldap_userdirectoryid,
 			'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
@@ -317,58 +329,6 @@ class CControllerAuthenticationUpdate extends CController {
 
 			if ($del_userdirectoryids) {
 				$result = API::UserDirectory()->delete($del_userdirectoryids);
-			}
-		}
-
-		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
-			$saml_fields = [
-				'saml_userdirectoryid' => '',
-				'idp_entityid' => '',
-				'sso_url' => '',
-				'slo_url' => '',
-				'username_attribute' => '',
-				'sp_entityid' => '',
-				'nameid_format' => '',
-				'sign_messages' => 0,
-				'sign_assertions' => 0,
-				'sign_authn_requests' => 0,
-				'sign_logout_requests' => 0,
-				'sign_logout_responses' => 0,
-				'encrypt_nameid' => 0,
-				'encrypt_assertions' => 0,
-				'saml_group_name' => '',
-				'saml_user_username' => '',
-				'saml_user_lastname' => '',
-				'saml_provision_groups' => [],
-				'saml_provision_media' => [],
-				'scim_status' => 0,
-				'scim_token' => ''
-			];
-
-			$this->getInputs($saml_fields, array_keys($saml_fields));
-			$saml_data = [
-				'idp_type' => IDP_TYPE_SAML,
-				'userdirectoryid' => $saml_fields['saml_userdirectoryid'],
-				'group_name' => $saml_fields['saml_group_name'],
-				'user_username' => $saml_fields['saml_user_username'],
-				'user_lastname' => $saml_fields['saml_user_lastname'],
-				'provision_groups' => $saml_fields['saml_provision_groups'],
-				'provision_media' => $saml_fields['saml_provision_media'],
-			];
-			unset($saml_fields['saml_group_name'], $saml_fields['saml_user_username'],
-				$saml_fields['saml_user_lastname'], $saml_fields['saml_provision_groups'],
-				$saml_fields['saml_provision_media'], $saml_fields['saml_userdirectoryid']
-			);
-			$saml_data += $saml_fields;
-
-			$this->extendProvisionGroups($saml_data['provision_groups']);
-
-			if ($saml_data['userdirectoryid'] == '') {
-				unset($saml_data['userdirectoryid']);
-				$result = API::UserDirectory()->create($saml_data);
-			}
-			else {
-				$result = API::UserDirectory()->update($saml_data);
 			}
 		}
 
@@ -441,6 +401,69 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		return [true, $ldap_userdirectoryid];
+	}
+
+	/**
+	 * Retrieves SAML configuration fields and creates or updates SAML configuration.
+	 *
+	 * @return array
+	 */
+	private function processSamlConfiguration(): array {
+		$saml_fields = [
+			'saml_userdirectoryid' => '',
+			'idp_entityid' => '',
+			'sso_url' => '',
+			'slo_url' => '',
+			'username_attribute' => '',
+			'sp_entityid' => '',
+			'nameid_format' => '',
+			'sign_messages' => 0,
+			'sign_assertions' => 0,
+			'sign_authn_requests' => 0,
+			'sign_logout_requests' => 0,
+			'sign_logout_responses' => 0,
+			'encrypt_nameid' => 0,
+			'encrypt_assertions' => 0,
+			'saml_provision_status' => JIT_PROVISIONING_DISABLED,
+			'saml_group_name' => '',
+			'saml_user_username' => '',
+			'saml_user_lastname' => '',
+			'saml_provision_groups' => [],
+			'saml_provision_media' => [],
+			'scim_status' => 0,
+			'scim_token' => ''
+		];
+
+		$this->getInputs($saml_fields, array_keys($saml_fields));
+		$saml_data = [
+			'idp_type' => IDP_TYPE_SAML,
+			'userdirectoryid' => $saml_fields['saml_userdirectoryid'],
+			'group_name' => $saml_fields['saml_group_name'],
+			'user_username' => $saml_fields['saml_user_username'],
+			'user_lastname' => $saml_fields['saml_user_lastname'],
+			'provision_status' => $saml_fields['saml_provision_status'],
+			'provision_groups' => $saml_fields['saml_provision_groups'],
+			'provision_media' => $saml_fields['saml_provision_media'],
+		];
+
+		unset($saml_fields['saml_group_name'], $saml_fields['saml_user_username'],
+			$saml_fields['saml_user_lastname'], $saml_fields['saml_provision_groups'],
+			$saml_fields['saml_provision_media'], $saml_fields['saml_userdirectoryid'],
+			$saml_fields['saml_provision_status']);
+
+		$saml_data += $saml_fields;
+
+		$this->extendProvisionGroups($saml_data['provision_groups']);
+
+		if ($saml_data['userdirectoryid'] == '') {
+			unset($saml_data['userdirectoryid']);
+			$auth_valid = API::UserDirectory()->create($saml_data);
+		}
+		else {
+			$auth_valid = API::UserDirectory()->update($saml_data);
+		}
+
+		return $auth_valid;
 	}
 
 	/**

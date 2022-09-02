@@ -380,10 +380,10 @@ $saml_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Allow JIT provisioning'), 'saml_allow_jit'),
+		new CLabel(_('Allow JIT provisioning'), 'saml_provision_status'),
 		new CFormField(
-			(new CCheckBox('saml_allow_jit'))
-				->setChecked($data['saml_allow_jit'])
+			(new CCheckBox('saml_provision_status'))
+				->setChecked($data['saml_provision_status'])
 				->setEnabled($data['saml_enabled'])
 				->addClass('saml-enabled')
 		)
@@ -391,34 +391,34 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Group name attribute'), 'saml_group_name'))
 			->setAsteriskMark()
-			->addClass('saml-allow-jit'),
+			->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CTextBox('saml_group_name', $data['saml_group_name'], false,
 				DB::getFieldLength('userdirectory_saml', 'group_name')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
-		))->addClass('saml-allow-jit')
+		))->addClass('saml-provision-status')
 	])
 	->addItem([
-		(new CLabel(_('User name attribute'), 'saml_user_username'))->addClass('saml-allow-jit'),
+		(new CLabel(_('User name attribute'), 'saml_user_username'))->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CTextBox('saml_user_username', $data['saml_user_username'], false,
 				DB::getFieldLength('userdirectory_saml', 'user_username')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass('saml-allow-jit')
+		))->addClass('saml-provision-status')
 	])
 	->addItem([
-		(new CLabel(_('User lastname attribute'), 'saml_user_lastname'))->addClass('saml-allow-jit'),
+		(new CLabel(_('User lastname attribute'), 'saml_user_lastname'))->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CTextBox('saml_user_lastname', $data['saml_user_lastname'], false,
 				DB::getFieldLength('userdirectory_saml', 'user_lastname')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass('saml-allow-jit')
+		))->addClass('saml-provision-status')
 	])
-	->addItem([(new CLabel(_('User group mapping')))->addClass('saml-allow-jit'),
+	->addItem([(new CLabel(_('User group mapping')))->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CDiv(
 				(new CTable())
@@ -445,13 +445,13 @@ $saml_tab = (new CFormGrid())
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass('saml-allow-jit')
+		))->addClass('saml-provision-status')
 	])
 	->addItem([(new CLabel([
 		_('Media type mapping'),
 		makeHelpIcon(
 			_('Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications.')
-		)]))->addClass('saml-allow-jit'),
+		)]))->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CDiv(
 				(new CTable())
@@ -479,26 +479,26 @@ $saml_tab = (new CFormGrid())
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 
-		))->addClass('saml-allow-jit')
+		))->addClass('saml-provision-status')
 	])
 	->addItem([
-		(new CLabel(_('Enable SCIM provisioning'), 'scim_status'))->addClass('saml-allow-jit'),
+		(new CLabel(_('Enable SCIM provisioning'), 'scim_status'))->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CCheckBox('scim_status', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
 				->setChecked($data['scim_status'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
 				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
-		))->addClass('saml-allow-jit')
+		))->addClass('saml-provision-status')
 	])
 	->addItem([
 		(new CLabel(_('Authorization token'), 'scim_token'))
-			->addClass('saml-allow-jit'),
+			->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CTextBox('scim_token', $data['scim_token'], false,
 				DB::getFieldLength('userdirectory_saml', 'scim_token')
 			))
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass('saml-allow-jit')
+		))->addClass('saml-provision-status')
 	]);
 
 $form = (new CForm())

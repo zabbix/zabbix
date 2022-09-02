@@ -61,6 +61,7 @@ class CControllerAuthenticationEdit extends CController {
 			'sign_logout_responses' =>			'in 0,1',
 			'encrypt_nameid' =>					'in 0,1',
 			'encrypt_assertions' =>				'in 0,1',
+			'saml_provision_status' =>			'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'saml_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'saml_group_name' =>				'db userdirectory_saml.group_name',
 			'saml_user_username' =>				'db userdirectory_saml.user_username',
@@ -164,6 +165,7 @@ class CControllerAuthenticationEdit extends CController {
 				'passwd_check_rules'
 			]);
 
+			$data['saml_provision_status'] = $this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED);
 			$data['saml_provision_groups'] = $this->getInput('saml_provision_groups', []);
 
 			if ($data['saml_provision_groups'] != []) {
@@ -206,6 +208,7 @@ class CControllerAuthenticationEdit extends CController {
 
 			if ($saml_configuration) {
 				$data['saml_userdirectoryid'] = $saml_configuration['userdirectoryid'];
+				$data['saml_provision_status'] = $saml_configuration['provision_status'];
 				$data['saml_group_name'] = $saml_configuration['group_name'];
 				$data['saml_user_username'] = $saml_configuration['user_username'];
 				$data['saml_user_lastname'] = $saml_configuration['user_lastname'];
@@ -214,7 +217,8 @@ class CControllerAuthenticationEdit extends CController {
 
 				unset($saml_configuration['userdirectoryid'], $saml_configuration['group_name'],
 					$saml_configuration['user_username'], $saml_configuration['user_lastname'],
-					$saml_configuration['provision_groups'], $saml_configuration['provision_media']);
+					$saml_configuration['provision_groups'], $saml_configuration['provision_media'],
+					$saml_configuration['provision_status']);
 
 				$data += $saml_configuration;
 			}
@@ -234,6 +238,7 @@ class CControllerAuthenticationEdit extends CController {
 					'sign_logout_responses' => '',
 					'encrypt_nameid' => '',
 					'encrypt_assertions' => '',
+					'saml_provision_status' => JIT_PROVISIONING_DISABLED,
 					'saml_group_name' => '',
 					'saml_user_username' => '',
 					'saml_user_lastname' => '',
@@ -281,8 +286,6 @@ class CControllerAuthenticationEdit extends CController {
 
 			$data['ldap_removed_userdirectoryids'] = [];
 		}
-
-		$data['saml_allow_jit'] = $data['saml_group_name'] !== '';
 
 		unset($data[CAuthenticationHelper::LDAP_USERDIRECTORYID]);
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK

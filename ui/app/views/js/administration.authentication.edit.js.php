@@ -36,14 +36,14 @@
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups, saml_provision_media}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
-			this.allow_jit = document.getElementById('saml_allow_jit');
+			this.saml_provision_status = document.getElementById('saml_provision_status');
 
 			this._addEventListeners();
 			this._addLdapServers(ldap_servers, ldap_default_row_index);
 			this._renderProvisionGroups(saml_provision_groups);
 			this._renderProvisionMedia(saml_provision_media);
 
-			this.toggleScimProvisioning(this.allow_jit.checked);
+			this.toggleSamlJitProvisioning(this.saml_provision_status.checked);
 			this._initSortable(document.getElementById('saml-group-table'));
 		}
 
@@ -100,8 +100,8 @@
 				});
 			}
 
-			this.allow_jit.addEventListener('change', (e) => {
-				this.toggleScimProvisioning(e.target.checked);
+			this.saml_provision_status.addEventListener('change', (e) => {
+				this.toggleSamlJitProvisioning(e.target.checked);
 			});
 
 			document
@@ -386,6 +386,7 @@
 					start_tls: row.querySelector(`[name="ldap_servers[${row_index}][start_tls]"`).value,
 					bind_dn: row.querySelector(`[name="ldap_servers[${row_index}][bind_dn]"`).value,
 					description: row.querySelector(`[name="ldap_servers[${row_index}][description]"`).value,
+					provision_status: row.querySelector(`[name="ldap_servers[${row_index}][provision_status]"`).value,
 					group_basedn: row.querySelector(`[name="ldap_servers[${row_index}][group_basedn]"`).value,
 					group_name: row.querySelector(`[name="ldap_servers[${row_index}][group_name]"`).value,
 					group_member: row.querySelector(`[name="ldap_servers[${row_index}][group_member]"`).value,
@@ -570,6 +571,7 @@
 						<input type="hidden" name="ldap_servers[#{row_index}][bind_dn]" value="#{bind_dn}">
 						<input type="hidden" name="ldap_servers[#{row_index}][bind_password]" value="#{bind_password}">
 						<input type="hidden" name="ldap_servers[#{row_index}][description]" value="#{description}">
+						<input type="hidden" name="ldap_servers[#{row_index}][provision_status]" value="#{provision_status}">
 						<input type="hidden" name="ldap_servers[#{row_index}][group_basedn]" value="#{group_basedn}">
 						<input type="hidden" name="ldap_servers[#{row_index}][group_name]" value="#{group_name}">
 						<input type="hidden" name="ldap_servers[#{row_index}][group_member]" value="#{group_member}">
@@ -630,8 +632,8 @@
 			`;
 		}
 
-		toggleScimProvisioning(checked) {
-			for (const element of this.form.querySelectorAll('.saml-allow-jit')) {
+		toggleSamlJitProvisioning(checked) {
+			for (const element of this.form.querySelectorAll('.saml-provision-status')) {
 				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
 			}
 		}
