@@ -1,0 +1,1 @@
+..F....... [ZBX-21544] fixed pressing parse button truncates value of query field to the first "=" sign (agriscenko)
