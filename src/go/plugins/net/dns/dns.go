@@ -20,6 +20,7 @@
 package dns
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -102,6 +103,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func exportDns(params []string) (result interface{}, err error) {
 	answer, err := getDNSAnswers(params)
 	if err != nil {
+		if errors.Is(err, zbxerr.ErrorCannotFetchData.Unwrap()) {
+			return 0, nil
+		}
+
 		return
 	}
 

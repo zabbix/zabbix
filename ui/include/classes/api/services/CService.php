@@ -97,7 +97,7 @@ class CService extends CApiService {
 			'selectProblemTags' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'operator', 'value']), 'default' => null],
 			'selectProblemEvents' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['eventid', 'severity', 'name']), 'default' => null],
 			'selectStatusRules' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['type', 'limit_value', 'limit_status', 'new_status']), 'default' => null],
-			'selectStatusTimeline' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'uniq' => [['from', 'to']], 'default' => null, 'fields' => [
+			'selectStatusTimeline' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'uniq' => [['period_from', 'period_to']], 'default' => null, 'fields' => [
 				'period_from' =>			['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'flags' => API_REQUIRED],
 				'period_to' =>				['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'flags' => API_REQUIRED]
 			]],
