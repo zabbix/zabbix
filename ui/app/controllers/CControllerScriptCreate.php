@@ -41,7 +41,7 @@ class CControllerScriptCreate extends CController {
 			'script' => 				'db scripts.command|flags '.P_CRLF,
 			'timeout' => 				'db scripts.timeout|time_unit '.implode(':', [1, SEC_PER_MIN]),
 			'url' => 					'db scripts.url',
-			'new_window' => 			'db scripts.new_window',
+			'new_window' => 			'db scripts.new_window|in '.implode(',', [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]),
 			'description' =>			'db scripts.description',
 			'host_access' =>			'db scripts.host_access|in '.implode(',', [PERM_READ, PERM_READ_WRITE]),
 			'groupid' =>				'db scripts.groupid',
@@ -138,7 +138,7 @@ class CControllerScriptCreate extends CController {
 
 			case ZBX_SCRIPT_TYPE_URL:
 				$script['url'] = $this->getInput('url', '');
-				$script['new_window'] = $this->getInput('new_window');
+				$script['new_window'] = $this->getInput('new_window', ZBX_SCRIPT_URL_NEW_WINDOW_YES);
 				break;
 		}
 
