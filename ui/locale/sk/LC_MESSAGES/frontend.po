@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2013-08-25 22:42+0300\n"
-"Last-Translator: Jan <jan.garaj@gmail.com>\n"
+"PO-Revision-Date: 2022-08-31 10:22+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1377463363.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -1398,12 +1399,16 @@ msgstr "Inventárne číslo"
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
 msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:50
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
 msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:112
 #, c-format
@@ -2349,12 +2354,11 @@ msgid "Cannot delete dependency"
 msgstr "Nie je možné zmazať závislosť"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
-msgstr[0] "Nie je možné zmazať zisťovacie pravidlo"
-msgstr[1] "Nie je možné zmazať zisťovacie pravidlo"
-msgstr[2] "Nie je možné zmazať zisťovacie pravidlo"
+msgstr[0] "Nie je možné zmazať discovery pravidlo"
+msgstr[1] "Nie je možné zmazať discovery pravidlá"
+msgstr[2] "  "
 
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
@@ -2522,11 +2526,10 @@ msgid "Cannot delete selected actions"
 msgstr "Nie je možné zmazať označené akcie"
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Nie je možné zmazať službu"
-msgstr[1] "Nie je možné zmazať službu"
+msgstr[1] "Nie je možné zmazať služby"
 msgstr[2] "Nie je možné zmazať službu"
 
 #: include/classes/api/services/CService.php:455
@@ -3446,11 +3449,10 @@ msgid "Cannot update host group"
 msgstr ""
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:341
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Nie je možné aktualizovať prototyp hosta"
-msgstr[1] "Nie je možné aktualizovať prototyp hosta"
+msgstr[1] "Nie je možné aktualizovať prototypy hosta"
 msgstr[2] "Nie je možné aktualizovať prototyp hosta"
 
 #: app/controllers/CControllerPopupMassupdateHost.php:465
@@ -3477,12 +3479,11 @@ msgid "Cannot update item"
 msgstr "Nie je možné aktualizovať prototyp položky"
 
 #: disc_prototypes.php:556 disc_prototypes.php:583 disc_prototypes.php:617
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
-msgstr[0] "Nie je možné aktualizovať prototyp položky"
-msgstr[1] "Nie je možné aktualizovať prototyp položky"
-msgstr[2] "Nie je možné aktualizovať prototyp položky"
+msgstr[0] "Nie je možné aktualizovať prototyp itemu"
+msgstr[1] "Nie je možné aktualizovať prototyp itemov"
+msgstr[2] " "
 
 #: app/controllers/CControllerPopupMassupdateItem.php:316
 msgid "Cannot update item prototypes"
@@ -3598,12 +3599,11 @@ msgstr ""
 
 #: trigger_prototypes.php:365 trigger_prototypes.php:440
 #: trigger_prototypes.php:488
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
-msgstr[0] "Nie je možné aktualizovať prototyp spúšťača"
-msgstr[1] "Nie je možné aktualizovať prototyp spúšťača"
-msgstr[2] "Nie je možné aktualizovať prototyp spúšťača"
+msgstr[0] "Nie je možné aktualizovať prototyp triggra"
+msgstr[1] "Nie je možné aktualizovať prototyp triggrov"
+msgstr[2] " "
 
 #: include/classes/api/services/CTriggerGeneral.php:1721
 #, c-format
@@ -6167,12 +6167,11 @@ msgid "Discovery rule created"
 msgstr "Zisťovacie pravidlo vytvorené"
 
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:416
-#, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
-msgstr[0] "Zisťovacie pravidlo vymazané"
-msgstr[1] "Zisťovacie pravidlo vymazané"
-msgstr[2] "Zisťovacie pravidlo vymazané"
+msgstr[0] "Discovery pravidlo vymazané"
+msgstr[1] "Discovery pravidlá vymazané"
+msgstr[2] "  "
 
 #: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:767
 msgid "Discovery rule disabled"
@@ -8556,12 +8555,11 @@ msgid "Host prototype macros"
 msgstr ""
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:340
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Prototyp hosta aktualizovaný"
-msgstr[1] "Prototyp hosta aktualizovaný"
-msgstr[2] "Prototyp hosta aktualizovaný"
+msgstr[1] "Prototypy hostov bol aktualizovaný"
+msgstr[2] " "
 
 #: include/classes/api/services/CHostPrototype.php:999
 #, c-format
@@ -10748,12 +10746,11 @@ msgid "Item prototype deleted"
 msgstr "Prototyp položky zmazaný"
 
 #: disc_prototypes.php:556 disc_prototypes.php:582 disc_prototypes.php:616
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
-msgstr[0] "Prototyp položky aktualizovaný"
-msgstr[1] "Prototyp položky aktualizovaný"
-msgstr[2] "Prototyp položky aktualizovaný"
+msgstr[0] "Prototyp itemu bol aktualizovaný"
+msgstr[1] "Prototypy itemov boli aktualizované"
+msgstr[2] " "
 
 #: include/classes/api/services/CDashboardGeneral.php:474
 #: include/classes/api/services/CDashboardGeneral.php:482
@@ -16806,12 +16803,11 @@ msgid "Service data storage period"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Služba zmazaná"
-msgstr[1] "Služba zmazaná"
-msgstr[2] "Služba zmazaná"
+msgstr[1] "Služby zmazané"
+msgstr[2] " Služba zmazaná"
 
 #: app/views/administration.userrole.edit.php:146
 #: app/views/administration.userrole.edit.php:187
@@ -19031,12 +19027,11 @@ msgstr "Prototyp spúšťača zmazaný"
 
 #: trigger_prototypes.php:362 trigger_prototypes.php:439
 #: trigger_prototypes.php:487
-#, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
-msgstr[0] "Prototyp spúšťača aktualizovaný"
-msgstr[1] "Prototyp spúšťača aktualizovaný"
-msgstr[2] "Prototyp spúšťača aktualizovaný"
+msgstr[0] "Prototyp triggra aktualizovaný"
+msgstr[1] "Prototyp triggrov aktualizovaný"
+msgstr[2] " "
 
 #: app/controllers/CControllerPopupGeneric.php:183
 #: app/controllers/CControllerPopupImportCompare.php:174
