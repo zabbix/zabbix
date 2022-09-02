@@ -34,35 +34,36 @@ $form = (new CForm())
 $form_grid = new CFormGrid();
 
 if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-	$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
-
 	if ($data['discoveryRule']) {
 		if ($data['allowed_ui_conf_hosts'] && $data['is_discovery_rule_editable']) {
 			$discovery_rule = (new CLink($data['discoveryRule']['name'],
-					(new CUrl('host_prototypes.php'))
-						->setArgument('form', 'update')
-						->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
-						->setArgument('hostid', $data['hostPrototype']['hostid'])
-						->setArgument('context', 'host')
-				));
+				(new CUrl('host_prototypes.php'))
+					->setArgument('form', 'update')
+					->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+					->setArgument('hostid', $data['hostPrototype']['hostid'])
+					->setArgument('context', 'host')
+			));
 		}
 		else {
 			$discovery_rule = new CSpan($data['discoveryRule']['name']);
 		}
+	}
+	else {
+		$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
 	}
 
 	$form_grid->addItem([[new CLabel(_('Discovered by')), new CFormField($discovery_rule)]]);
 }
 
 $form_grid->addItem([
-		(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
-		new CFormField(
-			(new CTextBox('name', $data['name'], $data['groupid'] != 0 && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED))
-				->setAttribute('autofocus', 'autofocus')
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired()
-		)
-	]);
+	(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
+	new CFormField(
+		(new CTextBox('name', $data['name'], $data['groupid'] != 0 && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED))
+			->setAttribute('autofocus', 'autofocus')
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	)
+]);
 
 if ($data['groupid'] != 0 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$form_grid->addItem([
