@@ -6449,6 +6449,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	/* global configuration must be synchronized directly with database */
 	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
+
 	zbx_dbsync_init(&autoreg_config_sync, mode);
 	zbx_dbsync_init(&autoreg_host_sync, mode);
 	zbx_dbsync_init(&hosts_sync, changelog_sync_mode);
@@ -6490,13 +6491,13 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	zbx_dbsync_init(&maintenance_group_sync, mode);
 	zbx_dbsync_init(&maintenance_host_sync, mode);
 
-	zbx_dbsync_init(&drules_sync, mode);
-	zbx_dbsync_init(&dchecks_sync, mode);
+	zbx_dbsync_init(&drules_sync, changelog_sync_mode);
+	zbx_dbsync_init(&dchecks_sync, changelog_sync_mode);
 
-	zbx_dbsync_init(&httptest_sync, mode);
-	zbx_dbsync_init(&httptest_field_sync, mode);
-	zbx_dbsync_init(&httpstep_sync, mode);
-	zbx_dbsync_init(&httpstep_field_sync, mode);
+	zbx_dbsync_init(&httptest_sync, changelog_sync_mode);
+	zbx_dbsync_init(&httptest_field_sync, changelog_sync_mode);
+	zbx_dbsync_init(&httpstep_sync, changelog_sync_mode);
+	zbx_dbsync_init(&httpstep_field_sync, changelog_sync_mode);
 
 
 #ifdef HAVE_ORACLE
