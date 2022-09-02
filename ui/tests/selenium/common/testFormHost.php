@@ -212,7 +212,31 @@ class testFormHost extends CWebTest {
 						'password' => ''
 					]
 				]
-			]
+			],
+			[
+				'host' => 'testFormHost clone with secret Macros',
+				'groups' => $groups,
+				'macros' => [
+					[
+						'macro' => '{$USER_MACRO}',
+						'value' => 'secret',
+						'description' => 'secret text',
+						'type' => '1'
+					]
+				]
+			],
+			[
+				'host' => 'testFormHost full clone with secret Macros',
+				'groups' => $groups,
+				'macros' => [
+					[
+						'macro' => '{$USER_MACRO}',
+						'value' => 'secret',
+						'description' => 'secret text',
+						'type' => '1'
+					]
+				]
+			],
 		]);
 
 		self::$hostids = $result['hostids'];
@@ -1615,12 +1639,14 @@ class testFormHost extends CWebTest {
 		return [
 			[
 				[
-					'Host name' => microtime().' clone without interface changes'
-
+					'fields' => [
+						'Host name' => microtime().' clone without interface changes'
+					]
 				]
 			],
 			[
 				[
+					'fields' => [
 					'Host name' => microtime().' clone with interface changes',
 					'Visible name' => microtime().'😀😀😀',
 					'Description' => '😀😀😀😀😀😀😀',
@@ -1645,7 +1671,8 @@ class testFormHost extends CWebTest {
 					]
 				]
 			]
-		];
+		]
+	];
 	}
 
 	/**
@@ -1654,13 +1681,12 @@ class testFormHost extends CWebTest {
 	 * @param array     $data		   data provider with fields values
 	 * @param string    $button        Clone or Full clone
 	 */
-	public function cloneHost($data, $button = 'Clone') {
-		$host = 'testFormHost with items';
+	public function cloneHost($data, $button = 'Clone', $host = 'testFormHost with items') {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
 
 		// Get values from form.
-		$form->fill($data);
+		$form->fill($data['fields']);
 		$original = $form->getFields()->asValues();
 
 		// Clone host.
@@ -1670,12 +1696,16 @@ class testFormHost extends CWebTest {
 			? COverlayDialogElement::find()->asForm()->waitUntilReady()->one()
 			: $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
 
+		if (CTestArrayHelper::get($data, 'expected')) {
+			$this->assertMessage(TEST_ERROR, null, $data['error']);
+		}
+
 		$cloned_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host added');
 
 		// Check the values of the original host with the cloned host.
-		$this->filterAndSelectHost((CTestArrayHelper::get($data, 'Visible name', $data['Host name'])) )
+		$this->filterAndSelectHost((CTestArrayHelper::get($data['fields'], 'Visible name', $data['fields']['Host name'])) )
 				->checkValue($original);
 		COverlayDialogElement::find()->one()->close();
 	}
