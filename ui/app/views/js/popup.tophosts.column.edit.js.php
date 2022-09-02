@@ -89,7 +89,6 @@ window.tophosts_column_edit_form = new class {
 		$('[name="text"]', this._$widget_form).attr('disabled', !data_text);
 		$('[name="min"],[name="max"]', this._$widget_form).attr('disabled', display_as_is || !data_item_value);
 		this._$thresholds_table.toggleClass('disabled', !data_item_value);
-		$('[name$="[color]"],[name$="[threshold]"],button', this._$thresholds_table).attr('disabled', !data_item_value);
 
 		// Toggle warning icons for non-numeric items settings.
 		if (data_item_value) {

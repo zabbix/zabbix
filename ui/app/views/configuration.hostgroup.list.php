@@ -28,7 +28,7 @@ $this->includeJsFile('configuration.hostgroup.list.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Host groups'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOSTGROUPS_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOSTGROUPS_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
