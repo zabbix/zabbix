@@ -474,13 +474,8 @@ static int	send_smtp_helo(const char *addr, const char *helo, zbx_socket_t *s, c
 			goto out;
 		}
 		else
-		{
-			zabbix_log(1, "parsed helo = '%s' / %s", helo_parsed, addr);
 			zbx_snprintf(cmd, sizeof(cmd), "HELO %s\r\n", helo_parsed);
-		}
 	}
-
-	zabbix_log(1, "DBG, sending helo '%s'", cmd);
 
 	if (-1 == write(s->socket, cmd, strlen(cmd)))
 	{
@@ -506,7 +501,6 @@ static int	send_smtp_helo(const char *addr, const char *helo, zbx_socket_t *s, c
 		ret = FAIL;
 		goto out;
 	}
-	zabbix_log(1, "DBG helo response = '%s'", response);
 out:
 	zbx_free(helo_parsed);
 	return ret;
