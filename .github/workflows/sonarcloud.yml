@@ -1,10 +1,8 @@
 name: SonarCloud C Build
 
 on:
-  push:
-    branches:
-     - 'master'
-     - 'release/*'
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
 
