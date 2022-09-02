@@ -18,15 +18,127 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
+/**
+ * @backup profiles, hosts, items, graphs
+ *
+ * @onBefore prepareHostsData
+ * @onBefore prepareItemsData
+ * @onBefore prepareGraphsData
+ */
 class testPageMonitoringHostsGraph extends CWebTest {
+
+	private static $hostid;
+	private static $itemid;
+
+	public function prepareHostsData() {
+		$response = CDataHelper::call('host.create', [
+			[
+				'host' => 'Host for monitoring graphs',
+				'groups' => [
+					'groupid' => 4
+				],
+				'interfaces' => [
+					'type'=> 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => '10050'
+				]
+			]
+		]);
+		$this->assertArrayHasKey('hostids', $response);
+		self::$hostid = $response['hostids'][0];
+	}
+
+	public function prepareItemsData() {
+		$response = CDataHelper::call('item.create', [
+			[
+				'name' => 'Item for graph 1',
+				'key_' => 'trap_1',
+				'hostid' => self::$hostid,
+				'type' => 2,
+				'value_type' => 0
+			],
+			[
+				'name' => 'Item for graph 2',
+				'key_' => 'trap_2',
+				'hostid' => self::$hostid,
+				'type' => 2,
+				'value_type' => 0
+			],
+			[
+				'name' => 'Item for graph 3',
+				'key_' => 'trap_3',
+				'hostid' => self::$hostid,
+				'type' => 2,
+				'value_type' => 0
+			]
+		]);
+		$this->assertArrayHasKey('itemids', $response);
+		self::$itemid = CDataHelper::getIds('name');
+	}
+
+	public function prepareGraphsData() {
+		$response = CDataHelper::call('graph.create', [
+			[
+				'name' => 'Graph 1',
+				'gitems' => [
+					[
+						'itemid' => self::$itemid['Item for graph 1'],
+						'color' => '00AA00'
+					]
+				]
+			],
+			[
+				'name' => 'Graph 2',
+				'gitems' => [
+					[
+						'itemid' => self::$itemid['Item for graph 2'],
+						'color' => '00AA00'
+					],
+					[
+						'itemid' => self::$itemid['Item for graph 2'],
+						'color' => '00AA00'
+					]
+				]
+			],
+			[
+				'name' => 'Graph 3',
+				'gitems' => [
+					[
+						'itemid' => self::$itemid['Item for graph 2'],
+						'color' => '00AA00'
+					],
+					[
+						'itemid' => self::$itemid['Item for graph 3'],
+						'color' => '00AA00'
+					]
+
+				]
+			],
+		]);
+		$this->assertArrayHasKey('graphids', $response);
+	}
 
 	public function testPageMonitoringHostsGraph_Layout() {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to'.
 				'=now&filter_search_type=0&filter_set=1');
 		$this->page->assertHeader('Graphs');
 		$this->page->assertTitle('Custom graphs');
+
+		// If the time selector is not visible - enable it.
+		if ($this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]')->exists()) {
+			$this->query('id:ui-id-1')->one()->click();
+		}
+
+		// Check that timeselector set to display Last hour data.
+		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')
+			->one()->getAttribute('class')
+		);
 
 		// If the filter is not visible - enable it.
 		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
@@ -53,9 +165,50 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			$this->assertEquals($placeholder, $form->query('id', $id)->one()->getAttribute('placeholder'));
 		}
 
+		// Check filter buttons.
+		foreach (['Apply', 'Reset'] as $button) {
+			$this->assertTrue($form->query('xpath:.//div[@class="filter-forms"]/button[text()="'.$button.'"]')
+					->one()->isClickable()
+			);
+		}
+
+		// When table result is empty.
 		$this->assertEquals('Specify host to see the graphs.',
 			$this->query("xpath://table[@class='list-table']//td")->one()->getText()
 		);
+
+		// Check "View as" values.
+		$this->assertEquals(['Graph', 'Values'], $this->query('id:view-as')->one()->asDropdown()->getOptions()->asText());
+
+		// Check that "Favourite" button appears and is clickable.
+		$form->fill(['Search type' => 'Strict', 'Graphs' => 'CPU jumps'])->submit();
+		$this->page->waitUntilReady();
+
+		foreach (['Add to favourites', 'Remove from favourites'] as $favourite) {
+			$this->assertTrue($this->query('xpath://button[@title="'.$favourite.'"]')->waitUntilReady()->exists());
+			$this->query('xpath://button[@title="'.$favourite.'"]')->one()->click();
+		}
+	}
+
+	public function testPageMonitoringHostsGraph_KioskMode() {
+		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to'.
+			'=now&filter_search_type=0&filter_set=1');
+
+		// Check Kiosk mode.
+		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->page->waitUntilReady();
+
+		// Check that Header and Filter disappeared.
+		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
+		$this->assertFalse($this->query('xpath://div[@aria-label="Filter"]')->exists());
+
+		// Return to normal view.
+		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
+		$this->page->waitUntilReady();
+
+		// Check that Header and Filter are visible again.
+		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
+		$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
 	}
 
 	public static function getCheckFilterData() {
@@ -63,52 +216,111 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host' => 'Dynamic widgets H1'
+						'Host' => 'Host for monitoring graphs',
+						'Search type' => 'Strict'
 					],
-					'graphs_amount' => 4,
-					'items_names' => ['Dynamic widgets H1I1', 'Dynamic widgets H1I2', 'Dynamic widgets H3I1']
+					'graphs_result' => 3,
+					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Search type' => 'Strict',
-						'Graphs' => 'Graph ZBX6663 Second'
-					],
-					'graphs_amount' => 1,
-					'items_names' => ['Item ZBX6663 Second']
-				]
-			],
-			[
-				[
-					'filter' => [
-						'Host' => 'Host to delete graphs',
+						'Host' => 'Host for monitoring graphs',
 						'Search type' => 'Pattern'
 					],
-					'graphs_amount' => 5,
-					'items_names' => ['Item to delete graph']
+					'graphs_result' => 3,
+					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Host' => 'Host to delete graphs',
+						'Host' => 'Host for monitoring graphs',
 						'Search type' => 'Pattern',
-						'Graphs' => 'Delete graph 1'
+						'Graphs' => 'Graph 2'
 					],
-					'graphs_amount' => 1,
-					'items_names' => ['Item to delete graph']
+					'graphs_result' => 1,
+					'items_names' => ['Item for graph 2']
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Host' => 'Dynamic widgets H1',
+						'Host' => 'Host for monitoring graphs',
 						'Search type' => 'Strict',
-						'Graphs' => 'Dynamic widgets H1 G1 (I1)'
+						'Graphs' => 'Graph 2'
 					],
-					'graphs_amount' => 1,
-					'items_names' => ['Dynamic widgets H1I1']
+					'graphs_result' => 1,
+					'items_names' => ['Item for graph 2']
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Search type' => 'Strict',
+						'Graphs' => 'Graph 1'
+					],
+					'graphs_result' => 1,
+					'items_names' => ['Item for graph 1']
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Search type' => 'Pattern',
+						'Graphs' => 'Graph 1'
+					],
+					'graphs_result' => 0
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Search type' => 'Strict',
+						'Graphs' => ['Graph 1', 'Graph 3']
+					],
+					'graphs_result' => 2,
+					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Search type' => 'Pattern',
+						'Graphs' => ['Graph 1', 'Graph 3']
+					],
+					'graphs_result' => 0
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Search type' => 'Pattern',
+						'Graphs' => ['non_existing_graph', 'Graph 1']
+					],
+					'graphs_result' => 0
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Host' => 'Host for monitoring graphs',
+						'Search type' => 'Pattern',
+						'Graphs' => 'lonely_graph'
+					],
+					'graphs_result' => 0
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Host' => 'Host for monitoring graphs',
+						'Search type' => 'Pattern',
+						'Graphs' => ['non_existing_graph', 'Graph 1']
+					],
+					'graphs_result' => 1,
+					'items_names' => ['Item for graph 1']
 				]
 			]
 		];
@@ -118,26 +330,46 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	 * @dataProvider getCheckFilterData
 	 */
 	public function testPageMonitoringHostsGraph_CheckFilter($data) {
-		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to=now&filter_search_type=0&filter_set=1');
+		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to='.
+				'now&filter_search_type=0&filter_set=1');
 
-		// Checking that graph filter is activated and visible.
-		if ($this->query('xpath://li[@aria-controls="tab_2"]')->one()->getAttribute('aria-selected') == 'false') {
-			$this->query('xpath://ul[@role="tablist"]/li[@aria-controls="tab_2"]/a')->one()->click();
+		// If the filter is not visible - enable it.
+		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
+			$this->query('id:ui-id-2')->one()->click();
 		}
 
 		$form = $this->query('name:zbx_filter')->one()->asForm();
-		$form->fill($data['filter']);
-		$form->submit();
+		$form->fill($data['filter'])->submit();
 		$this->page->waitUntilReady();
-		$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
-		$this->assertEquals($data['graphs_amount'], $graphs_count);
 
-		// Checking from Values view.
-		$this->query('id:view_as')->asDropdown()->one()->select('Values');
-		$this->page->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
-		foreach ($data['items_names'] as $item) {
-			$this->assertTrue($table->query('xpath://tr/th[@title="'.$item.'"]')->exists());
+		if ($data['graphs_result'] === 0) {
+			foreach(['Graph', 'Values'] as $view) {
+				$this->query('id:view-as')->asDropdown()->one()->select($view);
+
+				if ($data['filter']['Graphs'] === 'lonely_graph') {
+					$this->assertEquals(['No data found.'], $this->query('class:list-table')->asTable()->one()->
+							getRows()->asText()
+					);
+				}
+				else {
+					$this->assertEquals('Specify host to see the graphs.',
+							$this->query("xpath://table[@class='list-table']//td")->one()->getText()
+					);
+				}
+			}
+		}
+		else {
+			$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
+			$this->assertEquals($data['graphs_result'], $graphs_count);
+
+			// Checking from Values view.
+			$this->query('id:view-as')->asDropdown()->one()->select('Values');
+			$this->page->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one();
+			$this->assertEquals(['No data found.'], $table->getRows()->asText());
+			foreach ($data['items_names'] as $item) {
+				$this->assertTrue($table->query('xpath://tr/th[@title="'.$item.'"]')->exists());
+			}
 		}
 	}
 }

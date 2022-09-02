@@ -55,6 +55,7 @@ require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
 require_once dirname(__FILE__).'/testPageMonitoringHosts.php';
+require_once dirname(__FILE__).'/testPageMonitoringHostsGraph.php';
 require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
 require_once dirname(__FILE__).'/testPageLowLevelDiscovery.php';
 /*
@@ -169,7 +170,6 @@ require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
 require_once dirname(__FILE__).'/testSID.php';
-require_once dirname(__FILE__).'/testPageMonitoringHostsGraph.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -213,6 +213,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
+		$suite->addTestSuite('testPageMonitoringHostsGraph');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 		$suite->addTestSuite('testPageOverview');
 /*
@@ -328,7 +329,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testSID');
-		$suite->addTestSuite('testPageMonitoringHostsGraph');
 
 		return $suite;
 	}
