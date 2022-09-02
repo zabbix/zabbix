@@ -591,7 +591,7 @@ int	zbx_is_int(const char *str, int *value)
 	zbx_uint32_t	value_ui32;
 	int		sign;
 
-	if ('-' == (ptr = str))
+	if ('-' == *(ptr = str))
 	{
 		ptr++;
 		sign = -1;
@@ -599,7 +599,7 @@ int	zbx_is_int(const char *str, int *value)
 	else
 		sign = 1;
 
-	if (SUCCEED != is_uint31(str, &value_ui32))
+	if (SUCCEED != is_uint31(ptr, &value_ui32))
 		return FAIL;
 
 	if (NULL != value)

@@ -775,7 +775,10 @@ static int	proxyconfig_convert_value(const ZBX_TABLE *table, const ZBX_FIELD *fi
 			break;
 		case ZBX_TYPE_ID:
 			if (ZBX_JSON_TYPE_NULL == type)
+			{
 				value_local.ui64 = 0;
+				ret = SUCCEED;
+			}
 			else
 				ret = is_uint64(buf, &value_local.ui64);
 			break;
@@ -803,8 +806,11 @@ static int	proxyconfig_convert_value(const ZBX_TABLE *table, const ZBX_FIELD *fi
 		return FAIL;
 	}
 
-	*value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
-	**value = value_local;
+	if (NULL != value)
+	{
+		*value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
+		**value = value_local;
+	}
 
 	return SUCCEED;
 }
@@ -848,9 +854,6 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 		{
 			const ZBX_FIELD	*field = td->fields.values[j].field;
 			char		*value_esc;
-			zbx_uint64_t	value_ui64;
-			double		value_dbl;
-			zbx_uint32_t	value_int;
 
 			if (SUCCEED != zbx_flags128_isset(&row->flags, j))
 				continue;
