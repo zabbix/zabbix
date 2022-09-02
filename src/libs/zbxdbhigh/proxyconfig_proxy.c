@@ -333,7 +333,6 @@ static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 	}
 	else if (0 == strcmp(table->table, "hosts"))
 	{
-		td->rename_field = "host";
 		td->sql_filter = zbx_dsprintf(NULL, "status<>%d", HOST_STATUS_TEMPLATE);
 	}
 	else if (0 == strcmp(table->table, "items"))
