@@ -93,7 +93,7 @@ func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
 		switch params[0] {
 		case "", "all":
 		case "percpu":
-			split = len(p.cpus) - 1
+			split = numCPUOnline()
 		default:
 			return nil, errors.New("Invalid second parameter.")
 		}

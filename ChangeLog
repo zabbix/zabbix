@@ -1,14 +1,44 @@
+Changes for 5.0.28rc1
+
+New features:
+...G...... [ZBXNEXT-6666] added listen socket security fix for Agent 2 on Windows (ssimonenko)
+
+Bug fixes:
+.......PS. [ZBX-21454] added blocking of rtc signals during script execution (dgoloscapov)
+..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
+..F....... [ZBX-18838] removed non-existent value 'failed' in script.execute response property (dpetra)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.27
+
+5.0.27rc1 was released as 5.0.27 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.27rc1
 
 New features:
+.........T [ZBXNEXT-7520] added template for OPNsense (drasihov)
 
 Bug fixes:
+...G...... [ZBX-21328] fixed Zabbix agent 2 log and eventlog items behavior to match Zabbix agent when key has been updated (vso)
+...G...... [ZBX-21234] fixed net.dns to return 0 when server is unreachable in Zabbix agent 2 (esneiders)
+...G...PS. [ZBX-21445] improved performance by only calling res_init() on changed resolv.conf if glibc lower than 2.26 is used (vso)
+.......PS. [ZBX-21385] fixed setting of character set for MySQL and MariaDB when utf8mb3 is missing while utf8 is present (vso)
+..F....... [ZBX-20975] fixed PHP TypeError in inaccessible dashboard view (miks)
+A......... [ZBX-19769] fixed performance when Host API is filtering records by severity or suppressed problems (miks)
+..F....... [ZBX-19176] fixed multiple performance issues in map navigation tree widget and map (miks)
+...G...... [ZBX-21295] changed system.cpu.load[percpu] to split based on online CPUs in Zabbix agent 2 (esneiders)
+...G...... [ZBX-18573] improved performance of directory scanning by Zabbix agent on Windows (dgoloscapov)
+........S. [ZBX-21138] blocked housekeeper history/trends record creation on item removal when history/trends housekeeping is disabled (wiper)
+.........T [ZBX-20901] changed host macro in MySQL by Zabbix agent template to use TCP/IP connection method explicitly (drasihov)
+.........T [ZBX-21344] changed JS preprocessing in Apache by HTTP/Zabbix agent templates to use ServerActive field from status page primarily (drasihov)
 .........T [ZBX-21220] changed uptime item description, removed uptime trigger in Zookeeper by HTTP template (drasihov)
 .........T [ZBX-20992] fixed typos and duplications in templates (drasihov)
 ........S. [ZBX-20419] fixed database deadlocks and MySQL error number calculation to be consistent between logging and recoverability detection logic (akozlovs)
 ........S. [ZBX-20656] updated active proxy throttling to allow task transfer (wiper)
-.......PS. [ZBX-21153] fixed info collection about access to vmware DS for HV with large number of connected DS (MVekslers)
+.......PS. [ZBX-21153] fixed info collection about access to VMware DS for HV with large number of connected DS (MVekslers)
 ..F....... [ZBX-4646] fixed month abbreviation with capital "M" (Sasha)
+..F....... [ZBX-21333] fixed housekeeper table usage with disabled housekeeping (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.26
@@ -2568,6 +2598,7 @@ Changes for 4.0.44rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.43
