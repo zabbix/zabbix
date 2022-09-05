@@ -42,7 +42,7 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 				(new CControllerResponseData([
 					'main_block' => json_encode([
 						'error' => [
-							'title' => _('Invalid user group mappin configuration'),
+							'title' => _('Invalid user group mapping configuration.'),
 							'messages' => array_column(get_and_clear_messages(), 'message')
 						]
 					])
