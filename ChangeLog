@@ -1,8 +1,16 @@
 Changes for 6.0.9rc1
 
 New features:
+...G...... [ZBXNEXT-6666] added listen socket security fix for Agent 2 on Windows (ssimonenko)
 
 Bug fixes:
+..F....... [ZBX-21422] fixed inability to change password and/or username on templated SSH items (acikuns)
+.......PS. [ZBX-21454] added blocking of rtc signals during script execution (dgoloscapov)
+..F....... [ZBX-21495] fixed selection of IPMI parameters in the host form (Sasha)
+..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
+.........T [ZBX-21461] fixed item "Checksum of /etc/passwd" (egordymov)
+........S. [ZBX-21266] fixed {ITEM.KEY} macro not getting expanded in expression macros (ssimonenko)
+..F....... [ZBX-21264] fixed empty service suggestions in SLA reports (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.8
@@ -2091,8 +2099,12 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.28rc1
 
 New features:
+...G...... [ZBXNEXT-6666] added listen socket security fix for Agent 2 on Windows (ssimonenko)
 
 Bug fixes:
+.......PS. [ZBX-21454] added blocking of rtc signals during script execution (dgoloscapov)
+..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
+..F....... [ZBX-18838] removed non-existent value 'failed' in script.execute response property (dpetra)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.27
@@ -4684,6 +4696,7 @@ Changes for 4.0.44rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.43
