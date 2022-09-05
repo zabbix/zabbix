@@ -1421,9 +1421,11 @@ static void	proxyconfig_prepare_hostmacros(zbx_table_data_t *hostmacro, zbx_tabl
 
 			pf = zbx_json_next(&row->columns, NULL);
 
-			zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL);
-			if (SUCCEED == is_uint64(buf, &hostid))
+			if (NULL != zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL) &&
+					SUCCEED == is_uint64(buf, &hostid))
+			{
 				zbx_vector_uint64_append(&hostids, hostid);
+			}
 		}
 
 		zbx_hashset_iter_reset(&hosts_templates->rows, &iter);
@@ -1435,9 +1437,11 @@ static void	proxyconfig_prepare_hostmacros(zbx_table_data_t *hostmacro, zbx_tabl
 
 			pf = zbx_json_next(&row->columns, NULL);
 
-			zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL);
-			if (SUCCEED == is_uint64(buf, &hostid))
+			if (NULL != zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL) &&
+					SUCCEED == is_uint64(buf, &hostid))
+			{
 				zbx_vector_uint64_append(&hostids, hostid);
+			}
 		}
 
 		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1493,10 +1497,11 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, char **
 			goto out;
 		}
 
-		zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL);
-
-		if (SUCCEED == is_uint64(buf, &templateid))
+		if (NULL != zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL) &&
+				SUCCEED == is_uint64(buf, &templateid))
+		{
 			zbx_vector_uint64_append(&templateids, templateid);
+		}
 	}
 
 	/* check for existing templates and create empty templates if necessary */
