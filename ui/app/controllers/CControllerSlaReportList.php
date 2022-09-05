@@ -44,30 +44,6 @@ class CControllerSlaReportList extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret) {
-			$fields = [];
-
-			if ($this->getInput('filter_date_from', '') !== '') {
-				$fields['filter_date_from'] = 'abs_date';
-			}
-
-			if ($this->getInput('filter_date_to', '') !== '') {
-				$fields['filter_date_to'] = 'abs_date';
-			}
-
-			if ($fields) {
-				$validator = new CNewValidator($this->getInputAll(), $fields);
-
-				foreach ($validator->getAllErrors() as $error) {
-					info($error);
-				}
-
-				if ($validator->isErrorFatal() || $validator->isError()) {
-					$ret = false;
-				}
-			}
-		}
-
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
@@ -159,24 +135,44 @@ class CControllerSlaReportList extends CController {
 			: CTimezoneHelper::getSystemTimezone()
 		);
 
+		$absolute_time_parser = new CAbsoluteTimeParser();
+
 		$period_from = null;
 
 		if ($filter['date_from'] !== '') {
-			$parser = new CAbsoluteTimeParser();
-			$parser->parse($filter['date_from']);
-			$period_from = $parser
-				->getDateTime(true, $timezone)
-				->getTimestamp();
+			if ($absolute_time_parser->parse($filter['date_from']) == CParser::PARSE_SUCCESS) {
+				$period_from = $absolute_time_parser
+					->getDateTime(true, $timezone)
+					->getTimestamp();
+
+				if ($period_from < 0 || $period_from > ZBX_MAX_DATE) {
+					$period_from = null;
+
+					error(_s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a date is expected')));
+				}
+			}
+			else {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a date is expected')));
+			}
 		}
 
 		$period_to = null;
 
 		if ($filter['date_to'] !== '') {
-			$parser = new CAbsoluteTimeParser();
-			$parser->parse($filter['date_to']);
-			$period_to = $parser
-				->getDateTime(false, $timezone)
-				->getTimestamp();
+			if ($absolute_time_parser->parse($filter['date_to']) == CParser::PARSE_SUCCESS) {
+				$period_to = $absolute_time_parser
+					->getDateTime(false, $timezone)
+					->getTimestamp();
+
+				if ($period_to < 0 || $period_to > ZBX_MAX_DATE) {
+					$period_to = null;
+
+					error(_s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a date is expected')));
+				}
+			}
+			else {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a date is expected')));
+			}
 		}
 
 		if ($period_from !== null && $period_to !== null && $period_to <= $period_from) {
@@ -231,7 +227,7 @@ class CControllerSlaReportList extends CController {
 		}
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('SLA Report'));
+		$response->setTitle(_('SLA report'));
 		$this->setResponse($response);
 	}
 }
