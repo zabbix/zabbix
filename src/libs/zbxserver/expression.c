@@ -2448,7 +2448,7 @@ static int	get_expression_macro_result(const DB_EVENT *event, char *data, zbx_st
 	}
 
 	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_NORMAL, &ctx);
-	zbx_expression_eval_resolve_trigger_hosts(&eval, &event->trigger);
+	zbx_expression_eval_resolve_trigger_hosts_items(&eval, &event->trigger);
 
 	if (SUCCEED == (ret = zbx_expression_eval_execute(&eval, ts, &value, error)))
 	{

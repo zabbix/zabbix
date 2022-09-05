@@ -514,32 +514,16 @@ class IpmiTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const ipmi_authtype = document.getElementById('ipmi_authtype');
 
-		if (ipmi_authtype !== null) {
-			if (ipmi_authtype.type === 'select-multiple') {
-				const options = ipmi_authtype.selectedOptions;
-
-				if (options.length > 1 || options[0].value != IpmiTabIndicatorItem.IPMI_AUTHTYPE_DEFAULT) {
-					return true;
-				}
-			}
-			else if (ipmi_authtype.value != IpmiTabIndicatorItem.IPMI_AUTHTYPE_DEFAULT) {
-				return true;
-			}
+		if (ipmi_authtype !== null
+				&& ipmi_authtype.value != IpmiTabIndicatorItem.IPMI_AUTHTYPE_DEFAULT) {
+			return true;
 		}
 
 		const ipmi_privilege = document.getElementById('ipmi_privilege');
 
-		if (ipmi_privilege !== null) {
-			if (ipmi_privilege.type === 'select-multiple') {
-				const options = ipmi_privilege.selectedOptions;
-
-				if (options.length > 1 || options[0].value != IpmiTabIndicatorItem.IPMI_PRIVILEGE_USER) {
-					return true;
-				}
-			}
-			else if (ipmi_privilege.value != IpmiTabIndicatorItem.IPMI_PRIVILEGE_USER) {
-				return true;
-			}
+		if (ipmi_privilege !== null
+				&& ipmi_privilege.value != IpmiTabIndicatorItem.IPMI_PRIVILEGE_USER) {
+			return true;
 		}
 
 		for (const input of document.querySelectorAll('#ipmi_username, #ipmi_password')) {

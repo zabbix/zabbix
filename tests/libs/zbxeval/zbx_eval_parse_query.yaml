@@ -39,6 +39,38 @@ out:
   key: 'key[?, "[]"]'
   filter: 'group="\"a\""'
 ---
+test case: Success '/{HOST.HOST}/key'
+in:
+  query: '/{HOST.HOST}/key'
+out:
+  host: '{HOST.HOST}'
+  key: 'key'
+  filter: ''
+---
+test case: Success '/{HOST.HOST}/{ITEM.KEY}'
+in:
+  query: '/{HOST.HOST}/{ITEM.KEY}'
+out:
+  host: '{HOST.HOST}'
+  key: '{ITEM.KEY}'
+  filter: ''
+---
+test case: Success '/host/{ITEM.KEY}'
+in:
+  query: '/host/{ITEM.KEY}'
+out:
+  host: 'host'
+  key: '{ITEM.KEY}'
+  filter: ''
+---
+test case: Success '/{HOST.HOST1}/{ITEM.KEY1}'
+in:
+  query: '/{HOST.HOST1}/{ITEM.KEY1}'
+out:
+  host: '{HOST.HOST1}'
+  key: '{ITEM.KEY1}'
+  filter: ''
+---
 test case: Failure '/*/*?'
 in:
   query: '/*/*?'
@@ -56,8 +88,16 @@ in:
   query: '/*/*['
 out:
   key: ''
+---
+test case: Failure '/{HOST.HOST/key'
+in:
+  query: '/{HOST.HOST/key'
+out:
+  key: ''
+---
+test case: Failure '/{HOST.HOST}/{ITEM.KEY'
+in:
+  query: '/{HOST.HOST}/{ITEM.KEY'
+out:
+  key: ''
 ...
-
-
-
-

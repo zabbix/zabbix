@@ -85,26 +85,61 @@ class CWidgetFormSlaReport extends CWidgetForm
 			return $errors;
 		}
 
+		$errors = [];
+
+		$slaids = $this->fields['slaid']->getValue();
+
+		$slas = $slaids
+			? API::Sla()->get([
+				'output' => ['timezone'],
+				'slaids' => $slaids,
+				'filter' => [
+					'status' => ZBX_SLA_STATUS_ENABLED
+				]
+			])
+			: [];
+
+		$sla = $slas ? $slas[0] : null;
+
+		$timezone = new DateTimeZone($sla !== null && $sla['timezone'] !== ZBX_DEFAULT_TIMEZONE
+			? $sla['timezone']
+			: CTimezoneHelper::getSystemTimezone()
+		);
+
 		$absolute_time_parser = new CAbsoluteTimeParser();
 
-		if (!$absolute_time_parser->parse($this->fields['date_from']->getValue()) == CParser::PARSE_SUCCESS) {
-			return [];
+		$period_from = null;
+
+		if ($absolute_time_parser->parse($this->fields['date_from']->getValue()) == CParser::PARSE_SUCCESS) {
+			$period_from = $absolute_time_parser
+				->getDateTime(true, $timezone)
+				->getTimestamp();
+
+			if ($period_from < 0 || $period_from > ZBX_MAX_DATE) {
+				$period_from = null;
+
+				$errors[] = _s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a date is expected'));
+			}
 		}
 
-		$date_from_timestamp = $absolute_time_parser->getDateTime(false);
+		$period_to = null;
 
-		if (!$absolute_time_parser->parse($this->fields['date_to']->getValue()) == CParser::PARSE_SUCCESS) {
-			return [];
+		if ($absolute_time_parser->parse($this->fields['date_to']->getValue()) == CParser::PARSE_SUCCESS) {
+			$period_to = $absolute_time_parser
+				->getDateTime(false, $timezone)
+				->getTimestamp();
+
+			if ($period_to < 0 || $period_to > ZBX_MAX_DATE) {
+				$period_to = null;
+
+				$errors[] = _s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a date is expected'));
+			}
 		}
 
-		$date_to_timestamp = $absolute_time_parser->getDateTime(false);
-
-		if ($date_to_timestamp < $date_from_timestamp) {
-			return [
-				_s('"%1$s" date must be less than "%2$s" date.', _('From'), _('To'))
-			];
+		if ($period_from !== null && $period_to !== null && $period_to <= $period_from) {
+			$errors[] = _s('"%1$s" date must be less than "%2$s" date.', _('From'), _('To'));
 		}
 
-		return [];
+		return $errors;
 	}
 }

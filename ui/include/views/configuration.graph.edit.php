@@ -44,7 +44,7 @@ $url = (new CUrl('graphs.php'))
 // Create form.
 $graphForm = (new CForm('post', $url))
 	->setName('graphForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 
