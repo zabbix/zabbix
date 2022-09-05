@@ -237,24 +237,6 @@ void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data, zbx_
 	}
 }
 
-zbx_uint32_t	zbx_availability_serialize_hostid(unsigned char **data, zbx_uint64_t hostid)
-{
-	zbx_uint32_t	data_len = 0;
-
-	zbx_serialize_prepare_value(data_len, hostid);
-
-	*data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
-
-	(void)zbx_serialize_value(*data, hostid);
-
-	return data_len;
-}
-
-void	zbx_availability_deserialize_hostid(const unsigned char *data, zbx_uint64_t *hostid)
-{
-	(void)zbx_deserialize_uint64(data, hostid);
-}
-
 zbx_uint32_t	zbx_availability_serialize_hostids(unsigned char **data, zbx_vector_uint64_t *hostids)
 {
 	zbx_uint32_t	data_len = 0;
