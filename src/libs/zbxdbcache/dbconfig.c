@@ -181,16 +181,24 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 
 				init_request(&request);
 
-				if (SUCCEED != parse_item_key(key, &request) || (2 != request.nparam &&
-						3 != request.nparam))
+				if (SUCCEED != parse_item_key(key, &request) || 2 > request.nparam ||
+						3 < request.nparam)
 				{
 					goto clean;
 				}
 
 				arg1 = get_rparam(&request, 0);
 				arg2 = get_rparam(&request, 1);
-				if (3 == request.nparam)
-					arg3 = get_rparam(&request, 2);
+
+				if (2 == request.nparam)
+				{
+					if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg2, "discovery"))
+						ret = SUCCEED;
+
+					goto clean;
+				}
+
+				arg3 = get_rparam(&request, 2);
 
 				if (0 == strcmp(arg1, "host"))
 				{
@@ -205,8 +213,7 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 					else if (0 == strcmp(arg2, "discovery") && 0 == strcmp(arg3, "interfaces"))
 						ret = SUCCEED;
 				}
-				else if (0 == strcmp(arg1, "proxy") &&
-						(0 == strcmp(arg2, "discovery") || 0 == strcmp(arg3, "lastaccess") ||
+				else if (0 == strcmp(arg1, "proxy") && (0 == strcmp(arg3, "lastaccess") ||
 						0 == strcmp(arg3, "delay")))
 				{
 					ret = SUCCEED;
@@ -13383,9 +13390,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION))
 		{
 			if (0 != strcmp(proxy->version_str, diff->version_str))
-			{
 				dc_strpool_replace(1, &proxy->version_str, diff->version_str);
-			}
 
 			if (proxy->version_int != diff->version_int)
 			{
@@ -13393,9 +13398,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 				proxy->compatibility = diff->compatibility;
 			}
 			else
-			{
 				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION);
-			}
 		}
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))

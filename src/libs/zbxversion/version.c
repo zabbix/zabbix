@@ -67,12 +67,12 @@ int	zbx_get_component_version(const char *version_str)
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_component_version_ignore_patch(const char *value)
+int	zbx_get_component_version_without_patch(const char *value)
 {
 	int	ver;
 
 	if (FAIL == (ver = zbx_get_component_version(value)))
 		return FAIL;
 
-	return ZBX_COMPONENT_VERSION_IGNORE_PATCH(ver);
+	return ZBX_COMPONENT_VERSION_WITHOUT_PATCH(ver);
 }

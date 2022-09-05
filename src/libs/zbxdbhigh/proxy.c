@@ -3867,7 +3867,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp), NULL) ||
-				FAIL == (version = zbx_get_component_version_ignore_patch(tmp)))
+				FAIL == (version = zbx_get_component_version_without_patch(tmp)))
 	{
 		version = ZBX_COMPONENT_VERSION(4, 2, 0);
 	}
@@ -4542,8 +4542,8 @@ char	*zbx_get_proxy_protocol_version_str(struct zbx_json_parse *jp)
 
 	if (NULL != jp && SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value), NULL))
 		return strdup(value);
-	else
-		return strdup(ZBX_VERSION_UNDEFINED_STR);
+
+	return strdup(ZBX_VERSION_UNDEFINED_STR);
 }
 
 /******************************************************************************
@@ -4570,10 +4570,8 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str)
 	{
 		return version_int;
 	}
-	else
-	{
-		return ZBX_COMPONENT_VERSION(3, 2, 0);
-	}
+
+	return ZBX_COMPONENT_VERSION(3, 2, 0);
 }
 
 /******************************************************************************
@@ -4991,7 +4989,7 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
 	if (0 == proxy_version)
 		return ZBX_PROXY_VERSION_UNDEFINED;
 
-	proxy_version = ZBX_COMPONENT_VERSION_IGNORE_PATCH(proxy_version);
+	proxy_version = ZBX_COMPONENT_VERSION_WITHOUT_PATCH(proxy_version);
 
 	if (SERVER_VERSION == proxy_version)
 		return ZBX_PROXY_VERSION_CURRENT;
@@ -5125,12 +5123,8 @@ int	zbx_check_protocol_version(DC_PROXY *proxy, int version)
 					ZBX_COMPONENT_VERSION_PATCH(version), ZABBIX_VERSION_MAJOR,
 					ZABBIX_VERSION_MINOR, ZABBIX_VERSION_PATCH);
 		}
-
 		else if (ZBX_PROXY_VERSION_UNDEFINED == compatibility)
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
 			return FAIL;
-		}
 	}
 
 	return SUCCEED;

@@ -51,20 +51,14 @@ void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_args_t *zb
 		encryption = zbx_config->zbx_config_tls->connect_mode;
 	}
 
-	if (0 < (encryption & ZBX_TCP_SEC_UNENCRYPTED))
-		zbx_json_addstring(json, ZBX_TCP_SEC_UNENCRYPTED_TXT, "true", ZBX_JSON_TYPE_INT);
-	else
-		zbx_json_addstring(json, ZBX_TCP_SEC_UNENCRYPTED_TXT, "false", ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(json, ZBX_TCP_SEC_UNENCRYPTED_TXT,
+			0 < (encryption & ZBX_TCP_SEC_UNENCRYPTED) ? "true" : "false", ZBX_JSON_TYPE_INT);
 
-	if (0 < (encryption & ZBX_TCP_SEC_TLS_PSK))
-		zbx_json_addstring(json, ZBX_TCP_SEC_TLS_PSK_TXT, "true", ZBX_JSON_TYPE_INT);
-	else
-		zbx_json_addstring(json, ZBX_TCP_SEC_TLS_PSK_TXT, "false", ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(json, ZBX_TCP_SEC_TLS_PSK_TXT,
+			0 < (encryption & ZBX_TCP_SEC_TLS_PSK) ? "true" : "false", ZBX_JSON_TYPE_INT);
 
-	if (0 < (encryption & ZBX_TCP_SEC_TLS_CERT))
-		zbx_json_addstring(json, ZBX_TCP_SEC_TLS_CERT_TXT, "true", ZBX_JSON_TYPE_INT);
-	else
-		zbx_json_addstring(json, ZBX_TCP_SEC_TLS_CERT_TXT, "false", ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(json, ZBX_TCP_SEC_TLS_CERT_TXT,
+			0 < (encryption & ZBX_TCP_SEC_TLS_CERT) ? "true" : "false", ZBX_JSON_TYPE_INT);
 
 	return;
 }

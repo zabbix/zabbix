@@ -254,7 +254,7 @@ out:
  ******************************************************************************/
 static int	proxy_send_configuration(DC_PROXY *proxy)
 {
-	char		*error = NULL, *buffer = NULL, *version_str = NULL;
+	char		*error = NULL, *buffer = NULL;
 	int		ret, flags = ZBX_TCP_PROTOCOL;
 	zbx_socket_t	s;
 	struct zbx_json	j;
@@ -326,11 +326,14 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 			}
 			else
 			{
+				char	*version_str;
+
 				version_str = zbx_get_proxy_protocol_version_str(&jp);
 				zbx_strlcpy(proxy->version_str, version_str, sizeof(proxy->version_str));
 				proxy->version_int = zbx_get_proxy_protocol_version_int(version_str);
 				proxy->auto_compress = (0 != (s.protocol & ZBX_TCP_COMPRESS) ? 1 : 0);
 				proxy->lastaccess = time(NULL);
+				zbx_free(version_str);
 			}
 		}
 	}
@@ -339,7 +342,6 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 out:
 	zbx_free(buffer);
 	zbx_free(error);
-	zbx_free(version_str);
 	zbx_json_free(&j);
 
 	return ret;
@@ -366,7 +368,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 {
 	struct zbx_json_parse	jp;
 	char			*error = NULL, *version_str = NULL;
-	int			ret = FAIL, version_int;
+	int			version_int, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
