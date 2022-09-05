@@ -980,7 +980,11 @@ class CItem extends CItemGeneral {
 				$names = [];
 
 				foreach ($items as $item) {
-					if (count($names) < 2 && $item['inventory_link'] == $conflictedLink) {
+					if (count($names) == 2) {
+						break;
+					}
+
+					if ($item['inventory_link'] == $conflictedLink) {
 						if (isset($item['name'])) {
 							$beingSavedItemName = $item['name'];
 						}
