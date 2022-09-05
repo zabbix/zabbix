@@ -87,6 +87,7 @@ func (b *pluginBroker) handleConnection() {
 		if err != nil {
 			if errors.Is(err, net.ErrClosed) {
 				log.Tracef("closed connection to loaded %s plugin", b.pluginName)
+
 				return
 			}
 
