@@ -31,11 +31,6 @@
 
 #define ZBX_VMWARE_STATE_MASK		0x0FF
 
-/* the vmware performance counter state */
-#define ZBX_VMWARE_COUNTER_NEW		0x00
-#define ZBX_VMWARE_COUNTER_READY	0x01
-#define ZBX_VMWARE_COUNTER_UPDATING	0x10
-
 #define ZBX_VMWARE_EVENT_KEY_UNINITIALIZED	__UINT64_C(0xffffffffffffffff)
 
 typedef struct
@@ -59,8 +54,22 @@ typedef struct
 	/*    pair->value - value                   */
 	zbx_vector_str_uint64_pair_t	values;
 
-	/* the counter state, see ZBX_VMAWRE_COUNTER_* defines */
+#define ZBX_VMWARE_COUNTER_NEW		0x00
+#define ZBX_VMWARE_COUNTER_READY	0x01
+#define ZBX_VMWARE_COUNTER_UPDATING	0x02
+#define ZBX_VMWARE_COUNTER_CUSTOM	0x10
+#define ZBX_VMWARE_COUNTER_ACCEPTABLE	0x20
+#define ZBX_VMWARE_COUNTER_NOTSUPPORTED	0x40
+
+#define ZBX_VMWARE_COUNTER_STATE_MASK	0xF0
+	/* the vmware performance counter state */
 	unsigned char			state;
+
+	/* time of last attempt of poller to use data */
+	time_t				last_used;
+
+	/* alternate query instance (for the case when 'entity' query is TOTAL) */
+	char				*query_instance;
 }
 zbx_vmware_perf_counter_t;
 
@@ -73,15 +82,19 @@ typedef struct
 	/* entity id */
 	char			*id;
 
+#define ZBX_VMWARE_PERF_INTERVAL_UNKNOWN	0
+#define ZBX_VMWARE_PERF_INTERVAL_NONE		-1
 	/* the performance counter refresh rate */
 	int			refresh;
 
 	/* timestamp when the entity was queried last time */
-	int			last_seen;
+	time_t			last_seen;
 
 	/* the performance counters to monitor */
 	zbx_vector_ptr_t	counters;
 
+#define ZBX_VMWARE_PERF_QUERY_ALL		"*"
+#define ZBX_VMWARE_PERF_QUERY_TOTAL		""
 	/* the performance counter query instance name */
 	char			*query_instance;
 
@@ -472,10 +485,10 @@ typedef struct
 	/* the service state - see ZBX_VMWARE_STATE_* defines */
 	int				state;
 
-	int				lastcheck;
+	time_t				lastcheck;
 
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
-	int				lastaccess;
+	time_t				lastaccess;
 
 	/* the vmware service instance version */
 	char				*version;
@@ -510,9 +523,6 @@ typedef struct
 }
 zbx_vmware_service_t;
 
-#define ZBX_VMWARE_PERF_INTERVAL_UNKNOWN	0
-#define ZBX_VMWARE_PERF_INTERVAL_NONE		-1
-
 /* the vmware collector data */
 typedef struct
 {
@@ -525,7 +535,7 @@ zbx_vmware_t;
 
 typedef struct
 {
-	int			nextcheck;
+	time_t			nextcheck;
 #define ZBX_VMWARE_UPDATE_CONF		1
 #define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
 #define ZBX_VMWARE_UPDATE_REST_TAGS	3

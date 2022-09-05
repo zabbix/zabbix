@@ -301,6 +301,20 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 
 	perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
 
+	if (0 == (perfcounter->state & ZBX_VMWARE_COUNTER_NOTSUPPORTED) &&
+			0 != (ZBX_VMWARE_COUNTER_CUSTOM & perfcounter->state) &&
+			0 != (ZBX_VMWARE_COUNTER_READY & perfcounter->state))
+	{
+		perfcounter->last_used = time(NULL);
+	}
+
+	if (0 != (perfcounter->state & ZBX_VMWARE_COUNTER_CUSTOM) &&
+			0 != (perfcounter->state & ZBX_VMWARE_COUNTER_NOTSUPPORTED))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter not supported or data not ready."));
+		goto out;
+	}
+
 	if (0 == (perfcounter->state & ZBX_VMWARE_COUNTER_READY))
 	{
 		ret = SYSINFO_RET_OK;
@@ -3092,7 +3106,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 
 	/* FAIL is returned if counter already exists */
 	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "ClusterComputeResource", cluster->id,
-			counterid, "*"))
+			counterid, ZBX_VMWARE_PERF_QUERY_ALL))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
@@ -3152,7 +3166,8 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* FAIL is returned if counter already exists */
-	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "HostSystem", hv->id, counterid, "*"))
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "HostSystem", hv->id, counterid,
+			ZBX_VMWARE_PERF_QUERY_ALL))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
@@ -5146,7 +5161,8 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* FAIL is returned if counter already exists */
-	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "VirtualMachine", vm->id, counterid, "*"))
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "VirtualMachine", vm->id, counterid,
+			ZBX_VMWARE_PERF_QUERY_ALL))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
@@ -5745,7 +5761,8 @@ static int	check_vcenter_rp_common(const char *url, const char *username, const 
 	}
 
 	/* FAIL is returned if counter already exists */
-	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, ZBX_VMWARE_SOAP_RESOURCEPOOL, rpid, counterid, ""))
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, ZBX_VMWARE_SOAP_RESOURCEPOOL, rpid, counterid,
+			ZBX_VMWARE_PERF_QUERY_TOTAL))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
@@ -6014,5 +6031,21 @@ int	check_vcenter_alarms_get(AGENT_REQUEST *request, const char *username, const
 
 #undef	ALARMS_GET_START
 #undef	ALARMS_GET_END
+
+#undef	ZBX_VMWARE_DATASTORE_SIZE_TOTAL
+#undef	ZBX_VMWARE_DATASTORE_SIZE_FREE
+#undef	ZBX_VMWARE_DATASTORE_SIZE_PFREE
+#undef	ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED
+
+#undef	ZBX_DATASTORE_TOTAL
+#undef	ZBX_DATASTORE_COUNTER_CAPACITY
+#undef	ZBX_DATASTORE_COUNTER_USED
+#undef	ZBX_DATASTORE_COUNTER_PROVISIONED
+
+#undef	ZBX_DATASTORE_DIRECTION_READ
+#undef	ZBX_DATASTORE_DIRECTION_WRITE
+
+#undef	ZBX_IF_DIRECTION_IN
+#undef	ZBX_IF_DIRECTION_OUT
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
