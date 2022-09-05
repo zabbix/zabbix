@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-08-30T15:16:13Z</date>
+    <date>2022-09-05T14:11:36Z</date>
     <media_types>
         <media_type>
             <name>Opsgenie</name>
@@ -407,7 +407,8 @@ try {&#13;
         fields.user = (params.event_value != 0) ? params.zbxuser : '';&#13;
         fields.note = params.alert_message;&#13;
         if ( [0, 3].indexOf(parseInt(params.event_source)) &gt; -1  &amp;&amp; params.event_value == 0 ) {&#13;
-            method = &quot;close&quot;;&#13;
+            // skip sending of close request from update operation(mandatory when both update &amp; recovery operations are defined in action)  &#13;
+            method = params.event_update_status == 0 ? &quot;close&quot; : &quot;skip&quot;;&#13;
         }&#13;
         else if ( params.event_source == 0 &amp;&amp; params.event_value == 1 &amp;&amp; params.event_update_status == 1 &amp;&amp; params.event_update_action.includes('acknowledged')) {&#13;
             method = params.event_update_action.includes('unacknowledged') ? &quot;unacknowledge&quot; : &quot;acknowledge&quot;;&#13;
@@ -415,6 +416,8 @@ try {&#13;
         else {&#13;
             method = &quot;notes&quot;;&#13;
         }&#13;
+
+        if (method !== &quot;skip&quot;) {&#13;
         resp = Media.request('post', params.event_id + '/' + method +'?identifierType=alias', fields);&#13;
 &#13;
         if (typeof resp.response !== 'object' || typeof resp.response.result === 'undefined') {&#13;
@@ -428,7 +431,7 @@ try {&#13;
             throw Media.name + ' response code is unexpected. Check debug log for more information.';&#13;
         }&#13;
     }&#13;
-&#13;
+    }&#13;
     return JSON.stringify(result);&#13;
 }&#13;
 catch (error) {&#13;

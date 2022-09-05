@@ -41,7 +41,7 @@ For more information, please see [Zabbix](https://www.zabbix.com/documentation/5
 
 ## Known issue:
 
-When recovery & update operations both defined in action and problem is closed manually in frontend: First is sent close alert and after it is closed in OPSGenie, update of it fails.
+When recovery & update operations both defined in action and problem is closed manually in frontend: First operation executed is close event, next update of already closed event. Update operation which closes event will be skipped, but status operation shown as sent(to avoid failed request attempts).
 
 ## Supported Versions
 
