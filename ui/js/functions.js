@@ -685,9 +685,14 @@ function parseUrlString(url_string) {
 		url = url.substring(0, pos);
 
 		for (const param of new URLSearchParams(query)) {
+			if (encodeURIComponent(param[0]).match(/%[01]/) || encodeURIComponent(param[1]).match(/%[01]/)) {
+				// Non-printable characters in URL.
+				return false;
+			}
+
 			pairs.push({
-				'name': decodeURIComponent(param[0]),
-				'value': decodeURIComponent(param[1])
+				'name': param[0],
+				'value': param[1]
 			});
 		}
 	}
