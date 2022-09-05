@@ -39,7 +39,7 @@ if (!hasRequest('form_refresh')) {
 $frmHost = (new CForm())
 	->setId('hostsForm')
 	->setName('hostsForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->disablePasswordAutofill()
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])

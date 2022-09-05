@@ -1,3 +1,14 @@
+Changes for 5.0.28rc1
+
+New features:
+...G...... [ZBXNEXT-6666] added listen socket security fix for Agent 2 on Windows (ssimonenko)
+
+Bug fixes:
+.......PS. [ZBX-21454] added blocking of rtc signals during script execution (dgoloscapov)
+..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
+..F....... [ZBX-18838] removed non-existent value 'failed' in script.execute response property (dpetra)
+
+--------------------------------------------------------------------------------
 Changes for 5.0.27
 
 5.0.27rc1 was released as 5.0.27 without any changes
@@ -2587,6 +2598,7 @@ Changes for 4.0.44rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.43

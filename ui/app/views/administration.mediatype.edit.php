@@ -42,7 +42,7 @@ $mediaTypeForm = (new CForm())
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->disablePasswordAutofill()
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 // Create form list.
 $mediatype_formlist = (new CFormList())
