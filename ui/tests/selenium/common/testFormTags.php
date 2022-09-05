@@ -325,7 +325,7 @@ class testFormTags extends CWebTest {
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$this->page->removeFocus();
 			$this->page->updateViewport();
-			$screenshot_area = $this->query('id', $tags_table)->one();
+			$screenshot_area = $this->query('class', $tags_table)->one();
 			$screen_object = ($this->problem_tags) ? 'Service problem tags' : $object;
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}
@@ -806,12 +806,12 @@ class testFormTags extends CWebTest {
 		}
 		unset($tag);
 
-		$this->query('id', $tags_table)->asMultifieldTable()->one()->checkValue($expected);
+		$this->query('class', $tags_table)->asMultifieldTable()->one()->checkValue($expected);
 
 		// Check screenshot of text area after saving.
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$this->page->removeFocus();
-			$screenshot_area = $this->query('id', $tags_table)->one();
+			$screenshot_area = $this->query('class', $tags_table)->one();
 			$screen_object = ($this->problem_tags) ? 'Service problem tags' : $object;
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}
