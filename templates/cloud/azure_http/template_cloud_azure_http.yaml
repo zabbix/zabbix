@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T10:49:00Z'
+  date: '2022-09-05T13:11:01Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -626,9 +626,9 @@ zabbix_export:
       items:
         -
           uuid: 9c87cde45e984ce282d8ba9fbe184f9b
-          name: 'Azure: Availability status detailed'
+          name: 'Azure MySQL: Availability status detailed'
           type: DEPENDENT
-          key: azure.db.availability.details
+          key: azure.db.mysql.availability.details
           delay: '0'
           history: 7d
           trends: '0'
@@ -651,9 +651,9 @@ zabbix_export:
               value: health
         -
           uuid: 7f2d8e8d94ae4c87ba0480a2d9518f65
-          name: 'Azure: Availability state'
+          name: 'Azure MySQL: Availability state'
           type: DEPENDENT
-          key: azure.db.availability.state
+          key: azure.db.mysql.availability.state
           delay: '0'
           history: 7d
           description: 'Availability status of the resource.'
@@ -706,8 +706,8 @@ zabbix_export:
           triggers:
             -
               uuid: e822fd2214fb41db9b57cdb8eec0444a
-              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.availability.state)=1'
-              name: 'Azure: MySQL server is degraded'
+              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=1'
+              name: 'Azure MySQL: MySQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in degraded state.'
@@ -717,8 +717,8 @@ zabbix_export:
                   value: availability
             -
               uuid: ebb35037a5b646a0bd2c6be44bb1f3c6
-              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.availability.state)=3'
-              name: 'Azure: MySQL server is in unknown state'
+              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=3'
+              name: 'Azure MySQL: MySQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
@@ -728,8 +728,8 @@ zabbix_export:
                   value: availability
             -
               uuid: 240b861c09a94e209036782b6c7496fa
-              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.availability.state)=2'
-              name: 'Azure: MySQL server is unavailable'
+              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=2'
+              name: 'Azure MySQL: MySQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
@@ -739,9 +739,9 @@ zabbix_export:
                   value: availability
         -
           uuid: cab6ac822f2c4e118b030e49cc15eaa2
-          name: 'Azure: Connections aborted'
+          name: 'Azure MySQL: Connections aborted'
           type: DEPENDENT
-          key: azure.db.connections.aborted
+          key: azure.db.mysql.connections.aborted
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -759,9 +759,9 @@ zabbix_export:
               value: network
         -
           uuid: 71b33f0a5d37498dbb57d185ac0f2741
-          name: 'Azure: Connections active'
+          name: 'Azure MySQL: Connections active'
           type: DEPENDENT
-          key: azure.db.connections.active
+          key: azure.db.mysql.connections.active
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -779,9 +779,9 @@ zabbix_export:
               value: network
         -
           uuid: 1993ae276fe44db6a89451291749f703
-          name: 'Azure: Connections total'
+          name: 'Azure MySQL: Connections total'
           type: DEPENDENT
-          key: azure.db.connections.total
+          key: azure.db.mysql.connections.total
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -799,9 +799,9 @@ zabbix_export:
               value: network
         -
           uuid: b235666b98954555ae5e75e757bba707
-          name: 'Azure: CPU credits consumed'
+          name: 'Azure MySQL: CPU credits consumed'
           type: DEPENDENT
-          key: azure.db.cpu.credits.consumed
+          key: azure.db.mysql.cpu.credits.consumed
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -820,9 +820,9 @@ zabbix_export:
               value: cpu
         -
           uuid: 4f591346d3d34d49b37cfff2a169f57e
-          name: 'Azure: CPU credits remaining'
+          name: 'Azure MySQL: CPU credits remaining'
           type: DEPENDENT
-          key: azure.db.cpu.credits.remaining
+          key: azure.db.mysql.cpu.credits.remaining
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -841,9 +841,9 @@ zabbix_export:
               value: cpu
         -
           uuid: afe4d11c2f474428acc00d153ad2a6e5
-          name: 'Azure: Percentage CPU'
+          name: 'Azure MySQL: Percentage CPU'
           type: DEPENDENT
-          key: azure.db.cpu.percentage
+          key: azure.db.mysql.cpu.percentage
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -863,8 +863,8 @@ zabbix_export:
           triggers:
             -
               uuid: 5af82cc95239479c86c7ab3dabcfb592
-              expression: 'min(/Azure MySQL flexible servers by HTTP/azure.db.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
-              name: 'Azure: High CPU utilization'
+              expression: 'min(/Azure MySQL flexible servers by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              name: 'Azure MySQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'CPU utilization is too high. the system might be slow to respond.'
@@ -874,9 +874,9 @@ zabbix_export:
                   value: performance
         -
           uuid: f960e7667571497c96454b5c4b7b69ff
-          name: 'Azure: Get errors'
+          name: 'Azure MySQL: Get errors'
           type: DEPENDENT
-          key: azure.db.data.errors
+          key: azure.db.mysql.data.errors
           delay: '0'
           history: 7d
           trends: '0'
@@ -900,8 +900,8 @@ zabbix_export:
           triggers:
             -
               uuid: 98c1b86b79e9469cac2870fb2ba42949
-              expression: 'length(last(/Azure MySQL flexible servers by HTTP/azure.db.data.errors))>0'
-              name: 'Azure: There are errors in requests to API'
+              expression: 'length(last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.data.errors))>0'
+              name: 'Azure MySQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in requests to API.'
@@ -910,62 +910,8 @@ zabbix_export:
                   tag: scope
                   value: availability
         -
-          uuid: b4a6363aac734b6c8d043718ca667c09
-          name: 'Azure: IO consumption percent'
-          type: DEPENDENT
-          key: azure.db.io.consumption.percent
-          delay: '0'
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          description: 'IO Percent.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.metrics.io_consumption_percent.maximum
-          master_item:
-            key: azure.db.mysql.data.get
-          tags:
-            -
-              tag: component
-              value: operations
-        -
-          uuid: f0f56a67942a40509d6835f3da9eb7e2
-          name: 'Azure: Memory utilization'
-          type: DEPENDENT
-          key: azure.db.memory.percentage
-          delay: '0'
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          description: 'Host memory percent.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.metrics.memory_percent.maximum
-          master_item:
-            key: azure.db.mysql.data.get
-          tags:
-            -
-              tag: component
-              value: memory
-          triggers:
-            -
-              uuid: 89c031f356084208ae33d695a53b8d3e
-              expression: 'min(/Azure MySQL flexible servers by HTTP/azure.db.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
-              name: 'Azure: High memory utilization'
-              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
-              priority: AVERAGE
-              description: 'The system is running out of free memory.'
-              tags:
-                -
-                  tag: scope
-                  value: performance
-        -
           uuid: de712334db1440309fa68f9252d4f9bc
-          name: 'Azure: Get data'
+          name: 'Azure MySQL: Get data'
           type: SCRIPT
           key: azure.db.mysql.data.get
           history: 0d
@@ -1140,10 +1086,64 @@ zabbix_export:
               tag: component
               value: raw
         -
-          uuid: 84f3d2b152784993944a2d4c3fad1a59
-          name: 'Azure: Network out'
+          uuid: b4a6363aac734b6c8d043718ca667c09
+          name: 'Azure MySQL: IO consumption percent'
           type: DEPENDENT
-          key: azure.db.network.egress
+          key: azure.db.mysql.io.consumption.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'IO Percent.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.io_consumption_percent.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: operations
+        -
+          uuid: f0f56a67942a40509d6835f3da9eb7e2
+          name: 'Azure MySQL: Memory utilization'
+          type: DEPENDENT
+          key: azure.db.mysql.memory.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Host memory percent.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.memory_percent.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: memory
+          triggers:
+            -
+              uuid: 89c031f356084208ae33d695a53b8d3e
+              expression: 'min(/Azure MySQL flexible servers by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
+              name: 'Azure MySQL: High memory utilization'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 84f3d2b152784993944a2d4c3fad1a59
+          name: 'Azure MySQL: Network out'
+          type: DEPENDENT
+          key: azure.db.mysql.network.egress
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1166,9 +1166,9 @@ zabbix_export:
               value: network
         -
           uuid: 5f38b6b4e3a849d09022bd34c4347088
-          name: 'Azure: Network in'
+          name: 'Azure MySQL: Network in'
           type: DEPENDENT
-          key: azure.db.network.ingress
+          key: azure.db.mysql.network.ingress
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1191,9 +1191,9 @@ zabbix_export:
               value: network
         -
           uuid: 05329dcdb2e14080a43d1bf7553037f6
-          name: 'Azure: Queries'
+          name: 'Azure MySQL: Queries'
           type: DEPENDENT
-          key: azure.db.queries
+          key: azure.db.mysql.queries
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1211,9 +1211,9 @@ zabbix_export:
               value: queries
         -
           uuid: 80a05247fec04e39a99ccafaefbd0441
-          name: 'Azure: Replication lag'
+          name: 'Azure MySQL: Replication lag'
           type: DEPENDENT
-          key: azure.db.replication.lag
+          key: azure.db.mysql.replication.lag
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1233,9 +1233,9 @@ zabbix_export:
               value: replication
         -
           uuid: 8d5cd0d3cd0744a5a260a8a0485f6735
-          name: 'Azure: Backup storage used'
+          name: 'Azure MySQL: Backup storage used'
           type: DEPENDENT
-          key: azure.db.storage.backup.used
+          key: azure.db.mysql.storage.backup.used
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1254,9 +1254,9 @@ zabbix_export:
               value: storage
         -
           uuid: 78f3e03b5caf4f85a3c61513cf242f76
-          name: 'Azure: Storage limit'
+          name: 'Azure MySQL: Storage limit'
           type: DEPENDENT
-          key: azure.db.storage.limit
+          key: azure.db.mysql.storage.limit
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1275,9 +1275,9 @@ zabbix_export:
               value: storage
         -
           uuid: ced51184b59643adaa51bef90710166b
-          name: 'Azure: Storage percent'
+          name: 'Azure MySQL: Storage percent'
           type: DEPENDENT
-          key: azure.db.storage.percent
+          key: azure.db.mysql.storage.percent
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1297,8 +1297,8 @@ zabbix_export:
           triggers:
             -
               uuid: 1703edc1553644e5aa25d35928c5eafd
-              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
-              name: 'Azure: Storage space is critically low'
+              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              name: 'Azure MySQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Critical storage space utilization.'
@@ -1308,8 +1308,8 @@ zabbix_export:
                   value: capacity
             -
               uuid: a2ec23a5e77c40aa9e45d214f4e06ca1
-              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
-              name: 'Azure: Storage space is low'
+              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              name: 'Azure MySQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'High storage space utilization.'
@@ -1319,9 +1319,9 @@ zabbix_export:
                   value: capacity
         -
           uuid: 9f96e947eee646f890742676e9f9a22a
-          name: 'Azure: Storage used'
+          name: 'Azure MySQL: Storage used'
           type: DEPENDENT
-          key: azure.db.storage.used
+          key: azure.db.mysql.storage.used
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1423,9 +1423,9 @@ zabbix_export:
       items:
         -
           uuid: c7771aa67d3c424490d8de2d6c2d609a
-          name: 'Azure: Availability status detailed'
+          name: 'Azure MySQL: Availability status detailed'
           type: DEPENDENT
-          key: azure.db.availability.details
+          key: azure.db.mysql.availability.details
           delay: '0'
           history: 7d
           trends: '0'
@@ -1448,9 +1448,9 @@ zabbix_export:
               value: health
         -
           uuid: c325b977b26e4e00acc3ea8703895f05
-          name: 'Azure: Availability state'
+          name: 'Azure MySQL: Availability state'
           type: DEPENDENT
-          key: azure.db.availability.state
+          key: azure.db.mysql.availability.state
           delay: '0'
           history: 7d
           description: 'Availability status of the resource.'
@@ -1503,8 +1503,8 @@ zabbix_export:
           triggers:
             -
               uuid: 91a32645266547d78df3a70b44c7782b
-              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.availability.state)=1'
-              name: 'Azure: MySQL server is degraded'
+              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=1'
+              name: 'Azure MySQL: MySQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in degraded state.'
@@ -1514,8 +1514,8 @@ zabbix_export:
                   value: availability
             -
               uuid: 852aba88476a40aeb2170b933726b7d8
-              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.availability.state)=3'
-              name: 'Azure: MySQL server is in unknown state'
+              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=3'
+              name: 'Azure MySQL: MySQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
@@ -1525,8 +1525,8 @@ zabbix_export:
                   value: availability
             -
               uuid: 5f2d2254dfc24f5481207585bed0d933
-              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.availability.state)=2'
-              name: 'Azure: MySQL server is unavailable'
+              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=2'
+              name: 'Azure MySQL: MySQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
@@ -1536,9 +1536,9 @@ zabbix_export:
                   value: availability
         -
           uuid: 69aba8caa6874c9d9423926a2ee78e99
-          name: 'Azure: Connections active'
+          name: 'Azure MySQL: Connections active'
           type: DEPENDENT
-          key: azure.db.connections.active
+          key: azure.db.mysql.connections.active
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1556,9 +1556,9 @@ zabbix_export:
               value: network
         -
           uuid: e185b56984914507bc40c07c55153967
-          name: 'Azure: Connections failed'
+          name: 'Azure MySQL: Connections failed'
           type: DEPENDENT
-          key: azure.db.connections.failed
+          key: azure.db.mysql.connections.failed
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1577,9 +1577,9 @@ zabbix_export:
               value: network
         -
           uuid: d0b5864a56094166b76fbc58a5e05c7c
-          name: 'Azure: Percentage CPU'
+          name: 'Azure MySQL: Percentage CPU'
           type: DEPENDENT
-          key: azure.db.cpu.percentage
+          key: azure.db.mysql.cpu.percentage
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1599,8 +1599,8 @@ zabbix_export:
           triggers:
             -
               uuid: 7115fb320e2b4cc1ad1739c8a6cee155
-              expression: 'min(/Azure MySQL single servers by HTTP/azure.db.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
-              name: 'Azure: High CPU utilization'
+              expression: 'min(/Azure MySQL single servers by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              name: 'Azure MySQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'CPU utilization is too high. the system might be slow to respond.'
@@ -1610,9 +1610,9 @@ zabbix_export:
                   value: performance
         -
           uuid: 2fc253a20100478d91cac13590a64bfc
-          name: 'Azure: Get errors'
+          name: 'Azure MySQL: Get errors'
           type: DEPENDENT
-          key: azure.db.data.errors
+          key: azure.db.mysql.data.errors
           delay: '0'
           history: 7d
           trends: '0'
@@ -1636,8 +1636,8 @@ zabbix_export:
           triggers:
             -
               uuid: df5fa33f8c13413bb9d61ea4470b9b2d
-              expression: 'length(last(/Azure MySQL single servers by HTTP/azure.db.data.errors))>0'
-              name: 'Azure: There are errors in requests to API'
+              expression: 'length(last(/Azure MySQL single servers by HTTP/azure.db.mysql.data.errors))>0'
+              name: 'Azure MySQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in requests to API.'
@@ -1646,62 +1646,8 @@ zabbix_export:
                   tag: scope
                   value: availability
         -
-          uuid: a17c365253eb4821841ec82ac8f61106
-          name: 'Azure: IO consumption percent'
-          type: DEPENDENT
-          key: azure.db.io.consumption.percent
-          delay: '0'
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          description: 'IO Percent.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.metrics.io_consumption_percent.average
-          master_item:
-            key: azure.db.mysql.data.get
-          tags:
-            -
-              tag: component
-              value: operations
-        -
-          uuid: 5c19c08912634993b1f96fb11e5d1ae2
-          name: 'Azure: Memory utilization'
-          type: DEPENDENT
-          key: azure.db.memory.percentage
-          delay: '0'
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          description: 'Host memory percent.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.metrics.memory_percent.average
-          master_item:
-            key: azure.db.mysql.data.get
-          tags:
-            -
-              tag: component
-              value: memory
-          triggers:
-            -
-              uuid: a67b35f1ac674d6692b0b2bcd6f89bd8
-              expression: 'min(/Azure MySQL single servers by HTTP/azure.db.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
-              name: 'Azure: High memory utilization'
-              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
-              priority: AVERAGE
-              description: 'The system is running out of free memory.'
-              tags:
-                -
-                  tag: scope
-                  value: performance
-        -
           uuid: cd62d92ef0384ea9acf0cae71c88ebc6
-          name: 'Azure: Get data'
+          name: 'Azure MySQL: Get data'
           type: SCRIPT
           key: azure.db.mysql.data.get
           history: 0d
@@ -1875,10 +1821,64 @@ zabbix_export:
               tag: component
               value: raw
         -
-          uuid: fe1b9846a634412aaa6a76fc05dbe46a
-          name: 'Azure: Network out'
+          uuid: a17c365253eb4821841ec82ac8f61106
+          name: 'Azure MySQL: IO consumption percent'
           type: DEPENDENT
-          key: azure.db.network.egress
+          key: azure.db.mysql.io.consumption.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'IO Percent.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.io_consumption_percent.average
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: operations
+        -
+          uuid: 5c19c08912634993b1f96fb11e5d1ae2
+          name: 'Azure MySQL: Memory utilization'
+          type: DEPENDENT
+          key: azure.db.mysql.memory.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Host memory percent.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.memory_percent.average
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: memory
+          triggers:
+            -
+              uuid: a67b35f1ac674d6692b0b2bcd6f89bd8
+              expression: 'min(/Azure MySQL single servers by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
+              name: 'Azure MySQL: High memory utilization'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: fe1b9846a634412aaa6a76fc05dbe46a
+          name: 'Azure MySQL: Network out'
+          type: DEPENDENT
+          key: azure.db.mysql.network.egress
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1902,9 +1902,9 @@ zabbix_export:
               value: network
         -
           uuid: 1cc97817bda5470887e3d5d9f2d78650
-          name: 'Azure: Network in'
+          name: 'Azure MySQL: Network in'
           type: DEPENDENT
-          key: azure.db.network.ingress
+          key: azure.db.mysql.network.ingress
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1928,9 +1928,9 @@ zabbix_export:
               value: network
         -
           uuid: 8e60794282ea42c7bad1573811b2e498
-          name: 'Azure: Replication lag'
+          name: 'Azure MySQL: Replication lag'
           type: DEPENDENT
-          key: azure.db.replication.lag
+          key: azure.db.mysql.replication.lag
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1950,9 +1950,9 @@ zabbix_export:
               value: replication
         -
           uuid: 1303a659d17a4e4fa9fa03cef35fef5a
-          name: 'Azure: Backup storage used'
+          name: 'Azure MySQL: Backup storage used'
           type: DEPENDENT
-          key: azure.db.storage.backup.used
+          key: azure.db.mysql.storage.backup.used
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1971,9 +1971,9 @@ zabbix_export:
               value: storage
         -
           uuid: 4aed6d0c01d1458fbd1f7c7ea5386303
-          name: 'Azure: Storage limit'
+          name: 'Azure MySQL: Storage limit'
           type: DEPENDENT
-          key: azure.db.storage.limit
+          key: azure.db.mysql.storage.limit
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1992,9 +1992,9 @@ zabbix_export:
               value: storage
         -
           uuid: 5b1b350be6f0409fb7ab842571c3f086
-          name: 'Azure: Storage percent'
+          name: 'Azure MySQL: Storage percent'
           type: DEPENDENT
-          key: azure.db.storage.percent
+          key: azure.db.mysql.storage.percent
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -2014,8 +2014,8 @@ zabbix_export:
           triggers:
             -
               uuid: 3afcb840e8004822a2dada2a89971f69
-              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
-              name: 'Azure: Storage space is critically low'
+              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              name: 'Azure MySQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Critical storage space utilization.'
@@ -2025,8 +2025,8 @@ zabbix_export:
                   value: capacity
             -
               uuid: 2e605f906b284f769e7c880d4e642b43
-              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
-              name: 'Azure: Storage space is low'
+              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              name: 'Azure MySQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'High storage space utilization.'
@@ -2036,9 +2036,9 @@ zabbix_export:
                   value: capacity
         -
           uuid: 7f553d8a0898477b87a2828e51efcfcc
-          name: 'Azure: Server log storage limit'
+          name: 'Azure MySQL: Server log storage limit'
           type: DEPENDENT
-          key: azure.db.storage.server.log.limit
+          key: azure.db.mysql.storage.server.log.limit
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -2057,9 +2057,9 @@ zabbix_export:
               value: storage
         -
           uuid: cf5a77306c554a24b3741ef065b6d27a
-          name: 'Azure: Server log storage percent'
+          name: 'Azure MySQL: Server log storage percent'
           type: DEPENDENT
-          key: azure.db.storage.server.log.percent
+          key: azure.db.mysql.storage.server.log.percent
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -2078,9 +2078,9 @@ zabbix_export:
               value: storage
         -
           uuid: 8ed99a951e264185b1e0f343d7ea0aec
-          name: 'Azure: Server log storage used'
+          name: 'Azure MySQL: Server log storage used'
           type: DEPENDENT
-          key: azure.db.storage.server.log.used
+          key: azure.db.mysql.storage.server.log.used
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -2099,9 +2099,9 @@ zabbix_export:
               value: storage
         -
           uuid: 0c9a5496d9884c8e9a434fb232b3208f
-          name: 'Azure: Storage used'
+          name: 'Azure MySQL: Storage used'
           type: DEPENDENT
-          key: azure.db.storage.used
+          key: azure.db.mysql.storage.used
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -3669,42 +3669,6 @@ zabbix_export:
               newvalue: Unknown
   graphs:
     -
-      uuid: 750ae48e6ef749c19a06f4bbe716f92f
-      name: 'Azure: Connections'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure MySQL flexible servers by HTTP'
-            key: azure.db.connections.active
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure MySQL flexible servers by HTTP'
-            key: azure.db.connections.total
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Azure MySQL flexible servers by HTTP'
-            key: azure.db.connections.aborted
-    -
-      uuid: 360a24b56be74cf48df3135008437824
-      name: 'Azure: Connections'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure MySQL single servers by HTTP'
-            key: azure.db.connections.active
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure MySQL single servers by HTTP'
-            key: azure.db.connections.failed
-    -
       uuid: 781dd83ed494465bbf2c16efbc753a51
       name: 'Azure: Data disk read/write bytes'
       graph_items:
@@ -3807,36 +3771,6 @@ zabbix_export:
             host: 'Azure virtual machine by HTTP'
             key: azure.vm.network.out.total
     -
-      uuid: dc6840162405481ebc1c3c98fdfcaef1
-      name: 'Azure: Network traffic'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure MySQL single servers by HTTP'
-            key: azure.db.network.egress
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure MySQL single servers by HTTP'
-            key: azure.db.network.ingress
-    -
-      uuid: f929f47602734f82a79f22a5f4446f61
-      name: 'Azure: Network traffic'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure MySQL flexible servers by HTTP'
-            key: azure.db.network.egress
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure MySQL flexible servers by HTTP'
-            key: azure.db.network.ingress
-    -
       uuid: 41bd1642704c4d3fbe4fb34c8c389320
       name: 'Azure: OS disk read/write bytes'
       graph_items:
@@ -3897,47 +3831,113 @@ zabbix_export:
             host: 'Azure virtual machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
     -
-      uuid: 3fcf43fd338e4902874d940fc0bec8b9
-      name: 'Azure: Server log storage utilization'
+      uuid: 750ae48e6ef749c19a06f4bbe716f92f
+      name: 'Azure MySQL: Connections'
       graph_items:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL single servers by HTTP'
-            key: azure.db.storage.server.log.used
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.mysql.connections.active
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL single servers by HTTP'
-            key: azure.db.storage.server.log.limit
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.mysql.connections.total
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.mysql.connections.aborted
     -
-      uuid: 4210e6b4ed8744589dce88217e961a56
-      name: 'Azure: Storage utilization'
+      uuid: 360a24b56be74cf48df3135008437824
+      name: 'Azure MySQL: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.mysql.connections.active
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.mysql.connections.failed
+    -
+      uuid: f929f47602734f82a79f22a5f4446f61
+      name: 'Azure MySQL: Network traffic'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Azure MySQL flexible servers by HTTP'
-            key: azure.db.storage.used
+            key: azure.db.mysql.network.egress
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Azure MySQL flexible servers by HTTP'
-            key: azure.db.storage.limit
+            key: azure.db.mysql.network.ingress
+    -
+      uuid: dc6840162405481ebc1c3c98fdfcaef1
+      name: 'Azure MySQL: Network traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.mysql.network.egress
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.mysql.network.ingress
+    -
+      uuid: 3fcf43fd338e4902874d940fc0bec8b9
+      name: 'Azure MySQL: Server log storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.mysql.storage.server.log.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single servers by HTTP'
+            key: azure.db.mysql.storage.server.log.limit
     -
       uuid: bdc178e6faaa4850badc0c60c7c80d40
-      name: 'Azure: Storage utilization'
+      name: 'Azure MySQL: Storage utilization'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Azure MySQL single servers by HTTP'
-            key: azure.db.storage.used
+            key: azure.db.mysql.storage.used
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Azure MySQL single servers by HTTP'
-            key: azure.db.storage.limit
+            key: azure.db.mysql.storage.limit
+    -
+      uuid: 4210e6b4ed8744589dce88217e961a56
+      name: 'Azure MySQL: Storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.mysql.storage.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL flexible servers by HTTP'
+            key: azure.db.mysql.storage.limit

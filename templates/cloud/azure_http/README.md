@@ -243,39 +243,39 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Azure |Azure: Get data |<p>The JSON with result of API requests.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Azure |Azure: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Azure |Azure: Availability state |<p>Availability status of the resource.</p> |DEPENDENT |azure.db.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Azure |Azure: Availability status detailed |<p>Summary description of the availability status.</p> |DEPENDENT |azure.db.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Azure |Azure: Percentage CPU |<p>Host CPU percent.</p> |DEPENDENT |azure.db.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.maximum`</p> |
-|Azure |Azure: Memory utilization |<p>Host memory percent.</p> |DEPENDENT |azure.db.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.maximum`</p> |
-|Azure |Azure: Network out |<p>Host network egress in bytes.</p> |DEPENDENT |azure.db.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>- MULTIPLIER: `0.0088`</p> |
-|Azure |Azure: Network in |<p>Host network ingress in bytes.</p> |DEPENDENT |azure.db.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>- MULTIPLIER: `0.0088`</p> |
-|Azure |Azure: Connections active |<p>Active connections count.</p> |DEPENDENT |azure.db.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.maximum`</p> |
-|Azure |Azure: Connections total |<p>Total connections count.</p> |DEPENDENT |azure.db.connections.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.total_connections.total`</p> |
-|Azure |Azure: Connections aborted |<p>Aborted connections count.</p> |DEPENDENT |azure.db.connections.aborted<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.aborted_connections.total`</p> |
-|Azure |Azure: Queries |<p>Queries count.</p> |DEPENDENT |azure.db.queries<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Queries.total`</p> |
-|Azure |Azure: IO consumption percent |<p>IO Percent.</p> |DEPENDENT |azure.db.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.maximum`</p> |
-|Azure |Azure: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.maximum`</p> |
-|Azure |Azure: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.maximum`</p> |
-|Azure |Azure: Storage limit |<p>Storage limit in bytes.</p> |DEPENDENT |azure.db.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
-|Azure |Azure: Backup storage used |<p>Backup storage used in bytes.</p> |DEPENDENT |azure.db.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.maximum`</p> |
-|Azure |Azure: Replication lag |<p>Replication lag in seconds.</p> |DEPENDENT |azure.db.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.replication_lag.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure: CPU credits remaining |<p>CPU credits remaining.</p> |DEPENDENT |azure.db.cpu.credits.remaining<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_remaining.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure: CPU credits consumed |<p>CPU credits consumed.</p> |DEPENDENT |azure.db.cpu.credits.consumed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_consumed.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure MySQL: Get data |<p>The JSON with result of API requests.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure MySQL: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.mysql.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Availability state |<p>Availability status of the resource.</p> |DEPENDENT |azure.db.mysql.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Availability status detailed |<p>Summary description of the availability status.</p> |DEPENDENT |azure.db.mysql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Percentage CPU |<p>Host CPU percent.</p> |DEPENDENT |azure.db.mysql.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.maximum`</p> |
+|Azure |Azure MySQL: Memory utilization |<p>Host memory percent.</p> |DEPENDENT |azure.db.mysql.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.maximum`</p> |
+|Azure |Azure MySQL: Network out |<p>Host network egress in bytes.</p> |DEPENDENT |azure.db.mysql.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure MySQL: Network in |<p>Host network ingress in bytes.</p> |DEPENDENT |azure.db.mysql.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure MySQL: Connections active |<p>Active connections count.</p> |DEPENDENT |azure.db.mysql.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.maximum`</p> |
+|Azure |Azure MySQL: Connections total |<p>Total connections count.</p> |DEPENDENT |azure.db.mysql.connections.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.total_connections.total`</p> |
+|Azure |Azure MySQL: Connections aborted |<p>Aborted connections count.</p> |DEPENDENT |azure.db.mysql.connections.aborted<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.aborted_connections.total`</p> |
+|Azure |Azure MySQL: Queries |<p>Queries count.</p> |DEPENDENT |azure.db.mysql.queries<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Queries.total`</p> |
+|Azure |Azure MySQL: IO consumption percent |<p>IO Percent.</p> |DEPENDENT |azure.db.mysql.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.maximum`</p> |
+|Azure |Azure MySQL: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.mysql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.maximum`</p> |
+|Azure |Azure MySQL: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.mysql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.maximum`</p> |
+|Azure |Azure MySQL: Storage limit |<p>Storage limit in bytes.</p> |DEPENDENT |azure.db.mysql.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
+|Azure |Azure MySQL: Backup storage used |<p>Backup storage used in bytes.</p> |DEPENDENT |azure.db.mysql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.maximum`</p> |
+|Azure |Azure MySQL: Replication lag |<p>Replication lag in seconds.</p> |DEPENDENT |azure.db.mysql.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.replication_lag.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure MySQL: CPU credits remaining |<p>CPU credits remaining.</p> |DEPENDENT |azure.db.mysql.cpu.credits.remaining<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_remaining.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure MySQL: CPU credits consumed |<p>CPU credits consumed.</p> |DEPENDENT |azure.db.mysql.cpu.credits.consumed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_consumed.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Azure: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL flexible servers by HTTP/azure.db.data.errors))>0` |AVERAGE | |
-|Azure: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.availability.state)=2` |HIGH | |
-|Azure: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.availability.state)=1` |AVERAGE | |
-|Azure: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.availability.state)=3` |WARNING | |
-|Azure: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL flexible servers by HTTP/azure.db.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL flexible servers by HTTP/azure.db.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
-|Azure: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
-|Azure: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
+|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
+|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
+|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
+|Azure MySQL: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL flexible servers by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL flexible servers by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
@@ -334,38 +334,38 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Azure |Azure: Get data |<p>The JSON with result of API requests.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Azure |Azure: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Azure |Azure: Availability state |<p>Availability status of the resource.</p> |DEPENDENT |azure.db.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Azure |Azure: Availability status detailed |<p>Summary description of the availability status.</p> |DEPENDENT |azure.db.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Azure |Azure: Percentage CPU |<p>Host CPU percent.</p> |DEPENDENT |azure.db.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.average`</p> |
-|Azure |Azure: Memory utilization |<p>Host memory percent.</p> |DEPENDENT |azure.db.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.average`</p> |
-|Azure |Azure: Network out |<p>Network out across active connections.</p> |DEPENDENT |azure.db.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.0088`</p> |
-|Azure |Azure: Network in |<p>Network in across active connections.</p> |DEPENDENT |azure.db.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.0088`</p> |
-|Azure |Azure: Connections active |<p>Active connections count.</p> |DEPENDENT |azure.db.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.average`</p> |
-|Azure |Azure: Connections failed |<p>Failed connections count.</p> |DEPENDENT |azure.db.connections.failed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connections_failed.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure: IO consumption percent |<p>IO Percent.</p> |DEPENDENT |azure.db.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.average`</p> |
-|Azure |Azure: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.average`</p> |
-|Azure |Azure: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.average`</p> |
-|Azure |Azure: Storage limit |<p>Storage limit in bytes.</p> |DEPENDENT |azure.db.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
-|Azure |Azure: Backup storage used |<p>Backup storage used in bytes.</p> |DEPENDENT |azure.db.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.average`</p> |
-|Azure |Azure: Replication lag |<p>Replication lag in seconds.</p> |DEPENDENT |azure.db.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.seconds_behind_master.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure: Server log storage percent |<p>Server log storage utilization in %.</p> |DEPENDENT |azure.db.storage.server.log.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_percent.average`</p> |
-|Azure |Azure: Server log storage used |<p>Used server log storage space in bytes.</p> |DEPENDENT |azure.db.storage.server.log.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_usage.average`</p> |
-|Azure |Azure: Server log storage limit |<p>Server log storage limit in bytes.</p> |DEPENDENT |azure.db.storage.server.log.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_limit.maximum`</p> |
+|Azure |Azure MySQL: Get data |<p>The JSON with result of API requests.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure MySQL: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.mysql.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Availability state |<p>Availability status of the resource.</p> |DEPENDENT |azure.db.mysql.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Availability status detailed |<p>Summary description of the availability status.</p> |DEPENDENT |azure.db.mysql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Percentage CPU |<p>Host CPU percent.</p> |DEPENDENT |azure.db.mysql.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.average`</p> |
+|Azure |Azure MySQL: Memory utilization |<p>Host memory percent.</p> |DEPENDENT |azure.db.mysql.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.average`</p> |
+|Azure |Azure MySQL: Network out |<p>Network out across active connections.</p> |DEPENDENT |azure.db.mysql.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure MySQL: Network in |<p>Network in across active connections.</p> |DEPENDENT |azure.db.mysql.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure MySQL: Connections active |<p>Active connections count.</p> |DEPENDENT |azure.db.mysql.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.average`</p> |
+|Azure |Azure MySQL: Connections failed |<p>Failed connections count.</p> |DEPENDENT |azure.db.mysql.connections.failed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connections_failed.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure MySQL: IO consumption percent |<p>IO Percent.</p> |DEPENDENT |azure.db.mysql.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.average`</p> |
+|Azure |Azure MySQL: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.mysql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.average`</p> |
+|Azure |Azure MySQL: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.mysql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.average`</p> |
+|Azure |Azure MySQL: Storage limit |<p>Storage limit in bytes.</p> |DEPENDENT |azure.db.mysql.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
+|Azure |Azure MySQL: Backup storage used |<p>Backup storage used in bytes.</p> |DEPENDENT |azure.db.mysql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.average`</p> |
+|Azure |Azure MySQL: Replication lag |<p>Replication lag in seconds.</p> |DEPENDENT |azure.db.mysql.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.seconds_behind_master.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure MySQL: Server log storage percent |<p>Server log storage utilization in %.</p> |DEPENDENT |azure.db.mysql.storage.server.log.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_percent.average`</p> |
+|Azure |Azure MySQL: Server log storage used |<p>Used server log storage space in bytes.</p> |DEPENDENT |azure.db.mysql.storage.server.log.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_usage.average`</p> |
+|Azure |Azure MySQL: Server log storage limit |<p>Server log storage limit in bytes.</p> |DEPENDENT |azure.db.mysql.storage.server.log.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_limit.maximum`</p> |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Azure: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL single servers by HTTP/azure.db.data.errors))>0` |AVERAGE | |
-|Azure: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.availability.state)=2` |HIGH | |
-|Azure: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.availability.state)=1` |AVERAGE | |
-|Azure: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.availability.state)=3` |WARNING | |
-|Azure: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL single servers by HTTP/azure.db.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL single servers by HTTP/azure.db.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
-|Azure: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
-|Azure: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL single servers by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
+|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
+|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
+|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
+|Azure MySQL: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL single servers by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL single servers by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
