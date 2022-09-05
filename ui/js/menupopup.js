@@ -1200,7 +1200,8 @@ jQuery(function($) {
 	}
 
 	var defaultOptions = {
-		closeCallback: function(){}
+		closeCallback: function(){},
+		parent_selector: '.wrapper'
 	};
 
 	var methods = {
@@ -1248,7 +1249,7 @@ jQuery(function($) {
 
 			$menu_popup.data('menu_popup', options);
 
-			$('.wrapper').append($menu_popup);
+			$(options.parent_selector).append($menu_popup);
 
 			// Position the menu (before hiding).
 			$menu_popup.position(options.position);
@@ -1264,7 +1265,9 @@ jQuery(function($) {
 			// Need to be postponed.
 			setTimeout(function() {
 				$(document)
-					.on('click', {menu: $menu_popup, opener: $opener}, menuPopupDocumentCloseHandler)
+					.on('click dragstart contextmenu', {menu: $menu_popup, opener: $opener},
+						menuPopupDocumentCloseHandler
+					)
 					.on('keydown', {menu: $menu_popup}, menuPopupKeyDownHandler);
 			});
 
@@ -1283,7 +1286,7 @@ jQuery(function($) {
 				$('[aria-expanded="true"]', menu_popup).attr({'aria-expanded': 'false'});
 
 				$(document)
-					.off('click', menuPopupDocumentCloseHandler)
+					.off('click dragstart contextmenu', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
 
 				var overlay = removeFromOverlaysStack('menu-popup', return_focus);

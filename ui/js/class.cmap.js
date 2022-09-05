@@ -204,10 +204,6 @@ ZABBIX.apps.map = (function($) {
 				start: $.proxy(function(event) {
 					if (!event.ctrlKey && !event.metaKey) {
 						this.clearSelection();
-
-						if (event.target.id === this.container[0].id) {
-							$('.menu-popup-top').menuPopup('close', null, false);
-						}
 					}
 				}, this),
 				stop: $.proxy(function(event) {
@@ -745,22 +741,25 @@ ZABBIX.apps.map = (function($) {
 						}
 					];
 
-					$(event.target).menuPopup(items, event, {position: {
-						of: event,
-						my: 'left top',
-						at: 'left bottom',
-						using: (pos, data) => {
-							let max_left = (data.horizontal === 'left')
-								? document.getElementById(containerId).clientWidth
-								: document.getElementById(containerId).clientWidth - data.element.width;
+					$(event.target).menuPopup(items, event, {
+						parent_selector: '.sysmap-scroll-container',
+						position: {
+							of: event,
+							my: 'left top',
+							at: 'left bottom',
+							using: (pos, data) => {
+								let max_left = (data.horizontal === 'left')
+									? document.getElementById(containerId).clientWidth
+									: document.getElementById(containerId).clientWidth - data.element.width;
 
-							pos.top = Math.max(0, pos.top);
-							pos.left = Math.max(0, Math.min(max_left, pos.left));
+								pos.top = Math.max(0, pos.top);
+								pos.left = Math.max(0, Math.min(max_left, pos.left));
 
-							data.element.element[0].style.top = `${pos.top}px`;
-							data.element.element[0].style.left = `${pos.left}px`;
+								data.element.element[0].style.top = `${pos.top}px`;
+								data.element.element[0].style.left = `${pos.left}px`;
+							}
 						}
-					}});
+					});
 				});
 
 				/*
