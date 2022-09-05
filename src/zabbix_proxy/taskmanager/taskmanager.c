@@ -221,7 +221,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	tm_execute_data_json(int type, const char *data, char **info, const zbx_config_args_t *zbx_config)
+static int	tm_execute_data_json(int type, const char *data, char **info, const zbx_config_comms_args_t *zbx_config)
 {
 	struct zbx_json_parse	jp_data;
 
@@ -254,7 +254,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info, const z
  *                                                                            *
  ******************************************************************************/
 static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int clock, int ttl, int now,
-		const zbx_config_args_t *zbx_config)
+		const zbx_config_comms_args_t *zbx_config)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -323,7 +323,7 @@ finish:
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_config_args_t *zbx_config)
+static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_config_comms_args_t *zbx_config)
 {
 	DB_ROW			row;
 	DB_RESULT		result;

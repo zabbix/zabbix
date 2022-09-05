@@ -254,7 +254,7 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
  *             zbx_config     - [IN] proxy config                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_args_t *zbx_config)
+void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *zbx_config)
 {
 	struct zbx_json		j;
 	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
@@ -384,7 +384,7 @@ out:
  *             zbx_config     - [IN] proxy config                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_args_t *zbx_config)
+void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *zbx_config)
 {
 	struct zbx_json		j;
 	char			*error = NULL, *buffer = NULL;

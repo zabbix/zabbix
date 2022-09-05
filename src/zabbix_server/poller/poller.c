@@ -285,7 +285,7 @@ void	zbx_free_result_ptr(AGENT_RESULT *result)
 }
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
-		const zbx_config_args_t *zbx_config)
+		const zbx_config_comms_args_t *zbx_config)
 {
 	int	res = FAIL;
 
@@ -697,7 +697,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 }
 
 void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, zbx_vector_ptr_t *add_results,
-		unsigned char poller_type, const zbx_config_args_t *zbx_config)
+		unsigned char poller_type, const zbx_config_comms_args_t *zbx_config)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -806,7 +806,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  *           see DCconfig_get_poller_items()                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_args_t *zbx_config)
+static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *zbx_config)
 {
 	DC_ITEM			item, *items;
 	AGENT_RESULT		results[MAX_POLLER_ITEMS];

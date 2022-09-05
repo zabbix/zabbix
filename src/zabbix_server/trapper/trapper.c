@@ -868,7 +868,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_args_t *zbx_config)
+		const zbx_config_comms_args_t *zbx_config)
 {
 	struct zbx_json	json;
 	char		type[MAX_STRING_LEN], error[MAX_STRING_LEN];
@@ -1082,7 +1082,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 }
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
-		const zbx_config_args_t *zbx_config)
+		const zbx_config_comms_args_t *zbx_config)
 {
 	int	ret = SUCCEED;
 
@@ -1293,7 +1293,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	return ret;
 }
 
-static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_args_t *zbx_config)
+static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *zbx_config)
 {
 	ssize_t	bytes_received;
 

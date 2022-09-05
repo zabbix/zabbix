@@ -26,7 +26,7 @@
 
 typedef struct
 {
-	const zbx_config_args_t	*zbx_config;
+	const zbx_config_comms_args_t	*zbx_config;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 }
 zbx_thread_taskmanager_args;

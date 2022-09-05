@@ -180,7 +180,7 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_args_t *zbx_config)
+int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;

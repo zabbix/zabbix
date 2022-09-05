@@ -34,7 +34,7 @@
  *           statistics.                                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_args_t *zbx_config)
+void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config)
 {
 	unsigned int	encryption;
 

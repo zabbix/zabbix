@@ -127,7 +127,7 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 }
 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **info,
-		const zbx_config_args_t *zbx_config)
+		const zbx_config_comms_args_t *zbx_config)
 {
 	char			tmp[MAX_STRING_LEN + 1], **pvalue;
 	DC_ITEM			item;
@@ -410,7 +410,7 @@ out:
 	return ret;
 }
 
-void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, const zbx_config_args_t *zbx_config)
+void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, const zbx_config_comms_args_t *zbx_config)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;

@@ -93,7 +93,7 @@ typedef struct
 	const char		*hostname;
 	const int		proxymode;
 }
-zbx_config_args_t;
+zbx_config_comms_args_t;
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 

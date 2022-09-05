@@ -51,7 +51,7 @@ void	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get_func_t cb)
  *             zbx_config - [IN] Zabbix server/proxy config                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_args_t *zbx_config)
+void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config)
 {
 	zbx_config_cache_info_t	count_stats;
 	zbx_vmware_stats_t	vmware_stats;

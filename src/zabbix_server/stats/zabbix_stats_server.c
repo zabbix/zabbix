@@ -39,7 +39,7 @@
  *           statistics.                                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_args_t *zbx_config)
+void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config)
 {
 	zbx_vc_stats_t		vc_stats;
 	zbx_uint64_t		queue_size;
