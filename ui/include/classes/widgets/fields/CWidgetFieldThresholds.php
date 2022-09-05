@@ -82,20 +82,25 @@ class CWidgetFieldThresholds extends CWidgetField {
 	}
 
 	public function getJavascript() {
-		return '
-			var thresholds_table = jQuery("#'.sprintf(self::THRESHOLDS_TABLE_ID, $this->getName()).'");
-
-			thresholds_table
-				.dynamicRows({template: "#'.sprintf(self::THRESHOLDS_ROW_TMPL_ID, $this->getName()).'"})
-				.on("afteradd.dynamicRows", function(opt) {
-					const rows = this.querySelectorAll(".form_row");
-					jQuery(".color-picker input", rows[rows.length - 1])
-						.val(colorPalette.getNextColor())
-						.colorpicker({
-							appendTo: ".overlay-dialogue-body"
-						});
-				});
-		';
+		return 'var thresholds_table = jQuery("#'.sprintf(self::THRESHOLDS_TABLE_ID, $this->getName()).'");'.
+				'thresholds_table'.
+					'.dynamicRows({template: "#'.sprintf(self::THRESHOLDS_ROW_TMPL_ID, $this->getName()).'"})'.
+					'.on("afteradd.dynamicRows", function(opt) {'.
+						'const rows = this.querySelectorAll(".form_row");'.
+						'const colors = jQuery("#widget-dialogue-form")[0]'.
+							'.querySelectorAll(".'.ZBX_STYLE_COLOR_PICKER.' input");'.
+						'const used_colors = [];'.
+						'for (const color of colors) {'.
+							'if (color.value !== "" && color.name.includes("thresholds")) {'.
+								'used_colors.push(color.value);'.
+							'}'.
+						'}'.
+				'jQuery(".color-picker input", rows[rows.length - 1])'.
+					'.val(colorPalette.getNextColor(used_colors))'.
+					'.colorpicker({'.
+						'appendTo: ".overlay-dialogue-body"'.
+					'});'.
+				'});';
 	}
 
 	public function toApi(array &$widget_fields = []) {
