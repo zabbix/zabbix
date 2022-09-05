@@ -24,17 +24,12 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 /**
  * @backup profiles, hosts, items, graphs
  *
- * @onBefore prepareHostsData
- * @onBefore prepareItemsData
  * @onBefore prepareGraphsData
  */
 class testPageMonitoringHostsGraph extends CWebTest {
 
-	private static $hostid;
-	private static $itemid;
-
-	public function prepareHostsData() {
-		$response = CDataHelper::call('host.create', [
+	public function prepareGraphsData() {
+		$hosts = CDataHelper::call('host.create', [
 			[
 				'host' => 'Host for monitoring graphs',
 				'groups' => [
@@ -50,45 +45,41 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				]
 			]
 		]);
-		$this->assertArrayHasKey('hostids', $response);
-		self::$hostid = $response['hostids'][0];
-	}
+		$this->assertArrayHasKey('hostids', $hosts);
+		$hostid = $hosts['hostids'][0];
 
-	public function prepareItemsData() {
-		$response = CDataHelper::call('item.create', [
+		$items = CDataHelper::call('item.create', [
 			[
 				'name' => 'Item for graph 1',
 				'key_' => 'trap_1',
-				'hostid' => self::$hostid,
+				'hostid' => $hostid,
 				'type' => 2,
 				'value_type' => 0
 			],
 			[
 				'name' => 'Item for graph 2',
 				'key_' => 'trap_2',
-				'hostid' => self::$hostid,
+				'hostid' => $hostid,
 				'type' => 2,
 				'value_type' => 0
 			],
 			[
 				'name' => 'Item for graph 3',
 				'key_' => 'trap_3',
-				'hostid' => self::$hostid,
+				'hostid' => $hostid,
 				'type' => 2,
 				'value_type' => 0
 			]
 		]);
-		$this->assertArrayHasKey('itemids', $response);
-		self::$itemid = CDataHelper::getIds('name');
-	}
+		$this->assertArrayHasKey('itemids', $items);
+		$itemids = CDataHelper::getIds('name');
 
-	public function prepareGraphsData() {
-		$response = CDataHelper::call('graph.create', [
+		$graphs = CDataHelper::call('graph.create', [
 			[
 				'name' => 'Graph 1',
 				'gitems' => [
 					[
-						'itemid' => self::$itemid['Item for graph 1'],
+						'itemid' => $itemids['Item for graph 1'],
 						'color' => '00AA00'
 					]
 				]
@@ -97,11 +88,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				'name' => 'Graph 2',
 				'gitems' => [
 					[
-						'itemid' => self::$itemid['Item for graph 2'],
+						'itemid' => $itemids['Item for graph 2'],
 						'color' => '00AA00'
 					],
 					[
-						'itemid' => self::$itemid['Item for graph 2'],
+						'itemid' => $itemids['Item for graph 2'],
 						'color' => '00AA00'
 					]
 				]
@@ -110,20 +101,23 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				'name' => 'Graph 3',
 				'gitems' => [
 					[
-						'itemid' => self::$itemid['Item for graph 2'],
+						'itemid' => $itemids['Item for graph 2'],
 						'color' => '00AA00'
 					],
 					[
-						'itemid' => self::$itemid['Item for graph 3'],
+						'itemid' => $itemids['Item for graph 3'],
 						'color' => '00AA00'
 					]
 
 				]
 			],
 		]);
-		$this->assertArrayHasKey('graphids', $response);
+		$this->assertArrayHasKey('graphids', $graphs);
 	}
 
+	/**
+	 * Check graph page layout.
+	 */
 	public function testPageMonitoringHostsGraph_Layout() {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to'.
 				'=now&filter_search_type=0&filter_set=1');
@@ -190,6 +184,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check graph page in layout mode.
+	 */
 	public function testPageMonitoringHostsGraph_KioskMode() {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to'.
 			'=now&filter_search_type=0&filter_set=1');
@@ -213,6 +210,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 	public static function getCheckFilterData() {
 		return [
+			// #0
 			[
 				[
 					'filter' => [
@@ -223,6 +221,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
 				]
 			],
+			// #1
 			[
 				[
 					'filter' => [
@@ -233,6 +232,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
 				]
 			],
+			// #2
 			[
 				[
 					'filter' => [
@@ -244,6 +244,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'items_names' => ['Item for graph 2']
 				]
 			],
+			// #3
 			[
 				[
 					'filter' => [
@@ -255,6 +256,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'items_names' => ['Item for graph 2']
 				]
 			],
+			// #4
 			[
 				[
 					'filter' => [
@@ -265,6 +267,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'items_names' => ['Item for graph 1']
 				]
 			],
+			// #5
 			[
 				[
 					'filter' => [
@@ -274,6 +277,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'graphs_result' => 0
 				]
 			],
+			// #6
 			[
 				[
 					'filter' => [
@@ -284,6 +288,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
 				]
 			],
+			// #7
 			[
 				[
 					'filter' => [
@@ -293,6 +298,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'graphs_result' => 0
 				]
 			],
+			// #8
 			[
 				[
 					'filter' => [
@@ -302,6 +308,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'graphs_result' => 0
 				]
 			],
+			// #9
 			[
 				[
 					'filter' => [
@@ -312,6 +319,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'graphs_result' => 0
 				]
 			],
+			// #10
 			[
 				[
 					'filter' => [
@@ -327,6 +335,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	}
 
 	/**
+	 * Check graph page filter.
+	 *
 	 * @dataProvider getCheckFilterData
 	 */
 	public function testPageMonitoringHostsGraph_CheckFilter($data) {
