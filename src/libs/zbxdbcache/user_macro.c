@@ -1326,7 +1326,7 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_uint64_t 
 		{
 			if (0 != hosts.values[i]->macros.values_num || 0 != hosts.values[i]->templateids.values_num)
 				zbx_vector_uint64_append(macro_hostids, hosts.values[i]->hostid);
-			else if (0 != revision)		/* skip when full sync */
+			else
 				zbx_vector_uint64_append(del_macro_hostids, hosts.values[i]->hostid);
 		}
 	}
