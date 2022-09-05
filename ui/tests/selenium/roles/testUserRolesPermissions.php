@@ -1210,12 +1210,10 @@ class testUserRolesPermissions extends CWebTest {
 			}
 			else {
 				if (array_key_exists('actions', $data)) {
-					$menu->query('xpath://ul/li/a[text()="Actions"]')->waitUntilClickable()->one()->click();
-					$this->assertEquals($action_status, $menu->exists($data['page']));
+					$menu->query('xpath:.//ul/li/a[text()="Actions"]')->waitUntilClickable()->one()->click();
 				}
-				else {
-					$this->assertEquals($action_status, $menu->exists($data['page']));
-				}
+
+			$this->assertEquals($action_status, $menu->exists($data['page']));
 			}
 
 			if ($action_status) {
@@ -1232,18 +1230,12 @@ class testUserRolesPermissions extends CWebTest {
 				}
 
 				if (array_key_exists('actions', $data)) {
-					if ($data['page'] === 'Trigger actions') {
-						$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
-						$this->page->open('actionconf.php?eventsource=1')->waitUntilReady();
-					}
-					else {
-						$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
-						$this->page->open('actionconf.php')->waitUntilReady();
-					}
+					$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
+					$this->page->open('actionconf.php'.(($data['page'] === 'Trigger actions') ? '?eventsource=1' : ''))->waitUntilReady();
 					$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
 					$this->assertNotContains($data['page'], $popup_menu->getItems()->asText());
 					$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
-					}
+				}
 			}
 			else {
 				if (array_key_exists('user_roles', $data)) {
