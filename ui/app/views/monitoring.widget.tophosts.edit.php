@@ -26,7 +26,9 @@
  * @var array $data
  */
 
-(new CWidgetFormView($data))
+$form = (new CWidgetFormView($data));
+
+$form
 	->addField(
 		new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['ms']['groups']['groupids'])
 	)
@@ -40,13 +42,13 @@
 		new CWidgetFieldTagsView($data['fields']['tags'])
 	)
 	->addItem(
-		getColumnsField($data['fields']['columns'])
+		getColumnsField($form, $data['fields']['columns'])
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['order'])
 	)
 	->addItem(
-		getColumnField($data['fields']['column'])
+		getColumnField($form, $data['fields']['column'])
 	)
 	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['count'])
@@ -55,21 +57,21 @@
 	->addJavaScript('widget_tophosts_form.init();')
 	->show();
 
-function getColumnsField(CWidgetFieldColumnsList $field): array {
+function getColumnsField(CWidgetFormView $form, CWidgetFieldColumnsList $field): array {
 	$columns = new CWidgetFieldColumnsListView($field);
 
-	return [
+	return $form->makeCustomField($columns, [
 		$columns->getLabel(),
 		(new CFormField($columns->getView()))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	];
+	]);
 }
 
-function getColumnField(CWidgetFieldSelect $field): array {
+function getColumnField(CWidgetFormView $form, CWidgetFieldSelect $field): array {
 	$column = new CWidgetFieldSelectView($field);
 
-	return [
+	return $form->makeCustomField($column, [
 		$column->getLabel(),
 		(new CFormField($field->getValues() ? $column->getView() : _('Add item column')))
 			->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
-	];
+	]);
 }

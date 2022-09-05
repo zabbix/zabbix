@@ -65,12 +65,21 @@ $form
 		new CWidgetFieldColorView($data['fields']['bg_color']),
 		'js-row-bg-color'
 	)
+	->addField(
+		(new CWidgetFieldThresholdsView($data['fields']['thresholds']))
+			->setHint(
+				makeWarningIcon(_('This setting applies only to numeric data.'))->setId('item-value-thresholds-warning')
+			),
+		'js-row-thresholds'
+	)
 	->addField(array_key_exists('dynamic', $data['fields'])
 		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
 		: null
 	)
 	->includeJsFile('js/monitoring.widget.item.edit.js.php')
-	->addJavaScript('widget_item_form.init();')
+	->addJavaScript('widget_item_form.init('.json_encode([
+			'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE
+		]).');')
 	->show();
 
 function getDescriptionFieldsGroupViews(CWidgetFormView $form, array $fields): array {

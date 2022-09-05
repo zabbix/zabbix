@@ -153,13 +153,12 @@ void	zbx_availability_deserialize_hostdata(const unsigned char *data, zbx_vector
 zbx_uint32_t	zbx_availability_serialize_active_status_request(unsigned char **data, zbx_uint64_t hostid)
 {
 	zbx_uint32_t	data_len = 0;
-	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, hostid);
 
-	ptr = *data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
+	*data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
 
-	ptr += zbx_serialize_value(ptr, hostid);
+	(void)zbx_serialize_value(*data, hostid);
 
 	return data_len;
 }
@@ -167,13 +166,12 @@ zbx_uint32_t	zbx_availability_serialize_active_status_request(unsigned char **da
 zbx_uint32_t	zbx_availability_serialize_active_status_response(unsigned char **data, int status)
 {
 	zbx_uint32_t	data_len = 0;
-	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, status);
 
-	ptr = *data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
+	*data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
 
-	ptr += zbx_serialize_value(ptr, status);
+	(void)zbx_serialize_value(*data, status);
 
 	return data_len;
 }
@@ -242,13 +240,12 @@ void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data, zbx_
 zbx_uint32_t	zbx_availability_serialize_hostid(unsigned char **data, zbx_uint64_t hostid)
 {
 	zbx_uint32_t	data_len = 0;
-	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, hostid);
 
-	ptr = *data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
+	*data = (unsigned char *)zbx_calloc(NULL, data_len, 1);
 
-	ptr += zbx_serialize_value(ptr, hostid);
+	(void)zbx_serialize_value(*data, hostid);
 
 	return data_len;
 }

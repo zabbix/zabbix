@@ -683,6 +683,9 @@ footer {
     word-wrap: break-word; }
     .form-grid > label.fields-group-label {
       padding-top: 5px; }
+    .form-grid > label .icon-help-hint,
+    .form-grid > label .icon-info {
+      margin-left: 5px; }
   .form-grid > .form-field,
   .form-grid > .field-fluid,
   .form-grid .form-actions {
@@ -2621,7 +2624,7 @@ section {
     width: 24px;
     height: 24px;
     margin: 2px 2px 0 auto;
-    background: url("../img/icon-sprite.svg?20220519") no-repeat -6px -654px; }
+    background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -654px; }
   section .section-foot {
     padding: 0 10px;
     text-align: right;

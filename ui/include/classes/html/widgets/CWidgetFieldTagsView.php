@@ -60,7 +60,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 	public function getJavaScript(): string {
 		return '
 			jQuery("#tags_table_'.$this->field->getName().'")
-				.dynamicRows({template: "#tag-row-tmpl"})
+				.dynamicRows({template: "#'.$this->field->getName().'-row-tmpl"})
 				.on("afteradd.dynamicRows", function() {
 					const rows = this.querySelectorAll(".form_row");
 					new CTagFilterItem(rows[rows.length - 1]);
@@ -75,7 +75,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 
 	public function getTemplates(): array {
 		return [
-			new CTemplateTag('tag-row-tmpl', $this->getRowTemplate(CWidgetFieldTags::DEFAULT_TAG))
+			new CTemplateTag($this->field->getName().'-row-tmpl', $this->getRowTemplate(CWidgetFieldTags::DEFAULT_TAG))
 		];
 	}
 

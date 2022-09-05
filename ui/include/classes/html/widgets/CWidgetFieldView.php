@@ -25,10 +25,17 @@ abstract class CWidgetFieldView {
 
 	protected string $form_name = '';
 
+	protected ?CTag $hint = null;
 	protected string $help_hint = '';
 
 	public function setFormName($form_name): self {
 		$this->form_name = $form_name;
+
+		return $this;
+	}
+
+	public function setHint(CTag $hint): self {
+		$this->hint = $hint;
 
 		return $this;
 	}
@@ -46,9 +53,11 @@ abstract class CWidgetFieldView {
 			return null;
 		}
 
-		$help_hint = $this->help_hint !== '' ? makeHelpIcon($this->help_hint) : null;
-
-		return new CLabel([$label, $help_hint]);
+		return new CLabel([
+			$label,
+			$this->hint,
+			$this->help_hint !== '' ? makeHelpIcon($this->help_hint) : null
+		]);
 	}
 
 	/**

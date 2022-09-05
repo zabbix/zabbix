@@ -220,6 +220,9 @@ class CWidgetFormItem extends CWidgetForm {
 			->addField(
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
+			->addField(
+				new CWidgetFieldThresholds('thresholds', _('Thresholds'))
+			)
 			->addField($this->templateid === null
 				? new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
 				: null
