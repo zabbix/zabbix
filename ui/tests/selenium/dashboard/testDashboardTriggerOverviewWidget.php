@@ -144,7 +144,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		DBexecute('UPDATE problem SET r_eventid=9001 WHERE objectid='.$triggerids[0]);
 		DBexecute('UPDATE problem SET r_clock='.$timestamp.' WHERE objectid='.$triggerids[0]);
 
-		// Change the resolved triggers blinking period as the default value is too small fot this test.
+		// Change the resolved triggers blinking period as the default value is too small for this test.
 		CDataHelper::call('settings.update', ['blink_period' => '5m']);
 
 		// Enable the trigger that other triggers depend on.
@@ -645,7 +645,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
 			$form->submit();
-			// Check that changes took place on the unsaved dashboard (wigdet got renamed).
+			// Check that changes took place on the unsaved dashboard (widget got renamed).
 			$this->assertTrue($dashboard->getWidget($new_name)->isValid());
 		}
 		else {
@@ -880,7 +880,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	 * Check the selerity and the icon displayed in the table cell under attention.
 	 *
 	 * @param CElement	$cell		table cell that represents the trigger to be checked
-	 * @param string	$trigger	the name ot the trigger that is represented by the trigger cell
+	 * @param string	$trigger	the name of the trigger that is represented by the trigger cell
 	 */
 	private function checkTriggerCell ($cell, $trigger) {
 		// Check the colour of the background.
