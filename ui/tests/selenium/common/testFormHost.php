@@ -2044,9 +2044,13 @@ class testFormHost extends CWebTest {
 					$form->checkValue($ipmi_values);
 
 					foreach (array_keys($ipmi_values) as $label) {
-						$this->assertEquals(255, $form->getField($label)->getAttribute('maxlength'));
 						$this->assertFalse($form->getField($label)->isEnabled());
 					}
+
+					foreach (['Username', 'Password'] as $fields) {
+						$this->assertEquals(255, $form->getField($label)->getAttribute('maxlength'));
+					}
+
 					break;
 
 				case 'Tags':
