@@ -28,6 +28,7 @@
 #include "zbxnum.h"
 #include "zbxcomms.h"
 #include "zbxip.h"
+#include "zbxversion.h"
 
 extern unsigned char	program_type;
 

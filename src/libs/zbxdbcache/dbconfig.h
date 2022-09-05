@@ -24,7 +24,7 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "user_macro.h"
-#include "version.h"
+#include "zbxversion.h"
 
 #define ZBX_MAINTENANCE_IDLE		0
 #define ZBX_MAINTENANCE_RUNNING		1

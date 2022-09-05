@@ -38,6 +38,7 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "version.h"
+#include "zbxversion.h"
 
 extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;

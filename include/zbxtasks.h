@@ -22,6 +22,7 @@
 
 #include "zbxalgo.h"
 #include "zbxjson.h"
+#include "zbxversion.h"
 
 #define ZBX_TASK_UPDATE_FREQUENCY	1
 

@@ -25,6 +25,7 @@
 #include "zbxdbschema.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxversion.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;

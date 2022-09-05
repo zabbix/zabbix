@@ -25,6 +25,7 @@
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
 #include "version.h"
+#include "zbxversion.h"
 
 #include "zbxcompress.h"
 
