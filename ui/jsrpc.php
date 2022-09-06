@@ -670,7 +670,7 @@ switch ($data['method']) {
 						$host = API::Host()->get($options);
 
 						if ($host) {
-							$hostids[] = array_key_first(API::Host()->get($options));
+							$hostids[] = array_key_first($host);
 						}
 					}
 				}

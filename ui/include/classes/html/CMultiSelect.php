@@ -215,7 +215,8 @@ class CMultiSelect extends CTag {
 				}
 			}
 
-			if (array_key_exists('filter_multiple', $options['autosuggest'])) {
+			if (array_key_exists('filter_preselect_fields', $options['autosuggest'])
+					&& array_key_exists('filter_multiple', $options['autosuggest'])) {
 				$mapped_options['autosuggest']['filter_multiple'] = $options['autosuggest']['filter_multiple'];
 			}
 		}
