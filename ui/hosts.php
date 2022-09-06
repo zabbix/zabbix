@@ -1280,6 +1280,13 @@ elseif (hasRequest('form')) {
 
 	$data['readonly'] = ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 
+	$data['is_discovery_rule_editable'] = $data['discoveryRule']
+		&& API::DiscoveryRule()->get([
+			'output' => [],
+			'itemids' => $data['discoveryRule']['itemid'],
+			'editable' => true
+		]);
+
 	if ($data['hostid'] != 0) {
 		// get items that populate host inventory fields
 		$data['inventory_items'] = API::Item()->get([
@@ -1531,11 +1538,22 @@ else {
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectDiscoveryRule' => ['itemid', 'name'],
-		'selectHostDiscovery' => ['ts_delete'],
+		'selectHostDiscovery' => ['parent_hostid', 'ts_delete'],
 		'selectTags' => ['tag', 'value'],
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
 		'preservekeys' => true
 	]);
+
+	foreach ($hosts as &$host) {
+		$host['is_discovery_rule_editable'] = $host['discoveryRule']
+			&& API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => $host['discoveryRule']['itemid'],
+				'editable' => true
+			]);
+	}
+	unset($host);
+
 	order_result($hosts, $sortField, $sortOrder);
 
 	// selecting linked templates to templates linked to hosts
