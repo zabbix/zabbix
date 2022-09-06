@@ -656,12 +656,32 @@ switch ($data['method']) {
 				break;
 
 			case 'items':
+				$hostids = null;
+
+				if (array_key_exists('hostids', $data)) {
+					foreach ($data['hostids'] as $name) {
+						$options = [
+							'output' => ['name'],
+							'search' => ['name' => $name.($data['wildcard_allowed'] ? '*' : '')],
+							'searchWildcardsEnabled' => $data['wildcard_allowed'],
+							'preservekeys' => true
+						];
+
+						$host = API::Host()->get($options);
+
+						if ($host) {
+							$hostids[] = array_key_first(API::Host()->get($options));
+						}
+					}
+				}
+
 				$options = [
 					'output' => ['name'],
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
+					'hostids' => $hostids,
 					'webitems' => true,
 					'limit' => $limit
 				];

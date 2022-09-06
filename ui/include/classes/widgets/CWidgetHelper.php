@@ -1131,26 +1131,28 @@ class CWidgetHelper {
 		];
 
 		if ($dataset_type == self::DATASET_TYPE_PATTERN_ITEM) {
+			$host_pattern_field = (new CPatternSelect([
+				'name' => $field_name.'['.$row_num.'][hosts][]',
+				'object_name' => 'hosts',
+				'data' => $value['hosts'],
+				'placeholder' => _('host pattern'),
+				'wildcard_allowed' => 1,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'hosts',
+						'srcfld1' => 'host',
+						'dstfrm' => $form_name,
+						'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
+					]
+				],
+				'add_post_js' => false
+			]))
+				->addClass('js-hosts-multiselect')
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
+
 			$dataset_head = array_merge($dataset_head, [
 				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))->appendColorPickerJs(false),
-				(new CPatternSelect([
-					'name' => $field_name.'['.$row_num.'][hosts][]',
-					'object_name' => 'hosts',
-					'data' => $value['hosts'],
-					'placeholder' => _('host pattern'),
-					'wildcard_allowed' => 1,
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'hosts',
-							'srcfld1' => 'host',
-							'dstfrm' => $form_name,
-							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
-						]
-					],
-					'add_post_js' => false
-				]))
-					->addClass('js-hosts-multiselect')
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				$host_pattern_field,
 				(new CPatternSelect([
 					'name' => $field_name.'['.$row_num.'][items][]',
 					'object_name' => 'items',
@@ -1165,7 +1167,13 @@ class CWidgetHelper {
 							'numeric' => 1,
 							'dstfrm' => $form_name,
 							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
-						]
+						],
+					],
+					'autosuggest' => [
+						'filter_preselect_fields' => [
+							'hosts' => $host_pattern_field->getId()
+						],
+						'filter_multiple' => true
 					],
 					'add_post_js' => false
 				]))

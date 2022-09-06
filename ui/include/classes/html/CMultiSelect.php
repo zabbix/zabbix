@@ -101,6 +101,10 @@ class CMultiSelect extends CTag {
 			if (array_key_exists('filter_preselect_fields', $options['autosuggest'])) {
 				$params['autosuggest']['filter_preselect_fields'] = $options['autosuggest']['filter_preselect_fields'];
 			}
+
+			if (array_key_exists('filter_multiple', $options['autosuggest'])) {
+				$params['autosuggest']['filter_multiple'] = $options['autosuggest']['filter_multiple'];
+			}
 		}
 
 		if (array_key_exists('custom_select', $options)) {
@@ -187,7 +191,7 @@ class CMultiSelect extends CTag {
 		}
 
 		if (array_key_exists('autosuggest', $options)) {
-			$valid_fields = ['filter_preselect_fields'];
+			$valid_fields = ['filter_preselect_fields', 'filter_multiple'];
 
 			foreach (array_keys($options['autosuggest']) as $field) {
 				if (!in_array($field, $valid_fields)) {
@@ -209,6 +213,10 @@ class CMultiSelect extends CTag {
 				else {
 					error('invalid property: $options[\'autosuggest\'][\'filter_preselect_fields\']');
 				}
+			}
+
+			if (array_key_exists('filter_multiple', $options['autosuggest'])) {
+				$mapped_options['autosuggest']['filter_multiple'] = $options['autosuggest']['filter_multiple'];
 			}
 		}
 

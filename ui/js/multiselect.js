@@ -316,6 +316,7 @@
 	 * @param object options['autosuggest']         autosuggest options (optional)
 	 * @param object options['autosuggest']['filter_preselect_fields'] autosuggest preselect fields (optional)
 	 * @param string options['autosuggest']['filter_preselect_fields']['hosts'] autosuggest host preselect field (optional)
+	 * @param bool 	 options['autosuggest']['filter_multiple'] allows to filter multiple values (optional)
 	 * @param string options['styles']				additional style for multiselect wrapper HTML element (optional)
 	 * @param string options['styles']['property']
 	 * @param string options['styles']['value']
@@ -495,27 +496,48 @@
 			return ret;
 		}
 
-		if (typeof preselect_options.filter_preselect_fields.hosts !== 'undefined') {
+		if (preselect_options.filter_preselect_fields.hosts !== undefined) {
 			const hosts = $('#' + preselect_options.filter_preselect_fields.hosts).multiSelect('getData');
 
-			if (hosts.length != 0) {
+			if (preselect_options.filter_multiple) {
+				ret.hostids = [];
+
+				for (const host of hosts) {
+					ret.hostids.push(host.id);
+				}
+			}
+			else if (hosts.length != 0) {
 				ret.hostid = hosts[0].id;
 			}
 		}
 
-		if (typeof preselect_options.filter_preselect_fields.hostgroups !== 'undefined') {
+		if (preselect_options.filter_preselect_fields.hostgroups !== undefined) {
 			const host_groups = $('#' + preselect_options.filter_preselect_fields.hostgroups).multiSelect('getData');
 
-			if (host_groups.length != 0) {
+			if (preselect_options.filter_multiple) {
+				ret.groupids = [];
+
+				for (const host_group of host_groups) {
+					ret.groupids.push(host_group.id);
+				}
+			}
+			else if (host_groups.length != 0) {
 				ret.groupid = host_groups[0].id;
 			}
 		}
 
-		if (typeof preselect_options.filter_preselect_fields.templategroups !== 'undefined') {
+		if (preselect_options.filter_preselect_fields.templategroups !== undefined) {
 			const template_groups = $('#' + preselect_options.filter_preselect_fields.templategroups)
 				.multiSelect('getData');
 
-			if (template_groups.length != 0) {
+			if (preselect_options.filter_multiple) {
+				ret.templategroupids = [];
+
+				for (const template_group of template_groups) {
+					ret.templategroupids.push(template_group.id);
+				}
+			}
+			else if (template_groups.length != 0) {
 				ret.templategroupid = template_groups[0].id;
 			}
 		}
