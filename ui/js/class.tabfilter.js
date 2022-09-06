@@ -56,7 +56,7 @@ class CTabFilter extends CBaseComponent {
 			options.data[options.selected].expanded = true;
 		}
 
-		for (const template of this._target.querySelectorAll('[type="text/x-jquery-tmpl"][data-template]')) {
+		for (const template of this._target.querySelectorAll('[data-template]')) {
 			this._templates[template.getAttribute('data-template')] = template;
 		}
 
