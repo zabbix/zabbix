@@ -615,11 +615,11 @@ abstract class CHostGeneral extends CHostBase {
 			Manager::HttpTest()->link($templateid, $hostids);
 		}
 
-		API::Item()->syncTemplates($templateids, $hostids);
+		CItem::linkTemplateObjects($templateids, $hostids);
 		$ruleids = API::DiscoveryRule()->syncTemplates($templateids, $hostids);
 
 		if ($ruleids) {
-			API::ItemPrototype()->syncTemplates($templateids, $hostids);
+			CItemPrototype::linkTemplateObjects($templateids, $hostids);
 			API::HostPrototype()->syncTemplates($ruleids, $hostids);
 		}
 
@@ -848,11 +848,11 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		foreach ($link_requests as $link_request) {
-			API::Item()->syncTemplates($link_request['templateids'], $link_request['hostids']);
+			CItem::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
 			$ruleids = API::DiscoveryRule()->syncTemplates($link_request['templateids'], $link_request['hostids']);
 
 			if ($ruleids) {
-				API::ItemPrototype()->syncTemplates($link_request['templateids'], $link_request['hostids']);
+				CItemPrototype::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
 				API::HostPrototype()->syncTemplates($ruleids, $link_request['hostids']);
 			}
 		}

@@ -86,11 +86,6 @@ class CItem extends CItemGeneral {
 	];
 
 	/**
-	 * @inheritDoc
-	 */
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_ITEM;
-
-	/**
 	 * Get items data.
 	 *
 	 * @param array  $options
@@ -497,11 +492,7 @@ class CItem extends CItemGeneral {
 		self::validateCreate($items);
 
 		self::createForce($items);
-		[$tpl_items] = self::getTemplatedObjects($items);
-
-		if ($tpl_items) {
-			$this->inherit($tpl_items);
-		}
+		self::inherit($items);
 
 		return ['itemids' => array_column($items, 'itemid')];
 	}
@@ -579,6 +570,43 @@ class CItem extends CItemGeneral {
 
 	/**
 	 * @param array $items
+	 */
+	public static function createForce(array &$items): void {
+		$itemids = DB::insert('items', $items);
+
+		$ins_items_rtdata = [];
+		$host_statuses = [];
+
+		foreach ($items as &$item) {
+			$item['itemid'] = array_shift($itemids);
+
+			if (in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
+				$ins_items_rtdata[] = ['itemid' => $item['itemid']];
+			}
+
+			$host_statuses[] = $item['host_status'];
+			unset($item['host_status']);
+		}
+		unset($item);
+
+		if ($ins_items_rtdata) {
+			DB::insertBatch('item_rtdata', $ins_items_rtdata, false);
+		}
+
+		self::updateParameters($items);
+		self::updatePreprocessing($items);
+		self::updateTags($items);
+
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_ITEM, $items);
+
+		foreach ($items as &$item) {
+			$item['host_status'] = array_shift($host_statuses);
+		}
+		unset($item);
+	}
+
+	/**
+	 * @param array $items
 	 *
 	 * @return array
 	 */
@@ -586,12 +614,7 @@ class CItem extends CItemGeneral {
 		$this->validateUpdate($items, $db_items);
 
 		self::updateForce($items, $db_items);
-
-		[$tpl_items, $tpl_db_items] = self::getTemplatedObjects($items, $db_items);
-
-		if ($tpl_items) {
-			$this->inherit($tpl_items, $tpl_db_items);
-		}
+		self::inherit($items, $db_items);
 
 		return ['itemids' => array_column($items, 'itemid')];
 	}
@@ -626,14 +649,14 @@ class CItem extends CItemGeneral {
 		 * fields as they stored in database.
 		 */
 		$db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
-				'inventory_link', 'logtimefmt', 'description', 'status'
+			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
+				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
 		]);
 
-		$this->addInternalFields($db_items);
+		self::addInternalFields($db_items);
 
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
@@ -774,6 +797,40 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	public static function updateForce(array &$items, array $db_items): void {
+		// Helps to avoid deadlocks.
+		CArrayHelper::sort($items, ['itemid'], ZBX_SORT_DOWN);
+
+		self::addFieldDefaultsByType($items, $db_items);
+
+		$upd_items = [];
+
+		foreach ($items as $item) {
+			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
+
+			if ($upd_item) {
+				$upd_items[] = [
+					'values' => $upd_item,
+					'where' => ['itemid' => $item['itemid']]
+				];
+			}
+		}
+
+		if ($upd_items) {
+			DB::update('items', $upd_items);
+		}
+
+		self::updateTags($items, $db_items);
+		self::updatePreprocessing($items, $db_items);
+		self::updateParameters($items, $db_items);
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM, $items, $db_items);
+	}
+
+	/**
 	 * @param array $itemids
 	 *
 	 * @throws APIException
@@ -825,7 +882,7 @@ class CItem extends CItemGeneral {
 	 * @param array $templateids
 	 * @param array $hostids
 	 */
-	public function syncTemplates(array $templateids, array $hostids): void {
+	public static function linkTemplateObjects(array $templateids, array $hostids): void {
 		$db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
 				'inventory_link', 'logtimefmt', 'description', 'status'
@@ -842,7 +899,7 @@ class CItem extends CItemGeneral {
 			return;
 		}
 
-		$this->addInternalFields($db_items);
+		self::addInternalFields($db_items);
 
 		$items = [];
 
@@ -873,7 +930,331 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->inherit($items, [], $hostids);
+		self::inherit($items, [], $hostids);
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array      $db_items
+	 * @param array|null $hostids
+	 * @param bool       $is_dep_items  Inherit called for dependent items.
+	 */
+	private static function inherit(array $items, array $db_items = [], array $hostids = null,
+			bool $is_dep_items = false): void {
+		$tpl_links = self::getTemplateLinks($items, $hostids);
+
+		if ($hostids === null) {
+			foreach ($items as $i => $item) {
+				if (!array_key_exists($item['hostid'], $tpl_links)) {
+					unset($items[$i]);
+
+					if (array_key_exists($item['itemid'], $db_items)) {
+						unset($db_items[$item['itemid']]);
+					}
+				}
+			}
+
+			if (!$items) {
+				return;
+			}
+		}
+
+		self::checkDoubleInheritedNames($items, $db_items, $tpl_links);
+
+		$dep_items = [];
+
+		/*
+		 * Upon template linking, the first iteration inherits non-dependent items, the second one inherits dependent
+		 * ones.
+		 */
+		if ($hostids !== null && !$is_dep_items) {
+			foreach ($items as $i => $item) {
+				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					$dep_items[] = $item;
+					unset($items[$i]);
+				}
+			}
+		}
+
+		$ins_items = [];
+		$upd_items = [];
+		$upd_db_items = [];
+
+		if ($db_items) {
+			$upd_db_items = self::getChildObjectsUsingTemplateid($items, $db_items);
+			$upd_items = self::getUpdChildObjectsUsingTemplateid($items, $db_items, $upd_db_items);
+
+			self::checkDuplicates($upd_items, $upd_db_items);
+		}
+
+		if (count($items) != count($db_items)) {
+			$_upd_db_items = self::getChildObjectsUsingName($items, $hostids);
+
+			if ($_upd_db_items) {
+				$_upd_items = self::getUpdChildObjectsUsingName($items, $db_items, $_upd_db_items);
+
+				$upd_items = array_merge($upd_items, $_upd_items);
+				$upd_db_items += $_upd_db_items;
+			}
+
+			$ins_items = self::getInsChildObjects($items, $_upd_db_items, $tpl_links);
+		}
+
+		self::setChildMasterItemIds($upd_items, $ins_items, $hostids);
+
+		$edit_items = array_merge($upd_items, $ins_items);
+
+		self::checkDependentItems($edit_items, $upd_db_items, true);
+		self::checkInventoryLinks($edit_items, $upd_db_items);
+
+		self::addInterfaceIds($upd_items, $upd_db_items, $ins_items);
+
+		if ($upd_items) {
+			self::updateForce($upd_items, $upd_db_items);
+		}
+
+		if ($ins_items) {
+			self::createForce($ins_items);
+		}
+
+		self::inherit(array_merge($upd_items, $ins_items), $upd_db_items);
+
+		if ($dep_items) {
+			self::inherit($dep_items, [], $hostids, true);
+		}
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 *
+	 * @return array
+	 */
+	private static function getChildObjectsUsingTemplateid(array $items, array $db_items): array {
+		$upd_db_items = DB::select('items', [
+			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
+				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
+			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			'filter' => [
+				'templateid' => array_keys($db_items)
+			],
+			'preservekeys' => true
+		]);
+
+		self::addInternalFields($upd_db_items);
+
+		if ($upd_db_items) {
+			$parent_indexes = array_flip(array_column($items, 'itemid'));
+			$upd_items = [];
+
+			foreach ($upd_db_items as $upd_db_item) {
+				$item = $items[$parent_indexes[$upd_db_item['templateid']]];
+				$db_item = $db_items[$upd_db_item['templateid']];
+
+				$upd_item = [
+					'itemid' => $upd_db_item['itemid'],
+					'type' => $item['type']
+				];
+
+				$upd_item += array_intersect_key([
+					'tags' => [],
+					'preprocessing' => [],
+					'parameters' => []
+				], $db_item);
+
+				$upd_items[] = $upd_item;
+			}
+
+			self::addAffectedObjects($upd_items, $upd_db_items);
+		}
+
+		return $upd_db_items;
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 * @param array $upd_db_items
+	 *
+	 * @return array
+	 */
+	private static function getUpdChildObjectsUsingTemplateid(array $items, array $db_items,
+			array $upd_db_items): array {
+		$parent_indexes = [];
+
+		foreach ($items as $i => &$item) {
+			if (!array_key_exists($item['itemid'], $db_items)) {
+				continue;
+			}
+
+			$item = self::unsetNestedObjectIds($item);
+			$parent_indexes[$item['itemid']] = $i;
+		}
+		unset($item);
+
+		$upd_items = [];
+
+		foreach ($upd_db_items as $upd_db_item) {
+			$item = $items[$parent_indexes[$upd_db_item['templateid']]];
+
+			$upd_items[] = array_intersect_key($upd_db_item,
+				array_flip(['itemid', 'hostid', 'templateid', 'host_status'])
+			) + $item;
+		}
+
+		return $upd_items;
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array|null $hostids
+	 *
+	 * @return array
+	 */
+	private static function getChildObjectsUsingName(array $items, ?array $hostids): array {
+		$hostids_condition = ($hostids !== null) ? ' AND '.dbConditionId('ht.hostid', $hostids) : '';
+		if ($items[0]['itemid'] === '43430') {
+			file_put_contents('test.txt', print_r([], true) . "\n", FILE_APPEND);
+			return [];
+		}
+		$result = DBselect(
+			'SELECT i.itemid,ht.hostid,i.key_,i.templateid,i.flags,h.status AS host_status,'.
+				'ht.templateid AS parent_hostid'.
+			' FROM hosts_templates ht,items i,hosts h'.
+			' WHERE ht.hostid=i.hostid'.
+				' AND ht.hostid=h.hostid'.
+				' AND '.dbConditionId('ht.templateid', array_unique(array_column($items, 'hostid'))).
+				' AND '.dbConditionString('i.key_', array_unique(array_column($items, 'key_'))).
+				$hostids_condition
+		);
+
+		$upd_db_items = [];
+		$parent_indexes = [];
+
+		while ($row = DBfetch($result)) {
+			foreach ($items as $i => $item) {
+				if (bccomp($row['parent_hostid'], $item['hostid']) == 0 && $row['key_'] === $item['key_']) {
+					if ($row['flags'] == $item['flags'] && $row['templateid'] == 0) {
+						$upd_db_items[$row['itemid']] = $row;
+						$parent_indexes[$row['itemid']] = $i;
+					}
+					else {
+						self::showObjectMismatchError($item, $row);
+					}
+				}
+			}
+		}
+
+		if (!$upd_db_items) {
+			return [];
+		}
+
+		$options = [
+			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
+				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
+			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			'itemids' => array_keys($upd_db_items)
+		];
+		$result = DBselect(DB::makeSql('items', $options));
+
+		while ($row = DBfetch($result)) {
+			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];
+		}
+
+		$upd_items = [];
+
+		foreach ($upd_db_items as $upd_db_item) {
+			$item = $items[$parent_indexes[$upd_db_item['itemid']]];
+
+			$upd_items[] = [
+				'itemid' => $upd_db_item['itemid'],
+				'type' => $item['type'],
+				'tags' => [],
+				'preprocessing' => [],
+				'parameters' => []
+			];
+		}
+
+		self::addAffectedObjects($upd_items, $upd_db_items);
+
+		return $upd_db_items;
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 * @param array $upd_db_items
+	 *
+	 * @return array
+	 */
+	private static function getUpdChildObjectsUsingName(array $items, array $db_items, array $upd_db_items): array {
+		$parent_indexes = [];
+
+		foreach ($items as $i => &$item) {
+			if (array_key_exists($item['itemid'], $db_items)) {
+				continue;
+			}
+
+			$item = self::unsetNestedObjectIds($item);
+			$parent_indexes[$item['hostid']][$item['key_']] = $i;
+		}
+		unset($item);
+
+		$upd_items = [];
+
+		foreach ($upd_db_items as $upd_db_item) {
+			$item = $items[$parent_indexes[$upd_db_item['parent_hostid']][$upd_db_item['key_']]];
+
+			$upd_item = [
+				'itemid' => $upd_db_item['itemid'],
+				'hostid' => $upd_db_item['hostid'],
+				'templateid' => $item['itemid'],
+				'host_status' => $upd_db_item['host_status']
+			] + $item;
+
+			$upd_item += [
+				'tags' => [],
+				'preprocessing' => [],
+				'parameters' => []
+			];
+
+			$upd_items[] = $upd_item;
+		}
+
+		return $upd_items;
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $upd_db_items
+	 * @param array $tpl_links
+	 *
+	 * @return array
+	 */
+	private static function getInsChildObjects(array $items, array $upd_db_items, array $tpl_links): array {
+		$ins_items = [];
+
+		foreach ($items as $item) {
+			$item['uuid'] = '';
+			$item = self::unsetNestedObjectIds($item);
+
+			foreach ($tpl_links[$item['hostid']] as $host) {
+				foreach ($upd_db_items as $upd_db_item) {
+					if (bccomp($host['hostid'], $upd_db_item['hostid']) == 0
+							&& $item['key_'] === $upd_db_item['key_']) {
+						continue 2;
+					}
+				}
+
+				$ins_items[] = [
+					'hostid' => $host['hostid'],
+					'templateid' => $item['itemid'],
+					'host_status' => $host['status']
+				] + array_diff_key($item, array_flip(['itemid']));
+			}
+		}
+
+		return $ins_items;
 	}
 
 	/**
@@ -884,7 +1265,8 @@ class CItem extends CItemGeneral {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$result = DBselect(
-			'SELECT ii.itemid,ii.name,ii.templateid,ii.valuemapid,ii.uuid,h.status AS host_status'.
+			'SELECT ii.itemid,ii.name,ii.type,ii.key_,ii.value_type,ii.templateid,ii.uuid,ii.valuemapid,ii.hostid,'.
+				'h.status AS host_status'.
 			' FROM items i,items ii,hosts h'.
 			' WHERE i.itemid=ii.templateid'.
 				' AND ii.hostid=h.hostid'.
@@ -896,24 +1278,44 @@ class CItem extends CItemGeneral {
 
 		$items = [];
 		$db_items = [];
+		$i = 0;
+		$tpl_itemids = [];
 
 		while ($row = DBfetch($result)) {
 			$item = [
 				'itemid' => $row['itemid'],
-				'templateid' => 0,
-				'valuemapid' => 0
+				'type' => $row['type'],
+				'templateid' => 0
 			];
 
 			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
 				$item += ['uuid' => generateUuidV4()];
 			}
 
-			$items[] = $item;
+			if ($row['valuemapid'] != 0) {
+				$item += ['valuemapid' => 0];
+
+				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+					$tpl_itemids[$i] = $row['itemid'];
+					$item += array_intersect_key($row,
+						array_flip(['key_', 'hostid', 'host_status', 'value_type'])
+					);
+				}
+			}
+
+			$items[$i++] = $item;
 			$db_items[$row['itemid']] = $row;
 		}
 
 		if ($items) {
 			self::updateForce($items, $db_items);
+
+			if ($tpl_itemids) {
+				$items = array_intersect_key($items, $tpl_itemids);
+				$db_items = array_intersect_key($db_items, array_flip($tpl_itemids));
+
+				self::inherit($items, $db_items);
+			}
 		}
 	}
 
