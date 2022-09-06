@@ -1213,7 +1213,7 @@ class testUserRolesPermissions extends CWebTest {
 					$menu->query('xpath:.//ul/li/a[text()="Actions"]')->waitUntilClickable()->one()->click();
 				}
 
-			$this->assertEquals($action_status, $menu->exists($data['page']));
+				$this->assertEquals($action_status, $menu->exists($data['page']));
 			}
 
 			if ($action_status) {
