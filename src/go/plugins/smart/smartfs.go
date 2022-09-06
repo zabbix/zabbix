@@ -543,6 +543,9 @@ runner:
 				if raid.rType == satType {
 					dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
 					dp.Info.raidType = raid.rType
+				} else if raid.rType == "aacraid" {
+					dp.Info.Name = fmt.Sprintf("%s %s,0,0,%d", raid.name, raid.rType, i)
+					dp.Info.raidType = fmt.Sprintf("%s,0,0,%d", raid.rType, i)
 				} else {
 					dp.Info.Name = fmt.Sprintf("%s %s,%d", raid.name, raid.rType, i)
 					dp.Info.raidType = fmt.Sprintf("%s,%d", raid.rType, i)
