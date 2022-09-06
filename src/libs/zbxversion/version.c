@@ -38,6 +38,7 @@ int	zbx_get_component_version(const char *version_str)
 {
 	char	*pmid, *plow;
 	char	version_buf[ZBX_VERSION_BUF_LEN];
+	int	patch;
 
 	zbx_strlcpy(version_buf, version_str, sizeof(version_buf));
 
@@ -46,12 +47,14 @@ int	zbx_get_component_version(const char *version_str)
 
 	*pmid++ = '\0';
 
-	if (NULL == (plow = strchr(pmid, '.')))
-		return FAIL;
+	if (NULL != (plow = strchr(pmid, '.')))
+	{
+		*plow++ = '\0';
+		patch = atoi(plow);
+	}
+		patch = 0;
 
-	*plow++ = '\0';
-
-	return ZBX_COMPONENT_VERSION(atoi(version_buf), atoi(pmid), atoi(plow));
+	return ZBX_COMPONENT_VERSION(atoi(version_buf), atoi(pmid), patch);
 }
 
 /******************************************************************************
