@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/CAPITest.php';
 
 /**
- * @backup media_type, config, profiles
+ * @backup media_type, auditlog, config, profiles
  *
  * @onBefore deleteAuditlog
  */
