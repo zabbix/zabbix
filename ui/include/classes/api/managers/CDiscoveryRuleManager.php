@@ -34,7 +34,7 @@ class CDiscoveryRuleManager {
 		$parent_itemids = $ruleids;
 		$child_ruleids = [];
 		do {
-			$db_items = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parent_itemids));
+			$db_items = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionId('i.templateid', $parent_itemids));
 			$parent_itemids = [];
 			while ($db_item = DBfetch($db_items)) {
 				$parent_itemids[$db_item['itemid']] = $db_item['itemid'];
@@ -45,12 +45,12 @@ class CDiscoveryRuleManager {
 		$ruleids = array_merge($ruleids, $child_ruleids);
 
 		// Delete item prototypes.
-		$db_items = DBfetchArray(DBselect(
+		$db_items = DBfetchArrayAssoc(DBselect(
 			'SELECT id.itemid,i.name'.
 			' FROM item_discovery id,items i'.
 			' WHERE id.itemid=i.itemid'.
-				' AND '.dbConditionInt('parent_itemid', $ruleids)
-		));
+				' AND '.dbConditionId('parent_itemid', $ruleids)
+		), 'itemid');
 
 		if ($db_items) {
 			CItemPrototype::deleteForce($db_items);
@@ -61,7 +61,7 @@ class CDiscoveryRuleManager {
 			'SELECT hd.hostid,h.host'.
 			' FROM host_discovery hd,hosts h'.
 			' WHERE hd.hostid=h.hostid'.
-				' AND '.dbConditionInt('hd.parent_itemid', $ruleids)
+				' AND '.dbConditionId('hd.parent_itemid', $ruleids)
 		), 'hostid');
 
 		if ($db_host_prototypes) {
