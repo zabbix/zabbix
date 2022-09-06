@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-05T13:11:01Z'
+  date: '2022-09-06T16:29:40Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -133,8 +133,15 @@ zabbix_export:
             };
             
             var result,
-                data = {};
-                data['errors'] = {};
+                data = {},
+                types = [
+                    {"method": "Microsoft.Compute/virtualMachines", "version": "2022-03-01"}, 
+                    {"method": "Microsoft.DBforMySQL/flexibleServers", "version": "2021-05-01"}, 
+                    {"method": "Microsoft.DBforMySQL/servers", "version": "2017-12-01"}
+                ];
+                data['errors'] = {},
+                data['resources'] = {};
+                data.resources.value = [];
             
             try {
                 Azure.setParams(JSON.parse(value));
@@ -157,35 +164,24 @@ zabbix_export:
             
                 if (!('auth' in data.errors)) {
                     try {
-                        raw_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.Compute/virtualMachines?api-version=2022-03-01');
-            
-                        mysql_flex_db_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.DBforMySQL/flexibleServers?api-version=2021-05-01');
-            
-                        mysql_flex_db_data.value.forEach(function (value) {
-                            raw_data.value.push(value);
-                        });
-            
-                        mysql_db_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.DBforMySQL/servers?api-version=2017-12-01');
-            
-                        mysql_db_data.value.forEach(function (value) {
-                            raw_data.value.push(value);
-                        });
-            
-                        if ('nextLink' in raw_data) {
-                            next_data = raw_data;
-                            while ('nextLink' in next_data) {
-                                next_data = Azure.request(next_data.nextLink);
-                                next_data.value.forEach(function (value) {
-                                    raw_data.value.push(value);
-                                });
-                            }
-                        }
+                        for (var i in types) {
+                            raw_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
                         
-                        raw_data.value.forEach(function (value) {
-                            value.resourceGroup = value.id.split("/")[4];
-                        });
-            
-                        data.resources = raw_data;
+                            if ('nextLink' in raw_data) {
+                                next_data = raw_data;
+                                while ('nextLink' in next_data) {
+                                    next_data = Azure.request(next_data.nextLink);
+                                    next_data.value.forEach(function (value) {
+                                        raw_data.value.push(value);
+                                    });
+                                }
+                            }
+                        
+                            raw_data.value.forEach(function (value) {
+                                value.resourceGroup = value.id.split("/")[4];
+                                data.resources.value.push(value);
+                            });
+                        }
                     }
                     catch (error) {
                         data.errors.resources = error.toString();
@@ -280,7 +276,7 @@ zabbix_export:
                     name: Databases
               templates:
                 -
-                  name: 'Azure MySQL flexible servers by HTTP'
+                  name: 'Azure MySQL flexible server by HTTP'
               macros:
                 -
                   macro: '{$AZURE.RESOURCE_ID}'
@@ -383,7 +379,7 @@ zabbix_export:
                     name: Databases
               templates:
                 -
-                  name: 'Azure MySQL single servers by HTTP'
+                  name: 'Azure MySQL single server by HTTP'
               macros:
                 -
                   macro: '{$AZURE.RESOURCE_ID}'
@@ -604,8 +600,8 @@ zabbix_export:
           description: 'This macro used in virtual machines discovery rule.'
     -
       uuid: ec92c7b0b1d14946b6ac61de89357199
-      template: 'Azure MySQL flexible servers by HTTP'
-      name: 'Azure MySQL flexible servers by HTTP'
+      template: 'Azure MySQL flexible server by HTTP'
+      name: 'Azure MySQL flexible server by HTTP'
       description: |
         The template to monitor Microsoft Azure virtual machines by HTTP.
         It works without any external scripts and uses the script item.
@@ -706,7 +702,7 @@ zabbix_export:
           triggers:
             -
               uuid: e822fd2214fb41db9b57cdb8eec0444a
-              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=1'
+              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=1'
               name: 'Azure MySQL: MySQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -717,7 +713,7 @@ zabbix_export:
                   value: availability
             -
               uuid: ebb35037a5b646a0bd2c6be44bb1f3c6
-              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=3'
+              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=3'
               name: 'Azure MySQL: MySQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -728,7 +724,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 240b861c09a94e209036782b6c7496fa
-              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=2'
+              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=2'
               name: 'Azure MySQL: MySQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
@@ -863,7 +859,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5af82cc95239479c86c7ab3dabcfb592
-              expression: 'min(/Azure MySQL flexible servers by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              expression: 'min(/Azure MySQL flexible server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure MySQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -900,7 +896,7 @@ zabbix_export:
           triggers:
             -
               uuid: 98c1b86b79e9469cac2870fb2ba42949
-              expression: 'length(last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.data.errors))>0'
+              expression: 'length(last(/Azure MySQL flexible server by HTTP/azure.db.mysql.data.errors))>0'
               name: 'Azure MySQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1130,7 +1126,7 @@ zabbix_export:
           triggers:
             -
               uuid: 89c031f356084208ae33d695a53b8d3e
-              expression: 'min(/Azure MySQL flexible servers by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
+              expression: 'min(/Azure MySQL flexible server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
               name: 'Azure MySQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1297,7 +1293,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1703edc1553644e5aa25d35928c5eafd
-              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
               name: 'Azure MySQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1308,7 +1304,7 @@ zabbix_export:
                   value: capacity
             -
               uuid: a2ec23a5e77c40aa9e45d214f4e06ca1
-              expression: 'last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
               name: 'Azure MySQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -1401,8 +1397,8 @@ zabbix_export:
               newvalue: Unknown
     -
       uuid: c1396bf1e8cf46f6a407e88ddceef0b8
-      template: 'Azure MySQL single servers by HTTP'
-      name: 'Azure MySQL single servers by HTTP'
+      template: 'Azure MySQL single server by HTTP'
+      name: 'Azure MySQL single server by HTTP'
       description: |
         The template to monitor Microsoft Azure virtual machines by HTTP.
         It works without any external scripts and uses the script item.
@@ -1503,7 +1499,7 @@ zabbix_export:
           triggers:
             -
               uuid: 91a32645266547d78df3a70b44c7782b
-              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=1'
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=1'
               name: 'Azure MySQL: MySQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1514,7 +1510,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 852aba88476a40aeb2170b933726b7d8
-              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=3'
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=3'
               name: 'Azure MySQL: MySQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -1525,7 +1521,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 5f2d2254dfc24f5481207585bed0d933
-              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=2'
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=2'
               name: 'Azure MySQL: MySQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
@@ -1599,7 +1595,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7115fb320e2b4cc1ad1739c8a6cee155
-              expression: 'min(/Azure MySQL single servers by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure MySQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -1636,7 +1632,7 @@ zabbix_export:
           triggers:
             -
               uuid: df5fa33f8c13413bb9d61ea4470b9b2d
-              expression: 'length(last(/Azure MySQL single servers by HTTP/azure.db.mysql.data.errors))>0'
+              expression: 'length(last(/Azure MySQL single server by HTTP/azure.db.mysql.data.errors))>0'
               name: 'Azure MySQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1865,7 +1861,7 @@ zabbix_export:
           triggers:
             -
               uuid: a67b35f1ac674d6692b0b2bcd6f89bd8
-              expression: 'min(/Azure MySQL single servers by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
+              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
               name: 'Azure MySQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -2014,7 +2010,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3afcb840e8004822a2dada2a89971f69
-              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
               name: 'Azure MySQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -2025,7 +2021,7 @@ zabbix_export:
                   value: capacity
             -
               uuid: 2e605f906b284f769e7c880d4e642b43
-              expression: 'last(/Azure MySQL single servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
               name: 'Azure MySQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -3837,19 +3833,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL flexible servers by HTTP'
+            host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.connections.active
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL flexible servers by HTTP'
+            host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.connections.total
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Azure MySQL flexible servers by HTTP'
+            host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.connections.aborted
     -
       uuid: 360a24b56be74cf48df3135008437824
@@ -3858,13 +3854,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL single servers by HTTP'
+            host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.connections.active
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL single servers by HTTP'
+            host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.connections.failed
     -
       uuid: f929f47602734f82a79f22a5f4446f61
@@ -3873,13 +3869,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL flexible servers by HTTP'
+            host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.network.egress
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL flexible servers by HTTP'
+            host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.network.ingress
     -
       uuid: dc6840162405481ebc1c3c98fdfcaef1
@@ -3888,13 +3884,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL single servers by HTTP'
+            host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.network.egress
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL single servers by HTTP'
+            host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.network.ingress
     -
       uuid: 3fcf43fd338e4902874d940fc0bec8b9
@@ -3903,13 +3899,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL single servers by HTTP'
+            host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.storage.server.log.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL single servers by HTTP'
+            host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.storage.server.log.limit
     -
       uuid: bdc178e6faaa4850badc0c60c7c80d40
@@ -3918,13 +3914,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL single servers by HTTP'
+            host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.storage.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL single servers by HTTP'
+            host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.storage.limit
     -
       uuid: 4210e6b4ed8744589dce88217e961a56
@@ -3933,11 +3929,11 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL flexible servers by HTTP'
+            host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.storage.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL flexible servers by HTTP'
+            host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.storage.limit

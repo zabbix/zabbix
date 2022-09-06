@@ -192,7 +192,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 
-# Azure MySQL flexible servers by HTTP
+# Azure MySQL flexible server by HTTP
 
 ## Overview
 
@@ -268,14 +268,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
-|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
-|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
-|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
-|Azure MySQL: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL flexible servers by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL flexible servers by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
-|Azure MySQL: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
-|Azure MySQL: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL flexible servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL flexible server by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
+|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
+|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
+|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
+|Azure MySQL: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
@@ -283,7 +283,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 
-# Azure MySQL single servers by HTTP
+# Azure MySQL single server by HTTP
 
 ## Overview
 
@@ -358,14 +358,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL single servers by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
-|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
-|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
-|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
-|Azure MySQL: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL single servers by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL single servers by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
-|Azure MySQL: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
-|Azure MySQL: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL single servers by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL single server by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
+|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
+|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
+|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
+|Azure MySQL: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
