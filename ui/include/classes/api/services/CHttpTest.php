@@ -651,12 +651,11 @@ class CHttpTest extends CApiService {
 			$del_httpstepids[] = $db_httpstepitem['httpstepid'];
 		}
 
-		if ($del_itemids) {
-			DB::delete('httpstepitem', ['httpstepid' => $del_httpstepids]);
-			DB::delete('httptestitem', ['httptestid' => $del_httptestids]);
+		DB::delete('httpstepitem', ['httpstepid' => $del_httpstepids]);
 
-			CItemManager::delete($del_itemids);
-		}
+		DB::delete('httptestitem', ['httptestid' => $del_httptestids]);
+
+		CItemManager::delete($del_itemids);
 
 		DB::delete('httptest_field', ['httptestid' => $del_httptestids]);
 
