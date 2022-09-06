@@ -214,19 +214,7 @@ class testFormHost extends CWebTest {
 				]
 			],
 			[
-				'host' => 'testFormHost clone with secret Macros',
-				'groups' => $groups,
-				'macros' => [
-					[
-						'macro' => '{$USER_MACRO}',
-						'value' => 'secret',
-						'description' => 'secret text',
-						'type' => '1'
-					]
-				]
-			],
-			[
-				'host' => 'testFormHost full clone with secret Macros',
+				'host' => 'testFormHost with secret Macro',
 				'groups' => $groups,
 				'macros' => [
 					[
@@ -1639,6 +1627,20 @@ class testFormHost extends CWebTest {
 		return [
 			[
 				[
+					'host' => 'testFormHost with secret Macro',
+					'items' => 0,
+					'fields'  => [
+						'Host name' => microtime().' clone with secret Macros'
+					],
+					'expected' => TEST_ERROR,
+					'error' => 'The cloned host contains user defined macros with type "Secret text".'.
+					' The value and type of these macros were reset.'
+				]
+			],
+			[
+				[
+					'host' => 'testFormHost with items',
+					'items' => 3,
 					'fields' => [
 						'Host name' => microtime().' clone without interface changes'
 					]
@@ -1646,33 +1648,35 @@ class testFormHost extends CWebTest {
 			],
 			[
 				[
+					'host' => 'testFormHost with items',
+					'items' => 3,
 					'fields' => [
-					'Host name' => microtime().' clone with interface changes',
-					'Visible name' => microtime().'😀😀😀',
-					'Description' => '😀😀😀😀😀😀😀',
-					'Interfaces' => [
-						[
-							'action' => USER_ACTION_ADD,
-							'type' => 'SNMP',
-							'ip' => '127.3.3.3',
-							'dns' => '',
-							'Connect to' => 'IP',
-							'port' => '122',
-							'SNMP version' => 'SNMPv3',
-							'Context name' => 'zabbix',
-							'Security name' => 'selenium',
-							'Security level' => 'authPriv',
-							'Authentication protocol' => 'SHA256',
-							'Authentication passphrase' => 'test123',
-							'Privacy protocol' => 'AES256',
-							'Privacy passphrase' => '456test',
-							'Use bulk requests' => false
+						'Host name' => microtime().' clone with interface changes',
+						'Visible name' => microtime().'😀😀😀',
+						'Description' => '😀😀😀😀😀😀😀',
+						'Interfaces' => [
+							[
+								'action' => USER_ACTION_ADD,
+								'type' => 'SNMP',
+								'ip' => '127.3.3.3',
+								'dns' => '',
+								'Connect to' => 'IP',
+								'port' => '122',
+								'SNMP version' => 'SNMPv3',
+								'Context name' => 'zabbix',
+								'Security name' => 'selenium',
+								'Security level' => 'authPriv',
+								'Authentication protocol' => 'SHA256',
+								'Authentication passphrase' => 'test123',
+								'Privacy protocol' => 'AES256',
+								'Privacy passphrase' => '456test',
+								'Use bulk requests' => false
+							]
 						]
 					]
 				]
 			]
-		]
-	];
+		];
 	}
 
 	/**
@@ -1681,9 +1685,9 @@ class testFormHost extends CWebTest {
 	 * @param array     $data		   data provider with fields values
 	 * @param string    $button        Clone or Full clone
 	 */
-	public function cloneHost($data, $button = 'Clone', $host = 'testFormHost with items') {
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
-		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
+	public function cloneHost($data, $button = 'Clone') {
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host']));
+		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $data['host']);
 
 		// Get values from form.
 		$form->fill($data['fields']);
