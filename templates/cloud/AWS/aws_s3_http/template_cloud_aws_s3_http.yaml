@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-28T10:12:33Z'
+  date: '2022-08-31T22:51:40Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -439,6 +439,8 @@ zabbix_export:
             
                         payload.NextToken = alarms.DescribeAlarmsResponse.DescribeAlarmsResult.NextToken || '';
             
+                        if (!Array.isArray(alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms))
+                            alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms = [alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms]
                         alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms.forEach(function (alarm) {
                             var dimensions = alarm.Dimensions;
             
