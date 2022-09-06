@@ -652,17 +652,22 @@ class CHttpTest extends CApiService {
 		}
 
 		if ($del_itemids) {
-			DB::delete('httptestitem', ['itemid' => $del_itemids]);
-			DB::delete('httpstepitem', ['itemid' => $del_itemids]);
+			DB::delete('httpstepitem', ['httpstepid' => $del_httpstepids]);
+			DB::delete('httptestitem', ['httptestid' => $del_httptestids]);
 
 			CItemManager::delete($del_itemids);
 		}
 
-		DB::delete('httpstep_field', ['httpstepid' => $del_httpstepids]);
-
 		DB::delete('httptest_field', ['httptestid' => $del_httptestids]);
 
-		DB::delete('httpstep', ['httptestid' => $del_httptestids]);
+		DB::delete('httpstep_field', ['httpstepid' => $del_httpstepids]);
+
+		DB::delete('httpstep', ['httpstepid' => $del_httpstepids]);
+
+		DB::update('httptest', [
+			'values' => ['templateid' => null],
+			'where' => ['httptestid' => $del_httptestids]
+		]);
 
 		DB::delete('httptest', ['httptestid' => $del_httptestids]);
 
