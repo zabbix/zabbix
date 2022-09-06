@@ -423,11 +423,11 @@ typedef struct
 	/* the result of query */
 	char				*value;
 
-#define ZBX_VMWARE_CQ_NEW	0
-#define ZBX_VMWARE_CQ_READY	1
-#define ZBX_VMWARE_CQ_ERROR	2
-#define ZBX_VMWARE_CQ_PAUSED	4
-#define ZBX_VMWARE_CQ_SEPARATE	8
+#define ZBX_VMWARE_CQ_NEW		0
+#define ZBX_VMWARE_CQ_READY		1
+#define ZBX_VMWARE_CQ_ERROR		2
+#define ZBX_VMWARE_CQ_PAUSED		4
+#define ZBX_VMWARE_CQ_SEPARATE		8
 	/* the state of query */
 	unsigned char			state;
 

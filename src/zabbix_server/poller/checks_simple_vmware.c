@@ -308,8 +308,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		perfcounter->last_used = time(NULL);
 	}
 
-	if (0 != (perfcounter->state & ZBX_VMWARE_COUNTER_CUSTOM) &&
-			0 != (perfcounter->state & ZBX_VMWARE_COUNTER_NOTSUPPORTED))
+	if (0 != (perfcounter->state & ZBX_VMWARE_COUNTER_NOTSUPPORTED))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter not supported or data not ready."));
 		goto out;
@@ -658,18 +657,20 @@ static int	custquery_read_result(zbx_vmware_cust_query_t *custom_query, AGENT_RE
 	}
 
 	if (0 != (custom_query->state & ZBX_VMWARE_CQ_READY))
+	{
 		SET_STR_RESULT(result, zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(custom_query->value)));
 
-	if (0 != (custom_query->state & ZBX_VMWARE_CQ_PAUSED))
-		custom_query->state &= (unsigned char)~ZBX_VMWARE_CQ_PAUSED;
+		if (0 != (custom_query->state & ZBX_VMWARE_CQ_PAUSED))
+			custom_query->state &= (unsigned char)~ZBX_VMWARE_CQ_PAUSED;
 
-	if (NULL != custom_query->value && '\0' != *custom_query->value &&
-			0 != (custom_query->state & ZBX_VMWARE_CQ_SEPARATE))
-	{
-		custom_query->state &= (unsigned char)~ZBX_VMWARE_CQ_SEPARATE;
+		if (NULL != custom_query->value && '\0' != *custom_query->value &&
+				0 != (custom_query->state & ZBX_VMWARE_CQ_SEPARATE))
+		{
+			custom_query->state &= (unsigned char)~ZBX_VMWARE_CQ_SEPARATE;
+		}
+
+		custom_query->last_pooled = time(NULL);
 	}
-
-	custom_query->last_pooled = time(NULL);
 
 	return SYSINFO_RET_OK;
 }

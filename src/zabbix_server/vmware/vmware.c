@@ -269,8 +269,10 @@ static zbx_uint64_t	evt_req_chunk_size;
 
 #define ZBX_XPATH_FAULT_SLOW(max_len)									\
 	"concat(substring(" ZBX_XPATH_FAULT_FAST("faultstring")",1," ZBX_STR(max_len) "),"		\
-	"substring(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]"					\
-	"),1," ZBX_STR(max_len) " * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ")=0)))"
+	"substring(concat(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]),':',"			\
+	"//*[local-name()='name']),1,"									\
+	ZBX_STR(max_len) " * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ")=0)"		\
+	"* number(string-length(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]) )>0)))"
 
 #define ZBX_XPATH_REFRESHRATE()										\
 	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
@@ -5949,8 +5951,13 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	vmware_service_get_hv_pnics_data(details, &hv->pnics);
 	zbx_vector_str_create(&hv->alarm_ids);
-	vmware_service_get_alarms_data(__func__, service, easyhandle, details, NULL, &hv->alarm_ids, alarms_data,
-			error);
+
+	if (FAIL == vmware_service_get_alarms_data(__func__, service, easyhandle, details, NULL, &hv->alarm_ids,
+			alarms_data, error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot get hv %s alarms: %s.", hv->id, *error);
+		zbx_str_free(*error);
+	}
 
 	if (NULL != (value = zbx_xml_doc_read_value(details, "//*[@type='" ZBX_VMWARE_SOAP_CLUSTER "']")))
 		hv->clusterid = value;
@@ -6169,7 +6176,8 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 				nodeset->nodeTab[i], ZBX_XPATH_PROP_NAME_NODE("triggeredAlarmState")),
 				&datacenter->alarm_ids, alarms_data, &error))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get datacenter alarms: %s.", __func__, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get datacenter %s alarms: %s.", __func__,
+					datacenter->id, error);
 			zbx_str_free(error);
 		}
 
@@ -6443,6 +6451,9 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 		ZBX_XPATH_PROP_OBJECT_ID(object, "[text()='" id "']") "/"			\
 		ZBX_XPATH_PROP_NAME_NODE("triggeredAlarmState")
 
+#define ZBX_XPATH_GET_OBJS(type)								\
+		"//*[local-name()='objects']/*[local-name()='obj' and @type='" type "']"
+
 	char				tmp[MAX_STRING_LEN * 2];
 	int				ret = FAIL;
 	xmlDoc				*doc = NULL;
@@ -6461,11 +6472,11 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 	}
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type)
-		zbx_xml_read_values(doc, "//*[@type='HostSystem']", hvs);
+		zbx_xml_read_values(doc, ZBX_XPATH_GET_OBJS(ZBX_VMWARE_SOAP_HV) , hvs);
 	else
 		zbx_vector_str_append(hvs, zbx_strdup(NULL, "ha-host"));
 
-	zbx_xml_read_values(doc, "//*[@type='Datastore']", dss);
+	zbx_xml_read_values(doc, ZBX_XPATH_GET_OBJS(ZBX_VMWARE_SOAP_DS), dss);
 	vmware_service_get_datacenters_list(service, easyhandle, doc, alarms_data, datacenters);
 	vmware_service_get_dvswitch_list(doc, dvswitches);
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_ROOT_ALARMS(ZBX_VMWARE_SOAP_FOLDER, "%s"),
@@ -6486,9 +6497,9 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 			goto out;
 
 		if (ZBX_VMWARE_TYPE_VCENTER == service->type)
-			zbx_xml_read_values(doc, "//*[@type='HostSystem']", hvs);
+			zbx_xml_read_values(doc, ZBX_XPATH_GET_OBJS(ZBX_VMWARE_SOAP_HV), hvs);
 
-		zbx_xml_read_values(doc, "//*[@type='Datastore']", dss);
+		zbx_xml_read_values(doc, ZBX_XPATH_GET_OBJS(ZBX_VMWARE_SOAP_DS), dss);
 		vmware_service_get_datacenters_list(service, easyhandle, doc, alarms_data, datacenters);
 		vmware_service_get_dvswitch_list(doc, dvswitches);
 
@@ -6508,6 +6519,7 @@ out:
 
 	return ret;
 
+#	undef ZBX_XPATH_GET_OBJS
 #	undef ZBX_XPATH_GET_ROOT_ALARMS
 #	undef ZBX_POST_VCENTER_HV_DS_LIST
 }
@@ -8323,6 +8335,7 @@ static char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values,
 		zbx_vector_cq_value_append(cqvs, cq);
 	}
 
+
 	return buff;
 }
 /******************************************************************************
@@ -8960,6 +8973,12 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 
 				counter = (zbx_vmware_perf_counter_t *)entity->counters.values[j];
 
+				if (0 != (counter->state & ZBX_VMWARE_COUNTER_CUSTOM) &&
+						0 == (counter->state & ZBX_VMWARE_COUNTER_ACCEPTABLE))
+				{
+					continue;
+				}
+
 				zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
 						"<ns0:metricId><ns0:counterId>" ZBX_FS_UI64
 						"</ns0:counterId><ns0:instance>%s</ns0:instance></ns0:metricId>",
@@ -9046,7 +9065,8 @@ static int	vmware_perf_counters_expired_remove(zbx_vector_ptr_t *counters)
 		if (0 == (counter->state & ZBX_VMWARE_COUNTER_CUSTOM))
 			continue;
 
-		if ((0 != (counter->state & ZBX_VMWARE_COUNTER_NOTSUPPORTED) &&
+		if (0 == counter->last_used ||
+				(0 != (counter->state & ZBX_VMWARE_COUNTER_NOTSUPPORTED) &&
 				now - SEC_PER_HOUR * 2 < counter->last_used) ||
 				(0 == (counter->state & ZBX_VMWARE_COUNTER_NOTSUPPORTED) &&
 				now - SEC_PER_DAY < counter->last_used))
@@ -9097,7 +9117,8 @@ static int	vmware_perf_available_update(zbx_vmware_service_t *service, CURL *eas
 	xmlDoc			*doc = NULL;
 	zbx_vector_str_t	counters;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s begin_time:%s interval:%d", __func__, type, id,
+			begin_time, refresh);
 
 	zbx_vector_str_create(&counters);
 
@@ -9160,6 +9181,9 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 	int	i;
 	char	begin_time[ZBX_XML_DATETIME];
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() entities:%d perf_available:%d", __func__,
+			entities->values_num, perf_available->values_num);
+
 	*begin_time = '\0';
 
 	for (i = 0; i < entities->values_num ; i++)
@@ -9172,7 +9196,7 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 		for (j = 0; j < entity->counters.values_num; j++)
 		{
 			int				k;
-			char				*err;
+			char				*err = NULL;
 			zbx_vmware_perf_counter_t	*counter;
 			zbx_vmware_perf_available_t	*perf, perf_cmp = {.type = entity->type, .id = entity->id};
 
@@ -9194,16 +9218,18 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 				strftime(begin_time, sizeof(begin_time), "%Y-%m-%dT%TZ", &st);
 			}
 
-			if (FAIL == (k = zbx_vector_perf_available_bsearch(
-					perf_available, &perf_cmp, vmware_perf_available_compare)) &&
-					FAIL == vmware_perf_available_update(service, easyhandle, entity->type,
+			if (FAIL != (k = zbx_vector_perf_available_bsearch(
+					perf_available, &perf_cmp, vmware_perf_available_compare)))
+			{
+				perf = perf_available->values[k];
+			}
+			else if (FAIL == vmware_perf_available_update(service, easyhandle, entity->type,
 					entity->id, entity->refresh, begin_time, perf_available, &perf, &err))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "%s() cache update error: %s", __func__, err);
+				zbx_str_free(err);
 				return;
 			}
-			else
-				perf = perf_available->values[k];
 
 			if (FAIL == zbx_vector_uint16_bsearch(&perf->list, (uint16_t)counter->counterid,
 					vmware_uint16_compare))
@@ -9214,8 +9240,15 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 			{
 				counter->state |= ZBX_VMWARE_COUNTER_ACCEPTABLE;
 			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s id:%s counterid:" ZBX_FS_UI64 " state:%X %s",
+					__func__, entity->type, entity->id, counter->counterid, counter->state,
+					0 == (counter->state & ZBX_VMWARE_COUNTER_ACCEPTABLE) ?
+					"NOTSUPPORTED" : "ACCEPTABLE");
 		}
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -9327,8 +9360,8 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service)
 
 			counter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
 
-			if (0 == (counter->state & ZBX_VMWARE_COUNTER_CUSTOM) ||
-					0 != (counter->state & ZBX_VMWARE_COUNTER_ACCEPTABLE))
+			if (0 == (counter->state & ZBX_VMWARE_COUNTER_CUSTOM) || 0 != (counter->state &
+					(ZBX_VMWARE_COUNTER_ACCEPTABLE | ZBX_VMWARE_COUNTER_NOTSUPPORTED)))
 			{
 				continue;
 			}
@@ -9354,6 +9387,30 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service)
 					"type:%s id:%s", entity->type, entity->id);
 			continue;
 		}
+
+		/* pre-check acceptable counters */
+		for (i = 0; i < entity->counters.values_num; i++)
+		{
+			zbx_vmware_perf_counter_t	*counter;
+
+			counter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
+
+			if (0 != (counter->state & ZBX_VMWARE_COUNTER_CUSTOM) &&
+					0 == (counter->state & ZBX_VMWARE_COUNTER_ACCEPTABLE))
+			{
+				continue;
+			}
+
+			break;
+		}
+
+		if (i == entity->counters.values_num)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "skipping performance entity with type:%s id:%s: "
+					"unsupported counters", entity->type, entity->id);
+			continue;
+		}
+
 
 		if (ZBX_VMWARE_PERF_INTERVAL_NONE == entity->refresh)
 			zbx_vector_ptr_append(&hist_entities, entity);
@@ -9629,7 +9686,8 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 	if (*ZBX_VMWARE_PERF_QUERY_ALL != *pentity->query_instance)
 		counter->query_instance = vmware_shared_strdup(instance);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s counter state:%X", __func__, zbx_result_string(ret),
+			counter->state);
 
 	return ret;
 }
