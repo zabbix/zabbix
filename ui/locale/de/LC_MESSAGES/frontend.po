@@ -13853,6 +13853,10 @@ msgstr "Übergeordnete Suchlaufregeln"
 msgid "Parent graphs"
 msgstr "Übergeordnete Diagramme"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 # Es geht hier (auch?) um Templates
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
