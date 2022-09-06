@@ -895,12 +895,18 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		if (count($items) != count($db_items)) {
+			foreach ($items as $i => $item) {
+				if (array_key_exists($item['itemid'], $db_items)) {
+					unset($items[$i]);
+				}
+			}
+
 			$lld_links = self::getLldLinks($items);
 
 			$_upd_db_items = self::getChildObjectsUsingName($items, $hostids, $lld_links);
 
 			if ($_upd_db_items) {
-				$_upd_items = self::getUpdChildObjectsUsingName($items, $db_items, $_upd_db_items);
+				$_upd_items = self::getUpdChildObjectsUsingName($items, $_upd_db_items);
 
 				$upd_items = array_merge($upd_items, $_upd_items);
 				$upd_db_items += $_upd_db_items;
@@ -1069,7 +1075,7 @@ class CItemPrototype extends CItemGeneral {
 			foreach ($items as $i => $item) {
 				if (bccomp($row['parent_hostid'], $item['hostid']) == 0 && $row['key_'] === $item['key_']) {
 					if ($row['flags'] == $item['flags'] && $row['templateid'] == 0
-							&& bccomp($row['ruleid'], $lld_links[$item['ruleid']][$row['parent_hostid']])) {
+							&& bccomp($row['ruleid'], $lld_links[$item['ruleid']][$row['hostid']]) == 0) {
 						$upd_db_items[$row['itemid']] = $row;
 						$parent_indexes[$row['itemid']] = $i;
 					}
@@ -1117,19 +1123,14 @@ class CItemPrototype extends CItemGeneral {
 
 	/**
 	 * @param array $items
-	 * @param array $db_items
 	 * @param array $upd_db_items
 	 *
 	 * @return array
 	 */
-	private static function getUpdChildObjectsUsingName(array $items, array $db_items, array $upd_db_items): array {
+	private static function getUpdChildObjectsUsingName(array $items, array $upd_db_items): array {
 		$parent_indexes = [];
 
 		foreach ($items as $i => &$item) {
-			if (array_key_exists($item['itemid'], $db_items)) {
-				continue;
-			}
-
 			$item = self::unsetNestedObjectIds($item);
 			$parent_indexes[$item['hostid']][$item['key_']] = $i;
 		}
@@ -1188,7 +1189,8 @@ class CItemPrototype extends CItemGeneral {
 			: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" and LLD rule "%3$s" to template "%4$s", because an item prototype with the same key already belongs to LLD rule "%5$s".');
 
 		self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $upd_db_item['key_'], $hosts[$item['hostid']]['host'],
-			$lld_rules[$item['ruleid']], $hosts[$upd_db_item['hostid']]['host'], $lld_rules[$upd_db_item['ruleid']]
+			$lld_rules[$item['ruleid']]['name'], $hosts[$upd_db_item['hostid']]['host'],
+			$lld_rules[$upd_db_item['ruleid']]['name']
 		));
 	}
 
@@ -1203,16 +1205,20 @@ class CItemPrototype extends CItemGeneral {
 	private static function getInsChildObjects(array $items, array $upd_db_items, array $tpl_links, array $lld_links): array {
 		$ins_items = [];
 
+		$upd_item_keys = [];
+
+		foreach ($upd_db_items as $upd_db_item) {
+			$upd_item_keys[$upd_db_item['hostid']][] = $upd_db_item['key_'];
+		}
+
 		foreach ($items as $item) {
 			$item['uuid'] = '';
 			$item = self::unsetNestedObjectIds($item);
 
 			foreach ($tpl_links[$item['hostid']] as $host) {
-				foreach ($upd_db_items as $upd_db_item) {
-					if (bccomp($host['hostid'], $upd_db_item['hostid']) == 0
-							&& $item['key_'] === $upd_db_item['key_']) {
-						continue 2;
-					}
+				if (array_key_exists($host['hostid'], $upd_item_keys)
+						&& in_array($item['key_'], $upd_item_keys[$host['hostid']])) {
+					continue;
 				}
 
 				$ins_items[] = [

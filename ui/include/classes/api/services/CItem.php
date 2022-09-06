@@ -988,10 +988,16 @@ class CItem extends CItemGeneral {
 		}
 
 		if (count($items) != count($db_items)) {
+			foreach ($items as $i => $item) {
+				if (array_key_exists($item['itemid'], $db_items)) {
+					unset($items[$i]);
+				}
+			}
+
 			$_upd_db_items = self::getChildObjectsUsingName($items, $hostids);
 
 			if ($_upd_db_items) {
-				$_upd_items = self::getUpdChildObjectsUsingName($items, $db_items, $_upd_db_items);
+				$_upd_items = self::getUpdChildObjectsUsingName($items, $_upd_db_items);
 
 				$upd_items = array_merge($upd_items, $_upd_items);
 				$upd_db_items += $_upd_db_items;
@@ -1179,19 +1185,14 @@ class CItem extends CItemGeneral {
 
 	/**
 	 * @param array $items
-	 * @param array $db_items
 	 * @param array $upd_db_items
 	 *
 	 * @return array
 	 */
-	private static function getUpdChildObjectsUsingName(array $items, array $db_items, array $upd_db_items): array {
+	private static function getUpdChildObjectsUsingName(array $items, array $upd_db_items): array {
 		$parent_indexes = [];
 
 		foreach ($items as $i => &$item) {
-			if (array_key_exists($item['itemid'], $db_items)) {
-				continue;
-			}
-
 			$item = self::unsetNestedObjectIds($item);
 			$parent_indexes[$item['hostid']][$item['key_']] = $i;
 		}
@@ -1231,16 +1232,20 @@ class CItem extends CItemGeneral {
 	private static function getInsChildObjects(array $items, array $upd_db_items, array $tpl_links): array {
 		$ins_items = [];
 
+		$upd_item_keys = [];
+
+		foreach ($upd_db_items as $upd_db_item) {
+			$upd_item_keys[$upd_db_item['hostid']][] = $upd_db_item['key_'];
+		}
+
 		foreach ($items as $item) {
 			$item['uuid'] = '';
 			$item = self::unsetNestedObjectIds($item);
 
 			foreach ($tpl_links[$item['hostid']] as $host) {
-				foreach ($upd_db_items as $upd_db_item) {
-					if (bccomp($host['hostid'], $upd_db_item['hostid']) == 0
-							&& $item['key_'] === $upd_db_item['key_']) {
-						continue 2;
-					}
+				if (array_key_exists($host['hostid'], $upd_item_keys)
+						&& in_array($item['key_'], $upd_item_keys[$host['hostid']])) {
+					continue;
 				}
 
 				$ins_items[] = [
