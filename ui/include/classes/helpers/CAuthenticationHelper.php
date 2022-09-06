@@ -39,8 +39,6 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	public const SAML_AUTH_ENABLED = 'saml_auth_enabled';
 	public const SAML_CASE_SENSITIVE = 'saml_case_sensitive';
 	public const SAML_JIT_STATUS = 'saml_jit_status';
-	public const SAML_SETTINGS = 'saml_settings';
-	public const LDAP_SETTINGS = 'ldap_settings';
 
 	/**
 	 * Authentication API object parameters array.
