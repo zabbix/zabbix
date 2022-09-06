@@ -842,7 +842,7 @@ class testFormTabIndicators extends CWebTest {
 		$this->assertTabIndicator($tab_selector, 3);
 
 		// Remove the tags and check count indicator.
-		$form->query('id:tags-table')->one()->query('button:Remove')->all()->click();
+		$form->query('class:tags-table')->one()->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
 	}
 
