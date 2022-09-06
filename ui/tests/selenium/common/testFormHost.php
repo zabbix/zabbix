@@ -1634,7 +1634,7 @@ class testFormHost extends CWebTest {
 					],
 					'expected' => TEST_ERROR,
 					'error' => 'The cloned host contains user defined macros with type "Secret text".'.
-					' The value and type of these macros were reset.'
+							' The value and type of these macros were reset.'
 				]
 			],
 			[
@@ -1709,7 +1709,7 @@ class testFormHost extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Host added');
 
 		// Check the values of the original host with the cloned host.
-		$this->filterAndSelectHost((CTestArrayHelper::get($data['fields'], 'Visible name', $data['fields']['Host name'])) )
+		$this->filterAndSelectHost((CTestArrayHelper::get($data['fields'], 'Visible name', $data['fields']['Host name'])))
 				->checkValue($original);
 		COverlayDialogElement::find()->one()->close();
 	}
