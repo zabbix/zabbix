@@ -75,8 +75,6 @@ class testAuditlogToken extends testAuditlogCommon {
 
 	public function testAuditlogToken_Delete() {
 		$this->call('token.delete', [self::TOKENID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid,
-				'Updated audit token', self::TOKENID
-		);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated audit token', self::TOKENID);
 	}
 }

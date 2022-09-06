@@ -84,9 +84,7 @@ class testAuditlogDashboard extends testAuditlogCommon {
 		]);
 
 		$resourceid = $create['result']['dashboardids'][0];
-		$pageid = CDBHelper::getRow('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='.
-				zbx_dbstr($resourceid)
-		);
+		$pageid = CDBHelper::getRow('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='.zbx_dbstr($resourceid));
 		$widgetid = CDBHelper::getRow('SELECT widgetid FROM widget WHERE dashboard_pageid='.
 				zbx_dbstr($pageid['dashboard_pageid'])
 		);
@@ -216,8 +214,6 @@ class testAuditlogDashboard extends testAuditlogCommon {
 
 	public function testAuditlogDashboard_Delete() {
 		$this->call('dashboard.delete', [self::DASHBOARDID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid,
-				'Updated dashboard name', self::DASHBOARDID
-		);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated dashboard name', self::DASHBOARDID);
 	}
 }

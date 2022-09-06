@@ -69,12 +69,8 @@ class testAuditlogUser extends testAuditlogCommon {
 		]);
 
 		self::$resourceid = $create['result']['userids'][0];
-		self::$before_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.
-				zbx_dbstr(self::$resourceid)
-		);
-		self::$before_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.
-				zbx_dbstr(self::$resourceid)
-		);
+		self::$before_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.zbx_dbstr(self::$resourceid));
+		self::$before_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.zbx_dbstr(self::$resourceid));
 
 		$created = "{\"user.username\":[\"add\",\"Audit\"],".
 				"\"user.passwd\":[\"add\",\"******\"],".
@@ -122,12 +118,8 @@ class testAuditlogUser extends testAuditlogCommon {
 				]
 			]
 		]);
-		$after_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.
-				zbx_dbstr(self::$resourceid)
-		);
-		$after_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.
-				zbx_dbstr(self::$resourceid)
-		);
+		$after_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.zbx_dbstr(self::$resourceid));
+		$after_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.zbx_dbstr(self::$resourceid));
 
 		$updated = "{\"user.usrgrps[".self::$before_usrgroup['id']."]\":[\"delete\"],".
 				"\"user.medias[".self::$before_media['mediaid']."]\":[\"delete\"],".

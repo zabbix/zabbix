@@ -47,9 +47,7 @@ class testAuditlogIconMap extends testAuditlogCommon {
 		]);
 
 		$resourceid = $create['result']['iconmapids'][0];
-		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.
-				zbx_dbstr($resourceid)
-		);
+		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.zbx_dbstr($resourceid));
 
 		$created = "{\"iconmap.name\":[\"add\",\"icon_mapping\"],".
 				"\"iconmap.default_iconid\":[\"add\",\"5\"],".
@@ -79,9 +77,7 @@ class testAuditlogIconMap extends testAuditlogCommon {
 			]
 		]);
 
-		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.
-				zbx_dbstr(self::ICONMAPID)
-		);
+		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.zbx_dbstr(self::ICONMAPID));
 
 		$updated = "{\"iconmap.mappings[1]\":[\"delete\"],".
 				"\"iconmap.mappings[".$icon_map['iconmappingid']."]\":[\"add\"],".
@@ -97,8 +93,6 @@ class testAuditlogIconMap extends testAuditlogCommon {
 
 	public function testAuditlogIconMap_Delete() {
 		$this->call('iconmap.delete', [self::ICONMAPID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid,
-				'updated_icon_mapping', self::ICONMAPID
-		);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'updated_icon_mapping', self::ICONMAPID);
 	}
 }

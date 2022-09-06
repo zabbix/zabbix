@@ -56,9 +56,9 @@ class testAuditlogCommon extends CAPITest {
 	/**
 	 * Send auditlog.get request and check returned values.
 	 *
-	 * @param string $output 		what parameter need to be checked in audit
-	 * @param integer $action 		action id
-	 * @param string $result 		what should be returned in request
+	 * @param string $parameter 	what parameter need to be checked in audit
+	 * @param integer $actionid 	action id
+	 * @param string $expected 		what should be returned in request
 	 * @param integer $resourceid 	resource id
 	 */
 	public function getAuditDetails($parameter, $actionid, $expected, $resourceid) {

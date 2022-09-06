@@ -46,12 +46,8 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 		]);
 
 		$resourceid = $create['result']['usrgrpids'][0];
-		$rights = CDBHelper::getRow('SELECT rightid FROM rights WHERE groupid='.
-				zbx_dbstr($resourceid)
-		);
-		$id = CDBHelper::getRow('SELECT id FROM users_groups WHERE usrgrpid='.
-				zbx_dbstr($resourceid)
-		);
+		$rights = CDBHelper::getRow('SELECT rightid FROM rights WHERE groupid='.zbx_dbstr($resourceid));
+		$id = CDBHelper::getRow('SELECT id FROM users_groups WHERE usrgrpid='.zbx_dbstr($resourceid));
 
 		$created = "{\"usergroup.name\":[\"add\",\"Audit user groups\"],".
 				"\"usergroup.rights[".$rights['rightid']."]\":[\"add\"],".
@@ -84,8 +80,6 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 
 	public function testAuditlogUserGroups_Delete() {
 		$this->call('usergroup.delete', [self::USRGRPID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid,
-				'Updated user group name', self::USRGRPID
-		);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated user group name', self::USRGRPID);
 	}
 }

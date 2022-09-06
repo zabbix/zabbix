@@ -117,8 +117,6 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 
 	public function testAuditlogEventCorrelation_Delete() {
 		$this->call('correlation.delete', [self::CORRELATIONID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid,
-				'Updated event correlation name', self::CORRELATIONID
-		);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated event correlation name', self::CORRELATIONID);
 	}
 }

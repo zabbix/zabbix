@@ -144,12 +144,8 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 			]
 		]);
 
-		$usrgrp = CDBHelper::getRow('SELECT reportusrgrpid FROM report_usrgrp WHERE reportid='.
-				zbx_dbstr(self::$resourceid)
-		);
-		$user = CDBHelper::getRow('SELECT reportuserid FROM report_user WHERE reportid='.
-				zbx_dbstr(self::$resourceid)
-		);
+		$usrgrp = CDBHelper::getRow('SELECT reportusrgrpid FROM report_usrgrp WHERE reportid='.zbx_dbstr(self::$resourceid));
+		$user = CDBHelper::getRow('SELECT reportuserid FROM report_user WHERE reportid='.zbx_dbstr(self::$resourceid));
 
 		$updated = "{\"report.users[".self::$before_user['reportuserid']."]\":[\"delete\"],".
 				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."]\":[\"delete\"],".
@@ -184,8 +180,6 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 	 */
 	public function testAuditlogScheduledReport_Delete() {
 		$this->call('report.delete', [self::$resourceid]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid,
-				'Updated report for audit', self::$resourceid
-		);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated report for audit', self::$resourceid);
 	}
 }

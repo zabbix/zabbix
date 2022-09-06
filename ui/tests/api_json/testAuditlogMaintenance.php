@@ -65,9 +65,7 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 				zbx_dbstr($resourceid)
 		);
 		$timeperiod = CDBHelper::getRow('SELECT timeperiodid FROM timeperiods ORDER BY timeperiodid DESC');
-		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.
-				zbx_dbstr($resourceid)
-		);
+		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.zbx_dbstr($resourceid));
 
 		$created = "{\"maintenance.name\":[\"add\",\"audit_maintenance\"],".
 				"\"maintenance.active_since\":[\"add\",\"1358844540\"],".
@@ -158,8 +156,6 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 
 	public function testAuditlogMaintenance_Delete() {
 		$this->call('maintenance.delete', [self::MAINTENANCEID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid,
-				'updated_maintenance', self::MAINTENANCEID
-		);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'updated_maintenance', self::MAINTENANCEID);
 	}
 }

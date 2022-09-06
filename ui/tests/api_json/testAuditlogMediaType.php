@@ -132,8 +132,6 @@ class testAuditlogMediaType extends testAuditlogCommon {
 
 	public function testAuditlogMediaType_Delete() {
 		$this->call('mediatype.delete', [self::MEDIATYPEID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid,
-				'updated_email_media', self::MEDIATYPEID
-		);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'updated_email_media', self::MEDIATYPEID);
 	}
 }

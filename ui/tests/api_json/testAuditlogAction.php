@@ -92,9 +92,7 @@ class testAuditlogAction extends testAuditlogCommon {
 		$resourceid = $create['result']['actionids'][0];
 		$operationid = CDBHelper::getAll('SELECT operationid FROM operations WHERE actionid='.
 				zbx_dbstr($resourceid).' AND operationtype In (0,11,12)');
-		$conditiodid = CDBHelper::getRow('SELECT conditionid FROM conditions WHERE actionid='.
-				zbx_dbstr($resourceid)
-		);
+		$conditiodid = CDBHelper::getRow('SELECT conditionid FROM conditions WHERE actionid='.zbx_dbstr($resourceid));
 		$op_group = CDBHelper::getRow('SELECT opmessage_grpid FROM opmessage_grp WHERE operationid='.
 				zbx_dbstr($operationid[0]['operationid'])
 		);
@@ -180,9 +178,7 @@ class testAuditlogAction extends testAuditlogCommon {
 		$operationid = CDBHelper::getRow('SELECT operationid FROM operations WHERE (actionid, operationtype)=('
 				.zbx_dbstr(self::ACTIONID).', 0)'
 		);
-		$conditiodid = CDBHelper::getRow('SELECT conditionid FROM conditions WHERE actionid='
-				.zbx_dbstr(self::ACTIONID)
-		);
+		$conditiodid = CDBHelper::getRow('SELECT conditionid FROM conditions WHERE actionid='.zbx_dbstr(self::ACTIONID));
 		$op_group = CDBHelper::getRow('SELECT opmessage_grpid FROM opmessage_grp WHERE operationid='.
 				zbx_dbstr($operationid['operationid'])
 		);
@@ -216,8 +212,6 @@ class testAuditlogAction extends testAuditlogCommon {
 
 	public function testAuditlogAction_Delete() {
 		$this->call('action.delete', [self::ACTIONID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid,
-				'Updated action audit', self::ACTIONID
-		);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated action audit', self::ACTIONID);
 	}
 }

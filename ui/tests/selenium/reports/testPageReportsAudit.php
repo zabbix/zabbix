@@ -24,9 +24,9 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup media_type, auditlog, config
+ * @backup media_type, auditlog, config, profiles
  *
- * @onBefore deleteAuditlog
+ * @onBefore deleteAuditlog, prepareLoginData
  */
 class testPageReportsAudit extends CWebTest {
 
@@ -62,10 +62,8 @@ class testPageReportsAudit extends CWebTest {
 			->one()->getAttribute('class')
 		);
 
-		// If the filter is not visible - enable it.
-		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
-			$this->query('id:ui-id-2')->one()->click();
-		}
+		// Press to display filter.
+		$this->query('id:ui-id-2')->one()->click();
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -91,16 +89,7 @@ class testPageReportsAudit extends CWebTest {
 		$this->assertEquals($filter_actions, $this->query('id:filter-actions')->asCheckboxList()->one()->getLabels()->asText());
 
 		// Check that table stats are present.
-		if ($this->query('xpath://a[@class="paging-selected"]')->exists()) {
-			$time = time() - 3600;
-			$audit_count = CDBHelper::getCount('SELECT * FROM auditlog WHERE clock >'.zbx_dbstr($time));
-			$table_stats = ($audit_count > 1000) ? 'Displaying 1 to 100 of 1000+ found'
-					: 'Displaying 1 to 100 of '.$audit_count.' found';
-			$this->assertEquals($table_stats, $this->query('xpath://div[@class="table-stats"]')->one()->getText());
-		}
-		else {
-			$this->assertTableStats($table->getRows()->count());
-		}
+		$this->assertTableStats($table->getRows()->count());
 
 		// Resource name with checkboxes that are enabled.
 		$resource_actions =[
@@ -269,7 +258,8 @@ class testPageReportsAudit extends CWebTest {
 
 			// Save audit data from table in UI and database.
 			$this->page->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
-			$audit_values = $this->getTableRowValue();
+			$table = $this->query('class:list-table')->asTable()->one();
+			$audit_values = $table->getRow(0)->getText();
 			$hash = CDBHelper::getHash('SELECT * FROM auditlog');
 
 			// Check information in audit page that audit is disabled/enabled.
@@ -291,16 +281,19 @@ class testPageReportsAudit extends CWebTest {
 			$this->page->refresh()->waitUntilReady();
 
 			if (!$status) {
-				$this->assertEquals($audit_values, $this->getTableRowValue());
+				$this->assertEquals($audit_values, $table->getRow(0)->getText());
 				$this->assertEquals($hash, CDBHelper::getHash('SELECT * FROM auditlog'));
 			}
 			else {
-				$this->assertNotEquals($audit_values, $this->getTableRowValue());
+				$this->assertNotEquals($audit_values, $table->getRow(0)->getText());
 				$this->assertNotEquals($hash, CDBHelper::getHash('SELECT * FROM auditlog'));
 			}
 		}
 	}
 
+	/**
+	 * @onBeforeOnce prepareLoginData
+	 */
 	public static function getCheckFilterData() {
 		return [
 			[
@@ -309,7 +302,7 @@ class testPageReportsAudit extends CWebTest {
 						'Resource' => 'Media type',
 						'Actions' => 'Add'
 					],
-					'result_amount' => 1
+					'result_count' => 1
 				]
 			],
 			[
@@ -317,7 +310,7 @@ class testPageReportsAudit extends CWebTest {
 					'fields' => [
 						'Resource' => 'Media type'
 					],
-					'result_amount' => 4
+					'result_count' => 4
 				]
 			],
 			[
@@ -326,14 +319,15 @@ class testPageReportsAudit extends CWebTest {
 						'Resource' => 'Media type',
 						'Users' => 'Admin'
 					],
-					'result_amount' => 4
+					'result_count' => 4
 				]
 			],
 			[
 				[
 					'fields' => [
 						'Users' => 'Admin'
-					]
+					],
+					'result_count' => 12
 				]
 			],
 			[
@@ -341,7 +335,8 @@ class testPageReportsAudit extends CWebTest {
 					'fields' => [
 						'Users' => 'Admin',
 						'Actions' => 'Failed login'
-					]
+					],
+					'result_count' => 1
 				]
 			],
 			[
@@ -356,7 +351,7 @@ class testPageReportsAudit extends CWebTest {
 							'Login'
 						]
 					],
-					'result_amount' => 5
+					'result_count' => 5
 				]
 			],
 			[
@@ -377,7 +372,7 @@ class testPageReportsAudit extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Users' => ['guest', 'Admin']
+						'Users' => ['test-timezone', 'Admin']
 					]
 				]
 			],
@@ -386,7 +381,7 @@ class testPageReportsAudit extends CWebTest {
 					'fields' => [
 						'Resource ID' => 99106
 					],
-					'result_amount' => 1
+					'result_count' => 1
 				]
 			],
 			[
@@ -397,7 +392,7 @@ class testPageReportsAudit extends CWebTest {
 						'Resource ID' => 99106,
 						'Actions' => 'History clear'
 					],
-					'result_amount' => 1
+					'result_count' => 1
 				]
 			],
 			[
@@ -405,7 +400,7 @@ class testPageReportsAudit extends CWebTest {
 					'fields' => [
 						'Recordset ID' => 'cl7irkc1h00003pde7s7xxxxx'
 					],
-					'expected' => TEST_BAD
+					'no_data' => true
 				]
 			],
 			[
@@ -414,7 +409,7 @@ class testPageReportsAudit extends CWebTest {
 						'Users' => 'guest',
 						'Actions' => 'Add'
 					],
-					'expected' => TEST_BAD
+					'no_data' => true
 				]
 			],
 			[
@@ -422,7 +417,7 @@ class testPageReportsAudit extends CWebTest {
 					'fields' => [
 						'Resource ID' => 77777777
 					],
-					'expected' => TEST_BAD
+					'no_data' => true
 				]
 			],
 			[
@@ -430,7 +425,7 @@ class testPageReportsAudit extends CWebTest {
 					'fields' => [
 						'Users' => 'filter-create'
 					],
-					'expected' => TEST_BAD
+					'no_data' => true
 				]
 			],
 			[
@@ -438,7 +433,7 @@ class testPageReportsAudit extends CWebTest {
 					'fields' => [
 						'Actions' => 'Execute'
 					],
-					'expected' => TEST_BAD
+					'no_data' => true
 				]
 			],
 			[
@@ -446,7 +441,7 @@ class testPageReportsAudit extends CWebTest {
 					'fields' => [
 						'Resource' => 'Web scenario'
 					],
-					'expected' => TEST_BAD
+					'no_data' => true
 				]
 			]
 			// TODO: uncomment after ZBX-21097 fix
@@ -455,7 +450,7 @@ class testPageReportsAudit extends CWebTest {
 //					'fields' => [
 //						'Resource ID' => 'aaaaaaaa'
 //					],
-//					'expected' => TEST_BAD
+//					'no_data' => true
 //				]
 //			],
 //			[
@@ -463,14 +458,14 @@ class testPageReportsAudit extends CWebTest {
 //					'fields' => [
 //						'Recordset ID' => 'aaaaaaaa'
 //					],
-//					'expected' => TEST_BAD
+//					'no_data' => true
 //				]
 //			]
 		];
 	}
 
 	/**
-	 * Check audit filter. This checks can be runned only after all other scenarios completed.
+	 * Check audit filter. This checks can be executed only after all other scenarios completed.
 	 * There are used values and data that was created before in this autotest.
 	 *
 	 * @dataProvider getCheckFilterData
@@ -479,10 +474,12 @@ class testPageReportsAudit extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
+		$form->query('button:Reset')->one()->click();
+
 		$form->fill($data['fields'])->submit();
 
 		// If there is no result - "No data found" displayed in table.
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if (array_key_exists('no_data', $data)) {
 			$this->assertEquals(['No data found.'], $table->getRows()->asText());
 		}
 		else {
@@ -514,31 +511,31 @@ class testPageReportsAudit extends CWebTest {
 			}
 
 			// There is some scenarios with known result amount.
-			if (array_key_exists('result_amount', $data)) {
-				$this->assertEquals($data['result_amount'], $table->getRows()->count());
+			if (array_key_exists('result_count', $data)) {
+				$this->assertEquals($data['result_count'], $table->getRows()->count());
 			}
 		}
-
-		$form->query('button:Reset')->one()->click();
 	}
 
 	/**
-	 * Check that audit log can be searched by recordsetid.
+	 * Check that audit log can be filtered by recordsetid.
 	 */
 	public function testPageReportsAudit_CheckRecordsetFilter() {
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
-
-		// Get recordset ID and check how much rows displayed in Audit page.
-		$recordsetid = CDBHelper::getRow('SELECT recordsetid FROM auditlog ORDER BY clock DESC');
-		$recordsetid_count = CDBHelper::getCount('SELECT * FROM auditlog WHERE recordsetid='.
-				zbx_dbstr($recordsetid['recordsetid'])
-		);
-		$form->fill(['Recordset ID' => $recordsetid['recordsetid']])->submit();
-		$this->assertEquals($recordsetid_count, $table->getRows()->count());
-		$this->assertEquals($recordsetid['recordsetid'], $table->getRow(0)->getColumn('Recordset ID')->getText());
 		$form->query('button:Reset')->one()->click();
+
+		// Click on Recordset ID in first row.
+		$table->getRow(0)->getColumn('Recordset ID')->query('xpath:.//a')->one()->click();
+		$recordsetid = $table->getRow(0)->getColumn('Recordset ID')->getText();
+
+		// Check that correct Recordset ID displayed in filter form.
+		$this->assertTrue($form->checkValue(['Recordset ID' => $recordsetid]));
+
+		// Compare result cout on page and in DB.
+		$recordsetid_count = CDBHelper::getCount('SELECT NULL FROM auditlog WHERE recordsetid='.zbx_dbstr($recordsetid));
+		$this->assertEquals($recordsetid_count, $table->getRows()->count());
 	}
 
 	/**
@@ -558,11 +555,12 @@ class testPageReportsAudit extends CWebTest {
 
 		// Find filter form and fill with correct resource values.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form->query('button:Reset')->one()->click();
 
 		foreach ($actions as $action => $audit) {
 			$form->fill(['Resource' => $resource_name, 'Resource ID' => $resourceid]);
-			$form->query('xpath:.//label[text()="'.$action.'"]/../input[contains(@id, "filter_actions")]')
-					->asCheckbox()->one()->check();
+			$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($action).
+					']/../input[contains(@id, "filter_actions")]')->asCheckbox()->one()->check();
 			$form->submit()->waitUntilReloaded();
 
 			// Check that action column has correct action value.
@@ -617,26 +615,7 @@ class testPageReportsAudit extends CWebTest {
 					(resourceid, action)=('.zbx_dbstr($resourceid).','.zbx_dbstr($action_ids[$action]).') ORDER BY clock DESC LIMIT 1'
 			);
 			$this->assertEquals([], array_diff($result, $dbaudit[0]));
-
-			// Reset audit filter.
-			$this->query('name:zbx_filter')->asForm()->one()->query('button:Reset')->one()->click();
 		}
-	}
-
-	/**
-	 * Get table values from first row.
-	 *
-	 * @return array
-	 */
-	private function getTableRowValue() {
-		$headers = $this->query('class:list-table')->asTable()->one()->getHeadersText();
-		$result = [];
-		$row = $this->query('class:list-table')->asTable()->one()->getRow(0);
-		foreach ($headers as $header) {
-			$result[] = $row->getColumn($header)->getText();
-		}
-
-		return $result;
 	}
 
 	/**
@@ -644,5 +623,9 @@ class testPageReportsAudit extends CWebTest {
 	 */
 	public function deleteAuditlog() {
 		DBexecute('DELETE FROM auditlog');
+	}
+
+	public function prepareLoginData() {
+		$this->page->userLogin('test-timezone', 'zabbix');
 	}
 }

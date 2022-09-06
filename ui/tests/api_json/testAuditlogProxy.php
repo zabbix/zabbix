@@ -84,8 +84,6 @@ class testAuditlogProxy extends testAuditlogCommon {
 
 	public function testAuditlogProxy_Delete() {
 		$this->call('proxy.delete', [self::PROXYID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid,
-				'Updated Audit proxy', self::PROXYID
-		);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated Audit proxy', self::PROXYID);
 	}
 }
