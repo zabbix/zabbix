@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-06T16:29:40Z'
+  date: '2022-09-06T19:12:26Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -226,16 +226,16 @@ zabbix_export:
       discovery_rules:
         -
           uuid: 7fafbef68f8b46d083eb43da7cd1e2cc
-          name: 'MySQL flexible servers discovery'
+          name: 'MySQL servers discovery'
           type: DEPENDENT
-          key: azure.mysql.flexible.servers.discovery
+          key: azure.mysql.servers.discovery
           delay: '0'
           filter:
             evaltype: AND
             conditions:
               -
                 macro: '{#TYPE}'
-                value: ^Microsoft.DBforMySQL/flexibleServers$
+                value: ^Microsoft.DBforMySQL
                 formulaid: G
               -
                 macro: '{#NAME}'
@@ -264,19 +264,16 @@ zabbix_export:
                 value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
-          description: 'A list of the flexible MySQL servers in the subscription.'
+          description: 'A list of the MySQL servers in the subscription.'
           host_prototypes:
             -
               uuid: 55b87078c14c4561b53e64af5ed77d61
-              host: 'Azure MySQL flexible server {#NAME}'
-              name: 'Azure MySQL flexible server {#NAME}'
+              host: 'Azure MySQL server {#NAME}'
+              name: 'Azure MySQL server {#NAME}'
               group_links:
                 -
                   group:
                     name: Databases
-              templates:
-                -
-                  name: 'Azure MySQL flexible server by HTTP'
               macros:
                 -
                   macro: '{$AZURE.RESOURCE_ID}'
@@ -327,109 +324,39 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        -
-          uuid: 87918074a4564185abe9b704267ca9f2
-          name: 'MySQL single servers discovery'
-          type: DEPENDENT
-          key: azure.mysql.single.servers.discovery
-          delay: '0'
-          filter:
-            evaltype: AND
-            conditions:
-              -
-                macro: '{#TYPE}'
-                value: ^Microsoft.DBforMySQL/servers$
-                formulaid: G
-              -
-                macro: '{#NAME}'
-                value: '{$AZURE.MYSQL.DB.NAME.MATCHES}'
-                formulaid: E
-              -
-                macro: '{#NAME}'
-                value: '{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
-              -
-                macro: '{#LOCATION}'
-                value: '{$AZURE.MYSQL.DB.LOCATION.MATCHES}'
-                formulaid: C
-              -
-                macro: '{#LOCATION}'
-                value: '{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
-              -
-                macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: B
-              -
-                macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: A
-          description: 'A list of the single MySQL servers in the subscription.'
-          host_prototypes:
+          overrides:
             -
-              uuid: 111e6ed65abe4d479250be5419209e99
-              host: 'Azure MySQL single server {#NAME}'
-              name: 'Azure MySQL single server {#NAME}'
-              group_links:
+              name: 'Flexible server'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: Microsoft.DBforMySQL/flexibleServers
+                    formulaid: A
+              operations:
                 -
-                  group:
-                    name: Databases
-              templates:
+                  operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    -
+                      name: 'Azure MySQL flexible server by HTTP'
+            -
+              name: 'Single server'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: Microsoft.DBforMySQL/servers
+                    formulaid: A
+              operations:
                 -
-                  name: 'Azure MySQL single server by HTTP'
-              macros:
-                -
-                  macro: '{$AZURE.RESOURCE_ID}'
-                  value: '{#ID}'
-              tags:
-                -
-                  tag: location
-                  value: '{#LOCATION}'
-                -
-                  tag: resource-group
-                  value: '{#GROUP}'
-                -
-                  tag: size
-                  value: '{#SIZE}'
-                -
-                  tag: version
-                  value: '{#VERSION}'
-          master_item:
-            key: azure.get.resources
-          lld_macro_paths:
-            -
-              lld_macro: '{#GROUP}'
-              path: $.resourceGroup
-            -
-              lld_macro: '{#ID}'
-              path: $.id
-            -
-              lld_macro: '{#LOCATION}'
-              path: $.location
-            -
-              lld_macro: '{#NAME}'
-              path: $.name
-            -
-              lld_macro: '{#SIZE}'
-              path: $.sku.name
-            -
-              lld_macro: '{#TYPE}'
-              path: $.type
-            -
-              lld_macro: '{#VERSION}'
-              path: $.properties.version
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.resources.value
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
+                  operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    -
+                      name: 'Azure MySQL single server by HTTP'
         -
           uuid: f9386233186648ce828f406c52972ce5
           name: 'Virtual machines discovery'
