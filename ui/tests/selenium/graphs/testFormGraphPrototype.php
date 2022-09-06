@@ -89,7 +89,7 @@ class testFormGraphPrototype extends testFormGraphs {
 			[
 				'name' => 'Graph for items change',
 				'itemid' => self::$items['graph_prototype_trap_int']['itemid']
-			],
+			]
 		];
 
 		$graph_prototypes_data = [];
