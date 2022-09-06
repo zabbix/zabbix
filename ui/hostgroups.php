@@ -236,7 +236,6 @@ if (hasRequest('form')) {
 
 		$data['group'] = reset($groups);
 
-
 		$data['group']['is_discovery_rule_editable'] = $data['group']['discoveryRule']
 			&& API::DiscoveryRule()->get([
 				'output' => [],

@@ -57,7 +57,6 @@ if ($data['clone_hostid'] != 0) {
 $hostList = new CFormList('hostlist');
 
 // LLD rule link
-
 if ($data['readonly']) {
 	if ($data['discoveryRule']) {
 		if ($data['is_discovery_rule_editable']) {
