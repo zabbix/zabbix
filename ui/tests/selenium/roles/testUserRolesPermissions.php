@@ -117,7 +117,7 @@ class testUserRolesPermissions extends CWebTest {
 		// Remove all unnecessary services before proceeding with execution.
 		$serviceids = CDBHelper::getColumn('SELECT * from services', 'serviceid');
 
-		if ($serviceids !== []) {
+		if (count($serviceids) !== 0) {
 			CDataHelper::call('service.delete', $serviceids);
 		}
 

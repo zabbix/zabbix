@@ -161,7 +161,6 @@ class testSlaReport extends CWebTest {
 						'SLA' => 'SLA Daily'
 					],
 					'reporting_period' => 'Daily',
-					'downtimes' => true,
 					'expected' => [
 						'SLO' => '11.111',
 						'services' => ['Service with problem']
@@ -250,8 +249,6 @@ class testSlaReport extends CWebTest {
 				'SELECT created_at FROM services WHERE name='.zbx_dbstr('Service with problem')
 		);
 
-		$creation_day = date('Y-m-d', self::$actual_creation_time);
-
 		// Construct the reference reporting period array based on the period type.
 		foreach (['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Annually'] as $reporting_period) {
 			$period_values = [];
@@ -280,9 +277,8 @@ class testSlaReport extends CWebTest {
 
 				case 'Monthly':
 					// Get the number of Months to be displayed as difference between today and SLA creation day in months.
-					$months = ((date('Y', time()) - date('Y', self::SLA_CREATION_TIME)) * 12) + ((date('m', time()) -
-							date('m', self::SLA_CREATION_TIME))
-					);
+					$months = CDateTimeHelper::countMonthsBetweenDates(self::SLA_CREATION_TIME, time());
+
 					$months = ($months > 20) ? 20 : $months;
 
 					for ($i = 0; $i <= $months; $i++) {
@@ -622,7 +618,7 @@ class testSlaReport extends CWebTest {
 			$filter_input = $filter_form->query('name:filter_name')->one();
 			$this->assertEquals(255, $filter_input->getAttribute('maxlength'));
 
-			// Filter out all unwanted services befoce checking table content.
+			// Filter out all unwanted services before checking table content.
 			$filter_input->fill($dialog_data['check_row']['Name']);
 			$dialog->query('button:Filter')->one()->click();
 			$dialog->waitUntilReady();
@@ -646,9 +642,9 @@ class testSlaReport extends CWebTest {
 			$this->assertEquals(CDBHelper::getCount('SELECT serviceid FROM services'), $table->getRows()->count());
 		}
 
-		foreach ($dialog_data['buttons'] as $button) {
-			$this->assertTrue($dialog->query('button', $button)->one()->isClickable());
-		}
+		$this->assertEquals(count($dialog_data['buttons']), $dialog->query('button', $dialog_data['buttons'])->all()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+		);
 		$dialog->query('button:Cancel')->one()->click();
 	}
 }

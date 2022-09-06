@@ -275,6 +275,6 @@ class Sla {
 
 		$creation_time = time();
 
-		return ['sla_ids' => CDataHelper::getIds('name'), 'creation_time' => $creation_time];
+		return ['slaids' => CDataHelper::getIds('name'), 'creation_time' => $creation_time];
 	}
 }

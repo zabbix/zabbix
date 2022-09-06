@@ -254,8 +254,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
-		$suite->addTestSuite('testPageServicesServices');
-		$suite->addTestSuite('testPageServicesServicesMassUpdate');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
@@ -268,6 +266,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageReportsSystemInformation');
 		$suite->addTestSuite('testPageReportsTriggerTop');
 		$suite->addTestSuite('testPageSearch');
+		$suite->addTestSuite('testPageServicesServices');
+		$suite->addTestSuite('testPageServicesServicesMassUpdate');
 		$suite->addTestSuite('testPageServicesSla');
 		$suite->addTestSuite('testPageServicesSlaReport');
 		$suite->addTestSuite('testPageStatusOfZabbix');

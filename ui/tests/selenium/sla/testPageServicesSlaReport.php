@@ -124,10 +124,9 @@ class testPageServicesSlaReport extends testSlaReport {
 		$this->assertTableDataColumn($data['expected'], 'Service');
 
 		// Check updated service sorting.
-		foreach(['asc', 'desc'] as $sorting) {
-			$expected = ($sorting === 'desc') ? $data['expected'] : array_reverse($data['expected']);
+		foreach (['desc', 'asc'] as $sort) {
 			$column_header->click();
-			$this->assertTableDataColumn($expected, 'Service');
+			$this->assertTableDataColumn(($sort === 'asc') ? $data['expected'] : array_reverse($data['expected']), 'Service');
 		}
 	}
 
@@ -240,8 +239,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'Service' => 'Service with problem',
 						'From' => 'yesterday'
 					],
-					'reporting_period' => 'Daily',
-					'expected_periods' => []
+					'reporting_period' => 'Daily'
 				]
 			],
 			[
@@ -348,8 +346,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'SLA' => 'SLA Daily',
 						'From' => 'yesterday'
 					],
-					'reporting_period' => 'Daily',
-					'expected_periods' => []
+					'reporting_period' => 'Daily'
 				]
 			],
 			[
@@ -457,8 +454,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'Service' => 'Simple actions service',
 						'From' => 'today - 2 weeks'
 					],
-					'reporting_period' => 'Weekly',
-					'expected_periods' => []
+					'reporting_period' => 'Weekly'
 				]
 			],
 			[
@@ -561,8 +557,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'SLA' => 'SLA Weekly',
 						'From' => 'today - 3 weeks'
 					],
-					'reporting_period' => 'Weekly',
-					'expected_periods' => []
+					'reporting_period' => 'Weekly'
 				]
 			],
 			[
@@ -572,7 +567,6 @@ class testPageServicesSlaReport extends testSlaReport {
 						'Service' => 'Simple actions service',
 						'From' => '2020-01-01',
 						'To' => '2020-02-29'
-
 					],
 					'reporting_period' => 'Monthly',
 					'expected_periods' => [
@@ -587,7 +581,6 @@ class testPageServicesSlaReport extends testSlaReport {
 						'SLA' => 'SLA Monthly',
 						'Service' => 'Simple actions service',
 						'From' => '2020-01-01'
-
 					],
 					'reporting_period' => 'Monthly',
 					'expected_periods' => [
@@ -669,8 +662,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'Service' => 'Simple actions service',
 						'From' => 'today - 2 months'
 					],
-					'reporting_period' => 'Monthly',
-					'expected_periods' => []
+					'reporting_period' => 'Monthly'
 				]
 			],
 			[
@@ -679,13 +671,11 @@ class testPageServicesSlaReport extends testSlaReport {
 						'SLA' => 'SLA Monthly',
 						'From' => '2020-01-01',
 						'To' => '2020-02-29'
-
 					],
 					'reporting_period' => 'Monthly',
 					'expected_periods' => [
 						'2020-01',
 						'2020-02'
-
 					]
 				]
 			],
@@ -772,8 +762,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'SLA' => 'SLA Monthly',
 						'From' => 'today - 2 months'
 					],
-					'reporting_period' => 'Monthly',
-					'expected_periods' => []
+					'reporting_period' => 'Monthly'
 				]
 			],
 			[
@@ -783,7 +772,6 @@ class testPageServicesSlaReport extends testSlaReport {
 						'Service' => 'Simple actions service',
 						'From' => '2021-05-01',
 						'To' => '2021-10-01'
-
 					],
 					'reporting_period' => 'Quarterly',
 					'expected_periods' => [
@@ -878,8 +866,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'Service' => 'Simple actions service',
 						'From' => 'today - 6 months'
 					],
-					'reporting_period' => 'Quarterly',
-					'expected_periods' => []
+					'reporting_period' => 'Quarterly'
 				]
 			],
 			[
@@ -888,7 +875,6 @@ class testPageServicesSlaReport extends testSlaReport {
 						'SLA' => 'SLA Quarterly',
 						'From' => '2021-05-01',
 						'To' => '2021-10-01'
-
 					],
 					'reporting_period' => 'Quarterly',
 					'expected_periods' => [
@@ -979,8 +965,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'SLA' => 'SLA Quarterly',
 						'From' => 'today - 6 months'
 					],
-					'reporting_period' => 'Quarterly',
-					'expected_periods' => []
+					'reporting_period' => 'Quarterly'
 				]
 			],
 			[
@@ -990,7 +975,6 @@ class testPageServicesSlaReport extends testSlaReport {
 						'Service' => 'Service with problem',
 						'From' => '2020-05-01',
 						'To' => '2025-12-31'
-
 					],
 					'reporting_period' => 'Annually',
 					'expected_periods' => [
@@ -1071,8 +1055,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'Service' => 'Service with problem',
 						'From' => 'today - 13 months'
 					],
-					'reporting_period' => 'Annually',
-					'expected_periods' => []
+					'reporting_period' => 'Annually'
 				]
 			],
 			[
@@ -1081,7 +1064,6 @@ class testPageServicesSlaReport extends testSlaReport {
 						'SLA' => 'SLA Annual',
 						'From' => '2019-05-01',
 						'To' => '2024-10-01'
-
 					],
 					'reporting_period' => 'Annually',
 					'expected_periods' => [
@@ -1159,8 +1141,7 @@ class testPageServicesSlaReport extends testSlaReport {
 						'SLA' => 'SLA Annual',
 						'From' => 'today - 13 months'
 					],
-					'reporting_period' => 'Annually',
-					'expected_periods' => []
+					'reporting_period' => 'Annually'
 				]
 			],
 			// Using non-complete date in From and To fields.
@@ -1438,9 +1419,9 @@ class testPageServicesSlaReport extends testSlaReport {
 	/**
 	 * @dataProvider getSlaDataWithCustomDates
 	 */
-	public function testPageServicesSlaReport_CheckCustomPeriods ($data) {
+	public function testPageServicesSlaReport_CheckCustomPeriods($data) {
 		// Construct the expected result array if such is not present in the data provider.
-		if (CTestArrayHelper ::get($data, 'expected_periods') === []) {
+		if (!array_key_exists('expected_periods', $data) && !array_key_exists('error', $data)) {
 			$data['expected_periods'] = $this->getPeriodDataWithCustomDates($data);
 			$data['fields']['From'] = date('Y-m-d', strtotime($data['fields']['From']));
 		}
@@ -1476,7 +1457,7 @@ class testPageServicesSlaReport extends testSlaReport {
 	 */
 	public function getPeriodDataWithCustomDates($data) {
 		foreach (self::$reporting_periods[$data['reporting_period']] as $period) {
-			// Write all periods tat end after the value in From field into the reference array.
+			// Write all periods that end after the value in From field into the reference array.
 			if ($period['end'] >= strtotime($data['fields']['From'])) {
 				$expected_periods[] = $period['value'];
 			}
@@ -1486,7 +1467,7 @@ class testPageServicesSlaReport extends testSlaReport {
 		}
 
 		if (!array_key_exists('Service', $data['fields'])) {
-			// If SLA report is shouwn without selecting a service, then periods are displayed in reverse order.
+			// If SLA report is shown without selecting a service, then periods are displayed in reverse order.
 			$expected_periods = array_reverse($expected_periods);
 		}
 

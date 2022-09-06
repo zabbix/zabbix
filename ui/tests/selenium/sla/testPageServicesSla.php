@@ -294,8 +294,8 @@ class testPageServicesSla extends CWebTest {
 		// Check the links in SLA report column.
 		foreach ($sla_data as $sla) {
 			if ($sla['SLA report'] === 'SLA report') {
-				$link = 'zabbix.php?action=slareport.list&filter_slaid='.CDataHelper::get('Sla.sla_ids')[$sla['Name']].'&filter_set=1';
-				$this->assertEquals($link, $table->findRow('Name', $sla['Name'])->query('link:SLA report')->one()
+				$link = 'zabbix.php?action=slareport.list&filter_slaid='.CDataHelper::get('Sla.slaids')[$sla['Name']].'&filter_set=1';
+				$this->assertStringEndsWith($link, $table->findRow('Name', $sla['Name'])->query('link:SLA report')->one()
 						->getAttribute('href')
 				);
 			}
@@ -445,8 +445,7 @@ class testPageServicesSla extends CWebTest {
 				[
 					'filter' => [
 						'Name' => 'No data should be returned'
-					],
-					'no_data' => true
+					]
 				]
 			],
 			// Search should not be case sensitive.
@@ -658,8 +657,7 @@ class testPageServicesSla extends CWebTest {
 								'operator' => 'Exists'
 							]
 						]
-					],
-					'no_data' => true
+					]
 				]
 			],
 			// Tags evaluation: And/Or.
@@ -717,6 +715,34 @@ class testPageServicesSla extends CWebTest {
 						'Update SLA'
 					]
 				]
+			],
+			// All filter fields involved.
+			[
+				[
+					'filter' => [
+						'Name' => ' SLA',
+						'Status' => 'Enabled'
+					],
+					'Tags' => [
+						'Evaluation' => 'Or',
+						'tags' => [
+							[
+								'index' => 0,
+								'action' => USER_ACTION_UPDATE,
+								'tag' => 'old_tag_1',
+								'operator' => 'Does not contain',
+								'value' => 'new'
+							],
+							[
+								'tag' => 'sla',
+								'operator' => 'Exists'
+							]
+						]
+					],
+					'expected' => [
+						'Update SLA'
+					]
+				]
 			]
 		];
 	}
@@ -741,17 +767,19 @@ class testPageServicesSla extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		if (CTestArrayHelper::get($data, 'no_data')) {
+		if (!array_key_exists('expected', $data)) {
+			// Check that 'No data found.' string is returned if no results are expected.
 			$this->assertTableData();
 		}
 		else {
 			// Using column Name check that only the expected SLAs are returned in the list.
 			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
+
 		}
 
 		// Reset the filter and check that all SLAs are displayed.
 		$this->query('button:Reset')->one()->click();
-		$this->assertTableStats(count(CDataHelper::get('Sla.sla_ids')));
+		$this->assertTableStats(count(CDataHelper::get('Sla.slaids')));
 	}
 
 	public function getSortData() {
@@ -835,15 +863,10 @@ class testPageServicesSla extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$header = $table->query('xpath:.//a[text()="'.$data['sort_field'].'"]')->one();
 
-		foreach(['asc', 'desc'] as $sorting) {
-			$expected = ($sorting === 'asc') ? $data['expected'] : array_reverse($data['expected']);
-			$values = [];
-
+		foreach(['desc', 'asc'] as $sorting) {
+			$expected = ($sorting === 'desc') ? $data['expected'] : array_reverse($data['expected']);
 			$header->click();
-			foreach ($table->getRows() as $row) {
-				$values[] = $row->getColumn($data['sort_field'])->getText();
-			}
-			$this->assertEquals($expected, $values);
+			$this->assertTableDataColumn($expected, $data['sort_field']);
 		}
 	}
 
@@ -851,7 +874,7 @@ class testPageServicesSla extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=sla.list');
 
 		// Delete SLA.
-		$this->query('class:list-table')->asTable()->one()->findRow('Name', self::$delete_sla)->select();
+		$this->selectTableRows(self::$delete_sla);
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();

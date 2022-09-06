@@ -107,13 +107,11 @@ class testDashboardSlaReportWidget extends testSlaReport {
 
 	public function testDashboardSlaReportWidget_ConfigurationFormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$old_widget_count = $dashboard->getWidgets()->count();
 
 		// Add a widget.
-		$dialog = $dashboard->edit()->addWidget();
+		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
 		$form = $dialog->asForm();
-		$form->getField('Type')->fill('SLA report');
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('SLA report')]);
 		$dialog->waitUntilReady();
 
 		$this->assertEquals(["Type", "Name", "Refresh interval", "SLA", "Service", "Show periods", "From", "To"],
@@ -150,7 +148,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		];
 
 		foreach ($inputs as $field => $attributes) {
-			foreach($attributes as $attribute => $value) {
+			foreach ($attributes as $attribute => $value) {
 				$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
 			}
 		}
@@ -408,7 +406,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$form = $dashboard->getWidget(self::$update_widget)->edit();
 		$form->submit();
 
-		$dashboard->getWidget(self::$update_widget)->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+		// Wait for the widget to be loaded and save dashboard (wait implemented inside the getWidget method).
+		$dashboard->getWidget(self::$update_widget);
 		$dashboard->save();
 
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -465,7 +464,10 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		}
 		else {
 			$form = $dashboard->addWidget()->asForm();
-			$form->getField('Type')->fill('SLA report');
+
+			if ($form->getField('Type')->getValue() !== 'SLA report') {
+				$form->fill(['Type' => CFormElement::RELOADABLE_FILL('SLA report')]);
+			}
 		}
 		$form->fill([
 			'Name' => $new_name,
@@ -480,7 +482,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
 			$form->submit();
-			$dashboard->getWidget($new_name)->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+
 			// Check that changes took place on the unsaved dashboard.
 			$this->assertTrue($dashboard->getWidget($new_name)->isVisible());
 		}
@@ -494,9 +496,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					$this->assertTrue($dashboard->getWidget($name, $valid)->isValid($valid));
 				}
 			}
-			else {
-				$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
-			}
+
+			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 		}
 		// Save or cancel dashboard update.
 		if (CTestArrayHelper::get($data, 'save_dashboard', false)) {
@@ -520,7 +521,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		// Confirm that widget is not present on dashboard.
 		$this->assertFalse($dashboard->getWidget(self::$delete_widget, false)->isValid());
-		$widget_sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
+		$widget_sql = 'SELECT null FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 				' WHERE w.name='.zbx_dbstr(self::$delete_widget);
 		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
 	}
@@ -545,7 +546,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			$form = $dashboard->addWidget()->asForm();
 
 			if ($form->getField('Type')->getValue() !== 'SLA report') {
-				$form->getField('Type')->fill('SLA report');
+				$form->fill(['Type' => CFormElement::RELOADABLE_FILL('SLA report')]);
 			}
 		}
 		else {
@@ -558,9 +559,10 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		 * In SLA report widget the number of returned periods is not limited only by Show periods value, and not
 		 * by the creation date or current date. So to use the $reporting_periods array, Show periods should be filled.
 		 */
-		if (!array_key_exists('error', $data) && !array_key_exists('Service', $data['fields']) && !array_key_exists('no_data', $data)
-				&& in_array($data['reporting_period'], ['Monthly', 'Quarterly', 'Annually'])
-		) {
+		if (!array_key_exists('error', $data)
+				&& !array_key_exists('Service', $data['fields'])
+				&& !array_key_exists('no_data', $data)
+				&& in_array($data['reporting_period'], ['Monthly', 'Quarterly', 'Annually'])) {
 			$data['fields']['Show periods'] = count(self::$reporting_periods[$data['reporting_period']]);
 		}
 
@@ -580,7 +582,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		}
 		else {
 			COverlayDialogElement::ensureNotPresent();
-			$dashboard->getWidget($data['fields']['Name'])->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+			// Wait for the widget to be loaded and save dashboard (wait implemented inside the getWidget method).
+			$dashboard->getWidget($data['fields']['Name']);
 			$dashboard->save();
 
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -602,10 +605,10 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	}
 
 	/**
-	 * Clear multiselects and add default data to data provider before filling in new data inthe form.
+	 * Clear multiselects and add default data to data provider before filling in new data in the form.
 	 * This is needed in update scenarios to overwrite the data left from previous test case.
 	 *
-	 * @param	array			$fields		Array containing tall the fields to be filled in the form.
+	 * @param	array			$fields		Array containing all the fields to be filled in the form.
 	 * @param	CFormElement	$form		Form that should be filled in.
 	 * @return	array
 	 */
@@ -757,8 +760,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'Service' => 'Service with problem',
 						'From' => 'yesterday'
 					],
-					'reporting_period' => 'Daily',
-					'expected_periods' => []
+					'reporting_period' => 'Daily'
 				]
 			],
 			[
@@ -769,8 +771,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'To' => 'yesterday - 1 day',
 						'Show periods' => 3
 					],
-					'reporting_period' => 'Daily',
-					'expected_periods' => []
+					'reporting_period' => 'Daily'
 				]
 			],
 			// Oldest periods should be cut off if Show periods doesn't cover the whole From -> To period.
@@ -874,8 +875,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'SLA' => 'SLA Daily',
 						'From' => 'yesterday'
 					],
-					'reporting_period' => 'Daily',
-					'expected_periods' => []
+					'reporting_period' => 'Daily'
 				]
 			],
 			[
@@ -885,8 +885,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'To' => 'yesterday',
 						'Show periods' => 5
 					],
-					'reporting_period' => 'Daily',
-					'expected_periods' => []
+					'reporting_period' => 'Daily'
 				]
 			],
 			[
@@ -1012,8 +1011,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'Service' => 'Simple actions service',
 						'From' => 'today - 2 weeks'
 					],
-					'reporting_period' => 'Weekly',
-					'expected_periods' => []
+					'reporting_period' => 'Weekly'
 				]
 			],
 			[
@@ -1024,8 +1022,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'To' => 'today - 2 weeks',
 						'Show periods' => 8
 					],
-					'reporting_period' => 'Weekly',
-					'expected_periods' => []
+					'reporting_period' => 'Weekly'
 				]
 			],
 			[
@@ -1147,8 +1144,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'From' => 'today - 3 weeks',
 						'Show periods' => 11
 					],
-					'reporting_period' => 'Weekly',
-					'expected_periods' => []
+					'reporting_period' => 'Weekly'
 				]
 			],
 			[
@@ -1157,8 +1153,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'SLA' => 'SLA Weekly',
 						'To' => 'today - 3 weeks'
 					],
-					'reporting_period' => 'Weekly',
-					'expected_periods' => []
+					'reporting_period' => 'Weekly'
 				]
 			],
 			[
@@ -1283,8 +1278,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'Service' => 'Simple actions service',
 						'From' => 'today - 2 months'
 					],
-					'reporting_period' => 'Monthly',
-					'expected_periods' => []
+					'reporting_period' => 'Monthly'
 				]
 			],
 			[
@@ -1295,8 +1289,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'To' => 'today - 2 months',
 						'Show periods' => 6
 					],
-					'reporting_period' => 'Monthly',
-					'expected_periods' => []
+					'reporting_period' => 'Monthly'
 				]
 			],
 			[
@@ -1305,7 +1298,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'SLA' => 'SLA Monthly',
 						'From' => '2020-01-01',
 						'To' => '2020-02-29'
-
 					],
 					'reporting_period' => 'Monthly',
 					'expected_periods' => [
@@ -1413,8 +1405,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'From' => 'today - 2 months',
 						'Show periods' => 5
 					],
-					'reporting_period' => 'Monthly',
-					'expected_periods' => []
+					'reporting_period' => 'Monthly'
 				]
 			],
 			[
@@ -1423,8 +1414,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'SLA' => 'SLA Monthly',
 						'To' => 'today - 2 months'
 					],
-					'reporting_period' => 'Monthly',
-					'expected_periods' => []
+					'reporting_period' => 'Monthly'
 				]
 			],
 			[
@@ -1434,7 +1424,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'Service' => 'Simple actions service',
 						'From' => '2021-05-01',
 						'To' => '2021-10-01'
-
 					],
 					'reporting_period' => 'Quarterly',
 					'expected_periods' => [
@@ -1552,8 +1541,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'Service' => 'Simple actions service',
 						'From' => 'today - 6 months'
 					],
-					'reporting_period' => 'Quarterly',
-					'expected_periods' => []
+					'reporting_period' => 'Quarterly'
 				]
 			],
 			[
@@ -1564,8 +1552,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'To' => 'today',
 						'Show periods' => 6
 					],
-					'reporting_period' => 'Quarterly',
-					'expected_periods' => []
+					'reporting_period' => 'Quarterly'
 				]
 			],
 			[
@@ -1574,7 +1561,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'SLA' => 'SLA Quarterly',
 						'From' => '2021-05-01',
 						'To' => '2021-10-01'
-
 					],
 					'reporting_period' => 'Quarterly',
 					'expected_periods' => [
@@ -1686,8 +1672,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'From' => 'today - 3 months',
 						'Show periods' => 4
 					],
-					'reporting_period' => 'Quarterly',
-					'expected_periods' => []
+					'reporting_period' => 'Quarterly'
 				]
 			],
 			[
@@ -1696,8 +1681,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'SLA' => 'SLA Quarterly',
 						'To' => 'today - 1 month'
 					],
-					'reporting_period' => 'Quarterly',
-					'expected_periods' => []
+					'reporting_period' => 'Quarterly'
 				]
 			],
 			[
@@ -1833,8 +1817,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'Service' => 'Service with problem',
 						'From' => 'today - 10 years'
 					],
-					'reporting_period' => 'Annually',
-					'expected_periods' => []
+					'reporting_period' => 'Annually'
 				]
 			],
 			[
@@ -1845,8 +1828,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'From' => 'today + 3 months',
 						'Show periods' => 4
 					],
-					'reporting_period' => 'Annually',
-					'expected_periods' => []
+					'reporting_period' => 'Annually'
 				]
 			],
 			[
@@ -1855,7 +1837,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'SLA' => 'SLA Annual',
 						'From' => '2019-05-01',
 						'To' => '2024-10-01'
-
 					],
 					'reporting_period' => 'Annually',
 					'expected_periods' => [
@@ -1969,8 +1950,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'From' => 'today - 6 months',
 						'Show periods' => 5
 					],
-					'reporting_period' => 'Annually',
-					'expected_periods' => []
+					'reporting_period' => 'Annually'
 				]
 			],
 			[
@@ -1979,8 +1959,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'SLA' => 'SLA Annual',
 						'To' => 'tomorrow'
 					],
-					'reporting_period' => 'Annually',
-					'expected_periods' => []
+					'reporting_period' => 'Annually'
 				]
 			],
 			// Using non-complete date in From and To fields.
@@ -2019,8 +1998,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'From' => 'today'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2033,8 +2011,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'From' => 'today - 1 day - 1 week - 1 month - 1 year'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2047,8 +2024,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'From' => 'today'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2062,8 +2038,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'From' => 'this week'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2075,8 +2050,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'From' => date('Y-m-d', strtotime('first day of this month'))
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2090,8 +2064,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'From' => '1 January this Year'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2104,8 +2077,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'To' => 'today'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2118,8 +2090,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'To' => 'today - 1 day - 1 week - 1 month - 1 year'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2132,8 +2103,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'To' => 'today'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2146,8 +2116,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'To' => 'next week -1 day'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2159,8 +2128,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'To' => date('Y-m-d', strtotime('last day of this month'))
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2173,8 +2141,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
 						'To' => '31 December this Year'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2187,8 +2154,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Weekly',
 					'equivalent_timestamps' => [
 						'From' => 'this week - 3 weeks'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2202,8 +2168,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Weekly',
 					'equivalent_timestamps' => [
 						'To' => 'next week -1 day + 3 weeks'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2217,8 +2182,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Monthly',
 					'equivalent_timestamps' => [
 						'From' => date('Y-m', strtotime('first day of this month')).' - 1 month'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2231,8 +2195,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Monthly',
 					'equivalent_timestamps' => [
 						'To' => date('Y-m', strtotime('last day of this month')).' + 1 month'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2245,8 +2208,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Annually',
 					'equivalent_timestamps' => [
 						'From' => '1 January this year - 1 year'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2260,8 +2222,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Annually',
 					'equivalent_timestamps' => [
 						'To' => '31 December this year + 1 year'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2274,8 +2235,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Quarterly',
 					'equivalent_timestamps' => [
 						'From' => '1 January this year + 3 month'
-					],
-					'expected_periods' => []
+					]
 				]
 			],
 			[
@@ -2289,8 +2249,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'reporting_period' => 'Quarterly',
 					'equivalent_timestamps' => [
 						'To' => 'today - 100 days'
-					],
-					'expected_periods' => []
+					]
 				]
 			]
 		];
@@ -2301,8 +2260,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	 */
 	public function testDashboardSlaReportWidget_UpdateWithCustomPeriods($data) {
 		// Construct the expected result array if such is not present in the data provider.
-		if (CTestArrayHelper::get($data, 'expected_periods') === []) {
-
+		if (!array_key_exists('expected_periods', $data)) {
 			// If dynamic format is used in From and To fields, equivalent values are used for building the reference array.
 			$data_for_period = $data;
 			if (array_key_exists('equivalent_timestamps', $data)) {
@@ -2328,7 +2286,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$data['fields'] = $this->cleanupFormBeforeFill($data['fields'], $form);
 
 		// Convert From and To field values to date if it is populated as string and not as a dynamic date.
-		if (CTestArrayHelper::get($data, 'expected_periods') === [] && !array_key_exists('equivalent_timestamps', $data)) {
+		if (!array_key_exists('expected_periods', $data) && !array_key_exists('equivalent_timestamps', $data)) {
 			foreach (['From', 'To'] as $field) {
 				if (CTestArrayHelper::get($data['fields'], $field)) {
 					$data['fields'][$field] = date('Y-m-d', strtotime($data['fields'][$field]));
@@ -2342,7 +2300,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 		$form->submit();
 
-		$dashboard->getWidget(self::$update_widget)->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+		// Wait for the widget to be loaded and save dashboard (wait implemented inside the getWidget method).
+		$dashboard->getWidget(self::$update_widget);
 		$dashboard->save();
 
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -2372,34 +2331,38 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		// By default the last 20 periods are displayed.
 		$show_periods = (array_key_exists('Show periods', $data['fields'])) ? $data['fields']['Show periods'] : 20;
 
+
+
+		if (array_key_exists('To', $data['fields'])) {
+			$to_date = $data['fields']['To'];
+		}
+		elseif (array_key_exists('From', $data['fields'])) {
+			$units = [
+				'Daily' => 'days',
+				'Weekly' => 'weeks',
+				'Monthly' => 'months',
+				'Quarterly' => 'months',
+				'Annually' => 'years'
+			];
+			$multiplier = ($data['reporting_period'] === 'Quarterly') ? 3 : 1;
+
+			$to_date = date('Y-m-d', strtotime($data['fields']['From'].' + '.($multiplier * ($show_periods - 1)).
+					' '.$units[$data['reporting_period']])
+			);
+		}
+		else {
+			$to_date = 'today';
+		}
+
+
 		switch ($data['reporting_period']) {
 			case 'Daily':
-				if (array_key_exists('To', $data['fields'])) {
-					$to_date = $data['fields']['To'];
-				}
-				elseif (array_key_exists('From', $data['fields'])) {
-					$to_date = $data['fields']['From'].' + '.($show_periods - 1).' days';
-				}
-				else {
-					$to_date = 'today';
-				}
-
 				for ($i = 0; $i < $show_periods; $i++) {
 					$period_values[] = date('Y-m-d', strtotime($to_date.' '.-$i.' days'));
 				}
 				break;
 
 			case 'Weekly':
-				if (array_key_exists('To', $data['fields'])) {
-					$to_date = $data['fields']['To'];
-				}
-				elseif (array_key_exists('From', $data['fields'])) {
-					$to_date = date('Y-m-d', strtotime($data['fields']['From'].' + '.($show_periods - 1).' weeks'));
-				}
-				else {
-					$to_date = 'today';
-				}
-
 				// Since in SLA report week starts on Sunday but in php - on Monday, use +1 week if to_date is Sunday.
 				$date_string = (date('l', strtotime($to_date)) === 'Sunday')
 					? 'this week this sunday'
@@ -2414,32 +2377,12 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				break;
 
 			case 'Monthly':
-				if (array_key_exists('To', $data['fields'])) {
-					$to_date = $data['fields']['To'];
-				}
-				elseif (array_key_exists('From', $data['fields'])) {
-					$to_date = date('Y-m-d', strtotime($data['fields']['From'].' + '.($show_periods - 1).' months'));
-				}
-				else {
-					$to_date = 'today';
-				}
-
 				for ($i = 0; $i < $show_periods; $i++) {
 					$period_values[] = date('Y-m', strtotime($to_date.' '.-$i.' month'));
 				}
 				break;
 
 			case 'Quarterly':
-				if (array_key_exists('To', $data['fields'])) {
-					$to_date = $data['fields']['To'];
-				}
-				elseif (array_key_exists('From', $data['fields'])) {
-					$to_date = date('Y-m-d', strtotime($data['fields']['From'].' + '.(3 * ($show_periods - 1)).' months'));
-				}
-				else {
-					$to_date = 'today';
-				}
-
 				$quarters = ['01 – 03', '04 – 06', '07 – 09', '10 – 12'];
 				$to_year = date('Y', strtotime($to_date));
 				$to_month = date('m', strtotime($to_date));
@@ -2466,20 +2409,9 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						}
 					}
 				}
-
 				break;
 
 			case 'Annually':
-				if (array_key_exists('To', $data['fields'])) {
-					$to_date = $data['fields']['To'];
-				}
-				elseif (array_key_exists('From', $data['fields'])) {
-					$to_date = date('Y-m-d', strtotime($data['fields']['From'].' + '.($show_periods - 1).' years'));
-				}
-				else {
-					$to_date = 'today';
-				}
-
 				for ($i = 0; $i < $show_periods; $i++) {
 					$period_values[] = date('Y', strtotime($to_date.' '.-$i.' years'));
 				}

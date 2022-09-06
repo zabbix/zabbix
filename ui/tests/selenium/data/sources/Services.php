@@ -399,7 +399,8 @@ class Services {
 			]
 		]);
 
-		DBexecute("UPDATE services SET status = 5 WHERE name = 'Service with problem'");
+		// Set service into Disaster (status 5) state.
+		DBexecute("UPDATE services SET status=5 WHERE name='Service with problem'");
 
 		return ['serviceids' => $serviceids];
 	}

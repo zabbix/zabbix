@@ -39,12 +39,7 @@ class testFormServicesServices extends CWebTest {
 	private static $service_sql = 'SELECT * FROM services ORDER BY serviceid';
 	private static $update_service = 'Update service';
 	private static $delete_service = 'Service for delete';
-
-	private static $parentid;
-	private static $childid;
-	private static $parentid_2;
-	private static $childid_2;
-	private static $service_count;
+	private static $serviceids;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -56,13 +51,7 @@ class testFormServicesServices extends CWebTest {
 	}
 
 	public static function prepareServicesData() {
-		$services = CDataHelper::get('Services.serviceids');
-
-		self::$parentid = $services['Parent for deletion from row'];
-		self::$childid = $services['Child 2'];
-		self::$parentid_2 = $services['Parent for child deletion from row'];
-		self::$childid_2 = $services['Child 1'];
-		self::$service_count = count($services);
+		self::$serviceids = CDataHelper::get('Services.serviceids');
 	}
 
 	/**
@@ -340,7 +329,9 @@ class testFormServicesServices extends CWebTest {
 		$children_dialog->waitUntilReady();
 
 		// Check possible children count in table.
-		$this->assertEquals(self::$service_count, $children_dialog->query('class:list-table')->asTable()->one()->getRows()->count());
+		$this->assertEquals(count(self::$serviceids), $children_dialog->query('class:list-table')->asTable()->one()
+				->getRows()->count())
+		;
 
 		foreach (['Add', 'Cancel'] as $button) {
 			$this->assertTrue($dialog->getFooter()->query('button', $button)->one()->isClickable());
@@ -1237,7 +1228,7 @@ class testFormServicesServices extends CWebTest {
 
 		// Check that service linking is disappeared from DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-				self::$parentid.' AND servicedownid ='.self::$childid)
+				self::$serviceids['Parent for deletion from row'].' AND servicedownid ='.self::$serviceids['Child 2'])
 		);
 	}
 
@@ -1265,14 +1256,14 @@ class testFormServicesServices extends CWebTest {
 		}
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-				self::$parentid_2.' AND servicedownid ='.self::$childid_2)
+				self::$serviceids['Parent for child deletion from row'].' AND servicedownid ='.self::$serviceids['Child 1'])
 		);
 	}
 
 	public function testFormServicesServices_DeleteService() {
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
-		$table->findRow('Name', 'Service for delete')->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
+		$table->findRow('Name', self::$delete_service)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
@@ -1281,7 +1272,7 @@ class testFormServicesServices extends CWebTest {
 
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Service deleted');
-		$this->assertFalse($this->query('link:Service for delete')->one(false)->isValid());
+		$this->assertFalse($this->query('link', self::$delete_service)->one(false)->isValid());
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr(self::$delete_service)));
 	}

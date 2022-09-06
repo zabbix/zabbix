@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup sla
  *
- * @dataSource Sla
+ * @dataSource Services, Sla
  */
 class testFormServicesSla extends CWebTest {
 
@@ -73,12 +73,11 @@ class testFormServicesSla extends CWebTest {
 		];
 
 		$this->assertEquals(array_merge($sla_tab_labels, ['Excluded downtimes']), $form->getLabels()->asText());
-		foreach ($sla_tab_labels as $label) {
-			$this->assertTrue($form->getField($label)->isVisible());
-		}
+
+		$form->getLabels()->filter(new CElementFilter(CElementFilter::VISIBLE))->asText();
 
 		// Check that mandatory fields are marked accordingly.
-		foreach(['Name', 'SLO', 'Effective date', 'Service tags'] as $sla_label) {
+		foreach (['Name', 'SLO', 'Effective date', 'Service tags'] as $sla_label) {
 			$this->assertEquals('form-label-asterisk', $form->getLabel($sla_label)->getAttribute('class'));
 		}
 
@@ -114,6 +113,22 @@ class testFormServicesSla extends CWebTest {
 		$this->assertEquals(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
 				$schedule_table->query("xpath:.//label")->all()->asText()
 		);
+
+		// Check checkboxes default values.
+		$days = [
+			'Sunday' => false,
+			'Monday' => true,
+			'Tuesday' => true,
+			'Wednesday' => true,
+			'Thursday' => true,
+			'Friday' => true,
+			'Saturday' => false
+		];
+		$this->assertEquals(array_keys($days), $schedule_table->query("xpath:.//label")->all()->asText());
+		$form->checkValue($days);
+
+		// Check the default status of the SLA.
+		$this->assertTrue($form->getField('Enabled')->isChecked());
 
 		// Check SLA tab input fields maxlength, placeholders and default values.
 		$inputs = [
@@ -210,21 +225,6 @@ class testFormServicesSla extends CWebTest {
 
 		$this->checkDropdowns($dropdowns, $form);
 
-		// Check checkboxes default values.
-		$checkboxes = [
-			'id:schedule_enabled_0' => false,
-			'id:schedule_enabled_1' => true,
-			'id:schedule_enabled_2' => true,
-			'id:schedule_enabled_3' => true,
-			'id:schedule_enabled_4' => true,
-			'id:schedule_enabled_5' => true,
-			'id:schedule_enabled_6' => false,
-			'id:status' => true
-		];
-		foreach ($checkboxes as $locator => $checked) {
-			$this->assertEquals($checked, $form->query($locator)->asCheckbox()->one()->isChecked());
-		}
-
 		$tags_table_elements = [
 			'headers' => ['Name', 'Operation', 'Value', 'Action'],
 			'buttons' => ['Add', 'Remove'],
@@ -255,12 +255,12 @@ class testFormServicesSla extends CWebTest {
 		$this->assertEquals($downtime_labels, $downtimes_form->getLabels()->asText());
 
 		// Check that all three fields are marked as mandatory.
-		foreach($downtime_labels as $downtime_label) {
+		foreach ($downtime_labels as $downtime_label) {
 			$this->assertEquals('form-label-asterisk', $downtimes_form->getLabel($downtime_label)->getAttribute('class'));
 		}
 
 		$duration_field = $downtimes_form->getField('Duration');
-		foreach(['Days', 'Hours', 'Minutes'] as $string) {
+		foreach (['Days', 'Hours', 'Minutes'] as $string) {
 			$this->assertStringContainsString($string, $duration_field->getText());
 		}
 
@@ -287,7 +287,7 @@ class testFormServicesSla extends CWebTest {
 				'field' => 'id:start_time',
 				'maxlength' => 16,
 				'placeholder' => 'YYYY-MM-DD hh:mm',
-				'value' => date('Y-m-d',strtotime(date('Y-m-d')."+1 days")).' 00:00'
+				'value' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00'
 			],
 			[
 				'field' => 'id:duration_days',
@@ -314,7 +314,7 @@ class testFormServicesSla extends CWebTest {
 
 		$table_data = [
 			[
-				'Start time' => date('Y-m-d',strtotime(date('Y-m-d')."+1 days")).' 00:00',
+				'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
 				'Duration' => '1h',
 				'Name' => '!@#$%^&*()_+123Zabbix',
 				'Action' => 'Edit Remove'
@@ -411,11 +411,11 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '99.9',
 						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
-						'id:schedule_enabled_1' => false,
-						'id:schedule_enabled_2' => false,
-						'id:schedule_enabled_3' => false,
-						'id:schedule_enabled_4' => false,
-						'id:schedule_enabled_5' => false
+						'Monday' => false,
+						'Tuesday' => false,
+						'Wednesday' => false,
+						'Thursday' => false,
+						'Friday' => false
 					],
 					'error' => 'Incorrect schedule: cannot be empty.'
 				]
@@ -429,7 +429,7 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '99.9',
 						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
-						'id:schedule_enabled_1' => true,
+						'Monday' => true,
 						'id:schedule_periods_1' => 'all day'
 					],
 					'error' => 'Incorrect schedule: comma separated list of time periods is expected for scheduled week days.'
@@ -444,7 +444,7 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '99.9',
 						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
-						'id:schedule_enabled_1' => true,
+						'Monday' => true,
 						'id:schedule_periods_1' => '00:01-00:01'
 					],
 					'error' => 'Incorrect schedule: comma separated list of time periods is expected for scheduled week days.'
@@ -459,7 +459,7 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '99.9',
 						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
-						'id:schedule_enabled_1' => true,
+						'Monday' => true,
 						'id:schedule_periods_1' => '00:01-00:61'
 					],
 					'error' => 'Incorrect schedule: comma separated list of time periods is expected for scheduled week days.'
@@ -474,7 +474,7 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '99.9',
 						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
-						'id:schedule_enabled_1' => true,
+						'Monday' => true,
 						'id:schedule_periods_1' => '00:01-00:03,00:09-00:09'
 					],
 					'error' => 'Incorrect schedule: comma separated list of time periods is expected for scheduled week days.'
@@ -738,13 +738,13 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => 'tag',
 						'name:service_tags[0][operator]' => 'Contains',
 						'id:service_tags_0_value' => 'мфдгу',
-						'id:schedule_enabled_0' => true,
-						'id:schedule_enabled_6' => true,
-						'id:schedule_enabled_1' => false,
-						'id:schedule_enabled_2' => false,
-						'id:schedule_enabled_3' => false,
-						'id:schedule_enabled_4' => false,
-						'id:schedule_enabled_5' => false,
+						'Sunday' => true,
+						'Saturday' => true,
+						'Monday' => false,
+						'Tuesday' => false,
+						'Wednesday' => false,
+						'Thursday' => false,
+						'Friday' => false,
 						'id:schedule_periods_0' => '01:33-02:44, 03:55-04:11',
 						'id:schedule_periods_6' => '20:33-21:22, 22:55-23:44',
 						'Description' => 'SLA description',
@@ -779,13 +779,13 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => '  trim tag  ',
 						'name:service_tags[0][operator]' => 'Contains',
 						'id:service_tags_0_value' => '   trim value   ',
-						'id:schedule_enabled_1' => true,
-						'id:schedule_enabled_2' => true,
-						'id:schedule_enabled_3' => false,
-						'id:schedule_enabled_4' => false,
-						'id:schedule_enabled_5' => false,
-						'id:schedule_enabled_4' => false,
-						'id:schedule_enabled_5' => false,
+						'Monday' => true,
+						'Tuesday' => true,
+						'Wednesday' => false,
+						'Thursday' => false,
+						'Friday' => false,
+						'Saturday' => false,
+						'Sunday' => false,
 						'id:schedule_periods_1' => '   00:00-24:00   ',
 						'id:schedule_periods_2' => '   01:23-02:34, 03:45-04:56   ',
 						'Description' => '   SLA description   ',
@@ -845,7 +845,7 @@ class testFormServicesSla extends CWebTest {
 
 	public function testFormServicesSla_Delete() {
 		// Get ID of the SLA to be deleted.
-		$id_to_delete = CDataHelper::get('Sla.sla_ids')[self::$delete_sla];
+		$id_to_delete = CDataHelper::get('Sla.slaids')[self::$delete_sla];
 
 		$this->page->login()->open('zabbix.php?action=sla.list');
 		$this->query('link', self::$delete_sla)->waitUntilClickable()->one()->click();
@@ -860,7 +860,7 @@ class testFormServicesSla extends CWebTest {
 
 		// Check that the records associated with the deleted SLA are not present in all SLA related tables.
 		foreach (['sla', 'sla_excluded_downtime', 'sla_schedule', 'sla_service_tag'] as $table) {
-			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM '.$table.' WHERE slaid='.$id_to_delete));
+			$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM '.$table.' WHERE slaid='.$id_to_delete));
 		}
 	}
 
@@ -931,7 +931,7 @@ class testFormServicesSla extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'SLA created');
 		// Check that there are 2 SLAs whose name contain the name of the original SLA (the clone has prefix "Clone:").
-		$this->assertEquals(2, CDBHelper::getCount('SELECT * FROM sla WHERE name LIKE ('.zbx_dbstr('%'.self::$sla_with_downtimes).')'));
+		$this->assertEquals(2, CDBHelper::getCount('SELECT null FROM sla WHERE name LIKE ('.zbx_dbstr('%'.self::$sla_with_downtimes).')'));
 
 		// Check cloned sla saved form.
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
@@ -960,6 +960,7 @@ class testFormServicesSla extends CWebTest {
 
 		// Open service form depending on create or update scenario.
 		$this->page->login()->open('zabbix.php?action=sla.list');
+
 		if ($update) {
 			$this->query('link', self::$update_sla)->waitUntilClickable()->one()->click();
 		}
@@ -995,7 +996,6 @@ class testFormServicesSla extends CWebTest {
 
 				return;
 			}
-
 		}
 		$form->submit();
 		$this->page->waitUntilReady();
