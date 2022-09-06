@@ -5290,6 +5290,9 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision, int t
 	{
 		preprocitem = (ZBX_DC_PREPROCITEM *)items.values[i];
 
+		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &preprocitem->itemid)))
+			dc_item_update_revision(item, revision);
+
 		if (0 == preprocitem->preproc_ops.values_num)
 		{
 			zbx_vector_ptr_destroy(&preprocitem->preproc_ops);
@@ -5297,9 +5300,6 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision, int t
 		}
 		else
 			zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
-
-		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &preprocitem->itemid)))
-			dc_item_update_revision(item, revision);
 	}
 
 	zbx_vector_ptr_destroy(&items);
@@ -5402,6 +5402,9 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	{
 		scriptitem = (ZBX_DC_SCRIPTITEM *)items.values[i];
 
+		if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &scriptitem->itemid)))
+			dc_item_update_revision(dc_item, revision);
+
 		if (0 == scriptitem->params.values_num)
 		{
 			zbx_vector_ptr_destroy(&scriptitem->params);
@@ -5409,9 +5412,6 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 		else
 			zbx_vector_ptr_sort(&scriptitem->params, dc_compare_itemscript_param);
-
-		if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &scriptitem->itemid)))
-			dc_item_update_revision(dc_item, revision);
 	}
 
 	zbx_vector_ptr_destroy(&items);
