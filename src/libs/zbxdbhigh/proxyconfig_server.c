@@ -497,7 +497,7 @@ out:
  * Purpose: get item data from items table                                    *
  *                                                                            *
  * Parameters: hostids    - [IN] the target host identifiers                  *
- *             itemids    - [IN] the selected item identifiers                *
+ *             itemids    - [IN] the selected item identifiers, sorted        *
  *             j          - [OUT] the output json                             *
  *             error      - [OUT] the error message                           *
  *                                                                            *
@@ -574,6 +574,8 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 
 	zbx_json_close(j);
 	zbx_json_close(j);
+
+	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	ret = SUCCEED;
 out:
