@@ -419,7 +419,6 @@ class testFormGraph extends testFormGraphs {
 			],
 			[
 				[
-					'last_case' => true,
 					'fields' => [
 						'Name' => 'Exploded graph 3D false',
 						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded'),
