@@ -96,38 +96,40 @@ if (is_array($SSO) && array_key_exists('SETTINGS', $SSO)) {
 
 $baseurl = Utils::getSelfURLNoQuery();
 $relay_state = null;
+$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);
+
 $settings = [
 	'sp' => [
-		'entityId' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SP_ENTITYID),
+		'entityId' => $saml_settings['sp_entityid'],
 		'assertionConsumerService' => [
 			'url' => $baseurl.'?acs'
 		],
 		'singleLogoutService' => [
 			'url' => $baseurl.'?sls'
 		],
-		'NameIDFormat' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_NAMEID_FORMAT),
+		'NameIDFormat' => $saml_settings['nameid_format'],
 		'x509cert' => $sp_cert,
 		'privateKey' => $sp_key
 	],
 	'idp' => [
-		'entityId' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_IDP_ENTITYID),
+		'entityId' => $saml_settings['idp_entityid'],
 		'singleSignOnService' => [
-			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SSO_URL)
+			'url' => $saml_settings['sso_url']
 		],
 		'singleLogoutService' => [
-			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL)
+			'url' => $saml_settings['slo_url']
 		],
 		'x509cert' => $idp_cert
 	],
 	'security' => [
-		'nameIdEncrypted' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_ENCRYPT_NAMEID),
-		'authnRequestsSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_AUTHN_REQUESTS),
-		'logoutRequestSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_LOGOUT_REQUESTS),
-		'logoutResponseSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_LOGOUT_RESPONSES),
-		'wantMessagesSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_MESSAGES),
-		'wantAssertionsEncrypted' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_ENCRYPT_ASSERTIONS),
-		'wantAssertionsSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_ASSERTIONS),
-		'wantNameIdEncrypted' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_ENCRYPT_NAMEID)
+		'nameIdEncrypted' => (bool) $saml_settings['encrypt_nameid'],
+		'authnRequestsSigned' => (bool) $saml_settings['sign_authn_requests'],
+		'logoutRequestSigned' => (bool) $saml_settings['sign_logout_requests'],
+		'logoutResponseSigned' => (bool) $saml_settings['sign_logout_responses'],
+		'wantMessagesSigned' => (bool) $saml_settings['sign_messages'],
+		'wantAssertionsEncrypted' => (bool)$saml_settings['encrypt_assertions'],
+		'wantAssertionsSigned' => (bool) $saml_settings['sign_assertions'],
+		'wantNameIdEncrypted' => (bool) $saml_settings['encrypt_nameid']
 	]
 ];
 
@@ -183,17 +185,17 @@ try {
 
 		$user_attributes = $auth->getAttributes();
 
-		if (!array_key_exists(CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE),
+		if (!array_key_exists($saml_settings['username_attribute'],
 			$user_attributes
 		)) {
 			throw new Exception(
-				_s('The parameter "%1$s" is missing from the user attributes.', CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE))
+				_s('The parameter "%1$s" is missing from the user attributes.', $saml_settings['username_attribute'])
 			);
 		}
 
 		$saml_data = [
 			'username_attribute' => reset(
-				$user_attributes[CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE)]
+				$user_attributes[$saml_settings['username_attribute']]
 			),
 			'nameid' => $auth->getNameId(),
 			'nameid_format' => $auth->getNameIdFormat(),
@@ -210,7 +212,7 @@ try {
 		}
 	}
 
-	if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL) !== '') {
+	if ($saml_settings['slo_url'] !== '') {
 		if (hasRequest('slo') && CSessionHelper::has('saml_data')) {
 			$saml_data = CSessionHelper::get('saml_data');
 

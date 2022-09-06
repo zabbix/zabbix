@@ -42,7 +42,7 @@ check_fields($fields);
 
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 	if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_ENABLED
-			&& CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL) !== ''
+			&& CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML)['slo_url'] !== ''
 			&& CSessionHelper::has('saml_data')) {
 		redirect('index_sso.php?slo');
 	}

@@ -112,6 +112,26 @@ class CUserDirectory extends CApiService {
 		return $db_userdirectories;
 	}
 
+	/**
+	 * Function for internal purpose only, used in CAuthenticationHelper.
+	 *
+	 * @param array $options
+	 * @param bool  $api_call  Flag indicating whether this method called via an API call or from a local PHP file.
+	 *
+	 * @throws APIException if the input is invalid.
+	 *
+	 * @return array
+	 */
+	public function getGlobal(array $options, bool $api_call = true): array {
+		if ($api_call) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect method "%1$s.%2$s".', 'userdirectory', 'getglobal')
+			);
+		}
+
+		return $this->get($options);
+	}
+
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sql_parts) {
 		$sql_parts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sql_parts);
 
