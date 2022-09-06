@@ -559,7 +559,7 @@ class testPageReportsAudit extends CWebTest {
 
 		foreach ($actions as $action => $audit) {
 			$form->fill(['Resource' => $resource_name, 'Resource ID' => $resourceid]);
-			$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($action).
+			$form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($action).
 					']/../input[contains(@id, "filter_actions")]')->asCheckbox()->one()->check();
 			$form->submit()->waitUntilReloaded();
 
