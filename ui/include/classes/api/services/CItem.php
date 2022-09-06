@@ -1113,10 +1113,7 @@ class CItem extends CItemGeneral {
 	 */
 	private static function getChildObjectsUsingName(array $items, ?array $hostids): array {
 		$hostids_condition = ($hostids !== null) ? ' AND '.dbConditionId('ht.hostid', $hostids) : '';
-		if ($items[0]['itemid'] === '43430') {
-			file_put_contents('test.txt', print_r([], true) . "\n", FILE_APPEND);
-			return [];
-		}
+
 		$result = DBselect(
 			'SELECT i.itemid,ht.hostid,i.key_,i.templateid,i.flags,h.status AS host_status,'.
 				'ht.templateid AS parent_hostid'.

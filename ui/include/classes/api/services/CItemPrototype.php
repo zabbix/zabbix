@@ -920,8 +920,7 @@ class CItemPrototype extends CItemGeneral {
 		if ($upd_items) {
 			self::updateForce($upd_items, $upd_db_items);
 		}
-file_put_contents('test.txt', print_r($items, true) . "\n", FILE_APPEND);
-file_put_contents('test.txt', print_r($ins_items, true) . "\n", FILE_APPEND);
+
 		if ($ins_items) {
 			self::createForce($ins_items);
 		}
