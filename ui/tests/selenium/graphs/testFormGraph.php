@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormGraphs.php';
 
 /**
@@ -32,6 +33,8 @@ class testFormGraph extends testFormGraphs {
 	public $url = 'graphs.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host';
 
 	public function prepareGraphsData() {
+		self::$update_graph = 'Graph for update';
+
 		// Create items on given host.
 		$items_data = [];
 		foreach (self::$items['items'] as $name => $fields) {
@@ -53,7 +56,7 @@ class testFormGraph extends testFormGraphs {
 		self::$items['graph_trap_text']['itemid'] = $itemids['graph_trap_text'];
 		self::$items['graph_trap_log']['itemid'] = $itemids['graph_trap_log'];
 
-		// Create graphs with previously created items..
+		// Create graphs with previously created items.
 		$prepared_graphs = [
 			[
 				'name' => 'Graph for update',
@@ -69,6 +72,10 @@ class testFormGraph extends testFormGraphs {
 			],
 			[
 				'name' => 'Graph for clone',
+				'itemid' => self::$items['graph_trap_int']['itemid']
+			],
+			[
+				'name' => 'Graph for items change',
 				'itemid' => self::$items['graph_trap_int']['itemid']
 			]
 		];
@@ -106,24 +113,7 @@ class testFormGraph extends testFormGraphs {
 					'fields' => [
 						'Name' => 'Empty color'
 					],
-					'items' =>[
-						[
-							'item' => 'testFormItem',
-							'color' => ''
-						]
-					],
-					'details' => [
-						'Empty color.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty color'
-					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'testFormItem',
 							'color' => ''
@@ -140,7 +130,7 @@ class testFormGraph extends testFormGraphs {
 					'fields' => [
 						'Name' => 'Duplicated graph'
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'testFormItem'
 						]
@@ -159,7 +149,7 @@ class testFormGraph extends testFormGraphs {
 						'Show legend' => false,
 						'3D view' => true
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
 							'color'=> 'AB47BC',
@@ -200,7 +190,7 @@ class testFormGraph extends testFormGraphs {
 						'id:yaxismin' => 0.1,
 						'id:yaxismax' => 0.1
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'testFormItem'
 						]
@@ -220,7 +210,7 @@ class testFormGraph extends testFormGraphs {
 						'id:yaxismin' => 0.2,
 						'id:yaxismax' => 0.1
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'testFormItem'
 						]
@@ -251,7 +241,7 @@ class testFormGraph extends testFormGraphs {
 						'min' => 'Failed step of scenario "testFormWeb1".',
 						'max' => 'Download speed for scenario "testFormWeb1".'
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'testFormItem',
 							'color'=> 'BBDEFB',
@@ -315,7 +305,7 @@ class testFormGraph extends testFormGraphs {
 						'id:yaxismin' => 0.1,
 						'id:yaxismax' => 0.99
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'testFormItem',
 							'color'=> '00897B',
@@ -351,7 +341,7 @@ class testFormGraph extends testFormGraphs {
 						'Show legend' => true,
 						'3D view' => false
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'Failed step of scenario "testFormWeb1".',
 							'color'=> 'D2D2D2',
@@ -379,7 +369,7 @@ class testFormGraph extends testFormGraphs {
 						'Show legend' => false,
 						'3D view' => true
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'Failed step of scenario "testFormWeb3".',
 							'color'=> 'AB47BC',
@@ -407,7 +397,7 @@ class testFormGraph extends testFormGraphs {
 						'Show legend' => false,
 						'3D view' => true
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
 							'color'=> 'AB47BC',
@@ -436,7 +426,7 @@ class testFormGraph extends testFormGraphs {
 						'Show legend' => true,
 						'3D view' => false
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
 							'color'=> 'AB47BC',
@@ -460,8 +450,6 @@ class testFormGraph extends testFormGraphs {
 	}
 
 	/**
-	 * @backupOnce graphs
-	 *
 	 * @dataProvider getCommonGraphData
 	 * @dataProvider getGraphData
 	 */
@@ -470,14 +458,11 @@ class testFormGraph extends testFormGraphs {
 	}
 
 	/**
-	 * @backupOnce graphs
-	 *
 	 * @dataProvider getCommonGraphData
 	 * @dataProvider getGraphData
 	 */
 	public function testFormGraph_Update($data) {
-		$this->update = true;
-		$this->checkGraphForm($data);
+		$this->checkGraphForm($data, true);
 	}
 
 	/**
@@ -564,34 +549,25 @@ class testFormGraph extends testFormGraphs {
 		$this->checkDelete();
 	}
 
-	public static function getTextItemsData() {
-		return [
-			[
+	public function testFormGraph_TextItems() {
+		$data = [
+			'fields' => [
+				'Name' => 'Graph of text items',
+				'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
+				'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+			],
+			'yaxis_items' => [
+				'min' => 'graph_trap_text',
+				'max' => 'graph_trap_log'
+			],
+			'items' => [
 				[
-					'fields' => [
-						'Name' => 'Graph of text items',
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
-					],
-					'yaxis_items' => [
-						'min' => 'graph_trap_text',
-						'max' => 'graph_trap_log'
-					],
-					'items' =>[
-						[
-							'item' => 'graph_trap_text',
-							'item' => 'graph_trap_log'
-						]
-					]
+					'item' => 'graph_trap_text',
+					'item' => 'graph_trap_log'
 				]
 			]
 		];
-	}
 
-	/**
-	 * @dataProvider getTextItemsData
-	 */
-	public function testFormGraph_TextItems($data) {
 		$this->checkTextItems($data);
 	}
 }

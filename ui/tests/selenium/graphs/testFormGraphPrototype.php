@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormGraphs.php';
 
 /**
@@ -32,14 +33,9 @@ class testFormGraphPrototype extends testFormGraphs {
 	public $prototype = true;
 	public $url = 'graphs.php?parent_discoveryid='.self::LLDID.'&context=host';
 
-	/**
-	 * @dataProvider getLayoutData
-	 */
-	public function testFormGraphPrototype_Layout($data) {
-		$this->checkGraphFormLayout($data);
-	}
-
 	public function prepareGraphPrototypesData() {
+		self::$update_graph = 'Graph for update';
+
 		// Create item on given host.
 		$items = CDataHelper::call('item.create', [
 			'hostid' => self::HOSTID,
@@ -72,7 +68,7 @@ class testFormGraphPrototype extends testFormGraphs {
 		self::$items['graph_prototype_trap_text']['itemid'] = $item_prototype_ids['graph_prototype_trap_text'];
 		self::$items['graph_prototype_trap_char']['itemid'] = $item_prototype_ids['graph_prototype_trap_char'];
 
-		// Create graphs with previously created items..
+		// Create graphs with previously created items.
 		$prepared_graph_prototypes = [
 			[
 				'name' => 'Graph for update',
@@ -89,7 +85,11 @@ class testFormGraphPrototype extends testFormGraphs {
 			[
 				'name' => 'Graph prototype for clone',
 				'itemid' => self::$items['graph_prototype_trap_int']['itemid']
-			]
+			],
+			[
+				'name' => 'Graph for items change',
+				'itemid' => self::$items['graph_prototype_trap_int']['itemid']
+			],
 		];
 
 		$graph_prototypes_data = [];
@@ -114,6 +114,13 @@ class testFormGraphPrototype extends testFormGraphs {
 		CDataHelper::call('graphprototype.create', $graph_prototypes_data);
 	}
 
+	/**
+	 * @dataProvider getLayoutData
+	 */
+	public function testFormGraphPrototype_Layout($data) {
+		$this->checkGraphFormLayout($data);
+	}
+
 	public function getGraphPrototypeData() {
 		return [
 			[
@@ -122,7 +129,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'fields' => [
 						'Name' => 'Empty item prototype {#KEY}'
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'testFormItem'
 						]
@@ -138,7 +145,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'fields' => [
 						'Name' => 'Empty color in item prototype {#KEY}'
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1',
@@ -155,7 +162,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'fields' => [
 						'Name' => 'Normal graph prototype without LLD macro'
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1'
@@ -169,7 +176,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'fields' => [
 						'Name' => 'Duplicated graph prototype'
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1'
@@ -187,7 +194,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'Name' => 'Exploded graph prototype duplicated Graph sum type',
 						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1',
@@ -229,7 +236,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'Name' => 'Exploded graph prototype duplicated Graph sum type mixed',
 						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1',
@@ -275,7 +282,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'min' => 'testFormItemPrototype1',
 						'max' => 'testFormItemPrototype2'
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1',
@@ -344,7 +351,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'id:yaxismin' => 0.1,
 						'id:yaxismax' => 0.99
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1',
@@ -385,7 +392,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'id:yaxismin' => 0.1,
 						'id:yaxismax' => 0.1
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1'
@@ -406,7 +413,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'id:yaxismin' => 0.2,
 						'id:yaxismax' => 0.1
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1'
@@ -425,7 +432,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'Show legend' => true,
 						'3D view' => false
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1',
@@ -455,7 +462,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'Show legend' => false,
 						'3D view' => true
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype3',
@@ -485,7 +492,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'Show legend' => false,
 						'3D view' => true
 					],
-					'items' =>[
+					'items' => [
 						[
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1',
@@ -532,7 +539,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'Show legend' => true,
 						'3D view' => false
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
 							'color'=> 'AB47BC',
@@ -574,8 +581,6 @@ class testFormGraphPrototype extends testFormGraphs {
 	}
 
 	/**
-	 * @backupOnce graphs
-	 *
 	 * @dataProvider getCommonGraphData
 	 * @dataProvider getGraphPrototypeData
 	 */
@@ -584,14 +589,11 @@ class testFormGraphPrototype extends testFormGraphs {
 	}
 
 	/**
-	 * @backupOnce graphs
-	 *
 	 * @dataProvider getCommonGraphData
 	 * @dataProvider getGraphPrototypeData
 	 */
 	public function testFormGraphPrototype_Update($data) {
-		$this->update = true;
-		$this->checkGraphForm($data);
+		$this->checkGraphForm($data, true);
 	}
 
 	/**
@@ -691,7 +693,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'min' => 'graph_prototype_trap_text',
 						'max' => 'graph_prototype_trap_char'
 					],
-					'items' =>[
+					'items' => [
 						[
 							'item' => 'graph_prototype_trap_text',
 							'item' => 'graph_prototype_trap_char'
@@ -702,10 +704,25 @@ class testFormGraphPrototype extends testFormGraphs {
 		];
 	}
 
-	/**
-	 * @dataProvider getTextItemPrototypesData
-	 */
-	public function testFormGraphPrototype_TextItems($data) {
+	public function testFormGraphPrototype_TextItems() {
+		$data = [
+			'fields' => [
+				'Name' => 'Graph prototype of text items',
+				'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
+				'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+			],
+			'yaxis_items' => [
+				'min' => 'graph_prototype_trap_text',
+				'max' => 'graph_prototype_trap_char'
+			],
+			'items' => [
+				[
+					'item' => 'graph_prototype_trap_text',
+					'item' => 'graph_prototype_trap_char'
+				]
+			]
+		];
+
 		$this->checkTextItems($data);
 	}
 }

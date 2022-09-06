@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -35,11 +36,6 @@ class testFormGraphs extends CWebTest {
 	public $prototype = false;
 
 	/**
-	 * Flag for update scenario.
-	 */
-	public $update = false;
-
-	/**
 	 * URL for opening graph or graph prototype form.
 	 */
 	public $url;
@@ -48,7 +44,7 @@ class testFormGraphs extends CWebTest {
 	 * Name of graph for update scenario.
 	 *
 	 */
-	private static $update_graph = 'Graph for update';
+	public static $update_graph;
 
 	/**
 	 * Id for item used in graph prototype.
@@ -340,15 +336,17 @@ class testFormGraphs extends CWebTest {
 			$items_container->query('button', $item['button'])->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->one();
 			$dialog->query('link', $item['name'])->waitUntilClickable()->one()->click();
-			$dialog->waitUntilNotPresent();
+			$dialog->ensureNotPresent();
 
 			$this->assertEquals($data['items']['item_columns'], $form->query('id:itemsTable')->asTable()->one()->getHeadersText());
 
 			// Check items functions dropdown options depending on graph type.
 			foreach ($data['items']['dropdowns'] as $function => $options) {
-				$this->assertEquals($options, $items_container->query('xpath:.//z-select[@name="items[0]['.$function.']"]')
-						->asDropdown()->one()->getOptions()->asText()
-				);
+				$dropdown = $items_container->query('xpath:.//z-select[@name="items[0]['.$function.']"]')->asDropdown()->one();
+				$this->assertEquals($options, $dropdown->getOptions()->asText());
+
+				// Check default selected option.
+				$this->assertEquals($options[0], $dropdown->getValue());
 			}
 		}
 	}
@@ -554,18 +552,47 @@ class testFormGraphs extends CWebTest {
 								($this->prototype ? ' {#KEY}' : NULL).'".'
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty Y MIN and MAX itmes',
+						'Width' => 200,
+						'Height' => 400,
+						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
+						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
+						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+					],
+					'items' => [
+						[
+							'item' => 'testFormItem',
+							'color'=> 'BBDEFB',
+							'functions' => [
+								'calc_fnc' => 'min',
+								'drawtype' => 'Bold line',
+								'yaxisside' => 'Right'
+							]
+						]
+					],
+					'error' => 'Page received incorrect data',
+					'details' => [
+						'Field "ymin_itemid" is mandatory.',
+						'Field "ymax_itemid" is mandatory.'
+					]
+				]
 			]
 		];
 	}
 
-	public function checkGraphForm($data) {
+	public function checkGraphForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
 		$this->page->login()->open($this->url)->waitUntilReady();
 
-		if ($this->update) {
+		if ($update) {
 			$this->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
 		}
 		else {
@@ -575,7 +602,7 @@ class testFormGraphs extends CWebTest {
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 
 		// Clear all items from graph to change them to new ones from data provider.
-		if ($this->update) {
+		if ($update) {
 			$items_container = $form->getFieldContainer('Items');
 			$items_count = $items_container->query('xpath:.//tr[contains(@id, "items_")]')->count();
 
@@ -585,6 +612,10 @@ class testFormGraphs extends CWebTest {
 				$remove_button->waitUntilClickable()->click();
 				$remove_button->waitUntilNotPresent();
 			}
+		}
+
+		if ($update && !CTestArrayHelper::get($data, 'expected')) {
+			$data['fields']['Name'] = $data['fields']['Name'].' update';
 		}
 
 		$form->fill($data['fields']);
@@ -597,7 +628,7 @@ class testFormGraphs extends CWebTest {
 					$form->query('xpath:.//button[@id="yaxis_'.$y.'_prototype"]')->waitUntilClickable()->one()->click();
 					$dialog = COverlayDialogElement::find()->one();
 					$dialog->query('link', $yaxis_item)->waitUntilClickable()->one()->click();
-					$dialog->waitUntilNotPresent();
+					$dialog->ensureNotPresent();
 				}
 				else {
 					$form->query('xpath:.//div[@id="y'.$y.'_itemid"]/..')->asMultiselect()->one()
@@ -613,7 +644,7 @@ class testFormGraphs extends CWebTest {
 						->waitUntilClickable()->one()->click();
 				$dialog = COverlayDialogElement::find()->one();
 				$dialog->query('link', $item['item'])->waitUntilClickable()->one()->click();
-				$dialog->waitUntilNotPresent();
+				$dialog->ensureNotPresent();
 
 				// Check that added item link appeared.
 				$item_row = $items_container->query('xpath:.//tr[@id="items_'.$i.'"]')->one()->waitUntilPresent();
@@ -642,22 +673,21 @@ class testFormGraphs extends CWebTest {
 				$error = $data['error'];
 			}
 			else {
-				$error = $this->update
+				$error = $update
 					? 'Cannot update graph'.$this->getGraphSuffix()
 					: 'Cannot add graph'.$this->getGraphSuffix();
 			}
+
 			$this->assertMessage(TEST_BAD, $error, $data['details']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
 			// Write new name to update graph for next case, but if it's last case return to initial name 'Graph for update'.
-			if ($this->update) {
-				self::$update_graph = (CTestArrayHelper::get($data, 'last_case', false))
-					? 'Graph for update'
-					: $data['fields']['Name'];
+			if ($update) {
+				self::$update_graph = $data['fields']['Name'];
 			}
 
-			$message = $this->update
+			$message = $update
 				? 'Graph'.$this->getGraphSuffix().' updated'
 				: 'Graph'.$this->getGraphSuffix().' added';
 
@@ -666,8 +696,8 @@ class testFormGraphs extends CWebTest {
 					zbx_dbstr($data['fields']['Name']))
 			);
 
-			// Open just created graph and check that all fields present correctly in form.
-			$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilReady()
+			// Open just created graph and cыheck that all fields present correctly in form.
+			$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilPresent()
 					->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 			$form->invalidate();
 			$form->checkValue($data['fields']);
@@ -718,7 +748,8 @@ class testFormGraphs extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'New Cloned graph name with no changes'
-					]
+					],
+					'check_buttons' => true
 				]
 			],
 			[
@@ -738,7 +769,7 @@ class testFormGraphs extends CWebTest {
 						'min' => 'Failed step of scenario "testFormWeb3".',
 						'max' => 'Download speed for scenario "testFormWeb4".'
 					],
-					'items' =>[
+					'items' => [
 						[
 							'color'=> 'B39DDB',
 							'functions' => [
@@ -762,7 +793,7 @@ class testFormGraphs extends CWebTest {
 						'id:yaxismin' => 1,
 						'id:yaxismax' => 99
 					],
-					'items' =>[
+					'items' => [
 						[
 							'color'=> '1B5E20',
 							'functions' => [
@@ -785,8 +816,10 @@ class testFormGraphs extends CWebTest {
 		$form->query('button:Clone')->waitUntilClickable()->one()->click();
 		$form->invalidate();
 
-		foreach (['Update', 'Clone', 'Delete'] as $button) {
-			$this->assertFalse($form->query('button', $button)->exists());
+		if (CTestArrayHelper::get($data, 'check_buttons', false)) {
+			foreach (['Update', 'Clone', 'Delete'] as $button) {
+				$this->assertFalse($form->query('button', $button)->exists());
+			}
 		}
 
 		$form->fill($data['fields']);
@@ -932,7 +965,7 @@ class testFormGraphs extends CWebTest {
 	 */
 	public function changeItemSettings($data) {
 		$this->page->login()->open($this->url)->waitUntilReady();
-		$this->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
+		$this->query('link:Graph for items change')->waitUntilClickable()->one()->click();
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 		$item_number = $this->prototype ? 1 : 0;
 		$item_row = $form->getFieldContainer('Items')->query('xpath:.//tr[@id="items_'.$item_number.'"]')
@@ -956,7 +989,7 @@ class testFormGraphs extends CWebTest {
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' updated');
 		$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilReady()
-				->query('link', self::$update_graph)->waitUntilClickable()->one()->click();
+				->query('link:Graph for items change')->waitUntilClickable()->one()->click();
 		$item_row = $form->getFieldContainer('Items')->query('xpath:.//tr[@id="items_'.$item_number.'"]')
 				->one()->waitUntilPresent();
 
@@ -1007,7 +1040,8 @@ class testFormGraphs extends CWebTest {
 				$form->query('xpath:.//div[@id="y'.$y.'_itemid"]/..')->asMultiselect()->one()->query('tag:input')
 						->one()->type($yaxis_item);
 				$this->assertTrue($this->query('xpath://div[@class="multiselect-matches" and text()="No matches found"]')
-						->waitUntilVisible()->one()->isVisible());
+						->waitUntilVisible()->one()->isVisible()
+				);
 			}
 		}
 
