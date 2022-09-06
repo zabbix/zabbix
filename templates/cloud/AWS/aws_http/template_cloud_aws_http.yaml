@@ -539,7 +539,7 @@ zabbix_export:
                         throw 'Cannot get buckets region location data from AWS S3 API. Check debug log for more information.';
                     }
             
-                    return result.LocationConstraint;
+                    return result.LocationConstraint !== null ? result.LocationConstraint : 'us-east-1';
                 },
             
                 listBuckets: function () {
