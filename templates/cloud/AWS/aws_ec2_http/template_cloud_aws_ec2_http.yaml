@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-27T11:53:27Z'
+  date: '2022-08-31T22:51:37Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -644,13 +644,15 @@ zabbix_export:
             
                    while (payload.NextToken !== '') {
                        var volumes = AwsEc2.request('GET', AwsEc2.params.region, 'ec2', AwsEc2.prepareParams(payload));
-                       if (typeof result !== 'object'
+                       if (typeof volumes !== 'object'
                            || typeof volumes.DescribeVolumesResponse !== 'object'
                            || typeof volumes.DescribeVolumesResponse.volumeSet !== 'object'
                            || typeof volumes.DescribeVolumesResponse.volumeSet.item !== 'object') {
                            throw 'Cannot get metrics data from AWS EC2 API. Check debug log for more information.';
                        }
                        payload.NextToken = volumes.DescribeVolumesResponse.NextToken || '';
+                       if (!Array.isArray(volumes.DescribeVolumesResponse.volumeSet.item))
+                           volumes.DescribeVolumesResponse.volumeSet.item = [volumes.DescribeVolumesResponse.volumeSet.item]
                        volumes.DescribeVolumesResponse.volumeSet.item.forEach(function (volume) {
                            result.push(volume.volumeId)
                        });
@@ -679,6 +681,8 @@ zabbix_export:
             
                        payload.NextToken = alarms.DescribeAlarmsResponse.DescribeAlarmsResult.NextToken || '';
             
+                       if (!Array.isArray(alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms))
+                           alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms = [alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms]
                        alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms.forEach(function (alarm) {
                            var dimensions = alarm.Dimensions;
             
@@ -1852,7 +1856,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.Label == "VolumeConsumedReadWriteOps")].Values.first().first()'
+                    - '$.[?(@.Label == "BurstBalance")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'aws.ec2.get_ebs_metrics["{#VOLUME_ID}"]'
