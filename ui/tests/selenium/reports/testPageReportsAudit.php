@@ -22,11 +22,12 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CAPITest.php';
 
 /**
- * @backup media_type, auditlog, config, profiles
+ * @backup media_type, config, profiles
  *
- * @onBefore deleteAuditlog, prepareLoginData
+ * @onBefore deleteAuditlog
  */
 class testPageReportsAudit extends CWebTest {
 
@@ -296,6 +297,7 @@ class testPageReportsAudit extends CWebTest {
 	 */
 	public static function getCheckFilterData() {
 		return [
+			// #0
 			[
 				[
 					'fields' => [
@@ -305,6 +307,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
+			// #1
 			[
 				[
 					'fields' => [
@@ -313,6 +316,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 4
 				]
 			],
+			// #2
 			[
 				[
 					'fields' => [
@@ -322,6 +326,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 4
 				]
 			],
+			// #3
 			[
 				[
 					'fields' => [
@@ -330,6 +335,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 12
 				]
 			],
+			// #4
 			[
 				[
 					'fields' => [
@@ -339,6 +345,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
+			// #5
 			[
 				[
 					'fields' => [
@@ -354,6 +361,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 5
 				]
 			],
+			// #6
 			[
 				[
 					'fields' => [
@@ -369,13 +377,16 @@ class testPageReportsAudit extends CWebTest {
 					]
 				]
 			],
+			// #7
 			[
 				[
 					'fields' => [
 						'Users' => ['test-timezone', 'Admin']
-					]
+					],
+					'result_count' => 13
 				]
 			],
+			// #8
 			[
 				[
 					'fields' => [
@@ -384,6 +395,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
+			// #9
 			[
 				[
 					'fields' => [
@@ -395,6 +407,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
+			// #10
 			[
 				[
 					'fields' => [
@@ -403,6 +416,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
+			// #11
 			[
 				[
 					'fields' => [
@@ -412,6 +426,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
+			// #12
 			[
 				[
 					'fields' => [
@@ -420,6 +435,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
+			// #13
 			[
 				[
 					'fields' => [
@@ -428,6 +444,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
+			// #14
 			[
 				[
 					'fields' => [
@@ -436,6 +453,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
+			// #15
 			[
 				[
 					'fields' => [
@@ -445,6 +463,7 @@ class testPageReportsAudit extends CWebTest {
 				]
 			]
 			// TODO: uncomment after ZBX-21097 fix
+			// #16
 //			[
 //				[
 //					'fields' => [
@@ -453,6 +472,7 @@ class testPageReportsAudit extends CWebTest {
 //					'no_data' => true
 //				]
 //			],
+			// #17
 //			[
 //				[
 //					'fields' => [
@@ -469,6 +489,15 @@ class testPageReportsAudit extends CWebTest {
 	 * There are used values and data that was created before in this autotest.
 	 *
 	 * @dataProvider getCheckFilterData
+	 *
+	 * @onBeforeOnce prepareLoginData
+	 *
+	 * @depends testPageReportsAudit_Add
+	 * @depends testPageReportsAudit_Update
+	 * @depends testPageReportsAudit_Delete
+	 * @depends testPageReportsAudit_HistoryClear
+	 * @depends testPageReportsAudit_LoginLogoutFailed
+	 * @depends testPageReportsAudit_DisabledEnabled
 	 */
 	public function testPageReportsAudit_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
@@ -510,6 +539,7 @@ class testPageReportsAudit extends CWebTest {
 				$this->assertEquals($table_value, []);
 			}
 
+			// TODO: remove IF condition after ZBX-19918 fix. Add result_count to test case #6
 			// There is some scenarios with known result amount.
 			if (array_key_exists('result_count', $data)) {
 				$this->assertEquals($data['result_count'], $table->getRows()->count());
@@ -625,7 +655,16 @@ class testPageReportsAudit extends CWebTest {
 		DBexecute('DELETE FROM auditlog');
 	}
 
+	/**
+	 * Login as test-timezone user to create new data in autotest for fitler scenario.
+	 */
 	public function prepareLoginData() {
-		$this->page->userLogin('test-timezone', 'zabbix');
+		CAPITest::disableAuthorization();
+		CDataHelper::call('user.login',
+			[
+				'username' => 'test-timezone',
+				'password' => 'zabbix'
+
+		]);
 	}
 }
