@@ -44,20 +44,24 @@ $host_form = (new CForm())
 $discovered_by = null;
 $interfaces_row = null;
 
+
 if ($host_is_discovered) {
-	if ($data['editable_discovery_rules']) {
-		$discovery_rule = (new CLink($data['host']['discoveryRule']['name'],
-			(new CUrl('host_prototypes.php'))
-				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $data['host']['discoveryRule']['itemid'])
-				->setArgument('hostid', $data['host']['hostDiscovery']['parent_hostid'])
-				->setArgument('context', 'host')
-		))->setAttribute('target', '_blank');
+	if ($data['host']['discoveryRule']) {
+		if ($data['is_discovery_rule_editable']) {
+			$discovery_rule = (new CLink($data['host']['discoveryRule']['name'],
+				(new CUrl('host_prototypes.php'))
+					->setArgument('form', 'update')
+					->setArgument('parent_discoveryid', $data['host']['discoveryRule']['itemid'])
+					->setArgument('hostid', $data['host']['hostDiscovery']['parent_hostid'])
+					->setArgument('context', 'host')
+			))->setAttribute('target', '_blank');
+		}
+		else {
+			$discovery_rule = new CSpan($data['host']['discoveryRule']['name']);
+		}
 	}
 	else {
-		$discovery_rule = $data['host']['discoveryRule']
-			? (new CSpan($data['host']['discoveryRule']['name']))
-			: (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
+		$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
 	}
 
 	$discovered_by = [new CLabel(_('Discovered by')), new CFormField($discovery_rule)];
