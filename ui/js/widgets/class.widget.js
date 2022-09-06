@@ -433,7 +433,7 @@ class CWidget extends CBaseComponent {
 			type: this._type,
 			name: this._name,
 			view_mode: this._view_mode,
-			fields: Object.keys(this._fields).length > 0 ? JSON.stringify(this._fields) : undefined
+			fields: Object.keys(this._fields).length > 0 ? this._fields : undefined
 		};
 	}
 

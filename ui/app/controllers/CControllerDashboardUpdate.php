@@ -45,7 +45,7 @@ class CControllerDashboardUpdate extends CController {
 			[
 				'dashboard_pages' => $this->dashboard_pages,
 				'errors' => $dashboard_pages_errors
-			] = CDashboardHelper::validateDashboardPages($this->getInput('pages', []), null);
+			] = CDashboardHelper::validateDashboardPages($this->getInput('pages', []));
 
 			$errors = array_merge($sharing_errors, $dashboard_pages_errors);
 
