@@ -792,8 +792,8 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public static function linkTemplateObjects(array $templateids, array $hostids): void {
 		$db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
-				'logtimefmt', 'description', 'status', 'discover'
+			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
+				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'filter' => [
 				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
