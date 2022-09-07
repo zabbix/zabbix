@@ -971,7 +971,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 		// Reset form in case of previous test case.
 		$this->resetConfiguration($form, $this->default_values, 'Reset defaults');
-		// Fill nesessary settings.
+		// Fill necessary settings.
 		$form->fill($data['field']);
 		$form->submit();
 		// Check saved settings.

@@ -448,7 +448,7 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
 	for (ptr = period; 0 != isdigit(*ptr); ptr++)
 		;
 
-	if (FAIL == is_uint_n_range(period, (size_t)(ptr - period), multiplier, sizeof(*multiplier), 0, UINT32_MAX))
+	if (FAIL == zbx_is_uint_n_range(period, (size_t)(ptr - period), multiplier, sizeof(*multiplier), 0, UINT32_MAX))
 	{
 		*error = zbx_strdup(*error, "invalid period multiplier");
 		return FAIL;
@@ -884,7 +884,7 @@ int	zbx_get_week_number(const struct tm *tm)
  * Comments: the function automatically processes suffixes s, m, h, d, w      *
  *                                                                            *
  ******************************************************************************/
-int	is_time_suffix(const char *str, int *value, int length)
+int	zbx_is_time_suffix(const char *str, int *value, int length)
 {
 	const int	max = 0x7fffffff;	/* minimum acceptable value for INT_MAX is 2 147 483 647 */
 	int		len = length;
@@ -954,7 +954,7 @@ int	is_time_suffix(const char *str, int *value, int length)
  * Return value: sleep time, in seconds                                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_sleeptime(int nextcheck, int max_sleeptime)
+int	zbx_calculate_sleeptime(int nextcheck, int max_sleeptime)
 {
 	int	sleeptime;
 

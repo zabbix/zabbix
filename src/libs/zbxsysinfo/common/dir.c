@@ -169,7 +169,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 	{
 		*max_depth = TRAVERSAL_DEPTH_UNLIMITED; /* <max_depth> default value */
 	}
-	else if (SUCCEED != is_uint31(max_depth_str, max_depth))
+	else if (SUCCEED != zbx_is_uint31(max_depth_str, max_depth))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid %s parameter.", (4 == depth_param ?
 						"fifth" : "sixth")));
@@ -252,13 +252,13 @@ int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result)
 	if (NULL == etypes || '\0' == *etypes)
 		return 0;
 
-	num = num_param(etypes);
+	num = zbx_num_param(etypes);
 	for (n = 1; n <= num; n++)
 	{
 		char	*etype;
 		int	type;
 
-		if (NULL == (etype = get_param_dyn(etypes, n, NULL)))
+		if (NULL == (etype = zbx_get_param_dyn(etypes, n, NULL)))
 			continue;
 
 		if (ZBX_FT_OVERFLOW & (type = etype_to_mask(etype)))
@@ -286,7 +286,7 @@ static int	parse_size_parameter(char *text, zbx_uint64_t *size_out)
 	if (NULL == text || '\0' == *text)
 		return SUCCEED;
 
-	return str2uint64(text, "KMGT", size_out);
+	return zbx_str2uint64(text, "KMGT", size_out);
 }
 
 static int	parse_age_parameter(char *text, time_t *time_out, time_t now)
@@ -296,7 +296,7 @@ static int	parse_age_parameter(char *text, time_t *time_out, time_t now)
 	if (NULL == text || '\0' == *text)
 		return SUCCEED;
 
-	if (SUCCEED != str2uint64(text, "smhdw", &seconds))
+	if (SUCCEED != zbx_str2uint64(text, "smhdw", &seconds))
 		return FAIL;
 
 	*time_out = now - (time_t)seconds;

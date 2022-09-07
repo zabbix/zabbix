@@ -1027,7 +1027,7 @@ int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_reques
 		goto out;
 	}
 
-	if (SUCCEED != is_uint64(tmp, &proxy_config_revision))
+	if (SUCCEED != zbx_is_uint64(tmp, &proxy_config_revision))
 	{
 		*error = zbx_dsprintf(NULL, "invalid proxy configuration revision: %s", tmp);
 		goto out;

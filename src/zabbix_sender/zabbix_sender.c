@@ -1064,7 +1064,7 @@ static void	parse_commandline(int argc, char **argv)
 				REAL_TIME = 1;
 				break;
 			case 't':
-				if (FAIL == is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_SENDER_TIMEOUT,
+				if (FAIL == zbx_is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_SENDER_TIMEOUT,
 						sizeof(CONFIG_SENDER_TIMEOUT), CONFIG_SENDER_TIMEOUT_MIN,
 						CONFIG_SENDER_TIMEOUT_MAX))
 				{
@@ -1152,7 +1152,7 @@ static void	parse_commandline(int argc, char **argv)
 
 		if (NULL != ZABBIX_SERVER_PORT)
 		{
-			if (SUCCEED != is_ushort(ZABBIX_SERVER_PORT, &port) || MIN_ZABBIX_PORT > port)
+			if (SUCCEED != zbx_is_ushort(ZABBIX_SERVER_PORT, &port) || MIN_ZABBIX_PORT > port)
 			{
 				zbx_error("option \"-p\" used with invalid port number \"%s\", valid port numbers are"
 						" %d-%d", ZABBIX_SERVER_PORT, (int)MIN_ZABBIX_PORT,
@@ -1681,7 +1681,7 @@ int	main(int argc, char **argv)
 					break;
 				}
 
-				if (FAIL == is_uint31(clock, &timestamp))
+				if (FAIL == zbx_is_uint31(clock, &timestamp))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "[line %d] invalid 'Timestamp' value detected",
 							total_count);
@@ -1700,7 +1700,7 @@ int	main(int argc, char **argv)
 						break;
 					}
 
-					if (FAIL == is_uint_n_range(clock, sizeof(clock), &ns, sizeof(ns),
+					if (FAIL == zbx_is_uint_n_range(clock, sizeof(clock), &ns, sizeof(ns),
 							0LL, 999999999LL))
 					{
 						zabbix_log(LOG_LEVEL_WARNING,

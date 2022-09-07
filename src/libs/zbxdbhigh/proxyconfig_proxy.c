@@ -261,7 +261,7 @@ static int	proxyconfig_parse_table_rows(zbx_table_data_t *td, struct zbx_json_pa
 			goto out;
 		}
 
-		if (SUCCEED != is_uint64(buf, &row_local.recid))
+		if (SUCCEED != zbx_is_uint64(buf, &row_local.recid))
 		{
 			*error = zbx_dsprintf(*error, "invalid record identifier: \"%s\"", buf);
 			goto out;
@@ -771,7 +771,7 @@ static int	proxyconfig_convert_value(const ZBX_TABLE *table, const ZBX_FIELD *fi
 			ret = zbx_is_int(buf, &value_local.i32);
 			break;
 		case ZBX_TYPE_UINT:
-			ret = is_uint64(buf, &value_local.ui64);
+			ret = zbx_is_uint64(buf, &value_local.ui64);
 			break;
 		case ZBX_TYPE_ID:
 			if (ZBX_JSON_TYPE_NULL == type)
@@ -780,7 +780,7 @@ static int	proxyconfig_convert_value(const ZBX_TABLE *table, const ZBX_FIELD *fi
 				ret = SUCCEED;
 			}
 			else
-				ret = is_uint64(buf, &value_local.ui64);
+				ret = zbx_is_uint64(buf, &value_local.ui64);
 			break;
 		case ZBX_TYPE_FLOAT:
 			ret = zbx_is_double(buf, &value_local.dbl);
@@ -1422,7 +1422,7 @@ static void	proxyconfig_prepare_hostmacros(zbx_table_data_t *hostmacro, zbx_tabl
 			pf = zbx_json_next(&row->columns, NULL);
 
 			if (NULL != zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL) &&
-					SUCCEED == is_uint64(buf, &hostid))
+					SUCCEED == zbx_is_uint64(buf, &hostid))
 			{
 				zbx_vector_uint64_append(&hostids, hostid);
 			}
@@ -1438,7 +1438,7 @@ static void	proxyconfig_prepare_hostmacros(zbx_table_data_t *hostmacro, zbx_tabl
 			pf = zbx_json_next(&row->columns, NULL);
 
 			if (NULL != zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL) &&
-					SUCCEED == is_uint64(buf, &hostid))
+					SUCCEED == zbx_is_uint64(buf, &hostid))
 			{
 				zbx_vector_uint64_append(&hostids, hostid);
 			}
@@ -1492,13 +1492,13 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, char **
 		pf = zbx_json_next(&row->columns, NULL);
 
 		if (NULL != (pf = zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL)) &&
-				SUCCEED == is_uint64(buf, &templateid))
+				SUCCEED == zbx_is_uint64(buf, &templateid))
 		{
 			zbx_vector_uint64_append(&templateids, templateid);
 		}
 
 		if (NULL != zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL) &&
-				SUCCEED == is_uint64(buf, &templateid))
+				SUCCEED == zbx_is_uint64(buf, &templateid))
 		{
 			zbx_vector_uint64_append(&templateids, templateid);
 		}
@@ -1879,7 +1879,7 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 		goto out;
 	}
 
-	if (SUCCEED != (ret = is_uint64(tmp, &config_revision)))
+	if (SUCCEED != (ret = zbx_is_uint64(tmp, &config_revision)))
 	{
 		*error = zbx_strdup(NULL, "invalid config_revision value in proxy configuration response");
 		ret = FAIL;
@@ -1912,7 +1912,7 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 
 		for (p = 0; NULL != (p = zbx_json_next_value(&jp_del_hostids, p, tmp, sizeof(tmp), NULL));)
 		{
-			if (SUCCEED == is_uint64(tmp, &hostid))
+			if (SUCCEED == zbx_is_uint64(tmp, &hostid))
 				zbx_vector_uint64_append(&del_hostids, hostid);
 		}
 	}
@@ -1924,7 +1924,7 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 
 		for (p = 0; NULL != (p = zbx_json_next_value(&jp_del_hostids, p, tmp, sizeof(tmp), NULL));)
 		{
-			if (SUCCEED == is_uint64(tmp, &hostid))
+			if (SUCCEED == zbx_is_uint64(tmp, &hostid))
 			{
 				if (0 != hostid)
 					zbx_vector_uint64_append(&del_macro_hostids, hostid);

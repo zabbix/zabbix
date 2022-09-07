@@ -103,7 +103,7 @@ $form = (new CForm())
 	->setName('macrosForm')
 	->disablePasswordAutofill()
 	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'macros.update')->getUrl())
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem($tab_view);
 
 $widget

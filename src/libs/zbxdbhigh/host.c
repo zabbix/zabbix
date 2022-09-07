@@ -6043,7 +6043,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 			tmp = strdup(row[4]);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
-			if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
+			if (FAIL == zbx_is_ushort(tmp, &db_port) || db_port != port)
 				continue;
 
 			ZBX_STR2UINT64(interfaceid, row[0]);
@@ -6084,7 +6084,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 				zbx_audit_host_update_json_update_interface_dns(hostid, interfaceid, db_dns, dns);
 			}
 
-			if (FAIL == is_ushort(row[4], &db_port) || db_port != port)
+			if (FAIL == zbx_is_ushort(row[4], &db_port) || db_port != port)
 			{
 				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cport=%u", delim, port);
 				zbx_audit_host_update_json_update_interface_port(hostid, interfaceid, db_port, port);

@@ -39,7 +39,7 @@
  *                       the specified range                                  *
  *                                                                            *
  ******************************************************************************/
-int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
+int	zbx_is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
 {
 	zbx_uint64_t		value_uint64 = 0, c;
 	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
@@ -97,7 +97,7 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
  *                       is outside the specified range                       *
  *                                                                            *
  ******************************************************************************/
-int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
+int	zbx_is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
 {
 	zbx_uint64_t		value_uint64 = 0, c;
 	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
@@ -184,7 +184,7 @@ int	zbx_validate_value_dbl(double value, int dbl_precision)
  * Return value: FAIL - out of period, SUCCEED - within the period            *
  *                                                                            *
  ******************************************************************************/
-int	int_in_list(char *list, int value)
+int	zbx_int_in_list(char *list, int value)
 {
 	char	*start = NULL, *end = NULL, c = '\0';
 	int	i1, i2, ret = FAIL;
@@ -404,7 +404,7 @@ int	zbx_number_parse(const char *number, int *len)
  * Comments: the function automatically processes suffixes K, M, G, T         *
  *                                                                            *
  ******************************************************************************/
-int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
+int	zbx_str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
 {
 	size_t		sz;
 	const char	*p;
@@ -421,7 +421,7 @@ int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
 		sz--;
 	}
 
-	if (SUCCEED == (ret = is_uint64_n(str, sz, value)))
+	if (SUCCEED == (ret = zbx_is_uint64_n(str, sz, value)))
 		*value *= factor;
 
 	return ret;
@@ -545,7 +545,7 @@ void	zbx_trim_float(char *str)
  *                FAIL - otherwise                                            *
  *                                                                            *
  ******************************************************************************/
-int	is_hex_string(const char *str)
+int	zbx_is_hex_string(const char *str)
 {
 	if ('\0' == *str)
 		return FAIL;
@@ -599,7 +599,7 @@ int	zbx_is_int(const char *str, int *value)
 	else
 		sign = 1;
 
-	if (SUCCEED != is_uint31(ptr, &value_ui32))
+	if (SUCCEED != zbx_is_uint31(ptr, &value_ui32))
 		return FAIL;
 
 	if (NULL != value)

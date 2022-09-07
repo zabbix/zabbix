@@ -930,7 +930,7 @@ class testFormAdministrationScripts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
 		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
 		$form->fill([
-			'Name' => 'Cancelled cript',
+			'Name' => 'Cancelled script',
 			'Type' => 'Script',
 			'Execute on' => 'Zabbix server',
 			'Commands' => 'Script command',

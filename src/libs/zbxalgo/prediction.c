@@ -876,7 +876,7 @@ int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error)
 	{
 		*fit = FIT_POLYNOMIAL;
 
-		if (SUCCEED != is_uint_range(fit_str + strlen("polynomial"), k, 1, 6))
+		if (SUCCEED != zbx_is_uint_range(fit_str + strlen("polynomial"), k, 1, 6))
 		{
 			*error = zbx_strdup(*error, "polynomial degree is invalid");
 			return FAIL;

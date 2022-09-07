@@ -195,7 +195,7 @@ zbx_host_template_link_type;
 #define ZBX_DBROW2UINT64(uint, row)	if (SUCCEED == DBis_null(row))		\
 						uint = 0;			\
 					else					\
-						is_uint64(row, &uint)
+						zbx_is_uint64(row, &uint)
 
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 

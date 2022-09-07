@@ -146,7 +146,7 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 		}
 
 		if (0 == *value_int)
-			strscpy(send_buf, "0\n");
+			zbx_strscpy(send_buf, "0\n");
 
 		ret = zbx_tcp_send_raw(&s, send_buf);
 		zbx_tcp_close(&s);
@@ -174,7 +174,7 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 		goto clean;
 	}
 
-	if (SUCCEED == is_ip6(host))
+	if (SUCCEED == zbx_is_ip6(host))
 		zbx_snprintf(https_host, sizeof(https_host), "%s[%s]", (0 == strncmp(host, "https://", 8) ? "" : "https://"), host);
 	else
 		zbx_snprintf(https_host, sizeof(https_host), "%s%s", (0 == strncmp(host, "https://", 8) ? "" : "https://"), host);
@@ -329,12 +329,12 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 					"Check service item must have IP parameter or host interface specified."));
 			return SYSINFO_RET_FAIL;
 		}
-		strscpy(ip, default_addr);
+		zbx_strscpy(ip, default_addr);
 	}
 	else
-		strscpy(ip, ip_str);
+		zbx_strscpy(ip, ip_str);
 
-	if (NULL != port_str && '\0' != *port_str && SUCCEED != is_ushort(port_str, &port))
+	if (NULL != port_str && '\0' != *port_str && SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		return SYSINFO_RET_FAIL;

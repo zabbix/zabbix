@@ -6478,6 +6478,14 @@ msgstr "選択したグループのデバッグモードを有効にしますか
 msgid "Enable host"
 msgstr "ホストを有効"
 
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
+
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
 msgstr "ホストを有効にしますか？"
@@ -18203,6 +18211,10 @@ msgstr "今月"
 #: include/func.inc.php:2477
 msgid "This month so far"
 msgstr "今月(現在まで)"
+
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."

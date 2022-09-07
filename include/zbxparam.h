@@ -22,9 +22,9 @@
 
 #include "zbxcommon.h"
 
-int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type);
-int	num_param(const char *p);
-char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type);
+int	zbx_get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type);
+int	zbx_num_param(const char *p);
+char	*zbx_get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type);
 /******************************************************************************
  *                                                                            *
  * Purpose: replaces an item key, SNMP OID or their parameters                *
@@ -48,12 +48,12 @@ char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type);
  *           characters                                                       *
  *                                                                            *
  ******************************************************************************/
-typedef int	(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
-		char **param);
+typedef int	(*zbx_replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted,
+		void *cb_data, char **param);
 #define ZBX_KEY_TYPE_ITEM	0
 #define ZBX_KEY_TYPE_OID	1
-int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
+int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_f cb, void *cb_data, char *error,
 		size_t maxerrlen);
-int	get_key_param(char *param, int num, char *buf, size_t max_len);
-int	num_key_param(char *param);
+int	zbx_get_key_param(char *param, int num, char *buf, size_t max_len);
+int	zbx_num_key_param(char *param);
 #endif /* ZABBIX_PARAM_H */
