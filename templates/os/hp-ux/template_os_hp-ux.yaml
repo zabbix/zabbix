@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:33Z'
+  date: '2022-08-22T14:21:10Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -244,6 +244,8 @@ zabbix_export:
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 1h
           history: 1w
+          trends: '0'
+          value_type: CHAR
           tags:
             -
               tag: component
@@ -548,8 +550,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU load'
                         host: 'HP-UX by Zabbix agent'
+                        name: 'CPU load'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -564,8 +566,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU utilization'
                         host: 'HP-UX by Zabbix agent'
+                        name: 'CPU utilization'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -580,8 +582,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'HP-UX by Zabbix agent'
+                        name: 'Memory usage'
       valuemaps:
         -
           uuid: 663bea44626447b5a72a71238dfda919

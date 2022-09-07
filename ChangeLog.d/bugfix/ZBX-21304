@@ -1,0 +1,1 @@
+.........T [ZBX-21304] fixed ping item preprocessing regex in PHP-FPM templates to be compatible with Zabbix agent 2 (drasihov)
