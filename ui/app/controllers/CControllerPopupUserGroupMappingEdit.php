@@ -68,7 +68,6 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 			'name' => $this->getInput('name', ''),
 			'add_group' => $this->getInput('add_group', 0),
 			'user' => ['debug_mode' => $this->getDebugMode()],
-			'name_label' => _('LDAP group pattern'), // TODO: should be moved to the view.
 			'is_fallback' => $this->getInput('is_fallback'),
 			'fallback_status' => $this->getInput('fallback_status', GROUP_MAPPING_FALLBACK_OFF)
 		];

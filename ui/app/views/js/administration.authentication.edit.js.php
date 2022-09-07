@@ -33,10 +33,14 @@
 			this.allow_jit = null;
 		}
 
-		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups, saml_provision_media}) {
+		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
+				saml_provision_media
+		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
 			this.saml_provision_status = document.getElementById('saml_provision_status');
+			this.saml_provision_groups_table = document.getElementById('saml-group-table');
+			this.saml_media_type_mapping_table = document.getElementById('saml-media-type-mapping-table');
 
 			this._addEventListeners();
 			this._addLdapServers(ldap_servers, ldap_default_row_index);
@@ -44,7 +48,7 @@
 			this._renderProvisionMedia(saml_provision_media);
 
 			this.toggleSamlJitProvisioning(this.saml_provision_status.checked);
-			this._initSortable(document.getElementById('saml-group-table'));
+			this._initSortable();
 		}
 
 		_addEventListeners() {
@@ -93,10 +97,39 @@
 			if (document.getElementById('saml_auth_enabled') !== null) {
 				document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
 					this.form.querySelectorAll('.saml-enabled').forEach(field => {
-						if (!field.isSameNode(e.target)) {
-							field.disabled = !e.target.checked;
-						}
+						field.disabled = !e.target.checked;
 					});
+
+					if (e.target.checked) {
+						$(this.saml_provision_groups_table).sortable('enable');
+						this.saml_provision_groups_table.querySelectorAll('a, .drag-icon').forEach(element => {
+							element.classList.remove('<?= ZBX_STYLE_DISABLED ?>');
+						});
+						this.saml_provision_groups_table.querySelectorAll('button').forEach(button => {
+							button.disabled = false;
+						});
+						this.saml_media_type_mapping_table.querySelectorAll('a').forEach(element => {
+							element.classList.remove('<?= ZBX_STYLE_DISABLED ?>');
+						});
+						this.saml_media_type_mapping_table.querySelectorAll('button').forEach(button => {
+							button.disabled = false;
+						});
+					}
+					else {
+						$(this.saml_provision_groups_table).sortable('disable');
+						this.saml_provision_groups_table.querySelectorAll('a, .drag-icon').forEach(element => {
+							element.classList.add('<?= ZBX_STYLE_DISABLED ?>');
+						});
+						this.saml_provision_groups_table.querySelectorAll('button').forEach(button => {
+							button.disabled = true;
+						});
+						this.saml_media_type_mapping_table.querySelectorAll('a').forEach(element => {
+							element.classList.add('<?= ZBX_STYLE_DISABLED ?>');
+						});
+						this.saml_media_type_mapping_table.querySelectorAll('button').forEach(button => {
+							button.disabled = true;
+						});
+					}
 				});
 			}
 
@@ -104,30 +137,33 @@
 				this.toggleSamlJitProvisioning(e.target.checked);
 			});
 
-			document
-				.getElementById('saml-group-table')
-				.addEventListener('click', (e) => {
-					if (e.target.classList.contains('js-add')) {
-						this.editSamlProvisionGroup();
-					}
-					else if (e.target.classList.contains('js-edit')) {
-						this.editSamlProvisionGroup(e.target.closest('tr'));
-					}
-					else if (e.target.classList.contains('js-remove')) {
-						e.target.closest('tr').remove()
-					}
-					else if (e.target.classList.contains('js-enabled')) {
-						this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_OFF ?>);
-					}
-					else if (e.target.classList.contains('js-disabled')) {
-						this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_ON ?>);
-					}
-				});
+			this.saml_provision_groups_table.addEventListener('click', (e) => {
+				if (e.target.classList.contains('disabled')) {
+					return;
+				}
+				else if (e.target.classList.contains('js-add')) {
+					this.editSamlProvisionGroup();
+				}
+				else if (e.target.classList.contains('js-edit')) {
+					this.editSamlProvisionGroup(e.target.closest('tr'));
+				}
+				else if (e.target.classList.contains('js-remove')) {
+					e.target.closest('tr').remove()
+				}
+				else if (e.target.classList.contains('js-enabled')) {
+					this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_OFF ?>);
+				}
+				else if (e.target.classList.contains('js-disabled')) {
+					this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_ON ?>);
+				}
+			});
 
-			document
-				.getElementById('saml-media-type-mapping-table')
+			this.saml_media_type_mapping_table
 				.addEventListener('click', (e) => {
-					if (e.target.classList.contains('js-add')) {
+					if (e.target.classList.contains('disabled')) {
+						return;
+					}
+					else if (e.target.classList.contains('js-add')) {
 						this.editSamlProvisionMedia();
 					}
 					else if (e.target.classList.contains('js-edit')) {
@@ -146,7 +182,7 @@
 		}
 
 		toggleFallbackStatus(status) {
-			const row = document.querySelector('[data-row_fallback="<?= GROUP_MAPPING_FALLBACK ?>"]');
+			const row = document.querySelector('[data-row_fallback]');
 			const btn = row.querySelector('.btn-link');
 
 			if (status == <?= GROUP_MAPPING_FALLBACK_ON ?>) {
@@ -163,11 +199,9 @@
 			}
 		}
 
-		_initSortable(element) {
-			$(element).sortable({
-				// disabled: is_disabled,
+		_initSortable() {
+			$(this.saml_provision_groups_table).sortable({
 				items: 'tbody tr.sortable',
-				cancel: '[data-row_fallback="<?= GROUP_MAPPING_FALLBACK ?>"]',
 				axis: 'y',
 				containment: 'parent',
 				cursor: 'grabbing',
@@ -177,21 +211,18 @@
 				helper: function(e, ui) {
 					for (let td of ui.find('>td')) {
 						let $td = $(td);
-						$td.attr('width', $td.width())
+						$td.attr('width', $td.width());
 					}
 
-					// when dragging element on safari, it jumps out of the table
+					// When dragging element on safari, it jumps out of the table.
 					if (SF) {
-						// move back draggable element to proper position
+						// Move back draggable element to proper position.
 						ui.css('left', (ui.offset().left - 2) + 'px');
 					}
 
 					return ui;
 				},
 				stop: function(e, ui) {
-					if ($(ui.item).prev('[data-row_fallback="<?= GROUP_MAPPING_FALLBACK ?>"]').length) {
-						return false;
-					}
 					ui.item.find('>td').removeAttr('width');
 					ui.item.removeAttr('style');
 				},
@@ -223,8 +254,8 @@
 				ldap.is_default = (ldap.row_index == ldap_default_row_index) ? 'checked' : '';
 
 				document
-						.querySelector('#ldap-servers tbody')
-						.appendChild(this._prepareServerRow(ldap));
+					.querySelector('#ldap-servers tbody')
+					.appendChild(this._prepareServerRow(ldap));
 			}
 		}
 
@@ -232,8 +263,8 @@
 			for (const [row_index, saml_provision_group] of Object.entries(saml_provision_groups)) {
 				saml_provision_group.row_index = row_index;
 
-				document
-					.querySelector('#saml-group-table tbody')
+				this.saml_provision_groups_table
+					.querySelector('tbody')
 					.appendChild(this._renderProvisionGroupRow(saml_provision_group));
 			}
 		}
@@ -242,30 +273,40 @@
 			for (const [row_index, saml_media] of Object.entries(saml_provision_media)) {
 				saml_media.row_index = row_index;
 
-				document
-					.querySelector('#saml-media-type-mapping-table tbody')
+				this.saml_media_type_mapping_table
+					.querySelector('tbody')
 					.appendChild(this._renderProvisionMediaRow(saml_media));
 			}
 		}
 
 		editSamlProvisionGroup(row = null) {
 			let popup_params;
-			let row_index;
+			let row_index = 0;
+			let status = <?= GROUP_MAPPING_FALLBACK_OFF ?>;
 
-			if (row != null) {
+			if (row !== null) {
 				row_index = row.dataset.row_index;
-				const user_groups = row.querySelectorAll(`[name="saml_provision_groups[${row_index}][user_groups][]"`);
+				let is_fallback = row.querySelector(`[name="saml_provision_groups[${row_index}][is_fallback]"`).value;
+				let user_groups = row.querySelectorAll(
+					`[name="saml_provision_groups[${row_index}][user_groups][][usrgrpid]"`
+				);
 
 				popup_params = {
-					name: row.querySelector(`[name="saml_provision_groups[${row_index}][name]"`).value,
 					usrgrpid: [...user_groups].map(usrgrp => usrgrp.value),
 					roleid: row.querySelector(`[name="saml_provision_groups[${row_index}][roleid]"`).value,
-					is_fallback: row.querySelector(`[name="saml_provision_groups[${row_index}][is_fallback]"`).value
+					is_fallback: is_fallback
 				};
+				if (is_fallback == <?= GROUP_MAPPING_REGULAR ?>) {
+					popup_params.name = row.querySelector(`[name="saml_provision_groups[${row_index}][name]"`).value;
+				}
+				else {
+					status = row.querySelector(`[name="saml_provision_groups[${row_index}][fallback_status]"`).value;
+				}
 			}
 			else {
-				const rows = document.querySelectorAll('#saml-group-table [data-row_index]');
-				row_index = Math.max([...rows].map(row => row.dataset.row_index)) + 1;
+				while (this.saml_provision_groups_table.querySelector(`[data-row_index="${row_index}"]`) !== null) {
+					row_index++;
+				}
 
 				popup_params = {
 					add_group: 1,
@@ -274,22 +315,23 @@
 			}
 
 			popup_params.name_label = t('SAML group pattern'); // TODO: this will be deleted, need to discuss with Miks how to perform it correctly.
+																// TODO: don't forget to discuss this with Elīna how to perfom it correctly.
 
 			const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const saml_provision_group = {...e.detail, ...{row_index: row_index}};
+				const saml_provision_group = {...e.detail, ...{row_index: row_index, fallback_status: status}};
 
 				if (row === null) {
-					const fallback_row = document.querySelector('[data-row_fallback="<?= GROUP_MAPPING_FALLBACK ?>"]');
+					const fallback_row = document.querySelector('[data-row_fallback]');
 					if (fallback_row !== null) {
 						fallback_row.parentNode.insertBefore(
 							this._renderProvisionGroupRow(saml_provision_group), fallback_row
 						);
 					}
 					else {
-						document
-							.querySelector('#saml-group-table tbody')
+						this.saml_provision_groups_table
+							.querySelector('tbody')
 							.appendChild(this._renderProvisionGroupRow(saml_provision_group));
 					}
 				}
@@ -302,9 +344,9 @@
 
 		editSamlProvisionMedia(row = null) {
 			let popup_params;
-			let row_index;
+			let row_index = 0;
 
-			if (row != null) {
+			if (row !== null) {
 				row_index = row.dataset.row_index;
 
 				popup_params = {
@@ -314,8 +356,9 @@
 				};
 			}
 			else {
-				const rows = document.querySelectorAll('#saml-media-type-mapping-table [data-row_index]');
-				row_index = Math.max([...rows].map(row => row.dataset.row_index)) + 1;
+				while (this.saml_media_type_mapping_table.querySelector(`[data-row_index="${row_index}"]`) !== null) {
+					row_index++;
+				}
 
 				popup_params = {
 					add_media_type_mapping: 1
@@ -328,8 +371,8 @@
 				const saml_media_type_mapping = {...e.detail, ...{row_index: row_index}};
 
 				if (row === null) {
-					document
-						.querySelector('#saml-media-type-mapping-table tbody')
+					this.saml_media_type_mapping_table
+						.querySelector('tbody')
 						.appendChild(this._renderProvisionMediaRow(saml_media_type_mapping));
 				}
 				else {
@@ -340,38 +383,59 @@
 
 		editLdapServer(row = null) {
 			let popup_params;
-			let row_index;
+			let row_index = 0;
 
 			if (row !== null) {
 				row_index = row.dataset.row_index;
-				const provision_groups_count = row.querySelectorAll(`[name^="ldap_servers[${row_index}][provision_groups]"][name$="[is_fallback]"]`).length
+				const provision_groups_count = row.querySelectorAll(
+					`[name^="ldap_servers[${row_index}][provision_groups]"][name$="[is_fallback]"]`
+				).length;
 				const provision_groups = [];
 
 				for (let i = 0; i < provision_groups_count; i++) {
-					let user_groups = row.querySelectorAll(`[name="ldap_servers[${row_index}][provision_groups][${i}][user_groups][]"`);
+					let user_groups = row.querySelectorAll(
+						`[name="ldap_servers[${row_index}][provision_groups][${i}][user_groups][][usrgrpid]"`
+					);
 					let provision_group = {
-						is_fallback: row.querySelector(`[name="ldap_servers[${row_index}][provision_groups][${i}][is_fallback]"`).value,
-						fallback_status: row.querySelector(`[name="ldap_servers[${row_index}][provision_groups][${i}][fallback_status]"`).value,
-						name: row.querySelector(`[name="ldap_servers[${row_index}][provision_groups][${i}][name]"`).value,
-						roleid: row.querySelector(`[name="ldap_servers[${row_index}][provision_groups][${i}][roleid]"`).value,
+						is_fallback: row.querySelector(
+							`[name="ldap_servers[${row_index}][provision_groups][${i}][is_fallback]"`
+						).value,
+						roleid: row.querySelector(
+							`[name="ldap_servers[${row_index}][provision_groups][${i}][roleid]"`
+						).value,
 						user_groups: [...user_groups].map(usrgrp => usrgrp.value)
 					}
 
-					if (provision_group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?> && provision_group.name == '') {
-						provision_group.name = '<?= _('Fallback group') ?>';
+					if (provision_group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?>) {
+						provision_group.fallback_status = row.querySelector(
+							`[name="ldap_servers[${row_index}][provision_groups][${i}][fallback_status]"`
+						).value;
+					}
+					else {
+						provision_group.name = row.querySelector(
+							`[name="ldap_servers[${row_index}][provision_groups][${i}][name]"`
+						).value;
 					}
 
 					provision_groups.push(provision_group);
 				}
 
-				const provision_media_count = row.querySelectorAll(`[name^="ldap_servers[${row_index}][provision_media]"][name$="[name]"]`).length
+				const provision_media_count = row.querySelectorAll(
+					`[name^="ldap_servers[${row_index}][provision_media]"][name$="[name]"]`
+				).length
 				const provision_media = [];
 
 				for (let i = 0; i < provision_media_count; i++) {
 					let media = {
-						name: row.querySelector(`[name="ldap_servers[${row_index}][provision_media][${i}][name]"`).value,
-						mediatypeid: row.querySelector(`[name="ldap_servers[${row_index}][provision_media][${i}][mediatypeid]"`).value,
-						attribute: row.querySelector(`[name="ldap_servers[${row_index}][provision_media][${i}][attribute]"`).value,
+						name: row.querySelector(
+							`[name="ldap_servers[${row_index}][provision_media][${i}][name]"`
+						).value,
+						mediatypeid: row.querySelector(
+							`[name="ldap_servers[${row_index}][provision_media][${i}][mediatypeid]"`
+						).value,
+						attribute: row.querySelector(
+							`[name="ldap_servers[${row_index}][provision_media][${i}][attribute]"`
+						).value,
 					}
 
 					provision_media.push(media);
@@ -413,8 +477,6 @@
 				}
 			}
 			else {
-				row_index = 0;
-
 				while (document.querySelector(`#ldap-servers [data-row_index="${row_index}"]`) !== null) {
 					row_index++;
 				}
@@ -459,25 +521,23 @@
 			template.innerHTML = template_ldap_server_row.evaluate(ldap).trim();
 			const row = template.content.firstChild;
 
-			if ('provision_groups' in ldap) {
-				for (const [group_index, provision_group] of Object.entries(ldap.provision_groups)) {
-					for (const [name, value] of Object.entries(provision_group)) {
-						if (name === 'user_groups') {
-							for (const usrgrpid of value.values()) {
-								const input = document.createElement('input');
-								input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][user_groups][]';
-								input.value = usrgrpid;
-								input.type = 'hidden';
-								row.appendChild(input);
-							}
-						}
-						else {
+			for (const [group_index, provision_group] of Object.entries(ldap.provision_groups)) {
+				for (const [name, value] of Object.entries(provision_group)) {
+					if (name === 'user_groups') {
+						for (const usrgrp of value) {
 							const input = document.createElement('input');
-							input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][' + name + ']';
-							input.value = value;
+							input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][user_groups][][usrgrpid]';
+							input.value = usrgrp.usrgrpid;
 							input.type = 'hidden';
 							row.appendChild(input);
 						}
+					}
+					else {
+						const input = document.createElement('input');
+						input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][' + name + ']';
+						input.value = value;
+						input.type = 'hidden';
+						row.appendChild(input);
 					}
 				}
 			}
@@ -513,13 +573,15 @@
 		}
 
 		_renderProvisionGroupRow(saml_provision_group) {
-			const template_saml_group_row = new Template(this._templateProvisionGroupRow());
-			let template = document.createElement('template');
+			const template = document.createElement('template');
+			const template_saml_group_row = saml_provision_group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?>
+				? new Template(this._templateProvisionFallbackGroupRow())
+				: new Template(this._templateProvisionGroupRow());
+
 			saml_provision_group.user_group_names = Object.values(saml_provision_group.user_groups)
 				.map(user_group => user_group.name).join(', ');
 
 			if (saml_provision_group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?>) {
-				saml_provision_group.drag_icon_class = '<?= ZBX_STYLE_DISABLED ?>';
 				if (saml_provision_group.fallback_status == <?= GROUP_MAPPING_FALLBACK_ON ?>) {
 					saml_provision_group.action_label = '<?= _('Enabled') ?>';
 					saml_provision_group.action_class = 'js-enabled <?= ZBX_STYLE_GREEN ?>';
@@ -529,17 +591,13 @@
 					saml_provision_group.action_class = 'js-disabled <?= ZBX_STYLE_RED ?>';
 				}
 			}
-			else {
-				saml_provision_group.action_label = '<?= _('Remove') ?>';
-				saml_provision_group.action_class = 'js-remove';
-			}
 
 			template.innerHTML = template_saml_group_row.evaluate(saml_provision_group).trim();
 			const row = template.content.firstChild;
 
 			for (const user_group of Object.values(saml_provision_group.user_groups)) {
 				const input = document.createElement('input');
-				input.name = 'saml_provision_groups[' + saml_provision_group.row_index + '][user_groups][]';
+				input.name = 'saml_provision_groups[' + saml_provision_group.row_index + '][user_groups][][usrgrpid]';
 				input.value = user_group.usrgrpid;
 				input.type = 'hidden';
 
@@ -595,23 +653,41 @@
 			`;
 		}
 
-		_templateProvisionGroupRow() {
+		_templateProvisionFallbackGroupRow() {
 			return `
-				<tr data-row_index="#{row_index}" data-row_fallback="#{is_fallback}" class="sortable">
-					<td class="td-drag-icon">
-						<div class="drag-icon ui-sortable-handle #{drag_icon_class}"></div>
-					</td>
+				<tr data-row_index="#{row_index}" data-row_fallback>
+					<td></td>
 					<td>
-						<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
-						<input type="hidden" name="saml_provision_groups[#{row_index}][name]" value="#{name}">
+						<a href="javascript:void(0);" class="wordwrap js-edit"><?= _('Fallback group') ?></a>
 						<input type="hidden" name="saml_provision_groups[#{row_index}][roleid]" value="#{roleid}">
-						<input type="hidden" name="saml_provision_groups[#{row_index}][is_fallback]" value="#{is_fallback}">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_FALLBACK ?>">
 						<input type="hidden" name="saml_provision_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
 					</td>
 					<td class="wordbreak">#{user_group_names}</td>
 					<td class="wordbreak">#{role_name}</td>
 					<td>
 						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> #{action_class}">#{action_label}</button>
+					</td>
+				</tr>
+			`;
+		}
+
+		_templateProvisionGroupRow() {
+			return `
+				<tr data-row_index="#{row_index}" class="sortable">
+					<td class="td-drag-icon">
+						<div class="drag-icon ui-sortable-handle"></div>
+					</td>
+					<td>
+						<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
+						<input type="hidden" name="saml_provision_groups[#{row_index}][name]" value="#{name}">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][roleid]" value="#{roleid}">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_REGULAR ?>">
+					</td>
+					<td class="wordbreak">#{user_group_names}</td>
+					<td class="wordbreak">#{role_name}</td>
+					<td>
+						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
 					</td>
 				</tr>
 			`;

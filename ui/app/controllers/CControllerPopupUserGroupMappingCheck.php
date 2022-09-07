@@ -29,13 +29,24 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'roleid' =>				'required|db users.roleid',
-			'name' =>				'required|string|not_empty',
+			'name' =>				'string|not_empty',
 			'user_groups' =>		'required|array_id',
 			'is_fallback' =>		'required|in '.GROUP_MAPPING_REGULAR.','.GROUP_MAPPING_FALLBACK,
-			'fallback_status' =>	'required|in '.GROUP_MAPPING_FALLBACK_OFF.','.GROUP_MAPPING_FALLBACK_ON
+			'fallback_status' =>	'in '.GROUP_MAPPING_FALLBACK_OFF.','.GROUP_MAPPING_FALLBACK_ON
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			if ($this->getInput('is_fallback') == GROUP_MAPPING_REGULAR && !$this->hasInput('name')) {
+				error(_s('Field "%1$s" is mandatory.', 'name'));
+				$ret = false;
+			}
+			elseif ($this->getInput('is_fallback') == GROUP_MAPPING_FALLBACK && !$this->hasInput('fallback_status')) {
+				error(_s('Field "%1$s" is mandatory.', 'fallback_status'));
+				$ret = false;
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -56,11 +67,7 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 	}
 
 	protected function doAction(): void {
-		$data = [
-			'name' => $this->getInput('name'),
-			'is_fallback' => $this->getInput('is_fallback'),
-			'fallback_status' => $this->getInput('fallback_status')
-		];
+		$this->getInputs($data, ['name', 'is_fallback', 'fallback_status']);
 
 		$user_groups = API::UserGroup()->get([
 			'output' => ['usrgrpid', 'name'],

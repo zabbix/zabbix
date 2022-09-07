@@ -79,10 +79,7 @@ $inline_js .= $user_role_multiselect->getPostJS();
 if ($data['is_fallback'] == GROUP_MAPPING_FALLBACK) {
 	$name_hint_icon = makeHelpIcon([
 		_('Use fallback group to define user groups and a role for users not covered by group mapping.'),
-	])
-		->addClass(ZBX_STYLE_LIST_DASHED);
-
-	$form->addVar('name', $data['name']);
+	])->addClass(ZBX_STYLE_LIST_DASHED);
 }
 else {
 	$name_hint_icon = makeHelpIcon([
@@ -98,13 +95,13 @@ else {
 $form
 	->addItem((new CFormGrid())
 		->addItem([
-			(new CLabel([$data['name_label'], $name_hint_icon], 'name'))->setAsteriskMark(),
+			(new CLabel([_('LDAP group pattern'), $name_hint_icon], 'name'))->setAsteriskMark(),
 			new CFormField($data['is_fallback'] == GROUP_MAPPING_REGULAR
 				? (new CTextBox('name', $data['name']))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
 					->setAriaRequired()
-				: $data['name']
+				: _('Fallback group')
 			)
 		])
 		->addItem([

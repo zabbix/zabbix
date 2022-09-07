@@ -56,16 +56,24 @@ class CControllerPopupLdapCheck extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret && $this->getInput('provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
-			$provisioning_fields = [
-				'group_basedn' =>		'required|db userdirectory_ldap.group_basedn|not_empty',
-				'group_member' =>		'required|db userdirectory_ldap.group_member|not_empty',
-				'group_filter' =>		'required|db userdirectory_ldap.group_filter|not_empty',
-				'group_membership' =>	'required|db userdirectory_ldap.group_membership|not_empty'
-			] + $fields;
+			foreach (['group_basedn', 'group_member', 'group_filter', 'group_membership'] as $field) {
+				if (!$this->hasInput($field)) {
+					error(_s('Field "%1$s" is mandatory.', $field));
 
-			$ret &= $this->validateInput($provisioning_fields);
-			$ret &= $this->validateProvisionGroups();
-			$ret &= $this->validateProvisionMedia();
+					$ret = false;
+					break;
+				}
+				elseif ($this->getInput($field) === '') {
+					error(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
+
+					$ret = false;
+					break;
+				}
+			}
+
+			if ($ret) {
+				$ret = $this->validateProvisionGroups() && $this->validateProvisionMedia();
+			}
 		}
 
 		if (!$ret) {
@@ -130,21 +138,34 @@ class CControllerPopupLdapCheck extends CController {
 
 	private function validateProvisionGroups(): bool {
 		if (!$this->hasInput('provision_groups')) {
-			return true;
+			return false;
 		}
 
 		foreach ($this->getInput('provision_groups') as $group) {
 			if (!is_array($group)
-				|| !array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === ''
-				|| !array_key_exists('is_fallback', $group)
-				|| ($group['is_fallback'] != GROUP_MAPPING_REGULAR
-					&& $group['is_fallback'] != GROUP_MAPPING_FALLBACK)
-				|| !array_key_exists('fallback_status', $group)
-				|| ($group['fallback_status'] != GROUP_MAPPING_FALLBACK_OFF
-					&& $group['fallback_status'] != GROUP_MAPPING_FALLBACK_ON)
-				|| !array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
-				|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])) {
+					|| !array_key_exists('is_fallback', $group)
+					|| !array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
+					|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])) {
 				return false;
+			}
+
+			switch ($group['is_fallback']) {
+				case GROUP_MAPPING_REGULAR:
+					if (!array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === '') {
+						return false;
+					}
+					break;
+
+				case GROUP_MAPPING_FALLBACK:
+					if (!array_key_exists('fallback_status', $group)
+							|| ($group['fallback_status'] != GROUP_MAPPING_FALLBACK_OFF
+								&& $group['fallback_status'] != GROUP_MAPPING_FALLBACK_ON)) {
+						return false;
+					}
+					break;
+
+				default:
+					return false;
 			}
 		}
 

@@ -29,10 +29,9 @@ $this->includeJsFile('administration.authentication.edit.js.php');
 // Authentication general fields.
 $auth_tab = (new CFormGrid())
 	->addItem([
-		new CLabel(_('Default authentication'), 'authentication_type'),
+		new CLabel(_('Default authentication')),
 		new CFormField(
 			(new CRadioButtonList('authentication_type', (int) $data['authentication_type']))
-				->setAttribute('autofocus', 'autofocus')
 				->addValue(_x('Internal', 'authentication'), ZBX_AUTH_INTERNAL)
 				->addValue(_('LDAP'), ZBX_AUTH_LDAP)
 				->setModern(true)
@@ -258,20 +257,17 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('SSO service URL'), 'sso_url'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('sso_url', $data['sso_url'], false,
-				DB::getFieldLength('userdirectory_saml', 'sso_url')
-			))
+			(new CTextBox('sso_url', $data['sso_url'], false, DB::getFieldLength('userdirectory_saml', 'sso_url')))
 				->setEnabled($data['saml_enabled'])
 				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired())
+				->setAriaRequired()
+		)
 	])
 	->addItem([
 		new CLabel(_('SLO service URL'), 'slo_url'),
 		new CFormField(
-			(new CTextBox('slo_url', $data['slo_url'], false,
-				DB::getFieldLength('userdirectory_saml', 'slo_url')
-			))
+			(new CTextBox('slo_url', $data['slo_url'], false, DB::getFieldLength('userdirectory_saml', 'slo_url')))
 				->setEnabled($data['saml_enabled'])
 				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -398,6 +394,7 @@ $saml_tab = (new CFormGrid())
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
+				->addClass('saml-enabled')
 		))->addClass('saml-provision-status')
 	])
 	->addItem([
@@ -407,6 +404,7 @@ $saml_tab = (new CFormGrid())
 				DB::getFieldLength('userdirectory_saml', 'user_username')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->addClass('saml-enabled')
 		))->addClass('saml-provision-status')
 	])
 	->addItem([
@@ -416,63 +414,59 @@ $saml_tab = (new CFormGrid())
 				DB::getFieldLength('userdirectory_saml', 'user_lastname')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->addClass('saml-enabled')
 		))->addClass('saml-provision-status')
 	])
-	->addItem([(new CLabel(_('User group mapping')))->addClass('saml-provision-status'),
+	->addItem([
+		(new CLabel(_('User group mapping')))->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CDiv(
 				(new CTable())
 					->setId('saml-group-table')
 					->setAttribute('style', 'width: 100%;')
-					->setHeader((new CRowHeader([
-						'',
-						(new CColHeader(_('SAML group pattern')))->addClass(ZBX_STYLE_LEFT),
-						(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_LEFT),
-						(new CColHeader(_('User role')))->addClass(ZBX_STYLE_LEFT),
-						(new CColHeader(_('Action')))->addClass(ZBX_STYLE_LEFT)
-					]))->addClass(ZBX_STYLE_GREY)
+					->setHeader(
+						(new CRowHeader([
+							'', _('SAML group pattern'), _('User groups'), _('User role'), _('Action')
+						]))->addClass(ZBX_STYLE_GREY)
 					)
 					->addItem(
-						(new CTag('tfoot', true))
-							->addItem(
-								(new CCol(
-									(new CSimpleButton(_('Add')))
-										->addClass(ZBX_STYLE_BTN_LINK)
-										->addClass('js-add')
-								))->setColSpan(5)
-							)
+						(new CTag('tfoot', true))->addItem(
+							(new CCol(
+								(new CSimpleButton(_('Add')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass('js-add')
+							))->setColSpan(5)
+						)
 					)
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass('saml-provision-status')
 	])
-	->addItem([(new CLabel([
-		_('Media type mapping'),
-		makeHelpIcon(
-			_('Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications.')
-		)]))->addClass('saml-provision-status'),
+	->addItem([
+		(new CLabel([
+			_('Media type mapping'),
+			makeHelpIcon(
+				_('Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications.')
+			)
+		]))->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CDiv(
 				(new CTable())
 					->setId('saml-media-type-mapping-table')
 					->setHeader(
 						(new CRowHeader([
-							(new CColHeader(_('Name ')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
-							(new CColHeader(_('Media type')))->addClass(ZBX_STYLE_LEFT)->addStyle('width: 35%'),
-							(new CColHeader(_('Attribute')))->addClass(ZBX_STYLE_NOWRAP)->addClass(ZBX_STYLE_LEFT),
-							(new CColHeader(_('')))->addClass(ZBX_STYLE_LEFT)
+							_('Name '), _('Media type'), _('Attribute'), ''
 						]))->addClass(ZBX_STYLE_GREY)
 					)
 					->addItem(
-						(new CTag('tfoot', true))
-							->addItem(
-								(new CCol(
-									(new CSimpleButton(_('Add')))
-										->addClass(ZBX_STYLE_BTN_LINK)
-										->addClass('js-add')
-								))->setColSpan(5)
-							)
+						(new CTag('tfoot', true))->addItem(
+							(new CCol(
+								(new CSimpleButton(_('Add')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass('js-add')
+							))->setColSpan(5)
+						)
 					)
 					->addStyle('width: 100%;')
 			))
@@ -487,17 +481,18 @@ $saml_tab = (new CFormGrid())
 			(new CCheckBox('scim_status', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
 				->setChecked($data['scim_status'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
 				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
+				->addClass('saml-enabled')
 		))->addClass('saml-provision-status')
 	])
 	->addItem([
-		(new CLabel(_('Authorization token'), 'scim_token'))
-			->addClass('saml-provision-status'),
+		(new CLabel(_('Authorization token'), 'scim_token'))->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CTextBox('scim_token', $data['scim_token'], false,
 				DB::getFieldLength('userdirectory_saml', 'scim_token')
 			))
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->addClass('saml-enabled')
 		))->addClass('saml-provision-status')
 	]);
 
@@ -519,10 +514,6 @@ $form = (new CForm())
 		->onTabChange('jQuery("[name=ldap_test]")[(ui.newTab.index() == 2) ? "show" : "hide"]()')
 	);
 
-if ($data['saml_userdirectoryid'] != '') {
-	$form->addVar('saml_userdirectoryid', $data['saml_userdirectoryid']);
-}
-
 (new CWidget())
 	->setTitle(_('Authentication'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTHENTICATION_EDIT))
@@ -530,7 +521,7 @@ if ($data['saml_userdirectoryid'] != '') {
 	->show();
 
 (new CScriptTag(
-	'view.init('. json_encode([
+	'view.init('.json_encode([
 		'ldap_servers' => $data['ldap_servers'],
 		'ldap_default_row_index' => $data['ldap_default_row_index'],
 		'db_authentication_type' => $data['db_authentication_type'],

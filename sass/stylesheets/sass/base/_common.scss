@@ -118,6 +118,17 @@ a {
 		border: 0;
 		vertical-align: top;
 	}
+
+	&.disabled {
+		&:active,
+		&:focus,
+		&:hover {
+			cursor: default !important;
+			border-bottom: 0;
+			outline: 0;
+			opacity: .35;
+		}
+	}
 }
 
 svg a {

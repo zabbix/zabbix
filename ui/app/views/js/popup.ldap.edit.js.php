@@ -36,6 +36,7 @@ window.ldap_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.advanced_chbox = document.getElementById('advanced_configuration');
 		this.allow_jit_chbox = document.getElementById('provision_status');
+		this.provision_groups_table = document.getElementById('ldap-user-groups-table');
 
 		this.toggleAdvancedConfiguration(this.advanced_chbox.checked);
 		this.toggleAllowJitProvisioning(this.allow_jit_chbox.checked);
@@ -43,7 +44,7 @@ window.ldap_edit_popup = new class {
 		this._addEventListeners();
 		this._renderProvisionGroups(provision_groups);
 		this._renderProvisionMedia(provision_media);
-		this._initSortable(document.getElementById('ldap-user-groups-table'));
+		this._initSortable();
 
 		if (document.getElementById('bind-password-btn') !== null) {
 			document.getElementById('bind-password-btn').addEventListener('click', this.showPasswordField);
@@ -59,25 +60,23 @@ window.ldap_edit_popup = new class {
 			this.toggleAllowJitProvisioning(e.target.checked);
 		});
 
-		document
-			.getElementById('ldap-user-groups-table')
-			.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-add')) {
-					this.editProvisionGroup();
-				}
-				else if (e.target.classList.contains('js-edit')) {
-					this.editProvisionGroup(e.target.closest('tr'));
-				}
-				else if (e.target.classList.contains('js-remove')) {
-					e.target.closest('tr').remove();
-				}
-				else if (e.target.classList.contains('js-enabled')) {
-					this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_OFF ?>);
-				}
-				else if (e.target.classList.contains('js-disabled')) {
-					this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_ON ?>);
-				}
-			});
+		this.provision_groups_table.addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-add')) {
+				this.editProvisionGroup();
+			}
+			else if (e.target.classList.contains('js-edit')) {
+				this.editProvisionGroup(e.target.closest('tr'));
+			}
+			else if (e.target.classList.contains('js-remove')) {
+				e.target.closest('tr').remove();
+			}
+			else if (e.target.classList.contains('js-enabled')) {
+				this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_OFF ?>);
+			}
+			else if (e.target.classList.contains('js-disabled')) {
+				this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_ON ?>);
+			}
+		});
 
 		document
 			.getElementById('ldap-media-type-mapping-table')
@@ -107,7 +106,7 @@ window.ldap_edit_popup = new class {
 	}
 
 	toggleFallbackStatus(status) {
-		const row = this.dialogue.querySelector('[data-row_fallback="<?= GROUP_MAPPING_FALLBACK ?>"]');
+		const row = this.dialogue.querySelector('[data-row_fallback]');
 		const btn = row.querySelector('.btn-link');
 
 		if (status == <?= GROUP_MAPPING_FALLBACK_ON ?>) {
@@ -124,10 +123,9 @@ window.ldap_edit_popup = new class {
 		}
 	}
 
-	_initSortable(element) {
-		$(element).sortable({
+	_initSortable() {
+		$(this.provision_groups_table).sortable({
 			items: 'tbody tr.sortable',
-			cancel: '[data-row_fallback="<?= GROUP_MAPPING_FALLBACK ?>"]',
 			axis: 'y',
 			containment: 'parent',
 			cursor: 'grabbing',
@@ -149,10 +147,6 @@ window.ldap_edit_popup = new class {
 				return ui;
 			},
 			stop: function(e, ui) {
-				if ($(ui.item).prev('[data-row_fallback="<?= GROUP_MAPPING_FALLBACK ?>"]').length) {
-					return false;
-				}
-
 				ui.item.find('>td').removeAttr('width');
 				ui.item.removeAttr('style');
 			},
@@ -294,11 +288,13 @@ window.ldap_edit_popup = new class {
 
 	editProvisionGroup(row = null) {
 		let popup_params;
-		let row_index;
+		let row_index = 0;
+		let status = <?= GROUP_MAPPING_FALLBACK_OFF ?>;
 
 		if (row === null) {
-			const rows = this.dialogue.querySelectorAll('#ldap-user-groups-table [data-row_index]');
-			row_index = Math.max([...rows].map(row => row.dataset.row_index)) + 1;
+			while (this.provision_groups_table.querySelector(`[data-row_index="${row_index}"]`) !== null) {
+				row_index++;
+			}
 
 			popup_params = {
 				add_group: 1,
@@ -307,15 +303,20 @@ window.ldap_edit_popup = new class {
 		}
 		else {
 			row_index = row.dataset.row_index;
-			const user_groups = row.querySelectorAll('[name="provision_groups[' + row_index + '][user_groups][]"]');
+			let is_fallback = row.querySelector(`[name="provision_groups[${row_index}][is_fallback]"`).value;
+			let user_groups = row.querySelectorAll(`[name="provision_groups[${row_index}][user_groups][][usrgrpid]"`);
 
 			popup_params = {
-				name: row.querySelector('[name="provision_groups[' + row_index + '][name]"]').value,
-				roleid: row.querySelector('[name="provision_groups[' + row_index + '][roleid]"]').value,
-				is_fallback: row.querySelector('[name="provision_groups[' + row_index + '][is_fallback]"]').value,
-				fallback_status: row.querySelector('[name="provision_groups[' + row_index + '][fallback_status]"]').value,
-				usrgrpid: [...user_groups].map(usrgrp => usrgrp.value)
+				usrgrpid: [...user_groups].map(usrgrp => usrgrp.value),
+				roleid: row.querySelector(`[name="provision_groups[${row_index}][roleid]"`).value,
+				is_fallback: is_fallback
 			};
+			if (is_fallback == <?= GROUP_MAPPING_REGULAR ?>) {
+				popup_params.name = row.querySelector(`[name="provision_groups[${row_index}][name]"`).value;
+			}
+			else {
+				status = row.querySelector(`[name="provision_groups[${row_index}][fallback_status]"`).value;
+			}
 		}
 
 		const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
@@ -324,13 +325,13 @@ window.ldap_edit_popup = new class {
 			const group = {...e.detail, ...{row_index: row_index}};
 
 			if (row === null) {
-				const fallback_row = this.dialogue.querySelector('[data-row_fallback="<?= GROUP_MAPPING_FALLBACK ?>"]');
+				const fallback_row = this.dialogue.querySelector('[data-row_fallback]');
 				if (fallback_row !== null) {
 					fallback_row.parentNode.insertBefore(this._renderProvisionGroupRow(group), fallback_row);
 				}
 				else {
-					this.dialogue
-						.querySelector('#ldap-user-groups-table tbody')
+					this.provision_groups_table
+						.querySelector('tbody')
 						.appendChild(this._renderProvisionGroupRow(group));
 				}
 			}
@@ -342,11 +343,12 @@ window.ldap_edit_popup = new class {
 
 	editProvisionMediaType(row = null) {
 		let popup_params;
-		let row_index;
+		let row_index = 0;
 
 		if (row === null) {
-			const rows = this.dialogue.querySelectorAll('#ldap-media-type-mapping-table [data-row_index]');
-			row_index = Math.max([...rows].map(row => row.dataset.row_index)) + 1;
+			while (document.querySelector(`#ldap-media-type-mapping-table [data-row_index="${row_index}"]`) !== null) {
+				row_index++;
+			}
 
 			popup_params = {
 				add_media_type_mapping: 1
@@ -380,18 +382,19 @@ window.ldap_edit_popup = new class {
 
 	_renderProvisionGroups(groups) {
 		for (const key in groups) {
-			document
-				.querySelector('#ldap-user-groups-table tbody')
+			this.provision_groups_table
+				.querySelector('tbody')
 				.appendChild(this._renderProvisionGroupRow({...groups[key], ...{row_index: key}}));
 		}
 	}
 
 	_renderProvisionGroupRow(group) {
+		const template = document.createElement('template');
+		const template_row = group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?>
+			? new Template(this._templateProvisionFallbackGroupRow())
+			: new Template(this._templateProvisionGroupRow());
 		const attributes = {
-			user_group_names: Object.values(group.user_groups).map(user_group => user_group.name).join(', '),
-			action_label: '<?= _('Remove') ?>',
-			action_class: 'js-remove',
-			drag_icon_class: ''
+			user_group_names: Object.values(group.user_groups).map(user_group => user_group.name).join(', ')
 		};
 
 		if (group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?>) {
@@ -403,35 +406,14 @@ window.ldap_edit_popup = new class {
 				attributes.action_label = '<?= _('Disabled') ?>';
 				attributes.action_class = 'js-disabled <?= ZBX_STYLE_RED ?>';
 			}
-			attributes.drag_icon_class = '<?= ZBX_STYLE_DISABLED ?>';
 		}
 
-		const provision_group_row_tmpl = new Template(`
-			<tr data-row_index="#{row_index}" data-row_fallback="#{is_fallback}" class="sortable">
-				<td class="td-drag-icon">
-					<div class="drag-icon ui-sortable-handle #{drag_icon_class}"></div>
-				</td>
-				<td>
-					<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
-					<input type="hidden" name="provision_groups[#{row_index}][name]" value="#{name}">
-					<input type="hidden" name="provision_groups[#{row_index}][roleid]" value="#{roleid}">
-					<input type="hidden" name="provision_groups[#{row_index}][is_fallback]" value="#{is_fallback}">
-					<input type="hidden" name="provision_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
-				</td>
-				<td class="wordbreak">#{user_group_names}</td>
-				<td class="wordbreak">#{role_name}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> #{action_class}">#{action_label}</button>
-				</td>
-			</tr>`);
-
-		const template = document.createElement('template');
-		template.innerHTML = provision_group_row_tmpl.evaluate({...group, ...attributes}).trim();
+		template.innerHTML = template_row.evaluate({...group, ...attributes}).trim();
 		const row = template.content.firstChild;
 
 		for (const user of Object.values(group.user_groups)) {
 			const input = document.createElement('input');
-			input.name = 'provision_groups[' + group.row_index + '][user_groups][]';
+			input.name = 'provision_groups[' + group.row_index + '][user_groups][][usrgrpid]';
 			input.value = user.usrgrpid;
 			input.type = 'hidden';
 
@@ -439,6 +421,46 @@ window.ldap_edit_popup = new class {
 		}
 
 		return row;
+	}
+
+	_templateProvisionFallbackGroupRow() {
+		return `
+			<tr data-row_index="#{row_index}" data-row_fallback>
+				<td></td>
+				<td>
+					<a href="javascript:void(0);" class="wordwrap js-edit"><?= _('Fallback group') ?></a>
+					<input type="hidden" name="provision_groups[#{row_index}][roleid]" value="#{roleid}">
+					<input type="hidden" name="provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_FALLBACK ?>">
+					<input type="hidden" name="provision_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
+				</td>
+				<td class="wordbreak">#{user_group_names}</td>
+				<td class="wordbreak">#{role_name}</td>
+				<td>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> #{action_class}">#{action_label}</button>
+				</td>
+			</tr>
+		`;
+	}
+
+	_templateProvisionGroupRow() {
+		return `
+			<tr data-row_index="#{row_index}" class="sortable">
+				<td class="td-drag-icon">
+					<div class="drag-icon ui-sortable-handle"></div>
+				</td>
+				<td>
+					<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
+					<input type="hidden" name="provision_groups[#{row_index}][name]" value="#{name}">
+					<input type="hidden" name="provision_groups[#{row_index}][roleid]" value="#{roleid}">
+					<input type="hidden" name="provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_REGULAR ?>">
+				</td>
+				<td class="wordbreak">#{user_group_names}</td>
+				<td class="wordbreak">#{role_name}</td>
+				<td>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+				</td>
+			</tr>
+		`;
 	}
 
 	_renderProvisionMedia(provision_media) {

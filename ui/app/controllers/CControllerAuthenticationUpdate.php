@@ -35,11 +35,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'form_refresh' =>					'string',
-			'ldap_test_user' =>					'string',
-			'ldap_test_password' =>				'string',
-			'ldap_test' =>						'in 1',
-			'change_bind_password' =>			'in 0,1',
+			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_configured' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
@@ -50,7 +46,6 @@ class CControllerAuthenticationUpdate extends CController {
 			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>				'db config.http_strip_domains',
-			'saml_userdirectoryid' =>			'db userdirectory_saml.userdirectoryid',
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
@@ -81,22 +76,11 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			$ret = $this->validateDefaultAuth() && $this->validateLdap() && $this->validateSamlAuth();
+		}
+
 		if (!$ret) {
-			$this->response->setFormData($this->getInputAll());
-			$this->setResponse($this->response);
-		}
-
-		$auth_valid = $this->validateDefaultAuth();
-
-		if ($auth_valid && !$this->validateLdap()) {
-			$auth_valid = false;
-		}
-
-		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
-			$auth_valid = $this->validateSamlAuth();
-		}
-
-		if (!$auth_valid) {
 			if (CMessageHelper::getTitle() === null) {
 				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
 			}
@@ -104,7 +88,7 @@ class CControllerAuthenticationUpdate extends CController {
 			$this->setResponse($this->response);
 		}
 
-		return $auth_valid;
+		return $ret;
 	}
 
 	/**
@@ -146,21 +130,34 @@ class CControllerAuthenticationUpdate extends CController {
 
 			if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
 				CMessageHelper::setErrorTitle($ldap_status['error']);
+
 				return false;
 			}
 
 			if (!$ldap_servers) {
 				CMessageHelper::setErrorTitle(_('At least one LDAP server must exist.'));
+
 				return false;
 			}
 		}
 
 		if ($ldap_servers
 				&& (!$this->hasInput('ldap_default_row_index')
-					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers)
-				)) {
+					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers))) {
 			CMessageHelper::setErrorTitle(_('Default LDAP server must be specified.'));
+
 			return false;
+		}
+
+		foreach ($ldap_servers as $ldap_server) {
+			if (!array_key_exists('provision_groups', $ldap_server)
+					|| !$this->validateProvisionGroups($ldap_server['provision_groups'])) {
+				return false;
+			}
+			if (array_key_exists('provision_media', $ldap_server)
+					&& !$this->validateProvisionMedia($ldap_server['provision_media'])) {
+				return false;
+			}
 		}
 
 		return true;
@@ -172,15 +169,17 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function validateSamlAuth() {
-		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED) == ZBX_AUTH_SAML_DISABLED) {
+			return true;
+		}
 
+		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 		if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
 			CMessageHelper::setErrorTitle($openssl_status['error']);
 
 			return false;
 		}
 
-		$saml_fields = [];
 		$this->getInputs($saml_fields, [
 			'idp_entityid',
 			'sso_url',
@@ -189,7 +188,7 @@ class CControllerAuthenticationUpdate extends CController {
 		]);
 
 		if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_JIT_STATUS) == JIT_PROVISIONING_ENABLED) {
-			$saml_fields['saml_group_name'] = $this->getInput('saml_group_name');
+			$saml_fields['saml_group_name'] = $this->getInput('saml_group_name', '');
 		}
 
 		foreach ($saml_fields as $field_name => $field_value) {
@@ -202,7 +201,8 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 		}
 
-		if (!$this->validateProvisionGroups() || !$this->validateProvisionMedia()) {
+		if (!$this->validateProvisionGroups($this->getInput('saml_provision_groups', []))
+				|| !$this->validateProvisionMedia($this->getInput('saml_provision_media', []))) {
 			return false;
 		}
 
@@ -239,13 +239,28 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	protected function doAction() {
-		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
-			$saml_auth_valid = $this->processSamlConfiguration();
-		}
+		$saml_auth_valid = $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED
+			? $this->processSamlConfiguration()
+			: true;
 
-		[$ldap_auth_valid, $ldap_userdirectoryid] = $this->processLdapServers(
-			$this->getInput('ldap_servers', []), $this->getInput('ldap_default_row_index', 0)
-		);
+		$ldap_auth_valid = true;
+		$ldap_servers = $this->getInput('ldap_servers', []);
+
+		if ($ldap_servers) {
+			$ldap_userdirectoryids = $this->processLdapServers($ldap_servers);
+			$ldap_default_row_index = $this->getInput('ldap_default_row_index', 0);
+
+			if (!$ldap_userdirectoryids) {
+				$ldap_auth_valid = false;
+			}
+			elseif (!array_key_exists($ldap_default_row_index, $ldap_userdirectoryids)) {
+				CMessageHelper::setErrorTitle(_('Failed to select default LDAP server.'));
+				$ldap_auth_valid = false;
+			}
+			else {
+				$ldap_userdirectoryid = $ldap_userdirectoryids[$ldap_default_row_index];
+			}
+		}
 
 		if (!$saml_auth_valid || !$ldap_auth_valid) {
 			if (CMessageHelper::getTitle() === null) {
@@ -347,70 +362,49 @@ class CControllerAuthenticationUpdate extends CController {
 	 * Updates existing LDAP servers, creates new ones, removes deleted ones.
 	 *
 	 * @param array $ldap_servers
-	 * @param int $default_row_index
 	 *
 	 * @return array
 	 */
-	private function processLdapServers(array $ldap_servers, int $default_row_index): array {
+	private function processLdapServers(array $ldap_servers): array {
 		$ins_ldap_servers = [];
 		$upd_ldap_servers = [];
-
-		$ldap_userdirectoryid = 0;
-		$default_ldap_mapping_index = null;
+		$userdirectoryid_map = [];
 
 		foreach ($ldap_servers as $row_index => $ldap_server) {
-			$this->extendProvisionGroups($ldap_server['provision_groups']);
-
 			if (array_key_exists('userdirectoryid', $ldap_server)) {
+				$userdirectoryid_map[$row_index] = $ldap_server['userdirectoryid'];
 				$upd_ldap_servers[] = $ldap_server;
-
-				if ($default_row_index == $row_index) {
-					$ldap_userdirectoryid = $ldap_server['userdirectoryid'];
-				}
 			}
 			else {
-				$ldap_server['idp_type'] = IDP_TYPE_LDAP;
-				$ins_ldap_servers[] = $ldap_server;
+				$userdirectoryid_map[$row_index] = null;
+				$ins_ldap_servers[] = ['idp_type' => IDP_TYPE_LDAP] + $ldap_server;
+			}
+		}
 
-				if ($default_row_index == $row_index) {
-					$default_ldap_mapping_index = count($ins_ldap_servers) - 1;
+		$result = $upd_ldap_servers ? API::UserDirectory()->update($upd_ldap_servers) : [];
+		$result = $result && $ins_ldap_servers ? API::UserDirectory()->create($ins_ldap_servers) : $result;
+
+		if ($result) {
+			foreach ($userdirectoryid_map as $row_index => $userdirectoryid) {
+				if ($userdirectoryid === null) {
+					$userdirectoryid_map[$row_index] = array_shift($result['userdirectoryids']);
 				}
 			}
+
+			return $userdirectoryid_map;
 		}
-
-		if ($upd_ldap_servers && !API::UserDirectory()->update($upd_ldap_servers)) {
-			return [false, $ldap_userdirectoryid];
+		else {
+			return [];
 		}
-
-		if ($ins_ldap_servers) {
-			$inserted_ids = API::UserDirectory()->create($ins_ldap_servers);
-
-			if (!$inserted_ids) {
-				return [false, $ldap_userdirectoryid];
-			}
-
-			if ($default_ldap_mapping_index !== null) {
-				$ldap_userdirectoryid = $inserted_ids['userdirectoryids'][$default_ldap_mapping_index];
-			}
-		}
-
-		if ($ldap_servers && $ldap_userdirectoryid === 0) {
-			CMessageHelper::setErrorTitle(_('Failed to select default LDAP server.'));
-
-			return [false, $ldap_userdirectoryid];
-		}
-
-		return [true, $ldap_userdirectoryid];
 	}
 
 	/**
 	 * Retrieves SAML configuration fields and creates or updates SAML configuration.
 	 *
-	 * @return array
+	 * @return bool
 	 */
-	private function processSamlConfiguration(): array {
+	private function processSamlConfiguration(): bool {
 		$saml_fields = [
-			'saml_userdirectoryid' => '',
 			'idp_entityid' => '',
 			'sso_url' => '',
 			'slo_url' => '',
@@ -430,40 +424,44 @@ class CControllerAuthenticationUpdate extends CController {
 			'saml_user_lastname' => '',
 			'saml_provision_groups' => [],
 			'saml_provision_media' => [],
-			'scim_status' => 0,
+			'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
 			'scim_token' => ''
 		];
 
 		$this->getInputs($saml_fields, array_keys($saml_fields));
+
 		$saml_data = [
 			'idp_type' => IDP_TYPE_SAML,
-			'userdirectoryid' => $saml_fields['saml_userdirectoryid'],
 			'group_name' => $saml_fields['saml_group_name'],
 			'user_username' => $saml_fields['saml_user_username'],
 			'user_lastname' => $saml_fields['saml_user_lastname'],
 			'provision_status' => $saml_fields['saml_provision_status'],
 			'provision_groups' => $saml_fields['saml_provision_groups'],
-			'provision_media' => $saml_fields['saml_provision_media'],
+			'provision_media' => $saml_fields['saml_provision_media']
 		];
 
-		unset($saml_fields['saml_group_name'], $saml_fields['saml_user_username'],
-			$saml_fields['saml_user_lastname'], $saml_fields['saml_provision_groups'],
-			$saml_fields['saml_provision_media'], $saml_fields['saml_userdirectoryid'],
-			$saml_fields['saml_provision_status']);
+		unset($saml_fields['saml_group_name'], $saml_fields['saml_user_username'], $saml_fields['saml_user_lastname'],
+			$saml_fields['saml_provision_groups'], $saml_fields['saml_provision_media'],
+			$saml_fields['saml_provision_status']
+		);
 
 		$saml_data += $saml_fields;
 
-		$this->extendProvisionGroups($saml_data['provision_groups']);
+		$db_saml = API::UserDirectory()->get([
+			'output' => ['userdirectoryid'],
+			'filter' => [
+				'idp_type' => IDP_TYPE_SAML
+			]
+		]);
 
-		if ($saml_data['userdirectoryid'] == '') {
-			unset($saml_data['userdirectoryid']);
-			$auth_valid = API::UserDirectory()->create($saml_data);
+		if ($db_saml) {
+			$result = API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid']] + $saml_data);
 		}
 		else {
-			$auth_valid = API::UserDirectory()->update($saml_data);
+			$result = API::UserDirectory()->create($saml_data);
 		}
 
-		return $auth_valid;
+		return $result !== false;
 	}
 
 	/**
@@ -500,60 +498,44 @@ class CControllerAuthenticationUpdate extends CController {
 		return $result;
 	}
 
-	/**
-	 * Prepares provision groups data for API.
-	 *
-	 * @param array $provision_groups
-	 *
-	 * @return void
-	 */
-	private function extendProvisionGroups(array &$provision_groups): void {
-		foreach ($provision_groups as &$provision_group) {
-			if ($provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK_ON) {
-				unset($provision_group['name']);
-			}
-			else {
-				unset($provision_group['fallback_status']);
-			}
-
-			$user_groups = [];
-			foreach ($provision_group['user_groups'] as $usrgrpid) {
-				$user_groups[] = ['usrgrpid' => $usrgrpid];
-			}
-			$provision_group['user_groups'] = $user_groups;
-		}
-		unset($provision_group);
-	}
-
-	private function validateProvisionGroups(): bool {
-		if (!$this->hasInput('provision_groups')) {
-			return true;
-		}
-
-		foreach ($this->getInput('provision_groups') as $group) {
+	private function validateProvisionGroups(array $provision_group): bool {
+		foreach ($provision_group as $group) {
 			if (!is_array($group)
-				|| !array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === ''
-				|| !array_key_exists('is_fallback', $group)
-				|| ($group['is_fallback'] != GROUP_MAPPING_REGULAR
-					&& $group['is_fallback'] != GROUP_MAPPING_FALLBACK)
-				|| !array_key_exists('fallback_status', $group)
-				|| ($group['fallback_status'] != GROUP_MAPPING_FALLBACK_OFF
-					&& $group['fallback_status'] != GROUP_MAPPING_FALLBACK_ON)
-				|| !array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
-				|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])) {
+					|| !array_key_exists('is_fallback', $group)
+					|| !array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
+					|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])) {
 				return false;
+			}
+
+			switch ($group['is_fallback']) {
+				case GROUP_MAPPING_REGULAR:
+					if (!array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === '') {
+						return false;
+					}
+					break;
+
+				case GROUP_MAPPING_FALLBACK:
+					if (!array_key_exists('fallback_status', $group)
+							|| ($group['fallback_status'] != GROUP_MAPPING_FALLBACK_OFF
+								&& $group['fallback_status'] != GROUP_MAPPING_FALLBACK_ON)) {
+						return false;
+					}
+					break;
+
+				default:
+					return false;
 			}
 		}
 
 		return true;
 	}
 
-	private function validateProvisionMedia(): bool {
-		if (!$this->hasInput('provision_media')) {
+	private function validateProvisionMedia(array $provision_media): bool {
+		if (!$provision_media) {
 			return true;
 		}
 
-		foreach ($this->getInput('provision_media') as $media) {
+		foreach ($provision_media as $media) {
 			if (!is_array($media)
 				|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
 				|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])

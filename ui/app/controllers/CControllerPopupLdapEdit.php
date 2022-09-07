@@ -220,16 +220,29 @@ class CControllerPopupLdapEdit extends CController {
 
 		foreach ($this->getInput('provision_groups') as $group) {
 			if (!is_array($group)
-					|| !array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === ''
 					|| !array_key_exists('is_fallback', $group)
-						|| ($group['is_fallback'] != GROUP_MAPPING_REGULAR
-							&& $group['is_fallback'] != GROUP_MAPPING_FALLBACK)
-					|| !array_key_exists('fallback_status', $group)
-						|| ($group['fallback_status'] != GROUP_MAPPING_FALLBACK_OFF
-							&& $group['fallback_status'] != GROUP_MAPPING_FALLBACK_ON)
 					|| !array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
 					|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])) {
 				return false;
+			}
+
+			switch ($group['is_fallback']) {
+				case GROUP_MAPPING_REGULAR:
+					if (!array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === '') {
+						return false;
+					}
+					break;
+
+				case GROUP_MAPPING_FALLBACK:
+					if (!array_key_exists('fallback_status', $group)
+							|| ($group['fallback_status'] != GROUP_MAPPING_FALLBACK_OFF
+								&& $group['fallback_status'] != GROUP_MAPPING_FALLBACK_ON)) {
+						return false;
+					}
+					break;
+
+				default:
+					return false;
 			}
 		}
 
