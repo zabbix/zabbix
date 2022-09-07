@@ -132,7 +132,7 @@
 			});
 
 			dialogue.addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('service');
+				uncheckTableRows(chkbxRange.prefix);
 
 				postMessageOk(e.detail.title);
 
@@ -140,7 +140,7 @@
 					postMessageDetails('success', e.detail.messages);
 				}
 
-				location.href = options.serviceid === this.serviceid ? this.parent_url : location.href;
+				location.href = parameters.serviceid === this.serviceid ? this.parent_url : location.href;
 			});
 
 			dialogue.addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
@@ -171,7 +171,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('service', response.error.keepids);
+						uncheckTableRows(chkbxRange.prefix, response.error.keepids);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -180,7 +180,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows('service');
+						uncheckTableRows(chkbxRange.prefix);
 					}
 
 					location.href = location.href;

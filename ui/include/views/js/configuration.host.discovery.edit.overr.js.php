@@ -1079,11 +1079,11 @@
 			})
 			.trigger('change');
 
-		jQuery('#tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
-		jQuery('#tags-table', this.$form)
+		jQuery('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
+		jQuery('.tags-table', this.$form)
 			.dynamicRows({template: '#lldoverride-tag-row'})
 			.on('click', 'button.element-table-add', function() {
-				jQuery('#tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
+				jQuery('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
 			});
 
 		// Override actions available per override object.

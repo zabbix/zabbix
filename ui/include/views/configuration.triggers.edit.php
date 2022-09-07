@@ -40,7 +40,7 @@ $url = (new CUrl('triggers.php'))
 $triggersForm = (new CForm('post', $url))
 	->setid('triggers-form')
 	->setName('triggersForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('expression_constructor', $data['expression_constructor'])
@@ -588,7 +588,8 @@ $triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab
 		'tags' => $data['tags'],
 		'show_inherited_tags' => $data['show_inherited_tags'],
 		'readonly' => $discovered_trigger,
-		'tabs_id' => 'tabs'
+		'tabs_id' => 'tabs',
+		'tags_tab_id' => 'tags-tab'
 	]),
 	TAB_INDICATOR_TAGS
 );
@@ -654,7 +655,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
 $cancelButton = $data['backurl'] !== null
-	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+	? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
 	: new CButtonCancel(url_param('context'));
 
 // Append buttons to form list.

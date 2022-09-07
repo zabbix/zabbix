@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:09Z'
+  date: '2022-08-16T02:25:45Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -273,6 +273,34 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
+          uuid: f5f8ed93998a4b5799d1f6b2e1984006
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: ba4d97d2010f4d3498fc71e4b10a0941
           name: 'System location'
           type: SNMP_AGENT
@@ -335,6 +363,28 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: fadb61328389434c888cb8bfd6e964ed
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 9977da08f1374d1c82e92332bbcc199e
           name: 'System object ID'
           type: SNMP_AGENT
@@ -396,45 +446,6 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
-          uuid: fadb61328389434c888cb8bfd6e964ed
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: f4c5126396ce4a07b9f0ef82aea599e3
-              expression: 'last(/MikroTik RB5009UGSIN SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/MikroTik RB5009UGSIN SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
           uuid: aa54b9f3cf6746b897c07e7f3eac3c1f
           name: 'Total memory'
           type: SNMP_AGENT
@@ -491,7 +502,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//vm.memory.used[hrStorageUsed.Memory])/last(//vm.memory.total[hrStorageSize.Memory])*100'
-          description: 'Memory utilization in %'
+          description: 'Memory utilization in %.'
           tags:
             -
               tag: component
@@ -1820,7 +1831,7 @@ zabbix_export:
               uuid: da49d6b3b96c4c32b1439d13a289a2ef
               expression: |
                 last(/MikroTik RB5009UGSIN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                ((last(/MikroTik RB5009UGSIN SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB5009UGSIN SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<5G or timeleft(/MikroTik RB5009UGSIN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                ((last(/MikroTik RB5009UGSIN SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB5009UGSIN SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik RB5009UGSIN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is critically low'
               event_name: 'Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1828,7 +1839,7 @@ zabbix_export:
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 5G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -1842,7 +1853,7 @@ zabbix_export:
               uuid: dd9a814580fd47be8982b9ca83217070
               expression: |
                 last(/MikroTik RB5009UGSIN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
-                ((last(/MikroTik RB5009UGSIN SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB5009UGSIN SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<10G or timeleft(/MikroTik RB5009UGSIN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                ((last(/MikroTik RB5009UGSIN SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB5009UGSIN SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik RB5009UGSIN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is low'
               event_name: 'Disk-{#SNMPINDEX}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1850,7 +1861,7 @@ zabbix_export:
               description: |
                 Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}.
                  Second condition should be one of the following:
-                 - The disk free space is less than 10G.
+                 - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"Disk-{#SNMPINDEX}"}.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
@@ -1858,7 +1869,7 @@ zabbix_export:
                   name: 'Disk-{#SNMPINDEX}: Disk space is critically low'
                   expression: |
                     last(/MikroTik RB5009UGSIN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                    ((last(/MikroTik RB5009UGSIN SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB5009UGSIN SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<5G or timeleft(/MikroTik RB5009UGSIN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                    ((last(/MikroTik RB5009UGSIN SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB5009UGSIN SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik RB5009UGSIN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -2037,8 +2048,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'MikroTik RB5009UGSIN SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: 209d3691ddba4079971e42b4c66bbf7b
@@ -2947,6 +2958,23 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: f4c5126396ce4a07b9f0ef82aea599e3
+      expression: '(last(/MikroTik RB5009UGSIN SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/MikroTik RB5009UGSIN SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/MikroTik RB5009UGSIN SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/MikroTik RB5009UGSIN SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/MikroTik RB5009UGSIN SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 00b301e0452b4c43abdba945529c667d

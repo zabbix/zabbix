@@ -30,7 +30,7 @@ $widget = (new CWidget())
 $token_form = (new CForm())
 	->setId('token_form')
 	->setName('token')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 $token_from_list = (new CFormList())
 	->addRow(_('Name').':', $data['name'])

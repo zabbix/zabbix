@@ -160,8 +160,8 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_MARIA_MIN_VERSION_FRIENDLY			"10.02.00"
 #define ZBX_MARIA_MIN_SUPPORTED_VERSION			100500
 #define ZBX_MARIA_MIN_SUPPORTED_VERSION_FRIENDLY	"10.05.00"
-#define ZBX_MARIA_MAX_VERSION				100799
-#define ZBX_MARIA_MAX_VERSION_FRIENDLY			"10.07.xx"
+#define ZBX_MARIA_MAX_VERSION				100899
+#define ZBX_MARIA_MAX_VERSION_FRIENDLY			"10.08.xx"
 
 #define ZBX_POSTGRESQL_MIN_VERSION			100009
 #define ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY		"10.9"
@@ -192,12 +192,28 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 			20001
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY 		"2.0.1"
 #define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
-#define ZBX_TIMESCALE_MAX_VERSION				20699
-#define ZBX_TIMESCALE_MAX_VERSION_FRIENDLY			"2.6"
+#define ZBX_TIMESCALE_MAX_VERSION				20799
+#define ZBX_TIMESCALE_MAX_VERSION_FRIENDLY			"2.7"
 #define ZBX_TIMESCALE_LICENSE_APACHE				"apache"
 #define ZBX_TIMESCALE_LICENSE_APACHE_FRIENDLY			"TimescaleDB Apache 2 Edition"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY		"TimescaleDB Community Edition"
+
+#if defined(HAVE_POSTGRESQL)
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
+#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_DB_STRLIST_DELIM		','
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB3	"utf8mb3"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4 	"utf8mb4"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET		ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 ","\
+							ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB3 ","\
+							ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
+#	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin,utf8mb4_bin"
+#endif
 
 typedef enum
 {	/* db version status flags shared with FRONTEND */
@@ -288,10 +304,6 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 #	define ZBX_DB_TIMESTAMP()	"cast(extract(epoch from now()) as int)"
 #else /* HAVE_ORACLE */
 #	define ZBX_DB_TIMESTAMP()	"(cast(sys_extract_utc(systimestamp) as date) - date'1970-01-01') * 86400"
-#endif
-
-#if defined(HAVE_MYSQL)
-void zbx_db_set_character_set(const char *char_set);
 #endif
 
 #endif
