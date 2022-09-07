@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-06-30 22:05+0000\n"
-"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
+"POT-Creation-Date: 2022-04-01 16:26+0300\n"
+"PO-Revision-Date: 2022-08-22 07:28+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -107,7 +107,7 @@ msgstr "%1$s (rok %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s – vyvoláno modulem umístěným na %2$s."
 
 #: app/partials/monitoring.latest.view.html.php:133
 #, c-format
@@ -525,7 +525,7 @@ msgstr "Akce byla přidána"
 #: include/classes/core/ZBase.php:433
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "Třída akcí %1$s musí rozšířit třídu %2$s."
 
 #: actionconf.php:202
 msgid "Action deleted"
@@ -1235,7 +1235,7 @@ msgstr "Minimálně jedna perioda údržby musí být vytvořena."
 
 #: include/classes/setup/CFrontendSetup.php:259
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "Měl by být podporován alespoň jeden z MySQL, PostgreSQL nebo Oracle."
 
 #: include/views/configuration.correlation.edit.php:154
 msgid "At least one operation must be selected."
@@ -1247,7 +1247,7 @@ msgstr "Minimálně jedna operace musí existovat."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:155
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "Alespoň jedna operace aktualizace nebo zprávy je povinná"
 
 #: app/views/popup.acknowledge.edit.php:102
 msgid "At least one update operation or message must exist."
@@ -1403,7 +1403,7 @@ msgstr "Doba ukládání dat automatické registrace"
 #: include/profiles.inc.php:232
 #, c-format
 msgid "Autoregistration event and alert data storage period \"%1$s\"."
-msgstr ""
+msgstr "Perioda automatického zápisu událostí a výstrah do úložiště dat \"%1$s\"."
 
 #: app/partials/monitoring.host.view.html.php:35
 #: include/views/configuration.host.list.php:195
@@ -2126,9 +2126,9 @@ msgstr[2] "Není možné smazat typy médií"
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze smazat modul: %1$s."
+msgstr[1] "Nelze odstranit moduly: %1$s"
+msgstr[2] "Nelze odstranit modulů: %1$s"
 
 #: sysmaps.php:259
 msgid "Cannot delete network map"
@@ -10817,6 +10817,11 @@ msgstr "M"
 msgctxt "Monday short"
 msgid "M"
 msgstr "Po"
+
+#: include/func.inc.php:597 jsLoader.php:144
+msgctxt "month short"
+msgid "M"
+msgstr ""
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:90
 msgid "MAC address A"

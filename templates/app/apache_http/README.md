@@ -137,7 +137,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Apache: Service is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m) |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].min(5m)}>{$APACHE.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p> |
-|Apache: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:apache.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
+|Apache: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:apache.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Apache: Version has changed (new version: {ITEM.VALUE}) |<p>Apache version has changed. Ack to close.</p> |`{TEMPLATE_NAME:apache.version.diff()}=1 and {TEMPLATE_NAME:apache.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Apache: Failed to fetch status page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:apache.get_status.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p> |
 

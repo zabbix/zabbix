@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T06:24:32Z</date>
+   <date>2022-08-01T13:34:57Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -18,7 +18,7 @@
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '&lt;password&gt;';&#13;
 GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';&#13;
 For more information read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please. &#13;
-4.Create .my.cnf in home directory of Zabbix agent for Linux (/var/lib/zabbix by default ) or my.cnf in c:\ for Windows. For example:&#13;
+4.Create .my.cnf in home directory of Zabbix agent for Linux (/var/lib/zabbix by default) or my.cnf in c:\ for Windows. For example:&#13;
 [client]&#13;
 user='zbx_monitor'&#13;
 password='&lt;password&gt;'&#13;
@@ -1781,7 +1781,7 @@ return '[]';</params>
             </macro>
             <macro>
                <macro>{$MYSQL.HOST}</macro>
-               <value>localhost</value>
+               <value>127.0.0.1</value>
                <description>Hostname or IP of MySQL host or container.</description>
             </macro>
             <macro>

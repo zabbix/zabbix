@@ -2860,7 +2860,7 @@ static void	add_value_suffix_s(char *value, size_t max_len)
 
 	if (0 != (n = floor(secs / SEC_PER_MONTH)))
 	{
-		offset += zbx_snprintf(value + offset, max_len - offset, "%dm ", (int)n);
+		offset += zbx_snprintf(value + offset, max_len - offset, "%dM ", (int)n);
 		secs -= n * SEC_PER_MONTH;
 		if (0 == n_unit)
 			n_unit = 3;

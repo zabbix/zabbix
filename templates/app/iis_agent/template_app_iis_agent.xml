@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-06-14T13:19:24Z</date>
+   <date>2022-07-21T11:08:40Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -198,7 +198,7 @@ Template tooling version used: 0.39</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: Method Method GET requests per second</name>
+               <name>IIS: Method GET requests per second</name>
                <key>perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
