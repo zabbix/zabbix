@@ -1,6 +1,6 @@
 module zabbix.com
 
-go 1.16
+go 1.18
 
 require (
 	git.zabbix.com/ap/plugin-support v0.0.0-20220608100211-35b8bffd7ad0
