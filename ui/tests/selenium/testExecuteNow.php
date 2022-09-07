@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
- * @backup profiles
+ * @backup profiles, users
  *
  * @dataSource ExecuteNowAction
  */

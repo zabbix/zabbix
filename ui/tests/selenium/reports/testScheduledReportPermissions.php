@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @dataSource ScheduledReports
  *
- * @backup report
+ * @backup report, users
  *
  * @onBefore prepareData
  */

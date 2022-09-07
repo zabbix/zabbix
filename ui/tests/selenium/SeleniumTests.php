@@ -119,6 +119,10 @@ require_once dirname(__FILE__).'/reports/testPageReportsTriggerTop.php';
 require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 
+// Roles.
+require_once dirname(__FILE__).'/roles/testFormUserRoles.php';
+require_once dirname(__FILE__).'/roles/testPageUserRoles.php';
+require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
 
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
@@ -163,7 +167,6 @@ require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationLdap.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationSaml.php';
-
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAuditLog.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
@@ -213,7 +216,6 @@ require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
 require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
-require_once dirname(__FILE__).'/roles/testFormUserRoles.php';
 require_once dirname(__FILE__).'/testFormWeb.php';
 require_once dirname(__FILE__).'/testFormWebStep.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
@@ -235,8 +237,6 @@ require_once dirname(__FILE__).'/testUrlParameters.php';
 require_once dirname(__FILE__).'/testUrlUserPermissions.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
-require_once dirname(__FILE__).'/roles/testPageUserRoles.php';
-require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
 require_once dirname(__FILE__).'/testSID.php';
 
 use PHPUnit\Framework\TestSuite;
@@ -346,6 +346,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageScheduledReport');
 		$suite->addTestSuite('testScheduledReportPermissions');
 
+		// Roles.
+		$suite->addTestSuite('testFormUserRoles');
+		$suite->addTestSuite('testPageUserRoles');
+		$suite->addTestSuite('testUserRolesPermissions');
+
 
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
@@ -435,7 +440,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testFormValueMappingsHost');
 		$suite->addTestSuite('testFormValueMappingsTemplate');
-		$suite->addTestSuite('testFormUserRoles');
+
 		$suite->addTestSuite('testFormWeb');
 		$suite->addTestSuite('testFormWebStep');
 		$suite->addTestSuite('testPageBrowserWarning');
@@ -457,8 +462,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testUrlUserPermissions');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-		$suite->addTestSuite('testPageUserRoles');
-		$suite->addTestSuite('testUserRolesPermissions');
+
 		$suite->addTestSuite('testFormScheduledReport');
 		$suite->addTestSuite('testPageScheduledReport');
 		$suite->addTestSuite('testScheduledReportPermissions');
