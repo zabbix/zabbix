@@ -741,24 +741,18 @@ abstract class CItemGeneral extends CApiService {
 		$result = DBselect(DB::makeSql('items', $options));
 
 		while ($row = DBfetch($result)) {
-			if (array_key_exists($row['templateid'], $upd_item_indexes)) {
-				foreach ($upd_item_indexes[$row['templateid']] as $hostid => $i) {
-					if (bccomp($row['hostid'], $hostid) != 0) {
-						continue;
-					}
+			if (array_key_exists($row['templateid'], $upd_item_indexes)
+					&& array_key_exists($row['hostid'], $upd_item_indexes[$row['templateid']])) {
+				$i = $upd_item_indexes[$row['templateid']][$row['hostid']];
 
-					$upd_items[$i]['master_itemid'] = $row['itemid'];
-				}
+				$upd_items[$i]['master_itemid'] = $row['itemid'];
 			}
 
-			if (array_key_exists($row['templateid'], $ins_item_indexes)) {
-				foreach ($ins_item_indexes[$row['templateid']] as $hostid => $i) {
-					if (bccomp($row['hostid'], $hostid) != 0) {
-						continue;
-					}
+			if (array_key_exists($row['templateid'], $ins_item_indexes)
+					&& array_key_exists($row['hostid'], $ins_item_indexes[$row['templateid']])) {
+				$i = $ins_item_indexes[$row['templateid']][$row['hostid']];
 
-					$ins_items[$i]['master_itemid'] = $row['itemid'];
-				}
+				$ins_items[$i]['master_itemid'] = $row['itemid'];
 			}
 		}
 	}
