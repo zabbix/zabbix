@@ -110,7 +110,7 @@ static int	DBpatch_6030000(void)
 
 static int	DBpatch_6030001(void)
 {
-	const ZBX_FIELD field = {"subtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"provider", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
