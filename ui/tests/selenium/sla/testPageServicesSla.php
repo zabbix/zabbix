@@ -247,11 +247,7 @@ class testPageServicesSla extends CWebTest {
 		$this->assertTrue($filter->isDisplayed());
 
 		// Check that all filter fields are present.
-		foreach (['Name', 'Status', 'Service tags'] as $filter_label) {
-			$this->assertTrue($filter_form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($filter_label)."]")
-					->one()->isVisible()
-			);
-		}
+		$this->assertEquals(['Name', 'Status', 'Service tags'], $filter_form->getLabels()->asText());
 
 		// Check the count of returned SLAs and the count of selected SLAs.
 		$this->assertTableStats($sla_count);
@@ -316,9 +312,7 @@ class testPageServicesSla extends CWebTest {
 				}
 
 				// Check records for each day in the custom schedule table.
-				foreach ($schedule['rows'] as $schedule_day) {
-					$this->assertTrue(in_array($schedule_day, $displayed_days));
-				}
+				$this->assertEquals($schedule['rows'], $displayed_days);
 
 				$overlay->close();
 			}

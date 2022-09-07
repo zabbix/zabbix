@@ -117,7 +117,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$this->assertEquals(["Type", "Name", "Refresh interval", "SLA", "Service", "Show periods", "From", "To"],
 				$form->getLabels()->asText()
 		);
-		$form->checkValue(['id:show_header' => true, 'Refresh interval' => 'Default (No refresh)']);
+		$form->checkValue(['Show header' => true, 'Refresh interval' => 'Default (No refresh)']);
 
 		// Check attributes of input elements.
 		$inputs = [

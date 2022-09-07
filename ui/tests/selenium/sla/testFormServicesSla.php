@@ -578,7 +578,7 @@ class testFormServicesSla extends CWebTest {
 							'Name' => ''
 						]
 					],
-					'error' => 'Incorrect value for field "name": cannot be empty.'
+					'downtime_error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			[
@@ -594,7 +594,7 @@ class testFormServicesSla extends CWebTest {
 							'Name' => ' '
 						]
 					],
-					'error' => 'Incorrect value for field "name": cannot be empty.'
+					'downtime_error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			// TODO: Uncomment data provider when ZBX-21085 will be fixed.
@@ -612,7 +612,7 @@ class testFormServicesSla extends CWebTest {
 //							'Start time' =>  '2222-01-01 00:00'
 //						]
 //					],
-//					'error' => 'Invalid parameter "/1/excluded_downtimes/1/period_from": a number is too large.'
+//					'downtime_error' => 'Invalid parameter "/1/excluded_downtimes/1/period_from": a number is too large.'
 //				]
 //			],
 //			[
@@ -629,7 +629,7 @@ class testFormServicesSla extends CWebTest {
 //							'Start time' =>  '1965-01-01 00:00'
 //						]
 //					],
-//					'error' => 'Invalid parameter "/1/excluded_downtimes/1/period_from": a number is too far in the past.'
+//					'downtime_error' => 'Invalid parameter "/1/excluded_downtimes/1/period_from": a number is too far in the past.'
 //				]
 //			],
 //			[
@@ -647,7 +647,7 @@ class testFormServicesSla extends CWebTest {
 //							'id:duration_days' => 9999
 //						]
 //					],
-//					'error' => 'Invalid parameter "/1/excluded_downtimes/1/period_to": a number is too large.'
+//					'downtime_error' => 'Invalid parameter "/1/excluded_downtimes/1/period_to": a number is too large.'
 //				]
 //			],
 			[
@@ -664,7 +664,7 @@ class testFormServicesSla extends CWebTest {
 							'Start time' => '00:00'
 						]
 					],
-					'error' => 'Incorrect value for field "start_time": a time is expected.'
+					'downtime_error' => 'Incorrect value for field "start_time": a time is expected.'
 				]
 			],
 			[
@@ -681,7 +681,7 @@ class testFormServicesSla extends CWebTest {
 							'Start time' => '2022-02-30 00:00'
 						]
 					],
-					'error' => 'Incorrect value for field "start_time": a time is expected.'
+					'downtime_error' => 'Incorrect value for field "start_time": a time is expected.'
 				]
 			],
 			[
@@ -698,7 +698,7 @@ class testFormServicesSla extends CWebTest {
 							'Start time' => '2022-05-20 24:01'
 						]
 					],
-					'error' => 'Incorrect value for field "start_time": a time is expected.'
+					'downtime_error' => 'Incorrect value for field "start_time": a time is expected.'
 				]
 			],
 			[
@@ -715,7 +715,7 @@ class testFormServicesSla extends CWebTest {
 							'Start time' => '  2022-05-20  '
 						]
 					],
-					'error' => 'Incorrect value for field "start_time": a time is expected.'
+					'downtime_error' => 'Incorrect value for field "start_time": a time is expected.'
 				]
 			],
 			[
@@ -725,6 +725,34 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '1',
 						'id:service_tags_0_tag' => 'tag'
 					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Duplicate excluded downtimes',
+						'SLO' => '99.999',
+						'id:service_tags_0_tag' => 'tag'
+					],
+					'excluded_downtimes' => [
+						[
+							'Name' => 'Duplicate downtime',
+							'Start time' => '2030-06-01 11:11',
+							'name:duration_days' => 3,
+							'name:duration_hours' => 2,
+							'name:duration_minutes' => 1
+						],
+						[
+							'Name' => 'Duplicate downtime 2',
+							'Start time' => '2030-06-01 11:11',
+							'name:duration_days' => 3,
+							'name:duration_hours' => 2,
+							'name:duration_minutes' => 1
+						]
+					],
+					'error' => 'Invalid parameter "/1/excluded_downtimes/2": value (period_from, period_to)='.
+							'(1906531860, 1906798320) already exists.'
 				]
 			],
 			[
@@ -816,6 +844,36 @@ class testFormServicesSla extends CWebTest {
 		];
 	}
 
+	public function getUpdateSlaData() {
+		return [
+			[
+				[
+					'fields' => [
+						'Name' => 'Edit excluded downtime'
+					],
+					'excluded_downtimes' => [
+						[
+							'Name' => 'Updated downtime',
+							'Start time' => '2030-11-11 22:22',
+							'name:duration_days' => 6,
+							'name:duration_hours' => 5,
+							'name:duration_minutes' => 4
+						]
+					],
+					'downtime_action' => 'edit'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Remove excluded downtime'
+					],
+					'downtime_action' => 'remove'
+				]
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider getSlaData
 	 */
@@ -825,6 +883,7 @@ class testFormServicesSla extends CWebTest {
 
 	/**
 	 * @dataProvider getSlaData
+	 * @dataProvider getUpdateSlaData
 	 */
 	public function testFormServicesSla_Update($data) {
 		$this->checkAction($data, true);
@@ -954,7 +1013,7 @@ class testFormServicesSla extends CWebTest {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 
 		// Excluded downtimes dialog validation is made without attempting to save the SLA, so no hash needed.
-		if ($expected === TEST_BAD && !array_key_exists('excluded_downtimes', $data)) {
+		if ($expected === TEST_BAD && array_key_exists('error', $data)) {
 			$old_hash = CDBHelper::getHash(self::$sla_sql);
 		}
 
@@ -962,7 +1021,8 @@ class testFormServicesSla extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=sla.list');
 
 		if ($update) {
-			$this->query('link', self::$update_sla)->waitUntilClickable()->one()->click();
+			$update_sla = (array_key_exists('downtime_action', $data)) ? self::$sla_with_downtimes : self::$update_sla;
+			$this->query('link', $update_sla)->waitUntilClickable()->one()->click();
 		}
 		else {
 			$this->query('button:Create SLA')->waitUntilClickable()->one()->click();
@@ -978,21 +1038,37 @@ class testFormServicesSla extends CWebTest {
 		$form->fill($data['fields']);
 
 		// Add excluded downtimes if such specified.
-		if (array_key_exists('excluded_downtimes', $data)) {
+		if (array_key_exists('excluded_downtimes', $data) || array_key_exists('downtime_action', $data)) {
 			$form->selectTab('Excluded downtimes');
+			$downtimes_table = $this->query('id:excluded-downtimes')->asMultifieldTable()->waitUntilVisible()->one();
 
-			foreach ($data['excluded_downtimes'] as $downtime) {
-				$form->query('id:excluded-downtimes')->waitUntilVisible()->one()->query('button:Add')
-						->waitUntilCLickable()->one()->click();
-				$downtimes_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
-				$downtimes_form->fill($downtime);
+			// Remove all excluded downtimes if required or proceed with adding or updating downtimes.
+			if (CTestArrayHelper::get($data, 'downtime_action') === 'remove') {
+				$downtimes_table->clear();
+			}
+			else {
+				foreach ($data['excluded_downtimes'] as $downtime) {
+					$button = (CTestArrayHelper::get($data, 'downtime_action') === 'edit') ? 'Edit' : 'Add';
+					$downtimes_table->query('button', $button)->waitUntilCLickable()->one()->click();
+					$downtimes_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
+					$downtimes_form->fill($downtime);
 
-				$downtimes_form->submit();
+					$downtimes_form->submit();
+
+					if ($expected === TEST_GOOD) {
+						$downtimes_form->waitUntilNotVisible();
+
+						// Make sure that row was added to table.
+						$downtimes_table->invalidate();
+						$name = (array_key_exists('trim', $data)) ? trim($downtime['Name']) : $downtime['Name'];
+						$this->assertTrue($downtimes_table->findRow('Name', $name)->isValid());
+					}
+				}
 			}
 
 			// Excluded downtimes ar validated in their configuration dialog, so the error message should be checked here.
-			if ($expected === TEST_BAD) {
-				$this->assertMessage(TEST_BAD, null, $data['error']);
+			if (array_key_exists('downtime_error', $data)) {
+				$this->assertMessage(TEST_BAD, null, $data['downtime_error']);
 
 				return;
 			}
@@ -1007,7 +1083,7 @@ class testFormServicesSla extends CWebTest {
 		else {
 			$this->assertMessage(TEST_GOOD, ($update ? 'SLA updated' : 'SLA created'));
 
-			// Trim leading nad trailing spaces from expected results if necessary.
+			// Trim leading and trailing spaces from expected results if necessary.
 			if (array_key_exists('trim', $data)) {
 				foreach ($data['trim'] as $section => $fields) {
 					if ($section === 'excluded_downtimes') {
@@ -1025,40 +1101,50 @@ class testFormServicesSla extends CWebTest {
 			$this->assertTrue(in_array($data['fields']['Name'], $db_data));
 
 			if ($update) {
-				// For update scenarios check that old name is not present anymore.
-				$this->assertFalse(in_array(self::$update_sla, $db_data));
-
-				//  Write new name to global variable for using it in next case.
-				self::$update_sla = $data['fields']['Name'];
+				// Check that old name is not present anymore and write new name to global variable for future cases.
+				if (array_key_exists('downtime_action', $data)) {
+					$this->assertFalse(in_array(self::$sla_with_downtimes, $db_data));
+					self::$sla_with_downtimes = $data['fields']['Name'];
+				}
+				else {
+					$this->assertFalse(in_array(self::$update_sla, $db_data));
+					self::$update_sla = $data['fields']['Name'];
+				}
 			}
 
 			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 			$form->invalidate();
 			$form->checkValue($data['fields']);
 
-			if (array_key_exists('excluded_downtimes', $data)) {
+			if (array_key_exists('excluded_downtimes', $data) || array_key_exists('downtime_action', $data)) {
 				$form->selectTab('Excluded downtimes');
 				$downtimes_table = $this->query('id:excluded-downtimes')->asMultifieldTable()->waitUntilVisible()->one();
 
-				foreach ($data['excluded_downtimes'] as $downtime) {
-					$expected = [
-						'Start time' => $downtime['Start time'],
-						'Duration' => $downtime['name:duration_days'].'d '.$downtime['name:duration_hours'].'h '.
-								$downtime['name:duration_minutes'].'m',
-						'Name' => $downtime['Name']
-					];
-					$row = $downtimes_table->findRow('Name', $expected['Name']);
+				// Check that downtimes were removed or check downtime configuration.
+				if (CTestArrayHelper::get($data, 'downtime_action') === 'remove') {
+					$this->assertEquals([], $downtimes_table->getRows()->asText());
+				}
+				else {
+					foreach ($data['excluded_downtimes'] as $downtime) {
+						$expected = [
+							'Start time' => $downtime['Start time'],
+							'Duration' => $downtime['name:duration_days'].'d '.$downtime['name:duration_hours'].'h '.
+									$downtime['name:duration_minutes'].'m',
+							'Name' => $downtime['Name']
+						];
+						$row = $downtimes_table->findRow('Name', $expected['Name']);
 
-					foreach ($expected as $column => $value) {
-						$this->assertEquals($expected[$column], $row->getColumn($column)->getText());
+						foreach ($expected as $column => $value) {
+							$this->assertEquals($expected[$column], $row->getColumn($column)->getText());
+						}
+
+						$row->query('button:Edit')->one()->click();
+
+						$downtimes_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
+
+						$downtimes_form->checkValue($downtime);
+						$downtimes_form->submit();
 					}
-
-					$row->query('button:Edit')->one()->click();
-
-					$downtimes_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
-
-					$downtimes_form->checkValue($downtime);
-					$downtimes_form->submit();
 				}
 			}
 		}

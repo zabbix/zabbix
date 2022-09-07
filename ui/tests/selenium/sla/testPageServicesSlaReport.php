@@ -33,7 +33,7 @@ class testPageServicesSlaReport extends testSlaReport {
 		$this->page->login()->open('zabbix.php?action=slareport.list');
 		$this->page->assertHeader('SLA report');
 		// TODO: Uncomment the below check after ZBX-21264 is fixed.
-		// $this->page->assertTitle('SLA report');
+		//$this->page->assertTitle('SLA report');
 
 		// Check status of buttons on the SLA report page.
 		foreach ($this->query('button', ['Apply', 'Reset'])->all() as $button) {
