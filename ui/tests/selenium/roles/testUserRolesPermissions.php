@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -789,6 +790,86 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'section' => 'Alerts',
+					'page' => 'Trigger actions',
+					'actions' => true,
+					'displayed_ui' => [
+						'Service actions',
+						'Discovery actions',
+						'Autoregistration actions',
+						'Internal actions',
+						'Media types',
+						'Scripts'
+					],
+					'link' => ['actionconf.php?eventsource=0']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Service actions',
+					'actions' => true,
+					'displayed_ui' => [
+						'Trigger actions',
+						'Discovery actions',
+						'Autoregistration actions',
+						'Internal actions',
+						'Media types',
+						'Scripts'
+					],
+					'link' => ['actionconf.php?eventsource=4']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Discovery actions',
+					'actions' => true,
+					'displayed_ui' => [
+						'Trigger actions',
+						'Service actions',
+						'Autoregistration actions',
+						'Internal actions',
+						'Media types',
+						'Scripts'
+					],
+					'link' => ['actionconf.php?eventsource=1']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Autoregistration actions',
+					'actions' => true,
+					'displayed_ui' => [
+						'Trigger actions',
+						'Service actions',
+						'Discovery actions',
+						'Internal actions',
+						'Media types',
+						'Scripts'
+					],
+					'link' => ['actionconf.php?eventsource=2']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Internal actions',
+					'actions' => true,
+					'displayed_ui' => [
+						'Trigger actions',
+						'Service actions',
+						'Discovery actions',
+						'Autoregistration actions',
+						'Media types',
+						'Scripts'
+					],
+					'link' => ['actionconf.php?eventsource=3']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
 					'page' => 'Actions',
 					'displayed_ui' => [
 						'Media types',
@@ -1128,6 +1209,10 @@ class testUserRolesPermissions extends CWebTest {
 				$this->assertEquals($action_status, $submenu->query('link', $data['page'])->one(false)->isValid());
 			}
 			else {
+				if (array_key_exists('actions', $data)) {
+					$menu->query('xpath:.//ul/li/a[text()="Actions"]')->waitUntilClickable()->one()->click();
+				}
+
 				$this->assertEquals($action_status, $menu->exists($data['page']));
 			}
 
@@ -1141,6 +1226,14 @@ class testUserRolesPermissions extends CWebTest {
 				}
 				else {
 					$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
+					$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
+				}
+
+				if (array_key_exists('actions', $data)) {
+					$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
+					$this->page->open('actionconf.php'.(($data['page'] === 'Trigger actions') ? '?eventsource=1' : ''))->waitUntilReady();
+					$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
+					$this->assertNotContains($data['page'], $popup_menu->getItems()->asText());
 					$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
 				}
 			}

@@ -73,7 +73,7 @@ class testFormHostFromMonitoring extends testFormHost {
 		$this->cloneHost($data, 'Clone');
 
 		// Check that items aren't cloned from original host.
-		$this->assertItemsDBCount($data['Host name'], 0);
+		$this->assertItemsDBCount($data['fields']['Host name'], 0);
 	}
 
 	/**
@@ -83,7 +83,7 @@ class testFormHostFromMonitoring extends testFormHost {
 		$this->cloneHost($data, 'Full clone');
 
 		// Check that items cloned from original host.
-		$this->assertItemsDBCount($data['Host name'], 3);
+		$this->assertItemsDBCount($data['fields']['Host name'], $data['items']);
 	}
 
 	/**
