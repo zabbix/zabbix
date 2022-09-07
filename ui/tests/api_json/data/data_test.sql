@@ -306,14 +306,6 @@ INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,his
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150151, 15015, 150151, 2);
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150152, 15015, 150152, 3);
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15015, 150153, 4);
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15003, 150153, 4);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15003, 150154, 2);
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15004, 150153, 4);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15004, 150154, 2);
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15005, 150153, 4);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15005, 150154, 2);
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15010, 150153, 4);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15010, 150154, 2);
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15015, 150154, 2);
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150155, 15015, 150155, 1);
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150156, 15015, 150156, 0);
