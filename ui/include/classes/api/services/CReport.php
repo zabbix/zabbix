@@ -267,7 +267,7 @@ class CReport extends CApiService {
 			'limit' => 1
 		]);
 
-		if ($db_reports) {
+		if ($duplicates) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Report "%1$s" already exists.', $duplicates[0]['name']));
 		}
 	}
