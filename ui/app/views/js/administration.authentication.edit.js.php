@@ -37,8 +37,8 @@
 				) ?>);
 			warn = true;
 
-			$form.trimValues(['#saml_idp_entityid', '#saml_sso_url', '#saml_slo_url', '#saml_username_attribute',
-				'#saml_sp_entityid', '#saml_nameid_format'
+			$form.trimValues(['#http_strip_domains', '#saml_idp_entityid', '#saml_sso_url', '#saml_slo_url',
+				'#saml_username_attribute', '#saml_sp_entityid', '#saml_nameid_format'
 			]);
 
 			return proceed;

@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-03-02 20:03+0000\n"
-"Last-Translator: Yanan <wangyanan@grandage.cn>\n"
+"PO-Revision-Date: 2022-08-29 12:12+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -10950,6 +10950,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "Mac 地址 A"
@@ -13702,6 +13707,10 @@ msgstr "上层探索规则"
 #: include/views/configuration.graph.edit.php:66
 msgid "Parent graphs"
 msgstr "父图表"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
@@ -19433,7 +19442,7 @@ msgstr ""
 #: include/views/monitoring.history.php:293
 #, c-format
 msgid "Value"
-msgstr "ֵ值"
+msgstr "值"
 
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405

@@ -268,7 +268,7 @@ class testFormServicesServices extends CWebTest {
 		$this->assertTrue($tags_tab->query('xpath:.//label[text()="Tags"]')->one()->isValid());
 
 		// Check Tags default empty row and headers.
-		$tags_tab->query('id:tags-table')->asMultifieldTable()->one()->checkValue([['Name' => '', 'Value' => '']]);
+		$tags_tab->query('class:tags-table')->asMultifieldTable()->one()->checkValue([['Name' => '', 'Value' => '']]);
 
 		// Check table tags placeholders and length.
 		foreach (['tag' => 255, 'value' => 255] as $placeholder => $length) {

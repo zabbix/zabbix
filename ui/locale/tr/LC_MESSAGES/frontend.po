@@ -11056,6 +11056,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "Pzt"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "MAC adresi A"
@@ -13818,6 +13823,10 @@ msgstr "Üst keşfetme kuralları"
 #: include/views/configuration.graph.edit.php:66
 msgid "Parent graphs"
 msgstr "Üst grafikler"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53

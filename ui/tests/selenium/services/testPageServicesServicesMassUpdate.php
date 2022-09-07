@@ -471,7 +471,7 @@ class testPageServicesServicesMassUpdate extends CWebTest {
 		$dialog->query('id:mass_update_tags')->asSegmentedRadio()->one()->fill($data['Tags']['action']);
 
 		if ($data['Tags']['tags'] !== []) {
-			$this->query('id:tags-table')->asMultifieldTable()->one()->fill($data['Tags']['tags']);
+			$this->query('class:tags-table')->asMultifieldTable()->one()->fill($data['Tags']['tags']);
 		}
 
 		$dialog->submit();
@@ -517,7 +517,7 @@ class testPageServicesServicesMassUpdate extends CWebTest {
 				}
 
 				$expected_tags = array_key_exists('expected_tags', $data) ? $data['expected_tags'][$name] : $expected;
-				$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($expected_tags);
+				$this->query('class:tags-table')->asMultifieldTable()->one()->checkValue($expected_tags);
 
 				$service_dialog->close();
 			}
@@ -557,7 +557,7 @@ class testPageServicesServicesMassUpdate extends CWebTest {
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->asForm()->getLabel('Tags')->click();
-		$this->query('id:tags-table')->asMultifieldTable()->one()->fill($new_tags);
+		$this->query('class:tags-table')->asMultifieldTable()->one()->fill($new_tags);
 
 		$dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
 		COverlayDialogElement::ensureNotPresent();

@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-07-03 22:24+0000\n"
-"Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
+"PO-Revision-Date: 2022-09-01 10:27+0000\n"
+"Last-Translator: Paweł Seledec <pawel.seledec@zetosoftware.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -1141,7 +1141,7 @@ msgstr "Wszystkie problemy"
 #: include/views/configuration.trigger.prototype.edit.php:514
 #: include/views/configuration.triggers.edit.php:542
 msgid "All problems if tag values match"
-msgstr "Wszystkie problemy, jeśli wartość tag'a się pasuje"
+msgstr "Wszystkie problemy, jeśli wartości znaczników są równe"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
@@ -1149,7 +1149,7 @@ msgstr "Wszystkie usługi"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
-msgstr "Wszystkie etykiety"
+msgstr "Wszystkie znaczniki"
 
 #: include/html.inc.php:267
 msgid "All templates"
@@ -1274,7 +1274,7 @@ msgstr "Zastosuj"
 
 #: include/views/configuration.hostgroups.edit.php:46
 msgid "Apply permissions and tag filters to all subgroups"
-msgstr "Dodaj uprawnienia i etykietę filtrów do wszystkich podgrup"
+msgstr "Dodaj uprawnienia i filtry znaczników do wszystkich podgrup"
 
 #: include/views/configuration.maintenance.list.php:67
 #: include/views/configuration.maintenance.list.php:101
@@ -3893,7 +3893,7 @@ msgstr "Kompresja"
 #: app/views/administration.housekeeping.edit.php:173
 #: app/views/administration.housekeeping.edit.php:183
 msgid "Compression is not supported."
-msgstr ""
+msgstr "Kompresja nie jest wspierana."
 
 #: app/views/administration.mediatype.edit.php:319
 msgid "Concurrent sessions"
@@ -5581,7 +5581,7 @@ msgstr "Szczegóły scenariusza sieci www"
 
 #: app/views/administration.housekeeping.edit.php:194
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "Wykryta licencja TimescaleDB nie obsługuje kompresji. Kompresja jest obsługiwana w TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -11163,6 +11163,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "P"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr "M"
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "MAC adres A"
@@ -11770,7 +11775,7 @@ msgstr "Wymagana minimalna wersja PHP to %1$s."
 #: app/views/administration.housekeeping.edit.php:174
 #, c-format
 msgid "Minimum required TimescaleDB version is %1$s."
-msgstr ""
+msgstr "Wymagana minimalna wersja TimescaleDB to %1$s."
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -11865,7 +11870,7 @@ msgid "Module added: %1$s."
 msgid_plural "Modules added: %1$s."
 msgstr[0] "Dodany moduł: %1$s."
 msgstr[1] "Dodane moduły: %1$s."
-msgstr[2] "Dodanych modułów: %1$s."
+msgstr[2] "Dodane moduły: %1$s."
 
 #: app/controllers/CControllerModuleScan.php:113
 #, c-format
@@ -11873,7 +11878,7 @@ msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
 msgstr[0] "Usunięty moduł: %1$s."
 msgstr[1] "Usunięte moduły: %1$s."
-msgstr[2] "Usuniętych modułów: %1$s."
+msgstr[2] "Usunięte moduły: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
@@ -11881,15 +11886,15 @@ msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
 msgstr[0] "Wyłączony moduł: %1$s."
 msgstr[1] "Wyłączone moduły: %1$s."
-msgstr[2] "Wyłączonych modułów: %1$s."
+msgstr[2] "Wyłączone moduły: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Włączony moduł: %1$s."
-msgstr[1] "Wyłączony moduł: %1$s."
-msgstr[2] "Wyłączonych modułów: %1$s."
+msgstr[1] "Włączone moduły: %1$s."
+msgstr[2] "Włączone moduły: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -13936,6 +13941,10 @@ msgstr "Nadrzędne reguły wykrywania"
 msgid "Parent graphs"
 msgstr "Nadrzędne wykresy"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr "Wartość nadrzędnego hosta"
+
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
 msgid "Parent items"
@@ -14263,7 +14272,7 @@ msgstr "Typ metody post"
 
 #: app/views/administration.housekeeping.edit.php:164
 msgid "PostgreSQL database server version is too old."
-msgstr ""
+msgstr "Wersja serwera bazy danych PostgreSQL jest za stara."
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -17280,7 +17289,7 @@ msgstr "Tabela \"%1$s\" nie posiada pola o nazwie \"%2$s\"."
 #: app/views/popup.condition.common.php:323 include/hosts.inc.php:144
 #: include/views/inventory.host.list.php:90
 msgid "Tag"
-msgstr "Etykieta"
+msgstr "Znacznik"
 
 #: app/partials/monitoring.latest.filter.php:172
 #: app/partials/monitoring.problem.filter.php:233
@@ -18657,11 +18666,11 @@ msgstr "Nie można nadpisać istniejącego pliku konfiguracji."
 
 #: app/views/administration.housekeeping.edit.php:159
 msgid "Unable to retrieve TimescaleDB compression support status."
-msgstr ""
+msgstr "Nie można ustalić stanu obsługi kompresji TimescaleDB."
 
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unable to retrieve TimescaleDB version."
-msgstr ""
+msgstr "Nie można ustalić wersji TimescaleDB."
 
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
@@ -18849,12 +18858,12 @@ msgstr "Wersja serwera bazodanowego %1$s nie jest wspierana. Musi być nie więk
 #: app/views/administration.housekeeping.edit.php:178
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
-msgstr ""
+msgstr "Nieobsługiwana wersja TimescaleDB. Powinna wynosić co najmniej %1$s."
 
 #: app/views/administration.housekeeping.edit.php:188
 #, c-format
 msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
-msgstr ""
+msgstr "Nieobsługiwana wersja TimescaleDB. Powinna wynosić co najwyżej %1$s."
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -22354,7 +22363,7 @@ msgstr "tabela \"%1$s\" nie została znaleziona"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #, c-format
 msgid "the tag \"%1$s\" is missing"
-msgstr "brak tag-a \"%1$s\""
+msgstr "brak taga \"%1$s\""
 
 #: app/views/popup.maintenance.period.php:126 include/maintenances.inc.php:107
 msgid "third"
