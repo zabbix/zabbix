@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:36Z'
+  date: '2022-09-06T12:34:41Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Get PHP-FPM metrics using Zabbix agent running on Linux.
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -186,7 +186,7 @@ zabbix_export:
             -
               type: REGEX
               parameters:
-                - '{$PHP_FPM.PING.REPLY}($|\n)'
+                - '{$PHP_FPM.PING.REPLY}($|\r?\n)'
                 - '1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
@@ -419,8 +419,8 @@ zabbix_export:
             -
               uuid: c6966a6c3ff0452ab4fd112c9299e624
               expression: 'last(/PHP-FPM by Zabbix agent/php-fpm.uptime)<10m'
-              name: 'PHP-FPM: has been restarted'
-              event_name: 'PHP-FPM: has been restarted (uptime < 10m)'
+              name: 'PHP-FPM: Pool has been restarted'
+              event_name: 'PHP-FPM: Pool has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'

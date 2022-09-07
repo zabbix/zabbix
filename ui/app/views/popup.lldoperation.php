@@ -264,7 +264,7 @@ $operations_popup_form_list
 					['field_name' => 'optag', 'add_post_js' => false])
 				->setHeader([_('Name'), _('Value'), _('Action')])
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setId('tags-table')
+				->addClass('tags-table')
 		))->setId('optag_div'),
 		'optag_row'
 	)

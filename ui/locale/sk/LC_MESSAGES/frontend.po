@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2013-08-25 22:42+0300\n"
-"Last-Translator: Jan <jan.garaj@gmail.com>\n"
+"PO-Revision-Date: 2022-08-31 10:22+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1377463363.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -209,6 +210,11 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: include/classes/graph/CSvgGraph.php:1418
+#, c-format
+msgid "%1$s percentile: %2$s"
+msgstr ""
 
 #: jsLoader.php:348
 #, c-format
@@ -1393,12 +1399,16 @@ msgstr "Inventárne číslo"
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
 msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:50
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
 msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:112
 #, c-format
@@ -2344,12 +2354,11 @@ msgid "Cannot delete dependency"
 msgstr "Nie je možné zmazať závislosť"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
-msgstr[0] "Nie je možné zmazať zisťovacie pravidlo"
-msgstr[1] "Nie je možné zmazať zisťovacie pravidlo"
-msgstr[2] "Nie je možné zmazať zisťovacie pravidlo"
+msgstr[0] "Nie je možné zmazať discovery pravidlo"
+msgstr[1] "Nie je možné zmazať discovery pravidlá"
+msgstr[2] "  "
 
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
@@ -2517,11 +2526,10 @@ msgid "Cannot delete selected actions"
 msgstr "Nie je možné zmazať označené akcie"
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Nie je možné zmazať službu"
-msgstr[1] "Nie je možné zmazať službu"
+msgstr[1] "Nie je možné zmazať služby"
 msgstr[2] "Nie je možné zmazať službu"
 
 #: include/classes/api/services/CService.php:455
@@ -3441,11 +3449,10 @@ msgid "Cannot update host group"
 msgstr ""
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:341
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Nie je možné aktualizovať prototyp hosta"
-msgstr[1] "Nie je možné aktualizovať prototyp hosta"
+msgstr[1] "Nie je možné aktualizovať prototypy hosta"
 msgstr[2] "Nie je možné aktualizovať prototyp hosta"
 
 #: app/controllers/CControllerPopupMassupdateHost.php:465
@@ -3472,12 +3479,11 @@ msgid "Cannot update item"
 msgstr "Nie je možné aktualizovať prototyp položky"
 
 #: disc_prototypes.php:556 disc_prototypes.php:583 disc_prototypes.php:617
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
-msgstr[0] "Nie je možné aktualizovať prototyp položky"
-msgstr[1] "Nie je možné aktualizovať prototyp položky"
-msgstr[2] "Nie je možné aktualizovať prototyp položky"
+msgstr[0] "Nie je možné aktualizovať prototyp itemu"
+msgstr[1] "Nie je možné aktualizovať prototyp itemov"
+msgstr[2] " "
 
 #: app/controllers/CControllerPopupMassupdateItem.php:316
 msgid "Cannot update item prototypes"
@@ -3593,12 +3599,11 @@ msgstr ""
 
 #: trigger_prototypes.php:365 trigger_prototypes.php:440
 #: trigger_prototypes.php:488
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
-msgstr[0] "Nie je možné aktualizovať prototyp spúšťača"
-msgstr[1] "Nie je možné aktualizovať prototyp spúšťača"
-msgstr[2] "Nie je možné aktualizovať prototyp spúšťača"
+msgstr[0] "Nie je možné aktualizovať prototyp triggra"
+msgstr[1] "Nie je možné aktualizovať prototyp triggrov"
+msgstr[2] " "
 
 #: include/classes/api/services/CTriggerGeneral.php:1721
 #, c-format
@@ -6162,12 +6167,11 @@ msgid "Discovery rule created"
 msgstr "Zisťovacie pravidlo vytvorené"
 
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:416
-#, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
-msgstr[0] "Zisťovacie pravidlo vymazané"
-msgstr[1] "Zisťovacie pravidlo vymazané"
-msgstr[2] "Zisťovacie pravidlo vymazané"
+msgstr[0] "Discovery pravidlo vymazané"
+msgstr[1] "Discovery pravidlá vymazané"
+msgstr[2] "  "
 
 #: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:767
 msgid "Discovery rule disabled"
@@ -8551,12 +8555,11 @@ msgid "Host prototype macros"
 msgstr ""
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:340
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Prototyp hosta aktualizovaný"
-msgstr[1] "Prototyp hosta aktualizovaný"
-msgstr[2] "Prototyp hosta aktualizovaný"
+msgstr[1] "Prototypy hostov bol aktualizovaný"
+msgstr[2] " "
 
 #: include/classes/api/services/CHostPrototype.php:999
 #, c-format
@@ -10743,12 +10746,11 @@ msgid "Item prototype deleted"
 msgstr "Prototyp položky zmazaný"
 
 #: disc_prototypes.php:556 disc_prototypes.php:582 disc_prototypes.php:616
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
-msgstr[0] "Prototyp položky aktualizovaný"
-msgstr[1] "Prototyp položky aktualizovaný"
-msgstr[2] "Prototyp položky aktualizovaný"
+msgstr[0] "Prototyp itemu bol aktualizovaný"
+msgstr[1] "Prototypy itemov boli aktualizované"
+msgstr[2] " "
 
 #: include/classes/api/services/CDashboardGeneral.php:474
 #: include/classes/api/services/CDashboardGeneral.php:482
@@ -11553,6 +11555,11 @@ msgstr "M"
 msgctxt "Monday short"
 msgid "M"
 msgstr "Po"
+
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
@@ -14379,6 +14386,10 @@ msgstr "Nadradené zisťovacie pravidlá"
 msgid "Parent graphs"
 msgstr "Nadradené grafy"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
 msgid "Parent items"
@@ -16792,12 +16803,11 @@ msgid "Service data storage period"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Služba zmazaná"
-msgstr[1] "Služba zmazaná"
-msgstr[2] "Služba zmazaná"
+msgstr[1] "Služby zmazané"
+msgstr[2] " Služba zmazaná"
 
 #: app/views/administration.userrole.edit.php:146
 #: app/views/administration.userrole.edit.php:187
@@ -19017,12 +19027,11 @@ msgstr "Prototyp spúšťača zmazaný"
 
 #: trigger_prototypes.php:362 trigger_prototypes.php:439
 #: trigger_prototypes.php:487
-#, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
-msgstr[0] "Prototyp spúšťača aktualizovaný"
-msgstr[1] "Prototyp spúšťača aktualizovaný"
-msgstr[2] "Prototyp spúšťača aktualizovaný"
+msgstr[0] "Prototyp triggra aktualizovaný"
+msgstr[1] "Prototyp triggrov aktualizovaný"
+msgstr[2] " "
 
 #: app/controllers/CControllerPopupGeneric.php:183
 #: app/controllers/CControllerPopupImportCompare.php:174
@@ -20128,13 +20137,33 @@ msgstr ""
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware štatistiky cache. Platné módy sú: total, free, pfree, used a pused."
 
+#: include/classes/data/CItemData.php:1256
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware stav klustra, <url> - URL VMware služby, <name> - VMware kluster meno"
+
+#: include/classes/data/CItemData.php:1272
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1308
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1316
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -20142,6 +20171,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1276
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1242
@@ -20153,8 +20186,16 @@ msgstr ""
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1300
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1246
@@ -20171,6 +20212,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1336
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1350
@@ -20241,6 +20286,10 @@ msgstr "VMware model procesora, <url> - URL VMware služby, <uuid> - VMware host
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware využitie procesora v Hz, <url> - URL VMware služby, <uuid> - VMware host meno"
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
@@ -20252,6 +20301,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware status, <url> - URL VMware služby, <uuid> - VMware host meno"
+
+#: include/classes/data/CItemData.php:1488
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20280,6 +20333,14 @@ msgstr "VMware plné meno služby, <url> - URL VMware služby"
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware verzia, <url> - URL VMware služby"
+
+#: include/classes/data/CItemData.php:1248
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1516
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20361,6 +20422,10 @@ msgstr ""
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využitie procesora virtuálneho stroja v Hz, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
 
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware veľkosť zdielanej pamäte virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
@@ -20376,6 +20441,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware veľkosť swapovanej pamäte virtuálneho stroja, <url> - URL VMware služby, <uuid> - VMware host meno virtuálneho stroja"
+
+#: include/classes/data/CItemData.php:1684
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"

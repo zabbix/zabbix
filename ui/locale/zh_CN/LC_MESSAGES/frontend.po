@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-01 15:19+0000\n"
-"Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
+"PO-Revision-Date: 2022-08-29 12:14+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -192,6 +192,11 @@ msgstr[0] "%1$s 分"
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%2$s 中的 %1$s 处于问题状态"
+
+#: include/classes/graph/CSvgGraph.php:1418
+#, c-format
+msgid "%1$s percentile: %2$s"
+msgstr ""
 
 #: jsLoader.php:348
 #, c-format
@@ -11351,6 +11356,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "Mac 地址 A"
@@ -14155,6 +14165,10 @@ msgstr "上层探索规则"
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "父图表"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -19857,13 +19871,33 @@ msgstr "VMware FetchDVPorts 包装器，<url> - VMware 服务 URL，<filter> - v
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware缓存统计.可用的mode有:total, free, pfree, used and pused."
 
+#: include/classes/data/CItemData.php:1256
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware 集群性能计数器，<url> - VMware 服务 URL，<id> - VMware 集群 id，<path> - 性能计数器路径，<instance> - 性能计数器实例"
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware集群状态, <url> - VMware 服务 URL, <name> - VMware 集群名称"
+
+#: include/classes/data/CItemData.php:1272
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1308
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1316
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -19872,6 +19906,10 @@ msgstr "VMware 数据中心及其 ID，<url> - VMware 服务 URL。返回 JSON"
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr "VMware 数据中心及其 ID。返回 JSON"
+
+#: include/classes/data/CItemData.php:1276
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
@@ -19882,9 +19920,17 @@ msgstr "VMware数据存储容量统计信息，以字节为单位，以百分比
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "VMware 数据存储管理程序列表，<url> - VMware 服务 URL，<datastore> - 数据存储名称"
 
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "VMware 数据存储读取统计信息，<url> - VMware 服务 URL，<datastore> - 数据存储名称，<mode> - 延迟/最大延迟 - 平均值或最大值"
+
+#: include/classes/data/CItemData.php:1300
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -19901,6 +19947,10 @@ msgstr "VMware hypervisor BIOS UUID，<url> - VMware 服务 URL，<uuid> - VMwar
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "VMware hypervisor硬件供应商状态传感器，<url> - VMware 服务 URL，<uuid> - VMware 管理程序主机名。返回 JSON"
+
+#: include/classes/data/CItemData.php:1336
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19970,6 +20020,10 @@ msgstr "VMware hypervisor 处理器型号, <url> - VMware 服务 URL, <uuid> - V
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor 处理器使用率单位Hz, <url> - VMware 服务 URL, <uuid> - VMware hypervisor 主机名"
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "VMware hypervisor传感器值，<url> - VMware 服务 URL，<uuid> - VMware 管理程序主机名。返回 JSON"
@@ -19981,6 +20035,10 @@ msgstr "VMware hypervisor序列号，<url> - VMware 服务 URL，<uuid> - VMware
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor 状态, <url> - VMware 服务 URL, <uuid> - VMware hypervisor 主机名"
+
+#: include/classes/data/CItemData.php:1488
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20009,6 +20067,14 @@ msgstr "VMware 服务完整名, <url> - VMware 服务 URL"
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware 服务版本, <url> - VMware 服务 URL"
+
+#: include/classes/data/CItemData.php:1248
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1516
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20090,6 +20156,10 @@ msgstr "VMware虚拟机处理器准备时间ms，<url> - VMware服务URL，<uuid
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware 虚拟机处理器使用率，单位Hz, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机主机名"
 
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware 虚拟机共享内存大小, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机主机名"
@@ -20105,6 +20175,10 @@ msgstr "VMware 虚拟机状态，<url> - VMware 服务 URL，<uuid> - VMware 虚
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware 虚拟机交换分区大小, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机主机名"
+
+#: include/classes/data/CItemData.php:1684
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
@@ -20201,12 +20275,12 @@ msgstr "验证"
 #: include/views/monitoring.history.php:293
 #, c-format
 msgid "Value"
-msgstr "ֵ值"
+msgstr "值"
 
 #: app/views/monitoring.widget.plaintext.view.php:51
 msgctxt "compact table header"
 msgid "Value"
-msgstr "ֵ值"
+msgstr "值"
 
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405

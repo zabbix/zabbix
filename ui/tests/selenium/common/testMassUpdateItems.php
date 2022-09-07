@@ -22,6 +22,7 @@ require_once dirname(__FILE__) .'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 
 /**
  * Test the mass update of items and item prototypes.
@@ -1416,7 +1417,7 @@ class testMassUpdateItems extends CWebTest{
 				// Check that tags are not changed after other fields are mass updated.
 				if (CTestArrayHelper::get($data, 'expected_tags')) {
 					$form->selectTab('Tags');
-					$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($data['expected_tags'][$name]);
+					$this->query('class:tags-table')->asMultifieldTable()->one()->checkValue($data['expected_tags'][$name]);
 				}
 
 				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
@@ -1703,7 +1704,13 @@ class testMassUpdateItems extends CWebTest{
 			// Check changed fields in saved item form.
 			foreach ($data['names'] as $name) {
 				$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
-				$table->query('link', $name)->one()->waitUntilClickable()->click();
+				// TODO: not stable test testPageMassUpdateItems_ChangePreprocessing#8 on Jenkins, failed to properly waitUntilReady for page
+				try {
+					$table->query('link', $name)->one()->waitUntilClickable()->click();
+				}
+				catch (ElementClickInterceptedException $e) {
+					$table->query('link', $name)->one()->waitUntilClickable()->click();
+				}
 				$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 				$form->selectTab('Preprocessing');
 				$this->assertPreprocessingSteps($data['Preprocessing steps']);
@@ -2123,7 +2130,7 @@ class testMassUpdateItems extends CWebTest{
 		$form->query('id:mass_update_tags')->asSegmentedRadio()->one()->fill($data['Tags']['action']);
 
 		if ($data['Tags']['tags'] !== []) {
-			$this->query('id:tags-table')->asMultifieldTable()->one()->fill($data['Tags']['tags']);
+			$this->query('class:tags-table')->asMultifieldTable()->one()->fill($data['Tags']['tags']);
 		}
 
 		$dialog->query('button:Update')->one()->waitUntilClickable()->click();
@@ -2168,7 +2175,7 @@ class testMassUpdateItems extends CWebTest{
 				}
 
 				$expected_tags = array_key_exists('expected_tags', $data) ? $data['expected_tags'][$name] : $expected;
-				$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($expected_tags);
+				$this->query('class:tags-table')->asMultifieldTable()->one()->checkValue($expected_tags);
 
 				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
 				$this->page->waitUntilReady();

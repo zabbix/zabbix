@@ -427,7 +427,7 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'link' => 'zabbix.php?action=problem.view',
-					'selector' => 'xpath:(//a[@class="link-action" and text()="ЗАББИКС Сервер"])[1]'
+					'selector' => 'xpath:(//a[@class="link-action wordbreak" and text()="ЗАББИКС Сервер"])[1]'
 				]
 			],
 			// Dashboard problem widget.
@@ -1396,11 +1396,13 @@ class testUserRolesPermissions extends CWebTest {
 			$form->fill($data['service_list']);
 		}
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'User role updated');
 		$this->page->logout();
 
 		// Login as user that belongs to the updated row and check access to services based on applied configuration.
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=service.list')->waitUntilReady();
+		$this->assertEquals('user_for_role', $this->query('xpath://a[text()="User settings"]')->one()->getAttribute('title'));
 
 		$services_mode = $this->query('id:list_mode')->asSegmentedRadio()->one(false);
 

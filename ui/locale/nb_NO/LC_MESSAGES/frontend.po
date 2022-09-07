@@ -203,6 +203,11 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] ""
 msgstr[1] ""
 
+#: include/classes/graph/CSvgGraph.php:1418
+#, c-format
+msgid "%1$s percentile: %2$s"
+msgstr ""
+
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
@@ -11451,6 +11456,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "MAC-adresse A"
@@ -14265,6 +14275,10 @@ msgstr "Oppdagelsesregler for foreldre"
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "Foreldre grafer"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -19991,13 +20005,33 @@ msgstr ""
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware-cachestatistikk. Gyldige moduser er: totalt, gratis, pfree, brukt og pusset."
 
+#: include/classes/data/CItemData.php:1256
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware-klyngestatus, <url> - VMware-tjenesteadresse, <navn> - VMware-klyngenavn"
+
+#: include/classes/data/CItemData.php:1272
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1308
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1316
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -20005,6 +20039,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1276
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1242
@@ -20016,8 +20054,16 @@ msgstr "VMware datastore kapasitetsstatistikk i byte eller i prosent fra totalt.
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1300
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1246
@@ -20034,6 +20080,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1336
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1350
@@ -20104,6 +20154,10 @@ msgstr "VMware hypervisor prosessormodell, <url> - VMware service URL, <uuid> - 
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor prosessor bruk i Hz, <url> - VMware tjeneste URL, <uuid> - VMware hypervisor vertsnavn"
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
@@ -20115,6 +20169,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor vertsnavn"
+
+#: include/classes/data/CItemData.php:1488
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20143,6 +20201,14 @@ msgstr "VMware-tjenesten fullt navn, <url> - VMware-tjenesteadresse"
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware-tjenesteversjon, <url> - VMware-tjenesteadresse"
+
+#: include/classes/data/CItemData.php:1248
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1516
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20224,6 +20290,10 @@ msgstr "VMware virtuell maskinprosessor klartid ms, <url> - VMware-tjenesteadres
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Bruk av VMware virtuell maskinprosessor i Hz, <url> - VMware-tjenesteadresse, <uuid> - VMware-maskinens vertsnavn"
 
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware virtuell maskin delt minne størrelse, <url> - VMware tjeneste URL, <uuid> - VMware virtuell maskin vertsnavn"
@@ -20239,6 +20309,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware virtuell maskin byttet minne størrelse, <url> - VMware tjeneste URL, <uuid> - VMware virtuell maskin vertsnavn"
+
+#: include/classes/data/CItemData.php:1684
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"

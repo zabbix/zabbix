@@ -32,6 +32,7 @@ $fields = [
 	'triggerid' => [T_ZBX_INT, O_MAND, P_SYS, DB_ID, null]
 ];
 if (!check_fields($fields)) {
+	session_write_close();
 	exit();
 }
 

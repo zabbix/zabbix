@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:33:32Z'
+  date: '2022-08-16T11:19:58Z'
   template_groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -14,11 +14,12 @@ zabbix_export:
         The template to monitor SAN Huawei OceanStor 5300 V5 by Zabbix SNMP agent.
         
         MIBs used:
+        HOST-RESOURCES-MIB
         SNMPv2-MIB
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418855-discussion-thread-for-official-zabbix-template-huawei-oceanstor
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/SAN
@@ -272,6 +273,34 @@ zabbix_export:
               tag: component
               value: system
         -
+          uuid: f54aca2b926e4d4d980f980acb0aefac
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: fed7a954ea614cb086b901b2e6957621
           name: 'System location'
           type: SNMP_AGENT
@@ -334,6 +363,28 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: f14eaa207ac9480995d2a2a10bea1467
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: bf571c06cc264eca89d68f0b0b7559f7
           name: 'System object ID'
           type: SNMP_AGENT
@@ -355,45 +406,6 @@ zabbix_export:
             -
               tag: component
               value: system
-        -
-          uuid: f14eaa207ac9480995d2a2a10bea1467
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 0e3713bdf52e40d692cf256ac2a01988
-              expression: 'last(/Huawei OceanStor 5300 V5 SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/Huawei OceanStor 5300 V5 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
         -
           uuid: 197767da1b3c4c4f8f3c59ab3c3fc5b8
           name: 'SNMP agent availability'
@@ -1818,7 +1830,7 @@ zabbix_export:
         -
           macro: '{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME}'
           value: 5m
-          description: 'The time during which verage I/O latency of node may exceed the threshold.'
+          description: 'The time during which average I/O latency of node may exceed the threshold.'
         -
           macro: '{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}'
           value: '20'
@@ -2283,6 +2295,23 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: 0e3713bdf52e40d692cf256ac2a01988
+      expression: '(last(/Huawei OceanStor 5300 V5 SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Huawei OceanStor 5300 V5 SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Huawei OceanStor 5300 V5 SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Huawei OceanStor 5300 V5 SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/Huawei OceanStor 5300 V5 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 9401d60314c441a5a04d7a9709c6970e

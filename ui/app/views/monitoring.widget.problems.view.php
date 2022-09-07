@@ -101,9 +101,6 @@ $allowed = [
 foreach ($data['data']['problems'] as $eventid => $problem) {
 	$trigger = $data['data']['triggers'][$problem['objectid']];
 
-	$allowed['close'] = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $data['allowed_close']);
-	$can_be_closed = $allowed['close'];
-
 	if ($problem['r_eventid'] != 0) {
 		$value = TRIGGER_VALUE_FALSE;
 		$value_str = _('RESOLVED');
@@ -111,8 +108,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$can_be_closed = false;
 	}
 	else {
-		$can_be_closed = !hasEventCloseAction($problem['acknowledges']);
-		$in_closing = !$can_be_closed;
+		$in_closing = hasEventCloseAction($problem['acknowledges']);
+		$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $data['allowed_close']
+			&& !$in_closing
+		);
 		$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 		$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 		$value_clock = $in_closing ? time() : $problem['clock'];
@@ -226,9 +225,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			);
 
 			if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
-				$opdata = (new CCol($opdata))
-					->addClass('opdata')
-					->addClass(ZBX_STYLE_WORDWRAP);
+				$opdata = (new CCol($opdata))->addClass('opdata');
 			}
 		}
 	}
@@ -245,7 +242,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$problem_link = array_merge($problem_link, [' (', $opdata, ')']);
 	}
 
-	$description = (new CCol($problem_link));
+	$description = (new CCol($problem_link))->addClass(ZBX_STYLE_WORDBREAK);
 
 	$description_style = CSeverityHelper::getStyle((int) $problem['severity']);
 
@@ -308,7 +305,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
-		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY ) ? $opdata : null,
+		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY ) ? $opdata->addClass(ZBX_STYLE_WORDBREAK) : null,
 		(new CCol(
 			(new CLinkAction(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 				->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $eventid, $show_timeline,

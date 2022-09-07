@@ -42,7 +42,7 @@ $url = (new CUrl('items.php'))
 $form = (new CForm('post', $url))
 	->setId('item-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 
@@ -746,7 +746,7 @@ $item_tab
 		(new CLabel(_('Formula'), 'params_f'))
 			->setAsteriskMark()
 			->setId('js-item-formula-label'),
-		(new CFormField((new CTextArea('params_f', $data['params'], $discovered_item))
+		(new CFormField((new CTextArea('params_f', $data['params']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
@@ -762,7 +762,7 @@ $item_tab
 		(new CLabel(_('Update interval'), 'delay'))
 			->setAsteriskMark()
 			->setId('js-item-delay-label'),
-		(new CFormField((new CTextBox('delay', $data['delay']))
+		(new CFormField((new CTextBox('delay', $data['delay'], $discovered_item))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 		))->setId('js-item-delay-field')
@@ -781,7 +781,7 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 			->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
 			->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
 			->setModern(true)
-			->setEnabled(!$discovered_item);
+			->setEnabled(false);
 	}
 	else {
 		$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
@@ -1033,7 +1033,8 @@ $item_tabs = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'readonly' => $discovered_item,
-			'tabs_id' => 'tabs'
+			'tabs_id' => 'tabs',
+			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
 	)
@@ -1111,7 +1112,8 @@ $widget->show();
 (new CScriptTag('
 	item_form.init('.json_encode([
 		'interfaces' => $data['interfaces'],
-		'key_type_suggestions' => CItemData::getTypeSuggestionsByKey(),
+		'value_type_by_keys' => CItemData::getValueTypeByKey(),
+		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
 		'interface_types' => itemTypeInterface()

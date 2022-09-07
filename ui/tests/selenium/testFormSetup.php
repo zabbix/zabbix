@@ -134,7 +134,7 @@ class testFormSetup extends CWebTest {
 		$this->checkPageTextElements('Configure DB connection', $text);
 		$form = $this->query('xpath://form')->asForm()->one();
 
-		// Check input fieldsin Configure DB connection section for each DB type.
+		// Check input fields in Configure DB connection section for each DB type.
 		$db_types = $form->getField('Database type')->getOptions()->asText();
 		foreach ($db_types as $db_type) {
 			$form->getField('Database type')->select($db_type);
@@ -942,6 +942,7 @@ class testFormSetup extends CWebTest {
 		$db_parameters = $this->getDbParameters();
 		$form = $this->query('xpath://form')->asForm()->one();
 		$form->fill($db_parameters);
+
 		for ($i = 0; $i < $skip_sections[$section]; $i++) {
 			$this->query('button:Next step')->one()->click();
 		}

@@ -369,8 +369,23 @@
 						src.setArgument('ymax_type', $('#ymax_type').val());
 						src.setArgument('yaxismin', $('#yaxismin').val());
 						src.setArgument('yaxismax', $('#yaxismax').val());
-						src.setArgument('ymin_itemid', $('#ymin_itemid').val());
-						src.setArgument('ymax_itemid', $('#ymax_itemid').val());
+
+						if ($('#ymin_type').val() == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
+							const ymin_item_data = $('#ymin_itemid').multiSelect('getData');
+
+							if (ymin_item_data.length) {
+								src.setArgument('ymin_itemid', ymin_item_data[0]['id']);
+							}
+						}
+
+						if ($('#ymax_type').val() == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
+							const ymax_item_data = $('#ymax_itemid').multiSelect('getData');
+
+							if (ymax_item_data.length) {
+								src.setArgument('ymax_itemid', ymax_item_data[0]['id']);
+							}
+						}
+
 						src.setArgument('showworkperiod', $('#show_work_period').is(':checked') ? 1 : 0);
 						src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
 					}
@@ -475,8 +490,6 @@
 			$('#itemButtonsRow').before($row);
 			$row.find('.<?= ZBX_STYLE_COLOR_PICKER ?> input').colorpicker();
 
-			colorPalette.incrementNextColor();
-
 			!this.graphs.readonly && this.rewriteNameLinks();
 		},
 
@@ -488,9 +501,18 @@
 				return false;
 			}
 
+			const form = document.getElementsByName(this.form_name)[0];
 			const itemTpl = new Template($('#tmpl-item-row-' + this.graphs.graphtype).html());
 
 			for (let i = 0; i < list.values.length; i++) {
+				const used_colors = [];
+
+				for (const color of form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+					if (color.value !== '') {
+						used_colors.push(color.value);
+					}
+				}
+
 				const number = $('#itemsTable tr.sortable').length;
 				const item = {
 					number: number,
@@ -502,7 +524,7 @@
 					yaxisside: 0,
 					sortorder: number,
 					flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
-					color: colorPalette.getNextColor(),
+					color: colorPalette.getNextColor(used_colors),
 					name: list.values[i].name
 				};
 				const $row = $(itemTpl.evaluate(item));
