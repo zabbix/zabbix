@@ -270,7 +270,7 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_FAULT_SLOW(max_len)									\
 	"concat(substring(" ZBX_XPATH_FAULT_FAST("faultstring")",1," ZBX_STR(max_len) "),"		\
 	"substring(concat(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]),':',"			\
-	"//*[local-name()='name']),1,"									\
+	ZBX_XPATH_FAULT_FAST("detail")"//*[local-name()='name']),1,"					\
 	ZBX_STR(max_len) " * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ")=0)"		\
 	"* number(string-length(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]) )>0)))"
 

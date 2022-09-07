@@ -806,7 +806,7 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 		vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_CLUSTER, cluster->id, &json_data, NULL);
 		zbx_json_close(&json_data);
 		zbx_json_addstring(&json_data, "{#CLUSTER.VSAN.UUID}", cluster->vsan_uuid, ZBX_JSON_TYPE_STRING);
-		zbx_json_addarray(&json_data, "datastore.uuid");
+		zbx_json_addarray(&json_data, "datastore_uuid");
 
 		for (j = 0; j < cluster->dss_uuid.values_num; j++)
 			zbx_json_addstring(&json_data, NULL, cluster->dss_uuid.values[j], ZBX_JSON_TYPE_STRING);
@@ -1566,8 +1566,8 @@ int	check_vcenter_hv_diskinfo_get(AGENT_REQUEST *request, const char *username, 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "instance", di->diskname,
 				ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "hv.uuid", hv->uuid, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "datastore.uuid", ZBX_NULL2EMPTY_STR(di->ds_uuid),
+		zbx_json_addstring(&json_data, "hv_uuid", hv->uuid, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "datastore_uuid", ZBX_NULL2EMPTY_STR(di->ds_uuid),
 				ZBX_JSON_TYPE_STRING);
 		zbx_json_addraw(&json_data, "operational_state", ZBX_NULL2EMPTY_STR(di->operational_state));
 		zbx_json_addstring(&json_data, "lun_type", ZBX_NULL2EMPTY_STR(di->lun_type),
@@ -2445,7 +2445,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 			goto unlock;
 		}
 
-		zbx_json_addarray(&json_data, "datastore.extent");
+		zbx_json_addarray(&json_data, "datastore_extent");
 
 		for (j = 0; j < datastore->diskextents.values_num; j++)
 		{
@@ -3551,7 +3551,7 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", datastore->name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", datastore->uuid, ZBX_JSON_TYPE_STRING);
-		zbx_json_addarray(&json_data, "datastore.extent");
+		zbx_json_addarray(&json_data, "datastore_extent");
 
 		for (j = 0; j < datastore->diskextents.values_num; j++)
 		{
@@ -4249,7 +4249,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			else
 				zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", "", ZBX_JSON_TYPE_STRING);
 
-			zbx_json_addarray(&json_data, "vm.customattribute");
+			zbx_json_addarray(&json_data, "vm_customattribute");
 
 			for (j = 0; j < vm->custom_attrs.values_num; j++)
 			{
