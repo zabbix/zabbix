@@ -667,6 +667,10 @@ class CUserDirectory extends CApiService {
 					_s('Incorrect value for field "%1$s": %2$s.', 'idp_type', _('cannot be changed'))
 				);
 			}
+
+			if (!array_key_exists('provision_status', $userdirectory)) {
+				$userdirectory['provision_status'] = $db_userdirectory['provision_status'];
+			}
 		}
 		unset($userdirectory);
 
@@ -1178,7 +1182,7 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'group_basedn' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_basedn')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_basedn')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'group_name' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -1194,23 +1198,23 @@ class CUserDirectory extends CApiService {
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'user_lastname')]
 			]],
 			'group_member' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_member')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_member')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'group_filter' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_filter')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_filter')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'group_membership' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_membership')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_membership')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'idp_entityid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_entityid')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'idp_entityid')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sso_url' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_saml', 'sso_url')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'sso_url')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'slo_url' =>			['type' => API_MULTIPLE, 'rules' => [
@@ -1218,7 +1222,7 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sp_entityid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_saml', 'sp_entityid')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'sp_entityid')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'nameid_format' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -1226,7 +1230,7 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'username_attribute' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_saml', 'username_attribute')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_saml', 'username_attribute')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_messages' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -1265,29 +1269,35 @@ class CUserDirectory extends CApiService {
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'default' => DB::getDefault('userdirectory_saml', 'scim_token')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'provision_media' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
-				'mediatypeid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
+			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
+											'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
+											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
+										]],
+										['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'provision_groups' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-				'is_fallback' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_REGULAR, GROUP_MAPPING_FALLBACK]), 'default' => GROUP_MAPPING_REGULAR],
-				'fallback_status' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => function (array $provision_group): bool {
-												return $provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK;
-											}, 'type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_FALLBACK_OFF, GROUP_MAPPING_FALLBACK_ON]), 'default' => GROUP_MAPPING_FALLBACK_ON],
-											['else' => true, 'type' => API_UNEXPECTED]
+			'provision_groups' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+											'is_fallback' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_REGULAR, GROUP_MAPPING_FALLBACK]), 'default' => GROUP_MAPPING_REGULAR],
+											'fallback_status' =>	['type' => API_MULTIPLE, 'rules' => [
+																		['if' => function (array $provision_group): bool {
+																			return $provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK;
+																		}, 'type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_FALLBACK_OFF, GROUP_MAPPING_FALLBACK_ON]), 'default' => GROUP_MAPPING_FALLBACK_ON],
+																		['else' => true, 'type' => API_UNEXPECTED]
+																	]],
+											'name' =>				['type' => API_MULTIPLE, 'rules' => [
+																		['if' => function (array $provision_group): bool {
+																			return $provision_group['is_fallback'] == GROUP_MAPPING_REGULAR;
+																		}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_idpgroup', 'name')],
+																		['else' => true, 'type' => API_UNEXPECTED]
+																	]],
+											'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+											'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
+												'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+											]]
 										]],
-				'name' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => function (array $provision_group): bool {
-												return $provision_group['is_fallback'] == GROUP_MAPPING_REGULAR;
-											}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_idpgroup', 'name')],
-											['else' => true, 'type' => API_UNEXPECTED]
-										]],
-				'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
-					'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
-				]]
+										['else' => true, 'type' => API_UNEXPECTED]
 			]]
 		]];
 

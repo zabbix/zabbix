@@ -150,6 +150,11 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		foreach ($ldap_servers as $ldap_server) {
+			if (!array_key_exists('provision_status', $ldap_server)
+					|| $ldap_server['provision_status'] != JIT_PROVISIONING_ENABLED) {
+				continue;
+			}
+
 			if (!array_key_exists('provision_groups', $ldap_server)
 					|| !$this->validateProvisionGroups($ldap_server['provision_groups'])) {
 				return false;

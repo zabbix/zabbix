@@ -271,22 +271,22 @@ class CControllerAuthenticationEdit extends CController {
 				);
 			}
 
+			foreach ($data['ldap_servers'] as &$ldap_server) {
+				$ldap_server['provision_groups'] = array_map(function ($provision_group) {
+					if ($provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK) {
+						unset($provision_group['name']);
+					}
+					else {
+						unset($provision_group['fallback_status']);
+					}
+
+					return $provision_group;
+				}, $ldap_server['provision_groups']);
+			}
+			unset($ldap_server);
+
 			$data['ldap_removed_userdirectoryids'] = [];
 		}
-
-		foreach ($data['ldap_servers'] as &$ldap_server) {
-			$ldap_server['provision_groups'] = array_map(function ($provision_group) {
-				if ($provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK) {
-					unset($provision_group['name']);
-				}
-				else {
-					unset($provision_group['fallback_status']);
-				}
-
-				return $provision_group;
-			}, $ldap_server['provision_groups']);
-		}
-		unset($ldap_server);
 
 		unset($data[CAuthenticationHelper::LDAP_USERDIRECTORYID]);
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
