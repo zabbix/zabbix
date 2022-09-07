@@ -1174,6 +1174,10 @@ static void	proxy_db_init(void)
 		exit(EXIT_FAILURE);
 #endif
 	}
+
+#ifndef HAVE_SQLITE3
+	ZBX_UNUSED(version_check);
+#endif
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
