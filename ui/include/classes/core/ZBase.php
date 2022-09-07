@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -333,7 +333,6 @@ class ZBase {
 			$this->rootDir.'/include/classes/helpers/trigger',
 			$this->rootDir.'/include/classes/macros',
 			$this->rootDir.'/include/classes/html',
-			$this->rootDir.'/include/classes/html/pageheader',
 			$this->rootDir.'/include/classes/html/svg',
 			$this->rootDir.'/include/classes/html/widgets',
 			$this->rootDir.'/include/classes/html/interfaces',
@@ -808,7 +807,7 @@ class ZBase {
 	 * Initialize module manager and load all enabled and allowed modules according to user role settings.
 	 */
 	private function initModuleManager() {
-		$this->module_manager = new CModuleManager($this->rootDir.'/modules');
+		$this->module_manager = new CModuleManager($this->rootDir);
 
 		$db_modules = API::getApiService('module')->get([
 			'output' => ['moduleid', 'id', 'relative_path', 'config'],

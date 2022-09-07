@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -26,63 +26,44 @@ class CView {
 
 	/**
 	 * Directory list of MVC views ordered by search priority.
-	 *
-	 * @static
-	 *
-	 * @var array
 	 */
-	private static $directories = ['local/app/views', 'app/views', 'include/views'];
+	private static array $directories = ['local/app/views', 'app/views', 'include/views'];
 
 	/**
 	 * Indicates support of web layout modes.
-	 *
-	 * @var boolean
 	 */
-	private $layout_modes_enabled = false;
+	private bool $layout_modes_enabled = false;
 
 	/**
 	 * Explicitly set layout mode.
-	 *
-	 * @var int
 	 */
-	private $layout_mode;
-
-	/**
-	 * View name.
-	 *
-	 * @var string
-	 */
-	private $name;
-
-	/**
-	 * Data provided for view.
-	 *
-	 * @var array
-	 */
-	private $data;
+	private ?int $layout_mode = null;
 
 	/**
 	 * Directory where the view file was found.
-	 *
-	 * @var string
 	 */
-	private $directory;
-
+	private ?string $directory = null;
 	private static $last_directory;
 
 	/**
-	 * List of JavaScript files for inclusion into a HTML page using <script src="...">.
-	 *
-	 * @var array
+	 * View name.
 	 */
-	private $js_files = [];
+	private string $name;
 
 	/**
-	 * List of CSS files for inclusion into a HTML page using <link rel="stylesheet" type="text/css" src="...">.
-	 *
-	 * @var array
+	 * List of JavaScript files for inclusion into HTML page using <script src="...">.
 	 */
-	private $css_files = [];
+	private array $js_files = [];
+
+	/**
+	 * List of CSS files for inclusion into HTML page using <link rel="stylesheet" type="text/css" src="...">.
+	 */
+	private array $css_files = [];
+
+	/**
+	 * Data provided for view.
+	 */
+	private array $data;
 
 	/**
 	 * Create a view based on view name and data.
@@ -93,7 +74,7 @@ class CView {
 	 * @throws InvalidArgumentException if view name not valid.
 	 * @throws RuntimeException if view not found or not readable.
 	 */
-	public function __construct($name, array $data = []) {
+	public function __construct(string $name, array $data = []) {
 		if (!preg_match('/^[a-z]+(\/[a-z]+)*(\.[a-z]+)*$/', $name)) {
 			throw new InvalidArgumentException(sprintf('Invalid view name: "%s".', $name));
 		}
@@ -102,6 +83,7 @@ class CView {
 
 		foreach (self::$directories as $directory) {
 			$file_path = $directory.'/'.$name.'.php';
+
 			if (is_file($file_path)) {
 				$this->directory = $directory;
 				break;
@@ -112,11 +94,11 @@ class CView {
 			throw new RuntimeException(sprintf('View not found: "%s".', $name));
 		}
 
+		self::$last_directory = $this->directory;
+
 		if (!is_readable($file_path)) {
 			throw new RuntimeException(sprintf('View not readable: "%s".', $file_path));
 		}
-
-		self::$last_directory = $this->directory;
 
 		$this->name = $name;
 		$this->data = $data;
@@ -131,10 +113,8 @@ class CView {
 	 * Note: view should only output textual content like HTML, JSON, scripts or similar.
 	 *
 	 * @throws RuntimeException if view not found, not readable or returned false.
-	 *
-	 * @return string
 	 */
-	public function getOutput() {
+	public function getOutput(): string {
 		$data = $this->data;
 
 		$file_path = $this->directory.'/'.$this->name.'.php';
@@ -156,15 +136,13 @@ class CView {
 	 *   - JavaScript file will be searched in the "js" subdirectory of the view file.
 	 *   - A copy of $data variable will be available for using within the file.
 	 *
-	 * @param string $file_name
-	 * @param array  $data
-	 *
-	 * @throws RuntimeException if the file not found, not readable or returned false.
+	 * @param string     $file_name
+	 * @param array|null $data
 	 *
 	 * @return string
 	 */
-	public function readJsFile(string $file_name, ?array $data = null): string {
-		$data = ($data === null) ? $this->data : $data;
+	public function readJsFile(string $file_name, array $data = null): string {
+		$data = $data ?? $this->data;
 
 		$file_path = $this->directory.'/js/'.$file_name;
 
@@ -185,40 +163,37 @@ class CView {
 	 *   - JavaScript file will be searched in the "js" subdirectory of the view file.
 	 *   - A copy of $data variable will be available for using within the file.
 	 *
-	 * @param string $file_name
-	 * @param array  $data
-	 *
 	 * @throws RuntimeException if the file not found, not readable or returned false.
 	 */
-	public function includeJsFile(string $file_name, array $data = null) {
+	public function includeJsFile(string $file_name, array $data = null): self {
 		echo $this->readJsFile($file_name, $data);
+
+		return $this;
 	}
 
 	/**
 	 * Add a native JavaScript file to this view.
-	 *
-	 * @param string $src
 	 */
-	public function addJsFile($src) {
-		$this->js_files[] = $src;
+	public function addJsFile(string $js): self {
+		$this->js_files[] = $js;
+
+		return $this;
 	}
 
 	/**
 	 * Get list of native JavaScript files added to this view.
-	 *
-	 * @return array
 	 */
-	public function getJsFiles() {
+	public function getJsFiles(): array {
 		return $this->js_files;
 	}
 
 	/**
 	 * Add a CSS file to this view.
-	 *
-	 * @param string $src
 	 */
-	public function addCssFile($src) {
-		$this->css_files[] = $src;
+	public function addCssFile($css): self {
+		$this->css_files[] = $css;
+
+		return $this;
 	}
 
 	/**
@@ -226,15 +201,17 @@ class CView {
 	 *
 	 * @return array
 	 */
-	public function getCssFiles() {
+	public function getCssFiles(): array {
 		return $this->css_files;
 	}
 
 	/**
 	 * Enable support of web layout modes.
 	 */
-	public function enableLayoutModes() {
+	public function enableLayoutModes(): self {
 		$this->layout_modes_enabled = true;
+
+		return $this;
 	}
 
 	/**
@@ -242,8 +219,10 @@ class CView {
 	 *
 	 * @param int $layout_mode  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_KIOSKMODE
 	 */
-	public function setLayoutMode(int $layout_mode): void {
+	public function setLayoutMode(int $layout_mode): self {
 		$this->layout_mode = $layout_mode;
+
+		return $this;
 	}
 
 	/**
@@ -251,9 +230,9 @@ class CView {
 	 *
 	 * @return int  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_KIOSKMODE
 	 */
-	public function getLayoutMode() {
+	public function getLayoutMode(): int {
 		if ($this->layout_modes_enabled) {
-			return ($this->layout_mode !== null) ? $this->layout_mode : CViewHelper::loadLayoutMode();
+			return $this->layout_mode ?? CViewHelper::loadLayoutMode();
 		}
 
 		return ZBX_LAYOUT_NORMAL;
@@ -261,11 +240,9 @@ class CView {
 
 	/**
 	 * Register custom directory of MVC views. The last registered will have the first priority.
-	 *
-	 * @param string $directory
 	 */
-	public static function registerDirectory($directory) {
-		if (!in_array($directory, self::$directories)) {
+	public static function registerDirectory(string $directory): void {
+		if (!in_array($directory, self::$directories, true)) {
 			array_unshift(self::$directories, $directory);
 		}
 	}

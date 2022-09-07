@@ -28,94 +28,58 @@ use CController as CAction;
  */
 class CModule {
 
-	/**
-	 * Module directory path.
-	 *
-	 * @var string
-	 */
-	private $dir;
+	public const TYPE_MODULE = 0;
+	public const TYPE_WIDGET = 1;
 
-	/**
-	 * Module manifest.
-	 *
-	 * @var array
-	 */
-	private $manifest;
+	private string $dir;
+	private string $relative_path;
 
-	/**
-	 * @param string $dir       Module directory path.
-	 * @param array  $manifest  Module manifest.
-	 */
-	public function __construct(string $dir, array $manifest) {
-		$this->dir = $dir;
+	private array $manifest;
+
+	public function __construct(string $modules_dir, string $relative_path, array $manifest) {
+		$this->dir = $modules_dir.'/'.$relative_path;
+		$this->relative_path = $relative_path;
 		$this->manifest = $manifest;
 	}
 
-	/**
-	 * Initialize module.
-	 */
 	public function init(): void {
 	}
 
-	/**
-	 * Get module directory path.
-	 *
-	 * @return string
-	 */
 	final public function getDir(): string {
 		return $this->dir;
 	}
 
-	/**
-	 * Get module manifest.
-	 *
-	 * @return array
-	 */
+	final public function getRelativePath(): string {
+		return $this->relative_path;
+	}
+
 	final public function getManifest(): array {
 		return $this->manifest;
 	}
 
-	/**
-	 * Get module id.
-	 *
-	 * @return string
-	 */
 	final public function getId(): string {
 		return $this->manifest['id'];
 	}
 
-	/**
-	 * Get module namespace.
-	 *
-	 * @return string
-	 */
 	final public function getNamespace(): string {
 		return $this->manifest['namespace'];
 	}
 
-	/**
-	 * Get module version.
-	 *
-	 * @return string
-	 */
 	final public function getVersion(): string {
 		return $this->manifest['version'];
 	}
 
-	/**
-	 * Get module actions.
-	 *
-	 * @return array
-	 */
 	final public function getActions(): array {
 		return $this->manifest['actions'];
 	}
 
-	/**
-	 * Get module configuration.
-	 *
-	 * @return array
-	 */
+	final public function getAssets(): array {
+		return $this->manifest['assets'] + [
+			'css' => [],
+			'js' => []
+		];
+	}
+
 	final public function getConfig(): array {
 		return $this->manifest['config'];
 	}
@@ -123,8 +87,8 @@ class CModule {
 	/**
 	 * Get module configuration option.
 	 *
-	 * @param string $name     Option name.
-	 * @param mixed  $default  Default value.
+	 * @param string|null $name     Option name.
+	 * @param mixed       $default  Default value.
 	 *
 	 * @return mixed  Configuration option (if exists) or the $default value.
 	 */

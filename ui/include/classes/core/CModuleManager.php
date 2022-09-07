@@ -30,35 +30,27 @@ final class CModuleManager {
 	/**
 	 * Highest supported manifest version.
 	 */
-	const MAX_MANIFEST_VERSION = 1;
+	private const MAX_MANIFEST_VERSION = 1;
 
 	/**
 	 * Home path of modules.
-	 *
-	 * @var string
 	 */
-	private $modules_dir;
+	private string $modules_dir;
 
 	/**
 	 * Manifest data of added modules.
-	 *
-	 * @var array
 	 */
-	private $manifests = [];
+	private array $manifests = [];
 
 	/**
 	 * List of instantiated, initialized modules.
-	 *
-	 * @var array
 	 */
-	private $modules = [];
+	private array $modules = [];
 
 	/**
 	 * List of errors caused by module initialization.
-	 *
-	 * @var array
 	 */
-	private $errors = [];
+	private array $errors = [];
 
 	/**
 	 * @param string $modules_dir  Home path of modules.
@@ -69,8 +61,6 @@ final class CModuleManager {
 
 	/**
 	 * Get home path of modules.
-	 *
-	 * @return string
 	 */
 	public function getModulesDir(): string {
 		return $this->modules_dir;
@@ -80,7 +70,7 @@ final class CModuleManager {
 	 * Add module and prepare it's manifest data.
 	 *
 	 * @param string      $relative_path  Relative path to the module.
-	 * @param string      $id             Stored module ID to optionally check the manifest module ID against.
+	 * @param string|null $id             Stored module ID to optionally check the manifest module ID against.
 	 * @param array|null  $config         Override configuration to use instead of one stored in the manifest file.
 	 *
 	 * @return array|null  Either manifest data or null if manifest file had errors or IDs didn't match.
@@ -109,22 +99,6 @@ final class CModuleManager {
 	}
 
 	/**
-	 * Get namespaces of all added modules.
-	 *
-	 * @return array
-	 */
-	public function getNamespaces(): array {
-		$namespaces = [];
-
-		foreach ($this->manifests as $relative_path => $manifest) {
-			$module_path = $this->modules_dir.'/'.$relative_path;
-			$namespaces['Modules\\'.$manifest['namespace']] = [$module_path];
-		}
-
-		return $namespaces;
-	}
-
-	/**
 	 * Check added modules for conflicts.
 	 *
 	 * @return array  Lists of conflicts and conflicting modules.
@@ -143,7 +117,7 @@ final class CModuleManager {
 		}
 
 		foreach (['ids', 'namespaces', 'actions'] as $var) {
-			$$var = array_filter($$var, function($list) {
+			$$var = array_filter($$var, static function($list) {
 				return count($list) > 1;
 			});
 		}
@@ -165,7 +139,7 @@ final class CModuleManager {
 			$conflicting_manifests = array_merge($conflicting_manifests, $relative_paths);
 		}
 
-		$relative_paths = array_unique(array_reduce($actions, function($carry, $item) {
+		$relative_paths = array_unique(array_reduce($actions, static function($carry, $item) {
 			return array_merge($carry, $item);
 		}, []));
 
@@ -178,6 +152,45 @@ final class CModuleManager {
 			'conflicts' => $conflicts,
 			'conflicting_manifests' => array_unique($conflicting_manifests)
 		];
+	}
+
+	/**
+	 * Get add initialized modules.
+	 */
+	public function getModules(): array {
+		return $this->modules;
+	}
+
+	/**
+	 * Get loaded module instance associated with given action name.
+	 *
+	 * @param string $action_name
+	 *
+	 * @return CModule|null
+	 */
+	public function getModuleByActionName(string $action_name): ?CModule {
+		/** @var CModule $module */
+		foreach ($this->modules as $module) {
+			if (array_key_exists($action_name, $module->getActions())) {
+				return $module;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get namespaces of all added modules.
+	 */
+	public function getNamespaces(): array {
+		$namespaces = [];
+
+		foreach ($this->manifests as $relative_path => $manifest) {
+			$module_path = $this->modules_dir.'/'.$relative_path;
+			$namespaces['Modules\\'.$manifest['namespace']] = [$module_path];
+		}
+
+		return $namespaces;
 	}
 
 	/**
@@ -194,12 +207,12 @@ final class CModuleManager {
 		$non_conflicting_manifests = array_diff_key($this->manifests, array_flip($conflicting_manifests));
 
 		foreach ($non_conflicting_manifests as $relative_path => $manifest) {
-			$path = $this->modules_dir.'/'.$relative_path;
+			$module_dir = $this->modules_dir.'/'.$relative_path;
 
-			if (is_file($path.'/Module.php')) {
+			if (is_file($module_dir.'/Module.php')) {
 				$module_class = implode('\\', ['Modules', $manifest['namespace'], 'Module']);
 
-				if (!class_exists($module_class, true)) {
+				if (!class_exists($module_class)) {
 					$this->errors[] = _s('Wrong Module.php class name for module located at %1$s.', $relative_path);
 
 					continue;
@@ -211,7 +224,7 @@ final class CModuleManager {
 
 			try {
 				/** @var CModule $instance */
-				$instance = new $module_class($path, $manifest);
+				$instance = new $module_class($this->modules_dir, $relative_path, $manifest);
 
 				if ($instance instanceof CModule) {
 					$instance->init();
@@ -233,39 +246,12 @@ final class CModuleManager {
 	}
 
 	/**
-	 * Get add initialized modules.
-	 *
-	 * @return array
-	 */
-	public function getModules(): array {
-		return $this->modules;
-	}
-
-	/**
-	 * Get loaded module instance associated with given action name.
-	 *
-	 * @param string $action_name
-	 *
-	 * @return CModule|null
-	 */
-	public function getModuleByActionName(string $action_name): ?CModule {
-		foreach ($this->modules as $module) {
-			if (array_key_exists($action_name, $module->getActions())) {
-				return $module;
-			}
-		}
-
-		return null;
-	}
-
-	/**
 	 * Get actions of all initialized modules.
-	 *
-	 * @return array
 	 */
 	public function getActions(): array {
 		$actions = [];
 
+		/** @var CModule $module */
 		foreach ($this->modules as $module) {
 			foreach ($module->getActions() as $name => $data) {
 				$actions[$name] = [
@@ -279,6 +265,32 @@ final class CModuleManager {
 		}
 
 		return $actions;
+	}
+
+	public function getAssets(): array {
+		$assets = ['css' => [], 'js' => []];
+
+		/** @var CModule $module */
+		foreach ($this->modules as $module) {
+			$module_assets = $module->getAssets();
+
+			foreach ($module_assets['css'] as $css_file) {
+				$assets['css'][] = $module->getRelativePath().'/assets/css/'.$css_file;
+			}
+
+			foreach ($module_assets['js'] as $js_file) {
+				$assets['js'][] = $module->getRelativePath().'/assets/js/'.$js_file;
+			}
+		}
+
+		return $assets;
+	}
+
+	/**
+	 * Get errors encountered while module initialization.
+	 */
+	public function getErrors(): array {
+		return $this->errors;
 	}
 
 	/**
@@ -299,15 +311,6 @@ final class CModuleManager {
 		if ($action_module) {
 			$action_module->$event($action);
 		}
-	}
-
-	/**
-	 * Get errors encountered while module initialization.
-	 *
-	 * @return array
-	 */
-	public function getErrors(): array {
-		return $this->errors;
 	}
 
 	/**
@@ -354,10 +357,12 @@ final class CModuleManager {
 
 		// Ensure empty defaults.
 		$manifest += [
+			'type' => CModule::TYPE_MODULE,
 			'author' => '',
 			'url' => '',
 			'description' => '',
 			'actions' => [],
+			'assets' => [],
 			'config' => []
 		];
 

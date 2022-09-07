@@ -21,11 +21,15 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-$pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team'), CWebUser::getLang()))
-	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
-	->display();
+$page_header = (new CHtmlPageHeader(_('Fatal error, please report to the Zabbix team'), CWebUser::getLang()));
+
+$page_header
+	->setTheme($data['theme'])
+	->addCssFile('assets/styles/'.$page_header->getTheme().'.css')
+	->show();
 
 $buttons = [
 	(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
