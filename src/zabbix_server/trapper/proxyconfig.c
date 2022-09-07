@@ -180,6 +180,7 @@ void	recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls
 				" \"%s\": %s", sock->peer, error);
 	}
 	zbx_send_proxy_response(sock, ret, error, CONFIG_TIMEOUT);
+	zbx_free(error);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

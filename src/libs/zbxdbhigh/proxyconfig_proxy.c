@@ -1896,7 +1896,8 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		ret = proxyconfig_parse_data(&jp_data, &config_tables, error);
+		if (SUCCEED != (ret = proxyconfig_parse_data(&jp_data, &config_tables, error)))
+			goto clean;
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			proxyconfig_dump_data(&config_tables);
@@ -1955,7 +1956,7 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 	}
 	else
 		DBrollback();
-
+clean:
 	zbx_vector_uint64_destroy(&del_macro_hostids);
 	zbx_vector_uint64_destroy(&del_hostids);
 	zbx_vector_table_data_ptr_clear_ext(&config_tables, table_data_free);
