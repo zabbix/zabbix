@@ -44,7 +44,6 @@ $host_form = (new CForm())
 $discovered_by = null;
 $interfaces_row = null;
 
-
 if ($host_is_discovered) {
 	if ($data['host']['discoveryRule']) {
 		if ($data['is_discovery_rule_editable']) {
@@ -322,7 +321,8 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'tags' => $data['host']['tags'],
 	'with_automatic' => true,
 	'readonly' => false,
-	'tabs_id' => 'host-tabs'
+	'tabs_id' => 'host-tabs',
+	'tags_tab_id' => 'host-tags-tab'
 ]);
 
 // Macros tab.
@@ -511,7 +511,7 @@ $tabs = (new CTabView(['id' => 'host-tabs']))
 	->setSelected(0)
 	->addTab('host-tab', _('Host'), $host_tab)
 	->addTab('ipmi-tab', _('IPMI'), $ipmi_tab, TAB_INDICATOR_IPMI)
-	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
+	->addTab('host-tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('macros-tab', _('Macros'), $macros_tab, TAB_INDICATOR_MACROS)
 	->addTab('inventory-tab', _('Inventory'), $inventory_tab, TAB_INDICATOR_INVENTORY)
 	->addTab('encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);
