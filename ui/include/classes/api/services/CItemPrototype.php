@@ -692,7 +692,7 @@ class CItemPrototype extends CItemGeneral {
 		self::updateTags($items, $db_items);
 		self::updatePreprocessing($items, $db_items);
 		self::updateParameters($items, $db_items);
-		self::updateDicoveredItems($items, $db_items);
+		self::updateDiscoveredItems($items, $db_items);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM_PROTOTYPE, $items, $db_items);
 	}
@@ -701,7 +701,7 @@ class CItemPrototype extends CItemGeneral {
 	 * @param array $items
 	 * @param array $db_items
 	 */
-	private static function updateDicoveredItems(array $item_prototypes, array $db_item_prototypes): void {
+	private static function updateDiscoveredItems(array $item_prototypes, array $db_item_prototypes): void {
 		foreach ($item_prototypes as $i => $item_prototype) {
 			if (!in_array($item_prototype['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
 					|| !array_key_exists('update_discovered_items', $db_item_prototypes[$item_prototype['itemid']])) {
