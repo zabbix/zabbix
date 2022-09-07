@@ -436,64 +436,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get macro data (globalmacro, hostmacro, hosts_templates) from     *
- *          database                                                          *
- *                                                                            *
- * Parameters: hostids           - [IN] the target host identifiers           *
- *             revision          - [IN] the current proxy config revision     *
- *             keys_paths        - [OUT] the vault macro path/key             *
- *             j                 - [OUT] the output json                      *
- *             del_macro_hostids - [OUT] the identifiers of cleared host      *
- *                                       objects (without macros or linked    *
- *                                       templates)                           *
- *             error             - [OUT] the error message                    *
- *                                                                            *
- * Return value: SUCCEED - the data was read successfully                     *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	proxyconfig_get_macro_data(const zbx_vector_uint64_t *hostids,
-		const zbx_vector_uint64_t *updated_hostids, zbx_uint64_t revision, zbx_vector_ptr_t *keys_paths,
-		struct zbx_json *j, zbx_vector_uint64_t *del_macro_hostids, char **error)
-{
-	zbx_vector_uint64_t	macro_hostids;
-	int			global_macros, ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&macro_hostids);
-
-	zbx_dc_get_macro_updates(hostids, updated_hostids, revision, &macro_hostids, &global_macros, del_macro_hostids);
-
-	if (0 == revision || SUCCEED == global_macros)
-	{
-		if (SUCCEED != proxyconfig_get_macro_updates("globalmacro", NULL, keys_paths, j, error))
-			goto out;
-	}
-
-	if (0 == revision || 0 != macro_hostids.values_num)
-	{
-		if (SUCCEED != proxyconfig_get_table_data("hosts_templates", "hostid", &macro_hostids, NULL,  NULL, j,
-				error))
-		{
-			goto out;
-		}
-
-		if (SUCCEED != proxyconfig_get_macro_updates("hostmacro", &macro_hostids, keys_paths, j, error))
-			goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	zbx_vector_uint64_destroy(&macro_hostids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: get item data from items table                                    *
  *                                                                            *
  * Parameters: hostids    - [IN] the target host identifiers                  *
@@ -778,6 +720,186 @@ out:
 	return ret;
 }
 
+#define ZBX_PROXYCONFIG_SYNC_HOSTS		0x0001
+#define ZBX_PROXYCONFIG_SYNC_GMACROS		0x0002
+#define ZBX_PROXYCONFIG_SYNC_HMACROS		0x0002
+#define ZBX_PROXYCONFIG_SYNC_DRULES		0x0004
+#define ZBX_PROXYCONFIG_SYNC_EXPRESSIONS	0x0008
+#define ZBX_PROXYCONFIG_SYNC_CONFIG		0x0010
+#define ZBX_PROXYCONFIG_SYNC_HTTPTESTS		0x0020
+#define ZBX_PROXYCONFIG_SYNC_AUTOREG		0x0040
+
+#define ZBX_PROXYCONFIG_SYNC_ALL	(ZBX_PROXYCONFIG_SYNC_HOSTS | ZBX_PROXYCONFIG_SYNC_GMACROS | 		\
+					ZBX_PROXYCONFIG_SYNC_HMACROS |ZBX_PROXYCONFIG_SYNC_DRULES |		\
+					ZBX_PROXYCONFIG_SYNC_EXPRESSIONS | ZBX_PROXYCONFIG_SYNC_CONFIG | 	\
+					ZBX_PROXYCONFIG_SYNC_HTTPTESTS | ZBX_PROXYCONFIG_SYNC_AUTOREG)
+
+static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_config_revision,
+		zbx_dc_revision_t *dc_revision, struct zbx_json *j, char **error)
+{
+	zbx_vector_uint64_t	hostids, httptestids, updated_hostids, removed_hostids, del_macro_hostids,
+				macro_hostids;
+	zbx_vector_ptr_t	keys_paths;
+	int			global_macros, ret = FAIL, i;
+	zbx_uint64_t		flags = 0;
+
+	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_create(&updated_hostids);
+	zbx_vector_uint64_create(&removed_hostids);
+	zbx_vector_uint64_create(&httptestids);
+	zbx_vector_uint64_create(&macro_hostids);
+	zbx_vector_uint64_create(&del_macro_hostids);
+	zbx_vector_ptr_create(&keys_paths);
+
+	if (proxy_config_revision < proxy->revision || proxy_config_revision < proxy->macro_revision)
+	{
+		zbx_vector_uint64_reserve(&hostids, 1000);
+		zbx_vector_uint64_reserve(&updated_hostids, 1000);
+		zbx_vector_uint64_reserve(&removed_hostids, 100);
+		zbx_vector_uint64_reserve(&httptestids, 100);
+		zbx_vector_uint64_reserve(&macro_hostids, 1000);
+		zbx_vector_uint64_reserve(&del_macro_hostids, 100);
+
+		zbx_dc_get_proxy_config_updates(proxy->hostid, proxy_config_revision, &hostids, &updated_hostids,
+				&removed_hostids, &httptestids);
+
+		zbx_dc_get_macro_updates(&hostids, &updated_hostids, proxy_config_revision, &macro_hostids,
+				&global_macros, &del_macro_hostids);
+	}
+
+	if (0 != proxy_config_revision)
+	{
+		if (0 != updated_hostids.values_num)
+			flags |= ZBX_PROXYCONFIG_SYNC_HOSTS;
+
+		if (SUCCEED == global_macros)
+			flags |= ZBX_PROXYCONFIG_SYNC_GMACROS;
+
+		if(0 != macro_hostids.values_num)
+			flags |= ZBX_PROXYCONFIG_SYNC_HMACROS;
+
+		if (proxy_config_revision < proxy->revision)
+			flags |= ZBX_PROXYCONFIG_SYNC_DRULES;
+
+		if (proxy_config_revision < dc_revision->expression)
+			flags |= ZBX_PROXYCONFIG_SYNC_EXPRESSIONS;
+
+		if (proxy_config_revision < dc_revision->config_table)
+			flags |= ZBX_PROXYCONFIG_SYNC_CONFIG;
+
+		if (0 != httptestids.values_num)
+			flags |= ZBX_PROXYCONFIG_SYNC_HTTPTESTS;
+
+		if (proxy_config_revision < dc_revision->autoreg_tls)
+			flags |= ZBX_PROXYCONFIG_SYNC_AUTOREG;
+	}
+	else
+		flags = ZBX_PROXYCONFIG_SYNC_ALL;
+
+	zbx_json_addobject(j, ZBX_PROTO_TAG_DATA);
+
+	if (0 != flags)
+	{
+		DBbegin();
+
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_HOSTS) &&
+				SUCCEED != proxyconfig_get_host_data(&updated_hostids, j, error))
+		{
+			goto out;
+		}
+
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_GMACROS) &&
+				SUCCEED != proxyconfig_get_macro_updates("globalmacro", NULL, &keys_paths, j, error))
+		{
+			goto out;
+		}
+
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_HMACROS))
+		{
+			if (SUCCEED != proxyconfig_get_table_data("hosts_templates", "hostid", &macro_hostids, NULL,
+					NULL, j, error))
+			{
+				goto out;
+			}
+
+			if (SUCCEED != proxyconfig_get_macro_updates("hostmacro", &macro_hostids, &keys_paths, j, error))
+				goto out;
+		}
+
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_DRULES) &&
+				SUCCEED != proxyconfig_get_drules_data(proxy, j, error))
+		{
+			goto out;
+		}
+
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_EXPRESSIONS) &&
+				SUCCEED != proxyconfig_get_expression_data(j, error))
+		{
+			goto out;
+		}
+
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_CONFIG) &&
+				SUCCEED != proxyconfig_get_table_data("config", NULL, NULL, NULL, NULL, j, error))
+		{
+			goto out;
+		}
+
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_HTTPTESTS) &&
+				SUCCEED != proxyconfig_get_httptest_data(&httptestids, j, error))
+		{
+			goto out;
+		}
+
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_AUTOREG) &&
+				SUCCEED != proxyconfig_get_table_data("config_autoreg_tls", NULL, NULL, NULL, NULL, j,
+						error))
+		{
+			goto out;
+		}
+	}
+
+	zbx_json_close(j);
+
+	if (0 != removed_hostids.values_num)
+	{
+		zbx_json_addarray(j, ZBX_PROTO_TAG_REMOVED_HOSTIDS);
+
+		for (i = 0; i < removed_hostids.values_num; i++)
+			zbx_json_adduint64(j, NULL, removed_hostids.values[i]);
+
+		zbx_json_close(j);
+	}
+
+	if (0 != del_macro_hostids.values_num)
+	{
+		zbx_json_addarray(j, ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS);
+
+		for (i = 0; i < del_macro_hostids.values_num; i++)
+			zbx_json_adduint64(j, NULL, del_macro_hostids.values[i]);
+
+		zbx_json_close(j);
+	}
+
+	if (0 != keys_paths.values_num)
+		get_macro_secrets(&keys_paths, j);
+
+	ret = SUCCEED;
+out:
+	if (0 != flags)
+		DBcommit();
+
+	zbx_vector_ptr_clear_ext(&keys_paths, key_path_free);
+	zbx_vector_ptr_destroy(&keys_paths);
+	zbx_vector_uint64_destroy(&httptestids);
+	zbx_vector_uint64_destroy(&macro_hostids);
+	zbx_vector_uint64_destroy(&del_macro_hostids);
+	zbx_vector_uint64_destroy(&removed_hostids);
+	zbx_vector_uint64_destroy(&updated_hostids);
+	zbx_vector_uint64_destroy(&hostids);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: prepare proxy configuration data                                  *
@@ -785,10 +907,7 @@ out:
  ******************************************************************************/
 int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j, char **error)
 {
-	int			i, ret = FAIL;
-	zbx_vector_uint64_t	hostids, httptestids, updated_hostids, removed_hostids, del_macro_hostids;
-	zbx_hashset_t		itemids;
-	zbx_vector_ptr_t	keys_paths;
+	int			ret = FAIL;
 	char			token[ZBX_SESSION_TOKEN_LEN + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
 	zbx_uint64_t		proxy_config_revision;
 	zbx_dc_revision_t	dc_revision;
@@ -826,113 +945,17 @@ int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_reques
 				__func__, proxy_config_revision, dc_revision.config);
 	}
 
-	if (proxy_config_revision == dc_revision.config)
+	if (proxy_config_revision != dc_revision.config)
 	{
+		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, &dc_revision, j, error)))
+			goto out;
+
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_CONFIG_REVISION, dc_revision.config);
+
+		zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: %s", __func__, j->buffer);
+	}
+	else
 		ret = SUCCEED;
-		goto out;
-	}
-
-	zbx_hashset_create(&itemids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_create(&hostids);
-	zbx_vector_uint64_create(&updated_hostids);
-	zbx_vector_uint64_create(&removed_hostids);
-	zbx_vector_uint64_create(&del_macro_hostids);
-	zbx_vector_uint64_create(&httptestids);
-	zbx_vector_ptr_create(&keys_paths);
-
-	if (proxy_config_revision < proxy->revision || proxy_config_revision < proxy->macro_revision)
-	{
-		zbx_vector_uint64_reserve(&hostids, 1000);
-		zbx_vector_uint64_reserve(&updated_hostids, 1000);
-		zbx_vector_uint64_reserve(&removed_hostids, 100);
-		zbx_vector_uint64_reserve(&httptestids, 100);
-		zbx_dc_get_proxy_config_updates(proxy->hostid, proxy_config_revision, &hostids, &updated_hostids,
-				&removed_hostids, &httptestids);
-	}
-
-	DBbegin();
-
-	zbx_json_addobject(j, ZBX_PROTO_TAG_DATA);
-
-	if (0 == proxy_config_revision || 0 != updated_hostids.values_num)
-	{
-		if (SUCCEED != proxyconfig_get_host_data(&updated_hostids, j, error))
-			goto clean;
-	}
-
-	if (SUCCEED != proxyconfig_get_macro_data(&hostids, &updated_hostids, proxy_config_revision, &keys_paths, j,
-			&del_macro_hostids, error))
-	{
-		goto clean;
-	}
-
-	if (proxy_config_revision < proxy->revision)
-	{
-		if (SUCCEED != proxyconfig_get_drules_data(proxy, j, error))
-			goto clean;
-	}
-
-	if (proxy_config_revision < dc_revision.expression && SUCCEED != proxyconfig_get_expression_data(j, error))
-		goto clean;
-
-	if (proxy_config_revision < dc_revision.config_table)
-	{
-		if (SUCCEED != proxyconfig_get_table_data("config", NULL, NULL, NULL, NULL, j, error))
-			goto clean;
-	}
-
-	if (0 == proxy_config_revision || 0 != httptestids.values_num)
-	{
-		if (SUCCEED != proxyconfig_get_httptest_data(&httptestids, j, error))
-			goto clean;
-	}
-
-	if (proxy_config_revision < dc_revision.autoreg_tls)
-	{
-		if (SUCCEED != proxyconfig_get_table_data("config_autoreg_tls", NULL, NULL, NULL, NULL, j, error))
-			goto clean;
-	}
-
-	zbx_json_close(j);
-
-	if (0 != removed_hostids.values_num)
-	{
-		zbx_json_addarray(j, ZBX_PROTO_TAG_REMOVED_HOSTIDS);
-
-		for (i = 0; i < removed_hostids.values_num; i++)
-			zbx_json_adduint64(j, NULL, removed_hostids.values[i]);
-
-		zbx_json_close(j);
-	}
-
-	if (0 != del_macro_hostids.values_num)
-	{
-		zbx_json_addarray(j, ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS);
-
-		for (i = 0; i < del_macro_hostids.values_num; i++)
-			zbx_json_adduint64(j, NULL, del_macro_hostids.values[i]);
-
-		zbx_json_close(j);
-	}
-
-	if (0 != keys_paths.values_num)
-		get_macro_secrets(&keys_paths, j);
-
-	zbx_json_adduint64(j, ZBX_PROTO_TAG_CONFIG_REVISION, dc_revision.config);
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: %s", __func__, j->buffer);
-
-	ret = SUCCEED;
-clean:
-	DBcommit();
-	zbx_vector_ptr_clear_ext(&keys_paths, key_path_free);
-	zbx_vector_ptr_destroy(&keys_paths);
-	zbx_vector_uint64_destroy(&httptestids);
-	zbx_vector_uint64_destroy(&del_macro_hostids);
-	zbx_vector_uint64_destroy(&removed_hostids);
-	zbx_vector_uint64_destroy(&updated_hostids);
-	zbx_vector_uint64_destroy(&hostids);
-	zbx_hashset_destroy(&itemids);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
