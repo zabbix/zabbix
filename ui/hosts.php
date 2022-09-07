@@ -1280,12 +1280,14 @@ elseif (hasRequest('form')) {
 
 	$data['readonly'] = ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 
-	$data['is_discovery_rule_editable'] = $data['discoveryRule']
-		&& API::DiscoveryRule()->get([
-			'output' => [],
-			'itemids' => $data['discoveryRule']['itemid'],
-			'editable' => true
-		]);
+	if (array_key_exists('discoveryRule', $data)) {
+		$data['is_discovery_rule_editable'] = $data['discoveryRule']
+			&& API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => $data['discoveryRule']['itemid'],
+				'editable' => true
+			]);
+	}
 
 	if ($data['hostid'] != 0) {
 		// get items that populate host inventory fields
