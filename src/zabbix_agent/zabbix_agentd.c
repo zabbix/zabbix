@@ -979,7 +979,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef _WINDOWS
 	DWORD		res;
 
-	AddVectoredExceptionHandler(1, &zbx_win_exception_filter);
+	AddVectoredExceptionHandler(1, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_exception_filter);
 #endif
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
