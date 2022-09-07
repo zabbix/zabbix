@@ -434,6 +434,52 @@ out:
 	return ret;
 }
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	master_itemid;
+	DB_ROW		row;
+	int		cols_num;
+}
+zbx_proxyconfig_dep_item_t;
+
+ZBX_PTR_VECTOR_DECL(proxyconfig_dep_item_ptr, zbx_proxyconfig_dep_item_t *)
+ZBX_PTR_VECTOR_IMPL(proxyconfig_dep_item_ptr, zbx_proxyconfig_dep_item_t *)
+
+static void	proxyconfig_dep_item_free(zbx_proxyconfig_dep_item_t *item)
+{
+	int	i;
+
+	for (i = 0; i < item->cols_num; i++)
+		zbx_free(item->row[i]);
+
+	zbx_free(item->row);
+	zbx_free(item);
+}
+
+static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t itemid, zbx_uint64_t master_itemid,
+		const DB_ROW row, int cols_num)
+{
+	zbx_proxyconfig_dep_item_t	*item;
+	int				i;
+
+	item = (zbx_proxyconfig_dep_item_t *)zbx_malloc(NULL, sizeof(zbx_proxyconfig_dep_item_t));
+	item->itemid = itemid;
+	item->master_itemid = master_itemid;
+	item->cols_num = cols_num;
+	item->row = (DB_ROW)zbx_malloc(NULL, sizeof(DB_ROW) * cols_num);
+
+	for (i = 0; i < cols_num; i++)
+	{
+		if (NULL == row[i])
+			item->row[i] = NULL;
+		else
+			item->row[i] = zbx_strdup(NULL, row[i]);
+	}
+
+	return item;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get item data from items table                                    *
@@ -455,9 +501,17 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 	const ZBX_TABLE	*table;
 	char		*sql;
 	size_t		sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		ret = FAIL, fld_key = -1, fld_type = -1, i, fld;
+	int		ret = FAIL, fld_key = -1, fld_type = -1, fld_master_itemid = -1, i, fld, dep_items_num;
+	zbx_uint64_t	itemid, master_itemid;
+
+	zbx_vector_proxyconfig_dep_item_ptr_t	dep_items;
+	zbx_hashset_t				items;
+	zbx_proxyconfig_dep_item_t		*dep_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_hashset_create(&items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_proxyconfig_dep_item_ptr_create(&dep_items);
 
 	table = DBget_table("items");
 
@@ -471,10 +525,12 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 			fld_type = fld;
 		else if (0 == strcmp(table->fields[i].name, "key_"))
 			fld_key = fld;
+		else if (0 == strcmp(table->fields[i].name, "master_itemid"))
+			fld_master_itemid = fld;
 		fld++;
 	}
 
-	if (-1 == fld_type || -1 == fld_key)
+	if (-1 == fld_type || -1 == fld_key || -1 == fld_master_itemid)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
@@ -507,11 +563,52 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 			if (SUCCEED == is_item_processed_by_server(atoi(row[fld_type]), row[fld_key]))
 					continue;
 
-			zbx_json_addarray(j, NULL);
-			proxyconfig_add_row(j, row, table, itemids);
-			zbx_json_close(j);
+			ZBX_DBROW2UINT64(itemid, row[0]);
+
+			if (ITEM_TYPE_DEPENDENT != atoi(row[fld_type]))
+			{
+				zbx_json_addarray(j, NULL);
+				proxyconfig_add_row(j, row, table, itemids);
+				zbx_json_close(j);
+
+				zbx_hashset_insert(&items, &itemid, sizeof(itemid));
+			}
+			else
+			{
+				ZBX_DBROW2UINT64(master_itemid, row[fld_master_itemid]);
+				dep_item = proxyconfig_dep_item_create(itemid, master_itemid, row, fld);
+				zbx_vector_proxyconfig_dep_item_ptr_append(&dep_items, dep_item);
+			}
 		}
 		DBfree_result(result);
+
+		/* add dependent items processed by proxy */
+		if (0 != dep_items.values_num)
+		{
+			do
+			{
+				dep_items_num = dep_items.values_num;
+
+				for (i = 0; i < dep_items.values_num; )
+				{
+					dep_item = dep_items.values[i];
+
+					if (NULL != zbx_hashset_search(&items, &dep_item->master_itemid))
+					{
+						zbx_json_addarray(j, NULL);
+						proxyconfig_add_row(j, dep_item->row, table, itemids);
+						zbx_json_close(j);
+
+						zbx_hashset_insert(&items, &dep_item->itemid, sizeof(zbx_uint64_t));
+						proxyconfig_dep_item_free(dep_item);
+						zbx_vector_proxyconfig_dep_item_ptr_remove_noorder(&dep_items, i);
+					}
+					else
+						i++;
+				}
+			}
+			while (dep_items_num != dep_items.values_num);
+		}
 	}
 
 	zbx_json_close(j);
@@ -522,6 +619,10 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 	ret = SUCCEED;
 out:
 	zbx_free(sql);
+
+	zbx_vector_proxyconfig_dep_item_ptr_clear_ext(&dep_items, proxyconfig_dep_item_free);
+	zbx_vector_proxyconfig_dep_item_ptr_destroy(&dep_items);
+	zbx_hashset_destroy(&items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

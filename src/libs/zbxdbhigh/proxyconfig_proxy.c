@@ -842,7 +842,7 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 	for (i = 0; i < td->updates.values_num; i++)
 	{
 		char		delim = ' ';
-		const char	*pf, *ptr;
+		const char	*pf;
 		zbx_table_row_t	*row = td->updates.values[i];
 		zbx_json_type_t	type;
 
