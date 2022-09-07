@@ -8054,6 +8054,8 @@ static void	vmware_service_cust_query_prep(zbx_hashset_t *cust_queries, const zb
 	zbx_vmware_cust_query_t	*instance;
 	time_t			now = time(NULL);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() cust_queries:%d", __func__, cust_queries->num_data);
+
 	zbx_hashset_iter_reset(cust_queries, &iter);
 
 	while (NULL != (instance = (zbx_vmware_cust_query_t *)zbx_hashset_iter_next(&iter)))
@@ -8063,7 +8065,7 @@ static void	vmware_service_cust_query_prep(zbx_hashset_t *cust_queries, const zb
 		if (instance->query_type != type)
 			continue;
 
-		if (ZBX_VMWARE_CQ_NEW != instance->state && now - instance->last_pooled > SEC_PER_DAY)
+		if (0 == (instance->state & ZBX_VMWARE_CQ_NEW) && now - instance->last_pooled > SEC_PER_DAY)
 		{
 			vmware_shared_cust_query_clean(instance);
 			zbx_hashset_iter_remove(&iter);
@@ -8073,7 +8075,7 @@ static void	vmware_service_cust_query_prep(zbx_hashset_t *cust_queries, const zb
 		if (0 != (instance->state & ZBX_VMWARE_CQ_PAUSED))
 			continue;
 
-		if (ZBX_VMWARE_CQ_NEW != instance->state &&
+		if (0 == (instance->state & ZBX_VMWARE_CQ_NEW) &&
 				now - instance->last_pooled > 2 * ZBX_VMWARE_CACHE_UPDATE_PERIOD)
 		{
 			instance->state |= ZBX_VMWARE_CQ_PAUSED;
@@ -8086,6 +8088,8 @@ static void	vmware_service_cust_query_prep(zbx_hashset_t *cust_queries, const zb
 		cqv->response = NULL;
 		zbx_vector_cq_value_append(cq_values, cqv);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() cq_values:%d", __func__, cq_values->values_num);
 }
 
 /******************************************************************************
@@ -8334,7 +8338,6 @@ static char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values,
 		buff = zbx_strdcat(buff, tmp);
 		zbx_vector_cq_value_append(cqvs, cq);
 	}
-
 
 	return buff;
 }
