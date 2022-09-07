@@ -359,14 +359,8 @@ class testSlaReport extends CWebTest {
 		}
 		else {
 			// Check empty result if non-related SLA + Service or disabled SLA (in widget) is selected and proceed with next test.
-			if ($widget && !array_key_exists('expected', $data)) {
-				// TODO: remove this if condition and the statement under it when ZBX-21264 is fixed.
-				$this->assertEquals(['No permissions to referred object or it does not exist!'], $table->getRows()->asText());
-			}
-			else {
-				$string = (array_key_exists('expected', $data)) ? $data['expected'] : 'No data found.';
-				$this->assertEquals([$string], $table->getRows()->asText());
-			}
+			$string = (array_key_exists('expected', $data)) ? $data['expected'] : 'No data found.';
+			$this->assertEquals([$string], $table->getRows()->asText());
 			$this->assertFalse($table->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
 
 			return;

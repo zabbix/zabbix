@@ -286,29 +286,28 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'error' => 'Invalid parameter "From": a date is expected.'
 				]
 			],
-			// TODO: Uncomment the below 2 cases when ZBX-21264 is fixed.
-//			// From date too far in the past.
-//			[
-//				[
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'From' => '1968-01-01'
-//					],
-//					'expected' => TEST_BAD,
-//					'error' => 'Invalid parameter "/period_from": value must be one of 0-2147483647.'
-//				]
-//			],
-//			// From date too far in the future.
-//			[
-//				[
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'From' => '2050-01-01'
-//					],
-//					'expected' => TEST_BAD,
-//					'error' => 'Invalid parameter "/period_from": a number is too large.'
-//				]
-//			],
+			// From date too far in the past.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'From' => '1968-01-01'
+					],
+					'expected' => TEST_BAD,
+					'error' => 'Incorrect value for field "From": a date is expected.'
+				]
+			],
+			// From date too far in the future.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'From' => '2050-01-01'
+					],
+					'expected' => TEST_BAD,
+					'error' => 'Incorrect value for field "From": a date is expected.'
+				]
+			],
 			// String type To date.
 			[
 				[
@@ -331,29 +330,28 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'error' => 'Invalid parameter "To": a date is expected.'
 				]
 			],
-			// TODO: Uncomment the below 2 cases when ZBX-21264 is fixed.
-//			// To date too far in the past.
-//			[
-//				[
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'To' => '1969-10-10'
-//					],
-//					'expected' => TEST_BAD,
-//					'error' => 'Invalid parameter "/period_to": value must be one of 0-2147483647.'
-//				]
-//			],
-//			// From date too far in the future.
-//			[
-//				[
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'From' => '2040-10-10'
-//					],
-//					'expected' => TEST_BAD,
-//					'error' => 'Invalid parameter "/period_to": a number is too large.'
-//				]
-//			],
+			// To date too far in the past.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'To' => '1969-10-10'
+					],
+					'expected' => TEST_BAD,
+					'error' => 'Incorrect value for field "To": a date is expected.'
+				]
+			],
+			// From date too far in the future.
+			[
+				[
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'To' => '2040-10-10'
+					],
+					'expected' => TEST_BAD,
+					'error' => 'Incorrect value for field "To": a date is expected.'
+				]
+			],
 			// SLA report for disabled SLA without Service.
 			[
 				[

@@ -32,8 +32,8 @@ class testPageServicesSlaReport extends testSlaReport {
 	public function testPageServicesSlaReport_GeneralLayout() {
 		$this->page->login()->open('zabbix.php?action=slareport.list');
 		$this->page->assertHeader('SLA report');
-		// TODO: Uncomment the below check after ZBX-21264 is fixed.
-		//$this->page->assertTitle('SLA report');
+
+		$this->page->assertTitle('SLA report');
 
 		// Check status of buttons on the SLA report page.
 		foreach ($this->query('button', ['Apply', 'Reset'])->all() as $button) {
@@ -1279,140 +1279,139 @@ class testPageServicesSlaReport extends testSlaReport {
 					],
 					'error' => '"From" date must be less than "To" date.'
 				]
+			],
+			// Non existing date in From field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'From' => '2022-06-32'
+					],
+					'error' => 'Incorrect value for field "From": a date is expected.'
+				]
+			],
+			// Non existing date in To field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'To' => '2022-06-32'
+					],
+					'error' => 'Incorrect value for field "To": a date is expected.'
+				]
+			],
+			// Leading space in To field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'To' => ' 2022-06-13'
+					],
+					'error' => 'Incorrect value for field "To": a date is expected.'
+				]
+			],
+			// Trailing space in To field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'From' => '2022-06 '
+					],
+					'error' => 'Incorrect value for field "From": a date is expected.'
+				]
+			],
+			// Wrong value format in "From" field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'From' => '13-12-2022'
+					],
+					'error' => 'Incorrect value for field "From": a date is expected.'
+				]
+			],
+			// Wrong value format in "To" field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'To' => '12/31/2022'
+					],
+					'error' => 'Incorrect value for field "To": a date is expected.'
+				]
+			],
+			// Unix time in "From" field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'From' => '1641340800'
+					],
+					'error' => 'Incorrect value for field "From": a date is expected.'
+				]
+			],
+			// Unix time in "To" field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'To' => '1641340800'
+					],
+					'error' => 'Incorrect value for field "To": a date is expected.'
+				]
+			],
+			// Field "From" too far in the past.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'From' => '1969-12-31'
+					],
+					'error' => 'Incorrect value for field "From": a date is expected.'
+				]
+			],
+			// Field "From" too far in the future.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'From' => '2039-01-01'
+					],
+					'error' => 'Incorrect value for field "From": a date is expected.'
+				]
+			],
+			// Field "To" too far in the past.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'To' => '1969-12-31'
+					],
+					'error' => 'Incorrect value for field "To": a date is expected.'
+				]
+			],
+			// Field "To" too far in the future.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SLA' => 'SLA Daily',
+						'To' => '2039-01-01'
+					],
+					'error' => 'Incorrect value for field "To": a date is expected.'
+				]
 			]
-			// TODO: Uncomment the below cases and correct error messages when ZBX-21264 is fixed.
-//			// Non existing date in From field.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'From' => '2022-06-32'
-//					],
-//					'error' => 'Incorrect value for field "From": a date is expected.'
-//				]
-//			],
-//			// Non existing date in To field.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'To' => '2022-06-32'
-//					],
-//					'error' => 'Incorrect value for field "To": a date is expected.'
-//				]
-//			],
-//			// Leading space in To field.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'To' => ' 2022-06-13'
-//					],
-//					'error' => 'Incorrect value for field "To": a date is expected.'
-//				]
-//			],
-//			// Trailing space in To field.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'From' => '2022-06-13 '
-//					],
-//					'error' => 'Incorrect value for field "To": a date is expected.'
-//				]
-//			],
-//			// Wrong value format in "From" field.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'From' => '13-12-2022'
-//					],
-//					'error' => 'Incorrect value for field "From": a date is expected.'
-//				]
-//			],
-//			// Wrong value format in "To" field.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'To' => '12/31/2022'
-//					],
-//					'error' => 'Incorrect value for field "To": a date is expected.'
-//				]
-//			],
-//			// Unix time in "From" field.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'From' => '1641340800'
-//					],
-//					'error' => 'Incorrect value for field "From": a date is expected.'
-//				]
-//			],
-//			// Unix time in "To" field.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'To' => '1641340800'
-//					],
-//					'error' => 'Incorrect value for field "To": a date is expected.'
-//				]
-//			],
-//			// Field "From" too far in the past.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'From' => '1969-12-31'
-//					],
-//					'error' => 'Invalid parameter "/period_from": value must be one of 0-2147483647.'
-//				]
-//			],
-//			// Field "From" too far in the future.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'From' => '2039-01-01'
-//					],
-//					'error' => 'Invalid parameter "/period_from": a number is too large.'
-//				]
-//			],
-//			// Field "To" too far in the past.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'To' => '1969-12-31'
-//					],
-//					'error' => 'Invalid parameter "/period_to": value must be one of 0-2147483647.'
-//				]
-//			],
-//			// Field "To" too far in the future.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'SLA' => 'SLA Daily',
-//						'To' => '2039-01-01'
-//					],
-//					'error' => 'Invalid parameter "/period_to": a number is too large.'
-//				]
-//			]
 		];
 	}
 
@@ -1440,7 +1439,7 @@ class testPageServicesSlaReport extends testSlaReport {
 		$this->page->login()->open('zabbix.php?action=slareport.list');
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 
-		// TODO: Remove the below workaround with changing multiselect fill modes after ZBX-21264 is fixed.
+		// Usage of Select mode is required as in Type mode a service that contains the name of required service is chosen.
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$filter_form->query('button:Reset')->one()->click();
 		$filter_form->fill($filter_data);
