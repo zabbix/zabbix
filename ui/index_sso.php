@@ -175,7 +175,6 @@ if (is_array($SSO) && array_key_exists('SETTINGS', $SSO)) {
 
 try {
 	$auth = new Auth($settings);
-
 	if (hasRequest('acs') && !CSessionHelper::has('saml_data')) {
 		$auth->processResponse();
 
@@ -203,6 +202,60 @@ try {
 			'nameid_sp_name_qualifier' => $auth->getNameIdSPNameQualifier(),
 			'session_index' => $auth->getSessionIndex()
 		];
+
+		if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_JIT_STATUS)
+				&& $saml_settings['provision_status'] == JIT_PROVISIONING_ENABLED) {
+			if (!array_key_exists($saml_settings['group_name'], $user_attributes)) {
+				throw new Exception(
+					_s('The parameter "%1$s" is missing from the user attributes.', $saml_settings['group_name'])
+				);
+			}
+
+			$saml_data['group_names'] = $user_attributes[$saml_settings['group_name']];
+			$saml_data['user_name'] = array_key_exists($saml_settings['user_username'], $user_attributes)
+				? reset($user_attributes[$saml_settings['user_username']])
+				: '';
+			$saml_data['user_lastname'] = array_key_exists($saml_settings['user_lastname'], $user_attributes)
+				? reset($user_attributes[$saml_settings['user_lastname']])
+				: '';
+
+			foreach ($saml_data['group_names'] as $group_name) {
+				foreach ($saml_settings['provision_groups'] as $provision_group) {
+					if ($provision_group['is_fallback'] == GROUP_MAPPING_REGULAR) {
+						$pattern = '/^'.str_replace('\*', '.*', preg_quote($provision_group['name'], '/')).'$/i';
+						if (preg_match($pattern, $group_name)) {
+							$saml_data['provision_groups'] = [
+								'user_groups' => $provision_group['user_groups'],
+								'roleid' => $provision_group['roleid']
+							];
+							break;
+						}
+					}
+
+					if ($provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK
+						&& $provision_group['fallback_status'] == GROUP_MAPPING_FALLBACK_ON
+						&& !array_key_exists('provision_groups', $saml_data)) {
+						$saml_data['provision_groups'] = [
+							'user_groups' => $provision_group['user_groups'],
+							'roleid' => $provision_group['roleid']
+						];
+					}
+				}
+			}
+
+			$provision_media = [];
+			foreach($saml_settings['provision_media'] as $media) {
+				if (array_key_exists($media['attribute'], $user_attributes)) {
+					$provision_media[] = [
+						'mediatypeid' => $media['mediatypeid'],
+						'sendto' => $user_attributes[$media['attribute']]
+					];
+				}
+			}
+
+			$saml_data['medias'] = $provision_media != [] ? $provision_media : [];
+		}
+
 		$saml_data['sign'] = CEncryptHelper::sign(json_encode($saml_data));
 
 		CSessionHelper::set('saml_data', $saml_data);
@@ -246,6 +299,26 @@ try {
 
 		if (!CEncryptHelper::checkSign($saml_data_sign, $saml_data_sign_check)) {
 			throw new Exception(_('Session initialization error.'));
+		}
+
+		$user = API::getApiService('user')->findAccessibleUser($saml_data['username_attribute'], // TODO check if this works well after updates from API
+			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
+			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), false);
+
+		if (!array_key_exists('db_user', $user)) {
+			if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_JIT_STATUS)
+				&& $saml_settings['provision_status'] == JIT_PROVISIONING_ENABLED) {
+
+				$result = API::getApiService('user')->create([
+					'username' => $saml_data['username_attribute'],
+					'name' => $saml_data['user_name'],
+					'surname' => $saml_data['user_lastname'],
+					'passwd' => 'zabbixzabbix123',							// TODO here needs to be some kind of password, it is not used for login, just for user creation
+					'roleid' => $saml_data['provision_groups']['roleid'],
+					'usrgrps' => $saml_data['provision_groups']['user_groups'],
+					'medias' => $saml_data['medias']
+				], ['userdirecotryid' => $saml_settings['userdirectoryid']]);
+			}
 		}
 
 		CWebUser::$data = API::getApiService('user')->loginByUsername($saml_data['username_attribute'],
