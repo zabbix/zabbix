@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-06T19:12:26Z'
+  date: '2022-09-07T12:22:23Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -1050,18 +1050,6 @@ zabbix_export:
             -
               tag: component
               value: memory
-          triggers:
-            -
-              uuid: 89c031f356084208ae33d695a53b8d3e
-              expression: 'min(/Azure MySQL flexible server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
-              name: 'Azure MySQL: High memory utilization'
-              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
-              priority: AVERAGE
-              description: 'The system is running out of free memory.'
-              tags:
-                -
-                  tag: scope
-                  value: performance
         -
           uuid: 84f3d2b152784993944a2d4c3fad1a59
           name: 'Azure MySQL: Network out'

@@ -272,7 +272,6 @@ There are no template links in this template.
 |Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
 |Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
 |Azure MySQL: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
 |Azure MySQL: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
 |Azure MySQL: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
