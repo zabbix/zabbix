@@ -84,6 +84,51 @@ $condition_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
 
+$i = 0;
+
+if ($data['action']['filter']['conditions']) {
+	$actionConditionStringValues = actionConditionValueToString([$data['action']]);
+
+	foreach ($data['action']['filter']['conditions'] as $cIdx => $condition) {
+		if (!isset($condition['conditiontype'])) {
+			$condition['conditiontype'] = 0;
+		}
+		if (!isset($condition['operator'])) {
+			$condition['operator'] = 0;
+		}
+		if (!isset($condition['value'])) {
+			$condition['value'] = '';
+		}
+		if (!array_key_exists('value2', $condition)) {
+			$condition['value2'] = '';
+		}
+
+		$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
+
+		$labelSpan = (new CSpan($label))
+			->addClass('label')
+			->setAttribute('data-conditiontype', $condition['conditiontype'])
+			->setAttribute('data-formulaid', $label);
+
+		$condition_table
+			->addRow([
+					$labelSpan,
+					(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
+						$actionConditionStringValues[0][$cIdx], $condition['value2']
+					)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
+					(new CCol([
+						(new CButton('remove', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('condition-remove')
+							->removeId(),
+						new CVar('conditions['.$i.']', $condition)
+					]))
+			]);
+
+		$i++;
+	}
+}
+
 $condition_table->setFooter(
 	(new CSimpleButton(_('Add')))
 	->setAttribute('data-eventsource', $data['eventsource'])
@@ -251,7 +296,8 @@ $form
 				'condition_types' => condition_type2str(),
 				'conditions' => $data['action']['filter']['conditions'],
 				'actionid' => $data['actionid'],
-				'eventsource' => $data['eventsource']
+				'eventsource' => $data['eventsource'],
+				'condition_name' => $data['condition_name']
 		]).
 			');'))->setOnDocumentReady()
 	);

@@ -30,11 +30,10 @@ window.action_edit_popup = new class {
 		this.condition_types = condition_types;
 		this.conditions = conditions;
 		this.actionid = actionid;
-		this.eventsource = eventsource
-		this.row_num = 0;
+		this.eventsource = eventsource;
+		this.row_count = document.getElementById('conditionTable').rows.length;
 
 		this._initActionButtons();
-		this._createExistingConditionRow(conditions);
 		this._processTypeOfCalculation();
 	}
 
@@ -42,6 +41,9 @@ window.action_edit_popup = new class {
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-condition-create')) {
 				this._openConditionPopup();
+			}
+			else if (e.target.classList.contains('condition-remove')) {
+				e.target.closest('tr').remove();
 			}
 			else if (e.target.classList.contains('js-operation-details')) {
 				this._openOperationPopup('0', '0', this.actionid);
@@ -72,7 +74,6 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
-			console.log(e.detail.name)
 				this.row = document.createElement('tr');
 				this._createRow(this.row, e.detail);
 				$('#conditionTable tr:last').before(this.row);
@@ -107,12 +108,11 @@ window.action_edit_popup = new class {
 	_createLabelCell(input) {
 		const cell = document.createElement('td');
 
-		this.label = num2letter(this.row_num)
-		cell.setAttribute('class', 'label')
-		cell.setAttribute('data-formulaid', this.label)
-		cell.setAttribute('data-conditiontype', input.conditiontype)
+		this.label = num2letter(document.getElementById('conditionTable').rows.length -2);
+		cell.setAttribute('class', 'label');
+		cell.setAttribute('data-formulaid', this.label);
+		cell.setAttribute('data-conditiontype', input.conditiontype);
 		cell.append(this.label);
-		this.row_num ++;
 		return cell;
 	}
 
@@ -121,7 +121,6 @@ window.action_edit_popup = new class {
 		const condition_cell = document.createElement('td');
 		const operator_cell = document.createElement('td');
 		const value_cell = document.createElement('em');
-		const value2_cell = document.createElement('em');
 
 		cell.appendChild(this._createHiddenInput('conditiontype',input.conditiontype));
 		cell.appendChild(this._createHiddenInput('operator',input.operator));
@@ -132,15 +131,10 @@ window.action_edit_popup = new class {
 		cell.appendChild(this._createHiddenInput('formulaid',this.label));
 
 		if (input.conditiontype == <?= CONDITION_TYPE_EVENT_TAG_VALUE ?>) {
-			condition_cell.textContent = ('Value of tag ');
-			operator_cell.textContent = (this.condition_operators[input.operator] + ' ')
-			value_cell.textContent = (input.value);
-			value2_cell.textContent = (input.value2);
-
-			cell.append(condition_cell);
-			cell.append(value2_cell);
-			cell.append(operator_cell);
-			cell.append(value_cell);
+			cell.append('Value of tag ');
+			cell.append(input.value2);
+			cell.append(' ' + this.condition_operators[input.operator] + ' ');
+			cell.append(input.value);
 		}
 		else if (input.conditiontype == <?= CONDITION_TYPE_SUPPRESSED ?>) {
 			if (input.operator == <?= CONDITION_OPERATOR_YES ?>) {
@@ -176,8 +170,8 @@ window.action_edit_popup = new class {
 	_createHiddenInput(name, value) {
 		const input = document.createElement('input');
 		input.type = 'hidden';
-		input.id = `conditions_${this.row_num-1}_${name}`;
-		input.name = `conditions[${this.row_num-1}][${name}]`;
+		input.id = `conditions_${this.row_count}_${name}`;
+		input.name = `conditions[${this.row_count}][${name}]`;
 		input.value =value;
 
 		return input;
@@ -193,28 +187,6 @@ window.action_edit_popup = new class {
 
 		cell.appendChild(btn);
 		return cell;
-	}
-
-	_createExistingConditionRow(conditions) {
-		conditions.forEach(condition => {
-				const row = document.createElement('tr');
-				const cell = document.createElement('td');
-
-				this.label = condition.formulaid;
-				cell.append(this.label)
-				cell.setAttribute('class', 'label')
-				cell.setAttribute('data-formulaid', this.label)
-				cell.setAttribute('data-conditiontype', condition.conditiontype)
-				row.append(cell)
-				this.row_num ++;
-				row.append(this._createNameCell(condition));
-				row.append(this._createRemoveCell());
-
-				$('#conditionTable tr:last').before(row);
-			}
-		)
-		const table = document.getElementById('conditionTable');
-		this.row_count = table.rows.length -2;
 	}
 
 	submit() {
@@ -343,7 +315,6 @@ window.action_edit_popup = new class {
 		jQuery('#expression').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
 
 		jQuery('#evaltype').change(function() {
-
 			this.show_formula = (jQuery(this).val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 			jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
 			jQuery('#expression').toggle(!this.show_formula);

@@ -95,8 +95,6 @@ class CControllerActionConditionCheck extends CController {
 	}
 
 	protected function doAction() {
-		// todo : based on condition type return correct messaging
-
 		$condition = [
 			'condition_type' => $this->getInput('condition_type'),
 			'operator' => $this->getInput('operator'),
@@ -105,7 +103,6 @@ class CControllerActionConditionCheck extends CController {
 		];
 
 		$actionConditionStringValues = $this->conditionValueToString($condition);
-		sdff($actionConditionStringValues);
 
 		$data = [
 			'title' => _('New condition'),
