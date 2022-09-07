@@ -303,17 +303,13 @@ INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,his
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150157, 50009, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 2,bps]','1m','30d',0,'','',0,'','');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150158, 50009, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 2,resp]','1m','30d',0,'','',0,'','');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150159, 50009, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 2]','1m','30d',0,'','',0,'','');
+
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150140, 15003, 150140, 2);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150141, 15003, 150141, 2);
+
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150151, 15015, 150151, 2);
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150152, 15015, 150152, 3);
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15015, 150153, 4);
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15003, 150153, 4);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15003, 150154, 2);
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15004, 150153, 4);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15004, 150154, 2);
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15005, 150153, 4);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15005, 150154, 2);
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15010, 150153, 4);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15010, 150154, 2);
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15015, 150154, 2);
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150155, 15015, 150155, 1);
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150156, 15015, 150156, 0);
