@@ -1930,7 +1930,6 @@ int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
 					zbx_vector_uint64_append(&del_macro_hostids, hostid);
 				else
 					delete_globalmacros = 1;
-
 			}
 		}
 	}

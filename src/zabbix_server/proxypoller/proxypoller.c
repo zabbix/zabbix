@@ -264,13 +264,13 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 	zbx_json_init(&j, 512 * ZBX_KIBIBYTE);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED != (ret = connect_to_proxy(proxy, &s, CONFIG_TIMEOUT)))
+	if (SUCCEED != (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
 		goto out;
 
 	if (SUCCEED != (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size, reserved, ZBX_TCP_PROTOCOL)))
 		goto clean;
 
-	if (FAIL == (ret = zbx_tcp_recv_ext(&s, CONFIG_TIMEOUT, 0)))
+	if (FAIL == (ret = zbx_tcp_recv_ext(&s, 0, 0)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive configuration information from proxy \"%s\": %s",
 				proxy->host, zbx_socket_strerror());
@@ -329,7 +329,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 
 	if (SUCCEED == ret)
 	{
-		if (SUCCEED != (ret = zbx_recv_response(&s, CONFIG_TRAPPER_TIMEOUT, &error)))
+		if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
 					" \"%s\" at \"%s\": %s", proxy->host, s.peer, error);
