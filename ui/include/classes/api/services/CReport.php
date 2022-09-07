@@ -310,15 +310,12 @@ class CReport extends CApiService {
 
 		foreach ($reports as $report) {
 			$db_report = [];
-			$dashboardid_has_changed = false;
 			$users = array_key_exists('users', $report) ? $report['users'] : [];
 			$user_groups = array_key_exists('user_groups', $report) ? $report['user_groups'] : [];
 
 			if ($db_reports) {
 				$db_report = $db_reports[$report['reportid']];
-				$dashboardid_has_changed = (array_key_exists('dashboardid', $report)
-					&& $report['dashboardid'] != $db_report['dashboardid']
-				);
+
 				if (!array_key_exists('users', $report)) {
 					$users = $db_report['users'];
 				}
@@ -359,13 +356,12 @@ class CReport extends CApiService {
 				}
 
 				foreach ($report['users'] as $user) {
-					if ($dashboardid_has_changed || !array_key_exists($user['userid'], $db_userids)) {
+					if (!array_key_exists($user['userid'], $db_userids)) {
 						$userids[$user['userid']] = true;
 					}
 
 					if (array_key_exists('access_userid', $user) && $user['access_userid'] != 0
-							&& ($dashboardid_has_changed
-								|| !array_key_exists($user['access_userid'], $db_access_userids))) {
+							&& !array_key_exists($user['access_userid'], $db_access_userids)) {
 						$userids[$user['access_userid']] = true;
 					}
 				}
@@ -378,8 +374,7 @@ class CReport extends CApiService {
 
 				foreach ($report['user_groups'] as $usrgrp) {
 					if (array_key_exists('access_userid', $usrgrp) && $usrgrp['access_userid'] != 0
-							&& ($dashboardid_has_changed
-								|| !array_key_exists($usrgrp['access_userid'], $db_access_userids))) {
+							&& !array_key_exists($usrgrp['access_userid'], $db_access_userids)) {
 						$userids[$usrgrp['access_userid']] = true;
 					}
 				}
@@ -427,19 +422,12 @@ class CReport extends CApiService {
 
 		foreach ($reports as $report) {
 			if (array_key_exists('user_groups', $report) && $report['user_groups']) {
-				$db_usrgrpids = [];
-				$dashboardid_has_changed = false;
-
-				if ($db_reports) {
-					$db_report = $db_reports[$report['reportid']];
-					$db_usrgrpids = array_flip(array_column($db_report['user_groups'], 'usrgrpid'));
-					$dashboardid_has_changed = (array_key_exists('dashboarid', $report)
-						&& $report['dashboarid'] != $db_report['dashboarid']
-					);
-				}
+				$db_usrgrpids = $db_reports
+					? array_flip(array_column($db_reports[$report['reportid']]['user_groups'], 'usrgrpid'))
+					: [];
 
 				foreach ($report['user_groups'] as $usrgrp) {
-					if ($dashboardid_has_changed || !array_key_exists($usrgrp['usrgrpid'], $db_usrgrpids)) {
+					if (!array_key_exists($usrgrp['usrgrpid'], $db_usrgrpids)) {
 						$usrgrpids[$usrgrp['usrgrpid']] = true;
 					}
 				}
