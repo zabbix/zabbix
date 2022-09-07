@@ -204,15 +204,6 @@ typedef off_t	zbx_offset_t;
 #	define S_ISDIR(x) (((x) & S_IFMT) == S_IFDIR)
 #endif
 
-#define ZBX_STR2UINT64(uint, string) is_uint64(string, &uint)
-#define ZBX_OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
-#define ZBX_HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
-
-#define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
-
-#define ZBX_CONST_STRING(str) "" str
-#define ZBX_CONST_STRLEN(str) (sizeof(ZBX_CONST_STRING(str)) - 1)
-
 typedef struct
 {
 	zbx_uint64_t	lo;
@@ -230,5 +221,15 @@ zbx_uint128_t;
 #endif
 
 typedef struct zbx_variant zbx_variant_t;
+
+#define	SUCCEED		0
+#define	FAIL		-1
+#define	NOTSUPPORTED	-2
+#define	NETWORK_ERROR	-3
+#define	TIMEOUT_ERROR	-4
+#define	AGENT_ERROR	-5
+#define	GATEWAY_ERROR	-6
+#define	CONFIG_ERROR	-7
+#define	SIG_ERROR	-8
 
 #endif

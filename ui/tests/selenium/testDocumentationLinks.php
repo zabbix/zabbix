@@ -66,14 +66,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards'
 				]
 			],
 			// #1 Certain dashboard in view mode.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards'
 				]
 			],
 			// #2 Create dashboard popup.
@@ -86,7 +86,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Create dashboard'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards#creating-a-dashboard'
 				]
 			],
 			// #3 Widget Create popup.
@@ -103,14 +103,14 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'id:dashboard-add-widget'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard/widgets'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets'
 				]
 			],
 			// #4 Widget edit form.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard/widgets',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -123,7 +123,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#adding-pages',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards#adding-pages',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -170,7 +170,7 @@ class testDocumentationLinks extends CWebTest {
 							'callback' => 'openMassUpdate'
 						]
 					],
-					'doc_link' => '/en/manual/acknowledges#updating-problems'
+					'doc_link' => '/en/manual/acknowledgment#updating-problems'
 				]
 			],
 			// #10 Problems acknowledge popup.
@@ -183,7 +183,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'link:No'
 						]
 					],
-					'doc_link' => '/en/manual/acknowledges#updating-problems'
+					'doc_link' => '/en/manual/acknowledgment#updating-problems'
 				]
 			],
 			// #11 Monitoring -> Hosts view.
@@ -320,7 +320,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Create service'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/services/service#service-configuration'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/services/service#editing-services'
 				]
 			],
 			// #28 Service mass update popup.
@@ -339,7 +339,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'actionconf.php?eventsource=4',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/services/service_actions'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/actions'
 				]
 			],
 			// #30 Service action configuration form.
@@ -366,7 +366,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Create SLA'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/services/sla#configuration'
+					'doc_link' => '/en/manual/it_services/sla#configuration'
 				]
 			],
 			// #33 SLA report view.
@@ -446,7 +446,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=auditlog.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/audit'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/audit_log'
 				]
 			],
 			// #43 Action log view.
@@ -467,7 +467,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=hostgroup.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hostgroups'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hostgroups'
 				]
 			],
 			// #46 Create host group popup.
@@ -508,7 +508,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'templates.php',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates'
 				]
 			],
 			// #49 Create template view.
@@ -554,7 +554,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'items.php?context=template',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/items'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/items'
 				]
 			],
 			// #54 Template item create form.
@@ -600,7 +600,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'triggers.php?context=template',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/triggers'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/triggers'
 				]
 			],
 			// #59 Template trigger create form.
@@ -633,7 +633,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'graphs.php?context=template',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/graphs'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/graphs'
 				]
 			],
 			// #63 Template graph create form.
@@ -667,14 +667,14 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Create dashboard'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards#creating-a-dashboard'
 				]
 			],
 			// #67 Template dashboards view mode.
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards#creating-a-dashboard'
 				]
 			],
 			// #68 Template dashboard widget create popup.
@@ -687,7 +687,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'xpath:(//button[@class="btn-widget-edit"])[1]'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard/widgets'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets'
 				]
 			],
 			// #69 Template dashboard widget edit popup.
@@ -700,14 +700,14 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'id:dashboard-add-widget'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard/widgets'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets'
 				]
 			],
 			// #70 Add Template dashboard page configuration popup.
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/dashboard#adding-pages',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards#adding-pages',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -724,7 +724,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'host_discovery.php?context=template',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/discovery'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery'
 				]
 			],
 			// #72 Template LLD rule configuration form.
@@ -751,7 +751,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'disc_prototypes.php?parent_discoveryid=15011&context=template',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/discovery/item_prototypes'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery/item_prototypes'
 				]
 			],
 			// #75 Template LLD item prototype create form.
@@ -797,7 +797,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'trigger_prototypes.php?parent_discoveryid=15011&context=template',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/discovery/trigger_prototypes'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery/trigger_prototypes'
 				]
 			],
 			// #80 Template LLD trigger prototype create form.
@@ -830,7 +830,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'graphs.php?parent_discoveryid=15011&context=template',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/discovery/graph_prototypes'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery/graph_prototypes'
 				]
 			],
 			// #84 Template LLD graph prototype create form.
@@ -851,7 +851,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'host_prototypes.php?parent_discoveryid=15011&context=template',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/discovery/host_prototypes'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery/host_prototypes'
 				]
 			],
 			// #87 Template LLD host prototype create form.
@@ -872,7 +872,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'httpconf.php?context=template',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/templates/web'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/web'
 				]
 			],
 			// #90 Template Web scenario create form.
@@ -910,7 +910,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=host.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts'
 				]
 			],
 			// #94 Create host popup.
@@ -976,7 +976,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'items.php?context=host',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/items'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/items'
 				]
 			],
 			// #100 Host item create form.
@@ -1023,7 +1023,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'triggers.php?context=host',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/triggers'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/triggers'
 				]
 			],
 			// #105 Host trigger create form.
@@ -1056,7 +1056,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'graphs.php?context=host',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/graphs'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/graphs'
 				]
 			],
 			// #109 Host graph create form.
@@ -1077,7 +1077,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'host_discovery.php?context=host',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/discovery'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery'
 				]
 			],
 			// #112 Host LLD rule configuration form.
@@ -1104,7 +1104,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'disc_prototypes.php?parent_discoveryid=133800&context=host',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/discovery/item_prototypes'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery/item_prototypes'
 				]
 			],
 			// #115 Host LLD item prototype create form.
@@ -1150,7 +1150,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'trigger_prototypes.php?parent_discoveryid=133800&context=host',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/discovery/trigger_prototypes'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery/trigger_prototypes'
 				]
 			],
 			// #120 Host LLD trigger prototype create form.
@@ -1183,7 +1183,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'graphs.php?parent_discoveryid=133800&context=host',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/discovery/graph_prototypes'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery/graph_prototypes'
 				]
 			],
 			// #124 Host LLD graph prototype create form.
@@ -1204,7 +1204,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'host_prototypes.php?parent_discoveryid=90001&context=host',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/discovery/host_prototypes'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery/host_prototypes'
 				]
 			],
 			// #127 Host LLD host prototype create form.
@@ -1225,7 +1225,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hosts/web'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/web'
 				]
 			],
 			// #130 Host Web scenario create form.
@@ -1263,7 +1263,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'maintenance.php',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/maintenance'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/maintenance'
 				]
 			],
 			// #134 Create maintenance form view.
@@ -1284,7 +1284,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'actionconf.php?eventsource=0',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/actions'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/actions'
 				]
 			],
 			// #137 Create trigger action form view.
@@ -1305,7 +1305,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'actionconf.php?eventsource=1',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/actions'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/actions'
 				]
 			],
 			// #140 Create discovery action form view.
@@ -1326,7 +1326,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'actionconf.php?eventsource=2',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/actions'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/actions'
 				]
 			],
 			// #143 Create autoregistration action form view.
@@ -1347,7 +1347,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'actionconf.php?eventsource=3',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/actions'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/actions'
 				]
 			],
 			// #146 Create internal action form view.
@@ -1368,7 +1368,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=correlation.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/correlation'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/correlation'
 				]
 			],
 			// #149 Create event correlation form view.
@@ -1389,7 +1389,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=discovery.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/discovery'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/discovery'
 				]
 			],
 			// #152 Create network discovery form view.
@@ -1424,14 +1424,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=housekeeping.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#housekeeper'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/housekeeping'
 				]
 			],
 			// #157 Administration -> General -> Audit log view.
 			[
 				[
 					'url' => 'zabbix.php?action=audit.settings.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#audit-log'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/audit_log'
 				]
 			],
 			// #158 Administration -> General -> Images -> Icon view.
@@ -1521,7 +1521,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=macros.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#macros'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/macros'
 				]
 			],
 			// #170 Administration -> General -> Trigger displaying options view.
@@ -1566,7 +1566,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=token.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
 			// #175 Administration -> General -> Api tokens -> Create Api token popup.
@@ -1579,7 +1579,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Create API token'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
 			// #176 Administration -> General -> Api tokens -> Edit Api token popup.
@@ -1592,7 +1592,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'link:Admin token'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
 			// #177 Administration -> General -> Other view.
@@ -1639,14 +1639,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=authentication.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/authentication'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/users/authentication'
 				]
 			],
 			// #182 Administration -> User groups list view.
 			[
 				[
 					'url' => 'zabbix.php?action=usergroup.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/user_groups'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/users/user_groups'
 				]
 			],
 			// #183 Administration -> User groups -> Create user group view.
@@ -1667,28 +1667,28 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=userrole.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/user_roles'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/users/user_roles'
 				]
 			],
 			// #186 Administration -> User roles -> Create form view.
 			[
 				[
 					'url' => '/zabbix.php?action=userrole.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/user_roles#default-user-roles'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/users/user_roles#default-user-roles'
 				]
 			],
 			// #187 Administration -> User roles -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=userrole.edit&roleid=3',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/user_roles#default-user-roles'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/users/user_roles#default-user-roles'
 				]
 			],
 			// #188 Administration -> Users list view.
 			[
 				[
 					'url' => 'zabbix.php?action=user.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/users'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/users/user_list'
 				]
 			],
 			// #189 Administration -> Users -> Create form view.
@@ -1709,7 +1709,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/mediatypes'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/mediatypes'
 				]
 			],
 			// #192 Administration -> Media type -> Create form view.
@@ -1743,21 +1743,21 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/scripts'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts'
 				]
 			],
 			// #196 Administration -> Scripts -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/scripts#configuring-a-global-script'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts#configuring-a-global-script'
 				]
 			],
 			// #197 Administration -> Scripts -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.edit&scriptid=2',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/scripts#configuring-a-global-script'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts#configuring-a-global-script'
 				]
 			],
 			// #198 Administration -> Queue overview view.
@@ -1805,7 +1805,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Create API token'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
 			// #204 User settings -> Api tokens -> Edit Api token popup.
@@ -1818,7 +1818,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'link:Admin token'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#api-tokens'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
 			/** TODO: uncomment and change doc links after ZBXNEXT-2592

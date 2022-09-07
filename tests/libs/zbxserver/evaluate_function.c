@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
@@ -27,6 +25,8 @@
 #include "valuecache.h"
 #include "zbxserver.h"
 #include "../../src/libs/zbxserver/evalfunc.h"
+
+#include "zbxnum.h"
 
 #include "mocks/valuecache/valuecache_mock.h"
 
@@ -82,7 +82,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	handle;
 	zbx_variant_t		returned_value;
 
-	ZBX_DOUBLE_EPSILON = 0.000001;
+	zbx_update_epsilon_to_float_precision();
 
 	err = zbx_vc_init(&error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
@@ -132,7 +132,7 @@ void	zbx_mock_test_entry(void **state)
 						returned_value.data.dbl);
 				break;
 			case ZBX_VARIANT_UI64:
-				if (SUCCEED != is_uint64(expected_value, &expected_ui64))
+				if (SUCCEED != zbx_is_uint64(expected_value, &expected_ui64))
 				{
 					fail_msg("function result '" ZBX_FS_UI64
 							"' does not match expected result '%s'",

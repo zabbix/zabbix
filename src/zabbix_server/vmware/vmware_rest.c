@@ -21,6 +21,8 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
+#include "zbxstr.h"
+
 extern int	CONFIG_VMWARE_TIMEOUT;
 #define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
 
@@ -279,7 +281,7 @@ static int	vmware_curl_init(const char *url, CURL **easyhandle, ZBX_HTTPPAGE *pa
 		goto out;
 	}
 
-	strscpy(&page->url[url_sz - ZBX_CONST_STRLEN("api")], "api");
+	memcpy(&page->url[url_sz - ZBX_CONST_STRLEN("api")], "api", ZBX_CONST_STRLEN("api"));
 	*headers = curl_slist_append(*headers, ZBX_XML_HEADER1);
 	*headers = curl_slist_append(*headers, ZBX_XML_HEADER2);
 
@@ -537,7 +539,10 @@ static int	vmware_rest_get(const char *fn_parent, CURL *easyhandle, const char *
 	char		url[MAX_STRING_LEN];
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPGET, 1L)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		return FAIL;
+	}
 
 	zbx_snprintf(url, sizeof(url),"%s%s", url_suffix, param);
 
@@ -563,10 +568,8 @@ static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char 
 	CURLcode	err;
 	CURLoption	opt;
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)))
-		return FAIL;
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, request)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, request)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		return FAIL;

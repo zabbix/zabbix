@@ -26,6 +26,7 @@
 #include "preprocessing.h"
 #include "preproc_history.h"
 #include "preproc_manager.h"
+#include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -217,8 +218,10 @@ static void	preprocessor_sync_configuration(zbx_preprocessing_manager_t *manager
 		zbx_hashset_iter_reset(&manager->item_config, &iter);
 		while (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_iter_next(&iter)))
 		{
-			if (ts >= item->update_time)
+			if (ts >= item->update_time && ZBX_PREPROC_MACRO_UPDATE_FALSE == item->macro_update)
 				continue;
+
+			item->macro_update = ZBX_PREPROC_MACRO_UPDATE_FALSE;
 
 			if (NULL == (vault = (zbx_preproc_history_t *)zbx_hashset_search(&manager->history_cache,
 					&item->itemid)))

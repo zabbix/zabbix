@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxnum.h"
 #include "zbxvariant.h"
 
 static unsigned int	hex2num(char c)
@@ -72,7 +72,7 @@ static void	mock_read_variant(const char *path, zbx_variant_t *variant)
 	{
 		zbx_uint64_t	value_ui64;
 
-		if (SUCCEED != is_uint64(value, &value_ui64))
+		if (SUCCEED != zbx_is_uint64(value, &value_ui64))
 			fail_msg("Cannot convert value %s to uint64", value);
 
 		zbx_variant_set_ui64(variant, value_ui64);
@@ -110,7 +110,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	ZBX_DOUBLE_EPSILON = 0.000001;
+	zbx_update_epsilon_to_float_precision();
 
 	mock_read_variant("in.value1", &value1);
 	mock_read_variant("in.value2", &value2);

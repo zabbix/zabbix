@@ -125,7 +125,6 @@ typedef struct
 }
 zbx_tm_task_t;
 
-
 zbx_tm_task_t	*zbx_tm_task_create(zbx_uint64_t taskid, unsigned char type, unsigned char status, int clock, int ttl,
 		zbx_uint64_t proxy_hostid);
 void	zbx_tm_task_clear(zbx_tm_task_t *task);

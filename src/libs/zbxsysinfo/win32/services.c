@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
+
+#include "zbxstr.h"
 #include "log.h"
 #include "zbxjson.h"
 
@@ -771,7 +772,7 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 				{
 					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
 
-					if (NULL == exclude || FAIL == str_in_list(exclude, utf8, ','))
+					if (NULL == exclude || FAIL == zbx_str_in_list(exclude, utf8, ','))
 						buf = zbx_strdcatf(buf, "%s\n", utf8);
 
 					zbx_free(utf8);

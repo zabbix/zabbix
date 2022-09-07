@@ -23,6 +23,7 @@
 #include "log.h"
 #include "zbxjson.h"
 #include "dbcache.h"
+#include "zbxnum.h"
 
 #define AUDIT_USERID		__UINT64_C(0)
 #define AUDIT_USERID_SQL	"null"

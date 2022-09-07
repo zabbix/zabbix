@@ -29,7 +29,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Scripts'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_SCRIPT_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_LIST))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'))
@@ -106,9 +106,23 @@ foreach ($data['scripts'] as $script) {
 						$actions[] = ', ';
 					}
 
-					$has_access = $action['eventsource'] == EVENT_SOURCE_SERVICE
-						? CWebUser::checkAccess(CRoleHelper::UI_SERVICES_ACTIONS)
-						: CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS);
+					switch ($action['eventsource']) {
+						case EVENT_SOURCE_TRIGGERS:
+							$has_access = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
+							break;
+						case EVENT_SOURCE_SERVICE:
+							$has_access = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
+							break;
+						case EVENT_SOURCE_DISCOVERY:
+							$has_access = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
+							break;
+						case EVENT_SOURCE_AUTOREGISTRATION:
+							$has_access = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
+							break;
+						case EVENT_SOURCE_INTERNAL:
+							$has_access = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
+							break;
+					}
 
 					if ($has_access) {
 						$url = (new CUrl('actionconf.php'))

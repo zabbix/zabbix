@@ -25,6 +25,9 @@
 #include "zbxservice.h"
 #include "service_actions.h"
 #include "zbxserialize.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxexpr.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

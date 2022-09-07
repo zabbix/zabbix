@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
+
+#include "zbxstr.h"
 #include "zbxthreads.h"
 #include "perfstat.h"
 #include "zbxjson.h"
@@ -83,13 +84,13 @@ static int perf_counter_ex(const char *function, AGENT_REQUEST *request, AGENT_R
 		goto out;
 	}
 
-	strscpy(counterpath, tmp);
+	zbx_strscpy(counterpath, tmp);
 
 	if (NULL == (tmp = get_rparam(request, 1)) || '\0' == *tmp)
 	{
 		interval = 1;
 	}
-	else if (FAIL == is_uint31(tmp, &interval))
+	else if (FAIL == zbx_is_uint31(tmp, &interval))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		goto out;

@@ -31,7 +31,6 @@ $url = (new CUrl('zabbix.php'))
 $token_form = (new CForm('post', $url))
 	->setId('token_form')
 	->setName('token')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('admin_mode', $data['admin_mode'])
 	->addVar('tokenid', $data['tokenid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
@@ -105,6 +104,7 @@ $token_from_grid->addItem([
 				->setDateFormat(DATE_TIME_FORMAT_SECONDS)
 				->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 				->setAriaRequired()
+				->setId('expires-at-row')
 		)
 	])
 	->addItem([

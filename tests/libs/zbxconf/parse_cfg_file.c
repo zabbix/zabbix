@@ -20,7 +20,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
 #include "cfg.h"
 
 void	zbx_mock_test_entry(void **state)
@@ -87,7 +88,7 @@ void	zbx_mock_test_entry(void **state)
 			{
 				expected_values[parameter_count] = zbx_malloc(NULL, sizeof(zbx_uint64_t));
 
-				if (SUCCEED != is_uint64(tmp, expected_values[parameter_count]))
+				if (SUCCEED != zbx_is_uint64(tmp, expected_values[parameter_count]))
 				{
 					fail_msg("Expected value \"%s\" of parameter #%d is not numeric.", tmp,
 							parameter_count + 1);
@@ -107,7 +108,7 @@ void	zbx_mock_test_entry(void **state)
 			{
 				zbx_uint64_t	min;
 
-				if (SUCCEED != is_uint64(tmp, &min))
+				if (SUCCEED != zbx_is_uint64(tmp, &min))
 				{
 					fail_msg("Minimum allowed value \"%s\" of parameter #%d is not numeric.", tmp,
 							parameter_count + 1);
@@ -126,7 +127,7 @@ void	zbx_mock_test_entry(void **state)
 			{
 				zbx_uint64_t	max;
 
-				if (SUCCEED != is_uint64(tmp, &max))
+				if (SUCCEED != zbx_is_uint64(tmp, &max))
 				{
 					fail_msg("Maximum allowed value \"%s\" of parameter #%d is not numeric.", tmp,
 							parameter_count + 1);

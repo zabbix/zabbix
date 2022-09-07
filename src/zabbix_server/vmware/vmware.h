@@ -118,6 +118,7 @@ typedef struct
 	zbx_uint64_t			uncommitted;
 	zbx_vector_str_uint64_pair_t	hv_uuids_access;
 	zbx_vector_vmware_diskextent_t	diskextents;
+	zbx_vector_str_t		alarm_ids;
 }
 zbx_vmware_datastore_t;
 
@@ -150,10 +151,10 @@ typedef struct
 {
 	char			*name;
 	char			*id;
+	zbx_vector_str_t	alarm_ids;
 }
 zbx_vmware_datacenter_t;
-
-int	vmware_dc_name_compare(const void *d1, const void *d2);
+int	vmware_dc_id_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datacenter, zbx_vmware_datacenter_t *)
 
 typedef struct
@@ -203,6 +204,21 @@ zbx_vmware_pnic_t;
 int	vmware_pnic_compare(const void *v1, const void *v2);
 ZBX_PTR_VECTOR_DECL(vmware_pnic, zbx_vmware_pnic_t *)
 
+/* Alarm data */
+typedef struct
+{
+	char	*key;
+	char	*name;
+	char	*system_name;
+	char	*description;
+	char	*overall_status;
+	char	*time;
+	int	enabled;
+	int	acknowledged;
+}
+zbx_vmware_alarm_t;
+ZBX_PTR_VECTOR_DECL(vmware_alarm, zbx_vmware_alarm_t *)
+
 /* file system data */
 typedef struct
 {
@@ -231,6 +247,7 @@ typedef struct
 	zbx_vector_ptr_t		file_systems;
 	unsigned int			snapshot_count;
 	zbx_vector_vmware_custom_attr_t	custom_attrs;
+	zbx_vector_str_t		alarm_ids;
 }
 zbx_vmware_vm_t;
 
@@ -248,6 +265,7 @@ typedef struct
 	zbx_vector_vmware_dsname_t	dsnames;
 	zbx_vector_ptr_t		vms;
 	zbx_vector_vmware_pnic_t	pnics;
+	zbx_vector_str_t		alarm_ids;
 }
 zbx_vmware_hv_t;
 
@@ -262,9 +280,10 @@ zbx_vmware_vm_index_t;
 /* the vmware cluster data */
 typedef struct
 {
-	char	*id;
-	char	*name;
-	char	*status;
+	char			*id;
+	char			*name;
+	char			*status;
+	zbx_vector_str_t	alarm_ids;
 }
 zbx_vmware_cluster_t;
 
@@ -314,6 +333,8 @@ typedef struct
 	zbx_vector_vmware_datacenter_t		datacenters;
 	zbx_vector_vmware_resourcepool_t	resourcepools;
 	zbx_vector_vmware_dvswitch_t		dvswitches;
+	zbx_vector_vmware_alarm_t		alarms;
+	zbx_vector_str_t			alarm_ids;
 }
 zbx_vmware_data_t;
 
@@ -364,6 +385,7 @@ typedef struct
 #define ZBX_VMWARE_CQ_READY	1
 #define ZBX_VMWARE_CQ_ERROR	2
 #define ZBX_VMWARE_CQ_PAUSED	4
+#define ZBX_VMWARE_CQ_SEPARATE	8
 	/* the state of query */
 	unsigned char			state;
 
@@ -524,8 +546,8 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
 		const char *id);
 
-int	zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *type, const char *id,
-		const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
+zbx_vmware_cust_query_t *zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *type,
+		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
 		zbx_vector_custquery_param_t *query_params);
 zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t *service, const char *type,
 		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode);

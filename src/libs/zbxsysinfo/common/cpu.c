@@ -21,7 +21,7 @@
 #include "zbxjson.h"
 #include "cpustat.h"
 #include "module.h"
-#include "common.h"
+#include "zbxcommon.h"
 
 static const char	*get_cpu_status_string(int status)
 {

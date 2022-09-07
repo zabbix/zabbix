@@ -340,7 +340,7 @@ class CHistory extends CApiService {
 	 * @param array|null $db_items
 	 *
 	 * @throws APIException if the input is invalid
-	 * @throws APIException if comperesion is enabled
+	 * @throws APIException if compression is enabled
 	 */
 	private static function validateClear(array $itemids, array &$db_items = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];

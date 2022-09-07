@@ -822,8 +822,7 @@ class CHistoryManager {
 							$sql_select[] = 'SUM(num) AS count, MAX(clock) AS clock';
 							break;
 						case AGGREGATE_SUM:
-							$sql_select[] = '(value_avg * num) AS value, MAX(clock) AS clock';
-							$sql_group_by = array_merge($sql_group_by, ['value_avg', 'num']);
+							$sql_select[] = 'SUM(value_avg * num) AS value, MAX(clock) AS clock';
 							break;
 						case AGGREGATE_FIRST:
 							$sql_select[] = 'MIN(clock) AS clock';
@@ -1413,7 +1412,7 @@ class CHistoryManager {
 		}
 
 		$indices = [];
-		$endponts = [];
+		$endpoints = [];
 
 		foreach (array_unique($value_types) as $type) {
 			if (self::getDataSourceType($type) === ZBX_HISTORY_SOURCE_ELASTIC) {
@@ -1423,11 +1422,11 @@ class CHistoryManager {
 
 		foreach ($indices as $type => $index) {
 			if (($url = self::getElasticsearchUrl($index)) !== null) {
-				$endponts[$type] = $url.$index.'*/'.$action;
+				$endpoints[$type] = $url.$index.'*/'.$action;
 			}
 		}
 
-		return $endponts;
+		return $endpoints;
 	}
 
 	/**

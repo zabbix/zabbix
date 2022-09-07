@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-30 13:38+0000\n"
+"PO-Revision-Date: 2022-08-17 06:23+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -501,10 +501,10 @@ msgstr "サービスへのアクセス"
 msgid "Ack"
 msgstr "確認済"
 
-#: app/views/monitoring.widget.problems.view.php:78
+#: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr "確認済"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -602,7 +602,7 @@ msgstr "アクション"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr "アクション"
+msgstr ""
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -671,10 +671,10 @@ msgstr "アクションを更新しました"
 msgid "Actions"
 msgstr "アクション"
 
-#: app/views/monitoring.widget.problems.view.php:79
+#: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr "アクション"
+msgstr ""
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -1075,6 +1075,11 @@ msgstr "アグリゲーション間隔"
 #: include/actions.inc.php:2106
 msgid "Alert message"
 msgstr "通知メッセージ"
+
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CRoleHelper.php:338
+msgid "Alerts"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -1625,7 +1630,7 @@ msgstr "利用可能"
 #: app/views/monitoring.widget.hostavail.view.php:37
 msgctxt "compact table header"
 msgid "Available"
-msgstr "利用可能"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -3891,6 +3896,13 @@ msgstr "次よりも古いものはレコードを圧縮"
 msgid "Compression"
 msgstr "圧縮"
 
+#: app/views/administration.housekeeping.edit.php:164
+#: app/views/administration.housekeeping.edit.php:169
+#: app/views/administration.housekeeping.edit.php:174
+#: app/views/administration.housekeeping.edit.php:184
+msgid "Compression is not supported."
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
 msgstr "並列実行数"
@@ -4885,6 +4897,11 @@ msgstr "破線"
 msgid "Data"
 msgstr "取得データ"
 
+#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CRoleHelper.php:337
+msgid "Data collection"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
 #, c-format
@@ -5032,7 +5049,7 @@ msgstr "日"
 #: include/classes/helpers/CSlaHelper.php:68
 msgctxt "compact table header"
 msgid "Day"
-msgstr "日"
+msgstr ""
 
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
@@ -5633,6 +5650,10 @@ msgstr "詳細"
 msgid "Details of web scenario"
 msgstr "Webシナリオの詳細"
 
+#: app/views/administration.housekeeping.edit.php:195
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
 msgstr "検出期間"
@@ -5957,7 +5978,7 @@ msgstr "ディスカバリルール"
 #: app/views/monitoring.widget.discovery.view.php:33
 msgctxt "compact table header"
 msgid "Discovery rule"
-msgstr "ディスカバリルール"
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
@@ -6183,7 +6204,7 @@ msgstr "ダウンタイム"
 #: app/views/monitoring.widget.slareport.view.php:100
 msgctxt "compact table header"
 msgid "Downtime"
-msgstr "ダウンタイム"
+msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
@@ -6249,10 +6270,10 @@ msgstr "マップ\"%2$s\"のためのユーザー内のuserid \"%1$s\"が重複�
 msgid "Duration"
 msgstr "継続期間"
 
-#: app/views/monitoring.widget.problems.view.php:77
+#: app/views/monitoring.widget.problems.view.php:80
 msgctxt "compact table header"
 msgid "Duration"
-msgstr "継続期間"
+msgstr ""
 
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
@@ -6456,6 +6477,14 @@ msgstr "選択したグループのデバッグモードを有効にしますか
 #: include/actions.inc.php:694 include/actions.inc.php:1031
 msgid "Enable host"
 msgstr "ホストを有効"
+
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -6685,7 +6714,7 @@ msgstr "エラーバジェット"
 #: app/views/monitoring.widget.slareport.view.php:101
 msgctxt "compact table header"
 msgid "Error budget"
-msgstr "エラーバジェット"
+msgstr ""
 
 #: include/db.inc.php:518
 #, c-format
@@ -6700,6 +6729,13 @@ msgstr "エラーメッセージ"
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr "エラー！サポートされていないデータベースのバージョン%1$sなのでZabbixサーバーを起動できません。(%2$s)以上が必要です"
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
+msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -6829,7 +6865,7 @@ msgstr "除外するダウンタイム"
 #: app/views/monitoring.widget.slareport.view.php:102
 msgctxt "compact table header"
 msgid "Excluded downtimes"
-msgstr "除外するダウンタイム"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:197 jsLoader.php:219
 msgid "Execute"
@@ -7035,10 +7071,10 @@ msgstr "フェールオーバーの遅延： %1$s"
 msgid "Failed"
 msgstr "失敗"
 
-#: app/views/monitoring.widget.web.view.php:33
+#: app/views/monitoring.widget.web.view.php:34
 msgctxt "compact table header"
 msgid "Failed"
-msgstr "失敗"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
@@ -8095,11 +8131,11 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "ホスト"
 
-#: app/views/monitoring.widget.problems.view.php:63
-#: app/views/monitoring.widget.problems.view.php:64
+#: app/views/monitoring.widget.problems.view.php:66
+#: app/views/monitoring.widget.problems.view.php:67
 msgctxt "compact table header"
 msgid "Host"
-msgstr "ホスト"
+msgstr ""
 
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
@@ -8189,12 +8225,12 @@ msgstr "ホストのグラフ"
 msgid "Host group"
 msgstr "ホストグループ"
 
-#: app/views/monitoring.widget.problemhosts.view.php:31
-#: app/views/monitoring.widget.problemsbysv.view.php:40
-#: app/views/monitoring.widget.web.view.php:31
+#: app/views/monitoring.widget.problemhosts.view.php:32
+#: app/views/monitoring.widget.problemsbysv.view.php:41
+#: app/views/monitoring.widget.web.view.php:32
 msgctxt "compact table header"
 msgid "Host group"
-msgstr "ホストグループ"
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:760
 #, c-format
@@ -9780,11 +9816,11 @@ msgstr "無限大"
 msgid "Info"
 msgstr "情報"
 
-#: app/views/monitoring.widget.problems.view.php:60
-#: app/views/monitoring.widget.problems.view.php:61
+#: app/views/monitoring.widget.actionlog.view.php:48
+#: app/views/monitoring.widget.problems.view.php:64
 msgctxt "compact table header"
 msgid "Info"
-msgstr "情報"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -11329,6 +11365,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr "M"
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "MACアドレスA"
@@ -11857,7 +11898,7 @@ msgstr "メッセージ"
 #: app/views/monitoring.widget.actionlog.view.php:44
 msgctxt "compact table header"
 msgid "Message"
-msgstr "メッセージ"
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
@@ -11941,6 +11982,11 @@ msgstr "PHPアップロードファイルサイズの最小値は%1$sです (\"u
 #, c-format
 msgid "Minimum required PHP version is %1$s."
 msgstr "最低限必要なPHPのバージョンは%1$sです。"
+
+#: app/views/administration.housekeeping.edit.php:175
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
+msgstr "最低限必要なTimescaleDBのバージョンは%1$sです。"
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -12120,7 +12166,7 @@ msgstr "月"
 #: include/classes/helpers/CSlaHelper.php:70
 msgctxt "compact table header"
 msgid "Month"
-msgstr "月"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
@@ -12386,7 +12432,7 @@ msgstr "名前"
 #: app/views/monitoring.widget.plaintext.view.php:49
 msgctxt "compact table header"
 msgid "Name"
-msgstr "名前"
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
@@ -13187,7 +13233,7 @@ msgstr "利用不可"
 #: app/views/monitoring.widget.hostavail.view.php:38
 msgctxt "compact table header"
 msgid "Not available"
-msgstr "利用不可"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
@@ -13477,10 +13523,10 @@ msgstr "OFF"
 msgid "Ok"
 msgstr "正常"
 
-#: app/views/monitoring.widget.web.view.php:32
+#: app/views/monitoring.widget.web.view.php:33
 msgctxt "compact table header"
 msgid "Ok"
-msgstr "正常"
+msgstr ""
 
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
@@ -13625,10 +13671,10 @@ msgstr "操作対象のテンプレートがありません。"
 msgid "Operational data"
 msgstr "運用データ"
 
-#: app/views/monitoring.widget.problems.view.php:75
+#: app/views/monitoring.widget.problems.view.php:78
 msgctxt "compact table header"
 msgid "Operational data"
-msgstr "運用データ"
+msgstr ""
 
 #: app/views/configuration.correlation.edit.php:145
 #: app/views/configuration.correlation.list.php:78
@@ -14129,6 +14175,10 @@ msgstr "親ディスカバリルール"
 msgid "Parent graphs"
 msgstr "親グラフ"
 
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr "親ホストの値"
+
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
 msgid "Parent items"
@@ -14442,6 +14492,10 @@ msgstr "ポルトガル語 (pt_PT)"
 msgid "Position"
 msgstr "位置"
 
+#: include/classes/widgets/views/widget.item.form.view.php:143
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr "位置は、単位がs、uptime、unixtimeの時は無視されます。"
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "POSTフィールド"
@@ -14449,6 +14503,10 @@ msgstr "POSTフィールド"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "POSTデータの形式"
+
+#: app/views/administration.housekeeping.edit.php:165
+msgid "PostgreSQL database server version is too old."
+msgstr "PostgreSQLデータベースサーバーのバージョンが古すぎます。"
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -14610,11 +14668,11 @@ msgstr "特権レベル"
 msgid "Problem"
 msgstr "障害"
 
-#: app/views/monitoring.widget.problems.view.php:67
-#: app/views/monitoring.widget.problems.view.php:68
+#: app/views/monitoring.widget.problems.view.php:70
+#: app/views/monitoring.widget.problems.view.php:71
 msgctxt "compact table header"
 msgid "Problem"
-msgstr "障害"
+msgstr ""
 
 #: include/actions.inc.php:2059
 msgid "Problem created"
@@ -14845,7 +14903,7 @@ msgstr "四半期"
 #: include/classes/helpers/CSlaHelper.php:71
 msgctxt "compact table header"
 msgid "Quarter"
-msgstr "四半期"
+msgstr ""
 
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
@@ -14992,11 +15050,11 @@ msgstr "最近の障害"
 msgid "Recipient"
 msgstr "送信先"
 
-#: app/views/monitoring.widget.actionlog.view.php:41
 #: app/views/monitoring.widget.actionlog.view.php:42
+#: app/views/monitoring.widget.actionlog.view.php:43
 msgctxt "compact table header"
 msgid "Recipient"
-msgstr "送信先"
+msgstr ""
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
@@ -15045,10 +15103,10 @@ msgstr "復旧時の実行内容"
 msgid "Recovery time"
 msgstr "復旧時刻"
 
-#: app/views/monitoring.widget.problems.view.php:56
+#: app/views/monitoring.widget.problems.view.php:59
 msgctxt "compact table header"
 msgid "Recovery time"
-msgstr "復旧時刻"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:371
 #: include/views/js/monitoring.sysmaps.js.php:531
@@ -15853,7 +15911,7 @@ msgstr "SLI"
 #: app/views/monitoring.widget.slareport.view.php:98
 msgctxt "compact table header"
 msgid "SLI"
-msgstr "SLI"
+msgstr ""
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
@@ -15867,7 +15925,7 @@ msgstr "SLO"
 #: app/views/monitoring.widget.slareport.view.php:97
 msgctxt "compact table header"
 msgid "SLO"
-msgstr "SLO"
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
@@ -16493,7 +16551,7 @@ msgstr "サービス"
 #: app/views/monitoring.widget.slareport.view.php:37
 msgctxt "compact table header"
 msgid "Service"
-msgstr "サービス"
+msgstr ""
 
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
@@ -16693,11 +16751,11 @@ msgstr "設定"
 msgid "Severity"
 msgstr "深刻度"
 
-#: app/views/monitoring.widget.problems.view.php:71
-#: app/views/monitoring.widget.problems.view.php:72
+#: app/views/monitoring.widget.problems.view.php:74
+#: app/views/monitoring.widget.problems.view.php:75
 msgctxt "compact table header"
 msgid "Severity"
-msgstr "深刻度"
+msgstr ""
 
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
@@ -17248,12 +17306,12 @@ msgstr "Zabbixの書き込みキャッシュの統計。cacheがvaluesならmode
 msgid "Status"
 msgstr "ステータス"
 
-#: app/views/monitoring.widget.actionlog.view.php:45
 #: app/views/monitoring.widget.actionlog.view.php:46
-#: app/views/monitoring.widget.problems.view.php:59
+#: app/views/monitoring.widget.actionlog.view.php:47
+#: app/views/monitoring.widget.problems.view.php:62
 msgctxt "compact table header"
 msgid "Status"
-msgstr "ステータス"
+msgstr ""
 
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
@@ -17698,10 +17756,10 @@ msgstr "タグの値"
 msgid "Tags"
 msgstr "タグ"
 
-#: app/views/monitoring.widget.problems.view.php:80
+#: app/views/monitoring.widget.problems.view.php:83
 msgctxt "compact table header"
 msgid "Tags"
-msgstr "タグ"
+msgstr ""
 
 #: include/views/configuration.copy.elements.php:69
 #: include/views/configuration.trigger.prototype.edit.php:202
@@ -18154,6 +18212,10 @@ msgstr "今月"
 msgid "This month so far"
 msgstr "今月(現在まで)"
 
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "この設定は数値データにだけ適用されます。非数値データは常にヒストリから取得されます。"
@@ -18239,11 +18301,13 @@ msgstr "終了"
 msgid "Time"
 msgstr "時間"
 
-#: app/views/monitoring.widget.actionlog.view.php:34
 #: app/views/monitoring.widget.actionlog.view.php:35
+#: app/views/monitoring.widget.actionlog.view.php:36
+#: app/views/monitoring.widget.problems.view.php:40
+#: app/views/monitoring.widget.problems.view.php:41
 msgctxt "compact table header"
 msgid "Time"
-msgstr "時間"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
@@ -18311,7 +18375,7 @@ msgstr "タイムスタンプ"
 #: app/views/monitoring.widget.plaintext.view.php:33
 msgctxt "compact table header"
 msgid "Timestamp"
-msgstr "タイムスタンプ"
+msgstr ""
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
@@ -18370,10 +18434,11 @@ msgstr "上位ホスト"
 msgid "Total"
 msgstr "合計"
 
-#: app/views/monitoring.widget.problemhosts.view.php:34
+#: app/views/monitoring.widget.hostavail.view.php:40
+#: app/views/monitoring.widget.problemhosts.view.php:35
 msgctxt "compact table header"
 msgid "Total"
-msgstr "合計"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -18640,62 +18705,62 @@ msgstr "トリガーのプロトタイプ\"%1$s\"はリンクされている他�
 #: include/classes/api/services/CDiscoveryRule.php:916
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "トリガーのプロトタイプ\"%1$s\"は、ホスト\"%3$s\"に存在しないトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:915
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
-msgstr ""
+msgstr "トリガーのプロトタイプ\"%1$s\"は、テンプレート\"%3$s\"に存在しないトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2684
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "子テンプレートまたはホストからの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、ホスト\"%3$s\"からのトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2683
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "子テンプレートまたはホストからの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、テンプレート\"%3$s\"からのトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2573
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "親テンプレートからの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、テンプレート\"%3$s\"からトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2424
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "テンプレートトリガーのホストトリガーへの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"は、トリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2813
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%3$s\"はホスト\"%4$s\"にリンクされていないため、トリガーのプロトタイプ\"%1$s\"はトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2812
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%3$s\"はテンプレート\"%4$s\"にリンクされていないため、トリガーのプロトタイプ\"%1$s\"はトリガー\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2306
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "ホスト\"%4$s\"に対して循環リンク(%3$s)が発生してしまうため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2301
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "テンプレート\"%4$s\"に対して循環リンク(%3$s)が発生してしまうため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2317
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "循環リンク(%3$s)が発生してしまうため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:1325
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
-msgstr ""
+msgstr "別のLLDルールからトリガーのプロトタイプへの依存関係は許可されていないため、トリガーのプロトタイプ\"%1$s\"はトリガーのプロトタイプ\"%2$s\"に依存させることができません。"
 
 #: include/classes/api/services/CTriggerGeneral.php:1715
 #, c-format
@@ -18877,11 +18942,11 @@ msgstr "2つ以上のフィールドを同じスペースに配置できませ�
 msgid "Type"
 msgstr "タイプ"
 
-#: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.actionlog.view.php:39
+#: app/views/monitoring.widget.actionlog.view.php:40
 msgctxt "compact table header"
 msgid "Type"
-msgstr "タイプ"
+msgstr ""
 
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
@@ -19029,6 +19094,14 @@ msgstr "設定APIの引数が読み込めません。"
 msgid "Unable to overwrite the existing configuration file."
 msgstr "設定ファイルが上書きできません。"
 
+#: app/views/administration.housekeeping.edit.php:160
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr "TimescaleDBの圧縮サポートステータスを取得できません。"
+
+#: app/views/administration.housekeeping.edit.php:170
+msgid "Unable to retrieve TimescaleDB version."
+msgstr "TimescaleDBのバージョンを取得できません。"
+
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
 msgstr "データベースのバージョンを取得できません。"
@@ -19139,10 +19212,11 @@ msgstr "単位"
 msgid "Unknown"
 msgstr "不明"
 
-#: app/views/monitoring.widget.web.view.php:34
+#: app/views/monitoring.widget.hostavail.view.php:39
+#: app/views/monitoring.widget.web.view.php:35
 msgctxt "compact table header"
 msgid "Unknown"
-msgstr "不明"
+msgstr ""
 
 #: app/views/reports.auditlog.list.php:119
 msgid "Unknown action"
@@ -19213,6 +19287,26 @@ msgstr "テンプレートとのリンクを解除"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "ミュートを解除"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr "データベースサーバーのバージョン%1$sはサポートされていません。%2$s以上が必要です。"
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr "データベースサーバーのバージョン%1$sはサポートされていません。%2$sより高いバージョンは使用できません。"
+
+#: app/views/administration.housekeeping.edit.php:179
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr "サポートされていないTimescaleDBのバージョンです。 %1$s以上が必要です。"
+
+#: app/views/administration.housekeeping.edit.php:189
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr "サポートされていないTimescaleDBのバージョンです。%1$sより高いバージョンは使用できません。"
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -19402,7 +19496,7 @@ msgstr "アップタイム"
 #: app/views/monitoring.widget.slareport.view.php:99
 msgctxt "compact table header"
 msgid "Uptime"
-msgstr "アップタイム"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1686
 msgid "Uptime of Zabbix server process in seconds."
@@ -19794,13 +19888,33 @@ msgstr "VMware FetchDVPortラッパー、<url> - VMwareサービスURL、<filter
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMwareのキャッシュ統計。利用可能なモード：total, free, pfree, used, pused。"
 
+#: include/classes/data/CItemData.php:1252
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMwareクラスターのパフォーマンスカウンター、 <url> - VMwareサービスURL、<id> - VMwareクラスターid、<path> - パフォーマンスカウンターのパス、<instance> - パフォーマンスカウンターのインスタンス"
 
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMwareクラスターの状態、<url> - VMwareサービスURL、<name> - VMwareクラスター名"
+
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1296
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1304
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -19809,6 +19923,10 @@ msgstr "VMwareデータセンターとそのID、<url> - VMwareサービスURL�
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr "VMwareデータセンターとそのID。JSONを返す"
+
+#: include/classes/data/CItemData.php:1268
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
@@ -19819,9 +19937,17 @@ msgstr "VMwareデータストアのバイト単位かトータルからのパー
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "VMwareデータストアのハイパーバイザーのリスト、<url> - VMwareサービスURL>、<datastore> - データストア名"
 
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "VMwareのデータストアの読み込み、<url> - VMwareサービスURL、<datastore> - データストア名、<mode> - latency/maxlatency - 平均値または最大値"
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -19838,6 +19964,10 @@ msgstr "VMwareハイパーバイザーBIOSのUUID、<url> - VMwareサービスUR
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "VMwareハイパーバイザーHWベンダーの状態センサー、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
+
+#: include/classes/data/CItemData.php:1324
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19907,6 +20037,10 @@ msgstr "VMwareハイパーバイザーのプロセッサーモデル、<url> - V
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのプロセッサー利用量(Hz)、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "VMwareハイパーバイザーのセンサー値、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
@@ -19918,6 +20052,10 @@ msgstr "VMwareハイパーバイザーのシリアル番号、<url> - VMwareサ�
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのステータス、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
+
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19946,6 +20084,14 @@ msgstr "VMwareサービスフルネーム、<url> - VMwareサービスURL"
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMwareサービスバージョン、<url> - VMwareサービスURL"
+
+#: include/classes/data/CItemData.php:1244
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1500
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20027,6 +20173,10 @@ msgstr "VMware仮想マシンのプロセッサ有効時間(ms)、<url> - VMware
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのプロセッサ利用量(Hz)、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンの共有メモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
@@ -20042,6 +20192,10 @@ msgstr "VMware仮想マシンの状態、<url> - VMwareサービスURL、<uuid> 
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのスワップされたメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
+
+#: include/classes/data/CItemData.php:1664
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
@@ -20143,7 +20297,7 @@ msgstr "値"
 #: app/views/monitoring.widget.plaintext.view.php:51
 msgctxt "compact table header"
 msgid "Value"
-msgstr "値"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
@@ -20404,10 +20558,24 @@ msgstr "警告"
 msgid "Warning message"
 msgstr "警告メッセージ"
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr "警告！データベースのバージョンを取得できません。"
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr "警告！データベースサーバーのバージョン%1$sはサポートされていません。%2$s以上が必要です。"
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr "警告！データベースサーバーのバージョン%1$sはサポートされていません。(%2$s)以上が必要です"
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
+msgstr "警告！データベースサーバーのバージョン%1$sはサポートされていません。%2$sより高いバージョンは使用できません。"
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -20504,7 +20672,7 @@ msgstr "週"
 #: include/classes/helpers/CSlaHelper.php:69
 msgctxt "compact table header"
 msgid "Week"
-msgstr "週"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -20600,10 +20768,10 @@ msgstr "障害名と一緒に"
 msgid "With problems"
 msgstr "障害あり"
 
-#: app/views/monitoring.widget.problemhosts.view.php:33
+#: app/views/monitoring.widget.problemhosts.view.php:34
 msgctxt "compact table header"
 msgid "With problems"
-msgstr "障害あり"
+msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
@@ -20621,10 +20789,10 @@ msgstr "データなし"
 msgid "Without problems"
 msgstr "障害なし"
 
-#: app/views/monitoring.widget.problemhosts.view.php:32
+#: app/views/monitoring.widget.problemhosts.view.php:33
 msgctxt "compact table header"
 msgid "Without problems"
-msgstr "障害なし"
+msgstr ""
 
 #: include/forms.inc.php:343
 msgid "Without triggers"
@@ -20820,7 +20988,7 @@ msgstr "年"
 #: include/classes/helpers/CSlaHelper.php:72
 msgctxt "compact table header"
 msgid "Year"
-msgstr "年"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93

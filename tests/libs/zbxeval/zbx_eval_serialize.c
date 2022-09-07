@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxnum.h"
 #include "zbxeval.h"
 
 static void	mock_read_token(zbx_eval_token_t *token, zbx_mock_handle_t htoken)
@@ -43,7 +43,7 @@ static void	mock_read_token(zbx_eval_token_t *token, zbx_mock_handle_t htoken)
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(hvalue, &value)))
 			fail_msg("cannot read token value: %s", zbx_mock_error_string(err));
 
-		if (SUCCEED == is_uint64(value, &ui64))
+		if (SUCCEED == zbx_is_uint64(value, &ui64))
 			zbx_variant_set_ui64(&token->value, ui64);
 		else if (SUCCEED == zbx_number_parse(value, &len) && strlen(value) == (size_t)len)
 			zbx_variant_set_dbl(&token->value, atof(value));
@@ -85,7 +85,7 @@ static void	mock_read_stack(zbx_vector_eval_token_t *stack, const char *path)
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(hrepeat, &repeat)))
 			fail_msg("cannot read repeat number: %s", zbx_mock_error_string(err));
 
-		if (SUCCEED != is_uint32(repeat, &repeat_num))
+		if (SUCCEED != zbx_is_uint32(repeat, &repeat_num))
 			fail_msg("invalid repeat value");
 
 		zbx_vector_eval_token_create(&template);
