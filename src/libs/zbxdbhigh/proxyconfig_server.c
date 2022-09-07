@@ -841,7 +841,7 @@ static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_conf
 	zbx_vector_uint64_t	hostids, httptestids, updated_hostids, removed_hostids, del_macro_hostids,
 				macro_hostids;
 	zbx_vector_ptr_t	keys_paths;
-	int			global_macros, ret = FAIL, i;
+	int			global_macros = FAIL, ret = FAIL, i;
 	zbx_uint64_t		flags = 0;
 
 	zbx_vector_uint64_create(&hostids);
