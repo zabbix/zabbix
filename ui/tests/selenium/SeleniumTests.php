@@ -124,6 +124,11 @@ require_once dirname(__FILE__).'/roles/testFormUserRoles.php';
 require_once dirname(__FILE__).'/roles/testPageUserRoles.php';
 require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
 
+// Services.
+require_once dirname(__FILE__).'/services/testFormServicesServices.php';
+require_once dirname(__FILE__).'/services/testPageServicesServices.php';
+require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php';
+
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
@@ -191,9 +196,6 @@ require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
-require_once dirname(__FILE__).'/services/testFormServicesServices.php';
-require_once dirname(__FILE__).'/services/testPageServicesServices.php';
-require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
@@ -351,6 +353,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUserRoles');
 		$suite->addTestSuite('testUserRolesPermissions');
 
+		// Services.
+		$suite->addTestSuite('testFormServicesServices');
+		$suite->addTestSuite('testPageServicesServices');
+		$suite->addTestSuite('testPageServicesServicesMassUpdate');
+
 
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
@@ -377,8 +384,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
-		$suite->addTestSuite('testPageServicesServices');
-		$suite->addTestSuite('testPageServicesServicesMassUpdate');
+
 		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
@@ -416,7 +422,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
-		$suite->addTestSuite('testFormServicesServices');
 		$suite->addTestSuite('testFormNetworkDiscovery');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
@@ -440,7 +445,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testFormValueMappingsHost');
 		$suite->addTestSuite('testFormValueMappingsTemplate');
-
 		$suite->addTestSuite('testFormWeb');
 		$suite->addTestSuite('testFormWebStep');
 		$suite->addTestSuite('testPageBrowserWarning');
@@ -462,7 +466,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testUrlUserPermissions');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-
 		$suite->addTestSuite('testFormScheduledReport');
 		$suite->addTestSuite('testPageScheduledReport');
 		$suite->addTestSuite('testScheduledReportPermissions');
