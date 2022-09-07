@@ -340,7 +340,8 @@ $tabs->addTab('tags-tab', _('Tags'),
 		'source' => 'host_prototype',
 		'tags' => $data['tags'],
 		'readonly' => $data['readonly'],
-		'tabs_id' => 'tabs'
+		'tabs_id' => 'tabs',
+		'tags_tab_id' => 'tags-tab'
 	]),
 	TAB_INDICATOR_TAGS
 );
