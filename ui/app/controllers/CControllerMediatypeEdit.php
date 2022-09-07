@@ -30,7 +30,7 @@ class CControllerMediatypeEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'mediatypeid' =>			'db media_type.mediatypeid',
-			'type' =>					'db media_type.type|in '.implode(',', array_keys(media_type2str())),
+			'type' =>					'db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::type2str())),
 			'name' =>					'db media_type.name',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
@@ -59,7 +59,8 @@ class CControllerMediatypeEdit extends CController {
 			'description' =>			'db media_type.description',
 			'form_refresh' =>			'int32',
 			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
-			'message_templates' =>		'array'
+			'message_templates' =>		'array',
+			'provider' =>				'int32| in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders()))
 		];
 
 		$ret = $this->validateInput($fields);
@@ -92,7 +93,7 @@ class CControllerMediatypeEdit extends CController {
 					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
 					'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
 					'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
-					'event_menu_url', 'event_menu_name', 'parameters', 'description'
+					'event_menu_url', 'event_menu_name', 'parameters', 'description', 'provider'
 				],
 				'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 				'mediatypeids' => $this->getInput('mediatypeid'),
@@ -112,19 +113,22 @@ class CControllerMediatypeEdit extends CController {
 	protected function doAction() {
 		// default values
 		$db_defaults = DB::getDefaults('media_type');
+		$email_defaults =  CMediatypeHelper::getEmailProviders(CMediatypeHelper::EMAIL_PROVIDER_SMTP);
+
 		$data = [
 			'sid' => $this->getUserSID(),
 			'mediatypeid' => 0,
 			'type' => MEDIA_TYPE_EMAIL,
+			'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
 			'name' => '',
-			'smtp_server' => 'mail.example.com',
-			'smtp_port' => $db_defaults['smtp_port'],
-			'smtp_helo' => 'example.com',
-			'smtp_email' => 'zabbix@example.com',
-			'smtp_security' => $db_defaults['smtp_security'],
-			'smtp_verify_peer' => $db_defaults['smtp_verify_peer'],
-			'smtp_verify_host' => $db_defaults['smtp_verify_host'],
-			'smtp_authentication' => $db_defaults['smtp_authentication'],
+			'smtp_server' => $email_defaults['smtp_server'],
+			'smtp_port' => $email_defaults['smtp_port'],
+			'smtp_helo' => $email_defaults['smtp_helo'],
+			'smtp_email' => $email_defaults['smtp_email'],
+			'smtp_security' => $email_defaults['smtp_security'],
+			'smtp_verify_peer' => $email_defaults['smtp_verify_peer'],
+			'smtp_verify_host' => $email_defaults['smtp_verify_host'],
+			'smtp_authentication' => $email_defaults['smtp_authentication'],
 			'exec_params' => [],
 			'exec_path' => '',
 			'gsm_modem' => '/dev/ttyS0',
@@ -151,7 +155,8 @@ class CControllerMediatypeEdit extends CController {
 			'description' => '',
 			'form_refresh' => 0,
 			'content_type' => $db_defaults['content_type'],
-			'message_templates' => []
+			'message_templates' => [],
+			'providers' => CMediatypeHelper::getEmailProviders()
 		];
 		$message_templates = [];
 
@@ -171,6 +176,7 @@ class CControllerMediatypeEdit extends CController {
 			$data['exec_path'] = $this->mediatype['exec_path'];
 			$data['content_type'] = $this->mediatype['content_type'];
 			$data['description'] = $this->mediatype['description'];
+			$data['provider'] = $this->mediatype['provider'];
 			$message_templates = $this->mediatype['message_templates'];
 
 			$this->mediatype['exec_params'] = explode("\n", $this->mediatype['exec_params']);
@@ -216,7 +222,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'exec_path', 'gsm_modem',
 			'smtp_username', 'passwd', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'maxsessionsType',
 			'form_refresh', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
-			'event_menu_name', 'description'
+			'event_menu_name', 'description', 'provider'
 		]);
 		$data['exec_params'] = array_values($data['exec_params']);
 

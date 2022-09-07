@@ -147,7 +147,9 @@
 	}
 
 	jQuery(function($) {
-		populateMessageTemplates(<?= json_encode(array_values($this->data['message_templates'])) ?>);
+		populateMessageTemplates(<?= json_encode(array_values($data['message_templates'])) ?>);
+
+		const providers = <?= json_encode($data['providers']) ?>;
 
 		$('#message-templates').on('click', '[data-action]', function() {
 			var $btn = $(this),
@@ -198,7 +200,7 @@
 
 			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #passwd, #smtp_verify_peer, ' +
 					'#smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_path, ' +
-					'#exec_params_table, #content_type')
+					'#exec_params_table, #content_type, #provider')
 				.closest('li')
 				.hide();
 
@@ -206,12 +208,9 @@
 
 			switch (media_type) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
-					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication, #content_type' )
-						.closest('li')
-						.show();
-					// radio button actions
-					toggleSecurityOptions();
-					toggleAuthenticationOptions();
+					const provider = $('#provider').val();
+
+					showFormByProvider(provider);
 					setMaxSessionsType(media_type);
 					break;
 
@@ -231,6 +230,13 @@
 					break;
 			}
 		});
+
+	$('#provider').change(function() {
+		const provider = $('#provider').val();
+
+		adjustDataByProvider(provider);
+		showFormByProvider(provider);
+	});
 
 		// clone button
 		$('#clone').click(function() {
@@ -347,6 +353,48 @@
 				old_media_type = media_type;
 				maxsessions_type.filter('[value=one]').click();
 			}
+		}
+
+		function showFormByProvider(provider) {
+			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #passwd, #smtp_verify_peer, #smtp_verify_host,' +
+					'#smtp_username, #smtp_security, #smtp_authentication, #content_type, #provider')
+				.closest('li')
+				.hide();
+
+			if (provider ==	'<?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>' ) {
+				$('input[name=passwd]').attr('aria-required', 'false');
+				$('label[for=passwd]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+				$('label[for=smtp_email]').text(<?= json_encode(_('SMTP email')) ?>);
+
+				$('#smtp_server, #smtp_port, #smtp_helo, #smtp_security, #smtp_authentication, #provider,' +
+					' #smtp_email, #content_type')
+					.closest('li')
+					.show();
+
+				// radio button actions
+				toggleSecurityOptions();
+				toggleAuthenticationOptions();
+			}
+			else {
+				$('input[name=passwd]').attr('aria-required', 'true');
+				$('label[for=passwd]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+				$('label[for=smtp_email]').text(<?= json_encode(_('Email')) ?>);
+
+				$('#provider, #smtp_email, #content_type, #passwd').closest('li').show();
+			}
+		}
+
+		function adjustDataByProvider(provider) {
+			$('input[name=smtp_port]').val(providers[provider]['smtp_port']);
+			$('input[name=smtp_email]').val(providers[provider]['smtp_email']);
+			$('input[name=smtp_server]').val(providers[provider]['smtp_server']);
+			$('input[name=smtp_helo]').val(providers[provider]['smtp_helo']);
+			$('input[name=smtp_security]:checked').prop("checked", false);
+			$('input[value=' + providers[provider]['smtp_security'] + ']').prop("checked", true);
+			$('input[name=smtp_verify_host]').val(providers[provider]['smtp_verify_host']);
+			$('input[name=smtp_verify_peer]').val(providers[provider]['smtp_verify_peer']);
+			$('input[name=smtp_authentication]:checked').prop("checked", false);
+			$('input[value=' + providers[provider]['smtp_authentication'] + ']').prop("checked", true);
 		}
 
 		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });

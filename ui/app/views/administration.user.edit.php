@@ -300,17 +300,34 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Action')]);
 
 	foreach ($data['medias'] as $index => $media) {
-		if ($media['active'] == MEDIA_STATUS_ACTIVE) {
-			$status = (new CLink(_('Enabled'), '#'))
-				->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);')
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_GREEN);
+		if ($data['mediatypes'][$media['mediatypeid']]['status'] == MEDIA_TYPE_STATUS_ACTIVE) {
+			$media_name = $media['name'];
+
+			if ($media['active'] == MEDIA_STATUS_ACTIVE) {
+				$status = (new CLink(_('Enabled'), '#'))
+					->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);')
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_GREEN);
+			}
+			else {
+				$status = (new CLink(_('Disabled'), '#'))
+					->onClick('return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);')
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_RED);
+			}
 		}
 		else {
-			$status = (new CLink(_('Disabled'), '#'))
-				->onClick('return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);')
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED);
+			$media_name = new CDiv([
+				$media['name'],
+				(new CSpan([
+					' ',
+					makeWarningIcon(
+						_('Media disabled by Administration.')
+					)
+				]))
+			]);
+
+			$status = (new CLink(_('Disabled'), '#'))->addClass(ZBX_STYLE_RED);
 		}
 
 		$parameters = [
@@ -347,7 +364,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 
 		$media_table_info->addRow(
 			(new CRow([
-				$media['name'],
+				$media_name,
 				$media['sendto'],
 				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
@@ -369,12 +386,23 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		);
 	}
 
+	$has_enabled_media_types = array_search(MEDIA_TYPE_STATUS_ACTIVE, array_column($data['mediatypes'], 'status'));
+
+	if ($has_enabled_media_types === false) {
+		$add_button = (new CButton(null, _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass(ZBX_STYLE_RED);
+	}
+	else {
+		$add_button = (new CButton(null, _('Add')))
+			->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
+			->addClass(ZBX_STYLE_BTN_LINK);
+	}
+
 	$media_form_list->addRow(_('Media'),
 		(new CDiv([
 			$media_table_info,
-			(new CButton(null, _('Add')))
-				->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
-				->addClass(ZBX_STYLE_BTN_LINK)
+			$add_button
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

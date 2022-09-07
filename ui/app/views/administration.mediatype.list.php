@@ -91,10 +91,17 @@ $mediaTypeTable = (new CTableInfo())
 foreach ($data['mediatypes'] as $mediaType) {
 	switch ($mediaType['typeid']) {
 		case MEDIA_TYPE_EMAIL:
-			$details =
-				_('SMTP server').NAME_DELIMITER.'"'.$mediaType['smtp_server'].'", '.
-				_('SMTP helo').NAME_DELIMITER.'"'.$mediaType['smtp_helo'].'", '.
-				_('SMTP email').NAME_DELIMITER.'"'.$mediaType['smtp_email'].'"';
+			if ($mediaType['provider'] == CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
+				$details =
+					_('SMTP server') . NAME_DELIMITER . '"' . $mediaType['smtp_server'] . '", '.
+					_('SMTP helo') . NAME_DELIMITER . '"' . $mediaType['smtp_helo'] . '", '.
+					_('SMTP email') . NAME_DELIMITER . '"' . $mediaType['smtp_email'] . '"';
+			}
+			else {
+				$details =
+					_('Server') . NAME_DELIMITER . '"' . $mediaType['smtp_server'] . '", '.
+					_('email') . NAME_DELIMITER . '"' . $mediaType['smtp_email'] . '"';
+			}
 			break;
 
 		case MEDIA_TYPE_EXEC:

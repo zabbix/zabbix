@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->addJsFile('multilineinput.js');
@@ -57,8 +58,14 @@ $mediatype_formlist = (new CFormList())
 	->addRow(new CLabel(_('Type'), 'label-type'), (new CSelect('type'))
 		->setId('type')
 		->setFocusableElementId('label-type')
-		->addOptions(CSelect::createOptionsFromArray(media_type2str()))
+		->addOptions(CSelect::createOptionsFromArray(CMediatypeHelper::type2str()))
 		->setValue($data['type'])
+	)
+	->addRow(new CLabel(_('Email provider'), 'label-provider'), (new CSelect('provider'))
+		->setId('provider')
+		->setFocusableElementId('label-provider')
+		->addOptions(CSelect::createOptionsFromArray(CMediatypeHelper::getAllEmailProvidersNames()))
+		->setValue($data['provider'])
 	)
 	->addRow((new CLabel(_('SMTP server'), 'smtp_server'))->setAsteriskMark(),
 		(new CTextBox('smtp_server', $data['smtp_server']))
@@ -68,15 +75,14 @@ $mediatype_formlist = (new CFormList())
 	->addRow(_('SMTP server port'),
 		(new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	)
-	->addRow((new CLabel(_('SMTP helo'), 'smtp_helo'))->setAsteriskMark(),
-		(new CTextBox('smtp_helo', $data['smtp_helo']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
 	->addRow((new CLabel(_('SMTP email'), 'smtp_email'))->setAsteriskMark(),
 		(new CTextBox('smtp_email', $data['smtp_email']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+	)
+	->addRow((new CLabel(_('SMTP helo'), 'smtp_helo')),
+		(new CTextBox('smtp_helo'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('Connection security'), 'smtp_security'),
 		(new CRadioButtonList('smtp_security', (int) $data['smtp_security']))

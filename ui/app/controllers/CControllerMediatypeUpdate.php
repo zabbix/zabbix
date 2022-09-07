@@ -24,7 +24,7 @@ class CControllerMediatypeUpdate extends CController {
 	protected function checkInput() {
 		$fields = [
 			'mediatypeid' =>			'fatal|required|db media_type.mediatypeid',
-			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(media_type2str())),
+			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::type2str())),
 			'name' =>					'db media_type.name|not_empty',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
@@ -53,7 +53,8 @@ class CControllerMediatypeUpdate extends CController {
 			'description' =>			'db media_type.description',
 			'form_refresh' =>			'int32',
 			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
-			'message_templates' =>		'array'
+			'message_templates' =>		'array',
+			'provider' => 				'int32|in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders()))
 		];
 
 		$ret = $this->validateInput($fields);
@@ -111,7 +112,7 @@ class CControllerMediatypeUpdate extends CController {
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
 				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
-					'smtp_authentication', 'passwd', 'content_type'
+					'smtp_authentication', 'passwd', 'content_type', 'provider'
 				]);
 
 				if ($this->hasInput('smtp_username')) {

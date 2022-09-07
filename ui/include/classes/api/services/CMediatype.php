@@ -221,6 +221,7 @@ class CMediatype extends CApiService {
 			'smtp_verify_peer' =>		['type' => API_INT32],
 			'smtp_verify_host' =>		['type' => API_INT32],
 			'smtp_authentication' =>	['type' => API_INT32],
+			'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))],
 			'exec_params' =>			['type' => API_STRING_UTF8],
 			'maxsessions' =>			['type' => API_INT32],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
@@ -321,6 +322,7 @@ class CMediatype extends CApiService {
 			'smtp_verify_peer' =>		['type' => API_INT32],
 			'smtp_verify_host' =>		['type' => API_INT32],
 			'smtp_authentication' =>	['type' => API_INT32],
+			'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))],
 			'exec_params' =>			['type' => API_STRING_UTF8],
 			'maxsessions' =>			['type' => API_INT32],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
@@ -355,7 +357,7 @@ class CMediatype extends CApiService {
 				'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
 				'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
 				'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
-				'event_menu_url', 'event_menu_name', 'description'
+				'event_menu_url', 'event_menu_name', 'description', 'provider'
 			],
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
 			'preservekeys' => true
@@ -429,7 +431,7 @@ class CMediatype extends CApiService {
 			$type_fields = [
 				MEDIA_TYPE_EMAIL => [
 					'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security', 'smtp_verify_peer',
-					'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'content_type'
+					'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'content_type', 'provider'
 				],
 				MEDIA_TYPE_EXEC => [
 					'exec_path', 'exec_params'
@@ -520,12 +522,13 @@ class CMediatype extends CApiService {
 			case MEDIA_TYPE_EMAIL:
 				$api_input_rules['fields'] = [
 					'smtp_server' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_server')],
-					'smtp_helo' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_helo')],
+					'smtp_helo' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'smtp_helo')],
 					'smtp_email' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_email')],
 					'smtp_port' =>				['type' => API_INT32, 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
 					'smtp_security' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_CONNECTION_SECURITY_NONE, SMTP_CONNECTION_SECURITY_STARTTLS, SMTP_CONNECTION_SECURITY_SSL_TLS])],
 					'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL])],
-					'content_type' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_MESSAGE_FORMAT_PLAIN_TEXT, SMTP_MESSAGE_FORMAT_HTML])]
+					'content_type' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_MESSAGE_FORMAT_PLAIN_TEXT, SMTP_MESSAGE_FORMAT_HTML])],
+					'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))]
 				];
 
 				$mediatype += array_intersect_key($db_mediatype, array_flip(['smtp_security', 'smtp_authentication']));
@@ -546,7 +549,7 @@ class CMediatype extends CApiService {
 				}
 
 				if ($method === 'create' || $type != $db_mediatype['type']) {
-					foreach (['smtp_server', 'smtp_helo', 'smtp_email'] as $field) {
+					foreach (['smtp_server', 'smtp_email'] as $field) {
 						$api_input_rules['fields'][$field]['flags'] |= API_REQUIRED;
 					}
 				}

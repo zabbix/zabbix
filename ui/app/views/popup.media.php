@@ -60,9 +60,11 @@ $type_select = (new CSelect('mediatypeid'))
 	->setValue($options['mediatypeid']);
 
 foreach ($data['db_mediatypes'] as $mediatypeid => $value) {
-	$type_select->addOption((new CSelectOption($mediatypeid, $value['name']))
-		->addClass($value['status'] == MEDIA_TYPE_STATUS_DISABLED ? ZBX_STYLE_RED : null)
-	);
+	if ($options['mediatypeid'] == $mediatypeid || $value['status'] != MEDIA_TYPE_STATUS_DISABLED) {
+		$type_select->addOption((new CSelectOption($mediatypeid, $value['name']))
+			->addClass($value['status'] == MEDIA_TYPE_STATUS_DISABLED ? ZBX_STYLE_RED : null)
+		);
+	}
 }
 
 // Create media form.
