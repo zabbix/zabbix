@@ -266,12 +266,6 @@ INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15001, 'Ap
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15001, 15001, 'Api step for update one', 1, 'http://api1.com', '');
 INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15002, 'Api web scenario for update two', 60, 'Zabbix', 50009);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15002, 15002, 'Api step for update two', 1, 'http://api2.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15003, 'Api web scenario for delete0', 60, 'Zabbix', 50009);
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15003, 15003, 'Api step for delete0', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15004, 'Api web scenario for delete1', 60, 'Zabbix', 50009);
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15004, 15004, 'Api step for delete1', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15005, 'Api web scenario for delete2', 60, 'Zabbix', 50009);
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15005, 15005, 'Api step for delete2', 1, 'http://api.com', '');
 INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15006, 'Api templated web scenario', 60, 'Zabbix', 50010);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15006, 15006, 'Api templated step', 1, 'http://api.com', '');
 INSERT INTO httptest (httptestid, name, delay, agent, hostid, templateid) VALUES (15007, 'Api templated web scenario', 60, 'Zabbix', 50009, 15006);
@@ -280,8 +274,6 @@ INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15008, 'Ap
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15008, 15008, 'Api step with read permissions', 1, 'http://api.com', '');
 INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15009, 'Api web with deny permissions', 60, 'Zabbix', 50014);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15009, 15009, 'Api step with deny permissions', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15010, 'Api web scenario for delete as zabbix-admin', 60, 'Zabbix', 50009);
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15010, 15010, 'Api step for delete as zabbix-admin', 1, 'http://api.com', '');
 INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15011, 'Api web scenario for delete as zabbix-user', 60, 'Zabbix', 50009);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15011, 15011, 'Api step for delete as zabbix-user', 1, 'http://api.com', '');
 INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15012, 'Api web scenario for update having 1 step', 60, 'Zabbix', 50009);
@@ -303,10 +295,6 @@ INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,his
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150157, 50009, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 2,bps]','1m','30d',0,'','',0,'','');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150158, 50009, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 2,resp]','1m','30d',0,'','',0,'','');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150159, 50009, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 2]','1m','30d',0,'','',0,'','');
-
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150140, 15003, 150140, 2);
-INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150141, 15003, 150141, 2);
-
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150151, 15015, 150151, 2);
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150152, 15015, 150152, 3);
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15015, 150153, 4);
