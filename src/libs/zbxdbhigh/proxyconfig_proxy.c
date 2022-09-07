@@ -1491,10 +1491,10 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, char **
 
 		pf = zbx_json_next(&row->columns, NULL);
 
-		if (NULL == (pf = zbx_json_next(&row->columns, pf)))
+		if (NULL != (pf = zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL)) &&
+				SUCCEED == is_uint64(buf, &templateid))
 		{
-			*error = zbx_strdup(NULL, "not enough columns in host template data");
-			goto out;
+			zbx_vector_uint64_append(&templateids, templateid);
 		}
 
 		if (NULL != zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL) &&
