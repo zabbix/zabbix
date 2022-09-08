@@ -36,7 +36,7 @@ class CAuthentication extends CApiService {
 	 * @var array
 	 */
 	private $output_fields = ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
-		'http_case_sensitive', 'ldap_configured', 'ldap_case_sensitive', 'ldap_userdirectoryid', 'saml_auth_enabled',
+		'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid', 'saml_auth_enabled',
 		'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules', 'jit_provision_interval', 'saml_jit_status',
 		'ldap_jit_status'
 	];
@@ -118,7 +118,7 @@ class CAuthentication extends CApiService {
 			'http_login_form' =>			['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
 			'http_strip_domains' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'http_strip_domains')],
 			'http_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
-			'ldap_configured' =>			['type' => API_INT32, 'in' => ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED],
+			'ldap_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED],
 			'ldap_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'ldap_userdirectoryid' =>		['type' => API_ID],
 			'saml_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED],
@@ -160,7 +160,7 @@ class CAuthentication extends CApiService {
 			$auth += $db_auth;
 
 			if ($auth['authentication_type'] == ZBX_AUTH_LDAP
-					&& $auth['ldap_configured'] == ZBX_AUTH_LDAP_DISABLED) {
+					&& $auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_DISABLED) {
 				static::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value for field "%1$s": %2$s.', '/authentication_type', _('LDAP must be enabled'))
 				);

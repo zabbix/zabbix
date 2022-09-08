@@ -38,7 +38,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_configured' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
+			'ldap_auth_enabled' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_servers' =>					'array',
 			'ldap_default_row_index' =>			'int32',
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
@@ -99,13 +99,13 @@ class CControllerAuthenticationUpdate extends CController {
 	 */
 	private function validateDefaultAuth() {
 		$data = [
-			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
+			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 			'authentication_type' => ZBX_AUTH_INTERNAL
 		];
 		$this->getInputs($data, array_keys($data));
 
 		$is_valid = ($data['authentication_type'] != ZBX_AUTH_LDAP
-				|| $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
+				|| $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED);
 
 		if (!$is_valid) {
 			CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type',
@@ -122,7 +122,7 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function validateLdap(): bool {
-		$ldap_enabled = $this->getInput('ldap_configured', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED;
+		$ldap_enabled = $this->getInput('ldap_auth_enabled', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED;
 		$ldap_servers = $this->getInput('ldap_servers', []);
 
 		if ($ldap_enabled) {
@@ -283,7 +283,7 @@ class CControllerAuthenticationUpdate extends CController {
 			CAuthenticationHelper::HTTP_LOGIN_FORM,
 			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
 			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
-			CAuthenticationHelper::LDAP_CONFIGURED,
+			CAuthenticationHelper::LDAP_AUTH_ENABLED,
 			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
 			CAuthenticationHelper::SAML_AUTH_ENABLED,
@@ -299,7 +299,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
-			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
+			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 			'ldap_userdirectoryid' => $ldap_userdirectoryid,
 			'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,

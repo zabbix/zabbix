@@ -157,19 +157,19 @@ $http_tab = (new CFormGrid())
 // LDAP authentication fields.
 $ldap_tab = (new CFormGrid())
 	->addItem([
-		new CLabel(_('Enable LDAP authentication'), 'ldap_configured'),
+		new CLabel(_('Enable LDAP authentication'), 'ldap_auth_enabled'),
 		new CFormField($data['ldap_error']
 			? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
-			: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
-				->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
+			: (new CCheckBox('ldap_auth_enabled', ZBX_AUTH_LDAP_ENABLED))
+				->setChecked($data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED)
 				->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
 		)
 	])
 	->addItem([
-		new CLabel(_('LDAP JIT provisioning'), 'ldap_jit_provisioning'),
+		new CLabel(_('Enable JIT provisioning'), 'ldap_jit_status'),
 		new CFormField(
-			(new CCheckBox('ldap_jit_provisioning', ZBX_AUTH_LDAP_ENABLED))
-				->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
+			(new CCheckBox('ldap_jit_status', ZBX_AUTH_LDAP_ENABLED))
+				->setChecked($data['ldap_jit_status'] == ZBX_AUTH_LDAP_ENABLED)
 				->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
 		)
 	])

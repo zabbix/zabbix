@@ -285,7 +285,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 
 		// Click on remove button and check that LDAP server NOT removed from DB.
 		$table->query('button:Remove')->one()->click();
-		$this->query('id:ldap_configured')->asCheckbox()->one()->set(false);
+		$this->query('id:ldap_auth_enabled')->asCheckbox()->one()->set(false);
 		$this->assertEquals(1, CDBHelper::getCount('SELECT 1 FROM userdirectory'));
 
 		// Submit changes and check that LDAP server removed.
@@ -803,7 +803,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		}
 
 		// Open and fill LDAP settings form.
-		$this->query('id:ldap_configured')->asCheckbox()->one()->set(true);
+		$this->query('id:ldap_auth_enabled')->asCheckbox()->one()->set(true);
 		if ($values !== null) {
 			$ldaps = [
 				[

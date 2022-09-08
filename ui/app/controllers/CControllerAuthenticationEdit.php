@@ -38,7 +38,7 @@ class CControllerAuthenticationEdit extends CController {
 			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>				'db config.http_strip_domains',
 			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_configured' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
+			'ldap_auth_enabled' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_servers' =>					'array',
 			'ldap_default_row_index' =>			'int32',
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
@@ -108,7 +108,7 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::HTTP_LOGIN_FORM,
 			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
 			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
-			CAuthenticationHelper::LDAP_CONFIGURED,
+			CAuthenticationHelper::LDAP_AUTH_ENABLED,
 			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_JIT_STATUS,
@@ -132,7 +132,7 @@ class CControllerAuthenticationEdit extends CController {
 				'http_login_form',
 				'http_strip_domains',
 				'http_case_sensitive',
-				'ldap_configured',
+				'ldap_auth_enabled',
 				'ldap_case_sensitive',
 				'jit_provision_interval',
 				'ldap_jit_status',
@@ -250,7 +250,7 @@ class CControllerAuthenticationEdit extends CController {
 						'name' => _('Fallback group'),
 						'is_fallback' => GROUP_MAPPING_FALLBACK,
 						'fallback_status' => GROUP_MAPPING_FALLBACK_OFF,
-						'user_groups' => [ 7, 8
+						'user_groups' => [
 							// TODO: define default user group.
 						],
 						'roleid' => $default_role[0]['roleid']
@@ -290,7 +290,7 @@ class CControllerAuthenticationEdit extends CController {
 
 		unset($data[CAuthenticationHelper::LDAP_USERDIRECTORYID]);
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
-				&& $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED
+				&& $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED
 		);
 		$data['saml_enabled'] = ($openssl_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED

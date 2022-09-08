@@ -33,7 +33,7 @@ class testAuthentication extends CAPITest {
 			'Test getting authentication general data' => [
 				'authentication' => [
 					'output' => ['authentication_type', 'passwd_min_length', 'passwd_check_rules', 'http_auth_enabled',
-						'http_login_form', 'http_strip_domains', 'http_case_sensitive', 'ldap_configured',
+						'http_login_form', 'http_strip_domains', 'http_case_sensitive', 'ldap_auth_enabled',
 						'ldap_userdirectoryid', 'saml_auth_enabled', 'saml_idp_entityid', 'saml_sso_url', 'saml_slo_url',
 						'saml_username_attribute', 'saml_sp_entityid', 'saml_nameid_format', 'saml_sign_messages',
 						'saml_sign_assertions', 'saml_sign_authn_requests', 'saml_sign_logout_requests',
@@ -57,7 +57,7 @@ class testAuthentication extends CAPITest {
 					'http_case_sensitive' => [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE],
 
 					// LDAP fields.
-					'ldap_configured' =>	[ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED],
+					'ldap_auth_enabled' =>	[ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED],
 
 					// SAML fields.
 					'saml_auth_enabled' => [ZBX_AUTH_SAML_DISABLED, ZBX_AUTH_SAML_ENABLED],
@@ -103,7 +103,7 @@ class testAuthentication extends CAPITest {
 			$this->assertContains($result['http_case_sensitive'], $get_result['http_case_sensitive']);
 
 			// LDAP fields.
-			$this->assertContains($result['ldap_configured'], $get_result['ldap_configured']);
+			$this->assertContains($result['ldap_auth_enabled'], $get_result['ldap_auth_enabled']);
 
 			// SAML fields.
 			$this->assertContains($result['saml_auth_enabled'], $get_result['saml_auth_enabled']);
@@ -174,9 +174,9 @@ class testAuthentication extends CAPITest {
 			// Invalid LDAP auth tests.
 			'Test invalid LDAP auth' => [
 				'authentication' => [
-					'ldap_configured' => 999
+					'ldap_auth_enabled' => 999
 				],
-				'expected_error' => 'Invalid parameter "/ldap_configured": value must be one of '.
+				'expected_error' => 'Invalid parameter "/ldap_auth_enabled": value must be one of '.
 					implode(', ', [ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED]).'.'
 			],
 			'Test invalid userdirectoryid' => [
@@ -188,7 +188,7 @@ class testAuthentication extends CAPITest {
 			'Cannot set default authentication ldap when ldap is disabled' => [
 				'authentication' => [
 					'authentication_type' => ZBX_AUTH_LDAP,
-					'ldap_configured' => ZBX_AUTH_LDAP_DISABLED
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED
 				],
 				'expected_error' => 'Incorrect value for field "/authentication_type": LDAP must be enabled.'
 			],
@@ -331,13 +331,13 @@ class testAuthentication extends CAPITest {
 			// Valid LDAP auth tests.
 			'Test valid LDAP auth' => [
 				'authentication' => [
-					'ldap_configured' => ZBX_AUTH_LDAP_ENABLED
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
 				],
 				'expected_error' => null
 			],
 			'Test userdirectory can be set as default server' => [
 				'authentication' => [
-					'ldap_configured' => ZBX_AUTH_LDAP_ENABLED,
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
 					'ldap_userdirectoryid' => 'userdirectory_1'
 				],
 				'expected_error' => null

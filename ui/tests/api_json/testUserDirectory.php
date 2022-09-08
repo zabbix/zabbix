@@ -174,7 +174,7 @@ class testUserDirectory extends CAPITest {
 	}
 
 	/**
-	 * Default userdirectory can be deleted only when there are no userdirectories and ldap_configured=0.
+	 * Default userdirectory can be deleted only when there are no userdirectories and ldap_auth_enabled=0.
 	 */
 	public function testDeleteDefault() {
 		// Delete user group to allow to delete userdirectory linked to user group.
@@ -192,7 +192,7 @@ class testUserDirectory extends CAPITest {
 		$this->call('userdirectory.delete', self::$data['userdirectoryid'], $error);
 
 		// Disable ldap to be able to delete default userdirectory.
-		$this->call('authentication.update', ['ldap_configured' => ZBX_AUTH_LDAP_DISABLED]);
+		$this->call('authentication.update', ['ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED]);
 		$this->call('userdirectory.delete', array_values(self::$data['userdirectoryid']));
 	}
 
@@ -243,7 +243,7 @@ class testUserDirectory extends CAPITest {
 
 		CDataHelper::call('authentication.update', [
 			'ldap_userdirectoryid' => self::$data['userdirectoryid']['API LDAP #2'],
-			'ldap_configured' => ZBX_AUTH_LDAP_ENABLED
+			'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
 		]);
 	}
 

@@ -30,7 +30,7 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	public const HTTP_LOGIN_FORM = 'http_login_form';
 	public const HTTP_STRIP_DOMAINS = 'http_strip_domains';
 	public const JIT_PROVISION_INTERVAL = 'jit_provision_interval';
-	public const LDAP_CONFIGURED = 'ldap_configured';
+	public const LDAP_AUTH_ENABLED = 'ldap_auth_enabled';
 	public const LDAP_USERDIRECTORYID = 'ldap_userdirectoryid';
 	public const LDAP_CASE_SENSITIVE = 'ldap_case_sensitive';
 	public const LDAP_JIT_STATUS = 'ldap_jit_status';
