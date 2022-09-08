@@ -91,7 +91,8 @@ class testAuditlogAction extends testAuditlogCommon {
 
 		$resourceid = $create['result']['actionids'][0];
 		$operationid = CDBHelper::getAll('SELECT operationid FROM operations WHERE actionid='.
-				zbx_dbstr($resourceid).' AND operationtype In (0,11,12)');
+				zbx_dbstr($resourceid).' AND operationtype In (0,11,12)'
+		);
 		$conditiodid = CDBHelper::getRow('SELECT conditionid FROM conditions WHERE actionid='.zbx_dbstr($resourceid));
 		$op_group = CDBHelper::getRow('SELECT opmessage_grpid FROM opmessage_grp WHERE operationid='.
 				zbx_dbstr($operationid[0]['operationid'])
