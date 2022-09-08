@@ -1465,13 +1465,14 @@ static void	proxyconfig_prepare_hostmacros(zbx_table_data_t *hostmacro, zbx_tabl
  *          to other templates                                                *
  *                                                                            *
  * Parameters: hosts_templates - [IN] the hosts_temlates data                 *
+ *             hostmacro       - [IN] the hostmacro data                      *
  *             error           - [OUT] the error message                      *
  *                                                                            *
  * Return value: SUCCEED - the templates were synced successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, char **error)
+static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, zbx_table_data_t *hostmacro, char **error)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_table_row_t		*row;
@@ -1498,6 +1499,22 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, char **
 		}
 
 		if (NULL != zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL) &&
+				SUCCEED == zbx_is_uint64(buf, &templateid))
+		{
+			zbx_vector_uint64_append(&templateids, templateid);
+		}
+	}
+
+	zbx_hashset_iter_reset(&hostmacro->rows, &iter);
+	while (NULL != (row = (zbx_table_row_t *)zbx_hashset_iter_next(&iter)))
+	{
+		const char	*pf;
+		char		buf[ZBX_MAX_UINT64_LEN + 1];
+		zbx_uint64_t	templateid;
+
+		pf = zbx_json_next(&row->columns, NULL);
+
+		if (NULL != (pf = zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL)) &&
 				SUCCEED == zbx_is_uint64(buf, &templateid))
 		{
 			zbx_vector_uint64_append(&templateids, templateid);
@@ -1632,7 +1649,7 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 
 	if (NULL != hostmacro)
 	{
-		if (SUCCEED != proxyconfig_sync_templates(hosts_templates, error))
+		if (SUCCEED != proxyconfig_sync_templates(hosts_templates, hostmacro, error))
 			return FAIL;
 
 		if (SUCCEED != proxyconfig_insert_rows(hostmacro, error))
