@@ -66,7 +66,7 @@ class CMediatypeHelper {
 				'name' => 'Gmail',
 				'smtp_server' => 'smtp.gmail.com',
 				'smtp_email' => 'zabbix_example_admin@gmail.com',
-				'smtp_helo' => '',
+				'smtp_helo' => 'gmail.com',
 				'smtp_port' => 587,
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
 				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
