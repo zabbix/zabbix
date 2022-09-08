@@ -4,14 +4,14 @@
 ## Overview
 
 For Zabbix version: 6.0 and higher  
-The template to monitor PHP-FPM by Zabbix that work without any external scripts.
+This template to monitor PHP-FPM by Zabbix agent works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `PHP-FPM by Zabbix agent` collects metrics by polling PHP-FPM status-page locally with Zabbix agent:
+Template `PHP-FPM by Zabbix agent` collects metrics by polling the PHP-FPM status-page locally using Zabbix agent.
 
-Note that this template doesn't support https and redirects (limitations of web.page.get).
+Note that this template doesn't support redirects (limitation of web.page.get).
 
-It also uses Zabbix agent to collect `php-fpm` Linux process stats like CPU usage, memory usage and whether process is running or not.
+It also uses Zabbix agent to collect `php-fpm` Linux process stats, for example, CPU usage, memory usage, and also to find out whether the process is running or not.
 
 
 
@@ -23,16 +23,16 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
-1. Open the php-fpm configuration file and enable the status page as shown.
+1. Open the PHP-FPM configuration file and enable the status page as shown.
     ```
     pm.status_path = /status
     ping.path = /ping
     ```
-2. Validate the syntax is fine before we reload the service
+2. Validate the syntax is fine before we reload the service.
     ```
     $ php-fpm7 -t
     ```
-3. Reload the php-fpm service to make the change active
+3. Reload the php-fpm service to make the change active.
     ```
     $ systemctl reload php-fpm
     ```
@@ -65,11 +65,11 @@ This template was tested on:
 7. Verify
   ```curl -L 127.0.0.1/status```
 
-Note that depending on your OS distribution PHP-FPM process name may vary. Please, check the actual name in the line "Name" from /proc/\<pid\>/status file (https://www.zabbix.com/documentation/6.0/manual/appendix/items/proc_mem_num_notes) and change {$PHP_FPM.PROCESS_NAME} macro if needed.
+Note that depending on your OS distribution, the PHP-FPM process name may vary. Please, check the actual name in the line "Name" from /proc/\<pid\>/status file (https://www.zabbix.com/documentation/6.0/manual/appendix/items/proc_mem_num_notes) and change {$PHP_FPM.PROCESS_NAME} macro if needed.
 
-If you use another location of status/ping page, don't forget to change {$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE} macro.
+If you use another location of the status/ping page, don't forget to change {$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE} macro.
 
-If you use an atypical location for PHP-FPM status-page don't forget to change the macros {$PHP_FPM.PORT}.
+If you use an atypical location for the PHP-FPM status-page, don't forget to change the macros {$PHP_FPM.PORT}.
 
 
 
