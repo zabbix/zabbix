@@ -26,6 +26,10 @@ class CControllerAuthenticationUpdate extends CController {
 	 */
 	private $response;
 
+	private const PROVISION_ENABLED_FIELDS = ['group_basedn', 'group_member', 'group_membership', 'user_username',
+		'user_lastname', 'provision_groups', 'provision_media'
+	];
+
 	protected function init() {
 		$this->response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'authentication.edit')
@@ -377,6 +381,11 @@ class CControllerAuthenticationUpdate extends CController {
 		$userdirectoryid_map = [];
 
 		foreach ($ldap_servers as $row_index => $ldap_server) {
+			if (!array_key_exists('provision_status', $ldap_server)
+					|| $ldap_server['provision_status'] != JIT_PROVISIONING_ENABLED) {
+				$ldap_server = array_diff_key($ldap_server, array_flip(self::PROVISION_ENABLED_FIELDS));
+			}
+
 			if (array_key_exists('userdirectoryid', $ldap_server)) {
 				$userdirectoryid_map[$row_index] = $ldap_server['userdirectoryid'];
 				$upd_ldap_servers[] = $ldap_server;

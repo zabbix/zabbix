@@ -679,6 +679,19 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		foreach ($userdirectories as &$userdirectory) {
+			if ($userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
+				$empty_provision_fields = array_fill_keys(
+					['group_basedn', 'group_member', 'group_membership', 'user_username', 'user_lastname'], ''
+				);
+				$empty_provision_fields['provision_groups'] = [];
+				$empty_provision_fields['provision_media'] = [];
+
+				$userdirectory = $empty_provision_fields + $userdirectory;
+			}
+		}
+		unset($userdirectory);
+
 		$userdirectories = array_column($userdirectories, null, 'userdirectoryid');
 
 		self::checkDuplicates($userdirectories, $db_userdirectories);
