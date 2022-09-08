@@ -470,6 +470,9 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 #define ZBX_XPATH_OBJECTS_BY_TYPE(type)									\
 	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']]"
 
+#define ZBX_XPATH_OBJS_BY_TYPE(type)									\
+	"/*/*/*/*/*[local-name()='objects']/*[local-name()='obj'][@type='" type "']"
+
 #define ZBX_XPATH_NAME_BY_TYPE(type)									\
 	ZBX_XPATH_PROP_OBJECT(type) "*[local-name()='propSet'][*[local-name()='name']]"			\
 	"/*[local-name()='val']"
@@ -4673,7 +4676,6 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 					"<ns0:pathSet>summary.managementServerIp</ns0:pathSet>"			\
 					"<ns0:pathSet>config.storageDevice.scsiTopology</ns0:pathSet>"		\
 					"<ns0:pathSet>triggeredAlarmState</ns0:pathSet>"			\
-					"<ns0:pathSet>config.vsanHostConfig.storageInfo.diskMapping</ns0:pathSet>"\
 					"%s"									\
 					"%s"									\
 				"</ns0:propSet>"								\
@@ -4978,15 +4980,14 @@ static char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore
  * Purpose: parse the vmware hypervisor internal disks details info           *
  *                                                                            *
  * Parameters: xdoc       - [IN] a reference to xml document with disks info  *
- *             vsan_node  - [IN] all info about hv                            *
  *             dss        - [IN] all known Datastores                         *
  *             disks_info - [OUT]                                             *
  *                                                                            *
  * Return value: count of updated disk objects                                *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_hv_disks_parse_info(xmlDoc *xdoc, xmlNode *vsan_node,
-		const zbx_vector_vmware_datastore_t *dss, zbx_vector_ptr_pair_t *disks_info)
+static int	vmware_service_hv_disks_parse_info(xmlDoc *xdoc, const zbx_vector_vmware_datastore_t *dss,
+		zbx_vector_ptr_pair_t *disks_info)
 {
 #	define SCSILUN_PROP_NUM		8
 #	define ZBX_XPATH_PSET		"/*/*/*/*/*/*[local-name()='propSet']"
@@ -5017,9 +5018,8 @@ static int	vmware_service_hv_disks_parse_info(xmlDoc *xdoc, xmlNode *vsan_node,
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
 		zbx_vmware_diskinfo_t	*di;
-		xmlNode			*mapinfo_node, *node = nodeset->nodeTab[i];
+		xmlNode			*node = nodeset->nodeTab[i];
 		zbx_ptr_pair_t		pr;
-		char			tmp[MAX_STRING_LEN];
 
 		zbx_str_free(lun_key);
 		zbx_str_free(name);
@@ -5098,23 +5098,6 @@ static int	vmware_service_hv_disks_parse_info(xmlDoc *xdoc, xmlNode *vsan_node,
 			di->serial_number = zbx_xml_node_read_value(xdoc, node, ZBX_XNN("val"));
 			zbx_lrtrim(di->serial_number, " ");
 		}
-
-		if (NULL == vsan_node || NULL == di->diskname || 0 != strcmp(name, "canonicalName"))
-			continue;
-
-		zbx_snprintf(tmp, sizeof(tmp), ".//*[*[local-name()='canonicalName'][1]='%s'][1]", di->diskname);
-
-		if (NULL == (mapinfo_node = zbx_xml_node_get(vsan_node->doc, vsan_node, tmp)))
-			continue;
-
-		di->vsan = zbx_malloc(NULL, sizeof(zbx_vmware_vsandiskinfo_t));
-		memset(di->vsan, 0, sizeof(zbx_vmware_vsandiskinfo_t));
-		di->vsan->ssd = zbx_xml_node_read_value(mapinfo_node->doc, mapinfo_node, ZBX_XNN("ssd"));
-		di->vsan->local_disk = zbx_xml_node_read_value(mapinfo_node->doc, mapinfo_node, ZBX_XNN("localDisk"));
-		zbx_xml_node_read_num(mapinfo_node->doc, mapinfo_node,
-				"number(." ZBX_XPATH_LN2("capacity", "block") ")", (int *)&di->vsan->block);
-		zbx_xml_node_read_num(mapinfo_node->doc, mapinfo_node,
-				"number(." ZBX_XPATH_LN2("capacity", "blockSize") ")", (int *)&di->vsan->block_size);
 	}
 
 	zbx_str_free(lun_key);
@@ -5130,6 +5113,72 @@ clean:
 #	undef SCSILUN_PROP_NUM
 #	undef ZBX_XPATH_LUN_PR_NAME
 #	undef ZBX_XPATH_PSET
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse the vmware hypervisor vsan disks details info               *
+ *                                                                            *
+ * Parameters: xdoc       - [IN] a reference to xml document with disks info  *
+ *             disks_info - [IN/OUT] - collected the hv internal disks        *
+ *                                                                            *
+ * Return value: count of updated vsan disk objects                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_hv_vsan_parse_info(xmlDoc *xdoc, zbx_vector_ptr_pair_t *disks_info)
+{
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	int		i, updated_vsan = 0, j = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	xpathCtx = xmlXPathNewContext(xdoc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)"//*[" ZBX_XNN("canonicalName") "]", xpathCtx)))
+		goto clean;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		zbx_vmware_diskinfo_t	*di, di_cmp;
+		xmlNode			*mapinfo_node = nodeset->nodeTab[i];
+		zbx_ptr_pair_t		pr = {.first = NULL, .second = &di_cmp};
+
+		if (NULL == (di_cmp.diskname = zbx_xml_node_read_value(xdoc, mapinfo_node, ZBX_XNN("canonicalName"))) ||
+				FAIL == (j = zbx_vector_ptr_pair_bsearch(disks_info, pr,
+				vmware_diskinfo_diskname_compare)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() skipped internal disk: %s", __func__,
+					ZBX_NULL2EMPTY_STR(di_cmp.diskname));
+			zbx_str_free(di_cmp.diskname);
+			continue;
+		}
+
+		zbx_str_free(di_cmp.diskname);
+		di = (zbx_vmware_diskinfo_t *)disks_info->values[j].second;
+		di->vsan = zbx_malloc(NULL, sizeof(zbx_vmware_vsandiskinfo_t));
+		memset(di->vsan, 0, sizeof(zbx_vmware_vsandiskinfo_t));
+		di->vsan->ssd = zbx_xml_node_read_value(xdoc, mapinfo_node, ZBX_XNN("ssd"));
+		di->vsan->local_disk = zbx_xml_node_read_value(xdoc, mapinfo_node, ZBX_XNN("localDisk"));
+		zbx_xml_node_read_num(xdoc, mapinfo_node,
+				"number(." ZBX_XPATH_LN2("capacity", "block") ")", (int *)&di->vsan->block);
+		zbx_xml_node_read_num(xdoc, mapinfo_node,
+				"number(." ZBX_XPATH_LN2("capacity", "blockSize") ")", (int *)&di->vsan->block_size);
+		updated_vsan++;
+	}
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() vsan disks updated:%d", __func__, updated_vsan);
+
+	return updated_vsan;
 }
 
 /******************************************************************************
@@ -5181,11 +5230,10 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].serialNumber</ns0:pathSet>"
 
 	zbx_vector_str_t		scsi_luns;
-	xmlDoc				*doc = NULL;
-	xmlNode				*vsan_node;
+	xmlDoc				*doc = NULL, *doc_dinfo = NULL;
 	zbx_property_collection_iter	*iter = NULL;
-	char				*tmp = NULL, *hvid_esc, *scsi_req = NULL;
-	int				i, total, updated = 0, ret = SUCCEED;
+	char				*tmp = NULL, *hvid_esc, *scsi_req = NULL, *err;
+	int				i, total, updated = 0, updated_vsan = 0, ret = SUCCEED;
 	const char			*pcollecter = vmware_service_objects[service->type].property_collector;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, hvid);
@@ -5214,8 +5262,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 	if (SUCCEED != (ret = zbx_property_collection_init(easyhandle, tmp, pcollecter, &iter, &doc, error)))
 		goto out;
 
-	vsan_node = zbx_xml_doc_get(hv_data, ZBX_XPATH_PROP_NAME("config.vsanHostConfig.storageInfo.diskMapping"));
-	updated += vmware_service_hv_disks_parse_info(doc, vsan_node, dss, disks_info);
+	updated += vmware_service_hv_disks_parse_info(doc, dss, disks_info);
 
 	while (NULL != iter->token)
 	{
@@ -5225,15 +5272,43 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 		if (SUCCEED != (ret = zbx_property_collection_next(iter, &doc, error)))
 			goto out;
 
-		updated += vmware_service_hv_disks_parse_info(doc, vsan_node, dss, disks_info);
+		updated += vmware_service_hv_disks_parse_info(doc, dss, disks_info);
 	}
 
+	zbx_property_collection_free(iter);
 	zbx_vector_ptr_pair_sort(disks_info, vmware_diskinfo_diskname_compare);
+	hvid_esc = zbx_xml_escape_dyn(hvid);
+	tmp = zbx_dsprintf(NULL, ZBX_POST_HV_DISK_INFO, pcollecter ,
+			"<ns0:pathSet>config.vsanHostConfig.storageInfo.diskMapping</ns0:pathSet>", hvid_esc);
+	zbx_free(hvid_esc);
+
+	if (SUCCEED != (ret = zbx_property_collection_init(easyhandle, tmp, pcollecter, &iter, &doc_dinfo, &err)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get vsan disk_info:%s", __func__, err);
+		zbx_str_free(err);
+		goto out;
+	}
+
+	updated_vsan += vmware_service_hv_vsan_parse_info(doc_dinfo, disks_info);
+
+	while (NULL != iter->token)
+	{
+		zbx_xml_free_doc(doc_dinfo);
+		doc_dinfo = NULL;
+
+		if (SUCCEED != (ret = zbx_property_collection_next(iter, &doc_dinfo, error)))
+			goto out;
+
+		updated_vsan += vmware_service_hv_vsan_parse_info(doc_dinfo, disks_info);
+	}
 out:
 	zbx_free(tmp);
 	zbx_xml_free_doc(doc);
+	zbx_xml_free_doc(doc_dinfo);
 	zbx_vector_str_destroy(&scsi_luns);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s for %d / %d", __func__, zbx_result_string(ret), updated, total);
+	zbx_property_collection_free(iter);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s for %d(vsan:%d) / %d", __func__, zbx_result_string(ret), updated,
+			updated_vsan, total);
 
 	return ret;
 
@@ -6451,9 +6526,6 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 		ZBX_XPATH_PROP_OBJECT_ID(object, "[text()='" id "']") "/"			\
 		ZBX_XPATH_PROP_NAME_NODE("triggeredAlarmState")
 
-#define ZBX_XPATH_GET_OBJS(type)								\
-		"//*[local-name()='objects']/*[local-name()='obj' and @type='" type "']"
-
 	char				tmp[MAX_STRING_LEN * 2];
 	int				ret = FAIL;
 	xmlDoc				*doc = NULL;
@@ -6472,11 +6544,11 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 	}
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type)
-		zbx_xml_read_values(doc, ZBX_XPATH_GET_OBJS(ZBX_VMWARE_SOAP_HV) , hvs);
+		zbx_xml_read_values(doc, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_HV) , hvs);
 	else
 		zbx_vector_str_append(hvs, zbx_strdup(NULL, "ha-host"));
 
-	zbx_xml_read_values(doc, ZBX_XPATH_GET_OBJS(ZBX_VMWARE_SOAP_DS), dss);
+	zbx_xml_read_values(doc, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_DS), dss);
 	vmware_service_get_datacenters_list(service, easyhandle, doc, alarms_data, datacenters);
 	vmware_service_get_dvswitch_list(doc, dvswitches);
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_ROOT_ALARMS(ZBX_VMWARE_SOAP_FOLDER, "%s"),
@@ -6497,9 +6569,9 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 			goto out;
 
 		if (ZBX_VMWARE_TYPE_VCENTER == service->type)
-			zbx_xml_read_values(doc, ZBX_XPATH_GET_OBJS(ZBX_VMWARE_SOAP_HV), hvs);
+			zbx_xml_read_values(doc, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_HV), hvs);
 
-		zbx_xml_read_values(doc, ZBX_XPATH_GET_OBJS(ZBX_VMWARE_SOAP_DS), dss);
+		zbx_xml_read_values(doc, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_DS), dss);
 		vmware_service_get_datacenters_list(service, easyhandle, doc, alarms_data, datacenters);
 		vmware_service_get_dvswitch_list(doc, dvswitches);
 
@@ -6519,7 +6591,6 @@ out:
 
 	return ret;
 
-#	undef ZBX_XPATH_GET_OBJS
 #	undef ZBX_XPATH_GET_ROOT_ALARMS
 #	undef ZBX_POST_VCENTER_HV_DS_LIST
 }
@@ -7552,17 +7623,15 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 	if (SUCCEED != vmware_service_get_cluster_data(easyhandle, &cluster_data, error))
 		goto out;
 
-	zbx_xml_read_values(cluster_data, "/*/*/*/*/*[local-name()='objects']/*[local-name()='obj']"
-			"[@type='" ZBX_VMWARE_SOAP_CLUSTER "']", &ids);
+	zbx_xml_read_values(cluster_data, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_CLUSTER), &ids);
 	zbx_vector_ptr_reserve(clusters, (size_t)(ids.values_num + clusters->values_alloc));
 
 	for (i = 0; i < ids.values_num; i++)
 	{
 		char	*status, *vsan_uuid, *name;
 
-		zbx_snprintf(xpath, sizeof(xpath), "/*/*/*/*/*[local-name()='objects'][*[local-name()='obj']"
-				"[@type='" ZBX_VMWARE_SOAP_CLUSTER "'][.='%s']]/" ZBX_XPATH_PROP_NAME_NODE("name"),
-				ids.values[i]);
+		zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_CLUSTER, "[text()='%s']")
+				"/" ZBX_XPATH_PROP_NAME_NODE("name"), ids.values[i]);
 
 		if (NULL == (name = zbx_xml_doc_read_value(cluster_data, xpath)))
 			continue;
