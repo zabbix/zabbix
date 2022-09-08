@@ -91,7 +91,7 @@ static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const c
 {
 	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == (ret = zbx_tcp_send_ext(sock, data, size, reserved, flags, 0)))
 	{
