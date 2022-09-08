@@ -51,7 +51,7 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 	request := AgentDataRequest{
 		Request: "agent data",
 		Data:    c.results,
-		Session: c.token,
+		Session: u.Session(),
 		Host:    u.Hostname(),
 		Version: version.Short(),
 	}

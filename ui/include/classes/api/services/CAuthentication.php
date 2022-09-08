@@ -112,7 +112,7 @@ class CAuthentication extends CApiService {
 	 * @return array
 	 */
 	protected function validateUpdate(array $auth): array {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'authentication_type' =>		['type' => API_INT32, 'in' => ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP],
 			'http_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
 			'http_login_form' =>			['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
@@ -120,7 +120,7 @@ class CAuthentication extends CApiService {
 			'http_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'ldap_configured' =>			['type' => API_INT32, 'in' => ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED],
 			'ldap_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
-			'ldap_userdirectoryid' =>		['type' => API_ID, 'flags' => API_ALLOW_NULL],
+			'ldap_userdirectoryid' =>		['type' => API_ID],
 			'saml_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED],
 			'saml_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'passwd_min_length' =>			['type' => API_INT32, 'in' => '1:70', 'default' => DB::getDefault('config', 'passwd_min_length')],
@@ -134,7 +134,7 @@ class CAuthentication extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (array_key_exists('ldap_userdirectoryid', $auth) && $auth['ldap_userdirectoryid']) {
+		if (array_key_exists('ldap_userdirectoryid', $auth) && $auth['ldap_userdirectoryid'] != 0) {
 			$exists = API::UserDirectory()->get([
 				'countOutput' => true,
 				'userdirectoryids' => $auth['ldap_userdirectoryid'],

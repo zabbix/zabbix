@@ -29,7 +29,6 @@
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxservice.h"
-#include "zbxcomms.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"
@@ -116,7 +115,6 @@ static void	zbx_tag_filter_free(zbx_tag_filter_t *tag_filter)
 }
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static void	add_message_alert(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event, zbx_uint64_t actionid,
@@ -1382,7 +1380,7 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 
 		ZBX_DBROW2UINT64(script.scriptid, row[4]);
 
-		if (SUCCEED != is_time_suffix(row[15], &script.timeout, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != zbx_is_time_suffix(row[15], &script.timeout, ZBX_LENGTH_UNLIMITED))
 		{
 			zbx_strlcpy(error, "Invalid timeout value in script configuration.", sizeof(error));
 			rc = FAIL;
@@ -1411,7 +1409,7 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 		{
 			/* service event cannot have target, force execution on Zabbix server */
 			script.execute_on = ZBX_SCRIPT_EXECUTE_ON_SERVER;
-			strscpy(host.host, "Zabbix server");
+			zbx_strscpy(host.host, "Zabbix server");
 		}
 		else
 		{
@@ -1445,19 +1443,19 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 			{
 				/* target is from "Host" list or "Host group" list */
 
-				strscpy(host.host, row[2]);
+				zbx_strscpy(host.host, row[2]);
 				host.tls_connect = (unsigned char)atoi(row[17]);
 #ifdef HAVE_OPENIPMI
 				host.ipmi_authtype = (signed char)atoi(row[18]);
 				host.ipmi_privilege = (unsigned char)atoi(row[19]);
-				strscpy(host.ipmi_username, row[20]);
-				strscpy(host.ipmi_password, row[21]);
+				zbx_strscpy(host.ipmi_username, row[20]);
+				zbx_strscpy(host.ipmi_password, row[21]);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
+				zbx_strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
+				zbx_strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
+				zbx_strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
+				zbx_strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
 		}
@@ -1920,7 +1918,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_D
 		tmp = zbx_strdup(NULL, row[2]);
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
 				MACRO_TYPE_COMMON, NULL, 0);
-		if (SUCCEED != is_time_suffix(tmp, &esc_period, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != zbx_is_time_suffix(tmp, &esc_period, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid step duration \"%s\" for operation of action \"%s\","
 					" using default operation step duration of the action", tmp, action->name);
@@ -3433,17 +3431,21 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
  ******************************************************************************/
 ZBX_THREAD_ENTRY(escalator_thread, args)
 {
-	int		now, nextcheck, sleeptime = -1, escalations_count = 0, old_escalations_count = 0;
-	double		sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t		last_stat_time;
-	zbx_config_t	cfg;
+	zbx_thread_escalator_args	*escalator_args_in = (zbx_thread_escalator_args *)
+							(((zbx_thread_args_t *)args)->args);
+	int				now, nextcheck, sleeptime = -1, escalations_count = 0,
+					old_escalations_count = 0;
+	double				sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t				last_stat_time;
+	zbx_config_t			cfg;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(escalator_args_in->zbx_get_program_type_cb_arg()), server_num,
+			get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
@@ -3451,7 +3453,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 				/* once in STAT_INTERVAL seconds */
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(escalator_args_in->zbx_config_tls, escalator_args_in->zbx_get_program_type_cb_arg);
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
@@ -3485,7 +3487,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 		zbx_config_clean(&cfg);
 		total_sec += zbx_time() - sec;
 
-		sleeptime = calculate_sleeptime(nextcheck, CONFIG_ESCALATOR_FREQUENCY);
+		sleeptime = zbx_calculate_sleeptime(nextcheck, CONFIG_ESCALATOR_FREQUENCY);
 
 		now = time(NULL);
 

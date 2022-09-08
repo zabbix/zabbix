@@ -33,7 +33,7 @@ $widget = new CWidget();
 
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
-	$doc_url = CDocHelper::ADMINISTRATION_USER_EDIT;
+	$doc_url = CDocHelper::USERS_USER_EDIT;
 }
 else {
 	$widget_name = _('User profile').NAME_DELIMITER;
@@ -41,7 +41,7 @@ else {
 		? $data['name'].' '.$data['surname']
 		: $data['username'];
 	$widget->setTitleSubmenu(getUserSettingsSubmenu());
-	$doc_url = CDocHelper::ADMINISTRATION_USERPROFILE_EDIT;
+	$doc_url = CDocHelper::USERS_USERPROFILE_EDIT;
 }
 
 $widget
@@ -64,7 +64,7 @@ if ($data['readonly'] == true) {
 $user_form = (new CForm())
 	->setId('user-form')
 	->setName('user_form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);
 

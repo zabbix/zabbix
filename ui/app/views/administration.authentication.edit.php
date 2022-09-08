@@ -137,7 +137,9 @@ $http_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Remove domain name'), 'http_strip_domains'),
 		new CFormField(
-			(new CTextBox('http_strip_domains', $data['http_strip_domains']))
+			(new CTextBox('http_strip_domains', $data['http_strip_domains'], false,
+				DB::getFieldLength('config', 'http_strip_domains')
+			))
 				->setEnabled($data['http_auth_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
@@ -516,7 +518,7 @@ $form = (new CForm())
 
 (new CWidget())
 	->setTitle(_('Authentication'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTHENTICATION_EDIT))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_AUTHENTICATION_EDIT))
 	->addItem($form)
 	->show();
 

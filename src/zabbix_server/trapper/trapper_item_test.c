@@ -302,7 +302,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	{
 		init_result(&result);
 
-		if (FAIL == is_ushort(item.interface.port_orig, &item.interface.port))
+		if (FAIL == zbx_is_ushort(item.interface.port_orig, &item.interface.port))
 		{
 			*info = zbx_dsprintf(NULL, "Invalid port number [%s]", item.interface.port_orig);
 		}

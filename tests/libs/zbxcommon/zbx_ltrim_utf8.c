@@ -19,7 +19,7 @@
 
 #include "zbx_common_trim_utf8.h"
 #include "zbxmocktest.h"
-#include "common.h"
+#include "zbxcommon.h"
 
 void	zbx_mock_test_entry(void **state)
 {

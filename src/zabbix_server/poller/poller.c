@@ -47,7 +47,6 @@
 #include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 /******************************************************************************
@@ -474,7 +473,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 							NULL, 0);
 				}
 
-				if (FAIL == is_ushort(port, &items[i].interface.port))
+				if (FAIL == zbx_is_ushort(port, &items[i].interface.port))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
 								items[i].interface.port_orig));
@@ -946,6 +945,8 @@ exit:
 
 ZBX_THREAD_ENTRY(poller_thread, args)
 {
+	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
+
 	int			nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
 	double			sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t			last_stat_time;
@@ -955,20 +956,21 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	poller_type = *(unsigned char *)((zbx_thread_args_t *)args)->args;
+	poller_type = (poller_args_in->poller_type);
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
+			get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	scriptitem_es_engine_init();
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(poller_args_in->zbx_config_tls, poller_args_in->zbx_get_program_type_cb_arg);
 #endif
 	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
 	{
@@ -999,7 +1001,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		processed += get_values(poller_type, &nextcheck);
 		total_sec += zbx_time() - sec;
 
-		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
+		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{

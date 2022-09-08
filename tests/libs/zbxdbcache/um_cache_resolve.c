@@ -38,7 +38,7 @@ static void	mock_get_hostids(zbx_vector_uint64_t *hostids, zbx_mock_handle_t han
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(hhostid, &hostid_s)))
 			fail_msg("Cannot read hostid: %s", zbx_mock_error_string(err));
 
-		if (SUCCEED != is_uint64(hostid_s, &hostid))
+		if (SUCCEED != zbx_is_uint64(hostid_s, &hostid))
 			fail_msg("Invalid hostid: %s", hostid_s);
 
 		zbx_vector_uint64_append(hostids, hostid);
@@ -69,7 +69,7 @@ void	zbx_mock_test_entry(void **state)
 
 	um_mock_cache_diff(&mock_cache0, &mock_cache, &gmacros, &hmacros, &htmpls);
 	cache = um_cache_create();
-	cache = um_cache_sync(cache, &gmacros, &hmacros, &htmpls);
+	cache = um_cache_sync(cache, 0, &gmacros, &hmacros, &htmpls);
 
 	mock_dbsync_clear(&gmacros);
 	mock_dbsync_clear(&hmacros);

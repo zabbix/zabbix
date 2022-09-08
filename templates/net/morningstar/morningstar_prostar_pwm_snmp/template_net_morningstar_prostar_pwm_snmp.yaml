@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:36:24Z'
+  version: '6.4'
+  date: '2022-08-16T10:54:44Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -14,7 +14,7 @@ zabbix_export:
         MIBs used:
         PROSTAR-PWM
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -773,6 +773,30 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
+          uuid: 2c9f864ac33b4c2d992459c6519d045a
+          name: 'Status: Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: status.hw.uptime
+          history: 7d
+          units: uptime
+          description: 'The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: status
+        -
           uuid: 1cd47d04af104cb9ab1cd7dc745a6aea
           name: 'Status: Load Faults'
           type: SNMP_AGENT
@@ -913,13 +937,13 @@ zabbix_export:
                   value: notice
         -
           uuid: 42f6a75d923d4262b37d85c4f7d1d322
-          name: 'Status: Uptime'
+          name: 'Status: Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: status.uptime
+          key: status.net.uptime
           history: 7d
           units: uptime
-          description: 'Device uptime in seconds'
+          description: 'The time (in hundredths of a second) since the network management portion of the system was last re-initialized.'
           preprocessing:
             -
               type: MULTIPLIER
@@ -931,24 +955,12 @@ zabbix_export:
               value: status
           triggers:
             -
-              uuid: dea364bf454746bca6be38d7e0759d06
-              expression: 'last(/Morningstar ProStar PWM SNMP/status.uptime)<10m'
-              name: 'Status: Device has been restarted'
-              event_name: 'Status: Device has been restarted (uptime < 10m)'
-              priority: INFO
-              description: 'Uptime is less than 10 minutes'
-              manual_close: 'YES'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-            -
               uuid: 16c1444a745a47e59fd22bd1a64baef3
-              expression: 'nodata(/Morningstar ProStar PWM SNMP/status.uptime,5m)=1'
+              expression: 'nodata(/Morningstar ProStar PWM SNMP/status.net.uptime,5m)=1'
               name: 'Status: Failed to fetch data'
               event_name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 5 minutes'
+              description: 'Zabbix has not received data for items for the last 5 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1340,6 +1352,19 @@ zabbix_export:
             -
               value: '8'
               newvalue: NotUsed
+  triggers:
+    -
+      uuid: dea364bf454746bca6be38d7e0759d06
+      expression: '(last(/Morningstar ProStar PWM SNMP/status.hw.uptime)>0 and last(/Morningstar ProStar PWM SNMP/status.hw.uptime)<10m) or (last(/Morningstar ProStar PWM SNMP/status.hw.uptime)=0 and last(/Morningstar ProStar PWM SNMP/status.net.uptime)<10m)'
+      name: 'Status: Device has been restarted'
+      event_name: 'Status: Device has been restarted (uptime < 10m)'
+      priority: INFO
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 730d1e1e43224d1ea7b08f53988a7a60

@@ -214,7 +214,6 @@ jQuery(function($) {
 			case 'dashboard':
 			case 'dropdown':
 			case 'submenu':
-			case 'widget_actions':
 				return false;
 
 			default:

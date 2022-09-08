@@ -633,7 +633,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -732,7 +732,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -994,7 +994,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 				goto err;
 			}
 		}
-		else if (FAIL == is_supported_ip(addr))
+		else if (FAIL == zbx_is_supported_ip(addr))
 		{
 			*error = zbx_dsprintf(*error, "IP is not supported: \"%s\"", addr_in);
 			goto err;
@@ -1005,7 +1005,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 
 	if (NULL != port_in && '\0' != *port_in)
 	{
-		if (SUCCEED != is_ushort(port_in, &info->port))
+		if (SUCCEED != zbx_is_ushort(port_in, &info->port))
 		{
 			if (0 != atoi(port_in))
 			{

@@ -2851,7 +2851,7 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() refresh_rate:%s", __func__, value);
 
-	if (SUCCEED != (ret = is_uint31(value, refresh_rate)))
+	if (SUCCEED != (ret = zbx_is_uint31(value, refresh_rate)))
 		*error = zbx_dsprintf(*error, "Cannot convert refreshRate from %s.",  value);
 
 	zbx_free(value);
@@ -3572,7 +3572,7 @@ static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *
 
 	if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
 	{
-		if (SUCCEED != is_uint64(value, sz))
+		if (SUCCEED != zbx_is_uint64(value, sz))
 			*sz = 0;
 
 		zbx_free(value);
@@ -3584,7 +3584,7 @@ static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *
 
 		if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
 		{
-			if (SUCCEED != is_uint64(value, sz))
+			if (SUCCEED != zbx_is_uint64(value, sz))
 				*sz = 0;
 
 			zbx_free(value);
@@ -3600,7 +3600,7 @@ static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *
 
 	if (NULL != (value = zbx_xml_node_read_value(xdoc, layout_node, xpath)))
 	{
-		if (SUCCEED != is_uint64(value, usz))
+		if (SUCCEED != zbx_is_uint64(value, usz))
 			*usz = 0;
 
 		zbx_free(value);
@@ -4401,19 +4401,19 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 	{
 		if (NULL != (value = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("capacity"))))
 		{
-			is_uint64(value, &capacity);
+			zbx_is_uint64(value, &capacity);
 			zbx_free(value);
 		}
 
 		if (NULL != (value = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("freeSpace"))))
 		{
-			is_uint64(value, &free_space);
+			zbx_is_uint64(value, &free_space);
 			zbx_free(value);
 		}
 
 		if (NULL != (value = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("uncommitted"))))
 		{
-			is_uint64(value, &uncommitted);
+			zbx_is_uint64(value, &uncommitted);
 			zbx_free(value);
 		}
 	}
@@ -5064,7 +5064,7 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 		zbx_free(mask);
 		zbx_vector_str_append(&selected_ips, zbx_strdup(NULL, buff));
 
-		if (NULL != ip_vc && SUCCEED == ip_in_list(buff, ip_vc))
+		if (NULL != ip_vc && SUCCEED == zbx_ip_in_list(buff, ip_vc))
 		{
 			value = ip_hv;
 			goto out;
@@ -5086,7 +5086,7 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 
 	for (i = 0; NULL != ip_gw && i < selected_ips.values_num; i++)
 	{
-		if (SUCCEED != ip_in_list(selected_ips.values[i], ip_gw))
+		if (SUCCEED != zbx_ip_in_list(selected_ips.values[i], ip_gw))
 		{
 			zabbix_log(LOG_LEVEL_TRACE, "%s() default gateway fail; ip_gw:%s ip_hv:%s", __func__,
 					ip_gw, selected_ips.values[i]);
@@ -7147,7 +7147,7 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, zbx_vmware_servi
 	{
 		*max_qm = ZBX_MAXQUERYMETRICS_UNLIMITED;
 	}
-	else if (SUCCEED != is_uint31(val, max_qm))
+	else if (SUCCEED != zbx_is_uint31(val, max_qm))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot convert maxQueryMetrics from %s.", val);
 		*max_qm = get_default_maxquerymetrics_for_vcenter(service);
@@ -8134,7 +8134,7 @@ static int	vmware_service_process_perf_entity_data(zbx_vmware_perf_data_t *perfd
 			ZBX_STR2UINT64(perfvalue->counterid, counter);
 			perfvalue->instance = (NULL != instance ? instance : zbx_strdup(NULL, ""));
 
-			if (0 == strcmp(value, "-1") || SUCCEED != is_uint64(value, &perfvalue->value))
+			if (0 == strcmp(value, "-1") || SUCCEED != zbx_is_uint64(value, &perfvalue->value))
 			{
 				perfvalue->value = ZBX_MAX_UINT64;
 				zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter inaccessible. type:%s object id:%s "

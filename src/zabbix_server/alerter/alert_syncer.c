@@ -336,7 +336,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 	now = time(NULL);
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (FAIL == is_ushort(row[9], &smtp_port))
+		if (FAIL == zbx_is_ushort(row[9], &smtp_port))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -913,9 +913,8 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 
 ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 {
-	double		sec1, sec2;
-	int		alerts_num, sleeptime, nextcheck, freq_watchdog, time_watchdog = 0, time_cleanup = 0,
-			results_num;
+	double		sec1, sec2, time_cleanup = 0, time_watchdog = 0;
+	int		alerts_num, sleeptime, nextcheck, freq_watchdog, results_num;
 	zbx_am_db_t	amdb;
 	char		*error = NULL;
 

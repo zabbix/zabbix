@@ -132,7 +132,7 @@ void	zbx_mock_test_entry(void **state)
 						returned_value.data.dbl);
 				break;
 			case ZBX_VARIANT_UI64:
-				if (SUCCEED != is_uint64(expected_value, &expected_ui64))
+				if (SUCCEED != zbx_is_uint64(expected_value, &expected_ui64))
 				{
 					fail_msg("function result '" ZBX_FS_UI64
 							"' does not match expected result '%s'",

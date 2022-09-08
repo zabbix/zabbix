@@ -181,7 +181,7 @@ static zbx_expression_query_t*	expression_create_query(const char *itemquery)
 		{
 			int	wildcard = 0;
 
-			replace_key_params_dyn(&query->ref.key, ZBX_KEY_TYPE_ITEM, test_key_param_wildcard_cb,
+			zbx_replace_key_params_dyn(&query->ref.key, ZBX_KEY_TYPE_ITEM, test_key_param_wildcard_cb,
 					&wildcard, NULL, 0);
 
 			if (0 != wildcard)
@@ -446,7 +446,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 		char	*key;
 
 		key = zbx_strdup(NULL, query->ref.key);
-		replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param_wildcard_cb, NULL, NULL, 0);
+		zbx_replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param_wildcard_cb, NULL, NULL, 0);
 
 		esc = DBdyn_escape_string(key);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " %s i.key_ like '%s'", clause, esc);
@@ -476,7 +476,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 			if (ZBX_TOKEN_OBJECTID != token.type)
 				continue;
 
-			if (SUCCEED != is_uint64_n(filter_template + token.loc.l + 1, token.loc.r - token.loc.l - 1,
+			if (SUCCEED != zbx_is_uint64_n(filter_template + token.loc.l + 1, token.loc.r - token.loc.l - 1,
 					&index) && (int)index < groups->values_num)
 			{
 				continue;
@@ -1421,7 +1421,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 	{
 		if (ZBX_VARIANT_STR == args[1].type)
 		{
-			if (SUCCEED != is_ushort(args[1].data.str, &pos) || 0 >= pos)
+			if (SUCCEED != zbx_is_ushort(args[1].data.str, &pos) || 0 >= pos)
 			{
 				*error = zbx_strdup(NULL, "invalid third parameter");
 				goto err;
@@ -1469,7 +1469,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
 			continue;
 
-		if (0 != get_key_param(dcitem->key_orig, pos, bucket, sizeof(bucket)))
+		if (0 != zbx_get_key_param(dcitem->key_orig, pos, bucket, sizeof(bucket)))
 			continue;
 
 		zbx_strupper(bucket);
@@ -1578,7 +1578,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 			if (ZBX_VARIANT_STR == args[0].type)
 			{
-				if (FAIL == is_time_suffix(args[0].data.str, &seconds, ZBX_LENGTH_UNLIMITED))
+				if (FAIL == zbx_is_time_suffix(args[0].data.str, &seconds, ZBX_LENGTH_UNLIMITED))
 				{
 					*error = zbx_strdup(NULL, "invalid second parameter");
 					goto out;
@@ -1954,15 +1954,16 @@ static void	host_index_free(zbx_host_index_t *index)
 
 /******************************************************************************
 *                                                                             *
-* Purpose: resolve expression with an empty host macro(default host)          *
+* Purpose: resolve expression with an empty host macro (default host)         *
 *          and macro host references, like:                                   *
-*          (two forward slashes, {HOST.HOST}, {HOST.HOST<N>}) to host names   *
+*          (two forward slashes, {HOST.HOST}, {HOST.HOST<N>},                 *
+*          {ITEM.KEY} and {ITEM.KEY<N>}) to host names and item keys          *
 *                                                                             *
 * Parameters: eval    - [IN/OUT] the evaluation expression                    *
 *             trigger - [IN] trigger which defines the evaluation expression  *
 *                                                                             *
 *******************************************************************************/
-void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const ZBX_DB_TRIGGER *trigger)
+void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const ZBX_DB_TRIGGER *trigger)
 {
 	int			i, func_num, index;
 	zbx_vector_ptr_t	hosts;
@@ -1998,6 +1999,7 @@ void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, cons
 		if (NULL != hi->host)
 		{
 			query->ref.host = zbx_strdup(query->ref.host, hi->host);
+			DBget_trigger_value(trigger, &query->ref.key, func_num, ZBX_REQUEST_ITEM_KEY);
 		}
 		else
 		{

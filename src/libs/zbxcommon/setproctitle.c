@@ -23,7 +23,7 @@
 **/
 
 #include "setproctitle.h"
-#include "common.h"
+#include "zbxcommon.h"
 
 #if defined(PS_DARWIN_ARGV)
 #include <crt_externs.h>

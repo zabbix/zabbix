@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SYSINFO_H
 #define ZABBIX_SYSINFO_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "module.h"
 
 /* CHECK RESULT */
@@ -351,6 +351,7 @@ typedef struct
 	char			fstype[MAX_STRING_LEN];
 	zbx_fs_metrics_t	bytes;
 	zbx_fs_metrics_t	inodes;
+	char			*options;
 }
 zbx_mpoint_t;
 
@@ -358,6 +359,7 @@ zbx_mpoint_t;
 #define ZBX_LLD_MACRO_FSTYPE		"{#FSTYPE}"
 #define ZBX_LLD_MACRO_FSLABEL		"{#FSLABEL}"
 #define ZBX_LLD_MACRO_FSDRIVETYPE	"{#FSDRIVETYPE}"
+#define ZBX_LLD_MACRO_FSOPTIONS		"{#FSOPTIONS}"
 
 #define ZBX_SYSINFO_TAG_FSNAME			"fsname"
 #define ZBX_SYSINFO_TAG_FSTYPE			"fstype"
@@ -370,6 +372,7 @@ zbx_mpoint_t;
 #define ZBX_SYSINFO_TAG_USED			"used"
 #define ZBX_SYSINFO_TAG_PFREE			"pfree"
 #define ZBX_SYSINFO_TAG_PUSED			"pused"
+#define ZBX_SYSINFO_TAG_FSOPTIONS		"options"
 
 #define ZBX_SYSINFO_FILE_TAG_TYPE		"type"
 #define ZBX_SYSINFO_FILE_TAG_BASENAME		"basename"
@@ -407,6 +410,15 @@ zbx_uint32_t get_thread_global_mutex_flag(void);
 
 #ifndef _WINDOWS
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname);
+
+typedef struct
+{
+	zbx_uint64_t	flag;
+	const char	*name;
+}
+zbx_mntopt_t;
+
+char		*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags);
 #endif
 
 void		zbx_add_alias(const char *name, const char *value);
