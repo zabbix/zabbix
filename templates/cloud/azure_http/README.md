@@ -196,7 +196,7 @@ You can also provide feedback, discuss the template or ask for help with it at [
 ## Overview
 
 For Zabbix version: 6.2 and higher  
-The template to monitor Microsoft Azure virtual machines by HTTP.
+The template to monitor Microsoft Azure MySQL flexible servers by HTTP.
 It works without any external scripts and uses the script item.
 
 ## Setup
@@ -286,7 +286,7 @@ You can also provide feedback, discuss the template or ask for help with it at [
 ## Overview
 
 For Zabbix version: 6.2 and higher  
-The template to monitor Microsoft Azure virtual machines by HTTP.
+The template to monitor Microsoft Azure MySQL single servers by HTTP.
 It works without any external scripts and uses the script item.
 
 ## Setup

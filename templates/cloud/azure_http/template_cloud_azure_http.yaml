@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-07T12:22:23Z'
+  date: '2022-09-08T13:29:03Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -530,7 +530,7 @@ zabbix_export:
       template: 'Azure MySQL flexible server by HTTP'
       name: 'Azure MySQL flexible server by HTTP'
       description: |
-        The template to monitor Microsoft Azure virtual machines by HTTP.
+        The template to monitor Microsoft Azure MySQL flexible servers by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
@@ -1315,7 +1315,7 @@ zabbix_export:
       template: 'Azure MySQL single server by HTTP'
       name: 'Azure MySQL single server by HTTP'
       description: |
-        The template to monitor Microsoft Azure virtual machines by HTTP.
+        The template to monitor Microsoft Azure MySQL single servers by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
