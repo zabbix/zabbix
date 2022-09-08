@@ -5519,6 +5519,76 @@ class CApiInputValidatorTest extends TestCase {
 				['with_hosts' => true],
 				true,
 				'Parameter "/real_hosts" is deprecated.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'user_medias' => ['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
+							'status' =>	['type' => API_BOOLEAN]
+					]],
+					'medias' => ['type' => API_OBJECTS, 'fields' => [
+							'status' =>	['type' => API_BOOLEAN]
+					]]
+				]],
+				[
+					'user_medias' => [['status' => true], ['status' => false]],
+					'medias' => [['status' => true], ['status' => false]]
+				],
+				'/',
+				'Deprecated parameter "/user_medias" cannot be used with "/medias".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'user_medias' => ['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
+							'status' =>	['type' => API_BOOLEAN]
+					]],
+					'medias' => ['type' => API_OBJECTS, 'fields' => [
+							'status' =>	['type' => API_BOOLEAN]
+					]]
+				]],
+				[
+					'user_medias' => [['status' => true], ['status' => 'string']]
+				],
+				'/',
+				'Invalid parameter "/medias/2/status": a boolean is expected.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'user_medias' => ['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
+							'status' =>	['type' => API_BOOLEAN]
+					]],
+					'medias' => ['type' => API_OBJECTS, 'fields' => [
+							'status' =>	['type' => API_BOOLEAN]
+					]]
+				]],
+				[
+					'user_medias' => [['status' => true], ['status' => false]]
+				],
+				'/',
+				[
+					'medias' => [['status' => true], ['status' => false]]
+				],
+				true,
+				'Parameter "/user_medias" is deprecated.'
+			],
+			[
+				// API_DEPRECATED rule with 'replacement' SHOULD be defined before rules for field mentioned in 'replacement'
+				['type' => API_OBJECT, 'fields' => [
+					'medias' => ['type' => API_OBJECTS, 'fields' => [
+							'status' =>	['type' => API_BOOLEAN]
+					]],
+					'user_medias' => ['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
+							'status' =>	['type' => API_STRING_UTF8]
+					]]
+				]],
+				[
+					'user_medias' => [['status' => 'not boolean']]
+				],
+				'/',
+				[
+					'medias' => [['status' => 'not boolean']]
+				],
+				true,
+				'Parameter "/user_medias" is deprecated.'
 			]
 		];
 	}
