@@ -95,10 +95,16 @@ class DiscoveredHosts {
 				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", 4)"
 		);
 		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (90000082, ".
-				zbx_dbstr(self::DISCOVERED_HOSTID).", 'discovered', 'true')"
+				zbx_dbstr(self::DISCOVERED_HOSTID).", 'action', 'update')"
 		);
-		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (90000083, ".
-				zbx_dbstr(self::DISCOVERED_HOSTID).", 'host', 'no')"
+//		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (90000083, ".
+//			zbx_dbstr(self::DISCOVERED_HOSTID).", 'discovered', 'true')"
+//		);
+		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag) VALUES (90000083, ".
+			zbx_dbstr(self::DISCOVERED_HOSTID).", 'tag without value')"
+		);
+		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (90000084, ".
+			zbx_dbstr(self::DISCOVERED_HOSTID).", 'test', 'update')"
 		);
 
 		// Create templates.
