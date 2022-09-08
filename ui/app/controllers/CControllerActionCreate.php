@@ -233,6 +233,7 @@ class CControllerActionCreate extends CController {
 			}
 			unset($condition);
 
+
 			$action['filter'] = $filter;
 		}
 

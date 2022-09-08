@@ -113,6 +113,9 @@ class CControllerPopupActionConditionEdit extends CController {
 	}
 
 	protected function doAction(): void {
+		// todo: check if condition already exists
+
+
 			$data = [
 				'title' => _('New condition'),
 				'command' => '',

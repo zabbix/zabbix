@@ -31,7 +31,7 @@ window.action_edit_popup = new class {
 		this.conditions = conditions;
 		this.actionid = actionid;
 		this.eventsource = eventsource;
-		this.row_count = document.getElementById('conditionTable').rows.length;
+		this.row_count = document.getElementById('conditionTable').rows.length-2;
 
 		this._initActionButtons();
 		this._processTypeOfCalculation();
@@ -297,13 +297,11 @@ window.action_edit_popup = new class {
 	_processTypeOfCalculation() {
 		this.show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 
-		console.log(this.row_count);
-
-		jQuery('#label-evaltype').toggle(this.row_count > 3);
-		jQuery('#evaltype-formfield').toggle(this.row_count > 3);
+		jQuery('#label-evaltype').toggle(this.row_count > 1);
+		jQuery('#evaltype-formfield').toggle(this.row_count > 1);
 		jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
 
-		// todo E.S.: check how should look when custom formula
+		// todo E.S.: remove expression field when multiselect - custom expression
 
 		const labels = jQuery('#conditionTable .label');
 

@@ -115,7 +115,6 @@ $action_tab
 					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
 				])),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			//$formula
 			(new CSpan(''))
 				->addStyle('white-space: normal;')
 				->setId('expression'),

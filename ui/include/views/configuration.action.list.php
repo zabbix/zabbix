@@ -138,7 +138,7 @@ if ($this->data['actions']) {
 		$conditions = [];
 		$operations = [];
 
-		order_result($action['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
+		order_result($action['filter']['conditions'], 'conditiontype');
 
 		foreach ($action['filter']['conditions'] as $cIdx => $condition) {
 			$conditions[] = getConditionDescription($condition['conditiontype'], $condition['operator'],

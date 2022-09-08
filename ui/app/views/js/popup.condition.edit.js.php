@@ -30,7 +30,7 @@ window.condition_popup = new class {
 	}
 
 	_loadViews() {
-		if($("#condition-type").val() == 27) {
+		if($("#condition-type").val() == <?= CONDITION_TYPE_SERVICE ?>) {
 			jQuery('#service-new-condition')
 				.multiSelect('getSelectButton')
 				.addEventListener('click', () => {
