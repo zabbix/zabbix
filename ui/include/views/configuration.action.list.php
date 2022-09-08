@@ -68,7 +68,7 @@ $current_url = (new CUrl('zabbix.php'))
 	->setArgument('eventsource', $data['eventsource']);
 
 $filter = (new CFilter())
-	->setResetUrl($current_url)
+	->setResetUrl(new CUrl('zabbix.php'))
 	->addVar('action', 'action.list')
 	->addVar('eventsource', $data['eventsource'])
 	->setProfile($data['profileIdx'])
@@ -142,16 +142,24 @@ if ($this->data['actions']) {
 
 		if ($action['status'] == ACTION_STATUS_DISABLED) {
 			$status = (new CLink(_('Disabled'),
-				'zabbix.php?action=action.enable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
-				)
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'action.enable')
+					->setArgument('g_actionid[]', $action['actionid'])
+					->setArgument('eventsource', $data['eventsource'])
+					->getUrl()
+			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
 				->addSID();
 		}
 		else {
 			$status = (new CLink(_('Enabled'),
-				'zabbix.php?action=action.disable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
-			)
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'action.disable')
+					->setArgument('g_actionid[]', $action['actionid'])
+					->setArgument('eventsource', $data['eventsource'])
+					->getUrl()
+			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
 				->addSID();

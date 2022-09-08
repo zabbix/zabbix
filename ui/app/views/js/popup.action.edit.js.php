@@ -106,6 +106,7 @@ window.action_edit_popup = new class {
 	}
 
 	_createLabelCell(input) {
+		// todo E.S. : FIX LABEL WHEN DELETE ROW AND ADD A NEW ONE!!
 		const cell = document.createElement('td');
 
 		this.label = num2letter(document.getElementById('conditionTable').rows.length -2);
@@ -299,6 +300,8 @@ window.action_edit_popup = new class {
 		jQuery('#label-evaltype').toggle(this.row_count > 1);
 		jQuery('#evaltype-formfield').toggle(this.row_count > 1);
 		jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
+
+		// todo E.S.: check how should look when custom formula
 
 		const labels = jQuery('#conditionTable .label');
 
