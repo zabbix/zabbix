@@ -116,6 +116,14 @@ static int	DBpatch_6030001(void)
 	return DBmodify_field_type("autoreg_host", &field, &old_field);
 }
 
+static int	DBpatch_6030002(void)
+{
+	const ZBX_FIELD	old_field = {"host_metadata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"host_metadata", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("proxy_autoreg_host", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -124,5 +132,6 @@ DBPATCH_START(6030)
 
 DBPATCH_ADD(6030000, 0, 1)
 DBPATCH_ADD(6030001, 0, 1)
+DBPATCH_ADD(6030002, 0, 1)
 
 DBPATCH_END()
