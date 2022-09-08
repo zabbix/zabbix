@@ -79,7 +79,9 @@ class CControllerPopupActionEdit extends CController {
 
 		if ($this->hasInput('actionid')) {
 			$this->action = API::Action()->get([
-				'output' => ['actionid', 'name', 'esc_period', 'eventsource', 'status', 'pause_suppressed', 'notify_if_canceled'],
+				'output' => [
+					'actionid', 'name', 'esc_period', 'eventsource', 'status', 'pause_suppressed', 'notify_if_canceled'
+				],
 				'actionids' => $this->getInput('actionid'),
 				'selectOperations' => 'extend',
 				'selectFilter' => 'extend'
@@ -110,7 +112,9 @@ class CControllerPopupActionEdit extends CController {
 					'eventsource' => $eventsource,
 					'status' => $this->action['status'],
 					'operations' => $this->action['operations'],
-					'filter' => $this->action['filter']
+					'filter' => $this->action['filter'],
+					'pause_suppressed' => $this->action['pause_suppressed'],
+					'notify_if_canceled' =>  $this->action['notify_if_canceled']
 				]
 			];
 			foreach ($data['action']['filter']['conditions'] as $condition) {

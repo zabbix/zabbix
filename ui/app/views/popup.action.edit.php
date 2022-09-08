@@ -45,39 +45,6 @@ $action_tab = (new CFormGrid())
 			->setAttribute('autofocus', 'autofocus')
 	]);
 
-$formula = (new CTextBox('formula', $data['action']['filter']['formula'], DB::getFieldLength('actions', 'formula')))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setId('formula')
-	->setAttribute('placeholder', 'A or (B and C) &hellip;');
-
-$action_tab
-	->addItem([
-		(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('label-evaltype'),
-		(new CFormField([
-			(new CSelect('evaltype'))
-				->setId('evaltype')
-				->setFocusableElementId('label-evaltype')
-				->setValue($data['action']['filter']['evaltype'])
-				->addOptions(CSelect::createOptionsFromArray([
-					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-					CONDITION_EVAL_TYPE_AND => _('And'),
-					CONDITION_EVAL_TYPE_OR => _('Or'),
-					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-				])),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			//$formula
-			(new CSpan(''))
-				->addStyle('white-space: normal;')
-				->setId('expression'),
-			(new CTextBox('formula', $data['formula'],
-				DB::getFieldLength('actions', 'formula')))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setId('formula')
-				->setAttribute('placeholder', 'A or (B and C) &hellip;')
-		]))->setId('evaltype-formfield')
-	])
-	->setId('actionCalculationRow');
-
 // Create condition table.
 $condition_table = (new CTable())
 	->setId('conditionTable')
@@ -112,22 +79,54 @@ if ($data['action']['filter']['conditions']) {
 
 		$condition_table
 			->addRow([
-					$labelSpan,
-					(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
-						$actionConditionStringValues[0][$cIdx], $condition['value2']
-					)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
-					(new CCol([
-						(new CButton('remove', _('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('condition-remove')
-							->removeId(),
-						new CVar('conditions['.$i.']', $condition)
-					]))
+				$labelSpan,
+				(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
+					$actionConditionStringValues[0][$cIdx], $condition['value2']
+				)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
+				(new CCol([
+					(new CButton('remove', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('condition-remove')
+						->removeId(),
+					new CVar('conditions['.$i.']', $condition)
+				]))
 			]);
 
 		$i++;
 	}
 }
+$formula = (new CTextBox('formula', $data['action']['filter']['formula'], DB::getFieldLength('actions', 'formula')))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setId('formula')
+	->setAttribute('placeholder', 'A or (B and C) &hellip;');
+
+$action_tab
+	->addItem([
+		(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('label-evaltype'),
+		(new CFormField([
+			(new CSelect('evaltype'))
+				->setId('evaltype')
+				->setFocusableElementId('label-evaltype')
+				->setValue($data['action']['filter']['evaltype'])
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				])),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			//$formula
+			(new CSpan(''))
+				->addStyle('white-space: normal;')
+				->setId('expression'),
+			(new CTextBox('formula', $data['action']['filter']['formula'],
+				DB::getFieldLength('actions', 'formula')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setId('formula')
+				->setAttribute('placeholder', 'A or (B and C) &hellip;')
+		]))->setId('evaltype-formfield')
+	])
+	->setId('actionCalculationRow');
 
 $condition_table->setFooter(
 	(new CSimpleButton(_('Add')))
@@ -262,18 +261,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$operations_tab
 		->addItem([
 			new CLabel(_('Pause operations for suppressed problems'), 'pause_suppressed'),
-			new CFormField(
-				(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
+			new CFormField((new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
 				->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
-				->setChecked(true)
 			)
 		])
 		->addItem([
 			new CLabel(_('Notify about canceled escalations'), 'notify_if_canceled'),
-			new CFormField(
-				(new CCheckBox('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_TRUE))
-					->setChecked($data['action']['notify_if_canceled'] == ACTION_NOTIFY_IF_CANCELED_TRUE)
-					->setChecked(true)
+			new CFormField((new CCheckBox('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_TRUE))
+				->setChecked($data['action']['notify_if_canceled'] == ACTION_NOTIFY_IF_CANCELED_TRUE)
 			)
 		]);
 }
@@ -344,7 +339,7 @@ $header = $data['actionid'] !== '' ? _('Action') : _('New action');
 
 $output = [
 	'header' => $header,
-	'doc_url' => CDocHelper::getUrl(CDocHelper::CONFIGURATION_ACTION_EDIT),
+	//'doc_url' => CDocHelper::getUrl(CDocHelper::CONFIGURATION_ACTION_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().

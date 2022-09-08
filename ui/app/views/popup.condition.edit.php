@@ -38,7 +38,6 @@ $form = (new CForm())
 	->addVar('source', $data['eventsource'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-
 $condition_type = (int) $data['last_type'];
 $form_grid = (new CFormGrid())->cleanItems();
 
