@@ -140,8 +140,7 @@ class testPageReportsAudit extends CWebTest {
 			$left_actions = array_values(array_diff($filter_actions, $actions));
 
 			// At first, we need to check that correct checkboxes is enabled. Then we check that all others are disabled.
-			foreach([true, false] as $status) {
-
+			foreach ([true, false] as $status) {
 				if (!$status) {
 					$actions = $left_actions;
 				}
@@ -511,8 +510,7 @@ class testPageReportsAudit extends CWebTest {
 			$this->assertEquals(['No data found.'], $table->getRows()->asText());
 		}
 		else {
-			foreach($data['fields'] as $column => $values) {
-
+			foreach ($data['fields'] as $column => $values) {
 				if ($column === 'Users' || 'Actions') {
 					$column = rtrim($column, 's');
 				}
