@@ -516,9 +516,7 @@ static void	zbx_set_defaults(void)
 		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
 
 	if (-1 != CONFIG_HEARTBEAT_FREQUENCY)
-	{
 		zabbix_log(LOG_LEVEL_WARNING, "HeartbeatFrequency parameter is deprecated, and has no effect");
-	}
 
 	if (0 == CONFIG_SERVER_PORT)
 	{

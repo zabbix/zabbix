@@ -191,8 +191,7 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "ignoring heartbeat from active proxy \"%s\" at \"%s\": proxy heartbeats"
-				" are deprecated",
-				proxy.host, sock->peer);
+			" are deprecated", proxy.host, sock->peer);
 out:
 	zbx_free(error);
 
