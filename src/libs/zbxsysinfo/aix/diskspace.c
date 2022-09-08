@@ -298,6 +298,8 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_mpoint_t		*mntpoint;
 	char 			*mpoint;
 
+	ZBX_UNUSED(request);
+
 	/* check how many bytes to allocate for the mounted filesystems */
 	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
 	{
