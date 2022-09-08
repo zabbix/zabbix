@@ -18,15 +18,16 @@
 **/
 
 #include "housekeeper.h"
+
 #include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxserver.h"
 #include "zbxrtc.h"
-
+#include "zbxnum.h"
+#include "zbxtime.h"
 #include "history_compress.h"
 #include "../../libs/zbxdbcache/valuecache.h"
-
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -395,7 +396,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
 
-			if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
+			if (SUCCEED != zbx_is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period '%s' for itemid '%s'",
 						tmp, row[0]);
@@ -426,7 +427,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
 
-			if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
+			if (SUCCEED != zbx_is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period '%s' for itemid '%s'",
 						tmp, row[0]);
@@ -1203,7 +1204,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER | ZBX_CONFIG_FLAGS_DB_EXTENSION);
 
-		if (0 == strcmp(cfg.db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+		if (0 == strcmp(cfg.db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		{
 			zbx_setproctitle("%s [synchronizing history and trends compression settings]",
 					get_process_type_string(process_type));
@@ -1246,7 +1247,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		DBclose();
 
-		zbx_dc_cleanup_data_sessions();
+		zbx_dc_cleanup_sessions();
 		zbx_vc_housekeeping_value_cache();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"

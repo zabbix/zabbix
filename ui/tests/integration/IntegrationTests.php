@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once dirname(__FILE__).'/testTimescaleDb.php';
 require_once dirname(__FILE__).'/testDataCollection.php';
 require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
@@ -27,6 +28,7 @@ require_once dirname(__FILE__).'/testValuemaps.php';
 require_once dirname(__FILE__).'/testTriggerLinking.php';
 require_once dirname(__FILE__).'/testGraphLinking.php';
 require_once dirname(__FILE__).'/testEscalations.php';
+require_once dirname(__FILE__).'/testAlertingForServices.php';
 require_once dirname(__FILE__).'/testComplexServiceStatus.php';
 require_once dirname(__FILE__).'/testServiceRoles.php';
 require_once dirname(__FILE__).'/testExpressionMacros.php';
@@ -37,12 +39,17 @@ require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
+require_once dirname(__FILE__).'/testActiveAvailability.php';
 
 use PHPUnit\Framework\TestSuite;
 
 class IntegrationTests {
 	public static function suite() {
 		$suite = new TestSuite('Integration');
+
+		if  (substr(getenv('DB'), 0, 4) === "tsdb" ) {
+			$suite->addTestSuite('testTimescaleDb');
+		}
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
@@ -52,6 +59,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testTriggerLinking');
 		$suite->addTestSuite('testGraphLinking');
 		$suite->addTestSuite('testEscalations');
+		$suite->addTestSuite('testAlertingForServices');
 		$suite->addTestSuite('testComplexServiceStatus');
 		$suite->addTestSuite('testServiceRoles');
 		$suite->addTestSuite('testExpressionMacros');
@@ -62,6 +70,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHighAvailability');
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
+		$suite->addTestSuite('testActiveAvailability');
 
 		return $suite;
 	}

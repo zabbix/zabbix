@@ -19,7 +19,7 @@
 
 #include "dbupgrade.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 
 /*
  * 2.4 maintenance database patches

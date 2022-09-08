@@ -23,6 +23,10 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
+/* audit logging mode */
+#define ZBX_AUDITLOG_DISABLED	0
+#define ZBX_AUDITLOG_ENABLED	1
+
 #define AUDIT_ACTION_ADD		0
 #define AUDIT_ACTION_UPDATE		1
 #define AUDIT_ACTION_DELETE		2

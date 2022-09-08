@@ -18,15 +18,16 @@
 **/
 
 #include "hardware.h"
-
-#include "../common/zbxsysinfo_common.h"
 #include "sysinfo.h"
+#include "../common/zbxsysinfo_common.h"
+
 #include <sys/mman.h>
 #include <setjmp.h>
 #include <signal.h>
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "log.h"
+#include "zbxnum.h"
 
 static ZBX_THREAD_LOCAL volatile char sigbus_handler_set;
 static ZBX_THREAD_LOCAL sigjmp_buf sigbus_jmp_buf;
@@ -400,7 +401,7 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == param || '\0' == *param || 0 == strcmp(param, "all"))
 		cpu = HW_CPU_ALL_CPUS;	/* show all CPUs by default */
-	else if (FAIL == is_uint31(param, &cpu))
+	else if (FAIL == zbx_is_uint31(param, &cpu))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;

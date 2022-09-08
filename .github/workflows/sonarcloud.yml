@@ -1,10 +1,8 @@
 name: SonarCloud C Build
 
 on:
-  push:
-    branches:
-     - 'master'
-     - 'release/*'
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
 
@@ -38,6 +36,7 @@ jobs:
 
       - name: Download and compile Zabbix
         run: |
+          sudo apt-get update
           sudo apt-get install libsnmp-dev snmp libopenipmi-dev libevent-dev libcurl4-openssl-dev
           cd $GITHUB_WORKSPACE
           sh bootstrap.sh

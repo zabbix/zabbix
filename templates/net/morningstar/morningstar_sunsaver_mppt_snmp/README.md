@@ -3,11 +3,11 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 Refer to the vendor documentation.
 
@@ -63,7 +63,8 @@ There are no template links in this template.
 |Load |Load: State |<p>MIB: SUNSAVER-MPPT</p><p>Description:Load State</p><p>Modbus address:0x001A</p><p>0: Start</p><p>1: Normal</p><p>2: LvdWarning</p><p>3: Lvd</p><p>4: Fault</p><p>5: Disconnect</p><p>6: NormalOff</p><p>7: Override</p><p>8: NotUsed</p> |SNMP |load.state[loadState.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Load |Load: Voltage |<p>MIB: SUNSAVER-MPPT</p><p>Description:Load Voltage</p><p>Scaling Factor:0.0030517578125</p><p>Units:V</p><p>Range:[0, 80]</p><p>Modbus address:0x000A</p> |SNMP |load.voltage[loadVoltage.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.003051757813`</p><p>- REGEX: `^(\d+)(\.\d{1,2})? \1\2`</p> |
 |Load |Load: Current |<p>MIB: SUNSAVER-MPPT</p><p>Description:Load Current</p><p>Scaling Factor:0.002415771484375</p><p>Units:A</p><p>Range:[0, 60]</p><p>Modbus address:0x000C</p> |SNMP |load.current[loadCurrent.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.002415771484`</p><p>- REGEX: `^(\d+)(\.\d{1,2})? \1\2`</p> |
-|Status |Status: Uptime |<p>Device uptime in seconds</p> |SNMP |status.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Status: Uptime (network) |<p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |status.net.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Status: Uptime (hardware) |<p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p> |SNMP |status.hw.uptime<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.01`</p> |
 |Status |Status: Array Faults |<p>MIB: SUNSAVER-MPPT</p><p>Description:Array Faults</p><p>Modbus address:0x0012</p> |SNMP |status.array_faults[arrayFaults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Status |Status: Load Faults |<p>MIB: SUNSAVER-MPPT</p><p>Description:Array Faults</p><p>Modbus address:0x0012</p> |SNMP |status.load_faults[loadFaults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Status |Status: Alarms |<p>MIB: SUNSAVER-MPPT</p><p>Description:Alarms</p><p>Modbus addresses:H=0x0023 L=0x0024</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
@@ -84,8 +85,8 @@ There are no template links in this template.
 |Battery: Critically high battery voltage |<p>-</p> |`min(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}` |HIGH | |
 |Load: Device load in warning state |<p>-</p> |`last(/Morningstar SunSaver MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar SunSaver MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}` |WARNING |<p>**Depends on**:</p><p>- Load: Device load in critical state</p> |
 |Load: Device load in critical state |<p>-</p> |`last(/Morningstar SunSaver MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SunSaver MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}` |HIGH | |
-|Status: Device has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Morningstar SunSaver MPPT SNMP/status.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Status: Failed to fetch data |<p>Zabbix has not received data for items for the last 5 minutes</p> |`nodata(/Morningstar SunSaver MPPT SNMP/status.uptime,5m)=1` |WARNING |<p>Manual close: YES</p> |
+|Status: Device has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/Morningstar SunSaver MPPT SNMP/status.hw.uptime)>0 and last(/Morningstar SunSaver MPPT SNMP/status.hw.uptime)<10m) or (last(/Morningstar SunSaver MPPT SNMP/status.hw.uptime)=0 and last(/Morningstar SunSaver MPPT SNMP/status.net.uptime)<10m)` |INFO |<p>Manual close: YES</p> |
+|Status: Failed to fetch data |<p>Zabbix has not received data for items for the last 5 minutes.</p> |`nodata(/Morningstar SunSaver MPPT SNMP/status.net.uptime,5m)=1` |WARNING |<p>Manual close: YES</p> |
 |Status: Device has "overcurrent" array faults flag |<p>-</p> |`count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2` |HIGH | |
 |Status: Device has "mosfetSShorted" array faults flag |<p>-</p> |`count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2` |HIGH | |
 |Status: Device has "softwareFault" array faults flag |<p>-</p> |`count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","softwareFault")=2` |HIGH | |

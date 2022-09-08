@@ -360,10 +360,10 @@ function itemTypeInterface($type = null) {
 		ITEM_TYPE_SNMPTRAP => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_IPMI => INTERFACE_TYPE_IPMI,
 		ITEM_TYPE_ZABBIX => INTERFACE_TYPE_AGENT,
-		ITEM_TYPE_SIMPLE => INTERFACE_TYPE_ANY,
-		ITEM_TYPE_EXTERNAL => INTERFACE_TYPE_ANY,
-		ITEM_TYPE_SSH => INTERFACE_TYPE_ANY,
-		ITEM_TYPE_TELNET => INTERFACE_TYPE_ANY,
+		ITEM_TYPE_SIMPLE => INTERFACE_TYPE_OPT,
+		ITEM_TYPE_EXTERNAL => INTERFACE_TYPE_OPT,
+		ITEM_TYPE_SSH => INTERFACE_TYPE_OPT,
+		ITEM_TYPE_TELNET => INTERFACE_TYPE_OPT,
 		ITEM_TYPE_JMX => INTERFACE_TYPE_JMX,
 		ITEM_TYPE_HTTPAGENT => INTERFACE_TYPE_OPT
 	];
@@ -759,15 +759,6 @@ function copyItems($srcHostId, $dstHostId, $assign_opt_interface = false) {
 	}
 
 	return true;
-}
-
-function get_item_by_itemid($itemid) {
-	$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.zbx_dbstr($itemid)));
-	if ($db_items) {
-		return $db_items;
-	}
-	error(_s('No item with item ID "%1$s".', $itemid));
-	return false;
 }
 
 /**

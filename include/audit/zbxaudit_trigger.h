@@ -20,7 +20,7 @@
 #ifndef ZABBIX_AUDIT_TRIGGER_H
 #define ZABBIX_AUDIT_TRIGGER_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxalgo.h"
 
 void	zbx_audit_trigger_create_entry(int audit_action, zbx_uint64_t triggerid, const char *name, int flags);
@@ -62,8 +62,8 @@ void	zbx_audit_trigger_update_json_remove_dependency(int flags, zbx_uint64_t tri
 void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid,
 		const char *tag, const char *value);
 void	zbx_audit_trigger_update_json_delete_tags(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid);
-void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(zbx_uint64_t trigger, int trigger_flags,
-		zbx_uint64_t tagid);
+void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(zbx_uint64_t triggerid, int trigger_flags,
+		zbx_uint64_t triggertagid);
 
 #define PREPARE_AUDIT_TRIGGER_UPDATE_TAG_H(resource, type1)							\
 void	zbx_audit_trigger_update_json_update_tag_##resource(zbx_uint64_t triggerid, int trigger_flags, 		\

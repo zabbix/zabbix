@@ -46,7 +46,7 @@ $filter_column_left = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 	)
 	->addRow(
-		new CLabel($data['context'] === 'host' ? _('Hosts') : _('Templates'), 'filter_hosts__ms'),
+		(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -90,8 +90,8 @@ $filter = (new CFilter())
 $widget = (new CWidget())
 	->setTitle(_('Web monitoring'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_HTTPCONF_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_HTTPCONF_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_HTTPCONF_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_HTTPCONF_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,76 +21,95 @@
 
 /**
  * Problem hosts widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
-);
-
 $scripts = [];
-$jq_templates = [];
+
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
+);
 
 // Host groups.
-$field_groupids = CWidgetHelper::getGroup($fields['groupids'],
-	$data['captions']['ms']['groups']['groupids'],
+$field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']['ms']['groups']['groupids'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
+$form_grid->addItem([
+	CWidgetHelper::getMultiselectLabel($fields['groupids']),
+	new CFormField($field_groupids)
+]);
 $scripts[] = $field_groupids->getPostJS();
 
 // Exclude host groups.
 $field_exclude_groupids = CWidgetHelper::getGroup($fields['exclude_groupids'],
-	$data['captions']['ms']['groups']['exclude_groupids'],
-	$form->getName()
+	$data['captions']['ms']['groups']['exclude_groupids'], $form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['exclude_groupids']), $field_exclude_groupids);
+$form_grid->addItem([
+	CWidgetHelper::getMultiselectLabel($fields['exclude_groupids']),
+	new CFormField($field_exclude_groupids)
+]);
 $scripts[] = $field_exclude_groupids->getPostJS();
 
 // Hosts.
-$field_hostids = CWidgetHelper::getHost($fields['hostids'],
-	$data['captions']['ms']['hosts']['hostids'],
+$field_hostids = CWidgetHelper::getHost($fields['hostids'], $data['captions']['ms']['hosts']['hostids'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $field_hostids);
+$form_grid->addItem([
+	CWidgetHelper::getMultiselectLabel($fields['hostids']),
+	new CFormField($field_hostids)
+]);
 $scripts[] = $field_hostids->getPostJS();
 
 // Problem.
-$form_list->addRow(CWidgetHelper::getLabel($fields['problem']), CWidgetHelper::getTextBox($fields['problem']));
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['problem']),
+	new CFormField(CWidgetHelper::getTextBox($fields['problem']))
+]);
 
 // Severity.
-$form_list->addRow(
+$form_grid->addItem([
 	CWidgetHelper::getLabel($fields['severities']),
-	CWidgetHelper::getSeverities($fields['severities'])
-);
+	new CFormField(CWidgetHelper::getSeverities($fields['severities']))
+]);
 
 // Tags.
-$form_list->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']));
-
-// Tags filter list.
-$form_list->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
+$form_grid
+	->addItem([
+		CWidgetHelper::getLabel($fields['evaltype']),
+		new CFormField(CWidgetHelper::getRadioButtonList($fields['evaltype']))
+	])
+	->addItem(
+		new CFormField(CWidgetHelper::getTags($fields['tags']))
+	);
 $scripts[] = $fields['tags']->getJavascript();
 $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Show suppressed problems.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
-	CWidgetHelper::getCheckBox($fields['show_suppressed'])
-);
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['show_suppressed']),
+	new CFormField(CWidgetHelper::getCheckBox($fields['show_suppressed']))
+]);
 
 // Hide groups without problems.
-$form_list->addRow(
+$form_grid->addItem([
 	CWidgetHelper::getLabel($fields['hide_empty_groups']),
-	CWidgetHelper::getCheckBox($fields['hide_empty_groups'])
-);
+	new CFormField(CWidgetHelper::getCheckBox($fields['hide_empty_groups']))
+]);
 
 // Problem display.
-$form_list->addRow(CWidgetHelper::getLabel($fields['ext_ack']), CWidgetHelper::getRadioButtonList($fields['ext_ack']));
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['ext_ack']),
+	new CFormField(CWidgetHelper::getRadioButtonList($fields['ext_ack']))
+]);
 
-$form->addItem($form_list);
+$form->addItem($form_grid);
 
 return [
 	'form' => $form,

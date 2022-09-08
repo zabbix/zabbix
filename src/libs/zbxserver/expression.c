@@ -28,6 +28,10 @@
 #include "valuecache.h"
 #include "macrofunc.h"
 #include "zbxxml.h"
+#include "zbxstr.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
 
 typedef struct
 {
@@ -951,6 +955,29 @@ static int	DBget_drule_value_by_event(const ZBX_DB_EVENT *event, char **replace_
 	return ret;
 }
 
+static const char	*item_logtype_string(unsigned char logtype)
+{
+	switch (logtype)
+	{
+		case ITEM_LOGTYPE_INFORMATION:
+			return "Information";
+		case ITEM_LOGTYPE_WARNING:
+			return "Warning";
+		case ITEM_LOGTYPE_ERROR:
+			return "Error";
+		case ITEM_LOGTYPE_FAILURE_AUDIT:
+			return "Failure Audit";
+		case ITEM_LOGTYPE_SUCCESS_AUDIT:
+			return "Success Audit";
+		case ITEM_LOGTYPE_CRITICAL:
+			return "Critical";
+		case ITEM_LOGTYPE_VERBOSE:
+			return "Verbose";
+		default:
+			return "unknown";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve a particular attribute of a log value                    *
@@ -1004,7 +1031,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 			break;
 		case ZBX_REQUEST_ITEM_LOG_SEVERITY:
 			*replace_to = zbx_strdup(*replace_to,
-					zbx_item_logtype_string((unsigned char)value.value.log->severity));
+					item_logtype_string((unsigned char)value.value.log->severity));
 			break;
 		case ZBX_REQUEST_ITEM_LOG_NSEVERITY:
 			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->severity);
@@ -1167,6 +1194,30 @@ static char	*format_user_fullname(const char *name, const char *surname, const c
 	return buf;
 }
 
+static const char	*alert_type_string(unsigned char type)
+{
+	switch (type)
+	{
+		case ALERT_TYPE_MESSAGE:
+			return "message";
+		default:
+			return "script";
+	}
+}
+
+static const char	*alert_status_string(unsigned char type, unsigned char status)
+{
+	switch (status)
+	{
+		case ALERT_STATUS_SENT:
+			return (ALERT_TYPE_MESSAGE == type ? "sent" : "executed");
+		case ALERT_STATUS_NOT_SENT:
+			return "in progress";
+		default:
+			return "failed";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve escalation history                                       *
@@ -1215,8 +1266,8 @@ static void	get_escalation_history(zbx_uint64_t actionid, const ZBX_DB_EVENT *ev
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s %s %-7s %-11s",
 				zbx_date2str(now, tz), zbx_time2str(now, tz),	/* date, time */
-				zbx_alert_type_string(type),		/* alert type */
-				zbx_alert_status_string(type, status));	/* alert status */
+				alert_type_string(type),		/* alert type */
+				alert_status_string(type, status));	/* alert status */
 
 		if (ALERT_TYPE_COMMAND == type)
 		{
@@ -2018,6 +2069,62 @@ static void	get_event_tag_by_name(const char *text, const ZBX_DB_EVENT *event, c
 	}
 }
 
+static const char      *trigger_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case TRIGGER_STATE_NORMAL:
+			return "Normal";
+		case TRIGGER_STATE_UNKNOWN:
+			return "Unknown";
+		default:
+			return "unknown";
+	}
+}
+
+static const char	*item_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case ITEM_STATE_NORMAL:
+			return "Normal";
+		case ITEM_STATE_NOTSUPPORTED:
+			return "Not supported";
+		default:
+			return "unknown";
+	}
+}
+
+static const char	*event_value_string(unsigned char source, unsigned char object, unsigned char value)
+{
+	if (EVENT_SOURCE_TRIGGERS == source || EVENT_SOURCE_SERVICE == source)
+	{
+		switch (value)
+		{
+			case EVENT_STATUS_PROBLEM:
+				return "PROBLEM";
+			case EVENT_STATUS_RESOLVED:
+				return "RESOLVED";
+			default:
+				return "unknown";
+		}
+	}
+
+	if (EVENT_SOURCE_INTERNAL == source)
+	{
+		switch (object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				return trigger_state_string(value);
+			case EVENT_OBJECT_ITEM:
+			case EVENT_OBJECT_LLDRULE:
+				return item_state_string(value);
+		}
+	}
+
+	return "unknown";
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: request recovery event value by macro                             *
@@ -2037,7 +2144,7 @@ static void	get_recovery_event_value(const char *macro, const ZBX_DB_EVENT *r_ev
 	else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_STATUS))
 	{
 		*replace_to = zbx_strdup(*replace_to,
-				zbx_event_value_string(r_event->source, r_event->object, r_event->value));
+				event_value_string(r_event->source, r_event->object, r_event->value));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_TIME))
 	{
@@ -2070,7 +2177,7 @@ static void	get_current_event_value(const char *macro, const ZBX_DB_EVENT *event
 	if (0 == strcmp(macro, MVAR_EVENT_STATUS))
 	{
 		*replace_to = zbx_strdup(*replace_to,
-				zbx_event_value_string(event->source, event->object, event->value));
+				event_value_string(event->source, event->object, event->value));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_VALUE))
 	{
@@ -2409,7 +2516,7 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
 
 		if ('?' != mod_macros[i].macro[1] && len != fm_len)
 		{
-			if (SUCCEED != is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
+			if (SUCCEED != zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
 					sizeof(*N_functionid), 1, 9))
 			{
 				continue;
@@ -2418,7 +2525,7 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
 		else if (mod_macros[i].macro[len - 1] != str[fm->macro.l + fm_len - 1])
 			continue;
 
-		if (SUCCEED == str_n_in_list(mod_macros[i].functions, str + fm->func.l, fm->func_param.l - fm->func.l,
+		if (SUCCEED == zbx_str_n_in_list(mod_macros[i].functions, str + fm->func.l, fm->func_param.l - fm->func.l,
 				','))
 		{
 			return mod_macros[i].macro;
@@ -2471,7 +2578,7 @@ static int	get_expression_macro_result(const ZBX_DB_EVENT *event, char *data, zb
 	}
 
 	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_NORMAL, &ctx);
-	zbx_expression_eval_resolve_trigger_hosts(&eval, &event->trigger);
+	zbx_expression_eval_resolve_trigger_hosts_items(&eval, &event->trigger);
 
 	if (SUCCEED == (ret = zbx_expression_eval_execute(&eval, ts, &value, error)))
 	{
@@ -2657,6 +2764,60 @@ static int	resolve_host_target_macros(const char *m, const DC_HOST *dc_host, DC_
 	}
 
 	return ret;
+}
+
+static const char	*dservice_type_string(zbx_dservice_type_t service)
+{
+	switch (service)
+	{
+		case SVC_SSH:
+			return "SSH";
+		case SVC_LDAP:
+			return "LDAP";
+		case SVC_SMTP:
+			return "SMTP";
+		case SVC_FTP:
+			return "FTP";
+		case SVC_HTTP:
+			return "HTTP";
+		case SVC_POP:
+			return "POP";
+		case SVC_NNTP:
+			return "NNTP";
+		case SVC_IMAP:
+			return "IMAP";
+		case SVC_TCP:
+			return "TCP";
+		case SVC_AGENT:
+			return "Zabbix agent";
+		case SVC_SNMPv1:
+			return "SNMPv1 agent";
+		case SVC_SNMPv2c:
+			return "SNMPv2c agent";
+		case SVC_SNMPv3:
+			return "SNMPv3 agent";
+		case SVC_ICMPPING:
+			return "ICMP ping";
+		case SVC_HTTPS:
+			return "HTTPS";
+		case SVC_TELNET:
+			return "Telnet";
+		default:
+			return "unknown";
+	}
+}
+
+static const char	*trigger_value_string(unsigned char value)
+{
+	switch (value)
+	{
+		case TRIGGER_VALUE_PROBLEM:
+			return "PROBLEM";
+		case TRIGGER_VALUE_OK:
+			return "OK";
+		default:
+			return "unknown";
+	}
 }
 
 /******************************************************************************
@@ -3090,7 +3251,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				else if (0 == strcmp(m, MVAR_TRIGGER_STATUS) || 0 == strcmp(m, MVAR_STATUS))
 				{
 					replace_to = zbx_strdup(replace_to,
-							zbx_trigger_value_string(c_event->trigger.value));
+							trigger_value_string(c_event->trigger.value));
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
 				{
@@ -3368,7 +3529,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_STATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_trigger_state_string(c_event->value));
+					replace_to = zbx_strdup(replace_to, trigger_state_string(c_event->value));
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_STATE_ERROR))
 				{
@@ -3464,7 +3625,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 							"c.type")))
 					{
 						replace_to = zbx_strdup(replace_to,
-								zbx_dservice_type_string(atoi(replace_to)));
+								dservice_type_string(atoi(replace_to)));
 					}
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_SERVICE_PORT))
@@ -3764,7 +3925,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_STATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_item_state_string(c_event->value));
+					replace_to = zbx_strdup(replace_to, item_state_string(c_event->value));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_VALUETYPE))
 				{
@@ -3913,7 +4074,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				}
 				else if (0 == strcmp(m, MVAR_LLDRULE_STATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_item_state_string(c_event->value));
+					replace_to = zbx_strdup(replace_to, item_state_string(c_event->value));
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
@@ -6304,7 +6465,7 @@ static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM
 			exit(EXIT_FAILURE);
 	}
 
-	ret = replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error, maxerrlen);
+	ret = zbx_replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error, maxerrlen);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __func__, zbx_result_string(ret), *data);
 

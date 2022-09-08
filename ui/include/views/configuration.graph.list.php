@@ -29,8 +29,8 @@ if (!empty($this->data['parent_discoveryid'])) {
 	$widget = (new CWidget())
 		->setTitle(_('Graph prototypes'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-			? CDocHelper::CONFIGURATION_HOST_GRAPH_PROTOTYPE_LIST
-			: CDocHelper::CONFIGURATION_TEMPLATES_GRAPH_PROTOTYPE_LIST
+			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_PROTOTYPE_LIST
+			: CDocHelper::DATA_COLLECTION_TEMPLATES_GRAPH_PROTOTYPE_LIST
 		))
 		->setControls(
 			(new CTag('nav', true,
@@ -51,8 +51,8 @@ else {
 	$widget = (new CWidget())
 		->setTitle(_('Graphs'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-			? CDocHelper::CONFIGURATION_HOST_GRAPH_LIST
-			: CDocHelper::CONFIGURATION_TEMPLATE_GRAPH_LIST
+			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_LIST
+			: CDocHelper::DATA_COLLECTION_TEMPLATE_GRAPH_LIST
 		))
 		->setControls(
 			(new CTag('nav', true,
@@ -91,7 +91,7 @@ else {
 				(new CFormList())
 					->addRow(
 						new CLabel($data['context'] === 'host' ? _('Host groups') : _('Template groups'),
-							'filter_groups__ms'
+							'filter_groupids__ms'
 						),
 						(new CMultiSelect([
 							'name' => 'filter_groupids[]',
@@ -110,7 +110,7 @@ else {
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addRow(
-						new CLabel($data['context'] === 'host' ? _('Hosts') : _('Templates'), 'filter_hosts__ms'),
+						(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms')),
 						(new CMultiSelect([
 							'name' => 'filter_hostids[]',
 							'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',

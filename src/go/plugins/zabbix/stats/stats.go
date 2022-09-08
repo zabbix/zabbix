@@ -48,7 +48,8 @@ var impl Plugin
 func (p *Plugin) getRemoteZabbixStats(addr string, req []byte) ([]byte, error) {
 	var parse response
 
-	resp, errs := zbxcomms.Exchange(&[]string{addr}, &p.localAddr, time.Duration(p.options.Timeout)*time.Second, time.Duration(p.options.Timeout)*time.Second, req)
+	resp, errs, _ := zbxcomms.Exchange(&[]string{addr}, &p.localAddr, time.Duration(p.options.Timeout)*time.Second,
+		time.Duration(p.options.Timeout)*time.Second, req)
 
 	if errs != nil {
 		return nil, fmt.Errorf("Cannot obtain internal statistics: %s", errs[0])

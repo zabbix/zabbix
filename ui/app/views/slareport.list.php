@@ -37,7 +37,7 @@ $filter = (new CFilter())
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
-				new CLabel(_('SLA'), 'filter_slaid'),
+				new CLabel(_('SLA'), 'filter_slaid_ms'),
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_slaid',
@@ -57,11 +57,11 @@ $filter = (new CFilter())
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				),
-				new CLabel(_('Service'), 'filter_serviceid'),
+				new CLabel(_('Service'), 'filter_serviceid_ms'),
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_serviceid',
-						'object_name' => 'service',
+						'object_name' => 'services',
 						'data' => $data['service'] !== null
 							? [CArrayHelper::renameKeys($data['service'], ['serviceid' => 'id'])]
 							: [],
@@ -90,7 +90,7 @@ $filter = (new CFilter())
 
 $widget = (new CWidget())
 	->setTitle(_('SLA report'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::SLAREPORT_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SLAREPORT_LIST))
 	->addItem($filter);
 
 $report = new CTableInfo();

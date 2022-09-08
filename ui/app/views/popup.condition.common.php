@@ -30,7 +30,6 @@ require_once __DIR__ .'/../../include/actions.inc.php';
 $form = (new CForm())
 	->setId('popup.condition')
 	->setName('popup.condition')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('type', '1')
 	->addVar('source', $data['eventsource'])
@@ -78,7 +77,7 @@ switch ($data['type']) {
 						new CFormField([$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
 					])
 					->addItem([
-						new CLabel(_('Tag')),
+						new CLabel(_('Tag'), 'tag'),
 						new CFormField($new_condition_tag)
 					]);
 
@@ -114,7 +113,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Host groups')),
+						new CLabel(_('Host groups'), 'groupids__ms'),
 						new CFormField($hostgroup_multiselect)
 					]);
 
@@ -135,7 +134,7 @@ switch ($data['type']) {
 
 				$form_grid
 					->addItem([
-						new CLabel(_('Old tag name')),
+						new CLabel(_('Old tag name'), 'oldtag'),
 						new CFormField($new_condition_oldtag)
 					])
 					->addItem([
@@ -143,7 +142,7 @@ switch ($data['type']) {
 						new CFormField([$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
 					])
 					->addItem([
-						new CLabel(_('New tag name')),
+						new CLabel(_('New tag name'), 'newtag'),
 						new CFormField($new_condition_newtag)
 					]);
 
@@ -165,7 +164,7 @@ switch ($data['type']) {
 
 				$form_grid
 					->addItem([
-						new CLabel(_('Tag')),
+						new CLabel(_('Tag'), 'tag'),
 						new CFormField($new_condition_tag)
 					])
 					->addItem([
@@ -173,7 +172,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Value')),
+						new CLabel(_('Value'), 'value'),
 						new CFormField($new_condition_value)
 					]);
 
@@ -272,7 +271,7 @@ switch ($data['type']) {
 							->setModern(true))
 					])
 					->addItem([
-						new CLabel(_('Triggers')),
+						new CLabel(_('Triggers'), 'trigger_new_condition_ms'),
 						new CFormField($trigger_multiselect)
 					]);
 
@@ -328,7 +327,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Hosts')),
+						new CLabel(_('Hosts'), 'host_new_condition_ms'),
 						new CFormField($host_multiselect)
 					]);
 
@@ -366,7 +365,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Host groups')),
+						new CLabel(_('Host groups'), 'hostgroup_new_condition_ms'),
 						new CFormField($hostgroup_multiselect)
 					]);
 
@@ -402,7 +401,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						(new CLabel(_('Tag')))->setAsteriskMark(),
+						(new CLabel(_('Tag'), 'value'))->setAsteriskMark(),
 						new CFormField($new_condition_value)
 					]);
 
@@ -422,7 +421,7 @@ switch ($data['type']) {
 
 				$form_grid
 					->addItem([
-						(new CLabel(_('Tag')))->setAsteriskMark(),
+						(new CLabel(_('Tag'), 'value2'))->setAsteriskMark(),
 						new CFormField($new_condition_value2)
 					])
 					->addItem([
@@ -430,7 +429,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Value')),
+						new CLabel(_('Value'), 'value'),
 						new CFormField($new_condition_value)
 					]);
 
@@ -469,7 +468,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Templates')),
+						new CLabel(_('Templates'), 'template_new_condition_ms'),
 						new CFormField($template_multiselect)
 					]);
 
@@ -615,7 +614,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Discovery rules')),
+						new CLabel(_('Discovery rules'), 'drule_new_condition_ms'),
 						new CFormField($drule_multiselect)
 					]);
 
@@ -681,7 +680,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Proxy')),
+						new CLabel(_('Proxy'), 'proxy_new_condition_ms'),
 						new CFormField($proxy_multiselect)
 					]);
 
@@ -703,7 +702,7 @@ switch ($data['type']) {
 						)
 					])
 					->addItem([
-						new CLabel(_('Value')),
+						new CLabel(_('Value'), 'value'),
 						new CFormField($new_condition_value)
 					]);
 
@@ -797,7 +796,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						(new CLabel(_('Value')))->setAsteriskMark(),
+						(new CLabel(_('Value'), 'value'))->setAsteriskMark(),
 						new CFormField($new_condition_value)
 					]);
 

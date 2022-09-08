@@ -20,9 +20,9 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
-#include "sysinfo.h"
 #include "zbxserver.h"
+#include "zbxparam.h"
+#include "sysinfo.h"
 
 /******************************************************************************
  *                                                                            *
@@ -96,7 +96,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot get 'expected_key' from test case data: %s", zbx_mock_error_string(error));
 	}
 
-	if (expected_result != (actual_result = replace_key_params_dyn((char **)&key, ZBX_KEY_TYPE_ITEM,
+	if (expected_result != (actual_result = zbx_replace_key_params_dyn((char **)&key, ZBX_KEY_TYPE_ITEM,
 			replace_key_param_cb, NULL, NULL, 0)))
 	{
 		fail_msg("Got %s instead of %s as a result.", zbx_result_string(actual_result),

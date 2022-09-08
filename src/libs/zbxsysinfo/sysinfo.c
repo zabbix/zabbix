@@ -27,6 +27,9 @@
 #endif
 #include "zbxalgo.h"
 #include "zbxregexp.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
 
 extern int	CONFIG_TIMEOUT;
 
@@ -557,12 +560,12 @@ static int	parse_key_access_rule(char *pattern, zbx_key_access_rule_t *rule)
 	}
 
 	*pr = '\0';
-	size = num_param(pl);
+	size = zbx_num_param(pl);
 	zbx_vector_str_reserve(&rule->elements, size);
 
 	for (i = 0; i < size; i++)
 	{
-		if (NULL == (param = get_param_dyn(pl, i + 1, NULL)))
+		if (NULL == (param = zbx_get_param_dyn(pl, i + 1, NULL)))
 			return FAIL;
 
 		zbx_wildcard_minimize(param);
@@ -909,7 +912,7 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 	switch (parse_command_dyn(itemkey, &key, &params))
 	{
 		case ZBX_COMMAND_WITH_PARAMS:
-			if (0 == (request->nparam = num_param(params)))
+			if (0 == (request->nparam = zbx_num_param(params)))
 				goto out;	/* key is badly formatted */
 
 			request->params = (char **)zbx_malloc(request->params, request->nparam * sizeof(char *));
@@ -917,7 +920,7 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 					request->nparam * sizeof(zbx_request_parameter_type_t));
 
 			for (i = 0; i < request->nparam; i++)
-				request->params[i] = get_param_dyn(params, i + 1, &request->types[i]);
+				request->params[i] = zbx_get_param_dyn(params, i + 1, &request->types[i]);
 			break;
 		case ZBX_COMMAND_ERROR:
 			goto out;	/* key is badly formatted */
@@ -1245,9 +1248,9 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_trim_integer(c);
-			del_zeros(c);
+			zbx_del_zeros(c);
 
-			if (SUCCEED == is_uint64(c, &value_uint64))
+			if (SUCCEED == zbx_is_uint64(c, &value_uint64))
 			{
 				SET_UI64_RESULT(result, value_uint64);
 				ret = SUCCEED;
@@ -1256,7 +1259,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_trim_float(c);
 
-			if (SUCCEED == is_double(c, &dbl_tmp))
+			if (SUCCEED == zbx_is_double(c, &dbl_tmp))
 			{
 				SET_DBL_RESULT(result, dbl_tmp);
 				ret = SUCCEED;
@@ -1306,9 +1309,9 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 	else if (0 != ISSET_STR(result))
 	{
 		zbx_trim_integer(result->str);
-		del_zeros(result->str);
+		zbx_del_zeros(result->str);
 
-		if (SUCCEED != is_uint64(result->str, &value))
+		if (SUCCEED != zbx_is_uint64(result->str, &value))
 			return NULL;
 
 		SET_UI64_RESULT(result, value);
@@ -1316,9 +1319,9 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 	else if (0 != ISSET_TEXT(result))
 	{
 		zbx_trim_integer(result->text);
-		del_zeros(result->text);
+		zbx_del_zeros(result->text);
 
-		if (SUCCEED != is_uint64(result->text, &value))
+		if (SUCCEED != zbx_is_uint64(result->text, &value))
 			return NULL;
 
 		SET_UI64_RESULT(result, value);
@@ -1349,7 +1352,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	{
 		zbx_trim_float(result->str);
 
-		if (SUCCEED != is_double(result->str, &value))
+		if (SUCCEED != zbx_is_double(result->str, &value))
 			return NULL;
 
 		SET_DBL_RESULT(result, value);
@@ -1358,7 +1361,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	{
 		zbx_trim_float(result->text);
 
-		if (SUCCEED != is_double(result->text, &value))
+		if (SUCCEED != zbx_is_double(result->text, &value))
 			return NULL;
 
 		SET_DBL_RESULT(result, value);
@@ -1682,7 +1685,7 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 	if (*data_alloc - *data_offset < value_len + 1 + sizeof(int))
 	{
 		while (*data_alloc - *data_offset < value_len + 1 + sizeof(int))
-			*data_alloc *= 1.5;
+			*data_alloc = (size_t)(*data_alloc * 1.5);
 
 		*data = (char *)zbx_realloc(*data, *data_alloc);
 	}
@@ -1834,7 +1837,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		if ((int)(data_alloc - data_offset) < n + 1)
 		{
 			while ((int)(data_alloc - data_offset) < n + 1)
-				data_alloc *= 1.5;
+				data_alloc = (size_t)(data_alloc * 1.5);
 
 			data = (char *)zbx_realloc(data, data_alloc);
 		}
@@ -2040,6 +2043,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
  ******************************************************************************/
 void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 {
+	zbx_free(mpoint->options);
 	zbx_free(mpoint);
 }
 
@@ -2088,5 +2092,42 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 	SET_STR_RESULT(result, hostname);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: format string containing human-readable mount options from flags  *
+ *                                                                            *
+ * Parameters: mntopts     - [IN] array containing flag to string mappings    *
+ *             flags       - [IN] mount point flags                           *
+ *                                                                            *
+ * Return value: returns null-terminated allocated string with                *
+ *               comma-separated mount options                                *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags)
+{
+	char		*dst_string = NULL;
+	size_t		dst_alloc = 1, dst_offset = 0;
+	zbx_mntopt_t	*mntopt;
+
+	dst_string = (char *)zbx_malloc(NULL, dst_alloc);
+	*dst_string = '\0';
+
+	if (0 != flags)
+	{
+		for (mntopt = mntopts; 0 != mntopt->flag; mntopt++)
+		{
+			if (0 == ((zbx_uint64_t)flags & mntopt->flag))
+				continue;
+
+			if ('\0' != *dst_string)
+				zbx_strcpy_alloc(&dst_string, &dst_alloc, &dst_offset, ",");
+
+			zbx_strcpy_alloc(&dst_string, &dst_alloc, &dst_offset, mntopt->name);
+		}
+	}
+
+	return dst_string;
 }
 #endif

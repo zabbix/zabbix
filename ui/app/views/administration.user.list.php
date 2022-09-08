@@ -31,7 +31,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Users'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USER_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USER_LIST))
 	->setControls((new CList([
 		(new CForm('get'))
 			->cleanItems()
@@ -71,7 +71,7 @@ $widget = (new CWidget())
 			(new CFormList())->addRow(_('Last name'),
 				(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			),
-			(new CFormList())->addRow((new CLabel(_('User roles'), 'filter_roles')),
+			(new CFormList())->addRow((new CLabel(_('User roles'), 'filter_roles__ms')),
 				(new CMultiSelect([
 					'name' => 'filter_roles[]',
 					'object_name' => 'roles',

@@ -25,19 +25,7 @@
 #include "dbcache.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
-
-#if defined(HAVE_POSTGRESQL)
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
-#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
-#elif defined(HAVE_MYSQL)
-#	define ZBX_DB_STRLIST_DELIM		','
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8,utf8mb3"
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4 	"utf8mb4"
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET		ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 "," ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
-#	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin,utf8mb4_bin"
-#endif
+#include "zbxnum.h"
 
 #ifdef HAVE_ORACLE
 #	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
@@ -48,21 +36,6 @@
 #else
 #	define	ZBX_SQL_EXEC_FROM	0
 #endif
-
-typedef struct
-{
-	zbx_uint64_t	autoreg_hostid;
-	zbx_uint64_t	hostid;
-	char		*host;
-	char		*ip;
-	char		*dns;
-	char		*host_metadata;
-	int		now;
-	unsigned short	port;
-	unsigned short	flag;
-	unsigned int	connection_type;
-}
-zbx_autoreg_host_t;
 
 #if defined(HAVE_POSTGRESQL)
 extern char	ZBX_PG_ESCAPE_BACKSLASH;
@@ -760,7 +733,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-void	DBextract_version_info(struct zbx_db_version_info_t *version_info)
+void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
 {
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	zbx_dbms_version_info_extract(version_info);
@@ -769,44 +742,18 @@ void	DBextract_version_info(struct zbx_db_version_info_t *version_info)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: writes a json entry in DB with the result for the front-end       *
- *                                                                            *
- * Parameters: version - [IN] entry of DB versions                            *
+ * Purpose: connects to DB and tries to detect DB extension version info      *
  *                                                                            *
  ******************************************************************************/
-void	DBflush_version_requirements(const char *version)
+void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", version))
-		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: checks DBMS for optional features and exit if is not suitable     *
- *                                                                            *
- * Parameters: db_version - [IN] version of DB                                *
- *                                                                            *
- * Return value: SUCCEED - if optional features were checked successfully     *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	DBcheck_capabilities(zbx_uint32_t db_version)
-{
-	int	ret = SUCCEED;
 #ifdef HAVE_POSTGRESQL
-
-#define MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB	100002
-#define MIN_TIMESCALEDB_VERSION			10500
-	int		timescaledb_version;
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	/* in case of major upgrade, db_extension may be missing */
 	if (FAIL == DBfield_exists("config", "db_extension"))
 		goto out;
 
@@ -816,44 +763,232 @@ int	DBcheck_capabilities(zbx_uint32_t db_version)
 	if (NULL == (row = DBfetch(result)))
 		goto clean;
 
-	if (0 != zbx_strcmp_null(row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
-		goto clean;
+	version_info->extension = zbx_strdup(NULL, row[0]);
 
-	ret = FAIL;	/* In case of major upgrade, db_extension may be missing */
-
-	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
-	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > db_version)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %lu is not supported with TimescaleDB, minimum is %d",
-				(unsigned long)db_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
-		goto clean;
-	}
-
-	if (0 == (timescaledb_version = zbx_tsdb_get_version()))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot determine TimescaleDB version");
-		goto clean;
-	}
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: %d", timescaledb_version);
-
-	if (MIN_TIMESCALEDB_VERSION > timescaledb_version)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "TimescaleDB version %d is not supported, minimum is %d",
-				timescaledb_version, MIN_TIMESCALEDB_VERSION);
-		goto clean;
-	}
-
-	ret = SUCCEED;
+	zbx_tsdb_info_extract(version_info);
 clean:
 	DBfree_result(result);
 out:
 	DBclose();
 #else
-	ZBX_UNUSED(db_version);
+	ZBX_UNUSED(version_info);
 #endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: writes a json entry in DB with the result for the front-end       *
+ *                                                                            *
+ * Parameters: version - [IN] entry of DB versions                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_flush_version_requirements(const char *version)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", version))
+		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: verify that Zabbix server/proxy will start with provided DB version  *
+ *          and configuration                                                    *
+ *                                                                               *
+ * Parameters: allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
+ *                                                                               *
+ *********************************************************************************/
+int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported)
+{
+	zbx_db_extract_version_info(info);
+
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == info->flag ||
+			DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag || DB_VERSION_LOWER_THAN_MINIMUM == info->flag)
+	{
+		const char	*program_type_s;
+		int		server_db_deprecated;
+
+		program_type_s = get_program_type_string(program_type);
+
+		server_db_deprecated = (DB_VERSION_LOWER_THAN_MINIMUM == info->flag &&
+				0 != (program_type & ZBX_PROGRAM_TYPE_SERVER));
+
+		if (0 == allow_unsupported || 0 != server_db_deprecated)
+		{
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix %s due to unsupported %s database"
+					" version (%s).", program_type_s, info->database,
+					info->friendly_current_version);
+
+			if (DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Must not be higher than (%s).",
+						info->friendly_max_version);
+				info->flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s).",
+						info->friendly_min_supported_version);
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+
+			if (0 == server_db_deprecated)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
+						" in Zabbix %s configuration file at your own risk.", program_type_s);
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, " ");
+
+			return FAIL;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database version (%s).",
+					info->database, info->friendly_current_version);
+
+			if (DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Should not be higher than (%s).",
+						info->friendly_max_version);
+				info->flag = DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s).",
+						info->friendly_min_supported_version);
+				info->flag = DB_VERSION_NOT_SUPPORTED_WARNING;
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+			zabbix_log(LOG_LEVEL_ERR, " ");
+		}
+	}
+
+	return SUCCEED;
+}
+
+#ifdef HAVE_POSTGRESQL
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if TimescaleDB version is allowed and if it supports       *
+ *          compression                                                       *
+ *                                                                            *
+ * Parameters: allow_unsupported_ver - [IN] flag that indicates whether to    *
+ *                                          allow unsupported versions of     *
+ *                                          TimescaleDB or not                *
+ *             db_version_info       - [IN/OUT] information about version of  *
+ *                                              DB and its extensions         *
+ *                                                                            *
+ * Return value: SUCCEED - if there are no critical errors                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver)
+{
+	int	ret = SUCCEED;
+
+	if (0 != zbx_strcmp_null(db_version_info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+	{
+		goto out;
+	}
+
+	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 and newer */
+	/* in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition.    */
+	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0.  */
+	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > db_version_info->current_version)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "PostgreSQL version %lu is not supported with TimescaleDB, minimum"
+				" required is %d.", (unsigned long)db_version_info->current_version,
+				ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_POSTGRES_TOO_OLD;
+		ret = FAIL;
+		goto out;
+	}
+
+	if (DB_VERSION_FAILED_TO_RETRIEVE == db_version_info->ext_flag)
+	{
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE;
+		ret = FAIL;
+		goto out;
+	}
+
+	if (DB_VERSION_LOWER_THAN_MINIMUM == db_version_info->ext_flag)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Version must be at least %d. Recommended version should be at least"
+				" %s %s.", ZBX_TIMESCALE_MIN_VERSION, ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY,
+				ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM;
+		ret = FAIL;
+		goto out;
+	}
+
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info->ext_flag)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %u is not officially supported. Recommended version"
+				" should be at least %s %s.", db_version_info->ext_current_version,
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED;
+
+		if (0 == allow_unsupported_ver)
+		{
+			ret = FAIL;
+			goto out;
+		}
+
+		db_version_info->ext_flag = DB_VERSION_NOT_SUPPORTED_WARNING;
+	}
+
+	if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info->ext_flag)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should not be higher than %s %s.",
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MAX_VERSION_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM;
+
+		if (0 == allow_unsupported_ver)
+		{
+			db_version_info->ext_flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
+			ret = FAIL;
+			goto out;
+		}
+
+		db_version_info->ext_flag = DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING;
+	}
+
+	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT > db_version_info->ext_current_version)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Current TimescaleDB version is %u. TimescaleDB license and compression"
+				" availability detection is possible starting from TimescaleDB 2.0.",
+				db_version_info->ext_current_version);
+		zbx_tsdb_set_compression_availability(ON);
+		goto out;
+	}
+
+	if (0 != zbx_strcmp_null(db_version_info->ext_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Detected license [%s] does not support compression. Compression is"
+				" supported in %s.", ZBX_NULL2EMPTY_STR(db_version_info->ext_lic),
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+		db_version_info->ext_err_code = ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY;
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
+			ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+
+	if (ZBX_EXT_ERR_UNDEFINED == db_version_info->ext_err_code)
+		db_version_info->ext_err_code = ZBX_EXT_SUCCEED;
+
+	zbx_tsdb_set_compression_availability(ON);
+out:
 	return ret;
 }
+#endif
 
 #define MAX_EXPRESSIONS	950
 
@@ -1418,31 +1553,6 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	zbx_vector_ptr_destroy(&autoreg_hosts);
 }
 
-static int	DBregister_host_active(void)
-{
-	DB_RESULT	result;
-	int		ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	result = DBselect(
-			"select null"
-			" from actions"
-			" where eventsource=%d"
-				" and status=%d",
-			EVENT_SOURCE_AUTOREGISTRATION,
-			ACTION_STATUS_ACTIVE);
-
-	if (NULL == DBfetch(result))
-		ret = FAIL;
-
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 static void	autoreg_host_free(zbx_autoreg_host_t *autoreg_host)
 {
 	zbx_free(autoreg_host->host);
@@ -1554,7 +1664,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 				{
 					unsigned short	port;
 
-					if (FAIL == is_ushort(row[6], &port) || port != autoreg_host->port)
+					if (FAIL == zbx_is_ushort(row[6], &port) || port != autoreg_host->port)
 						break;
 
 					if (ZBX_CONN_IP == autoreg_host->flag && 0 != strcmp(row[4], autoreg_host->ip))
@@ -1634,9 +1744,6 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 	zbx_timespec_t		ts = {0, 0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (SUCCEED != DBregister_host_active())
-		goto exit;
 
 	process_autoreg_hosts(autoreg_hosts, proxy_hostid);
 
@@ -1728,7 +1835,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 	zbx_process_events(NULL, NULL);
 	zbx_clean_events();
-exit:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -1745,7 +1852,7 @@ void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts)
  *                                                                            *
  ******************************************************************************/
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		unsigned int connection_type, const char *host_metadata, unsigned short flag)
+		unsigned int connection_type, const char *host_metadata, unsigned short flag, int now)
 {
 	char	*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 
@@ -1758,7 +1865,7 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
 			" (clock,host,listen_ip,listen_dns,listen_port,tls_accepted,host_metadata,flags)"
 			" values"
 			" (%d,'%s','%s','%s',%d,%u,'%s',%d)",
-			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port, connection_type, host_metadata_esc,
+			now, host_esc, ip_esc, dns_esc, (int)port, connection_type, host_metadata_esc,
 			(int)flag);
 
 	zbx_free(host_metadata_esc);
@@ -1875,7 +1982,7 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *
 			continue;
 		}
 
-		if ('_' != *p || FAIL == is_uint64(p + 1, &n))
+		if ('_' != *p || FAIL == zbx_is_uint64(p + 1, &n))
 			continue;
 
 		zbx_vector_uint64_append(&nums, n);
@@ -2312,21 +2419,10 @@ void	DBcheck_character_set(void)
 		char	*char_set = row[0];
 		char	*collation = row[1];
 
-		if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8, char_set, ZBX_DB_STRLIST_DELIM))
-		{
-			zbx_db_set_character_set("utf8");
-		}
-		else if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4, char_set,
-				ZBX_DB_STRLIST_DELIM))
-		{
-			zbx_db_set_character_set("utf8mb4");
-		}
-		else
-		{
+		if (FAIL == zbx_str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET, char_set, ZBX_DB_STRLIST_DELIM))
 			zbx_warn_char_set(CONFIG_DBNAME, char_set);
-		}
 
-		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
+		if (SUCCEED != zbx_str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation(s)."
 					" Database \"%s\" has default collation \"%s\"", ZBX_SUPPORTED_DB_COLLATION,
@@ -2450,7 +2546,7 @@ void	DBcheck_character_set(void)
 		goto out;
 	}
 
-	strscpy(oid, *row);
+	zbx_strscpy(oid, *row);
 
 	DBfree_result(result);
 
@@ -3210,7 +3306,7 @@ int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx
  * Return value: SUCCEED - one or more of the specified records were          *
  *                         successfully locked                                *
  *               FAIL    - the table does not contain any of the specified    *
- *                         records                                            *
+ *                         records or 'table' name not found                  *
  *                                                                            *
  ******************************************************************************/
 int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
@@ -3226,7 +3322,13 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 	if (0 == zbx_db_txn_level())
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __func__);
 
-	t = DBget_table(table);
+	if (NULL == (t = DBget_table(table)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, table);
+		THIS_SHOULD_NEVER_HAPPEN;
+		ret = FAIL;
+		goto out;
+	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select null from %s where", table);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, t->recid, ids->values, ids->values_num);
@@ -3241,7 +3343,7 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 		ret = SUCCEED;
 
 	DBfree_result(result);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

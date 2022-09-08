@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
+
 #include "stats.h"
 #include "diskdevices.h"
 #include "zbxjson.h"
+#include "zbxstr.h"
 
 #define ZBX_DEV_PFX		"/dev/"
 #define ZBX_DEV_READ		0
@@ -86,8 +87,8 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	{
 		*dev_path = '\0';
 		if (0 != strncmp(devname, ZBX_DEV_PFX, ZBX_CONST_STRLEN(ZBX_DEV_PFX)))
-			strscpy(dev_path, ZBX_DEV_PFX);
-		strscat(dev_path, devname);
+			zbx_strscpy(dev_path, ZBX_DEV_PFX);
+		zbx_strscat(dev_path, devname);
 
 		if (zbx_stat(dev_path, &dev_st) == 0)
 			dev_exists = SUCCEED;
@@ -149,8 +150,8 @@ static int	get_kernel_devname(const char *devname, char *kernel_devname, size_t 
 
 	*dev_path = '\0';
 	if (0 != strncmp(devname, ZBX_DEV_PFX, ZBX_CONST_STRLEN(ZBX_DEV_PFX)))
-		strscpy(dev_path, ZBX_DEV_PFX);
-	strscat(dev_path, devname);
+		zbx_strscpy(dev_path, ZBX_DEV_PFX);
+	zbx_strscat(dev_path, devname);
 
 	if (zbx_stat(dev_path, &dev_st) < 0 || NULL == (f = fopen(INFO_FILE_NAME, "r")))
 		return ret;

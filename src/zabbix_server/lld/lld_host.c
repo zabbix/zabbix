@@ -18,13 +18,14 @@
 **/
 
 #include "lld.h"
+#include "zbxserver.h"
 
 #include "../db_lengths.h"
 #include "log.h"
-#include "zbxserver.h"
 #include "zbxavailability.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
+#include "zbxnum.h"
 
 /* host macro discovery state */
 #define ZBX_USERMACRO_MANUAL	0
@@ -391,7 +392,6 @@ static void	lld_hosts_get_tags(zbx_vector_ptr_t *hosts)
 		zbx_vector_db_tag_ptr_append(&host->tags, tag);
 	}
 out:
-
 	DBfree_result(result);
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&hostids);

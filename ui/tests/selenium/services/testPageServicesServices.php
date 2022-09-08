@@ -906,7 +906,7 @@ class testPageServicesServices extends CWebTest {
 			$this->assertSame($headers, $table->getHeadersText());
 		}
 
-		// Reset filer not to impact the results of next tests.
+		// Reset filter not to impact the results of next tests.
 		$filter_form->query('button:Reset')->one()->click();
 
 		// Check breadcrumbs and "Parent services" headers disappeared.
@@ -931,7 +931,7 @@ class testPageServicesServices extends CWebTest {
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
 		$this->assertTableStats($start_rows_count);
-		$start_contents = $this->getTableResult('Name');
+		$start_contents = $this->getTableColumnData('Name');
 
 		// Filling fields with needed services info.
 		$form->fill(['id:filter_name' => 'Server 3']);
@@ -950,7 +950,7 @@ class testPageServicesServices extends CWebTest {
 		$reset_count =  $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_count);
 		$this->assertTableStats($reset_count);
-		$this->assertEquals($start_contents, $this->getTableResult('Name'));
+		$this->assertEquals($start_contents, $this->getTableColumnData('Name'));
 	}
 
 	public function testPageServicesServices_AddChild() {

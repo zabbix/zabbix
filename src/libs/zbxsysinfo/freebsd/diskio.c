@@ -17,10 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
+
 #include "stats.h"
 #include "diskdevices.h"
+#include "zbxstr.h"
 
 #define ZBX_DEV_PFX	"/dev/"
 #define ZBX_DEV_READ	0
@@ -112,7 +113,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	if (NULL == tmp || 0 == strcmp(tmp, "all"))
 		*devname = '\0';
 	else
-		strscpy(devname, tmp);
+		zbx_strscpy(devname, tmp);
 
 	pd = devname;
 

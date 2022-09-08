@@ -54,7 +54,7 @@ This guide describes how to integrate your Zabbix 6.2 installation with Mattermo
 
 * You can also choose between two notification modes:
 	- **alarm** (default)
-		- Update messages will be attached as replies to Slack message thread
+		- Update messages will be attached as replies to Mattermost message thread
 		- Recovery message from Zabbix will update initial message
 	- **event**
 		- Recovery and update messages from Zabbix will be posted as new messages

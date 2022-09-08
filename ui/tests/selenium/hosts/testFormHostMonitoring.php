@@ -21,6 +21,8 @@
 require_once dirname(__FILE__).'/../common/testFormHost.php';
 
 /**
+ * @dataSource DiscoveredHosts
+ *
  * @backup hosts
  *
  * @onBefore prepareUpdateData
@@ -71,7 +73,7 @@ class testFormHostMonitoring extends testFormHost {
 		$this->cloneHost($data, 'Clone');
 
 		// Check that items aren't cloned from original host.
-		$this->assertItemsDBCount($data['Host name'], 0);
+		$this->assertItemsDBCount($data['fields']['Host name'], 0);
 	}
 
 	/**
@@ -81,7 +83,7 @@ class testFormHostMonitoring extends testFormHost {
 		$this->cloneHost($data, 'Full clone');
 
 		// Check that items cloned from original host.
-		$this->assertItemsDBCount($data['Host name'], 3);
+		$this->assertItemsDBCount($data['fields']['Host name'], $data['items']);
 	}
 
 	/**
@@ -96,6 +98,10 @@ class testFormHostMonitoring extends testFormHost {
 	 */
 	public function testFormHostMonitoring_Delete($data) {
 		$this->checkDelete($data);
+	}
+
+	public function testFormHostMonitoring_DiscoveredHostLayout() {
+		$this->checkDiscoveredHostLayout();
 	}
 }
 

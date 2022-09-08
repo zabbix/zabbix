@@ -733,7 +733,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 
 			if (!array_key_exists('only_true', $trigger_options)
 					|| ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null)) {
-				// Overview type = 'Data', Maps, Dasboard or Overview 'show any' mode.
+				// Overview type = 'Data', Maps, Dashboard or Overview 'show any' mode.
 				$trigger['value'] = TRIGGER_VALUE_FALSE;
 			}
 			else {
@@ -988,7 +988,7 @@ function make_trigger_details($trigger, $eventid) {
 	$table = (new CTableInfo())
 		->addRow([
 			new CCol(_n('Host', 'Hosts', count($hosts))),
-			new CCol($hostNames)
+			(new CCol($hostNames))->addClass(ZBX_STYLE_WORDBREAK)
 		])
 		->addRow([
 			new CCol(_('Trigger')),
@@ -2048,7 +2048,8 @@ function makeTriggersHostsList(array $triggers_hosts) {
 
 		foreach ($hosts as $host) {
 			$host_name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
+				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']))
+				->addClass(ZBX_STYLE_WORDBREAK);
 
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 				if (array_key_exists($host['maintenanceid'], $db_maintenances)) {

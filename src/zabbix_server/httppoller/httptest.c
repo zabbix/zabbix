@@ -26,6 +26,7 @@
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 #include "httpmacro.h"
+#include "zbxnum.h"
 
 typedef struct
 {
@@ -645,7 +646,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	/* 2) update interval is invalid */
 	db_httpstep.name = NULL;
 
-	if (SUCCEED != is_time_suffix(buffer, &delay, ZBX_LENGTH_UNLIMITED))
+	if (SUCCEED != zbx_is_time_suffix(buffer, &delay, ZBX_LENGTH_UNLIMITED))
 	{
 		err_str = zbx_dsprintf(err_str, "update interval \"%s\" is invalid", buffer);
 		lastfailedstep = -1;
@@ -729,7 +730,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 				NULL, &buffer, MACRO_TYPE_COMMON, NULL, 0);
 
-		if (SUCCEED != is_time_suffix(buffer, &db_httpstep.timeout, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != zbx_is_time_suffix(buffer, &db_httpstep.timeout, ZBX_LENGTH_UNLIMITED))
 		{
 			err_str = zbx_dsprintf(err_str, "timeout \"%s\" is invalid", buffer);
 			goto httpstep_error;
@@ -874,7 +875,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 			else if ('\0' != *db_httpstep.status_codes &&
-					FAIL == int_in_list(db_httpstep.status_codes, stat.rspcode))
+					FAIL == zbx_int_in_list(db_httpstep.status_codes, stat.rspcode))
 			{
 				err_str = zbx_dsprintf(err_str, "response code \"%ld\" did not match any of the"
 						" required status codes \"%s\"", stat.rspcode,
@@ -1071,7 +1072,7 @@ int	process_httptests(int httppoller_num, int now)
 	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())
 	{
 		ZBX_STR2UINT64(host.hostid, row[0]);
-		strscpy(host.host, row[1]);
+		zbx_strscpy(host.host, row[1]);
 		zbx_strlcpy_utf8(host.name, row[2], sizeof(host.name));
 
 		ZBX_STR2UINT64(httptest.httptest.httptestid, row[3]);

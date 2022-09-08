@@ -45,19 +45,22 @@ $discovered_by = null;
 $interfaces_row = null;
 
 if ($host_is_discovered) {
-	if ($data['editable_discovery_rules']) {
-		$discovery_rule = (new CLink($data['host']['discoveryRule']['name'],
-			(new CUrl('host_prototypes.php'))
-				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $data['host']['discoveryRule']['itemid'])
-				->setArgument('hostid', $data['host']['hostDiscovery']['parent_hostid'])
-				->setArgument('context', 'host')
-		))->setAttribute('target', '_blank');
+	if ($data['host']['discoveryRule']) {
+		if ($data['is_discovery_rule_editable']) {
+			$discovery_rule = (new CLink($data['host']['discoveryRule']['name'],
+				(new CUrl('host_prototypes.php'))
+					->setArgument('form', 'update')
+					->setArgument('parent_discoveryid', $data['host']['discoveryRule']['itemid'])
+					->setArgument('hostid', $data['host']['hostDiscovery']['parent_hostid'])
+					->setArgument('context', 'host')
+			))->setAttribute('target', '_blank');
+		}
+		else {
+			$discovery_rule = new CSpan($data['host']['discoveryRule']['name']);
+		}
 	}
 	else {
-		$discovery_rule = $data['host']['discoveryRule']
-			? (new CSpan($data['host']['discoveryRule']['name']))
-			: (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
+		$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
 	}
 
 	$discovered_by = [new CLabel(_('Discovered by')), new CFormField($discovery_rule)];
@@ -188,7 +191,7 @@ $host_tab
 					]))
 				])
 				: null
-		]),
+		], 'add_templates__ms'),
 		(new CFormField(
 			(count($templates_field_items) > 1)
 				? (new CDiv($templates_field_items))->addClass('linked-templates')
@@ -222,7 +225,13 @@ $host_tab
 	->addItem([
 		new CLabel(_('Interfaces')),
 		new CFormField([
-			new CDiv([renderInterfaceHeaders(), $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]),
+			(new CDiv([
+				renderInterfaceHeaders(),
+				$agent_interfaces,
+				$snmp_interfaces,
+				$jmx_interfaces,
+				$ipmi_interfaces
+			]))->addClass(ZBX_STYLE_HOST_INTERFACES),
 			$host_is_discovered
 				? null
 				: new CDiv(
@@ -264,32 +273,30 @@ $host_tab
 		)
 	]);
 
-// IPMI tab.
-if ($host_is_discovered) {
-	$ipmi_authtype_select = [
-		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['host']['ipmi_authtype']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		new CVar('ipmi_authtype', $data['host']['ipmi_authtype'])
-	];
-	$ipmi_privilege_select = [
-		(new CTextBox('ipmi_privilege_name', ipmiPrivileges($data['host']['ipmi_privilege']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		new CVar('ipmi_privilege', $data['host']['ipmi_privilege'])
-	];
-}
-else {
-	$ipmi_authtype_select = new CListBox('ipmi_authtype', $data['host']['ipmi_authtype'], 7, ipmiAuthTypes());
-	$ipmi_privilege_select = new CListBox('ipmi_privilege', $data['host']['ipmi_privilege'], 5, ipmiPrivileges());
-}
-
 $ipmi_tab = (new CFormGrid())
 	->addItem([
-		new CLabel(_('Authentication algorithm'), 'ipmi_authtype'),
-		new CFormField($ipmi_authtype_select)
+		new CLabel(_('Authentication algorithm'), 'label_ipmi_authtype'),
+		new CFormField(
+			(new CSelect('ipmi_authtype'))
+				->setValue($data['host']['ipmi_authtype'])
+				->setFocusableElementId('label_ipmi_authtype')
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->addOptions(CSelect::createOptionsFromArray(ipmiAuthTypes()))
+				->setReadonly($host_is_discovered)
+				->setId('ipmi_authtype')
+		)
 	])
 	->addItem([
-		new CLabel(_('Privilege level'), 'ipmi_privilege'),
-		new CFormField($ipmi_privilege_select)
+		new CLabel(_('Privilege level'), 'label_ipmi_privilege'),
+		new CFormField(
+			(new CSelect('ipmi_privilege'))
+				->setValue($data['host']['ipmi_privilege'])
+				->setFocusableElementId('label_ipmi_privilege')
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->addOptions(CSelect::createOptionsFromArray(ipmiPrivileges()))
+				->setReadonly($host_is_discovered)
+				->setId('ipmi_privilege')
+		)
 	])
 	->addItem([
 		new CLabel(_('Username'), 'ipmi_username'),
@@ -314,7 +321,8 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'tags' => $data['host']['tags'],
 	'with_automatic' => true,
 	'readonly' => false,
-	'tabs_id' => 'host-tabs'
+	'tabs_id' => 'host-tabs',
+	'tags_tab_id' => 'host-tags-tab'
 ]);
 
 // Macros tab.
@@ -396,7 +404,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 	}
 
 	$inventory_tab->addItem([
-		new CLabel($inventory_field['title']),
+		new CLabel($inventory_field['title'], 'host_inventory['.$field_name.']'),
 		new CFormField([$input_field, $inventory_item])
 	]);
 }
@@ -502,8 +510,8 @@ if (!$host_is_discovered) {
 $tabs = (new CTabView(['id' => 'host-tabs']))
 	->setSelected(0)
 	->addTab('host-tab', _('Host'), $host_tab)
-	->addTab('ipmi-tab', _('IPMI'), $ipmi_tab)
-	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
+	->addTab('ipmi-tab', _('IPMI'), $ipmi_tab, TAB_INDICATOR_IPMI)
+	->addTab('host-tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('macros-tab', _('Macros'), $macros_tab, TAB_INDICATOR_MACROS)
 	->addTab('inventory-tab', _('Inventory'), $inventory_tab, TAB_INDICATOR_INVENTORY)
 	->addTab('encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);
@@ -522,6 +530,5 @@ if (array_key_exists('buttons', $data)) {
 }
 
 $host_form
-	->addItem($data['warning'])
 	->addItem($tabs)
 	->show();

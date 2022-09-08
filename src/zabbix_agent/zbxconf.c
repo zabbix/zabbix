@@ -21,6 +21,8 @@
 
 #include "log.h"
 #include "sysinfo.h"
+#include "zbxstr.h"
+#include "zbxparam.h"
 
 #ifdef _WINDOWS
 #	include "perfstat.h"
@@ -154,25 +156,25 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 
 		for (pline = lines; NULL != *pline; pline++)
 		{
-			if (3 < num_param(*pline))
+			if (3 < zbx_num_param(*pline))
 			{
 				error = zbx_strdup(error, "Required parameter missing.");
 				goto pc_fail;
 			}
 
-			if (0 != get_param(*pline, 1, name, sizeof(name), NULL))
+			if (0 != zbx_get_param(*pline, 1, name, sizeof(name), NULL))
 			{
 				error = zbx_strdup(error, "Cannot parse key.");
 				goto pc_fail;
 			}
 
-			if (0 != get_param(*pline, 2, counterpath, sizeof(counterpath), NULL))
+			if (0 != zbx_get_param(*pline, 2, counterpath, sizeof(counterpath), NULL))
 			{
 				error = zbx_strdup(error, "Cannot parse counter path.");
 				goto pc_fail;
 			}
 
-			if (0 != get_param(*pline, 3, interval, sizeof(interval), NULL))
+			if (0 != zbx_get_param(*pline, 3, interval, sizeof(interval), NULL))
 			{
 				error = zbx_strdup(error, "Cannot parse interval.");
 				goto pc_fail;
