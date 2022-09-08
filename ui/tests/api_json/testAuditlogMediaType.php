@@ -70,7 +70,8 @@ class testAuditlogMediaType extends testAuditlogCommon {
 				"\"mediatype.message_templates[".$message['mediatype_messageid']."].recovery\":[\"add\",\"0\"],".
 				"\"mediatype.message_templates[".$message['mediatype_messageid']."].subject\":[\"add\",\"Subject message\"],".
 				"\"mediatype.message_templates[".$message['mediatype_messageid']."].message\":[\"add\",\"Main message\"],".
-				"\"mediatype.message_templates[".$message['mediatype_messageid']."].mediatype_messageid\":[\"add\",\"".$message['mediatype_messageid']."\"],".
+				"\"mediatype.message_templates[".$message['mediatype_messageid']."].mediatype_messageid\":[\"add\",\"".
+				$message['mediatype_messageid']."\"],".
 				"\"mediatype.maxsessions\":[\"add\",\"50\"],".
 				"\"mediatype.maxattempts\":[\"add\",\"5\"],".
 				"\"mediatype.attempt_interval\":[\"add\",\"50s\"],".

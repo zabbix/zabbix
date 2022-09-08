@@ -59,9 +59,7 @@ class testPageReportsAudit extends CWebTest {
 		}
 
 		// Check that filter set to display Last hour data.
-		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')
-			->one()->getAttribute('class')
-		);
+		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')->one()->getAttribute('class'));
 
 		// Press to display filter.
 		$this->query('id:ui-id-2')->one()->click();
@@ -143,6 +141,7 @@ class testPageReportsAudit extends CWebTest {
 
 			// At first, we need to check that correct checkboxes is enabled. Then we check that all others are disabled.
 			foreach([true, false] as $status) {
+
 				if (!$status) {
 					$actions = $left_actions;
 				}
@@ -508,11 +507,12 @@ class testPageReportsAudit extends CWebTest {
 		$form->fill($data['fields'])->submit();
 
 		// If there is no result - "No data found" displayed in table.
-		if (array_key_exists('no_data', $data)) {
+		if (CTestArrayHelper::get($data, 'no_data')) {
 			$this->assertEquals(['No data found.'], $table->getRows()->asText());
 		}
 		else {
 			foreach($data['fields'] as $column => $values) {
+
 				if ($column === 'Users' || 'Actions') {
 					$column = rtrim($column, 's');
 				}
@@ -528,6 +528,7 @@ class testPageReportsAudit extends CWebTest {
 
 				// Get all results from column and remove existing values.
 				$table_value = $this->getTableResult($column);
+
 				foreach ($values as $value) {
 					$this->assertTrue(in_array($value, $table_value));
 
@@ -590,7 +591,8 @@ class testPageReportsAudit extends CWebTest {
 		foreach ($actions as $action => $audit) {
 			$form->fill(['Resource' => $resource_name, 'Resource ID' => $resourceid]);
 			$form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($action).
-					']/../input[contains(@id, "filter_actions")]')->asCheckbox()->one()->check();
+					']/../input[contains(@id, "filter_actions")]'
+			)->asCheckbox()->one()->check();
 			$form->submit()->waitUntilReloaded();
 
 			// Check that action column has correct action value.
@@ -656,7 +658,7 @@ class testPageReportsAudit extends CWebTest {
 	}
 
 	/**
-	 * Login as test-timezone user to create new data in autotest for fitler scenario.
+	 * Login as test-timezone user to create new data in autotest for filter scenario.
 	 */
 	public function prepareLoginData() {
 		CAPITest::disableAuthorization();
@@ -664,7 +666,7 @@ class testPageReportsAudit extends CWebTest {
 			[
 				'username' => 'test-timezone',
 				'password' => 'zabbix'
-
-		]);
+			]
+		);
 	}
 }

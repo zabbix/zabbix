@@ -79,7 +79,8 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiod_type\":[\"add\",\"3\"],".
 				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].start_time\":[\"add\",\"64800\"],".
 				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].dayofweek\":[\"add\",\"64\"],".
-				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiodid\":[\"add\",\"".$timeperiod['timeperiodid']."\"],".
+				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiodid\":[\"add\",\"".
+				$timeperiod['timeperiodid']."\"],".
 				"\"maintenance.tags[".$tags['maintenancetagid']."]\":[\"add\"],".
 				"\"maintenance.tags[".$tags['maintenancetagid']."].tag\":[\"add\",\"audit\"],".
 				"\"maintenance.tags[".$tags['maintenancetagid']."].operator\":[\"add\",\"0\"],".
@@ -138,7 +139,8 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			"\"maintenance.active_since\":[\"update\",\"1458844500\",\"1539723600\"],".
 			"\"maintenance.active_till\":[\"update\",\"1490466900\",\"1539810000\"],".
 			"\"maintenance.groups[".$groupid['maintenance_groupid']."].groupid\":[\"add\",\"2\"],".
-			"\"maintenance.groups[".$groupid['maintenance_groupid']."].maintenance_groupid\":[\"add\",\"".$groupid['maintenance_groupid']."\"],".
+			"\"maintenance.groups[".$groupid['maintenance_groupid']."].maintenance_groupid\":[\"add\",\"".
+			$groupid['maintenance_groupid']."\"],".
 			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].period\":[\"add\",\"7200\"],".
 			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiod_type\":[\"add\",\"4\"],".
 			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].start_time\":[\"add\",\"68760\"],".
