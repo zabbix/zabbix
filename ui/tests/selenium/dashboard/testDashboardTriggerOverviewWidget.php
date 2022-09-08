@@ -148,23 +148,17 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		CDataHelper::call('settings.update', ['blink_period' => '5m']);
 
 		// Enable the trigger that other triggers depend on.
-		CDataHelper::call('trigger.update', [
-			[
-				'triggerid' => $triggerids[1],
-				'status' => 0
-			]
-		]);
+		CDataHelper::call('trigger.update', [['triggerid' => $triggerids[1], 'status' => 0]]);
 	}
 
 	public function testDashboardTriggerOverviewWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
-
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Trigger overview')]);
-
 		$this->assertEquals(['Type', 'Name', 'Refresh interval', 'Show', 'Host groups', 'Hosts', 'Tags', '',
 				'Show suppressed problems', 'Hosts location'], $form->getLabels()->asText()
 		);
+
 		$default_values = [
 			'Show header' => true,
 			'Refresh interval' => 'Default (1 minute)',
@@ -176,6 +170,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			'Show suppressed problems' => false,
 			'Hosts location' => 'Left'
 		];
+
 		$form->checkValue($default_values);
 
 		// Check field lengths and placeholders.
@@ -645,6 +640,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
 			$form->submit();
+
 			// Check that changes took place on the unsaved dashboard (widget got renamed).
 			$this->assertTrue($dashboard->getWidget($new_name)->isValid());
 		}
@@ -659,6 +655,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 				}
 			}
 		}
+
 		// Save or cancel dashboard update.
 		if (CTestArrayHelper::get($data, 'save_dashboard', false)) {
 			$dashboard->save();
@@ -682,8 +679,11 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 
 		// Confirm that widget is not present on dashboard.
 		$this->assertFalse($dashboard->getWidget(self::$delete_widget, false)->isValid());
-		$widget_sql = 'SELECT null FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
-				' WHERE w.name='.zbx_dbstr(self::$delete_widget);
+		$widget_sql = 'SELECT null FROM widget_field wf'.
+				' LEFT JOIN widget w'.
+					' ON w.widgetid=wf.widgetid'.
+					' WHERE w.name='.zbx_dbstr(self::$delete_widget);
+
 		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
 	}
 
@@ -708,10 +708,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->edit();
 
 		$form = $dashboard->getWidget(self::$update_widget)->edit();
-		$form->fill([
-			'Show' => 'Any',
-			'Hosts' => [self::$icon_host]
-		]);
+		$form->fill(['Show' => 'Any', 'Hosts' => [self::$icon_host]]);
 		$form->submit();
 
 		// Wait for the widget to be ready and save dashboard (the wait is performed within the getWidget() method).
@@ -759,6 +756,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		}
 		else {
 			$form = $dashboard->getWidget(self::$update_widget)->edit();
+
 			// Values from the previous cases should be cleaned-up in case of update scenario before filling-in data.
 			$this->cleanupFormBeforeFill($form, CTestArrayHelper::get($data, 'fields', []));
 		}
@@ -772,13 +770,13 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
+
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 
 		$widget_name = (array_key_exists('fields', $data)) ? $data['fields']['Name'] : 'Trigger overview';
 		$widget = $dashboard->getWidget($widget_name);
 		$dashboard->save();
-
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		if ($create) {
@@ -877,7 +875,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	}
 
 	/**
-	 * Check the selerity and the icon displayed in the table cell under attention.
+	 * Check the severity and the icon displayed in the table cell under attention.
 	 *
 	 * @param CElement	$cell		table cell that represents the trigger to be checked
 	 * @param string	$trigger	the name of the trigger that is represented by the trigger cell
