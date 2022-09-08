@@ -155,13 +155,12 @@ window.action_edit_popup = new class {
 		}
 		else {
 			condition_cell.textContent = (
-				this.condition_types[input.conditiontype] + " " +
+				this.condition_types[input.conditiontype] + ' ' +
 				this.condition_operators[input.operator]
 			);
 			value_cell.textContent = input.name;
 
 			cell.append(condition_cell);
-			cell.append(operator_cell);
 			cell.append(value_cell);
 		}
 
