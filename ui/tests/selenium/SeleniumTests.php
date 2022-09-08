@@ -302,7 +302,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormFilterProblems');
 		$suite->addTestSuite('testFormAdministrationGeneralGeomaps');
 		$suite->addTestSuite('testGeomapWidgetScreenshots');
-
 		$suite->addTestSuite('testFormHostConfiguration');
 		$suite->addTestSuite('testFormHostMonitoring');
 		$suite->addTestSuite('testFormHostStandalone');

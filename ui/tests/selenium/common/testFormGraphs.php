@@ -696,7 +696,7 @@ class testFormGraphs extends CWebTest {
 					zbx_dbstr($data['fields']['Name']))
 			);
 
-			// Open just created graph and cыheck that all fields present correctly in form.
+			// Open just created graph and check that all fields present correctly in form.
 			$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilPresent()
 					->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 			$form->invalidate();
@@ -816,7 +816,7 @@ class testFormGraphs extends CWebTest {
 		$form->query('button:Clone')->waitUntilClickable()->one()->click();
 		$form->invalidate();
 
-		if (CTestArrayHelper::get($data, 'check_buttons', false)) {
+		if (CTestArrayHelper::get($data, 'check_buttons')) {
 			foreach (['Update', 'Clone', 'Delete'] as $button) {
 				$this->assertFalse($form->query('button', $button)->exists());
 			}
@@ -841,14 +841,12 @@ class testFormGraphs extends CWebTest {
 
 			// Add line styling functions.
 			foreach ($data['items'][0]['functions'] as $function => $value) {
-				$item_row->query('xpath:.//z-select[@name="items[0]['.$function.']"]')->asDropdown()
-						->one()->fill($value);
+				$item_row->query('xpath:.//z-select[@name="items[0]['.$function.']"]')->asDropdown()->one()->fill($value);
 			}
 
 			// Add line color.
 			$item_row->query('xpath:.//button[@id="lbl_items_0_color"]')->waitUntilClickable()->one()->click();
 			$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($data['items'][0]['color']);
-
 		}
 
 		$form->submit();
@@ -859,7 +857,7 @@ class testFormGraphs extends CWebTest {
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.zbx_dbstr($graph_name)));
 		}
 
-		$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilReady()
+		$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilPresent()
 				->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 
 		$form->invalidate();
@@ -988,7 +986,7 @@ class testFormGraphs extends CWebTest {
 
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' updated');
-		$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilReady()
+		$this->query('xpath://form[@name="graphForm"]/table')->asTable()->one()->waitUntilPresent()
 				->query('link:Graph for items change')->waitUntilClickable()->one()->click();
 		$item_row = $form->getFieldContainer('Items')->query('xpath:.//tr[@id="items_'.$item_number.'"]')
 				->one()->waitUntilPresent();
