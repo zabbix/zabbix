@@ -126,7 +126,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			get_program_type_string(init_child_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
-	memcpy(&s, (zbx_socket_t *)(init_child_args_in->listen_sock), sizeof(zbx_socket_t));
+	memcpy(&s, init_child_args_in->listen_sock, sizeof(zbx_socket_t));
 
 	zbx_free(args);
 
