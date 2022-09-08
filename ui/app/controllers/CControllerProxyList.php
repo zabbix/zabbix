@@ -104,7 +104,9 @@ class CControllerProxyList extends CController {
 		]);
 
 		$data['proxies'] = API::Proxy()->get([
-			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'version', 'compatibility'],
+			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'version',
+				'compatibility'
+			],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'proxyids' => array_keys($data['proxies']),
 			'editable' => true,
@@ -119,7 +121,7 @@ class CControllerProxyList extends CController {
 		);
 
 		foreach ($data['proxies'] as &$proxy) {
-			order_result($proxy['hosts'],  'name');
+			CArrayHelper::sort($proxy['hosts'], ['name']);
 			$proxy['hosts'] = array_slice($proxy['hosts'], 0, CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1);
 		}
 		unset($proxy);

@@ -106,25 +106,19 @@ class CProxy extends CApiService {
 			$rt_filter = array_intersect_key($options['filter'], ['lastaccess' => '']);
 
 			if ($rt_filter && $rt_filter['lastaccess'] !== null) {
-				$this->dbFilter('host_rtdata hr', ['filter' => $rt_filter] + $options,
-					$sqlParts
-				);
+				$this->dbFilter('host_rtdata hr', ['filter' => $rt_filter] + $options, $sqlParts);
 			}
 
 			$rt_filter = array_intersect_key($options['filter'], ['version' => '']);
 
 			if ($rt_filter && $rt_filter['version'] !== null) {
-				$this->dbFilter('host_rtdata hv', ['filter' => $rt_filter] + $options,
-					$sqlParts
-				);
+				$this->dbFilter('host_rtdata hv', ['filter' => $rt_filter] + $options, $sqlParts);
 			}
 
 			$rt_filter = array_intersect_key($options['filter'], ['compatibility' => '']);
 
 			if ($rt_filter && $rt_filter['compatibility'] !== null) {
-				$this->dbFilter('host_rtdata hc', ['filter' => $rt_filter] + $options,
-					$sqlParts
-				);
+				$this->dbFilter('host_rtdata hc', ['filter' => $rt_filter] + $options, $sqlParts);
 			}
 		}
 
@@ -138,7 +132,7 @@ class CProxy extends CApiService {
 			'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
 			'tls_subject', 'proxy_address', 'auto_compress', 'version', 'compatibility'
 		];
-		$options['output'] = ($options['output'] === API_OUTPUT_EXTEND) ?  $fields : (array) $options['output'];
+		$options['output'] = ($options['output'] === API_OUTPUT_EXTEND) ? $fields : (array) $options['output'];
 
 		/*
 		 * For internal calls of API method, is possible to get the write-only fields if they were specified in output.
@@ -165,31 +159,24 @@ class CProxy extends CApiService {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+
 		while ($proxy = DBfetch($res)) {
 			if ($options['countOutput']) {
-				$result = $proxy['rowscount'];
+				return $proxy['rowscount'];
 			}
-			else {
-				$proxy['proxyid'] = $proxy['hostid'];
-				unset($proxy['hostid']);
 
-				$result[$proxy['proxyid']] = $proxy;
-				if (isset($result[$proxy['proxyid']]['version'])) {
-					if ($proxy['version'] === '0') {
-						$result[$proxy['proxyid']]['version'] = '';
-					}
-					else {
-						// Converting proxy version to readable format.
-						$version = $proxy['version'];
-						$result[$proxy['proxyid']]['version'] = (intdiv($version, 10000) % 100).'.'.
-							(intdiv($version, 100) % 100).'.'.($version % 100);
-					}
-				}
+			$proxy['proxyid'] = $proxy['hostid'];
+			unset($proxy['hostid']);
+
+			if (array_key_exists('version', $proxy)) {
+				$proxy['version'] = $proxy['version'] == 0
+					? ''
+					// Converting proxy version to readable format.
+					: (intdiv($proxy['version'], 10000) % 100).'.'.
+						(intdiv($proxy['version'], 100) % 100).'.'.($proxy['version'] % 100);
 			}
-		}
 
-		if ($options['countOutput']) {
-			return $result;
+			$result[$proxy['proxyid']] = $proxy;
 		}
 
 		if ($result) {

@@ -100,18 +100,19 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 	$compatibility = $proxy['compatibility'];
 
 	// Info icons.
-	$info_icon = '';
-	if ($compatibility == 2) {
+	$info_icons = [];
+	if ($compatibility == ZBX_PROXY_VERSION_OUTDATED) {
 		$version = (new CSpan($version))->addClass(ZBX_STYLE_RED);
-		$info_icon = (makeInformationIcon(_s('Proxy version is outdated, only data collection and remote execution is available with server version %1$s', $data['server_version'])))
-			->addClass(ZBX_STYLE_STATUS_YELLOW)
-			->addStyle('margin-left: 5px;');
+		$info_icons[] = makeWarningIcon(_s(
+			'Proxy version is outdated, only data collection and remote execution is available with server version %1$s.',
+			$data['server_version']
+		));
 	}
-	elseif ($compatibility == 3) {
+	elseif ($compatibility == ZBX_PROXY_VERSION_UNSUPPORTED) {
 		$version = (new CSpan($version))->addClass(ZBX_STYLE_RED);
-		$info_icon = (makeInformationIcon(_s('Proxy version is not supported by server version %1$s.', $data['server_version'])))
-			->addClass(ZBX_STYLE_STATUS_RED)
-			->addStyle('margin-left: 5px;');
+		$info_icons[] = makeErrorIcon(
+			_s('Proxy version is not supported by server version %1$s.', $data['server_version'])
+		);
 	}
 
 	foreach ($proxy['hosts'] as $host_index => $host) {
@@ -186,7 +187,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$encryption,
-		[$version, $info_icon],
+		[$version, '&nbsp;', makeInformationList($info_icons)],
 		($proxy['lastaccess'] == 0)
 			? (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED)
 			: zbx_date2age($proxy['lastaccess']),
