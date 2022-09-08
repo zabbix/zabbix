@@ -336,7 +336,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 	now = time(NULL);
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (FAIL == is_ushort(row[9], &smtp_port))
+		if (FAIL == zbx_is_ushort(row[9], &smtp_port))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;

@@ -67,7 +67,7 @@ void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
 	}
 	else
 	{
-		if (FAIL == is_uint64(expected_param_value_string, &expected_param_value) &&
+		if (FAIL == zbx_is_uint64(expected_param_value_string, &expected_param_value) &&
 			SYSINFO_RET_OK == expected_result)
 		{
 			fail_msg("Cannot get expected numeric parameter from test case data: %s",

@@ -348,7 +348,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 	{
 		config_revision = 0;
 	}
-	else if (FAIL == is_uint32(tmp, &config_revision))
+	else if (FAIL == zbx_is_uint32(tmp, &config_revision))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "\"%s\" is not a valid revision", tmp);
 		goto out;
@@ -400,7 +400,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 		delay = atoi(tmp);
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, tmp, sizeof(tmp), NULL) ||
-				SUCCEED != is_uint64(tmp, &lastlogsize))
+				SUCCEED != zbx_is_uint64(tmp, &lastlogsize))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_LASTLOGSIZE);
 			continue;

@@ -146,7 +146,7 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 	if (NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY)
 	{
 		err = GATEWAY_ERROR;
-		strscpy(error, "JavaGateway configuration parameter not set or empty");
+		zbx_strscpy(error, "JavaGateway configuration parameter not set or empty");
 		goto exit;
 	}
 
@@ -167,7 +167,7 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 					0 != strcmp(items[j].jmx_endpoint, items[i].jmx_endpoint))
 			{
 				err = GATEWAY_ERROR;
-				strscpy(error, "Java poller received items with different connection parameters");
+				zbx_strscpy(error, "Java poller received items with different connection parameters");
 				goto exit;
 			}
 		}
@@ -223,7 +223,7 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 
 	if (FAIL == err)
 	{
-		strscpy(error, zbx_socket_strerror());
+		zbx_strscpy(error, zbx_socket_strerror());
 		err = GATEWAY_ERROR;
 	}
 exit:

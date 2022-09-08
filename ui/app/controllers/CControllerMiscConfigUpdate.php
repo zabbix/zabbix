@@ -95,9 +95,7 @@ class CControllerMiscConfigUpdate extends CController {
 			CSettingsHelper::VAULT_PROVIDER => $this->getInput('vault_provider', ZBX_VAULT_TYPE_HASHICORP)
 		];
 
-		$settings[CSettingsHelper::ALERT_USRGRPID] = $this->hasInput('alert_usrgrpid')
-			? $this->getInput('alert_usrgrpid')
-			: null;
+		$settings[CSettingsHelper::ALERT_USRGRPID] = $this->getInput('alert_usrgrpid', 0);
 
 		if ($settings[CSettingsHelper::VALIDATE_URI_SCHEMES] == 1) {
 			$settings[CSettingsHelper::URI_VALID_SCHEMES] = $this->getInput('uri_valid_schemes',

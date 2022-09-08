@@ -75,7 +75,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		cpu_num = ZBX_CPUNUM_ALL;
 	}
-	else if (SUCCEED != is_uint31_1(tmp, &cpu_num))
+	else if (SUCCEED != zbx_is_uint31_1(tmp, &cpu_num))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;

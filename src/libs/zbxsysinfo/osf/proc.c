@@ -85,7 +85,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (NULL != (entries = readdir(dir)))
 	{
-		strscpy(filename, "/proc/");
+		zbx_strscpy(filename, "/proc/");
 		zbx_strlcat(filename, entries->d_name, MAX_STRING_LEN);
 
 		if (0 == zbx_stat(filename, &buf))
@@ -209,7 +209,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (NULL != (entries = readdir(dir)))
 	{
-		strscpy(filename, "/proc/");
+		zbx_strscpy(filename, "/proc/");
 		zbx_strlcat(filename, entries->d_name,MAX_STRING_LEN);
 
 		if (0 == zbx_stat(filename, &buf))

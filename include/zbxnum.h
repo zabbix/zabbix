@@ -22,31 +22,31 @@
 
 #include "zbxcommon.h"
 
-#define is_ushort(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned short), 0x0, 0xFFFF)
+#define zbx_is_ushort(str, value) \
+	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned short), 0x0, 0xFFFF)
 
-#define is_uint32(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0xFFFFFFFF)
+#define zbx_is_uint32(str, value) \
+	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0xFFFFFFFF)
 
-#define is_uint64(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
+#define zbx_is_uint64(str, value) \
+	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
 
-#define is_uint64_n(str, n, value) \
-	is_uint_n_range(str, n, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
+#define zbx_is_uint64_n(str, n, value) \
+	zbx_is_uint_n_range(str, n, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
 
-#define is_uint31(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0x7FFFFFFF)
+#define zbx_is_uint31(str, value) \
+	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0x7FFFFFFF)
 
 #define ZBX_MAX_UINT31_1	0x7FFFFFFE
-#define is_uint31_1(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, ZBX_MAX_UINT31_1)
+#define zbx_is_uint31_1(str, value) \
+	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, ZBX_MAX_UINT31_1)
 
-#define is_uint_range(str, value, min, max) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned int), min, max)
-int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
+#define zbx_is_uint_range(str, value, min, max) \
+	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned int), min, max)
+int	zbx_is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
-int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
-int	is_hex_string(const char *str);
+int	zbx_is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
+int	zbx_is_hex_string(const char *str);
 
 double	zbx_get_double_epsilon(void);
 void	zbx_update_epsilon_to_float_precision(void);
@@ -54,7 +54,7 @@ void	zbx_update_epsilon_to_python_compatible_precision(void);
 int	zbx_double_compare(double a, double b);
 int	zbx_validate_value_dbl(double value, int dbl_precision);
 
-int	int_in_list(char *list, int value);
+int	zbx_int_in_list(char *list, int value);
 
 #define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
 
@@ -69,9 +69,9 @@ int	zbx_wis_uint(const wchar_t *wide_string);
 const char	*zbx_print_double(char *buffer, size_t size, double val);
 int		zbx_number_parse(const char *number, int *len);
 
-#define ZBX_STR2UINT64(uint, string) is_uint64(string, &uint)
+#define ZBX_STR2UINT64(uint, string) zbx_is_uint64(string, &uint)
 
-int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
+int	zbx_str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 
 void	zbx_trim_integer(char *str);
 void	zbx_trim_float(char *str);

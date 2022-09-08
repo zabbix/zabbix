@@ -1661,7 +1661,7 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const DC_I
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			strscpy(value, h->value.str);
+			zbx_strscpy(value, h->value.str);
 			break;
 		default:
 			return;
