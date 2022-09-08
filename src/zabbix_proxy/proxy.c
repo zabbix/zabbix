@@ -517,8 +517,7 @@ static void	zbx_set_defaults(void)
 
 	if (-1 != CONFIG_HEARTBEAT_FREQUENCY)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "HeartbeatFrequency parameter is deprecated,"
-					" and has no effect");
+		zabbix_log(LOG_LEVEL_WARNING, "HeartbeatFrequency parameter is deprecated, and has no effect");
 	}
 
 	if (0 == CONFIG_SERVER_PORT)
