@@ -160,6 +160,9 @@ void	recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls
 		goto out;
 	}
 
+	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
+			sock->peer, (zbx_fs_size_t)(jp_config.end - jp_config.start + 1));
+
 	if (SUCCEED == (ret = proxyconfig_process(&jp_config, &error)))
 	{
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))

@@ -1109,9 +1109,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			}
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server"
-						" at \"%s\", datalen " ZBX_FS_SIZE_T,
-						sock->peer, (zbx_fs_size_t)(jp.end - jp.start + 1));
 				recv_proxyconfig(sock, zbx_config_tls);
 			}
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
