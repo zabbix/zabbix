@@ -31,7 +31,7 @@ class CControllerMapView extends CController {
 		$fields = [
 			'sysmapid' =>		'db sysmaps.sysmapid',
 			'mapname' =>		'not_empty',
-			'severity_min' =>	'in 0,1,2,3,4,5'
+			'severity_min' =>	'in '.implode(',', [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER])
 		];
 
 		$ret = $this->validateInput($fields);

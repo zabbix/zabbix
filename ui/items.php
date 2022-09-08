@@ -1389,19 +1389,19 @@ else {
 				if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
 					$delay = $update_interval_parser->getDelay();
 
-					$delay = ($delay[0] !== '{') ? convertUnitsS(timeUnitToSeconds($delay)) : $delay;
+					$delay = ($delay[0] !== '{') ? convertSecondsToTimeUnits(timeUnitToSeconds($delay)) : $delay;
 				}
 			}
 
 			$history = $item['history'];
-			$history = ($history[0] !== '{') ? convertUnitsS(timeUnitToSeconds($history)) : $history;
+			$history = ($history[0] !== '{') ? convertSecondsToTimeUnits(timeUnitToSeconds($history)) : $history;
 
 			// Hide trend (zero values) for non-numeric item types.
 			$trends = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 				? $item['trends']
 				: '';
 			$trends = ($trends !== '' && $trends[0] !== '{')
-				? convertUnitsS(timeUnitToSeconds($trends))
+				? convertSecondsToTimeUnits(timeUnitToSeconds($trends))
 				: $trends;
 
 			$item['subfilters'] = [
