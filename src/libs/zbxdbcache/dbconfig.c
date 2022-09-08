@@ -13344,8 +13344,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 		{
 			int	lost = 0;	/* communication lost */
 
-			if (0 != (diff->flags &
-					(ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT | ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG)))
+			if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG))
 			{
 				int	delay = diff->lastaccess - proxy->lastaccess;
 
