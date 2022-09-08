@@ -31,7 +31,7 @@ class testFormTagsDiscoveredHost extends testFormTags {
 	public $remove_name = 'Discovered host from prototype 1';
 	public $link = 'zabbix.php?action=host.list';
 	public $saved_link = 'zabbix.php?action=host.edit&hostid=';
-	
+
 	/**
 	 * Test update of Discovered Host with tags.
 	 *
@@ -47,21 +47,20 @@ class testFormTagsDiscoveredHost extends testFormTags {
 	public function testFormTagsDiscoveredHost_Clone() {
 		$this->executeCloning('discovered host', 'Clone');
 	}
-	
+
 	/**
 	 * Test full cloning of Discovered Host with tags.
 	 */
 	public function testFormTagsDiscoveredHost_FullClone() {
 		$this->executeCloning('discovered host', 'Full clone');
 	}
-	
+
 	/**
 	 * Test removing tags from Discovered Host.
 	 */
 	public function testFormTagsDiscoveredHost_RemoveTags() {
 		$this->clearTags('host');
 	}
-	
 }
 
 
