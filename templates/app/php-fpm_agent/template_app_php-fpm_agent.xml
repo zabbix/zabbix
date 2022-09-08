@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-09-08T03:51:08Z</date>
+   <date>2022-09-08T12:46:55Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -13,7 +13,7 @@
          <name>Template App PHP-FPM by Zabbix agent</name>
          <description>Get PHP-FPM metrics using Zabbix agent running on Linux.&#13;
 &#13;
-Note that depending on your OS distribution PHP-FPM process name may vary. Please, check the actual name in the line "Name" from /proc/&lt;pid&gt;/status file (https://www.zabbix.com/documentation/5.0/manual/appendix/items/proc_mem_num_notes) and change {$PHP_FPM.PROCESS_NAME} macro if needed.&#13;
+Note that depending on your OS distribution, the PHP-FPM process name may vary. Please, check the actual name in the line "Name" from /proc/&lt;pid&gt;/status file (https://www.zabbix.com/documentation/5.0/manual/appendix/items/proc_mem_num_notes) and change {$PHP_FPM.PROCESS_NAME} macro if needed.&#13;
 &#13;
 Template tooling version used: 0.39</description>
          <groups>
