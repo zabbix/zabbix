@@ -103,22 +103,15 @@ class CProxy extends CApiService {
 		if (is_array($options['filter'])) {
 			$this->dbFilter('hosts h', $options, $sqlParts);
 
-			$rt_filter = array_intersect_key($options['filter'], ['lastaccess' => '']);
+			$rt_filter = [];
+			foreach (['lastaccess', 'version', 'compatibility'] as $field) {
+				if (array_key_exists($field, $options['filter']) && $options['filter'][$field] !== null) {
+					$rt_filter[$field] = $options['filter'][$field];
+				}
+			}
 
-			if ($rt_filter && $rt_filter['lastaccess'] !== null) {
+			if ($rt_filter) {
 				$this->dbFilter('host_rtdata hr', ['filter' => $rt_filter] + $options, $sqlParts);
-			}
-
-			$rt_filter = array_intersect_key($options['filter'], ['version' => '']);
-
-			if ($rt_filter && $rt_filter['version'] !== null) {
-				$this->dbFilter('host_rtdata hv', ['filter' => $rt_filter] + $options, $sqlParts);
-			}
-
-			$rt_filter = array_intersect_key($options['filter'], ['compatibility' => '']);
-
-			if ($rt_filter && $rt_filter['compatibility'] !== null) {
-				$this->dbFilter('host_rtdata hc', ['filter' => $rt_filter] + $options, $sqlParts);
 			}
 		}
 
@@ -521,38 +514,27 @@ class CProxy extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if (!$options['countOutput'] && $options['selectInterface'] !== null) {
-			$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
-		}
+		if (!$options['countOutput']) {
+			if ($options['selectInterface'] !== null) {
+				$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
+			}
 
-		if ((!$options['countOutput'] && $this->outputIsRequested('lastaccess', $options['output'])
-				|| (is_array($options['filter']) && array_key_exists('lastaccess', $options['filter'])))) {
-			$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-		}
+			if ($this->outputIsRequested('lastaccess', $options['output'])
+					|| $this->outputIsRequested('version', $options['output'])
+					|| $this->outputIsRequested('compatibility', $options['output'])
+					|| (is_array($options['filter'])
+						&& (array_key_exists('lastaccess', $options['filter'])
+							|| array_key_exists('version', $options['filter'])
+							|| array_key_exists('compatibility', $options['filter'])))) {
+				$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 
-		if (!$options['countOutput'] && $this->outputIsRequested('lastaccess', $options['output'])) {
-			$sqlParts = $this->addQuerySelect('hr.lastaccess', $sqlParts);
-		}
-
-		if ((!$options['countOutput'] && $this->outputIsRequested('version', $options['output']))
-				|| (is_array($options['filter']) && array_key_exists('version', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'hv', 'table' => 'host_rtdata', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-		}
-
-		if (!$options['countOutput'] && $this->outputIsRequested('version', $options['output'])) {
-			$sqlParts = $this->addQuerySelect('hv.version', $sqlParts);
-		}
-
-		if ((!$options['countOutput'] && $this->outputIsRequested('compatibility', $options['output']))
-			|| (is_array($options['filter']) && array_key_exists('compatibility', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'hc', 'table' => 'host_rtdata', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-		}
-
-		if (!$options['countOutput'] && $this->outputIsRequested('compatibility', $options['output'])) {
-			$sqlParts = $this->addQuerySelect('hc.compatibility', $sqlParts);
+				foreach (['lastaccess', 'version', 'compatibility'] as $field) {
+					if ($this->outputIsRequested($field, $options['output'])) {
+						$sqlParts = $this->addQuerySelect('hr.'.$field, $sqlParts);
+					}
+				}
+			}
 		}
 
 		return $sqlParts;
