@@ -251,6 +251,7 @@ class CControllerAuthenticationEdit extends CController {
 						'is_fallback' => GROUP_MAPPING_FALLBACK,
 						'fallback_status' => GROUP_MAPPING_FALLBACK_OFF,
 						'user_groups' => [
+							['usrgrpid' => 7]
 							// TODO: define default user group.
 						],
 						'roleid' => $default_role[0]['roleid']
