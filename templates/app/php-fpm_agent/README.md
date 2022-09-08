@@ -15,7 +15,6 @@ It also uses Zabbix agent to collect `php-fpm` Linux process stats like CPU usag
 
 
 
-
 This template was tested on:
 
 - PHP, version 7
@@ -66,6 +65,8 @@ This template was tested on:
 7. Verify
   ```curl -L 127.0.0.1/status```
 
+Note that depending on your OS distribution PHP-FPM process name may vary. Please, check the actual name in the line "Name" from /proc/\<pid\>/status file (https://www.zabbix.com/documentation/6.0/manual/appendix/items/proc_mem_num_notes) and change {$PHP_FPM.PROCESS_NAME} macro if needed.
+
 If you use another location of status/ping page, don't forget to change {$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE} macro.
 
 If you use an atypical location for PHP-FPM status-page don't forget to change the macros {$PHP_FPM.PORT}.
@@ -86,7 +87,7 @@ No specific Zabbix configuration is required.
 |{$PHP_FPM.PING.PAGE} |<p>The path of PHP-FPM ping page.</p> |`ping` |
 |{$PHP_FPM.PING.REPLY} |<p>Expected reply to the ping.</p> |`pong` |
 |{$PHP_FPM.PORT} |<p>The port of PHP-FPM status host or container.</p> |`80` |
-|{$PHP_FPM.PROCESS_NAME} |<p>PHP-FPM process name</p> |`php-fpm` |
+|{$PHP_FPM.PROCESS_NAME} |<p>PHP-FPM process name. May vary depending on your OS distribution.</p> |`php-fpm` |
 |{$PHP_FPM.QUEUE.WARN.MAX} |<p>The maximum PHP-FPM queue usage percent for trigger expression.</p> |`80` |
 |{$PHP_FPM.STATUS.PAGE} |<p>The path of PHP-FPM status page.</p> |`status` |
 
