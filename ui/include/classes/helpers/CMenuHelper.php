@@ -233,7 +233,7 @@ class CMenuHelper {
 									(new CUrl('zabbix.php'))
 										->setArgument('action', 'action.list')
 										->setArgument('eventsource', EVENT_SOURCE_TRIGGERS),
-									'action.list'
+									'action.list?eventsource='.EVENT_SOURCE_TRIGGERS
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS)
@@ -241,7 +241,8 @@ class CMenuHelper {
 								->setUrl(
 									(new CUrl('zabbix.php'))
 										->setArgument('action', 'action.list')
-										->setArgument('eventsource', EVENT_SOURCE_SERVICE)
+										->setArgument('eventsource', EVENT_SOURCE_SERVICE),
+									'action.list?eventsource='.EVENT_SOURCE_SERVICE
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS)
@@ -249,7 +250,8 @@ class CMenuHelper {
 								->setUrl(
 									(new CUrl('zabbix.php'))
 										->setArgument('action', 'action.list')
-										->setArgument('eventsource', EVENT_SOURCE_DISCOVERY)
+										->setArgument('eventsource', EVENT_SOURCE_DISCOVERY),
+									'action.list?eventsource='.EVENT_SOURCE_DISCOVERY
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS)
@@ -257,7 +259,8 @@ class CMenuHelper {
 								->setUrl(
 									(new CUrl('zabbix.php'))
 										->setArgument('action', 'action.list')
-										->setArgument('eventsource', EVENT_SOURCE_AUTOREGISTRATION)
+										->setArgument('eventsource', EVENT_SOURCE_AUTOREGISTRATION),
+									'action.list?eventsource='.EVENT_SOURCE_AUTOREGISTRATION
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS)
@@ -265,7 +268,8 @@ class CMenuHelper {
 								->setUrl(
 									(new CUrl('zabbix.php'))
 										->setArgument('action', 'action.list')
-										->setArgument('eventsource', EVENT_SOURCE_INTERNAL)
+										->setArgument('eventsource', EVENT_SOURCE_INTERNAL),
+									'action.list?eventsource='.EVENT_SOURCE_INTERNAL
 								)
 							: null
 					])))
