@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-21T18:00:07Z</date>
+   <date>2022-09-06T13:00:26Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -215,7 +215,7 @@ Template tooling version used: 0.39</description>
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>{$PHP_FPM.PING.REPLY}($|\n)
+                     <params>{$PHP_FPM.PING.REPLY}($|\r?\n)
 1</params>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
@@ -459,9 +459,9 @@ Template tooling version used: 0.39</description>
                   </trigger>
                   <trigger>
                      <expression>{last()}&lt;10m</expression>
-                     <name>PHP-FPM: has been restarted (uptime &lt; 10m)</name>
+                     <name>PHP-FPM: Pool has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>

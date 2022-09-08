@@ -4087,7 +4087,7 @@
 						body.append(response.messages);
 					}
 
-					body.find('form').attr('aria-labeledby', header.find('h4').attr('id'));
+					body.find('form').attr('aria-labelledby', header.find('h4').attr('id'));
 
 					// Change submit function for returned form.
 					$('#widget_dialogue_form', body).on('submit', function(e) {
