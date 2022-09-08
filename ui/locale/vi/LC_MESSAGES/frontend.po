@@ -18210,6 +18210,10 @@ msgstr "Tháng này"
 msgid "This month so far"
 msgstr "Tháng này đến nay"
 
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
