@@ -93,7 +93,6 @@ window.action_edit_popup = new class {
 			dialogueid: 'condition',
 			dialogue_class: 'modal-popup-medium'
 		});
-
 	}
 
 	_createRow(row, input) {
@@ -120,16 +119,15 @@ window.action_edit_popup = new class {
 	_createNameCell(input) {
 		const cell = document.createElement('tr');
 		const condition_cell = document.createElement('td');
-		const operator_cell = document.createElement('td');
 		const value_cell = document.createElement('em');
 
+		cell.appendChild(this._createHiddenInput('formulaid',this.label));
 		cell.appendChild(this._createHiddenInput('conditiontype',input.conditiontype));
 		cell.appendChild(this._createHiddenInput('operator',input.operator));
 		cell.appendChild(this._createHiddenInput('value',input.value));
 		if (input.value2 !== '') {
 			cell.appendChild(this._createHiddenInput('value2',input.value2));
 		}
-		cell.appendChild(this._createHiddenInput('formulaid',this.label));
 
 		if (input.conditiontype == <?= CONDITION_TYPE_EVENT_TAG_VALUE ?>) {
 			cell.append('Value of tag ');
@@ -155,8 +153,7 @@ window.action_edit_popup = new class {
 		}
 		else {
 			condition_cell.textContent = (
-				this.condition_types[input.conditiontype] + ' ' +
-				this.condition_operators[input.operator]
+				this.condition_types[input.conditiontype] + ' ' + this.condition_operators[input.operator]
 			);
 			value_cell.textContent = input.name;
 
@@ -296,14 +293,10 @@ window.action_edit_popup = new class {
 	_processTypeOfCalculation() {
 		this.show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 
-		jQuery('#label-evaltype').toggle(this.row_count > 1);
-		jQuery('#evaltype-formfield').toggle(this.row_count > 1);
 		jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
-
-		// todo E.S.: remove expression field when multiselect - custom expression
+		jQuery('#expression').toggle(!this.show_formula);
 
 		const labels = jQuery('#conditionTable .label');
-
 		var conditions = [];
 		labels.each(function(index, label) {
 			var label = jQuery(label);
@@ -318,6 +311,7 @@ window.action_edit_popup = new class {
 
 		jQuery('#evaltype').change(function() {
 			this.show_formula = (jQuery(this).val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
+
 			jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
 			jQuery('#expression').toggle(!this.show_formula);
 
