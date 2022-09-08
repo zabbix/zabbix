@@ -64,7 +64,32 @@ class CControllerActionUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS);
+		$eventsource = $this->getInput('eventsource');
+		$has_permission = false;
+
+		switch ($eventsource) {
+			case EVENT_SOURCE_TRIGGERS:
+				$has_permission = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
+				break;
+
+			case EVENT_SOURCE_DISCOVERY:
+				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
+				break;
+
+			case EVENT_SOURCE_AUTOREGISTRATION:
+				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
+				break;
+
+			case EVENT_SOURCE_INTERNAL:
+				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
+				break;
+
+			case EVENT_SOURCE_SERVICE:
+				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
+				break;
+		}
+
+		return $has_permission;
 	}
 
 	protected function doAction(): void {
