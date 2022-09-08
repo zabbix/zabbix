@@ -25,6 +25,8 @@
 #include "base64.h"
 #include "zbxalgo.h"
 
+#include <sys/utsname.h>
+
 /* number of characters per line when wrapping Base64 data in Email */
 #define ZBX_EMAIL_B64_MAXLINE			76
 
@@ -438,21 +440,37 @@ out:
 }
 #endif
 
+static char	*smtp_get_helo_from_system(void)
+{
+	struct utsname	name;
+
+	if (-1 == uname(&name))
+		return NULL;
+
+	return zbx_strdup(NULL, name.nodename);
+}
+
 static char	*smtp_get_helo_from_addr(const char *addr)
 {
 	const char	*domain;
 	char		*helo_addr;
+	size_t		addr_len;
 
-	if (NULL == (domain = strrchr(addr, '@')))
+	if (NULL == addr || '\0' == *addr || NULL == (domain = strrchr(addr, '@')))
+		return NULL;
+
+	addr_len = strlen(domain + 1);
+
+	if (addr_len == 1 && *(domain + 1) == '>')
 		return NULL;
 
 	helo_addr = zbx_strdup(NULL, domain + 1);
-	helo_addr[strlen(helo_addr) - 1] = '\0';
+	helo_addr[addr_len - 1] = '\0';
 
 	return helo_addr;
 }
 
-static int	send_smtp_helo(const char *addr, const char *helo, zbx_socket_t *s, char **error, size_t max_error_len)
+static int	send_smtp_helo_plain(const char *addr, const char *helo, zbx_socket_t *s, char **error, size_t max_error_len)
 {
 	char		cmd[MAX_STRING_LEN], *helo_parsed = NULL;
 	const char	*response;
@@ -464,17 +482,23 @@ static int	send_smtp_helo(const char *addr, const char *helo, zbx_socket_t *s, c
 	}
 	else
 	{
-		if (NULL == addr)
-			return SUCCEED;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() HELO is not specified and failed to parse HELO from email address, "
+				"trying to form HELO command using system's hostname", __func__);
 
 		if (NULL == (helo_parsed = smtp_get_helo_from_addr(addr)))
 		{
-			zbx_snprintf(*error, max_error_len, "failed to parse domain name for HELO request");
-			ret = FAIL;
-			goto out;
+			if (NULL == (helo_parsed = smtp_get_helo_from_system()))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to form HELO command using system hostname",
+						__func__);
+
+				zbx_snprintf(*error, max_error_len, "failed to retrieve domain name for HELO command");
+				ret = FAIL;
+				goto out;
+			}
 		}
-		else
-			zbx_snprintf(cmd, sizeof(cmd), "HELO %s\r\n", helo_parsed);
+
+		zbx_snprintf(cmd, sizeof(cmd), "HELO %s\r\n", helo_parsed);
 	}
 
 	if (-1 == write(s->socket, cmd, strlen(cmd)))
@@ -544,11 +568,9 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 
 	/* send HELO */
 	if (0 != from_mails->values_num)
-	{
 		helo_addr = ((zbx_mailaddr_t *)from_mails->values[0])->addr;
-	}
 
-	if (FAIL == send_smtp_helo(helo_addr, smtp_helo, &s, &error, max_error_len))
+	if (FAIL == send_smtp_helo_plain(helo_addr, smtp_helo, &s, &error, max_error_len))
 		goto close;
 
 	/* send MAIL FROM */
@@ -713,17 +735,42 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	}
 	else
 	{
-		char	*helo_parsed;
+		char	*helo_domain = NULL;
 
-		if (NULL == (helo_parsed = smtp_get_helo_from_addr(((zbx_mailaddr_t *)from_mails->values[0])->addr)))
+		if (0 != from_mails->values_num)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s() HELO is not specified and failed to parse HELO from email address",
-					__func__);
+			if (NULL == (helo_domain = smtp_get_helo_from_addr(((zbx_mailaddr_t *)from_mails->values[0])->addr)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() HELO is not specified and failed to parse HELO "
+						"from email address, trying to form HELO command using system's hostname",
+						__func__);
+
+				if (NULL == (helo_domain = smtp_get_helo_from_system()))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to form HELO command using system hostname", __func__);
+				}
+				else
+					zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", helo_domain);
+			}
+			else
+				zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", helo_domain);
+
+			zbx_free(helo_domain);
 		}
 		else
 		{
-			zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", helo_parsed);
-			zbx_free(helo_parsed);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() no outcoming addresses configured, trying to form HELO command using system's hostname",
+					__func__);
+
+			if (NULL == (helo_domain = smtp_get_helo_from_system()))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to form HELO command using system hostname", __func__);
+			}
+			else
+			{
+				zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", helo_domain);
+				zbx_free(helo_domain);
+			}
 		}
 	}
 
