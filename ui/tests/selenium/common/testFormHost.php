@@ -2088,7 +2088,7 @@ class testFormHost extends CWebTest {
 					break;
 
 				case 'Tags':
-					$tags_table = $form->query('id:tags-table')->asMultifieldTable()->one()->waitUntilVisible();
+					$tags_table = $form->query('class:tags-table')->asMultifieldTable()->one()->waitUntilVisible();
 
 					$expected_tags = [
 						[
