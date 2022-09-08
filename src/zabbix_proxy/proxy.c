@@ -658,7 +658,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 #endif
 
 	if (0 != CONFIG_CONFSYNCER_FREQUENCY)
-		zabbix_log(LOG_LEVEL_WARNING, "\"ConfigFrequency\" parameter is deprecated, "
+		zabbix_log(LOG_LEVEL_WARNING, "\"ConfigFrequency\" parameter is deprecated and is ignored, "
 				"use ProxyConfigFrequency instead");
 
 	err |= (FAIL == zbx_db_validate_config_features());
