@@ -71,38 +71,73 @@ class CUserDirectory extends CApiService {
 	public function get(array $options) {
 		$this->validateGet($options);
 
-		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = array_merge(
-				$this->output_fields, $this->ldap_output_fields, $this->saml_output_fields
-			);
+		if (!$options['countOutput']) {
+			if ($options['output'] === API_OUTPUT_EXTEND) {
+				$options['output'] = array_merge(
+					$this->output_fields, $this->ldap_output_fields, $this->saml_output_fields
+				);
+			}
+
+			$request_output = $options['output'];
+			$db_userdirectories_by_type = [IDP_TYPE_LDAP => [], IDP_TYPE_SAML => []];
+			$db_userdirectories = [];
+
+			$options['output'] = array_merge(['idp_type'], array_intersect($request_output, $this->output_fields));
 		}
 
-		$sql_parts = [
-			'select' => ['userdirectory' => 'ud.userdirectoryid'],
-			'from' => ['userdirectory' => 'userdirectory ud'],
-			'left_join' => [],
-			'order' => [],
-			'group' => []
-		];
-
-		$sql_parts = $this->applyQueryFilterOptions($this->tableName, $this->tableAlias, $options, $sql_parts);
-		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-
-		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
-
-		$db_userdirectories = [];
-		while ($row = DBfetch($result, false)) {
+		$result = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
+		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
 				return $row['rowscount'];
 			}
 
 			$db_userdirectories[$row['userdirectoryid']] = $row;
+			$db_userdirectories_by_type[$row['idp_type']][] = $row['userdirectoryid'];
+		}
+
+		if ($db_userdirectories_by_type[IDP_TYPE_LDAP]) {
+			$sql_parts = [
+				'select' => array_merge(
+					['userdirectoryid'], array_intersect($request_output, $this->ldap_output_fields)
+				),
+				'from' => ['userdirectory_ldap'],
+				'where' => [
+					'userdirectoryid' => dbConditionInt('userdirectoryid', $db_userdirectories_by_type[IDP_TYPE_LDAP])
+				]
+			];
+
+			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
+			while ($row = DBfetch($result)) {
+				$db_userdirectories[$row['userdirectoryid']] = array_merge(
+					$db_userdirectories[$row['userdirectoryid']], $row
+				);
+			}
+		}
+
+		if ($db_userdirectories_by_type[IDP_TYPE_SAML]) {
+			$sql_parts = [
+				'select' => array_merge(
+					['userdirectoryid'], array_intersect($request_output, $this->saml_output_fields)
+				),
+				'from' => ['userdirectory_saml'],
+				'where' => [
+					'userdirectoryid' => dbConditionInt('userdirectoryid', $db_userdirectories_by_type[IDP_TYPE_SAML])
+				]
+			];
+
+			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
+			while ($row = DBfetch($result)) {
+				$db_userdirectories[$row['userdirectoryid']] = array_merge(
+					$db_userdirectories[$row['userdirectoryid']], $row
+				);
+			}
 		}
 
 		if ($db_userdirectories) {
 			$db_userdirectories = $this->addRelatedObjects($options, $db_userdirectories);
-			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid'], $options['output']);
+			$db_userdirectories = $this->unsetExtraFields($db_userdirectories, ['userdirectoryid', 'idp_type'],
+				$request_output
+			);
 
 			if (!$options['preservekeys']) {
 				$db_userdirectories = array_values($db_userdirectories);
