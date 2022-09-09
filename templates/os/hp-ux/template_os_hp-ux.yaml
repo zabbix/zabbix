@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-09T11:11:03Z'
+  date: '2022-09-09T14:44:03Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -246,6 +246,11 @@ zabbix_export:
           history: 1w
           trends: '0'
           value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             -
               tag: component

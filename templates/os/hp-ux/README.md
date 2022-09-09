@@ -50,7 +50,7 @@ There are no template links in this template.
 |HP-UX |Host local time |<p>-</p> |ZABBIX_PASSIVE |system.localtime |
 |HP-UX |System information |<p>The information as normally returned by 'uname -a'.</p> |ZABBIX_PASSIVE |system.uname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |HP-UX |Number of logged in users |<p>Number of users who are currently logged in.</p> |ZABBIX_PASSIVE |system.users.num |
-|HP-UX |Checksum of /etc/passwd |<p>-</p> |ZABBIX_PASSIVE |vfs.file.cksum[/etc/passwd,sha256] |
+|HP-UX |Checksum of /etc/passwd |<p>-</p> |ZABBIX_PASSIVE |vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |HP-UX |Available memory |<p>Available memory is defined as free+cached+buffers memory.</p> |ZABBIX_PASSIVE |vm.memory.size[available] |
 |HP-UX |Total memory |<p>-</p> |ZABBIX_PASSIVE |vm.memory.size[total] |
 |HP-UX |Interface {#IFNAME}: Incoming network traffic |<p>-</p> |ZABBIX_PASSIVE |net.if.in[{#IFNAME}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND: ``</p><p>- MULTIPLIER: `8`</p> |
