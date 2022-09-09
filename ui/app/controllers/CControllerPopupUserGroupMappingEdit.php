@@ -32,7 +32,6 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 			'roleid' =>				'db users.roleid',
 			'name' =>				'string',
 			'is_fallback' =>		'required|in '.GROUP_MAPPING_REGULAR.','.GROUP_MAPPING_FALLBACK,
-			'fallback_status' =>	'in '.GROUP_MAPPING_FALLBACK_OFF.','.GROUP_MAPPING_FALLBACK_ON
 		];
 
 		$ret = $this->validateInput($fields);
@@ -69,7 +68,6 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 			'add_group' => $this->getInput('add_group', 0),
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'is_fallback' => $this->getInput('is_fallback'),
-			'fallback_status' => $this->getInput('fallback_status', GROUP_MAPPING_FALLBACK_OFF)
 		];
 
 		$data['user_groups'] = $this->hasInput('usrgrpid')

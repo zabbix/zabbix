@@ -322,7 +322,7 @@ window.ldap_edit_popup = new class {
 		const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			const group = {...e.detail, ...{row_index: row_index}};
+			const group = {...e.detail, ...{row_index: row_index, fallback_status: status}};
 
 			if (row === null) {
 				const fallback_row = this.dialogue.querySelector('[data-row_fallback]');
