@@ -287,9 +287,11 @@ abstract class CControllerCharts extends CController {
 			}
 
 			foreach ($graph['tags'] as $tag) {
-				if ($selected_tagvalues && array_key_exists($tag['tag'], $selected_tagvalues)
-						&& !array_key_exists($tag['value'], $selected_tagvalues[$tag['tag']])) {
-					continue;
+				if ($selected_tagvalues) {
+					if (!(array_key_exists($tag['tag'], $selected_tagvalues)
+							&& array_key_exists($tag['value'], $selected_tagvalues[$tag['tag']]))) {
+						continue;
+					}
 				}
 
 				$graph_matches = true;
