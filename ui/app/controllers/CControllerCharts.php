@@ -217,16 +217,15 @@ abstract class CControllerCharts extends CController {
 	}
 
 	/**
-	 * Find what subfilters are available based on items selected using the main filter.
+	 * Find what subfilters are available based on hosts selected using the main filter.
 	 *
 	 * @param array  $graphs                           [IN/OUT] Result of host/simple graphs matching primary filter.
 	 * @param string $graphs[]['graphid']              [IN] Host graph graphid.
-	 * @param string $graphs[]['itemid']               [IN] Simple graph itemid.
 	 * @param array  $graphs[]['tags']                 [IN] Item tags array.
 	 * @param string $graphs[]['tags'][]['tag']        [IN] Tag name.
 	 * @param string $graphs[]['tags'][]['value']      [IN] Tag value.
-	 * @param array  $graphs[]['matching_subfilters']  [OUT] Flag for each of subfilter group showing either item fits
-	 *                                                 fits its subfilter requirements.
+	 * @param array  $graphs[]['matching_subfilters']  [OUT] Flag for each of subfilter group showing either graph fits
+	 *                                                 its subfilter requirements.
 	 * @param bool   $graphs[]['has_data']             [OUT] Flag either item has data.
 	 * @param array  $subfilters                       Selected subfilters.
 	 *
