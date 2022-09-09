@@ -11970,6 +11970,8 @@ void	zbx_config_clean(zbx_config_t *cfg)
  ********************************************************************************/
 int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 {
+#define ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL	(10 * SEC_PER_MIN)
+
 	ZBX_DC_HOST			*host;
 	ZBX_DC_INTERFACE		*interface;
 	zbx_hashset_iter_t		iter;
@@ -12004,7 +12006,7 @@ int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 			if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
 			{
 				/* SEC_PER_MIN is a tolerance interval, it was chosen arbitrarily */
-				if (ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX + SEC_PER_MIN >= now - proxy->lastaccess)
+				if (ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL >= now - proxy->lastaccess)
 					continue;
 			}
 
@@ -12044,6 +12046,7 @@ int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() interfaces:%d", __func__, interfaces->values_num);
 
 	return 0 == interfaces->values_num ? FAIL : SUCCEED;
+#undef ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL
 }
 
 /*******************************************************************************
