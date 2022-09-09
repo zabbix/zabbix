@@ -271,11 +271,11 @@ class CDashboardElement extends CElement {
 	/**
 	 * Select dashboard page by name.
 	 *
-	 * @param string	$page_name		page name to be selected
-	 * @param integer	$index			expected number of pages with the provided name
+	 * @param string	$name		page name to be selected
+	 * @param integer	$index		expected number of pages with the provided name
 	 */
-	public function selectPage($page_name, $index = 1) {
-		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
+	public function selectPage($name, $index = 1) {
+		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($name);
 		$this->query('xpath:('.$selection.'])['.$index.']')->waitUntilClickable()->one()->click();
 		$this->query('xpath:'.$selection.']/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
 	}

@@ -97,6 +97,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			[
 				'name' => 'Dashboard for Trigger overview widgets',
 				'private' => 0,
+				'auto_start' => 0,
 				'pages' => [
 					[
 						'name' => 'Page with widgets',
@@ -161,8 +162,11 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 
 		$default_values = [
 			'Show header' => true,
+			'Name' => '',
 			'Refresh interval' => 'Default (1 minute)',
 			'Show' => 'Recent problems',
+			'Host groups' => [],
+			'Hosts' => [],
 			'id:evaltype' => 'And/Or',
 			'id:tags_0_tag' => '',
 			'id:tags_0_value' => '',
@@ -201,6 +205,9 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$this->assertEquals(2, $form->query('id:tags_table_tags')->one()->query('button', ['Add', 'Remove'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
+
+		// Close the widget configuration form dialog to avoid possible alerts in following tests.
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function getWidgetData() {
@@ -362,37 +369,8 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Show suppressed problems',
-						'Show suppressed problems' => true
-					],
-					'expected' => [
-						'1_Host_to_check_Monitoring_Overview' => [
-							'1_trigger_Average',
-							'1_trigger_Disaster',
-							'1_trigger_High',
-							'1_trigger_Not_classified',
-							'1_trigger_Warning',
-							'2_trigger_Information'
-						],
-						'3_Host_to_check_Monitoring_Overview' => [
-							'3_trigger_Average'
-						],
-						'4_Host_to_check_Monitoring_Overview' => [
-							'4_trigger_Average'
-						],
-						'Host for triggers filtering' => [
-							'Inheritance trigger with tags'
-						],
-						'Host for suppression' => [
-							'Trigger_for_suppression'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Show hosts on top',
+						'Name' => 'Show suppressed problems + hosts on top',
+						'Show suppressed problems' => true,
 						'Hosts location' => 'Top'
 					],
 					'expected' => [
@@ -410,6 +388,9 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 						'4_Host_to_check_Monitoring_Overview' => [
 							'4_trigger_Average'
 						],
+						'Host for suppression' => [
+							'Trigger_for_suppression'
+						],
 						'Host for triggers filtering' => [
 							'Inheritance trigger with tags'
 						]
@@ -419,23 +400,12 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Виджет с 良い１日を un žšī!@#$%^&*()_+ vardā'
+						'Name' => 'Filter triggers by tag with default operator'
+					],
+					'tags' => [
+						['name' => 'server', 'operator' => 'Contains', 'value' => 'sel']
 					],
 					'expected' => [
-						'1_Host_to_check_Monitoring_Overview' => [
-							'1_trigger_Average',
-							'1_trigger_Disaster',
-							'1_trigger_High',
-							'1_trigger_Not_classified',
-							'1_trigger_Warning',
-							'2_trigger_Information'
-						],
-						'3_Host_to_check_Monitoring_Overview' => [
-							'3_trigger_Average'
-						],
-						'4_Host_to_check_Monitoring_Overview' => [
-							'4_trigger_Average'
-						],
 						'Host for triggers filtering' => [
 							'Inheritance trigger with tags'
 						]
@@ -464,7 +434,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 						'Tags' => 'Or'
 					],
 					'tags' => [
-						['name' => 'server', 'operator' => 'Contains', 'value' => 'sel'],
+						['name' => 'Street', 'operator' => 'Exists'],
 						['name' => 'webhook', 'operator' => 'Equals', 'value' => '1']
 					],
 					'expected' => [
@@ -473,6 +443,58 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 						],
 						'Host for triggers filtering' => [
 							'Inheritance trigger with tags'
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Does not exists and Does not equal tag operators',
+						'Show' => 'Problems'
+					],
+					'tags' => [
+						['name' => 'Street', 'operator' => 'Does not exist'],
+						['name' => 'webhook', 'operator' => 'Does not equal', 'value' => '1']
+					],
+					'expected' => [
+						'1_Host_to_check_Monitoring_Overview' => [
+							'1_trigger_Disaster',
+							'1_trigger_Not_classified',
+							'1_trigger_Warning',
+							'2_trigger_Information'
+						],
+						'3_Host_to_check_Monitoring_Overview' => [
+							'3_trigger_Average'
+						],
+						'4_Host_to_check_Monitoring_Overview' => [
+							'4_trigger_Average'
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Виджет с tag + 良い１日を un žšī!@#$%^&*()_ vardā'
+					],
+					'tags' => [
+						['name' => 'Street', 'operator' => 'Does not contain', 'value' => 'elza']
+					],
+					'expected' => [
+						'1_Host_to_check_Monitoring_Overview' => [
+							'1_trigger_Average',
+							'1_trigger_Disaster',
+							'1_trigger_High',
+							'1_trigger_Not_classified',
+							'1_trigger_Warning',
+							'2_trigger_Information'
+						],
+						'3_Host_to_check_Monitoring_Overview' => [
+							'3_trigger_Average'
+						],
+						'4_Host_to_check_Monitoring_Overview' => [
+							'4_trigger_Average'
 						]
 					]
 				]
@@ -716,8 +738,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$dashboard->save();
 
 		// Get the table row with all triggers (since all of them belong to a single host).
-		$table = $dashboard->getWidget(self::$update_widget)->getContent()->asTable();
-		$row = $table->findRow('Hosts', self::$icon_host);
+		$row = $dashboard->getWidget(self::$update_widget)->getContent()->asTable()->findRow('Hosts', self::$icon_host);
 
 		foreach ($popup_content as $trigger => $dependency) {
 			// Locate hint and check table headers in hint.
