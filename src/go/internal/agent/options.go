@@ -240,13 +240,15 @@ func ValidateOptions(options *AgentOptions) error {
 	}
 
 	if len(options.Hostname) > maxLen {
-		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d characters", maxLen)
+		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d"+
+			" characters", maxLen)
 	}
 	if err = CheckHostnameParameter(options.Hostname); err != nil {
 		return fmt.Errorf("invalid \"Hostname\" configuration parameter: %s", err.Error())
 	}
 	if utf8.RuneCountInString(options.HostInterface) > HostInterfaceLen {
-		return fmt.Errorf("the value of \"HostInterface\" configuration parameter cannot be longer than %d characters", HostInterfaceLen)
+		return fmt.Errorf("the value of \"HostInterface\" configuration parameter cannot be longer than %d"+
+			" characters", HostInterfaceLen)
 	}
 
 	return nil
