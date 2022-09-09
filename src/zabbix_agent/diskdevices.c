@@ -39,7 +39,7 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_u
 
 	device->index++;
 
-	if (MAX_COLLECTOR_HISTORY == device->index)
+	if (ZBX_MAX_COLLECTOR_HISTORY == device->index)
 		device->index = 0;
 
 	device->clock[device->index] = now;
@@ -53,7 +53,7 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_u
 	clock[ZBX_AVG1] = clock[ZBX_AVG5] = clock[ZBX_AVG15] = now + 1;
 	index[ZBX_AVG1] = index[ZBX_AVG5] = index[ZBX_AVG15] = -1;
 
-	for (i = 0; i < MAX_COLLECTOR_HISTORY; i++)
+	for (i = 0; i < ZBX_MAX_COLLECTOR_HISTORY; i++)
 	{
 		if (0 == device->clock[i])
 			continue;

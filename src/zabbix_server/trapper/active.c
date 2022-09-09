@@ -24,10 +24,10 @@
 #include "zbxregexp.h"
 #include "zbxcompress.h"
 #include "zbxcrypto.h"
-
 #include "zbxnum.h"
 #include "zbxcomms.h"
 #include "zbxip.h"
+#include "zbxsysinfo.h"
 
 extern unsigned char	program_type;
 

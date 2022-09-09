@@ -25,6 +25,7 @@
 
 #include"../vmware/vmware.h"
 #include "zbxxml.h"
+#include "zbxsysinfo.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
 #define ZBX_VMWARE_DATASTORE_SIZE_FREE		1
@@ -46,7 +47,7 @@ static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_OK;
 
-	if (NULL != GET_STR_RESULT(result))
+	if (NULL != ZBX_GET_STR_RESULT(result))
 	{
 		if (0 == strcmp(result->str, "poweredOff"))
 			SET_UI64_RESULT(result, 0);
@@ -57,7 +58,7 @@ static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 		else
 			ret = SYSINFO_RET_FAIL;
 
-		UNSET_STR_RESULT(result);
+		ZBX_UNSET_STR_RESULT(result);
 	}
 
 	return ret;
@@ -1249,7 +1250,7 @@ int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, con
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -1532,7 +1533,7 @@ int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, const char *username, c
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_CPU_MHZ, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -1711,7 +1712,7 @@ int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, c
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_MEMORY_USED, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -1794,7 +1795,7 @@ int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *use
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HEALTH_STATE, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_STR_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_STR_RESULT(result))
 	{
 		if (0 == strcmp(result->str, "gray") || 0 == strcmp(result->str, "unknown"))
 			SET_UI64_RESULT(result, 0);
@@ -1807,7 +1808,7 @@ int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *use
 		else
 			ret = SYSINFO_RET_FAIL;
 
-		UNSET_STR_RESULT(result);
+		ZBX_UNSET_STR_RESULT(result);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -1824,7 +1825,7 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_STATUS, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_STR_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_STR_RESULT(result))
 	{
 		if (0 == strcmp(result->str, "gray") || 0 == strcmp(result->str, "unknown"))
 			SET_UI64_RESULT(result, 0);
@@ -1837,7 +1838,7 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 		else
 			ret = SYSINFO_RET_FAIL;
 
-		UNSET_STR_RESULT(result);
+		ZBX_UNSET_STR_RESULT(result);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -1854,14 +1855,14 @@ int	check_vcenter_hv_maintenance(AGENT_REQUEST *request, const char *username, c
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_MAINTENANCE, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_STR_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_STR_RESULT(result))
 	{
 		if (0 == strcmp(result->str, "false"))
 			SET_UI64_RESULT(result, 0);
 		else
 			SET_UI64_RESULT(result, 1);
 
-		UNSET_STR_RESULT(result);
+		ZBX_UNSET_STR_RESULT(result);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -2597,31 +2598,31 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 		if (SYSINFO_RET_OK != (ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
 				counterid, datastore->uuid, 1, unit, result)))
 		{
-			char	*err, *msg = *GET_MSG_RESULT(result);
+			char	*err, *msg = *ZBX_GET_MSG_RESULT(result);
 
 			*msg = (char)tolower(*msg);
 			err = zbx_dsprintf(NULL, "Counter %s for datastore %s is not available for hypervisor %s: %s",
 					perfcounter, datastore->name,
 					ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NAME]), msg);
-			UNSET_MSG_RESULT(result);
+			ZBX_UNSET_MSG_RESULT(result);
 			SET_MSG_RESULT(result, err);
 			goto unlock;
 		}
 
 		ds_count++;
 
-		if (0 == ISSET_VALUE(result))
+		if (0 == ZBX_ISSET_VALUE(result))
 			continue;
 
 		if (DATASTORE_METRIC_MODE_MAX_LATENCY != metric_mode)
 		{
-			value += *GET_UI64_RESULT(result);
+			value += *ZBX_GET_UI64_RESULT(result);
 			count++;
 		}
-		else if (value < *GET_UI64_RESULT(result))
-			value = *GET_UI64_RESULT(result);
+		else if (value < *ZBX_GET_UI64_RESULT(result))
+			value = *ZBX_GET_UI64_RESULT(result);
 
-		UNSET_UI64_RESULT(result);
+		ZBX_UNSET_UI64_RESULT(result);
 	}
 
 	if (0 == ds_count)
@@ -2837,11 +2838,11 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 		ret = vmware_service_get_counter_value_by_path(service, "Datastore", datastore->id,
 				"disk/provisioned[latest]", ZBX_DATASTORE_TOTAL, ZBX_KIBIBYTE, result);
 
-		if (SYSINFO_RET_OK != ret || NULL == GET_UI64_RESULT(result))
+		if (SYSINFO_RET_OK != ret || NULL == ZBX_GET_UI64_RESULT(result))
 			goto unlock;
 
-		disk_provisioned = *GET_UI64_RESULT(result);
-		UNSET_UI64_RESULT(result);
+		disk_provisioned = *ZBX_GET_UI64_RESULT(result);
+		ZBX_UNSET_UI64_RESULT(result);
 	}
 
 	if (0 != (flags & ZBX_DATASTORE_COUNTER_USED))
@@ -2849,11 +2850,11 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 		ret = vmware_service_get_counter_value_by_path(service, "Datastore", datastore->id,
 				"disk/used[latest]", ZBX_DATASTORE_TOTAL, ZBX_KIBIBYTE, result);
 
-		if (SYSINFO_RET_OK != ret || NULL == GET_UI64_RESULT(result))
+		if (SYSINFO_RET_OK != ret || NULL == ZBX_GET_UI64_RESULT(result))
 			goto unlock;
 
-		disk_used = *GET_UI64_RESULT(result);
-		UNSET_UI64_RESULT(result);
+		disk_used = *ZBX_GET_UI64_RESULT(result);
+		ZBX_UNSET_UI64_RESULT(result);
 	}
 
 	if (0 != (flags & ZBX_DATASTORE_COUNTER_CAPACITY))
@@ -2861,11 +2862,11 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 		ret = vmware_service_get_counter_value_by_path(service, "Datastore", datastore->id,
 				"disk/capacity[latest]", ZBX_DATASTORE_TOTAL, ZBX_KIBIBYTE, result);
 
-		if (SYSINFO_RET_OK != ret || NULL == GET_UI64_RESULT(result))
+		if (SYSINFO_RET_OK != ret || NULL == ZBX_GET_UI64_RESULT(result))
 			goto unlock;
 
-		disk_capacity = *GET_UI64_RESULT(result);
-		UNSET_UI64_RESULT(result);
+		disk_capacity = *ZBX_GET_UI64_RESULT(result);
+		ZBX_UNSET_UI64_RESULT(result);
 	}
 
 	switch (mode)
@@ -3922,7 +3923,7 @@ int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, const char *username, con
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_CPU_USAGE, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -4200,7 +4201,7 @@ int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, const char *username, c
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -4217,7 +4218,7 @@ int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_BALLOONED, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -4234,7 +4235,7 @@ int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, const char *
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_COMPRESSED, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -4251,7 +4252,7 @@ int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, const char *use
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_SWAPPED, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -4268,7 +4269,7 @@ int	check_vcenter_vm_memory_size_usage_guest(AGENT_REQUEST *request, const char 
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_GUEST, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -4285,7 +4286,7 @@ int	check_vcenter_vm_memory_size_usage_host(AGENT_REQUEST *request, const char *
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_HOST, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -4302,7 +4303,7 @@ int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, const char *use
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_PRIVATE, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -4319,7 +4320,7 @@ int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *user
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_SHARED, result);
 
-	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
+	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));

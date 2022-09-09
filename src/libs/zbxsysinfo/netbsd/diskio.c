@@ -17,8 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {

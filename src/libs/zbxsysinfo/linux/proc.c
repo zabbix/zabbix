@@ -18,12 +18,14 @@
 **/
 
 #include "proc.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
+#include "stats.h"
 
 #include "zbxstr.h"
 #include "zbxregexp.h"
 #include "log.h"
-#include "stats.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -862,7 +864,6 @@ out:
 	}
 
 	return SYSINFO_RET_OK;
-
 #undef ZBX_SIZE
 #undef ZBX_RSS
 #undef ZBX_VSIZE

@@ -17,8 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 /* Solaris. */
 #if !defined(HAVE_SYSINFO_FREESWAP)
@@ -130,7 +129,7 @@ static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_FREESWAP
-	struct sysinfo info;
+	struct sysinfo	info;
 
 	if (0 == sysinfo(&info))
 	{
@@ -169,7 +168,7 @@ static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 static int	SYSTEM_SWAP_TOTAL(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_TOTALSWAP
-	struct sysinfo info;
+	struct sysinfo	info;
 
 	if (0 == sysinfo(&info))
 	{
