@@ -49,6 +49,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 		$time = '';
 		$units = '';
 		$decimals = null;
+		$last_value = null;
 		$is_dynamic = ($this->hasInput('dynamic_hostid')
 				&& ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
 					|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM)
@@ -321,11 +322,23 @@ class CControllerWidgetItemView extends CControllerWidget {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 
+		$bg_color = $fields['bg_color'];
+
+		if ($last_value !== null) {
+			foreach ($fields['thresholds'] as $threshold) {
+				if ($threshold['threshold_value'] > $last_value) {
+					break;
+				}
+
+				$bg_color = $threshold['color'];
+			}
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
 			'cells' => $cells,
 			'url' => $url,
-			'bg_color' => $fields['bg_color'],
+			'bg_color' => $bg_color,
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

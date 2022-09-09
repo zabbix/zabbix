@@ -45,6 +45,7 @@
 #define ZBX_LLD_MACRO_FSTYPE		"{#FSTYPE}"
 #define ZBX_LLD_MACRO_FSLABEL		"{#FSLABEL}"
 #define ZBX_LLD_MACRO_FSDRIVETYPE	"{#FSDRIVETYPE}"
+#define ZBX_LLD_MACRO_FSOPTIONS		"{#FSOPTIONS}"
 
 #define ZBX_SYSINFO_TAG_FSNAME			"fsname"
 #define ZBX_SYSINFO_TAG_FSTYPE			"fstype"
@@ -57,6 +58,7 @@
 #define ZBX_SYSINFO_TAG_USED			"used"
 #define ZBX_SYSINFO_TAG_PFREE			"pfree"
 #define ZBX_SYSINFO_TAG_PUSED			"pused"
+#define ZBX_SYSINFO_TAG_FSOPTIONS		"options"
 
 #define ZBX_SYSINFO_FILE_TAG_TYPE		"type"
 #define ZBX_SYSINFO_FILE_TAG_BASENAME		"basename"

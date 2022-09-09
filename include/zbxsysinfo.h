@@ -332,9 +332,9 @@ typedef struct
 	char			fstype[MAX_STRING_LEN];
 	zbx_fs_metrics_t	bytes;
 	zbx_fs_metrics_t	inodes;
+	char			*options;
 }
 zbx_mpoint_t;
-
 
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
 void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
@@ -355,6 +355,15 @@ zbx_uint32_t get_thread_global_mutex_flag(void);
 
 #ifndef _WINDOWS
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname);
+
+typedef struct
+{
+	zbx_uint64_t	flag;
+	const char	*name;
+}
+zbx_mntopt_t;
+
+char		*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags);
 #endif
 
 void		zbx_add_alias(const char *name, const char *value);
