@@ -17,7 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxstr.h"
+#include "zbxip.h"
+#include "zbxnum.h"
 
 #include "modbtype.h"
 
@@ -408,7 +410,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 		endpoint->protocol = ZBX_MODBUS_PROTOCOL_TCP;
 		ptr = endpoint_str + ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_TCP);
 
-		if (SUCCEED == (ret = parse_serveractive_element(ptr, &tmp, &port, ZBX_MODBUS_TCP_PORT_DEFAULT)))
+		if (SUCCEED == (ret = zbx_parse_serveractive_element(ptr, &tmp, &port, ZBX_MODBUS_TCP_PORT_DEFAULT)))
 		{
 			endpoint->conn_info.tcp.ip = tmp;
 			endpoint->conn_info.tcp.port = zbx_dsprintf(NULL, "%u", port);
@@ -640,7 +642,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		slaveid = ZBX_MODBUS_PROTOCOL_TCP == endpoint.protocol ? 255 : 1;
 	}
-	else if (FAIL == is_uint_n_range(tmp, ZBX_SIZE_T_MAX, &slaveid, sizeof(unsigned char),
+	else if (FAIL == zbx_is_uint_n_range(tmp, ZBX_SIZE_T_MAX, &slaveid, sizeof(unsigned char),
 			ZBX_MODBUS_PROTOCOL_TCP == endpoint.protocol ? 0 : 1,
 			ZBX_MODBUS_PROTOCOL_TCP == endpoint.protocol ? 255 : 247))
 	{
@@ -653,7 +655,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		function = ZBX_MODBUS_FUNCTION_EMPTY;
 	}
-	else if (FAIL == is_uint_n_range(tmp, ZBX_SIZE_T_MAX, &function, sizeof(unsigned char), 1, 4))
+	else if (FAIL == zbx_is_uint_n_range(tmp, ZBX_SIZE_T_MAX, &function, sizeof(unsigned char), 1, 4))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		goto err;
@@ -667,7 +669,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (ZBX_MODBUS_FUNCTION_EMPTY == function)
 			function = ZBX_MODBUS_FUNCTION_COIL;
 	}
-	else if (FAIL == is_ushort(tmp, &address))
+	else if (FAIL == zbx_is_ushort(tmp, &address))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		goto err;
@@ -706,7 +708,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		count = 1;
 	}
-	else if (FAIL == is_ushort(tmp, &count) || 0 == count)
+	else if (FAIL == zbx_is_ushort(tmp, &count) || 0 == count)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		goto err;
@@ -802,7 +804,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		offset = 0;
 	}
-	else if (FAIL == is_ushort(tmp, &offset))
+	else if (FAIL == zbx_is_ushort(tmp, &offset))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid eighth parameter."));
 		goto err;

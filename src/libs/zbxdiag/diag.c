@@ -26,6 +26,8 @@
 #include "preproc.h"
 #include "log.h"
 #include "zbxmutexs.h"
+#include "zbxtime.h"
+#include "zbxnum.h"
 
 #define ZBX_DIAG_SECTION_MAX	64
 #define ZBX_DIAG_FIELD_MAX	64
@@ -133,7 +135,7 @@ int	zbx_diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t
 				*error = zbx_strdup(*error, zbx_json_strerror());
 				goto out;
 			}
-			if (FAIL == is_uint64(value, &value_ui64))
+			if (FAIL == zbx_is_uint64(value, &value_ui64))
 			{
 				*error = zbx_dsprintf(*error, "Invalid top limit value: %s", value);
 				goto out;

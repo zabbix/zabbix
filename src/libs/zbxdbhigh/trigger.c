@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
 #include "zbxdbhigh.h"
+
 #include "log.h"
 #include "dbcache.h"
 #include "events.h"
 #include "zbxserver.h"
+#include "zbxnum.h"
 
 #define ZBX_FLAGS_TRIGGER_CREATE_NOTHING		0x00
 #define ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT		0x01
@@ -586,7 +586,7 @@ int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint
 				functionid = token->value.data.ui64;
 				break;
 			case ZBX_VARIANT_NONE:
-				if (SUCCEED != is_uint64_n(cache->eval_ctx.expression + token->loc.l + 1,
+				if (SUCCEED != zbx_is_uint64_n(cache->eval_ctx.expression + token->loc.l + 1,
 						token->loc.r - token->loc.l - 1, &functionid))
 				{
 					return FAIL;
@@ -762,7 +762,7 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 				functionid = token->value.data.ui64;
 				break;
 			case ZBX_VARIANT_NONE:
-				if (SUCCEED != is_uint64_n(local_ctx.expression + token->loc.l + 1,
+				if (SUCCEED != zbx_is_uint64_n(local_ctx.expression + token->loc.l + 1,
 						token->loc.r - token->loc.l - 1, &functionid))
 				{
 					continue;
@@ -918,7 +918,7 @@ static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **
 				functionid = token->value.data.ui64;
 				break;
 			case ZBX_VARIANT_NONE:
-				if (SUCCEED != is_uint64_n(local_ctx.expression + token->loc.l + 1,
+				if (SUCCEED != zbx_is_uint64_n(local_ctx.expression + token->loc.l + 1,
 						token->loc.r - token->loc.l - 1, &functionid))
 				{
 					continue;
@@ -960,7 +960,7 @@ static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int ind
 				functionid = token->value.data.ui64;
 				break;
 			case ZBX_VARIANT_NONE:
-				if (SUCCEED != is_uint64_n(local_ctx.expression + token->loc.l + 1,
+				if (SUCCEED != zbx_is_uint64_n(local_ctx.expression + token->loc.l + 1,
 						token->loc.r - token->loc.l - 1, &functionid))
 				{
 					continue;

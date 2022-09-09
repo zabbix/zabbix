@@ -19,7 +19,7 @@
 
 #include "inodes.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "sysinfo.h"
 #include "log.h"
 

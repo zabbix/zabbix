@@ -245,7 +245,7 @@ $fields = [
 	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
-if (getRequest('type') == ITEM_TYPE_HTTPAGENT && getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
+if (getRequest('interfaceid') == INTERFACE_TYPE_OPT && itemTypeInterface(getRequest('type')) == INTERFACE_TYPE_OPT) {
 	unset($fields['interfaceid']);
 	unset($_REQUEST['interfaceid']);
 }
@@ -268,13 +268,13 @@ if (!$discoveryRule) {
 
 $itemPrototypeId = getRequest('itemid');
 if ($itemPrototypeId) {
-	$item_prorotypes = API::ItemPrototype()->get([
+	$item_prototypes = API::ItemPrototype()->get([
 		'output' => [],
 		'itemids' => $itemPrototypeId,
 		'editable' => true
 	]);
 
-	if (!$item_prorotypes) {
+	if (!$item_prototypes) {
 		access_deny();
 	}
 }
@@ -522,7 +522,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($db_item['templateid'] != 0) {
 				$allowed_fields = array_fill_keys([
 					'itemid', 'delay', 'delay_flex', 'history', 'trends', 'history_mode', 'trends_mode', 'allow_traps',
-					'description', 'status', 'discover', 'tags'
+					'description', 'status', 'discover', 'tags', 'username', 'password', 'authtype', 'publickey',
+					'privatekey', 'params'
 				], true);
 
 				foreach ($item as $field => $value) {

@@ -29,7 +29,7 @@ $this->includeJsFile('administration.script.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Scripts'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_SCRIPT_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_EDIT));
 
 $row_template = (new CTag('script', true))
 	->setId('parameters-row')
@@ -55,7 +55,7 @@ $widget->addItem($row_template);
 $form = (new CForm())
 	->setId('script-form')
 	->setName('scripts')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 

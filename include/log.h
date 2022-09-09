@@ -20,7 +20,7 @@
 #ifndef ZABBIX_LOG_H
 #define ZABBIX_LOG_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
 #define LOG_LEVEL_CRIT		1
@@ -87,6 +87,4 @@ int		zbx_validate_log_parameters(ZBX_TASK_EX *task);
 
 void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offset, const char *format,
 		...) __zbx_attr_format_printf(5, 6);
-
-
 #endif

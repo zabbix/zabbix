@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxdbcache/user_macro.h"
 #include "zbxalgo.h"
@@ -173,7 +173,7 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		hconfig = zbx_mock_get_object_member_handle(hstep, "config");
 		um_mock_cache_init(&step->mock_cache, hconfig);
 		um_mock_cache_diff(mock_cache_last, &step->mock_cache, &gmacros, &hmacros, &htmpls);
-		config->um_cache = step->cache = um_cache_sync(config->um_cache, &gmacros, &hmacros, &htmpls);
+		config->um_cache = step->cache = um_cache_sync(config->um_cache, 0, &gmacros, &hmacros, &htmpls);
 
 		mock_dbsync_clear(&gmacros);
 		mock_dbsync_clear(&hmacros);

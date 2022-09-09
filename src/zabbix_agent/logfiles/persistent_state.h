@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PERSISTENT_STATE_H
 #define ZABBIX_PERSISTENT_STATE_H
 
-#include "common.h"	/* for SEC_PER_DAY */
+#include "zbxcommon.h"	/* for SEC_PER_DAY */
 #include "zbxhash.h"	/* for ZBX_MD5_DIGEST_SIZE, md5_byte_t */
 #include "zbxtypes.h"	/* for zbx_uint64_t struct st_logfile; */
 #include "zbxalgo.h"

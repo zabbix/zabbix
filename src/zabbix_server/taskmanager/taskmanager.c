@@ -35,6 +35,8 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_proxy.h"
 #include "dbcache.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -737,7 +739,6 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: process task for reload of configuration cache on passive proxy   *
@@ -802,7 +803,7 @@ static void	tm_process_temp_suppression(const char *data)
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_EVENTID, tmp_eventid, sizeof(tmp_eventid), NULL) ||
-			FAIL == is_uint64(tmp_eventid, &eventid))
+			FAIL == zbx_is_uint64(tmp_eventid, &eventid))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_EVENTID);
@@ -810,7 +811,7 @@ static void	tm_process_temp_suppression(const char *data)
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_USERID, tmp_userid, sizeof(tmp_userid), NULL) ||
-			FAIL == is_uint64(tmp_userid, &userid))
+			FAIL == zbx_is_uint64(tmp_userid, &userid))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_USERID);
@@ -845,7 +846,7 @@ static void	tm_process_temp_suppression(const char *data)
 	if (ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS == action)
 	{
 		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SUPPRESS_UNTIL, tmp_ts, sizeof(tmp_ts), NULL) ||
-				FAIL == is_uint32(tmp_ts, &ts))
+				FAIL == zbx_is_uint32(tmp_ts, &ts))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 					" \"%s\" tag", ZBX_PROTO_TAG_SUPPRESS_UNTIL);

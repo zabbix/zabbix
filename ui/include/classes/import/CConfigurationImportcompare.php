@@ -254,7 +254,7 @@ class CConfigurationImportcompare {
 				elseif ($has_before_templates && !$has_after_templates) {
 					$entity['after']['templates'] = [];
 
-					// Make sure, precessed entry is last in both arrays. Otherwise it will break the comparison.
+					// Make sure, processed entry is last in both arrays. Otherwise it will break the comparison.
 					$before_templates = $entity['before']['templates'];
 					unset($entity['before']['templates']);
 					$entity['before']['templates'] = $before_templates;

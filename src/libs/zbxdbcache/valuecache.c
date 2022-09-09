@@ -22,6 +22,7 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxmutexs.h"
+#include "zbxtime.h"
 
 /*
  * The cache (zbx_vc_cache_t) is organized as a hashset of item records (zbx_vc_item_t).
@@ -261,7 +262,7 @@ static void	vc_cache_item_update(zbx_uint64_t itemid, zbx_vc_item_update_type_t 
 	zbx_vc_item_update_t	*update;
 
 	if (vc_itemupdates.values_num == vc_itemupdates.values_alloc)
-		zbx_vector_vc_itemupdate_reserve(&vc_itemupdates, vc_itemupdates.values_alloc * 1.5);
+		zbx_vector_vc_itemupdate_reserve(&vc_itemupdates, (size_t)(vc_itemupdates.values_alloc * 1.5));
 
 	update = &vc_itemupdates.values[vc_itemupdates.values_num++];
 	update->itemid = itemid;
@@ -1955,8 +1956,12 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t **item, int range_start)
 	{
 		zbx_vc_item_t	new_item = {.itemid = itemid, .value_type = value_type};
 
-		if (NULL == (*item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(new_item))))
+		if (NULL == (*item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &new_item,
+				sizeof(new_item))))
+		{
+			ret = FAIL;
 			goto out;
+		}
 	}
 
 	/* when updating cache with time based request we can always reset status flags */
@@ -2065,7 +2070,10 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t **item, int ran
 		zbx_vc_item_t	new_item = {.itemid = itemid, .value_type = value_type};
 
 		if (NULL == (*item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(new_item))))
+		{
+			ret = FAIL;
 			goto out;
+		}
 	}
 
 	if (0 < records.values_num)

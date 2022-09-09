@@ -332,7 +332,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 			'SP entity ID' => PHPUNIT_SP_ENTITY_ID,
 			'Case-sensitive login' => false
 		];
-		// Override particcular SAMl settings with values from data provider.
+		// Override particular SAML settings with values from data provider.
 		if (array_key_exists('custom_settings', $data)) {
 			foreach ($data['custom_settings'] as $key => $value) {
 				$settings[$key] = $value;
@@ -343,7 +343,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 
 		// Logout and check that SAML authentication was enabled.
 		$this->page->logout();
-		// Login to a particcular url, if such is defined in data provider.
+		// Login to a particular url, if such is defined in data provider.
 		if (array_key_exists('url', $data)) {
 			$this->page->open($data['url'])->waitUntilReady();
 			$this->query('button:Login')->one()->click();

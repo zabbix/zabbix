@@ -19,7 +19,7 @@
 
 #include "zbxwinservice.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "cfg.h"
 #include "log.h"
 #include "zbxconf.h"

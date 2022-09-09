@@ -18,22 +18,23 @@
 **/
 
 #include "proxypoller.h"
+#include "zbxserver.h"
+#include "proxy.h"
 
-#include "common.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "zbxserver.h"
 #include "zbxdbhigh.h"
 #include "log.h"
-#include "proxy.h"
 #include "zbxcrypto.h"
 #include "../trapper/proxydata.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
+static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
@@ -64,7 +65,7 @@ static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeo
 		case ZBX_TCP_SEC_TLS_PSK:
 			zabbix_log(LOG_LEVEL_ERR, "TLS connection is configured to be used with passive proxy \"%s\""
 					" but support for TLS was not compiled into %s.", proxy->host,
-					get_program_type_string(program_type));
+					get_program_type_string(zbx_get_program_type_cb()));
 			ret = CONFIG_ERROR;
 			goto out;
 #endif
@@ -535,9 +536,9 @@ static int	process_proxy(void)
 			proxy.addr = proxy.addr_orig;
 
 			port = zbx_strdup(port, proxy.port_orig);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					&port, MACRO_TYPE_COMMON, NULL, 0);
-			if (FAIL == is_ushort(port, &proxy.port))
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
+			if (FAIL == zbx_is_ushort(port, &proxy.port))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "invalid proxy \"%s\" port: \"%s\"", proxy.host, port);
 				ret = CONFIG_ERROR;
@@ -598,17 +599,21 @@ exit:
 
 ZBX_THREAD_ENTRY(proxypoller_thread, args)
 {
-	int			nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
-	double			sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t			last_stat_time;
-	zbx_ipc_async_socket_t	rtc;
+	zbx_thread_proxy_poller_args	*proxy_poller_args_in = (zbx_thread_proxy_poller_args *)
+							(((zbx_thread_args_t *)args)->args);
+	int				nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
+	double				sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t				last_stat_time;
+	zbx_ipc_async_socket_t		rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
+	zbx_get_program_type_cb = proxy_poller_args_in->zbx_get_program_type_cb_arg;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(zbx_get_program_type_cb()), server_num,
+			get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
@@ -616,7 +621,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 				/* once in STAT_INTERVAL seconds */
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(proxy_poller_args_in->zbx_config_tls, zbx_get_program_type_cb);
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
@@ -644,7 +649,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 		total_sec += zbx_time() - sec;
 
 		nextcheck = DCconfig_get_proxypoller_nextcheck();
-		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
+		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{

@@ -18,17 +18,18 @@
 **/
 
 #include "scripts.h"
+#include "zbxserver.h"
 
 #include "../poller/checks_agent.h"
 #include "../ipmi/ipmi.h"
 #include "../poller/checks_ssh.h"
 #include "../poller/checks_telnet.h"
 #include "zbxexec.h"
-#include "zbxserver.h"
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxtasks.h"
 #include "zbxembed.h"
+#include "zbxnum.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;
@@ -57,7 +58,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			&port, MACRO_TYPE_COMMON, NULL, 0);
 
-	if (SUCCEED != (ret = is_ushort(port, &item.interface.port)))
+	if (SUCCEED != (ret = zbx_is_ushort(port, &item.interface.port)))
 	{
 		zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item.interface.port_orig);
 		goto fail;
@@ -347,7 +348,7 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &script->port, MACRO_TYPE_COMMON, NULL, 0);
 
-			if ('\0' != *script->port && SUCCEED != (ret = is_ushort(script->port, NULL)))
+			if ('\0' != *script->port && SUCCEED != (ret = zbx_is_ushort(script->port, NULL)))
 			{
 				zbx_snprintf(error, max_error_len, "Invalid port number \"%s\"", script->port);
 				goto out;
@@ -359,7 +360,7 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 					NULL, NULL, &script->password, MACRO_TYPE_COMMON, NULL, 0);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-			dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
+			zbx_dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
 			break;
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
 		case ZBX_SCRIPT_TYPE_IPMI:
@@ -527,7 +528,7 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *h
 	zbx_uint64_t	taskid;
 
 	if (NULL != script->port && '\0' != script->port[0])
-		is_ushort(script->port, &port);
+		zbx_is_ushort(script->port, &port);
 	else
 		port = 0;
 

@@ -23,6 +23,7 @@
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxvariant.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
@@ -343,7 +344,7 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 				ptr++;
 			if (0 != isdigit(*ptr))
 			{
-				del_zeros(buffer);
+				zbx_del_zeros(buffer);
 				zbx_variant_set_str(value, zbx_strdup(NULL, buffer));
 				ret = SUCCEED;
 			}

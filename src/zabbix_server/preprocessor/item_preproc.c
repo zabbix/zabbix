@@ -30,6 +30,8 @@
 #	include <libxml/xpath.h>
 #endif
 
+#include "zbxnum.h"
+
 #include "preproc_history.h"
 
 extern zbx_es_t	es_engine;
@@ -154,7 +156,7 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
 			zbx_variant_set_dbl(value, value_dbl);
 			break;
 		case ZBX_VARIANT_UI64:
-			if (SUCCEED == is_uint64(params, &multiplier_ui64))
+			if (SUCCEED == zbx_is_uint64(params, &multiplier_ui64))
 				value_ui64 = value_num.data.ui64 * multiplier_ui64;
 			else
 				value_ui64 = (double)value_num.data.ui64 * atof(params);
@@ -205,7 +207,7 @@ static int	item_preproc_multiplier(unsigned char value_type, zbx_variant_t *valu
 
 	zbx_trim_float(buffer);
 
-	if (FAIL == is_double(buffer, NULL))
+	if (FAIL == zbx_is_double(buffer, NULL))
 		err = zbx_dsprintf(NULL, "a numerical value is expected or the value is out of range");
 	else if (SUCCEED == item_preproc_multiplier_variant(value_type, value, buffer, &err))
 		return SUCCEED;
@@ -589,6 +591,114 @@ static int item_preproc_lrtrim(zbx_variant_t *value, const char *params, char **
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check if the string is boolean                                    *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is boolean                             *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_boolean(const char *str, zbx_uint64_t *value)
+{
+	double	dbl_tmp;
+	int	res;
+
+	if (SUCCEED == (res = zbx_is_double(str, &dbl_tmp)))
+		*value = (0 != dbl_tmp);
+	else
+	{
+		char	tmp[16];
+
+		zbx_strscpy(tmp, str);
+		zbx_strlower(tmp);
+
+		if (SUCCEED == (res = zbx_str_in_list("true,t,yes,y,on,up,running,enabled,available,ok,master", tmp,
+				',')))
+		{
+			*value = 1;
+		}
+		else if (SUCCEED == (res = zbx_str_in_list(
+				"false,f,no,n,off,down,unused,disabled,unavailable,err,slave", tmp, ',')))
+		{
+			*value = 0;
+		}
+	}
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is unsigned octal                             *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned octal                      *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_uoct(const char *str)
+{
+	int	res = FAIL;
+
+	while (' ' == *str)	/* trim left spaces */
+		str++;
+
+	for (; '\0' != *str; str++)
+	{
+		if (*str < '0' || *str > '7')
+			break;
+
+		res = SUCCEED;
+	}
+
+	while (' ' == *str)	/* check right spaces */
+		str++;
+
+	if ('\0' != *str)
+		return FAIL;
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is unsigned hexadecimal representation of     *
+ *          data in the form "0-9, a-f or A-F"                                *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned hexadecimal                *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_uhex(const char *str)
+{
+	int	res = FAIL;
+
+	while (' ' == *str)	/* trim left spaces */
+		str++;
+
+	for (; '\0' != *str; str++)
+	{
+		if (0 == isxdigit(*str))
+			break;
+
+		res = SUCCEED;
+	}
+
+	while (' ' == *str)	/* check right spaces */
+		str++;
+
+	if ('\0' != *str)
+		return FAIL;
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: execute decimal value conversion operation                        *
  *                                                                            *
  * Parameters: value   - [IN/OUT] the value to convert                        *
@@ -601,6 +711,9 @@ static int item_preproc_lrtrim(zbx_variant_t *value, const char *params, char **
  ******************************************************************************/
 static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char **errmsg)
 {
+#define OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
+#define HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
+
 	zbx_uint64_t	value_ui64;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
@@ -624,12 +737,12 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 				*errmsg = zbx_strdup(NULL, "invalid value format");
 				return FAIL;
 			}
-			ZBX_OCT2UINT64(value_ui64, value->data.str);
+			OCT2UINT64(value_ui64, value->data.str);
 			break;
 		case ZBX_PREPROC_HEX2DEC:
 			if (SUCCEED != is_uhex(value->data.str))
 			{
-				if (SUCCEED != is_hex_string(value->data.str))
+				if (SUCCEED != zbx_is_hex_string(value->data.str))
 				{
 					*errmsg = zbx_strdup(NULL, "invalid value format");
 					return FAIL;
@@ -637,7 +750,7 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 
 				zbx_remove_chars(value->data.str, " \n");
 			}
-			ZBX_HEX2UINT64(value_ui64, value->data.str);
+			HEX2UINT64(value_ui64, value->data.str);
 			break;
 		default:
 			*errmsg = zbx_strdup(NULL, "unknown operation type");
@@ -648,6 +761,8 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 	zbx_variant_set_ui64(value, value_ui64);
 
 	return SUCCEED;
+#undef OCT2UINT64
+#undef HEX2UINT64
 }
 
 /******************************************************************************
@@ -1367,7 +1482,7 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 {
 	int	ret, timeout, period = 0;
 
-	if (FAIL == is_time_suffix(params, &timeout, strlen(params)))
+	if (FAIL == zbx_is_time_suffix(params, &timeout, strlen(params)))
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "invalid time period: %s", params);
 		zbx_variant_clear(history_value);
@@ -1963,7 +2078,7 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
 		return FAIL;
 	}
 
-	new_string = string_replace(value->data.str, search_str, replace_str);
+	new_string = zbx_string_replace(value->data.str, search_str, replace_str);
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, new_string);
 

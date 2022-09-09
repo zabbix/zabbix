@@ -70,7 +70,7 @@ else {
 
 $output = [
 	'header' => $title,
-	'doc_url' => CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOSTGROUPS_EDIT),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOSTGROUPS_EDIT),
 	'body' => (new CPartial('configuration.hostgroup.edit.html', $data))->getOutput(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().

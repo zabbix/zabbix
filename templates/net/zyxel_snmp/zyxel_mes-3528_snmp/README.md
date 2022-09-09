@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 https://service-provider.zyxel.com/emea/en/products/carrier-and-access-switches/access-switches/mes3500-series
 
 This template was tested on:
@@ -12,7 +12,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 Refer to the vendor documentation.
 
@@ -87,7 +87,8 @@ There are no template links in this template.
 |Network interfaces |ZYXEL MES-3528: SFP {#SNMPINDEX}: Transceiver |<p>MIB: ZYXEL-MES3528-MIB</p><p>Transceiver module type names.</p> |SNMP |zyxel.3528.sfp.transceiver[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Network interfaces |ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION} |<p>MIB: ZYXEL-MES3528-MIB</p><p>Transceiver module DDM data ({#ZYXEL.SFP.DESCRIPTION}).</p> |SNMP |zyxel.3528.sfp.ddm[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Status |ZYXEL MES-3528: SNMP agent availability |<p>-</p> |INTERNAL |zabbix[host,snmp,available]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Status |ZYXEL MES-3528: Uptime |<p>MIB: RFC1213-MIB</p><p>The time (in hundredths of a second) since the</p><p>network management portion of the system was last</p><p>re-initialized.</p> |SNMP |zyxel.3528.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |ZYXEL MES-3528: Uptime (network) |<p>MIB: RFC1213-MIB</p><p>The time (in hundredths of a second) since the</p><p>network management portion of the system was last</p><p>re-initialized.</p> |SNMP |zyxel.3528.net.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |ZYXEL MES-3528: Uptime (hardware) |<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized.</p><p>Note that this is different from sysUpTime in the SNMPv2-MIB</p><p>[RFC1907] because sysUpTime is the uptime of the</p><p>network management portion of the system.</p> |SNMP |zyxel.3528.hw.uptime<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.01`</p> |
 
 ## Triggers
 
@@ -102,7 +103,7 @@ There are no template links in this template.
 |ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} |<p>The upper threshold value of the parameter is exceeded</p> |`last(/ZYXEL MES-3528 SNMP/zyxel.3528.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}` |WARNING | |
 |ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} |<p>The parameter values are less than the lower threshold</p> |`last(/ZYXEL MES-3528 SNMP/zyxel.3528.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}` |WARNING | |
 |ZYXEL MES-3528: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL MES-3528 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|ZYXEL MES-3528: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/ZYXEL MES-3528 SNMP/zyxel.3528.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|ZYXEL MES-3528: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/ZYXEL MES-3528 SNMP/zyxel.3528.hw.uptime)>0 and last(/ZYXEL MES-3528 SNMP/zyxel.3528.hw.uptime)<10m) or (last(/ZYXEL MES-3528 SNMP/zyxel.3528.hw.uptime)=0 and last(/ZYXEL MES-3528 SNMP/zyxel.3528.net.uptime)<10m)` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 

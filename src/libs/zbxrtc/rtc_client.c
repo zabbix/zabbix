@@ -19,7 +19,7 @@
 
 #include "rtc.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxserialize.h"
 #include "zbxjson.h"
 #include "zbxself.h"
