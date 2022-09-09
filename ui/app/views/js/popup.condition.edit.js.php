@@ -20,7 +20,6 @@
 ?>
 
 window.condition_popup = new class {
-
 	init() {
 		this.overlay = overlays_stack.getById('condition');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -105,9 +104,7 @@ window.condition_popup = new class {
 	}
 
 	selectServices() {
-		console.log('services');
 		const overlay = PopUp('popup.services', {title: t('Services')}, {dialogueid: 'services'});
-
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];
 

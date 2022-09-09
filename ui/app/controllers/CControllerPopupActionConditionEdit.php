@@ -89,7 +89,7 @@ class CControllerPopupActionConditionEdit extends CController {
 		return $has_permission;
 	}
 
-	protected function getConditionLastType() {
+	protected function getConditionLastType(): string {
 		$default = [
 			EVENT_SOURCE_TRIGGERS => CONDITION_TYPE_TRIGGER_NAME,
 			EVENT_SOURCE_DISCOVERY => CONDITION_TYPE_DHOST_IP,
@@ -113,28 +113,22 @@ class CControllerPopupActionConditionEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		// todo: check if condition already exists
-
-
-			$data = [
-				'title' => _('New condition'),
-				'command' => '',
-				'message' => '',
-				'errors' => null,
-				'action' => $this->getAction(),
-				'type' => $this->getInput('type'),
-				'last_type' => $this->getConditionLastType(),
-				'eventsource' => $this->getInput('source'),
-				'allowed_conditions' => get_conditions_by_eventsource($this->getInput('source')),
-				'trigger_context' => $this->getInput('trigger_context', 'host'),
-				'user' => [
-					'debug_mode' => $this->getDebugMode()
-				],
-				'actionid' => $this->getInput('actionid')
-			];
+		$data = [
+			'title' => _('New condition'),
+			'command' => '',
+			'message' => '',
+			'errors' => null,
+			'action' => $this->getAction(),
+			'type' => $this->getInput('type'),
+			'last_type' => $this->getConditionLastType(),
+			'eventsource' => $this->getInput('source'),
+			'allowed_conditions' => get_conditions_by_eventsource($this->getInput('source')),
+			'trigger_context' => $this->getInput('trigger_context', 'host'),
+			'user' => ['debug_mode' => $this->getDebugMode()],
+			'actionid' => $this->getInput('actionid')
+		];
 
 		$response = new CControllerResponseData($data);
-
 		$this->setResponse($response);
 	}
 }

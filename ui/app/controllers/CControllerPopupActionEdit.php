@@ -331,44 +331,44 @@ class CControllerPopupActionEdit extends CController {
 
 			switch ($condition['conditiontype']) {
 				case CONDITION_TYPE_HOST_GROUP:
-					if (isset($groups[$id])) {
+					if (array_key_exists($id, $groups)) {
 						$result = $groups[$id]['name'];
 					}
 					break;
 
 				case CONDITION_TYPE_TRIGGER:
-					if (isset($triggers[$id])) {
+					if (array_key_exists($id, $triggers)) {
 						$host = reset($triggers[$id]['hosts']);
 						$result = $host['name'] . NAME_DELIMITER . $triggers[$id]['description'];
 					}
 					break;
 
 				case CONDITION_TYPE_HOST:
-					if (isset($hosts[$id])) {
+					if (array_key_exists($id, $hosts)) {
 						$result = $hosts[$id]['name'];
 					}
 					break;
 
 				case CONDITION_TYPE_TEMPLATE:
-					if (isset($templates[$id])) {
+					if (array_key_exists($id, $templates)) {
 						$result = $templates[$id]['name'];
 					}
 					break;
 
 				case CONDITION_TYPE_PROXY:
-					if (isset($proxies[$id])) {
+					if (array_key_exists($id, $proxies)) {
 						$result = $proxies[$id]['host'];
 					}
 					break;
 
 				case CONDITION_TYPE_DRULE:
-					if (isset($dRules[$id])) {
+					if (array_key_exists($id, $dRules)) {
 						$result = $dRules[$id]['name'];
 					}
 					break;
 
 				case CONDITION_TYPE_DCHECK:
-					if (isset($dChecks[$id])) {
+					if (array_key_exists($id, $dChecks)) {
 						$drule = reset($dChecks[$id]['drules']);
 						$type = $dChecks[$id]['type'];
 						$key_ = $dChecks[$id]['key_'];
@@ -381,7 +381,7 @@ class CControllerPopupActionEdit extends CController {
 					break;
 
 				case CONDITION_TYPE_SERVICE:
-					if (isset($services[$id])) {
+					if (array_key_exists($id, $services)) {
 						$result = $services[$id]['name'];
 					}
 					break;

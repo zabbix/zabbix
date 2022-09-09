@@ -26,7 +26,6 @@ class CControllerActionUpdate extends CController {
 	}
 
 	protected function checkInput(): bool {
-		// TODO: check If additional fields are necessarry
 		$fields = [
 			'eventsource' => 'required|in '.implode(',', [
 					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTOREGISTRATION,

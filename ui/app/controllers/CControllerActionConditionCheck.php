@@ -294,44 +294,44 @@ class CControllerActionConditionCheck extends CController {
 
 			switch ($condition['condition_type']) {
 				case CONDITION_TYPE_HOST_GROUP:
-					if (isset($groups[$groupIds[0]])) {
+					if (array_key_exists($groupIds[0], $groups)) {
 						$result = $groups[$groupIds[0]]['name'];
 					}
 					break;
 
 				case CONDITION_TYPE_TRIGGER:
-					if (isset($triggers[$triggerIds[0]])) {
+					if (array_key_exists($triggerIds[0], $triggers)) {
 						$host = reset($triggers[$triggerIds[0]]['hosts']);
 						$result = $host['name'] . NAME_DELIMITER . $triggers[$triggerIds[0]]['description'];
 					}
 					break;
 
 				case CONDITION_TYPE_HOST:
-					if (isset($hosts[$hostIds[0]])) {
+					if (array_key_exists($hostIds[0], $hosts)) {
 						$result = $hosts[$hostIds[0]]['name'];
 					}
 					break;
 
 				case CONDITION_TYPE_TEMPLATE:
-					if (isset($templates[$templateIds[0]])) {
+					if (array_key_exists($templateIds[0], $templates)) {
 						$result = $templates[$templateIds[0]]['name'];
 					}
 					break;
 
 				case CONDITION_TYPE_PROXY:
-					if (isset($proxies[$proxyIds[0]])) {
+					if (array_key_exists($proxyIds[0], $proxies)) {
 						$result = $proxies[$proxyIds[0]]['host'];
 					}
 					break;
 
 				case CONDITION_TYPE_DRULE:
-					if (isset($dRules[$id])) {
+					if (array_key_exists($id, $dRules)) {
 						$result = $dRules[$id]['name'];
 					}
 					break;
 
 				case CONDITION_TYPE_DCHECK:
-					if (isset($dChecks[$id])) {
+					if (array_key_exists($id, $dChecks)) {
 						$drule = reset($dChecks[$id]['drules']);
 						$type = $dChecks[$id]['type'];
 						$key_ = $dChecks[$id]['key_'];
@@ -344,7 +344,7 @@ class CControllerActionConditionCheck extends CController {
 					break;
 
 				case CONDITION_TYPE_SERVICE:
-					if (isset($services[$serviceids[0]])) {
+					if (array_key_exists($serviceids[0], $services)) {
 						$result = $services[$serviceids[0]]['name'];
 					}
 					break;

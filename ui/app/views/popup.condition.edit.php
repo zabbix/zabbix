@@ -25,9 +25,6 @@
  */
 
 $inline_js = getPagePostJs().$this->readJsFile('popup.condition.edit.js.php');
-require_once __DIR__ .'/../../include/actions.inc.php';
-
-// todo: check if it is possible to clean this code
 
 $form = (new CForm())
 	->setId('popup.condition')
@@ -39,7 +36,7 @@ $form = (new CForm())
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $condition_type = (int) $data['last_type'];
-$form_grid = (new CFormGrid())->cleanItems();
+$form_grid = (new CFormGrid());
 
 switch ($data['type']) {
 	case ZBX_POPUP_CONDITION_TYPE_EVENT_CORR:
@@ -541,7 +538,7 @@ switch ($data['type']) {
 								'dstfld1' => 'dcheck_new_condition_value',
 								'dstfld2' => 'dcheck',
 								'writeonly' => '1'
-							]).', {dialogue_class: "modal-popup-generic"});'
+							], JSON_THROW_ON_ERROR) .', {dialogue_class: "modal-popup-generic"});'
 						)
 				];
 
