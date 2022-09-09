@@ -20,7 +20,7 @@
 #ifndef ZABBIX_DBSYNC_H
 #define ZABBIX_DBSYNC_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "dbconfig.h"
 
 /* no changes */

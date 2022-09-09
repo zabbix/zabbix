@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TRIGGER_DEP_LINKING_H
 #define ZABBIX_TRIGGER_DEP_LINKING_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxalgo.h"
 
 #define TRIGGER_DEP_SYNC_INSERT_OP 0

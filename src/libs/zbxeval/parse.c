@@ -610,6 +610,7 @@ static int	eval_parse_query_filter(const char **ptr)
 size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, const char **pfilter)
 {
 #define MVAR_HOST_HOST	"{HOST.HOST"
+#define MVAR_ITEM_KEY	"{ITEM.KEY"
 
 	const char	*host = str + 1, *key, *filter, *end;
 
@@ -623,7 +624,7 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
 	{
 		if (0 == strncmp(key, MVAR_HOST_HOST, ZBX_CONST_STRLEN(MVAR_HOST_HOST)))
 		{
-			int	offset = 0;
+			size_t	offset = 0;
 
 			if ('}' == key[ZBX_CONST_STRLEN(MVAR_HOST_HOST)])
 			{
@@ -651,7 +652,29 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
 	end = ++key;
 
 	if ('*' == *key)
+	{
 		end++;
+	}
+	else if ('{' == *key)
+	{
+		if (0 == strncmp(key, MVAR_ITEM_KEY, ZBX_CONST_STRLEN(MVAR_ITEM_KEY)))
+		{
+			size_t	offset = 0;
+
+			if ('}' == key[ZBX_CONST_STRLEN(MVAR_ITEM_KEY)])
+			{
+				offset = 1;
+			}
+			else if (0 != isdigit((unsigned char)key[ZBX_CONST_STRLEN(MVAR_ITEM_KEY)]) &&
+					'}' == key[ZBX_CONST_STRLEN(MVAR_ITEM_KEY) + 1])
+			{
+				offset = 2;
+			}
+
+			if (0 != offset)
+				end += ZBX_CONST_STRLEN(MVAR_ITEM_KEY) + offset;
+		}
+	}
 	else if (SUCCEED != parse_key(&end))
 		return 0;
 
@@ -675,6 +698,7 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
 	return end - str;
 
 #undef MVAR_HOST_HOST
+#undef MVAR_ITEM_KEY
 }
 
 /******************************************************************************

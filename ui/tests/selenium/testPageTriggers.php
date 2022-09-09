@@ -530,7 +530,7 @@ class testPageTriggers extends CLegacyWebTest {
 					]
 				]
 			],
-			// Filter by name (not case sensetive).
+			// Filter by name (not case sensitive).
 			[
 				[
 					'filter_options' => [

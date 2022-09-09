@@ -6475,6 +6475,14 @@ msgstr "Kích hoạt chế độ debug trong các nhóm được lựa ch
 msgid "Enable host"
 msgstr "Kích hoạt host"
 
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
+
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
 msgstr "Kích hoạt host?"
@@ -18201,6 +18209,10 @@ msgstr "Tháng này"
 #: include/func.inc.php:2477
 msgid "This month so far"
 msgstr "Tháng này đến nay"
+
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."

@@ -25,7 +25,7 @@ package zbxlib
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 #cgo CFLAGS: -I${SRCDIR}/../../../../include/common
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "sysinfo.h"
 #include "module.h"
 typedef int (*zbx_agent_check_t)(AGENT_REQUEST *request, AGENT_RESULT *result);

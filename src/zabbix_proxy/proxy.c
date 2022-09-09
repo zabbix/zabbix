@@ -587,7 +587,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (NULL != CONFIG_SOURCE_IP && SUCCEED != is_supported_ip(CONFIG_SOURCE_IP))
+	if (NULL != CONFIG_SOURCE_IP && SUCCEED != zbx_is_supported_ip(CONFIG_SOURCE_IP))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
 		err = 1;
@@ -1120,11 +1120,68 @@ static void	zbx_check_db(void)
 	zbx_free(db_version_info.friendly_current_version);
 }
 
+static void	proxy_db_init(void)
+{
+	char		*error = NULL;
+	int		db_type, version_check;
+#ifdef HAVE_SQLITE3
+	zbx_stat_t	db_stat;
+#endif
+
+	if (SUCCEED != DBinit(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	DBinit_autoincrement_options();
+
+	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
+				CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+	else if (ZBX_DB_PROXY != db_type)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix proxy cannot work with a"
+				" Zabbix server database", CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+
+	DBcheck_character_set();
+	zbx_check_db();
+
+	if (SUCCEED != (version_check = DBcheck_version()))
+	{
+#ifdef HAVE_SQLITE3
+		if (NOTSUPPORTED == version_check)
+			exit(EXIT_FAILURE);
+
+		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", CONFIG_DBNAME);
+		DBdeinit();
+
+		if (0 != unlink(CONFIG_DBNAME))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file \"%s\": %s, exiting...",
+					CONFIG_DBNAME, zbx_strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+
+		proxy_db_init();
+#else
+		ZBX_UNUSED(version_check);
+		exit(EXIT_FAILURE);
+#endif
+	}
+}
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t			listen_sock;
 	char				*error = NULL;
-	int				i, db_type, ret;
+	int				i, ret;
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
@@ -1301,33 +1358,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != DBinit(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
-	DBinit_autoincrement_options();
-
-	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
-				CONFIG_DBNAME);
-		exit(EXIT_FAILURE);
-	}
-	else if (ZBX_DB_PROXY != db_type)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix proxy cannot work with a"
-				" Zabbix server database", CONFIG_DBNAME);
-		exit(EXIT_FAILURE);
-	}
-
-	DBcheck_character_set();
-	zbx_check_db();
-
-	if (SUCCEED != DBcheck_version())
-		exit(EXIT_FAILURE);
+	proxy_db_init();
 
 	change_proxy_history_count(proxy_get_history_count());
 

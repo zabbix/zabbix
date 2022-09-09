@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-11 23:35+0000\n"
+"PO-Revision-Date: 2022-09-02 03:15+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -1082,7 +1082,7 @@ msgstr "告警消息"
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "告警"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -4903,7 +4903,7 @@ msgstr "数据"
 #: include/classes/helpers/CMenuHelper.php:215
 #: include/classes/helpers/CRoleHelper.php:337
 msgid "Data collection"
-msgstr ""
+msgstr "数据采集"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
@@ -6480,6 +6480,14 @@ msgstr "启用所选用户群组的调试模式?"
 #: include/actions.inc.php:694 include/actions.inc.php:1031
 msgid "Enable host"
 msgstr "启用主机"
+
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr "启用选择主机"
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -14173,7 +14181,7 @@ msgstr "父图表"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "父主机值"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -18208,6 +18216,10 @@ msgstr "本月"
 msgid "This month so far"
 msgstr "这个月到目前为止"
 
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "此设置仅适用于数值数据。非数字数据将始终取自历史记录。"
@@ -20284,7 +20296,7 @@ msgstr "验证"
 #: include/views/monitoring.history.php:293
 #, c-format
 msgid "Value"
-msgstr "ֵ值"
+msgstr "值"
 
 #: app/views/monitoring.widget.plaintext.view.php:51
 msgctxt "compact table header"

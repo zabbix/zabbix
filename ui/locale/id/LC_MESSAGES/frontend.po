@@ -6471,6 +6471,14 @@ msgstr "Aktifkan mode debug pada grup yang dipilih?"
 msgid "Enable host"
 msgstr "Aktifkan host"
 
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
+
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
 msgstr "Aktifkan host?"
@@ -18200,6 +18208,10 @@ msgstr "Bulan ini"
 
 #: include/func.inc.php:2477
 msgid "This month so far"
+msgstr ""
+
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
 msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:172

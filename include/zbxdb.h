@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXDB_H
 #define ZABBIX_ZBXDB_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxjson.h"
 
 #define ZBX_DB_OK	0
@@ -213,6 +213,22 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY		"TimescaleDB Community Edition"
 
+#if defined(HAVE_POSTGRESQL)
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
+#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_DB_STRLIST_DELIM		','
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB3	"utf8mb3"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4 	"utf8mb4"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET		ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 ","\
+							ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB3 ","\
+							ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
+#	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin,utf8mb4_bin"
+#endif
+
 typedef enum
 {	/* db version status flags shared with FRONTEND */
 	DB_VERSION_SUPPORTED,
@@ -310,7 +326,4 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 #	define ZBX_DB_CHAR_LENGTH(str)	"length(" #str ")"
 #endif
 
-#if defined(HAVE_MYSQL)
-void zbx_db_set_character_set(const char *char_set);
-#endif
 #endif

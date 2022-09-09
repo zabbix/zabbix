@@ -604,12 +604,12 @@ class testRole extends CAPITest {
 	* @dataProvider role_update
 	*/
 	public function testRole_Update($role, $expected_error) {
-//		if (isset($role['roleid'])) {
+		if (isset($role['roleid'])) {
 			if (isset($role['roleid']) && $role['roleid'] === 'roleid_3' ||
 				isset($role['roleid']) && $role['roleid'] === 'roleid_4') {
 				$role['roleid'] = (int) self::$data['roleids'][$role['roleid']];
 			}
-//		}
+		}
 
 		$result = $this->call('role.update', $role, $expected_error);
 

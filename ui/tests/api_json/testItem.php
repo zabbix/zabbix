@@ -450,7 +450,7 @@ class testItem extends CAPITest {
 				$this->assertEquals(0, CDBHelper::getCount($dbResult));
 			}
 
-			// Check that related discovered trigerid is removed with all related data.
+			// Check that related discovered triggerid is removed with all related data.
 			if (array_key_exists('discovered_triggerids', $data)) {
 				foreach ($data['discovered_triggerids'] as $id) {
 					$dbResult = 'SELECT * FROM triggers WHERE triggerid='.zbx_dbstr($id);

@@ -51,7 +51,7 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (NULL != (dns = get_rparam(&request, 1)) && '\0' != *dns)
 	{
-		strscpy(item->interface.dns_orig, dns);
+		zbx_strscpy(item->interface.dns_orig, dns);
 		item->interface.addr = item->interface.dns_orig;
 	}
 
@@ -64,7 +64,7 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (NULL != (port = get_rparam(&request, 2)) && '\0' != *port)
 	{
-		if (FAIL == is_ushort(port, &item->interface.port))
+		if (FAIL == zbx_is_ushort(port, &item->interface.port))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;

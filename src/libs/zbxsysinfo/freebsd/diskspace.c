@@ -17,12 +17,58 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "sysinfo.h"
 #include "zbxjson.h"
 #include "log.h"
 #include "zbxalgo.h"
 #include "inodes.h"
+
+static zbx_mntopt_t mntopts[] = {
+#if defined(MNTOPT_NAMES)
+	MNTOPT_NAMES
+#else
+	{MNT_ASYNC,		"asynchronous"},
+	{MNT_EXPORTED,		"NFS exported"},
+	{MNT_LOCAL,		"local"},
+	{MNT_NOATIME,		"noatime"},
+#if defined(MNT_NODEV)
+	{MNT_NODEV,		"nodev"},
+#endif
+	{MNT_NOEXEC,		"noexec"},
+	{MNT_NOSUID,		"nosuid"},
+	{MNT_NOSYMFOLLOW,	"nosymfollow"},
+	{MNT_QUOTA,		"with quotas"},
+	{MNT_RDONLY,		"read-only"},
+	{MNT_SYNCHRONOUS,	"synchronous"},
+	{MNT_UNION,		"union"},
+	{MNT_NOCLUSTERR,	"noclusterr"},
+	{MNT_NOCLUSTERW,	"noclusterw"},
+	{MNT_SUIDDIR,		"suiddir"},
+	{MNT_SOFTDEP,		"soft-updates"},
+#if defined(MNT_SUJ)
+	{MNT_SUJ,		"journaled soft-updates"},
+#endif
+	{MNT_MULTILABEL,	"multilabel"},
+	{MNT_ACLS,		"acls"},
+#if defined(MNT_NFS4ACLS)
+	{MNT_NFS4ACLS,		"nfsv4acls"},
+#endif
+#if defined(MNT_GJOURNAL)
+	{MNT_GJOURNAL,		"gjournal"},
+#endif
+#if defined(MNT_AUTOMOUNTED)
+	{MNT_AUTOMOUNTED,	"automounted"},
+#endif
+#if defined(MNT_VERIFIED)
+	{MNT_VERIFIED,		"verified"},
+#endif
+#if defined(MNT_UNTRUSTED)
+	{MNT_UNTRUSTED,		"untrusted"},
+#endif
+	{0,			NULL}
+#endif
+};
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
@@ -212,10 +258,17 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	for (i = 0; i < rc; i++)
 	{
+		char	*options;
+
+		options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flags & MNT_VISFLAGMASK);
+
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, mntbuf[i].f_mntonname, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSTYPE, mntbuf[i].f_fstypename, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSOPTIONS, options, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
+
+		zbx_free(options);
 	}
 
 	zbx_json_close(&j);
@@ -278,6 +331,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mntpoint->inodes.not_used = inot_used;
 		mntpoint->inodes.pfree = ipfree;
 		mntpoint->inodes.pused = ipused;
+		mntpoint->options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flags & MNT_VISFLAGMASK);
 
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 	}
@@ -287,6 +341,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		goto out;
 	}
+
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	for (i = 0; i < rc; i++)
@@ -314,6 +369,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->inodes.pfree);
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->inodes.pused);
 			zbx_json_close(&j);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntpoint->options, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 	}
@@ -334,5 +390,4 @@ out:
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
-
 }
