@@ -26,6 +26,8 @@
 #include "zbxself.h"
 #include "preproc.h"
 #include "zbxtime.h"
+#include "zbxnum.h"
+#include "zbxsysinfo.h"
 
 /* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1
@@ -162,8 +164,8 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 							break;
 					}
 
-					if (0 < value_dbl && ZBX_FLOAT_PRECISION > value_dbl)
-						value_dbl = ZBX_FLOAT_PRECISION;
+					if (0 < value_dbl && zbx_get_float_epsilon() > value_dbl)
+						value_dbl = zbx_get_float_epsilon();
 
 					process_value(item->itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
 					break;

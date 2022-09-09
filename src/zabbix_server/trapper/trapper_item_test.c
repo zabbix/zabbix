@@ -28,7 +28,7 @@
 #include "../ipmi/ipmi.h"
 #endif
 #include "zbxnum.h"
-
+#include "zbxsysinfo.h"
 #include "trapper_auth.h"
 
 static void	dump_item(const DC_ITEM *item)
@@ -356,7 +356,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		switch (errcode)
 		{
 			case SUCCEED:
-				if (NULL == (pvalue = GET_TEXT_RESULT(&result)))
+				if (NULL == (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 				{
 					*info = zbx_strdup(NULL, "no value");
 				}
@@ -367,7 +367,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 				}
 				break;
 			default:
-				if (NULL == (pvalue = GET_MSG_RESULT(&result)))
+				if (NULL == (pvalue = ZBX_GET_MSG_RESULT(&result)))
 					*info = zbx_dsprintf(NULL, "unknown error with code %d", errcode);
 				else
 					*info = zbx_strdup(NULL, *pvalue);

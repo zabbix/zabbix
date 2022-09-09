@@ -20,7 +20,6 @@
 #ifndef ZABBIX_DBCACHE_H
 #define ZABBIX_DBCACHE_H
 
-#include "sysinfo.h" //included for convenience
 #include "zbxdbhigh.h"
 #include "zbxcomms.h"
 #include "zbxshmem.h"

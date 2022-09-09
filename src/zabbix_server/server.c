@@ -78,6 +78,7 @@
 #include "zbxdiag.h"
 #include "diag/diag_server.h"
 #include "zbxip.h"
+#include "zbxsysinfo.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"

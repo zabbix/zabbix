@@ -20,7 +20,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxnum.h"
 
 void	zbx_mock_test_entry(void **state)
@@ -98,7 +98,7 @@ void	zbx_mock_test_entry(void **state)
 	{
 		zbx_uint64_t	*actual_context_switches_count;
 
-		if (NULL == (actual_context_switches_count = GET_UI64_RESULT(&zbx_agent_result)))
+		if (NULL == (actual_context_switches_count = ZBX_GET_UI64_RESULT(&zbx_agent_result)))
 			fail_msg("SYSTEM_CPU_SWITCHES() returned no valid number of context switches in AGENT_RESULT.");
 
 		if (expected_context_switches_count != *actual_context_switches_count)
@@ -111,7 +111,7 @@ void	zbx_mock_test_entry(void **state)
 	{
 		char	**actual_error_msg;
 
-		if (NULL == (actual_error_msg = GET_MSG_RESULT(&zbx_agent_result)) || NULL == *actual_error_msg)
+		if (NULL == (actual_error_msg = ZBX_GET_MSG_RESULT(&zbx_agent_result)) || NULL == *actual_error_msg)
 			fail_msg("SYSTEM_CPU_SWITCHES() returned no valid error message in AGENT_RESULT.");
 
 		if (0 != strcmp(expected_error_msg, *actual_error_msg))

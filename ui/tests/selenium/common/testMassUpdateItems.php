@@ -1417,7 +1417,7 @@ class testMassUpdateItems extends CWebTest{
 				// Check that tags are not changed after other fields are mass updated.
 				if (CTestArrayHelper::get($data, 'expected_tags')) {
 					$form->selectTab('Tags');
-					$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($data['expected_tags'][$name]);
+					$this->query('class:tags-table')->asMultifieldTable()->one()->checkValue($data['expected_tags'][$name]);
 				}
 
 				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
@@ -2130,7 +2130,7 @@ class testMassUpdateItems extends CWebTest{
 		$form->query('id:mass_update_tags')->asSegmentedRadio()->one()->fill($data['Tags']['action']);
 
 		if ($data['Tags']['tags'] !== []) {
-			$this->query('id:tags-table')->asMultifieldTable()->one()->fill($data['Tags']['tags']);
+			$this->query('class:tags-table')->asMultifieldTable()->one()->fill($data['Tags']['tags']);
 		}
 
 		$dialog->query('button:Update')->one()->waitUntilClickable()->click();
@@ -2175,7 +2175,7 @@ class testMassUpdateItems extends CWebTest{
 				}
 
 				$expected_tags = array_key_exists('expected_tags', $data) ? $data['expected_tags'][$name] : $expected;
-				$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($expected_tags);
+				$this->query('class:tags-table')->asMultifieldTable()->one()->checkValue($expected_tags);
 
 				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
 				$this->page->waitUntilReady();

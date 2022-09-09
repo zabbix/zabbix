@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+
 #include "zbxsymbols.h"
 
 int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -58,17 +58,30 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		{
 			SET_UI64_RESULT(result, ms_ex.ullTotalPhys);
+		}
 		else if (0 == strcmp(mode, "free"))
+		{
 			SET_UI64_RESULT(result, ms_ex.ullAvailPhys);
+		}
 		else if (0 == strcmp(mode, "used"))
+		{
 			SET_UI64_RESULT(result, ms_ex.ullTotalPhys - ms_ex.ullAvailPhys);
+		}
 		else if (0 == strcmp(mode, "pused") && 0 != ms_ex.ullTotalPhys)
-			SET_DBL_RESULT(result, (ms_ex.ullTotalPhys - ms_ex.ullAvailPhys) / (double)ms_ex.ullTotalPhys * 100);
+		{
+			SET_DBL_RESULT(result, (ms_ex.ullTotalPhys - ms_ex.ullAvailPhys) / (double)ms_ex.ullTotalPhys *
+					100);
+		}
 		else if (0 == strcmp(mode, "available"))
+		{
 			SET_UI64_RESULT(result, ms_ex.ullAvailPhys);
+		}
 		else if (0 == strcmp(mode, "pavailable") && 0 != ms_ex.ullTotalPhys)
+		{
 			SET_DBL_RESULT(result, ms_ex.ullAvailPhys / (double)ms_ex.ullTotalPhys * 100);
+		}
 		else
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));

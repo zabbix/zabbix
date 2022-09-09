@@ -26,7 +26,7 @@
 #include "zbxgetopt.h"
 #include "zbxmutexs.h"
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxmodules.h"
 
 #include "zbxnix.h"
@@ -451,8 +451,8 @@ static void	zbx_set_defaults(void)
 
 		init_result(&result);
 
-		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
-				NULL != (value = GET_STR_RESULT(&result)))
+		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND, &result) &&
+				NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
 
@@ -1171,6 +1171,7 @@ static void	proxy_db_init(void)
 
 		proxy_db_init();
 #else
+		ZBX_UNUSED(version_check);
 		exit(EXIT_FAILURE);
 #endif
 	}
