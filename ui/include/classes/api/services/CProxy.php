@@ -161,14 +161,6 @@ class CProxy extends CApiService {
 			$proxy['proxyid'] = $proxy['hostid'];
 			unset($proxy['hostid']);
 
-			if (array_key_exists('version', $proxy)) {
-				$proxy['version'] = $proxy['version'] == 0
-					? ''
-					// Converting proxy version to readable format.
-					: (intdiv($proxy['version'], 10000) % 100).'.'.
-						(intdiv($proxy['version'], 100) % 100).'.'.($proxy['version'] % 100);
-			}
-
 			$result[$proxy['proxyid']] = $proxy;
 		}
 

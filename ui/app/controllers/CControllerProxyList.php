@@ -121,6 +121,11 @@ class CControllerProxyList extends CController {
 		);
 
 		foreach ($data['proxies'] as &$proxy) {
+			$proxy['version'] = $proxy['version'] != 0
+				? (intdiv($proxy['version'], 10000) % 100).'.'.(intdiv($proxy['version'], 100) % 100).'.'.
+					($proxy['version'] % 100)
+				: '';
+
 			CArrayHelper::sort($proxy['hosts'], ['name']);
 			$proxy['hosts'] = array_slice($proxy['hosts'], 0, CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1);
 		}
