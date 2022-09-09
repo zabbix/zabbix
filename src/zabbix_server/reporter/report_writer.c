@@ -32,6 +32,7 @@ extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern char	*CONFIG_WEBSERVICE_URL;
+extern char	*CONFIG_SOURCE_IP;
 
 typedef struct
 {
@@ -158,7 +159,8 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, CONFIG_WEBSERVICE_URL)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, j.buffer)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
 				(curl_error = rw_curl_error(err)));
