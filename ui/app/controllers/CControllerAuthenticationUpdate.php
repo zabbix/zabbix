@@ -392,14 +392,15 @@ class CControllerAuthenticationUpdate extends CController {
 			if (array_key_exists('userdirectoryid', $ldap_server)) {
 				$userdirectoryid_map[$row_index] = $ldap_server['userdirectoryid'];
 				$upd_ldap_servers[] = $ldap_server;
-				$result = API::UserDirectory()->update($upd_ldap_servers);
 			}
 			else {
 				$userdirectoryid_map[$row_index] = null;
 				$ins_ldap_servers[] = ['idp_type' => IDP_TYPE_LDAP] + $ldap_server;
-				$result = API::UserDirectory()->create($ins_ldap_servers);
 			}
 		}
+
+		$result = $upd_ldap_servers ? API::UserDirectory()->update($upd_ldap_servers) : [];
+		$result = $result !== false && $ins_ldap_servers ? API::UserDirectory()->create($ins_ldap_servers) : $result;
 
 		if ($result) {
 			foreach ($userdirectoryid_map as $row_index => $userdirectoryid) {
