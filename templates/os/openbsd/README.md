@@ -74,7 +74,7 @@ There are no template links in this template.
 |OS |Number of logged in users |<p>Number of users who are currently logged in.</p> |ZABBIX_PASSIVE |system.users.num |
 |Processes |Number of running processes |<p>Number of processes in running state.</p> |ZABBIX_PASSIVE |proc.num[,,run] |
 |Processes |Number of processes |<p>Total number of processes in any state.</p> |ZABBIX_PASSIVE |proc.num[] |
-|Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_PASSIVE |vfs.file.cksum[/etc/passwd,sha256] |
+|Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_PASSIVE |vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |Zabbix agent availability |<p>Monitoring agent availability status</p> |INTERNAL |zabbix[host,agent,available] |
 
 ## Triggers
