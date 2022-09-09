@@ -205,7 +205,7 @@ int	CONFIG_PROXY_OFFLINE_BUFFER	= 1;
 int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 
 /* how often active Zabbix proxy requests configuration data from server, in seconds */
-int	CONFIG_PROXYCONFIG_FREQUENCY	= 5;
+int	CONFIG_PROXYCONFIG_FREQUENCY	= 0;	/* will be set to default 5 seconds if not configured */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;
 
 int	CONFIG_HISTSYNCER_FORKS		= 4;
@@ -656,10 +656,25 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 #if !defined(HAVE_OPENIPMI)
 	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_IPMIPOLLER_FORKS, "IPMI support"));
 #endif
-
 	if (0 != CONFIG_CONFSYNCER_FREQUENCY)
-		zabbix_log(LOG_LEVEL_WARNING, "\"ConfigFrequency\" parameter is deprecated and is ignored, "
-				"use ProxyConfigFrequency instead");
+	{
+		if (0 != CONFIG_PROXYCONFIG_FREQUENCY)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Deprecated \"ConfigFrequency\" configuration parameter cannot"
+					" be used together with \"ProxyConfigFrequency\" parameter");
+			err = 1;
+		}
+		else
+		{
+			CONFIG_PROXYCONFIG_FREQUENCY = CONFIG_CONFSYNCER_FREQUENCY;
+			zabbix_log(LOG_LEVEL_WARNING, "\"ConfigFrequency\" configuration parameter is deprecated, "
+					"use \"ProxyConfigFrequency\" instead");
+		}
+	}
+
+	/* assign default ProxyConfigFrequency value if not configured */
+	if (0 == CONFIG_PROXYCONFIG_FREQUENCY)
+		CONFIG_PROXYCONFIG_FREQUENCY = 5;
 
 	err |= (FAIL == zbx_db_validate_config_features());
 
