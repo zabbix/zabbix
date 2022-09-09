@@ -114,7 +114,7 @@ class CControllerPopupLdapEdit extends CController {
 
 		$data['advanced_configuration'] = $data['start_tls'] != ZBX_AUTH_START_TLS_OFF || $data['search_filter'] !== '';
 
-		if (!$data['provision_groups']) {
+		if ($data['add_ldap_server'] == 1) {
 			$default_role = API::Role()->get([
 				'output' => ['roleid'],
 				'filter' => ['type' => USER_TYPE_ZABBIX_USER],
@@ -134,7 +134,7 @@ class CControllerPopupLdapEdit extends CController {
 				: [];
 		}
 
-		if (!$data['provision_media']) {
+		if ($data['add_ldap_server'] == 1) {
 			$default_media = API::MediaType()->get([
 				'output' => ['mediatypeid'],
 				'filter' => [
