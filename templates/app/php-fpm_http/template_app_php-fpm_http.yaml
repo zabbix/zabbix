@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:33Z'
+  date: '2022-09-06T12:17:50Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -213,7 +213,7 @@ zabbix_export:
             -
               type: REGEX
               parameters:
-                - '{$PHP_FPM.PING.REPLY}($|\n)'
+                - '{$PHP_FPM.PING.REPLY}($|\r?\n)'
                 - '1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
@@ -442,10 +442,10 @@ zabbix_export:
             -
               uuid: 9ed4047bdcd74e649814c5d004ba78c7
               expression: 'last(/PHP-FPM by HTTP/php-fpm.uptime)<10m'
-              name: 'PHP-FPM: has been restarted'
-              event_name: 'PHP-FPM: has been restarted (uptime < 10m)'
+              name: 'PHP-FPM: Pool has been restarted'
+              event_name: 'PHP-FPM: Pool has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -

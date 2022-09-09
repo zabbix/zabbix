@@ -777,6 +777,33 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 			}
 
+			if ($type == ITEM_TYPE_HTTPAGENT) {
+				if ($db_item['authtype'] != getRequest('http_authtype', ITEM_AUTHTYPE_PASSWORD)) {
+					$item['authtype'] = getRequest('http_authtype', ITEM_AUTHTYPE_PASSWORD);
+				}
+
+				if ($db_item['username'] !== getRequest('http_username', '')) {
+					$item['username'] = getRequest('http_username', '');
+				}
+
+				if ($db_item['password'] !== getRequest('http_password', '')) {
+					$item['password'] = getRequest('http_password', '');
+				}
+			}
+			else {
+				if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
+					$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
+				}
+
+				if ($db_item['username'] !== getRequest('username', '')) {
+					$item['username'] = getRequest('username', '');
+				}
+
+				if ($db_item['password'] !== getRequest('password', '')) {
+					$item['password'] = getRequest('password', '');
+				}
+			}
+
 			if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
 				$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
 			}
@@ -1362,19 +1389,19 @@ else {
 				if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
 					$delay = $update_interval_parser->getDelay();
 
-					$delay = ($delay[0] !== '{') ? convertUnitsS(timeUnitToSeconds($delay)) : $delay;
+					$delay = ($delay[0] !== '{') ? convertSecondsToTimeUnits(timeUnitToSeconds($delay)) : $delay;
 				}
 			}
 
 			$history = $item['history'];
-			$history = ($history[0] !== '{') ? convertUnitsS(timeUnitToSeconds($history)) : $history;
+			$history = ($history[0] !== '{') ? convertSecondsToTimeUnits(timeUnitToSeconds($history)) : $history;
 
 			// Hide trend (zero values) for non-numeric item types.
 			$trends = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 				? $item['trends']
 				: '';
 			$trends = ($trends !== '' && $trends[0] !== '{')
-				? convertUnitsS(timeUnitToSeconds($trends))
+				? convertSecondsToTimeUnits(timeUnitToSeconds($trends))
 				: $trends;
 
 			$item['subfilters'] = [

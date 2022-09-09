@@ -45,19 +45,22 @@ $discovered_by = null;
 $interfaces_row = null;
 
 if ($host_is_discovered) {
-	if ($data['editable_discovery_rules']) {
-		$discovery_rule = (new CLink($data['host']['discoveryRule']['name'],
-			(new CUrl('host_prototypes.php'))
-				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $data['host']['discoveryRule']['itemid'])
-				->setArgument('hostid', $data['host']['hostDiscovery']['parent_hostid'])
-				->setArgument('context', 'host')
-		))->setAttribute('target', '_blank');
+	if ($data['host']['discoveryRule']) {
+		if ($data['is_discovery_rule_editable']) {
+			$discovery_rule = (new CLink($data['host']['discoveryRule']['name'],
+				(new CUrl('host_prototypes.php'))
+					->setArgument('form', 'update')
+					->setArgument('parent_discoveryid', $data['host']['discoveryRule']['itemid'])
+					->setArgument('hostid', $data['host']['hostDiscovery']['parent_hostid'])
+					->setArgument('context', 'host')
+			))->setAttribute('target', '_blank');
+		}
+		else {
+			$discovery_rule = new CSpan($data['host']['discoveryRule']['name']);
+		}
 	}
 	else {
-		$discovery_rule = $data['host']['discoveryRule']
-			? (new CSpan($data['host']['discoveryRule']['name']))
-			: (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
+		$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
 	}
 
 	$discovered_by = [new CLabel(_('Discovered by')), new CFormField($discovery_rule)];
@@ -346,7 +349,8 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'source' => 'host',
 	'tags' => $data['host']['tags'],
 	'readonly' => $host_is_discovered,
-	'tabs_id' => 'host-tabs'
+	'tabs_id' => 'host-tabs',
+	'tags_tab_id' => 'host-tags-tab'
 ]);
 
 // Macros tab.
@@ -535,7 +539,7 @@ $tabs = (new CTabView(['id' => 'host-tabs']))
 	->setSelected(0)
 	->addTab('host-tab', _('Host'), $host_tab)
 	->addTab('ipmi-tab', _('IPMI'), $ipmi_tab, TAB_INDICATOR_IPMI)
-	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
+	->addTab('host-tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('macros-tab', _('Macros'), $macros_tab, TAB_INDICATOR_MACROS)
 	->addTab('inventory-tab', _('Inventory'), $inventory_tab, TAB_INDICATOR_INVENTORY)
 	->addTab('encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);

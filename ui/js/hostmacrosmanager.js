@@ -203,13 +203,6 @@ class HostMacrosManager {
 				.addClass('initialized-field')
 				.textareaFlexible();
 		});
-
-		// Init tab indicator observer.
-		const tab = document.querySelector('#tab_macros-tab, #tab_macroTab');
-
-		if (tab) {
-			new MacrosTabIndicatorItem().initObserver(tab);
-		}
 	}
 
 	getMacroTable() {
