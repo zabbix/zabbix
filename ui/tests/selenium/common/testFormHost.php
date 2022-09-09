@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -2054,7 +2055,7 @@ class testFormHost extends CWebTest {
 					break;
 
 				case 'Tags':
-					$tags_table = $form->query('id:tags-table')->asMultifieldTable()->one()->waitUntilVisible();
+					$tags_table = $form->query('class:tags-table')->asMultifieldTable()->one()->waitUntilVisible();
 
 					$expected_tags = [
 						[
