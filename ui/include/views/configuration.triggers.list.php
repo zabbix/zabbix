@@ -277,12 +277,14 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	// status
 	$status = (new CLink(
 		triggerIndicator($trigger['status'], $trigger['state']),
-		'triggers.php?'.
-			'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED
+		(new CUrl('triggers.php'))
+			->setArgument('action', $trigger['status'] == TRIGGER_STATUS_DISABLED
 				? 'trigger.massenable'
 				: 'trigger.massdisable'
-			).
-			'&g_triggerid='.$triggerid))
+			)
+			->setArgument('g_triggerid[]', $triggerid)
+			->getUrl()
+		))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		->addSID();
