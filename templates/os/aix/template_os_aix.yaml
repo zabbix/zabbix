@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-22T14:09:56Z'
+  date: '2022-09-09T11:10:59Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -545,7 +545,7 @@ zabbix_export:
           uuid: 4771d6d33c2247d6843198152a7065a8
           name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
-          delay: 1h
+          delay: 15m
           history: 1w
           trends: '0'
           value_type: CHAR
