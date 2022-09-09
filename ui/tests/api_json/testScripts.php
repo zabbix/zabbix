@@ -474,7 +474,7 @@ class testScripts extends CAPITest {
 				'key_' => 'api_test_item_inventory_rw_2',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
-			],
+			]
 		];
 		$items = CDataHelper::call('item.create', $items_data);
 		$this->assertArrayHasKey('itemids', $items, 'prepareScriptsData() failed: Could not create items.');
@@ -1181,7 +1181,7 @@ class testScripts extends CAPITest {
 			// Check script type.
 			'Test script.create missing type' => [
 				'script' => [
-					'name' => 'API create script',
+					'name' => 'API create script'
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "type" is missing.'
 			],
@@ -1195,14 +1195,14 @@ class testScripts extends CAPITest {
 			'Test script.create invalid type (string)' => [
 				'script' => [
 					'name' => 'API create script',
-					'type' => 'abc',
+					'type' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			'Test script.create invalid type' => [
 				'script' => [
 					'name' => 'API create script',
-					'type' => 999999,
+					'type' => 999999
 				],
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.
 					implode(', ', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
@@ -1214,7 +1214,7 @@ class testScripts extends CAPITest {
 			'Test script.create missing scope' => [
 				'script' => [
 					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "scope" is missing.'
 			],
@@ -1230,7 +1230,7 @@ class testScripts extends CAPITest {
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => 'abc',
+					'scope' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/scope": an integer is expected.'
 			],
@@ -4144,7 +4144,7 @@ class testScripts extends CAPITest {
 				'expected_results' => [
 					[
 						'name' => 'API test script.get URL',
-						'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}',
+						'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
 					],
 					[
 						'name' => 'API test script.getScriptsByHosts - URL',

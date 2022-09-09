@@ -746,7 +746,7 @@ class CScript extends CApiService {
 			case ZBX_SCRIPT_TYPE_IPMI:
 				$api_input_rules['fields'] += [
 					'scope' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
-					'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
+					'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')]
 				];
 
 				if ($method === 'create') {
