@@ -53,7 +53,7 @@ $fields = [
 	'status_change' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'txt_select' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'inventory' =>			[T_ZBX_STR, O_OPT, null,	null,		null]
+	'inventory' =>			[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null]
 ];
 check_fields($fields);
 
