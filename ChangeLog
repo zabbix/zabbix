@@ -4696,6 +4696,7 @@ Changes for 4.0.44rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-21416] fixed check now not working on calculated items, aggregate checks and some internal items (wiper)
 ..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
 
 --------------------------------------------------------------------------------
