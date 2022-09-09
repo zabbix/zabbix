@@ -121,6 +121,7 @@ class CControllerProxyList extends CController {
 		);
 
 		foreach ($data['proxies'] as &$proxy) {
+			// Convert proxy version to readable format.
 			$proxy['version'] = $proxy['version'] != 0
 				? (intdiv($proxy['version'], 10000) % 100).'.'.(intdiv($proxy['version'], 100) % 100).'.'.
 					($proxy['version'] % 100)

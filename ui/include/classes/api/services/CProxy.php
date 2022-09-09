@@ -36,20 +36,13 @@ class CProxy extends CApiService {
 	protected $sortColumns = ['hostid', 'host', 'status'];
 
 	/**
-	 * Get proxy data.
+	 * @param array $options
 	 *
-	 * @param array  $options
-	 * @param array  $options['proxyids']
-	 * @param bool   $options['editable']	only with read-write permission. Ignored for SuperAdmins
-	 * @param int    $options['count']		returns value in rowscount
-	 * @param string $options['pattern']
-	 * @param int    $options['limit']
-	 * @param string $options['sortfield']
-	 * @param string $options['sortorder']
+	 * @throws APIException
 	 *
-	 * @return array
+	 * @return array|string
 	 */
-	public function get($options = []) {
+	public function get(array $options = []) {
 		$result = [];
 
 		$sqlParts = [
@@ -178,20 +171,20 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Create proxy.
-	 *
 	 * @param array $proxies
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function create(array $proxies) {
+	public function create(array $proxies): array {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
 			);
 		}
 
-		$this->validateCreate($proxies);
+		self::validateCreate($proxies);
 
 		$proxyids = DB::insert('hosts', $proxies);
 		$host_rtdata = [];
@@ -203,8 +196,8 @@ class CProxy extends CApiService {
 		unset($proxy);
 
 		DB::insert('host_rtdata', $host_rtdata, false);
-		self::updateInterfaces($proxies, __FUNCTION__);
-		self::updateHosts($proxies, __FUNCTION__);
+		self::updateInterfaces($proxies);
+		self::updateHosts($proxies);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_PROXY, $proxies);
 
@@ -212,13 +205,13 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Update proxy.
-	 *
 	 * @param array $proxies
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function update(array $proxies) {
+	public function update(array $proxies): array {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
@@ -244,8 +237,8 @@ class CProxy extends CApiService {
 			DB::update('hosts', $upd_proxies);
 		}
 
-		self::updateInterfaces($proxies, __FUNCTION__, $db_proxies);
-		self::updateHosts($proxies, __FUNCTION__, $db_proxies);
+		self::updateInterfaces($proxies, $db_proxies);
+		self::updateHosts($proxies, $db_proxies);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_PROXY, $proxies, $db_proxies);
 
@@ -253,15 +246,10 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Update table "interface".
-	 *
-	 * @static
-	 *
 	 * @param array      $proxies
-	 * @param string     $method
-	 * @param null|array $db_proxies
+	 * @param array|null $db_proxies
 	 */
-	private static function updateInterfaces(array &$proxies, string $method, array $db_proxies = null): void {
+	private static function updateInterfaces(array &$proxies, array $db_proxies = null): void {
 		$ins_interfaces = [];
 		$upd_interfaces = [];
 		$del_interfaceids = [];
@@ -271,7 +259,7 @@ class CProxy extends CApiService {
 				continue;
 			}
 
-			$db_interface = ($method == 'update') ? $db_proxies[$proxy['proxyid']]['interface'] : [];
+			$db_interface = $db_proxies !== null ? $db_proxies[$proxy['proxyid']]['interface'] : [];
 
 			if ($proxy['interface']) {
 				if ($db_interface) {
@@ -320,15 +308,10 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Update table "hosts".
-	 *
-	 * @static
-	 *
 	 * @param array      $proxies
-	 * @param string     $method
-	 * @param null|array $db_proxies
+	 * @param array|null $db_proxies
 	 */
-	private static function updateHosts(array &$proxies, string $method, array $db_proxies = null): void {
+	private static function updateHosts(array &$proxies, array $db_proxies = null): void {
 		$upd_hosts = [];
 
 		foreach ($proxies as &$proxy) {
@@ -336,7 +319,7 @@ class CProxy extends CApiService {
 				continue;
 			}
 
-			$db_hosts = ($method == 'update') ? $db_proxies[$proxy['proxyid']]['hosts'] : [];
+			$db_hosts = $db_proxies !== null ? $db_proxies[$proxy['proxyid']]['hosts'] : [];
 
 			foreach ($proxy['hosts'] as $host) {
 				if (!array_key_exists($host['hostid'], $db_hosts)) {
@@ -367,11 +350,11 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * @param array	$proxyids
+	 * @param array $proxyids
 	 *
 	 * @return array
 	 */
-	public function delete(array $proxyids) {
+	public function delete(array $proxyids): array {
 		$this->validateDelete($proxyids, $db_proxies);
 
 		DB::delete('host_rtdata', ['hostid' => $proxyids]);
@@ -406,12 +389,12 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * @param array $proxyids
-	 * @param array $db_proxies
+	 * @param array      $proxyids
+	 * @param array|null $db_proxies
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
-	private function validateDelete(array &$proxyids, array &$db_proxies = null) {
+	private function validateDelete(array &$proxyids, ?array &$db_proxies): void {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
@@ -435,9 +418,9 @@ class CProxy extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkUsedInDiscovery($db_proxies);
-		$this->checkUsedInHosts($db_proxies);
-		$this->checkUsedInActions($db_proxies);
+		self::checkUsedInDiscovery($db_proxies);
+		self::checkUsedInHosts($db_proxies);
+		self::checkUsedInActions($db_proxies);
 	}
 
 	/**
@@ -445,8 +428,10 @@ class CProxy extends CApiService {
 	 *
 	 * @param array  $proxies
 	 * @param string $proxies[<proxyid>]['host']
+	 *
+	 * @throws APIException
 	 */
-	private function checkUsedInDiscovery(array $proxies) {
+	private static function checkUsedInDiscovery(array $proxies): void {
 		$db_drules = DB::select('drules', [
 			'output' => ['proxy_hostid', 'name'],
 			'filter' => ['proxy_hostid' => array_keys($proxies)],
@@ -465,8 +450,10 @@ class CProxy extends CApiService {
 	 *
 	 * @param array  $proxies
 	 * @param string $proxies[<proxyid>]['host']
+	 *
+	 * @throws APIException
 	 */
-	protected function checkUsedInHosts(array $proxies) {
+	private static function checkUsedInHosts(array $proxies): void {
 		$db_hosts = DB::select('hosts', [
 			'output' => ['proxy_hostid', 'name'],
 			'filter' => ['proxy_hostid' => array_keys($proxies)],
@@ -485,8 +472,10 @@ class CProxy extends CApiService {
 	 *
 	 * @param array  $proxies
 	 * @param string $proxies[<proxyid>]['host']
+	 *
+	 * @throws APIException
 	 */
-	private function checkUsedInActions(array $proxies) {
+	private static function checkUsedInActions(array $proxies): void {
 		$db_actions = DBfetchArray(DBselect(
 			'SELECT a.name,c.value AS proxy_hostid'.
 			' FROM actions a,conditions c'.
@@ -574,13 +563,11 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $proxies
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
-	protected function validateCreate(array &$proxies) {
+	private static function validateCreate(array &$proxies): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['host']], 'fields' => [
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hosts', 'host')],
 			'status' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE])],
@@ -656,16 +643,12 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check for unique proxy names.
-	 *
-	 * @static
-	 *
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 *
-	 * @throws APIException if proxy names are not unique.
+	 * @throws APIException
 	 */
-	protected static function checkDuplicates(array $proxies, array $db_proxies = null): void {
+	private static function checkDuplicates(array $proxies, array $db_proxies = null): void {
 		$names = [];
 
 		foreach ($proxies as $proxy) {
@@ -697,16 +680,12 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check for valid hosts.
-	 *
-	 * @static
-	 *
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 *
-	 * @throws APIException if hosts are not valid.
+	 * @throws APIException
 	 */
-	protected static function checkHosts(array $proxies, array $db_proxies = null): void {
+	private static function checkHosts(array $proxies, array $db_proxies = null): void {
 		$hostids = [];
 
 		foreach ($proxies as $proxy) {
@@ -726,7 +705,6 @@ class CProxy extends CApiService {
 			return;
 		}
 
-		// Check if host exists.
 		$db_hosts = API::Host()->get([
 			'output' => ['hostid', 'host', 'flags'],
 			'hostids' => array_keys($hostids),
@@ -747,15 +725,11 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check for valid proxy address field.
-	 *
-	 * @static
-	 *
 	 * @param array $proxies
 	 *
-	 * @throws APIException if proxy addresses are not valid.
+	 * @throws APIException
 	 */
-	protected static function checkProxyAddress(array &$proxies): void {
+	private static function checkProxyAddress(array &$proxies): void {
 		foreach ($proxies as $i => &$proxy) {
 			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
 				$proxy += ['proxy_address' => ''];
@@ -771,16 +745,12 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check for valid interface.
-	 *
-	 * @static
-	 *
 	 * @param array  $proxies
 	 * @param string $method
 	 *
-	 * @throws APIException if proxy interface is not valid.
+	 * @throws APIException
 	 */
-	protected static function checkInterface(array &$proxies, string $method): void {
+	private static function checkInterface(array &$proxies, string $method): void {
 		foreach ($proxies as $i => &$proxy) {
 			if ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE) {
 				$proxy += ['interface' => []];
@@ -825,14 +795,12 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
-	protected function validateUpdate(array &$proxies, array &$db_proxies = null) {
+	private function validateUpdate(array &$proxies, ?array &$db_proxies = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['proxyid']], 'fields' => [
 			'proxyid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE])],
@@ -986,10 +954,6 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Add the existing hosts and host interfaces to $db_proxies whether these are affected by the update.
-	 *
-	 * @static
-	 *
 	 * @param array $proxies
 	 * @param array $db_proxies
 	 */
