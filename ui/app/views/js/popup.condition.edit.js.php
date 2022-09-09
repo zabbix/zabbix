@@ -50,6 +50,14 @@ window.condition_popup = new class {
 
 	submit() {
 		const fields = getFormFields(this.form);
+
+		if (typeof(fields.value) == 'string') {
+			fields.value = fields.value.trim();
+		}
+		if (fields.value2 !== null && typeof(fields.value2) == 'string') {
+			fields.value2 = fields.value2.trim();
+		}
+
 		let curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'popup.condition.check');
 

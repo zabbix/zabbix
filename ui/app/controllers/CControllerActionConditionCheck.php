@@ -23,20 +23,19 @@
  * Actions new condition popup.
  */
 class CControllerActionConditionCheck extends CController {
-
-	protected function init() {
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableSIDvalidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'actionid' => 'db actions.actionid',
 			'type' => 'required|in ' . ZBX_POPUP_CONDITION_TYPE_ACTION,
 			'source' => 'required|in ' . implode(',', [
 					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 					EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-				]),
+			]),
 			'condition_type' => 'in ' . implode(',', [
 					CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_TEMPLATE, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER,
 					CONDITION_TYPE_TRIGGER_NAME, CONDITION_TYPE_TRIGGER_SEVERITY, CONDITION_TYPE_TIME_PERIOD,
@@ -46,17 +45,16 @@ class CControllerActionConditionCheck extends CController {
 					CONDITION_TYPE_EVENT_ACKNOWLEDGED, CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_EVENT_TYPE,
 					CONDITION_TYPE_HOST_METADATA, CONDITION_TYPE_EVENT_TAG, CONDITION_TYPE_EVENT_TAG_VALUE,
 					CONDITION_TYPE_SERVICE, CONDITION_TYPE_SERVICE_NAME
-				]),
+			]),
 			'trigger_context' => 'in ' . implode(',', ['host', 'template']),
 			'operator' => 'in ' . implode(',', [
 					CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
 					CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_IN, CONDITION_OPERATOR_MORE_EQUAL,
 					CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_NOT_IN, CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO,
 					CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
-				]),
-			'value' => '',
-			'value2' => ''
-			// todo : write legit validation rules for value and value2
+			]),
+			'value' => 'required|not_empty',
+			'value2' => 'not_empty'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateCondition();
@@ -74,11 +72,11 @@ class CControllerActionConditionCheck extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
 	}
 
-	protected function validateCondition() {
+	protected function validateCondition(): bool {
 		$validator = new CActionCondValidator();
 		$is_valid = $validator->validate([
 			'conditiontype' => $this->getInput('condition_type'),
@@ -94,14 +92,16 @@ class CControllerActionConditionCheck extends CController {
 		return $is_valid;
 	}
 
-	protected function doAction() {
+	/**
+	 * @throws JsonException
+	 */
+	protected function doAction(): void {
 		$condition = [
 			'condition_type' => $this->getInput('condition_type'),
 			'operator' => $this->getInput('operator'),
 			'value' => $this->getInput('value'),
 			'value2' => $this->getInput('value2')
 		];
-
 		$actionConditionStringValues = $this->conditionValueToString($condition);
 
 		$data = [
@@ -124,7 +124,8 @@ class CControllerActionConditionCheck extends CController {
 			],
 			'name' => $actionConditionStringValues
 		];
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data, JSON_THROW_ON_ERROR)]));
 	}
 
 	protected function conditionValueToString($condition): array {
@@ -137,80 +138,80 @@ class CControllerActionConditionCheck extends CController {
 		$dCheckIds = [];
 		$serviceids = [];
 
-				$result = _('Unknown');
+		$result = _('Unknown');
 
-				switch ($condition['condition_type']) {
-					case CONDITION_TYPE_HOST_GROUP:
-						$groupIds = $condition['value'];
-						break;
+		switch ($condition['condition_type']) {
+			case CONDITION_TYPE_HOST_GROUP:
+				$groupIds = $condition['value'];
+				break;
 
-					case CONDITION_TYPE_TRIGGER:
-						$triggerIds = $condition['value'];
-						break;
+			case CONDITION_TYPE_TRIGGER:
+				$triggerIds = $condition['value'];
+				break;
 
-					case CONDITION_TYPE_HOST:
-						$hostIds = $condition['value'];
-						break;
+			case CONDITION_TYPE_HOST:
+				$hostIds = $condition['value'];
+				break;
 
-					case CONDITION_TYPE_TEMPLATE:
-						$templateIds = $condition['value'];
-						break;
+			case CONDITION_TYPE_TEMPLATE:
+				$templateIds = $condition['value'];
+				break;
 
-					case CONDITION_TYPE_PROXY:
-						$proxyIds = $condition['value'];
-						break;
+			case CONDITION_TYPE_PROXY:
+				$proxyIds = $condition['value'];
+				break;
 
-					case CONDITION_TYPE_SERVICE:
-						$serviceids = $condition['value'];
-						break;
+			case CONDITION_TYPE_SERVICE:
+				$serviceids = $condition['value'];
+				break;
 
-					// return values as is for following condition types
-					case CONDITION_TYPE_TRIGGER_NAME:
-					case CONDITION_TYPE_HOST_METADATA:
-					case CONDITION_TYPE_HOST_NAME:
-					case CONDITION_TYPE_TIME_PERIOD:
-					case CONDITION_TYPE_DHOST_IP:
-					case CONDITION_TYPE_DSERVICE_PORT:
-					case CONDITION_TYPE_DUPTIME:
-					case CONDITION_TYPE_DVALUE:
-					case CONDITION_TYPE_EVENT_TAG:
-					case CONDITION_TYPE_EVENT_TAG_VALUE:
-					case CONDITION_TYPE_SERVICE_NAME:
-						$result = $condition['value'];
-						break;
+			// return values as is for following condition types
+			case CONDITION_TYPE_TRIGGER_NAME:
+			case CONDITION_TYPE_HOST_METADATA:
+			case CONDITION_TYPE_HOST_NAME:
+			case CONDITION_TYPE_TIME_PERIOD:
+			case CONDITION_TYPE_DHOST_IP:
+			case CONDITION_TYPE_DSERVICE_PORT:
+			case CONDITION_TYPE_DUPTIME:
+			case CONDITION_TYPE_DVALUE:
+			case CONDITION_TYPE_EVENT_TAG:
+			case CONDITION_TYPE_EVENT_TAG_VALUE:
+			case CONDITION_TYPE_SERVICE_NAME:
+				$result = $condition['value'];
+				break;
 
-					case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-						$result = $condition['value'] ? _('Ack') : _('Not Ack');
-						break;
+			case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
+				$result = $condition['value'] ? _('Ack') : _('Not Ack');
+				break;
 
-					case CONDITION_TYPE_TRIGGER_SEVERITY:
-						$result =CSeverityHelper::getName((int)$condition['value']);
-						break;
+			case CONDITION_TYPE_TRIGGER_SEVERITY:
+				$result =CSeverityHelper::getName((int)$condition['value']);
+				break;
 
-					case CONDITION_TYPE_DRULE:
-						$dRuleIds[$condition['value']] = $condition['value'];
-						break;
+			case CONDITION_TYPE_DRULE:
+				$dRuleIds[$condition['value']] = $condition['value'];
+				break;
 
-					case CONDITION_TYPE_DCHECK:
-						$dCheckIds[$condition['value']] = $condition['value'];
-						break;
+			case CONDITION_TYPE_DCHECK:
+				$dCheckIds[$condition['value']] = $condition['value'];
+				break;
 
-					case CONDITION_TYPE_DOBJECT:
-						$result = discovery_object2str($condition['value']);
-						break;
+			case CONDITION_TYPE_DOBJECT:
+				$result = discovery_object2str($condition['value']);
+				break;
 
-					case CONDITION_TYPE_DSERVICE_TYPE:
-						$result = discovery_check_type2str($condition['value']);
-						break;
+			case CONDITION_TYPE_DSERVICE_TYPE:
+				$result = discovery_check_type2str($condition['value']);
+				break;
 
-					case CONDITION_TYPE_DSTATUS:
-						$result = discovery_object_status2str($condition['value']);
-						break;
+			case CONDITION_TYPE_DSTATUS:
+				$result = discovery_object_status2str($condition['value']);
+				break;
 
-					case CONDITION_TYPE_EVENT_TYPE:
-						$result = eventType($condition['value']);
-						break;
-				}
+			case CONDITION_TYPE_EVENT_TYPE:
+				$result = eventType($condition['value']);
+				break;
+		}
 
 		$groups = [];
 		$triggers = [];
@@ -289,7 +290,6 @@ class CControllerActionConditionCheck extends CController {
 		}
 
 		if ($groups || $triggers || $hosts || $templates || $proxies || $dRules || $dChecks || $services) {
-
 			$id = $condition['value'];
 
 			switch ($condition['condition_type']) {
@@ -300,7 +300,6 @@ class CControllerActionConditionCheck extends CController {
 					break;
 
 				case CONDITION_TYPE_TRIGGER:
-
 					if (isset($triggers[$triggerIds[0]])) {
 						$host = reset($triggers[$triggerIds[0]]['hosts']);
 						$result = $host['name'] . NAME_DELIMITER . $triggers[$triggerIds[0]]['description'];
@@ -352,7 +351,7 @@ class CControllerActionConditionCheck extends CController {
 			}
 		}
 
-	$result_arr[] = $result;
+		$result_arr[] = $result;
 		return $result_arr;
 	}
 }

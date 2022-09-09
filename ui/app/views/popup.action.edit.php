@@ -284,16 +284,15 @@ $tabs = (new CTabView())
 $form
 	->addItem($tabs)
 	->addItem(
-		(new CScriptTag(
-			'action_edit_popup.init('.json_encode([
+		(new CScriptTag('
+			action_edit_popup.init('. json_encode([
 				'condition_operators' => condition_operator2str(),
 				'condition_types' => condition_type2str(),
 				'conditions' => $data['action']['filter']['conditions'],
 				'actionid' => $data['actionid'],
-				'eventsource' => $data['eventsource'],
-				'condition_name' => $data['condition_name']
-		]).
-			');'))->setOnDocumentReady()
+				'eventsource' => $data['eventsource']
+			], JSON_THROW_ON_ERROR) .');
+		'))->setOnDocumentReady()
 	);
 
 if ($data['actionid'] !== '') {
@@ -333,7 +332,7 @@ else {
 	];
 }
 
-// todo: check if this is fine. Add as translatable strings.
+// todo E.S.: check with V if this is fine. Add as translatable strings and add to spec.
 $header = $data['actionid'] !== '' ? _('Action') : _('New action');
 
 $output = [

@@ -25,7 +25,6 @@
  */
 
 require_once __DIR__ .'/js/configuration.action.list.js.php';
-$this->addJsFile('popup.condition.common.js');
 
 $submenu_source = [];
 
@@ -60,6 +59,10 @@ foreach ($submenu_source as $value => $label) {
 	$submenu[$url] = $label;
 }
 
+$current_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'action.list')
+	->setArgument('eventsource', $data['eventsource']);
+
 $widget = (new CWidget())
 	->setTitle($title)
 	->setTitleSubmenu(['main_section' => ['items' => $submenu]])
@@ -69,42 +72,35 @@ $widget = (new CWidget())
 			->cleanItems()
 			->addItem(new CInput('hidden', 'eventsource', $data['eventsource']))
 			->addItem(
-				(new CSimpleButton(_('Create action')))
-					->addClass('js-action-create')
+				(new CSimpleButton(_('Create action')))->addClass('js-action-create')
 			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	);
 
-$current_url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'action.list')
-	->setArgument('eventsource', $data['eventsource']);
-
 $filter = (new CFilter())
-	->setResetUrl(new CUrl('zabbix.php'))
+	->setResetUrl($current_url)
 	->addVar('action', 'action.list')
 	->addVar('eventsource', $data['eventsource'])
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
-			(new CFormGrid())->addItem([
-				new CLabel(_('Name'), 'filter_name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
-			]),
-			(new CFormGrid())->addItem([
-				new CLabel(_('Status')),
-				new CFormField(
-					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-						->addValue(_('Any'), -1)
-						->addValue(_('Enabled'), ACTION_STATUS_ENABLED)
-						->addValue(_('Disabled'), ACTION_STATUS_DISABLED)
-						->setModern(true)
-				)
-			])
-		]
-	);
+		(new CFormGrid())->addItem([
+			new CLabel(_('Name'), 'filter_name'),
+			(new CTextBox('filter_name', $data['filter']['name']))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
+		]),
+		(new CFormGrid())->addItem([
+			new CLabel(_('Status')),
+			new CFormField(
+				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+					->addValue(_('Any'), -1)
+					->addValue(_('Enabled'), ACTION_STATUS_ENABLED)
+					->addValue(_('Disabled'), ACTION_STATUS_DISABLED)
+					->setModern(true)
+			)
+		])
+	]);
 
 $widget->addItem($filter);
 $current_url->removeArgument('filter_rst');

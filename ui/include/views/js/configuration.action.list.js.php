@@ -22,7 +22,6 @@
 /**
  * @var CView $this
  */
-
 ?>
 
 <script>
@@ -60,21 +59,6 @@
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.actionDelete, {once: true});
 		}
 
-		actionDelete(e) {
-			const data = e.detail;
-
-			if ('success' in data) {
-				postMessageOk(data.success.title);
-
-				if ('messages' in data.success) {
-					postMessageDetails('success', data.success.messages);
-				}
-			}
-
-			uncheckTableRows('actionForm');
-			location.href = location.href;
-		}
-
 		_openActionPopup(parameters = {}) {
 			return PopUp('popup.action.edit', parameters, {
 				dialogueid: 'action-edit',
@@ -105,9 +89,7 @@
 						if ('title' in response.error) {
 							postMessageError(response.error.title);
 						}
-
 						postMessageDetails('error', response.error.messages);
-
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -115,21 +97,33 @@
 						if ('messages' in response.success) {
 							postMessageDetails('success', response.success.messages);
 						}
-
 					}
 
 					location.href = location.href;
 				})
 				.catch(() => {
 					clearMessages();
-
 					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
-
 					addMessage(message_box);
 				})
 				.finally(() => {
 					uncheckTableRows('g_actionid');
 				});
+		}
+
+		actionDelete(e) {
+			const data = e.detail;
+
+			if ('success' in data) {
+				postMessageOk(data.success.title);
+
+				if ('messages' in data.success) {
+					postMessageDetails('success', data.success.messages);
+				}
+			}
+
+			uncheckTableRows('actionForm');
+			location.href = location.href;
 		}
 	};
 </script>

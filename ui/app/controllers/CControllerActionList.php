@@ -20,8 +20,7 @@
 
 
 class CControllerActionList extends CController {
-
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
@@ -30,7 +29,7 @@ class CControllerActionList extends CController {
 			'eventsource'=> 'in '.implode(',', [
 					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
 					EVENT_SOURCE_SERVICE
-				]),
+			]),
 			'g_actionid' => 'array_id',
 			'filter_set' => 'in 1',
 			'filter_rst' =>	'in 1',
@@ -39,7 +38,6 @@ class CControllerActionList extends CController {
 			'sortorder' => 'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
 			'filter_status' =>'in '.implode(',', [-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])
 		];
-		// todo: check error messaging for input field validation
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
@@ -48,7 +46,7 @@ class CControllerActionList extends CController {
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])]))->disableView()
+				], JSON_THROW_ON_ERROR)]))->disableView()
 			);
 		}
 
@@ -85,7 +83,6 @@ class CControllerActionList extends CController {
 	}
 
 	protected function doAction(): void {
-
 		$eventsource = $this->getInput('eventsource', EVENT_SOURCE_TRIGGERS);
 		$sort_field = $this->getInput('sort', CProfile::get('web.action.list.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.action.list.sortorder', ZBX_SORT_UP));
@@ -145,7 +142,6 @@ class CControllerActionList extends CController {
 			$page_num = $this->getInput('page', 1);
 		}
 
-//		CPagerHelper::savePage($page['file'], $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sort_order, (new CUrl('zabbix.php'))
 			->setArgument('action', 'action.list')
 			->setArgument('eventsource', $eventsource)
@@ -153,7 +149,6 @@ class CControllerActionList extends CController {
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of actions'));
-
 		$this->setResponse($response);
 	}
 }

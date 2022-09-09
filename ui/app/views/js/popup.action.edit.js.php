@@ -21,7 +21,6 @@
 ?>
 
 window.action_edit_popup = new class {
-
 	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -76,7 +75,8 @@ window.action_edit_popup = new class {
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
 				this.row = document.createElement('tr');
 				this._createRow(this.row, e.detail);
-				$('#conditionTable tr:last').before(this.row);
+
+			$('#conditionTable tr:last').before(this.row);
 				this._processTypeOfCalculation();
 			});
 	}
@@ -96,6 +96,8 @@ window.action_edit_popup = new class {
 	}
 
 	_createRow(row, input) {
+		// todo: check if condition with the same value already exists in the table.
+
 		// check if identical condition already exists in table
 		const hasRows = [...document.getElementById('conditionTable').getElementsByTagName('tr')].map(it => {
 			const table_row = it.getElementsByTagName('td')[1];
@@ -201,6 +203,7 @@ window.action_edit_popup = new class {
 
 	submit() {
 		const fields = getFormFields(this.form);
+		fields.name = fields.name.trim();
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', this.actionid !== '' ? 'action.update' : 'action.create');
 
@@ -308,6 +311,8 @@ window.action_edit_popup = new class {
 
 		jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
 		jQuery('#expression').toggle(!this.show_formula);
+		jQuery('#label-evaltype').toggle(this.row_count > 1);
+		jQuery('#evaltype-formfield').toggle(this.row_count > 1);
 
 		const labels = jQuery('#conditionTable .label');
 		var conditions = [];

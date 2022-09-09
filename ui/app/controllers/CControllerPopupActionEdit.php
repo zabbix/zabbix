@@ -18,10 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once __DIR__ .'/../../include/actions.inc.php';
 
 class CControllerPopupActionEdit extends CController {
-
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' => 'in '.implode(',', [
@@ -164,7 +162,6 @@ class CControllerPopupActionEdit extends CController {
 		}
 
 		$response = new CControllerResponseData($data);
-
 		$this->setResponse($response);
 	}
 
@@ -330,7 +327,6 @@ class CControllerPopupActionEdit extends CController {
 		}
 
 		if ($groups || $triggers || $hosts || $templates || $proxies || $dRules || $dChecks || $services) {
-
 			$id = $condition['value'];
 
 			switch ($condition['conditiontype']) {
