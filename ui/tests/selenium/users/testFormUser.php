@@ -18,10 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 
 /**
  * @backup users
+ *
+ * @dataSource LoginUsers
  */
 class testFormUser extends CWebTest {
 
@@ -590,7 +593,7 @@ class testFormUser extends CWebTest {
 		try {
 			$this->page->logout();
 			// Log in with the created or updated user.
-			$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix');
+			$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix12345');
 			$this->page->userLogin($data['fields']['Username'], $password);
 			// Verification of URL after login.
 			$this->assertStringContainsString($data['fields']['URL (after login)'], $this->page->getCurrentURL());

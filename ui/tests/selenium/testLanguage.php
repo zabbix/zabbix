@@ -18,13 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
- * @backup users
+ * @backup users, config
  *
- * @backup config
+ * @dataSource LoginUsers
  */
 class testLanguage extends CWebTest {
 
@@ -163,9 +164,10 @@ class testLanguage extends CWebTest {
 	 * @dataProvider getUserData
 	 */
 	public function testLanguage_User($data) {
-		$this->page->userLogin('user-zabbix', 'zabbix');
+		$this->page->open('index.php');
+		$this->page->userLogin('user-zabbix', 'zabbix12345');
 		$this->page->open('zabbix.php?action=userprofile.edit');
-		$form = $this->query('name:user_form')->one()->asForm();
+		$form = $this->query('id:user-form')->asForm()->one();
 
 		// Red info icon check.
 		$this->query('xpath://a[@class="icon-info status-red"]')->one()->click();

@@ -18,10 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
  * @backup widget, profiles
+ *
+ * @dataSource LoginUsers
  */
 class testDashboardHostAvailabilityWidget extends CWebTest {
 
@@ -266,7 +269,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 	 * @dataProvider getCreateWidgetData
 	 */
 	public function testDashboardHostAvailabilityWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10110');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
@@ -455,7 +458,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 	 * @dataProvider getUpdateWidgetData
 	 */
 	public function testDashboardHostAvailabilityWidget_Update($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10110');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('Reference HA widget')->edit();
 
@@ -481,7 +484,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 		$initial_values = CDBHelper::getHash($this->sql);
 
 		// Open a dashboard widget and then save it without applying any changes
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10110');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('Reference HA widget')->edit();
 		$form->submit();
@@ -535,7 +538,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 	public function testDashboardHostAvailabilityWidget_Cancel($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10110');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
 		$dashboard = CDashboardElement::find()->one();
 
 		// Start updating or creating a widget.
@@ -590,7 +593,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 	public function testDashboardHostAvailabilityWidget_Delete() {
 		$name = 'Reference HA widget to delete';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10110');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget($name);
 		$dashboard->deleteWidget($name);

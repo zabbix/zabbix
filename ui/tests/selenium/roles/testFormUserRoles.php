@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -28,6 +29,9 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  * @onBefore prepareRoleData
  * @onBefore prepareUserData
  * @onBefore prepareServiceData
+ *
+ * @dataSource LoginUsers
+ *
  */
 class testFormUserRoles extends CWebTest {
 
@@ -1318,6 +1322,7 @@ class testFormUserRoles extends CWebTest {
 			$this->query('button:Delete')->one()->click();
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
+
 			if ($role === 'Admin role') {
 				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'Cannot delete assigned user role "Admin role".');
 				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));

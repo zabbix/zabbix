@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -27,6 +28,8 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  * @backup role, module, users, report, services
  *
  * @onBefore prepareUserData, prepareReportData, prepareServiceData
+ *
+ * @dataSource LoginUsers
  */
 class testUserRolesPermissions extends CWebTest {
 
@@ -1212,7 +1215,7 @@ class testUserRolesPermissions extends CWebTest {
 	public function testUserRolesPermissions_ManageApiToken() {
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
-		$this->assertEquals('TEST_SERVER_NAME: API tokens', $this->page->getTitle());
+		$this->assertEquals('API tokens', $this->page->getTitle());
 		$this->changeRoleRule(['Manage API tokens' => false]);
 		$this->checkLinks(['zabbix.php?action=user.token.list']);
 	}

@@ -18,11 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup users, config
+ *
+ * @dataSource LoginUsers
  */
 class testTimezone extends CWebTest {
 
@@ -102,7 +105,7 @@ class testTimezone extends CWebTest {
 		$this->page->logout();
 
 		// User timezone change.
-		$this->page->userLogin('test-timezone', 'zabbix');
+		$this->page->userLogin('test-timezone', 'zabbix12345');
 		$this->setTimezone($data['user_timezone'], 'userprofile');
 		date_modify($system_time, $data['time_diff']);
 

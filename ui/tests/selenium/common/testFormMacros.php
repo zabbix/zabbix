@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
@@ -26,6 +27,8 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
  * Base class for Macros tests.
+ *
+ * @dataSource LoginUsers
  */
 abstract class testFormMacros extends CLegacyWebTest {
 

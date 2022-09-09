@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
@@ -25,6 +26,8 @@ require_once dirname(__FILE__) . '/../include/CWebTest.php';
  *
  * @backup profiles
  * @backup problem
+ *
+ * @dataSource LoginUsers
  */
 class testPageTriggerUrl extends CWebTest {
 
@@ -81,7 +84,7 @@ class testPageTriggerUrl extends CWebTest {
 	 * Check trigger url in Trigger overview widget.
 	 */
 	public function testPageTriggerUrl_TriggerOverviewWidget($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10220');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1020');
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget('Group to check Overview');
 

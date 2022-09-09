@@ -18,10 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormFilter.php';
 
 /**
  * @backup profiles
+ *
+ * @dataSource LoginUsers
  */
 class testFormFilterProblems extends testFormFilter {
 
@@ -139,7 +142,7 @@ class testFormFilterProblems extends testFormFilter {
 	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterProblems_CheckCreatedFilter($data) {
-		$this->createFilter($data, 'filter-create', 'zabbix');
+		$this->createFilter($data, 'filter-create', 'zabbix12345');
 		$this->checkFilters($data, $this->table_selector);
 	}
 
@@ -147,21 +150,21 @@ class testFormFilterProblems extends testFormFilter {
 	 * Delete filters.
 	 */
 	public function testFormFilterProblems_Delete() {
-		$this->deleteFilter('filter-delete', 'zabbix');
+		$this->deleteFilter('filter-delete', 'zabbix12345');
 	}
 
 	/**
 	 * Updating filter form.
 	 */
 	public function testFormFilterProblems_UpdateForm() {
-		$this->updateFilterForm('filter-update', 'zabbix', $this->table_selector);
+		$this->updateFilterForm('filter-update', 'zabbix12345', $this->table_selector);
 	}
 
 	/**
 	 * Updating saved filter properties.
 	 */
 	public function testFormFilterProblems_UpdateProperties() {
-		$this->updateFilterProperties('filter-update', 'zabbix');
+		$this->updateFilterProperties('filter-update', 'zabbix12345');
 	}
 
 

@@ -1,11 +1,6 @@
 -- Activate Zabbix Server, set visible name and make it a more unique name
 UPDATE hosts SET status=0,name='ЗАББИКС Сервер',host='Test host' WHERE host='Zabbix server';
 
--- More medias for user 'Admin'
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (1,1,1,'test@zabbix.com',0,63,'1-7,00:00-24:00');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (2,1,1,'test2@zabbix.com',1,60,'1-7,00:00-24:00');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (3,1,3,'123456789',0,32,'1-7,00:00-24:00');
-
 -- More user scripts
 INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, confirmation) VALUES (4, 0,'Reboot','/sbin/shutdown -r',3,7,4,'This command reboots server.','Do you really want to reboot it?');
 
@@ -173,7 +168,6 @@ INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (15, 1
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (16, 18, 7);
 
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (2, 16, 1);
-INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (3, 19, 1);
 
 INSERT INTO opcommand (operationid, scriptid) VALUES (20, 4);
 
@@ -594,17 +588,6 @@ INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES 
 --
 -- -- updating record "Configuration of Zabbix" in the auditlog
 -- INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (700, 1, 1411543800, 1, 2, 'Default theme "originalblue".; Event acknowledges "1".; Dr...', '192.168.3.32', 0, '');
-
--- adding test data to the 'alerts' table for testing Audit->Actions report
-INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns) VALUES (1, 0, 0, 13545, 1329724790, 1, 0, 0);
-
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (1, 12, 1, 1, 1329724800, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 5', 'Event at 2012.02.20 10:00:00 Hostname: H1 Value of item key1 > 5: PROBLEM Last value: 6', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (2, 12, 1, 1, 1329724810, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 6', 'Event at 2012.02.20 10:00:10 Hostname: H1 Value of item key1 > 6: PROBLEM', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (3, 12, 1, 1, 1329724820, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 7', 'Event at 2012.02.20 10:00:20 Hostname: H1 Value of item key1 > 7: PROBLEM', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (4, 12, 1, 1, 1329724830, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 10', 'Event at 2012.02.20 10:00:30 Hostname: H1 Value of item key1 > 10: PROBLEM', 2, 0, 'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (5, 12, 1, 1, 1329724840, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 20', 'Event at 2012.02.20 10:00:40 Hostname: H1 Value of item key1 > 20: PROBLEM', 0, 0, 'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (6, 12, 1, NULL, 1329724850, NULL, '', '', 'Command: H1:ls -la', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (7, 12, 1, NULL, 1329724860, NULL, '', '', 'Command: H1:ls -la', 1, 0, '', 1, 1, '');
 
 -- deleting auditid from the ids table
 -- delete from ids where table_name='auditlog' and field_name='auditid'
@@ -1050,10 +1033,10 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, 
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (300003, 300003, 99102, 1, 1, 'FF5555', 0, 2, 0);
 
 -- testFormDiscoveryRule.SimpleUpdate
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 44000, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 44001, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 44002, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 44003, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 43700, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 43701, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 43702, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 43703, 1,  50, '', '', 40011, '', '');
 
 -- testFormItemPrototype.SimpleUpdate
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule', 'discovery-rule-form', 40001, 4, 133800, 1,  50, '', '', 40011, '', '');
@@ -1360,57 +1343,9 @@ INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, de
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description, flags, posts, headers) VALUES (15091, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Eventlog'        , 'eventlog[item_testpagehistory_checklayout]'        , '30s', '90d',      0,           '', 'https://zabbix.com', 0, '', '');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description, flags, posts, headers) VALUES (15092, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Eventlog_2'      , 'eventlog[item_testpagehistory_checklayout, 2]'     , '30s', '90d',      0,           '', 'The following url should be clickable: https://zabbix.com', 0, '', '');
 
--- testPageUsers, testFormLogin
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (3, 'test-user', '$2y$10$rHT2NCiJY3ly7ORLdqWbceGrDZ3YsR6gHSb5KAZAtc4QNbs6rFAaC', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (5, 8, 3);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-for-blocking', '$2y$10$XuoeDz5QsPSjhZm9Ht.J8ujgX5en.X5QNSzLa3aYn04l9u6bu1p2u', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (8, 8, 6);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'disabled-user', '$2y$10$7BRRzklg43VciDKXPsLq7uUqFehlgdTGzr/WfQXDFtACVYWFiRjjO', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 9, 7);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'no-access-to-the-frontend', '$2y$10$cExfysPEJsHzIoCkoUVH..XM0OSIwIQPE1sob2UgXDcH1Iyw8Wtny', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (10, 12, 8);
-
--- testFormFilterProblems, testFormFilterHosts
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (92, 'filter-create', '$2y$10$nA7hh4cZ5oHM.GgXPqzZ/e/vaD1LYcOi.3ZfulCjZV/9H4PFtIKnK', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (106, 7, 92);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (93, 'filter-delete', '$2y$10$z9toljmutmrQqkrl6BZiGO2kvQNcfN4wY.Pi00CeyhFMwPRIYBt16', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (107, 7, 93);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (94, 'filter-update', '$2y$10$rHPaFkVgIx.ceaZYTlMTiuH9HyCv5M/GXQkrCyQLcK2sdubp303ze', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (108, 7, 94);
-
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (24, 93, 'web.monitoring.problem.properties', 0, 0, 0, '{"filter_name":""}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (25, 93, 'web.monitoring.problem.properties', 1, 0, 0, '{"hostids":["10084"],"filter_name":"delete_problems_1"}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (30, 93, 'web.monitoring.problem.properties', 2, 0, 0, '{"filter_name":"delete_problems_2"}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (20, 93, 'web.monitoring.hosts.properties', 0, 0, 0, '{"filter_name":""}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (21, 93, 'web.monitoring.hosts.properties', 1, 0, 0, '{"groupids":["4"],"filter_name":"delete_hosts_1"}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (31, 93, 'web.monitoring.hosts.properties', 2, 0, 0, '{"filter_name":"delete_hosts_2"}', 3);
-
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (26, 94, 'web.monitoring.problem.properties', 0, 0, 0, '{"filter_name":""}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (27, 94, 'web.monitoring.problem.properties', 1, 0, 0, '{"filter_name":"update_tab","filter_show_counter":1,"show_timeline":"0"}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (28, 94, 'web.monitoring.hosts.properties', 0, 0, 0, '{"filter_name":""}', 3);
-INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (29, 94, 'web.monitoring.hosts.properties', 1, 0, 0, '{"filter_name":"update_tab","filter_show_counter":1}', 3);
-
--- testTimezone
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (9, 'test-timezone', '$2y$10$TUIJdrXgEUaoCmbOdhiLhe8kWc3M.EE.paOv0rC7bgSP2til3643O', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
-INSERT INTO usrgrp (usrgrpid, name) VALUES (92, 'Test timezone');
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (105, 92, 9);
-
--- testUrlUserPermissions
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page, url) VALUES (4, 'admin-zabbix', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_US', 30, 2, 'default', 0, 0, 50, 'toptriggers.php');
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 7, 4);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'user-zabbix', '$2y$10$MZQTU3/7XsECy1DbQqvn/eaoPoMDgMYJ7Ml1wYon1dC0NfwM9E3zu', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 7, 5);
-
 -- testPageDashboard Favorites
 INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (1,1,'web.favorite.sysmapids',1,'','sysmapid',1);
 INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (2,1,'web.favorite.graphids',42258,'','itemid',1);
-
--- testFormAdministrationUserGroups
-INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'Selenium user group');
-INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'Selenium user group in scripts');
-INSERT INTO usrgrp (usrgrpid, name) VALUES (15, 'Selenium user group in configuration');
-INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (5, 0, 'Selenium script','test',2,14,NULL,'selenium script description', 1);
-UPDATE config SET alert_usrgrpid = 15 WHERE configid = 1;
 
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
@@ -1458,12 +1393,6 @@ INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (93,93,'Service','ab
 INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (93,0,0,99251,1603466628,128786843,'Test trigger with tag',2);
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (93,93,'Service','abc');
 
--- Tag based permissions
-INSERT INTO usrgrp (usrgrpid, name) VALUES (90, 'Selenium user group for tag permissions AAA');
-INSERT INTO usrgrp (usrgrpid, name) VALUES (91, 'Selenium user group for tag permissions BBB');
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (90, 'Tag-user', '$2y$10$UpgaksQrfBNgJVTZ8Zy53eVE6gaRcGhh1WQZojBAw2GGGh3ZXIoSi', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (90, 90, 90);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (91, 91, 90);
 -- Tag based permissions: host group, host, item, two triggers
 INSERT INTO hstgrp (groupid, name, internal) VALUES (50004, 'Host group for tag permissions', 0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'Host for tag permissions', 'Host for tag permissions', 0, '');
@@ -1485,9 +1414,6 @@ INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name) VALUES (
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (95,95,'Service','Oracle');
 INSERT INTO problem (eventid,source,object,objectid,clock,ns,name) VALUES (95,0,0,100028,1603466728,128786843,'Trigger for tag permissions Oracle');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (95,95,'Service','Oracle');
--- Tag based permissions: Read-write permissions to host group
-INSERT INTO rights (rightid,groupid,permission,id) VALUES (1,90,3,50004);
-INSERT INTO rights (rightid,groupid,permission,id) VALUES (2,91,3,50004);
 
 -- event correlation
 INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event correlation for delete', 'Test description delete', 0, 0, '');
@@ -1542,7 +1468,7 @@ INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90011, 90003);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1000, 90002, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1001, 90003, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1019, 90003, '{#FSNAME}', NULL, NULL);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (10220, 90012, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1020, 90012, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1002, 90004, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1003, 90005, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1004, 90006, '', 5, NULL);
@@ -1557,136 +1483,14 @@ INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (99009, 90012, '{$PROTOYPE_MACRO_1}', 'Prototype macro value 1', 'Prototype macro description 1');
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (99010, 90012, '{$PROTOYPE_MACRO_2}', 'Prototype macro value 2', 'Prototype macro description 2');
 
--- adding test data to the 'alerts' table for testing Reports-> Notifications
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (8, 12, 1, 1, 1483275171, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.01.01 12:52:51', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (9, 12, 1, 2, 1486039971, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.02.02 12:52:51', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (10, 12, 1, 2, 1487030400, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.02.14 00:00:00', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (11, 12, 1, 3, 1488545571, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.03.03 12:52:51', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (12, 12, 1, 3, 1488382034, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.03.01 15:27:14', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (13, 12, 1, 3, 1490701552, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.03.28 11:45:52', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (14, 12, 1, 4, 1491310371, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.04 12:52:51', 2, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (15, 12, 1, 4, 1493096321, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.25 04:58:41', 2, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (16, 12, 1, 4, 1492456511, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.17 19:15:11', 2, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (17, 12, 1, 4, 1493585245, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.30 23:47:25', 2, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (18, 12, 1, 5, 1493988771, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.05 12:52:51', 0, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (19, 12, 1, 5, 1493693050, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.02 02:44:10', 0, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (20, 12, 1, 5, 1494674768, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.13 11:26:08', 0, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (21, 12, 1, 5, 1495924312, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.27 22:31:52', 0, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (22, 12, 1, 5, 1496256062, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.31 21:41:02', 0, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (23, 12, 1, 6, 1496753571, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.06.06 12:52:51', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (24, 12, 1, 6, 1496524375, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.06.03 21:12:55', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (25, 12, 1, 6, 1497731966, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.06.17 20:39:26', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (26, 12, 1, 6, 1498160557, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.06.22 19:42:37', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (27, 12, 1, 6, 1498501846, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.06.26 18:30:46', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (28, 12, 1, 6, 1498759123, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.06.29 17:58:43', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (29, 12, 1, 7, 1499431971, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.07.07 12:52:51', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (30, 12, 1, 7, 1498870861, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.07.01 01:01:01', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (31, 12, 1, 7, 1498960922, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.07.02 02:02:02', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (32, 12, 1, 7, 1499050983, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.07.03 03:03:03', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (33, 12, 1, 7, 1499141044, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.07.04 04:04:04', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (34, 12, 1, 7, 1499231105, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.07.05 05:05:05', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (35, 12, 1, 7, 1499321166, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.07.06 06:06:06', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (36, 12, 1, 8, 1502196771, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.08.08 12:52:51', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (37, 12, 1, 8, 1502269749, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.08.09 09:09:09', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (38, 12, 1, 8, 1502359810, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.08.10 10:10:10', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (39, 12, 1, 8, 1502449871, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.08.11 11:11:11', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (40, 12, 1, 8, 1502539932, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.08.12 12:12:12', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (41, 12, 1, 8, 1502629993, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.08.13 13:13:13', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (42, 12, 1, 8, 1502720054, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.08.14 14:14:14', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (43, 12, 1, 8, 1502810115, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.08.15 15:15:15', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (44, 12, 1, 1, 1504961571, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.09.09 12:52:51', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (45, 12, 1, 1, 1505578576, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.09.16 16:16:16', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (46, 12, 1, 1, 1505668637, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.09.17 17:17:17', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (47, 12, 1, 1, 1505758698, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.09.18 18:18:18', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (48, 12, 1, 1, 1505848759, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.09.19 19:19:19', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (49, 12, 1, 1, 1505938820, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.09.20 20:20:20', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (50, 12, 1, 1, 1506028881, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.09.21 21:21:21', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (51, 12, 1, 1, 1506118942, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.09.22 22:22:22', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (52, 12, 1, 1, 1506209003, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.09.23 23:23:23', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (53, 12, 1, 2, 1507639971, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.10.10 12:52:51', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (54, 12, 1, 2, 1508804664, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.10.24 00:24:24', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (55, 12, 1, 2, 1508894725, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.10.25 01:25:25', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (56, 12, 1, 2, 1508984786, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.10.26 02:26:26', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (57, 12, 1, 2, 1509074847, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.10.27 03:27:27', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (58, 12, 1, 2, 1509164908, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.10.28 04:28:28', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (59, 12, 1, 2, 1509254969, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.10.29 05:29:29', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (60, 12, 1, 2, 1509345030, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.10.30 06:30:30', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (61, 12, 1, 2, 1509435091, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.10.31 07:31:31', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (62, 12, 1, 2, 1506846752, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.10.01 08:32:32', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (63, 12, 1, 3, 1510404771, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.11 12:52:51', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (64, 12, 1, 3, 1509615213, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.02 09:33:33', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (65, 12, 1, 3, 1509705274, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.03 10:34:34', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (66, 12, 1, 3, 1509795335, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.04 11:35:35', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (67, 12, 1, 3, 1509885396, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.05 12:36:36', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (68, 12, 1, 3, 1509975457, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.06 13:37:37', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (69, 12, 1, 3, 1510065518, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.07 14:38:38', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (70, 12, 1, 3, 1510155579, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.08 15:39:39', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (71, 12, 1, 3, 1510245640, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.09 16:40:40', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (72, 12, 1, 3, 1510335701, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.10 17:41:41', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (73, 12, 1, 3, 1510425762, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.11 18:42:42', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (74, 12, 1, 4, 1513083171, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.12 12:52:51', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (75, 12, 1, 4, 1513107823, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.12 19:43:43', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (76, 12, 1, 4, 1513197884, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.13 20:44:44', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (77, 12, 1, 4, 1513287945, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.14 21:45:45', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (78, 12, 1, 4, 1513378006, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.15 22:46:46', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (79, 12, 1, 4, 1513468067, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.16 23:47:47', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (80, 12, 1, 4, 1513471728, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.17 00:48:48', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (81, 12, 1, 4, 1513561789, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.18 01:49:49', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (82, 12, 1, 4, 1513651850, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.19 02:50:50', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (83, 12, 1, 4, 1513741911, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.20 03:51:51', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (84, 12, 1, 4, 1513831972, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.21 04:52:52', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (85, 12, 1, 4, 1513922033, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.22 05:53:53', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (86, 12, 1, 5, 1453524894, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.23 06:54:54', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (87, 12, 1, 5, 1453614955, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.24 07:55:55', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (88, 12, 1, 5, 1453705016, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.25 08:56:56', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (89, 12, 1, 5, 1453795077, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.26 09:57:57', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (90, 12, 1, 5, 1453885138, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.27 10:58:58', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (91, 12, 1, 5, 1453975199, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.28 11:59:59', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (92, 12, 1, 5, 1454061600, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.29 12:00:00', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (93, 12, 1, 5, 1454151661, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.30 13:01:01', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (94, 12, 1, 5, 1454241722, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.31 14:02:02', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (95, 12, 1, 5, 1451653383, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.01 15:03:03', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (96, 12, 1, 5, 1451743444, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.02 16:04:04', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (97, 12, 1, 5, 1451833505, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.03 17:05:05', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (98, 12, 1, 5, 1451923566, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.04 18:06:06', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (99, 12, 1, 6, 1467734827, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.05 19:07:07', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (100, 12, 1, 6, 1467824888, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.06 20:08:08', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (101, 12, 1, 6, 1467914949, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.07 21:09:09', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (102, 12, 1, 6, 1468005010, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.08 22:10:10', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (103, 12, 1, 6, 1468095071, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.09 23:11:11', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (104, 12, 1, 6, 1468098732, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.10 00:12:12', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (105, 12, 1, 6, 1468188793, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.11 01:13:13', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (106, 12, 1, 6, 1468278854, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.12 02:14:14', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (107, 12, 1, 6, 1468368915, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.13 03:15:15', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (108, 12, 1, 6, 1468458976, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.14 04:16:16', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (109, 12, 1, 6, 1468549037, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.15 05:17:17', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (110, 12, 1, 6, 1468639098, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.16 06:18:18', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (111, 12, 1, 6, 1468729159, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.17 07:19:19', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (112, 12, 1, 6, 1468819220, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.18 08:20:20', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (113, 12, 1, 7, 1479540081, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.19 09:21:21', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (114, 12, 1, 7, 1479630142, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.20 10:22:22', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (115, 12, 1, 7, 1479720203, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.21 11:23:23', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (116, 12, 1, 7, 1479810264, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.22 12:24:24', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (117, 12, 1, 7, 1479900325, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.23 13:25:25', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (118, 12, 1, 7, 1479990386, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.24 14:26:26', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (119, 12, 1, 7, 1480080447, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.25 15:27:27', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (120, 12, 1, 7, 1480170508, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.26 16:28:28', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (121, 12, 1, 7, 1480260569, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.27 17:29:29', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (122, 12, 1, 7, 1480350630, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.28 18:30:30', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (123, 12, 1, 7, 1480440691, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.29 19:31:31', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (124, 12, 1, 7, 1480530752, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.30 20:32:32', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (125, 12, 1, 7, 1478201613, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.03 21:33:33', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (126, 12, 1, 7, 1478032474, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.01 22:34:34', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (127, 12, 1, 7, 1478122535, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.02 23:35:35', 1, 0, '', 1, 1, '');
-
 -- testInheritanceHostPrototype
 INSERT INTO hstgrp (groupid, name, internal) VALUES (50019, 'Inheritance test', 0);
 INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99000, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, NULL, '');
 INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99001, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, 99000, '');
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99000, NULL, 15011, '', 0, 0);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99001, NULL, 15016, '', 0, 0);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (10110, 99000, '', 50019, NULL);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1011, 99001, '', 50019, 10110);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1010, 99000, '', 50019, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1011, 99001, '', 50019, 1010);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99006, 'Inheritance test template with host prototype', 'Inheritance test template with host prototype', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99006, 99006, 50019);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers, flags) VALUES (99083, 99006, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '', 1);
@@ -1992,6 +1796,7 @@ INSERT INTO history_uint (itemid, clock, value, ns) VALUES (99086, 1533555726, 1
 INSERT INTO history_uint (itemid, clock, value, ns) VALUES (99091, 1533555726, 2, 726692808);
 INSERT INTO history_uint (itemid, clock, value, ns) VALUES (99088, 1533555726, 3, 726692808);
 INSERT INTO history_uint (itemid, clock, value, ns) VALUES (99089, 1533555726, 4, 726692808);
+
 INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9000, 0, 0, 100032, 1533555726, 726692808, 1, '1_trigger_Not_classified', 0);
 INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9001, 0, 0, 100033, 1533555726, 726692808, 1, '1_trigger_Warning', 2);
 INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9002, 0, 0, 100034, 1533555726, 726692808, 1, '1_trigger_Average', 3);
@@ -2000,6 +1805,7 @@ INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, s
 INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity, acknowledged) VALUES (9005, 0, 0, 100037, 1533555726, 726692808, 1, '2_trigger_Information', 1, 1);
 INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity, acknowledged) VALUES (9006, 0, 0, 100038, 1533555726, 726692808, 1, '3_trigger_Average', 3, 1);
 INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9007, 0, 0, 100040, 1533555726, 726692808, 1, '4_trigger_Average', 3);
+
 INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ( 9000, 0, 0, 100032, 1533555726, 726692808, '1_trigger_Not_classified', 0);
 INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ( 9001, 0, 0, 100033, 1533555726, 726692808, '1_trigger_Warning', 2);
 INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ( 9002, 0, 0, 100034, 1533555726, 726692808, '1_trigger_Average', 3);
@@ -2026,9 +1832,9 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99911, 99053, 4)
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99912, 99054, 4);
 
 -- Dashboard for problem hosts widget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (100100, 'Dashboard for Problem hosts widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (100100, 100100);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (101100, 100100, 'problemhosts', '', 0, 0, 8, 8);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1000, 'Dashboard for Problem hosts widget', 1, 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1000, 1000);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10000, 1000, 'problemhosts', '', 0, 0, 8, 8);
 INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (4, 1, 'web.dashboard.dashboardid', 1,'','', 1);
 
 -- testPageAvailabilityReport SLA reports
@@ -2097,19 +1903,16 @@ INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (100069, 1000
 INSERT INTO media_type (mediatypeid, type, name, exec_path, status, script, description) VALUES (100, 1, 'Test script', 'Selenium test script', 1, '', '');
 
 -- testFormUser
-INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status,debug_mode) VALUES (16,'LDAP user group',2,0,0);
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10, 'Public map with image', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (10,10,0,4,7,NULL,'Test phone icon',0,151,101,NULL,NULL);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (91, 'http-auth-admin', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_US', 30, 2, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (92, 7, 91);
 
 -- testHostAvailabilityWidget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (10110, 'Dashboard for Host availability widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (10110, 10110);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10001, 10110, 'hostavail', 'Reference HA widget', 0, 0, 6, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10002, 10110, 'hostavail', 'Reference HA widget to delete', 0, 3, 6, 3);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (89000, 10002, 2, 'groupids', 0, 4);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (89001, 10002, 0, 'layout', 1);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1010, 'Dashboard for Host availability widget', 1, 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1010, 1010);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10001, 1010, 'hostavail', 'Reference HA widget', 0, 0, 6, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10002, 1010, 'hostavail', 'Reference HA widget to delete', 0, 3, 6, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (8900, 10002, 2, 'groupids', 0, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (8901, 10002, 0, 'layout', 1);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50015,'Group for Host availability widget',0);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50016,'Group in maintenance for Host availability widget',0);
 
@@ -2175,24 +1978,17 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (9
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (90107, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE2}', '', '');
 
 -- testPageTriggerUrl
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (10220, 'Dashboard for Trigger overview widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (10220, 10220);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10003, 10220, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (89002, 10003, 0, 'style', 1);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (89003, 10003, 2, 'groupids', 0, 50011);
-
--- Dashboard for sharing testing
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1210, 'Testing share dashboard', 9, 0);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (12100, 1210);
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1220, 'Dashboard for Admin share testing', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (12200, 1220);
-INSERT INTO dashboard_user (dashboard_userid, dashboardid, userid, permission) VALUES (1, 1220, 9, 2);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1020, 'Dashboard for Trigger overview widget', 1, 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1020, 1020);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10003, 1020, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (8902, 10003, 0, 'style', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (8903, 10003, 2, 'groupids', 0, 50011);
 
 -- Dashboard for graph widget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (10330, 'Dashboard for graph widgets', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (10330, 10330);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10004, 10330, 'svggraph', 'Test cases for update', 0, 0, 6, 5);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10005, 10330, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1030, 'Dashboard for graph widgets', 1, 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1030, 1030);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10004, 1030, 'svggraph', 'Test cases for update', 0, 0, 6, 5);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10005, 1030, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
 -- widget "Test cases for simple update and deletion"
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90006, 10005, 0, 'righty', 0, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 10005, 1, 'ds.hosts.0.0', 0, 'Host*');
@@ -2223,13 +2019,13 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90034, 10004, 1, 'time_to', 0, 'now-5m');
 
 -- testProblemsBySeverityWidget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (10440, 'Dashboard for Problems by severity', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (10440, 10440);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10006, 10440, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10007, 10440, 'problemsbysv', 'Reference PBS widget to delete', 12, 0, 6, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10009, 10440, 'problemsbysv', 'Totals reference PBS widget to delete',18, 0, 6, 3);
-INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (10009, 81337, 0, 'show_type', 1);
-INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (10009, 81338, 0, 'layout', 1);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1040, 'Dashboard for Problems by severity', 1, 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1040, 1040);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10006, 1040, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10007, 1040, 'problemsbysv', 'Reference PBS widget to delete', 12, 0, 6, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10009, 1040, 'problemsbysv', 'Totals reference PBS widget to delete',18, 0, 6, 3);
+INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (10009, 8137, 0, 'show_type', 1);
+INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (10009, 8138, 0, 'layout', 1);
 
 -- testFormItemTest
 INSERT INTO hosts (hostid, proxy_hostid, host, name, status, description) VALUES (99136, 20000, 'Test item host', 'Test item host', 0, 'Test item host for testing items');
@@ -2299,7 +2095,7 @@ INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUE
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1008, 102, 'Message', '{ALERT.MESSAGE}');
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1009, 102, 'HTTPProxy', '');
 INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (103, 4, 'Webhook to delete', 0, 'return 0;', 1, 'Unique webhook url', 'zabbix.php?action=mediatype.list&ddreset={EVENT.TAGS.webhook}', 'Webhook media type to be deleted');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (10110, 103, 'Parameter name to be deleted', 'Parameter value to be deleted');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1010, 103, 'Parameter name to be deleted', 'Parameter value to be deleted');
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1011, 103, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
 
 -- testPageProblems_ProblemLinks
@@ -2371,10 +2167,10 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700039, 7
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700040, 700031, 99106, 1);
 
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1050, 'Dashboard for Dynamic item', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (10500, 1050);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10010, 10500, 'graph', '', 0, 0, 8, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10011, 10500, 'graph', '', 8, 0, 8, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10012, 10500, 'graph', '', 16, 0, 8, 3);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1050, 1050);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10010, 1050, 'graph', '', 0, 0, 8, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10011, 1050, 'graph', '', 8, 0, 8, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10012, 1050, 'graph', '', 16, 0, 8, 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90035, 10010, 0, 'source_type', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90036, 10010, 4, 'itemid', 0, 99104);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90037, 10011, 0, 'source_type', 1);
@@ -2383,11 +2179,11 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90040, 10012, 0, 'source_type', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90041, 10012, 4, 'itemid', 0, 99104);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90042, 10012, 0, 'dynamic', 1);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10013, 10500, 'graph', '', 0, 3, 8, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10014, 10500, 'graph', '', 8, 3, 8, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10015, 10500, 'graph', '', 16, 3, 8, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10016, 10500, 'graph', '', 0, 6, 10, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10017, 10500, 'graph', '', 10, 6, 10, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10013, 1050, 'graph', '', 0, 3, 8, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10014, 1050, 'graph', '', 8, 3, 8, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10015, 1050, 'graph', '', 16, 3, 8, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10016, 1050, 'graph', '', 0, 6, 10, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10017, 1050, 'graph', '', 10, 6, 10, 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90043, 10013, 6, 'graphid', 0, 700027);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90044, 10014, 6, 'graphid', 0, 700026);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90045, 10014, 0, 'dynamic', 1);
@@ -2397,10 +2193,10 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90049, 10016, 0, 'dynamic', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90050, 10017, 6, 'graphid', 0, 700031);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90051, 10017, 0, 'dynamic', 1);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10018, 10500, 'plaintext', '', 0, 9, 8, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10019, 10500, 'plaintext', '', 8, 9, 8, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10020, 10500, 'plaintext', '', 16, 9, 8, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10021, 10500, 'plaintext', '', 0, 11, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10018, 1050, 'plaintext', '', 0, 9, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10019, 1050, 'plaintext', '', 8, 9, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10020, 1050, 'plaintext', '', 16, 9, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10021, 1050, 'plaintext', '', 0, 11, 8, 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90052, 10018, 4, 'itemids', 0, 99104);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90053, 10019, 4, 'itemids', 0, 99103);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90054, 10019, 0, 'dynamic', 1);
@@ -2409,17 +2205,17 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90057, 10021, 4, 'itemids', 0, 99103);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90058, 10021, 4, 'itemids', 0, 99104);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90059, 10021, 0, 'dynamic', 1);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10022, 10500, 'url', 'Dynamic URL', 0, 13, 11, 4);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10022, 1050, 'url', 'Dynamic URL', 0, 13, 11, 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90060, 10022, 0, 'dynamic', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90061, 10022, 1, 'url', 'iframe.php?name={HOST.NAME}');
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10023, 10500, 'graphprototype', '', 0, 17, 9, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10024, 10500, 'graphprototype', '', 9, 17, 8, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10025, 10500, 'graphprototype', '', 17, 17, 7, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10026, 10500, 'graphprototype', '', 0, 19, 8, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10027, 10500, 'graphprototype', '', 8, 19, 9, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10028, 10500, 'graphprototype', '', 17, 19, 7, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10029, 10500, 'graphprototype', '', 0, 21, 11, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10030, 10500, 'graphprototype', '', 11, 21, 11, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10023, 1050, 'graphprototype', '', 0, 17, 9, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10024, 1050, 'graphprototype', '', 9, 17, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10025, 1050, 'graphprototype', '', 17, 17, 7, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10026, 1050, 'graphprototype', '', 0, 19, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10027, 1050, 'graphprototype', '', 8, 19, 9, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10028, 1050, 'graphprototype', '', 17, 19, 7, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10029, 1050, 'graphprototype', '', 0, 21, 11, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10030, 1050, 'graphprototype', '', 11, 21, 11, 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90062, 10023, 0, 'source_type', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90063, 10023, 5, 'itemid', 0, 99109);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90064, 10024, 0, 'dynamic', 1);
@@ -2438,22 +2234,322 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90077, 10030, 0, 'dynamic', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90078, 10030, 7, 'graphid', 0, 700035);
 
--- testFormUserMedia
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (4,1,10,'test@jabber.com',0,16,'1-7,00:00-24:00');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (5,1,12,'test_account',0,63,'6-7,09:00-18:00');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (6,3,1,'zabbix@zabbix.com',0,60,'1-5,09:00-18:00');
+-- Dashboards and widgets for Copy widget tests
+-- Dashboard_1 for widgets copying
+INSERT INTO dashboard (dashboardid, name, userid, private, auto_start) VALUES (1300, 'Dashboard_1 for Copying widgets', 1, 1, 0);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1300, 1300);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid, name, sortorder) VALUES (1430, 1300, 'Test_page', 1);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10050, 1300, 'actionlog', 'Test copy Action log', 0, 0, 7, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90250, 10050, 0, 'rf_rate', 10);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90251, 10050, 0, 'show_lines', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90252, 10050, 0, 'sort_triggers', 7);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10051, 1300, 'clock', 'Test copy Clock', 7, 0, 2, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90253, 10051, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90254, 10051, 0, 'time_type', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90412, 10051, 4, 'itemid', 0, 42229);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10052, 1300, 'dataover', 'Test copy Data overview', 9, 0, 4, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90255, 10052, 0, 'rf_rate', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90256, 10052, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90257, 10052, 0, 'style', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90258, 10052, 1, 'application', 0, '3 application');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90259, 10052, 2, 'groupids', 0, 50011);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (90260, 10052, 3, 'hostids', 0, 50012);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10053, 1300, 'graph', 'Test copy classic Graph', 13, 0, 11, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90261, 10053, 0, 'dynamic', 10);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90262, 10053, 0, 'rf_rate', 30);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90263, 10053, 0, 'show_legend', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90264, 10053, 0, 'source_type', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90265, 10053, 4, 'itemid', 0, 99088);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10054, 1300, 'favgraphs', 'Test copy Favourite graphs', 7, 2, 2, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90413, 10054, 0, 'rf_rate', 30);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10055, 1300, 'favmaps', 'Test copy Favourite maps', 9, 2, 4, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90266, 10055, 0, 'rf_rate', 600);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10056, 1300, 'discovery', 'Test copy Discovery status', 8, 8, 5, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90267, 10056, 0, 'rf_rate', 900);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10058, 1300, 'graphprototype', 'Test copy Graph prototype', 0, 4, 13, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90269, 10058, 0, 'columns', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90270, 10058, 0, 'rows', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90271, 10058, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90272, 10058, 0, 'rf_rate', 30);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90273, 10058, 0, 'show_legend', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (900401, 10058, 7, 'graphid', 0, 600000);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10059, 1300, 'hostavail', 'Test copy Host availability', 13, 4, 5, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90402, 10059, 0, 'interface_type', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90403, 10059, 0, 'interface_type', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904004, 10059, 0, 'interface_type', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904005, 10059, 0, 'layout', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904006, 10059, 0, 'maintenance', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904007, 10059, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (904008, 10059, 2, 'groupids', 0, 50013);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10060, 1300, 'map', 'Test copy Map', 18, 4, 6, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904009, 10060, 1, 'reference', 0, 'OYKZW');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_sysmapid) VALUES (904010, 10060, 8, 'sysmapid', 0, 3);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10092, 1300, 'navtree', 'Test copy Map navigation tree', 13, 11, 11, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904011, 10092, 0, 'navtree.order.2', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904012, 10092, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904013, 10092, 0, 'show_unavailable', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904014, 10092, 1, 'navtree.name.1', 0, 'Map with icon mapping');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904015, 10092, 1, 'navtree.name.2', 0, 'Public map with image');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904016, 10092, 1, 'reference', 0, 'STZDI');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904017, 10092, 8, 'navtree.sysmapid.1', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904018, 10092, 8, 'navtree.sysmapid.2', 0);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10091, 1300, 'map', 'Test copy Map from tree', 0, 11, 13, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904019, 10091, 0, 'rf_rate', 120);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904020, 10091, 0, 'source_type', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904021, 10091, 1, 'filter_widget_reference', 0, 'STZDI');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904022, 10091, 1, 'reference', 0, 'PVEYR');
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10067, 1300, 'problemsbysv', 'Test copy Problems by severity', 13, 8, 11, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904091, 10067, 0, 'evaltype', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904092, 10067, 0, 'ext_ack', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904093, 10067, 0, 'layout', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904094, 10067, 0, 'rf_rate', 30);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904096, 10067, 0, 'severities', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904097, 10067, 0, 'severities', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904098, 10067, 0, 'show_opdata', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904099, 10067, 0, 'show_timeline', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905000, 10067, 0, 'show_type', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905001, 10067, 0, 'tags.operator.0', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905002, 10067, 1, 'problem', 0, 'test problem');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905003, 10067, 1, 'tags.tag.0', 0, 'tag5');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905004, 10067, 1, 'tags.value.0', 0, 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (905005, 10067, 2, 'exclude_groupids', 0, 50008);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (905006, 10067, 2, 'groupids', 0, 50011);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (905007, 10067, 3, 'hostids', 0, 99012);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10065, 1300, 'problems', 'Test copy Problems', 0, 8, 8, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904045, 10065, 0, 'evaltype', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904046, 10065, 0, 'rf_rate', 900);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90321, 10065, 0, 'severities', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90415, 10065, 0, 'severities', 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90416, 10065, 0, 'severities', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904048, 10065, 0, 'show', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904049, 10065, 0, 'show_lines', 12);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904050, 10065, 0, 'show_opdata', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904051, 10065, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904052, 10065, 0, 'show_tags', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904053, 10065, 0, 'sort_triggers', 15);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904054, 10065, 0, 'show_timeline', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904055, 10065, 0, 'tag_name_format', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904056, 10065, 0, 'tags.operator.0', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904057, 10065, 0, 'tags.operator.1', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904058, 10065, 0, 'unacknowledged', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904059, 10065, 1, 'problem', 0, 'test2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904060, 10065, 1, 'tags.value.0', 0, '2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904061, 10065, 1, 'tags.value.1', 0, '33');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904062, 10065, 1, 'tag_priority', 0, '1,2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904063, 10065, 1, 'tags.tag.0', 0, 'tag2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904064, 10065, 1, 'tags.tag.1', 0, 'tagg33');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (904065, 10065, 2, 'exclude_groupids', 0, 50014);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (904066, 10065, 2, 'groupids', 0, 50005);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (904067, 10065, 3, 'hostids', 0, 99026);
+-- Please, don't add any widgets to Dashboard_1, for copying new widgets use Dashboard_2
+
+-- Dashboard_2 for widgets copying.
+INSERT INTO dashboard (dashboardid, name, userid, private, auto_start) VALUES (1350, 'Dashboard_2 for Copying widgets', 1, 1, 0);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1350, 1350);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid, name, sortorder) VALUES (1450, 1350, 'Test_page', 1);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10068, 1350, 'systeminfo', 'Test copy System information', 16, 0, 8, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905008, 10068, 0, 'rf_rate', 30);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10069, 1350, 'trigover', 'Test copy Trigger overview', 0, 3, 16, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905009, 10069, 0, 'rf_rate', 120);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905010, 10069, 0, 'show', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905011, 10069, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905012, 10069, 0, 'style', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905013, 10069, 1, 'application', 0, 'Inventory');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (905014, 10069, 2, 'groupids', 0, 50011);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (905015, 10069, 3, 'hostids', 0, 99012);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10070, 1350, 'url', 'Test copy URL', 16, 3, 8, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905016, 10070, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905017, 10070, 0, 'rf_rate', 120);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905018, 10070, 1, 'url', 0, 'https://www.zabbix.com/integrations');
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10063, 1350, 'plaintext', 'Test copy plain text', 5, 6, 5, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904023, 10063, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904024, 10063, 0, 'rf_rate', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904025, 10063, 0, 'show_as_html', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904026, 10063, 0, 'show_lines', 12);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904027, 10063, 0, 'style', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (904028, 10063, 4, 'itemids', 0, 42230);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10064, 1350, 'problemhosts', 'Test copy Problem hosts', 10, 6, 6, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904029, 10064, 0, 'evaltype', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904030, 10064, 0, 'ext_ack', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904031, 10064, 0, 'hide_empty_groups', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904032, 10064, 0, 'rf_rate', 30);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904034, 10064, 0, 'severities', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904035, 10064, 0, 'severities', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904036, 10064, 0, 'severities', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904037, 10064, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904038, 10064, 0, 'tags.operator.0', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904039, 10064, 1, 'problem', 0, 'Test');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904040, 10064, 1, 'tags.tag.0', 0, 'Tag1');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904041, 10064, 1, 'tags.value.0', 0, 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (904042, 10064, 2, 'exclude_groupids', 0, 50014);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (904043, 10064, 2, 'groupids', 0, 50011);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (904044, 10064, 4, 'itemids', 0, 42230);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10066, 1350, 'problems', 'Test copy Problems 2', 0, 8, 16, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904068, 10066, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904069, 10066, 0, 'show', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904070, 10066, 0, 'show_lines', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904071, 10066, 0, 'show_opdata', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904072, 10066, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904073, 10066, 0, 'show_tags', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904074, 10066, 0, 'show_timeline', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904075, 10066, 0, 'sort_triggers', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904076, 10066, 0, 'tag_name_format', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904077, 10066, 0, 'tags.operator.0', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904078, 10066, 0, 'tags.operator.1', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904081, 10066, 0, 'unacknowledged', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904082, 10066, 1, 'problem', 0, 'test4');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904083, 10066, 1, 'tags.value.0', 0, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904084, 10066, 1, 'tags.value.1', 0, 44);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904085, 10066, 1, 'tag_priority', 0, 'test5, test6');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904086, 10066, 1, 'tags.tag.0', 0, 'tag3');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904087, 10066, 1, 'tags.tag.1', 0, 'tag44');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (904088, 10066, 2, 'exclude_groupids', 0, 50014);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (904089, 10066, 2, 'groupids', 0, 50006);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (904090, 10066, 3, 'hostids', 0, 99015);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10071, 1350, 'web', 'Test copy Web monitoring', 0, 6, 5, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905019, 10071, 0, 'maintenance', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905020, 10071, 0, 'rf_rate', 120);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (905021, 10071, 2, 'exclude_groupids', 0, 50008);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (905022, 10071, 2, 'groupids', 0, 50016);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (905023, 10071, 3, 'hostids', 0, 99133);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10072, 1350, 'problems', 'Test copy Problems 3', 0, 11, 14, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905024, 10072, 0, 'evaltype', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905025, 10072, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905026, 10072, 0, 'severities', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905027, 10072, 0, 'severities', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905028, 10072, 0, 'severities', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905029, 10072, 0, 'severities', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905030, 10072, 0, 'severities', 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905031, 10072, 0, 'severities', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905032, 10072, 0, 'show', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905033, 10072, 0, 'show_lines', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905034, 10072, 0, 'show_opdata', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905035, 10072, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905036, 10072, 0, 'show_tags', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905037, 10072, 0, 'sort_triggers', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905038, 10072, 0, 'tags.operator.0', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905039, 10072, 0, 'tag_name_format', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905040, 10072, 0, 'unacknowledged', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905041, 10072, 1, 'problem', 0, 'test5');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905042, 10072, 1, 'tag_priority', 0, 'test7, test8');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905043, 10072, 1, 'tags.tag.0', 0, 'tag9');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905044, 10072, 1, 'tags.value.0', 0, '9');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (905045, 10072, 2, 'exclude_groupids', 0, 50014);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (905046, 10072, 2, 'groupids', 0, 50006);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (905047, 10072, 3, 'hostids', 0, 99015);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10073, 1350, 'graphprototype', 'Test copy Graph prototype 2', 10, 13, 14, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905048, 10073, 0, 'columns', 20);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905049, 10073, 0, 'rows', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905050, 10073, 0, 'dynamic', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905051, 10073, 0, 'rf_rate', 600);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 10073, 0, 'show_legend', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (905053, 10073, 7, 'graphid', 0, 600000);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10730, 1350, 'geomap', 'Geomap widget for copying', 0, 13, 10, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (9050612, 10730, 2, 'groupids', 0, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (9050613, 10730, 3, 'hostids', 0, 99136);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050614, 10730, 0, 'evaltype', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050615, 10730, 1, 'tags.tag.0', 0, 'tag');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050616, 10730, 0, 'tags.operator.0', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050617, 10730, 1, 'tags.value.0', 0, 'value');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050618, 10730, 1, 'tags.tag.1', 0, 'tag2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050619, 10730, 0, 'tags.operator.1', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050620, 10730, 1, 'tags.value.1', 0, 'value2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050621, 10730, 1, 'default.view', 0, '56.94417950974463, 24.231017685433184,17');
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (101101, 1350, 'tophosts', 'Test copy Top hosts', 14, 11, 10, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (9050622, 101101, 2, 'groupids', 0, 50011);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (9050623, 101101, 3, 'hostids', 0, 50012);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050624, 101101, 1, 'tags.tag.0', 0, 'tag_name');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050625, 101101, 0, 'tags.operator.0', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050626, 101101, 1, 'tags.value.0', 0, 'tag_value');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050627, 101101, 1, 'columns.name.0', 0, 'Item name');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050628, 101101, 0, 'columns.data.0', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050629, 101101, 1, 'columns.item.0', 0, '3_item');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050630, 101101, 1, 'columns.timeshift.0', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050631, 101101, 0, 'columns.aggregate_function.0', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050632, 101101, 1, 'columns.aggregate_interval.0', 0, '1h');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050633, 101101, 1, 'columns.min.0', 0, '10');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050634, 101101, 1, 'columns.max.0', 0, '50');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050635, 101101, 0, 'columns.display.0', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050636, 101101, 0, 'columns.history.0', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050637, 101101, 1, 'columns.base_color.0', 0, 'FF0000');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050638, 101101, 1, 'columnsthresholds.color.0.0', 0, 'FF465C');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050639, 101101, 1, 'columnsthresholds.threshold.0.0', 0, '100');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050640, 101101, 1, 'columns.name.1', 0, 'Host name');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050641, 101101, 0, 'columns.data.1', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050642, 101101, 0, 'columns.aggregate_function.1', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050643, 101101, 1, 'columns.base_color.1', 0, 'BF00FF');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050644, 101101, 1, 'columns.name.2', 0, 'Text name');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050645, 101101, 0, 'columns.data.2', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050646, 101101, 0, 'columns.aggregate_function.2', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050647, 101101, 1, 'columns.base_color.2', 0, '00BFFF');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (9050648, 101101, 1, 'columns.text.2', 0, 'text_here');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (9050649, 101101, 0, 'column', 0);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10074, 1350, 'item', 'Test copy item value', 0, 28, 6, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (905056, 10074, 4, 'itemid', 0, 42230);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905057, 10074, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905058, 10074, 0, 'adv_conf', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905059, 10074, 0, 'desc_h_pos', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905060, 10074, 0, 'desc_v_pos', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905061, 10074, 0, 'desc_bold', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905062, 10074, 0, 'time_h_pos', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905063, 10074, 0, 'time_v_pos', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905064, 10074, 0, 'time_bold', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905065, 10074, 0, 'time_size', 16);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905066, 10074, 0, 'units_size', 34);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905067, 10074, 1, 'units', 'some');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905068, 10074, 1, 'bg_color', 'E1E1E1');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905069, 10074, 1, 'updown_color', 'FFB300');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905070, 10074, 1, 'up_color', 'CE93D8');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905071, 10074, 1, 'down_color', '29B6F6');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905072, 10074, 0, 'value_v_pos', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905073, 10074, 0, 'dynamic', 1);
+
+-- Dashboard for Paste widgets in Copy widgets test
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1310, 'Dashboard for Paste widgets', 1, 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1310, 1310);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10090, 1310, 'navtree', 'Test copy Map navigation tree', 0, 0, 6, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90479, 10090, 1, 'reference', 0, 'FYKXG');
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (0174, 1310, 'clock', 'Test widget for replace', 6, 0, 13, 8);
 
 -- Dashboard for Graph Prototype widget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1400, 'Dashboard for Graph Prototype widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (14123, 1400);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10099, 14123, 'graphprototype', 'Graph prototype widget for update', 0, 0, 16, 5);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1400, 1400);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10099, 1400, 'graphprototype', 'Graph prototype widget for update', 0, 0, 16, 5);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905054, 10099, 7, 'graphid', 600003);
 
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (12000, 14123, 'graphprototype', 'Graph prototype widget for delete', 0, 5, 16, 5);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (12000, 1400, 'graphprototype', 'Graph prototype widget for delete', 0, 5, 16, 5);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905055, 12000, 7, 'graphid', 600002);
 
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1410, 'Dashboard for Sceenshoting Graph Prototype widgets', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (14100, 1410);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1410, 1410);
 
 -- Overrides for LLD Overrides test
 INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5000, 133800, 'Override for update 1', 1, 1, 0);

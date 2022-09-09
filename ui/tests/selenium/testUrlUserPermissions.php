@@ -18,15 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @onBefore removeGuestFromDisabledGroup
  * @onAfter addGuestToDisabledGroup
+ *
+ * @dataSource LoginUsers
  */
 class testUrlUserPermissions extends CLegacyWebTest {
 
-	public static function data() {
+	public static function getUrlUserPermissiondata() {
 		return [
 			// Monitoring
 			[[
@@ -617,16 +620,22 @@ class testUrlUserPermissions extends CLegacyWebTest {
 	}
 
 	/**
-	 * @dataProvider data
+	 * $adminzid and $userzid Special defined variables for users which are created with API and used in autotest.
+	 * Firstly used data source, then defined inside the source value of needed user ID, afterwards user who's id is required.
+	 *
+	 * @dataProvider getUrlUserPermissiondata
 	 */
 	public function testUrlUserPermissions_Users($data) {
+		$adminzid = CDataHelper::get('LoginUsers.userids.admin-zabbix');
+		$userzid = CDataHelper::get('LoginUsers.userids.user-zabbix');
+
 		foreach ($data['users'] as $alias => $user) {
 			switch ($alias) {
 				case 'admin-zabbix' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c' , 4);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c' , $adminzid);
 					break;
 				case 'user-zabbix' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d' , 5);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d' , $userzid);
 					break;
 			}
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {
@@ -659,7 +668,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 	 * @onBefore addGuestToDisabledGroup
 	 * @onAfter removeGuestFromDisabledGroup
 	 *
-	 * @dataProvider data
+	 * @dataProvider getUrlUserPermissiondata
 	 */
 	public function testUrlUserPermissions_DisabledGuest($data) {
 		$this->zbxTestOpen($data['url']);
