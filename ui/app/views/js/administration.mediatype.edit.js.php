@@ -364,7 +364,6 @@
 			if (provider ==	'<?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>' ) {
 				$('input[name=passwd]').attr('aria-required', 'false');
 				$('label[for=passwd]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
-				$('label[for=smtp_email]').text(<?= json_encode(_('SMTP email')) ?>);
 
 				$('#smtp_server, #smtp_port, #smtp_helo, #smtp_security, #smtp_authentication, #provider,' +
 					' #smtp_email, #content_type')
@@ -378,7 +377,6 @@
 			else {
 				$('input[name=passwd]').attr('aria-required', 'true');
 				$('label[for=passwd]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
-				$('label[for=smtp_email]').text(<?= json_encode(_('Email')) ?>);
 
 				$('#provider, #smtp_email, #content_type, #passwd').closest('li').show();
 			}

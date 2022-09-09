@@ -75,7 +75,7 @@ $mediatype_formlist = (new CFormList())
 	->addRow(_('SMTP server port'),
 		(new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	)
-	->addRow((new CLabel(_('SMTP email'), 'smtp_email'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Email'), 'smtp_email'))->setAsteriskMark(),
 		(new CTextBox('smtp_email', $data['smtp_email']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
