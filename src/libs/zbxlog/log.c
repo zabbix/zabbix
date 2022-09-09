@@ -27,7 +27,7 @@
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "zbxwinservice.h"
-#	include "sysinfo.h"
+#	include "zbxsysinfo.h"
 static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 #endif
 

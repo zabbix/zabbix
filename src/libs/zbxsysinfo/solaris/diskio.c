@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+
 #include "log.h"
 
 typedef struct
@@ -218,8 +218,8 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
-		{"bytes", 	VFS_DEV_WRITE_BYTES},
-		{"operations", 	VFS_DEV_WRITE_OPERATIONS},
+		{"bytes",	VFS_DEV_WRITE_BYTES},
+		{"operations",	VFS_DEV_WRITE_OPERATIONS},
 		{NULL,		NULL}
 	};
 
