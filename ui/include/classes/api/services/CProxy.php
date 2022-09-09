@@ -43,131 +43,150 @@ class CProxy extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options = []) {
-		$result = [];
+		$output_fields = ['proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept',
+			'tls_issuer', 'tls_subject', 'proxy_address', 'auto_compress', 'version', 'compatibility'
+		];
+		$host_fields = ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+			'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type', 'maintenance_from', 'name',
+			'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'inventory_mode',
+			'active_available'
+		];
+		$interface_fields = ['interfaceid', 'hostid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'available',
+			'error', 'errors_from', 'disable_until'
+		];
 
-		$sqlParts = [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'proxyids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE])],
+				'lastaccess' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0:'.ZBX_MAX_DATE],
+				'version' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'compatibility' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_PROXY_VERSION_UNDEFINED, ZBX_PROXY_VERSION_CURRENT, ZBX_PROXY_VERSION_OUTDATED, ZBX_PROXY_VERSION_UNSUPPORTED])]
+			]],
+			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'description' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_fields), 'default' => null],
+			'selectInterface' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $interface_fields), 'default' => null],
+			// sort and limit
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
+			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false],
+			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$sql_parts = [
 			'select'	=> ['hostid' => 'h.hostid'],
 			'from'		=> ['hosts' => 'hosts h'],
-			'where'		=> ['h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'],
-			'order'		=> [],
-			'limit'		=> null
+			'where'		=> [],
+			'order'		=> []
 		];
-
-		$defOptions = [
-			'proxyids'					=> null,
-			'editable'					=> false,
-			'nopermissions'				=> null,
-			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> null,
-			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'countOutput'				=> false,
-			'preservekeys'				=> false,
-			'selectHosts'				=> null,
-			'selectInterface'			=> null,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null
-		];
-		$options = zbx_array_merge($defOptions, $options);
-
-		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+
 			if ($permission == PERM_READ_WRITE) {
-				return [];
+				return $options['countOutput'] ? '0' : [];
+			}
+		}
+
+		$count_output = $options['countOutput'];
+
+		if ($count_output) {
+			$options['output'] = ['proxyid'];
+			$options['countOutput'] = false;
+		}
+		else {
+			if ($options['output'] === API_OUTPUT_EXTEND) {
+				$options['output'] = $output_fields;
+			}
+
+			/*
+			 * For internal calls, it is possible to get the write-only fields if they were specified in output.
+			 * Specify write-only fields in output only if they will not appear in debug mode.
+			 */
+			if (APP::getMode() !== APP::EXEC_MODE_API) {
+				$options['output'][] = 'tls_psk_identity';
+				$options['output'][] = 'tls_psk';
 			}
 		}
 
 		// proxyids
-		if (!is_null($options['proxyids'])) {
-			zbx_value2array($options['proxyids']);
-			$sqlParts['where'][] = dbConditionInt('h.hostid', $options['proxyids']);
+		if ($options['proxyids'] !== null) {
+			$sql_parts['where'][] = dbConditionInt('h.hostid', $options['proxyids']);
 		}
 
 		// filter
-		if (is_array($options['filter'])) {
-			$this->dbFilter('hosts h', $options, $sqlParts);
+		if ($options['filter'] === null) {
+			$options['filter'] = [];
+		}
 
-			$rt_filter = [];
-			foreach (['lastaccess', 'version', 'compatibility'] as $field) {
-				if (array_key_exists($field, $options['filter']) && $options['filter'][$field] !== null) {
-					$rt_filter[$field] = $options['filter'][$field];
-				}
-			}
+		if (!array_key_exists('status', $options['filter']) || $options['filter']['status'] === null) {
+			$options['filter']['status'] = [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE];
+		}
 
-			if ($rt_filter) {
-				$this->dbFilter('host_rtdata hr', ['filter' => $rt_filter] + $options, $sqlParts);
+		$this->dbFilter('hosts h', $options, $sql_parts);
+
+		$rt_filter = [];
+		foreach (['lastaccess', 'version', 'compatibility'] as $field) {
+			if (array_key_exists($field, $options['filter']) && $options['filter'][$field] !== null) {
+				$rt_filter[$field] = $options['filter'][$field];
 			}
+		}
+
+		if ($rt_filter) {
+			$this->dbFilter('host_rtdata hr', ['filter' => $rt_filter] + $options, $sql_parts);
 		}
 
 		// search
-		if (is_array($options['search'])) {
-			zbx_db_search('hosts h', $options, $sqlParts);
+		if ($options['search'] !== null) {
+			zbx_db_search('hosts h', $options, $sql_parts);
 		}
 
-		// output
-		$fields = [
-			'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
-			'tls_subject', 'proxy_address', 'auto_compress', 'version', 'compatibility'
-		];
-		$options['output'] = ($options['output'] === API_OUTPUT_EXTEND) ? $fields : (array) $options['output'];
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$resource = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
-		/*
-		 * For internal calls of API method, is possible to get the write-only fields if they were specified in output.
-		 * Specify write-only fields in output only if they will not appear in debug mode.
-		 */
-		if (APP::getMode() !== APP::EXEC_MODE_API) {
-			$fields[] = 'tls_psk_identity';
-			$fields[] = 'tls_psk';
+		$db_proxies = [];
+
+		while ($row = DBfetch($resource)) {
+			$row['proxyid'] = $row['hostid'];
+			unset($row['hostid']);
+
+			$db_proxies[$row['proxyid']] = $row;
 		}
 
-		$options['output'] = array_intersect($options['output'], $fields);
-
-		// countOutput
-		if ($options['countOutput']) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = ['COUNT(DISTINCT h.hostid) AS rowscount'];
+		if ($count_output) {
+			return (string) count($db_proxies);
 		}
 
-		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sqlParts['limit'] = $options['limit'];
-		}
+		if ($db_proxies) {
+			$db_proxies = $this->addRelatedObjects($options, $db_proxies);
+			$db_proxies = $this->unsetExtraFields($db_proxies, ['hostid'], $options['output']);
 
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-
-		while ($proxy = DBfetch($res)) {
-			if ($options['countOutput']) {
-				return $proxy['rowscount'];
+			if (!$options['preservekeys']) {
+				$db_proxies = array_values($db_proxies);
 			}
-
-			$proxy['proxyid'] = $proxy['hostid'];
-			unset($proxy['hostid']);
-
-			$result[$proxy['proxyid']] = $proxy;
 		}
 
-		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
-		}
-
-		// removing keys (hash -> array)
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
-		}
-
-		return $result;
+		return $db_proxies;
 	}
 
 	/**
@@ -364,28 +383,6 @@ class CProxy extends CApiService {
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_PROXY, $db_proxies);
 
 		return ['proxyids' => $proxyids];
-	}
-
-	/**
-	 * Validates the input parameters for the get() method.
-	 *
-	 * @param array $options
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	protected function validateGet(array $options) {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', [
-				'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
-				'tls_subject', 'proxy_address', 'auto_compress', 'version', 'compatibility'
-			]), 'default' => API_OUTPUT_EXTEND]
-		]];
-
-		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
-
-		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
 	}
 
 	/**
