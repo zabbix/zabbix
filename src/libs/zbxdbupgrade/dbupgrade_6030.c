@@ -110,255 +110,280 @@ static int	DBpatch_6030000(void)
 
 static int	DBpatch_6030001(void)
 {
-	return DBcreate_changelog_insert_trigger("drules", "druleid");
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("group_discovery", &field, NULL);
 }
 
 static int	DBpatch_6030002(void)
 {
-	return DBcreate_changelog_update_trigger("drules", "druleid");
+	if (ZBX_DB_OK > DBexecute(
+			"update group_discovery gd"
+			" set name=("
+				"select gp.name"
+				" from group_prototype gp"
+				" where gd.parent_group_prototypeid=gp.group_prototypeid"
+			")"
+			" where " ZBX_DB_CHAR_LENGTH(gd.name) "=64"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
+
 
 static int	DBpatch_6030003(void)
 {
-	return DBcreate_changelog_delete_trigger("drules", "druleid");
+	return DBcreate_changelog_insert_trigger("drules", "druleid");
 }
 
 static int	DBpatch_6030004(void)
 {
-	return DBcreate_changelog_insert_trigger("dchecks", "dcheckid");
+	return DBcreate_changelog_update_trigger("drules", "druleid");
 }
 
 static int	DBpatch_6030005(void)
 {
-	return DBcreate_changelog_update_trigger("dchecks", "dcheckid");
+	return DBcreate_changelog_delete_trigger("drules", "druleid");
 }
 
 static int	DBpatch_6030006(void)
 {
-	return DBcreate_changelog_delete_trigger("dchecks", "dcheckid");
+	return DBcreate_changelog_insert_trigger("dchecks", "dcheckid");
 }
 
 static int	DBpatch_6030007(void)
 {
-	return DBcreate_changelog_insert_trigger("httptest", "httptestid");
+	return DBcreate_changelog_update_trigger("dchecks", "dcheckid");
 }
 
 static int	DBpatch_6030008(void)
 {
-	return DBcreate_changelog_update_trigger("httptest", "httptestid");
+	return DBcreate_changelog_delete_trigger("dchecks", "dcheckid");
 }
 
 static int	DBpatch_6030009(void)
 {
-	return DBcreate_changelog_delete_trigger("httptest", "httptestid");
+	return DBcreate_changelog_insert_trigger("httptest", "httptestid");
 }
 
 static int	DBpatch_6030010(void)
 {
-	return DBcreate_changelog_insert_trigger("httptest_field", "httptest_fieldid");
+	return DBcreate_changelog_update_trigger("httptest", "httptestid");
 }
 
 static int	DBpatch_6030011(void)
 {
-	return DBcreate_changelog_update_trigger("httptest_field", "httptest_fieldid");
+	return DBcreate_changelog_delete_trigger("httptest", "httptestid");
 }
 
 static int	DBpatch_6030012(void)
 {
-	return DBcreate_changelog_delete_trigger("httptest_field", "httptest_fieldid");
+	return DBcreate_changelog_insert_trigger("httptest_field", "httptest_fieldid");
 }
 
 static int	DBpatch_6030013(void)
 {
-	return DBcreate_changelog_insert_trigger("httptestitem", "httptestitemid");
+	return DBcreate_changelog_update_trigger("httptest_field", "httptest_fieldid");
 }
 
 static int	DBpatch_6030014(void)
 {
-	return DBcreate_changelog_update_trigger("httptestitem", "httptestitemid");
+	return DBcreate_changelog_delete_trigger("httptest_field", "httptest_fieldid");
 }
 
 static int	DBpatch_6030015(void)
 {
-	return DBcreate_changelog_delete_trigger("httptestitem", "httptestitemid");
+	return DBcreate_changelog_insert_trigger("httptestitem", "httptestitemid");
 }
 
 static int	DBpatch_6030016(void)
 {
-	return DBcreate_changelog_insert_trigger("httpstep", "httpstepid");
+	return DBcreate_changelog_update_trigger("httptestitem", "httptestitemid");
 }
 
 static int	DBpatch_6030017(void)
 {
-	return DBcreate_changelog_update_trigger("httpstep", "httpstepid");
+	return DBcreate_changelog_delete_trigger("httptestitem", "httptestitemid");
 }
 
 static int	DBpatch_6030018(void)
 {
-	return DBcreate_changelog_delete_trigger("httpstep", "httpstepid");
+	return DBcreate_changelog_insert_trigger("httpstep", "httpstepid");
 }
 
 static int	DBpatch_6030019(void)
 {
-	return DBcreate_changelog_insert_trigger("httpstep_field", "httpstep_fieldid");
+	return DBcreate_changelog_update_trigger("httpstep", "httpstepid");
 }
 
 static int	DBpatch_6030020(void)
 {
-	return DBcreate_changelog_update_trigger("httpstep_field", "httpstep_fieldid");
+	return DBcreate_changelog_delete_trigger("httpstep", "httpstepid");
 }
 
 static int	DBpatch_6030021(void)
 {
-	return DBcreate_changelog_delete_trigger("httpstep_field", "httpstep_fieldid");
+	return DBcreate_changelog_insert_trigger("httpstep_field", "httpstep_fieldid");
 }
 
 static int	DBpatch_6030022(void)
 {
-	return DBcreate_changelog_insert_trigger("httpstepitem", "httpstepitemid");
+	return DBcreate_changelog_update_trigger("httpstep_field", "httpstep_fieldid");
 }
 
 static int	DBpatch_6030023(void)
 {
-	return DBcreate_changelog_update_trigger("httpstepitem", "httpstepitemid");
+	return DBcreate_changelog_delete_trigger("httpstep_field", "httpstep_fieldid");
 }
 
 static int	DBpatch_6030024(void)
 {
-	return DBcreate_changelog_delete_trigger("httpstepitem", "httpstepitemid");
+	return DBcreate_changelog_insert_trigger("httpstepitem", "httpstepitemid");
 }
 
 static int	DBpatch_6030025(void)
 {
-	return DBdrop_field("drules", "nextcheck");
+	return DBcreate_changelog_update_trigger("httpstepitem", "httpstepitemid");
 }
 
 static int	DBpatch_6030026(void)
 {
-	return DBdrop_field("httptest", "nextcheck");
+	return DBcreate_changelog_delete_trigger("httpstepitem", "httpstepitemid");
 }
 
 static int	DBpatch_6030027(void)
+{
+	return DBdrop_field("drules", "nextcheck");
+}
+
+static int	DBpatch_6030028(void)
+{
+	return DBdrop_field("httptest", "nextcheck");
+}
+
+static int	DBpatch_6030029(void)
 {
 	const ZBX_FIELD field = {"discovery_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBdrop_not_null("config", &field);
 }
 
-static int	DBpatch_6030028(void)
+static int	DBpatch_6030030(void)
 {
 	return DBdrop_foreign_key("dchecks", 1);
 }
 
-static int	DBpatch_6030029(void)
+static int	DBpatch_6030031(void)
 {
 	const ZBX_FIELD	field = {"druleid", NULL, "drules", "druleid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("dchecks", 1, &field);
 }
 
-static int	DBpatch_6030030(void)
+static int	DBpatch_6030032(void)
 {
 	return DBdrop_foreign_key("httptest", 2);
 }
 
-static int	DBpatch_6030031(void)
+static int	DBpatch_6030033(void)
 {
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("httptest", 2, &field);
 }
 
-static int	DBpatch_6030032(void)
+static int	DBpatch_6030034(void)
 {
 	return DBdrop_foreign_key("httptest", 3);
 }
 
-static int	DBpatch_6030033(void)
+static int	DBpatch_6030035(void)
 {
 	const ZBX_FIELD	field = {"templateid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("httptest", 3, &field);
 }
 
-static int	DBpatch_6030034(void)
-{
-	return DBdrop_foreign_key("httpstep", 1);
-}
-
-static int	DBpatch_6030035(void)
-{
-	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
-
-	return DBadd_foreign_key("httpstep", 1, &field);
-}
-
 static int	DBpatch_6030036(void)
 {
-	return DBdrop_foreign_key("httptestitem", 1);
+	return DBdrop_foreign_key("httpstep", 1);
 }
 
 static int	DBpatch_6030037(void)
 {
 	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
 
-	return DBadd_foreign_key("httptestitem", 1, &field);
+	return DBadd_foreign_key("httpstep", 1, &field);
 }
 
 static int	DBpatch_6030038(void)
 {
-	return DBdrop_foreign_key("httptestitem", 2);
+	return DBdrop_foreign_key("httptestitem", 1);
 }
 
 static int	DBpatch_6030039(void)
+{
+	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httptestitem", 1, &field);
+}
+
+static int	DBpatch_6030040(void)
+{
+	return DBdrop_foreign_key("httptestitem", 2);
+}
+
+static int	DBpatch_6030041(void)
 {
 	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("httptestitem", 2, &field);
 }
 
-static int	DBpatch_6030040(void)
+static int	DBpatch_6030042(void)
 {
 	return DBdrop_foreign_key("httpstepitem", 1);
 }
 
-static int	DBpatch_6030041(void)
+static int	DBpatch_6030043(void)
 {
 	const ZBX_FIELD	field = {"httpstepid", NULL, "httpstep", "httpstepid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("httpstepitem", 1, &field);
 }
 
-static int	DBpatch_6030042(void)
+static int	DBpatch_6030044(void)
 {
 	return DBdrop_foreign_key("httpstepitem", 2);
 }
 
-static int	DBpatch_6030043(void)
+static int	DBpatch_6030045(void)
 {
 	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("httpstepitem", 2, &field);
 }
 
-static int	DBpatch_6030044(void)
+static int	DBpatch_6030046(void)
 {
 	return DBdrop_foreign_key("httptest_field", 1);
 }
 
-static int	DBpatch_6030045(void)
+static int	DBpatch_6030047(void)
 {
 	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("httptest_field", 1, &field);
 }
 
-static int	DBpatch_6030046(void)
+static int	DBpatch_6030048(void)
 {
 	return DBdrop_foreign_key("httpstep_field", 1);
 }
 
-static int	DBpatch_6030047(void)
+static int	DBpatch_6030049(void)
 {
 	const ZBX_FIELD	field = {"httpstepid", NULL, "httpstep", "httpstepid", 0, ZBX_TYPE_ID, 0, 0};
 
@@ -373,6 +398,7 @@ DBPATCH_START(6030)
 
 DBPATCH_ADD(6030000, 0, 1)
 DBPATCH_ADD(6030001, 0, 1)
+DBPATCH_ADD(6030002, 0, 1)
 DBPATCH_ADD(6030002, 0, 1)
 DBPATCH_ADD(6030003, 0, 1)
 DBPATCH_ADD(6030004, 0, 1)
@@ -419,5 +445,7 @@ DBPATCH_ADD(6030044, 0, 1)
 DBPATCH_ADD(6030045, 0, 1)
 DBPATCH_ADD(6030046, 0, 1)
 DBPATCH_ADD(6030047, 0, 1)
+DBPATCH_ADD(6030048, 0, 1)
+DBPATCH_ADD(6030049, 0, 1)
 
 DBPATCH_END()

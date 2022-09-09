@@ -1,0 +1,1 @@
+..F....... [ZBX-21465] fixed missing warning message when host contains secret macros and is being cloned (dpetra)

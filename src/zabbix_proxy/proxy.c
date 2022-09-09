@@ -1193,6 +1193,7 @@ static void	proxy_db_init(void)
 
 		proxy_db_init();
 #else
+		ZBX_UNUSED(version_check);
 		exit(EXIT_FAILURE);
 #endif
 	}
