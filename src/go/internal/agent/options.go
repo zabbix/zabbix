@@ -245,9 +245,6 @@ func ValidateOptions(options *AgentOptions) error {
 	if err = CheckHostnameParameter(options.Hostname); err != nil {
 		return fmt.Errorf("invalid \"Hostname\" configuration parameter: %s", err.Error())
 	}
-	if utf8.RuneCountInString(options.HostMetadata) > 0 && utf8.RuneCountInString(options.HostMetadata) > HostMetadataLen {
-		return fmt.Errorf("the value of \"HostMetadata\" configuration parameter cannot be longer than %d characters", HostMetadataLen)
-	}
 	if utf8.RuneCountInString(options.HostInterface) > HostInterfaceLen {
 		return fmt.Errorf("the value of \"HostInterface\" configuration parameter cannot be longer than %d characters", HostInterfaceLen)
 	}
