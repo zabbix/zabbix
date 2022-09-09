@@ -96,6 +96,17 @@ window.action_edit_popup = new class {
 	}
 
 	_createRow(row, input) {
+		// check if identical condition already exists in table
+		const hasRows = [...document.getElementById('conditionTable').getElementsByTagName('tr')].map(it => {
+			const table_row = it.getElementsByTagName('td')[1];
+			if (table_row !== undefined) {
+				return (table_row.innerHTML === this._createNameCell(input).getElementsByTagName('td')[0].innerHTML);
+			}
+		});
+
+		const hasRow = [hasRows.some(it => it === true)]
+		if (hasRow[0] === true) return;
+
 		row.append(this._createLabelCell(input));
 		row.append(this._createNameCell(input));
 		row.append(this._createRemoveCell());
@@ -118,8 +129,9 @@ window.action_edit_popup = new class {
 
 	_createNameCell(input) {
 		const cell = document.createElement('tr');
-		const condition_cell = document.createElement('td');
-		const value_cell = document.createElement('em');
+		const span = document.createElement('td');
+		const value = document.createElement('em');
+		const value2 = document.createElement('em');
 
 		cell.appendChild(this._createHiddenInput('formulaid',this.label));
 		cell.appendChild(this._createHiddenInput('conditiontype',input.conditiontype));
@@ -130,36 +142,37 @@ window.action_edit_popup = new class {
 		}
 
 		if (input.conditiontype == <?= CONDITION_TYPE_EVENT_TAG_VALUE ?>) {
-			cell.append('Value of tag ');
-			cell.append(input.value2);
-			cell.append(' ' + this.condition_operators[input.operator] + ' ');
-			cell.append(input.value);
+			value2.textContent = input.value2;
+
+			span.append('Value of tag ');
+			span.append(value2)
+			span.append(' ' + this.condition_operators[input.operator] + ' ');
+			value.textContent = input.value;
+			span.append(value);
 		}
 		else if (input.conditiontype == <?= CONDITION_TYPE_SUPPRESSED ?>) {
 			if (input.operator == <?= CONDITION_OPERATOR_YES ?>) {
-				cell.append('Problem is suppressed');
+				span.append('Problem is suppressed');
 			}
 			else {
-				cell.append('Problem is not suppressed');
+				span.append('Problem is not suppressed');
 			}
 		}
 		else if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
 			if (input.value) {
-				cell.append('Event is acknowledged');
+				span.append('Event is acknowledged');
 			}
 			else {
-				cell.append('Event is not acknowledged');
+				span.append('Event is not acknowledged');
 			}
 		}
 		else {
-			condition_cell.textContent = (
-				this.condition_types[input.conditiontype] + ' ' + this.condition_operators[input.operator]
-			);
-			value_cell.textContent = input.name;
+			value.textContent = input.name;
 
-			cell.append(condition_cell);
-			cell.append(value_cell);
+			span.append(this.condition_types[input.conditiontype] + ' ' + this.condition_operators[input.operator] + ' ');
+			span.append(value);
 		}
+		cell.append(span);
 
 		return cell;
 	}
