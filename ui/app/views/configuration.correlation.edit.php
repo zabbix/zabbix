@@ -102,7 +102,7 @@ $condition_table->addRow([
 		->onClick(
 			'return PopUp("popup.condition.event.corr", '.
 				json_encode(['type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR]).',
-				{dialogue_class: "modal-popup-medium"}
+				{dialogue_class: "modal-popup-medium", dialogueid: "event_corr_condition"}
 			);'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)

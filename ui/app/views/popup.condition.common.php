@@ -203,16 +203,16 @@ switch ($data['type']) {
 		}
 
 		// Type select.
-	$form_grid
-		->addItem([
-			new CLabel(_('Type'), 'label-condition-type'),
-			new CFormField((new CSelect('condition_type'))
-				->setFocusableElementId('label-condition-type')
-				->setValue($condition_type)
-				->setId('condition-type')
-				->addOptions(CSelect::createOptionsFromArray($action_conditions))
-			)
-		]);
+		$form_grid
+			->addItem([
+				new CLabel(_('Type'), 'label-condition-type'),
+				new CFormField((new CSelect('condition_type'))
+					->setFocusableElementId('label-condition-type')
+					->setValue($condition_type)
+					->setId('condition-type')
+					->addOptions(CSelect::createOptionsFromArray($action_conditions))
+				)
+			]);
 
 		switch ($condition_type) {
 			// Trigger form elements.

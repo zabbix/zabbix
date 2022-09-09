@@ -46,13 +46,11 @@ switch ($data['type']) {
 				new CLabel(_('Type'), 'label-condition-type'),
 				new CFormField((new CSelect('condition_type'))
 					->setFocusableElementId('label-condition-type')
+					//->setValue($condition_type)
 					->setId('condition-type')
 					->addOptions(CSelect::createOptionsFromArray(CCorrelationHelper::getConditionTypes()))
 				)
 			]);
-
-		$inline_js .= '$(() => $("#condition-type").on("change",'
-			.'(e) => reloadPopup($(e.target).closest("form").get(0), "popup.condition.event.corr")));';
 
 		switch ($condition_type) {
 			// Old|New event tag form elements.

@@ -21,7 +21,12 @@
 
 window.condition_popup = new class {
 	init() {
-		this.overlay = overlays_stack.getById('condition');
+		if (overlays_stack.stack[0] === 'event_corr_condition') {
+			this.overlay = overlays_stack.getById('event_corr_condition');
+		}
+		if (overlays_stack.stack[0] === 'action-edit') {
+			this.overlay = overlays_stack.getById('condition');
+		}
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
@@ -41,6 +46,9 @@ window.condition_popup = new class {
 			$("#condition-type").change(function() {
 				reloadPopup(e.target.closest('form'), 'popup.condition.edit')
 			})
+			//$("#condition-type").change(function() {
+			// reloadPopup(e.target.closest("form"), "popup.condition.event.corr")
+			//})
 			$("#trigger_context").change(function() {
 				reloadPopup(e.target.closest("form"), 'popup.condition.edit')
 			})
