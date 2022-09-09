@@ -2044,6 +2044,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
  ******************************************************************************/
 void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 {
+	zbx_free(mpoint->options);
 	zbx_free(mpoint);
 }
 
@@ -2092,5 +2093,42 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 	SET_STR_RESULT(result, hostname);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: format string containing human-readable mount options from flags  *
+ *                                                                            *
+ * Parameters: mntopts     - [IN] array containing flag to string mappings    *
+ *             flags       - [IN] mount point flags                           *
+ *                                                                            *
+ * Return value: returns null-terminated allocated string with                *
+ *               comma-separated mount options                                *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags)
+{
+	char		*dst_string = NULL;
+	size_t		dst_alloc = 1, dst_offset = 0;
+	zbx_mntopt_t	*mntopt;
+
+	dst_string = (char *)zbx_malloc(NULL, dst_alloc);
+	*dst_string = '\0';
+
+	if (0 != flags)
+	{
+		for (mntopt = mntopts; 0 != mntopt->flag; mntopt++)
+		{
+			if (0 == ((zbx_uint64_t)flags & mntopt->flag))
+				continue;
+
+			if ('\0' != *dst_string)
+				zbx_strcpy_alloc(&dst_string, &dst_alloc, &dst_offset, ",");
+
+			zbx_strcpy_alloc(&dst_string, &dst_alloc, &dst_offset, mntopt->name);
+		}
+	}
+
+	return dst_string;
 }
 #endif
