@@ -179,7 +179,7 @@ class CProxy extends CApiService {
 
 		if ($db_proxies) {
 			$db_proxies = $this->addRelatedObjects($options, $db_proxies);
-			$db_proxies = $this->unsetExtraFields($db_proxies, ['hostid'], $options['output']);
+			$db_proxies = $this->unsetExtraFields($db_proxies, ['proxyid'], $options['output']);
 
 			if (!$options['preservekeys']) {
 				$db_proxies = array_values($db_proxies);
