@@ -252,7 +252,7 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 		case ZBX_DB_POSTGRESQL:
 			if (!$result = pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', 'sql');
+				error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', true);
 			}
 
 			break;
@@ -262,14 +262,14 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 			if ($result === false) {
 				$e = oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
+				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
 
 				break;
 			}
 
 			if (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
 				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
+				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
 			}
 
 			break;
@@ -317,7 +317,7 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 
 	if ((isset($limit) && ($limit < 0 || !zbx_ctype_digit($limit))) || $offset < 0 || !zbx_ctype_digit($offset)) {
 		$moreDetails = isset($limit) ? ' Limit ['.$limit.'] Offset ['.$offset.']' : ' Offset ['.$offset.']';
-		error('Incorrect parameters for limit and/or offset. Query ['.$query.']'.$moreDetails, 'sql');
+		error('Incorrect parameters for limit and/or offset. Query ['.$query.']'.$moreDetails, true);
 
 		return false;
 	}
@@ -371,7 +371,7 @@ function DBexecute($query): bool {
 
 		case ZBX_DB_POSTGRESQL:
 			if (!$result = (bool) pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', 'sql');
+				error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', true);
 			}
 
 			break;
@@ -381,14 +381,14 @@ function DBexecute($query): bool {
 
 			if ($result === false) {
 				$e = oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
+				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
 
 				break;
 			}
 
 			if (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
 				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
+				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
 			}
 
 			$result = true;

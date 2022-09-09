@@ -1739,8 +1739,7 @@ function filter_messages(): array {
 
 		$generic_exists = false;
 		foreach ($messages as $message) {
-			if ($message['type'] === CMessageHelper::MESSAGE_TYPE_ERROR
-					&& ($message['source'] === 'sql' || $message['source'] === 'php')) {
+			if ($message['type'] === CMessageHelper::MESSAGE_TYPE_ERROR	&& $message['is_technical_error']) {
 				if (!$generic_exists) {
 					CMessageHelper::addError(_('System error occurred. Please contact Zabbix administrator.'));
 					$generic_exists = true;
@@ -2026,7 +2025,7 @@ function warning($messages): void {
 	}
 }
 
-/*
+/**
  * Add an error to global message array.
  *
  * @param string|array $msg	                Error message text.
@@ -2290,7 +2289,7 @@ function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	}
 
 	// Don't show the call to this handler function.
-	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', 'php');
+	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', true);
 
 	return false;
 }
