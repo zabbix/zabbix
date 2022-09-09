@@ -92,7 +92,7 @@ class CUserDirectory extends CApiService {
 		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		$db_userdirectories = [];
-		while ($row = DBfetch($result)) {
+		while ($row = DBfetch($result, false)) {
 			if ($options['countOutput']) {
 				return $row['rowscount'];
 			}
