@@ -82,8 +82,8 @@ while(0)
 	return SYSINFO_RET_OK;
 #undef ZBX_STATFS
 #undef ZBX_FFREE
-#undef get_string
 #undef validate
+#undef get_string
 }
 
 static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)

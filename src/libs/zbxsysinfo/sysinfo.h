@@ -1,4 +1,3 @@
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -28,11 +27,9 @@
 #define ZBX_PROC_STAT_DISK	4
 #define ZBX_PROC_STAT_TRACE	5
 
-
 #define ZBX_PROC_MODE_PROCESS	0
 #define ZBX_PROC_MODE_THREAD	1
 #define ZBX_PROC_MODE_SUMMARY	2
-
 
 #define ZBX_DO_SUM		0
 #define ZBX_DO_MAX		1

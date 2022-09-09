@@ -98,7 +98,8 @@ void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
 
 	if (SYSINFO_RET_OK == expected_result)
 	{
-		if (NULL == ZBX_GET_UI64_RESULT(&param_result) || expected_param_value != *ZBX_GET_UI64_RESULT(&param_result))
+		if (NULL == ZBX_GET_UI64_RESULT(&param_result) || expected_param_value !=
+				*ZBX_GET_UI64_RESULT(&param_result))
 		{
 			if (NULL != ZBX_GET_UI64_RESULT(&param_result))
 			{

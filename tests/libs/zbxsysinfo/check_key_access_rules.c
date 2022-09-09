@@ -27,7 +27,6 @@
 #include "module.h"
 #include "zbxsysinfo.h"
 
-
 extern zbx_vector_ptr_t	key_access_rules;
 
 static int	zbx_mock_str_to_key_access_type(const char *str)

@@ -1028,8 +1028,6 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 		*error = zbx_dsprintf(*error, "IP is not supported: \"%s\"", addr_in);
 		goto err;
 	}
-#define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
-#define IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
 #ifdef HAVE_IPV6
 	if (info->ai->ai_family == AF_INET6)
 	{
@@ -1038,7 +1036,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 		if (NULL != addr)
 		{
 			if (-1 == prefix_sz_local)
-				prefix_sz_local = IPV6_MAX_CIDR_PREFIX;
+				prefix_sz_local = ZBX_IPV6_MAX_CIDR_PREFIX;
 
 			if (0 == memcmp(((struct sockaddr_in6*)info->ai->ai_addr)->sin6_addr.s6_addr, ipv6_mapped, 12))
 				info->mapped = 1;
@@ -1051,13 +1049,12 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 #endif
 	{
 		if (NULL != addr && -1 == prefix_sz_local)
-			prefix_sz_local = IPV4_MAX_CIDR_PREFIX;
+			prefix_sz_local = ZBX_IPV4_MAX_CIDR_PREFIX;
 
 		if (NULL != service)
 			info->port = ntohs(((struct sockaddr_in*)info->ai->ai_addr)->sin_port);
 	}
-#undef IPV4_MAX_CIDR_PREFIX
-#undef IPV6_MAX_CIDR_PREFIX
+
 	if (NULL == addr)
 	{
 		freeaddrinfo(info->ai);
