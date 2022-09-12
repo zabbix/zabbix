@@ -19,6 +19,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
@@ -493,6 +494,263 @@ class testDashboardItemValueWidget extends CWebTest {
 			],
 			[
 				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '-'
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => 'a'
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '1a%?'
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '0.00001'
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/1/threshold": a number has too many fractional digits.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '9999999999999999'
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/1/threshold": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '1',
+						'id:thresholds_1_threshold' => 'a'
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/2/threshold": a number is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '1',
+						'id:thresholds_1_threshold' => '1'
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/2": value (threshold)=(1) already exists.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Advanced configuration' => true,
+					],
+					'colors' => [
+						'id:lbl_thresholds_0_color' => ''
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '1'
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/1/color": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Advanced configuration' => true,
+					],
+					'colors' => [
+						'id:lbl_thresholds_0_color' => 'AABBCC',
+						'id:lbl_thresholds_1_color' => ''
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '1',
+						'id:thresholds_1_threshold' => '2'
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/2/color": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Advanced configuration' => true,
+					],
+					'colors' => [
+						'id:lbl_thresholds_0_color' => 'AABBCC'
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => 'a'
+					],
+					'error' => [
+						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Name' => 'Item Widget with threshold',
+						'Refresh interval' => '30 seconds',
+						'Advanced configuration' => true,
+					],
+					'colors' => [
+						'id:lbl_thresholds_0_color' => 'AABBCC'
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '1'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Name' => 'Item Widget with max number',
+						'Refresh interval' => '10 seconds',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '999999999999999'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Name' => 'Item Widget with threshold with fractional digits',
+						'Refresh interval' => '10 minutes',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '0.9999'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Name' => 'Item Widget with thresholds with suffix',
+						'Refresh interval' => '15 minutes',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '1K',
+						'id:thresholds_1_threshold' => '1024'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Name' => 'Item Widget with thresholds with suffixes',
+						'Refresh interval' => '15 minutes',
+						'Advanced configuration' => true,
+					],
+					'colors' => [
+						'id:lbl_thresholds_0_color' => '26C6DA',
+						'id:lbl_thresholds_1_color' => 'FFEB3B'
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '1K',
+						'id:thresholds_1_threshold' => '5G'
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Item value',
@@ -716,6 +974,16 @@ class testDashboardItemValueWidget extends CWebTest {
 
 		if ($update && !CTestArrayHelper::get($data['fields'], 'Name')) {
 			$form->fill(['Name' => '']);
+		}
+
+		if (array_key_exists('thresholds', $data)) {
+			foreach ($data['thresholds'] as $fieldid => $threshold) {
+				$form->query('button:Add')->one()->click();
+				$form->query($fieldid)->one()->fill($threshold);
+			}
+			if ($update === true && $data['expected']=== TEST_GOOD) {
+				return;
+			}
 		}
 
 		if (array_key_exists('colors', $data)) {
