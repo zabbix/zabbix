@@ -690,7 +690,7 @@ class CProxy extends CApiService {
 			}
 
 			$proxy_hostids = array_column($proxy['hosts'], null, 'hostid');
-			$db_proxy_hostids = ($db_proxies !== null)
+			$db_proxy_hostids = $db_proxies !== null
 				? array_column($db_proxies[$proxy['proxyid']]['hosts'], null, 'hostid')
 				: [];
 
@@ -796,7 +796,7 @@ class CProxy extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function validateUpdate(array &$proxies, ?array &$db_proxies = null): void {
+	private function validateUpdate(array &$proxies, ?array &$db_proxies): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['proxyid']], 'fields' => [
 			'proxyid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE])],
