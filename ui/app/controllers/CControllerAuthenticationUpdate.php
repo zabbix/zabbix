@@ -389,6 +389,17 @@ class CControllerAuthenticationUpdate extends CController {
 				$ldap_server = array_diff_key($ldap_server, array_flip(self::PROVISION_ENABLED_FIELDS));
 			}
 
+			if (array_key_exists('provision_groups', $ldap_server)) {
+				CArrayHelper::sort($ldap_server['provision_groups'], ['sortorder']);
+				$ldap_server['provision_groups'] = array_values($ldap_server['provision_groups']);
+
+				$ldap_server['provision_groups'] = array_map(function ($group) {
+					return array_intersect_key($group,
+						array_flip(['is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups'])
+					);
+				}, $ldap_server['provision_groups']);
+			}
+
 			if (array_key_exists('userdirectoryid', $ldap_server)) {
 				$userdirectoryid_map[$row_index] = $ldap_server['userdirectoryid'];
 				$upd_ldap_servers[] = $ldap_server;
@@ -471,6 +482,14 @@ class CControllerAuthenticationUpdate extends CController {
 				'idp_type' => IDP_TYPE_SAML
 			]
 		]);
+
+		CArrayHelper::sort($saml_data['provision_groups'], ['sortorder']);
+		$saml_data['provision_groups'] = array_values($saml_data['provision_groups']);
+		$saml_data['provision_groups'] = array_map(function ($group) {
+			return array_intersect_key($group,
+				array_flip(['is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups'])
+			);
+		}, $saml_data['provision_groups']);
 
 		if ($db_saml) {
 			$result = API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid']] + $saml_data);

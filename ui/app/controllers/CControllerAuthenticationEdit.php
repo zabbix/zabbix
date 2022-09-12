@@ -167,6 +167,9 @@ class CControllerAuthenticationEdit extends CController {
 
 			if ($data['saml_provision_groups']) {
 				$data['saml_provision_groups'] = $this->extendProvisionGroups($data['saml_provision_groups']);
+
+				CArrayHelper::sort($data['saml_provision_groups'], ['sortorder']);
+				$data['saml_provision_groups'] = array_values($data['saml_provision_groups']);
 			}
 
 			if ($data['saml_provision_media']) {

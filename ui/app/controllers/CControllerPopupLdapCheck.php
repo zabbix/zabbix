@@ -120,6 +120,9 @@ class CControllerPopupLdapCheck extends CController {
 			]
 		];
 
+		CArrayHelper::sort($data['body']['provision_groups'], ['sortorder']);
+		$data['body']['provision_groups'] = array_values($data['body']['provision_groups']);
+
 		if ($this->hasInput('userdirectoryid')) {
 			$data['body']['userdirectoryid'] = $this->getInput('userdirectoryid');
 		}

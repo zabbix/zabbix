@@ -146,6 +146,11 @@ window.ldap_edit_popup = new class {
 
 				return ui;
 			},
+			update: (e, ui) => {
+				[...this.provision_groups_table.querySelectorAll('tbody tr')].forEach((row, i) => {
+					row.querySelector('[name^="provision_groups"][name$="[sortorder]"]').value = i + 1;
+				});
+			},
 			stop: function(e, ui) {
 				ui.item.find('>td').removeAttr('width');
 				ui.item.removeAttr('style');
@@ -289,7 +294,9 @@ window.ldap_edit_popup = new class {
 	editProvisionGroup(row = null) {
 		let popup_params;
 		let row_index = 0;
+		let sortorder;
 		let status = <?= GROUP_MAPPING_FALLBACK_OFF ?>;
+		const fallback_row = this.dialogue.querySelector('[data-row_fallback]');
 
 		if (row === null) {
 			while (this.provision_groups_table.querySelector(`[data-row_index="${row_index}"]`) !== null) {
@@ -300,11 +307,13 @@ window.ldap_edit_popup = new class {
 				add_group: 1,
 				is_fallback: <?= GROUP_MAPPING_REGULAR ?>
 			};
+			sortorder = parseInt(fallback_row.querySelector(`[name^="provision_groups"][name$="[sortorder]"]`).value);
 		}
 		else {
 			row_index = row.dataset.row_index;
 			let is_fallback = row.querySelector(`[name="provision_groups[${row_index}][is_fallback]"`).value;
 			let user_groups = row.querySelectorAll(`[name="provision_groups[${row_index}][user_groups][][usrgrpid]"`);
+			sortorder = parseInt(row.querySelector(`[name="provision_groups[${row_index}][sortorder]"`).value);
 
 			popup_params = {
 				usrgrpid: [...user_groups].map(usrgrp => usrgrp.value),
@@ -322,18 +331,11 @@ window.ldap_edit_popup = new class {
 		const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			const group = {...e.detail, ...{row_index: row_index, fallback_status: status}};
+			const group = {...e.detail, ...{row_index: row_index, fallback_status: status, sortorder: sortorder}};
 
 			if (row === null) {
-				const fallback_row = this.dialogue.querySelector('[data-row_fallback]');
-				if (fallback_row !== null) {
-					fallback_row.parentNode.insertBefore(this._renderProvisionGroupRow(group), fallback_row);
-				}
-				else {
-					this.provision_groups_table
-						.querySelector('tbody')
-						.appendChild(this._renderProvisionGroupRow(group));
-				}
+				fallback_row.parentNode.insertBefore(this._renderProvisionGroupRow(group), fallback_row);
+				fallback_row.querySelector(`[name^="provision_groups"][name$="[sortorder]"`).value = sortorder + 1;
 			}
 			else {
 				row.replaceWith(this._renderProvisionGroupRow(group));
@@ -382,9 +384,10 @@ window.ldap_edit_popup = new class {
 
 	_renderProvisionGroups(groups) {
 		for (const key in groups) {
+			let order = parseInt(key) + 1
 			this.provision_groups_table
 				.querySelector('tbody')
-				.appendChild(this._renderProvisionGroupRow({...groups[key], ...{row_index: key}}));
+				.appendChild(this._renderProvisionGroupRow({...groups[key], ...{row_index: key, sortorder: order}}));
 		}
 	}
 
@@ -432,6 +435,7 @@ window.ldap_edit_popup = new class {
 					<input type="hidden" name="provision_groups[#{row_index}][roleid]" value="#{roleid}">
 					<input type="hidden" name="provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_FALLBACK ?>">
 					<input type="hidden" name="provision_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
+					<input type="hidden" name="provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 				</td>
 				<td class="wordbreak">#{user_group_names}</td>
 				<td class="wordbreak">#{role_name}</td>
@@ -453,6 +457,7 @@ window.ldap_edit_popup = new class {
 					<input type="hidden" name="provision_groups[#{row_index}][name]" value="#{name}">
 					<input type="hidden" name="provision_groups[#{row_index}][roleid]" value="#{roleid}">
 					<input type="hidden" name="provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_REGULAR ?>">
+					<input type="hidden" name="provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 				</td>
 				<td class="wordbreak">#{user_group_names}</td>
 				<td class="wordbreak">#{role_name}</td>

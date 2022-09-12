@@ -132,9 +132,7 @@ class CControllerPopupLdapEdit extends CController {
 					'roleid' => $default_role[0]['roleid']
 				]]
 				: [];
-		}
 
-		if ($data['add_ldap_server'] == 1) {
 			$default_media = API::MediaType()->get([
 				'output' => ['mediatypeid'],
 				'filter' => [

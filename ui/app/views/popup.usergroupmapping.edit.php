@@ -32,7 +32,6 @@ $form = (new CForm('post', $form_action))
 	->setId('user-group-mapping-edit-form')
 	->setName('user-group-mapping-edit-form')
 	->addVar('is_fallback', $data['is_fallback'])
-	->addVar('fallback_status', $data['fallback_status'])
 	->addItem(
 		(new CInput('submit', 'submit'))
 			->addStyle('display: none;')

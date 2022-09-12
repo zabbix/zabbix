@@ -222,6 +222,11 @@
 
 					return ui;
 				},
+				update: (e, ui) => {
+					[...this.saml_provision_groups_table.querySelectorAll('tbody tr')].forEach((row, i) => {
+						row.querySelector('[name^="saml_provision_groups"][name$="[sortorder]"]').value = i + 1;
+					});
+				},
 				stop: function(e, ui) {
 					ui.item.find('>td').removeAttr('width');
 					ui.item.removeAttr('style');
@@ -262,6 +267,7 @@
 		_renderProvisionGroups(saml_provision_groups) {
 			for (const [row_index, saml_provision_group] of Object.entries(saml_provision_groups)) {
 				saml_provision_group.row_index = row_index;
+				saml_provision_group.sortorder = parseInt(row_index) + 1;
 
 				this.saml_provision_groups_table
 					.querySelector('tbody')
@@ -282,7 +288,9 @@
 		editSamlProvisionGroup(row = null) {
 			let popup_params;
 			let row_index = 0;
+			let sortorder;
 			let status = <?= GROUP_MAPPING_FALLBACK_OFF ?>;
+			const fallback_row = document.querySelector('[data-row_fallback]');
 
 			if (row !== null) {
 				row_index = row.dataset.row_index;
@@ -302,11 +310,14 @@
 				else {
 					status = row.querySelector(`[name="saml_provision_groups[${row_index}][fallback_status]"`).value;
 				}
+				sortorder = row.querySelector(`[name="saml_provision_groups[${row_index}][sortorder]"`).value;
 			}
 			else {
 				while (this.saml_provision_groups_table.querySelector(`[data-row_index="${row_index}"]`) !== null) {
 					row_index++;
 				}
+
+				sortorder = fallback_row.querySelector(`[name^="saml_provision_groups"][name$="[sortorder]"]`).value;
 
 				popup_params = {
 					add_group: 1,
@@ -320,24 +331,18 @@
 			const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const saml_provision_group = {...e.detail, ...{row_index: row_index, fallback_status: status}};
+				const saml_provision_group = {...e.detail,
+					...{row_index: row_index, fallback_status: status, sortorder: sortorder}
+				};
 
 				if (row === null) {
-					const fallback_row = document.querySelector('[data-row_fallback]');
-					if (fallback_row !== null) {
-						fallback_row.parentNode.insertBefore(
-							this._renderProvisionGroupRow(saml_provision_group), fallback_row
-						);
-					}
-					else {
-						this.saml_provision_groups_table
-							.querySelector('tbody')
-							.appendChild(this._renderProvisionGroupRow(saml_provision_group));
-					}
+					fallback_row.parentNode.insertBefore(this._renderProvisionGroupRow(saml_provision_group),
+						fallback_row
+					);
+					fallback_row.querySelector(`[name^="saml_provision_groups"][name$="[sortorder]"]`).value = parseInt(sortorder) + 1;
 				}
 				else {
-					row.parentNode.insertBefore(this._renderProvisionGroupRow(saml_provision_group), row);
-					row.remove();
+					row.replaceWith(this._renderProvisionGroupRow(saml_provision_group));
 				}
 			});
 		}
@@ -387,12 +392,16 @@
 
 			if (row !== null) {
 				row_index = row.dataset.row_index;
-				const provision_groups_count = row.querySelectorAll(
-					`[name^="ldap_servers[${row_index}][provision_groups]"][name$="[is_fallback]"]`
-				).length;
-				const provision_groups = [];
 
-				for (let i = 0; i < provision_groups_count; i++) {
+				const provision_group_indexes = [...row.querySelectorAll(
+					`[name^="ldap_servers[${row_index}][provision_groups]"][name$="[is_fallback]"]`
+				)].map((element) => {
+					let start = 33 + row_index.toString().length;
+					let end = element.name.length - start - 14;
+
+					return element.name.substr(start, end);
+				});
+				const provision_groups = provision_group_indexes.map((i) => {
 					let user_groups = row.querySelectorAll(
 						`[name="ldap_servers[${row_index}][provision_groups][${i}][user_groups][][usrgrpid]"`
 					);
@@ -402,6 +411,9 @@
 						).value,
 						roleid: row.querySelector(
 							`[name="ldap_servers[${row_index}][provision_groups][${i}][roleid]"`
+						).value,
+						sortorder: row.querySelector(
+							`[name="ldap_servers[${row_index}][provision_groups][${i}][sortorder]"`
 						).value,
 						user_groups: [...user_groups].map(usrgrp => usrgrp.value)
 					}
@@ -417,16 +429,19 @@
 						).value;
 					}
 
-					provision_groups.push(provision_group);
-				}
+					return provision_group;
+				});
 
-				const provision_media_count = row.querySelectorAll(
+				const provision_media_indexes = [...row.querySelectorAll(
 					`[name^="ldap_servers[${row_index}][provision_media]"][name$="[name]"]`
-				).length
-				const provision_media = [];
+				)].map((element) => {
+					let start = 32 + row_index.toString().length;
+					let end = element.name.length - start - 7;
 
-				for (let i = 0; i < provision_media_count; i++) {
-					let media = {
+					return element.name.substr(start, end);
+				});
+				const provision_media = provision_media_indexes.map((i) => {
+					return {
 						name: row.querySelector(
 							`[name="ldap_servers[${row_index}][provision_media][${i}][name]"`
 						).value,
@@ -435,11 +450,9 @@
 						).value,
 						attribute: row.querySelector(
 							`[name="ldap_servers[${row_index}][provision_media][${i}][attribute]"`
-						).value,
-					}
-
-					provision_media.push(media);
-				}
+						).value
+					};
+				});
 
 				popup_params = {
 					row_index,
@@ -522,6 +535,8 @@
 			const row = template.content.firstChild;
 
 			for (const [group_index, provision_group] of Object.entries(ldap.provision_groups)) {
+				provision_group.sortorder = +group_index + 1;
+
 				for (const [name, value] of Object.entries(provision_group)) {
 					if (name === 'user_groups') {
 						for (const usrgrp of value) {
@@ -662,6 +677,7 @@
 						<input type="hidden" name="saml_provision_groups[#{row_index}][roleid]" value="#{roleid}">
 						<input type="hidden" name="saml_provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_FALLBACK ?>">
 						<input type="hidden" name="saml_provision_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 					</td>
 					<td class="wordbreak">#{user_group_names}</td>
 					<td class="wordbreak">#{role_name}</td>
@@ -683,6 +699,7 @@
 						<input type="hidden" name="saml_provision_groups[#{row_index}][name]" value="#{name}">
 						<input type="hidden" name="saml_provision_groups[#{row_index}][roleid]" value="#{roleid}">
 						<input type="hidden" name="saml_provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_REGULAR ?>">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 					</td>
 					<td class="wordbreak">#{user_group_names}</td>
 					<td class="wordbreak">#{role_name}</td>
