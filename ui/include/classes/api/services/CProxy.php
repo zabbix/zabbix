@@ -497,21 +497,21 @@ class CProxy extends CApiService {
 				$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
 			}
 
-			if ($this->outputIsRequested('lastaccess', $options['output'])
-					|| $this->outputIsRequested('version', $options['output'])
-					|| $this->outputIsRequested('compatibility', $options['output'])
-					|| (is_array($options['filter'])
-						&& (array_key_exists('lastaccess', $options['filter'])
-							|| array_key_exists('version', $options['filter'])
-							|| array_key_exists('compatibility', $options['filter'])))) {
+			$host_rtdata = false;
+			foreach (['lastaccess', 'version', 'compatibility'] as $field) {
+				if ($this->outputIsRequested($field, $options['output'])) {
+					$sqlParts = $this->addQuerySelect('hr.'.$field, $sqlParts);
+					$host_rtdata = true;
+				}
+
+				if (is_array($options['filter']) && array_key_exists($field, $options['filter'])) {
+					$host_rtdata = true;
+				}
+			}
+
+			if ($host_rtdata) {
 				$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-
-				foreach (['lastaccess', 'version', 'compatibility'] as $field) {
-					if ($this->outputIsRequested($field, $options['output'])) {
-						$sqlParts = $this->addQuerySelect('hr.'.$field, $sqlParts);
-					}
-				}
 			}
 		}
 
