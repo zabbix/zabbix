@@ -204,10 +204,6 @@ ZABBIX.apps.map = (function($) {
 				start: $.proxy(function(event) {
 					if (!event.ctrlKey && !event.metaKey) {
 						this.clearSelection();
-
-						if (event.target.id === this.container[0].id) {
-							$('.menu-popup-top').menuPopup('close', null, false);
-						}
 					}
 				}, this),
 				stop: $.proxy(function(event) {
@@ -998,6 +994,15 @@ ZABBIX.apps.map = (function($) {
 					$('#last_shape_type').val(value);
 				});
 
+				$(this.container).parents('.sysmap-scroll-container').eq(0)
+					.on('scroll', (e) => {
+						if (!e.target.dataset.last_scroll_at || Date.now() - e.target.dataset.last_scroll_at > 1000) {
+							$('.menu-popup-top').menuPopup('close', null, false);
+
+							e.target.dataset.last_scroll_at = Date.now();
+						}
+					});
+
 				$('input[type=radio][name=type]:checked').change();
 			},
 
@@ -1451,6 +1456,8 @@ ZABBIX.apps.map = (function($) {
 
 			selectElements: function(ids, addSelection, prevent_form_open) {
 				var i, ln;
+
+				$('.menu-popup-top').menuPopup('close', null, false);
 
 				if (!addSelection) {
 					this.clearSelection();

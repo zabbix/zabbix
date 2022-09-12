@@ -1306,7 +1306,9 @@ jQuery(function($) {
 			// Need to be postponed.
 			setTimeout(function() {
 				$(document)
-					.on('click', {menu: $menu_popup, opener: $opener}, menuPopupDocumentCloseHandler)
+					.on('click dragstart contextmenu', {menu: $menu_popup, opener: $opener},
+						menuPopupDocumentCloseHandler
+					)
 					.on('keydown', {menu: $menu_popup}, menuPopupKeyDownHandler);
 			});
 
@@ -1325,7 +1327,7 @@ jQuery(function($) {
 				$('[aria-expanded="true"]', menu_popup).attr({'aria-expanded': 'false'});
 
 				$(document)
-					.off('click', menuPopupDocumentCloseHandler)
+					.off('click dragstart contextmenu', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
 
 				var overlay = removeFromOverlaysStack('menu-popup', return_focus);
@@ -1376,14 +1378,26 @@ jQuery(function($) {
 				$('>a', li[0]).addClass('highlighted');
 
 				if (!$('ul', item[0]).is(':visible')) {
-					$('ul:first', item[0]).prev('[role="menuitem"]').attr({'aria-expanded': 'true'});
+					const $submenu = $('ul:first', item[0]);
 
-					$('ul:first', item[0])
-						.css({
+					if ($submenu.length) {
+						const position = {
 							'top': pos.top - 6,
 							'left': pos.left + li.outerWidth() + 14,
-							'display': 'block'
-						});
+						};
+
+						$submenu
+							.css('display' ,'block')
+							.prev('[role="menuitem"]').attr({'aria-expanded': 'true'});
+
+						let max_relative_left = $(window).outerWidth(true) - $submenu.outerWidth(true)
+							- menu[0].getBoundingClientRect().left - 14 * 2;
+
+						position.top = Math.max(0, position.top);
+						position.left = Math.max(0, Math.min(max_relative_left, position.left));
+
+						$submenu.css(position);
+					}
 				}
 			}
 			else {
