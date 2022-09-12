@@ -5197,7 +5197,7 @@ return [
 			],
 			'host_metadata' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			],
 			'flags' => [
@@ -5254,7 +5254,7 @@ return [
 			],
 			'host_metadata' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			],
 			'flags' => [
