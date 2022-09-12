@@ -37,6 +37,8 @@
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
 
+extern int				CONFIG_ENABLE_REMOTE_COMMANDS;
+extern int				CONFIG_LOG_REMOTE_COMMANDS;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;

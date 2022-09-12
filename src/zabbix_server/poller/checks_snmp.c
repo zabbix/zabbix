@@ -30,6 +30,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "zbxparam.h"
+#include "zbxsysinfo.h"
 
 /*
  * SNMP Dynamic Index Cache
@@ -1232,17 +1233,17 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result, &val_type))
 				{
-					if (ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
+					if (ZBX_ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
 						zbx_remove_chars(snmp_result.text, "\r\n");
 
-					str_res = GET_STR_RESULT(&snmp_result);
+					str_res = ZBX_GET_STR_RESULT(&snmp_result);
 				}
 
 				if (NULL == str_res)
 				{
 					char	**msg;
 
-					msg = GET_MSG_RESULT(&snmp_result);
+					msg = ZBX_GET_MSG_RESULT(&snmp_result);
 
 					zabbix_log(LOG_LEVEL_DEBUG, "cannot get index '%s' string value: %s",
 							oid_index, NULL != msg && NULL != *msg ? *msg : "(null)");
@@ -1423,7 +1424,7 @@ retry:
 			else
 				errcodes[j] = zbx_snmp_set_result(var, &results[j], &val_type);
 
-			if (ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
+			if (ZBX_ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
 				zbx_remove_chars(results[j].text, "\r\n");
 		}
 
@@ -1931,7 +1932,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 			if (SUCCEED != errcodes[j])
 				continue;
 
-			if (NULL == GET_STR_RESULT(&results[j]) || 0 != strcmp(results[j].str, index_values[j]))
+			if (NULL == ZBX_GET_STR_RESULT(&results[j]) || 0 != strcmp(results[j].str, index_values[j]))
 			{
 				to_walk[to_walk_num++] = j;
 			}

@@ -26,6 +26,7 @@
 #include "expression.h"
 #include "zbxnum.h"
 #include "zbxparam.h"
+#include "zbxsysinfo.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 

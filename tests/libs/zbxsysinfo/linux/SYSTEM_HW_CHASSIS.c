@@ -23,7 +23,7 @@
 #include "zbxmockhelper.h"
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -50,17 +50,17 @@ void	zbx_mock_test_entry(void **state)
 				zbx_sysinfo_ret_string(expected_result), zbx_sysinfo_ret_string(actual_result));
 	}
 
-	if (SYSINFO_RET_OK == expected_result && 0 == strcmp(expected_value, *GET_STR_RESULT(&result)))
+	if (SYSINFO_RET_OK == expected_result && 0 == strcmp(expected_value, *ZBX_GET_STR_RESULT(&result)))
 	{
-		if (NULL == GET_STR_RESULT(&result))
+		if (NULL == ZBX_GET_STR_RESULT(&result))
 			fail_msg("Got 'NULL' instead of '%s' as a value.", expected_value);
 	}
 	else /* SYSINFO_RET_FAIL == expected_result */
 	{
-		if (NULL == GET_MSG_RESULT(&result) || 0 != strcmp(expected_value, *GET_MSG_RESULT(&result)))
+		if (NULL == ZBX_GET_MSG_RESULT(&result) || 0 != strcmp(expected_value, *ZBX_GET_MSG_RESULT(&result)))
 		{
 				fail_msg("Got '%s' instead of '%s' as a value.",
-					(NULL != GET_MSG_RESULT(&result) ? *GET_MSG_RESULT(&result) : "NULL"),
+					(NULL != ZBX_GET_MSG_RESULT(&result) ? *ZBX_GET_MSG_RESULT(&result) : "NULL"),
 					expected_value);
 		}
 	}

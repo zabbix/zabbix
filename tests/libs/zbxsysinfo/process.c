@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 
 #include "module.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxalgo.h"

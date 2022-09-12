@@ -18,8 +18,9 @@
 **/
 
 #include "checks_telnet.h"
-
 #include "telnet_run.h"
+
+#include "zbxsysinfo.h"
 
 int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 {

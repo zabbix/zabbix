@@ -134,13 +134,27 @@ static int	DBpatch_6030002(void)
 
 static int	DBpatch_6030003(void)
 {
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6030004(void)
+{
+	const ZBX_FIELD	field = {"new_window", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6030005(void)
+{
 	const ZBX_FIELD	old_field = {"host_metadata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 	const ZBX_FIELD	field = {"host_metadata", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("autoreg_host", &field, &old_field);
 }
 
-static int	DBpatch_6030004(void)
+static int	DBpatch_6030006(void)
 {
 	const ZBX_FIELD	old_field = {"host_metadata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 	const ZBX_FIELD	field = {"host_metadata", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
@@ -159,5 +173,7 @@ DBPATCH_ADD(6030001, 0, 1)
 DBPATCH_ADD(6030002, 0, 1)
 DBPATCH_ADD(6030003, 0, 1)
 DBPATCH_ADD(6030004, 0, 1)
+DBPATCH_ADD(6030005, 0, 1)
+DBPATCH_ADD(6030006, 0, 1)
 
 DBPATCH_END()
