@@ -18,16 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
  * @backup profiles
  *
  * @onBefore prepareDashboardData
  */
-class testDashboardFavoriteMapsWidget extends CLegacyWebTest {
+class testDashboardFavoriteMapsWidget extends CWebTest {
 
 	protected static $dashboardid;
 	public $mapTest = 'Test map 1';
@@ -40,13 +39,12 @@ class testDashboardFavoriteMapsWidget extends CLegacyWebTest {
 				'private' => 1,
 				'pages' => [
 					[
-						'name' => 'Page 1',
 						'widgets' => [
 							[
 								'type' => 'favmaps',
-								'x' => 13,
+								'x' => 0,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							]
 						]
@@ -57,37 +55,44 @@ class testDashboardFavoriteMapsWidget extends CLegacyWebTest {
 		self::$dashboardid = $response['dashboardids'][0];
 	}
 
-	public function testDashboardFavoriteMapsWidget_AddFavouriteMap() {
-		$this->zbxTestLogin('sysmaps.php');
-		$this->zbxTestCheckHeader('Maps');
-		$this->zbxTestClickLinkTextWait($this->mapTest);
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favorites');
-		$this->zbxTestClickWait('addrm_fav');
+	public function testDashboardFavoriteMapsWidget_AddFavoriteMap() {
+		$this->page->login()->open('sysmaps.php')->waitUntilReady();
+		$this->page->assertHeader('Maps');
+		$this->query('link', $this->mapTest)->waitUntilClickable()->one()->click();
+
+		$this->page->waitUntilReady();
+		$button = $this->query('xpath://button[@id="addrm_fav"]')->waitUntilVisible()->one();
+		$this->assertEquals('Add to favorites', $button->getAttribute('title'));
+		$button->waitUntilClickable()->click();
 		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favorites');
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$this->zbxTestAssertElementText('//div[@class="dashboard-grid-widget-container"]/div[2]//a[@href="zabbix.php?action=map.view&sysmapid='.$this->mapTestId.'"]', $this->mapTest);
-		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.zbx_dbstr('web.favorite.sysmapids').' AND value_id='.$this->mapTestId));
+		$widget = CDashboardElement::find()->one()->getWidget('Favorite maps')->waitUntilReady()->getContent();
+		$this->assertEquals('zabbix.php?action=map.view&sysmapid='.$this->mapTestId,
+				$widget->query('link', $this->mapTest)->one()->getAttribute('href')
+		);
+		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
+				zbx_dbstr('web.favorite.sysmapids').' AND value_id='.$this->mapTestId)
+		);
 	}
 
-	public function testDashboardFavoriteMapsWidget_RemoveFavouriteMaps() {
+	public function testDashboardFavoriteMapsWidget_RemoveFavoriteMaps() {
+		$favourite_maps = CDBHelper::getAll('SELECT value_id FROM profiles WHERE idx='.zbx_dbstr('web.favorite.sysmapids'));
+
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$widget_content = CDashboardElement::find()->one()->getWidget('Favorite maps')->getContent();
-		$favourite_maps = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.
-				zbx_dbstr('web.favorite.sysmapids')));
+		$widget = CDashboardElement::find()->one()->getWidget('Favorite maps')->getContent();
 
 		foreach ($favourite_maps as $favourite_map) {
-			$remove_item = $this->query('xpath://button[@data-sysmapid='.zbx_dbstr($favourite_map['value_id']).
-					' and contains(@onclick, "rm4favorites")]')->waituntilClickable()->one();
+			// Added variable due to External Hook.
+			$xpath = './/button[@data-sysmapid='.CXPathHelper::escapeQuotes($favourite_map['value_id']);
+			$remove_item = $widget->query('xpath', $xpath.' and contains(@onclick, "rm4favorites")]')->waituntilClickable()->one();
 			$remove_item->click();
 			$remove_item->waitUntilNotVisible();
 		}
 
-		$this->assertTrue($widget_content->query('xpath://table//td[text()="No maps added."]')->waitUntilVisible()
-				->one()->isPresent());
+		$this->assertTrue($widget->query('xpath:.//td[text()="No maps added."]')->waitUntilVisible()->one()->isPresent());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
-				zbx_dbstr('web.favorite.sysmapids')));
+				zbx_dbstr('web.favorite.sysmapids'))
+		);
 	}
 }

@@ -18,16 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
  * @backup profiles
  *
  * @onBefore prepareDashboardData
  */
-class testDashboardFavoriteGraphsWidget extends CLegacyWebTest {
+class testDashboardFavoriteGraphsWidget extends CWebTest {
 
 	protected static $dashboardid;
 	public $graphCpu = 'CPU utilization';
@@ -41,7 +40,6 @@ class testDashboardFavoriteGraphsWidget extends CLegacyWebTest {
 				'private' => 1,
 				'pages' => [
 					[
-						'name' => 'Page 1',
 						'widgets' => [
 							[
 								'type' => 'favgraphs',
@@ -58,73 +56,61 @@ class testDashboardFavoriteGraphsWidget extends CLegacyWebTest {
 		self::$dashboardid = $response['dashboardids'][0];
 	}
 
-	public function testDashboardFavoriteGraphsWidget_AddFavouriteGraphs() {
+	public function testDashboardFavoriteGraphsWidget_AddFavoriteGraphs() {
 		$cpu_itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid=10084 AND name='.zbx_dbstr($this->graphCpu));
 		$memory_itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid=10084 AND name='.zbx_dbstr($this->graphMemory));
 
-		$this->zbxTestLogin('zabbix.php?action=latest.view&filter_selected=0&filter_reset=1');
-		$this->zbxTestCheckHeader('Latest data');
-
+		$this->page->login()->open('zabbix.php?action=latest.view&filter_selected=0&filter_reset=1')->waitUntilReady();
+		$this->page->assertHeader('Latest data');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Hosts')->fill($this->hostName);
-		$filter->getField('Name')->fill($this->graphCpu);
-		$filter->submit();
-		$cpu_link = $this->query('link:Graph')->one();
-		$cpu_link->click();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
 
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favorites');
-		$this->zbxTestClickWait('addrm_fav');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//button[@id="addrm_fav" and @title="Remove from favorites"]'));
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favorites');
+		foreach ([$this->graphCpu, $this->graphMemory] as $graph) {
+			$filter->fill(['Hosts' => $this->hostName, 'Name' => $graph]);
+			$filter->submit();
+			$table->waitUntilReloaded();
+			$table->findRow('Host', $this->hostName)->query('link:Graph')->waitUntilClickable()->one()->click();
 
-		$this->page->open('zabbix.php?action=latest.view');
-		$filter->invalidate();
-		$filter->getField('Hosts')->fill($this->hostName);
-		$filter->getField('Name')->fill($this->graphMemory);
-		$filter->submit();
-		$memory_link = $this->query('link:Graph')->one();
-		$memory_link->click();
-
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favorites');
-		$this->zbxTestClickWait('addrm_fav');
-		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favorites');
+			// Add graph to favorite.
+			$this->page->waitUntilReady();
+			$button = $this->query('xpath://button[@id="addrm_fav"]')->waitUntilVisible()->one();
+			$this->assertEquals('Add to favorites', $button->getAttribute('title'));
+			$button->waitUntilClickable()->click();
+			$button->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
+			$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
+		}
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$url_xpath = '//div[@class="dashboard-grid"]/div[2]//a[@href=';
+		$widget = CDashboardElement::find()->one()->getWidget('Favorite graphs')->waitUntilReady()->getContent();
 
+		// Check favorite graphs in widget.
 		foreach ([$this->graphCpu => $cpu_itemid, $this->graphMemory => $memory_itemid] as $graph => $itemid) {
-			$graph_url = 'history.php?action=showgraph&itemids%5B0%5D='.$itemid;
-			$this->zbxTestAssertElementText($url_xpath.CXPathHelper::escapeQuotes($graph_url).']', 'ЗАББИКС Сервер: '.$graph);
-			$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='
-					.zbx_dbstr('web.favorite.graphids').' AND value_id='.$itemid)
+			$this->assertEquals('history.php?action=showgraph&itemids%5B0%5D='.$itemid,
+					$widget->query('link', $this->hostName.': '.$graph)->one()->getAttribute('href')
+			);
+			$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
+					zbx_dbstr('web.favorite.graphids').' AND value_id='.$itemid)
 			);
 		}
 	}
 
-	public function testDashboardFavoriteGraphsWidget_RemoveFavouriteGraphs() {
-		$exception = null;
+	public function testDashboardFavoriteGraphsWidget_RemoveFavoriteGraphs() {
+		$favourite_graphs = CDBHelper::getAll('SELECT value_id FROM profiles WHERE idx='.zbx_dbstr('web.favorite.graphids'));
 
-		try {
-			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-			$FavouriteGraphs = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.zbx_dbstr('web.favorite.graphids')));
-			foreach ($FavouriteGraphs as $FavouriteGraph) {
-				$remove_item = $this->query('xpath://button[@data-itemid='.zbx_dbstr($FavouriteGraph['value_id']).
-						' and contains(@onclick, "rm4favorites")]')->waituntilClickable()->one();
-				$remove_item->click();
-				$remove_item->waitUntilNotVisible();
-			}
-			$this->zbxTestAssertElementText('//div[@class="dashboard-grid-widget-container"]//tr[@class="nothing-to-show"]/td', 'No graphs added.');
-			$this->assertEquals(0, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.zbx_dbstr('web.favorite.graphids')));
-		}
-		catch (Exception $e) {
-			$exception = $e;
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$widget = CDashboardElement::find()->one()->getWidget('Favorite graphs')->waitUntilReady()->getContent();
+
+		foreach ($favourite_graphs as $graph) {
+			// Added variable due to External Hook.
+			$xpath = './/button[@data-itemid='.CXPathHelper::escapeQuotes($graph['value_id']);
+			$remove_item = $widget->query('xpath', $xpath.' and contains(@onclick, "rm4favorites")]')->waituntilClickable()->one();
+			$remove_item->click();
+			$remove_item->waitUntilNotVisible();
 		}
 
-		if ($exception !== null) {
-			throw $exception;
-		}
+		$this->assertEquals('No graphs added.', $widget->query('class:nothing-to-show')->one()->getText());
+		$this->assertEquals(0, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
+				zbx_dbstr('web.favorite.graphids'))
+		);
 	}
 }
