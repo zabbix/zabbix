@@ -26,7 +26,7 @@
 #include "zbxregexp.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxcrypto.h"
 #include "zbxexpr.h"
 #include "zbxnum.h"

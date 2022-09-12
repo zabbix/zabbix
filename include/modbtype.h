@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SYSINFO_COMMON_MODBTYPE_H
 #define ZABBIX_SYSINFO_COMMON_MODBTYPE_H
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 extern int	CONFIG_TIMEOUT;
 

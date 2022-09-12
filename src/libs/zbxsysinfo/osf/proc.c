@@ -17,12 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <sys/procfs.h>
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxstr.h"
+
+#include <sys/procfs.h>
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

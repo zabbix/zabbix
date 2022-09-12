@@ -22,7 +22,7 @@
 
 #include "zbxstr.h"
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxalgo.h"
 
 #define ZBX_MODULE_FUNC_INIT			"zbx_module_init"

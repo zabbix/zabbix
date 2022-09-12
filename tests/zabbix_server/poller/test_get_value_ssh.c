@@ -21,6 +21,8 @@
 
 #include "../../../src/zabbix_server/poller/checks_ssh.h"
 
+#include "zbxsysinfo.h"
+
 int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
