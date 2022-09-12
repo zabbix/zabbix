@@ -506,6 +506,11 @@ class CControllerAuthenticationUpdate extends CController {
 			);
 		}, $saml_data['provision_groups']);
 
+		if (!array_key_exists('provision_status', $saml_data)
+				|| $saml_data['provision_status'] != JIT_PROVISIONING_ENABLED) {
+			$saml_data = array_diff_key($saml_data, array_flip(self::PROVISION_ENABLED_FIELDS));
+		}
+
 		if ($db_saml) {
 			$result = API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid']] + $saml_data);
 		}

@@ -204,23 +204,17 @@ class CControllerAuthenticationEdit extends CController {
 			}
 
 			if ($saml_configuration) {
-				$data['saml_provision_status'] = $saml_configuration['provision_status'];
-				$data['saml_group_name'] = $saml_configuration['group_name'];
-				$data['saml_user_username'] = $saml_configuration['user_username'];
-				$data['saml_user_lastname'] = $saml_configuration['user_lastname'];
-				$data['saml_provision_groups'] = $this->extendProvisionGroups($saml_configuration['provision_groups']);
-				$data['saml_provision_media'] = $this->extendProvisionMedia($saml_configuration['provision_media']);
-
-				unset($saml_configuration['userdirectoryid'], $saml_configuration['group_name'],
-					$saml_configuration['user_username'], $saml_configuration['user_lastname'],
-					$saml_configuration['provision_groups'], $saml_configuration['provision_media'],
-					$saml_configuration['provision_status']
-				);
-
-				$data += $saml_configuration;
+				$saml_configuration = CArrayHelper::renameKeys($saml_configuration, [
+					'provision_status' => 'saml_provision_status',
+					'group_name' => 'saml_group_name',
+					'user_username' => 'saml_user_username',
+					'user_lastname' => 'saml_user_lastname',
+					'provision_groups' => 'saml_provision_groups',
+					'provision_media' => 'saml_provision_media'
+				]);
 			}
 			else {
-				$saml_settings = [
+				$saml_configuration = [
 					'idp_entityid' => '',
 					'sso_url' => '',
 					'slo_url' => '',
@@ -239,16 +233,20 @@ class CControllerAuthenticationEdit extends CController {
 					'saml_user_username' => '',
 					'saml_user_lastname' => '',
 					'scim_status' => '',
-					'scim_token' => ''
+					'scim_token' => '',
+					'saml_provision_groups' => [],
+					'saml_provision_media' => []
 				];
+			}
 
+			if (!$saml_configuration['saml_provision_groups']) {
 				$default_role = API::Role()->get([
 					'output' => ['roleid'],
 					'filter' => ['type' => USER_TYPE_ZABBIX_USER],
 					'limit' => 1
 				]);
 
-				$default_group = $default_role
+				$saml_configuration['saml_provision_groups'] = $default_role
 					? [[
 						'name' => _('Fallback group'),
 						'is_fallback' => GROUP_MAPPING_FALLBACK,
@@ -260,12 +258,11 @@ class CControllerAuthenticationEdit extends CController {
 						'roleid' => $default_role[0]['roleid']
 					]]
 					: [];
-
-				$saml_settings['saml_provision_groups'] = $this->extendProvisionGroups($default_group);
-				$saml_settings['saml_provision_media'] = [];
-
-				$data += $saml_settings;
 			}
+
+			$saml_configuration['saml_provision_groups'] = $this->extendProvisionGroups($saml_configuration['saml_provision_groups']);
+			$saml_configuration['saml_provision_media'] = $this->extendProvisionMedia($saml_configuration['saml_provision_media']);
+			$data += $saml_configuration;
 
 			$data['ldap_default_row_index'] = '';
 
