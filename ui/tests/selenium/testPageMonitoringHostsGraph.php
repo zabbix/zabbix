@@ -31,7 +31,21 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	public function prepareGraphsData() {
 		$hosts = CDataHelper::call('host.create', [
 			[
-				'host' => 'Host for monitoring graphs',
+				'host' => 'Host_for_monitoring_graphs_1',
+				'groups' => [
+					'groupid' => 4
+				],
+				'interfaces' => [
+					'type'=> 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => '10050'
+				]
+			],
+			[
+				'host' => 'Host_for_monitoring_graphs_2',
 				'groups' => [
 					'groupid' => 4
 				],
@@ -46,27 +60,52 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			]
 		]);
 		$this->assertArrayHasKey('hostids', $hosts);
-		$hostid = $hosts['hostids'][0];
+		$hostid = CDataHelper::getIds('host');
 
 		$items = CDataHelper::call('item.create', [
 			[
-				'name' => 'Item for graph 1',
+				'name' => 'Item_for_graph_1',
 				'key_' => 'trap_1',
-				'hostid' => $hostid,
+				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
 				'type' => 2,
-				'value_type' => 0
+				'value_type' => 0,
+				'tags' => [
+					[
+						'tag' => 'tag_name_1',
+						'value' => 'tag_value_1'
+					]
+				]
 			],
 			[
-				'name' => 'Item for graph 2',
+				'name' => 'Item_for_graph_2',
 				'key_' => 'trap_2',
-				'hostid' => $hostid,
+				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
 				'type' => 2,
-				'value_type' => 0
+				'value_type' => 0,
+				'tags' => [
+					[
+						'tag' => 'tag_name_2',
+						'value' => 'tag_value_2'
+					]
+				]
 			],
 			[
-				'name' => 'Item for graph 3',
+				'name' => 'Item_for_graph_3',
 				'key_' => 'trap_3',
-				'hostid' => $hostid,
+				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
+				'type' => 2,
+				'value_type' => 0,
+				'tags' => [
+					[
+						'tag' => 'tag_name_3',
+						'value' => 'tag_value_3'
+					]
+				]
+			],
+			[
+				'name' => 'Item_for_graph_4',
+				'key_' => 'trap_4',
+				'hostid' => $hostid['Host_for_monitoring_graphs_2'],
 				'type' => 2,
 				'value_type' => 0
 			]
@@ -76,41 +115,50 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		$graphs = CDataHelper::call('graph.create', [
 			[
-				'name' => 'Graph 1',
+				'name' => 'Graph_1',
 				'gitems' => [
 					[
-						'itemid' => $itemids['Item for graph 1'],
+						'itemid' => $itemids['Item_for_graph_1'],
 						'color' => '00AA00'
 					]
 				]
 			],
 			[
-				'name' => 'Graph 2',
+				'name' => 'Graph_2',
 				'gitems' => [
 					[
-						'itemid' => $itemids['Item for graph 2'],
+						'itemid' => $itemids['Item_for_graph_2'],
 						'color' => '00AA00'
 					],
 					[
-						'itemid' => $itemids['Item for graph 2'],
+						'itemid' => $itemids['Item_for_graph_2'],
 						'color' => '00AA00'
 					]
 				]
 			],
 			[
-				'name' => 'Graph 3',
+				'name' => 'Graph_3',
 				'gitems' => [
 					[
-						'itemid' => $itemids['Item for graph 2'],
+						'itemid' => $itemids['Item_for_graph_2'],
 						'color' => '00AA00'
 					],
 					[
-						'itemid' => $itemids['Item for graph 3'],
+						'itemid' => $itemids['Item_for_graph_3'],
 						'color' => '00AA00'
 					]
 
 				]
 			],
+			[
+				'name' => 'Graph_4',
+				'gitems' => [
+					[
+						'itemid' => $itemids['Item_for_graph_4'],
+						'color' => '00AA00'
+					]
+				]
+			]
 		]);
 		$this->assertArrayHasKey('graphids', $graphs);
 	}
@@ -182,127 +230,144 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
 	}
 
+	/**
+	 * Check tags filtering.
+	 */
+	public function testPageMonitoringHostsGraph_TagFilter() {
+		//		// Check that tags and information message are visible.
+//		$form->fill('Host for monitoring graphs')->submit();
+//		$this->page->waitUntilReady();
+	}
+
 	public static function getCheckFilterData() {
 		return [
-			// #0
+			// #0 One host with several items and graphs. Show all graphs.
 			[
 				[
 					'filter' => [
-						'Host' => 'Host for monitoring graphs',
-						'Search type' => 'Strict'
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Show' => 'All graphs'
 					],
-					'graphs_result' => 3,
-					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
+					'graphs_result' => 6
 				]
 			],
-			// #1
+			// #1 Show host graphs for host.
 			[
 				[
 					'filter' => [
-						'Host' => 'Host for monitoring graphs',
-						'Search type' => 'Pattern'
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Show' => 'Host graphs'
 					],
-					'graphs_result' => 3,
-					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
+					'graphs_result' => 3
 				]
 			],
-			// #2
+			// #2 Show simple graphs for host.
 			[
 				[
 					'filter' => [
-						'Host' => 'Host for monitoring graphs',
-						'Search type' => 'Pattern',
-						'Graphs' => 'Graph 2'
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Show' => 'Simple graphs'
 					],
-					'graphs_result' => 1,
-					'items_names' => ['Item for graph 2']
+					'graphs_result' => 3
 				]
 			],
-			// #3
+			// #3 Show all graphs for host with graph name.
 			[
 				[
 					'filter' => [
-						'Host' => 'Host for monitoring graphs',
-						'Search type' => 'Strict',
-						'Graphs' => 'Graph 2'
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Graph_2',
+						'Show' => 'All graphs'
 					],
-					'graphs_result' => 1,
-					'items_names' => ['Item for graph 2']
+					'graphs_result' => 3
 				]
 			],
-			// #4
+			// #4 Show host graphs for host with graph name.
 			[
 				[
 					'filter' => [
-						'Search type' => 'Strict',
-						'Graphs' => 'Graph 1'
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Graph_2',
+						'Show' => 'Host graphs'
 					],
-					'graphs_result' => 1,
-					'items_names' => ['Item for graph 1']
+					'graphs_result' => 3
 				]
 			],
-			// #5
+			// #5 Show simple graphs for host with graph name.
 			[
 				[
 					'filter' => [
-						'Search type' => 'Pattern',
-						'Graphs' => 'Graph 1'
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Graph_2',
+						'Show' => 'Host graphs'
+					],
+					'graphs_result' => 1
+				]
+			],
+			// #6 Show all graphs with not existing graph name .
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Nothing here',
+						'Show' => 'All graphs'
 					],
 					'graphs_result' => 0
 				]
 			],
-			// #6
+			// #7 Show host graphs with not existing graph name .
 			[
 				[
 					'filter' => [
-						'Search type' => 'Strict',
-						'Graphs' => ['Graph 1', 'Graph 3']
-					],
-					'graphs_result' => 2,
-					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
-				]
-			],
-			// #7
-			[
-				[
-					'filter' => [
-						'Search type' => 'Pattern',
-						'Graphs' => ['Graph 1', 'Graph 3']
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Nothing here',
+						'Show' => 'Host graphs'
 					],
 					'graphs_result' => 0
 				]
 			],
-			// #8
+			// #8 Show simple graphs with not existing graph name .
 			[
 				[
 					'filter' => [
-						'Search type' => 'Pattern',
-						'Graphs' => ['non_existing_graph', 'Graph 1']
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Nothing here',
+						'Show' => 'Simple graphs'
 					],
 					'graphs_result' => 0
 				]
 			],
-			// #9
+			// #9 Show all graphs with partial graph name .
 			[
 				[
 					'filter' => [
-						'Host' => 'Host for monitoring graphs',
-						'Search type' => 'Pattern',
-						'Graphs' => 'lonely_graph'
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'gr',
+						'Show' => 'All graphs'
 					],
 					'graphs_result' => 0
 				]
 			],
-			// #10
+			// #10 Show host graphs with partial graph name .
 			[
 				[
 					'filter' => [
-						'Host' => 'Host for monitoring graphs',
-						'Search type' => 'Pattern',
-						'Graphs' => ['non_existing_graph', 'Graph 1']
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'gr',
+						'Show' => 'Host graphs'
 					],
-					'graphs_result' => 1,
-					'items_names' => ['Item for graph 1']
+					'graphs_result' => 0
+				]
+			],
+			// #11 Show simple graphs with partial graph name .
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'gr',
+						'Show' => 'Simple graphs'
+					],
+					'graphs_result' => 0
 				]
 			]
 		];
@@ -326,34 +391,13 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		$form->fill($data['filter'])->submit();
 		$this->page->waitUntilReady();
 
-		if ($data['graphs_result'] === 0) {
-			foreach(['Graph', 'Values'] as $view) {
-				$this->query('id:view-as')->asDropdown()->one()->select($view);
-
-				if ($data['filter']['Graphs'] === 'lonely_graph') {
-					$this->assertEquals(['No data found.'], $this->query('class:list-table')->asTable()->one()->
-					getRows()->asText()
-					);
-				}
-				else {
-					$this->assertEquals('Specify host to see the graphs.',
-						$this->query("xpath://table[@class='list-table']//td")->one()->getText()
-					);
-				}
-			}
-		}
-		else {
+		// Check result amount.
+		if ($data['graphs_result'] !== 0) {
 			$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
 			$this->assertEquals($data['graphs_result'], $graphs_count);
-
-			// Checking from Values view.
-			$this->query('id:view-as')->asDropdown()->one()->select('Values');
-			$this->page->waitUntilReady();
-			$table = $this->query('class:list-table')->asTable()->one();
-			$this->assertEquals(['No data found.'], $table->getRows()->asText());
-			foreach ($data['items_names'] as $item) {
-				$this->assertTrue($table->query('xpath://tr/th[@title="'.$item.'"]')->exists());
-			}
+		}
+		else {
+			$this->assertEquals('No data found.', $this->query('class:nothing-to-show')->one()->getText());
 		}
 	}
 }
