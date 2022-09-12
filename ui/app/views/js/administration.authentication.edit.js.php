@@ -534,25 +534,27 @@
 			template.innerHTML = template_ldap_server_row.evaluate(ldap).trim();
 			const row = template.content.firstChild;
 
-			for (const [group_index, provision_group] of Object.entries(ldap.provision_groups)) {
-				provision_group.sortorder = +group_index + 1;
+			if ('provision_groups' in ldap) {
+				for (const [group_index, provision_group] of Object.entries(ldap.provision_groups)) {
+					provision_group.sortorder = +group_index + 1;
 
-				for (const [name, value] of Object.entries(provision_group)) {
-					if (name === 'user_groups') {
-						for (const usrgrp of value) {
+					for (const [name, value] of Object.entries(provision_group)) {
+						if (name === 'user_groups') {
+							for (const usrgrp of value) {
+								const input = document.createElement('input');
+								input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][user_groups][][usrgrpid]';
+								input.value = usrgrp.usrgrpid;
+								input.type = 'hidden';
+								row.appendChild(input);
+							}
+						}
+						else {
 							const input = document.createElement('input');
-							input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][user_groups][][usrgrpid]';
-							input.value = usrgrp.usrgrpid;
+							input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][' + name + ']';
+							input.value = value;
 							input.type = 'hidden';
 							row.appendChild(input);
 						}
-					}
-					else {
-						const input = document.createElement('input');
-						input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][' + name + ']';
-						input.value = value;
-						input.type = 'hidden';
-						row.appendChild(input);
 					}
 				}
 			}

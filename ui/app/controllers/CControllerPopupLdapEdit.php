@@ -49,9 +49,7 @@ class CControllerPopupLdapEdit extends CController {
 			'provision_media' =>				'array'
 		];
 
-		$ret = $this->validateInput($fields);
-		$ret &= $this->validateProvisionGroups();
-		$ret &= $this->validateProvisionMedia();
+		$ret = $this->validateInput($fields) && $this->validateProvisionGroups() && $this->validateProvisionMedia();
 
 		if (!$ret) {
 			$this->setResponse(
@@ -114,7 +112,8 @@ class CControllerPopupLdapEdit extends CController {
 
 		$data['advanced_configuration'] = $data['start_tls'] != ZBX_AUTH_START_TLS_OFF || $data['search_filter'] !== '';
 
-		if ($data['add_ldap_server'] == 1) {
+		if ($data['add_ldap_server'] == 1
+				|| $data['provision_status'] == JIT_PROVISIONING_DISABLED && !$data['provision_groups']) {
 			$default_role = API::Role()->get([
 				'output' => ['roleid'],
 				'filter' => ['type' => USER_TYPE_ZABBIX_USER],
@@ -132,7 +131,10 @@ class CControllerPopupLdapEdit extends CController {
 					'roleid' => $default_role[0]['roleid']
 				]]
 				: [];
+		}
 
+		if ($data['add_ldap_server'] == 1
+				|| $data['provision_status'] == JIT_PROVISIONING_DISABLED && !$data['provision_media']) {
 			$default_media = API::MediaType()->get([
 				'output' => ['mediatypeid'],
 				'filter' => [
