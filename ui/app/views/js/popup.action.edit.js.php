@@ -78,7 +78,7 @@ window.action_edit_popup = new class {
 
 			$('#conditionTable tr:last').before(this.row);
 				this._processTypeOfCalculation();
-			});
+		});
 	}
 
 	_openOperationPopup(eventsource, recovery_phase, actionid) {
@@ -89,10 +89,15 @@ window.action_edit_popup = new class {
 			actionid: actionid
 		};
 
-		return PopUp('popup.operations', parameters, {
-			dialogueid: 'condition',
+		const overlay = PopUp('popup.operations', parameters, {
+			dialogueid: 'operations',
 			dialogue_class: 'modal-popup-medium'
 		});
+
+		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
+			// todo : add function to create row in operation table
+		});
+
 	}
 
 	_createRow(row, input) {

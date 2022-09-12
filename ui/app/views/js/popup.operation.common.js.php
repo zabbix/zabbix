@@ -19,28 +19,63 @@
 
 window.operation_popup = new class {
 	init() {
-
-	}
-
-	submit(overlay) {
-		this.overlay = overlay;
+		this.overlay = overlays_stack.getById('operations');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+
+		this._loadViews();
+	}
+
+	_loadViews() {
+		$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
+		$('[id="operation-message-body"],[id="operation-message-label"]').hide();
+
+		$('#operation_opmessage_default_msg')
+			.change(function() {
+			if($('#operation_opmessage_default_msg')[0].checked) {
+				$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show();
+				$('[id="operation-message-body"],[id="operation-message-label"]').show();
+			}
+			else {
+				$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
+				$('[id="operation-message-body"],[id="operation-message-label"]').hide();
+			}
+			})
+
+		this.form.addEventListener('click', (e) => {
+
+		})
+	}
+
+	submit() {
+		this.validate();
+
 		const fields = getFormFields(this.form);
+		const url = new Curl('zabbix.php');
+		url.setArgument('action', 'popup.operations');
 
-		this.overlay.setLoading();
+		// todo: pass eventsource and recovery
+		url.setArgument('eventsource', 0);
+		url.setArgument('recovery', 0);
 
-		let curl = new Curl('zabbix.php', false);
-		curl.setArgument('action', 'action.edit');
-		// todo create action for this?
+		this._post(url.getUrl(), fields);
+	}
 
-		this._post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+	validate() {
+		// todo : pass actionid (0 if create new action???)
+		const url = new Curl('zabbix.php');
+		url.setArgument('action', 'action.operation.validate');
+		url.setArgument('actionid', 0);
 
-			const $action_edit = overlays_stack.getById('action-edit').$dialogue[0];
-			$action_edit.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+		// todo: rewrite this:
+		return $.ajax({
+			url: url.getUrl(),
+			processData: false,
+			contentType: false,
+			data: this.form,
+			dataType: 'json',
+			method: 'POST'
 		});
-
 	}
 
 	_post(url, data, success_callback) {
@@ -55,7 +90,9 @@ window.operation_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('operation.submit', {detail: response}));
 			})
 			.then(success_callback)
 			.catch((exception) => {
@@ -85,71 +122,71 @@ window.operation_popup = new class {
 }
 
 
-function submitOperationPopup(response) {
-	var form_param = response.form.param,
-		input_name = response.form.input_name,
-		inputs = response.inputs;
+// function submitOperationPopup(response) {
+//	var form_param = response.form.param,
+//		input_name = response.form.input_name,
+//		inputs = response.inputs;
 
-	var input_keys = {
-		opmessage_grp: 'usrgrpid',
-		opmessage_usr: 'userid',
-		opcommand_grp: 'groupid',
-		opcommand_hst: 'hostid',
-		opgroup: 'groupid',
-		optemplate: 'templateid'
-	};
+//	var input_keys = {
+//		opmessage_grp: 'usrgrpid',
+//		opmessage_usr: 'userid',
+//		opcommand_grp: 'groupid',
+//		opcommand_hst: 'hostid',
+//		opgroup: 'groupid',
+//		optemplate: 'templateid'
+//	};
 
-	for (var i in inputs) {
-		if (inputs.hasOwnProperty(i) && inputs[i] !== null) {
-			if (i === 'opmessage' || i === 'opcommand' || i === 'opinventory') {
-				for (var j in inputs[i]) {
-					if (inputs[i].hasOwnProperty(j)) {
-						create_var('action.edit', input_name + '[' + i + ']' + '[' + j + ']', inputs[i][j], false);
-					}
-				}
-			}
-			else if (i === 'opconditions') {
-				for (var j in inputs[i]) {
-					if (inputs[i].hasOwnProperty(j)) {
-						create_var(
-							'action.edit',
-							input_name + '[' + i + ']' + '[' + j + '][conditiontype]',
-							inputs[i][j]['conditiontype'],
-							false
-						);
-						create_var(
-							'action.edit',
-							input_name + '[' + i + ']' + '[' + j + '][operator]',
-							inputs[i][j]['operator'],
-							false
-						);
-						create_var(
-							'action.edit',
-							input_name + '[' + i + ']' + '[' + j + '][value]',
-							inputs[i][j]['value'],
-							false
-						);
-					}
-				}
-			}
-			else if (['opmessage_grp', 'opmessage_usr', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'optemplate']
-					.indexOf(i) !== -1) {
-				for (var j in inputs[i]) {
-					if (inputs[i].hasOwnProperty(j)) {
-						create_var(
-							'action.edit',
-							input_name + '[' + i + ']' + '[' + j + ']' + '[' + input_keys[i] + ']',
-							inputs[i][j][input_keys[i]],
-							false
-						);
-					}
-				}
-			}
-			else {
-				create_var('action.edit', input_name + '[' + i + ']', inputs[i], false);
-			}
-		}
-	}
+//	for (var i in inputs) {
+//		if (inputs.hasOwnProperty(i) && inputs[i] !== null) {
+//			if (i === 'opmessage' || i === 'opcommand' || i === 'opinventory') {
+//				for (var j in inputs[i]) {
+//					if (inputs[i].hasOwnProperty(j)) {
+//						create_var('action.edit', input_name + '[' + i + ']' + '[' + j + ']', inputs[i][j], false);
+//					}
+//				}
+//			}
+//			else if (i === 'opconditions') {
+//				for (var j in inputs[i]) {
+//					if (inputs[i].hasOwnProperty(j)) {
+//						create_var(
+//							'action.edit',
+//							input_name + '[' + i + ']' + '[' + j + '][conditiontype]',
+//							inputs[i][j]['conditiontype'],
+//							false
+//						);
+//						create_var(
+//							'action.edit',
+//							input_name + '[' + i + ']' + '[' + j + '][operator]',
+//							inputs[i][j]['operator'],
+//							false
+//						);
+//						create_var(
+//							'action.edit',
+//							input_name + '[' + i + ']' + '[' + j + '][value]',
+//							inputs[i][j]['value'],
+//							false
+//						);
+//					}
+//				}
+//			}
+//			else if (['opmessage_grp', 'opmessage_usr', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'optemplate']
+//					.indexOf(i) !== -1) {
+//				for (var j in inputs[i]) {
+//					if (inputs[i].hasOwnProperty(j)) {
+//						create_var(
+//							'action.edit',
+//							input_name + '[' + i + ']' + '[' + j + ']' + '[' + input_keys[i] + ']',
+//							inputs[i][j][input_keys[i]],
+//							false
+//						);
+//					}
+//				}
+//			}
+//			else {
+//				create_var('action.edit', input_name + '[' + i + ']', inputs[i], false);
+//			}
+//		}
+//	}
 
-	submitFormWithParam('action.edit', form_param, '1');
-}
+//	submitFormWithParam('action.edit', form_param, '1');
+//}
