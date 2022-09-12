@@ -5,6 +5,7 @@ New features:
 ...G...... [ZBXNEXT-6666] added listen socket security fix for Agent 2 on Windows (ssimonenko)
 
 Bug fixes:
+.......P.. [ZBX-21624] fixed "Something impossible" error and Vault macro not working on passive Zabbix proxy (vso)
 ........S. [ZBX-19783] added sourceip handling for scheduled reports (dgoloscapov)
 .......PS. [ZBX-21517] fixed invalid update interval handling in network discovery and web scenario scheduling (wiper)
 ........S. [ZBX-21558] fixed possible crash in value cache when a new item is being added in low memory situation (wiper)
