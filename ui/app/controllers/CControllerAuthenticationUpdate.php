@@ -46,7 +46,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_servers' =>					'array',
 			'ldap_default_row_index' =>			'int32',
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_removed_userdirectoryids' =>	'array',
+			'ldap_removed_userdirectoryids' =>	'array_id',
 			'ldap_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
@@ -249,61 +249,70 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$saml_auth_valid = $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED
-			? $this->processSamlConfiguration()
-			: true;
+		$result = false;
 
-		$ldap_auth_valid = true;
-		$ldap_servers = $this->getInput('ldap_servers', []);
+		try {
+			DBstart();
 
-		$ldap_userdirectoryid = 0;
-		if ($ldap_servers) {
-			$ldap_userdirectoryids = $this->processLdapServers($ldap_servers);
-			$ldap_default_row_index = $this->getInput('ldap_default_row_index', 0);
+			$result = $this->hasInput('ldap_removed_userdirectoryids')
+				? (bool) API::UserDirectory()->delete($this->getInput('ldap_removed_userdirectoryids'))
+				: true;
 
-			if (!$ldap_userdirectoryids) {
-				$ldap_auth_valid = false;
+			if ($result) {
+				$result = $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED
+					? $this->processSamlConfiguration()
+					: true;
 			}
-			elseif (!array_key_exists($ldap_default_row_index, $ldap_userdirectoryids)) {
-				CMessageHelper::setErrorTitle(_('Failed to select default LDAP server.'));
-				$ldap_auth_valid = false;
+
+			$ldap_userdirectoryid = 0;
+			if ($result) {
+				$ldap_servers = $this->getInput('ldap_servers', []);
+
+				if ($ldap_servers) {
+					$ldap_userdirectoryids = $this->processLdapServers($ldap_servers);
+					$ldap_default_row_index = $this->getInput('ldap_default_row_index', 0);
+
+					if (!$ldap_userdirectoryids) {
+						$result = false;
+					}
+					elseif (!array_key_exists($ldap_default_row_index, $ldap_userdirectoryids)) {
+						CMessageHelper::setErrorTitle(_('Failed to select default LDAP server.'));
+						$result = false;
+					}
+					else {
+						$ldap_userdirectoryid = $ldap_userdirectoryids[$ldap_default_row_index];
+					}
+				}
 			}
-			else {
-				$ldap_userdirectoryid = $ldap_userdirectoryids[$ldap_default_row_index];
+
+			if ($result) {
+				$result = $this->processGeneralAuthenticationSettings($ldap_userdirectoryid);
 			}
+
+			if (!$result) {
+				throw new Exception();
+			}
+
+			$result = DBend(true);
+		}
+		catch (Exception $e) {
+			DBend(false);
 		}
 
-		if (!$saml_auth_valid || !$ldap_auth_valid) {
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
+		}
+		else {
 			if (CMessageHelper::getTitle() === null) {
 				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
 			}
 			$this->response->setFormData($this->getInputAll());
-			$this->setResponse($this->response);
-
-			return;
 		}
 
-		$auth_params = [
-			CAuthenticationHelper::AUTHENTICATION_TYPE,
-			CAuthenticationHelper::HTTP_AUTH_ENABLED,
-			CAuthenticationHelper::HTTP_LOGIN_FORM,
-			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
-			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
-			CAuthenticationHelper::LDAP_AUTH_ENABLED,
-			CAuthenticationHelper::LDAP_USERDIRECTORYID,
-			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
-			CAuthenticationHelper::LDAP_JIT_STATUS,
-			CAuthenticationHelper::SAML_AUTH_ENABLED,
-			CAuthenticationHelper::SAML_JIT_STATUS,
-			CAuthenticationHelper::SAML_CASE_SENSITIVE,
-			CAuthenticationHelper::PASSWD_MIN_LENGTH,
-			CAuthenticationHelper::PASSWD_CHECK_RULES
-		];
-		$auth = [];
-		foreach ($auth_params as $param) {
-			$auth[$param] = CAuthenticationHelper::get($param);
-		}
+		$this->setResponse($this->response);
+	}
 
+	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid): bool {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
@@ -331,6 +340,28 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 		}
 
+		$auth_params = [
+			CAuthenticationHelper::AUTHENTICATION_TYPE,
+			CAuthenticationHelper::HTTP_AUTH_ENABLED,
+			CAuthenticationHelper::HTTP_LOGIN_FORM,
+			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
+			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
+			CAuthenticationHelper::LDAP_AUTH_ENABLED,
+			CAuthenticationHelper::LDAP_USERDIRECTORYID,
+			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
+			CAuthenticationHelper::LDAP_JIT_STATUS,
+			CAuthenticationHelper::SAML_AUTH_ENABLED,
+			CAuthenticationHelper::SAML_JIT_STATUS,
+			CAuthenticationHelper::SAML_CASE_SENSITIVE,
+			CAuthenticationHelper::PASSWD_MIN_LENGTH,
+			CAuthenticationHelper::PASSWD_CHECK_RULES
+		];
+
+		$auth = [];
+		foreach ($auth_params as $param) {
+			$auth[$param] = CAuthenticationHelper::get($param);
+		}
+
 		$data = $fields + $auth;
 		$this->getInputs($data, array_keys($fields));
 
@@ -345,30 +376,14 @@ class CControllerAuthenticationUpdate extends CController {
 		$result = true;
 
 		if ($data) {
-			$result = API::Authentication()->update($data);
+			$result = (bool) API::Authentication()->update($data);
 
 			if ($result && array_key_exists('authentication_type', $data)) {
 				$this->invalidateSessions();
 			}
 		}
 
-		if ($result) {
-			$del_userdirectoryids = $this->getInput('ldap_removed_userdirectoryids', []);
-
-			if ($del_userdirectoryids) {
-				$result = API::UserDirectory()->delete($del_userdirectoryids);
-			}
-		}
-
-		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
-		}
-		else {
-			$this->response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update authentication'));
-		}
-
-		$this->setResponse($this->response);
+		return $result;
 	}
 
 	/**

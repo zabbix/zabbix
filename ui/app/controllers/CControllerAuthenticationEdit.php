@@ -42,7 +42,7 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_servers' =>					'array',
 			'ldap_default_row_index' =>			'int32',
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_removed_userdirectoryids' =>	'array',
+			'ldap_removed_userdirectoryids' =>	'array_id',
 			'provisioning_period' =>			'db config.jit_provision_interval',
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
