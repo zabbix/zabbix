@@ -654,13 +654,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		}
 	}
 
-	if (NULL != CONFIG_HOST_METADATA && HOST_METADATA_LEN < zbx_strlen_utf8(CONFIG_HOST_METADATA))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostMetadata\" configuration parameter cannot be longer than"
-				" %d characters", HOST_METADATA_LEN);
-		err = 1;
-	}
-
 	if (NULL != CONFIG_HOST_INTERFACE && HOST_INTERFACE_LEN < zbx_strlen_utf8(CONFIG_HOST_INTERFACE))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer"
